@@ -21,4 +21,4 @@ speed_light = constants('SPEED_OF_LIGHT');
 a = 2 * planck / speed_light^2;
 b = planck / boltzmann;
   
-BT =  a * f^3 / ( exp( b*f/ T ) - 1 );
+BT =  a * f.^3 ./ ( exp( b*f./T ) - 1 );

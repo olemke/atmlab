@@ -1,3 +1,16 @@
+2003-10-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-56
+
+	* physics/planck.m: Matrixified (referring not to the movie) the
+	function. Frequency and temperature can now be matrices. If both
+	are matrices, they must have the same size. 
+
+	Try to implement this feature for every function.
+
+	* physics/planck_wlength.m: Created this complementary function,
+	taking wavelength as input instead of frequency.
+
 2003-10-24  Mattias Ekström  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-1-55
