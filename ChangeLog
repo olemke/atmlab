@@ -1,3 +1,12 @@
+2004-03-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-69
+
+	* sensors/ssmi_read_1tbfile.m: Created this function.
+
+	* handy/set_defaults.m: Input arguments given as [] where not set to
+	default values. Better cleaning up of _D EFAULT variables.
+
 2004-03-08  Oliver Lemke  <olemke@linux.net>
 
 	* atmlab-0-1-68
@@ -33,6 +42,7 @@
 
 	* xml/xmlWriteHeader.m: Minor fix in docs.
 
+>>>>>>> 1.87
 2004-02-20  Oliver Lemke  <olemke@linux.net>
 
 	* atmlab-0-1-67
@@ -43,7 +53,8 @@
 
 	* atmlab-0-1-66
 
-	* atmlab.spec: Added to ease building of rpm package for smiles cluster.
+	* atmlab.spec: Added to ease building of rpm package for smiles
+	cluster.
 
 2004-02-13  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 

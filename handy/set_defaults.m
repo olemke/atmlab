@@ -55,10 +55,11 @@ for i93628462 = 1 : length(VNS93628462)
   if length( VNF93628462 ) > 8  &  ...
      strcmp( VNF93628462(length(VNF93628462)+(-7:0)), '_DEFAULT' )
     VN93628462 = VNF93628462( 1 : (length(VNF93628462)-8) );
-    if ~exist( eval(['''',VN93628462,'''']), 'var' ) | isempty(VN93628462)
+    if ~exist( eval(['''',VN93628462,'''']), 'var' ) | ...
+                                                   isempty( eval(VN93628462) )
       eval([ VN93628462, '=', VNF93628462 , ';' ])
-      eval([ 'clear ', VNF93628462 ])
     end
+    eval([ 'clear ', VNF93628462 ])
   end
 end
 
