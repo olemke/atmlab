@@ -1,3 +1,13 @@
+2004-09-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-12
+
+	* handy/qtool.m: Moved this function from files/, to get all
+	q-functions in same folder.
+
+	* forwardmodel/gridselect1D.m: Created this function. A first of a set
+	of general functions for grid selection. 
+
 2004-09-17  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-2-11
