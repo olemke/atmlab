@@ -1,6 +1,7 @@
 % ISSCALAR   True for scalar variables.
 %
 %    Determines if a variable is a scalar, that is, a numeric of size 1x1.
+%    Empty variables are classified as non-scalars.
 %
 % FORMAT   bool = isscalar(a)
 %        

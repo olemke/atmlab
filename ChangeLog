@@ -1,3 +1,15 @@
+2002-12-12  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-0-6
+
+	* math/isvector.m: Created this function. 
+
+	* graphs/fit_to_paper.m: Wrote a header. Introduced vertical and
+	horisontal borders and landscape paper size.
+
+	* graphs/add_plot_row.m: Created this function. Check it out, it is
+	cool.
+
 2002-12-11  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-0-5
