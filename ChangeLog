@@ -1,5 +1,16 @@
 2002-12-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-0-2
+
+	* example_heading.m: Forgot to mention this file, and empty_heading,
+	in the last commit. 
+	I discovered that the AMI/Qpack type of headers in fact work rather
+	poor with the Matlab help tool. So I have made new template functions.
+	There are also some hints about optional variables. Please, read
+	and comment.
+
+2002-12-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-0-1
 
 	* atmlab_init.m: This file adds the Atmlab folders to the search path.

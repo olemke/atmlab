@@ -16,7 +16,7 @@ function s = qpack_version
 
 nr1 = 0;
 nr2 = 0;
-nr3 = 1;
+nr3 = 2;
 
 
 s = sprintf('atmlab-%d.%d.%d',nr1,nr2,nr3);
