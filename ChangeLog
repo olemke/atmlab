@@ -1,3 +1,14 @@
+2002-12-18  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-1-5
+
+	* xml/xmlWriteSpeciesTag.m: Added.
+
+	* xml/xmlReadSpeciesTag.m: Make it work.
+
+	* xml/xmlReadAttributes.m, xml/xmlReadTag.m: Parsing of tags with no
+	attributes was completely broken.
+
 2002-12-17  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-4
