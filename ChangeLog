@@ -1,3 +1,22 @@
+2002-12-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-0-1
+
+	* atmlab_init.m: This file adds the Atmlab folders to the search path.
+	Call this function from your startup.m file if you want to use Atmlab.
+	All folders that are added to Atmlab must be included in this function.
+
+	* atmlab_version.m: The version number shall be transfered to this
+	function before each commit. This function prints the version number.
+
+	* INSTRUCTIONS: Instructions for future Atmlab authors. Please, read 
+	and comment. 
+	Oliver: I was not sure what to write about what you have to put in 
+	Makefile.am. Can you add this?
+
+	* artsfuns/Contents.m: Started on this folder, mainly as an example 
+	(but so far a bad example).
+
 2002-12-05  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-0-0
