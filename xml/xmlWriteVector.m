@@ -24,7 +24,7 @@ nelem = length (data);
 xmlWriteTag (fid, 'Vector', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
-fprintf (fid, '%f\n', data);
+fprintf (fid, '%e\n', data);
 
 xmlWriteCloseTag (fid, 'Vector');
 

@@ -31,9 +31,9 @@ xmlWriteTag (fid, 'Tensor3', attrlist);
 
 data = permute (data, [3 2 1]);
 
-form='%f';
+form='%e';
 for i = 1:(nc-1)
-  form = sprintf ('%s %%f', form);
+  form = sprintf ('%s %%e', form);
 end
 form = sprintf ('%s\n', form);
 

@@ -30,9 +30,9 @@ xmlWriteTag (fid, 'Matrix', attrlist);
 data = reshape (data, [nr nc]);
 data = data';
 
-form='%f';
+form='%e';
 for i = 1:(nc-1)
-  form = sprintf ('%s %%f', form);
+  form = sprintf ('%s %%e', form);
 end
 form = sprintf ('%s\n', form);
 

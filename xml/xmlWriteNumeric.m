@@ -14,7 +14,7 @@ function xmlWriteNumeric(fid, data)
 
 xmlWriteTag (fid, 'Numeric', []);
 
-fprintf (fid, "%f\n", data);
+fprintf (fid, "%e\n", data);
 
 xmlWriteCloseTag (fid, 'Numeric');
 
