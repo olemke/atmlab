@@ -14,7 +14,7 @@ function xmlWriteIndex(fid, data)
 
 xmlWriteTag (fid, 'Index', []);
 
-fprintf (fid, "%d\n", data);
+fprintf (fid, '%d\n', data);
 
 xmlWriteCloseTag (fid, 'Index');
 
