@@ -1,8 +1,7 @@
-% A template for function headers.
+% FUNCNAME   A template for function headers.
 %
-%    The line above give a very short summary of the function. The line 
-%    above gives a very short summary of the function. Write the line 
-%    carefully as it is used by Matlab for special purposes. For example, 
+%    The line above gives a very short summary of the function. Write the 
+%    line carefully as it is used by Matlab for special purposes. For example, 
 %    the default for the *lookfor* function is to only look at the first 
 %    comment line.
 %
@@ -16,8 +15,10 @@
 %    functions are here indicated as * * (instead of using capital letters).
 %    For example, "input argument *b* must be a string, which as passed on
 %    to the function *some_fun*". This scheme is also used for the ARTS
-%    forward model. In addition, the function declaration is put after
-%    the header part (instead of at the top).
+%    forward model. An exception is the first line of the header where the
+%    Matlab style is used. Another difference to the Matlab style is that
+%    the function declaration is put after the header part (instead of at 
+%    the top).
 %
 %    The function is first described by giving the format. Optional input
 %    arguments are given inside square brackets ([]). The output and input

@@ -21,5 +21,7 @@ toppath = fileparts( which( 'atmlab_init' ) );
 %
 % If you create a new sub-folder, it should be added here.
 %
+addpath( fullfile( toppath, 'plots' ) ); 
+addpath( fullfile( toppath, 'math' ) ); 
 addpath( fullfile( toppath, 'artsfuns' ) ); 
 addpath( toppath );
