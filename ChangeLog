@@ -1,3 +1,43 @@
+2004-10-08  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-26
+
+	* mie/:
+
+	Update to version 3 provided by Christian Mätzler
+	<christian.matzler@iap.unibe.ch>
+
+	* mie/{Besselplot4.m, Mie_1.m, Mie2_ab.m, Mie2_abs.m, Mie2_cd.m,
+	Mie2_esquare.m, Mie_2.m, Mie2.m, Mie2_S12.m, Mie2_tetascan.m,
+	Mie2_xscan.m, Mieab_1.m, Mieab_2.m, Mie_abcd.m, Mie_ab.m, Mie_abs.m,
+	Mie_cd.m, Miecoated_ab1.m, Miecoated_ab2.m, Miecoated_ab3.m,
+	Miecoated.m, Miecoated_prscan.m, Miecoated_rain3.m, Miecoated_rain4.m,
+	Miecoated_rain5.m, Miecoated_rain6.m, Miecoated_rain7.m,
+	Miecoated_S12.m, Miecoated_tetascan.m, Miecoated_wrscan.m,
+	Miecoated_wscan.m, Mie_esquare.m, Mie.m, Mie_pt.m, Mie_rain1c.m,
+	Mie_rain1d.m, Mie_rain1.m, Mie_rain1r.m, Mie_rain2.m, Mie_rain3.m,
+	Mie_rain4.m, Mie_rain5.m, Mie_S12.m, Mie_tetascan.m, Mie_xscan.m}:
+
+	Removed.
+
+	* mie/{besselplot4.m, cloud_phasefunction.m, cloud_phasefunplot.m,
+	cloudphasefunbeta0.m, e3_xscan.m, mie.m, mie2.m, mie2_ab.m,
+	mie2_abs.m, mie2_cd.m, mie2_esquare.m, mie2_tetascan.m, mie2_xscan.m,
+	mie_1.m, mie_2.m, mie_S12.m, mie_S12nopeak.m, mie_ab.m, mie_abcd.m,
+	mie_abs.m, mie_beamefficiency.m, mie_beamefficiencyold.m, mie_cd.m,
+	mie_esquare.m, mie_esquare2.m, mie_esquare3.m, mie_nmax.m,
+	mie_phasefunasy.m, mie_phasefunction.m, mie_phasefunctions.m,
+	mie_phasefunplot.m, mie_pt.m, mie_teta.m, mie_tetado.m,
+	mie_tetascan.m, mie_tetascanall.m, mie_tetascanallold.m, mie_xscan.m,
+	mie_xscansmooth.m, mieab_1.m, mieab_2.m, miecoated.m, miecoated_S12.m,
+	miecoated_ab1.m, miecoated_ab2.m, miecoated_ab3.m, miecoated_prscan.m,
+	miecoated_rain3.m, miecoated_rain4.m, miecoated_rain5.m,
+	miecoated_rain6.m, miecoated_rain7.m, miecoated_tetascan.m,
+	miecoated_wrscan.m, miecoated_wscan.m, mierayleighxscan1.m,
+	mierayleighxscan2.m, phasefunav_phi.m, phasefunbeta0.m, phasefungi.m}:
+
+	Added.
+
 2004-10-07  Mattias Ekström  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-25
