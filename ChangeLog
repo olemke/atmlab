@@ -1,3 +1,16 @@
+2004-10-22  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-28
+
+	* physics/eps_water_liebe93.m: Created this function, to compare
+	the different expressions floating around. They basically agree.
+	There will be an email.
+
+	* physics/eps_ice_liebe93.m: Created this function.
+
+	* physics/fresnel.m: Included comment about that mu for bot media
+	must be 1 to use the function.
+
 2004-10-08  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-27
