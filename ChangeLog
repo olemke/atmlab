@@ -1,3 +1,16 @@
+2002-12-11  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-0-5
+
+	* handy/min_nargin.m: Created this folder and this function. 
+
+	* graphs/fit_to_paper.m: Created this function to set the figure size
+	to match the paper size. Not ready!
+
+	* atmplots/atmplot_timeseries.m: Renamed atmplot_scanseries.m to this 
+	name. The function is now working. Maybe there will be some future
+	modifications.
+
 2002-12-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-0-4
