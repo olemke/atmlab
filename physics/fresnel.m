@@ -7,6 +7,9 @@
 %
 %       r = abs(R)^2
 %    
+%    The expressions assume that relative magnetic permeability is 1
+%    for both involved media.
+%
 %    The refractive index can be complex. The refractive index and 
 %    the dielectric constant, epsilon, are releated as
 %
