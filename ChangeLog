@@ -1,3 +1,13 @@
+2003-04-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-45
+
+	* graphs/ypatch.m: Created this function. Main purpose is to plot 
+	retrieved vertical profiles with the confidence interval (e.g. +-1si)
+	as a shaded area. See the header for an example.
+
+	* graphs/xpatch.m: As complementary function to YPATCH.
+
 2003-04-10  Thomas Kuhn  <tkuhn@uni-bremen.de>
 
 	* atmlab-0-1-44
