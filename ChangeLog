@@ -1,3 +1,17 @@
+2004-10-01  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-20
+
+	* Qarts changed to follow latest changes in ARTS. So, an older 
+	version of ARTS can not be used now. USe latest version.
+	
+	* arts/qarts2cfile.m: Modified to follow new agendas in ARTS and 
+	inclusion of PRE_RTE_WSMS.
+
+	* arts/qarts.m (I.PRE_RTE_VSMS): Added field PRE_RTE_WSMS.
+
+	* arts/qarts_demo.m: Updated to follow changes above. 
+
 2004-09-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-19

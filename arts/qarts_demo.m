@@ -51,12 +51,12 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 %= RTE 
 %
 Q.Z_SURFACE      = 500;
-Q.SURFACE_AGENDA = ...
-   {'Ignore(rte_los){}', 'Ignore(r_geoid){}', 'Ignore(z_surface){}', ...
-    'surfaceTreatAsBlackbody{}' };
+Q.IY_SURFACE_AGENDA = ...
+   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
+     'surfaceFlat{"water-liebe93"}', 'surfaceCalc{}' };
 %
-Q.I_SPACE_AGENDA = ...
-   { 'Ignore(rte_pos){}', 'Ignore(rte_los){}', 'MatrixCBR(i_space,f_grid){}' };
+Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
+Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{5e3}' };
 Q.Y_UNIT            = 'RJ';

@@ -176,14 +176,15 @@ case 'init_rte'
     T{1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, tmpdir );
   end
   if ~isnan( Q.Z_SURFACE )  &  isscalar( Q.Z_SURFACE )
-    T{2} = sprintf('MatrixSetTakingSizeFromMatrix(z_surface,r_geoid){%.3f}',...
-                                                                 Q.Z_SURFACE );
+    T{2} = 'ncolsGet( r_geoid ){}';
+    T{3} = 'nrowsGet( r_geoid ){}';
+    T{4} = sprintf('MatrixSet(z_surface){%.3f}', Q.Z_SURFACE );
   else
     T{2} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, tmpdir );
   end
   %
-  T = add_agenda( T, 'surface_agenda', Q.SURFACE_AGENDA );
-  T = add_agenda( T, 'i_space_agenda', Q.I_SPACE_AGENDA );
+  T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
+  T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
   if iscellstr( Q.REFR_INDEX_AGENDA )
     T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
@@ -197,6 +198,8 @@ case 'init_rte'
          file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   T{length(T)+1} = 'sensorOff{}';
   T{length(T)+1} = 'cloudboxOff{}';
+  %
+  T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
 
 case 'calc_rte'
   %
@@ -269,4 +272,16 @@ function T = add_agenda( T, agenda, strarray )
     T{length(T)+1} = sprintf( '   %s', strarray{j} );
   end
   T{length(T)+1} = '}';
+return
+
+
+function T = add_wsms( T, field, strarray )
+  if ~iscellstr( strarray )
+    error( ...
+        sprintf('The field %s must be specified as cell array of strings.', ...
+                                                                     field ) );
+  end
+  for j = 1 : length(strarray)
+    T{length(T)+1} = sprintf( '%s', strarray{j} );
+  end
 return
