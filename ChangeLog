@@ -1,3 +1,31 @@
+2003-05-21  Christian Melsheimer  <melsheimer@uni-bremen.de>
+
+	* atmlab-0-1-49
+
+	* atmlab/atmlab_version.m: adjusted nr3 to 49
+
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: 
+	Corrected minor error in parameterization of complex 
+	permittivity for ice water:  must read:
+	b   = ( (0.233/(1-0.993/theta))^2 + 6.33/theta - 1.31 ) * 1e-5;
+	            ^ 
+	      not 0.223 
+        
+	Corrected error in parameterizatio of complex permittivity for
+	liquid water (Double-Debye model):
+	The parameters a and b actually have different denominators, 
+	tmp1 = v_ghz*v_ghz + g1*g1
+	and 
+	tmp2 = v_ghz*v_ghz + g2*g2,
+	respectively; not just tmp1 for both a and b (this error might 
+	have propagated from the WATS report) - note that g2=39.8*g1. 
+	To make sure, I checked
+	with the papers Liebe, Hufford, Cotton [1993] (i.e., MPM93),
+	Liebe, Hufford, Manabe [1991] ("A model for the complex
+        permittivity of water at frequencies below 1 THz"), and Liebe's
+	original MPM93 fortran code.
+	
+        	
 2003-04-22  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-1-48

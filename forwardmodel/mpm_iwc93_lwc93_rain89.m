@@ -46,7 +46,7 @@ elseif iwc > 10
   error('IWC > 10 g/m3 is not allowed.');
 elseif iwc > 0
   a   = ( theta - 0.1871 ) * exp( 17.0 - 22.1*theta );
-  b   = ( (0.223/(1-0.993/theta))^2 + 6.33/theta - 1.31 ) * 1e-5;
+  b   = ( (0.233/(1-0.993/theta))^2 + 6.33/theta - 1.31 ) * 1e-5;
   ep  = 3.15;
   epp = a/v_ghz + b*v_ghz;
   nc  = nc + 1.5 * iwc / 0.916 * ( 3*epp / ( (ep+2)^2 + epp^2 ) ); 
@@ -66,9 +66,10 @@ elseif lwc > 0
   e0  = 77.66 + 103.3*(theta-1);
   e1  = 0.0671 * e0;
   e2  = 3.52;
-  tmp = v_ghz*v_ghz + g1*g1;
-  a   = (e0-e1)/tmp;
-  b   = (e1-e2)/tmp;
+  tmp1 = v_ghz*v_ghz + g1*g1;
+  tmp2 = v_ghz*v_ghz + g2*g2;
+  a   = (e0-e1)/tmp1;
+  b   = (e1-e2)/tmp2;
   ep  = e0 - v_ghz*v_ghz * ( a + b );
   epp = v_ghz * ( g1*a + g2*b );
   nc  = nc + 1.5 * lwc * ( 3*epp / ( (ep+2)^2 + epp^2 ) ); 
