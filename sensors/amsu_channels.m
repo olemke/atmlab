@@ -6,7 +6,7 @@
 %    The bands of each channel are centered at v0 +- dv1 +- dv2,
 %    and each band has the width *bwidth*.
 %
-% FORMAT   [v0,nbands,dv1,dv2,nedt] = amsu_channels( channelnrs )
+% FORMAT   [v0,nbands,dv1,dv2,bwidth,nedt] = amsu_channels( channelnrs )
 %        
 % OUT   v0           Centre frequency of channels
 %       nbands       Number of bands for the channels (1, 2 or 4)
