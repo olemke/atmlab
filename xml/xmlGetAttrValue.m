@@ -24,3 +24,5 @@ for i = 1:j(1)
   end
 end
 
+clear i j name;
+
