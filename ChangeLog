@@ -1,3 +1,18 @@
+2004-08-10  Bengt Rydberg  <benryd@etek.chalmers.se>
+	
+	* atmlab-0-1-83
+
+	* atmscenarios/ice_psd_Mcfar_97.m: added and created this function.
+
+	* atmscenarios/ice_psd_Ivanova_01.m: added and created this function.
+
+	* atmscenarios/ice_psd_Heyms_84.m: added and created this function.
+
+	* Made a series of functions to generate cirrus ice particle size
+	distributions. The functions are named as ice_psd_xxxx.m
+	
+	* atmscenarios/ice_psd_Donovan_03.m: added an created this function.
+
 2004-08-06  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-1-82
