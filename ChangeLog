@@ -1,3 +1,12 @@
+2004-10-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-30
+
+	* forwardmodel/cruzpol98.m: Created this function.
+
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Replaced local calculation
+	of dielectric constant with call of e ps_water_liebe93.
+
 2004-10-22  Carmen Verdes  <cverdes@uni-bremen.de>
 
 	* atmlab-0-2-29

@@ -61,17 +61,21 @@ if lwc < 0
 elseif lwc > 5
   error('LWC > 5 g/m3 is not allowed.');
 elseif lwc > 0
-  g1  = 20.20 - 146*(theta-1) + 316*(theta-1)^2;
-  g2  = 39.8 * g1;
-  e0  = 77.66 + 103.3*(theta-1);
-  e1  = 0.0671 * e0;
-  e2  = 3.52;
-  tmp1 = v_ghz*v_ghz + g1*g1;
-  tmp2 = v_ghz*v_ghz + g2*g2;
-  a   = (e0-e1)/tmp1;
-  b   = (e1-e2)/tmp2;
-  ep  = e0 - v_ghz*v_ghz * ( a + b );
-  epp = v_ghz * ( g1*a + g2*b );
+%= Use function doing the same thing
+%  g1  = 20.20 - 146*(theta-1) + 316*(theta-1)^2;
+%  g2  = 39.8 * g1;
+%  e0  = 77.66 + 103.3*(theta-1);
+%  e1  = 0.0671 * e0;
+%  e2  = 3.52;
+%  tmp1 = v_ghz*v_ghz + g1*g1;
+%  tmp2 = v_ghz*v_ghz + g2*g2;
+%  a   = (e0-e1)/tmp1;
+%  b   = (e1-e2)/tmp2;
+%  ep  = e0 - v_ghz*v_ghz * ( a + b );
+%  epp = v_ghz * ( g1*a + g2*b );
+  eps = eps_water_liebe93(v,t);
+  ep  = real( eps );
+  epp = imag( eps );
   nc  = nc + 1.5 * lwc * ( 3*epp / ( (ep+2)^2 + epp^2 ) ); 
 end
 
