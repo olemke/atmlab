@@ -14,8 +14,9 @@
 % IN    filename   Name of output file
 % IN    data       Data
 % IN    type       Data type
-                                                                                                                               
+
 % 2002-12-16  Created by Oliver Lemke.
+
 
 function xmlStore(filename, data, type)
 

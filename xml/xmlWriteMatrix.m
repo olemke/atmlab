@@ -15,7 +15,7 @@ function xmlWriteMatrix(fid, data)
 s = size (data);
 
 for i = (ndims (data)+1):2
-  s(i) = 1
+  s(i) = 1;
 end
 
 nr = s(1);

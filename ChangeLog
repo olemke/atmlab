@@ -1,3 +1,19 @@
+2003-03-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-30
+	
+	* arts/arts_ppath.m: Started on this function. Instead of having
+	many functions for doing 2D or 3D grid cells etc., the idea is now
+	to calculate a full path when a figure shall be produced. This is
+	the getaway function to get a path out of arts.
+
+	* xml/xmlWriteMatrix/TensorX.m: Removed output form statement s(1)=1;
+
+	* arts/artsplanck.m (iplanck): Added output format to cfile template.
+
+	* arts/atmplot: Removed functions atmplot_gridcell2D.m and
+	atmplot_gridcell3D.m.
+
 2003-02-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-29

@@ -15,7 +15,7 @@ function xmlWriteTensor7(filename, data)
 s = size (data);
 
 for i = (ndims (data)+1):7
-  s(i) = 1
+  s(i) = 1;
 end
 
 nl = s(1);

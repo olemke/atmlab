@@ -6,7 +6,7 @@
 %    Both FMODEL_NAME and FMODEL_EXEC are required personal settings.
 %    See CONFIGURE.
 %
-%    The different forwaqrd models are called with these string patterns:
+%    The different forward models are called with these string patterns:
 %
 %    'arts'
 %       [ FMODEL_EXEC, ' ', cfile ]
@@ -16,7 +16,7 @@
 % OUT   est    Error status. If all OK, *est* = 0. If an error occured, and
 %              *etol* = 1 (and only a warning is given), then *est* is 
 %              returned as 1.
-% OPT   cfile  Argument string. The usage of this string cab vary between
+% OPT   cfile  Argument string. The usage of this string can vary between
 %              forward models, but the standard choice would be to give the
 %              name of a control file. See atmlab/atmlab_defs for information.
 %       etol   Boolean for tolerate errors. Default is 0, which means that

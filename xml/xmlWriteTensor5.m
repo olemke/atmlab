@@ -15,7 +15,7 @@ function xmlWriteTensor5(fid, data)
 s = size (data);
 
 for i = (ndims (data)+1):5
-  s(i) = 1
+  s(i) = 1;
 end
 
 ns = s(1);
