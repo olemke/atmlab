@@ -1,3 +1,13 @@
+2002-12-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-7
+
+	* atmplots/atmplot_timeseries.m: Values were not centered before for
+	facated and flat shading. Profiles are now plotted diferently, 
+	depending on the shading. A NaN made two rectangles empty for flat
+	and faceted shading (due to a strange behaviour of Matlab), which
+	is now corrected.
+
 2002-12-18  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-6
