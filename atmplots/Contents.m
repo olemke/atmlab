@@ -1,4 +1,6 @@
-% Functions of basic mathematical type.
+% Typical plots for atmospheric remote sensing.
 %
-%    This folder contains functions performing basic mathematical operations.
-%    Included are functions to determine the variable types.
+%    This folder contains core functions to generate typical plots used to
+%    display results retrieved from atmospheric remote sensing observations.
+%
+%    (Describe how to install m_map)

@@ -1,5 +1,39 @@
 2002-12-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-0-4
+
+	* example_heading.m: Changed the format on the starting line.
+	The name of the function shall be there (in all uppercase letters).
+
+	* math/Contents.m: Created this foler to hold:
+	This folder contains functions performing basic mathematical 
+	operations. Included are functions to determine the variable types.
+
+	* math: Added functions iseven.m, isinteger.m, isodd.m, isscalar.m,
+	vec2col.m and vec2row.m, where most are copiued from AMI.
+	
+	* atmplots/Contents.m: Created this foler to hold:
+	This folder contains core functions to generate typical plots used to
+    	display results retrieved from atmospheric remote sensing observations.
+
+	* atmplots/atmplot_scanseries.m: Started on this function.
+
+	* graphs/Contents.m: Created this foler to hold:
+	This folder contains functions to make the usage of the different graph
+ 	commands in Matlab simpler. 
+	See further the mentioned file.
+
+	* arts/Contents.m: The folder artsfuns has been renamed to arts
+	(as it is obvious that it contains functions).
+
+	* atmlab_init.m: Added new folders. 
+	Atmlab includes now functions also found in AMI. If you will use Qpack
+	and AMI on the same time (maybe as part of Qpack), I recommend to run 
+	atmlab_init before /ami/init to make sure that the AMI version of
+	functions is used.
+
+2002-12-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-0-3
 
 	* This is just a commit to really add some folders and functions.
