@@ -1,3 +1,13 @@
+2003-02-10  Carlos Jimenez  <jimenez@rss.chalmers.se>
+
+	* atmlab-0-1-25
+
+	* math/nearestinvec.m: Adding a mscript to find the closest value
+	in a vector to a given value.
+
+	* NOTE: I notice the atmlab version was out of date, we should
+	notforget to update the version number in atmlab/atmlab_version.
+	
 2003-01-20  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-1-24
