@@ -1,3 +1,20 @@
+2002-12-14  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-0-15
+	
+	* graphs: The function find_legend is removed (I was confussed and
+	thought that there is only one legend per figure, which is not the
+	case. Functions for axes below, and legends are axes objects, 
+	requieres now that some handle is given.)
+
+	Several functions have been re-named:
+	   legend_frame -> axes_frame
+	   legend_text  -> set_text
+	   legend_title -> axes_title
+	   scale_legend -> scale_axes
+
+	A handle argument is added to some of these functions.
+
 2002-12-13  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-0-14

@@ -1,28 +1,26 @@
-% LEGEND_FRAME   Visibility of legend frame.
+% AXES_FRAME   Visibility of axes frame.
 %
-%    The functions makes the legend frame visible or invisible.
+%    The functions makes the frame for some axes visible or invisible.
 %
-% FORMAT   h = legend_frame(on_or_off)
+% FORMAT   axes_frame(h,on_or_off)
 %        
-% OUT   h           Handle to the legend.
-% IN    on_or_off   Either 'on' or 'off'.
+% IN    h           Handle to the axes.
+%       on_or_off   Either 'on' or 'off'.
 
 % 2002-12-12   Created by Patrick Eriksson.
 
 
-function h = legend_frame(on_or_off)
+function axes_frame(h,on_or_off)
 
 
 %=== Check input
 %
-min_nargin( 1, nargin );
+min_nargin( 2, nargin );
 %
 if ~( strcmp( on_or_off, 'off' )  |  strcmp( on_or_off, 'on' ) )
   error('Valid actions are ''off'' and ''on''.');
 end
 
-
-h = find_legend;
 
 
 if strcmp( on_or_off, 'off' )

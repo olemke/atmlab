@@ -1,6 +1,8 @@
 % SCALE_FIG   Resizes a figure and the text size.
 %
-%    The function changes the size of a figure with the given scaling factor.
+%    The function changes the size of the current figure with the given 
+%    scaling factor.
+%
 %    The same scaling is applied vertoically and horisontally. The scaling
 %    is further applied on all text objects. 
 %

@@ -1,4 +1,4 @@
-% Returns or prints the Atmlab version number. 
+% ATMLAB_VERSION   Atmlab version number. 
 %
 %    If there is no output argument, a message is printed to the screen.
 %
@@ -16,7 +16,7 @@ function s = atmlab_version
 
 nr1 = 0;
 nr2 = 0;
-nr3 = 14;
+nr3 = 15;
 
 
 s = sprintf('atmlab-%d.%d.%d',nr1,nr2,nr3);
