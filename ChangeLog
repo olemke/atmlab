@@ -1,5 +1,14 @@
 2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
 
+	* atmlab-0-1-11
+
+	* xml/xmlWriteMatrix.m, xml/xmlWriteNumeric.m, xml/xmlWriteTensor3.m,
+	xml/xmlWriteTensor4.m, xml/xmlWriteTensor5.m, xml/xmlWriteTensor6.m,
+	xml/xmlWriteTensor7.m, xml/xmlWriteVector.m: Use scientific notation
+	in output files.
+
+2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
+
 	* atmlab-0-1-10
 
 	* xml/xmlWriteArrayOfArrayOf.m: Bug fix.
