@@ -18,6 +18,7 @@ function result = xmlReadArray(fid, attrlist)
 
 ne = str2num (xmlGetAttrValue (attrlist, 'nelem'));
 
+result = {};
 e = 0;
 while e ~= ne
   e = e + 1;
