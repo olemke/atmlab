@@ -33,8 +33,8 @@ function A = atmlab_local_defs
   
   A = atmlab_defs;
 
-  A.WORK_AREA = '/tmp';
+  A.WORK_AREA   = '/tmp';
 
-  A.FMODEL    = 'arts';
+  A.FMODEL_NAME = 'arts';
   
 return

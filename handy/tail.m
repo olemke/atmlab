@@ -9,6 +9,9 @@
 %    The last element of a vector is obtained by
 %       tail( x, 1 );
 %
+%    To ask for a tail with a length exceeding the vector lengths results in
+%    an error.
+%
 % FORMAT   t = tail( x, l )
 %        
 % OUT   t   Tail fo the vector.
@@ -19,6 +22,12 @@
 
 
 function t = tail( x, l )
+
+if l > length(x)
+  serr = sprintf( ['You have asked for a tail of length %d, but *x* has ',...
+                                          'only %d elements.'], l, length(x) );
+  error( serr );
+end
 
 
 t = x( length(x) + ((-l+1):0) );

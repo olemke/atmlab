@@ -34,7 +34,7 @@ addpath( fullfile( toppath, 'atmlab' ) );
 
 %= Add forward model folder(s), if a forward model is specified
 %
-fmodel = atmlab_get( 'FMODEL' );
+fmodel = atmlab_get( 'FMODEL_NAME' );
 %
 if ~isempty( fmodel )
   

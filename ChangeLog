@@ -1,3 +1,29 @@
+2002-12-21  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-17
+
+	* arts/artsplanck.m: Created this function to demonstrate the
+	potential of qtool, and how to link a control file template with
+	an actual ARTS calculation.
+
+	* files/qtool.m: Copied the function from AMI and made some 
+	modifications. The main change is that the template is given as
+	a string array, which gives a higher flexibility. The template
+	can now be read from a seperate file by file2strs, or be defined
+	inside a local sub-function (as done for artsplanck).
+
+	* examples/sample.tmplt: Added this file.
+
+	* files/call_fmodel.m: Created this function.
+
+	* atmlab/atmlab_defs.m: Changed FMODEL to FMODEL_NAME, and added
+	the setting FMODEL_EXEC. 
+
+	* files/file2strs.m: Created this function.
+
+	* handy/tail.m: There is now an error message if the tail length 
+	exceeds the length of the vector.
+
 2002-12-20  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-16
@@ -38,18 +64,18 @@
 
 	* atmlab-0-1-13
 
-	* atmlab/atmlab_version.m: Moved to atmlab/. Now you need to push more
+	* atmlab_version.m: Moved to atmlab/. Now you need to push more
 	buttons to reach atmlab_version from ChangeLog, but I thought this
 	was worth the advantage of having no Matlab functions in the top
 	folder.
 
-	* atmlab/atmlab_init.m: Moved to atmlab/ and modified accordingly.
+	* atmlab_init.m: Moved to atmlab/ and modified accordingly.
 
-	* examples/empty_heading.m: Moved to examples/.
+	* empty_heading.m: Moved to examples/.
 
-	* examples/example_heading.m: Moved to examples/.
+	* example_heading.m: Moved to examples/.
 
-	* atmlab/atmlab_defs.m: Created a way to set personal settings. 
+	* atmlab_defs.m: Created a way to set personal settings. 
 	Read CONFIGURE as an introduction. Please, check it out and comment. 
 
 	* examples/atmlab.m: Created this function as a template for

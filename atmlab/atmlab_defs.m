@@ -40,10 +40,10 @@ function A = atmlab_defs
 A.WORK_AREA = [];
 
 
-% FMODEL
+% FMODEL_NAME
 %
-% The forward model to use (if any). If no forward model will be used, just
-% keep the field empty.
+% The name of forward model to use (if any). If no forward model will be 
+% used, just keep the field empty.
 %    Atmlab folders with functions associated with a forward model are only
 % included in the search path if that particular forward model is used. That
 % is, if this field is empty, none of the forward model folders is added to
@@ -54,5 +54,19 @@ A.WORK_AREA = [];
 %
 % (more forward models will hopefully be added later, at least, arts-1)
 %
-A.FMODEL    = [];
+A.FMODEL_NAME = [];
+
+
+% FMODEL_EXEC
+%
+% Forward model executable and general arguments.
+% This string shall include the name of the forward model executable,
+% or the full path of the executable, depending on your configuration.
+% If the forward model can take command line arguments, beside the name,
+% of a control file, such arguments can be added to the string. An
+% example: FMODEL_EXEC = '/home/patrick/bin/arts2 -r40'
+%    The strings created to call different forward models are described
+% in the header of the function *call_fmodel*.
+%
+A.FMODEL_EXEC = [];
 
