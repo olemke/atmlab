@@ -1,3 +1,11 @@
+2005-01-27  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-2-38
+
+	* files/delete_tmpfolder.m: Added force flag (-f) to unix remove
+	command. Without this the function does not work for users with
+	alias rm='rm -i'.
+
 2005-01-26  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-37

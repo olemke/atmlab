@@ -13,6 +13,9 @@
 %
 % IN       tmpfolder   Full path of folder to remove. 
 
+% 2005-01-27  Added force (-f) flag to unix remove command. Without this
+%             the function does not work for users with alias rm='rm -i'.
+%             Mattias Ekstrom
 % 2002-12-20  Created by Patrick Eriksson, based on older version
 %             in AMI (part of arts-1).
 
@@ -39,7 +42,7 @@ end
 %=== could be found and system commands are used instead.
 %
 if isunix
-  eval([ '!rm -r ', tmpfolder ])
+  eval([ '!rm -rf ', tmpfolder ])
 else
   error('Unknown computer type.');
 end
