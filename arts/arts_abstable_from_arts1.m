@@ -58,14 +58,7 @@ p_grid   = qarts_get( Q.P_GRID );
 %
 if Q.USE_RAW_ATMOSPHERE
   %
-  parts = {'start','load_atm','save_atm','stop'};
-  S = arts_cfile( Q, parts, tmpfolder );
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
-  arts( cfile );
-  t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
-  z_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
-  vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml') );
+  [t_field,z_field,vmr_field] = arts_get_atmfields( Q ); 
 else
   t_field   = qarts_get( Q.T_FIELD );
   z_field   = qarts_get( Q.T_FIELD );
@@ -106,20 +99,10 @@ Q1.TGS    = Q.GAS_SPECIES;
 Q1.F_MONO = Q.F_GRID;
 
 
-%=== What ARTS1 file format to use?
-%
-use_binary = atmlab( 'ARTS1_HDF' );
-rqre_bool( 'Atmlab setting ARTS1_HDF', use_binary );
-if use_binary
-  fileext = '.ab';
-else
-  fileext = '.aa';
-end
-
-
 %=== Define control file for ARTS1 run
 %
-parts = {'tgs','load_atm','pf_grids','spectroscopy','abscalc',...
+cfile = fullfile( tmpfolder, 'cfile.arts' );
+parts = {'tgs','load_atm','pf_grids','spectroscopy','calc_abs',...
          'save_abs_per_tg'};
 
 
@@ -130,13 +113,14 @@ A.nonlinear_species = {};
 A.f_grid            = vec2col( qarts_get( Q.F_GRID ) );
 A.p_grid            = vec2col( qarts_get( Q.P_GRID ) );
 A.vmrs_ref          = vmr_field;
-A.t_ref             = t_field;
+A.t_ref             = vec2col( t_field );
 A.t_pert            = dt;
 A.nls_pert          = [];
 %
 nt = length(dt);
+nf = length(A.f_grid);
 %
-A.xsec = zeros( nt, length(A.species), length(A.f_grid), length(A.p_grid) );
+A.xsec = zeros( nt, length(A.species), nf, length(A.p_grid) );
 %
 for i = 1 : nt
   %
@@ -144,13 +128,13 @@ for i = 1 : nt
   %
   S = arts1_cfile( Q1, parts, tmpfolder );
   qtool( S, cfile, [] );
-  arts( cfile, 0, 1 );
+  arts1( cfile );
   %
-  X = read_datafile( fullfile( tmpfolder, ['abs_per_tg',fileext] ), ...
-                                                                 'AOMATRIX' );
+  X = arts1_loadfile( tmpfolder, 'abs_per_tg', 'AOMATRIX' );
   %
   for j = 1 : length(A.species)
-    A.xsec(i,j,:,:) = X{j}; 
+    A.xsec(i,j,:,:) = X{j} ./ ...
+              repmat( vmr2nd( A.vmrs_ref(j,:), A.p_grid, Q1.T_ABS )', nf, 1 );
   end
   %
 end

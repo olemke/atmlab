@@ -12,6 +12,13 @@
 %    Defined parts are:
 %       start
 %       stokes
+%       load_atm
+%       save_atm
+%       load_abs
+%       calc_abs
+%       init_rte
+%       calc_rte
+%       save_y
 %       stop
 %
 %    Sorry, the Q fields needed for each part is not listed here.
@@ -48,7 +55,6 @@ case 'start'
            'arts_cfile' ];
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
-  T{3} = 'SensorOff{}';
 
 case 'stokes'
   %
@@ -101,18 +107,56 @@ case 'load_abs'
 case 'calc_abs'
   T{1} = [ 'AgendaSet(scalar_gas_absorption_agenda)', ...
                                        '{abs_scalar_gasExtractFromLookup{}}' ];
-  T{2} = 'AgendaSet(opt_prop_gas_agenda){';
-  T{3} = '   ext_matInit{}';
-  T{4} = '   abs_vecInit{}';
-  nwsm = length( Q.OPT_PROP_GAS_AGENDA );
-  for i = 1 : nwsm
-    T{4+i} = sprintf( '   %s', Q.OPT_PROP_GAS_AGENDA{i} )
-  end
-  T{4+nwsm+1} = '}';
+  T = add_agenda( T, 'opt_prop_gas_agenda', ...
+              { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
 
-case 'rte'
+case 'init_rte'
   %
+  if ~isnan( Q.R_GEOID )  &  isscalar( Q.R_GEOID )
+    T{1} = sprintf( 'r_geoidSpherical{%e}', Q.R_GEOID );
+  else
+    T{1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, tmpdir );
+  end
+  if ~isnan( Q.Z_SURFACE )  &  isscalar( Q.Z_SURFACE )
+    T{2} = sprintf('MatrixSetTakingSizeFromMatrix(z_surface,r_geoid){%.3f}',...
+                                                                 Q.Z_SURFACE );
+  else
+    T{2} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, tmpdir );
+  end
+  %
+  T = add_agenda( T, 'surface_agenda', Q.SURFACE_AGENDA );
+  T = add_agenda( T, 'i_space_agenda', Q.I_SPACE_AGENDA );
+  T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
+  if ~isnan( Q.REFR_INDEX_AGENDA )
+    T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
+  end
+  T = add_agenda( T, 'rte_agenda', {'RteEmissionStd{}'} );
+  i = length(T) + 1;
+  T{i} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
+  i    = i + 1;
+  T{i} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
+  i    = i + 1;
+  T{i} = 'sensorOff{}';
+  i    = i + 1;
+  T{i} = 'cloudboxOff{}';
 
+case 'calc_rte'
+  %
+  T{1} = 'RteCalc{}';
+
+case 'save_y'
+  %
+  switch upper( Q.Y_UNIT )
+    case '1'
+      T{1} = '# No conversion to K';
+    case 'RJ'
+      T{1} = 'VectorToTbByRJ(y,y){}';
+    case 'PLANCK'
+      T{1} = 'VectorToTbByPlanck(y,y){}';
+    otherwise
+      error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
+  end
+  T{2} = add_savefile( 'y', tmpdir );
 
 case 'stop'
   %
@@ -155,3 +199,12 @@ function s = add_savefile( artsvar, tmpdir )
 return
 
 
+function T = add_agenda( T, agenda, strarray );
+  i = length(T) + 1;
+  T{i} = sprintf( 'AgendaSet(%s){', agenda );
+  n = length( strarray );
+  for j = (i+1) : (i+n)
+    T{j} = sprintf( '   %s', strarray{j-i} );
+  end
+  T{i+n+1} = '}';
+return

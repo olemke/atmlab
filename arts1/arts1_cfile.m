@@ -15,9 +15,12 @@
 %       load_atm
 %       save_atm
 %       spectroscopy
-%       abscalc
+%       calc_abs
 %       save_abs
 %       save_abs_per_tg
+%       init_rte
+%       calc_rte
+%       save_y
 %
 %    Sorry, the Q fields needed for each part is not listed here.
 %    See the code.
@@ -113,7 +116,7 @@ case 'spectroscopy'
   T{12} = 'cont_descriptionInit{}';
   T = [ T Tfile ];
 
-case 'abscalc'
+case 'calc_abs'
   %
   T{1} = 'h2o_absSet{}';
   T{2} = 'n2_absSet{}';
@@ -126,6 +129,72 @@ case 'save_abs'
 case 'save_abs_per_tg'
   %
   T{1} = add_savefile( 'abs_per_tg', 'ArrayOfMatrix', tmpdir, use_binary );
+
+case 'init_rte'
+  %
+  rqre_bool( 'Qarts1 setting EMISSION_ON', Q.EMISSION_ON );
+  if Q.EMISSION_ON
+    T{1} = 'emissionOn{}';
+  else
+    T{1} = 'emissionOff{}';
+  end
+  rqre_scalar( 'Qarts1 setting Z_PLAT', Q.Z_PLAT, 0 );
+  T{2} = sprintf( 'NumericSet(z_plat){%e}', Q.Z_PLAT );  
+  T{3} = file_or_data( 'za_pencil', 'Vector', Q.ZA_PENCIL, tmpdir, use_binary);
+  rqre_scalar( 'Qarts1 setting L_STEP', Q.L_STEP, 0 );
+  T{4} = sprintf( 'NumericSet(l_step){%e}', Q.L_STEP );  
+  T{5} = sprintf( 'VectorPlanck(y_space,f_mono){%.3f}', Q.T_SPACE );
+  rqre_bool( 'Qarts1 setting HSE_ON', Q.HSE_ON );
+  if Q.HSE_ON
+    T{6} = 'hseSet{';
+    T{7} = sprintf('      pref  = %e', Q.HSE(1) );
+    T{8} = sprintf('      zref  = %.3f', Q.HSE(2) );
+    T{9} = sprintf('      g0    = %.3f', Q.HSE(3) );
+    T{10} = sprintf('     niter = %d', Q.HSE(4) );
+    T{11} = '}';
+    T{12} = 'hseCalc{}';
+  else
+    T{6} = 'hseOff{}';
+    T{7} = ' '; T{8} = ' '; T{9} = ' '; T{10} = ' '; T{11} = ' '; T{12} = ' '; 
+  end
+  rqre_scalar( 'Qarts1 setting R_GEOID', Q.R_GEOID, 0 );
+  T{13} = sprintf( 'NumericSet(r_geoid){%e}', Q.R_GEOID );  
+  rqre_scalar( 'Qarts1 setting Z_GROUND', Q.Z_GROUND, 0 );
+  T{14} = sprintf( 'NumericSet(z_ground){%e}', Q.Z_GROUND );  
+  rqre_scalar( 'Qarts1 setting T_GROUND', Q.T_GROUND, 0 );
+  T{15} = sprintf( 'NumericSet(t_ground){%e}', Q.T_GROUND );  
+  T{16} = file_or_data( 'e_ground', 'Vector', Q.E_GROUND, tmpdir, use_binary );
+  rqre_bool( 'Qarts1 setting REFR_ON', Q.REFR_ON );
+  if Q.REFR_ON
+    T{17} = 'refrSet{';
+    T{18} = '   on    = 1';
+    T{19} = '   model = "Boudouris"';
+    T{20} = sprintf('   lfac    = %.3f', Q.REFR_LFAC );
+  else
+    T{17} = 'refrOff{}'; T{18} = ' '; T{19} = ' '; T{20} = ' ';
+  end
+  T{21} = 'refrCalc{}';
+
+case 'calc_rte'
+  %
+  T{1} = 'losCalc{}';
+  T{2} = 'sourceCalc{}';
+  T{3} = 'transCalc{}';
+  T{4} = 'yCalc{}';
+
+case 'save_y'
+  %
+  switch upper( Q.Y_UNIT )
+    case '1'
+      T{1} = '# No conversion to K';
+    case 'RJ'
+      T{1} = 'yTRJ{}';
+    case 'PLANCK'
+      T{1} = 'yTB{}';
+    otherwise
+      error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
+  end
+  T{2} = add_savefile( 'y', 'Vector', tmpdir, use_binary );
 
 otherwise
   error(sprintf('Unknown action (%s) was requested.',parts{i}));

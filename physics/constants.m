@@ -6,6 +6,7 @@
 %    The following constants are defined:
 %        
 %       BOLTZMANN_CONST
+%       CBGR                Temperature of cosmic background radiation 
 %       DEG2RAD             Conversion from degrees to radians
 %       EARTH_RADIUS        Standard value for the Earth radius. Selected value
 %                           gives a circumference of 360*60 nautical miles.
@@ -35,6 +36,9 @@ switch name
 
 case 'BOLTZMANN_CONST'
     const = 1.380662e-23;
+
+case 'CBGR'
+    const = 2.735;
 
 case 'DEG2RAD'
     const = 0.01745329251994;

@@ -1,3 +1,41 @@
+2004-09-11  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-8
+
+	* Status: The generation of control files is now ready both for 
+	ARTS and ARTS1 up to the point of generating spectra. So
+	weighting functions from ARTS1 are now yet handled. 
+
+	When setting up the same case for ARTS and ARTS1, basically identical
+	spectra can be obtained (I managed to get inside 0.025 K without
+	pushing variables controlling calculation accuracy to hard).
+	
+	Ask me if you want an example function.
+	
+	* arts1/arts1_loadfile.m: Created this function.
+
+	* arts/arts_get_atmfields.m: Created this function.
+
+	* physics/constants.m: Added cosmic background radiation temperature.
+
+	* arts/arts.m: Removed option to call ARTS1.
+
+	* arts1/arts1.m: Created this function. 
+
+	* forwardmodel/za2geomztan.m: Adapted this function from AMI (slightly
+	renamed).
+
+	* forwardmodel/geomztan2za.m: Adapted this function from AMI (slightly
+	renamed).
+
+	* arts/qarts.m: Added more fields.
+
+	* arts/arts_cfile.m: Added options.
+
+	* physics/vmr2nd.m: Adapted this function from AMI.
+
+	* physics/nd2vmr.m: Adapted this function from AMI.
+	
 2004-09-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-7
