@@ -151,7 +151,7 @@ for line = 1 : length( S )
     %= Check first if any "inline" function shall be called
     if length(s) & s(1) == '@'
       %
-      eval([ s(2:(length(s)-1)), '(Q,fid_out);' ])
+      eval([ s(2:length(s)), '(Q,fid);' ])
 
     %= Replace variables (marked by $$) and move text to cfile
     else

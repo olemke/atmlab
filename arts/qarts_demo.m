@@ -66,7 +66,6 @@ Q.SENSOR_POS = Q.R_GEOID + zplat;
 Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan );
 
 
-
 %= Calculate spectrum
 %
 y = arts_y( Q );

@@ -1,3 +1,24 @@
+2004-09-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-17
+
+	* pyarts: Created a folder for interface functions to PyARTS. All
+	this is VERY temporary and there will be no proper documentation 
+	before things are more fixed. I am mainly trying to set something 
+	up for Bengt.
+
+	* pyarts/pyarts_boxcloud_create.m: Creates a box cloud scenario by
+	storing files in a folder.
+
+	* pyarts/pyarts_scatdata2cfile.m: Include files from function above in
+	a control file. This is achived by using *qtool* and the template
+	includes the line:
+	   @pyarts_scatdata2cfile
+
+	* pyarts/boxcloud.py.tmplt: Template for pyarts_boxcloud_create.m.
+
+	* handy/qtool.m: Inline functions did not work. Fixed.
+
 2004-09-27  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-16

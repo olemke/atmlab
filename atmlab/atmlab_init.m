@@ -27,6 +27,7 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 %
 addpath( fullfile( toppath, 'xml' ) ); 
 addpath( fullfile( toppath, 'sensors' ) ); 
+addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
 addpath( fullfile( toppath, 'mie' ) ); 
 addpath( fullfile( toppath, 'math' ) ); 

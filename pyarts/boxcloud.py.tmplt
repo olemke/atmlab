@@ -1,0 +1,29 @@
+from PyARTS import clouds
+from PyARTS import artsXML
+from PyARTS import arts_math
+from PyARTS import PyARTS
+from PyARTS import general
+
+#First generate the cloud stuff
+
+lat1=$Q.CLOUD_LIMITS(3)$
+lat2=$Q.CLOUD_LIMITS(4)$
+lon1=$Q.CLOUD_LIMITS(5)$
+lon2=$Q.CLOUD_LIMITS(6)$
+ztopkm=$Q.CLOUD_LIMITS(2)/1e3$
+zbottomkm=$Q.CLOUD_LIMITS(1)/1e3$
+cb_size={'np':5,'nlat':5,'nlon':5} #no need for 41 lat and lon
+zfile='$Q.Z_FILE$'
+IWC=$Q.IWC$
+tfile='$Q.T_FILE$'
+
+a_cloud=clouds.boxcloud(ztopkm,zbottomkm,lat1,lat2,
+                        lon1,lon2,cb_size,zfile,
+                        tfile,IWC)
+random_column=clouds.Crystal(ptype=$Q.PTYPE$,NP=-1,aspect_ratio=$Q.ASPECT_RATIO$)
+a_cloud.addHydrometeor(random_column)
+a_cloud.scat_file_gen(f_grid=[$min(Q.F)$,$max(Q.F)$],num_proc=2)
+a_cloud.pnd_field_gen('pnd_field.xml')
+#save your cloud object for later use
+general.quickpickle(a_cloud,'cloud.pickle')
+artsXML.saveString(a_cloud.scat_files,'scat_files.xml')
