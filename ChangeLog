@@ -1,3 +1,9 @@
+2003-03-31  Carlos Jimenez  <jimenez@rss.chalmers.se>
+
+	* atmlab-0-1-37
+
+	* math/nearestinvec.m: updating with easier implementation.
+
 2003-03-28  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-1-36
