@@ -1,3 +1,12 @@
+2003-04-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-39
+
+	* handy/input_vector.m: Created this function.
+
+	* handy/extra.m: Created this function. Use it to list all functions
+	in Atmlab.
+
 2003-04-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-38
