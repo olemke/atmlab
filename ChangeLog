@@ -1,3 +1,11 @@
+2004-09-17  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-2-11
+
+	* README: Added names of all persons in the Changelog to the
+	Copyright, added recent years. (This since somebody has asked to
+	use one of the atmlab functions.)
+
 2004-09-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-10
@@ -455,7 +463,6 @@
 
 	* xml/xmlWriteHeader.m: Minor fix in docs.
 
->>>>>>> 1.87
 2004-02-20  Oliver Lemke  <olemke@linux.net>
 
 	* atmlab-0-1-67
