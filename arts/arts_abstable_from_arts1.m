@@ -96,7 +96,11 @@ Q1.VMRS  = vmr_field;
 %=== Copy some fields from Q to Q1
 %
 Q1.TGS    = Q.GAS_SPECIES;
-Q1.F_MONO = Q.F_GRID;
+if ischar(  Q.F_GRID )
+  Q1.F_MONO = xmlLoad( Q.F_GRID );
+else
+  Q1.F_MONO = Q.F_GRID;
+end
 
 
 %=== Define control file for ARTS1 run
