@@ -1,3 +1,11 @@
+2003-04-10  Thomas Kuhn  <tkuhn@uni-bremen.de>
+
+	* atmlab-0-1-44
+
+	* atmscenarios/simplecloud_plot.m: update. Included an if
+	statement if an ice/water/rain filed is defined in the cloud
+	structure or not. If YES then plot the field if NOT then leave it.
+	
 2003-04-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-43

@@ -38,14 +38,14 @@ rain = 0;
 %
 if C.do_iwc
   nz = size( C.iwc, 1 );
-  if z > C.iwc(1,1)  &&  z < C.iwc(nz,1)
+  if z > C.iwc(1,1) & z < C.iwc(nz,1)
     iwc = interp1( C.iwc(:,1), C.iwc(:,2), z );
   end
 end
 %
 if C.do_lwc
   nz = size( C.lwc, 1 );
-  if z > C.lwc(1,1)  &&  z < C.lwc(nz,1)
+  if z > C.lwc(1,1)  &  z < C.lwc(nz,1)
     lwc = interp1( C.lwc(:,1), C.lwc(:,2), z );
   end
 end

@@ -87,162 +87,169 @@ fig = gcf - 1;
 
 %=== IWC
 %
-if C.dim == 1
-  %
-  fig = fig + 1; figure( fig ); 
-  plot( c(:,1), z/1e3 )
-  xlabel('Ice water content [g/m3]', 'FontSize', 12 )
-  ylabel('Altitude [km]', 'FontSize', 12 )
-  axis([0 max(C.iwc(:,2))*1.1 0 zmax*wfactor/1e3])
-  %
-else
-  %
-  fig = fig + 1; figure( fig ); 
-  contourf( lat, z/1e3, squeeze( clat(:,:,1) ) );
-  shading flat
-  colorbar
-  axis([lat(1) tail(lat,1) 0 zmax*wfactor/1e3])
-  xlabel('Latitude [deg]', 'FontSize', 12);
-  ylabel('Altitude [km]', 'FontSize', 12 );
-  title( 'Latitude cross-section of ice water content [g/m3]', ...
-                                                               'FontSize', 12 )
-  %
-  fig = fig + 1; figure( fig ); 
-  contourf( lon, z/1e3, squeeze( clon(:,:,1) ) );
-  shading flat
-  colorbar
-  axis([lon(1) tail(lon,1) 0 zmax*wfactor/1e3])
-  xlabel('Longitude [deg]', 'FontSize', 12);
-  ylabel('Altitude [km]', 'FontSize', 12 );
-  title( 'Longitude cross-section of ice water content [g/m3]', ...
-                                                               'FontSize', 12 )
-  %
-  [u,iz] = max( C.iwc(:,2) );
-  cz = zeros( length(lat), length(lon) );
-  for i = 1 : length(lat)
-    for j = 1 : length(lon)
-      [iwc,lwc,rain] = simplecloud_get( C, C.iwc(iz,1), lat(i), lon(j) );
-      cz(i,j) = iwc;
+if C.do_iwc
+    if C.dim == 1        
+        %
+        fig = fig + 1; figure( fig ); 
+        plot( c(:,1), z/1e3 )
+        xlabel('Ice water content [g/m3]', 'FontSize', 12 )
+        ylabel('Altitude [km]', 'FontSize', 12 )
+        axis([0 max(C.iwc(:,2))*1.1 0 zmax*wfactor/1e3])
+        %        
+    else
+        %
+        fig = fig + 1; figure( fig ); 
+        contourf( lat, z/1e3, squeeze( clat(:,:,1) ) );
+        shading flat
+        colorbar
+        axis([lat(1) tail(lat,1) 0 zmax*wfactor/1e3])
+        xlabel('Latitude [deg]', 'FontSize', 12);
+        ylabel('Altitude [km]', 'FontSize', 12 );
+        title( 'Latitude cross-section of ice water content [g/m3]', ...
+            'FontSize', 12 )
+        %
+        fig = fig + 1; figure( fig ); 
+        contourf( lon, z/1e3, squeeze( clon(:,:,1) ) );
+        shading flat
+        colorbar
+        axis([lon(1) tail(lon,1) 0 zmax*wfactor/1e3])
+        xlabel('Longitude [deg]', 'FontSize', 12);
+        ylabel('Altitude [km]', 'FontSize', 12 );
+        title( 'Longitude cross-section of ice water content [g/m3]', ...
+            'FontSize', 12 )
+        %
+        [u,iz] = max( C.iwc(:,2) );
+        cz = zeros( length(lat), length(lon) );
+        for i = 1 : length(lat)
+            for j = 1 : length(lon)
+                [iwc,lwc,rain] = simplecloud_get( C, C.iwc(iz,1), lat(i), lon(j) );
+                cz(i,j) = iwc;
+            end
+        end
+        fig = fig + 1; figure( fig ); 
+        contourf( lon, lat, cz );
+        shading flat
+        colorbar
+        axis([ lon(1) tail(lon,1) lat(1) tail(lat,1) ])
+        axis equal
+        ylabel('Latitude [deg]', 'FontSize', 12);
+        xlabel('Longitude [deg]', 'FontSize', 12);
+        title( sprintf('Ice water content at %.2f km [g/m3]', C.iwc(iz,1)/1e3 ), ...
+            'FontSize', 12 )
+        
     end
-  end
-  fig = fig + 1; figure( fig ); 
-  contourf( lon, lat, cz );
-  shading flat
-  colorbar
-  axis([ lon(1) tail(lon,1) lat(1) tail(lat,1) ])
-  axis equal
-  ylabel('Latitude [deg]', 'FontSize', 12);
-  xlabel('Longitude [deg]', 'FontSize', 12);
-  title( sprintf('Ice water content at %.2f km [g/m3]', C.iwc(iz,1)/1e3 ), ...
-                                                               'FontSize', 12 )
 end
 
 
 
 %=== LWC
 %
-if C.dim == 1
-  %
-  fig = fig + 1; figure( fig ); 
-  plot( c(:,2), z/1e3 )
-  xlabel('Ice water content [g/m3]', 'FontSize', 12 )
-  ylabel('Altitude [km]', 'FontSize', 12 )
-  axis([0 max(C.lwc(:,2))*1.1 0 zmax*wfactor/1e3])
-  %
-else
-  %
-  fig = fig + 1; figure( fig ); 
-  contourf( lat, z/1e3, squeeze( clat(:,:,2) ) );
-  shading flat
-  colorbar
-  axis([lat(1) tail(lat,1) 0 zmax*wfactor/1e3])
-  xlabel('Latitude [deg]', 'FontSize', 12);
-  ylabel('Altitude [km]', 'FontSize', 12 );
-  title( 'Latitude cross-section of liquid water content [g/m3]', ...
-                                                               'FontSize', 12 )
-  %
-  fig = fig + 1; figure( fig ); 
-  contourf( lon, z/1e3, squeeze( clon(:,:,2) ) );
-  shading flat
-  colorbar
-  axis([lon(1) tail(lon,1) 0 zmax*wfactor/1e3])
-  xlabel('Longitude [deg]', 'FontSize', 12);
-  ylabel('Altitude [km]', 'FontSize', 12 );
-  title( 'Longitude cross-section of liquid water content [g/m3]', ...
-                                                               'FontSize', 12 )
-  %
-  [u,iz] = max( C.lwc(:,2) );
-  cz = zeros( length(lat), length(lon) );
-  for i = 1 : length(lat)
-    for j = 1 : length(lon)
-      [iwc,lwc,rain] = simplecloud_get( C, C.lwc(iz,1), lat(i), lon(j) );
-      cz(i,j) = lwc;
+if C.do_lwc
+    if C.dim == 1
+        %
+        fig = fig + 1; figure( fig ); 
+        plot( c(:,2), z/1e3 )
+        xlabel('Ice water content [g/m3]', 'FontSize', 12 )
+        ylabel('Altitude [km]', 'FontSize', 12 )
+        axis([0 max(C.lwc(:,2))*1.1 0 zmax*wfactor/1e3])
+        %
+    else
+        %
+        fig = fig + 1; figure( fig ); 
+        contourf( lat, z/1e3, squeeze( clat(:,:,2) ) );
+        shading flat
+        colorbar
+        axis([lat(1) tail(lat,1) 0 zmax*wfactor/1e3])
+        xlabel('Latitude [deg]', 'FontSize', 12);
+        ylabel('Altitude [km]', 'FontSize', 12 );
+        title( 'Latitude cross-section of liquid water content [g/m3]', ...
+            'FontSize', 12 )
+        %
+        fig = fig + 1; figure( fig ); 
+        contourf( lon, z/1e3, squeeze( clon(:,:,2) ) );
+        shading flat
+        colorbar
+        axis([lon(1) tail(lon,1) 0 zmax*wfactor/1e3])
+        xlabel('Longitude [deg]', 'FontSize', 12);
+        ylabel('Altitude [km]', 'FontSize', 12 );
+        title( 'Longitude cross-section of liquid water content [g/m3]', ...
+            'FontSize', 12 )
+        %
+        [u,iz] = max( C.lwc(:,2) );
+        cz = zeros( length(lat), length(lon) );
+        for i = 1 : length(lat)
+            for j = 1 : length(lon)
+                [iwc,lwc,rain] = simplecloud_get( C, C.lwc(iz,1), lat(i), lon(j) );
+                cz(i,j) = lwc;
+            end
+        end
+        fig = fig + 1; figure( fig ); 
+        contourf( lon, lat, cz );
+        shading flat
+        colorbar
+        axis([ lon(1) tail(lon,1) lat(1) tail(lat,1) ])
+        axis equal
+        ylabel('Latitude [deg]', 'FontSize', 12);
+        xlabel('Longitude [deg]', 'FontSize', 12);
+        title( ...
+            sprintf('Liquid water content at %.2f km [g/m3]', C.lwc(iz,1)/1e3 ), ...
+            'FontSize', 12 )
     end
-  end
-  fig = fig + 1; figure( fig ); 
-  contourf( lon, lat, cz );
-  shading flat
-  colorbar
-  axis([ lon(1) tail(lon,1) lat(1) tail(lat,1) ])
-  axis equal
-  ylabel('Latitude [deg]', 'FontSize', 12);
-  xlabel('Longitude [deg]', 'FontSize', 12);
-  title( ...
-     sprintf('Liquid water content at %.2f km [g/m3]', C.lwc(iz,1)/1e3 ), ...
-                                                               'FontSize', 12 )
 end
 
 
 
 %=== RAIN
 %
-if C.dim == 1
-  %
-  fig = fig + 1; figure( fig ); 
-  plot( c(:,3), z/1e3 )
-  xlabel('Rain rate [mm/h]', 'FontSize', 12 )
-  ylabel('Altitude [km]', 'FontSize', 12 )
-  axis([0 max(C.rain(:,2))*1.1 0 zmax*wfactor/1e3])
-  %
-else
-  %
-  fig = fig + 1; figure( fig ); 
-  contourf( lat, z/1e3, squeeze( clat(:,:,3) ) );
-  shading flat
-  colorbar
-  axis([lat(1) tail(lat,1) 0 zmax*wfactor/1e3])
-  xlabel('Latitude [deg]', 'FontSize', 12);
-  ylabel('Altitude [km]', 'FontSize', 12 );
-  title( 'Latitude cross-section of rain rate [mm/h]', ...
-                                                               'FontSize', 12 )
-  %
-  fig = fig + 1; figure( fig ); 
-  contourf( lon, z/1e3, squeeze( clon(:,:,3) ) );
-  shading flat
-  colorbar
-  axis([lon(1) tail(lon,1) 0 zmax*wfactor/1e3])
-  xlabel('Longitude [deg]', 'FontSize', 12);
-  ylabel('Altitude [km]', 'FontSize', 12 );
-  title( 'Longitude cross-section of rain rate [mm/h]', ...
-                                                               'FontSize', 12 )
-  %
-  [u,iz] = max( C.rain(:,2) );
-  cz = zeros( length(lat), length(lon) );
-  for i = 1 : length(lat)
-    for j = 1 : length(lon)
-      [iwc,lwc,rain] = simplecloud_get( C, C.rain(iz,1), lat(i), lon(j) );
-      cz(i,j) = rain;
+if C.do_rain
+    if C.dim == 1
+        %
+        fig = fig + 1; figure( fig ); 
+        plot( c(:,3), z/1e3 )
+        xlabel('Rain rate [mm/h]', 'FontSize', 12 )
+        ylabel('Altitude [km]', 'FontSize', 12 )
+        axis([0 max(C.rain(:,2))*1.1 0 zmax*wfactor/1e3])
+        %
+    else
+        %
+        fig = fig + 1; figure( fig ); 
+        contourf( lat, z/1e3, squeeze( clat(:,:,3) ) );
+        shading flat
+        colorbar
+        axis([lat(1) tail(lat,1) 0 zmax*wfactor/1e3])
+        xlabel('Latitude [deg]', 'FontSize', 12);
+        ylabel('Altitude [km]', 'FontSize', 12 );
+        title( 'Latitude cross-section of rain rate [mm/h]', ...
+            'FontSize', 12 )
+        %
+        fig = fig + 1; figure( fig ); 
+        contourf( lon, z/1e3, squeeze( clon(:,:,3) ) );
+        shading flat
+        colorbar
+        axis([lon(1) tail(lon,1) 0 zmax*wfactor/1e3])
+        xlabel('Longitude [deg]', 'FontSize', 12);
+        ylabel('Altitude [km]', 'FontSize', 12 );
+        title( 'Longitude cross-section of rain rate [mm/h]', ...
+            'FontSize', 12 )
+        %
+        [u,iz] = max( C.rain(:,2) );
+        cz = zeros( length(lat), length(lon) );
+        for i = 1 : length(lat)
+            for j = 1 : length(lon)
+                [iwc,lwc,rain] = simplecloud_get( C, C.rain(iz,1), lat(i), lon(j) );
+                cz(i,j) = rain;
+            end
+        end
+        fig = fig + 1; figure( fig ); 
+        contourf( lon, lat, cz );
+        shading flat
+        colorbar
+        axis([ lon(1) tail(lon,1) lat(1) tail(lat,1) ])
+        axis equal
+        ylabel('Latitude [deg]', 'FontSize', 12);
+        xlabel('Longitude [deg]', 'FontSize', 12);
+        title( ...
+            sprintf('Rain rate at %.2f km [mm/h]', C.rain(iz,1)/1e3 ), ...
+            'FontSize', 12 )
     end
-  end
-  fig = fig + 1; figure( fig ); 
-  contourf( lon, lat, cz );
-  shading flat
-  colorbar
-  axis([ lon(1) tail(lon,1) lat(1) tail(lat,1) ])
-  axis equal
-  ylabel('Latitude [deg]', 'FontSize', 12);
-  xlabel('Longitude [deg]', 'FontSize', 12);
-  title( ...
-     sprintf('Rain rate at %.2f km [mm/h]', C.rain(iz,1)/1e3 ), ...
-                                                               'FontSize', 12 )
 end
