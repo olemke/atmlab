@@ -3,7 +3,7 @@
 	* atmlab-0-2-7
 
 	* arts/qarts.m: Added more fields. Spectra can not be created, by
-	getting there.
+	getting closer.
 
 	* arts/arts_cfile.m: Renamed and added options.
 
