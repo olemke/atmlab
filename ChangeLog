@@ -1,3 +1,19 @@
+2002-12-25  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-19
+
+	* atmplots/atmplot_sph2cart.m: Created.
+
+	* atmplots/atmplot_gridcell3D.m: Created.
+
+	* arts/do_gridcell_3d.m: Created this function. Setting of 
+	at_lower/upper_psurface to be fixed.
+
+	* atmplots/atmplot_pol2cart.m: Changed the coordinate system so
+	lat=0 equals now x=0.
+
+	* arts/do_gridcell_2d.m: Finished this function.
+
 2002-12-21  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-18

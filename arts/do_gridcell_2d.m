@@ -1,17 +1,29 @@
-% ATMPLOT_GRIDCELL2D   2D grid cell plot.
+% DO_GRIDCELL_2D   The ARTS function with the same name.
 %
-%    The function plots a 2D grid cell. The pressure surfaces are plotted
-%    with linear segments in steps of 0.5 degrees latitude. Latitude 0
-%    is placed in the upward direction. That means that grid cells centered 
-%    around latitude 0 will look nice in the plot.
+%    The ARTS function with the same name is called (by the WSM DoGridcell2d)
+%    and the result is plotted. For further information, see the ARTS 
+%    documantation.
 %
-%    The function does not change the hold status of the plot.
+%    The grid cell and the ground are plotted by *atmplot_gridcell2D*. 
+%    The path is plotted as 'b-*', where the a red ring is drawn around 
+%    the * for the start point, and a red square for a tangent point.  
 %
-%    If no ground radius is given, the ground will no be included in the plot.
-%
-% FORMAT   atmplot_gridcell2D(lat1,lat3,r1,r2,r3,r4,rground1,rground2)
+% FORMAT   [r,lat,za,lstep,endface] = do_gridcell_2d(r,lat,za,lmax,lat1,lat3,
+%                                                r1,r2,r3,r4,rground1,rground2)
 %        
-% IN    lat1       Latitude of left end face of the grid cell
+% OUT   r          Vector with radius of found path points.
+%       lat        Vector with latitude of found path points.
+%       za         Vector with LOS zenith angle at found path points.
+%       lstep      Distance along the path between the points. All points are
+%                  equally spaced.
+%       endface    Number coding of grid cell face of exit point. See 
+%                  header of the ARTS function.
+% IN    r          Radius of start point for path to calculate.
+%       lat        Latitude of start point for path to calculate.
+%       za         LOS zenath angle at start point for path to calculate.
+%       lmax       Maximum lengt between points to define the path. -1 means
+%                  that just grid crossings and tangent points are included.
+%       lat1       Latitude of left end face of the grid cell
 %	lat3       Latitude of right end face of the grid cell
 %       r1         Radius of lower-left corner of the grid cell
 %       r2         Radius of lower-right corner of the grid cell.
@@ -23,16 +35,32 @@
 % 2002-12-21   Created by Patrick Eriksson.
 
 
-function [r,lat,za,lstep,endface] = do_gridcell_2d(r,lat,za,lmax,lat1,lat3,r1,r2,r3,r4,at_lower,at_upper,rground1,rground2)
+function [r,lat,za,lstep,endface] = do_gridcell_2d(r,lat,za,lmax,lat1,lat3,r1,r2,r3,r4,rground1,rground2)
 
 
 %= Input
 %
-min_nargin( 12, nargin );
+min_nargin( 10, nargin );
 %
-if nargin < 13
+if nargin < 11
   rground1 = [];
   rground2 = [];
+end
+
+
+%= Set the variables at_upper and at_lower
+%
+at_lower = 0;
+at_upper = 0;
+%
+c = ( r2 - r1 ) / ( lat3 - lat1 );
+if r == r1 + c * ( lat - lat1 )
+  at_lower = 1;
+end
+%
+c = ( r3 - r4 ) / ( lat3 - lat1 );
+if r == r4 + c * ( lat - lat1 )
+  at_upper = 1;
 end
 
 
@@ -99,9 +127,18 @@ atmplot_gridcell2D(lat1,lat3,r1,r2,r3,r4,rground1,rground2)
 %
 hold on
 %
-atmplot_pol2cart( r, lat, 'b-' )
+atmplot_pol2cart( r, lat, 'b-*' )
+%
+atmplot_pol2cart( r(1), lat(1), 'ro' )
+%
+if endface == 8
+  n = length( r );
+  atmplot_pol2cart( r(n), lat(n), 'rs' )
+end
 %
 hold off
+%
+axis equal
 
 return
 

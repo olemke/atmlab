@@ -1,13 +1,15 @@
 % ATMPLOT_GRIDCELL2D   2D grid cell plot.
 %
-%    The function plots a 2D grid cell. The pressure surfaces are plotted
-%    with linear segments in steps of 0.5 degrees latitude. Latitude 0
-%    is placed in the upward direction. That means that grid cells centered 
-%    around latitude 0 will look nice in the plot.
+%    The function plots a 2D grid cell. The radius of each corner point is
+%    given and the radius is assumed to vary linear as a function of latitude.
+%    The vertical surfaces are plotted with linear segments in steps of 
+%    0.5 degrees latitude. Latitude 90 is placed in the upward direction. 
+%    That means that grid cells centered around latitude 90 will look nice in 
+%    the plot.
 %
 %    The function does not change the hold status of the plot.
 %
-%    If no ground radius is given, the ground will no be included in the plot.
+%    If no ground radius is given, the ground will not be included in the plot.
 %
 % FORMAT   atmplot_gridcell2D(lat1,lat3,r1,r2,r3,r4,rground1,rground2)
 %        
@@ -33,6 +35,8 @@ min_nargin( 6, nargin );
 if nargin < 7
   rground1 = [];
   rground2 = [];
+else
+  min_nargin( 8, nargin );
 end
 
 
@@ -47,7 +51,7 @@ atmplot_pol2cart( [r2 r3], [lat3 lat3], 'k:' );
 
 
 
-%= Plot latitude faces
+%= Plot pressure surfaces
 %
 dlat = 0.5;    % Latitude distance for each plot line segment
 %
