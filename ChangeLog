@@ -1,3 +1,18 @@
+2004-10-22  Carmen Verdes  <cverdes@uni-bremen.de>
+
+	* atmlab-0-2-29
+
+	* sensor/atovs_griddata.m: small changes
+
+	* sensors/atovs_select_datafile.m: modified. The
+	old script did not select the data from the previous days if this
+	was already the last one from the previous month. The new version
+	seems to work properly.
+
+	* sensors/atovs_sortfiles.m: added. This is a help function to
+	sort the data files in increasing oder of starting measurement time
+	(used by atovs_griddata.m). 
+
 2004-10-22  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-28

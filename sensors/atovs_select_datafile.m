@@ -52,15 +52,15 @@
 %              This can also be set to 'all' which means that all the
 %              days from a specific month are selected
 %
-% time:        period of time for which the measurements are selected:
-%              e.g. [0000, 0200](first two digits are for hour and last
+% time:        period of time for which the measurements are selected:{t_start, t_end}
+%              e.g. {'0000', '0200'}(first two digits are for hour and last
 %              ones are for minutes), means the measurements between 0:00 and
-%              2:00. One can specify more time periods e.g. 
-%              [0000, 0200; 0300, 0500], or set to 'all' (i.e.considering
-%              all the measurements from day)
-%
-% setting day = 'all' and/or time='all' takes all the days
-% and/or time from a specific month
+%              2:00.  The selected starting time should be smaller than
+%              ending time.It is between 0000 and 2400. If the ending time
+%              is taken 2500 then it means that data is selected until 100
+%              seconmd day (24+1)
+% setting month ='all', and/or,  day = 'all' and/or time='all'  takes all the months and/or all days
+% and/or all time day period
 %
 % If no input is specified then this should be given interactive
 %============================================================
@@ -69,9 +69,6 @@
 % - DataSelectedFiles : It contains a structure array with the
 %                       selected names of files.
 %
-% - day_meas:           index for the day (=-1 if the data started to be
-%                       recorded the previous day,and  =1 otherwise)
-%
 % If no output is specified then the data is written in files:
 % a file for each satellite, instrument,year, month, day and full
 % selected time period
@@ -79,12 +76,15 @@
 % 18.05.2004 by Carmen Verdes
 %--------------------------------------------------------------------------
 function DataSelectedFiles =...
-         atovs_select_datafile(dir_data, satellite, instrument_tip, year, month, day, time); 
+    atovs_select_datafile_2(dir_data, satellite, instrument_tip, year, month, day, time);
 %-------------------------------
 % Check the input
 %
 % give interactive the  input parameters if no input is specified'
 if nargin<=1;
+    out_text(3, str2mat('Directory where the data is found'));
+    dir_data = input('Data directory: ');
+
     out_text(3, str2mat('Which satellite do you want', 'noaa15 = 15, noaa16 = 16, noaa17 = 17'));
     satellite = input('Satellite: ');
 
@@ -109,8 +109,7 @@ if nargin<=1;
     day = input('Day: ');
 
     out_text(3,str2mat('Which time period do you want?', 'E.g.' ,...
-        '      time= [230, 300] means data taken between 2:30 and 3:00', ...
-        '      time= [200 300; 800 1200 ]  means data taken between 2:00-3:00 and 8:00-12:00'));
+        ['      time= {','''','0230','''',',', '''','0300','''','} means data taken between 2:30 and 3:00']));
     time = input('Time: ');
 end
 
@@ -135,180 +134,158 @@ for id= 1:length(day)
     name_day =[name_day, num2str(day(id)), '-'];
 end
 
-% loop over:
-% 1: satellite
-% 2: instrument
-% 3: year;
-% 4: month
-% 5: day
-I_final=0; % initialization
-for is=1:length(satellite);
-    for ii=1:length(instrument_tip);
-        for iy = 1:length(year);
-            % get the name of the index file, in the data directory
-            % a index file exists for each specific year,
-            % instrument and satellite
-            index_name = [dir_data,'noaa',num2str(satellite(is)), '_', ...
-                char(instrument_tip{ii}),'_',num2str(year(iy)), '.index'];
-            % open the file
-            fid =fopen(index_name, 'r');
+if  strcmp(time, 'all')
+    name_time  = ['-T:', time];
+else
+    name_file = ['-T:', time{1}, 'to', time{2}];
+end
+% get the name of the index file, in the data directory
+% a index file exists for each specific year,
+% instrument and satellite
+index_name = [dir_data,'noaa',num2str(satellite), '_', ...
+    char(instrument_tip),'_',num2str(year), '.index'];
+% open the file
+fid =fopen(index_name, 'r');
 
-            % take just the last two digits of the year (only the last two
-            % digits are in file name)
-            year_dummy=num2str(year(iy));
-            year_dummy =year_dummy(length(year_dummy)-1:length(year_dummy));
-            year_short(iy)=str2num(year_dummy);
-            clear year_dummy;
 
-            % get the dates: month, day, year, no. of day, starting
-            % and ending time for each file included in the index file
-            i=0;
-            while ~feof(fid);
-                i=i+1;
-                data_files{i}    = [fgets(fid)];
-                s= strread(data_files{i}, '%s', 'delimiter', '/'); % separate the names;
-                months(i)        = str2num(s{2});
-                days_all(i)      = str2num(s{3});
-                years(i)         = str2num(s{4}(14:15));
-                days_nr(i)       = str2num(s{4}(16:18));
-                t_start_all(i)   = str2num(s{4}(21:25));
-                t_end_all(i)     = str2num(s{4}(27:30));
-            end
-            fclose(fid);
 
-            % make a selection for the specific year, month and
-            % day.
-            I=[];
-            for im = 1:length(month);
-                if strcmp(day, 'all'); % the case when all the days
-                    % from a month are taken
-                    I   = [find(year_short(iy)== years&month(im)==months)];
-                else
-                    for id=1:length(day); % case when only a
-                        % specific day is taken
-                        I   =  find(year_short(iy)== years&month(im)== ...
-                            months&day(id)==days_all);
-                    end
-                end
-                %
-                % if end time is after the mid-night and start
-                % time before then put 24 instead 00;
-                for i=1:length(I)
-                    if t_start_all(I(i))>t_end_all(I(i));
-                        t_end_all(I(i))=t_end_all(I(i))+2400;
-                    end
-                end
+% get the dates: month, day, year, no. of day, starting
+% and ending time for each file included in the index file
+i=0;
+while ~feof(fid);
+    i=i+1;
+    data_files{i}    = [fgets(fid)];
+    s= strread(data_files{i}, '%s', 'delimiter', '/'); ...
+        % separate the names;
+    n=length(s);
+    years(i) =str2num(s{n-3}(length(s{n-3})-3:length(s{n-3}))); %year
+    months(i)= str2num(s{n-2}); % month
+    days(i)=str2num(s{n-1}); % day
+    days_nr(i)      = str2num(s{n}(16:18));   % day of record
+    t_start_h(i)    = str2num(s{n}(21:22));   % starting hour
+    t_start_m(i)     = str2num(s{n}(23:24));  % and minutes
+    t_end_h(i)      = str2num(s{n}(27:28)) ;  % ending hour
+    t_end_m(i)      = str2num(s{n}(29:30));   %  and minute
 
-                % find the previous days
-                for i =1:length(I)
-                    I_previous = find(days_nr(I(i))-1 ==days_nr);
-                end
-
-                % check if for one of the selected days, the measurement
-                % started already in the previous day.
-                if I_previous
-                    for j =1:length(I_previous)
-                        if t_start_all(I_previous(j))>t_end_all(I_previous(j))
-                            I =[I_previous(j),I];
-                        end
-                    end
-                end
-
-                % files selected for year, day..., and full time;
-                data_files_selected = (deblank(data_files(I)));
-                t_start = t_start_all(I);
-                t_end   = t_end_all(I);
-                days =days_all(I);
-                clear I;
-                if strcmp(time, 'all'); % case when all the
-                    % measurements from one day are considered
-                    DataSelectedFiles = data_files_selected   ;
-                    time_dummy='all';
-                else
-                    I=[];
-                    time_dummy=[];
-                    if size(time,2)==2
-                        % loop over periods of specified times
-                        for i=1:size(time,1)
-                            time_dummy = [time_dummy, num2str(time(i,1)),...
-                                'to', num2str(time(i,2)), '-'];
-                            % check for each measurement time
-                            for j=1:length(t_start)
-                                I=[];
-                                if t_start(j)<t_end(j);
-                                    if (t_start(j)<= time(i,1)&t_end(j)>=time(i,2));
-                                        % check if the full
-                                        % selected time period is
-                                        % inside the interval time
-                                        % of one measurement
-                                        I = [I, j];
-                                    elseif (t_start(j)>= time(i,1)&t_end(j)<=time(i,2))&(t_start(j)<t_end(j));
-                                        % check if selected time interval includes
-                                        % the full measurement time interval
-                                        I = [I, j];
-                                    elseif (t_start(j)<= time(i,1)&t_end(j)>=time(i,1));
-                                        % check if selected end starting inside of a
-                                        % measurement interval time
-                                        I = [I, j];
-                                    elseif (t_start(j)<= time(i,2)&t_end(j)>=time(i,2));
-                                        % check if selected end time inside of a
-                                        % measurement interval time
-                                        I = [I, j];
-                                    else
-                                        % case of measurement interval time does
-                                        % not contain the any period of selected time
-                                        %out_text(1,['[', num2str(t_start(j)),', ', num2str(t_end(j)), '] does not content the selected time']);
-                                    end
-                                else
-                                    % handle the case when the measurements
-                                    % started in previous day should be
-                                    % considered.
-                                    if (t_end(j)>time(i,1)|t_end(j)>time(i,2))& (days(j)==day(id)-1);
-                                        I = [I, j];
-                                        out_text(1, ['time selected [', num2str(time(i,1)),', ', num2str(time(i,2)),']includes [', num2str(t_start(j)),', ', num2str(t_end(j)), '] ','(previous day)']);
-                                    end
-                                end
-                                if ~isempty(I)
-                                    I_final=I_final+1;
-                                    DataSelectedFiles{I_final} = char([char(data_files_selected(I))]);
-                                end
-
-                            end
-                            clear I
-                        end
-                    end
-                end
-                % if there is no output then write the data into files
-                % a file for each satellite, instrument, year, month,
-                % day and full selected time period.
-                if nargout==0
-                    name_file = ['List-','noaa', num2str(satellite(is)), '_', char(instrument_tip{ii})];
-                    name_file = [name_file, '-Y:', name_year];
-                    name_file=[name_file, '-M:', name_month];
-                    if strcmp(day, 'all')
-                        name_file=[name_file, '-D:' day];
-                        if  strcmp(time, 'all')
-                            name_file  = [name_file, '-T:', time];
-                        else
-                            name_file = [name_file, 'time-', time_dummy];
-                        end
-                    else
-                        name_file=[name_file, '-D:'   name_day, '-time-',time_dummy];
-                    end
-                    fid=fopen(name_file, 'a');
-                    for i=1:length(DataSelectedFiles);
-                        fprintf(fid, '%s\n',[deblank(char(DataSelectedFiles(i)))]);
-                    end
-                    fclose(fid);
-                    clear  DataSelectedFiles;
-                    I_final=0;
-                end
-            end
-        end
+    % consider the case when the measurements continues after
+    % the midnight
+    if t_start_h(i)>t_end_h(i)
+        t_end_h(i)=t_end_h(i)+24;
     end
 end
 
+fclose(fid);
+
+% convert the starting and ending time to jul. time
+t_start_jul = datenum(years, 0, days_nr,   t_start_h,  t_start_m, 0);
+t_end_jul  = datenum(years, 0, days_nr,   t_end_h,  t_end_m, 0);
+
+% case when all the month from one year are taken
+if strcmp(month, 'all');
+    month=1:12;
+end
+
+
+if strcmp(time, 'all');
+    time_h(1)=0;
+    time_m(1)=0;
+    time_h(2)=24;
+    time_m(2)=0;
+else
+    time_h(1)=str2num(time{1}(1:2));
+    time_m(1)=str2num(time{1}(3:4));
+    time_h(2)=str2num(time{2}(1:2));
+    time_m(2)=str2num(time{2}(3:4));
+end
+
+% considering the case when the selected data should start in one day in
+% continue after the midnight
+% previous day, e.g. 2300 and finish second day
+if time_h(1)>time_h(2)
+    out_text(1, 'ERROR: the start time should be smaller than the end time!');
+    return;
+end
+I=[];
+for im=1:length(month)
+
+    % take all the days from specified months
+    if  strcmp(day, 'all');
+        days=1:datenum(year, month(im)+1,0,0,0,0)-datenum(year, month(im),0,0,0,0)
+    end
+
+    clear time;
+    for id =1:length(days)
+        time(1)= datenum(year, month(im), days(id), time_h(1), time_m(1),0);
+        time(2)= datenum(year, month(im),days(id) ,  time_h(2),  time_m(2),0) ;
+        % check if selected time is inside of a
+        % measurement interval time
+        I_dummy=find(t_start_jul<time(1)&t_end_jul>time(2));
+        if I_dummy
+            for j=1:length(I_dummy)
+                I_=find(I_dummy(j)==I);
+            end
+            if isempty(I_)
+                I= [I, I_dummy]; clear I_dummy; clear I_
+            end
+        end
+        % check if selected end time inside of a
+        % measurement interval time
+        I_dummy=find(t_start_jul<time(1)&t_end_jul<time(2)&t_end_jul>time(1));
+        if I_dummy
+            for j=1:length(I_dummy)
+                I_=find(I_dummy(j)==I);
+            end
+            if isempty(I_)
+                I= [I, I_dummy]; clear I_dummy;clear I_
+            end
+        end
+        % check if the full selected time period is
+        % inside the interval time of one measurement
+        I_dummy=find(t_start_jul>=time(1)&t_end_jul<=time(2));
+        if I_dummy
+            for j=1:length(I_dummy)
+                I_=find(I_dummy(j)==I);
+            end
+            if isempty(I_)
+                I= [I, I_dummy]; clear I_dummy; clear I_;
+            end
+        end
+
+        % check if selected starting time inside of a
+        % measurement interval time
+        I_dummy=find(t_start_jul>time(1)&t_start_jul<time(2)&t_end_jul>time(2));
+
+        if I_dummy
+            for j=1:length(I_dummy)
+                I_=find(I_dummy(j)==I);
+            end
+            if isempty(I_)
+                I= [I, I_dummy]; clear I_dummy; clear I_
+            end
+        end
+
+    end
+
+end
+DataSelectedFiles=data_files(I);
+
 % subfunction;
+% if there is no output then write the data into files
+% a file for each satellite, instrument, year, month,
+% day and full selected time period.
+if nargout==0
+    name_file = ['List-','noaa2', num2str(satellite), '_', char(instrument_tip)]
+    name_file = [name_file, '-Y:', name_year];
+    name_file=[name_file, '-M:', name_month];
+    name_file=[name_file, '-D:', name_day, name_time];
+    fid=fopen(name_file, 'a');
+    for i=1:length(DataSelectedFiles);
+        fprintf(fid, '%s\n',[deblank(char(DataSelectedFiles(i)))]);
+    end
+    fclose(fid);
+    clear  DataSelectedFiles;
+
+end
 
 function out_text(level,  s )
 % this is very similar to out.m from ami but it ignores the report

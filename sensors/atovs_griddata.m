@@ -73,15 +73,13 @@ while ~feof(fid);
         t_end_m(i)      = str2num(s{n}(29:30));   %  and minutes
     end
 end
-disp(['Total number of right files: ', num2str(n_tot)]);
+disp('================================');
+disp(['|Total number of  files: ', num2str(n_tot)]);
 
-disp(['Number of right files: ', num2str(length(data_files))]);
-
+disp(['|Number of right files: ', num2str(length(data_files))]);
+disp('================================');
 % sort the files after the starting time
-for i =1:length(data_files)
-    sort_time(i) =datenum(years(i), month(i), days(i), t_start_h(i), 	t_start_m(i), 0);
-end
-[sort_time, I] =sort(sort_time);
+I= atovs_sortfiles(years, month, days, t_start_h,  t_start_m);
 data_files=data_files(I);
 years =years(I);
 month=month(I);
@@ -115,6 +113,9 @@ n_pixel=zeros(length(lat_grid), length(lon_grid),nr_channel);
 mean_comb=zeros(length(lat_grid),length(lon_grid), nr_channel);
 var_comb=zeros(length(lat_grid),length(lon_grid), nr_channel);
 time_pixel_end=0; %keeps the time for the last pixel recorded in a file
+time_limit= 1e8;  % gives the upper time for which the data should
+                           % be taken; this time is set to a high
+                           % value (corresponding to year 2008)
 nr_files =0; %no of files which are averaged
 
 % loop over the data
@@ -158,7 +159,7 @@ for i=1:length(data_files);
             dummy_time=datenum(years(i), month(i), days(i), 0, 0, 1e-3*(data.time));
             
             %trown away the time overlaped data
-            I_time = find(dummy_time>time_pixel_end);
+            I_time = find(dummy_time>time_pixel_end&dummy_time<=time_limit);
             data.tb= data.tb( :, I_time );
             data.lon=data.lon(:, I_time);
             data.lat=data.lat(:, I_time);
@@ -212,8 +213,9 @@ for i=1:length(data_files);
         fclose(fid);
     end
 end
+disp('================================');
 disp([num2str(nr_files),  '  files from ', num2str(length(data_files)),  ' were averaged']);
-
+disp('================================');
 
 % create a stucture containing lon, lat, no. of pixel, tb, and standard
 % deviation
