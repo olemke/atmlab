@@ -1,40 +1,44 @@
 % QTOOL   Creation of control files from a template.
 %
-%           The data for the control file are given by the structure Q. 
+%       The data for the control file are given by the structure Q. 
 %
-%           The Qtool has three mechanisms to create control files from
-%           templates. See the file examples/sample.tmplt for a practical 
-%           example on a template file.
+%       The Qtool has three mechanisms to create control files from
+%       templates. See the file examples/sample.tmplt for a practical 
+%       example on a template file. Such a file is read by the
+%       function *file2strs* and is then passed to *qtool* as a
+%       string array. The string array can also be defined inside
+%       a function, or a local sub-functions, and thus a seperate
+%       template file can be avoided.
 %
-%           1. Variable substition.
-%             The Qtool tries to replace everything specified between
-%             $-signs by the value of the corresponding variable in the 
-%             workspace. If the variable does not exist, there will be an
-%             error.
-%             As the data structure given to the function will have
-%             locally the name Q, this name must also be used
-%             in the control file template, e.g. $Q.PLAT_ALT$.
+%       1. Variable substition.
+%         The Qtool tries to replace everything specified between
+%         $-signs by the value of the corresponding variable in the 
+%         workspace. If the variable does not exist, there will be an
+%         error.
+%         As the data structure given to the function will have
+%         locally the name Q, this name must also be used
+%         in the control file template, e.g. $Q.PLAT_ALT$.
 %
-%           2. If statements
-%             The keywords IF, ELSE and END are valid. These keywords
-%             must be in uppercase and be placed in column 1.
-%             Nested if-statements are not valid.
-%             All logical expressions of Matlab can be used.
+%       2. If statements
+%         The keywords IF, ELSE and END are valid. These keywords
+%         must be in uppercase and be placed in column 1.
+%         Nested if-statements are not valid.
+%         All logical expressions of Matlab can be used.
 %
-%           3. Inline functions
-%             If a @-sign is found in the first column, the rest of the
-%             line is treated to be the name of a function writing text
-%             to the control file.
-%             This function will then be called with Q and the control 
-%             file identifier as input. For example "@some_fun" will 
-%             result in a function call as "some_fun(Q,fid)". 
+%       3. Inline functions
+%         If a @-sign is found in the first column, the rest of the
+%         line is treated to be the name of a function writing text
+%         to the control file.
+%         This function will then be called with Q and the control 
+%         file identifier as input. For example "@some_fun" will 
+%         result in a function call as "some_fun(Q,fid)". 
 %
-%           A field with name FILESEP will be added to Q. This field is 
-%           set to the file seperator for the platform (a string). A 
-%           folder and a file name of Q are thus combined in the template
-%	    as: $Q.CALCGRIDS_DIR$$Q.FILESEP$$Q.F_MONO$
+%       A field with name FILESEP will be added to Q. This field is 
+%       set to the file seperator for the platform (a string). A 
+%       folder and a file name of Q are thus combined in the template
+%	as: $Q.CALCGRIDS_DIR$$Q.FILESEP$$Q.F_MONO$
 %
-% FORMAT   qtool(S,outfile,Q,dbg)
+% FORMAT   qtool(S,outfile,Q[,dbg])
 %        
 % IN    S         String array containing the template file.
 %       outfile   Name of control file to create.

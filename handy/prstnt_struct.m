@@ -5,7 +5,7 @@
 %
 %    A persistent structure can be used for several purposes. The application
 %    in mind here is that the structure contains a number of settings of 
-%    global type. How this function works is bets described by an example.
+%    global type. How this function works is best described by an example.
 %    Let's say that we want to have a function that tells various plotting 
 %    function what color map to use, without having that as input to each 
 %    function. We create then a function called *cmap* with a local
@@ -61,7 +61,7 @@ if isempty( A )
 end
 
 
-%=== As this function is called witha varargin argument, we have to extract
+%=== As this function is called with a varargin argument, we have to extract
 %=== varargin as given to the calling function.
 %
 varg = varargin{1};

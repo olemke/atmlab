@@ -32,7 +32,7 @@
 %
 % OUT	   ei = Equilibrium water vapor pressure in [Pa].
 % IN       T  = Temperature in [K].
-%
+
 % 2003-03-28 Created by Stefan Buehler
 
 function ei = e_eq_ice(T)

@@ -11,6 +11,7 @@ Atmlab is added to the Matlab search path by calling the function
 atmlab_init, which is found in ATMLAB/atmlab. To view the search path, use
 the Matlab function path. If you will always be using Atmlab, the
 simplest is to include these lines in startup.m:
+
    cd ATMLAB/atmlab
    atmlab_init;
 
@@ -23,27 +24,41 @@ ensure that Matlab always finds your startup.m, the Matlab path must
 be extended already before calling Matlab. How this is done depends on
 the environment (operative system, shell etc.). If you are a bash
 user, a line like this will do the job:
+
    export MATLABPATH=/home/patrick/Configure/Matlab:
 
 Some functionality of Atmlab requires personal settings. Most parts
 of Atmlab will work without a file with personal settings. There will
 be an error message if a needed personal setting is lacking. 
 
-The personal settings are provided by a function with name
-atmplot.m. This function is not found inside the Atmlab folders added
-to the search path, but a template for you to copy and edit is found
-in ATMLAB/examples. Copy that file to a folder outside Atmlab, but
-part of the Matlab search path. You need to edit the file to include
-your settings, as described in the template. The present settings are
-displayed by executing
+The personal settings are handled by a function with name atmlab.
+Check out existing fields, and their present settings, by executing
 
    atmlab;
 
-To get a particular setting, give the name of the setting as input:
+A description of the field is obtained by
 
-   atmlab('fmodel')
+   help atmlab
 
-If you want to change your settings during an Atmlab session, the new
-value is given as a second argument to atmplot:
+which also gives instructions on how to use the atmlab function.
 
-   atmplot('fmodel','arts-1');
+The function atmlab_init (that you should run at startup) first sets all
+settings fields to be empty and calls then the function atmlab_conf, if
+it exists in the search path. The function atmlab_conf is not part of 
+Atmlab. The intention of the function is to set personal settings and 
+it shall be placed in a folder outside Atmlab, but inside the Matlab
+search path at the moment of calling atmlab_init.
+
+You can put any Matlab stuff you like in atmlab_conf. The most natural
+choice is to include calls of atmlab, to set the existing fields to our
+preferred choices. For example:
+
+  atmlab( 'WORK_AREA',   '/tmp' );
+  atmlab( 'FMODEL_NAME', 'arts' );
+  atmlab( 'FMODEL_EXEC', 'arts2 -r00' );
+
+
+Good luck!
+
+Patrick Eriksson
+(patrick@rss.chalmers.se)

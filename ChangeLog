@@ -1,3 +1,47 @@
+2003-07-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-52
+
+	* atmlab/atmlab.m: Moved this function from being a personal function
+	to an Atmlab function. This function makes atmlab_get and atmlab_defs
+	obselete. 
+
+	The personal settings are now set by calls of *atmlab*. 
+	See instructions in CONFIGURE.
+	
+	* atmlab/atmlab_init.m: Added to mie folder to the search path.
+	Added call of *atmlab* and *atmlab_conf* to implement new way of
+	to set personal settings.
+
+	* These functions are removed due to changes above:
+	    atmlab/atmlab_get.m
+ 	    atmlab/atmlab_defs.m
+	    example/atmlab
+
+	* arts/artsplanck.m: Removed as other functions in the folder shows
+	how to use an internal template.
+
+	* file/call_fmodel.m: Is moved to forwardmodel/call_fmodel.m.
+	
+	* */Contents.m: Removed all these files. I don't think they are 
+	useful and hard to keep updated. The name of the subfolders should
+	be clear enough to describe the content.
+	
+	* CONFIGURE: Updated text to new way to set personal settings.
+
+	* INSTRUCTIONS: Removed some old information.
+
+	* forwardmodel/i2planckTb.m: Wrote first header line description.
+
+	* forwardmodel/i2rayjeanTb.m: Wrote first header line description.
+
+	* arts/arts_plot_atmgrids.m: Added some text to the header.
+
+	* arts/arts_ppath.m: Added some text to the header.
+
+	* Small fixes in function headers for a number of functions not
+	listed above.
+
 2003-06-18  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-51

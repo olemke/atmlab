@@ -32,7 +32,7 @@
 %
 % OUT	   ew = Equilibrium water vapor pressure in [Pa].
 % IN       T  = Temperature in [K].
-%
+
 % 2003-03-28 Created by Stefan Buehler
 
 function ew = e_eq_water(T)

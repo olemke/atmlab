@@ -1,35 +1,21 @@
 INSTRUCTIONS FOR ATMLAB AUTHORS
 
 The top directory (where you find this file) shall only contain
-general information, the *atmlab_init* function and similar stuff. The
-provided functions shall be placed in suitable sub-folder. If you
-think that your function really not fit into the topic of any existing
-sub-folder you are free to add a new sub-folder, but please select a
-name/topic of the new folder with care. Don't select a too broad
-subject as then it is not clear what functions you can expect to find
-in the folder. If you select a too narrow subject there is a chance
-that your function will be alone in the folder. An exception is of
-course if you make a complete set of functions for a particular
-purpose, when it makes sense to create a particular folder for your
-functions.
-
-Each sub-folder shall contain a file called Contents.m which describes
-the function type of the folder. This file is used by Matlab when the
-user type "help" and the name of a folder in the search path. The
-Contents.m files for the Matlab original folders list the functions in
-the folder. As we probably will forget to update Contents.m when
-adding a function, and it is not always so easy to group the
-functions, I think it is better to make a general description of the
-functions, than maintaining function lists. The users have to look
-into the folders to check out what functions they can try out.
-
-Please, add the file Contents.m as soon as you create a new
-sub-folder. You need also to edit *atmlab_init* to include the new
-folder in the search path. 
+general information. The provided functions shall be placed in
+suitable sub-folder. If you think that your function really not fit
+into the topic of any existing sub-folder you are free to add a new
+sub-folder, but please select a name/topic of the new folder with
+care. Don't select a too broad subject as then it is not clear what
+functions you can expect to find in the folder. If you select a too
+narrow subject there is a chance that your function will be alone in
+the folder. An exception is of course if you make a complete set of
+functions for a particular purpose, when it makes sense to create a
+particular folder for your functions. You need to edit 
+atmlab/atmlab_init to include the new folder in the search path.
 
 The aim should be to mainly make functions that do not require any
 special toolbox. Functions that need a special toolbox should be
-placed into special folders, and this should be clear from Contents.m.
+placed into special folders.
 
 Each function shall have a clear description, a header. You are
 recommended to use either the style used by MathWorks or the style
@@ -39,7 +25,7 @@ regarding optional variables and how to set default variables.
 
 The changes done for each CVS commit shall be explained satisfactorily
 in ChangeLog. The new version number shall be transfered to the
-function *atmlab_version*.
+function atmlab/atmlab_version.
 
 
 

@@ -23,7 +23,7 @@
 %    neighbour point.
 %
 %    With *shadearg* = 'interp', the color will vary vertically in a 
-%    piece-wise linear manner, between the given altitudes.
+%    piecewise linear manner, between the given altitudes.
 %
 %    The shading of the plot shall be set by the optional argument. If the
 %    shading is changed later, the profiles can be displayed in an incorrect
@@ -35,7 +35,7 @@
 %    before start. All other operations, such as setting label texts or
 %    setting the color scale, must be handled separately.
 %
-% FORMAT   atmplot_timeseries(Ps[,shadearg])
+% FORMAT   atmplot_timeseries( Ps [,shadearg] )
 %        
 % IN    Ps         Struct vector with profile data. See further above.
 % OPT   shadearg   This argument is passed to *shading*. If not given, or 

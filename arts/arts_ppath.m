@@ -5,7 +5,7 @@
 %    The input arguments, beside *dim* and *vmr_field*, shall be given as
 %    their ARTS WSV counterpart. For example, *z_field* shall be given as
 %    a Tensor3 for 3D calculations. Note that trailing dimensions are added
-%    when storing to files, and only the used dimensions ahve to be added.
+%    when storing to files, and only the used dimensions have to be added.
 %    The fields shall for 1D be given as column vectors.
 %
 %    The geoid radius if for 1D set to the ARTS default value. For 2D and 3D,
@@ -16,6 +16,9 @@
 %    water vapour and *vmr_field* shall here be treated as a normal field 
 %    (i.e. a Tensor3). The Thayer parameterization is used to calculate
 %    the refractive index.
+%
+%     Examples on how to use this function is found in ARTS, at
+%     doc/uguide/Figs/fm_definitions/mkfigs_ppath_cases.m
 %
 % FORMAT   P = arts_ppath(dim,p_grid,lat_grid,lon_grid,z_field,a_pos,a_los,[
 %                   [lmax,z_ground,cb_lims,lraytrace,t_field,vmr_field])
@@ -152,7 +155,7 @@ end
 
 %= Execute ARTS and load the result
 %
-call_fmodel( ['-r20 ',cfile] );
+call_fmodel( cfile );
 %
 P = xmlLoad( fullfile( tmpfolder, 'ppath.xml' ) );
 

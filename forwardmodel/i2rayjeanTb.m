@@ -1,4 +1,4 @@
-% I2RAYJEANTB
+% I2RAYJEANTB   Rayleigh-Jeans brightness temperature
 %
 %    Convert intensities to "Rayleigh-Jeans" temperatures using the
 %    Rayleigh-Jeans scaling factor.

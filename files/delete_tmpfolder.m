@@ -22,7 +22,7 @@ function delete_tmpfolder(tmpfolder)
 
 %=== Require that a work area is set as a personal setting
 %
-workarea = atmlab_get( 'WORK_AREA', 1 );
+workarea = atmlab( 'WORK_AREA', 1 );
 
 
 if ~strncmp( workarea, tmpfolder, length(workarea) )

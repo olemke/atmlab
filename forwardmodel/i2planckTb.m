@@ -1,4 +1,4 @@
-% I2PLANCKTB
+% I2PLANCKTB   Planck brightness temperature
 %
 %          Convert intensities to brigthness temperatures by "inverting" the
 %          Planck function.

@@ -1,9 +1,12 @@
-% ATMLAB_INIT   Adds the folders of Atmlab search path.
+% ATMLAB_INIT   Initializes the Atmlab package
 %
-%    The folders are put at the start of the search path (prepended).
+%    Atmlab folders are added to the search path. The folders are put 
+%    at the start of the search path (prepended).
+%
+%    All Atmlab settings are first set to be empty ([]). After this,
+%    the function *atmlab_conf* is executed, if such a function is found 
+%    in the search path. See further CONFIGURE.
 %  
-%    This function must be placed at the top folder of Atmlab.
-%
 % FORMAT   atmlab_init
 
 % 2002-12-09   Created by Patrick Eriksson.
@@ -20,9 +23,11 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 %= Add folders to the search path
 %
 % If you create a new sub-folder, it should be added here.
+% Please use reversed alphabetical order.
 %
 addpath( fullfile( toppath, 'xml' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
+addpath( fullfile( toppath, 'mie' ) ); 
 addpath( fullfile( toppath, 'math' ) ); 
 addpath( fullfile( toppath, 'handy' ) ); 
 addpath( fullfile( toppath, 'graphs' ) );
@@ -34,9 +39,18 @@ addpath( fullfile( toppath, 'atmlab' ) );
 
 
 
+%=== Read Atmlab settings
+%
+atmlab('defaults');
+if exist( 'atmlab_conf' ) == 2
+  atmlab_conf;
+end
+
+
+
 %= Add forward model folder(s), if a forward model is specified
 %
-fmodel = atmlab_get( 'FMODEL_NAME' );
+fmodel = atmlab( 'FMODEL_NAME' );
 %
 if ~isempty( fmodel )
   
@@ -48,7 +62,7 @@ if ~isempty( fmodel )
 
     otherwise
       % 
-      serr = sprintf('You have selected an unknown forwrad model (%s).', ...
+      serr = sprintf('You have selected an unknown forward model (%s).', ...
                                                                       fmodel );
       error( serr );
   end

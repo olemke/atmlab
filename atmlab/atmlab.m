@@ -1,27 +1,34 @@
-% ATMLAB_DEFS   Defaults for Atmlab user settings.
+% ATMLAB   Handling of Atmlab settings.
 %
-%    A structure of the type used for the Atmlab personal settings is created
-%    where all fields are set to be empty.
+%   This function is based on *prstnt_struct* and for general help see 
+%   the on-line help for that function. 
 %
-%    Only fields defined here are valid setting options. The fields, and their
-%    options are described in the function body. To display the function
-%    execute:
-%       type atmlab_defs.m 
+%   Existing fields, and possible settings, are listed below. The default 
+%   value for all fields is to be empty.
 %
-%    The personal settings are given in function called *atmplot*. You find
-%    a template function as examples/atmplot.m.
+%   For adding personal settings at startup, see the file CONFIGURE. To 
+%   add or change settings after startup, follow the example below. x
 %
-% FORMAT   A = atmlab_defs
+%   To check all present settings
+%      atmlab;
+%
+%   A specific setting is obtained as
+%      value = atmlab( 'FMODEL_NAME' );
+%
+%   To set a field to a specic value
+%      atmlab( 'FMODEL_NAME', 'arts' );
+%
+%   To set all fields to be empty
+%      atmlab( 'defaults' );
+%
+% FORMAT   value = atmlab( [varargin] )
 %        
-% OUT   A   A structure with just empty fields. See the function body
-%           for field names.
-
-% 2002-12-19   Created by Patrick Eriksson.
-
-
-function A = atmlab_defs
-
-
+% OUT   value      Setting, if a field is selected. See further 
+%                  *prstnt_struct*.
+% OPT   varargin   Field, field and setting or any option supported by
+%                  *prstnt_struct*.
+%
+%----------------------------------------------------------------------------
 % WORK_AREA
 % 
 % A folder to be used for calculations outside Matlab. For each calculation
@@ -37,9 +44,7 @@ function A = atmlab_defs
 %    The work area is primarily used for forward model calculations, but
 % there could be other applications.
 %
-A.WORK_AREA = [];
-
-
+%----------------------------------------------------------------------------
 % FMODEL_NAME
 %
 % The name of forward model to use (if any). If no forward model will be 
@@ -54,13 +59,11 @@ A.WORK_AREA = [];
 %
 % (more forward models will hopefully be added later, at least, arts-1)
 %
-A.FMODEL_NAME = [];
-
-
+%----------------------------------------------------------------------------
 % FMODEL_EXEC
 %
 % Forward model executable and general arguments.
-% This string shall include the name of the forward model executable,
+%    This string shall include the name of the forward model executable,
 % or the full path of the executable, depending on your configuration.
 % If the forward model can take command line arguments, beside the name,
 % of a control file, such arguments can be added to the string. An
@@ -68,5 +71,22 @@ A.FMODEL_NAME = [];
 %    The strings created to call different forward models are described
 % in the header of the function *call_fmodel*.
 %
+%----------------------------------------------------------------------------
+
+% 2003-07-06   Created by Patrick Eriksson.
+
+
+function value = atmlab( varargin )
+            
+persistent A
+          
+[A,value] = prstnt_struct( A, @atmlab_defs, varargin );
+
+
+
+function A = atmlab_defs
+
+A.WORK_AREA   = [];
+A.FMODEL_NAME = [];
 A.FMODEL_EXEC = [];
 

@@ -4,9 +4,9 @@
 %    *atmlab*. See CONFIGURE for information about *atmlab*. A work area 
 %    is a required setting.
 %
-%    The folder is named as TmpXXXXXX, where XXXXXX is a random number between
-%    1 and 999999. The created folder will have an unique name. Random numbers
-%    are generated until an unique folder name is found.
+%    The folder is named as TmpXXXXXX, where XXXXXX is a random number 
+%    between 1 and 999999. The created folder will have an unique name. 
+%    Random numbers are generated until an unique folder name is found.
 %
 % FORMAT   tmpfolder = create_tmpfolder
 %        
@@ -22,7 +22,7 @@ function tmpfolder = create_tmpfolder
 
 %=== Require that a work area is set as a personal setting
 %
-workarea = atmlab_get( 'WORK_AREA', 1 );
+workarea = atmlab( 'WORK_AREA', 1 );
 
 
 if ~exist( workarea, 'dir' )

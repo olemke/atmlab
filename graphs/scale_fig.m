@@ -3,11 +3,11 @@
 %    The function changes the size of the current figure with the given 
 %    scaling factor.
 %
-%    The same scaling is applied vertoically and horisontally. The scaling
+%    The same scaling is applied vertically and horisontally. The scaling
 %    is further applied on all text objects. 
 %
 %    The idea is that a figure could be given any size maintaining the same
-%    relative appearence. This works for re-scaling with factors not devaiting
+%    relative appearence. This works for re-scaling with factors not deviating
 %    too much from 1, but as the space between e.g. axes and labels is not
 %    scaled in the same way by Matlab (which is done automatically), larger
 %    size changes distorts the appearence of the figure. For example, if a 

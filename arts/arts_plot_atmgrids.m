@@ -7,6 +7,9 @@
 %     1D where *lat_grid* shall contain two values, which determines how
 %     long (in latitude) the plotted atmosphere shall be extended.
 %
+%     Examples on how to use this function is found in ARTS, at
+%     doc/uguide/Figs/fm_definitions/mkfigs_atm_dims.m
+%
 % FORMAT   [h,hs] = arts_plot_atmgrids(dim,lat_grid,lon_grid,z_field,
 %                                       r_geoid,[z_ground,cb_lims,mark_fields])
 %        
