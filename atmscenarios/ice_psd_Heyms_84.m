@@ -13,33 +13,33 @@
 %     in terms of the ambient temperature and ice water content"
 %     J. Atmos. Sci., vol.41, No.5, 846-855, 1984
 %
-% FORMAT   [x,y] = ice_psd_Heyms_84(T,Dmin,Dmax,n)     
+% FORMAT   [y] = ice_psd_Heyms_84(T,D)     
 %
-% OUT      y is a vector with the particle size distribution [#/m³/m]
-%          x is a vector from Dmin to Dmax with n points, and represents 
-%          the maximum  dimensions of the ice particles [m]
+% OUT      y is a vector with the particle size distribution [#/m^3/m]
 %  
-% IN       T    Temperature [Celsius]
-%          Dmin The minimum dimension of the ice crystals [m]
-%          Dmax The maximum dimension of the ice crystals [m]
-%          n    number of points from Dmin to Dmax
+% IN       T    Temperature [Kelvin]
+%          D    the vector with the maximum dimension of
+%               the ice particles [m],
+%               where the concentration will be calculated
 
 
 % History: 2004-07-19  Created by Bengt Rydberg
 
 
-function [x,y]=ice_psd_Heyms_84(T,Dmin,Dmax,n)
+function [y]=ice_psd_Heyms_84(T,D)
+
+T=T-273.15;
 
 if T>-20
-   error('Only temperatures below or eqaul to -20  are allowed')
+   error('Only temperatures below or equal to -253.15  are allowed')
 end
 if T<-60
-   error('Only temperatures larger than or equal to -60 are allowed')
+   error('Only temperatures larger than or equal to -213.15 K are allowed')
 end
-if Dmin<20*1e-6
+if D(1)<20*1e-6
    error('Only Dmin larger than 20*1e-6 m is allowed')
 end
-if Dmax>3*1e-3
+if D(end)>3*1e-3
    error('Only Dmax smaller that 3*1e-3 m is allowed')
 end
 if T<=-20 & T>-25
@@ -73,11 +73,10 @@ A2=N1000_IWC/1000^(B2);
 warning off
 D0=(A2/A1)^(1/(B1-B2));
 warning on
-N=zeros(1,n);
+n=length(D);
 if D0>20 & D0<3000
-   D=linspace(Dmin,Dmax,n);
    A1=N100_IWC*1e6/(1e-4)^(B1);
-A2=N1000_IWC*1e6/(1e-3)^(B2);
+   A2=N1000_IWC*1e6/(1e-3)^(B2);
    N2=A2.*D.^(B2)*IWCmean;
    N1=A1.*D.^(B1)*IWCmean;
    for i=1:1:n
@@ -89,17 +88,14 @@ A2=N1000_IWC*1e6/(1e-3)^(B2);
    end
  
 elseif D0<=20
-       D2=linspace(Dmin,Dmax,n);
        A2=N1000_IWC*1e6/(1e-3)^(B2);
-       N2=A2.*D2.^(B2)*IWCmean;
+       N2=A2.*D.^(B2)*IWCmean;
        N=N2;
 
 elseif D0>3000
-       D1=linspace(Dmin,Dmax,n);
        A1=N100_IWC*1e6/(1e-4)^(B1);
-       N1=A1.*D1.^(B1)*IWCmean;
+       N1=A1.*D.^(B1)*IWCmean;
        N=N1;
 end
 
-x=linspace(Dmin,Dmax,n);
 y=N;

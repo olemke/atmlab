@@ -1,12 +1,16 @@
 % ice_psd_Donovan_2003 returns the particle size distribution in cirrus clouds.
 %    
 %     Returns a vector with the particle size distribution for a 
-%     given temperature and ice water content, for a midlatitude cirrus cloud.
+%     given temperature, ice water content, and shape
+%     for a midlatitude cirrus cloud.
 %     The uncertainty regarding the habits of the ice crystals is large.
 %     The parameterization here is based on the distribution of
 %     maximum dimension of complex polycrystals or compact
 %     polycrystals which are consistent with the average observed
-%     behaviour. 
+%     behaviour from the measurements. 
+%     The particle size distribution is a bimodal gamma distribution,
+%     and with the input "mode" there is an option of which mode
+%     that will be returned.
 %
 %     The parameterization is taken from Donovan.
 %     "Ice cloud effective particle size parameterization based
@@ -14,32 +18,34 @@
 %     velocity measurements"
 %     J. of Geophys. res., vol. 108, NO. D18, 4573, 2003
 %
-% FORMAT   [x,y] = ice_psd_Donovan_03(T,IWC,Dmin,Dmax,n,shape)     
+% FORMAT   [y] = ice_psd_Donovan_03(T,IWC,D,shape,mode)     
 %
-% OUT      y is a vector with the particle size distribution [#/m³/m]
-%          x is a vector from Dmin to Dmax with  n points [m], 
-%          and represents the maximum  dimensions of the ice particles.
+% OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
-% IN       T     Temperature [Celsius]
-%          IWC   Ice water content [g/m3]
-%          Dmin  Minimum dimension of ice crystals [m]
-%          Dmax  Maximum dimension of ice crystals [m]
-%          n     number of points from Dmin to Dmax
+% IN       T     Temperature [Kelvin]
+%          IWC   Ice water content [g/m^3]
+%          D     the vector with the maximum dimension of
+%                the ice particles [m],
+%                where the concentration will be calculated
 %          shape 1=complex polycrystals
 %                2=compact polycrystals
+%          mode  1=both small and large mode
+%                2=small mode
+%                3=large mode
 
 
 % History: 2004-07-19  Created by Bengt Rydberg
 
 
-function [x,y]=ice_psd_Donovan_03(T,IWC,Dmin,Dmax,n,shape) 
+function [y]=ice_psd_Donovan_03(T,IWC,D,shape,mode) 
 
+T=T-273.15;
 
 if T>0
-   error('Only temperatures smaller or equal to zero are allowed.')
+   error('Only temperatures smaller than 273.15 K are allowed.')
 end
 if T<-70
-   error('Only temperature larger or equal to -70 are allowed.')
+   error('Only temperature larger or equal to 203.15 K are allowed.')
 end
 if IWC<0.001
    error('Only IWC larger than or equal to 0.001 are allowed.')
@@ -50,7 +56,10 @@ end
 if ((shape~=1) && (shape~=2))
    error('Only shape 1 or 2 are allowed.')
 end
- 
+if ((mode~=1) && (mode~=2) && (mode~=3))
+   error('Only mode 1,2, or 3 are allowed.')
+end
+
 gammas=4.24;gammal=3.64;
 Rms=20.1623*1e-6;rms=Rms/(gammas+2);
 
@@ -97,14 +106,27 @@ if shape==2
    alfa2=0.84;beta2=2.88;
    alfap2=144.96;betap2=1.88;
 end
+
 rho=0.91e-12;
-d1=linspace(1e-6,1e-3,1000);d2=linspace(1.01e-4,1e-3,900);
+d1=linspace(1e-6,1e-3,1000);
 m1=rho*alfa1*(d1*1e6/2).^(beta1);
 m2=rho*(alfa2*(d1*1e6/2).^(beta2)+alfap2*(d1*1e6/2).^(betap2));
 N1=1/2/rms/gamma(gammas).*(d1/2/rms).^(gammas-1).*exp(-d1/2/rms);
 N2=Nl_Ns/2/rml/gamma(gammal).*(d1/2/rml).^(gammal-1).*exp(-d1/2/rml);
 Ntot=N1+N2;
-Ns=IWC/(1e-6*Ntot(1:100)*m1(1:100)'+1e-6*Ntot(101:1000)*m2(101:1000)');
+Ns=IWC/(1e-6*N1(1:1000)*m1(1:1000)'+1e-6*N2(1:1000)*m2(1:1000)');
   
-x=linspace(Dmin,Dmax,n);
-y=(Ns/2/rms/gamma(gammas).*(x/2/rms).^(gammas-1).*exp(-x/2/rms))+(Nl_Ns*Ns/2/rml/gamma(gammal).*(x/2/rml).^(gammal-1).*exp(-x/2/rml));
+N1=(Ns/2/rms/gamma(gammas).*(D/2/rms).^(gammas-1).*exp(-D/2/rms));
+N2=(Nl_Ns*Ns/2/rml/gamma(gammal).*(D/2/rml).^(gammal-1).*exp(-D/2/rml));
+
+if mode==1
+   y=N1+N2;
+end
+
+if mode==2
+   y=N1;
+end
+
+if mode==3
+   y=N2;
+end

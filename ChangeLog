@@ -1,3 +1,20 @@
+2004-11-26  Bengt Rydberg  <benryd@etek.chalmers.se>
+	
+	* atmlab-0-2-34
+
+	* atmscenarios/ice_psd_Mcfar_97.m: Modified this function.
+
+	* atmscenarios/ice_psd_Ivanova_01.m: Modified this function.
+
+	* atmscenarios/ice_psd_Heyms_84.m: Modified this function.
+
+        * atmscenarios/ice_psd_Donovan_03.m: Modified this function.
+
+	* atmscenarios/ice_psd_Mitchell_99.m: Modified this function.
+
+	* atmscenarios/ice_psd_ellipsoids.m: Modified this function.
+
+
 2004-11-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-33
