@@ -10,5 +10,5 @@ for i = 1 : length( Q.SCAT_FILES )
 end
 
   
-fprintf( fid, '\nReadXML( pnd_field ){\n' );
+fprintf( fid, '\nReadXML( pnd_field_raw ){\n' );
 fprintf( fid, '   filename = "%s"\n}\n', Q.PND_FIELD );

@@ -1,5 +1,12 @@
 2004-09-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-18
+
+	* pyarts/pyarts_scatdata2cfile.m: Changed from reading of pnd_field
+	to pnd_field_raw (the former did not work, obviously).	
+
+2004-09-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-17
 
 	* pyarts: Created a folder for interface functions to PyARTS. All
