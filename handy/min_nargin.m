@@ -16,7 +16,7 @@ function min_nargin(nmin,n)
 
 
 if n < nmin
-  serr = sprintf('At least %d input arguments are requiered.', nmin );
+  serr = sprintf('At least %d input arguments are required.', nmin );
   error( serr );
 end
  

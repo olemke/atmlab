@@ -25,7 +25,7 @@ the environment (operative system, shell etc.). If you are a bash
 user, a line like this will do the job:
    export MATLABPATH=/home/patrick/Configure/Matlab:
 
-Some functionality of Atmlab requieres personal settings. Most parts
+Some functionality of Atmlab requires personal settings. Most parts
 of Atmlab will work without a file with personal settings. There will
 be an error message if a needed personal setting is lacking. 
 

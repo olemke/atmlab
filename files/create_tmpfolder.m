@@ -2,7 +2,7 @@
 %
 %    The function creates a folder in the folder set as work area in
 %    *atmlab*. See CONFIGURE for information about *atmlab*. A work area 
-%    is a requiered setting.
+%    is a required setting.
 %
 %    The folder is named as TmpXXXXXX, where XXXXXX is a random number between
 %    1 and 999999. The created folder will have an unique name. Random numbers

@@ -2,7 +2,7 @@
 %
 %    The function removes a folder in the folder set as work area in
 %    *atmlab*. See CONFIGURE for information about *atmlab*. A work area 
-%    is a requiered setting. Only folders in the work area are removed for
+%    is a required setting. Only folders in the work area are removed for
 %    safety reasons.
 %
 %    No good and safe way to use the Matlab delete function has been found,
