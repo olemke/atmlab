@@ -7,8 +7,10 @@
 %        
 %       BOLTZMANN_CONST
 %       DEG2RAD             Conversion from degrees to radians
-%       EARTH_RADIUS        Standard value for the Earth radius
+%       EARTH_RADIUS        Standard value for the Earth radius. Selected value
+%                           gives a circumference of 360*60 nautical miles.
 %       EARTHORBIT_RADIUS   Radius of the Earth orbit, around the Sun  
+%       NAUTICAL_MILE       1 nautical mile 
 %       PLANCK_CONST  
 %       RAD2DEG             Conversion from radians to degrees
 %       SPEED_OF_LIGHT
@@ -38,10 +40,13 @@ case 'DEG2RAD'
     const = 0.01745329251994;
 
 case 'EARTH_RADIUS'
-    const = 6.378e6;
+    const = 6.3667e6;
 
 case 'EARTHORBIT_RADIUS'
     const = 1.495e11;
+
+case 'NAUTICAL_MILE'
+    const = 1852;
 
 case 'PLANCK_CONST'
     const = 6.626180e-34;

@@ -61,7 +61,8 @@
 % Functions writing to the screen set a report level for each output. If the
 % the set report level is higher than VERBOSITY, the output is ignored.
 % Output obeying this setting is most easily produced with the function *out*.
-% Functions can also use VERBOSITY to decide if figures shall be produced.
+% Functions can also use VERBOSITY to decide if figures shall be produced
+% (which is most easily checked by using *out*).
 %----------------------------------------------------------------------------
 % WORK_AREA
 % 
@@ -92,11 +93,11 @@ persistent A
 
 function A = atmlab_defs
 
-A.AMI_PATH         = [];
-A.ARTS_PATH        = [];
-A.ARTS1_PATH       = [];
-A.FMODEL_VERBOSITY = [];
-A.SCREEN_WIDTH     = [];
-A.VERBOSITY        = [];
-A.WORK_AREA        = [];
+A.AMI_PATH         = NaN;
+A.ARTS_PATH        = NaN;
+A.ARTS1_PATH       = NaN;
+A.FMODEL_VERBOSITY = NaN;
+A.SCREEN_WIDTH     = NaN;
+A.VERBOSITY        = NaN;
+A.WORK_AREA        = NaN;
 

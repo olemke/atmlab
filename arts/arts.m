@@ -29,19 +29,23 @@ if nargin == 1
   errortol = 0;
 end
 
+
 if exist( 'arts1' )  &  arts1
+  atmlab( 'require', {'ARTS1_PATH'} );
   exec = atmlab( 'ARTS1_PATH' );
-  if isempty( exec )
-    error('Path to ARTS1 executable is not set.');
+  if ~ischar( exec )
+    error('Path to ARTS1 executable must be a string.');
   end
 else
+  atmlab( 'require', {'ARTS_PATH'} );
   exec = atmlab( 'ARTS_PATH' );
   if isempty( exec )
-    error('Path to ARTS executable is not set.');
+    error('Path to ARTS executable must be a string.');
   end
 end
 
 
+atmlab( 'require', {'FMODEL_VERBOSITY'} );
 rlevel = atmlab( 'FMODEL_VERBOSITY' );
 if isempty( rlevel )
   rlevel = 0;

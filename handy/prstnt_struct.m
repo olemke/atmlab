@@ -26,6 +26,10 @@
 %       cmap;
 %    The default settings are re-created by:
 %       cmap('defaults');
+%    That fields exist and are not NaN can be performed as:
+%       cmap('require', {'map','dummy'} );
+%    where in this case an error will occur as the field 'dummy' does not 
+%    exist.
 %
 %    This is a very simple example. The technique is of course more powerful
 %    if more settings variables are involved.
@@ -79,10 +83,12 @@ switch length( varg )
     %
     if strcmp( varg{1}, 'defaults' )
       A = feval( def_fun );
+ 
     else
 
       if ~isfield( A, varg{1} )
-        error( sprintf('The field %s does not exists.', varg{1} ) ); 
+        fprintf('\nThe field %s is not defined.\n\n', varg{1} ); 
+        error( 'See above' ); 
       end
 
       value = getfield( A, varg{1} );
@@ -92,13 +98,28 @@ switch length( varg )
 
   case 2
 
-    if ~isfield( A, varg{1} )
-      error( sprintf('The field %s is not a valid option.', varg{1} ) ); 
+    if strcmp( varg{1}, 'require' )
+      for i = 1 : length(varg{2})
+        if ~isfield( A, varg{2}{i} )
+          fprintf('\nThe field %s is required.\n\n', varg{2}{i} );
+          error( 'See above' ); 
+        end
+        if isnan( getfield( A, varg{2}{i} ) )
+          fprintf('\nThe field %s is reuired but is NaN.\n\n', varg{2}{i} );
+          error( 'See above' ); 
+        end
+      end
+
+    else
+      if ~isfield( A, varg{1} )
+        fprintf('\nThe field %s is not defined.\n\n', varg{1} );
+        error( 'See above' ); 
+      end
+
+      A = setfield( A, varg{1}, varg{2} );
+
+      value = varg{2};
     end
-
-    A = setfield( A, varg{1}, varg{2} );
-
-    value = varg{2};
 
   otherwise
     %

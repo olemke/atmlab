@@ -25,7 +25,11 @@
 %          The function can also be used to determine if figures etc.
 %          shall be produced (the last format example).
 %
-% FORMAT:  out( level, s )
+%          The output can also be directed to a file by using the optional
+%          argument *fid*. Note that you can write to several files and
+%          the screen by making *fid* a vector. The screen has identifier 1.
+%
+% FORMAT:  out( level, s [, fid] )
 %            or
 %          do_output = out( level )
 %
@@ -34,20 +38,51 @@
 %          s           Message. Can be a string matrix (see str2mat).
 %                      If s is an integer, different vertical lines are
 %                      produced (see above).
+% OPT      fid         Vector with file identifiers. Default is 1, which
+%                      is standard output (screen).
 %------------------------------------------------------------------------
 
 % HISTORY: 040907  Copied from AMI and modified to Atmlab by Patrick
 %                  Eriksson, who also made AMI version.
 
 
-function do_output = out( level, s )
+function do_output = out( level, s, fid )
+
+
+if nargin < 3
+  fid = 1;
+end
+
+
+if length(fid) > 1
+  for i = 1 : length(fid)
+    out( level, s, fid(i) );
+  end
+  return
+end
+
+
+atmlab( 'require', {'VERBOSITY','SCREEN_WIDTH'} );
 
 
 verbosity = atmlab( 'VERBOSITY' );
 ncols     = atmlab( 'SCREEN_WIDTH' );
 
 
-if ~isempty(verbosity) & (level<=verbosity)
+if ~isscalar(verbosity)  |  verbosity < 0
+  error('VERBOSITY must be a scalar >= 0')
+end  
+
+if ~isscalar(ncols)  |  ncols < 0
+  error('SCREEN_WIDTH must be a scalar >= 0')
+end  
+
+if ~isscalar(level)  |  level < 0
+  error('Input argument *level* must be a scalar >= 0')
+end  
+
+
+if level <= verbosity
   do_output = 1;
 else
   do_output = 0;
@@ -59,24 +94,28 @@ if nargin == 1
   return;
 end
 
+if level == 0
+  level = 1;
+end
+
 if ischar(s)
 
   for i = 1:size(s,1)
   
-    fprintf('| ');
+    fprintf(fid,'| ');
   
     %Indention
     for j = 1:(level-1)
-      fprintf('  ');
+      fprintf(fid,'  ');
     end
   
-    fprintf('%s',s(i,:));
+    fprintf(fid,'%s',s(i,:));
   
     for j = 1:(ncols-length(s)-(level-1)*2-3)
-      fprintf(' ');
+      fprintf(fid,' ');
     end
   
-    fprintf('|\n');
+    fprintf(fid,'|\n');
   
   end
 
@@ -85,27 +124,27 @@ else
 
   %=== Start line
   if s > 0
-    fprintf('\n/');
+    fprintf(fid,'\n/');
     for j = 1:(ncols-2)
-      fprintf('-');
+      fprintf(fid,'-');
     end
-    fprintf('\\\n');
+    fprintf(fid,'\\\n');
 
   %=== Brake line
   elseif s == 0
-    fprintf('|');
+    fprintf(fid,'|');
     for j = 1:(ncols-2)
-      fprintf('-');
+      fprintf(fid,'-');
     end
-    fprintf('|\n')
+    fprintf(fid,'|\n');
 
   %=== End line
   else
-    fprintf('\\');
+    fprintf(fid,'\\');
     for j = 1:(ncols-2)
-      fprintf('-');
+      fprintf(fid,'-');
     end
-    fprintf('/\n');
+    fprintf(fid,'/\n');
   end
 
 end

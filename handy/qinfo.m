@@ -1,0 +1,131 @@
+% QINFO   Prints Q structure information 
+%
+%    This function prints field information for a "Q-structure" if the
+%    format described in *qcheck* is followed. 
+%
+%    Some examples:
+%    Assuming that *qdef* provides needed information, information for 
+%    field DUMMY is obrtained by:
+%       qinfo(@qdef,'DUMMY');
+%    To create a file qdoc.txt with information for all fields:
+%       qinfo(@qdef,'all',''qdoc.txt');
+%
+% FORMAT   qinfo( qfun, field, fid )
+%        
+% IN    qfun   Pointer to function providing default structure.
+%       field  Field name, or 'all'.
+% OPT   fid    File identifier(s) for output. Or name on file to create.
+%              Default is to only print on screen.
+
+% 2004-09-07   Created by Patrick Eriksson.
+
+function qinfo( qfun, field, fid )
+
+if nargin < 3
+  fid = 1;
+end
+
+if ischar(fid)
+  fid = fileopen( fid, 'w' );
+  filetoclose = 1;
+else
+  filetoclose = 0;
+end
+
+
+[Q,INFO] = feval( qfun );
+
+
+f1 = fieldnames( Q ); 
+f2 = fieldnames( INFO ); 
+
+ok = 1;
+
+for i = 1 : length(f1)
+  if ~isfield( INFO, f1{i} )
+    fprintf('The Q-field %s is not found in INFO.\n', f1{i} );
+    ok = 0;
+  end
+end
+
+
+if length(f1) ~= length(f2)  | ~ok
+  for i = 1 : length(f2)
+    if ~isfield( Q, f2{i} )
+      fprintf('The INFO-field %s is not defined in Q.\n', f1{i} );
+      ok = 0;
+    end
+  end
+end
+
+
+if ~ok
+  fprintf('\n');
+  error('Inconsistency found when comparing Q and INFO.');
+end
+
+
+if strcmp( field, 'all' )
+
+  fields = fieldnames( INFO );
+
+  out(0,1,fid);
+  for i = 1 : length(fields)  
+    printfield( fields{i}, getfield( INFO, fields{i} ), fid );
+    if i < length(fields)
+      out(0,0,fid);
+    end
+  end
+  out(0,-1,fid);
+
+
+else
+
+  if ~isfield( INFO, field )
+    error(sprintf('The field %s is not recognised.', field));
+  end
+
+  s = getfield( INFO, field );
+
+  if ~ischar( s )
+    error(sprintf('Information for field %s is not a string.', field));
+  end
+
+  out(0,1,fid);
+  printfield( field, s, fid );
+  out(0,-1,fid);
+
+end
+
+
+if  filetoclose 
+  fileclose( fid );
+end
+
+
+
+%----------------------------------------------------------------------------
+
+function printfield( field, s, fid )
+  %
+  atmlab( 'require', {'SCREEN_WIDTH'} );
+  ncols = atmlab( 'SCREEN_WIDTH' ) - 4;
+  ls = length( s );
+  %
+  ind = [find( s == ' ' ) ls+1 ];
+  ready = 0;
+  i = 1;
+  %
+  out(0,sprintf('Field: %s',field),fid);
+  out(0,'-',fid);
+  while ~ready
+    j = ind(max(find( ind <= i+ncols )))-1;
+    out(0,s(i:j),fid);
+    i = j + 2;
+    if i > ls
+      ready = 1;
+    end
+  end
+return
+
+

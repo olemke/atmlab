@@ -1,4 +1,4 @@
-% An (almost) empty function header.
+% FUNCTION   An (almost) empty function header.
 %
 %    XXX
 %

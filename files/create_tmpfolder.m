@@ -22,7 +22,12 @@ function tmpfolder = create_tmpfolder
 
 %=== Require that a work area is set as a personal setting
 %
+atmlab( 'require', {'WORK_AREA'} );
 workarea = atmlab( 'WORK_AREA' );
+%
+if ~ischar( workarea )
+  error( 'WORKAREA must be a string' );
+end 
 
 
 if ~exist( workarea, 'dir' )

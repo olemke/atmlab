@@ -1,3 +1,41 @@
+2004-09-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-1
+
+	* arts/arts_abstable_from_arts1.m: A not totally ready function to
+	generate absorption lookup tables. Needs templates stored so'far
+	only locally.
+
+	* arts/arts_tgs_cnvrt.m: Converts tag group information between
+	Atmlab and ARTS formats.
+
+	* handy/qinfo.m and qcheck.m: Created these two functions to
+	faciliate handling of settings in the "Q way".
+
+	* arts1/: Created this folder for functions related to ARTS-1.0.x.
+
+	* arts1/qarts1.m: Started on this function, defining recognised
+	fields for ARTS1 calculations (to be implemented). 
+
+	* atmlab/atmlab_init.m: Added path for arts1/. 
+
+	* atmlab/atmlab.m: Changed default values to be NaN, to make use of
+	new option in prstnt_struct.
+
+	* handy/prstnt_struct.m: Improved error messages and option 'require'. 
+
+	* handy/out.m: Improved checks of VERBOSITY and SCREEN_WIDTH. 
+	Included the possibility to write to files. Even files and screen
+	in parallel.
+
+	* files/create_tmpfolder.m: Improved check of WORK_AREA. 
+
+	* files/delete_tmpfolder.m: Improved check of WORK_AREA. 
+	
+	* arts/arts.m: Better check of used Atmlab settings.
+
+	* arts/arts_tgs_cnvrt.m: Added this function.
+
 2004-09-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-0
