@@ -1,3 +1,13 @@
+2003-10-27  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-1-58
+	
+	* arts/optimize_za_grid.m: Added. For scattering calculations in ARTS 
+	it is very important to represent the intensity field correctly.
+	Either you take a very fine grid (then the calculation takes very long)
+	or you optimize the grid using for example this function, which is 
+ 	the much better solution.
+
 2003-10-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-57

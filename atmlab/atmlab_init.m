@@ -37,7 +37,7 @@ addpath( fullfile( toppath, 'files' ) );
 addpath( fullfile( toppath, 'atmscenarios' ) ); 
 addpath( fullfile( toppath, 'atmplots' ) ); 
 addpath( fullfile( toppath, 'atmlab' ) ); 
-
+addpath( fullfile( toppath, 'arts' ) ); 
 
 
 %=== Read Atmlab settings
