@@ -1,3 +1,11 @@
+2003-04-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-38
+
+	* handy/input_scalar.m: Created this function.
+
+	* handy/ascii_menu.m: Added this function.
+
 2003-03-31  Carlos Jimenez  <jimenez@rss.chalmers.se>
 
 	* atmlab-0-1-37
