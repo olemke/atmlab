@@ -1,3 +1,27 @@
+2002-12-27  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-20
+
+	* arts/cart2poslos.m: Started on this function.
+
+	* arts/obsplane2latlon.m: Started on this function.
+
+	* arts/arts_sph2cart.m: Created this function to test out an algorithm
+	to be used in ARTS.
+
+	* arts/poslos2cart.m: Created this function to test out an algorithm
+	to be used in ARTS.
+
+	* arts/do_gridcell_3d.m: Finished text for header.
+
+	* atmplots/atmplot_sph2cart.m: Described the coordinate system used.
+
+	* atmplots/atmplot_pol2cart.m: Described the coordinate system used.
+
+	* atmplots/atmplot_gridcell3D.m: Improved the header slightly.
+
+	* atmplots/atmplot_gridcell2D.m: Improved the header slightly.
+
 2002-12-25  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-19

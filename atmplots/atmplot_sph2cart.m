@@ -8,6 +8,10 @@
 %     that value shall be applied for all points. If radii, latitudes and
 %     longitudes are given as vectors, all vectors must have the same size.
 %
+%     The x-axis corresponds to lat=0 and lon=0.
+%     The y-axis corresponds to lat=90.
+%     The z-axis corresponds to lat=0 and lon=90.
+%
 % FORMAT   atmplot_sph2cart( r, lat, lon, [, varargin ] )
 %        
 % IN    r          A single radius or a vector of radii.
@@ -18,7 +22,7 @@
 % 2002-12-22   Created by Patrick Eriksson.
 
 
-function atmplot_sph2cart( r, lat, lon, varargin )
+function [x,y,z] = atmplot_sph2cart( r, lat, lon, varargin )
 
 
 %= Input

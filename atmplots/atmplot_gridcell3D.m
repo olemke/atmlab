@@ -2,19 +2,33 @@
 %
 %    The function plots a 3D grid cell. The radius of each corner point is
 %    given and the radius is assumed to vary linear from corner to corner.
+%    See *atmplot_sph2cart* for coordinate system used.
 %
 %    The function does not change the hold status of the plot.
 %
 %    If no ground radius is given, the ground will not be included in the plot.
 %
+%    The naming of input arguments is taken from ARTS (see the suer guide).
+%
 % FORMAT   atmplot_gridcell3D(lat1,lat3,lon5,lon6,r1a,r2a,r3a,r4a,
 %                                        r1b,r2b,r3b,r4b[,rg1a,rg2a,rg1b,rg2b])
 %        
-% IN    See AUG. 
-% OPT   rg1a   
-%       rg2a
-%       rg1b   
-%       rg2b
+% IN    lat1   Lower latitude.
+%       lat3   Upper latitude.
+%       lon5   Lower longitude.
+%       lon6   Upper latitude.
+%       r1a    Radius of the lower pressure surface at *lat1* and *lon5*.
+%       r2a    Radius of the lower pressure surface at *lat3* and *lon5*.
+%       r3a    Radius of the upper pressure surface at *lat3* and *lon5*.
+%       r4a    Radius of the upper pressure surface at *lat1* and *lon5*.
+%       r1b    Radius of the lower pressure surface at *lat1* and *lon6*.
+%       r2b    Radius of the lower pressure surface at *lat3* and *lon6*.
+%       r3b    Radius of the upper pressure surface at *lat3* and *lon6*.
+%       r4b    Radius of the upper pressure surface at *lat1* and *lon6*.
+% OPT   rg1a   Radius of the ground at *lat1* and *lon5*.
+%       rg2a   Radius of the ground at *lat3* and *lon5*.
+%       rg1b   Radius of the ground at *lat1* and *lon6*.
+%       rg2b   Radius of the ground at *lat3* and *lon6*.
 
 % 2002-12-21   Created by Patrick Eriksson.
 

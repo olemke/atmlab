@@ -3,9 +3,7 @@
 %    The function plots a 2D grid cell. The radius of each corner point is
 %    given and the radius is assumed to vary linear as a function of latitude.
 %    The vertical surfaces are plotted with linear segments in steps of 
-%    0.5 degrees latitude. Latitude 90 is placed in the upward direction. 
-%    That means that grid cells centered around latitude 90 will look nice in 
-%    the plot.
+%    0.5 degrees latitude. See *atmplot_pol2cart* for coordinate system used.
 %
 %    The function does not change the hold status of the plot.
 %

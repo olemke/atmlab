@@ -8,6 +8,9 @@
 %     shall be applied for all points. If both the radii and latitudes are
 %     given as vectors, the both vectors must have the same size.
 %
+%     Latitude 0 is placed along the horisontal (x) axis. Latitude 90 is
+%     in the upward vertical direction.
+%
 %     To draw a heart:
 %        atmplot_pol2cart( linspace(0,9,91), 90:2:270, 'r-' );
 %        hold on
