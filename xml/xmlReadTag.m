@@ -3,14 +3,19 @@
 %    Internal function. Parses the tag and calls the appropriate reading
 %    function.
 %
-% FORMAT   result = xmlReadTag(filename)
+% FORMAT   result = xmlReadTag(fid, filename, binary, ftype, fid2)
 %
 % OUT   result     Data read from file
+% IN    fid        File descriptor of XML file
 % IN    filename   Name of XML file
+% IN    itype      Only used if called recursively
+% IN    ftype      Only used if called recursively
+% IN    binary     Only used if called recursively
+% IN    fid2       Only used if called recursively
 
 % 2002-11-28   Created by Oliver Lemke.
 
-function result = xmlReadTag(fid)
+function result = xmlReadTag(fid, filename, itype, ftype, binary, fid2)
 
 data_ok = 0;
 exit_loop = 0;
@@ -51,9 +56,22 @@ while ~feof (fid) & ~exit_loop
       
       switch tag
        case 'arts'
+         format = xmlGetAttrValue (attrlist, 'format');
+         if length (format) == length ('binary') & format == 'binary'
+             binary = 1;
+             fid2 = fopen (strcat (filename, '.bin'), 'rb');
+         end
+         fsize = xmlGetAttrValue (attrlist, 'fsize');
+         if ~length (fsize)
+           ftype = 'double';
+         end
+         isize = xmlGetAttrValue (attrlist, 'isize');
+         if ~length (isize)
+           itype = 'long';
+         end
        otherwise
          func = str2func (strcat ('xmlRead', tag));
-         result = feval (func, fid, attrlist);
+         result = feval (func, fid, attrlist, itype, ftype, binary, fid2);
          data_ok = 1;
       end
     else %=== or is it a closing tag

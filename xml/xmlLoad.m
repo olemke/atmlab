@@ -32,7 +32,7 @@ if ~strcmp (s, '<?xmlversion="1.0"?>')
 end
 
 %=== Parsing data tag
-result = xmlReadTag(fid);
+result = xmlReadTag(fid, filename, '', '', 0, 0);
 
 fclose (fid);
 

@@ -3,15 +3,19 @@
 %    Internal function that should never be called directly.
 %    Use *xmlLoad* instead.
 %
-% FORMAT   result = xmlReadSpeciesTag(fid, attrlist)
+% FORMAT   result = xmlReadSpeciesTag(fid, attrlist, itype, ftype, binary, fid2)
 %
 % OUT   result     SpeciesTag
 % IN    fid        File descriptor of XML file
 % IN    attrlist   List of tag attributes
-                                                                                                                               
+% IN    itype      Integer type of input file
+% IN    ftype      Floating point type of input file
+% IN    binary     Flag. 1 = binary file, 0 = ascii
+% IN    fid2       File descriptor of binary file
+
 % 2002-12-13   Created by Oliver Lemke.
 
-function result = xmlReadSpeciesTag(fid, attrlist)
+function result = xmlReadSpeciesTag(fid, attrlist, itype, ftype, binary, fid2)
 
 c = fgets (fid, 1);
 while ~feof (fid) & (c == 10 | c == 32)
