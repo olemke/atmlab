@@ -1,3 +1,9 @@
+2004-02-13  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-1-65
+	
+	* files/delete_tmpfolder.m: Fixed bug in call of workarea.
+	
 2004-01-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-64
