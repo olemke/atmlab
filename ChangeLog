@@ -1,5 +1,12 @@
 2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
 
+	* atmlab-0-1-12
+
+	* xml/xmlWriteArrayOf.m, xml/xmlWriteArrayOfArrayOf.m,
+	xml/xmlWriteVector.m: Allow empty objects.
+
+2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
+
 	* atmlab-0-1-11
 
 	* xml/xmlWriteMatrix.m, xml/xmlWriteNumeric.m, xml/xmlWriteTensor3.m,
