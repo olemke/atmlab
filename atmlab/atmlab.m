@@ -18,7 +18,7 @@
 %   To set a field to a specic value
 %      atmlab( 'FMODEL_NAME', 'arts' );
 %
-%   To set all fields to be empty
+%   To set all fields to default
 %      atmlab( 'defaults' );
 %
 % FORMAT   value = atmlab( [varargin] )
@@ -28,6 +28,40 @@
 % OPT   varargin   Field, field and setting or any option supported by
 %                  *prstnt_struct*.
 %
+%----------------------------------------------------------------------------
+% AMI_PATH
+%
+% The path to the AMI folder. AMI contains Matlab functions needed for 
+% communication with ARTS1. If you are not using ARTS1, just leave this field
+% empty.
+%----------------------------------------------------------------------------
+% ARTS_PATH
+%
+% Path to executable for ARTS. For example '/home/patrick/ARTS/arts2/src/arts'.
+%----------------------------------------------------------------------------
+% ARTS1_PATH
+%
+% Path to executable for ARTS-1.0.x. 
+%----------------------------------------------------------------------------
+% FMODEL_VERBOSITY
+%
+% Verbosity of forward model, if such a feature is supported. If field is
+% is empty, this is interpreted as no verbosity. The forward models work as:
+%   ARTS (both versions):
+%     A number between 0 and 3, where 3 means highest level of verbosity.
+%----------------------------------------------------------------------------
+% SCREEN_WIDTH
+% 
+% The width, in number of characters, of the Matlab window.
+% Used by the function *out* to make a frame around screen output.
+%----------------------------------------------------------------------------
+% VERBOSITY
+% 
+% The verbosity of Atmlab functions.  
+% Functions writing to the screen set a report level for each output. If the
+% the set report level is higher than VERBOSITY, the output is ignored.
+% Output obeying this setting is most easily produced with the function *out*.
+% Functions can also use VERBOSITY to decide if figures shall be produced.
 %----------------------------------------------------------------------------
 % WORK_AREA
 % 
@@ -43,34 +77,6 @@
 % platforms is '/tmp'.
 %    The work area is primarily used for forward model calculations, but
 % there could be other applications.
-%
-%----------------------------------------------------------------------------
-% FMODEL_NAME
-%
-% The name of forward model to use (if any). If no forward model will be 
-% used, just keep the field empty.
-%    Atmlab folders with functions associated with a forward model are only
-% included in the search path if that particular forward model is used. That
-% is, if this field is empty, none of the forward model folders is added to
-% the search path. Possible options are:
-%
-%    'arts' 
-%       The latest ARTS version.
-%
-% (more forward models will hopefully be added later, at least, arts-1)
-%
-%----------------------------------------------------------------------------
-% FMODEL_EXEC
-%
-% Forward model executable and general arguments.
-%    This string shall include the name of the forward model executable,
-% or the full path of the executable, depending on your configuration.
-% If the forward model can take command line arguments, beside the name,
-% of a control file, such arguments can be added to the string. An
-% example: FMODEL_EXEC = '/home/patrick/bin/arts2 -r40'
-%    The strings created to call different forward models are described
-% in the header of the function *call_fmodel*.
-%
 %----------------------------------------------------------------------------
 
 % 2003-07-06   Created by Patrick Eriksson.
@@ -86,7 +92,11 @@ persistent A
 
 function A = atmlab_defs
 
-A.WORK_AREA   = [];
-A.FMODEL_NAME = [];
-A.FMODEL_EXEC = [];
+A.AMI_PATH         = [];
+A.ARTS_PATH        = [];
+A.ARTS1_PATH       = [];
+A.FMODEL_VERBOSITY = [];
+A.SCREEN_WIDTH     = [];
+A.VERBOSITY        = [];
+A.WORK_AREA        = [];
 

@@ -48,23 +48,3 @@ if exist( 'atmlab_conf' ) == 2
 end
 
 
-
-%= Add forward model folder(s), if a forward model is specified
-%
-fmodel = atmlab( 'FMODEL_NAME' );
-%
-if ~isempty( fmodel )
-  
-  switch fmodel
-
-    case 'arts'
-      %
-      addpath( fullfile( toppath, 'arts' ) );
-
-    otherwise
-      % 
-      serr = sprintf('You have selected an unknown forward model (%s).', ...
-                                                                      fmodel );
-      error( serr );
-  end
-end

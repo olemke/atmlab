@@ -1,3 +1,37 @@
+2004-09-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-0
+
+	* Takes the step to version 0.2 as Atmlab now has a substantial
+	content and I have changed the set of general settings. And the new
+	set of settings shall hopefully be stable (settings can be added,
+	but exsting shall not be removed or changed).
+
+	* atmlab/atmlab.m: Some settings removed and some added. Existing
+	settings are now:
+	   AMI_PATH    
+	   ARTS_PATH   
+	   ARTS1_PATH  
+	   FMODEL_VERBOSITY
+	   SCREEN_WIDTH
+	   VERBOSITY   
+	   WORK_AREA   
+	Type 'help atmlab' for description of the settings. You need to modify
+	*atmlab_conf*, if you have any.
+
+	* arts/arts.m: Created this function to call ARTS from within Matlab.
+	Note that you can do a call as
+	   arts '-w all';
+
+	* forward_model/call_fmodel.m: Removed this function as there will
+	take a long time before it will be possible to switch between 
+	different forward models in a general manner.
+
+	* handy/out.m: Copied and modified this function from AMI.
+	Use this function to produce screen output, if there is more than
+	one or two lines of output. In that way you do not need to bother
+	about checking VERBOSITY.
+
 2004-09-03  Carlos Jimnenez  <carlos.jimenez@ed.ac.uk>
 	
 	* atmlab-0-1-86

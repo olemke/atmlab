@@ -45,7 +45,7 @@ which also gives instructions on how to use the atmlab function.
 The function atmlab_init (that you should run at startup) first sets all
 settings fields to be empty and calls then the function atmlab_conf, if
 it exists in the search path. The function atmlab_conf is not part of 
-Atmlab. The intention of the function is to set personal settings and 
+Atmlab. The purpose of the function is to set personal settings and 
 it shall be placed in a folder outside Atmlab, but inside the Matlab
 search path at the moment of calling atmlab_init.
 
