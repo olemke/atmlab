@@ -4,10 +4,17 @@
 %    channels of sensor part (a or b), by weighting the "limb" Tb
 %    for all channels (of sensor part).
 %
-%    Coefficeints are taken from:
+%    The nadir brightness temperatures, tb_nadir, are obtained as
+%
+%       tb_nadir = b + A*tb_limb
+%
+%    where tb_limb is a column vector holding the brightness temperatures
+%    of the sensor part (A or B), for viewing direction *fov*.
+%
+%    Coefficients are taken from:
 %       poes.nesdis.noaa.gov      Land, AMSU-B, satellite 15 and 16.
 %
-% FORMAT   tb_nadir = amsu_limb2nadir( sensor, fov, tb_limb, surftype )
+% FORMAT   [b,A] = amsu_limb2nadir( sensor, fov, tb_limb, surftype )
 %        
 % OUT   tb_nadir   Nadir brightness temperatures
 % IN    sensor     String giving satellite number and part, e.g. '15a'.
@@ -19,7 +26,7 @@
 % 2004-04-07   Patrick Eriksson: Converted IDL function by Mashrab.
 
 
-function tb_nadir = amsu_limb2nadir( sensor, fov, tb_limb, surftype )
+function [b,A] = amsu_limb2nadir( sensor, fov, surftype )
 
 
 %=== Check input
@@ -44,9 +51,6 @@ elseif part == 'b'
   if any( fov < 0  |  fov > 44 )
     error('For AMSU-B, FOV is 0 - 44.');
   end
-  if length(tb_limb) ~= 5
-    error('For AMSU-B, 5 Tb values must be given.');
-  end
 else
   error('Position 3 of *sensor* must be ''a'' or ''b''.');
 end
@@ -62,8 +66,9 @@ if strcmp(lower(surftype),'land')
       C = load( 'n16_limb_amsub_land.coeff' );
     end
    
-    ind      = (0:4)*90 + fov + 1;
-    tb_nadir = C(ind,1) + C(ind,2:6)*vec2col(tb_limb);
+    ind = (0:4)*90 + fov + 1;
+    b   = C(ind,1);
+    A   = C(ind,2:6);
   end
 
 else

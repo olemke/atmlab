@@ -1,3 +1,13 @@
+2004-04-13  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-73
+
+	* sensors/amsu_limb2nadir.m: Changed the output to be the conversion 
+	data (not the converted data). This to allow speed improvements, by
+	applying the same conversion data on a batch of measurements in
+	parallel. This solution also allows that the conversion can be inverted
+	and it thus possible to go between differnt FOV. Not only to nadir.
+
 2004-04-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-72
