@@ -45,7 +45,8 @@ if ischar( a )
 elseif iscell( a )
   %
   if ~iscell( a{1} )
-    error('Species tags in Atmlab shall be given as a nested cell array');
+    error( ...
+   'Species tags in Atmlab shall be given as a nested cell array of strings.');
   end
   %
   b = '';

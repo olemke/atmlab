@@ -126,7 +126,7 @@ for i = 1 : nt
   %
   Q1.T_ABS = t_field + dt(i);
   %
-  S = arts1_cfile( Q1, parts, tmpfolder );
+  S = qarts12cfile( Q1, parts, tmpfolder );
   qtool( S, cfile, [] );
   arts1( cfile );
   %

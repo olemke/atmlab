@@ -44,7 +44,7 @@ Q.USE_RAW_ATMOSPHERE = 1;
 tmpfolder   = create_tmpfolder;
 
 parts = {'start','load_atm','save_atm','stop'};
-S = arts_cfile( Q, parts, tmpfolder );
+S = qarts2cfile( Q, parts, tmpfolder );
 cfile = fullfile( tmpfolder, 'cfile.arts' );
 qtool( S, cfile, [] );
 arts( cfile );

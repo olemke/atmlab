@@ -1,3 +1,17 @@
+2004-09-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-9
+
+	* arts/arts_cfile.m: What was this function is now qarts2cfile.
+	This function has now the task of creating control file examples.
+
+	* arts/qarts2cfile.m: See above. Added optional argument do_save.
+
+	* arts/arts1_cfile.m: What was this function is now qarts12cfile.
+	This function has now the task of creating control file examples.
+
+	* arts/qarts12cfile.m: See above. Added optional argument do_save.
+
 2004-09-11  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-8
