@@ -1,3 +1,23 @@
+2004-09-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-7
+
+	* arts/qarts.m: Added more fields. Spectra can not be created, by
+	getting there.
+
+	* arts/arts_cfile.m: Renamed and added options.
+
+	* arts/arts_abstable_from_arts1.m: Fixed some problems and updated
+	the function to use Qarts input.
+
+	* handy/rqre_bool.m: Ensured that NaN gives error.
+
+	* handy/rqre_scalar.m: Ensured that NaN gives error.
+
+	* arts/arts_get.m: Renamed this function to qarts_get.m
+
+	* arts/qarts_get.m: Created this function.
+
 2004-09-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-6

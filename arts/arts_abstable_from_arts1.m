@@ -1,39 +1,41 @@
-% ARTS_ABSTABLE_FROM_ARTS1   Created an ARTS absorption lookup table
+% ARTS_ABSTABLE_FROM_ARTS1   Creates an ARTS absorption lookup table
 %
-%    ARTS1 is used to create an absorption lookup table for ARTS.
+%    ARTS1 is used to generate the absorption lookup table. Spectrocopic
+%    settings follows Qarts1. See needed fields below.
 %
-%    At this moment, settings follow Qarts1, but this will be changed
-%    to use Qarts.
+%    Gas species, grids and atmospheric state are specified following Qarts.
+%    Needed fields are listed below. The frequency and pressure grid in the
+%    absorption table will be Q.F_GRID and Q.P_GRID. If the atmospheric
+%    dimension, the VMR reference state is taken as a mean over all latitude
+%    and longitude profiles.
+%
+%    Needed Qarts fields:
+%       GAS_SPECIES
+%       P_GRID
+%       F_GRID
+%       ATMOSPHERE_DIM
+%       USE_RAW_ATMOSPHERE 
+%       atmospheric fields following value of USE_RAW_ATMOSPHERE  
 %
 %    Needed Qarts1 fields:
-%        TGS
-%        LINEFORMAT
-%        LINEDATA  
-%        LINESHAPE  
-%        LINESHAPE_FACTOR 
-%        LINESHAPE_CUTOFF 
-%        ABSMODELS 
-%        F_MONO
-%        P_ABS 
-%        USE_RAW_ATMOSPHERE
-%        and
-%        APRIORI_PTZ
-%        APRIORI_VMR
-%        or
-%        T_ABS
-%        Z_ABS
-%        VMRS
+%       LINEFORMAT
+%       LINEDATA  
+%       LINESHAPE  
+%       LINESHAPE_FACTOR 
+%       LINESHAPE_CUTOFF 
+%       ABSMODELS 
 %
-% FORMAT   A = arts_abstable_from_arts1( Q, dt )
+% FORMAT   A = arts_abstable_from_arts1( Q, Q1, dt )
 %        
 % OUT   A    Absorption table structure.
-% IN    Q    ARTS1 settings.
-%       dt   Vector with temperature perturbations.
+% IN    Q    ARTS settings.
+% IN    Q1   ARTS1 settings.
+%       dt   Vector with temperature perturbations. Default is 0.
 
 % 2004-09-08   Created by Patrick Eriksson.
 
 
-function A = arts_abstable_from_arts1( Q, dt )
+function A = arts_abstable_from_arts1( Q, Q1, dt )
 
 
 %= Default values
@@ -48,7 +50,63 @@ set_defaults;
 tmpfolder   = create_tmpfolder;
 
 
-%=== What file format to use?
+%=== Obtain profiles through ARTS
+%
+rqre_bool( 'ARTS field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
+%
+p_grid   = qarts_get( Q.P_GRID );
+%
+if Q.USE_RAW_ATMOSPHERE
+  %
+  parts = {'start','load_atm','save_atm','stop'};
+  S = arts_cfile( Q, parts, tmpfolder );
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  qtool( S, cfile, [] );
+  arts( cfile );
+  t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
+  z_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
+  vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml') );
+else
+  t_field   = qarts_get( Q.T_FIELD );
+  z_field   = qarts_get( Q.T_FIELD );
+  vmr_field = qarts_get( Q.VMR_FIELD );
+  %
+  np = length( p_grid );
+  if np~=size(t_field,1)  |  np~=size(z_field,1)  |  np~=size(vmr_field,2)
+    error( 'Either T_FIELD, Z_FIELD or VMR_FIELD does not match P_GRID' );
+  end
+end
+
+
+%=== Compact to 1D
+%
+if Q.ATMOSPHERE_DIM == 3
+ t_field = mean( t_field, 3 );
+ z_field = mean( t_field, 3 );
+ vmr_field = mean( vmr_field, 4 );
+end
+if Q.ATMOSPHERE_DIM > 1
+ t_field = mean( t_field, 2 );
+ z_field = mean( t_field, 2 );
+ vmr_field = mean( vmr_field, 3 );
+end
+
+
+%=== Assign obtained fields corresponding Qarts1 fields
+%
+Q1.USE_RAW_ATMOSPHERE = 0;
+Q1.P_ABS = p_grid;
+Q1.Z_ABS = z_field;
+Q1.VMRS  = vmr_field;
+
+
+%=== Copy some fields from Q to Q1
+%
+Q1.TGS    = Q.GAS_SPECIES;
+Q1.F_MONO = Q.F_GRID;
+
+
+%=== What ARTS1 file format to use?
 %
 use_binary = atmlab( 'ARTS1_HDF' );
 rqre_bool( 'Atmlab setting ARTS1_HDF', use_binary );
@@ -59,51 +117,22 @@ else
 end
 
 
-%=== Obtain profiles
-%
-% We want to make calculations for USE_RAW_ATMOSPHERE = 0.
-% If this field is set to 1, we need first to extract atmosphere data.
-%
-rqre_bool( 'ARTS1 field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
-%
-if Q.USE_RAW_ATMOSPHERE
-  %
-  S = arts1_cfile( Q, {'tgs','pf_grids','load_atm','save_atm'}, tmpfolder );
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
-  arts( cfile, 0, 1 );
-  %
-  Q.USE_RAW_ATMOSPHERE = 0;
-  Q.T_ABS = fullfile( tmpfolder, ['t_abs',fileext] );
-  Q.Z_ABS = fullfile( tmpfolder, ['z_abs',fileext] );
-  Q.VMRS  = fullfile( tmpfolder, ['vmrs',fileext] );
-  t0      = read_datafile( Q.T_ABS, 'VECTOR');
-else
-  t0 = vec2col( arts1_get( Q.T_ABS, 'VECTOR' ) );
-  Q.T_ABS = fullfile( tmpfolder, ['t_abs',fileext] );
-end
-
-
-%=== Create control file for ARTS1 run
+%=== Define control file for ARTS1 run
 %
 parts = {'tgs','load_atm','pf_grids','spectroscopy','abscalc',...
          'save_abs_per_tg'};
-S = arts1_cfile( Q, parts, tmpfolder );
-qtool( S, cfile, [] );
-arts( cfile, 0, 1 );
-
 
 
 %=== Create absorption table
 %
-A.species           = Q.TGS;
+A.species           = Q.GAS_SPECIES;
 A.nonlinear_species = {};
-A.f_grid            = vec2col( arts1_get( Q.F_MONO, 'VECTOR' ) );
-A.p_grid            = vec2col( arts1_get( Q.P_ABS, 'VECTOR' ) );
-A.vmrs_ref          = arts1_get( Q.VMRS, 'MATRIX' );
-A.t_ref             = t0;
+A.f_grid            = vec2col( qarts_get( Q.F_GRID ) );
+A.p_grid            = vec2col( qarts_get( Q.P_GRID ) );
+A.vmrs_ref          = vmr_field;
+A.t_ref             = t_field;
 A.t_pert            = dt;
-A.nls_pert          = 0;
+A.nls_pert          = [];
 %
 nt = length(dt);
 %
@@ -111,9 +140,10 @@ A.xsec = zeros( nt, length(A.species), length(A.f_grid), length(A.p_grid) );
 %
 for i = 1 : nt
   %
-  t = t0 + dt(i);
-  write_datafile( Q.T_ABS, t, 'VECTOR' );
+  Q1.T_ABS = t_field + dt(i);
   %
+  S = arts1_cfile( Q1, parts, tmpfolder );
+  qtool( S, cfile, [] );
   arts( cfile, 0, 1 );
   %
   X = read_datafile( fullfile( tmpfolder, ['abs_per_tg',fileext] ), ...
@@ -124,16 +154,6 @@ for i = 1 : nt
   end
   %
 end
-%
-A.species           = Q.TGS;
-A.nonlinear_species = {};
-A.f_grid            = vec2col( arts1_get( Q.F_MONO, 'VECTOR' ) );
-A.p_grid            = vec2col( arts1_get( Q.P_ABS, 'VECTOR' ) );
-A.vmrs_ref          = arts1_get( Q.VMRS, 'MATRIX' );
-A.t_ref             = t0;
-A.t_pert            = dt;
-A.nls_pert          = 0;
-
 
 
 %=== Delete working folder

@@ -21,7 +21,7 @@ if nargin < 4
   highlim = Inf;
 end
 
-if ~isscalar(a) |  a < lowlim  |  a > highlim
+if isnan(a)  |  ~isscalar(a) |  a < lowlim  |  a > highlim
   fprintf('\n%s is required to be a scalar >= %d and <= %d.\n\n', name, lowlim, highlim );
   error('See above');
 end

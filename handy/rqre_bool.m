@@ -12,7 +12,7 @@
 
 function rqre_bool( name, a )
 
-if ~( isequal(a,0) | isequal(a,1) )
+if isnan(a)  |  ~( isequal(a,0) | isequal(a,1) )
   fprintf('\n%s is required to be a boolean.\n\n', name );
   error('See above');
 end

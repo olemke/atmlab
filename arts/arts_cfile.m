@@ -12,6 +12,13 @@
 %    Defined parts are:
 %       start
 %       stokes
+%       stop
+%
+%    Sorry, the Q fields needed for each part is not listed here.
+%    See the code.
+%
+%    Output is stored in files placed in *tmpdir*, with names identical
+%    the WSV name and extension '.xml' (e.g. y.xml).
 %
 % FORMAT   S = arts_cfile( Q, parts, tmpdir )
 %        
@@ -41,32 +48,71 @@ case 'start'
            'arts_cfile' ];
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
+  T{3} = 'SensorOff{}';
 
 case 'stokes'
   %
   rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
+  %
   T{1} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
 
-case 'atmosphere'
+case 'load_atm'
+  %
+  rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
+  rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
   %
   T{1} = sprintf( 'gas_speciesSet{[%s]}', arts_tgs_cnvrt(Q.GAS_SPECIES) );
-  rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
   T{2} = sprintf( 'AtmosphereSet%dD{}', Q.ATMOSPHERE_DIM );
   T{3} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, tmpdir );
   if Q.ATMOSPHERE_DIM >= 2
     T{4} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, tmpdir );
   else
-    T{4} = ' ';
+    T{4} = '# No latitude grid loaded';
   end
   if Q.ATMOSPHERE_DIM == 3
     T{5} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, tmpdir );
   else
-    T{5} = ' ';
+    T{5} = '# No longitude grid loaded';
+  end
+  %
+  if Q.USE_RAW_ATMOSPHERE
+    rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
+    T{6} = sprintf('AtmRawRead{"%s"}', Q.RAW_ATMOSPHERE );
+    T{7} = 'AtmFieldsCalc{}';
+  else
+    T{6} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, tmpdir );
+    T{7} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, tmpdir );
+    T{8} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, tmpdir );
   end
 
-case 'absorption'
+case 'save_atm'
+  %
+  T{1} = add_savefile( 't_field', tmpdir );
+  T{2} = add_savefile( 'z_field', tmpdir );
+  T{3} = add_savefile( 'vmr_field', tmpdir );
+
+case 'load_abs'
   %
   T{1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, tmpdir );
+  T{2} = file_or_data( 'gas_abs_lookup', 'GasAbsLookup', Q.GAS_ABS_LOOKUP, ...
+                                                                      tmpdir );
+  T{3} = 'gas_abs_lookupAdapt{}';
+
+case 'calc_abs'
+  T{1} = [ 'AgendaSet(scalar_gas_absorption_agenda)', ...
+                                       '{abs_scalar_gasExtractFromLookup{}}' ];
+  T{2} = 'AgendaSet(opt_prop_gas_agenda){';
+  T{3} = '   ext_matInit{}';
+  T{4} = '   abs_vecInit{}';
+  nwsm = length( Q.OPT_PROP_GAS_AGENDA );
+  for i = 1 : nwsm
+    T{4+i} = sprintf( '   %s', Q.OPT_PROP_GAS_AGENDA{i} )
+  end
+  T{4+nwsm+1} = '}';
+
+case 'rte'
+  %
+
 
 case 'stop'
   %
@@ -84,14 +130,15 @@ end
 
 %------------------------------------------------------------------------------
 
-function s = file_or_data( artsvar, datatype, qvalue, tmpfolder )
+function s = file_or_data( artsvar, datatype, qvalue, tmpdir )
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else
-    if isnan( qvalue )
-       error( sprintf('NaN found for %s.',artsvar) );
+    if ~isstruct( qvalue )  &  isnan( qvalue )
+      fprintf('\nNaN found for %s.\n\n', artsvar );
+      error('See above');
     end
-    filename = fullfile( tmpfolder, [artsvar,'.xml'] );
+    filename = fullfile( tmpdir, [artsvar,'.xml'] );
     xmlStore( filename, qvalue, datatype );
     s = add_readfile( artsvar, filename );
   end
@@ -102,8 +149,9 @@ function s = add_readfile( artsvar, filename )
 return
 
 
-function s = add_savefile( artsvar, tmpfolder )
-  filename = fullfile( tmpfolder, [ artsvar, '.xml' ] ); 
+function s = add_savefile( artsvar, tmpdir )
+  filename = fullfile( tmpdir, [ artsvar, '.xml' ] ); 
   s = sprintf('WriteXML(%s){"%s"}', artsvar, filename );
 return
+
 

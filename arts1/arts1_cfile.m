@@ -19,11 +19,14 @@
 %       save_abs
 %       save_abs_per_tg
 %
-%    File format is selected following Atmlab setting ARTS1_HDF. 
-%    Name of output files will be: [tmpfolder,varname,fileext]
+%    Sorry, the Q fields needed for each part is not listed here.
+%    See the code.
+%
+%    Output is directed to files with name [tmpfolder,varname,fileext]
 %    where varname is the ARTS1 variable name and fileext is either
 %    '.aa' or '.ab' depending on if HDF is available or not. 
-%    Binary format is used if possible (ARTS1_HDF=1).
+%    File format is selected following Atmlab setting ARTS1_HDF, where 
+%    binary format is used if possible (ARTS1_HDF=1).
 %
 % FORMAT   S = arts1_cfile( Q, parts, tmpdir )
 %        
