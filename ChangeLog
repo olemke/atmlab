@@ -1,3 +1,19 @@
+2005-03-15  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-2-44
+	
+	* scattering: Included this directory. It should include
+	functions to calculate single scattering properties in ARTS
+	format. 
+	
+	* atmlab/atmlab_init.m (toppath): Included 'scattering" directory
+	here. 
+
+	* scattering/mie_scat_data.m: Included this function. It
+	calculates single scattering properties using the Mie functions by
+	Christian Mätzler. The return variable is a SingleScatteringData
+	structure which can be written to a file simply with xmlStore.
+
 2005-03-15  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-43
