@@ -1,4 +1,4 @@
-% CHILDREN   Returns the children of figure objects.
+% CHILDREN   Returns the children of all figure objects.
 %
 %    The function returns the children of all generations, or only the closest
 %    generation, of a figure or figure objects. To get a handle to all
@@ -8,6 +8,9 @@
 %    The input argument *h* can be a vector of handles. No object in *h*
 %    can be children (in any generation) of any other object in *h*. If this
 %    is the case, some handles will be duplicated in *hc*.
+%
+%    This function returns more handles than the Matlab function *allchild*.
+%    (I am not totally sure how that function is defined.)
 %
 % FORMAT   hc = children(h,all_generations)
 %        

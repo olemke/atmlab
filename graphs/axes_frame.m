@@ -28,18 +28,22 @@ end
 
 if strcmp( on_or_off, 'off' )
   %
-  c = get( h, 'Color' );
+  c = get( get( h, 'Parent' ), 'Color' );
   %
   A.xcol = get( h, 'XCol' );
+  A.xt   = get( h, 'XTick' );
   A.xtl  = get( h, 'XTickL' );
   A.ycol = get( h, 'YCol' );
+  A.yt   = get( h, 'YTick' );
   A.ytl  = get( h, 'YTickL' );
   set( h, 'UserData', A );
   %
   set( h, 'Box', 'off' );
   set( h, 'XCol', c );
+  set( h, 'XTick', [] );
   set( h, 'XTickL', [] );
   set( h, 'YCol', c );
+  set( h, 'YTick', [] );
   set( h, 'YTickL', [] );
 
 else
@@ -48,8 +52,10 @@ else
   %
   set( h, 'Box', 'on' );
   set( h, 'XCol', A.xcol );
+  set( h, 'XTick', A.xt );
   set( h, 'XTickL', A.xtl );
   set( h, 'YCol', A.ycol );
+  set( h, 'YTick', A.yt );
   set( h, 'YTickL', A.ytl );
 
 end

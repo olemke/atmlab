@@ -1,3 +1,16 @@
+2002-12-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-1
+
+	* handy/tail.m: Created this function to get the last part of
+	any vector.
+
+	* graphs/axes_frame.m: The old version did not work for printing.
+	That works now.
+
+	* graphs/children.m: A comment regarding allchild included in the 
+	header.
+
 2002-12-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-0

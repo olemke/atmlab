@@ -10,13 +10,11 @@
 
 % 2002-12-09   Created by Patrick Eriksson.
 
-
 function s = atmlab_version
-
 
 nr1 = 0;
 nr2 = 1;
-nr3 = 0;
+nr3 = 1;
 
 
 s = sprintf('atmlab-%d.%d.%d',nr1,nr2,nr3);
