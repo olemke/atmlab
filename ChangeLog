@@ -1,6 +1,13 @@
 2004-09-09  Carmen Verdes  <cverdes@uni-bremen.de>
 
-	* atmlab-0-2-4
+	* atmlab-0-2-5
+	
+	* sensor/atovs_select_datafiles.m: added some more explanations on
+	  input and output, ... (improvements are still necessary!)
+
+2004-09-09  Carmen Verdes  <cverdes@uni-bremen.de>
+
+	* atmlab-0-2-4 
 
 	* sensor/DataSelection.m renamed to atovs_select_datafiles.m. 
 	Major modification in the file has been	made (see the file description)
