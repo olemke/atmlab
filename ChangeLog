@@ -1,3 +1,9 @@
+2002-12-13  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-0-9
+
+	* xml: Added reading routines.
+
 2002-12-12  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-0-8
