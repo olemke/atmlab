@@ -3,27 +3,32 @@
 %     Returns a vector with the particle size distribution for
 %     a given temperature and ice water content, for a tropical cirrus cloud.
 %     The parameterization is based upon the distribution of mass equivalent
-%     spheres with diameter Dm=(6M/rhoice)^(1/3), where rhoice is the density
-%     of solid ice spheres, and M is the mass of the ice crystal. 
+%     spheres with diameter Dm=(6M/(pi*rhoice))^(1/3), 
+%     where rhoice is the density of solid ice spheres,
+%     and M is the mass of the ice crystal. The
+%     parameterization can be applied over all sizes. 
 %
 %     The parameterization is taken from G.M McFarquhar and A.J Heymsfield,
 %     "Parameterization of tropical cirrus ice crystal size distribution
 %     and implications for radiative transfer: results from CEPEX",
 %     J. Atmos. Sci., 54, 2187-2200, 1997
 %
-% FORMAT   [x,y] = ice_psd_Mcfar_97(T,IWC)     
+% FORMAT   [x,y] = ice_psd_Mcfar_97(T,IWC,Dmin,Dmax,n)     
 %
 % OUT      y is a vector with the particle size distribution [#/m³/m]
-%          x is a vector from 10^(-6)m to 10^(-3)m with ecah step 10^(-6)m,
-%          and represents the mass equivalent diameters of the ice particles.
-% 
-% IN       T   Temperature [Celsius]
-%          IWC Ice water content [g/m3]
+%          x is a vector from Dmin to Dmax with  n points [m], 
+%          and represents the mass equivalent sphere diameter
+%          of the ice particles.
+%
+% IN       T     Temperature [Celsius]
+%          IWC   Ice water content [g/m3]
+%          Dmin  Minimum dimension of ice crystals [m]
+%          Dmax  Maximum dimension of ice crystals [m]
+%          n     number of points from Dmin to Dmax
 
 % History: 2004-07-19  Created by Bengt Rydberg
 
-function [x,y]=ice_psd_Mcfar_97(T,IWC);
-
+function [x,y]=ice_psd_Mcfar_97(T,IWC,Dmin,Dmax,n);
 if T>0
    error('Only temperatures smaller or equal to zero are allowed.')
 end
@@ -48,7 +53,7 @@ asigma=aasigma+basigma*T;
 bsigma=absigma+bbsigma*T;
 sigmal100=asigma+bsigma*log10(IWCl100/IWC0);
 
-Dm=linspace(1e-6,1e-3,1000);
+Dm=linspace(Dmin,Dmax,n);
 D0=1e-6;
 
 Nm1=6*IWCs100*alfas100^(5)*Dm/(pi*rhoice*gamma(5)).*exp(-alfas100*Dm);
@@ -59,4 +64,3 @@ Nm=Nm1+Nm2;
 
 x=Dm;
 y=Nm;
-

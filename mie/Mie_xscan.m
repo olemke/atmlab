@@ -14,7 +14,7 @@ function result = Mie_xscan(m, nsteps, dx)
 nx=(1:nsteps)';
 x=(nx-1)*dx;
 for j = 1:nsteps
-    a(j,:)=mie(m,x(j));
+    a(j,:)=Mie(m,x(j));
 end;
 output_parameters='Qext, Qsca, Qabs, Qb, <costeta>, Qb/Qsca'
 
