@@ -1,5 +1,43 @@
 2003-04-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-40
+
+	* atmscenarios/simplecloud_init.m: Created this function. This is
+	the attempt to solve one of the tasks for the ACE+ study. But this
+	set of two functions can also be used for other studies. Some details
+	to be fixed.
+
+	* atmscenarios/simplecloud_get.m: Created this function. Purpose and
+	status as above.
+	
+	* forwardmodel: Added this folder. To hold Matlab version of things 
+	normally found in forward models. ARTS specific stuff shall be placed
+	in arts/.
+	
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Started on this function.
+	Not ready!
+
+	* physics/Int2Planck.m: Moved and renamed to forwardmodel/i2planckTb.m
+	The move because the new forwardmodel folder fits better. The
+	renaming to avoid starting with a capital letter, and to avoid Int
+	which leads the mind to Integer (at least for me). (Claudia, OK?)
+	"Vectorized" the function. 
+
+	* physics/Int2RayJean.m: Moved and renamed to 
+	forwardmodel/i2rayjeanTb.m. Reasons as above.
+	"Vectorized" the function. 
+
+	A note: The functions shall as far as possible work in a Matlab
+	"way". That is, the input can either be a scalar, vector or a matrix.
+	This is fixed normally by replacing * with .* and / with ./.
+	
+	* XXXX/Contents.m: Revised existing files and added Contents.m where
+	it was missing.
+
+	* atmlab/atmlab_init.m: Added new folders. 
+
+2003-04-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-39
 
 	* handy/input_vector.m: Created this function.

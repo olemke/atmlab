@@ -1,4 +1,5 @@
-% Functions directly connected to the ARTS forward model.
+% Functions connected to the ARTS forward model.
 %
-%    This folder contains interface functions to the ARTS forward model.
-%    To be continued ...
+%    This folder contains functions related to the ARTS forward model.
+%    Examples are interface functions, Matlab version of internal ARTS
+%    functions and functions to plot ARTS output.
