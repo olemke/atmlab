@@ -1,5 +1,14 @@
 2002-12-17  Oliver Lemke  <olemke@uni-bremen.de>
 
+	* atmlab-0-1-4
+
+	* xml/Contents.m: Added documentation.
+
+	* xml/xmlStore.m: Fixed copy'n'paste error.
+	Added documentation.
+
+2002-12-17  Oliver Lemke  <olemke@uni-bremen.de>
+
 	* atmlab-0-1-3
 
 	* xml/xmlReadGasAbsLookup.m, xml/xmlReadSpeciesTag.m,
