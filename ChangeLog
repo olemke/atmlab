@@ -1,3 +1,10 @@
+2004-08-10  Carlos Jimnenez  <carlos.jimenez@ed.ac.uk>
+	
+	* atmlab-0-1-84
+
+	* maths/meannans.m: adding a function as mean but removing nans,
+	not standard in normal matlab without statistic toolboxes.
+
 2004-08-10  Bengt Rydberg  <benryd@etek.chalmers.se>
 	
 	* atmlab-0-1-83
