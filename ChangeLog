@@ -1,3 +1,10 @@
+2004-04-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-74
+
+	* physics/fresnel.m: Created this function to test ARTS
+	implementation of surface reflections.
+
 2004-04-13  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-73
