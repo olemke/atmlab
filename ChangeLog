@@ -1,3 +1,9 @@
+2003-11-18  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-1-59
+	
+	* xml/xmlReadSingleScatteringData: Added.
+
 2003-10-27  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-1-58
