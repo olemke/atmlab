@@ -1,3 +1,18 @@
+2002-12-12  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-0-7
+
+	* physics: Created this directory.
+
+	* physics/constants.m: Created this function, which returns
+	physical constants or an error message, if the constant is not
+	defined.
+
+	* physics/Int2Planck.m: Created. Converts intensities to planck BT.
+
+	* physics/Int2RayJean.m: Created. Converts intensities to 
+	Rayleigh Jeans BT.
+
 2002-12-12  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-0-6
