@@ -1,3 +1,9 @@
+2004-02-20  Oliver Lemke  <olemke@linux.net>
+
+	* atmlab-0-1-67
+
+	* xml/xmlReadGriddedField3.m, xml/xmlWriteGriddedField3.m: Added.
+
 2004-02-19  Oliver Lemke  <olemke@linux.net>
 
 	* atmlab-0-1-66
