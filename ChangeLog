@@ -1,3 +1,11 @@
+2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-1-9
+
+	* xml/xmlWriteArrayOf.m, xml/xmlWriteArrayOfArrayOf.m,
+	xml/xmlWriteVector.m: Extended routines to deal with column and row
+	Vectors/Arrays.
+
 2002-12-19  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* xml/xmlWriteArrayOfArrayOf.m: Working commit with Oliver.
