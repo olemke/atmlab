@@ -1,3 +1,21 @@
+2004-04-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-72
+
+	* sensors/amsu_fov2za.m: Created this function, based on input from
+	Viju.
+
+	* sensors/amsu_limb2nadir.m: Created this function, based on input
+	from Mashrab.
+
+	* graphs/example_colorbar.m: Added another test option for zerowhite.
+
+	* graphs/zerowhite.m: Fixed what Stefan started. Added a number of
+	input checks. 
+	There seems to be a bug somewhere in Matlab. Color levels can not be 
+	set to go outside of data range on both sides. The function will
+	not allow this. 
+
 2004-04-07  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-1-71

@@ -8,12 +8,18 @@
 
 z = peaks;
 
-[cmap,v] = zerowhite( z, [-8 -6 -4 -2 -1 1 2 4 6 8], 'nzp', .5 );
+[cmap,v] = zerowhite( z, [-8 -6 -4 -2 -1 1 2 4 6 8], 'nzp', 0.5 );
 
+% Another example, with more levels and stronger blacking
+% You have sometime to play around with upper and lower limit for color levels.
+% Matlab does strange things with the colors!
+%[cmap,v] = zerowhite( z, [-8:-2 -1.5:0.5:-0.5 0.5:0.5:1.5 2:8], 'nzp', 0.9 );
+
+
+colormap(cmap);
 [cout,H,cf] = contourf(z,v);
 clabel(cout,H);
 colorbarf(cout,H);
-colormap(cmap);
 
 hold on;
 
@@ -21,3 +27,4 @@ hold on;
 clabel(c,h);
 
 hold off;
+
