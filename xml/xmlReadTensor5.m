@@ -13,7 +13,7 @@
 
 function result = xmlReadTensor5(fid, attrlist)
 
-nv = str2num (xmlGetAttrValue (attrlist, 'nshelves'));
+ns = str2num (xmlGetAttrValue (attrlist, 'nshelves'));
 nb = str2num (xmlGetAttrValue (attrlist, 'nbooks'));
 np = str2num (xmlGetAttrValue (attrlist, 'npages'));
 nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
