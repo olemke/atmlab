@@ -7,10 +7,11 @@
 %
 % IN    fid    File descriptor
 % IN    data   Index Vector
-                                                                                                                               
+% IN    precision  Precision for floats
+
 % 2003-06-18  Created by Oliver Lemke.
 
-function xmlWriteIndexVector(fid, data)
+function xmlWriteIndexVector(fid, data, precision)
 
 nrows = size (data, 1);
 ncols = size (data, 2);

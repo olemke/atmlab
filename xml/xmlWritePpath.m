@@ -3,32 +3,33 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWritePpath(fid, data)
+% FORMAT   xmlWritePpath(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Ppath
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Ppath
+% IN    precision  Precision for floats
+
 % 2003-01-09  Created by Oliver Lemke.
 
-function xmlWritePpath(fid, data)
+function xmlWritePpath(fid, data, precision)
 
 xmlWriteTag (fid, 'Ppath', []);
 
-xmlWriteIndex (fid, data.dim);
-xmlWriteIndex (fid, data.np);
-xmlWriteIndex (fid, data.refraction);
-xmlWriteString (fid, data.method);
-xmlWriteNumeric (fid, data.constant);
-xmlWriteMatrix (fid, data.pos);
-xmlWriteVector (fid, data.z);
-xmlWriteVector (fid, data.l_step);
-xmlWriteArrayOf (fid, data.gp_p, 'GridPos');
-xmlWriteArrayOf (fid, data.gp_lat, 'GridPos');
-xmlWriteArrayOf (fid, data.gp_lon, 'GridPos');
-xmlWriteMatrix (fid, data.los);
-xmlWriteString (fid, data.background);
-xmlWriteVector (fid, data.tan_pos);
-xmlWriteVector (fid, data.geom_tan_pos);
+xmlWriteIndex (fid, data.dim, precision);
+xmlWriteIndex (fid, data.np, precision);
+xmlWriteIndex (fid, data.refraction, precision);
+xmlWriteString (fid, data.method, precision);
+xmlWriteNumeric (fid, data.constant, precision);
+xmlWriteMatrix (fid, data.pos, precision);
+xmlWriteVector (fid, data.z, precision);
+xmlWriteVector (fid, data.l_step, precision);
+xmlWriteArrayOf (fid, data.gp_p, 'GridPos', precision);
+xmlWriteArrayOf (fid, data.gp_lat, 'GridPos', precision);
+xmlWriteArrayOf (fid, data.gp_lon, 'GridPos', precision);
+xmlWriteMatrix (fid, data.los, precision);
+xmlWriteString (fid, data.background, precision);
+xmlWriteVector (fid, data.tan_pos, precision);
+xmlWriteVector (fid, data.geom_tan_pos, precision);
 
 xmlWriteCloseTag (fid, 'Ppath');
 

@@ -1,3 +1,38 @@
+2004-03-08  Oliver Lemke  <olemke@linux.net>
+
+	* atmlab-0-1-68
+
+	* xml/xmlStore.m: Implemented eligible precision for floats in
+	ascii output files as proposed my Mattias.
+	Add optional fourth argument precision.
+	precision could be either the number of digits which should be written
+	on output, or a string containing either 'FLOAT' or 'DOUBLE'.
+	FLOAT is equal to precision=7, DOUBLE is equal to precision=15
+
+	NOTE: The default if precision='FLOAT'. I didn't want to take double
+	as default because in most cases float is sufficient and with double
+	precision the file size increases significantly because a lot of
+	trailing zeros are written (and I didn't find a proper solution to
+	turn them off :-( )
+
+	* xml/xmlGetPrecisionFormatString.m: Added. Creates format string for
+	the desired precision for use with printf.
+
+	* xml/xmlWriteArrayOf.m, xml/xmlWriteArrayOfArrayOf.m,
+	xml/xmlWriteColIndex.m, xml/xmlWriteGasAbsLookup.m,
+	xml/xmlWriteGridPos.m, xml/xmlWriteGriddedField3.m,
+	xml/xmlWriteIndex.m, xml/xmlWriteIndexVector.m, xml/xmlWriteMatrix.m,
+	xml/xmlWriteNumeric.m, xml/xmlWritePpath.m, xml/xmlWriteRowIndex.m,
+	xml/xmlWriteSparse.m, xml/xmlWriteSparseData.m,
+	xml/xmlWriteSpeciesTag.m, xml/xmlWriteString.m, xml/xmlWriteTensor3.m,
+	xml/xmlWriteTensor4.m, xml/xmlWriteTensor5.m, xml/xmlWriteTensor6.m,
+	xml/xmlWriteTensor7.m, xml/xmlWriteVector.m:
+	Add precision parameter. The parameter also has to be present for
+	writing routines that are not outputting floats because all of them
+	are called with the same arguments from xmlStore.
+
+	* xml/xmlWriteHeader.m: Minor fix in docs.
+
 2004-02-20  Oliver Lemke  <olemke@linux.net>
 
 	* atmlab-0-1-67

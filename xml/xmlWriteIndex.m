@@ -5,12 +5,13 @@
 %
 % FORMAT   xmlWriteIndex(fid, data)
 %
-% IN    fid    File descriptor
-% IN    data   Index
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Index
+% IN    precision  Precision for floats
+
 % 2002-12-17  Created by Oliver Lemke.
 
-function xmlWriteIndex(fid, data)
+function xmlWriteIndex(fid, data, precision)
 
 xmlWriteTag (fid, 'Index', []);
 

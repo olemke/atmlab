@@ -10,7 +10,7 @@
                                                                                                                                
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteVector(fid, data)
+function xmlWriteVector(fid, data, precision)
 
 nrows = size (data, 1);
 ncols = size (data, 2);
@@ -24,7 +24,7 @@ nelem = length (data);
 xmlWriteTag (fid, 'Vector', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
-fprintf (fid, '%e\n', data);
+fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
 
 xmlWriteCloseTag (fid, 'Vector');
 

@@ -6,7 +6,7 @@
 % FORMAT   result = xmlWriteHeader(fid)
 %
 % IN    fid   File descriptor of XML file
-                                                                                                                               
+
 % 2002-12-13   Created by Oliver Lemke.
 
 function result = xmlWriteHeader(fid)

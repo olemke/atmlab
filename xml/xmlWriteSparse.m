@@ -3,14 +3,15 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteSparse(fid, data)
+% FORMAT   xmlWriteSparse(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Sparse
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Sparse
+% IN    precision  Precision for floats
+
 % 2003-06-16  Created by Mattias Ekström.
 
-function xmlWriteSparse(fid, data)
+function xmlWriteSparse(fid, data, precision)
 
 s = size (data);
 
@@ -27,7 +28,7 @@ xmlWriteTag (fid, 'Sparse', attrlist);
 
 xmlWriteRowIndex (fid, r - 1);
 xmlWriteColIndex (fid, c - 1);
-xmlWriteSparseData (fid, nonzeros(data));
+xmlWriteSparseData (fid, nonzeros(data), precision);
 
 xmlWriteCloseTag (fid, 'Sparse');
 

@@ -3,15 +3,16 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteArrayOfArrayOf(fid, data, type)
+% FORMAT   xmlWriteArrayOfArrayOf(fid, data, type, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Vector
-% IN    type   Data type as string
+% IN    fid        File descriptor
+% IN    data       Vector
+% IN    type       Data type as string
+% IN    precision  Precision for floats
 
 % 2002-12-16  Created by Oliver Lemke.
 
-function xmlWriteArrayOfArrayOf(fid, data, type)
+function xmlWriteArrayOfArrayOf(fid, data, type, precision)
 
 nrows = size (data, 1);
 ncols = size (data, 2);
@@ -27,7 +28,7 @@ attrlist = xmlAddAttribute ([], 'type', sprintf ('ArrayOf%s', type));
 attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);
 for i = 1:nelem
-  xmlWriteArrayOf (fid, data{i}, type);
+  xmlWriteArrayOf (fid, data{i}, type, precision);
 end
 
 xmlWriteCloseTag (fid, 'Array');

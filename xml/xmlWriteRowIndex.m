@@ -3,14 +3,15 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteRowIndex(fid, data)
+% FORMAT   xmlWriteRowIndex(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Index Vector
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Index Vector
+% IN    precision  Precision for floats
+
 % 2003-06-18  Created by Oliver Lemke.
 
-function xmlWriteIndexVector(fid, data)
+function xmlWriteIndexVector(fid, data, precision)
 
 nrows = size (data, 1);
 ncols = size (data, 2);

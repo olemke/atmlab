@@ -3,14 +3,15 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteSparseData(fid, data)
+% FORMAT   xmlWriteSparseData(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   SparseData
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       SparseData
+% IN    precision  Precision for floats
+
 % 2003-06-18  Created by Oliver Lemke.
 
-function xmlWriteSparseData(fid, data)
+function xmlWriteSparseData(fid, data, precision)
 
 nrows = size (data, 1);
 ncols = size (data, 2);
@@ -24,7 +25,7 @@ nelem = length (data);
 xmlWriteTag (fid, 'SparseData', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
-fprintf (fid, '%e\n', data);
+fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
 
 xmlWriteCloseTag (fid, 'SparseData');
 

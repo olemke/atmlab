@@ -3,18 +3,19 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteNumeric(fid, data)
+% FORMAT   xmlWriteNumeric(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Numeric
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Numeric
+% IN    precision  Precision for floats
+
 % 2002-12-17  Created by Oliver Lemke.
 
-function xmlWriteNumeric(fid, data)
+function xmlWriteNumeric(fid, data, precision)
 
 xmlWriteTag (fid, 'Numeric', []);
 
-fprintf (fid, '%e\n', data);
+fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
 
 xmlWriteCloseTag (fid, 'Numeric');
 

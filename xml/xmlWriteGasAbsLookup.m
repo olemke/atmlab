@@ -3,26 +3,27 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteGasAbsLookup(fid, data)
+% FORMAT   xmlWriteGasAbsLookup(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   GasAbsLookup table
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       GasAbsLookup table
+% IN    precision  Precision for floats
+
 % 2002-12-16  Created by Oliver Lemke.
 
-function xmlWriteGasAbsLookup(fid, data)
+function xmlWriteGasAbsLookup(fid, data, precision)
 
 xmlWriteTag (fid, 'GasAbsLookup', []);
 
-xmlWriteArrayOfArrayOf (fid, data.species, 'SpeciesTag');
-xmlWriteArrayOf (fid, data.nonlinear_species, 'Index');
-xmlWriteVector (fid, data.f_grid);
-xmlWriteVector (fid, data.p_grid);
-xmlWriteMatrix (fid, data.vmrs_ref);
-xmlWriteVector (fid, data.t_ref);
-xmlWriteVector (fid, data.t_pert);
-xmlWriteVector (fid, data.nls_pert);
-xmlWriteTensor4 (fid, data.xsec);
+xmlWriteArrayOfArrayOf (fid, data.species, 'SpeciesTag', precision);
+xmlWriteArrayOf (fid, data.nonlinear_species, 'Index', precision);
+xmlWriteVector (fid, data.f_grid, precision);
+xmlWriteVector (fid, data.p_grid, precision);
+xmlWriteMatrix (fid, data.vmrs_ref, precision);
+xmlWriteVector (fid, data.t_ref, precision);
+xmlWriteVector (fid, data.t_pert, precision);
+xmlWriteVector (fid, data.nls_pert, precision);
+xmlWriteTensor4 (fid, data.xsec, precision);
 
 xmlWriteCloseTag (fid, 'GasAbsLookup');
 

@@ -3,14 +3,15 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteMatrix(fid, data)
+% FORMAT   xmlWriteMatrix(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Matrix
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Matrix
+% IN    precision  Precision for floats
+
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteMatrix(fid, data)
+function xmlWriteMatrix(fid, data, precision)
 
 s = size (data);
 
@@ -30,15 +31,16 @@ xmlWriteTag (fid, 'Matrix', attrlist);
 data = reshape (data, [nr nc]);
 data = data';
 
-form='%.14e';
+format=xmlGetPrecisionFormatString (precision);
+form=format;
 for i = 1:(nc-1)
-  form = sprintf ('%s %%.14e', form);
+  form = sprintf ('%s %s', form, format);
 end
-form = sprintf ('%s\n', form);
+form = strcat (form, '\n');
 
 fprintf (fid, form, data);
 
 xmlWriteCloseTag (fid, 'Matrix');
 
-clear attrlist form nr nc;
+clear attrlist form format nr nc;
 

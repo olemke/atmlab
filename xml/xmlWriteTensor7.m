@@ -3,14 +3,15 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteTensor7(fid, data)
+% FORMAT   xmlWriteTensor7(fid, data, precision)
 %
-% IN    fid    File descriptor
-% IN    data   Tensor7
-                                                                                                                               
+% IN    fid        File descriptor
+% IN    data       Tensor7
+% IN    precision  Precision for floats
+
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor7(fid, data)
+function xmlWriteTensor7(fid, data, precision)
 
 s = size (data);
 
@@ -39,15 +40,16 @@ xmlWriteTag (fid, 'Tensor7', attrlist);
 
 data = permute (data, [7 6 5 4 3 2 1]);
 
-form='%e';
+format=xmlGetPrecisionFormatString (precision);
+form=format;
 for i = 1:(nc-1)
-  form = sprintf ('%s %%e', form);
+  form = sprintf ('%s %s', form, format);
 end
-form = sprintf ('%s\n', form);
+form = strcat (form, '\n');
 
 fprintf (fid, form, data);
 
 xmlWriteCloseTag (fid, 'Tensor7');
 
-clear attrlist form nl nv ns nb np nr nc;
+clear attrlist form format nl nv ns nb np nr nc;
 

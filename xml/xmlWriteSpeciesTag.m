@@ -3,14 +3,15 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   result = xmlWriteSpeciesTag(fid, data)
+% FORMAT   result = xmlWriteSpeciesTag(fid, data, precision)
 %
-% IN    fid    File descriptor of XML file
-% IN    data   SpeciesTag
-                                                                                                                               
+% IN    fid        File descriptor of XML file
+% IN    data       SpeciesTag
+% IN    precision  Precision for floats
+
 % 2002-12-17   Created by Oliver Lemke.
 
-function result = xmlWriteSpeciesTag(fid, data)
+function result = xmlWriteSpeciesTag(fid, data, precision)
 
 xmlWriteTag (fid, 'SpeciesTag', []);
 fprintf (fid, '"%s"\n', data);
