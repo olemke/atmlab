@@ -41,6 +41,13 @@
 %
 % Path to executable for ARTS. For example '/home/patrick/ARTS/arts2/src/arts'.
 %----------------------------------------------------------------------------
+% ARTS_XMLDATA_PATH
+%
+% Path to main folder of arts-xml-data. 
+% The arts-xml-data is a compilation of useful data for ARTS calculations.
+% Contact the ARTS team if you want access to the data. The data is used
+% as input for ARTS example functions. 
+%----------------------------------------------------------------------------
 % ARTS1_HDF
 %
 % Boolean to indicate if ARTS-1.0.x is compiled with HDF. If true, the binary
@@ -100,12 +107,13 @@ persistent A
 
 function A = atmlab_defs
 
-A.AMI_PATH         = NaN;
-A.ARTS_PATH        = NaN;
-A.ARTS1_HDF        = NaN;
-A.ARTS1_PATH       = NaN;
-A.FMODEL_VERBOSITY = NaN;
-A.SCREEN_WIDTH     = NaN;
-A.VERBOSITY        = NaN;
-A.WORK_AREA        = NaN;
+A.AMI_PATH          = NaN;
+A.ARTS_PATH         = NaN;
+A.ARTS_XMLDATA_PATH = NaN;
+A.ARTS1_HDF         = NaN;
+A.ARTS1_PATH        = NaN;
+A.FMODEL_VERBOSITY  = NaN;
+A.SCREEN_WIDTH      = NaN;
+A.VERBOSITY         = NaN;
+A.WORK_AREA         = NaN;
 

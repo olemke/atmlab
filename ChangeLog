@@ -1,3 +1,12 @@
+2004-10-04  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-22
+
+	* atmlab/atmlab.m: Added setting ARTS_XMLDATA_PATH.
+
+	* arts/qarts_demo.m: Added use ARTS_XMLDATA_PATH. The example
+	included a hard coded path.
+
 2004-10-04  Carmen Verdes  <cverdes@uni-bremen.de>
 
 	* atmlab-0-2-21
