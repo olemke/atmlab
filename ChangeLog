@@ -1,3 +1,18 @@
+2002-12-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-21
+
+	* Basic functions to handle 3D path calculations seem to be ready.
+	But a lot of work to do before everything is working.
+
+	* arts/gridcell_crossing_3d.m: Created this function.
+
+	* arts/obsplane2latlon.m: Removed this function.
+
+	* arts/cart2poslos.m: Finished this function.
+
+	* arts/poslos2cart.m: Fixed a bug.
+
 2002-12-27  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-20

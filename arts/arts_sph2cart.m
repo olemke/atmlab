@@ -15,7 +15,7 @@
 % 2002-12-27   Created by Patrick Eriksson.
 
 
-function [x,y,z] = function arts_sph2cart(r,lat,lon)
+function [x,y,z] = arts_sph2cart(r,lat,lon)
 
 
 DEG2RAD = constants( 'DEG2RAD' );

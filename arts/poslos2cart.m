@@ -37,7 +37,7 @@ DEG2RAD = constants( 'DEG2RAD' );
 
 %= Handle lat = +- 90 as they are special cases
 %
-if abs( lat ) > 89.99999
+if abs( lat ) > 89.999999
 
   s = sign( lat );
 
