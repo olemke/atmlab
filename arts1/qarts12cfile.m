@@ -25,7 +25,7 @@
 %    Sorry, the Q fields needed for each part is not listed here.
 %    See the code.
 %
-%    Output is directed to files with name [tmpfolder,varname,fileext]
+%    Output is directed to files with name [tmpdir,varname,fileext]
 %    where varname is the ARTS1 variable name and fileext is either
 %    '.aa' or '.ab' depending on if HDF is available or not. 
 %    File format is selected following Atmlab setting ARTS1_HDF, where 
@@ -112,7 +112,7 @@ case 'spectroscopy'
     filename = Q.LINEDATA;
     format   = Q.LINEFORMAT;
   else
-    filename = fullfile( tmpfolder, 'linefile.al' );
+    filename = fullfile( tmpdir, 'linefile.al' );
     format   = 'Arts';
     arts_write_linefile( filename, Q.LINEDATA );
   end
