@@ -1,6 +1,6 @@
 2003-02-11  Oliver Lemke  <olemke@uni-bremen.de>
 
-	* atmlab-0-1-25
+	* atmlab-0-1-26
 
 	* xml/xmlLoad.m, xml/xmlRead*.m: Added support for reading binary xml
 	files. Speed up in comparison to ascii is similar to the improvements
