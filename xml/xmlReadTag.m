@@ -40,6 +40,7 @@ while ~feof (fid) & ~exit_loop
         c = fgets (fid, 1);
       end
 
+      attrlist = {};
       if feof (fid)
         error ('Unexpected end of file');
         break;
@@ -60,6 +61,7 @@ while ~feof (fid) & ~exit_loop
       while ~feof (fid) & c ~= '>'
         c = fgets (fid, 1);
       end
+      exit_loop = 1;
     end
   else
     exit_loop = 1;
