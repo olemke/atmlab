@@ -1,5 +1,22 @@
 2002-12-13  Oliver Lemke  <olemke@uni-bremen.de>
 
+	* atmlab-0-0-13
+
+	* xmlAddAttribute.m, xmlOpenOutputFile.m, xmlWriteCloseTag.m,
+	xmlWriteFooter.m, xmlWriteHeader.m, xmlWriteMatrix.m, xmlWriteTag.m,
+	xmlWriteTensor3.m, xmlWriteTensor4.m, xmlWriteTensor5.m,
+	xmlWriteTensor6.m, xmlWriteTensor7.m, xmlWriteVector.m:
+	Implemented writing routines.
+
+	* xmlGetAttrValue.m: Clear variables after use.
+	
+	* xmlReadTensor5.m: Fixed typo.
+
+	* xmlReadIndex.m, xmlReadNumeric.m, xmlReadSpeciesTag.m,
+	xmlReadTensor7.m: Added more reading routines.
+
+2002-12-13  Oliver Lemke  <olemke@uni-bremen.de>
+
 	* atmlab-0-0-12
 
 	* atmlab_init.m: Removed path artsfuns.
