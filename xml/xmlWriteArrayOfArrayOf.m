@@ -28,7 +28,9 @@ attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);
 for i = 1:nelem
   xmlWriteArrayOf (fid, data{i}, type);
-  xmlWriteCloseTag (fid, 'Array');
 end
+
+xmlWriteCloseTag (fid, 'Array');
+
 clear i nrows ncols nelem;
 
