@@ -1,3 +1,17 @@
+2003-03-28  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-1-36
+
+	* physics/e_eq_water.m: Added. Calculates the equilibrium water
+	vapor pressure over a plane surface of liquid water according to
+	Sonntag, 1994.
+
+	* physics/e_eq_ice.m: Added. Calculates the equilibrium water
+	vapor pressure over a plane surface of ice according to Sonntag,
+	1994.
+
+	* physics/Contents.m: Added information about the new functions.
+
 2003-03-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-35
