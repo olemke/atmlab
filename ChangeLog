@@ -1,3 +1,10 @@
+2004-10-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-24
+
+	* arts/arts_ppath.m: Updated internal template file to recent ARTS
+	modifications.
+
 2004-10-05  Carmen Verdes  <cverdes@uni-bremen.de>
 
 	* atmlab-0-2-23
