@@ -10,7 +10,7 @@
                                                                                                                                
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor7(filename, data)
+function xmlWriteTensor7(fid, data)
 
 s = size (data);
 

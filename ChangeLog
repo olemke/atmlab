@@ -1,3 +1,9 @@
+2003-10-24  Mattias Ekström  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-1-55
+
+	* xml/xmlWriteTensor7.m: Changed input argument 'filename' to 'fid'.
+
 2003-10-10  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-1-54
