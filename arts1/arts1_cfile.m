@@ -17,7 +17,7 @@ function arts1_cfile( Q, parts, cfile )
 
 tmpfolder   = create_tmpfolder;
 
-S = qarts21cfile( Q, parts, tmpfolder );
+S = qarts12cfile( Q, parts, tmpfolder );
 tmpcfile = fullfile( tmpfolder, 'cfile.arts' );
 qtool( S, tmpcfile, [], 0 );
 

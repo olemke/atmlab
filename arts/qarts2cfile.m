@@ -17,6 +17,7 @@
 %       load_abs
 %       calc_abs
 %       init_rte
+%       cloudbox
 %       sensor
 %       save_sensor
 %       calc_rte
@@ -79,7 +80,7 @@ if nargin == 1
   case 'y'
     %
     S = {'start', 'stokes', 'load_atm', 'load_abs', 'calc_abs', 'init_rte', ...
-         'sensor', 'calc_rte', 'save_y', 'stop' };
+         'cloudbox', 'sensor', 'calc_rte', 'save_y', 'stop' };
 
   otherwise
     error( sprintf( 'Unknown run type (%s) was requested.', Q ) );
@@ -194,14 +195,21 @@ case 'init_rte'
     error( 'Q.REFR_INDEX_AGENDA must either be NaN or cell array of strings.');
   end
   T = add_agenda( T, 'rte_agenda', {'RteEmissionStd{}'} );
-  T{length(T)+1} = ...
-         file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
-  T{length(T)+1} = ...
-         file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
-  T{length(T)+1} = 'cloudboxOff{}';
+  T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
+  T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   %
   T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
   
+case 'cloudbox'
+  %
+  if isstruct(Q.CLOUDBOX)
+    T = cloudbox2cfile( Q, tmpdir );
+  elseif isnan( Q.CLOUDBOX )  |  Q.CLOUDBOX == 0 
+    T{1} = 'cloudboxOff{}';
+  else
+    error( 'Unknown selection for Q.CLOUDBOX.' );
+  end
+
 case 'sensor'
   %
   if ischar(Q.SENSOR_RESPONSE) | issparse(Q.SENSOR_RESPONSE)
@@ -211,7 +219,7 @@ case 'sensor'
     T = Q.SENSOR_RESPONSE;
   elseif isstruct(Q.SENSOR_RESPONSE) 
     T = sensor2cfile( Q.SENSOR_RESPONSE, tmpdir );
-  elseif isnan(Q.SENSOR_RESPONSE) 
+  elseif isnan(Q.SENSOR_RESPONSE)  |  Q.SENSOR_RESPONSE == 0 
     T{1} = 'sensorOff{}';
   else
     error( 'Unrecognised choice for Q.SENSOR_RESPONSE.' );
@@ -238,6 +246,17 @@ case 'save_y'
       error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
   end
   T{2} = add_savefile( 'y', tmpdir );
+  %
+  if isstruct( Q.CLOUDBOX )  &  strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
+    T{3} = 'mc_errorApplySensor{}';
+    switch upper( Q.Y_UNIT )
+      case '1'
+        T{4} = '# No conversion to K';
+      case { 'RJ', 'PLANCK' }
+        T{4} = 'VectorToTbByRJ(mc_error,mc_error){}';
+    end
+    T{5} = add_savefile( 'mc_error', tmpdir );
+  end
 
 case 'stop'
   %
@@ -254,6 +273,9 @@ S = { S{:} T{:} };
 end
 
 
+
+%------------------------------------------------------------------------------
+% Smaller help functions
 %------------------------------------------------------------------------------
 
 function s = file_or_data( artsvar, datatype, qvalue, tmpdir )
@@ -287,11 +309,11 @@ function T = add_agenda( T, agenda, strarray )
         sprintf('The field %s must be specified as cell array of strings.', ...
                                                              upper(agenda) ) );
   end
-  T{length(T)+1} = sprintf( 'AgendaSet(%s){', agenda );
+  T{end+1} = sprintf( 'AgendaSet(%s){', agenda );
   for j = 1 : length(strarray)
-    T{length(T)+1} = sprintf( '   %s', strarray{j} );
+    T{end+1} = sprintf( '   %s', strarray{j} );
   end
-  T{length(T)+1} = '}';
+  T{end+1} = '}';
 return
 
 
@@ -302,6 +324,284 @@ function T = add_wsms( T, field, strarray )
                                                                      field ) );
   end
   for j = 1 : length(strarray)
-    T{length(T)+1} = sprintf( '%s', strarray{j} );
+    T{end+1} = sprintf( '%s', strarray{j} );
   end
 return
+
+
+function ok = isdefined( H, fields )
+  ok = 1;
+  for it=1:length(fields)
+    if isnan(H.(fields{it}))
+      ok = 0;
+    end
+  end
+return
+
+
+
+%------------------------------------------------------------------------------
+% cloudbox2cfile
+%------------------------------------------------------------------------------
+
+function T = cloudbox2cfile( Q, tmpdir )
+
+%= Pick out cloudbox structure
+%
+C = Q.CLOUDBOX;
+
+%= Check that all fields are present
+%
+qcheck( @qarts_cloudbox, C );
+
+%= Some basic checks
+if Q.ATMOSPHERE_DIM == 2
+  error( 'Scattering is not defined for 2D.' );
+elseif Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(C.METHOD), 'MC' )
+  error( 'MC can only be applied for 3D.' );
+end
+
+T = [];
+
+%= Agendas for scattering properties 
+%
+T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
+T = add_agenda( T, 'opt_prop_part_agenda', ...
+     {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
+
+%= Particle field and single scattering data
+%
+if isnumeric(C.PND_FIELD)  |  ischar(C.PND_FIELD)
+  %
+  if ~( isnumeric(C.SCAT_DATA)  |  ischar(C.SCAT_DATA) )
+     error( ['Not allowed combination of Q.CLOUDBOX.PND_FIELD and ',...
+                                          'Q.CLOUDBOX.SCAT_DATA data types'] );
+  end
+  %    
+  T{end+1} = file_or_data( 'pnd_field', 'Tensor4', C.PND_FIELD, tmpdir );
+  T{end+1} = file_or_data( 'scat_data_raw', 'ArrayOfSingleScatteringData', ...
+                                                         C.SCAT_DATA, tmpdir );
+
+elseif iscellstr(C.PND_FIELD)
+  %
+  if ~iscellstr(C.SCAT_DATA)
+     error( ...
+    'The cloudbox fields PND_FIELD and SCAT_DATA must be of same data type.' );
+  end
+  if length(C.PND_FIELD)  ~=  length(C.SCAT_DATA)
+    error( ['Length of Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must ',...
+                             'be equal when they are cell array of strings'] );
+  end
+  %
+  T{end+1} = 'ParticleTypeInit{}';
+  for i = 1 : length(C.PND_FIELD)
+    T{end+1} = 'ParticleTypeAdd{';
+    T{end+1} = sprintf('   filename_scat_data =  "%s"', C.SCAT_DATA{i} );
+    T{end+1} = sprintf('   filename_pnd_field =  "%s"', C.PND_FIELD{i} );
+    T{end+1} = '}';
+  end  
+  T{end+1} = 'pnd_fieldCalc{}';
+  %
+else
+  error( 'Unknown data type found for Q.CLOUDBOX.PND_FIELD' );
+end
+
+%= Cloudbox
+%
+if isvector(C.LIMITS)  &  ~any(isnan( C.LIMITS ))
+  if length(C.LIMITS) ~= 2*Q.ATMOSPHERE_DIM
+    error( ...
+    'Length of Q.CLOUDBOX.LIMITS does not match atmospheric dimensionality.' );
+  end 
+  if length(C.LIMITS) < 6
+     limits = C.LIMITS;
+     C.LIMITS = zeros(1,6);
+     C.LIMITS(1:length(limits)) = limits;
+  end
+  T{end+1} = 'cloudboxSetManuallyAltitude{';
+  T{end+1} = sprintf('   z1   = %.3f', C.LIMITS(1) );
+  T{end+1} = sprintf('   z2   = %.3f', C.LIMITS(2) );
+  T{end+1} = sprintf('   lat1 = %.3f', C.LIMITS(3) );
+  T{end+1} = sprintf('   lat2 = %.3f', C.LIMITS(4) );
+  T{end+1} = sprintf('   lon1 = %.3f', C.LIMITS(5) );
+  T{end+1} = sprintf('   lon2 = %.3f', C.LIMITS(6) );
+  T{end+1} = '}';
+else
+  error('Not valid specification CLOUDBOX.LIMITS.');
+end
+
+%= DOIT / MC
+%
+if strcmp( upper(C.METHOD), 'DOIT' )
+  %
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', SCAT_ZA_GRID );
+  T{end+1} = file_or_data( 'scat_za_grid', 'Vector', ...
+                                        C.METHOD_PARAMS.SCAT_ZA_GRID, tmpdir );
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', SCAT_ZA_INTERP );
+  T{end+1} = sprintf('scat_za_interpSet{interp_method = "%s"}', ...
+                                              C.METHOD_PARAMS.SCAT_ZA_INTERP );
+  if Q.ATMOSPHERE_DIM == 3
+    rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', SCAT_AA_GRID );
+    T{end+1} = file_or_data( 'scat_aa_grid', 'Vector', ...
+                                        C.METHOD_PARAMS.SCAT_AA_GRID, tmpdir );
+  end
+
+elseif strcmp( upper(C.METHOD), 'MC' )
+  %
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'STD_ERR', 0 );
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'MAX_TIME', 0 );
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'MAX_ITER', 0 );
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'RNG_SEED', 0 );
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', ...
+                                                        'INCOMING_LOOKUP', 0 );
+  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'Z_FIELD_IS_1D', 0);
+  %
+  if C.METHOD_PRMTRS.INCOMING_LOOKUP
+    T{end+1} = file_or_data( 'mc_incoming', 'SLIData2', ...
+                                     C.METHOD_PARAMS.INCOMING_LOOKUP, tmpdir );
+  end
+  %
+  T{end+1} = 'IndexSet(f_index){value=0}';
+  T{end+1} = 'scat_data_monoCalc{}';
+  %
+  T{end+1} = 'AgendaSet(iy_cloudbox_agenda){';
+  T{end+1} = '   ScatteringMonteCarlo{';
+  T{end+1} = sprintf('     std_err       = %d', C.METHOD_PRMTRS.STD_ERR );
+  T{end+1} = sprintf('     max_time      = %d', C.METHOD_PRMTRS.MAX_TIME );
+  T{end+1} = sprintf('     max_iter      = %d', C.METHOD_PRMTRS.MAX_ITER );
+  T{end+1} = sprintf('     rng_seed      = %d', C.METHOD_PRMTRS.RNG_SEED );
+  T{end+1} = sprintf('     incoming_lookup = %d', ...
+                                             C.METHOD_PRMTRS.INCOMING_LOOKUP );
+  T{end+1} = sprintf('     z_field_is_1D = %d', ...
+                                               C.METHOD_PRMTRS.Z_FIELD_IS_1D );
+  T{end+1} = '   }';
+  T{end+1} = '}';
+
+else
+  error( 'Unknown choice for CLOUDBOX.METHOD.' );
+end
+
+
+
+%------------------------------------------------------------------------------
+% sensor2cfile
+%------------------------------------------------------------------------------
+
+% 2005-01-26   Created by Mattias Ekström.
+
+function S = sensor2cfile( H, tmpdir )
+
+% Check that all fields are present
+qcheck( @qarts_sensor, H );
+
+% Check that some fields have valid values
+if (H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1)
+  error('The field *SENSOR_NORM* in the sensor structure can only be 0 or 1.')
+end
+if (H.ANTENNA_DIM~=1 & H.ANTENNA_DIM~=2)
+  error('The field *ANTENNA_DIM* in the sensor structure must be 1 or 2.')
+end
+
+% Check for obligatory sensor fields
+oblig_fields = {'SENSOR_NORM', 'ANTENNA_DIM', 'MBLOCK_ZA_GRID'};
+if (H.ANTENNA_DIM==2)
+  oblig_fields{length(oblig_fields)+1} = 'MBLOCK_AA_GRID';
+end
+
+for it=1:length(oblig_fields)
+  if isnan(H.(oblig_fields{it}))
+    error(['The field *' oblig_fields{it} ...
+           '* in the sensor structure must be set.'])
+  end
+end
+
+% Find out sensor structure
+parts{1} = 'init';
+if isdefined( H, {'ANTENNA_DIAGRAM','ANTENNA_LOS'} )
+  parts{length(parts)+1} = 'antenna';
+end
+if isdefined( H, {'SENSOR_ROT'} )
+  parts{length(parts)+1} = 'rotation';
+end
+if isdefined( H, {'SENSOR_POL'} )
+  parts{length(parts)+1} = 'polarisation';
+end
+if isdefined( H, {'LO','SIDEBAND_FILTER'} )
+  parts{length(parts)+1} = 'mixer';
+end
+if isdefined( H, {'F_BACKEND','CHANNEL_RESPONSE'} )
+  parts{length(parts)+1} = 'backend';
+end
+% If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
+if (strmatch('mixer',char(parts)) & ...
+    strmatch('backend',char(parts)) & ...
+    length(H.LO)>1 )
+  parts = rmfield( parts, {'mixer' 'backend'} );
+  parts{length(parts)+1} = 'multimixer';
+end
+parts{length(parts)+1} = 'close';
+    
+% Start writing to structure 'S'             
+S = {};
+
+for it = 1 : length(parts)
+
+T = [];
+
+switch parts{it}
+
+case 'init'
+  T{1} = ['# Sensor part created by Atmlab function sensor2cfile'];
+  T{2} = ['AntennaSet' num2str(H.ANTENNA_DIM) 'D{}'];
+  T{3} = file_or_data( 'mblock_za_grid', 'Vector', H.MBLOCK_ZA_GRID, tmpdir );
+  if H.ANTENNA_DIM==2
+    T{4} = file_or_data( 'mblock_aa_grid', 'Vector', H.MBLOCK_AA_GRID, tmpdir );
+  else
+    T{4} = ['# No azimuthal measurement block angle grid loaded'];
+  end
+  T{5} = ['IndexSet(sensor_norm){' num2str(H.SENSOR_NORM) '}'];
+  T{6} = 'sensor_responseInit{}';
+  
+case 'antenna'
+  T{1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, tmpdir );
+  T{2} = file_or_data( 'antenna_diagram', 'ArrayOfArrayOfMatrix', ...
+                       H.ANTENNA_DIAGRAM, tmpdir );
+  T{3} = 'sensor_responseAntenna1D{}';
+  
+case 'rotation'
+  T{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, tmpdir );
+  T{2} = 'sensor_responseRotation{}';
+
+case 'polarisation'
+  T{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
+  T{2} = 'sensor_responsePolarisation{}';
+    
+case 'mixer'
+  T{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
+  T{2} = file_or_data( 'matrix_1', 'Matrix', H.SIDEBAND_FILTER, tmpdir );
+  T{3} = 'sensor_responseMixer(matrix_1){}';
+
+case 'backend'
+  T{1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
+  T{2} = file_or_data( 'arrayofmatrix_1', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
+  T{3} = 'sensor_responseBackend(arrayofmatrix_1){}';
+  
+case 'multimixer'
+  T{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
+  T{2} = file_or_data( 'matrix_1', 'Matrix', H.SIDEBAND_FILTER, tmpdir );
+  T{3} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
+  T{4} = file_or_data( 'arrayofmatrix_1', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
+  T{5} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
+  T{6} = 'sensor_responseBackend(matrix_1,arrayofmatrix_1){}';
+  
+case 'close'
+  T{1} = '# End of sensor part';
+
+otherwise
+  error(sprintf('Unknown action (%s) was requested.',parts{it}));
+end
+
+S = { S{:} T{:} };
+
+end
+

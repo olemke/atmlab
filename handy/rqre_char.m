@@ -13,6 +13,6 @@
 function rqre_char( name, a )
 
 if ~ischar(a)
-  fprintf('\n%s is required to be a string.\n\n' );
+  fprintf('\n%s is required to be a string.\n\n', name );
   error('See above');
 end

@@ -3,15 +3,16 @@
 %    Qarts fields for atmosphere, absorption, sensor and RT must be
 %    specified.
 %
-% FORMAT   y = arts_y( Q )
+% FORMAT   [y,dy] = arts_y( Q )
 %        
 % OUT   y   Spectrum vector.
+%       dy  Estimate of calculation accuracy.
 % IN    Q   Qarts structure.
 
 % 2004-09-17   Created by Patrick Eriksson.
 
 
-function y = arts_y( Q )
+function [y,dy] = arts_y( Q )
 
 tmpfolder   = create_tmpfolder;
 
@@ -23,7 +24,19 @@ cfile = fullfile( tmpfolder, 'cfile.arts' );
 
 qtool( S, cfile, [] );
 
+
 arts( cfile );
+
+
+if isstruct( Q.CLOUDBOX )  
+  if strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
+    dy = xmlLoad( fullfile( tmpfolder, 'mc_error.xml' ) );
+  else
+    dy = NaN;
+  end
+else
+  dy = NaN;
+end
 
 y = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
 

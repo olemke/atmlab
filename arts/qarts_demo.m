@@ -1,3 +1,16 @@
+% QARTS_DEMO   A demonstration of Qarts
+%
+%    Gives an example on how Qarts can be used.
+%
+% FORMAT   Q = qarts_demo( ztan )
+%        
+% OUT   Q      Qarts setting structure.
+% OPT   ztan   Tangent altitude.
+
+% 2005-01-26   Sensor part added by Mattias Ekström.
+% 2004-??-??   Created by Patrick Erikssom.
+
+
 function Q = qarts_demo( ztan )
 
 if nargin == 0
@@ -38,7 +51,6 @@ Q.GAS_SPECIES{3}{1} = 'N2O';
 Q.GAS_SPECIES{4}{1} = 'H2O';
 Q.GAS_SPECIES{4}{2} = 'H2O-MPM89';
 Q.GAS_SPECIES{5}{1} = 'N2-SelfContStandardType';
-Q.GAS_SPECIES{6}{1} = 'O3-686-*-*';
 %
 Q.F_GRID         = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM     = 1;
@@ -49,7 +61,7 @@ Q1.LINEDATA      = fullfile( atmlab_example_data , 'lines501.4' );
 Q.OPT_PROP_GAS_AGENDA = { 'ext_matAddGas{}', 'abs_vecAddGas{}' };
 
 
-%= Create T_FIELD, Z_FIELD and VMR_FIELD by ARTS1
+%= Create T_FIELD, Z_FIELD and VMR_FIELD
 %
 [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD] = arts_get_atmfields( Q );
 
@@ -94,3 +106,4 @@ plot( Q.F_GRID/1e9, y )
 xlabel( 'Frequency [GHz]' )
 ylabel( 'Brightness temperature [K]' )
 title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3 ) );
+
