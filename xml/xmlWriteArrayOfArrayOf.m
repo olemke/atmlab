@@ -13,14 +13,15 @@
 
 function xmlWriteArrayOfArrayOf(fid, data, type)
 
-nelem = size (data, 2);
+nelem = size (data, 1);
 
 attrlist = [];
 attrlist = xmlAddAttribute ([], 'type', sprintf ('ArrayOf%s', type));
 attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);
-xmlWriteArrayOf (fid, data, type);
-xmlWriteCloseTag (fid, 'Array');
-
-clear nelem;
+for i = 1:nelem
+  xmlWriteArrayOf (fid, data{i}, type);
+  xmlWriteCloseTag (fid, 'Array');
+end
+clear i nelem;
 

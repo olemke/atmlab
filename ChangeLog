@@ -1,3 +1,7 @@
+2002-12-19  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* xml/xmlWriteArrayOfArrayOf.m: Working commit with Oliver.
+
 2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-8
