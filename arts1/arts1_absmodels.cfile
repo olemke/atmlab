@@ -39,10 +39,9 @@ cont_descriptionAppend{
     model         = "MPM93"
     userparameters = [ ]
 }
-
 cont_descriptionAppend{
-    tagname        = "N2-SelfContStandardType"
-    model          = "Rosenkranz"
+    tagname        = "O2-PWR93"
+    model         = "Rosenkranz"
     userparameters = [ ]
 }
 

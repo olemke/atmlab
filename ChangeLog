@@ -1,3 +1,35 @@
+2004-09-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-19
+
+	* arts1/arts1_absorption.m (parts): Created this
+	function. Absorption calculations have never been simpler ;-)
+	A small, but complete, example:
+	
+	   z = 250 : 500 : 19.75e3;
+	   f = linspace( 10e9, 300e9, 1451 );
+	   clear Q1
+	   addpath_ami,
+	   Q1 = qarts1;
+	   Q1.TGS{1}{1} = 'H2O-MPM89';
+	   Q1.TGS{2}{1} = 'O2-PWR93';
+	   Q1.TGS{3}{1} = 'N2-SelfContStandardType';
+	   Q1.USE_RAW_ATMOSPHERE  = 1;
+	   Q1.APRIORI_VMR = ...
+	            '/home/patrick/ARTS/arts-data/atmosphere/fascod/tropical';
+	   Q1.APRIORI_PTZ = ...
+	      '/home/patrick/ARTS/arts-data/atmosphere/fascod/tropical.tz.aa';
+	   Q1.P_ABS          = z2p_simple( z );
+	   Q1.F_MONO         = f;
+	   Q1.LINEFORMAT    = 'Arts';
+	   Q1.LINEDATA      = 'no_lines';
+	   A = arts1_absorption( Q1 );
+	   save absorption_tropical A z f
+
+	* arts1/arts1_absmodels.cfile: Added O2-PWR93.
+
+	* arts1/qarts1.m (I.R_GEOID): Field was mispelled.
+
 2004-09-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-18
