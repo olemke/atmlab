@@ -1,3 +1,9 @@
+2004-02-19  Oliver Lemke  <olemke@linux.net>
+
+	* atmlab-0-1-66
+
+	* atmlab.spec: Added to ease building of rpm package for smiles cluster.
+
 2004-02-13  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-1-65
