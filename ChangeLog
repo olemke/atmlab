@@ -1,3 +1,27 @@
+2002-12-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-0
+
+	* Atmlab-0.1 !
+	Introduced a first minor version to show that Atmlab is operational:
+	Atmlab contains already a lot of useful functions and we are 
+	using the package for Odin-SMR work. There are already about 60
+	functions in Atmlab. If we add 60 functions per minor version,
+	Atmlab will be a big toolbox when we reach Atmlab-1.0  :-)
+
+	* handy/prstnt_struct.m: A help function to handle settings for
+	environments and other purposes. 
+
+	* graphs/tplot.m: Created this function to create easily plots with
+	just text.
+
+	* handy/nversion.m: A function to get the Matlab version number
+	as a number. Can be used if different solutions are needed for
+	different Matlab versions.
+
+	* graphs/axes_frame.m: The axes are now restored fully when executing
+	axes_frame(h,'on');
+
 2002-12-14  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-0-15

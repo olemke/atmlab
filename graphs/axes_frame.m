@@ -2,6 +2,10 @@
 %
 %    The functions makes the frame for some axes visible or invisible.
 %
+%    The axes UserData is used to store lost information when making the
+%    frame invisible. The UserData are used to restore the frame in its
+%    original version.
+%
 % FORMAT   axes_frame(h,on_or_off)
 %        
 % IN    h           Handle to the axes.
@@ -22,17 +26,30 @@ if ~( strcmp( on_or_off, 'off' )  |  strcmp( on_or_off, 'on' ) )
 end
 
 
-
 if strcmp( on_or_off, 'off' )
   %
+  c = get( h, 'Color' );
+  %
+  A.xcol = get( h, 'XCol' );
+  A.xtl  = get( h, 'XTickL' );
+  A.ycol = get( h, 'YCol' );
+  A.ytl  = get( h, 'YTickL' );
+  set( h, 'UserData', A );
+  %
   set( h, 'Box', 'off' );
-  set( h, 'XCol', [1 1 1] );
-  set( h, 'YCol', [1 1 1] );
+  set( h, 'XCol', c );
+  set( h, 'XTickL', [] );
+  set( h, 'YCol', c );
+  set( h, 'YTickL', [] );
 
 else
   %
+  A = get( h, 'UserData' );
+  %
   set( h, 'Box', 'on' );
-  set( h, 'XCol', [0 0 0] );
-  set( h, 'YCol', [0 0 0] );
+  set( h, 'XCol', A.xcol );
+  set( h, 'XTickL', A.xtl );
+  set( h, 'YCol', A.ycol );
+  set( h, 'YTickL', A.ytl );
 
 end
