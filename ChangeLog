@@ -1,3 +1,19 @@
+2002-12-17  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-1-3
+
+	* xml/xmlReadGasAbsLookup.m, xml/xmlReadSpeciesTag.m,
+	xml/xmlWriteHeader.m, xml/xmlWriteMatrix.m, xml/xmlWriteTensor3.m,
+	xml/xmlWriteTensor4.m, xml/xmlWriteTensor5.m, xml/xmlWriteTensor6.m,
+	xml/xmlWriteTensor7.m, xml/xmlWriteVector.m:
+	Adapted to be used by xmlStore.m.  
+
+	* xml/xmlWriteArrayOf.m, xml/xmlWriteArrayOfArrayOf.m,
+	xml/xmlWriteGasAbsLookup.m, xml/xmlWriteIndex.m,
+	xml/xmlWriteNumeric.m: Added.
+
+	* xml/xmlStore.m: General writing routine.
+
 2002-12-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-2
