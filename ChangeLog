@@ -1,3 +1,10 @@
+2005-03-21  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-2-48
+
+	* arts/qarts2cfile.m: save_sensor now also saves the output frequency
+	grid sensor_response_f.
+
 2005-03-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-47

@@ -228,6 +228,7 @@ case 'sensor'
 case 'save_sensor'
   %
   T{1} = add_savefile( 'sensor_response', tmpdir );
+  T{2} = add_savefile( 'sensor_response_f', tmpdir );
   
 case 'calc_rte'
   %
