@@ -11,12 +11,12 @@
 % 2002-12-09   Created by Patrick Eriksson.
 
 
-function s = qpack_version
+function s = atmlab_version
 
 
 nr1 = 0;
 nr2 = 0;
-nr3 = 9;
+nr3 = 10;
 
 
 s = sprintf('atmlab-%d.%d.%d',nr1,nr2,nr3);

@@ -1,3 +1,11 @@
+2002-12-13  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-0-10
+
+	* atmlab_init.m: Added xml directory to path.
+
+	* atmlab_version.m: Corrected function name.
+
 2002-12-13  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-0-9
