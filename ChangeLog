@@ -1,5 +1,13 @@
 2002-12-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-15
+
+	* files/delete_tmpfolder.m: Created this function.
+
+	* files/create_tmpfolder.m: Created this function.
+
+2002-12-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-14
 
 	* handy/prstnt_struct.m: Particular code for version after 6.1 removed
