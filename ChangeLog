@@ -1,5 +1,11 @@
 2002-12-18  Oliver Lemke  <olemke@uni-bremen.de>
 
+	* atmlab-0-1-6
+
+	* xml/xmlWriteGasAbsLookup.m: Corrected name of Array functions.
+
+2002-12-18  Oliver Lemke  <olemke@uni-bremen.de>
+
 	* atmlab-0-1-5
 
 	* xml/xmlWriteSpeciesTag.m: Added.
