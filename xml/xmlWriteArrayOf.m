@@ -16,8 +16,8 @@ function xmlWriteArrayOf(fid, data, type)
 nelem = size (data, 2);
 
 attrlist = [];
-attrlist = xmlAddAttribute ([], 'type', sprintf ('%d', nelem));
-attrlist = xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem));
+attrlist = xmlAddAttribute ([], 'type', type);
+attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);
 for i = 1:nelem
   func = str2func (strcat ('xmlWrite', type));

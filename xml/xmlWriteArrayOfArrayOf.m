@@ -16,14 +16,11 @@ function xmlWriteArrayOfArrayOf(fid, data, type)
 nelem = size (data, 2);
 
 attrlist = [];
-attrlist = xmlAddAttribute ([], 'type', sprintf ('%d', nelem));
-attrlist = xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem));
-xmlWriteTag (fid, 'ArrayOfArray', attrlist);
-for i = 1:nelem
-  func = str2func (strcat ('xmlWrite', type));
-  feval (func, fid, data{i});
-end
-xmlWriteCloseTag (fid, 'ArrayOfArray');
+attrlist = xmlAddAttribute ([], 'type', sprintf ('ArrayOf%s', type));
+attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
+xmlWriteTag (fid, 'Array', attrlist);
+xmlWriteArrayOf (fid, data, type);
+xmlWriteCloseTag (fid, 'Array');
 
 clear nelem;
 
