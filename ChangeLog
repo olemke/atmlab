@@ -1,5 +1,22 @@
 2002-12-21  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-18
+
+	* arts/do_gridcell_2d.m: The function works but documentation is
+	lacking.
+	The intention of this function is to test the ARTS function with the
+	same name, and to be used for making figures in AUG.
+
+	* atmplots/atmplot_pol2cart.m: The function works but documentation is
+	lacking.
+
+	* atmplots/atmplot_gridcell2D.m: Created.
+
+	* physics/constants.m: Added constants EARTH_RADIUS, DEG2RAD and
+	RAD2DEG.
+
+2002-12-21  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-17
 
 	* arts/artsplanck.m: Created this function to demonstrate the

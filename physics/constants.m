@@ -1,4 +1,4 @@
-% constants(name)
+% CONSTANTS   Phyiscal and math constants
 %
 %    This function returns physical constants. It gives an 
 %    error message, if the constant is not defined.
@@ -6,7 +6,10 @@
 %    The following constants are defined:
 %        
 %       BOLTZMANN_CONST
+%       DEG2RAD             Conversion from degrees to radians
+%       EARTH_RADIUS        Standard value for the Earth radius
 %       PLANCK_CONST  
+%       RAD2DEG             Conversion from radians to degrees
 %       SPEED_OF_LIGHT
 %
 % FORMAT   const = constants(name);
@@ -25,12 +28,25 @@ function const = constants(name)
 % gives out a complete list of constants.
 
 switch name
+
 case ('BOLTZMANN_CONST')
     const = 1.380662e-23;
+
+case 'DEG2RAD'
+    const = 0.01745329251994;
+
+case 'EARTH_RADIUS'
+    const = 6.378e6;
+
 case ('PLANCK_CONST')
     const = 6.626180e-34;
+
+case 'RAD2DEG'
+    const = 57.29577951308232;
+
 case ('SPEED_OF_LIGHT')
     const = 2.99792458e8;
+
 otherwise
     error(strcat('Unknown constant: ', name))
 end      
