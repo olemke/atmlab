@@ -1,5 +1,16 @@
 2003-03-04  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-33
+
+	* handy/yes_or_no.m: Copied answer_is_yes from AMI to create this
+	function.
+
+	* arts/arts_plot_atmgrids.m: Added code for 3D. 
+
+	* graphs/axes_frame.m: Handles now also the z-axis.
+
+2003-03-04  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-32
 
 	* arts/arts_plot_atmgrids.m: Added and started on this function.  

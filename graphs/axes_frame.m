@@ -36,6 +36,9 @@ if strcmp( on_or_off, 'off' )
   A.ycol = get( h, 'YCol' );
   A.yt   = get( h, 'YTick' );
   A.ytl  = get( h, 'YTickL' );
+  A.zcol = get( h, 'ZCol' );
+  A.zt   = get( h, 'ZTick' );
+  A.ztl  = get( h, 'ZTickL' );
   set( h, 'UserData', A );
   %
   set( h, 'Box', 'off' );
@@ -45,6 +48,9 @@ if strcmp( on_or_off, 'off' )
   set( h, 'YCol', c );
   set( h, 'YTick', [] );
   set( h, 'YTickL', [] );
+  set( h, 'ZCol', c );
+  set( h, 'ZTick', [] );
+  set( h, 'ZTickL', [] );
 
 else
   %
@@ -57,5 +63,8 @@ else
   set( h, 'YCol', A.ycol );
   set( h, 'YTick', A.yt );
   set( h, 'YTickL', A.ytl );
+  set( h, 'ZCol', A.zcol );
+  set( h, 'ZTick', A.zt );
+  set( h, 'ZTickL', A.ztl );
 
 end

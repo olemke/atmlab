@@ -1,3 +1,29 @@
+% ARTS_PLOT_ATMGRIDS   Makes figure for 1D-3D with atmospheric grids.
+%
+%     The function produces figures to visualize the atmsopheric grids,
+%     the geoid, the ground, the cloud box and the atmospheric fields.
+%
+%     The variables work as their ARTS counterparts. The exception is for
+%     1D where *lat_grid* shall contain two values, which determines how
+%     long (in latitude) the plotted atmosphere shall be extended.
+%
+% FORMAT   [h,hs] = arts_plot_atmgrids(dim,lat_grid,lon_grid,z_field,
+%                                       r_geoid,z_ground[,cb_lims,mark_fields])
+%        
+% OUT   h         Handles to plot symbols.
+%       hs        Text suitable to put in legend.
+% IN    dim       Atmospheric dimension (1-3).
+%       lat_grid  As the WSV with the same name, except for 1D. See above.
+%       lon_grid  As the WSV with the same name.
+%       z_field   As the WSV with the same name.
+%       r_geoid   As the WSV with the same name.
+%       z_ground  As the WSV with the same name. 
+% OPT   cb_lims   As the WSV cloudbox_limits. The cloud box is turned off
+%                 with cb_lims=[], which is also default.
+%       mark_fields  Flag to indicate atmospheric fields with black dot at
+%                 crossings of grids. Default is 0.
+
+% 2003-03-04   Created by Patrick Eriksson.
 
 function [h,hs] = arts_plot_atmgrids(dim,lat_grid,lon_grid,z_field,...
                                           r_geoid,z_ground,cb_lims,mark_fields)
@@ -48,7 +74,9 @@ ps_field     = 'k.';
 hs{1} = 'Atmospheric grids';
 hs{2} = 'Ground';
 hs{3} = 'Geoid';
-hs{4} = 'Cloud box';
+if ~isempty( cb_lims )
+  hs{4} = 'Cloud box';
+end
 if mark_fields
   hs{5} = 'Atmospheric field';
 end
@@ -129,8 +157,63 @@ switch dim
     [x,y] = surf_segment2D( lat_grid, r_geoid+z_ground );
     h(2) = plot( x, y, ps_ground{:} );
     %
-    [x,y] = surf_segment2D( lat_grid, r_geoid(1) );
+    [x,y] = surf_segment2D( lat_grid, r_geoid );
     h(3) = plot( x, y, ps_geoid );
+
+
+  %- 3D
+  case 3
+    %
+    for j = 1 : length( lat_grid )
+      for k = 1 : length( lon_grid )
+        [x,y,z] = atmplot_sph2cart( [ r_geoid(j,k)+z_field(1,j,k), ...
+                                r_geoid(j,k)+z_field(nz,j,k) ], ...
+			        lat_grid(j)*ones(1,2), lon_grid(k)*ones(1,2) );
+      	h(1) = plot3( z, x, y, ps_grids );
+        hold on
+      	%
+      	if mark_fields
+      	  for l = 1 : nz
+      	    [x,y,z] = atmplot_sph2cart( r_geoid(j,k)+z_field(l,j,k), ...
+                                                    lat_grid(j), lon_grid(k) );
+      	    h(5) = plot3( z, x, y, ps_field );
+      	  end
+      	end
+      end
+    end
+    %
+    for j = 1 : length( lat_grid )
+      [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, ...
+                                                  r_geoid(j,:)+z_ground(j,:) );
+      h(2) = plot3( z, x, y, ps_ground{:} );
+      %
+      [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, r_geoid(j,:) );
+      h(3) = plot3( z, x, y, ps_geoid );
+      %
+      for k = 1 : nz
+        [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, ...
+                                      r_geoid(j,:)+squeeze(z_field(k,j,:))' );
+        plot3( z, x, y, ps_grids );
+      end
+    end
+    %
+    for j = 1 : length( lon_grid )
+      [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), ...
+                                                  r_geoid(:,j)+z_ground(:,j) );
+      plot3( z, x, y, ps_ground{:} );
+      %
+      [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), r_geoid(:,j) );
+      plot3( z, x, y, ps_geoid );
+      %
+      for k = 1 : nz
+        [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), ...
+                                       r_geoid(:,j)+squeeze(z_field(k,:,j))' );
+        plot3( z, x, y, ps_grids );
+      end
+    end
+    %
+    set( gca, 'Ydir', 'rev' );
+    view([37 30]);
 
 end
 
@@ -153,14 +236,62 @@ function [x,y] = surf_segment2D(lat,r)
   % Nominal latitude step length
   nom_dlat = 0.2;
 
-  lat1 = lat(1);
-  lat3 = tail( lat, 1 );
+  x = [];
+  y = [];
 
-  lats  = linspace( lat1, lat3, max([ 2, ceil( (lat3-lat1) / nom_dlat ) ] ) );
+  for j = 2 : length( lat )
 
-  slope = ( tail(r,1) - r(1) ) / ( lat3 - lat1 );
+    lat1 = lat(j-1);
+    lat3 = lat(j);
 
-  rs    = r(1) + slope * ( lats - lat1 );
-    
-  [x,y] = atmplot_pol2cart( rs, lats );
+    lats = linspace( lat1, lat3, max([ 2, ceil( (lat3-lat1) / nom_dlat ) ] ) );
+
+    slope = ( r(j) - r(j-1) ) / ( lat3 - lat1 );
+
+    rs    = r(j-1) + slope * ( lats - lat1 );
+      
+    [xv,yv] = atmplot_pol2cart( rs, lats );
+
+    x = [ x xv ];
+    y = [ y yv ];
+
+  end
+return
+
+
+
+function [x,y,z] = surf_segment3D(lat,lon,r)
+
+  % Nominal latitude step length
+  nom_dang = 0.2;
+
+  x = [];
+  y = [];
+  z = [];
+
+  if length(lon) == 1
+    for j = 2 : length( lat )
+      lat1 = lat(j-1);
+      lat3 = lat(j);
+      lats = linspace( lat1, lat3, max([ 2, ceil( (lat3-lat1) / nom_dang ) ]));
+      slope = ( r(j) - r(j-1) ) / ( lat3 - lat1 );
+      rs    = r(j-1) + slope * ( lats - lat1 );
+      [xv,yv,zv] = atmplot_sph2cart( rs, lats, lon );
+      x = [ x xv ];
+      y = [ y yv ];
+      z = [ z zv ];
+    end
+  else
+    for j = 2 : length( lon )
+      lon1 = lon(j-1);
+      lon3 = lon(j);
+      lons = linspace( lon1, lon3, max([ 2, ceil( (lon3-lon1) / nom_dang ) ]));
+      slope = ( r(j) - r(j-1) ) / ( lon3 - lon1 );
+      rs    = r(j-1) + slope * ( lons - lon1 );
+      [xv,yv,zv] = atmplot_sph2cart( rs, lat, lons );
+      x = [ x xv ];
+      y = [ y yv ];
+      z = [ z zv ];
+    end
+  end
 return

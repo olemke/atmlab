@@ -41,8 +41,11 @@ DEG2RAD = constants( 'DEG2RAD' );
 
 [x,z,y] = sph2cart( DEG2RAD * lon, DEG2RAD * lat, r );
 
+if ~nargout
+  
+  plot3( z, x, y, varargin{:} );
+  set( gca, 'Ydir', 'rev' );
+  view([37 30]);
 
-plot3( z, x, y, varargin{:} );
+end
 
-set( gca, 'Ydir', 'rev' );
-view([37 30]);
