@@ -1,3 +1,10 @@
+2003-12-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-61
+
+	* graphs/zerowhite.m: Created this function to make color maps where
+	the zero level is white. The result is not yet perfect.
+
 2003-11-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-60
