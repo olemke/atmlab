@@ -1,8 +1,15 @@
+2004-07-20  Bengt Rydberg  <benryd@etek.chalmers.se>
+
+	* Started on a set of functions to generate ice particle size
+	distributions in atmscenarios/.
+	
+	* atmscenarios/ice_psd_heyms84.m: Created this function.
+
 2004-06-30  Bengt Rydberg  <benryd@etek.chalmers.se>
 
 	* atmlab-0-1-80
 
-	* Just a demenstration of CVS. 
+	* Just a demonstration of CVS. 
 
 2004-06-29  Mashrab Kuvatov  <kmashrab@sat.physik.uni-bremen.de>
 
