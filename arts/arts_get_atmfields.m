@@ -14,7 +14,7 @@
 %       LON_GRID
 %    if not corresponding optional arguments are used.
 %
-% FORMAT   [t_field,z_field,vmr_field] = arts_get_atmfields( Q, p, lat, lon )
+% FORMAT [t_field,z_field,vmr_field] = arts_get_atmfields( Q [, p, lat, lon ])
 %        
 % OUT   t_field     As the ARTS WSV with same name.
 %       z_field     As the ARTS WSV with same name.
@@ -43,7 +43,7 @@ Q.USE_RAW_ATMOSPHERE = 1;
 
 tmpfolder   = create_tmpfolder;
 
-parts = {'start','load_atm','save_atm','stop'};
+parts = qarts2cfile( 'get_atmfields' );
 S = qarts2cfile( Q, parts, tmpfolder );
 cfile = fullfile( tmpfolder, 'cfile.arts' );
 qtool( S, cfile, [] );

@@ -1,27 +1,30 @@
-% ARTS_CFILE   Generates a ARTS control file example.
+% ARTS_CFILE   Generates a complete ARTS example.
 %
-%    Creates a control file matching the settings in a Qarts structure.
+%    Creates a control file and corresponding input files matching the 
+%    settings in a Qarts structure.
 %
-%    See *qarts2cfile* for existing choices for *parts*. 
+%    The control file is named as cfile.arts.
 %
-% FORMAT   arts_cfile( Q, parts, cfile )
+%    See *qarts2cfile* for existing choices for *runtype*. 
+%
+% FORMAT   arts_cfile( Q, runtype, folder )
 %        
-% IN    Q       Qarts structure.
-%       parts   Control file parts to include. See further above.
-%       cfile   Name of control file to create.
+% IN    Q         Qarts structure.
+%       runtype   String describing type of calculation to perform.
+%       folder    The folder where to put files.
 
-% 2004-09-15   Created by Patrick Eriksson.
+% 2004-09-23   Created by Patrick Eriksson.
 
 
-function arts_cfile( Q, parts, cfile )
+function arts_cfile( Q, runtype, folder )
 
-tmpfolder   = create_tmpfolder;
+parts = qarts2cfile( runtype );
 
-S = qarts2cfile( Q, parts, tmpfolder );
-tmpcfile = fullfile( tmpfolder, 'cfile.arts' );
-qtool( S, tmpcfile, [], 0 );
+S = qarts2cfile( Q, parts, folder );
 
-copyfile( tmpcfile, cfile );
+cfile = fullfile( folder, 'cfile.arts' );
 
-delete_tmpfolder( tmpfolder );
+qtool( S, cfile, [], 0 );
+
+
 

@@ -15,8 +15,7 @@ function y = arts_y( Q )
 
 tmpfolder   = create_tmpfolder;
 
-parts = {'start','stokes','load_atm','load_abs','calc_abs','init_rte',...
-         'calc_rte','save_y','stop'};
+parts = qarts2cfile( 'y' );
 
 S = qarts2cfile( Q, parts, tmpfolder );
 

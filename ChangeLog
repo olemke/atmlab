@@ -1,3 +1,25 @@
+2004-09-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-13
+
+	* forwardmodel/gridselect2D.m: Started on this function. Not yet ready.
+
+	* arts/arts_cfile.m: Changed this function from just creating a control
+	file, to create a complete ARTS example with input files and all.
+
+	* arts/qarts2cfile.m: Included option to extract *parts* for
+	different tasks.
+	Removed the option do_save. Obselete due to other changes.
+
+	* arts/arts_y.m: Moved definition of parts to qarts2cfile.
+
+	* arts/arts_get_atmfields.m: Moved definition of parts to qarts2cfile.
+
+	* arts/qarts.m (Q.RAW_ATM_EXPAND_1D): Added this field.
+
+	* arts/qarts2cfile.m: Proper check and error message regarding 
+	specification of agendas.
+
 2004-09-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-12

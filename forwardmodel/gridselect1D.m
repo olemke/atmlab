@@ -6,12 +6,16 @@
 %    errors can be neglected and shall span the possible cases that shall be
 %    represented. 
 %
+%    The dimension of Af shall be [ xf, number of realisation ]
+%
 %    The grid is selected by first including the end points of *xf*. The 
 %    coarse representation is transformed to the fine one, and a new grid 
 %    point is included where the maximum deviation is found (where all
 %    realisations are considered in parallel). This procedure is repeated
 %    until the coarse and representations deviates less then *tol* (at all
 %    points of *xf*).
+%
+%    See also GRIDSELECT2D and GRIDSELECT3D.
 %
 % FORMAT   xc = gridselect1D( xf, Af, tol, repr, abs_or_rel )
 %        
@@ -29,7 +33,7 @@
 
 function xc = gridselect1D( xf, Af, tol, repr, abs_or_rel )
 
-if nargin < 4
+if nargin < 5
   abs_or_rel = 'abs';
 end
 
@@ -49,7 +53,10 @@ end
 if size( Af, 1 ) ~= n
   error( 'Sizes of *xf* and *Af* do not match.' );
 end
-
+%
+if strcmp( abs_or_rel, 'rel' )  &  any( Af == 0 )
+   error( 'With *abs_or_rel* = ''rel'', *Af can not contain zeros.' );
+end
 
 ind = 1;
 ip  = n;
