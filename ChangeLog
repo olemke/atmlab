@@ -1,3 +1,10 @@
+2005-02-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-40
+
+	* arts1/qarts12cfile.m: Linefiles could not be saved. A variable had
+	an old name.
+
 2005-02-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-39
