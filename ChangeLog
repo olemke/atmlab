@@ -1,3 +1,22 @@
+2002-12-12  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-0-8
+
+	* graphs: Created the functions:
+	   children.m
+	   find_legend.m
+	   legend_frame.m
+	   legend_text.m
+	   legend_title.m
+	   scale_fig.m
+	   scale_legend.m
+	   scale_text.m
+	Type "help function" for more information. 
+
+	The legend in Matlab does not always work veru well, but the legend
+	functions above should be a good help to fix the legend when you
+	are not happy with the default result. 
+
 2002-12-12  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-0-7
