@@ -1,3 +1,10 @@
+2003-04-14  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-47
+
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Included parameter values from
+	Christian for rain rates > 25 mm.
+
 2003-04-11  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-46

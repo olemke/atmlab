@@ -3,6 +3,9 @@
 %    Returns the complex refractivity following MPM93 for ice water and
 %    liquid water, and MPM89 for rain. 
 %
+%    Parameter values for rain rates > 25 mm/h are derived by Christian
+%    Melsheimer from the Olsen 1978 paper.
+%
 % FORMAT   [nr,alpha] = mpm_iwc93_lwc93_rain89(iwc,lwc,rain,v,t)
 %
 % OUT      nr     Real part of refractivity [-] (a value just above 1).
@@ -77,30 +80,61 @@ end
 %
 if rain < 0
   error('Negativ rain rate is not allowed.');
-elseif rain > 25
-  error('Rain rate > 25 mm/h is not allowed.');
 elseif rain > 0
   %
-  if v_ghz <= 2.9
-    x1 = 3.51e-4;   y1 = 1.03;
-  elseif v_ghz <= 54
-    x1 = 2.31e-4;   y1 = 1.42;
-  elseif v_ghz <= 180
-    x1 = 0.225;     y1 = -0.301;
-  else
-    x1 = 18.6;      y1 = -1.151
+  if rain <= 25
+    %
+    if v_ghz <= 2.9
+      x1 = 3.51e-4;   y1 = 1.03;
+    elseif v_ghz <= 54
+      x1 = 2.31e-4;   y1 = 1.42;
+    elseif v_ghz <= 180
+      x1 = 0.225;     y1 = -0.301;
+    else
+      x1 = 18.6;      y1 = -1.151;
+    end
+    %
+    if v_ghz <= 8.5
+      x2 = 0.851;     y2 = 0.158;
+    elseif v_ghz <= 25
+      x2 = 1.41;      y2 = -0.0779;
+    elseif v_ghz <= 164
+      x2 = 2.63;      y2 = -0.272;
+    else
+      x2 = 0.616;     y2 = 0.0126;
+    end
+    %
+  else   % rain rate > 25 mm/h
+    if v > 100e9
+      error('Frequencies > 100 GHz and rain rates > 25 mm/h are not handled.');
+    end
+    %
+    if v_ghz <= 4.9
+      x1 = 2.91e-4;   y1 = 0.871;
+    elseif v_ghz <= 10.7
+      x1 = 2.76e-5;   y1 = 2.349;
+    elseif v_ghz <= 40.1
+      x1 = 1.39e-4;   y1 = 1.668;
+    elseif v_ghz <= 59.1
+      x1 = 1.96e-2;   y1 = 0.326;
+    else
+      x1 = 0.785;     y1 = -0.578;
+    end
+    %
+    if v_ghz <= 6.2
+      x2 = 0.911;     y2 = 0.190;
+    elseif v_ghz <= 23.8
+      x2 = 1.71;      y2 = -0.156;
+    elseif v_ghz <= 48.4
+      x2 = 3.08;      y2 = -0.342;
+    elseif v_ghz <= 68.2
+      x2 = 1.28;      y2 = -0.116;
+    else
+      x2 = 0.932;     y2 = -4.08e-2;
+    end
+    %    
   end
-  %
-  if v_ghz <= 8.5
-    x2 = 0.851;     y2 = 0.158;
-  elseif v_ghz <= 25
-    x2 = 1.41;      y2 = -0.0779;
-  elseif v_ghz <= 164
-    x2 = 2.63;      y2 = -0.272;
-  else
-    x2 = 0.616;     y2 = 0.0126;
-  end
-  %
+
   fr  = 53 - rain * ( 0.37 - 0.0015 * rain );
   y25 = (v_ghz/fr)^2.5;
   nr  = nr + 1e-6 * rain * ( 0.012*rain - 3.7 ) * y25 / ( fr * ( 1 + y25 ) ); 
