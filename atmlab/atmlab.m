@@ -41,6 +41,11 @@
 %
 % Path to executable for ARTS. For example '/home/patrick/ARTS/arts2/src/arts'.
 %----------------------------------------------------------------------------
+% ARTS1_HDF
+%
+% Boolean to indicate if ARTS-1.0.x is compiled with HDF. If true, the binary
+% file format will be used.
+%----------------------------------------------------------------------------
 % ARTS1_PATH
 %
 % Path to executable for ARTS-1.0.x. 
@@ -97,6 +102,7 @@ function A = atmlab_defs
 
 A.AMI_PATH         = NaN;
 A.ARTS_PATH        = NaN;
+A.ARTS1_HDF        = NaN;
 A.ARTS1_PATH       = NaN;
 A.FMODEL_VERBOSITY = NaN;
 A.SCREEN_WIDTH     = NaN;

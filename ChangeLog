@@ -1,3 +1,26 @@
+2004-09-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-6
+
+	* arts/arts_cfile.m: Started on this function
+
+	* arts/qarts.m: Started on this function.
+
+	* arts1/qarts1.m: Changed to not use NaN throughout as default.
+
+	* arts/arts_abstable_from_arts1.m: Further work on the function,
+	e.g. including automatic switch following ARTS1_HDF.
+
+	* arts1/arts1_cfile.m: Further work on the function, e.g. including
+	automatic switch following ARTS1_HDF.
+
+	* atmlab/atmlab.m: Added field ARTS1_HDF.
+
+	* arts1/arts1_absmodels.cfile: Completed this file.
+
+	* handy/qinfo.m: Had to change new paragraph symbol from § to #
+	because § was not properly recognised by Matlab.
+
 2004-09-09  Carmen Verdes  <cverdes@uni-bremen.de>
 
 	* atmlab-0-2-5

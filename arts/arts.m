@@ -25,12 +25,15 @@
 
 function status = arts(cfile,errortol,arts1)
 
-if nargin == 1
+if nargin < 2
   errortol = 0;
+end
+if nargin < 3
+  arts1 = 0;
 end
 
 
-if exist( 'arts1' )  &  arts1
+if arts1
   atmlab( 'require', {'ARTS1_PATH'} );
   exec = atmlab( 'ARTS1_PATH' );
   if ~ischar( exec )

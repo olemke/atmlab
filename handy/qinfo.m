@@ -6,8 +6,8 @@
 %    The information text shall be a plain string. Formatting of the output
 %    is handled by the function, where position of row brakes is determined
 %    by the Atmlab setting SCREEN_WIDTH. Row brakes can further be hard 
-%    coded and are then indicated by the character '§'. Leave some space
-%    after '§' if you want the new paragraph to be intended.
+%    coded and are then indicated by the character '#'. Leave some space
+%    after '#' if you want the new paragraph to be intended.
 %
 %    Some examples:
 %    Assuming that *qdef* provides needed information, information for 
@@ -132,7 +132,7 @@ function printfield( field, s, fid )
   ls = length( s );
   %
   ind  = [find( s == ' ' ) ls+1 ];
-  pind = [find( s == '§' ) ];
+  pind = find( s == '#' );
   ready = 0;
   i = 1;
   %

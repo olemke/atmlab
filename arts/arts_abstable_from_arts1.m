@@ -48,6 +48,16 @@ set_defaults;
 tmpfolder   = create_tmpfolder;
 
 
+%=== What file format to use?
+%
+use_binary = atmlab( 'ARTS1_HDF' );
+rqre_bool( 'Atmlab setting ARTS1_HDF', use_binary );
+if use_binary
+  fileext = '.ab';
+else
+  fileext = '.aa';
+end
+
 
 %=== Obtain profiles
 %
@@ -58,23 +68,27 @@ rqre_bool( 'ARTS1 field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
 %
 if Q.USE_RAW_ATMOSPHERE
   %
-  S = arts1_cfile( [], Q, {'tgs','load_atm','save_atm'}, tmpfolder );
+  S = arts1_cfile( Q, {'tgs','pf_grids','load_atm','save_atm'}, tmpfolder );
   cfile = fullfile( tmpfolder, 'cfile.arts' );
   qtool( S, cfile, [] );
   arts( cfile, 0, 1 );
   %
   Q.USE_RAW_ATMOSPHERE = 0;
-  Q.T_ABS = fullfile( tmpfolder, 't_abs.ab' );
-  Q.Z_ABS = fullfile( tmpfolder, 'z_abs.ab' );
-  Q.VMRS  = fullfile( tmpfolder, 'vmrs.ab' );
-  t0      = read_datafile( fullfile( tmpfolder, 't_abs.ab' ), 'VECTOR');
+  Q.T_ABS = fullfile( tmpfolder, ['t_abs',fileext] );
+  Q.Z_ABS = fullfile( tmpfolder, ['z_abs',fileext] );
+  Q.VMRS  = fullfile( tmpfolder, ['vmrs',fileext] );
+  t0      = read_datafile( Q.T_ABS, 'VECTOR');
+else
+  t0 = vec2col( arts1_get( Q.T_ABS, 'VECTOR' ) );
+  Q.T_ABS = fullfile( tmpfolder, ['t_abs',fileext] );
 end
 
 
 %=== Create control file for ARTS1 run
 %
-parts = {'tgs','load_atm','f_mono','spectroscopy','abscalc','save_abs_per_tg'};
-S = arts1_cfile( [], Q, parts, tmpfolder );
+parts = {'tgs','load_atm','pf_grids','spectroscopy','abscalc',...
+         'save_abs_per_tg'};
+S = arts1_cfile( Q, parts, tmpfolder );
 qtool( S, cfile, [] );
 arts( cfile, 0, 1 );
 
@@ -98,11 +112,12 @@ A.xsec = zeros( nt, length(A.species), length(A.f_grid), length(A.p_grid) );
 for i = 1 : nt
   %
   t = t0 + dt(i);
-  write_datafile( fullfile( tmpfolder, 't_abs.ab' ), t, 'VECTOR' );
+  write_datafile( Q.T_ABS, t, 'VECTOR' );
   %
   arts( cfile, 0, 1 );
   %
-  X = read_datafile( fullfile( tmpfolder, 'abs_per_tg.ab' ), 'AOMATRIX');
+  X = read_datafile( fullfile( tmpfolder, ['abs_per_tg',fileext] ), ...
+                                                                 'AOMATRIX' );
   %
   for j = 1 : length(A.species)
     A.xsec(i,j,:,:) = X{j}; 

@@ -1,7 +1,47 @@
-function S = arts1_cfile( S, Q, parts, tmpdir )
+% ARTS1_CFILE   Builds a control file for ARTS1
+%
+%    Creates a control file matching the settings in a Qarts1 structure.
+%    The control file is provided as cell array of strings. This means
+%    that the output can be combined with other control file pieces
+%    by combining their string arrays. The final control file is
+%    created by *qtool*.
+%    
+%    The control file structure is determined by putting different 'parts'
+%    together, following the format: parts = {'tgs','load_atm','save_atm'}
+%
+%    Defined parts are:
+%       tgs
+%       pf_grids
+%       load_atm
+%       save_atm
+%       spectroscopy
+%       abscalc
+%       save_abs
+%       save_abs_per_tg
+%
+%    File format is selected following Atmlab setting ARTS1_HDF. 
+%    Name of output files will be: [tmpfolder,varname,fileext]
+%    where varname is the ARTS1 variable name and fileext is either
+%    '.aa' or '.ab' depending on if HDF is available or not. 
+%    Binary format is used if possible (ARTS1_HDF=1).
+%
+% FORMAT   S = arts1_cfile( Q, parts, tmpdir )
+%        
+% OUT   S       String cell array that can be passed to qtool.
+% IN    parts   Control file parts to include. See further above.
+%       tmpdir  Temporary folder where calculations will be performed.
+
+% 2004-09-07   Created by Patrick Eriksson.
+
+
+function S = arts1_cfile( Q, parts, tmpdir )
 
 
 qcheck( @qarts1, Q );
+
+
+use_binary = atmlab( 'ARTS1_HDF' );
+rqre_bool( 'Atmlab setting ARTS1_HDF', use_binary );
 
 
 S = {};
@@ -16,32 +56,31 @@ case 'tgs'
   %
   T{1} = sprintf( 'tgsDefine{[%s]}', arts_tgs_cnvrt(Q.TGS) );
 
-case 'load_atm'
+case 'pf_grids'
   %
-  T{1} = file_or_data( 'p_abs', 'Vector', Q.P_ABS, tmpdir );
+  T{1} = file_or_data( 'f_mono', 'Vector', Q.F_MONO, tmpdir, use_binary );
+  T{2} = file_or_data( 'p_abs', 'Vector', Q.P_ABS, tmpdir, use_binary );
+
+case 'load_atm'
   %
   rqre_bool( 'ARTS1 field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
   if Q.USE_RAW_ATMOSPHERE
     rqre_char( 'ARTS1 field APRIORI_PTZ', Q.APRIORI_PTZ );
     rqre_char( 'ARTS1 field APRIORI_VMR', Q.APRIORI_VMR );
-    T{2} = add_readfile( 'raw_ptz', 'Matrix', Q.APRIORI_PTZ );
-    T{3} = sprintf('raw_vmrsReadFromScenario{"%s"}',Q.APRIORI_VMR);
-    T{4} = sprintf('AtmFromRaw{}');
+    T{1} = add_readfile( 'raw_ptz', 'Matrix', Q.APRIORI_PTZ );
+    T{2} = sprintf('raw_vmrsReadFromScenario{"%s"}',Q.APRIORI_VMR);
+    T{3} = sprintf('AtmFromRaw{}');
   else
-    T{2} = file_or_data( 't_abs', 'Vector', Q.T_ABS, tmpdir );
-    T{3} = file_or_data( 'z_abs', 'Vector', Q.Z_ABS, tmpdir );
-    T{4} = file_or_data( 'vmrs', 'Matrix', Q.VMRS, tmpdir );
+    T{1} = file_or_data( 't_abs', 'Vector', Q.T_ABS, tmpdir, use_binary );
+    T{2} = file_or_data( 'z_abs', 'Vector', Q.Z_ABS, tmpdir, use_binary );
+    T{3} = file_or_data( 'vmrs', 'Matrix', Q.VMRS, tmpdir, use_binary );
   end
 
 case 'save_atm'
   %
-  T{1} = add_savefile( 't_abs', 'Vector', tmpdir );
-  T{2} = add_savefile( 'z_abs', 'Vector', tmpdir );
-  T{3} = add_savefile( 'vmrs', 'Matrix', tmpdir );
-
-case 'f_mono'
-  %
-  T{1} = file_or_data( 'f_mono', 'Vector', Q.F_MONO, tmpdir );
+  T{1} = add_savefile( 't_abs', 'Vector', tmpdir, use_binary );
+  T{2} = add_savefile( 'z_abs', 'Vector', tmpdir, use_binary );
+  T{3} = add_savefile( 'vmrs', 'Matrix', tmpdir, use_binary );
 
 case 'spectroscopy'
   %
@@ -66,9 +105,6 @@ case 'spectroscopy'
   T{10} = '}';
   T{11} = 'lines_per_tgCreateFromLines{}'; 
   %
-  if isempty( Q.ABSMODELS )
-    Q.ABSMODELS = which('arts1_absmodels.cfile');
-  end
   rqre_char( 'ARTS1 field ABS_MODELS', Q.ABSMODELS );
   Tfile = file2strs( Q.ABSMODELS );
   T{12} = 'cont_descriptionInit{}';
@@ -82,11 +118,11 @@ case 'abscalc'
 
 case 'save_abs'
   %
-  T{1} = add_savefile( 'abs', 'Matrix', tmpdir );
+  T{1} = add_savefile( 'abs', 'Matrix', tmpdir, use_binary );
 
 case 'save_abs_per_tg'
   %
-  T{1} = add_savefile( 'abs_per_tg', 'ArrayOfMatrix', tmpdir );
+  T{1} = add_savefile( 'abs_per_tg', 'ArrayOfMatrix', tmpdir, use_binary );
 
 otherwise
   error(sprintf('Unknown action (%s) was requested.',parts{i}));
@@ -99,14 +135,22 @@ end
 
 %------------------------------------------------------------------------------
 
-function s = file_or_data( artsvar, datatype, qvalue, tmpfolder )
+function s = file_or_data( artsvar, datatype, qvalue, tmpfolder, use_binary )
   if ischar( qvalue )
     s = add_readfile( artsvar, datatype, qvalue );
   else
-    filename = fullfile( tmpfolder, [artsvar,'.ab'] );
+    if isnan( qvalue )
+       error( sprintf('NaN found for %s.',artsvar) );
+    end
+    if use_binary
+      filename = fullfile( tmpfolder, [artsvar,'.ab'] );
+    else
+      filename = fullfile( tmpfolder, [artsvar,'.aa'] );
+    end
     write_datafile( filename, qvalue, datatype );
     s = add_readfile( artsvar, datatype, filename );
   end
+return
 
 
 function s = add_readfile( artsvar, datatype, filename )
@@ -121,7 +165,12 @@ function s = add_readfile( artsvar, datatype, filename )
 return
 
 
-function s = add_savefile( artsvar, datatype, tmpfolder )
-  filename = fullfile( tmpfolder, [ artsvar, '.ab' ] ); 
-  s = sprintf('%sWriteBinary(%s){"%s"}', datatype, artsvar, filename ); 
+function s = add_savefile( artsvar, datatype, tmpfolder, use_binary )
+  if use_binary
+    filename = fullfile( tmpfolder, [ artsvar, '.ab' ] ); 
+    s = sprintf('%sWriteBinary(%s){"%s"}', datatype, artsvar, filename ); 
+  else
+    filename = fullfile( tmpfolder, [ artsvar, '.aa' ] ); 
+    s = sprintf('%sWriteAscii(%s){"%s"}', datatype, artsvar, filename ); 
+  end
 return
