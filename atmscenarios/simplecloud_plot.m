@@ -149,7 +149,7 @@ if C.do_lwc
         %
         fig = fig + 1; figure( fig ); 
         plot( c(:,2), z/1e3 )
-        xlabel('Ice water content [g/m3]', 'FontSize', 12 )
+        xlabel('Liquid water content [g/m3]', 'FontSize', 12 )
         ylabel('Altitude [km]', 'FontSize', 12 )
         axis([0 max(C.lwc(:,2))*1.1 0 zmax*wfactor/1e3])
         %

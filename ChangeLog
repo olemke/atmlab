@@ -1,3 +1,19 @@
+2003-04-11  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-46
+
+	* atmscenarios/simplecloud_init.m: Some more default values introduced.
+	Several cloud types defined. The cloud types follows roughly FASCODE.
+	Cases with rain follow suggestions from Christian.
+
+	Thomas and Christian: Please look and comment. The simplest way to
+	check the definitions is to do:
+	  C = simplecloud_init;simplecloud_plot(C);
+	and select 1D, the cloud type of interest and just accept all default 
+	values.
+
+	* atmscenarios/simplecloud_plot.m: Fixed wrong xlabel for LWC. 
+	
 2003-04-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-45
