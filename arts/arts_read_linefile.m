@@ -8,10 +8,7 @@
 %           field names.
 %
 %           The optional argument FLIMS can be used to only pick out 
-%           transitions inside a frequency range. This option is best used
-%           when reading a file with frequency sorted transitions as the
-%	        reading is stoped as soon as a transition is above the upper
-%           frequency limit.
+%           transitions inside a frequency range.
 %
 % FORMAT:   L = arts_read_linefile( filename [, flims ] )
 %
@@ -76,12 +73,7 @@ while ~isempty(S)
 
   f = sscanf( S{2}, '%f' );
 
-  if f > flims(2)
-    return
-  end
-
-
-  if f >= flims(1)
+  if f >= flims(1)  &  f <= flims(2)
     %
     n = n + 1;
     %

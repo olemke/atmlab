@@ -1,3 +1,14 @@
+2005-02-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-41
+
+	* handy/whoami.m: Created this function.
+
+	* handy/hostname.m: Created this function.
+
+	* arts/arts_read_linefile.m: Transitions can now be sorted in any order
+	and frequency limits can still be applied.
+
 2005-02-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-40
