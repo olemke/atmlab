@@ -1,3 +1,16 @@
+2003-06-18  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-1-51
+
+	* xml/xmlReadColIndex.m, xml/xmlReadIndexVector.m,
+	xml/xmlReadRowIndex.m, xml/xmlReadSparseData.m,
+	xml/xmlWriteColIndex.m, xml/xmlWriteIndexVector.m,
+	xml/xmlWriteRowIndex.m, xml/xmlWriteSparseData.m:
+	Added. Needed for reading sparse matrix.
+
+	* xml/xmlReadSparse.m, xml/xmlWriteSparse.m: Make use of the
+	reading/writing routines mentioned above.
+
 2003-06-16  Mattias Ekström  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-1-50
