@@ -19,20 +19,16 @@ function result = xmlReadSparse(fid, attrlist, itype, ftype, binary, fid2)
 
 nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
 nc = str2num (xmlGetAttrValue (attrlist, 'ncols'));
-nonz = str2num (xmlGetAttrValue (attrlist, 'nnz'));
 
-if ~binary
-  i = fscanf (fid, '%f', nonz)+1;
-  j = fscanf (fid, '%f', nonz)+1;
-  s = fscanf (fid, '%f', nonz);
-else
-  i = fread (fid2, nonz, itype)+1;
-  j = fread (fid2, nonz, itype)+1;
-  s = fread (fid2, nonz, ftype);
-end
-xmlCheckSize (nonz, size (i));
-xmlCheckSize (nonz, size (j));
-xmlCheckSize (nonz, size (s));
+i = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+j = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+s = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 
-result = sparse (i, j, s, nr, nc, nonz);
+i = i + 1;
+j = j + 1;
+
+xmlCheckSize (size (i), size (j));
+xmlCheckSize (size (j), size (s));
+
+result = sparse (i, j, s, nr, nc, size (s, 1));
 

@@ -16,33 +16,20 @@ s = size (data);
 
 nr = s(1);
 nc = s(2);
-nonz = nnz (data);
 
 attrlist = [];
 attrlist = xmlAddAttribute (attrlist, 'nrows', sprintf ('%d', nr));
 attrlist = xmlAddAttribute (attrlist, 'ncols', sprintf ('%d', nc));
-attrlist = xmlAddAttribute (attrlist, 'nnz', sprintf ('%d', nonz));
 
 xmlWriteTag (fid, 'Sparse', attrlist);
 
 [r,c] = find (data);
 
-form='%e';
-for i = 1:(nonz-1)
-  form = sprintf ('%s %%e', form);
-end
-form = sprintf ('%e\n', form);
-
-fprintf (fid, '%d ', r-1);
-fprintf (fid, '\n');
-
-fprintf (fid, '%d ', c-1);
-fprintf (fid, '\n');
-
-fprintf (fid, '%e ', nonzeros(data));
-fprintf (fid, '\n');
+xmlWriteRowIndex (fid, r - 1);
+xmlWriteColIndex (fid, c - 1);
+xmlWriteSparseData (fid, nonzeros(data));
 
 xmlWriteCloseTag (fid, 'Sparse');
 
-clear attrlist form nr nc nonz r c i;
+clear attrlist form nr nc r c i;
 
