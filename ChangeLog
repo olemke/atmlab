@@ -1,3 +1,12 @@
+2004-01-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-63
+
+	* handy/set_defaults.m: Created this script as a help to set default
+	input for function arguments.
+
+	Check it out, it is very useful!
+
 2003-12-24  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-62
