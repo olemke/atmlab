@@ -1,7 +1,5 @@
 % WHOAMI   Returns user name
 %
-%    So far only Unix type of computers are handled.
-%
 % FORMAT   user = whoami
 %        
 % OUT   user   String with user name.
@@ -12,10 +10,14 @@
 function user = whoami
 
 
-if isunix
+[st,user] = system( 'whoami' );
 
-  [st,user] = unix( 'whoami' );
 
-else
-  error('Our computer type is not handled.');
+%= Remove domain name that can be included on Windows machines
+%
+if ispc
+  i = find( user = '\' )
+  if ~isempty(i)
+    user = user((i+1):end);
+  end
 end

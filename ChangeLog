@@ -1,3 +1,14 @@
+2005-03-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-42
+
+	* handy/hostname.m: 
+	  handy/whoami.m:
+	  handy/extra.m:
+
+	Modified these functions to work with Windows. Changes made after
+	input from Hermann Berg, using Cygwin in Windows XP.
+	
 2005-02-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-41

@@ -21,7 +21,11 @@ P = path;
 %
 while ~isempty( P )
 
-  i = min( [ min( find( P == ':' ) ) - 1, length(P) ] );
+  if isunix
+    i = min( [ min( find( P == ':' ) ) - 1, length(P) ] );
+  else
+    i = min( [ min( find( P == ';' ) ) - 1, length(P) ] );    
+  end
 
   if isempty( findstr( P(1:i), 'matlab' ) )  &  ...
                                        isempty( findstr( P(1:i), 'toolbox' ) )

@@ -1,7 +1,5 @@
 % HOSTNAME   Returns name of computer
 %
-%    So far only Unix type of computers are handled.
-%
 % FORMAT   hname = hostname
 %        
 % OUT   hname   String with computer name.
@@ -12,10 +10,4 @@
 function hname = hostname
 
 
-if isunix
-
-  [st,hname] = unix( 'hostname' );
-
-else
-  error('Our computer type is not handled.');
-end
+[st,hname] = system( 'hostname' );
