@@ -14,8 +14,8 @@ function xmlWriteGasAbsLookup(fid, data)
 
 xmlWriteTag (fid, 'GasAbsLookup', []);
 
-xmlWriteArrayOfArray(fid, data.species, 'SpeciesTag');
-xmlWriteArray(fid, data.nonlinear_species, 'Index');
+xmlWriteArrayOfArrayOf (fid, data.species, 'SpeciesTag');
+xmlWriteArrayOf (fid, data.nonlinear_species, 'Index');
 xmlWriteVector (fid, data.f_grid);
 xmlWriteVector (fid, data.p_grid);
 xmlWriteMatrix (fid, data.vmrs_ref);
