@@ -89,6 +89,8 @@ Q.LMAX = lmax;
 Q.TMPFOLDER = tmpfolder;
 if isscalar( z_ground )
   Q.Z_GROUND = z_ground;
+else
+  Q.Z_GROUND = [];
 end
 Q.CLOUDBOX_LIMITS = cb_lims;
 Q.REFRACTION      = do_refr; 

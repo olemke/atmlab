@@ -1,6 +1,18 @@
+2003-03-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-35
+
+	* physics/wgs84.m: Copied and adapted this function from AMI.
+
+	* arts/arts_plot_atmgrids.m: Made z_ground an optional argument, to
+	supress plotting of the geoid and the ground. The function can now
+	be used to plot an individual grid cell.
+
+	* arts/arts_ppath.m: Fixed bug when z_ground is not a scalar.
+
 2003-03-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
-	* arts/arts_plot_atmgrids.m: Changed cb_lims to be a cella array, as
+	* arts/arts_plot_atmgrids.m: Changed cb_lims to be a cell array, as
 	for arts_ppath.m.
 
 	* arts/arts_ppath.m: Added r_geoid as mandatory input argument. 

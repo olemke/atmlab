@@ -8,7 +8,7 @@
 %     long (in latitude) the plotted atmosphere shall be extended.
 %
 % FORMAT   [h,hs] = arts_plot_atmgrids(dim,lat_grid,lon_grid,z_field,
-%                                       r_geoid,z_ground[,cb_lims,mark_fields])
+%                                       r_geoid,[z_ground,cb_lims,mark_fields])
 %        
 % OUT   h         Handles to plot symbols.
 %       hs        Text suitable to put in legend.
@@ -17,8 +17,9 @@
 %       lon_grid  As the WSV with the same name.
 %       z_field   As the WSV with the same name.
 %       r_geoid   As the WSV with the same name.
-%       z_ground  As the WSV with the same name. 
-% OPT   cb_lims   As the WSV cloudbox_limits. The cloud box is turned off
+% OPT   z_ground  As the WSV with the same name. If the variable is empty,
+%                 which is default, the geoid and the ground are not plotted.
+%       cb_lims   As the WSV cloudbox_limits. The cloud box is turned off
 %                 with cb_lims=[], which is also default.
 %       mark_fields  Flag to indicate atmospheric fields with black dot at
 %                 crossings of grids. Default is 0.
@@ -39,6 +40,10 @@ end
 %
 if dim == 1  & ( ~isvector( lat_grid )   |  length( lat_grid ) ~= 2 )
   error('For 1D, *lat_gid* must be a vector of length 2.');
+end
+%
+if nargin < 6
+  z_ground = [];
 end
 %
 if nargin < 7
@@ -118,13 +123,14 @@ switch dim
 
     end
     %
-    [x,y] = surf_segment2D( lat_grid, ...
+    if ~isempty( z_ground )
+      [x,y] = surf_segment2D( lat_grid, ...
                           [ r_geoid(1)+z_ground(1), r_geoid(1)+z_ground(1) ] );
-    h(2) = plot( x, y, ps_ground{:} );
-    %
-    [x,y] = surf_segment2D( lat_grid, [ r_geoid(1), r_geoid(1) ] );
-    h(3) = plot( x, y, ps_geoid );
-
+      h(2) = plot( x, y, ps_ground{:} );
+      %
+      [x,y] = surf_segment2D( lat_grid, [ r_geoid(1), r_geoid(1) ] );
+      h(3) = plot( x, y, ps_geoid );
+    end
 
   %- 2D
   case 2
@@ -159,12 +165,13 @@ switch dim
       end
     end
     %
-    [x,y] = surf_segment2D( lat_grid, r_geoid+z_ground );
-    h(2) = plot( x, y, ps_ground{:} );
-    %
-    [x,y] = surf_segment2D( lat_grid, r_geoid );
-    h(3) = plot( x, y, ps_geoid );
-
+    if ~isempty( z_ground )
+      [x,y] = surf_segment2D( lat_grid, r_geoid+z_ground );
+      h(2) = plot( x, y, ps_ground{:} );
+      %
+      [x,y] = surf_segment2D( lat_grid, r_geoid );
+      h(3) = plot( x, y, ps_geoid );
+    end
 
   %- 3D
   case 3
@@ -188,12 +195,14 @@ switch dim
     end
     %
     for j = 1 : length( lat_grid )
-      [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, ...
-                                                  r_geoid(j,:)+z_ground(j,:) );
-      h(2) = plot3( z, x, y, ps_ground{:} );
-      %
-      [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, r_geoid(j,:) );
-      h(3) = plot3( z, x, y, ps_geoid );
+      if ~isempty( z_ground )
+        [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, ...
+                                               r_geoid(j,:)+z_ground(j,:,:) );
+        h(2) = plot3( z, x, y, ps_ground{:} );
+        %
+        [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, r_geoid(j,:) );
+        h(3) = plot3( z, x, y, ps_geoid );
+      end
       %
       for k = 1 : nz
         [x,y,z] = surf_segment3D( lat_grid(j), lon_grid, ...
@@ -203,12 +212,15 @@ switch dim
     end
     %
     for j = 1 : length( lon_grid )
-      [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), ...
+      if ~isempty( z_ground )
+
+        [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), ...
                                                   r_geoid(:,j)+z_ground(:,j) );
-      plot3( z, x, y, ps_ground{:} );
-      %
-      [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), r_geoid(:,j) );
-      plot3( z, x, y, ps_geoid );
+        plot3( z, x, y, ps_ground{:} );
+        %
+        [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), r_geoid(:,j) );
+        plot3( z, x, y, ps_geoid );
+      end
       %
       for k = 1 : nz
         [x,y,z] = surf_segment3D( lat_grid, lon_grid(j), ...
