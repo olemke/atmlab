@@ -1,5 +1,12 @@
 2003-04-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-42
+
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Worked a bit on this function.
+	IWC and LWC seem to be ready. Rain not done.
+
+2003-04-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-41
 
 	* atmscenarios/simplecloud_field.m: Created this function.
