@@ -28,5 +28,5 @@ fprintf (fid, '%f\n', data);
 
 xmlWriteCloseTag (fid, 'Vector');
 
-clear fid nelem;
+clear fid nrows ncols nelem;
 

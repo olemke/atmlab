@@ -32,5 +32,5 @@ for i = 1:nelem
 end
 xmlWriteCloseTag (fid, 'Array');
 
-clear fid nelem;
+clear fid ncols nrows nelem;
 
