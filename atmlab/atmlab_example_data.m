@@ -12,5 +12,5 @@
 function p = atmlab_example_data
 
 p = fileparts(fileparts(which('atmlab_init')));
-p = fullfile( p, 'examples' );
-p = fullfile( p, 'Data' );
+p = fullfile( p, 'demos' );
+p = fullfile( p, 'data' );

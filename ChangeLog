@@ -1,5 +1,23 @@
 2005-03-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-47
+
+	* demos: Created this folder, to hold demos. The idea is to also
+	use these demos for code checks. Use then run_demos. 
+
+	* demos/run_demos: Runs a set of demo functions. Can be used to
+	test the code before a commit.
+
+	* arts/qarts_demo.m: Moved to /demos.
+
+	* arts1/qarts1_demo.m: Moved to /demos.
+	
+	* atmlab/atmlab_example_data.m: Path changed. 
+
+	* handy/extra.m: Further generalisation for different platforms.
+
+2005-03-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-46
 
 	* arts1/arts1_create_linefile.m: Created this function. 

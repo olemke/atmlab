@@ -21,16 +21,12 @@ P = path;
 %
 while ~isempty( P )
 
-  if isunix
-    i = min( [ min( find( P == ':' ) ) - 1, length(P) ] );
-  else
-    i = min( [ min( find( P == ';' ) ) - 1, length(P) ] );    
-  end
+  i = min( [ min( find( P == pathsep ) ) - 1, length(P) ] );
 
   if isempty( findstr( P(1:i), 'matlab' ) )  &  ...
                                        isempty( findstr( P(1:i), 'toolbox' ) )
     fprintf('===== %s =====', P(1:i) );
-    dir( [ P(1:i), '/*.m' ] )
+    dir( [ P(1:i), filesep, '*.m' ] )
   end 
 
   P = P((i+2):length(P));

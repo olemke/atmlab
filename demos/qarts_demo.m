@@ -101,8 +101,9 @@ y = arts_y( Q );
 
 %= Plot
 %
-plot( Q.F_GRID/1e9, y )
-xlabel( 'Frequency [GHz]' )
-ylabel( 'Brightness temperature [K]' )
-title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3 ) );
-
+if ~nargout
+  plot( Q.F_GRID/1e9, y ) 
+  xlabel( 'Frequency [GHz]' )
+  ylabel( 'Brightness temperature [K]' )
+  title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
+end
