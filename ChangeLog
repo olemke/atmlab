@@ -1,5 +1,11 @@
 2004-06-29  Mashrab Kuvatov  <kmashrab@sat.physik.uni-bremen.de>
 
+	* atmlab-0-1-79
+
+	* Forgot to "cvs add" the files in the previous entry.
+	
+2004-06-29  Mashrab Kuvatov  <kmashrab@sat.physik.uni-bremen.de>
+
 	* atmlab-0-1-78
 
 	* sensors/atovs_define_amsual1c.m: Added.
