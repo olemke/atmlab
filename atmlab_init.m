@@ -26,6 +26,7 @@ addpath( fullfile( toppath, 'math' ) );
 addpath( fullfile( toppath, 'handy' ) ); 
 addpath( fullfile( toppath, 'graphs' ) ); 
 addpath( fullfile( toppath, 'atmplots' ) ); 
-addpath( fullfile( toppath, 'arts' ) ); 
+addpath( fullfile( toppath, 'arts' ) );
+addpath( fullfile( toppath, 'physics' ) ); 
 addpath( fullfile( toppath, 'xml' ) ); 
 addpath( toppath );

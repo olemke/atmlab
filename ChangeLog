@@ -1,3 +1,14 @@
+2002-12-13  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-0-11
+
+	* physics/Contents.m: Added this file.
+
+	* atmlab_init.m: Added the physics folder here.
+
+	* physics/constants.m: Modified documentation. Now the help gives
+	out a complete list of defined constants.
+
 2002-12-13  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-0-10
@@ -34,8 +45,10 @@
 2002-12-12  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-0-7
-
-	* physics: Created this directory.
+	
+	* physics: Created this directory. 
+	This folder contains basic physical function needed for
+	remote sensing applications.
 
 	* physics/constants.m: Created this function, which returns
 	physical constants or an error message, if the constant is not
