@@ -1,3 +1,10 @@
+2003-04-22  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-1-48
+
+	* CONFIGURE: Updated location of atmlab_init script. (It seems to
+	be now in subdirectory atmlab.)
+
 2003-04-14  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-47

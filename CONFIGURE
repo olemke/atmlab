@@ -8,15 +8,15 @@ www.mathworks.com contains a lot of useful information and a good FAQ.
 The top folder of Atmlab is below denoted as ATMLAB/.
 
 Atmlab is added to the Matlab search path by calling the function
-atmlab_init, which is found in ATMLAB/. To view the search path, use
+atmlab_init, which is found in ATMLAB/atmlab. To view the search path, use
 the Matlab function path. If you will always be using Atmlab, the
 simplest is to include these lines in startup.m:
-   cd ATMLAB/
+   cd ATMLAB/atmlab
    atmlab_init;
 
 If you have different Matlab environments, and you don't want to add
 all the Matlab stuff that you have to the search path, the file
-ATMLAB/startup_menu.m gives you some hints on how this can be handled.
+ATMLAB/atmlab/startup_menu.m gives you some hints on how this can be handled.
 
 Matlab looks for startup.m in the folder where it is started. To
 ensure that Matlab always finds your startup.m, the Matlab path must
