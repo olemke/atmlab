@@ -1,5 +1,12 @@
 2003-03-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-31
+
+	* arts/arts_ppath.m: Finished the function. It now works also with
+	refraction.
+
+2003-03-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-30
 	
 	* arts/arts_ppath.m: Started on this function. Instead of having
