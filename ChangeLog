@@ -1,3 +1,17 @@
+2004-06-29  Mashrab Kuvatov  <kmashrab@sat.physik.uni-bremen.de>
+
+	* atmlab-0-1-78
+
+	* sensors/atovs_define_amsual1c.m: Added.
+	
+	* sensors/atovs_define_amsubl1c.m: Added.
+
+	* sensors/atovs_define_hirsl1c.m: Added.
+
+	* sensors/atovs_read_data.m: Added.
+
+	* sensors/atovs_read_header.m: Added.
+	
 2004-06-10  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-77
