@@ -1,9 +1,16 @@
+2005-03-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-50
+
+	* arts/qarts2cfile.m: Now using scat_fieldCalcLimb for DOIT, instead of
+	scat_fieldCalc. Needed as grid_sizeSet is not yet included. 
+
 2005-03-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-49
 
 	* arts/qarts2cfile.m: Made a first version where DOIT runs. Many
-	options still hard coded. Only zenoith and azimuth angles can be
+	options still hard coded. Only zenith and azimuth angles can be
 	selected. 
 
 	* arts/qarts_cloudbox.m: Added description of DOIT fields.
