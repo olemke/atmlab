@@ -1,3 +1,10 @@
+2003-03-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* arts/arts_plot_atmgrids.m: Changed cb_lims to be a cella array, as
+	for arts_ppath.m.
+
+	* arts/arts_ppath.m: Added r_geoid as mandatory input argument. 
+
 2003-03-04  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-33

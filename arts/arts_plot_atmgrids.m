@@ -76,9 +76,12 @@ hs{2} = 'Ground';
 hs{3} = 'Geoid';
 if ~isempty( cb_lims )
   hs{4} = 'Cloud box';
+  do_cb = 1;
+else
+  do_cb = 0;
 end
 if mark_fields
-  hs{5} = 'Atmospheric field';
+  hs{4+do_cb} = 'Atmospheric field';
 end
 
 
@@ -91,10 +94,12 @@ switch dim
   case 1
     %
     if ~isempty( cb_lims )
-      [x1,y1] = surf_segment2D( lat_grid, [r_geoid(1)+z_field(cb_lims(1)), ...
-                                           r_geoid(1)+z_field(cb_lims(1)) ] );
-      [x2,y2] = surf_segment2D( lat_grid, [r_geoid(1)+z_field(cb_lims(2)), ...
-                                           r_geoid(1)+z_field(cb_lims(2)) ] );
+      [x1,y1] = surf_segment2D( lat_grid, ... 
+                                        [r_geoid(1)+z_field(cb_lims{1}+1), ...
+                                         r_geoid(1)+z_field(cb_lims{1}+1) ] );
+      [x2,y2] = surf_segment2D( lat_grid, ...
+                                        [r_geoid(1)+z_field(cb_lims{2}+1), ...
+                                         r_geoid(1)+z_field(cb_lims{2}+1) ] );
       h(4) = patch( [x1 fliplr(x2)], [y1 fliplr(y2)], ps_cloudb);
       set( h(4), 'EdgeColor', ps_cloudb );
       hold on
@@ -108,7 +113,7 @@ switch dim
       %
       if mark_fields
         i0 = round( length(x)/2 );
-        h(5) = plot( x(i0), y(i0), ps_field );
+        h(4+do_cb) = plot( x(i0), y(i0), ps_field );
       end
 
     end
@@ -125,11 +130,11 @@ switch dim
   case 2
     %
     if ~isempty( cb_lims )
-      ind     = cb_lims(3):cb_lims(4);
+      ind     = (cb_lims{3}+1):(cb_lims{4}+1);
       [x1,y1] = surf_segment2D( lat_grid(ind), ...
-                                       r_geoid(ind)+z_field(cb_lims(1),ind)' );
+                                     r_geoid(ind)+z_field(cb_lims{1}+1,ind)' );
       [x2,y2] = surf_segment2D( lat_grid(ind), ...
-                                       r_geoid(ind)+z_field(cb_lims(2),ind)' );
+                                     r_geoid(ind)+z_field(cb_lims{2}+1,ind)' );
       h(4) = patch( [x1 fliplr(x2)], [y1 fliplr(y2)], ps_cloudb );
       set( h(4), 'EdgeColor', ps_cloudb );
       hold on
@@ -149,7 +154,7 @@ switch dim
       if mark_fields
         for k = 1 : nz
           [x,y] = atmplot_pol2cart( r_geoid(j)+z_field(k,j), lat_grid(j) );
-          h(5) = plot( x, y, ps_field );
+          h(4+do_cb) = plot( x, y, ps_field );
         end
       end
     end
@@ -176,7 +181,7 @@ switch dim
       	  for l = 1 : nz
       	    [x,y,z] = atmplot_sph2cart( r_geoid(j,k)+z_field(l,j,k), ...
                                                     lat_grid(j), lon_grid(k) );
-      	    h(5) = plot3( z, x, y, ps_field );
+      	    h(4+do_cb) = plot3( z, x, y, ps_field );
       	  end
       	end
       end
@@ -263,7 +268,7 @@ return
 function [x,y,z] = surf_segment3D(lat,lon,r)
 
   % Nominal latitude step length
-  nom_dang = 0.2;
+  nom_dang = 0.5;
 
   x = [];
   y = [];
