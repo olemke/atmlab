@@ -4,6 +4,10 @@
 %     applied. Plot symbol, and additional plot arguments, can be selected
 %     by adding arguments after *lat*.
 %
+%     Plotting is only performed if there are no output arguments. With
+%     output arguments, the function can be used for conversion inside
+%     other plotting functions.
+%
 %     A scalar as input for either radius, latitude or longitude means that 
 %     that value shall be applied for all points. If radii, latitudes and
 %     longitudes are given as vectors, all vectors must have the same size.
@@ -11,8 +15,11 @@
 %     The data are plotted in such way that the observer is placed a bit
 %     above the Equator and a bit east from the lon=0.
 %
-% FORMAT   atmplot_sph2cart( r, lat, lon, [, varargin ] )
+% FORMAT   [x,y,z] = atmplot_sph2cart( r, lat, lon, [, varargin ] )
 %        
+% OUT   x          The x-coordinate for the line to draw.
+%       y          The y-coordinate for the line to draw.
+%       z          The z-coordinate for the line to draw.
 % IN    r          A single radius or a vector of radii.
 %       lat        A single latitude, or a vector of latitides.
 %       lon        A single longitudes, or a vector of longitudes.

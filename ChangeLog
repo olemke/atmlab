@@ -1,3 +1,15 @@
+2003-03-04  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-32
+
+	* arts/arts_plot_atmgrids.m: Added and started on this function.  
+
+	* atmplots/atmplot_sph2cart.m: Added output arguments to the function.
+
+	* atmplots/atmplot_pol2cart.m: As above.
+
+	* arts/arts_sph2cart.m: Removed this function.
+	
 2003-03-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-31
