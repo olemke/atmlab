@@ -1,3 +1,15 @@
+2005-02-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-39
+
+	* atmscenarios/randgen_uniform.m: 
+	* atmscenarios/randgen_normal.m: 
+	* atmscenarios/randgen_free_distfun.m:
+
+	Created these functions for testing an idea to create random data
+	sets with arbitrary PDFs and cross-correlations. All functions are
+	preliminary and no headers exist.
+
 2005-01-27  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-38
