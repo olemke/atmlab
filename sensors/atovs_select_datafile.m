@@ -1,6 +1,6 @@
 % FUNCTION:atovs_select_datafile
 %
-% FORMAT:  [DataSelectedFiles, day_meas] = ...
+% FORMAT:  DataSelectedFiles = ...
 % atovs_select_datafile(dir_data, satellite, instrument_tip, year,...
 % month, day, time);
 %----------------------------------------------------------------
@@ -78,7 +78,7 @@
 %
 % 18.05.2004 by Carmen Verdes
 %--------------------------------------------------------------------------
-function [DataSelectedFiles, day_meas] =...
+function DataSelectedFiles =...
          atovs_select_datafile(dir_data, satellite, instrument_tip, year, month, day, time); 
 %-------------------------------
 % Check the input
@@ -259,7 +259,6 @@ for is=1:length(satellite);
                                         % not contain the any period of selected time
                                         %out_text(1,['[', num2str(t_start(j)),', ', num2str(t_end(j)), '] does not content the selected time']);
                                     end
-                                    day_meas(I)=1;
                                 else
                                     % handle the case when the measurements
                                     % started in previous day should be
@@ -267,7 +266,6 @@ for is=1:length(satellite);
                                     if (t_end(j)>time(i,1)|t_end(j)>time(i,2))& (days(j)==day(id)-1);
                                         I = [I, j];
                                         out_text(1, ['time selected [', num2str(time(i,1)),', ', num2str(time(i,2)),']includes [', num2str(t_start(j)),', ', num2str(t_end(j)), '] ','(previous day)']);
-                                        day_meas(j)=-1;
                                     end
                                 end
                                 if ~isempty(I)

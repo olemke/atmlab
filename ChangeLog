@@ -1,3 +1,10 @@
+2004-10-04  Carmen Verdes  <cverdes@uni-bremen.de>
+
+	* atmlab-0-2-21
+
+	* sensor/atovs_griddata.m: added the file. This script average
+	and grid the data on the same grid as ECMWF data (1.5deg. step)
+
 2004-10-01  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-20
