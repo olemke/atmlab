@@ -1,3 +1,18 @@
+2005-03-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-49
+
+	* arts/qarts2cfile.m: Made a first version where DOIT runs. Many
+	options still hard coded. Only zenoith and azimuth angles can be
+	selected. 
+
+	* arts/qarts_cloudbox.m: Added description of DOIT fields.
+
+	* scattering/mie_scat_data.m: Changed Mie to mie and Mie_S12 to 
+	mie_s12.
+
+	* mie/mie_S12.m (pt): Changed Mie_ab to mie_ab and Mie_pt to mie_pt.
+	
 2005-03-21  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-48

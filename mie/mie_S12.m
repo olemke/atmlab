@@ -8,11 +8,11 @@ function result = mie_S12(m, x, u)
 % C. Mätzler, May 2002
 
 nmax=round(2+x+4*x^(1/3));
-ab=Mie_ab(m,x);
+ab=mie_ab(m,x);
 an=ab(1,:);
 bn=ab(2,:);
 
-pt=Mie_pt(u,nmax);
+pt=mie_pt(u,nmax);
 pin =pt(1,:);
 tin =pt(2,:);
 

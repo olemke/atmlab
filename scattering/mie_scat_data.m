@@ -54,7 +54,7 @@ for i = 1:length(f_grid)
     x = k * r;
     
     % Calculate scattering, absorption and extinction cross-sections
-    mie_out = Mie(m,x);
+    mie_out = mie(m,x);
     
     ssp.ext_mat_data(i, j, 1, 1, 1) = mie_out(1)*pi*r^2;
     ssp.abs_vec_data(i, j, 1, 1, 1) = mie_out(3)*pi*r^2;
@@ -63,7 +63,7 @@ for i = 1:length(f_grid)
     for l = 1:length(theta)
       
       u = cos(pi/180*theta(l));
-      S = Mie_S12(m,x,u);
+      S = mie_S12(m,x,u);
       
       S11 = 1/2 * ( abs(S(1))^2 + abs(S(2))^2 )/k^2;
       S12 = 1/2 * ( abs(S(2))^2 - abs(S(1))^2 )/k^2;

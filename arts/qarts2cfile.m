@@ -166,8 +166,10 @@ case 'load_abs'
   T{3} = 'gas_abs_lookupAdapt{}';
 
 case 'calc_abs'
-  T{1} = [ 'AgendaSet(scalar_gas_absorption_agenda)', ...
-                                       '{abs_scalar_gasExtractFromLookup{}}' ];
+  T = add_agenda( T, 'scalar_gas_absorption_agenda', ...
+                                     { 'abs_scalar_gasExtractFromLookup{}' } );
+%  T{1} = [ 'AgendaSet(scalar_gas_absorption_agenda)', ...
+%                                      '{abs_scalar_gasExtractFromLookup{}}' ];
   T = add_agenda( T, 'opt_prop_gas_agenda', ...
               { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
 
@@ -232,7 +234,16 @@ case 'save_sensor'
   
 case 'calc_rte'
   %
-  T{1} = 'RteCalc{}';
+  %= Special solution for DOIT
+  if isstruct(Q.CLOUDBOX)  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
+    T{1} = 'CloudboxGetIncoming{}';
+    T{2} = 'ScatteringMain{}';
+    T{3} = 'RteCalc{}';
+    %
+  %= Standard solution
+  else
+    T{1} = 'RteCalc{}';
+  end
 
 case 'save_y'
   %
@@ -434,17 +445,29 @@ end
 %
 if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   %
-  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, SCAT_ZA_GRID );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_GRID' );
   T{end+1} = file_or_data( 'scat_za_grid', 'Vector', ...
-                               Q.CLOUDBOX.METHOD_PARAMS.SCAT_ZA_GRID, tmpdir );
-  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, SCAT_ZA_INTERP );
+                               Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_GRID, tmpdir );
+  T{end+1} = sprintf('IndexSet(za_grid_size){%d}', ...
+                             length( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_GRID ) );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP' );
   T{end+1} = sprintf('scat_za_interpSet{interp_method = "%s"}', ...
-                                     Q.CLOUDBOX.METHOD_PARAMS.SCAT_ZA_INTERP );
-  if Q.ATMOSPHERE_DIM == 3
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, SCAT_AA_GRID );
-    T{end+1} = file_or_data( 'scat_aa_grid', 'Vector', ...
-                               Q.CLOUDBOX.METHOD_PARAMS.SCAT_AA_GRID, tmpdir );
-  end
+                                     Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_AA_GRID' );
+  T{end+1} = file_or_data( 'scat_aa_grid', 'Vector', ...
+                               Q.CLOUDBOX.METHOD_PRMTRS.SCAT_AA_GRID, tmpdir );
+  T = add_agenda( T, 'scat_mono_agenda', ...
+           { 'DoitInit{}', 'ScatteringDataPrepareDOITOpt{}', ...
+                 'i_fieldSetClearsky{}', 'i_fieldIterate{}', 'scat_iPut{}' } );
+  T = add_agenda( T, 'pha_mat_spt_agenda', ...
+                                          { 'pha_mat_sptFromDataDOITOpt{}' } );
+  T = add_agenda( T, 'scat_field_agenda', { 'scat_fieldCalc{}' } );
+
+  T = add_agenda( T, 'scat_rte_agenda', ...
+                       { sprintf('i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
+  T = add_agenda( T, 'convergence_test_agenda', ...
+                  { 'convergence_flagAbs_BT{epsilon=[0.1, 0.1, 0.1, 0.1]}' } );
+  T = add_agenda( T, 'iy_cloudbox_agenda', { 'iyInterpCloudboxField{}' } );
 
 elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   %
