@@ -1,3 +1,23 @@
+2005-01-26  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-2-37
+
+	* arts/qarts.m: Added field SENSOR_RESPONSE, it can be given as
+	a sparse matrix, a string cell array or a sensor structure (see
+	below). If left as NaN, sensorOff is put in the control file.
+
+	* arts/qarts2cfile.m: Added parts 'sensor' and 'save_sensor' to
+	handle the Q.SENSOR_RESPONSE field.
+
+	* arts/qarts_sensor.m: As qarts but for the sensor structure, sets
+	up a default structure and also provides some info about the fields.
+
+	* arts/sensor2cfile.m: This function is called from qarts2cfile to
+	parse the sensor structure into a string cell array.
+
+	* arts/qarts_demo.m: Added a small antenna to the demo, uses the
+	antenna pattern in examples/Data/antenna.xml.
+
 2005-01-12  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-36

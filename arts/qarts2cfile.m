@@ -17,6 +17,8 @@
 %       load_abs
 %       calc_abs
 %       init_rte
+%       sensor
+%       save_sensor
 %       calc_rte
 %       save_y
 %       stop
@@ -77,7 +79,7 @@ if nargin == 1
   case 'y'
     %
     S = {'start', 'stokes', 'load_atm', 'load_abs', 'calc_abs', 'init_rte', ...
-         'calc_rte', 'save_y', 'stop' };
+         'sensor', 'calc_rte', 'save_y', 'stop' };
 
   otherwise
     error( sprintf( 'Unknown run type (%s) was requested.', Q ) );
@@ -196,11 +198,29 @@ case 'init_rte'
          file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
   T{length(T)+1} = ...
          file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
-  T{length(T)+1} = 'sensorOff{}';
   T{length(T)+1} = 'cloudboxOff{}';
   %
   T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
-
+  
+case 'sensor'
+  %
+  if ischar(Q.SENSOR_RESPONSE) | issparse(Q.SENSOR_RESPONSE)
+    T{1} = file_or_data( 'sensor_response', 'Sparse', ...
+                         Q.SENSOR_RESPONSE, tmpdir );
+  elseif iscellstr(Q.SENSOR_RESPONSE) 
+    T = Q.SENSOR_RESPONSE;
+  elseif isstruct(Q.SENSOR_RESPONSE) 
+    T = sensor2cfile( Q.SENSOR_RESPONSE, tmpdir );
+  elseif isnan(Q.SENSOR_RESPONSE) 
+    T{1} = 'sensorOff{}';
+  else
+    error( 'Unrecognised choice for Q.SENSOR_RESPONSE.' );
+  end
+  
+case 'save_sensor'
+  %
+  T{1} = add_savefile( 'sensor_response', tmpdir );
+  
 case 'calc_rte'
   %
   T{1} = 'RteCalc{}';

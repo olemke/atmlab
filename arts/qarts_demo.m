@@ -1,4 +1,4 @@
-function qarts_demo( ztan )
+function Q = qarts_demo( ztan )
 
 if nargin == 0
   ztan = 30e3;
@@ -14,12 +14,12 @@ addpath_ami;
 %
 Q  = qarts;
 Q1 = qarts1;
-
+H  = qarts_sensor;
 
 %= Atmosphere
 %
 Q.ATMOSPHERE_DIM      = 1;
-Q.USE_RAW_ATMOSPHERE  = 1;
+Q.USE_RAW_ATMOSPHERE  = 0;
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
@@ -38,6 +38,7 @@ Q.GAS_SPECIES{3}{1} = 'N2O';
 Q.GAS_SPECIES{4}{1} = 'H2O';
 Q.GAS_SPECIES{4}{2} = 'H2O-MPM89';
 Q.GAS_SPECIES{5}{1} = 'N2-SelfContStandardType';
+Q.GAS_SPECIES{6}{1} = 'O3-686-*-*';
 %
 Q.F_GRID         = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM     = 1;
@@ -46,6 +47,11 @@ Q1.LINEFORMAT    = 'Arts';
 Q1.LINEDATA      = fullfile( atmlab_example_data , 'lines501.4' );
 %
 Q.OPT_PROP_GAS_AGENDA = { 'ext_matAddGas{}', 'abs_vecAddGas{}' };
+
+
+%= Create T_FIELD, Z_FIELD and VMR_FIELD by ARTS1
+%
+[Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD] = arts_get_atmfields( Q );
 
 
 %= Create absorption lookup table by ARTS1
@@ -70,6 +76,12 @@ zplat        = 600e3;
 Q.SENSOR_POS = Q.R_GEOID + zplat;
 Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan );
 
+%= Sensor
+%
+H.MBLOCK_ZA_GRID = [-0.04:0.01:0.04];
+H.ANTENNA_LOS = 0;
+H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
+Q.SENSOR_RESPONSE = H;
 
 %= Calculate spectrum
 %
