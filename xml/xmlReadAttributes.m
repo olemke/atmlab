@@ -11,16 +11,33 @@
 
 function attrlist = xmlReadAttributes(fid)
 
+attrlist={};
 na = 0;
-s = ' ';
-while s(size(s)) ~= '>'
-  s = fscanf (fid, '%s', 1);
-  attr = strtok (s, '=');
-  pos = strfind (s, '"');
-  value = s (pos(1)+1:pos(2)-1);
+c = fgets (fid, 1);
+while ~feof (fid) & c ~= '>'
+  attr = '';
+  while ~feof (fid) & c ~= '=' & c ~= '>'
+    attr = strcat(attr, c);
+    c = fgets (fid, 1);
+  end
+
+  if c == '>', break, end;
+
+  c = fgets (fid, 1);
+  while ~feof (fid) & c == ' '
+    c = fgets (fid, 1);
+  end
+
+  value = '';
+  c = fgets (fid, 1);
+  while ~feof (fid) & c ~= '"'
+    value = strcat(value, c);
+    c = fgets (fid, 1);
+  end
 
   na = na + 1;
   attrlist{na,1} = attr;
   attrlist{na,2} = value;
+  c = fgets (fid, 1);
 end
 

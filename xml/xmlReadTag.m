@@ -14,23 +14,39 @@ function result = xmlReadTag(fid)
 
 data_ok = 0;
 exit_loop = 0;
+result = 'error';
 
 %=== Parsing tags
 while ~feof (fid) & ~exit_loop
-  s = fscanf (fid, '%s', 1);
 
-  if ~size (s)
-    break
+  c = fgets (fid, 1);
+  while ~feof (fid) & (c == 10 | c == 32)
+    c = fgets (fid, 1);
   end
 
+  if feof (fid), break, end
+
   %=== Tag has to start with bracket
-  if s(1) == '<'
+  if c == '<'
+    c = fgets (fid, 1);
+
     %=== Do we have an opening tag here?
-    if s(2) ~= '/'
-      l = size(s);
-      tag = s(2:l(2));
-      
-      attrlist = xmlReadAttributes (fid);
+    if c ~= '/'
+      tag = c;
+
+      c = fgets (fid, 1);
+      while ~feof (fid) & c ~= ' ' & c ~= '>'
+        tag = strcat (tag, c);
+        c = fgets (fid, 1);
+      end
+
+      if feof (fid)
+        error ('Unexpected end of file');
+        break;
+      elseif c ~= '>'
+        % Tag with attributes
+        attrlist = xmlReadAttributes (fid);
+      end
       
       switch tag
        case 'arts'
@@ -40,7 +56,10 @@ while ~feof (fid) & ~exit_loop
          data_ok = 1;
       end
     else %=== or is it a closing tag
-      exit_loop = 1;
+      c = fgets (fid, 1);
+      while ~feof (fid) & c ~= '>'
+        c = fgets (fid, 1);
+      end
     end
   else
     exit_loop = 1;
