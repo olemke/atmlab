@@ -1,5 +1,21 @@
 2004-10-08  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-2-27
+
+	* mie/: More updates from Christian.
+
+	* mie/{epsice.m, epswater.m, epswater93.m}: Updated.
+
+	* mie/epsoil.m: Added.
+
+	* mie/epsalwater.m:
+
+	Added.
+
+	Water model from Meissner and Wentz from IEEE TGARS Issue Sept. 04.
+
+2004-10-08  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-2-26
 
 	* mie/:

@@ -1,10 +1,12 @@
-% Function for calculating the relative permittivity of pure ice in the microwave region
-
 function z = epsice(f,TK)
+% Function for calculating the relative permittivity of pure ice in the 
+% microwave region, according to C. Mätzler, "Microwave properties of ice 
+% and snow", in B. Schmitt et al. (eds.) Solar System Ices, Astrophys. 
+% and Space Sci. Library, Vol. 227, Kluwer Academic Publishers, 
+% Dordrecht, pp. 241-257 (1998). Input:
+% TK = temperature (K), range 20 to 273.15
+% f = frequency in GHz, range 0.01 to 3000
 	
-% TK = temperature (deg K)
-% f = frequency in GHz
-
 	B1 = 0.0207;
 	B2 = 1.16e-11;
 	b = 335;

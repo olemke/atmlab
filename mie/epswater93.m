@@ -1,7 +1,8 @@
 function result = epswater93(fGHz, TK)
 
-% Dielectric permittivity of liquid water without salt according
-% to Liebe et al. 1991 Int. J. IR+mm Waves 12(12), 659-675
+% Complex dDielectric permittivity of liquid water without salt 
+% according to Liebe et al. 1991, Int. J. IR+mm Waves 12(12), 659-675
+% modified for version of MPM 1993
 % Mätzler, June 2002
 
 TETA=1-300/TK;
