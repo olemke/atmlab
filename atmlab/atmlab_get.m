@@ -9,13 +9,13 @@
 %        
 % OUT   value       Value of field.
 % IN    field       Field name.
-%       requiered   Boolean to require that personal settings exist.
+%       required    Boolean to require that personal settings exist.
 %                   Default is 0.
 
 % 2002-12-19   Created by Patrick Eriksson.
 
 
-function value = atmlab_get(field,requiered)
+function value = atmlab_get(field,required)
 
 
 %= Input
@@ -30,7 +30,7 @@ end
 if ~exist( 'atmlab.m', 'file' )
 
   if required
-    error( ['You have selected a feature requiering personal settings,', ...
+    error( ['You have selected a feature requiring personal settings,', ...
                      'but no *atmplot* function exists in the search path.'] );
   else
     value = [];
