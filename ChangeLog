@@ -1,3 +1,11 @@
+2004-09-03  Carlos Jimnenez  <carlos.jimenez@ed.ac.uk>
+	
+	* atmlab-0-1-86
+
+	* handy/getfield_fromtip.m: adding a function as F =
+	GETFIELD(S,'field') but using as 'field' the first field that
+	contain the string tip. If no field containing tip is found, F is
+	returned empty.
 
 2004-09-02  Bengt Rydberg  <benryd@etek.chalmers.se>
 	
