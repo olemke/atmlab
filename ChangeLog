@@ -1,3 +1,10 @@
+2004-09-09  Carmen Verdes  <cverdes@uni-bremen.de>
+
+	* atmlab-0-2-4
+
+	* sensor/DataSelection.m renamed to atovs_select_datafiles.m. 
+	Major modification in the file has been	made (see the file description)
+
 2004-09-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-3
