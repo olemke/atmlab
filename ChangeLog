@@ -1,5 +1,11 @@
 2003-04-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-43
+
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Finished this function. 
+
+2003-04-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-42
 
 	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Worked a bit on this function.

@@ -1,7 +1,7 @@
 % MPM_IWC93_LWC93_RAIN89   Complex refractivity for IWC, LWC and rain.
 %
-%    Returns the complex refractivity following MPM93 for ice water,
-%    liquid water and rain. 
+%    Returns the complex refractivity following MPM93 for ice water and
+%    liquid water, and MPM89 for rain. 
 %
 % FORMAT   [nr,alpha] = mpm_iwc93_lwc93_rain89(iwc,lwc,rain,v,t)
 %
@@ -13,10 +13,15 @@
 %          v      Frequency [Hz]
 %          t      Temperature [K]
 
-% HISTORY: 2003-03-07  Created by Patrick Eriksson
+% HISTORY: 2003-03-09  Created by Patrick Eriksson
 
 
 function [nr,alpha] = mpm_iwc93_lwc93_rain89(iwc,lwc,rain,v,t)
+
+
+if v < 1e9  |  v > 1000e9
+  error('This function is only valid for 1 -1000 GHz.');
+end
 
 
 %=== Local variables
@@ -72,15 +77,42 @@ end
 %
 if rain < 0
   error('Negativ rain rate is not allowed.');
-elseif rain > 5
+elseif rain > 25
   error('Rain rate > 25 mm/h is not allowed.');
 elseif rain > 0
   %
+  if v_ghz <= 2.9
+    x1 = 3.51e-4;   y1 = 1.03;
+  elseif v_ghz <= 54
+    x1 = 2.31e-4;   y1 = 1.42;
+  elseif v_ghz <= 180
+    x1 = 0.225;     y1 = -0.301;
+  else
+    x1 = 18.6;      y1 = -1.151
+  end
+  %
+  if v_ghz <= 8.5
+    x2 = 0.851;     y2 = 0.158;
+  elseif v_ghz <= 25
+    x2 = 1.41;      y2 = -0.0779;
+  elseif v_ghz <= 164
+    x2 = 2.63;      y2 = -0.272;
+  else
+    x2 = 0.616;     y2 = 0.0126;
+  end
+  %
+  fr  = 53 - rain * ( 0.37 - 0.0015 * rain );
+  y25 = (v_ghz/fr)^2.5;
+  nr  = nr + 1e-6 * rain * ( 0.012*rain - 3.7 ) * y25 / ( fr * ( 1 + y25 ) ); 
+  %
+  nc = nc + x1*v_ghz^y1 * rain^( x2*v_ghz^y2 );
 end
 
 
 
 %=== Convert to absorption per meter [1/m]
 %
-%alpha = 4 * pi * v * nc/1e6 / constants('SPEED_OF_LIGHT');
-alpha = 0.182 * v_ghz * nc;
+alpha = 4 * pi * v * nc/1e6 / constants('SPEED_OF_LIGHT');
+
+%alpha = 0.182 * v_ghz * nc;   % dB/km
+
