@@ -1,11 +1,12 @@
 % Writes a Tensor7 to an XML file.
 %
-%    Make sure that the argument you're passing has the correct type.
+%    Internal function that should never be called directly.
+%    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteTensor7(filename, data)
+% FORMAT   xmlWriteTensor7(fid, data)
 %
-% IN    filename   Name of output file
-% IN    data       Tensor7
+% IN    fid    File descriptor
+% IN    data   Tensor7
                                                                                                                                
 % 2002-12-13  Created by Oliver Lemke.
 
@@ -34,8 +35,6 @@ attrlist = xmlAddAttribute (attrlist, 'npages', sprintf ('%d', np));
 attrlist = xmlAddAttribute (attrlist, 'nrows', sprintf ('%d', nr));
 attrlist = xmlAddAttribute (attrlist, 'ncols', sprintf ('%d', nc));
 
-fid = xmlOpenOutputFile (filename);
-xmlWriteHeader (fid);
 xmlWriteTag (fid, 'Tensor7', attrlist);
 
 data = permute (data, [7 6 5 4 3 2 1]);
@@ -49,8 +48,6 @@ form = sprintf ('%s\n', form);
 fprintf (fid, form, data);
 
 xmlWriteCloseTag (fid, 'Tensor7');
-xmlWriteFooter (fid);
-fclose (fid);
 
-clear attrlist fid form nl nv ns nb np nr nc;
+clear attrlist form nl nv ns nb np nr nc;
 

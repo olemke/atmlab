@@ -1,28 +1,25 @@
 % Writes a Vector to an XML file.
 %
-%    Make sure that the argument you're passing has the correct type.
+%    Internal function that should never be called directly.
+%    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteVector(filename, data)
+% FORMAT   xmlWriteVector(fid, data)
 %
-% IN    filename   Name of output file
-% IN    data       Vector
+% IN    fid    File descriptor
+% IN    data   Vector
                                                                                                                                
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteVector(filename, data)
+function xmlWriteVector(fid, data)
 
 nelem = size (data, 1);
 
-fid = xmlOpenOutputFile (filename);
-xmlWriteHeader (fid);
 xmlWriteTag (fid, 'Vector', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
 fprintf (fid, '%f\n', data);
 
 xmlWriteCloseTag (fid, 'Vector');
-xmlWriteFooter (fid);
-fclose (fid);
 
 clear fid nelem;
 

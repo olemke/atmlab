@@ -13,6 +13,23 @@
 
 function result = xmlReadSpeciesTag(fid, attrlist)
 
-error ('ReadSpeciesTag not yet implemented');
-%result = fscanf (fid, '%s');
+%=== Validate XML file header
+result = fscanf (fid, '%s', 1);
+
+if result (1) ~= '"'
+  error (sprintf ('Invalid species tag: Expected " but got %s', s(1)));
+end
+
+limit = 255;
+result = fscanf (fid, '%s', 1);
+while limit & result(length (result)) ~= '"'
+  result = strcat (result, fscanf (fid, '%s', 1));
+  limit = limit - 1
+end
+
+if result (length (result)) ~= '"' | ~limit
+  error (sprintf ('Invalid species tag: Not terminated with "'));
+end
+
+result = result (1:length (result) - 1);
 

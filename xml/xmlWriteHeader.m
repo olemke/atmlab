@@ -1,6 +1,7 @@
 % Writes XML header information to a file.
 %
 %    Internal function that should never be called directly.
+%    Use *xmlStore* instead.
 %
 % FORMAT   result = xmlWriteHeader(fid)
 %

@@ -1,15 +1,16 @@
 % Writes a Tensor4 to an XML file.
 %
-%    Make sure that the argument you're passing has the correct type.
+%    Internal function that should never be called directly.
+%    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteTensor4(filename, data)
+% FORMAT   xmlWriteTensor4(fid, data)
 %
-% IN    filename   Name of output file
-% IN    data       Tensor4
+% IN    fid    File descriptor
+% IN    data   Tensor4
                                                                                                                                
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor4(filename, data)
+function xmlWriteTensor4(fid, data)
 
 s = size (data);
 
@@ -28,8 +29,6 @@ attrlist = xmlAddAttribute (attrlist, 'npages', sprintf ('%d', np));
 attrlist = xmlAddAttribute (attrlist, 'nrows', sprintf ('%d', nr));
 attrlist = xmlAddAttribute (attrlist, 'ncols', sprintf ('%d', nc));
 
-fid = xmlOpenOutputFile (filename);
-xmlWriteHeader (fid);
 xmlWriteTag (fid, 'Tensor4', attrlist);
 
 data = permute (data, [4 3 2 1]);
@@ -43,8 +42,6 @@ form = sprintf ('%s\n', form);
 fprintf (fid, form, data);
 
 xmlWriteCloseTag (fid, 'Tensor4');
-xmlWriteFooter (fid);
-fclose (fid);
 
-clear attrlist fid form nb np nr nc;
+clear attrlist form nb np nr nc;
 

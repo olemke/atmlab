@@ -15,12 +15,13 @@
 
 function result = xmlReadGasAbsLookup(fid, attrlist)
 
-  result.species  = xmlReadTag(fid);
-  result.f_grid   = xmlReadTag(fid);
-  result.p_grid   = xmlReadTag(fid);
-  result.vmrs_ref = xmlReadTag(fid);
-  result.t_ref    = xmlReadTag(fid);
-  result.t_pert   = xmlReadTag(fid);
-  result.nls_pert = xmlReadTag(fid);
-  result.abs      = xmlReadTag(fid);
+  result.species            = xmlReadTag(fid);
+  result.nonlinear_species  = xmlReadTag(fid);
+  result.f_grid             = xmlReadTag(fid);
+  result.p_grid             = xmlReadTag(fid);
+  result.vmrs_ref           = xmlReadTag(fid);
+  result.t_ref              = xmlReadTag(fid);
+  result.t_pert             = xmlReadTag(fid);
+  result.nls_pert           = xmlReadTag(fid);
+  result.abs                = xmlReadTag(fid);
 
