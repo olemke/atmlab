@@ -1,5 +1,11 @@
 2004-11-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-33
+
+	* forwardmodel/fwhm.m: Missed to add this one.
+
+2004-11-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-32
 
 	* forwardmodel/fm_o3_111ghz.m: Added this function. 
