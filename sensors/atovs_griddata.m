@@ -5,18 +5,21 @@
 % list_name, and grids in on in a step of 1.5deg in latitude and longitude
 % the data ( a array of matrix, one for each channel) is written into a 'mat' file 'fileout+grided'
 %
-% Input: tmp_dir - directory for the temporal data
+% Input: tmp_dir - directory for the temporal level 1c data
 %        data_dir_l1b - directory where the l1b data is found
-%        data_dir_l1c - directory where the l1c data is found, or should be written in if it does not exists yet
+%        data_dir_l1c - directory where the l1c data is found, or
+%        should be stored if it does not exists yet
 %        list_name - a list containing the name of the data files
-%        fov - selected viewing angle
-%        fileout -  basic name for the file where the final data should be written
-% Output: structure for gridded data : lat, lon, mean, standard
+%        fov - selected viewing angle for which the data should be
+%        averaged 
+%        fileout -  basic name for the file where the final data
+%        should be written 
+% Output: structure for gridded data : lat, lon, mean TB, standard
 %         deviation, and no. of pixels for each box
 
-%--------------------------------------------------------------------------
-function data_grided=atovs_griddata_mashrab34(tmp_dir,data_dir_1b , data_dir_1c, list_name,fov, fileout)
-%-------------------------------------------------------------------------
+%----------------------------------------------------------------
+function data_grided=atovs_griddata(tmp_dir,data_dir_1b , data_dir_1c, list_name,fov, fileout)
+%-----------------------------------------------------------------
 
 % create the lat and lon uniform grid in steps if 1.5 deg, the same
 % as in ECMWF data.
@@ -45,33 +48,32 @@ end
 
 % get and read the names for the data files included in list
 fid =fopen(list_name, 'r');
-i=0;
-j=0;
+i=0; % keeps the right files (no different year)
+n_tot=0; %keeps the total number of files
 while ~feof(fid);
-   j=j+1; % keeps the total number of files
+    n_tot=n_tot+1; % keeps the total number of files
     dummy_str  = [fgets(fid)];
     s= strread(dummy_str, '%s', 'delimiter', '/'); % separate the names;
     n =length(s);
     dummy= (s{n-3}(length(s{n-3})-3:length(s{n-3}))); 
-    years_2         = (s{n}(14:15)); % the last two digits of the
-                                     % year
+    years_2         = (s{n}(14:15)); % the last two digits of the year
     if  ~strcmp(dummy(length(dummy)-1: length(dummy)), (years_2))
-      % just a trick to ignore the files which are in a wrong
-       disp(['file no. ', num2str(j),' in wrong directory !!']);
+        % just a trick to ignore the files which are in a wrong file
+        disp(['file no. ', num2str(n_tot),' in wrong directory !!']);
     else 
-       i=i+1;
-      data_files{i}    = dummy_str;				     
-    years(i) =str2num(s{n-3}(length(s{n-3})-3:length(s{n-3}))); %year
-    month(i)= str2num(s{n-2}); % month
-    days(i)=str2num(s{n-1}); % day						    
-    days_nr(i)      = str2num(s{n}(16:18));   % day of record
-    t_start_h(i)    = str2num(s{n}(21:22));   % starting hour
-    t_start_m(i)     = str2num(s{n}(23:24));  % minutes
-    t_end_h(i)      = str2num(s{n}(27:28)) ;  % ending hour
-    t_end_m(i)      = str2num(s{n}(29:30));   % minutes
+        i=i+1;
+        data_files{i}    = dummy_str;				     
+        years(i) =str2num(s{n-3}(length(s{n-3})-3:length(s{n-3}))); %year
+        month(i)= str2num(s{n-2}); % month
+        days(i)=str2num(s{n-1}); % day						    
+        days_nr(i)      = str2num(s{n}(16:18));   % day of record
+        t_start_h(i)    = str2num(s{n}(21:22));   % starting hour
+        t_start_m(i)     = str2num(s{n}(23:24));  % and minutes
+        t_end_h(i)      = str2num(s{n}(27:28)) ;  % ending hour
+        t_end_m(i)      = str2num(s{n}(29:30));   %  and minutes
     end
 end
-disp(['Total number of right files: ', num2str(j)]);
+disp(['Total number of right files: ', num2str(n_tot)]);
 
 disp(['Number of right files: ', num2str(length(data_files))]);
 
@@ -110,15 +112,10 @@ end
 % some initializations
 sum_tbs=zeros(length(lat_grid), length(lon_grid),nr_channel);
 n_pixel=zeros(length(lat_grid), length(lon_grid),nr_channel);
-n_pix=zeros(length(data_files), nr_channel);
-mean_tbs=zeros(length(lat_grid),length(lon_grid));
 mean_comb=zeros(length(lat_grid),length(lon_grid), nr_channel);
 var_comb=zeros(length(lat_grid),length(lon_grid), nr_channel);
-data_grided.tb_mean=[]; % keeps the averaged data for all channels (structure of matrices, one for each channel)
-i_wrong=0; % index for wrong data files
-
-time_pixel_end=0; %keeps the time for the last pixel recorded in a
-%file
+time_pixel_end=0; %keeps the time for the last pixel recorded in a file
+nr_files =0; %no of files which are averaged
 
 % loop over the data
 for i=1:length(data_files);
@@ -133,7 +130,7 @@ for i=1:length(data_files);
         err_1c=0;
         file_out=name_1c;
     else % convert the file
-        file_out=[tmp_dir, '/', 'TMPOR'];
+        file_out=[tmp_dir, 'TMPl1c'];
         str_dummy= ['zamsu2l1c.sh ', name_1b, ' ', file_out];
         str_dummy=['system(','''','ssh marvin ' , str_dummy , '''', ');'];
         err_1c=eval(str_dummy);
@@ -142,7 +139,9 @@ for i=1:length(data_files);
     if err_1c==0 % if no error occur during converting file
         % read the converted file
         [data, err] = atovs_read_data( file_out);
-        if err==0&length(data.time)>0 % if no error occured during reading the l1c data file
+        if err==0&length(data.time)>0 % if no error occured during
+            % reading the l1c data file 
+            nr_files = nr_files+1;			      
             % moves the data for the 180 deg. longitudes in the other side
             I_lon=find(data.lon>=179.25); %
             data.lon(I_lon)= data.lon(I_lon)-360;   
@@ -183,7 +182,6 @@ for i=1:length(data_files);
                     % values
                     for j=1:nr_channel
                         if data.tb(i_box,j)>0
-                            n_pix(i, j)=n_pix(i, j)+1; 
                             n_pixel_now=1;
                             sum_ch = sum(data.tb(i_box,j)); % TB of the chosen pixel
                             var_now=var(data.tb(i_box,j)); % variance(in fact =0)
@@ -207,26 +205,24 @@ for i=1:length(data_files);
                 end
             end
         end
-    clear data
-else
-      fid=fopen([list_name, '_wrong_data'], 'a'); % write the data which could have not be read or converted
-             fprintf(fid, '%s\n', deblank(data_files{i}));
-      fclose(fid);
-        end
+        clear data
+    else
+        fid=fopen([list_name, '_wrong_data'], 'a'); % write the data which could have not be read or converted
+        fprintf(fid, '%s\n', deblank(data_files{i}));
+        fclose(fid);
+    end
 end
+disp([num2str(nr_files),  '  files from ', num2str(length(data_files)),  ' were averaged']);
 
-% calculate now the mean for each box and each channel and put in into the
-% structure
-for i=1:nr_channel
-    n_dummy(:,:) = n_pixel(:,:, i);
-    data_grided.pixel{i}(:,:) =  n_dummy;
-    data_grided.tb_mean{i}= reshape(mean_comb(:, :,i), size(m_lat,1)*size(m_lat,2),1);
-    data_grided.std{i}= reshape(sqrt(var_comb(:, :,i)), size(m_lat,1)*size(m_lat,2),1);
-    data_grided.pixel{i}= reshape(n_dummy,size(m_lat,1)*size(m_lat,2), 1) ;
-end
-data_grided.lon = reshape(m_lon, size(m_lon,1)*size(m_lon,2), 1);
-data_grided.lat = reshape(m_lat, size(m_lat,1)*size(m_lat,2), 1);
+
+% create a stucture containing lon, lat, no. of pixel, tb, and standard
+% deviation
+data_grided.lon    = m_lon;
+data_grided.lat     = m_lat;
+data_grided.pixel =  n_pixel;
+data_grided.tb     = mean_comb;
+data_grided.std    = sqrt(var_comb);
+%
 evalsave= ['save ', fileout, '_grided.aa ', 'data_grided'];
 eval(evalsave);
-
 return
