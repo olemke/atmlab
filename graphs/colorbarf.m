@@ -1,7 +1,7 @@
 function hcb=colorbarf(cout,H,loc)
 % COLORBARF Display color bar for a filled contour plot.
 % =========================================================================
-% colorbarf  Version 1.5 19-Feb-2001
+% colorbarf  Version 1.6 4-Aug-2004
 %
 % Usage: 
 %   colorbarf(cout,H,[loc])
@@ -38,7 +38,7 @@ function hcb=colorbarf(cout,H,loc)
 %   This function has been derived from the Matlab colorbar function
 %   Author: Clay M. Thompson 10-9-92
 %   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 1.1 $  $Date: 2004/04/07 16:06:04 $
+%   $Revision: 1.2 $  $Date: 2004/08/06 09:28:59 $
 %
 
 % Modifications:
@@ -55,6 +55,8 @@ function hcb=colorbarf(cout,H,loc)
 %   Version 1.4 - removed for loop at line 128 to speed up execution time
 %   Version 1.5 - modified line 129 "if (N1 > 1)" to accomodate the MATLAB 6.0 include some NULL
 %                 contours that have one point that is simply NaN.
+%   Version 1.6 - modified by Aslak Grinsted at line 145 to ensure MATLAB 7
+%                   compatability
 
 %   If called with COLORBAR(H) or for an existing colorbar, don't change
 %   the NextPlot property.
@@ -140,6 +142,10 @@ end
 
 C2 = unique(C1); % find the unique contour levels and sort
 numLevels = length(C2); 
+
+if strcmp(get(H,'type'),'hggroup') % version 1.6 added by Aslak Grinsted to ensure MATLAB v7 compatibility
+    H=get(H,'children');
+end
 
 for j = 1:length(H)
    colors(j) = get(H(j),'CData'); % get the color used to fill the patches

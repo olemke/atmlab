@@ -1,3 +1,10 @@
+2004-08-06  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-1-82
+
+	* graphs/colorbarf.m: Replaced by new version from
+	http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=1135. 
+
 2004-07-20  Bengt Rydberg  <benryd@etek.chalmers.se>
         
 	* atmlab-0-1-81 
