@@ -1,3 +1,11 @@
+2003-06-16  Mattias Ekström  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-1-50
+
+	* xml/xmlReadSparse.m: Added function for reading Sparse xml files.
+
+	* xml/xmlWriteSparse.m: Added function for writing Sparse xml files.
+
 2003-05-21  Christian Melsheimer  <melsheimer@uni-bremen.de>
 
 	* atmlab-0-1-49
