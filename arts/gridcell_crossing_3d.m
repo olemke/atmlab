@@ -58,9 +58,9 @@ switch known_dim
 case 1   % Radius is known
    
   a  = dx*dx + dy*dy + dz*dz;
-  p  = ( x*dx + y*dy + z*dz ) / a;
-  pp = p * p;
-  q  = ( x*x + y*y + z*z - rlatlon*rlatlon ) / a;
+  p  = ( x*dx + y*dy + z*dz ) / a
+  pp = p * p
+  q  = ( x*x + y*y + z*z - rlatlon*rlatlon ) / a
 
   l1 = -p + sqrt( pp - q );
   l2 = -p - sqrt( pp - q );

@@ -1,3 +1,10 @@
+2003-02-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-28
+
+	* files/qtool.m: Included an if-statement to avoid a warning for
+	some Matlab version(s), when making "empty == scalar".
+
 2003-02-27  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-1-27

@@ -152,25 +152,27 @@ for line = 1 : length( S )
     %= Replace variables (marked by $$) and move text to cfile
     else
 
-      dollars = find( s == '$' );
-      if ~isempty(dollars)
-        if isodd(length(dollars))
-          error(sprintf(...
-      	       'An odd number of $-signs was found on line %d.',line));
-        end
-        while ~isempty(dollars)
-          i1 = dollars(1);
-          i2 = dollars(2);
-          name = s((i1+1):(i2-1));
-          if isstr(eval(name))
-            s = [s(1:(i1-1)),eval(name),s((i2+1):length(s))];
-          else
-            s = [s(1:(i1-1)),num2str(eval(name)),s((i2+1):length(s))];
-          end
-          dollars = find( s == '$' );
-        end
+      if ~isempty( s )
+      	dollars = find( s == '$' );
+      	if ~isempty(dollars)
+      	  if isodd(length(dollars))
+      	    error(sprintf(...
+      		       'An odd number of $-signs was found on line %d.',line));
+      	  end
+      	  while ~isempty(dollars)
+      	    i1 = dollars(1);
+      	    i2 = dollars(2);
+      	    name = s((i1+1):(i2-1));
+      	    if isstr(eval(name))
+      	      s = [s(1:(i1-1)),eval(name),s((i2+1):length(s))];
+      	    else
+      	      s = [s(1:(i1-1)),num2str(eval(name)),s((i2+1):length(s))];
+      	    end
+      	    dollars = find( s == '$' );
+      	  end
+      	end
       end
-  
+
       fprintf(fid,'%s\n',s);
 
     end % else
