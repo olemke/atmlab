@@ -1,3 +1,16 @@
+2003-11-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-60
+
+	* forwardmodel/call_fmodel.m: The old atmlab_get was called instead
+	of new atmlab. Bug reported by Claudia.
+
+	In addition, the function existed in two versions. There was also
+	one version in files/, which is now removed.
+
+	* files/create_tmpfolder.m: Fixed an incorrect call of atmlabm. Bug
+	reported by Claudia.
+
 2003-11-18  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-59

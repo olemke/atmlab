@@ -37,9 +37,9 @@ if nargin < 2
 end
 
 
-fmodelname = atmlab( 'FMODEL_NAME', 1 );
+fmodelname = atmlab( 'FMODEL_NAME' );
 
-fmodelexec = atmlab( 'FMODEL_EXEC', 1 );
+fmodelexec = atmlab( 'FMODEL_EXEC' );
 
 
 switch fmodelname
