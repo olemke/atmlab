@@ -6,7 +6,7 @@
    Mashrab Kuvatov <kmashrab@uni-bremen.de>
    Stefan Buehler <sbuehler@uni-bremen.de>
    Carmen Verdes  <cverdes@uni-bremen.de>
-   Carlos Jimnenez  <carlos.jimenez@ed.ac.uk>
+   Carlos Jimenez  <carlos.jimenez@ed.ac.uk>
    Bengt Rydberg  <benryd@etek.chalmers.se>
    Oliver Lemke  <olemke@linux.net>
    Claudia Emde  <claudia@sat.physik.uni-bremen.de>
@@ -31,10 +31,6 @@
 
 
 
-A short description of Atmlab (to be written).
-
-
-
 For further information
 -----------------------
 
@@ -44,4 +40,8 @@ CONFIGURE: How to set-up Atmlab for your personal use.
 
 INSTRUCTIONS: Instructions for Atmlab developers.
 
-Or email Patrick.Eriksson@rss.chalmers.se
+When Atmlab is added to the Matlab search path (as described in CONFIGURE)
+you can run a small demonstration by executing:
+
+>> atmlab_demo 
+

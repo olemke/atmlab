@@ -1,4 +1,4 @@
-% ARTS1_GET   Resolves qarts1 variable
+% QARTS1_GET   Resolves qarts1 variable
 %
 %    This function handles cases where a variable either is given directly,
 %    or if it shall be loaded from a file of some ARTS1 format. 
@@ -15,7 +15,7 @@
 % 2004-07-08   Created by Patrick Eriksson.
 
 
-function b = arts1_get( a, artstype )
+function b = qarts1_get( a, artstype )
 
 if ischar( a )
   b = read_datafile( a, artstype );

@@ -59,6 +59,8 @@ if strcmp( abs_or_rel, 'rel' )  &  any( Af == 0 )
    error( 'With *abs_or_rel* = ''rel'', *Af can not contain zeros.' );
 end
 
+xf = vec2row( xf );
+
 ind = 1;
 ip  = n;
 e   = tol*2;

@@ -1,4 +1,4 @@
-% ARTS12CFILE   Builds a control file for ARTS1
+% QARTS12CFILE   Builds a control file for ARTS1
 %
 %    Creates a control file matching the settings in a Qarts1 structure.
 %    The control file is provided as cell array of strings. This means
@@ -43,7 +43,7 @@
 % 2004-09-07   Created by Patrick Eriksson.
 
 
-function S = arts12cfile( Q, parts, tmpdir, do_save )
+function S = qarts12cfile( Q, parts, tmpdir, do_save )
 
 if nargin < 4
   do_save = 1;

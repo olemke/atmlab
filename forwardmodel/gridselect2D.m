@@ -70,6 +70,9 @@ end
 xind = [1 nx];
 yind = [1 ny];
 
+xf = vec2row( xf );
+yf = vec2row( yf );
+
 Ac   = zeros( size( Af ) );
 
 Ac = do_interp( xf(xind), yf(yind), Af(xind,yind,:), xf, yf, repr );
@@ -86,7 +89,7 @@ while e > tol
     e1 = Inf;
   end
 
-  %= Test to put in xip
+  %= Test to put in yip
   if ~any( yip == yind )
     yindtmp = sort( [ yind yip ] );
     Ac = do_interp( xf(xind), yf(yindtmp), Af(xind,yindtmp,:), xf, yf, repr );

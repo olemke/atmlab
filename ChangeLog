@@ -1,3 +1,24 @@
+2004-09-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-15
+
+	* Do not test the demo functions yet. Need to be tested further.
+	
+	* arts/qarts_demo.m: Created. 
+
+	* atmlab/atmlab_demo.m: Created. 
+
+	* atmlab/atmlab_example_data.m: Created.
+
+	* examples/Data: Added this folder to hold example data. Do not add 
+	very large files, please.
+
+	* forwardmodel/z2p_simple.m: Created.
+
+	* forwardmodel/loggrid.m: Copied from AMI.
+
+	* forwardmodel/gridselect3D.m: Created.
+
 2004-09-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-14
