@@ -18,7 +18,7 @@ elseif x>0              % This is the normal situation
     n1=nmax-1;
     n=(1:nmax);cn=2*n+1; c1n=n.*(n+2)./(n+1); c2n=cn./n./(n+1);
     x2=x.*x;
-    f=mie_ab(m,x);
+    f=Mie_ab(m,x);
     anp=(real(f(1,:))); anpp=(imag(f(1,:)));
     bnp=(real(f(2,:))); bnpp=(imag(f(2,:)));
     g1(1:4,nmax)=[0; 0; 0; 0]; % displaced numbers used for

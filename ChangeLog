@@ -1,3 +1,9 @@
+2003-10-10  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-1-54
+	
+	* physics/planck.m: Added the Planck function.
+
 2003-10-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-53
