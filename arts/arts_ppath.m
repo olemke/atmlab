@@ -20,7 +20,7 @@
 %     Examples on how to use this function is found in ARTS, at
 %     doc/uguide/Figs/fm_definitions/mkfigs_ppath_cases.m
 %
-% FORMAT   P = arts_ppath(dim,p_grid,lat_grid,lon_grid,z_field,a_pos,a_los,[
+% FORMAT   P = arts_ppath(dim,p_grid,lat_grid,lon_grid,z_field,rte_pos,rte_los,
 %                   [lmax,z_ground,cb_lims,lraytrace,t_field,vmr_field])
 %        
 % OUT   P         The WSV *ppath*.
@@ -30,8 +30,8 @@
 %       lon_grid  As the WSV with the same name.
 %       z_field   As the WSV with the same name.
 %       r_geoid   As the WSV with the same name.
-%       a_pos     As the WSV with the same name.
-%       a_los     As the WSV with the same name.
+%       rte_pos   As the WSV with the same name.
+%       rte_los   As the WSV with the same name.
 % OPT   lmax      Keyword argument inside ppath_step_agenda. Default is -1.
 %       z_ground  As the WSV with the same name. Default is 0 everywhere.
 %       cb_lims   As the WSV cloudbox_limits. The cloud box is turned off
@@ -45,7 +45,7 @@
 
 
 function P = arts_ppath(dim,p_grid,lat_grid,lon_grid,z_field,r_geoid, ...
-                 a_pos,a_los,lmax,z_ground,cb_lims,lraytrace,t_field,vmr_field)
+             rte_pos,rte_los,lmax,z_ground,cb_lims,lraytrace,t_field,vmr_field)
 
 
 %= Check input and default values
@@ -135,10 +135,10 @@ if ~isempty( Q.CLOUDBOX_LIMITS )
 end
 
 
-%= Save a_pos and a_los
+%= Save rte_pos and rte_los
 %
-xmlStore( fullfile( tmpfolder, 'a_pos.xml' ), a_pos, 'Vector');
-xmlStore( fullfile( tmpfolder, 'a_los.xml' ), a_los, 'Vector');
+xmlStore( fullfile( tmpfolder, 'rte_pos.xml' ), rte_pos, 'Vector');
+xmlStore( fullfile( tmpfolder, 'rte_los.xml' ), rte_los, 'Vector');
 
 
 %= Refraction
@@ -192,13 +192,13 @@ S = { ...
 'ReadXML(z_ground){"$Q.TMPFOLDER$$Q.FILESEP$z_ground.xml"}', ...
 'END', ...
 'IF isempty( Q.CLOUDBOX_LIMITS )', ...
-'CloudboxOff{}', ...
+'cloudboxOff{}', ...
 'ELSE', ...
 'FlagOn(cloudbox_on){}', ...
 'ReadXML(cloudbox_limits){"$Q.TMPFOLDER$$Q.FILESEP$cb_lims.xml"}', ...
 'END', ...
-'ReadXML(a_pos){"$Q.TMPFOLDER$$Q.FILESEP$a_pos.xml"}', ...
-'ReadXML(a_los){"$Q.TMPFOLDER$$Q.FILESEP$a_los.xml"}', ...
+'ReadXML(rte_pos){"$Q.TMPFOLDER$$Q.FILESEP$rte_pos.xml"}', ...
+'ReadXML(rte_los){"$Q.TMPFOLDER$$Q.FILESEP$rte_los.xml"}', ...
 'IF Q.REFRACTION', ...
 'gas_speciesSet{species = ["H2O"]}', ...
 'ReadXML(t_field){"$Q.TMPFOLDER$$Q.FILESEP$t_field.xml"}', ...
