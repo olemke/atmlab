@@ -28,10 +28,13 @@ function [Rv,Rh,theta2] = fresnel(n1,n2,theta1)
 
 DEG2RAD = constants('DEG2RAD');
 
-theta1	= DEG2RAD * theta1;
-theta2	= asin( real(n1) * sin(theta1) / real(n2) );
+theta1	  = DEG2RAD * theta1;
+theta2    = asin( real(n1) * sin(theta1) / real(n2) );
 
-Rv = (n2*cos(theta1)-n1*cos(theta2))./(n2*cos(theta1)+n1*cos(theta2));
-Rh = (n1*cos(theta1)-n2*cos(theta2))./(n1*cos(theta1)+n2*cos(theta2));
+costheta1 = cos( theta1 );
+costheta2 = cos( theta2 );
+
+Rv = (n2*costheta1-n1*costheta2)./(n2*costheta1+n1*costheta2);
+Rh = (n1*costheta1-n2*costheta2)./(n1*costheta1+n2*costheta2);
 
 theta2 = theta2 / DEG2RAD;

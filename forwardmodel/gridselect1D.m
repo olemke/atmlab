@@ -20,6 +20,7 @@
 % FORMAT   xc = gridselect1D( xf, Af, tol, repr, abs_or_rel )
 %        
 % OUT   xc          Obtained coarse grid.
+%       Ac          Af at grid points xc.
 % IN    xf          Reference fine grid.
 %       Af          Reference data (a matrix) on fine grid.
 %       tol         Acceptable tolarance.
@@ -31,7 +32,7 @@
 % 2004-09-18   Created by Patrick Eriksson.
 
 
-function xc = gridselect1D( xf, Af, tol, repr, abs_or_rel )
+function [xc,Ac] = gridselect1D( xf, Af, tol, repr, abs_or_rel )
 
 if nargin < 5
   abs_or_rel = 'abs';
@@ -82,6 +83,10 @@ end
 
 
 xc = xf(ind);
+
+if nargout > 1
+  Ac = Af(xind,:);
+end
 
 
 return

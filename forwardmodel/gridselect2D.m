@@ -18,10 +18,11 @@
 %
 %    See also GRIDSELECT1D and GRIDSELECT3D.
 %
-% FORMAT   [xc,yc] = gridselect2D( xf, yf, Af, tol, repr, abs_or_rel )
+% FORMAT   [xc,yc,Ac] = gridselect2D( xf, yf, Af, tol, repr, abs_or_rel )
 %        
 % OUT   xc          Obtained coarse grid for x dimension.
 %       yc          Obtained coarse grid for y dimension.
+%       Ac          Af at grid points xc and yc.
 % IN    xf          Reference fine grid for x dimension.
 %       yf          Reference fine grid for y dimension.
 %       Af          Reference data (a matrix) on fine grid.
@@ -34,7 +35,7 @@
 % 2004-09-23   Created by Patrick Eriksson.
 
 
-function [xc,yc] = gridselect2D( xf, yf, Af, tol, repr, abs_or_rel )
+function [xc,yc,Ac] = gridselect2D( xf, yf, Af, tol, repr, abs_or_rel )
 
 if nargin < 6
   abs_or_rel = 'abs';
@@ -54,7 +55,7 @@ if ~isvector( yf )
   error( 'Input argument *yf* must be a vector.' );
 end
 %
-if ndims( Af ) ~= 3  |  ~isnumeric( Af )
+if ~( ndims( Af ) == 2  |  ndims( Af ) == 3 )  |  ~isnumeric( Af )
   error( 'Input argument *Af* must be a 3D matrix.' );
 end
 %
@@ -66,48 +67,79 @@ if strcmp( abs_or_rel, 'rel' )  &  any( Af == 0 )
    error( 'With *abs_or_rel* = ''rel'', *Af can not contain zeros.' );
 end
 
-xind = 1;
-yind = 1;
-xip  = nx;
-yip  = ny;
-e    = tol*2;
+xind = [1 nx];
+yind = [1 ny];
 
-nrel = size( Af, 3 );
 Ac   = zeros( size( Af ) );
+
+Ac = do_interp( xf(xind), yf(yind), Af(xind,yind,:), xf, yf, repr );
+[e,xip,yip] = get_max_dev( Af, Ac, abs_or_rel );
 
 while e > tol
 
-  xind = sort( [ xind xip ] );
-  yind = sort( [ yind yip ] );
-
-  for i = 1 : nrel
-keyboard
-    Ac(:,:,i) = interp2( xf(xind), yf(yind), Af(xind,yind,i), xf, yf, repr );
+  %= Test to put in xip
+  if ~any( xip == xind )
+    xindtmp = sort( [ xind xip ] );
+    Ac = do_interp( xf(xindtmp), yf(yind), Af(xindtmp,yind,:), xf, yf, repr );
+    [e1,xip1,yip1] = get_max_dev( Af, Ac, abs_or_rel );
+  else
+    e1 = Inf;
   end
 
+  %= Test to put in xip
+  if ~any( yip == yind )
+    yindtmp = sort( [ yind yip ] );
+    Ac = do_interp( xf(xind), yf(yindtmp), Af(xind,yindtmp,:), xf, yf, repr );
+    [e2,xip2,yip2] = get_max_dev( Af, Ac, abs_or_rel );
+  else
+    e2 = Inf;
+  end
+  
+  if e1 <= e2
+    xind = xindtmp;
+    xip  = xip1;
+    yip  = yip1;
+    e    = e1;
+  else
+    yind = yindtmp;
+    xip  = xip2;
+    yip  = yip2;
+    e    = e2;
+  end
+end
+
+xc = xf(xind);
+yc = yf(yind);
+
+if nargout > 2
+  Ac = Af(xind,yind,:);
+end
+
+
+return
+
+
+function Ac = do_interp( xc, yc, A, xf, yf, repr )
+  %
+  for i = 1 : size(A,3)
+    Ac(:,:,i) = interp2( yc, xc, A(:,:,i), yf, xf', repr );
+  end
+  %
+return
+
+
+function [e,xip,yip] = get_max_dev( Af, Ac, abs_or_rel );
+  %
   if strcmp( abs_or_rel, 'abs' )
-    [e,ip] = max( max( abs( Ac - Af ), [], 2 ) );
+    [e,xip] = max( max( max( abs( Ac - Af ), [], 3 ), [], 2 ) );
+    [e,yip] = max( max( max( abs( Ac - Af ), [], 3 ), [], 1 ) );
   elseif strcmp( abs_or_rel, 'rel' )
-    [e,ip] = max( max( abs( (Ac - Af)./Af ), [], 2 ) );
+    [e,xip] = max( max( max( abs( (Ac - Af)./Af ), [], 3 ), [], 2 ) );
+    [e,yip] = max( max( max( abs( (Ac - Af)./Af ), [], 3 ), [], 1 ) );
   else
     error( ...
       sprintf('Unknown error type (%s). Can only be ''abs'' or ''rel''.', ...
                                                                 abs_or_rel ) );
   end
-end
-
-
-xc = xf(ind);
-
-
+  %
 return
-
-%= Some code for plotting
-%
-
-E = Ac - Af;
-
-plot( xf, mean( E, 2 ), 'r-', xf, max( E, [], 2 ), 'b--', ...
-      xf, min( E, [], 2 ), 'g--' );
-ylabel( 'Absolute deviation' )
-legend( 'Mean deviation', 'Highest deviation', 'Lowest deviation' );

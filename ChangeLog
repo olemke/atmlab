@@ -1,5 +1,11 @@
 2004-09-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-14
+
+	* forwardmodel/gridselect2D.m: Ready.
+
+2004-09-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-13
 
 	* forwardmodel/gridselect2D.m: Started on this function. Not yet ready.
