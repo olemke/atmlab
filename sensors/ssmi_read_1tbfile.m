@@ -13,7 +13,7 @@
 %
 %     Files can be obtained from ghrc.msfc.nasa.gov by anonymous access.
 %     The files are found in folders:
-%       cd pub/data/ssmi_fXX/current_tb/hdf_swath/YY.DDD
+%       cd pub/data/ssmi-fXX/current-tb/hdf-swath/YY.DDD
 %
 %     See further the document SSMI-TBs.pdf found on the web, or at the
 %     ftp given above.
@@ -41,10 +41,10 @@
 %                     1 : 19 GHz V
 %                     2 : 19 GHz H
 %                     3 : 22 GHz V
-%                     1 : 37 GHz V
-%                     2 : 37 GHz H
-%                     1 : 85 GHz V
-%                     2 : 85 GHz H
+%                     4 : 37 GHz V
+%                     5 : 37 GHz H
+%                     6 : 85 GHz V
+%                     7 : 85 GHz H
 %                  Default is 1:7.
 %        doys      Day of year to keep. Default is *fildoy* + [-1 1].
 %        tods      Time of day to keep [s]. Default is 0 to 25 h (in seconds).
@@ -62,6 +62,7 @@
 %                      7 : Not used.
 
 % 2004-03-16   Created by Patrick Eriksson.
+
 
 function C = ssmi_read_1tbfile(infolder,satnr,year,filedoy,passnr,channels,doys,tods,lats,lons,sfts)
 

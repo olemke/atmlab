@@ -1,3 +1,9 @@
+2004-03-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-70
+
+	* sensors/ssmi_read_1tbfile.m: Corrected data download information.
+
 2004-03-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-69
