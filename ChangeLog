@@ -1,3 +1,13 @@
+2004-09-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-10
+
+	* arts/arts_batch.m: Created this function.
+
+	* arts/arts_y.m: Created this function. 
+
+	* arts1/arts1_y.m: Created this function. 
+
 2004-09-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-9

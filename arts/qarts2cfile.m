@@ -138,14 +138,12 @@ case 'init_rte'
     T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
   end
   T = add_agenda( T, 'rte_agenda', {'RteEmissionStd{}'} );
-  i = length(T) + 1;
-  T{i} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir, do_save );
-  i    = i + 1;
-  T{i} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir, do_save );
-  i    = i + 1;
-  T{i} = 'sensorOff{}';
-  i    = i + 1;
-  T{i} = 'cloudboxOff{}';
+  T{length(T)+1} = ...
+         file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir, do_save );
+  T{length(T)+1} = ...
+         file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir, do_save );
+  T{length(T)+1} = 'sensorOff{}';
+  T{length(T)+1} = 'cloudboxOff{}';
 
 case 'calc_rte'
   %
@@ -174,7 +172,8 @@ otherwise
   error(sprintf('Unknown action (%s) was requested.',parts{i}));
 end
 
-S = [ S T ];
+
+S = { S{:} T{:} };
 
 end
 
@@ -209,11 +208,9 @@ return
 
 
 function T = add_agenda( T, agenda, strarray );
-  i = length(T) + 1;
-  T{i} = sprintf( 'AgendaSet(%s){', agenda );
-  n = length( strarray );
-  for j = (i+1) : (i+n)
-    T{j} = sprintf( '   %s', strarray{j-i} );
+  T{length(T)+1} = sprintf( 'AgendaSet(%s){', agenda );
+  for j = 1 : length(strarray)
+    T{length(T)+1} = sprintf( '   %s', strarray{j} );
   end
-  T{i+n+1} = '}';
+  T{length(T)+1} = '}';
 return
