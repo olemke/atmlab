@@ -13,7 +13,14 @@
 
 function xmlWriteArrayOfArrayOf(fid, data, type)
 
-nelem = size (data, 1);
+nrows = size (data, 1);
+ncols = size (data, 2);
+
+if nrows ~= 1 & ncols ~= 1
+  error ('Either columns or rows must have size 1');
+end
+
+nelem = length (data);
 
 attrlist = [];
 attrlist = xmlAddAttribute ([], 'type', sprintf ('ArrayOf%s', type));
@@ -23,5 +30,5 @@ for i = 1:nelem
   xmlWriteArrayOf (fid, data{i}, type);
   xmlWriteCloseTag (fid, 'Array');
 end
-clear i nelem;
+clear i nrows ncols nelem;
 

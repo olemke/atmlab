@@ -12,7 +12,14 @@
 
 function xmlWriteVector(fid, data)
 
-nelem = size (data, 1);
+nrows = size (data, 1);
+ncols = size (data, 2);
+
+if nrows ~= 1 & ncols ~= 1
+  error ('Either columns or rows must have size 1');
+end
+
+nelem = length (data);
 
 xmlWriteTag (fid, 'Vector', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));

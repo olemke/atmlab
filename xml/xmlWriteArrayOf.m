@@ -13,7 +13,14 @@
 
 function xmlWriteArrayOf(fid, data, type)
 
-nelem = size (data, 2);
+nrows = size (data, 1);
+ncols = size (data, 2);
+
+if nrows ~= 1 & ncols ~= 1
+  error ('Either columns or rows must have size 1');
+end
+
+nelem = length (data);
 
 attrlist = [];
 attrlist = xmlAddAttribute ([], 'type', type);
