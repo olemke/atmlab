@@ -51,11 +51,11 @@ end
 %= Check input
 %
 if ~ischar(rgb)  &  length(rgb)~=3
-  error('The argument *rgb* must be string of length 3');
+  error( 'The argument *rgb* must be string of length 3' );
 end
 %
 if any( ~( (rgb=='n') + (rgb=='p') + (rgb=='z') ) )
-  error('The argument *rgb* can only include the characters n, m and p.');
+  error( 'The argument *rgb* can only include the characters n, m and p.' );
 end
 
 
@@ -76,9 +76,9 @@ else
 end
 
 
-%= Set up vectors for positive, negative and mxing colour
+%= Set up vectors for positive, negative and mixing colour
 %
-w = ( 1 + blackl ) * ( v' - dv/2 ) / amax;
+w = ( 1 + blackl ) * ( v' + dv/2 ) / amax;
 %
 p      = w + 1;
 ind    = find( p < 0 );

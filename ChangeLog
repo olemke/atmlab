@@ -1,3 +1,14 @@
+2003-12-24  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-62
+
+	* graphs/zerowhite.m: Bug fixed. The white level was shifted one
+	step from zero.
+
+	I was fooled by the Matlab colorbar. The numbers are not placed very 
+	good. The "center" numbr for each color, is actually placed at the 
+	upper end. I have no simple fix for this.
+
 2003-12-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-61
