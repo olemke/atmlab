@@ -68,7 +68,7 @@ dlon = -sinlon/coslat/r * dx +               + coslon/coslat/r * dz;
 %
 za = acos( dr );
 
-if za < 1e-6  |  za > 180 - 1e-6
+if za < 1e-6  |  za > pi - 1e-6
 
   aa = 0;
 

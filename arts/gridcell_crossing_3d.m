@@ -4,8 +4,8 @@
 %    cell, given a single grid face. Or rather, the function determines
 %    the position of the path for a given radius, latitude or longitude.
 %
-%    The function considers only crossings in the forward direction, but
-%    not after a tangent point. If no crossing is found, *r* is set to -1.
+%    The function considers only crossings in the forward direction, with
+%    a distance > 0. If no crossing is found, *r* is set to -1.
 %
 %    An example, to find the crossing with a latitude grid face at 10 degrees,
 %    call the function as: gridcell_crossing_3d(x,y,z,dx,dy,dz,2,10);
@@ -62,9 +62,20 @@ case 1   % Radius is known
   pp = p * p;
   q  = ( x*x + y*y + z*z - rlatlon*rlatlon ) / a;
 
-  l = -p + sign(p) * sqrt( pp - q );      % Not still totally sure that sign(p)
-                                          % for all cases !!!
-  if l >= 0
+  l1 = -p + sqrt( pp - q );
+  l2 = -p - sqrt( pp - q );
+
+  if( l1 < 0  &  l2 > 0 )
+    l = l2;
+  elseif( l1 > 0  &  l2 < 0 )
+    l = l1;
+  elseif( l1 < l2 )
+    l = l1;
+  else
+    l = l2;
+  end
+
+  if l > 0
     r   = rlatlon;
     lat = RAD2DEG * asin( ( y+dy*l ) / r );
     lon = RAD2DEG * atan2( z+dz*l, x+dx*l );
@@ -81,13 +92,24 @@ case 2   % Latitude is known
   pp     = p * p;
   q      = ( x*x + z*z - y*y/t2 ) / a;
 
-  l = -p + sign(p) * sqrt( pp - q );      % Not still totally sure that sign(p)
-                                          % for all cases !!!
-  if l >= 0
-    lat = rlatlon;
-    r   = ( y+dy*l ) / sin( latrad ); 
-    lon = RAD2DEG * atan2( z+dz*l, x+dx*l );
+  l1 = -p + sqrt( pp - q );
+  l2 = -p - sqrt( pp - q );
+
+  if( l1 < 0  &  l2 > 0 )
+    l = l2;
+  elseif( l1 > 0  &  l2 < 0 )
+    l = l1;
+  elseif( l1 < l2 )
+    l = l1;
+  else
+    l = l2;
   end
+
+  if l > 0
+    lat = rlatlon;
+    r   = sqrt( (x+dx*l)^2 + (y+dy*l)^2 + (z+dz*l)^2 );
+    lon = RAD2DEG * atan2( z+dz*l, x+dx*l );
+   end
   
 
 case 3   % Longitude is known
@@ -98,10 +120,9 @@ case 3   % Longitude is known
 
   l = ( z - tanlon*x ) / ( tanlon*dx - dz );
 
-  if l >= 0
+  if l > 0
     lon = rlatlon;
-    lat = atan( coslon * ( y+dy*l ) / (x+dx*l) );
-    r   = ( y+dy*l ) / sin( lat );
-    lat = RAD2DEG * lat;
+    lat = RAD2DEG * atan( coslon * ( y+dy*l ) / (x+dx*l) );
+    r   = sqrt( (x+dx*l)^2 + (y+dy*l)^2 + (z+dz*l)^2 );
   end
 end

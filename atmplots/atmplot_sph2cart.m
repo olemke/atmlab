@@ -8,9 +8,8 @@
 %     that value shall be applied for all points. If radii, latitudes and
 %     longitudes are given as vectors, all vectors must have the same size.
 %
-%     The x-axis corresponds to lat=0 and lon=0.
-%     The y-axis corresponds to lat=90.
-%     The z-axis corresponds to lat=0 and lon=90.
+%     The data are plotted in such way that the observer is placed a bit
+%     above the Equator and a bit east from the lon=0.
 %
 % FORMAT   atmplot_sph2cart( r, lat, lon, [, varargin ] )
 %        
@@ -36,5 +35,7 @@ DEG2RAD = constants( 'DEG2RAD' );
 [x,z,y] = sph2cart( DEG2RAD * lon, DEG2RAD * lat, r );
 
 
-plot3( x, y, z, varargin{:} );
+plot3( z, x, y, varargin{:} );
 
+set( gca, 'Ydir', 'rev' );
+view([37 30]);

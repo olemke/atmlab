@@ -1,3 +1,13 @@
+2002-12-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-22
+
+	* arts/do_gridcell_3d.m: A Matlab version of the future ARTS function
+	exists now as an internal function (with some short-cuts).
+
+	* arts/gridcell_crossing_3d.m: More safe way to calculate r. Crossings
+	with a length of 0 are now rejected.
+
 2002-12-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-21
