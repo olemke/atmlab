@@ -41,10 +41,10 @@
 
 function S = qarts2cfile( Q, parts, tmpdir, do_save )
 
-
 if nargin < 4
   do_save = 1;
 end
+
 
 qcheck( @qarts, Q );
 

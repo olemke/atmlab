@@ -8,7 +8,7 @@
 %        
 % IN    Q       Qarts structure.
 %       parts   Control file parts to include. See further above.
-%       tmpdir  Temporary folder where calculations will be performed.
+%       cfile   Name of control file to create.
 
 % 2004-09-15   Created by Patrick Eriksson.
 
