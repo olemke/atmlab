@@ -27,15 +27,13 @@ Please, add the file Contents.m as soon as you create a new
 sub-folder. You need also to edit *atmlab_init* to include the new
 folder in the search path. 
 
-Oliver: Can you describe what has to be done regarding Makefile.am.
-
 The aim should be to mainly make functions that do not require any
 special toolbox. Functions that need a special toolbox should be
 placed into special folders, and this should be clear from Contents.m.
 
 Each function shall have a clear description, a header. You are
 recommended to use either the style used by MathWorks or the style
-described in example_heading.m (you find an empty header in
+described in examples/example_heading.m (you find an empty header in
 empty_header.m). The file example_heading.m contains also some hints
 regarding optional variables and how to set default variables.
 

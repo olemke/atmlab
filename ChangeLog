@@ -1,3 +1,39 @@
+2002-12-19  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-13
+
+	* atmlab/atmlab_version.m: Moved to atmlab/. Now you need to push more
+	buttons to reach atmlab_version from ChangeLog, but I thought this
+	was worth the advantage of having no Matlab functions in the top
+	folder.
+
+	* atmlab/atmlab_init.m: Moved to atmlab/ and modified accordingly.
+
+	* examples/empty_heading.m: Moved to examples/.
+
+	* examples/example_heading.m: Moved to examples/.
+
+	* atmlab/atmlab_defs.m: Created a way to set personal settings. 
+	Read CONFIGURE as an introduction. Please, check it out and comment. 
+
+	* examples/atmlab.m: Created this function as a template for
+	personal atmlab functions.
+
+	* atmlab/atmlab_get.m: A gateway function to atmlab to make it
+	possible to create decent error messages and allow that no personal
+	settings are specified.
+
+	* README: A simple README file. Some more text should be added later.
+
+	* CONFIGURE: Info on how to start up Atmlab and create personal
+	settings.
+
+	* AUTHORS: Atmlab authors. Please add some text for you (Oliver: are
+	you happy about what I wrote for you?)
+
+	* examples/startup_menu.m: Merged some of my own files to create this
+	file to give an example on selecting different environments at startup.
+
 2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-12
