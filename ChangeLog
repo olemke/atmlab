@@ -1,3 +1,19 @@
+2003-01-09  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-1-23
+
+	* xml/xml{Read,Write}{GridPos,Ppath,String}.m: Added.
+
+	* xml/xmlReadTag.m: Fixed two bugs. Initialize attrlist. Setting
+	exit_loop to 1 was missing in one else branch. (Why did it work
+	before?!? :-o ) 
+
+	* xml/xmlReadArray.m: Initialize result for the case that the array in
+	the file is empty.
+
+	* xml/xml{Read,Write}Index.m, xml/xmlWriteNumeric.m: Why do I always
+	forget that strings in matlab must be enclosed in single quotes?
+
 2002-12-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-22
