@@ -28,7 +28,7 @@
 
 	* arts1/arts1_absmodels.cfile: Added O2-PWR93.
 
-	* arts1/qarts1.m (I.R_GEOID): Field was mispelled.
+	* arts1/qarts1.m (I.R_GEOID): Field was mispelled (you get the joke?).
 
 2004-09-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
