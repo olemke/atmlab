@@ -1,3 +1,10 @@
+2002-12-13  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-0-14
+
+	* graphs/set_XXX.m: Created the functions set_axes.m, set_labels.m
+	and set_titles.m. See on-line help for info.
+	
 2002-12-13  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-0-13

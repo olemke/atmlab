@@ -9,7 +9,7 @@
 % FORMAT   h = legend_text('Property1',PropertyValue1,...)
 %        
 % OUT   h   Handle to legend text objects.
-% IN        Arbitrary number of propoert / property value pairs.
+% IN        Arbitrary number of property / property value pairs.
 
 % 2002-12-12   Created by Patrick Eriksson.
 
