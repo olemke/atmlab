@@ -1,3 +1,24 @@
+2004-09-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-3
+
+	* arts/arts_abstable_from_arts1.m: Finished a version that generates
+	an absorption table (of at least correct format, not yet tested in
+	ARTS).
+	However, the function will be modified to be controled by a Qarts
+	structure. Now the input follows the Qarts1 format.
+
+	* arts1/arts1_get.m: Created this function.
+
+	* arts1/arts1_absmodels.cfile: Added this file but it is not ready.
+
+	* handy/qinfo.m: Included option of hard coding row brakes (by §
+	character), and possible to use trailing * for field names.	
+
+	* arts/arts_write_linefile.m: Copied from AMI function write_linefile.
+
+	* arts/arts_read_linefile.m: Copied from AMI function read_linefile.
+
 2004-09-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-2

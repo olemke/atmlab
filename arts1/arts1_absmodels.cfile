@@ -1,0 +1,17 @@
+cont_descriptionAppend{
+    tagname        = "H2O-MPM89"
+    model          = "MPM89"
+    userparameters = [ ]
+}
+
+cont_descriptionAppend{
+    tagname        = "N2-SelfContStandardType"
+    model          = "Rosenkranz"
+    userparameters = [ ]
+}
+
+cont_descriptionAppend{
+    tagname        = "O2-PWR93"
+    model         = "RosenkranzContinuum"
+    userparameters = [ ]
+}

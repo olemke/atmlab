@@ -4,6 +4,8 @@ function S = arts1_cfile( S, Q, parts, tmpdir )
 qcheck( @qarts1, Q );
 
 
+S = {};
+
 for i = 1 : length(parts)
 
 T = [];
@@ -16,7 +18,7 @@ case 'tgs'
 
 case 'load_atm'
   %
-  T = file_or_data( 'p_abs', 'Vector', Q.P_ABS, tmpdir );
+  T{1} = file_or_data( 'p_abs', 'Vector', Q.P_ABS, tmpdir );
   %
   rqre_bool( 'ARTS1 field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
   if Q.USE_RAW_ATMOSPHERE
@@ -25,6 +27,10 @@ case 'load_atm'
     T{2} = add_readfile( 'raw_ptz', 'Matrix', Q.APRIORI_PTZ );
     T{3} = sprintf('raw_vmrsReadFromScenario{"%s"}',Q.APRIORI_VMR);
     T{4} = sprintf('AtmFromRaw{}');
+  else
+    T{2} = file_or_data( 't_abs', 'Vector', Q.T_ABS, tmpdir );
+    T{3} = file_or_data( 'z_abs', 'Vector', Q.Z_ABS, tmpdir );
+    T{4} = file_or_data( 'vmrs', 'Matrix', Q.VMRS, tmpdir );
   end
 
 case 'save_atm'
@@ -35,7 +41,7 @@ case 'save_atm'
 
 case 'f_mono'
   %
-  T = file_or_data( 'f_mono', 'Vector', Q.F_MONO, tmpdir );
+  T{1} = file_or_data( 'f_mono', 'Vector', Q.F_MONO, tmpdir );
 
 case 'spectroscopy'
   %
@@ -44,7 +50,29 @@ case 'spectroscopy'
   T{3} = sprintf('   normalizationfactor = "%s"', Q.LINESHAPE_FACTOR );
   T{4} = sprintf('   cutoff              = %e', Q.LINESHAPE_CUTOFF );
   T{5} = '}';
-
+  %
+  if ischar( Q.LINEDATA )
+    filename = Q.LINEDATA;
+    format   = Q.LINEFORMAT;
+  else
+    filename = fullfile( tmpfolder, 'linefile.al' );
+    format   = 'Arts';
+    arts_write_linefile( filename, Q.LINEDATA );
+  end
+  T{6} = sprintf( 'linesReadFrom%s{', format ); 
+  T{7} = sprintf( '   filename = "%s"', filename );
+  T{8} =  '   fmin     = 0';
+  T{9} =  '   fmax     = 10e25';
+  T{10} = '}';
+  T{11} = 'lines_per_tgCreateFromLines{}'; 
+  %
+  if isempty( Q.ABSMODELS )
+    Q.ABSMODELS = which('arts1_absmodels.cfile');
+  end
+  rqre_char( 'ARTS1 field ABS_MODELS', Q.ABSMODELS );
+  Tfile = file2strs( Q.ABSMODELS );
+  T{12} = 'cont_descriptionInit{}';
+  T = [ T Tfile ];
 
 case 'abscalc'
   %
@@ -52,10 +80,17 @@ case 'abscalc'
   T{2} = 'n2_absSet{}';
   T{3} = 'absCalc{}';
 
+case 'save_abs'
+  %
+  T{1} = add_savefile( 'abs', 'Matrix', tmpdir );
+
+case 'save_abs_per_tg'
+  %
+  T{1} = add_savefile( 'abs_per_tg', 'ArrayOfMatrix', tmpdir );
+
 otherwise
   error(sprintf('Unknown action (%s) was requested.',parts{i}));
 end
-
 
 S = [ S T ];
 
@@ -64,13 +99,13 @@ end
 
 %------------------------------------------------------------------------------
 
-function T = file_or_data( artsvar, datatype, qvalue, tmpfolder )
+function s = file_or_data( artsvar, datatype, qvalue, tmpfolder )
   if ischar( qvalue )
-    T{1} = add_readfile( artsvar, datatype, qvalue );
+    s = add_readfile( artsvar, datatype, qvalue );
   else
     filename = fullfile( tmpfolder, [artsvar,'.ab'] );
     write_datafile( filename, qvalue, datatype );
-    T{1} = add_readfile( artsvar, datatype, filename );
+    s = add_readfile( artsvar, datatype, filename );
   end
 
 

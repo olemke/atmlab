@@ -1,12 +1,20 @@
 % QINFO   Prints Q structure information 
 %
 %    This function prints field information for a "Q-structure" if the
-%    format described in *qcheck* is followed. 
+%    general format described in *qcheck* is followed. 
+%
+%    The information text shall be a plain string. Formatting of the output
+%    is handled by the function, where position of row brakes is determined
+%    by the Atmlab setting SCREEN_WIDTH. Row brakes can further be hard 
+%    coded and are then indicated by the character '§'. Leave some space
+%    after '§' if you want the new paragraph to be intended.
 %
 %    Some examples:
 %    Assuming that *qdef* provides needed information, information for 
-%    field DUMMY is obrtained by:
+%    field DUMMY is obtained by:
 %       qinfo(@qdef,'DUMMY');
+%    A trailing wild character can also be used:
+%       qinfo(@qdef,'NEW*');
 %    To create a file qdoc.txt with information for all fields:
 %       qinfo(@qdef,'all',''qdoc.txt');
 %
@@ -65,9 +73,20 @@ if ~ok
 end
 
 
-if strcmp( field, 'all' )
+if strcmp( field, 'all' )  |  strcmp( tail(field,1), '*' )
 
   fields = fieldnames( INFO );
+
+  if strcmp( tail(field,1), '*' )
+    n   = length( field ) - 1;
+    ind = find( strncmp( field(1:n), fields, n ) );
+    if isempty(ind)
+      fprintf('No fields match the search string.\n');
+      return
+    else
+      fields = fields( ind );
+    end
+  end
 
   out(0,1,fid);
   for i = 1 : length(fields)  
@@ -112,7 +131,8 @@ function printfield( field, s, fid )
   ncols = atmlab( 'SCREEN_WIDTH' ) - 4;
   ls = length( s );
   %
-  ind = [find( s == ' ' ) ls+1 ];
+  ind  = [find( s == ' ' ) ls+1 ];
+  pind = [find( s == '§' ) ];
   ready = 0;
   i = 1;
   %
@@ -120,6 +140,10 @@ function printfield( field, s, fid )
   out(0,'-',fid);
   while ~ready
     j = ind(max(find( ind <= i+ncols )))-1;
+    if any( pind < j )
+      j = min(pind) - 1;
+      pind = tail( pind, length(pind)-1 );
+    end
     out(0,s(i:j),fid);
     i = j + 2;
     if i > ls
