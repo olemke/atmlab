@@ -85,25 +85,19 @@ switch length( varg )
         error( sprintf('The field %s does not exists.', varg{1} ) ); 
       end
 
-      if nversion > 6.1
-        value = A.(varg{1});
-      else
-        value = getfield( A, varg{1} );
-      end
+      value = getfield( A, varg{1} );
+
     end
 
+
   case 2
-    %
+
     if ~isfield( A, varg{1} )
       error( sprintf('The field %s is not a valid option.', varg{1} ) ); 
     end
-    %
-    if nversion > 6.1
-      A.(varg{1}) = varg{2};
-    else
-      A = setfield( A, varg{1}, varg{2} );
-    end
-    %
+
+    A = setfield( A, varg{1}, varg{2} );
+
     value = varg{2};
 
   otherwise

@@ -27,7 +27,7 @@ if nargin < 2
 end
 
 
-if ~exist( 'atmlab', 'file' )
+if ~exist( 'atmlab.m', 'file' )
 
   if required
     error( ['You have selected a feature requiering personal settings,', ...
