@@ -1,3 +1,22 @@
+2004-04-07  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-1-71
+
+	* graphs/colorbarf.m: Added. Correct colorbar to use with
+	contourf. From the MathWorks site. IMPORTANT: The standard
+	colorbar function does not work correctly with contourf!!
+
+	* graphs/zerowhite.m: Tried to make the function work with
+	prescribed contour intervals. This is important, since it is
+	preferable to have "nice" contour intervals instead of fractional
+	ones (in my opinion). Unfortunately this does not yet work
+	correctly. I don't understand how the field w in Patricks code
+	works, actually.
+
+	* graphs/example_colorbar.m: Added. Demonstrates how zerowhite and
+	colorbarf can be used to create a filled contour plot with correct
+	colorbar.
+
 2004-03-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-70

@@ -20,20 +20,28 @@
 % FORMAT   [cmap,v] = zerowhite( D, nclrs, rgb, blackl )
 %        
 % OUT   cmap     Color map.
-%       v        Vector with contor level values.
+%       v        Vector with contour level values.
 % IN    D        Data matrix to be displayed
-%       nclrs    Number of colors to use between 0 and max absolute value.
+%       nclrs    Number of colors to use between 0 and max absolute
+%                value. If this is a vector it is taken to define
+%                explictly the contour intervals. This is handy if
+%                you want to create nice intervals, such as [-2 -1
+%                .5 .5 1 2]. The intervals do not have to be evenly
+%                spaced.
 % OPT   rgb      Coding for red, green and blue color by a string of length 3.
 %                The character 'p' means that positive values will be weighted
 %                with the corresponding color. The character 'n' refer to
 %                negative values. The character 'z' means max weight at zero.
 %                Default is 'nzp'.
-%       blackl   Level of bleckness. A value between 0 and 1, where 0 means
+%       blackl   Level of blackness. A value between 0 and 1, where 0 means
 %                that no black is blended in for high value, and 1 means
 %                that max absolute value will be completely black.  
 %                Default is 0.5.
 
 % 2003-12-06   Created by Patrick Eriksson.
+% 2004-04-07   Stefan Buehler:
+%              Added the option to have prescribed contour intervals.
+%              Does not yet work correctly. 
 
 function [cmap,v] = zerowhite( D, nclrs, rgb, blackl )
 
@@ -55,27 +63,49 @@ if ~ischar(rgb)  &  length(rgb)~=3
 end
 %
 if any( ~( (rgb=='n') + (rgb=='p') + (rgb=='z') ) )
-  error( 'The argument *rgb* can only include the characters n, m and p.' );
+  error( 'The argument *rgb* can only include the characters n, z and p.' );
 end
-
 
 %= Get max/min values
 %
-minv = min( min( D ) );
-maxv = max( max( D ) );
-amax = max( abs( [ minv, maxv ] ) );
-dv   = amax / nclrs;
 
+if length(nclrs)==1
+  % Make nclrs contour levels.
+  minv = min( min( D ) );
+  maxv = max( max( D ) );
+  amax = max( abs( [ minv, maxv ] ) );
+  dv = amax / nclrs;
 
-%= Create vector with contour levels
-%
-if abs( minv ) < abs( maxv )
-  v = fliplr( (maxv-dv/2) : -dv : (minv-dv) );
-  w = ( 1 + blackl ) * ( v' + dv/2 ) / amax;
+  %= Create vector with contour levels
+  %
+  if abs( minv ) < abs( maxv )
+    v = fliplr( (maxv-dv/2) : -dv : (minv-dv) );
+    w = ( 1 + blackl ) * ( v' + dv/2 ) / amax;
+  else
+    v = (minv-dv/2) : dv : (maxv+dv);
+    w = ( 1 + blackl ) * ( v' - dv/2 ) / amax;
+  end
+
 else
-  v = (minv-dv/2) : dv : (maxv+dv);
-  w = ( 1 + blackl ) * ( v' - dv/2 ) / amax;
+  
+  v = nclrs;
+  
+  % Take dv from the first contour interval:
+  dv = v(2)-v(1);
+  
+  minv = min( v );
+  maxv = max( v );
+  amax = max( abs( [ minv, maxv ] ) );
+
+  %= Create vector with contour levels
+  %
+  if abs( minv ) < abs( maxv )
+    w = ( 1 + blackl ) * ( v' + dv/2 ) / amax;
+  else
+    w = ( 1 + blackl ) * ( v' - dv/2 ) / amax;
+  end
 end
+
 
 
 %= Set up vectors for positive, negative and mixing colour
