@@ -22,7 +22,7 @@ xmlWriteMatrix (fid, data.vmrs_ref);
 xmlWriteVector (fid, data.t_ref);
 xmlWriteVector (fid, data.t_pert);
 xmlWriteVector (fid, data.nls_pert);
-xmlWriteTensor4 (fid, data.abs);
+xmlWriteTensor4 (fid, data.xsec);
 
 xmlWriteCloseTag (fid, 'GasAbsLookup');
 

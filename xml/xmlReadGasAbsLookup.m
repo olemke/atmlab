@@ -27,5 +27,5 @@ function result = xmlReadGasAbsLookup(fid, attrlist, itype, ftype, binary, fid2)
   result.t_ref              = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.t_pert             = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.nls_pert           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.abs                = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.xsec               = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 

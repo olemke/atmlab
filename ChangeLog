@@ -1,3 +1,11 @@
+2003-02-27  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-1-27
+
+	* xml/xmlReadGasAbsLookup.m: Read .xsec instead of .abs.
+
+	* xml/xmlWriteGasAbsLookup.m: Write .xsec instead of .abs.
+
 2003-02-11  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-26
