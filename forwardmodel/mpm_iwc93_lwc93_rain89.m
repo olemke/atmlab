@@ -33,9 +33,7 @@ theta = 300 / t;
 v_ghz = v/1e9;
 
 
-nr  = 1;
-nc  = 0;
-
+N = 0;
 
 
 %=== Ice water
@@ -45,11 +43,8 @@ if iwc < 0
 elseif iwc > 10
   error('IWC > 10 g/m3 is not allowed.');
 elseif iwc > 0
-  a   = ( theta - 0.1871 ) * exp( 17.0 - 22.1*theta );
-  b   = ( (0.233/(1-0.993/theta))^2 + 6.33/theta - 1.31 ) * 1e-5;
-  ep  = 3.15;
-  epp = a/v_ghz + b*v_ghz;
-  nc  = nc + 1.5 * iwc / 0.916 * ( 3*epp / ( (ep+2)^2 + epp^2 ) ); 
+  eps = eps_ice_liebe93(v,t);
+  N   = N + iwc*(1.5/0.916)*(eps-1)/(eps+2);
 end
 
 
@@ -61,22 +56,8 @@ if lwc < 0
 elseif lwc > 5
   error('LWC > 5 g/m3 is not allowed.');
 elseif lwc > 0
-%= Use function doing the same thing
-%  g1  = 20.20 - 146*(theta-1) + 316*(theta-1)^2;
-%  g2  = 39.8 * g1;
-%  e0  = 77.66 + 103.3*(theta-1);
-%  e1  = 0.0671 * e0;
-%  e2  = 3.52;
-%  tmp1 = v_ghz*v_ghz + g1*g1;
-%  tmp2 = v_ghz*v_ghz + g2*g2;
-%  a   = (e0-e1)/tmp1;
-%  b   = (e1-e2)/tmp2;
-%  ep  = e0 - v_ghz*v_ghz * ( a + b );
-%  epp = v_ghz * ( g1*a + g2*b );
   eps = eps_water_liebe93(v,t);
-  ep  = real( eps );
-  epp = imag( eps );
-  nc  = nc + 1.5 * lwc * ( 3*epp / ( (ep+2)^2 + epp^2 ) ); 
+  N   = N + lwc*1.5*(eps-1)/(eps+2);
 end
 
 
@@ -142,16 +123,22 @@ elseif rain > 0
 
   fr  = 53 - rain * ( 0.37 - 0.0015 * rain );
   y25 = (v_ghz/fr)^2.5;
-  nr  = nr + 1e-6 * rain * ( 0.012*rain - 3.7 ) * y25 / ( fr * ( 1 + y25 ) ); 
   %
-  nc = nc + x1*v_ghz^y1 * rain^( x2*v_ghz^y2 );
+  N = N + ...
+          rain * ( 3.7 - 0.012*rain ) * ( 1- y25/( 1 + y25 ) ) / fr +...
+          i*x1*v_ghz^y1 * rain^( x2*v_ghz^y2 );
 end
 
 
 
-%=== Convert to absorption per meter [1/m]
+%=== Unit conversions
 %
-alpha = 4 * pi * v * nc/1e6 / constants('SPEED_OF_LIGHT');
+nr = 1 + 1e-6 * real( N );  % ppm -> -
+%
+alpha = 0.182 * v_ghz * imag( N );   % dB/km
+alpha = 1e-4 * log(10) * alpha;      % 1/m
 
-%alpha = 0.182 * v_ghz * nc;   % dB/km
+
+%alpha = 4 * pi * v * nc/1e6 / constants('SPEED_OF_LIGHT');
+
 

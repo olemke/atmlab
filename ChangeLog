@@ -1,3 +1,14 @@
+2004-11-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-35
+
+	* forwardmodel/mpm_iwc93_lwc93_rain89.m: Cleaned up function. 
+	Now using much more compact expressions for water and ice. Modified
+	expression for rain, to match ACEPASS report. 
+	Absorption checked to match figures from WATS and ACEPASS reports.
+	Real part of refractive index not checked, but magnitudes (and sign!)
+	look OK.
+
 2004-11-26  Bengt Rydberg  <benryd@etek.chalmers.se>
 	
 	* atmlab-0-2-34
