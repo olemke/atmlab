@@ -1,10 +1,13 @@
-% SIMPLECLOUD_GET   Returns ice and water content.
+% SIMPLECLOUD_GET   Returns ice and water content at a single position.
 %
 %    Returns the content of ice, liquid water and rain for the given
 %    geographical position and the defined cloud scenario (described 
 %    by SIMPLECLOUD_INIT).
 %    
 %    Latitude and longitude must be given for 3D cases.
+%
+%    This function is not "vectorized", to faciliate porting to
+%    to C or FORTRAN. This function is then slow.
 %     
 % FORMAT   [iwc,lwc,rain] = simplecloud_get(C,z[,lat,lon])
 %
@@ -15,7 +18,6 @@
 %          z      Altitude [m]
 %          lat    Latitude [-90,90]
 %          lon    Longitude [-180,180]
-
 
 % HISTORY: 2003-03-07  Created by Patrick Eriksson
 
@@ -83,7 +85,7 @@ if C.dim == 3
       end
     end
   else
-    hw = exp( -( (llat/C.latlength)^2 + (llon/C.lonlength)^2 ) );
+    hw = exp( -( (2*llat/C.latlength)^2 + (2*llon/C.lonlength)^2 ) );
   end
 
   iwc  = iwc * hw;

@@ -1,3 +1,20 @@
+2003-04-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-41
+
+	* atmscenarios/simplecloud_field.m: Created this function.
+
+	* atmscenarios/simplecloud_plot.m: Created this function.
+
+	* atmscenarios/simplecloud_XXXX.m: Finished a first version of this 
+	set of functions. More cloud types have to be defined in the init 
+	function. Thomas has promised to help me with this. 
+
+	To test this tool, try:
+	   help simplecloud_init
+	   C = simplecloud_init;
+	   simplecloud_plot(C);
+
 2003-04-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-40

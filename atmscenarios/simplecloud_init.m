@@ -1,8 +1,8 @@
-% SIMPLECLOUD_INIT   Definition of cloud scenario.
+% SIMPLECLOUD_INIT   Definition of simple cloud scenario.
 %
 %    The cloud scenario is described by a structure C that can be used as
 %    input to SIMPLECLOUD_GET to extract the ice and water content for
-%    an arbitrary position.
+%    an arbitrary position. Full fields  are obtained by SIMPLECLOUD_FIELD.
 %    
 %    The cloud scenario is described by answering a number of questions.
 %    The scenario can either be 1D or 3D.
@@ -39,8 +39,9 @@
 %     two functional forms: rectangular and gaussian. Rectangular clouds
 %     are described in the same manner as the IWC and LWC profiles, but with
 %     the same edge length on all sides. The latitude and longitude size
-%     of gaussian clouds, is the distance to where the abundance has dropped
-%     tp exp(-1).
+%     of gaussian clouds is the distance over which the abundande 
+%     is > exp(-1). So, the size is somewhat bigger than FWHM in the 
+%     direction of concern.
 %
 % FORMAT   C = simplecloud_init
 %
@@ -51,6 +52,14 @@
 
 
 function C = simplecloud_init
+
+
+%--- Min/max values
+%
+minedge  = 100;   % Smallest length of edges
+maxiwc   = 5;     % Max IWC value [g/m³]
+maxlwc   = 5;     % Max LWC value [g/m³]
+maxrain  = 25;    % Max rain rate [mm/h]
 
 
 %--- Atmospheric dimensionality
@@ -172,7 +181,7 @@ if do_manual
       if i == 1  |  i == length(zs)
         fprintf('%s = 0\n',s); 
       else
-        C.iwc(i,2) = input_scalar( s, 0, 1 );
+        C.iwc(i,2) = input_scalar( s, 0, maxiwc );
       end
     end
   end
@@ -187,7 +196,7 @@ if do_manual
       if i == 1  |  i == length(zs)
         fprintf('%s = 0\n',s); 
       else
-        C.lwc(i,2) = input_scalar( s, 0, 3 );
+        C.lwc(i,2) = input_scalar( s, 0, maxlwc );
       end
     end
   end
@@ -207,7 +216,7 @@ if do_manual
       if i == length(zs)
         fprintf('%s = 0\n',s); 
       else
-        C.rain(i,2) = input_scalar( s, 0, 25 );
+        C.rain(i,2) = input_scalar( s, 0, maxrain );
       end
     end
   end
@@ -221,15 +230,15 @@ else
   if do_iwc
     fprintf('\n----- Ice water profile -----\n\n');
     iwc_content = ...
-                 input_scalar( 'Ice water content [g/m3]', 0, 1, iwc_content );
+            input_scalar( 'Ice water content [g/m3]', 0, maxiwc, iwc_content );
     iwc_altitude = 1e3 * ...
                input_scalar( 'Centre altitude [km]', 0, 10, iwc_altitude/1e3 );
     iwc_thickness = 1e3 * ...
               input_scalar( 'Layer thickness [km]', 0, 10, iwc_thickness/1e3 );
-    iwc_edgelow = 1e3 * ...
-          input_scalar( 'Height of lower edge [km]', 0.1, 5, iwc_edgelow/1e3 );
-    iwc_edgehigh = 1e3 * ...
-         input_scalar( 'Height of upper edge [km]', 0.1, 5, iwc_edgehigh/1e3 );
+    iwc_edgelow = 1e3 * input_scalar( 'Height of lower edge [km]', ...
+                                             minedge/1e3, 5, iwc_edgelow/1e3 );
+    iwc_edgehigh = 1e3 * input_scalar( 'Height of upper edge [km]', ...
+                                            minedge/1e3, 5, iwc_edgehigh/1e3 );
 
     C.iwc = [ iwc_altitude-iwc_thickness/2-iwc_edgelow,  0;
               iwc_altitude-iwc_thickness/2,              iwc_content;
@@ -242,15 +251,15 @@ else
   if do_lwc
     fprintf('\n----- Liquid water profile -----\n\n');
     lwc_content = ...
-              input_scalar( 'Liquid water content [g/m3]', 0, 3, lwc_content );
+         input_scalar( 'Liquid water content [g/m3]', 0, maxlwc, lwc_content );
     lwc_altitude = 1e3 * ...
                input_scalar( 'Centre altitude [km]', 0, 10, lwc_altitude/1e3 );
     lwc_thickness = 1e3 * ...
               input_scalar( 'Layer thickness [km]', 0, 10, lwc_thickness/1e3 );
-    lwc_edgelow = 1e3 * ...
-          input_scalar( 'Height of lower edge [km]', 0.1, 5, lwc_edgelow/1e3 );
-    lwc_edgehigh = 1e3 * ...
-         input_scalar( 'Height of upper edge [km]', 0.1, 5, lwc_edgehigh/1e3 );
+    lwc_edgelow = 1e3 * input_scalar( 'Height of lower edge [km]', ...
+                                             minedge/1e3, 5, lwc_edgelow/1e3 );
+    lwc_edgehigh = 1e3 * input_scalar( 'Height of upper edge [km]', ...
+                                            minedge/1e3, 5, lwc_edgehigh/1e3 );
 
     C.lwc = [ lwc_altitude-lwc_thickness/2-lwc_edgelow,  0;
               lwc_altitude-lwc_thickness/2,              lwc_content;
@@ -262,10 +271,10 @@ else
   %
   if do_rain
     fprintf('\n----- Rain profile -----\n\n');
-    rain_rate = input_scalar( 'Rain rate [mm/h]', 0, 25, rain_rate );
+    rain_rate = input_scalar( 'Rain rate [mm/h]', 0, maxrain, rain_rate );
     rain_height = 1e3 * input_scalar( 'Height [km]', 0, 6, rain_height/1e3 );
-    rain_edgehigh = 1e3 * ...
-        input_scalar( 'Height of upper edge [km]', 0.1, 5, rain_edgehigh/1e3 );
+    rain_edgehigh = 1e3 * input_scalar( 'Height of upper edge [km]', ...
+                                           minedge/1e3, 5, rain_edgehigh/1e3 );
 
     C.rain = [ rain_height,               rain_rate;
                rain_height+rain_edgehigh, 0 ];
@@ -298,6 +307,7 @@ if C.dim == 3
   C.latlength = input_scalar( 'Latitude length [km]', 1, [], latlength )*1e3;
   C.lonlength = input_scalar( 'Longitude length [km]', 1, [], lonlength )*1e3;
   if C.hshape == 1
-    C.hedge = input_scalar( 'Horisontal edge length [km]', 0.1, [], 1 ) * 1e3;
+    C.hedge = input_scalar( 'Horisontal edge length [km]', ...
+                                                    minedge/1e3, [], 1 ) * 1e3;
   end
 end
