@@ -1,3 +1,11 @@
+2003-10-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-53
+
+	* sensors/amsu_channels.m: Created this folder and this function.
+	The function returns basic information on AMSU specifications.
+	Please add more data if you find it necessary.
+
 2003-07-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-52
