@@ -1,0 +1,49 @@
+--- How to configure Atmlab ---
+
+It is assumed that you have some basic Matlab knowledge. If some of
+the concepts here are unfamiliar to you, please try to find the
+information in the Matlab documentation. The Matlab web site at 
+www.mathworks.com contains a lot of useful information and a good FAQ.
+
+The top folder of Atmlab is below denoted as ATMLAB/.
+
+Atmlab is added to the Matlab search path by calling the function
+atmlab_init, which is found in ATMLAB/. To view the search path, use
+the Matlab function path. If you will always be using Atmlab, the
+simplest is to include these lines in startup.m:
+   cd ATMLAB/
+   atmlab_init;
+
+If you have different Matlab environments, and you don't want to add
+all the Matlab stuff that you have to the search path, the file
+ATMLAB/startup_menu.m gives you some hints on how this can be handled.
+
+Matlab looks for startup.m in the folder where it is started. To
+ensure that Matlab always finds your startup.m, the Matlab path must
+be extended already before calling Matlab. How this is done depends on
+the environment (operative system, shell etc.). If you are a bash
+user, a line like this will do the job:
+   export MATLABPATH=/home/patrick/Configure/Matlab:
+
+Some functionality of Atmlab requieres personal settings. Most parts
+of Atmlab will work without a file with personal settings. There will
+be an error message if a needed personal setting is lacking. 
+
+The personal settings are provided by a function with name
+atmplot.m. This function is not found inside the Atmlab folders added
+to the search path, but a template for you to copy and edit is found
+in ATMLAB/examples. Copy that file to a folder outside Atmlab, but
+part of the Matlab search path. You need to edit the file to include
+your settings, as described in the template. The present settings are
+displayed by executing
+
+   atmlab;
+
+To get a particular setting, give the name of the setting as input:
+
+   atmlab('fmodel')
+
+If you want to change your settings during an Atmlab session, the new
+value is given as a second argument to atmplot:
+
+   atmplot('fmodel','arts-1');
