@@ -1,5 +1,16 @@
 2003-02-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-29
+
+	* Removed the following test function from /arts:
+	   cart2poslos.m
+	   do_gridcell_2d.m
+	   do_gridcell_3d.m
+	   gridcell_crossing_3d.m
+	   poslos2cart.m
+
+2003-02-28  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-28
 
 	* files/qtool.m: Included an if-statement to avoid a warning for
