@@ -42,27 +42,16 @@ Q.LINEFORMAT    = 'Arts';
 Q.LINEDATA      = fullfile( atmlab_example_data , 'lines501.4' );
 
 
-%= Use Qarts to obtain atmospheric fields
+%= Atmosphere
 %
-QQ = qarts;
+atmlab( 'require', {'ARTS1_DATA_PATH'} );
 %
-QQ.GAS_SPECIES         = Q.TGS;
-QQ.ATMOSPHERE_DIM      = 1;
-arts_xmldata_path      = atmlab( 'ARTS_XMLDATA_PATH' );
-if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
-end
-QQ.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, ...
-                        fullfile( 'atmosphere', ...
-                        fullfile( 'fascod', 'tropical' ) ) );
-QQ.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:80e3] );
+Q.P_ABS               = z2p_simple( [0:500:45e3 46e3:1e3:80e3] );
 %
-Q.USE_RAW_ATMOSPHERE = 0;
-Q.P_ABS              = QQ.P_GRID;
-%
-[Q.T_ABS,Q.Z_ABS,Q.VMRS] = arts_get_atmfields( QQ );
-%
-clear QQ
+Q.USE_RAW_ATMOSPHERE  = 1;
+Q.APRIORI_VMR         = fullfile( atmlab( 'ARTS1_DATA_PATH' ), 'atmosphere',...
+                                                        'fascod', 'tropical' );
+Q.APRIORI_PTZ         = [ Q.APRIORI_VMR, '.tz.aa' ];
 
 
 %= RTE 

@@ -1,3 +1,28 @@
+2005-03-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-46
+
+	* arts1/arts1_create_linefile.m: Created this function. 
+
+	* arts/arts_write_linefile.m: Changed default for do_quanta and 
+	do_source.
+
+	* math/ismatrix.m: Created this function. 
+
+	* arts1/qarts1.m (LINEDATA): Text explaining that field can be set
+	to [], corresponding to no transitions.
+
+	* arts1/qarts1_demo.m: Removed dependency on Qarts. 
+
+	* handy/rqre_field.m: Removed struture name as input. Had missed 
+	function inputname.
+
+	* handy/rqre_datatype.m: Created this function.
+
+	* atmscenarios/land_sea_mask.m: Created this function.
+
+	* atmlab/atmlab.m: Added setting for path to arts-data.
+
 2005-03-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-45

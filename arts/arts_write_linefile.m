@@ -1,22 +1,21 @@
 %------------------------------------------------------------------------
-% NAME:     write_linefile
+% NAME:     arts_write_linefile
 %
 %           Creates a line file in the ARTS format.
 %
 %           The line data shall be given by an array of structures. The
 %           field names of the structures shall equal the label name of
-%           the table in absorption.h defininmg the ARTS line format.
+%           the table in absorption.h defining the ARTS line format.
 %           The field names are throughout in lower case.
 %           No unit conversions are performed, thus the data shall have 
 %           the same unit as in the line file.
 %
-% FORMAT:   write_linefile( filename, L [, do_quanta, do_source, do_append ])
+% FORMAT:   arts_write_linefile( filename, L [, do_quanta, do_source, do_append ])
 %
 % OUT:      -
 % IN:       filename   Name on file to create.
 %           L          Structure array with line data (see above)
-% OPTIONAL: vers       ARTS line file version number. Default is 3.
-%           do_quanta  Flag for writing of quantum data. Default is 1. 
+% OPTIONAL: do_quanta  Flag for writing of quantum data. Default is 1. 
 %           do_source  Flag for writing of source information. Default is 1.
 %           do_append  Flag for appending to an existing file instead of
 %                      creating a new file. Default is 0.
@@ -26,11 +25,11 @@
 %           020101  Created by Patrick Eriksson (PE).
 
 
-function write_linefile( filename, L, do_quanta, do_source, do_append )
+function arts_write_linefile( filename, L, do_quanta, do_source, do_append )
 
 
-if ~exist('do_quanta','var'),   do_quanta = 1;   end
-if ~exist('do_source','var'),   do_source = 1;   end
+if ~exist('do_quanta','var'),   do_quanta = 0;   end
+if ~exist('do_source','var'),   do_source = 0;   end
 if ~exist('do_append','var'),   do_append = 0;   end
 
 

@@ -3,8 +3,8 @@
 %
 %           Reads a line file in the ARTS format.
 %
-%           The output is in the format expected by WRITE_LINEFILE.
-%           See further WRITE_LINEFILE for definition of the structure
+%           The output is in the format expected by ARTS_WRITE_LINEFILE.
+%           See further ARTS_WRITE_LINEFILE for definition of the structure
 %           field names.
 %
 %           The optional argument FLIMS can be used to only pick out 

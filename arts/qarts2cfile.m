@@ -346,18 +346,14 @@ return
 
 function T = cloudbox2cfile( Q, tmpdir )
 
-%= Pick out cloudbox structure
-%
-C = Q.CLOUDBOX;
-
 %= Check that all fields are present
 %
-qcheck( @qarts_cloudbox, C );
+qcheck( @qarts_cloudbox, Q.CLOUDBOX );
 
 %= Some basic checks
 if Q.ATMOSPHERE_DIM == 2
   error( 'Scattering is not defined for 2D.' );
-elseif Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(C.METHOD), 'MC' )
+elseif Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   error( 'MC can only be applied for 3D.' );
 end
 
@@ -371,33 +367,36 @@ T = add_agenda( T, 'opt_prop_part_agenda', ...
 
 %= Particle field and single scattering data
 %
-if isnumeric(C.PND_FIELD)  |  ischar(C.PND_FIELD)
+if isnumeric(Q.CLOUDBOX.PND_FIELD)  |  ischar(Q.CLOUDBOX.PND_FIELD)
   %
-  if ~( isnumeric(C.SCAT_DATA)  |  ischar(C.SCAT_DATA) )
+  if ~( isnumeric(Q.CLOUDBOX.SCAT_DATA)  |  ischar(Q.CLOUDBOX.SCAT_DATA) )
      error( ['Not allowed combination of Q.CLOUDBOX.PND_FIELD and ',...
                                           'Q.CLOUDBOX.SCAT_DATA data types'] );
   end
   %    
-  T{end+1} = file_or_data( 'pnd_field', 'Tensor4', C.PND_FIELD, tmpdir );
+  T{end+1} = file_or_data( 'pnd_field', 'Tensor4', Q.CLOUDBOX.PND_FIELD, ...
+                                                                      tmpdir );
   T{end+1} = file_or_data( 'scat_data_raw', 'ArrayOfSingleScatteringData', ...
-                                                         C.SCAT_DATA, tmpdir );
+                                                Q.CLOUDBOX.SCAT_DATA, tmpdir );
 
-elseif iscellstr(C.PND_FIELD)
+elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
   %
-  if ~iscellstr(C.SCAT_DATA)
+  if ~iscellstr(Q.CLOUDBOX.SCAT_DATA)
      error( ...
     'The cloudbox fields PND_FIELD and SCAT_DATA must be of same data type.' );
   end
-  if length(C.PND_FIELD)  ~=  length(C.SCAT_DATA)
+  if length(Q.CLOUDBOX.PND_FIELD)  ~=  length(Q.CLOUDBOX.SCAT_DATA)
     error( ['Length of Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must ',...
                              'be equal when they are cell array of strings'] );
   end
   %
   T{end+1} = 'ParticleTypeInit{}';
-  for i = 1 : length(C.PND_FIELD)
+  for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
     T{end+1} = 'ParticleTypeAdd{';
-    T{end+1} = sprintf('   filename_scat_data =  "%s"', C.SCAT_DATA{i} );
-    T{end+1} = sprintf('   filename_pnd_field =  "%s"', C.PND_FIELD{i} );
+    T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
+                                                     Q.CLOUDBOX.SCAT_DATA{i} );
+    T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
+                                                     Q.CLOUDBOX.PND_FIELD{i} );
     T{end+1} = '}';
   end  
   T{end+1} = 'pnd_fieldCalc{}';
@@ -408,57 +407,56 @@ end
 
 %= Cloudbox
 %
-if isvector(C.LIMITS)  &  ~any(isnan( C.LIMITS ))
-  if length(C.LIMITS) ~= 2*Q.ATMOSPHERE_DIM
+if isvector(Q.CLOUDBOX.LIMITS)  &  ~any(isnan( Q.CLOUDBOX.LIMITS ))
+  if length(Q.CLOUDBOX.LIMITS) ~= 2*Q.ATMOSPHERE_DIM
     error( ...
     'Length of Q.CLOUDBOX.LIMITS does not match atmospheric dimensionality.' );
   end 
-  if length(C.LIMITS) < 6
-     limits = C.LIMITS;
-     C.LIMITS = zeros(1,6);
-     C.LIMITS(1:length(limits)) = limits;
+  if length(Q.CLOUDBOX.LIMITS) < 6
+     limits = Q.CLOUDBOX.LIMITS;
+     Q.CLOUDBOX.LIMITS = zeros(1,6);
+     Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
   end
   T{end+1} = 'cloudboxSetManuallyAltitude{';
-  T{end+1} = sprintf('   z1   = %.3f', C.LIMITS(1) );
-  T{end+1} = sprintf('   z2   = %.3f', C.LIMITS(2) );
-  T{end+1} = sprintf('   lat1 = %.3f', C.LIMITS(3) );
-  T{end+1} = sprintf('   lat2 = %.3f', C.LIMITS(4) );
-  T{end+1} = sprintf('   lon1 = %.3f', C.LIMITS(5) );
-  T{end+1} = sprintf('   lon2 = %.3f', C.LIMITS(6) );
+  T{end+1} = sprintf('   z1   = %.3f', Q.CLOUDBOX.LIMITS(1) );
+  T{end+1} = sprintf('   z2   = %.3f', Q.CLOUDBOX.LIMITS(2) );
+  T{end+1} = sprintf('   lat1 = %.3f', Q.CLOUDBOX.LIMITS(3) );
+  T{end+1} = sprintf('   lat2 = %.3f', Q.CLOUDBOX.LIMITS(4) );
+  T{end+1} = sprintf('   lon1 = %.3f', Q.CLOUDBOX.LIMITS(5) );
+  T{end+1} = sprintf('   lon2 = %.3f', Q.CLOUDBOX.LIMITS(6) );
   T{end+1} = '}';
 else
-  error('Not valid specification CLOUDBOX.LIMITS.');
+  error('Not valid specification Q.CLOUDBOX.LIMITS.');
 end
 
 %= DOIT / MC
 %
-if strcmp( upper(C.METHOD), 'DOIT' )
+if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   %
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', SCAT_ZA_GRID );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, SCAT_ZA_GRID );
   T{end+1} = file_or_data( 'scat_za_grid', 'Vector', ...
-                                        C.METHOD_PARAMS.SCAT_ZA_GRID, tmpdir );
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', SCAT_ZA_INTERP );
+                               Q.CLOUDBOX.METHOD_PARAMS.SCAT_ZA_GRID, tmpdir );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, SCAT_ZA_INTERP );
   T{end+1} = sprintf('scat_za_interpSet{interp_method = "%s"}', ...
-                                              C.METHOD_PARAMS.SCAT_ZA_INTERP );
+                                     Q.CLOUDBOX.METHOD_PARAMS.SCAT_ZA_INTERP );
   if Q.ATMOSPHERE_DIM == 3
-    rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', SCAT_AA_GRID );
+    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, SCAT_AA_GRID );
     T{end+1} = file_or_data( 'scat_aa_grid', 'Vector', ...
-                                        C.METHOD_PARAMS.SCAT_AA_GRID, tmpdir );
+                               Q.CLOUDBOX.METHOD_PARAMS.SCAT_AA_GRID, tmpdir );
   end
 
-elseif strcmp( upper(C.METHOD), 'MC' )
+elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   %
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'STD_ERR', 0 );
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'MAX_TIME', 0 );
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'MAX_ITER', 0 );
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'RNG_SEED', 0 );
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', ...
-                                                        'INCOMING_LOOKUP', 0 );
-  rqre_field( C.METHOD_PRMTRS, 'Q.CLOUDBOX.METHOD_PRMTRS', 'Z_FIELD_IS_1D', 0);
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'RNG_SEED', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'INCOMING_LOOKUP', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D', 0);
   %
-  if C.METHOD_PRMTRS.INCOMING_LOOKUP
+  if Q.CLOUDBOX.METHOD_PRMTRS.INCOMING_LOOKUP
     T{end+1} = file_or_data( 'mc_incoming', 'SLIData2', ...
-                                     C.METHOD_PARAMS.INCOMING_LOOKUP, tmpdir );
+                            Q.CLOUDBOX.METHOD_PARAMS.INCOMING_LOOKUP, tmpdir );
   end
   %
   T{end+1} = 'IndexSet(f_index){value=0}';
@@ -466,19 +464,19 @@ elseif strcmp( upper(C.METHOD), 'MC' )
   %
   T{end+1} = 'AgendaSet(iy_cloudbox_agenda){';
   T{end+1} = '   ScatteringMonteCarlo{';
-  T{end+1} = sprintf('     std_err       = %d', C.METHOD_PRMTRS.STD_ERR );
-  T{end+1} = sprintf('     max_time      = %d', C.METHOD_PRMTRS.MAX_TIME );
-  T{end+1} = sprintf('     max_iter      = %d', C.METHOD_PRMTRS.MAX_ITER );
-  T{end+1} = sprintf('     rng_seed      = %d', C.METHOD_PRMTRS.RNG_SEED );
+  T{end+1} = sprintf('     std_err  = %d', Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
+  T{end+1} = sprintf('     max_time = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
+  T{end+1} = sprintf('     max_iter = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
+  T{end+1} = sprintf('     rng_seed = %d', Q.CLOUDBOX.METHOD_PRMTRS.RNG_SEED );
   T{end+1} = sprintf('     incoming_lookup = %d', ...
-                                             C.METHOD_PRMTRS.INCOMING_LOOKUP );
+                                    Q.CLOUDBOX.METHOD_PRMTRS.INCOMING_LOOKUP );
   T{end+1} = sprintf('     z_field_is_1D = %d', ...
-                                               C.METHOD_PRMTRS.Z_FIELD_IS_1D );
+                                      Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
   T{end+1} = '   }';
   T{end+1} = '}';
 
 else
-  error( 'Unknown choice for CLOUDBOX.METHOD.' );
+  error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );
 end
 
 

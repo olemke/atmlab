@@ -46,7 +46,14 @@
 % Path to main folder of arts-xml-data. 
 % The arts-xml-data is a compilation of useful data for ARTS calculations.
 % Contact the ARTS team if you want access to the data. The data is used
-% as input for ARTS example functions. 
+% as input for ARTS example/utility functions. 
+%----------------------------------------------------------------------------
+% ARTS1_DATA_PATH
+%
+% Path to main folder of arts-data. 
+% The arts-data is a compilation of useful data for ARTS1 calculations.
+% Contact the ARTS team if you want access to the data. The data is used
+% as input for ARTS1 example/utility functions. 
 %----------------------------------------------------------------------------
 % ARTS1_HDF
 %
@@ -110,6 +117,7 @@ function A = atmlab_defs
 A.AMI_PATH          = NaN;
 A.ARTS_PATH         = NaN;
 A.ARTS_XMLDATA_PATH = NaN;
+A.ARTS1_DATA_PATH   = NaN;
 A.ARTS1_HDF         = NaN;
 A.ARTS1_PATH        = NaN;
 A.FMODEL_VERBOSITY  = NaN;

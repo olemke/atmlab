@@ -37,9 +37,8 @@ arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, ...
-                        fullfile( 'atmosphere', ...
-                        fullfile( 'fascod', 'tropical' ) ) );
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
+                                                        'fascod', 'tropical' );
 Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:80e3] );
 
 
