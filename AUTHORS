@@ -12,3 +12,8 @@ Oliver Lemke <olemke@uni-bremen.de>
 ---
 Maintaining CVS repository and the mailing list.
 Created the XML format for data files.
+
+
+Christian Mätzler <christian.matzler@iap.unibe.ch>
+---
+Mie scattering functions.

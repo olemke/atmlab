@@ -1,3 +1,16 @@
+2003-01-20  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-1-24
+
+	* AUTHORS: Added Christian Maetzler <christian.matzler@iap.unibe.ch>.
+
+	* mie/: Added this directory, containing Mie scattering functions
+	supplied by Christian Maetzler. Documentation is also there, in a
+	pdf file. I added the files as they were, without making any changes.
+
+	* mie/README: Added. Just contains a reference to the
+	documentation. 
+
 2003-01-09  Oliver Lemke  <olemke@uni-bremen.de>
 
 	* atmlab-0-1-23
