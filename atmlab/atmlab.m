@@ -31,9 +31,11 @@
 %----------------------------------------------------------------------------
 % AMI_PATH
 %
-% The path to the AMI folder. AMI contains Matlab functions needed for 
+% The path to the AMI top folder. AMI contains Matlab functions needed for 
 % communication with ARTS1. If you are not using ARTS1, just leave this field
-% empty.
+% empty. 
+% AMI is added by the function *addpath_ami*, where only the arts subfolder
+% is added to the Matlab search path.
 %----------------------------------------------------------------------------
 % ARTS_PATH
 %

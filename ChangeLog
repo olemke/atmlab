@@ -1,5 +1,26 @@
 2004-09-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-2
+
+	* arts1/qarts1.m: Added a number of fields. 
+
+	* arts1/arts1_cfile.m: Started on this function, generating ARTS-1.0
+	control files.
+
+	* arts/arts_abstable_from_arts1.m: Further work on this function. 
+
+	* arts/arts_tgs_cnvrt.m: Fixed spelling error in error message.
+
+	* handy/rqre_bool.m: Created this function.
+
+	* handy/rqre_scalar.m: Created this function.
+
+	* handy/rqre_char.m: Created this function.
+
+	* arts1/addpath_ami.m: Created this function.
+
+2004-09-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-1
 
 	* arts/arts_abstable_from_arts1.m: A not totally ready function to

@@ -1,4 +1,4 @@
-function A = arts_abstable_from_arts1( S, f, p, dt )
+function A = arts_abstable_from_arts1( Q, dt )
 
 
 %= Default values
@@ -11,49 +11,43 @@ set_defaults;
 %=== Create temporary working folder
 %
 tmpfolder   = create_tmpfolder;
-S.TMPFOLDER = tmpfolder;
 
-
-%=== Add path to AMI/arts
-%
-atmlab( 'require', {'AMI_PATH'} );
-amipath = atmlab( 'AMI_PATH' );
-addpath( fullfile( amipath, 'arts' ), '-end' );
-
-
-%=== Create tag string
-%
-S.TGSSTRING = arts_tgs_cnvrt( S.TGS );
-
-
-%=== Write *p* and *f* to files
-%
-write_datafile( fullfile( tmpfolder, 'p_abs.aa' ), p, 'VECTOR' );
-write_datafile( fullfile( tmpfolder, 'f_mono.aa' ), f, 'VECTOR' );
 
 
 %=== Obtain profiles
 %
-cfile = fullfile( tmpfolder, 'cfile.arts' );
-Tfile = file2strs( 'prof.tmplt' );
-qtool( Tfile, cfile, S );
+% We want to make calculations for USE_RAW_ATMOSPHERE = 0.
+% If this field is set to 1, we need first to extract atmosphere data.
 %
-arts( cfile, 0, 1 );
+rqre_bool( 'ARTS1 field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
 %
-t0   = read_datafile( fullfile( tmpfolder, 't_abs.aa' ), 'VECTOR');
-vmrs = read_datafile( fullfile( tmpfolder, 'vmrs.aa' ), 'MATRIX');
+if Q.USE_RAW_ATMOSPHERE
+  %
+  S = arts1_cfile( [], Q, {'tgs','load_atm','save_atm'}, tmpfolder );
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  qtool( S, cfile, [] );
+  arts( cfile, 0, 1 );
+  %
+  Q.USE_RAW_ATMOSPHERE = 0;
+  Q.T_ABS = fullfile( tmpfolder, 't_abs.ab' );
+  Q.Z_ABS = fullfile( tmpfolder, 'z_abs.ab' );
+  Q.VMRS  = fullfile( tmpfolder, 'vmrs.ab' );
+  t0      = read_datafile( fullfile( tmpfolder, 't_abs.ab' ), 'VECTOR');
+end
 
 
 %=== Create control file for ARTS1 run
 %
-Cfile = file2strs( S.ABSMODELS );
-Tfile = file2strs( 'abs.tmplt' );
-qtool( [{'cont_descriptionInit{}'} Cfile Tfile], cfile, S );
+parts = {'tgs','load_atm','f_mono','spectroscopy'};
+S = arts1_cfile( [], Q, parts, tmpfolder );
+qtool( S, cfile, [] );
+arts( cfile, 0, 1 );
+
 
 
 %=== Create absorption table
 %
-A.species           = S.TGS;
+A.species           = Q.TGS;
 A.nonlinear_species = {};
 A.f_grid            = f;
 A.p_grid            = p;
@@ -74,11 +68,6 @@ for i = 1 : nt
   A.xsec = read_datafile( fullfile( tmpfolder, 'abs_per_tg.aa' ), 'AOMATRIX');
   %
 end
-
-
-%=== Recreate path
-%
-rmpath( fullfile( amipath, 'arts' ) );
 
 
 

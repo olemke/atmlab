@@ -62,24 +62,14 @@ if length(fid) > 1
 end
 
 
+%=== Check data
+%
 atmlab( 'require', {'VERBOSITY','SCREEN_WIDTH'} );
-
-
 verbosity = atmlab( 'VERBOSITY' );
 ncols     = atmlab( 'SCREEN_WIDTH' );
-
-
-if ~isscalar(verbosity)  |  verbosity < 0
-  error('VERBOSITY must be a scalar >= 0')
-end  
-
-if ~isscalar(ncols)  |  ncols < 0
-  error('SCREEN_WIDTH must be a scalar >= 0')
-end  
-
-if ~isscalar(level)  |  level < 0
-  error('Input argument *level* must be a scalar >= 0')
-end  
+rqre_scalar( 'Atmlab setting VERBOSITY', verbosity, 0 );
+rqre_scalar( 'Atmlab setting SCREEN_WIDTH', ncols, 0 );
+rqre_scalar( 'Input argument *level*', level, 0 );
 
 
 if level <= verbosity

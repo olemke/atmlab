@@ -69,5 +69,5 @@ elseif iscell( a )
   end
 
 else
-  error('Input must be sring or cell array.');
+  error('Input must be string or cell array.');
 end
