@@ -1,3 +1,14 @@
+2004-01-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-1-64
+
+	* graphs/zerowhite.m: Yet another fix to handle strange logic of
+	Matlab plotting. I hate the plotting in Matlab.
+
+	It seems that the color map is looped in different order, depending if
+	the minimum or maximum value (in absolute terms) is the largest. 
+	Let us see if this works for all cases.
+
 2004-01-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-1-63

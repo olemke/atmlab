@@ -71,14 +71,15 @@ dv   = amax / nclrs;
 %
 if abs( minv ) < abs( maxv )
   v = fliplr( (maxv-dv/2) : -dv : (minv-dv) );
+  w = ( 1 + blackl ) * ( v' + dv/2 ) / amax;
 else
   v = (minv-dv/2) : dv : (maxv+dv);
+  w = ( 1 + blackl ) * ( v' - dv/2 ) / amax;
 end
 
 
 %= Set up vectors for positive, negative and mixing colour
 %
-w = ( 1 + blackl ) * ( v' + dv/2 ) / amax;
 %
 p      = w + 1;
 ind    = find( p < 0 );
