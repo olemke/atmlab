@@ -1,5 +1,13 @@
 2003-10-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-1-57
+
+	* physics/constants.m: Addded EARTHORBIT_RADIUS and SUN_EARTH.
+
+	* atmlab/atmlab_version.m: Don't forget to update version here.
+
+2003-10-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-1-56
 
 	* physics/planck.m: Matrixified (referring not to the movie) the

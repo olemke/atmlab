@@ -8,9 +8,11 @@
 %       BOLTZMANN_CONST
 %       DEG2RAD             Conversion from degrees to radians
 %       EARTH_RADIUS        Standard value for the Earth radius
+%       EARTHORBIT_RADIUS   Radius of the Earth orbit, around the Sun  
 %       PLANCK_CONST  
 %       RAD2DEG             Conversion from radians to degrees
 %       SPEED_OF_LIGHT
+%       SUN_RADIUS          Sun radius
 %
 % FORMAT   const = constants(name);
 %        
@@ -29,7 +31,7 @@ function const = constants(name)
 
 switch name
 
-case ('BOLTZMANN_CONST')
+case 'BOLTZMANN_CONST'
     const = 1.380662e-23;
 
 case 'DEG2RAD'
@@ -38,14 +40,20 @@ case 'DEG2RAD'
 case 'EARTH_RADIUS'
     const = 6.378e6;
 
-case ('PLANCK_CONST')
+case 'EARTHORBIT_RADIUS'
+    const = 1.495e11;
+
+case 'PLANCK_CONST'
     const = 6.626180e-34;
 
 case 'RAD2DEG'
     const = 57.29577951308232;
 
-case ('SPEED_OF_LIGHT')
+case 'SPEED_OF_LIGHT'
     const = 2.99792458e8;
+
+case 'SUN_RADIUS'
+    const = 6.960e8;
 
 otherwise
     error(strcat('Unknown constant: ', name))
