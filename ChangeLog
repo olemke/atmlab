@@ -1,5 +1,11 @@
 2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
 
+	* atmlab-0-1-10
+
+	* xml/xmlWriteArrayOfArrayOf.m: Bug fix.
+
+2002-12-19  Oliver Lemke  <olemke@uni-bremen.de>
+
 	* atmlab-0-1-9
 
 	* xml/xmlWriteArrayOf.m, xml/xmlWriteArrayOfArrayOf.m,
