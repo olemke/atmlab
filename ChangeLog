@@ -1,3 +1,9 @@
+2002-12-13  Oliver Lemke  <olemke@uni-bremen.de>
+
+	* atmlab-0-0-12
+
+	* atmlab_init.m: Removed path artsfuns.
+
 2002-12-13  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-0-11
