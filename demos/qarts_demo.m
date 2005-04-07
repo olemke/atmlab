@@ -73,9 +73,9 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 %= RTE 
 %
 Q.Z_SURFACE      = 500;
-Q.IY_SURFACE_AGENDA = ...
+Q.SURFACE_PROP_AGENDA = ...
    { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-     'surfaceFlat{"water-liebe93"}', 'surfaceCalc{}' };
+     'surfaceFlat{"water-liebe93"}' };
 %
 Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
 Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
@@ -107,3 +107,5 @@ if ~nargout
   ylabel( 'Brightness temperature [K]' )
   title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
 end
+
+keyboard

@@ -1,3 +1,18 @@
+2005-04-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-51
+
+	* Qarts: Surface now mainly handled by SURFACE_PROP_AGENDA.
+
+	* arts/qarts.m 
+	Q.IY_SURFACE_AGENDA    : Introduced default values.
+	Q.SURFACE__PROP_AGENDA : Added this agenda.
+
+	* arts/qarts2cfile.m: Included SURFACE_PROP_AGENDA.
+
+	* demos/qarts_demo.m: SURFACE_PROP_AGENDA is now set. Deafult is used
+	for IY_SURFACE_AGENDA.
+
 2005-03-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-50

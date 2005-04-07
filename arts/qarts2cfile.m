@@ -188,6 +188,7 @@ case 'init_rte'
     T{2} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, tmpdir );
   end
   %
+  T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
   T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
   T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
