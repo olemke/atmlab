@@ -61,7 +61,7 @@ if Q.USE_RAW_ATMOSPHERE
   [t_field,z_field,vmr_field] = arts_get_atmfields( Q ); 
 else
   t_field   = qarts_get( Q.T_FIELD );
-  z_field   = qarts_get( Q.T_FIELD );
+  z_field   = qarts_get( Q.Z_FIELD );
   vmr_field = qarts_get( Q.VMR_FIELD );
   %
   np = length( p_grid );
@@ -75,12 +75,12 @@ end
 %
 if Q.ATMOSPHERE_DIM == 3
  t_field = mean( t_field, 3 );
- z_field = mean( t_field, 3 );
+ z_field = mean( z_field, 3 );
  vmr_field = mean( vmr_field, 4 );
 end
 if Q.ATMOSPHERE_DIM > 1
  t_field = mean( t_field, 2 );
- z_field = mean( t_field, 2 );
+ z_field = mean( z_field, 2 );
  vmr_field = mean( vmr_field, 3 );
 end
 

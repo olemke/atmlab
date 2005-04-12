@@ -1,3 +1,12 @@
+2005-04-12  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-52
+
+	* arts/arts_abstable_from_arts1.m: Fixed 3 typos (resulting in
+	bad bugs, for cases not yet used (would have been noticed)). 
+
+	Found by Hermann Berg. Thanks!
+
 2005-04-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-51
