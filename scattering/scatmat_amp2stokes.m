@@ -1,4 +1,4 @@
-% SCATTERING_AMPLIT2STOKES   Conversion of scattering matrices
+% SCATMAT_AMP2STOKES   Conversion of scattering matrices
 %
 %    Converts amplitude scattering functions to a scattering matrix
 %    for Stokes vectors.
@@ -14,7 +14,7 @@
 %
 %    See further polarisation theory chapter in ARTS user guide.
 %
-% FORMAT   F = scattering_amplit2stokes(S1,S2,S3,S4)
+% FORMAT   F = scatmat_amp2stokes(S1,S2,S3,S4)
 %        
 % OUT   F   Stokes scattering matrix.
 % IN    S1  Amplitude scattering function.
@@ -25,7 +25,7 @@
 % 2004-05-20   Created by Patrick Eriksson.
 
 
-function F = scattering_amplit2stokes(S1,S2,S3,S4)
+function F = scatmat_amp2stokes(S1,S2,S3,S4)
 
 
 %=== Default values
