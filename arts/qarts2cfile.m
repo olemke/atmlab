@@ -380,6 +380,30 @@ T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
 T = add_agenda( T, 'opt_prop_part_agenda', ...
      {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
 
+%= Cloudbox
+%
+if isvector(Q.CLOUDBOX.LIMITS)  &  ~any(isnan( Q.CLOUDBOX.LIMITS ))
+  if length(Q.CLOUDBOX.LIMITS) ~= 2*Q.ATMOSPHERE_DIM
+    error( ...
+    'Length of Q.CLOUDBOX.LIMITS does not match atmospheric dimensionality.' );
+  end 
+  if length(Q.CLOUDBOX.LIMITS) < 6
+     limits = Q.CLOUDBOX.LIMITS;
+     Q.CLOUDBOX.LIMITS = zeros(1,6);
+     Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
+  end
+  T{end+1} = 'cloudboxSetManuallyAltitude{';
+  T{end+1} = sprintf('   z1   = %.3f', Q.CLOUDBOX.LIMITS(1) );
+  T{end+1} = sprintf('   z2   = %.3f', Q.CLOUDBOX.LIMITS(2) );
+  T{end+1} = sprintf('   lat1 = %.3f', Q.CLOUDBOX.LIMITS(3) );
+  T{end+1} = sprintf('   lat2 = %.3f', Q.CLOUDBOX.LIMITS(4) );
+  T{end+1} = sprintf('   lon1 = %.3f', Q.CLOUDBOX.LIMITS(5) );
+  T{end+1} = sprintf('   lon2 = %.3f', Q.CLOUDBOX.LIMITS(6) );
+  T{end+1} = '}';
+else
+  error('Not valid specification Q.CLOUDBOX.LIMITS.');
+end
+
 %= Particle field and single scattering data
 %
 if isnumeric(Q.CLOUDBOX.PND_FIELD)  |  ischar(Q.CLOUDBOX.PND_FIELD)
@@ -418,30 +442,6 @@ elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
   %
 else
   error( 'Unknown data type found for Q.CLOUDBOX.PND_FIELD' );
-end
-
-%= Cloudbox
-%
-if isvector(Q.CLOUDBOX.LIMITS)  &  ~any(isnan( Q.CLOUDBOX.LIMITS ))
-  if length(Q.CLOUDBOX.LIMITS) ~= 2*Q.ATMOSPHERE_DIM
-    error( ...
-    'Length of Q.CLOUDBOX.LIMITS does not match atmospheric dimensionality.' );
-  end 
-  if length(Q.CLOUDBOX.LIMITS) < 6
-     limits = Q.CLOUDBOX.LIMITS;
-     Q.CLOUDBOX.LIMITS = zeros(1,6);
-     Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
-  end
-  T{end+1} = 'cloudboxSetManuallyAltitude{';
-  T{end+1} = sprintf('   z1   = %.3f', Q.CLOUDBOX.LIMITS(1) );
-  T{end+1} = sprintf('   z2   = %.3f', Q.CLOUDBOX.LIMITS(2) );
-  T{end+1} = sprintf('   lat1 = %.3f', Q.CLOUDBOX.LIMITS(3) );
-  T{end+1} = sprintf('   lat2 = %.3f', Q.CLOUDBOX.LIMITS(4) );
-  T{end+1} = sprintf('   lon1 = %.3f', Q.CLOUDBOX.LIMITS(5) );
-  T{end+1} = sprintf('   lon2 = %.3f', Q.CLOUDBOX.LIMITS(6) );
-  T{end+1} = '}';
-else
-  error('Not valid specification Q.CLOUDBOX.LIMITS.');
 end
 
 %= DOIT / MC
