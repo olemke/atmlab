@@ -29,7 +29,7 @@ Xn = randgen_normal( zeros(lxm,1), C, n );
 
 %= Transform to cumulative values
 %
-C = 0.5*( 1 + erf( Xn/sqrt(2) );
+C = 0.5*( 1 + erf( Xn/sqrt(2) ) );
 
 %= Map to uniform distribution
 %

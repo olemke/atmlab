@@ -2,16 +2,18 @@
 %
 %    Gives an example on how Qarts can be used.
 %
-% FORMAT   Q = qarts_demo( ztan )
+% FORMAT   [Q,f,y] = qarts_demo( ztan )
 %        
 % OUT   Q      Qarts setting structure.
+%       f      Frequency grid
+%       y      Calculated spectrum
 % OPT   ztan   Tangent altitude.
 
 % 2005-01-26   Sensor part added by Mattias Ekström.
 % 2004-??-??   Created by Patrick Erikssom.
 
 
-function Q = qarts_demo( ztan )
+function [Q,f,y] = qarts_demo( ztan )
 
 if nargin == 0
   ztan = 30e3;
@@ -94,8 +96,10 @@ H.ANTENNA_LOS = 0;
 H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
 Q.SENSOR_RESPONSE = H;
 
+
 %= Calculate spectrum
 %
+f = Q.F_GRID;
 y = arts_y( Q );
 
 
@@ -108,4 +112,3 @@ if ~nargout
   title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
 end
 
-keyboard

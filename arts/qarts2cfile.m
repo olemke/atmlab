@@ -168,10 +168,9 @@ case 'load_abs'
 case 'calc_abs'
   T = add_agenda( T, 'scalar_gas_absorption_agenda', ...
                                      { 'abs_scalar_gasExtractFromLookup{}' } );
-%  T{1} = [ 'AgendaSet(scalar_gas_absorption_agenda)', ...
-%                                      '{abs_scalar_gasExtractFromLookup{}}' ];
   T = add_agenda( T, 'opt_prop_gas_agenda', ...
               { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
+  T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
 
 case 'init_rte'
   %
@@ -197,7 +196,7 @@ case 'init_rte'
   elseif ~isnan( Q.REFR_INDEX_AGENDA )
     error( 'Q.REFR_INDEX_AGENDA must either be NaN or cell array of strings.');
   end
-  T = add_agenda( T, 'rte_agenda', {'RteEmissionStd{}'} );
+  T = add_agenda( T, 'rte_agenda', {'RteStd{}'} );
   T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
   T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   %
@@ -236,8 +235,8 @@ case 'save_sensor'
 case 'calc_rte'
   %
   %= Special solution for DOIT
-  if isstruct(Q.CLOUDBOX)  &  strcmp( upper(Q.CLOUDBOX.METHOD), ...
-				      'DOIT' )
+  if isstruct(Q.CLOUDBOX)  &  ...
+     strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
     T{1} = 'CloudboxGetIncoming{}';
     T{2} = 'DoitInit{}';
     T{3} = 'ScatteringDoit{}';
