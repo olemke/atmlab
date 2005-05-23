@@ -1,5 +1,20 @@
 2005-05-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-58
+
+	* Made a demo script for randmvar part.
+	
+	* demos/randmvar_demo.m: Created. 
+
+	* atmscenarios/covmat_test.m: Created.
+
+	* atmscenarios/covmat_append.m: Included vec2col when appending
+	i, j and s. Apears needed to handle different Matlab versions. 
+
+	* atmscenarios/covmat_from_cfun.m: Improved tests of input. 
+
+2005-05-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-57
 
 	* An environemnt to create random data fulfilling multivariate 

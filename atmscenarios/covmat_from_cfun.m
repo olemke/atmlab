@@ -7,11 +7,7 @@
 %    correlation has dropped to exp(-1). For off-diagonal values, the 
 %    correlation length is averaged between the two involved positions.
 %
-%    For larger matrices and longer correlation lengths the obtained matrix 
-%    can fail to be positive definitive. To ensure a positive definitive,
-%    set the *test* flag.
-%
-% FORMAT   S = covmat_from_cfun( xp, Std, cfun, [Cl, cco, test] )
+% FORMAT   S = covmat_from_cfun( xp, Std, cfun, [Cl, cco] )
 %        
 % OUT   S     The covariance matrix
 % IN    xp    The data abscissa.
@@ -29,20 +25,16 @@
 % OPT   Cl    Correlation lengths. Given as a column matrix as *Std*.
 %             Must be given for all *cfun* beside 'dia'.
 %       cco   Correlation cut-off. All values below this limit are set to 0. 
-%       test  If set to true/1, the obtained matrix is checked to be positive
-%             definite.
 
 % 2005-05-20   Created by Patrick Eriksson.
 
 
-function S = covmat_from_cfun(xp,Std,cfun,Cl,cco,test)
+function S = covmat_from_cfun(xp,Std,cfun,Cl,cco)
 
 
 %= Default values
 %
-Cl_DEFAULT  = [1 1];
 cco_DEFAULT = 0;
-test_DEFAULT = false;
 %
 set_defaults;
 
@@ -55,7 +47,11 @@ if ~( isempty( Std )  &  size(Std,2) ~= 2 )
   error( 'Argument *Std* must be a matrix with 2 columns, or be empty.' );
 end
 %
-if size(Cl,2) ~= 2
+if ~ischar(cfun)  |  length(cfun) ~= 3
+  error('Argument *cfun* must be a string of length 3.');
+end
+%
+if nargin > 4  &  ( size(Cl,2) ~= 2  | isvector(Cl) )
   error( 'Argument *Cl* must be a matrix with 2 columns.' );
 end
 %
@@ -138,15 +134,3 @@ if ~isempty( Std )
 end
 
 
-
-%- Test?
-%
-if test
-  %
-  [R,p] = chol( S );
-  %
-  if p
-    error( 'Obtained matrix is not positive definite.' );
-  end
-  %
-end

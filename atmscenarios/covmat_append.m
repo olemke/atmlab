@@ -34,9 +34,9 @@ for a = 1 : length(varargin )
 
   [ii,jj,ss] = find( varargin{a} );
 
-  i = [ i n+ii ];
-  j = [ j n+jj ];
-  s = [ s ss ];
+  i = [ i; vec2col(n+ii) ];
+  j = [ j; vec2col(n+jj) ];
+  s = [ s; vec2col(ss) ];
 
   n = n + size( varargin{a}, 1 );
 
