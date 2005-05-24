@@ -196,7 +196,7 @@ case 'init_rte'
   elseif ~isnan( Q.REFR_INDEX_AGENDA )
     error( 'Q.REFR_INDEX_AGENDA must either be NaN or cell array of strings.');
   end
-  T = add_agenda( T, 'rte_agenda', {'RteStd{}'} );
+  T = add_agenda( T, 'rte_agenda', Q.RTE_AGENDA );
   T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
   T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   %

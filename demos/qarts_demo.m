@@ -41,7 +41,7 @@ if isnan( arts_xmldata_path )
 end
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
-Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:80e3] );
+Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
 
 
 %= Spectroscopy

@@ -1,3 +1,11 @@
+2005-05-24  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-2-59
+
+	* arts/qarts.m: Added RTE_AGENDA, with RteStd{} as default.
+
+	* arts/qarts2cfile.m: Implemented the use of RTE_AGENDA, in init_rte
+
 2005-05-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-58
