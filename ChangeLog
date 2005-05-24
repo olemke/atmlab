@@ -1,5 +1,14 @@
 2005-05-24  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
 
+	* atmlab-0-2-60
+
+	* atmlab/atmlab_init.m: Added 'demos' folder to path.
+
+	* demos/qarts_demo.m: Some change was commited last time, couldn't
+	find out what. But the script works as it should.
+
+2005-05-24  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
+
 	* atmlab-0-2-59
 
 	* arts/qarts.m: Added RTE_AGENDA, with RteStd{} as default.
