@@ -83,6 +83,11 @@ if nargin == 1
     S = {'start', 'stokes', 'load_atm', 'load_abs', 'calc_abs', 'init_rte', ...
          'cloudbox', 'sensor', 'calc_rte', 'save_y', 'stop' };
 
+  case 'batch'
+    %
+    S = {'start', 'stokes', 'load_atm', 'load_abs', 'calc_abs', 'init_rte', ...
+         'cloudbox', 'sensor', 'batch', 'stop' };
+
   otherwise
     error( sprintf( 'Unknown run type (%s) was requested.', Q ) );
   end
@@ -275,9 +280,11 @@ case 'save_y'
 
 case 'batch'
   %
-  if isstruct( Q.BATCH )
-    T = batch2cfile( Q.BATCH, tmpdir );
+  if ~isstruct( Q.BATCH )
+    error( 'Batch calculations can only be described by a structure.' )
   end
+  %
+  T = batch2cfile( Q, tmpdir );
 
 case 'stop'
   %
@@ -325,7 +332,7 @@ return
 
 
 function T = add_agenda( T, agenda, strarray )
-  if ~iscellstr( strarray )
+  if ~( iscellstr( strarray )  |  isempty( strarray ) )
     error( ...
         sprintf('The field %s must be specified as cell array of strings.', ...
                                                              upper(agenda) ) );
@@ -641,35 +648,65 @@ end
 % batch2cfile
 %------------------------------------------------------------------------------
 
-function T = batch2cfile( B, tmpdir )
+function T = batch2cfile( Q, tmpdir )
+
+B = Q.BATCH;
 
 %= Check that all fields are present
 %
-qcheck( @qarts_cloudbox, Q.CLOUDBOX );
+qcheck( @qarts_batch, B );
 
 %= Other data checks
 %
-if ~isstruct( B.DATA )
+if ~iscell( B.DATA )
   error('Q.BATCH.DATA must be a structure array.');
 end
 %
 rqre_scalar( 'Q.BATCH.N', B.N, 1 );
 
 T = [];
+A = [];
+
+num_wsv_nr = zeros(8,1);
+int_wsv_nr = zeros(2,1);
 
 for i = 1:length(B.DATA)
-  rqre_field( B.DATA{i}, type, 0 );
-  rqre_char( sprintf('Q.BATCH{%d}.type',i), B.DATA{i}.type );
-  rqre_field( B.DATA{i}, x, 0 );
+  rqre_field( B.DATA{i}, 'TYPE', 0 );
+  rqre_char( sprintf('Q.BATCH{%d}.TYPE',i), B.DATA{i}.TYPE );
+  rqre_field( B.DATA{i}, 'WSV', 0 );
+  rqre_char( sprintf('Q.BATCH{%d}.WSV',i), B.DATA{i}.WSV );
+  rqre_field( B.DATA{i}, 'X', 0 );
   
-  if size(B.DATA{i}.x,1) < B.N 
-    error(sprintf('Q.BATCH.DATA{%d}.x contains fewer cases than Q.BATCH.N',i));
+  if size(B.DATA{i}.X,1) < B.N 
+    error(sprintf('Q.BATCH.DATA{%d}.X contains fewer cases than Q.BATCH.N',i));
   end
 
-  
+  [dim,datatype] = arts_datatypes( B.DATA{i}.TYPE );
+  wsv_nr = eval([datatype,'_wsv_nr(dim+1)']) + 1;
+  eval([datatype,'_wsv_nr(dim+1) = wsv_nr;'])
+
+  wsv_type = arts_datatypes(dim+1,datatype)
+  varname  = sprintf('%s_%d', lower(wsv_type), wsv_nr  )
+  T{end+1} = file_or_data( varname, wsv_type, B.DATA{i}.X, tmpdir );
+  A{i}     = sprintf( 'BatchUpdate%s(%s,%s){}', B.DATA{i}.TYPE, ...
+                                                      B.DATA{i}.WSV, varname );
 end
 
+T        = add_agenda( T, 'batch_update_agenda', A );
 T        = add_agenda( T, 'batch_calc_agenda', B.CALC_AGENDA );
-T        = add_agenda( T, 'batch_psot_agenda', B.POST_AGENDA );
+T        = add_agenda( T, 'batch_post_agenda', B.POST_AGENDA );
 T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', B.N );
 T{end+1} = 'ybatchCalc{}';
+%
+switch upper( Q.Y_UNIT )
+  case '1'
+    T{end+1} = '# No conversion to K';
+  case 'RJ'
+    T{end+1} = 'MatrixToTbByRJ(ybatch,ybatch){}';
+  case 'PLANCK'
+    T{end+1} = 'MatrixToTbByPlanck(ybatch,ybatch){}';
+  otherwise
+    error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
+end
+%
+T{end+1} = add_savefile( 'ybatch', tmpdir );

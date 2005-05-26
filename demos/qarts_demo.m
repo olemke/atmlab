@@ -2,22 +2,30 @@
 %
 %    Gives an example on how Qarts can be used.
 %
-% FORMAT   [Q,f,y] = qarts_demo( ztan )
+% FORMAT   [Q,f,y,Y] = qarts_demo( [ ztan, do_batch ] )
 %        
-% OUT   Q      Qarts setting structure.
-%       f      Frequency grid
-%       y      Calculated spectrum
-% OPT   ztan   Tangent altitude.
+% OUT   Q          Qarts setting structure.
+%       f          Frequency grid
+%       y          Calculated spectrum
+%       Y          Batc spectra
+% OPT   ztan       Tangent altitude. Default is 30 km.
+%       do_batch   Flag to include batch calculations. Default is false.
+%                  Set to true, *Y* will include 3 spectra with random
+%                  shift in tangent altitude.
 
+% 2005-05-26   Batch part added by Patrick Eriksson
 % 2005-01-26   Sensor part added by Mattias Ekström.
 % 2004-??-??   Created by Patrick Erikssom.
 
 
-function [Q,f,y] = qarts_demo( ztan )
+function [Q,f,y,Y] = qarts_demo( ztan, do_batch )
 
-if nargin == 0
-  ztan = 30e3;
-end
+%= Set defualts
+%
+ztan_DEFAULT     = 30e3;
+do_batch_DEFAULT = false;
+%
+set_defaults;
 
 
 %= Make sure that AMI is in the search path. Needed to read/write ARTS1 files
@@ -96,17 +104,44 @@ H.ANTENNA_LOS = 0;
 H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
 Q.SENSOR_RESPONSE = H;
 
+%= Batch calculations
+%
+% This example creates 3 spectra with slightly different tangent altitudes
+% (selected in a random way).
+%
+if do_batch
+  Q.BATCH              = qarts_batch;
+  Q.BATCH.N            = 3;
+  Q.BATCH.DATA{1}.WSV  = 'sensor_los'; 
+  Q.BATCH.DATA{1}.TYPE = 'Matrix';
+  Q.BATCH.DATA{1}.X    = Q.SENSOR_LOS + 0.1*randn(5,1,1);
+end
 
-%= Calculate spectrum
+if nargout == 1
+  return
+end
+
+
+%= Calculate spectrum/spectra
 %
 f = Q.F_GRID;
 y = arts_y( Q );
+%
+if do_batch
+  Y = arts_batch( Q );
+end
 
 
 %= Plot
 %
 if ~nargout
-  plot( Q.F_GRID/1e9, y ) 
+  h1 = plot( Q.F_GRID/1e9, y, 'LineWidth', 2 );
+  if do_batch
+    hold on
+    h2=plot( Q.F_GRID/1e9, Y );
+    hold off
+    legend([h1;h2],'y','Y(1)','Y(2)','Y(3)')
+  end 
   xlabel( 'Frequency [GHz]' )
   ylabel( 'Brightness temperature [K]' )
   title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));

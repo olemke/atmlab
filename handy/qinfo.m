@@ -21,14 +21,17 @@
 % FORMAT   qinfo( qfun, field, fid )
 %        
 % IN    qfun   Pointer to function providing default structure.
-%       field  Field name, or 'all'.
-% OPT   fid    File identifier(s) for output. Or name on file to create.
+% OPT   field  Field name, or 'all'. Default is all.
+%       fid    File identifier(s) for output. Or name on file to create.
 %              Default is to only print on screen.
 
 % 2004-09-07   Created by Patrick Eriksson.
 
 function qinfo( qfun, field, fid )
 
+if nargin < 2
+  field = 'all';
+end
 if nargin < 3
   fid = 1;
 end

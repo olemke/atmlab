@@ -1,5 +1,27 @@
 2005-05-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-62
+
+	* Qarts batch part ready. 
+	
+	* demos/qarts_demo.m: Included batch calculations as optional part.
+
+	* arts/arts_batch.m: Modified to follow new batch solution.
+	(old version still inside file, below return).
+
+	I had forgotten that I had made a fully functional function for batch
+	calculations!!! However, I found the new solution better.
+
+	* arts/qarts2cfile.m: Finished batch part. 
+
+	* arts/qarts_batch.m: Finished information text. 
+
+	* handy/qinfo.m: Made 'all' default for field name.
+
+	* arts/arts_datatypes.m: Finished.
+
+2005-05-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-61
 
 	* Not finished work to include batch calculations in Qarts:
