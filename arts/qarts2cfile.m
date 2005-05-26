@@ -22,6 +22,7 @@
 %       save_sensor
 %       calc_rte
 %       save_y
+%       batch
 %       stop
 %
 %    Sorry, the Q fields needed for each part is not listed here.
@@ -204,7 +205,7 @@ case 'init_rte'
   
 case 'cloudbox'
   %
-  if isstruct(Q.CLOUDBOX)
+  if isstruct( Q.CLOUDBOX )
     T = cloudbox2cfile( Q, tmpdir );
   elseif isnan( Q.CLOUDBOX )  |  Q.CLOUDBOX == 0 
     T{1} = 'cloudboxOff{}';
@@ -270,6 +271,12 @@ case 'save_y'
         T{4} = 'VectorToTbByRJ(mc_error,mc_error){}';
     end
     T{5} = add_savefile( 'mc_error', tmpdir );
+  end
+
+case 'batch'
+  %
+  if isstruct( Q.BATCH )
+    T = batch2cfile( Q.BATCH, tmpdir );
   end
 
 case 'stop'
@@ -628,3 +635,41 @@ S = { S{:} T{:} };
 
 end
 
+
+
+%------------------------------------------------------------------------------
+% batch2cfile
+%------------------------------------------------------------------------------
+
+function T = batch2cfile( B, tmpdir )
+
+%= Check that all fields are present
+%
+qcheck( @qarts_cloudbox, Q.CLOUDBOX );
+
+%= Other data checks
+%
+if ~isstruct( B.DATA )
+  error('Q.BATCH.DATA must be a structure array.');
+end
+%
+rqre_scalar( 'Q.BATCH.N', B.N, 1 );
+
+T = [];
+
+for i = 1:length(B.DATA)
+  rqre_field( B.DATA{i}, type, 0 );
+  rqre_char( sprintf('Q.BATCH{%d}.type',i), B.DATA{i}.type );
+  rqre_field( B.DATA{i}, x, 0 );
+  
+  if size(B.DATA{i}.x,1) < B.N 
+    error(sprintf('Q.BATCH.DATA{%d}.x contains fewer cases than Q.BATCH.N',i));
+  end
+
+  
+end
+
+T        = add_agenda( T, 'batch_calc_agenda', B.CALC_AGENDA );
+T        = add_agenda( T, 'batch_psot_agenda', B.POST_AGENDA );
+T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', B.N );
+T{end+1} = 'ybatchCalc{}';

@@ -8,33 +8,33 @@
 %    This function is organised in such way that *qcheck* and *qinfo*
 %    can be used.
 %
-% FORMAT   [Q,I] = qarts_cloudbox
+% FORMAT   [C,I] = qarts_cloudbox
 %        
-% OUT   Q  Setting structure with default values for all recognised fields.
-%       I  Includes same fields as Q, where the content of each field
+% OUT   C  Setting structure with default values for all recognised fields.
+%       I  Includes same fields as C, where the content of each field
 %          is a description string (used by *qinfo*).
 
 % 2005-03-14   Created by Patrick Eriksson.
 
 
-function [Q,I] = qarts_cloudbox
+function [C,I] = qarts_cloudbox
  
 %-----------------------------------------------------------------------------
-Q.LIMITS = NaN;
+C.LIMITS = NaN;
 I.LIMITS = [ ...
 'Cloudbox limits. Given as a vector, with length 2-6 depending on the ',...
 'atmospheric dimensionality. The vertical extension is given in ',...
 'geometrical altitude.'
 ];
 %-----------------------------------------------------------------------------
-Q.METHOD = NaN;
+C.METHOD = NaN;
 I.METHOD = [ ...
 'Calculation method for scattering. Allowed options are:',...
 '#   ''DOIT'' : Discrete ordinate iterative method',...
 '#   ''MC''   : Backward Monte Carlo'
 ];
 %-----------------------------------------------------------------------------
-Q.METHOD_PRMTRS = NaN;
+C.METHOD_PRMTRS = NaN;
 I.METHOD_PRMTRS = [ ...
 'Parameters and data for scattering calculation method, given as a ',...
 'structure. The set of fields of this structure depend on choosen METHOD:',...
@@ -53,7 +53,7 @@ I.METHOD_PRMTRS = [ ...
 '#                     See *scat_za_interpSet* for possible options.'
 ];
 %-----------------------------------------------------------------------------
-Q.PND_FIELD = NaN;
+C.PND_FIELD = NaN;
 I.PND_FIELD = [ ...
 'Field of particle number densities. There are here two options:',...
 '#   1. The WSV *pnd_field* can be specified directly. Can then be given ',...
@@ -64,7 +64,7 @@ I.PND_FIELD = [ ...
 '#   The same option must be used for PND_FIELD and SCAT_DATA.'
 ];
 %-----------------------------------------------------------------------------
-Q.SCAT_DATA = NaN;
+C.SCAT_DATA = NaN;
 I.SCAT_DATA = [ ...
 'Single scattering data. There are here two options:',...
 '#   1. The WSV *scat_data_raw* can be specified directly. Can then be ',...
