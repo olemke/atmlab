@@ -1,3 +1,10 @@
+2005-05-30  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
+
+	* atmlab-0-2-63
+
+	* xml/xml[Read,Write]RetrievalQuantity.m: Added read/write functions
+	for RetrievalQuantity.
+
 2005-05-26  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-62
