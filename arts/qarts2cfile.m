@@ -113,10 +113,11 @@ switch parts{i}
 
 case 'start'
   %
-  T{1} = [ '# Control file created (at least partly) by Atmlab function ', ...
-           'qarts2cfile' ];
+  T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
+  T{4} = 'jacobianInit{}';
+  T{5} = 'gas_speciesInit{}';
 
 case 'stokes'
   %
@@ -129,33 +130,89 @@ case 'load_atm'
   rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
   rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
   %
-  T{1} = sprintf( 'gas_speciesSet{[%s]}', arts_tgs_cnvrt(Q.GAS_SPECIES) );
-  T{2} = sprintf( 'AtmosphereSet%dD{}', Q.ATMOSPHERE_DIM );
-  T{3} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, tmpdir );
+  T{end+1} = sprintf( 'AtmosphereSet%dD{}', Q.ATMOSPHERE_DIM );
+  T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, tmpdir );
   if Q.ATMOSPHERE_DIM >= 2
-    T{4} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, tmpdir );
-  else
-    T{4} = '# No latitude grid loaded';
+    T{end+1} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, tmpdir );
   end
   if Q.ATMOSPHERE_DIM == 3
-    T{5} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, tmpdir );
-  else
-    T{5} = '# No longitude grid loaded';
+    T{end+1} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, tmpdir );
+  end
+  %
+  %- Add gas species
+  for i = 1 : length(Q.GAS_SPECIES)
+
+    %- Jacobians or not?
+    do_jac = 0;
+    if Q.JACOBIAN_DO  &  ~isempty(Q.GAS_SPECIES_JAC)  &  ...
+                                                length(Q.GAS_SPECIES_JAC) >= i
+      rqre_field( Q.GAS_SPECIES_JAC{i}, 'DO' )
+      if Q.GAS_SPECIES_JAC{i}.DO
+        do_jac = 1;
+        rqre_field( Q.GAS_SPECIES_JAC{i}, 'METHOD' )
+        rqre_field( Q.GAS_SPECIES_JAC{i}, 'UNIT' )
+        rqre_field( Q.GAS_SPECIES_JAC{i}, 'P_GRID' )
+      end
+    end
+    
+    %- Write to cfile
+    if ~do_jac
+      T{end+1} = sprintf( 'gas_speciesAdd{[%s]}', ...
+                                          arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
+    else
+      if Q.ATMOSPHERE_DIM < 2
+        lat_grid = [];
+      else
+        rqre_field( Q.GAS_SPECIES_JAC{i}, 'LAT_GRID' )
+        lat_grid = Q.GAS_SPECIES_JAC{i}.LAT_GRID;
+      end
+      if Q.ATMOSPHERE_DIM < 3
+        lon_grid = [];
+      else
+        rqre_field( Q.GAS_SPECIES_JAC{i}, 'LON_GRID' )
+        lon_grid = Q.GAS_SPECIES_JAC{i}.LON_GRID;
+      end
+      T{end+1} = file_or_data( 'vector_1', 'Vector', ...
+          Q.GAS_SPECIES_JAC{i}.P_GRID, tmpdir, sprintf('gas%d_jac_p_grid',i) );
+      T{end+1} = file_or_data( 'vector_2', 'Vector', ...
+                           lat_grid, tmpdir, sprintf('gas%d_jac_lat_grid',i) );
+      T{end+1} = file_or_data( 'vector_3', 'Vector', ...
+                           lon_grid, tmpdir, sprintf('gas%d_jac_lon_grid',i) );
+
+      T{end+1} = 'jacobianAddGas(vector_1,vector_2,vector_3){';
+      T{end+1} = sprintf( '  species = %s', ...
+                                          arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
+      T{end+1} = sprintf( '  method  = "%s"', ...
+                                                 Q.GAS_SPECIES_JAC{i}.METHOD );
+      T{end+1} = sprintf( '  unit    = "%s"', ...
+                                                   Q.GAS_SPECIES_JAC{i}.UNIT );
+      if strcmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'analytical' )
+         T{end+1} = '  dx = 0.0';
+      elseif strncmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'perturbation' )
+        rqre_field( Q.GAS_SPECIES_JAC{i}, 'DX' )
+        T{end+1} = sprintf( '  dx       = "%s"', ...
+                                                     Q.GAS_SPECIES_JAC{i}.DX );
+      else
+        error( sprintf('Unknown selection for GAS_SPECIES_JAC.METHOD (%s)',...
+                                               Q.GAS_SPECIES_JAC{i}.METHOD ) );
+      end
+      T{end+1} = '}';
+    end
   end
   %
   if Q.USE_RAW_ATMOSPHERE
     rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
     rqre_bool( 'Qarts field RAW_ATM_EXPAND_1D', Q.RAW_ATM_EXPAND_1D );
-    T{6} = sprintf('AtmRawRead{"%s"}', Q.RAW_ATMOSPHERE );
+    T{end+1} = sprintf('AtmRawRead{"%s"}', Q.RAW_ATMOSPHERE );
     if Q.RAW_ATM_EXPAND_1D
-      T{7} = 'AtmFieldsCalcExpand1D{}';
+      T{end+1} = 'AtmFieldsCalcExpand1D{}';
     else
-      T{7} = 'AtmFieldsCalc{}';
+      T{end+1} = 'AtmFieldsCalc{}';
     end
   else
-    T{6} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, tmpdir );
-    T{7} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, tmpdir );
-    T{8} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, tmpdir);
+    T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, tmpdir );
+    T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, tmpdir );
+    T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, tmpdir);
   end
 
 case 'save_atm'
@@ -174,8 +231,6 @@ case 'load_abs'
 case 'calc_abs'
   T = add_agenda( T, 'scalar_gas_absorption_agenda', ...
                                      { 'abs_scalar_gasExtractFromLookup{}' } );
-  T = add_agenda( T, 'opt_prop_gas_agenda', ...
-              { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
   T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
 
 case 'init_rte'
@@ -207,11 +262,13 @@ case 'init_rte'
   T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   %
   T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
-  
+
 case 'cloudbox'
   %
   if isstruct( Q.CLOUDBOX )
     T = cloudbox2cfile( Q, tmpdir );
+    T = add_agenda( T, 'opt_prop_gas_agenda', ...
+              { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
   elseif isnan( Q.CLOUDBOX )  |  Q.CLOUDBOX == 0 
     T{1} = 'cloudboxOff{}';
   else
@@ -240,17 +297,23 @@ case 'save_sensor'
   
 case 'calc_rte'
   %
+  if Q.JACOBIAN_DO
+    T{end+1} = 'jacobianClose{}'; 
+  end
+  %
   %= Special solution for DOIT
   if isstruct(Q.CLOUDBOX)  &  ...
      strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
-    T{1} = 'CloudboxGetIncoming{}';
-    T{2} = 'DoitInit{}';
-    T{3} = 'ScatteringDoit{}';
-    T{4} = 'RteCalc{}';
+    T{end+1} = 'CloudboxGetIncoming{}';
+    T{end+1} = 'DoitInit{}';
+    T{end+1} = 'ScatteringDoit{}';
     %
-  %= Standard solution
-  else
-    T{1} = 'RteCalc{}';
+  end
+  %
+  T{end+1} = 'RteCalc{}';
+  %
+  if Q.JACOBIAN_DO
+    T{end+1} = 'jacobianCalc{}'; 
   end
 
 case 'save_y'
@@ -276,6 +339,19 @@ case 'save_y'
         T{4} = 'VectorToTbByRJ(mc_error,mc_error){}';
     end
     T{5} = add_savefile( 'mc_error', tmpdir );
+  end
+  %
+  if Q.JACOBIAN_DO
+  %
+    switch upper( Q.Y_UNIT )
+      case '1'
+        T{end+1} = '# No conversion to K';
+      case 'RJ'
+        T{end+1} = 'SparseToTbByRJ(jacobian,jacobian){}';
+      case 'PLANCK'
+        T{end+1} = 'SparseToTbByPlanck(jacobian,jacobian){}';
+    end
+    T{end+1} = add_savefile( 'jacobian', tmpdir );
   end
 
 case 'batch'
@@ -306,7 +382,7 @@ end
 % Smaller help functions
 %------------------------------------------------------------------------------
 
-function s = file_or_data( artsvar, datatype, qvalue, tmpdir )
+function s = file_or_data( artsvar, datatype, qvalue, tmpdir, nonDefFileId )
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else
@@ -314,7 +390,11 @@ function s = file_or_data( artsvar, datatype, qvalue, tmpdir )
       fprintf('\nNaN found for %s.\n\n', artsvar );
       error('See above');
     end
-    filename = fullfile( tmpdir, [artsvar,'.xml'] );
+    if nargin >= 5
+      filename = fullfile( tmpdir, [nonDefFileId,'.xml'] );
+    else
+      filename = fullfile( tmpdir, [artsvar,'.xml'] );
+    end
     xmlStore( filename, qvalue, datatype );
     s = add_readfile( artsvar, filename );
   end
@@ -462,8 +542,10 @@ end
 if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   %
   T{end+1} = 'DoitAngularGridsSet{';
-  T{end+1} = sprintf('   N_za_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{1} );
-  T{end+1} = sprintf('   N_aa_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{2} );
+  T{end+1} = sprintf('   N_za_grid = %d', ...
+                                  Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{1} );
+  T{end+1} = sprintf('   N_aa_grid = %d', ...
+                                  Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{2} );
   T{end+1} = sprintf('	 za_grid_opt_file = "%s"', ...
 		     Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{3} );
   T{end+1} = '}';
@@ -477,7 +559,8 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
 		    'doit_i_fieldSetClearsky{}', 'doit_i_fieldIterate{}',...
 		    'DoitCloudboxFieldPut{}' } );
   T = add_agenda( T, 'pha_mat_spt_agenda', { 'pha_mat_sptFromDataDOITOpt{}' });
-  T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalcLimb{}' } );
+  T = add_agenda( T, 'doit_scat_field_agenda', ...
+                                             { 'doit_scat_fieldCalcLimb{}' } );
   T = add_agenda( T, 'doit_rte_agenda', ...
 		  { sprintf('doit_i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
   T = add_agenda( T, 'doit_conv_test_agenda', ...

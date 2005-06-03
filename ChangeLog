@@ -1,3 +1,11 @@
+2005-06-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-64
+
+	* General changes to follow changes in ARTS-1.1.989.
+
+	* Qarts extended to handle jacobians, but work not totally finished.
+
 2005-05-30  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-63

@@ -17,13 +17,10 @@ xmlWriteTag (fid, 'RetrievalQuantity', []);
 
 xmlWriteString (fid, data.maintag, precision);
 xmlWriteString (fid, data.subtag, precision);
-xmlWriteString (fid, data.unit, precision);
+xmlWriteString (fid, data.mode, precision);
 xmlWriteIndex (fid, data.method, precision);
 xmlWriteNumeric (fid, data.perturbation, precision);
 xmlWriteArrayOf (fid, data.grids, 'Vector', precision);
-% Convert back to cell and 0-based indexing
-ji = mat2cell(data.jacobian_indices-1,[[] 1],[1 1]);
-xmlWriteArrayOf (fid, ji, 'Index', precision);
 
 xmlWriteCloseTag (fid, 'RetrievalQuantity');
 

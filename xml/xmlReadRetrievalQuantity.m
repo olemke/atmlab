@@ -21,10 +21,8 @@ function result = xmlReadRetrievalQuantity(fid, attrlist, itype, ftype, binary, 
 
   result.maintag          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.subtag           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.unit             = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.mode             = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.method           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.perturbation     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.grids            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  % Convert from cell to matrix and from 0-based to 1-based indexing
-  ji                      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.jacobian_indices = cell2mat(ji)+1;
+
