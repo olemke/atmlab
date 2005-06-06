@@ -22,6 +22,18 @@ cont_descriptionAppend{
     model         = "Rosenkranz"
     userparameters = [ ]
 }
+## CKD MT 1.00 self continuum original parameters:
+cont_descriptionAppend{
+    tagname        = "H2O-SelfContCKDMT100"
+    model          = "CKDMT100"
+    userparameters = [ ]
+}
+## CKD MT 1.00 H2O foreign continuum original parameters:
+cont_descriptionAppend{
+    tagname        = "H2O-ForeignContCKDMT100"
+    model          = "CKDMT100"
+    userparameters = [ ]
+}
 cont_descriptionAppend{
     tagname        = "O2-MPM85"
     model          = "MPM85"
@@ -54,5 +66,12 @@ cont_descriptionAppend{
 cont_descriptionAppend{
     tagname        = "N2-SelfContBorysow"
     model          = "BF86"
+    userparameters = [ ]
+}
+
+## far line wing continuum from CKD F77 program:
+cont_descriptionAppend{
+    tagname        = "CO2-CKDMT100"
+    model          = "CKDMT100"
     userparameters = [ ]
 }

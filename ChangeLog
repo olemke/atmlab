@@ -1,3 +1,36 @@
+2005-06-06  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-2-65
+
+	* arts/qarts2cfile.m: Now it is again possible to run DOIT using
+	atmlab.  
+
+	(load_abs) Added gas_abs_lookupInit{}.
+	  
+	Modified pnd_field part. Now particle_typeAddAll is used if only
+	one filename is given for pnd_field_file and scat_data_file,
+	unless one specifies Q.CLOUDBOX.DISTR_TYPE==mono, for monochromatic
+	size distribution. 
+
+	scat_field_agenda: Depending on the angular grid definitions, it
+	is decided whether doit_scat_fieldCalc or doit_scat_fieldCalcLimb
+	is used.
+	
+	doit_conv_test_agenda: convergence limit is set according to
+	stokes_dim.
+
+	Commented *gas_speciesInit*, because this method does not exist. 
+
+	Included *JacobianOff*. 
+	
+	* arts/qarts_cloudbox.m: Included C.DISTR_TYPE.
+	
+	* scattering/mie_scat_data.m: Modified. Now refractive index is 
+	input to the function.
+	
+        * arts1/arts1_absmodels.cfile: Included 
+	"H2O-SelfContCKDMT100", "H2O-ForeignContCKDMT100", "CO2-CKDMT100"
+	
 2005-06-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-64

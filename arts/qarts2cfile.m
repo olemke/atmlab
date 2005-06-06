@@ -117,7 +117,7 @@ case 'start'
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
   T{4} = 'jacobianInit{}';
-  T{5} = 'gas_speciesInit{}';
+%  T{5} = 'gas_speciesInit{}';
 
 case 'stokes'
   %
@@ -158,7 +158,8 @@ case 'load_atm'
     %- Write to cfile
     if ~do_jac
       T{end+1} = sprintf( 'gas_speciesAdd{[%s]}', ...
-                                          arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
+			  arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
+      T{end+1} = sprintf( 'jacobianOff{}' );	
     else
       if Q.ATMOSPHERE_DIM < 2
         lat_grid = [];
@@ -224,9 +225,10 @@ case 'save_atm'
 case 'load_abs'
   %
   T{1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, tmpdir );
-  T{2} = file_or_data( 'gas_abs_lookup', 'GasAbsLookup', Q.GAS_ABS_LOOKUP, ...
+  T{2} = 'gas_abs_lookupInit{}';
+  T{3} = file_or_data( 'gas_abs_lookup', 'GasAbsLookup', Q.GAS_ABS_LOOKUP, ...
                                                                       tmpdir );
-  T{3} = 'gas_abs_lookupAdapt{}';
+  T{4} = 'gas_abs_lookupAdapt{}';
 
 case 'calc_abs'
   T = add_agenda( T, 'scalar_gas_absorption_agenda', ...
@@ -514,27 +516,34 @@ if isnumeric(Q.CLOUDBOX.PND_FIELD)  |  ischar(Q.CLOUDBOX.PND_FIELD)
 elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
   %
   if ~iscellstr(Q.CLOUDBOX.SCAT_DATA)
-     error( ...
-    'The cloudbox fields PND_FIELD and SCAT_DATA must be of same data type.' );
+    error( ...
+	'The cloudbox fields PND_FIELD and SCAT_DATA must be of same data type.' );
   end
-  if length(Q.CLOUDBOX.PND_FIELD)  ~=  length(Q.CLOUDBOX.SCAT_DATA)
-    error( ['Length of Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must ',...
-                             'be equal when they are cell array of strings'] );
-  end
-  %
   T{end+1} = 'ParticleTypeInit{}';
-  for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
-    T{end+1} = 'ParticleTypeAdd{';
+  if (length(Q.CLOUDBOX.PND_FIELD) > 1 | Q.CLOUDBOX.DISTR_TYPE == ...
+      'mono' )
+    if (length(Q.CLOUDBOX.PND_FIELD)  ~=  length(Q.CLOUDBOX.SCAT_DATA))
+      error( ['Length of Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must ',...
+	      'be equal.'] );
+    end
+    for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
+      T{end+1} = 'ParticleTypeAdd{';
+      T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
+			 Q.CLOUDBOX.SCAT_DATA{1} );
+      T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
+			 Q.CLOUDBOX.PND_FIELD{1} );
+      T{end+1} = '}';
+    end
+  else
+    T{end+1} = 'ParticleTypeAddAll{';
     T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
-                                                     Q.CLOUDBOX.SCAT_DATA{i} );
+		       Q.CLOUDBOX.SCAT_DATA{i} );
     T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
-                                                     Q.CLOUDBOX.PND_FIELD{i} );
+		       Q.CLOUDBOX.PND_FIELD{i} );
     T{end+1} = '}';
-  end  
+    %
+  end
   T{end+1} = 'pnd_fieldCalc{}';
-  %
-else
-  error( 'Unknown data type found for Q.CLOUDBOX.PND_FIELD' );
 end
 
 %= DOIT / MC
@@ -554,17 +563,36 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   T{end+1} = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
 		     Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
   
-    T = add_agenda( T, 'doit_mono_agenda', ...
+  T = add_agenda( T, 'doit_mono_agenda', ...
 		  { 'DoitScatteringDataPrepare{}', ...
 		    'doit_i_fieldSetClearsky{}', 'doit_i_fieldIterate{}',...
 		    'DoitCloudboxFieldPut{}' } );
-  T = add_agenda( T, 'pha_mat_spt_agenda', { 'pha_mat_sptFromDataDOITOpt{}' });
-  T = add_agenda( T, 'doit_scat_field_agenda', ...
-                                             { 'doit_scat_fieldCalcLimb{}' } );
+  T = add_agenda( T, 'pha_mat_spt_agenda', { ...
+      'pha_mat_sptFromDataDOITOpt{}' });
+  
+  if(isempty(Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{3}))
+    T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalc{}' ...
+		   } );
+  else
+    T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalcLimb{}' ...
+		   } );
+  end
+  
   T = add_agenda( T, 'doit_rte_agenda', ...
 		  { sprintf('doit_i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
+  
+  if (Q.STOKES_DIM == 1) 
+    epsilon = '[0.1]';
+  elseif (Q.STOKES_DIM == 2)
+    epsilon = '[0.1, 0.01]'; 
+  elseif (Q.STOKES_DIM == 3)
+    epsilon = '[0.1, 0.01, 0.01]';
+  else
+    epsilon = '[0.1, 0.01, 0.01, 0.01]';
+  end
+    
   T = add_agenda( T, 'doit_conv_test_agenda', ...
-                  { 'doit_conv_flagAbsBT{epsilon=[0.1, 0.1, 0.1, 0.1]}' } );
+                  { ['doit_conv_flagAbsBT{epsilon=',epsilon,'}'] } );
   T = add_agenda( T, 'iy_cloudbox_agenda', { 'iyInterpCloudboxField{}' } );
 
 elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )

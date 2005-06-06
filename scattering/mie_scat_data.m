@@ -2,28 +2,25 @@
 %  MIE_SCAT_DATA Creates single scattering properties for spherical 
 %       particles
 % 
-%     The function uses the Mie code by C. Mätzler
+%  As input a matrix containing the refractive indices for the
+%  freqeuncies and temperatures given in f_grid and T_grid is
+%  required. 
+%
+%  The function uses the Mie code by C. Mätzler
 %     
-%   FORMAT  ssp = mie_scat_data(f_grid, T_grid, za_grid, aa_grid, r) 
+%   FORMAT  ssp = mie_scat_data(f_grid,  T_grid, rfr_index, za_grid, aa_grid, r) 
 %   
 %   OUT     ssp      single scattering data
-%   IN      f_grid   frequency grid [Hz], range 0.01e9 to 3000e9  
-%   IN      T_grid   temperature grid [K], range 20 to 273.15
+%   IN      f_grid   frequency grid [Hz] 
+%   IN      T_grid   temperature grid [K]
+%   IN      rfr_ind  refractive indices, matrix with dimension
+%                    [f_grid, T_grid] 
 %   IN      theta    scattering angle grid [°]
 %   IN      r        particle size [m]
 %
 %----------------------------------------------------------------------
 
-function ssp = mie_scat_data(f_grid, T_grid, theta, r) 
-
-if ( T_grid(1)<20 || T_grid(length(T_grid)) > 273.15)
-  error('Temperature grid is out of range (20 to 273.15 K)');
-end 
-
-if (f_grid(1)<0.01e9 || f_grid(length(f_grid))>3000e9)
-  error('Frequency grid is out of range (0.01e9 to 3000e9 Hz)');
-end
-  
+function ssp = mie_scat_data(f_grid, T_grid, rfr_ind, theta, r) 
 
 % Particle type is 'p20' for spherical particles
 ssp.ptype = 20;
@@ -45,9 +42,12 @@ ssp.aa_grid = [];
 
 c = constants('SPEED_OF_LIGHT');
 
+%R = xmlLoad('/rinax/storage/users/claudia/DOIT_broad_calc/data/refr_index_water.xml')
+
 for i = 1:length(f_grid)
   for j = 1:length(T_grid)
-    m = sqrt(epsice(f_grid(i)*1e-9,T_grid(j)));
+    % Refractive index
+    m = rfr_ind(i,j); 
     % Wavenumber
     k = 2*pi*f_grid(i)/c;
     % Size parameter
@@ -78,7 +78,7 @@ for i = 1:length(f_grid)
       ssp.pha_mat_data(i, j, l, 1, 1, 1, 6) = S33;
     
     end
-  
   end
 end
+
 
