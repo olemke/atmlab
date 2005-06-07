@@ -117,7 +117,7 @@ case 'start'
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
   T{4} = 'jacobianInit{}';
-%  T{5} = 'gas_speciesInit{}';
+  T{5} = 'gas_speciesInit{}';
 
 case 'stokes'
   %
@@ -159,7 +159,6 @@ case 'load_atm'
     if ~do_jac
       T{end+1} = sprintf( 'gas_speciesAdd{[%s]}', ...
 			  arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
-      T{end+1} = sprintf( 'jacobianOff{}' );	
     else
       if Q.ATMOSPHERE_DIM < 2
         lat_grid = [];
@@ -189,9 +188,9 @@ case 'load_atm'
                                                    Q.GAS_SPECIES_JAC{i}.UNIT );
       if strcmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'analytical' )
          T{end+1} = '  dx = 0.0';
-      elseif strncmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'perturbation' )
+      elseif strcmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'perturbation' )
         rqre_field( Q.GAS_SPECIES_JAC{i}, 'DX' )
-        T{end+1} = sprintf( '  dx       = "%s"', ...
+        T{end+1} = sprintf( '  dx      = %s', ...
                                                      Q.GAS_SPECIES_JAC{i}.DX );
       else
         error( sprintf('Unknown selection for GAS_SPECIES_JAC.METHOD (%s)',...
@@ -354,6 +353,7 @@ case 'save_y'
         T{end+1} = 'SparseToTbByPlanck(jacobian,jacobian){}';
     end
     T{end+1} = add_savefile( 'jacobian', tmpdir );
+    T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
   end
 
 case 'batch'

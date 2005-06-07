@@ -1,3 +1,15 @@
+2005-06-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-66
+
+	* demos/qarts_jacobian_demo.m: Added, to demonstrate/test jacobian
+	calculations.
+
+	* arts/qarts2cfile.m: Smaller changes. Added back gas_speciesInit,
+	it exists and is needed for jacobian calculations. Removed jacobianOff
+	(it is sufficient with jacobianInit). There were some smaller errors
+	for perturbation calculations.
+
 2005-06-06  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-2-65
