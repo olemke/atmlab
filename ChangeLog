@@ -5,6 +5,10 @@
 	* PyARTS interface to extract T-matrix single scattering properties 
 	done (old "boxcloud" interface removed).
 
+	PyARTS must be generally accessible to run this. Hint, put this in
+	.bashrc
+	export PYTHONPATH=/home/patrick/ARTS/PyARTS/lib/python:
+	
 	Please test and tell me if it works.
 	
 	* pyarts/pyarts_tmatrix.m: Created.
