@@ -1,3 +1,22 @@
+2005-06-08  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-67
+
+	* PyARTS interface to extract T-matrix single scattering properties 
+	done (old "boxcloud" interface removed).
+
+	Please test and tell me if it works.
+	
+	* pyarts/pyarts_tmatrix.m: Created.
+
+	* handy/vector2commalist.m: Created.
+
+	* pyarts/boxcloud.py.tmplt: Removed.
+
+	* pyarts/pyarts_scatdata2cfile.m: Removed.
+
+	* pyarts/pyarts_boxcloud_create.m: Removed. 
+
 2005-06-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-66

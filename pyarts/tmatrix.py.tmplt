@@ -1,0 +1,16 @@
+# This is the template file for pyarts_tmatrix.m
+
+from PyARTS import arts_scat
+
+scat_params={
+    'ptype':$Q.PTYPE$,
+    'equiv_radius':$Q.R$,
+    'aspect_ratio':$Q.ARATIO$,
+    'f_grid':[$Q.F$],
+    'T_grid':[$Q.T$],
+    'NP':$Q.SHAPE$,
+    'phase':'$Q.WPHASE$',
+    'za_grid':[$Q.ZA$],
+    'aa_grid':[$Q.AA$]}
+
+arts_scat.SingleScatteringData(scat_params).calc().file_gen('$Q.OUTFILE$')
