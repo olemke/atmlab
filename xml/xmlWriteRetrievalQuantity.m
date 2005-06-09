@@ -18,7 +18,7 @@ xmlWriteTag (fid, 'RetrievalQuantity', []);
 xmlWriteString (fid, data.maintag, precision);
 xmlWriteString (fid, data.subtag, precision);
 xmlWriteString (fid, data.mode, precision);
-xmlWriteIndex (fid, data.method, precision);
+xmlWriteIndex (fid, data.analytical, precision);
 xmlWriteNumeric (fid, data.perturbation, precision);
 xmlWriteArrayOf (fid, data.grids, 'Vector', precision);
 
