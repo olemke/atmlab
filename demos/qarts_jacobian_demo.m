@@ -67,18 +67,18 @@ Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
 %Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
 %Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
 Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [15e3:4e3:71e3] );;
+Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [1e3:4e3:91e3] );;
 if atmdim >= 2
-  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -8:8;  
+  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -10:2:10;  
 end
 %
 Q.GAS_SPECIES{2}{1}         = 'O3';
 Q.GAS_SPECIES_JAC{2}        = Q.GAS_SPECIES_JAC{1};
 %
-Q.GAS_SPECIES{3}{1}         = 'N2O';
-Q.GAS_SPECIES{4}{1}         = 'H2O';
-Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
-Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
+%Q.GAS_SPECIES{3}{1}         = 'N2O';
+%Q.GAS_SPECIES{4}{1}         = 'H2O';
+%Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
+%Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
@@ -97,7 +97,10 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 Q.Z_SURFACE      = 500;
 Q.SURFACE_PROP_AGENDA = ...
    { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-     'surfaceFlat{"water-liebe93"}' };
+     'NumericSet(numeric_1){0}','surfaceSingleEmissivity(numeric_1){}' };
+%Q.SURFACE_PROP_AGENDA = ...
+%   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
+%     'surfaceFlat{"water-liebe93"}' };
 %
 Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
 Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };

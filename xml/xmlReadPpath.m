@@ -34,4 +34,8 @@ function result = xmlReadPpath(fid, attrlist, itype, ftype, binary, fid2)
   result.background   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.tan_pos      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.geom_tan_pos = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.p            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.t            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.vmr          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.next_parts   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 

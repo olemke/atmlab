@@ -1,3 +1,14 @@
+2005-06-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-69
+
+	* demos/qarts_jacobian_demo.m: Some temporary changes, for testing
+	purposes.
+
+	* xml/xmlWritePpath.m: Included new fields.
+
+	* xml/xmlReadPpath.m: Included new fields.
+
 2005-06-09  Mattias Ekstrom  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-68

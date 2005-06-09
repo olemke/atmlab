@@ -30,6 +30,10 @@ xmlWriteMatrix (fid, data.los, precision);
 xmlWriteString (fid, data.background, precision);
 xmlWriteVector (fid, data.tan_pos, precision);
 xmlWriteVector (fid, data.geom_tan_pos, precision);
+xmlWriteVector (fid, data.p, precision);
+xmlWriteVector (fid, data.t, precision);
+xmlWriteMatrix (fid, data.vmr, precision);
+xmlWriteArrayOf (fid, data.next_parts, 'Index', precision);
 
 xmlWriteCloseTag (fid, 'Ppath');
 

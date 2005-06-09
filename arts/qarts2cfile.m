@@ -428,13 +428,16 @@ return
 
 
 function T = add_wsms( T, field, strarray )
-  if ~iscellstr( strarray )
-    error( ...
+  if iscellstr( strarray )
+    for j = 1 : length(strarray)
+      T{end+1} = sprintf( '%s', strarray{j} );
+    end
+  else
+    if ~isnan( strarray )
+      error( ...
         sprintf('The field %s must be specified as cell array of strings.', ...
                                                                      field ) );
-  end
-  for j = 1 : length(strarray)
-    T{end+1} = sprintf( '%s', strarray{j} );
+    end
   end
 return
 
