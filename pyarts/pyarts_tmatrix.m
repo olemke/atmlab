@@ -5,7 +5,7 @@
 %    properties for a single particle.
 %
 % FORMAT   pyarts_tmatrix(tmpfolder,outfile,shape,orient,r,aratio,f,t,...
-                                                       wphase,za_grid,aa_grid)
+%                                                       wphase,za_grid,aa_grid)
 %        
 % IN    tmpfolder   Temporary folder, where python will be launched.
 %       outfile     Name of output file (including extension). If not a

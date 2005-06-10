@@ -532,9 +532,9 @@ elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
     for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
       T{end+1} = 'ParticleTypeAdd{';
       T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
-			 Q.CLOUDBOX.SCAT_DATA{1} );
+			 Q.CLOUDBOX.SCAT_DATA{i} );
       T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
-			 Q.CLOUDBOX.PND_FIELD{1} );
+			 Q.CLOUDBOX.PND_FIELD{i} );
       T{end+1} = '}';
     end
   else
