@@ -16,7 +16,7 @@
 % 2005-06-06   Created by Patrick Erikssom.
 
 
-function [Q,f,y,J] = qarts_jacobian_demo( ztan, atmdim )
+function [Q,f,y,J,ji] = qarts_jacobian_demo( ztan, atmdim )
 
 %= Set defualts
 %
@@ -63,9 +63,9 @@ end
 %
 Q.GAS_SPECIES{1}{1}         = 'ClO';
 Q.GAS_SPECIES_JAC{1}.DO     = 1;
-Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
-%Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
-%Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
+%Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
+Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
+Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
 Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
 Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [1e3:4e3:91e3] );;
 if atmdim >= 2

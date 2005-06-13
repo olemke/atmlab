@@ -190,8 +190,7 @@ case 'load_atm'
          T{end+1} = '  dx = 0.0';
       elseif strcmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'perturbation' )
         rqre_field( Q.GAS_SPECIES_JAC{i}, 'DX' )
-        T{end+1} = sprintf( '  dx      = %s', ...
-                                                     Q.GAS_SPECIES_JAC{i}.DX );
+        T{end+1} = sprintf( '  dx      = %.5e', Q.GAS_SPECIES_JAC{i}.DX );
       else
         error( sprintf('Unknown selection for GAS_SPECIES_JAC.METHOD (%s)',...
                                                Q.GAS_SPECIES_JAC{i}.METHOD ) );
