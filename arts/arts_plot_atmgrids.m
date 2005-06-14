@@ -35,7 +35,7 @@ function [h,hs] = arts_plot_atmgrids(dim,lat_grid,lon_grid,z_field,...
 
 %= Check input and default values
 %
-min_nargin( 6, nargin );
+min_nargin( 5, nargin );
 %
 if ~isscalar( dim )  |  dim < 1  |  dim > 3
   error('The atmospheric dimensionality must be a scalar between 1 and 3.');

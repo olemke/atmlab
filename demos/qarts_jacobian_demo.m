@@ -21,7 +21,7 @@ function [Q,f,y,J,ji] = qarts_jacobian_demo( ztan, atmdim )
 %= Set defualts
 %
 ztan_DEFAULT     = 30e3;
-atmdim_DEFAULT = 1;
+atmdim_DEFAULT   = 2;
 %
 set_defaults;
 
@@ -63,11 +63,11 @@ end
 %
 Q.GAS_SPECIES{1}{1}         = 'ClO';
 Q.GAS_SPECIES_JAC{1}.DO     = 1;
-%Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
-Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
-Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
+Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
+%Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
+%Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
 Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [1e3:4e3:91e3] );;
+Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [25e3:4e3:71e3] );;
 if atmdim >= 2
   Q.GAS_SPECIES_JAC{1}.LAT_GRID = -10:2:10;  
 end
@@ -95,17 +95,17 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 %= RTE 
 %
 Q.Z_SURFACE      = 500;
-Q.SURFACE_PROP_AGENDA = ...
-   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-     'NumericSet(numeric_1){0}','surfaceSingleEmissivity(numeric_1){}' };
 %Q.SURFACE_PROP_AGENDA = ...
 %   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-%     'surfaceFlat{"water-liebe93"}' };
+%     'NumericSet(numeric_1){0.5}','surfaceSingleEmissivity(numeric_1){}' };
+Q.SURFACE_PROP_AGENDA = ...
+   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
+     'surfaceFlat{"water-liebe93"}' };
 %
 Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
 Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
 %
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{5e3}' };
+Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{50e3}' };
 Q.Y_UNIT            = 'RJ';
 %
 zplat        = 600e3;
@@ -158,5 +158,6 @@ if ~nargout
     title( 'Weighting function for frequency at ozone line centre' );
   end
   ylabel( 'Altitude [km]' )
+  colorbar
 end
 

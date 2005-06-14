@@ -366,7 +366,6 @@ case 'batch'
 case 'stop'
   %
   T{1} = '} # Main';
-  T{2} = ' ';
 
 otherwise
   error(sprintf('Unknown action (%s) was requested.',parts{i}));
