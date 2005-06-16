@@ -143,14 +143,14 @@ nplots = length( widths );
 if flush == 'c'
   hspacing = (1 - sum(widths) ) / nplots;
 else
-  hspacing = (0.95 - sum(widths) ) / nplots;
+  hspacing = (0.9 - sum(widths) ) / nplots;
 end
 
 
 %=== Place the axes
 %
 if flush == 'l'
-  vbase = 0.05;
+  vbase = 0.08;
 elseif flush == 'c'
   vbase = hspacing/2;
 else

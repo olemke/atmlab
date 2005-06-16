@@ -386,7 +386,7 @@ function s = file_or_data( artsvar, datatype, qvalue, tmpdir, nonDefFileId )
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else
-    if ~isstruct( qvalue )  &  isnan( qvalue )
+    if isnumeric( qvalue ) & isnan( qvalue )
       fprintf('\nNaN found for %s.\n\n', artsvar );
       error('See above');
     end
@@ -502,9 +502,9 @@ end
 
 %= Particle field and single scattering data
 %
-if isnumeric(Q.CLOUDBOX.PND_FIELD)  |  ischar(Q.CLOUDBOX.PND_FIELD)
+if isnumeric(Q.CLOUDBOX.PND_FIELD)  |  ischar(Q.CLOUDBOX.PND_FIELD) 
   %
-  if ~( isnumeric(Q.CLOUDBOX.SCAT_DATA)  |  ischar(Q.CLOUDBOX.SCAT_DATA) )
+  if ~( iscell(Q.CLOUDBOX.SCAT_DATA)  |  ischar(Q.CLOUDBOX.SCAT_DATA) )
      error( ['Not allowed combination of Q.CLOUDBOX.PND_FIELD and ',...
                                           'Q.CLOUDBOX.SCAT_DATA data types'] );
   end
@@ -541,7 +541,7 @@ elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
 		       Q.CLOUDBOX.SCAT_DATA{i} );
     T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
 		       Q.CLOUDBOX.PND_FIELD{i} );
-    T{end+1} = '}';
+    T{end+1} = '}';   
     %
   end
   T{end+1} = 'pnd_fieldCalc{}';
@@ -552,12 +552,9 @@ end
 if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   %
   T{end+1} = 'DoitAngularGridsSet{';
-  T{end+1} = sprintf('   N_za_grid = %d', ...
-                                  Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{1} );
-  T{end+1} = sprintf('   N_aa_grid = %d', ...
-                                  Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{2} );
-  T{end+1} = sprintf('	 za_grid_opt_file = "%s"', ...
-		     Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{3} );
+  T{end+1} = sprintf('   N_za_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{1} );
+  T{end+1} = sprintf('   N_aa_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{2} );
+  T{end+1} = sprintf('   za_grid_opt_file = "%s"', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{3} );
   T{end+1} = '}';
   
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP' );

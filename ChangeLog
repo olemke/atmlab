@@ -1,3 +1,11 @@
+2005-06-16  Bengt Rydberg  <benryd@etek.chalmers.se>
+
+	* atmlab-0-2-74
+
+	* atmscenarios/gauss_laguerre.m: Created.Returns abscissas and 
+	weights for Laguerre Gauss quadrature
+
+
 2005-06-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-73
