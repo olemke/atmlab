@@ -18,6 +18,7 @@
 %   IN      theta    scattering angle grid [°]
 %   IN      r        particle size [m]
 %
+%    Created by Claudia Emde.
 %----------------------------------------------------------------------
 
 function ssp = mie_scat_data(f_grid, T_grid, rfr_ind, theta, r) 

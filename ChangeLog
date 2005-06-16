@@ -1,3 +1,25 @@
+2005-06-16  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+
+	* atmlab-0-2-77
+	
+	* demos/qarts_doit_demo.m: Added. The demo shows a simple DOIT 
+	calculation including the generation of scattering data using the 
+	Mie code and the genearation of a very simple cloud layer. 
+
+	* demos/data/doit_za_grid.xml: Added.
+
+	* scattering/box_pnd_mono_size_1d.m: Creates a simple cloud layer
+	including a monochromatic ice particle distribution. 
+
+	* arts/qarts_cloudbox.m: Modifield DOIT angular grids. Now there
+	are three separate variables N_ZA_GRID, N_AA_GRID,
+	ZA_GRID_OPT_FILE. Modified use of DISTR_TYPE. 
+	If you now like to read directly pnd_field as a Tensor4 and
+	scat_field_raw this variable must be set to 'precalc'. Note that
+	the data is in this case not checked inside ARTS. 
+
+	* arts/qarts2cfile.m: Adapted to changes above. 
+
 2005-06-16  Bengt Rydberg  <benryd@etek.chalmers.se>
 
 	* atmlab-0-2-76

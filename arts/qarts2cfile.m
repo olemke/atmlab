@@ -502,27 +502,29 @@ end
 
 %= Particle field and single scattering data
 %
-if isnumeric(Q.CLOUDBOX.PND_FIELD)  |  ischar(Q.CLOUDBOX.PND_FIELD) 
-  %
-  if ~( iscell(Q.CLOUDBOX.SCAT_DATA)  |  ischar(Q.CLOUDBOX.SCAT_DATA) )
-     error( ['Not allowed combination of Q.CLOUDBOX.PND_FIELD and ',...
-                                          'Q.CLOUDBOX.SCAT_DATA data types'] );
+% Pre-calculated raw data: scat_data_raw, pnd_field_raw
+if strcmp(Q.CLOUDBOX.DISTR_TYPE, 'precalc')
+  if ~(isnumeric(Q.CLOUDBOX.PND_FIELD) | ischar(Q.CLOUDBOX.PND_FIELD)) ...
+	&& ...
+	~( isnumeric(Q.CLOUDBOX.SCAT_DATA) | ischar(Q.CLOUDBOX.SCAT_DATA) )
+    error( ['Not allowed combination of Q.CLOUDBOX.PND_FIELD and ',...
+	    'Q.CLOUDBOX.SCAT_DATA data types'] );
   end
   %    
   T{end+1} = file_or_data( 'pnd_field', 'Tensor4', Q.CLOUDBOX.PND_FIELD, ...
-                                                                      tmpdir );
+			   tmpdir );
   T{end+1} = file_or_data( 'scat_data_raw', 'ArrayOfSingleScatteringData', ...
-                                                Q.CLOUDBOX.SCAT_DATA, tmpdir );
-
-elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
-  %
-  if ~iscellstr(Q.CLOUDBOX.SCAT_DATA)
+			   Q.CLOUDBOX.SCAT_DATA, tmpdir );
+  
+% Read scattering and particle number density data using *ParticleTypeAdd(All)*  
+else
+  if ~(iscellstr(Q.CLOUDBOX.PND_FIELD) && iscellstr(Q.CLOUDBOX.SCAT_DATA)) 
     error( ...
 	'The cloudbox fields PND_FIELD and SCAT_DATA must be of same data type.' );
   end
   T{end+1} = 'ParticleTypeInit{}';
-  if (length(Q.CLOUDBOX.PND_FIELD) > 1 | Q.CLOUDBOX.DISTR_TYPE == ...
-      'mono' )
+  if (length(Q.CLOUDBOX.PND_FIELD) > 1 | strcmp(Q.CLOUDBOX.DISTR_TYPE, ...
+						'mono'))
     if (length(Q.CLOUDBOX.PND_FIELD)  ~=  length(Q.CLOUDBOX.SCAT_DATA))
       error( ['Length of Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must ',...
 	      'be equal.'] );
@@ -547,17 +549,40 @@ elseif iscellstr(Q.CLOUDBOX.PND_FIELD)
   T{end+1} = 'pnd_fieldCalc{}';
 end
 
+
+
 %= DOIT / MC
 %
 if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   %
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'N_ZA_GRID', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'N_AA_GRID', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'ZA_GRID_OPT_FILE', 0 );
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP', 0 );
+ 
+  if (~isinteger(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID) | ...
+      ~isinteger(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID))
+    error(['The parameter N_ZA_GRID and N_AA_GRID must be given as',...
+	   ' integer values.']);
+  end
+  
+ if (~ischar(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE))
+   error(['The field ZA_GRID_OPT_FILE is not a string. It must be' ...
+	  ' empty (""), if equidistant grids should be used.']);
+ end
+ 
+ if (~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'linear') | ...
+     strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'polynomial')))
+   error(['Unknown interpolation method. ',... 
+   'SCAT_ZA_INTERP can be linear or polynomial.']);
+ end
+     
   T{end+1} = 'DoitAngularGridsSet{';
-  T{end+1} = sprintf('   N_za_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{1} );
-  T{end+1} = sprintf('   N_aa_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{2} );
-  T{end+1} = sprintf('   za_grid_opt_file = "%s"', Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{3} );
+  T{end+1} = sprintf('   N_za_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID );
+  T{end+1} = sprintf('   N_aa_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID );
+  T{end+1} = sprintf('   za_grid_opt_file = "%s"', Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
   T{end+1} = '}';
   
-  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP' );
   T{end+1} = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
 		     Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
   
@@ -568,7 +593,7 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   T = add_agenda( T, 'pha_mat_spt_agenda', { ...
       'pha_mat_sptFromDataDOITOpt{}' });
   
-  if(isempty(Q.CLOUDBOX.METHOD_PRMTRS.DOIT_ANG_GRIDS{3}))
+  if (isempty(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE))
     T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalc{}' ...
 		   } );
   else
