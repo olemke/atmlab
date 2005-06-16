@@ -53,9 +53,9 @@ if isnan( arts_xmldata_path )
 end
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
-Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
+Q.P_GRID              = z2p_simple( 0:1e3:100e3 );
 if atmdim >= 2
-  Q.LAT_GRID          = -10:10:10;  
+  Q.LAT_GRID          = -10:10;  
 end
 
 
@@ -67,18 +67,18 @@ Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
 %Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
 %Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
 Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [25e3:4e3:71e3] );;
+Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [21e3:2e3:71e3] );;
 if atmdim >= 2
-  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -10:2:10;  
+  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -5:5;  
 end
 %
 Q.GAS_SPECIES{2}{1}         = 'O3';
 Q.GAS_SPECIES_JAC{2}        = Q.GAS_SPECIES_JAC{1};
 %
-%Q.GAS_SPECIES{3}{1}         = 'N2O';
-%Q.GAS_SPECIES{4}{1}         = 'H2O';
-%Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
-%Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
+Q.GAS_SPECIES{3}{1}         = 'N2O';
+Q.GAS_SPECIES{4}{1}         = 'H2O';
+Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
+Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
@@ -105,7 +105,7 @@ Q.SURFACE_PROP_AGENDA = ...
 Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
 Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
 %
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{50e3}' };
+Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{10e3}' };
 Q.Y_UNIT            = 'RJ';
 %
 zplat        = 600e3;
@@ -150,7 +150,6 @@ if ~nargout
     xlabel( 'J [K/1]' )
   elseif atmdim == 2
     lat = Q.GAS_SPECIES_JAC{2}.LAT_GRID;
-    ind = ji{2}{1}:ji{2}{2};
     contourf(lat,z/1e3,reshape(full(J(i,ind)),length(z),length(lat)));
     shading flat
     xlabel( 'Latitude [deg]' )

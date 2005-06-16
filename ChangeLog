@@ -1,3 +1,17 @@
+2005-06-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-73
+
+	* tests/: Created this folder to hold various tests. Primarily
+	intended for more demanding tests, that can not be afford to run at
+	each commit. 
+
+	* tests/test_arts_Olevels.m: Started.
+
+	* tests/test_arts_jacobians.m: Started.
+
+	* arts/arts_abcde.m: Now cvs-added also.
+
 2005-06-14  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-72
