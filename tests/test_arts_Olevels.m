@@ -1,8 +1,41 @@
-function Y = test_arts_Olevels
+% TEST_ARTS_OLEVELS
+%
+%    Runs a set of tests to check consistency between different compiler
+%    options.
+%
+%    Must be launced with PWD = /arts, the top folder of ARTS.
+%
+%    Differences are plotted.
+%
+%    No options here, all changes must be done in code.
+%
+% FORMAT   [Y,f] = test_arts_jacobians
+%
+% OUT      Y   All calculated spectra
+%          f   Corresponding frequency grid
+
+% 2005-06-16   Created by Patrick Eriksson
 
 
+function [Y,f] = test_arts_Olevels
+
+
+%= Compiler options are defined here
+%
+% olevels : Optimisation level
+% float   : 0 means double, 1 means float
+%
 olevels = [0 2 4 0 2 4];
 float   = [0 0 0 1 1 1];
+
+
+%= Check that we are in correct folder
+%
+if system('grep arts-1-1-1000 ChangeLog')
+  disp(' ');
+  error( 'The function must be started in ARTS top folder (/arts)' );
+end
+
 
 
 %= Make quite
@@ -48,8 +81,11 @@ for i = 1 : length( olevels ) - 1
 end
 
 
+f = Q.F_GRID;
+
+
 clf
-plot(Q.F_GRID/1e9,Y-repmat(y0,1,length(olevels)))
+plot(f/1e9,Y-repmat(y0,1,length(olevels)))
 xlabel('Frequency [GHz]');
 ylabel('Tb diff [K]');
 legend(L);

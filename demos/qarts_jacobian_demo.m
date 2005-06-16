@@ -1,19 +1,18 @@
-% QARTS_DEMO   A demonstration of Qarts
+% QARTS_JACOBIAN_DEMO   A demonstration of Jacobian calculations with Qarts
 %
-%    Gives an example on how Qarts can be used.
+%    See code for how jacobians are defined
 %
-% FORMAT   [Q,f,y,Y] = qarts_demo( [ ztan, do_batch ] )
+% FORMAT   [Q,f,y,J,ji] = qarts_jacobian_demo( [ ztan, atmdim ] )
 %        
 % OUT   Q          Qarts setting structure.
 %       f          Frequency grid
 %       y          Calculated spectrum
-%       Y          Batc spectra
+%       J          Jacobian
+%       ji         Index for each retrieval quantity.
 % OPT   ztan       Tangent altitude. Default is 30 km.
-%       do_batch   Flag to include batch calculations. Default is false.
-%                  Set to true, *Y* will include 3 spectra with random
-%                  shift in tangent altitude.
+%       atmdim     Atmospheric dimensionality. Default is 2.
 
-% 2005-06-06   Created by Patrick Erikssom.
+% 2005-06-16   Created by Patrick Eriksson.
 
 
 function [Q,f,y,J,ji] = qarts_jacobian_demo( ztan, atmdim )

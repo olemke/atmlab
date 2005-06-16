@@ -1,7 +1,22 @@
+% TEST_ARTS_JACOBIANS
+%
+%    Runs a set of tests to check the implementation of Jacobians.
+%
+%    No options here, all changes must be done in code.
+%
+% FORMAT   test_arts_jacobians
+
+% 2005-06-16   Created by Patrick Eriksson
+
+
 function test_arts_jacobians
 
 
-do_tests = [ 1:3 ];
+%= Select cases to run
+%
+% Case 1 is always included
+%
+do_tests = [ 1:4 ];
 
 
 %= Make quite
@@ -20,21 +35,19 @@ addpath_ami;
 Q = set_q;
 
 
-Q.SENSOR_RESPONSE = NaN;                            %!!!!!!!!
-
 
 %= Test 1: Just spectrum 
 %
 Q.JACOBIAN_DO = 0;
 %
-if any( do_tests == 1 )
+if 1
   %
   y0 = arts_y( Q );
   %
   t = [  y0(1)   min(y0)   max(y0)   y0(end)];
   e = [12.6083   11.7278   33.0063   14.7772];
   %
-  if max(abs( t - e )) > 1                       %!!!!!!!!
+  if max(abs( t - e )) > 1e-3
     disp( ' ' )
     disp( 'Expected values:' )
     disp( e )
@@ -55,7 +68,7 @@ end
 %
 Q.JACOBIAN_DO               = 1;
 Q.GAS_SPECIES_JAC{1}.DO     = 1;
-Q.GAS_SPECIES_JAC{1}.DX     = 0.1e-6;
+Q.GAS_SPECIES_JAC{1}.DX     = 0.01e-6;
 %
 if any( do_tests == 2 )
   %
@@ -72,13 +85,7 @@ if any( do_tests == 2 )
     error( 'Spectrum vector changed when activating analytical gas jacobians');
   end
   %
-  d = max(max(abs( (Jp-Ja)./Ja ))); 
-  if  d > 0.1
-    sprintf( 'Rel. difference between anal. and pert. jacobians : %.2f\n', d );
-    error( 'Inconsistency found for gas jacobians, relative unit' );
-  else
-    disp( 'Gas jacobians, relative unit : OK' );
-  end
+  cmpr_J( Ja, Jp, 'Gas jacobians, relative unit' );
   %
 end
 
@@ -105,13 +112,28 @@ if any( do_tests == 3 )
   %
   [y,dy,Jp] = arts_y( Q );
   %
-  d = max(max(abs( (Jp-Ja)./Ja ))); 
-  if  d > 0.1
-    sprintf( 'Rel. difference between anal. and pert. jacobians : %.2f\n', d );
-    error( 'Inconsistency found for gas jacobians, VMR unit' );
-  else
-    disp( 'Gas jacobians, VMR unit : OK' );
-  end
+  cmpr_J( Ja, Jp, 'Gas jacobians, VMR unit' );
+  %
+end
+
+
+
+%= Test 4: Gas jacobians, ND unit
+%
+% Compare analytical and perturbation calculations
+%
+Q.GAS_SPECIES_JAC{1}.UNIT   = 'nd';
+Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
+%
+if any( do_tests == 4 )
+  %
+  [y,dy,Ja] = arts_y( Q );
+  %
+  Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
+  %
+  [y,dy,Jp] = arts_y( Q );
+  %
+  cmpr_J( Ja, Jp, 'Gas jacobians, ND unit' );
   %
 end
 
@@ -127,6 +149,22 @@ atmlab( 'FMODEL_VERBOSITY', artsverb );
 return
 
 
+
+
+%----------------------------------------------------------------------------
+
+function   cmpr_J( Ja, Jp, type );
+  %
+  d = full( max(max(abs( Jp-Ja ))) / max(max(abs(Ja))) ); 
+  fprintf( 'Rel. difference between anal. and pert. jacobians : %.3f\n', d );
+  if  d > 0.02
+    keyboard
+    error( sprintf('Inconsistency found for %s', type ) );
+  else
+    fprintf( '%s : OK\n', type );
+  end
+  %
+return
 
 
 %----------------------------------------------------------------------------
@@ -168,9 +206,9 @@ Q.GAS_SPECIES_JAC{1}.DO     = 0;
 Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
 Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
 Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [21e3:4e3:71e3] );
+Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [20e3:4e3:100e3] );
 if Q.ATMOSPHERE_DIM >= 2
-  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -9:3:9;  
+  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -10:2:10;  
 end
 %
 Q.GAS_SPECIES{2}{1}         = 'ClO';

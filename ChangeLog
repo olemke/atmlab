@@ -1,3 +1,18 @@
+2005-06-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-75
+
+	* demos/qarts_jacobian_demo.m: Fixed proper head
+
+	* tests/test_arts_jacobians.m: A first version ready. OK results
+	for rel. and VMR gas jacobians. ND option fails in ARTS for 
+	perturbation calculations.
+
+	* tests/test_arts_Olevels.m: A first version ready. Excellent results.
+	Though not including scattering calculations.
+	Totally negliable differences between optimisation levels (1e-13K).
+	Difference between fload and double is for this case < 3mK.
+
 2005-06-16  Bengt Rydberg  <benryd@etek.chalmers.se>
 
 	* atmlab-0-2-74
