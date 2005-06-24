@@ -1,3 +1,27 @@
+2005-06-24  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-78
+
+	* arts/qarts.m: Wrote info text for GAS_SPECIES_JAC.
+
+	* atmscenarios/gauss_laguerre_apply.m: Created. Header text is 
+	missing.
+
+	* atmscenarios/gauss_laguerre.m: Added optional input argument xnorm. 
+
+	* handy/vector2commalist.m: Had to change default for fstring, to
+	work with Matlab6.
+
+	* arts/q_gas_species.m: Created.
+
+	* demos/qarts_jacobian_demo.m: Now no color bar for 1D. 
+
+	* atmscenarios/covmat_from_cfun.m: Check of size of Std was wrong. 
+
+	* arts/arts_y.m: Added jq as output argument.
+
+	* demos/qarts_jacobian_demo.m: Adopted to change in arts_y.
+
 2005-06-16  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 
 	* atmlab-0-2-77

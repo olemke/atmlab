@@ -298,7 +298,9 @@ case 'save_sensor'
 case 'calc_rte'
   %
   if Q.JACOBIAN_DO
+    %
     T{end+1} = 'jacobianClose{}'; 
+    %
   end
   %
   %= Special solution for DOIT
@@ -352,6 +354,7 @@ case 'save_y'
         T{end+1} = 'SparseToTbByPlanck(jacobian,jacobian){}';
     end
     T{end+1} = add_savefile( 'jacobian', tmpdir );
+    T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
     T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
   end
 

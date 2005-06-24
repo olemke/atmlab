@@ -4,17 +4,35 @@
 %     Laguerre Gauss quadrature to represent scattering properties
 %     of particle polydispersions. 
 %
-% FORMAT   [x_i,w_i] = gauss_laguerre(alpha,N)     
+%     To apply the integration weights use *gauss_laguerre_apply*.
+%
+%     An example on usage (to generate a PSD for ice particles):
+%        xnorm = 50e-6;
+%        [x_i,w_i] = gauss_laguerre(0,10,xnorm);
+%        y = ice_psd_gamma( ... );
+%        y = gauss_laguerre_apply(y,x_i,w_i,xnorm);
+%
+% FORMAT   [x_i,w_i] = gauss_laguerre(alpha,N[,xnorm])     
 %
 % OUT      x_i is a vector with abscissas
 %          w_i is a vector with weights
 % 
 % IN       alpha  exponent of weighting function x^alpha*exp(-x)
 %          N      number of points
+% OPT      xnorm  Normalisation value for length scale. Original point of 1
+%                 will be mapped to this value. Default is 1.
 
 % History: 2005-05-13  Created by Bengt Rydberg
 
-function [x_i,w_i]=gauss_laguerre(alpha,N);
+function [x_i,w_i]=gauss_laguerre(alpha,N,xnorm);
+
+
+%= Set defaults
+%
+xnorm_DEFAULT = 1;
+%
+set_defaults;
+
 
 L_size=100000;
 x=linspace(0,50,L_size)';
@@ -46,4 +64,6 @@ end
 w_i=gamma(N+alpha+1)*x_i./n_fak/(N+1)^2./L_i_a.^2;
 
 
+
+x_i = x_i * xnorm;
 

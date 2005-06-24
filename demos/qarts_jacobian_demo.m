@@ -66,7 +66,7 @@ Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
 %Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
 %Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
 Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [21e3:2e3:71e3] );;
+Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [11e3:2e3:71e3] );
 if atmdim >= 2
   Q.GAS_SPECIES_JAC{1}.LAT_GRID = -5:5;  
 end
@@ -123,7 +123,7 @@ end
 %= Calculate spectrum/spectra
 %
 f        = Q.F_GRID;
-[y,dy,J,ji] = arts_y( Q );
+[y,dy,J,jq,ji] = arts_y( Q );
 
 
 %= Plot
@@ -154,8 +154,8 @@ if ~nargout
     xlabel( 'Latitude [deg]' )
     ylabel( 'Altitude [km]' )
     title( 'Weighting function for frequency at ozone line centre' );
+    colorbar
   end
   ylabel( 'Altitude [km]' )
-  colorbar
 end
 

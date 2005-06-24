@@ -3,11 +3,12 @@
 %    Qarts fields for atmosphere, absorption, sensor and RT must be
 %    specified.
 %
-% FORMAT   [y,dy,J,ji] = arts_y( Q )
+% FORMAT   [y,dy,J,jq,ji] = arts_y( Q )
 %        
 % OUT   y   Spectrum vector.
 %       dy  Estimate of calculation accuracy.
 %       J   Jacobian. NaN returned if Q.JACOBIAN_DO=0.
+%       jq  Jacobian quantities. NaN returned if Q.JACOBIAN_DO=0.
 %       ji  Jacobian indices. NaN returned if Q.JACOBIAN_DO=0.
 %           Indices are 1-based (that is, ARTS indices + 1);
 % IN    Q   Qarts structure.
@@ -15,7 +16,7 @@
 % 2004-09-17   Created by Patrick Eriksson.
 
 
-function [y,dy,J,ji] = arts_y( Q )
+function [y,dy,J,jq,ji] = arts_y( Q )
 
 tmpfolder   = create_tmpfolder;
 
@@ -45,6 +46,7 @@ y = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
 
 if Q.JACOBIAN_DO
   J = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
+  jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
   ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
   for i = 1 : length(ji)
     for j = 1 : length(ji{i})
@@ -53,6 +55,7 @@ if Q.JACOBIAN_DO
   end
 else
   J  = NaN;
+  jq = NaN;
   ji = NaN;
 end
 

@@ -20,7 +20,7 @@
 
 function s = vector2commalist(x,fstring)
 
-fstring_DEFAULT = '%g';
+fstring_DEFAULT = '%1g';
 %
 set_defaults;
 

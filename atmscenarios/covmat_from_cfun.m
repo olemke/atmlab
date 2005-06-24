@@ -43,7 +43,7 @@ set_defaults;
 %
 min_nargin( 3, nargin );
 %
-if ~( isempty( Std )  &  size(Std,2) ~= 2 )
+if ~( isempty( Std )  |  size(Std,2) == 2 )
   error( 'Argument *Std* must be a matrix with 2 columns, or be empty.' );
 end
 %
