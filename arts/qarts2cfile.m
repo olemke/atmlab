@@ -562,28 +562,34 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'N_AA_GRID', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'ZA_GRID_OPT_FILE', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP', 0 );
- 
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'EPSILON', 0 );
+  
   if (~isinteger(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID) | ...
       ~isinteger(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID))
     error(['The parameter N_ZA_GRID and N_AA_GRID must be given as',...
 	   ' integer values.']);
   end
   
- if (~ischar(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE))
-   error(['The field ZA_GRID_OPT_FILE is not a string. It must be' ...
-	  ' empty (""), if equidistant grids should be used.']);
- end
+  if (~ischar(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE))
+    error(['The field ZA_GRID_OPT_FILE is not a string. It must be' ...
+	                     ' empty (""), if equidistant grids should be used.']);
+  end
  
- if (~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'linear') | ...
+  if (~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'linear') | ...
      strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'polynomial')))
-   error(['Unknown interpolation method. ',... 
-   'SCAT_ZA_INTERP can be linear or polynomial.']);
- end
-     
+    error(['Unknown interpolation method. ',... 
+                              'SCAT_ZA_INTERP can be linear or polynomial.']);
+  end
+  
+  if length(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON) < Q.STOKES_DIM
+   error('Length of Q.CLOUDBOX.METHOD_PRMTRS.EPSILON must be >= Q.STOKES_DIM');
+  end
+   
   T{end+1} = 'DoitAngularGridsSet{';
   T{end+1} = sprintf('   N_za_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID );
   T{end+1} = sprintf('   N_aa_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID );
-  T{end+1} = sprintf('   za_grid_opt_file = "%s"', Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
+  T{end+1} = sprintf('   za_grid_opt_file = "%s"', ...
+                                   Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
   T{end+1} = '}';
   
   T{end+1} = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
@@ -600,25 +606,15 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
     T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalc{}' ...
 		   } );
   else
-    T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalcLimb{}' ...
-		   } );
+    T = add_agenda( T, 'doit_scat_field_agenda', ...
+                                             { 'doit_scat_fieldCalcLimb{}' } );
   end
   
   T = add_agenda( T, 'doit_rte_agenda', ...
 		  { sprintf('doit_i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
-  
-  if (Q.STOKES_DIM == 1) 
-    epsilon = '[0.1]';
-  elseif (Q.STOKES_DIM == 2)
-    epsilon = '[0.1, 0.01]'; 
-  elseif (Q.STOKES_DIM == 3)
-    epsilon = '[0.1, 0.01, 0.01]';
-  else
-    epsilon = '[0.1, 0.01, 0.01, 0.01]';
-  end
-    
-  T = add_agenda( T, 'doit_conv_test_agenda', ...
-                  { ['doit_conv_flagAbsBT{epsilon=',epsilon,'}'] } );
+  T = add_agenda( T, 'doit_conv_test_agenda', { ...
+      sprintf('doit_conv_flagAbsBT{[%s]}', ...
+      vector2commalist(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON(1:Q.STOKES_DIM)) ) } );
   T = add_agenda( T, 'iy_cloudbox_agenda', { 'iyInterpCloudboxField{}' } );
 
 elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )

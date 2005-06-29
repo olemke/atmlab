@@ -1,3 +1,14 @@
+2005-06-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-79
+
+	* arts/qarts2cfile.m: Added field EPSILON for DOIT.
+
+	* arts/qarts_cloudbox.m : Fixed some bad formating.
+	
+	(LIMITS): Improved description slightly.
+	(METHOD_PRMTRS): Added field EPSILON for DOIT.
+
 2005-06-24  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-78
