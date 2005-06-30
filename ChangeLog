@@ -1,3 +1,17 @@
+2005-06-30  Bengt Rydberg  <benryd@etek.chalmers.se>
+
+	* atmlab-0-2-80
+		
+	* atmscenarios/gamma_lambda2d.m: created. Convers lambda
+	to Dme, Dmean or reverse.
+
+	* atmscenarios/ice_psd_gamma.m: Modified. Changed output
+	format.
+
+	* atmscenarios/gauss_laguerre_apply.m: Modified. Added 
+	missing Header text.
+
+
 2005-06-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-79

@@ -1,3 +1,33 @@
+% gauss_laguerre_apply performs Laguerre Gauss quadrature
+%    
+%     Returns a vector or matrix depending on input with for example 
+%     particle number density after performing
+%     Laguerre Gauss quadrature to represent scattering properties
+%     of particle polydispersions. 
+%     For information on Gaussian quadrature see for example
+%     numerical recipies
+%
+%
+%     An example on usage (to generate a PSD for ice particles):
+%        xnorm = 50e-6;
+%        [x_i,w_i] = gauss_laguerre(0,10,xnorm);
+%        y = ice_psd_gamma( ... );
+%        y = gauss_laguerre_apply(y,x_i,w_i,xnorm);
+%
+% FORMAT   [Y] = gauss_laguerre_apply(Y,x_i,w_i,xnorm])     
+%
+% OUT      Y      A matrix or vector with the integrated
+%                 values of Y
+%
+% IN       x_i    is a vector with abscissas
+%          w_i    is a vector with weights
+%          xnorm  Normalisation value for length scale.
+%          Y      The function to be integrated evaluated
+%                 at x_i
+
+% History: 2005-06-28  Created by Bengt Rydberg
+
+
 function Y = gauss_laguerre_apply(Y,x_i,w_i,xnorm)
 
 %= Set defaults
