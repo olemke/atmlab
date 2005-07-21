@@ -1,3 +1,12 @@
+2005-07-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-80
+
+	* graphs/add_plot_row.m: SORRY, I had to change this function.
+	Algorithm used to calculate horisontal spaces was wrong. Changed
+	default settings somewhat.
+	Added two optional arguments, for fine tuning of horisontal placement.
+
 2005-06-30  Bengt Rydberg  <benryd@etek.chalmers.se>
 
 	* atmlab-0-2-80
