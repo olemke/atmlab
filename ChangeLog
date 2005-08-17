@@ -1,3 +1,19 @@
+2005-08-17  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-81
+
+	* xml/xmlStoreImpl.m: Added. Moved xmlStore to here. 
+
+	* xml/xmlStore.m: Call new wrapper xmlStoreImpl.
+
+	* xml/xmlStoreWithComment.m:
+
+	Added. Use this function to store a comment along with your data.
+
+	* xml/xmlWritecomment.m: Added.
+
+	* xml/xmlReadTag.m: Skip comments in the xml files.
+
 2005-07-03  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-80

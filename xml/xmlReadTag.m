@@ -69,6 +69,25 @@ while ~feof (fid) & ~exit_loop
          if ~length (isize)
            itype = 'long';
          end
+       case 'comment'
+         buf = '';
+         c = fgets (fid, 1);
+         while ~feof (fid) & c ~= '>'
+           c = fgets (fid, 1);
+           buf = strcat (buf, c);
+         end
+         valid = 0;
+         if (length(buf) > 9)
+           p1 = length(buf)-8;
+           p2 = length(buf)-1;
+           if buf(p1:p2) == '/comment'
+             valid = 1;
+           end
+         end
+
+         if valid == 0
+           error ('Cannot find closing tag for comment');
+         end
        otherwise
          func = str2func (strcat ('xmlRead', tag));
          result = feval (func, fid, attrlist, itype, ftype, binary, fid2);
