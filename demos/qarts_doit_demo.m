@@ -69,10 +69,8 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 %= RTE 
 %
 Q.Z_SURFACE      = 500;
-Q.SURFACE_PROP_AGENDA = ...
-   { 'NumericSet(surface_skin_t){290.}',...
-     'surfaceBlackbody{}', ...
-     'surfaceCalc{}' };
+Q.IY_SURFACE_AGENDA =  { 'NumericSet(surface_skin_t){290.}',...
+      'surfaceBlackbody{}', 'surfaceCalc{}'}
 %
 Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
 Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
@@ -98,6 +96,7 @@ C.METHOD                        = 'DOIT';
 C.METHOD_PRMTRS.N_ZA_GRID       =  19;
 C.METHOD_PRMTRS.N_AA_GRID       =  10;
 C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, 'doit_za_grid.xml');
+C.METHOD_PRMTRS.EPSILON         = [0.1] % 0.01 0.01 0.01];
 %
 C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
 %
@@ -123,10 +122,6 @@ r = 50e-6;
 imc = 0.01*1e-3; 
 % cloud altitude
 alt = [9e3 12e3]; 
-
-% Particle distribution type
-C.DISTR_TYPE = 'mono' % 'distr' - default 'raw' - if one wants to
-                      % read pre-calcuated raw-data
 
 % Calculate scattering data using Mie
 scat_data = mie_scat_data(Q.F_GRID,  T_grid, rfr_index, theta, r); 

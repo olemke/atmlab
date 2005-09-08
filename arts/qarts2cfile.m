@@ -248,7 +248,9 @@ case 'init_rte'
     T{2} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, tmpdir );
   end
   %
-  T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
+  if ~isnan(Q.SURFACE_PROP_AGENDA)
+    T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
+  end
   T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
   T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
@@ -381,7 +383,7 @@ end
 
 
 
-%------------------------------------------------------------------------------
+%----------------------------------------------------------- -------------------
 % Smaller help functions
 %------------------------------------------------------------------------------
 
@@ -505,33 +507,10 @@ end
 
 %= Particle field and single scattering data
 %
-% Pre-calculated raw data: scat_data_raw, pnd_field_raw
-if strcmp(Q.CLOUDBOX.DISTR_TYPE, 'precalc')
-  if ~(isnumeric(Q.CLOUDBOX.PND_FIELD) | ischar(Q.CLOUDBOX.PND_FIELD)) ...
-	&& ...
-	~( isnumeric(Q.CLOUDBOX.SCAT_DATA) | ischar(Q.CLOUDBOX.SCAT_DATA) )
-    error( ['Not allowed combination of Q.CLOUDBOX.PND_FIELD and ',...
-	    'Q.CLOUDBOX.SCAT_DATA data types'] );
-  end
-  %    
-  T{end+1} = file_or_data( 'pnd_field', 'Tensor4', Q.CLOUDBOX.PND_FIELD, ...
-			   tmpdir );
-  T{end+1} = file_or_data( 'scat_data_raw', 'ArrayOfSingleScatteringData', ...
-			   Q.CLOUDBOX.SCAT_DATA, tmpdir );
-  
-% Read scattering and particle number density data using *ParticleTypeAdd(All)*  
-else
-  if ~(iscellstr(Q.CLOUDBOX.PND_FIELD) && iscellstr(Q.CLOUDBOX.SCAT_DATA)) 
-    error( ...
-	'The cloudbox fields PND_FIELD and SCAT_DATA must be of same data type.' );
-  end
-  T{end+1} = 'ParticleTypeInit{}';
-  if (length(Q.CLOUDBOX.PND_FIELD) > 1 | strcmp(Q.CLOUDBOX.DISTR_TYPE, ...
-						'mono'))
-    if (length(Q.CLOUDBOX.PND_FIELD)  ~=  length(Q.CLOUDBOX.SCAT_DATA))
-      error( ['Length of Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must ',...
-	      'be equal.'] );
-    end
+if (iscellstr(Q.CLOUDBOX.PND_FIELD) && ...
+    iscellstr(Q.CLOUDBOX.SCAT_DATA))
+  if (length(Q.CLOUDBOX.PND_FIELD) == length(Q.CLOUDBOX.SCAT_DATA)) 
+    T{end+1} = 'ParticleTypeInit{}';
     for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
       T{end+1} = 'ParticleTypeAdd{';
       T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
@@ -540,14 +519,22 @@ else
 			 Q.CLOUDBOX.PND_FIELD{i} );
       T{end+1} = '}';
     end
-  else
+    % 
+  elseif (length(Q.CLOUDBOX.SCAT_DATA) == 1 && ...
+	  length(Q.CLOUDBOX.PND_FIELD) > 1)
+    
     T{end+1} = 'ParticleTypeAddAll{';
     T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
-		       Q.CLOUDBOX.SCAT_DATA{i} );
+		     Q.CLOUDBOX.SCAT_DATA{i} );
     T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
 		       Q.CLOUDBOX.PND_FIELD{i} );
     T{end+1} = '}';   
     %
+  else
+    error(['Scattering data (Q.SCAT_DATA) or particle number density' ...
+	   '(Q.PND_FIELD) is wrong. The safest option is to give' ...
+	   ' filenames of the single scattering data and the' ...
+	   ' corresponding particle number density fields.']);
   end
   T{end+1} = 'pnd_fieldCalc{}';
 end

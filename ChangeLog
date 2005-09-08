@@ -1,3 +1,17 @@
+2005-09-08  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
+	    
+	* atmlab-0-2-82 
+	
+	* arts/qarts_cloudbox.m: Removed DISTR_TYPE. No longer needed
+	because from now on it is only allowed to read scattering data
+	using the proper methods *ParticleTypeAdd* and *ParticleTypeAddAll*.	
+	
+	* arts/qarts2cfile.m: Removed DISTR_TYPE for DOIT and included
+	possibility to use only IY_SURFACE_AGENDA and not
+	SURFACE_PROP_AGENDA. This did not work for a blackbody ground. 
+	
+	* demos/qarts_doit_demo.m: Removed DISTR_TYPE and added EPSILON.
+
 2005-08-17  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-81
