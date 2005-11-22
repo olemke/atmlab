@@ -63,7 +63,7 @@ if length(P) ~= size(C,1)
   error('Mismatch in size between *P* and *C*.');
 end
 %
-if ~isscalar(n)  |  ~isinteger(n)  |  n<1
+if ~isscalar(n)  |  ~iswhole(n)  |  n<1
   error('Input argument *n* must be a positive integer.');
 end
 %

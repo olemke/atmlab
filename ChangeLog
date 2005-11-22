@@ -1,3 +1,33 @@
+2005-11-22  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-83
+	
+	* math/iswhole.m: New name of *isinteger*.
+
+	* isinteger -> iswhole: Changed whereever needed.
+
+	* atmlab/atmlab_init.m: Included a function that copies functions
+	in /obselete to /AUTO_fixes, if these functions not already exist.
+	The folder /AUTO_fixes is created, or cleaned, before the copying.
+
+	This fixes the problem with isscalar and isvector.
+	
+	This functionality can also be used if you want to use a function
+	that only exists in newer Matlab versions, but otherwise would work
+	with older Matlab versions. Then copy this function
+	to the /obselete folder and everything will be fixed. However, make
+	sure that te function really works with versions that can be expected
+	to be used.
+
+	* obselete/: Created this folder and moved isscalar and isvector
+	to this folder.
+	
+	* .cvsignore: Created (to ignore /AUTO_fixes).
+
+	* arts/qarts2cfile.m: The check 
+	   if iscellstr( Q.SURFACE_PROP_AGENDA )
+	used before isnan, which crashed.
+	
 2005-09-08  Claudia Emde  <claudia@sat.physik.uni-bremen.de>
 	    
 	* atmlab-0-2-82 

@@ -41,7 +41,7 @@ if length(x) ~= size(C,1)
   error('Mismatch in size between *x* and *S*.');
 end
 %
-if ~isscalar(n)  |  ~isinteger(n)  |  n<1
+if ~isscalar(n)  |  ~iswhole(n)  |  n<1
   error('Input argument *n* must be a positive integer.');
 end
 

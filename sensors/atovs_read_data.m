@@ -71,7 +71,7 @@ nlines_read = count / rec_len;
 % if amount of data read is less than asked
 if count < rec_len * nlines
   % if some scan lines are missing, we still can go on
-  if isinteger( nlines_read )
+  if iswhole( nlines_read )
     disp( 'Warning. Some scanlines are missing.' );
   % if number of scan lines is not integer, part of a record is missing
   else

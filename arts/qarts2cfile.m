@@ -248,7 +248,7 @@ case 'init_rte'
     T{2} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, tmpdir );
   end
   %
-  if ~isnan(Q.SURFACE_PROP_AGENDA)
+  if iscellstr( Q.SURFACE_PROP_AGENDA )
     T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
   end
   T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
@@ -551,8 +551,8 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'EPSILON', 0 );
   
-  if (~isinteger(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID) | ...
-      ~isinteger(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID))
+  if (~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID) | ...
+      ~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID))
     error(['The parameter N_ZA_GRID and N_AA_GRID must be given as',...
 	   ' integer values.']);
   end

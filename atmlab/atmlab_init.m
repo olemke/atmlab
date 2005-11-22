@@ -25,9 +25,12 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 % If you create a new sub-folder, it should be added here.
 % Please use reversed alphabetical order.
 %
+% Note that /obselete or /versionfixes shall NOT be included here
+%
 addpath( fullfile( toppath, 'xml' ) ); 
 addpath( fullfile( toppath, 'tests' ) );
 addpath( fullfile( toppath, 'sensors' ) ); 
+addpath( fullfile( toppath, 'scattering' ) ); 
 addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
 addpath( fullfile( toppath, 'mie' ) ); 
@@ -42,7 +45,12 @@ addpath( fullfile( toppath, 'atmplots' ) );
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts1' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
-addpath( fullfile( toppath, 'scattering' ) ); 
+
+
+%=== Check if functions from never Matlab versions shall be included
+%
+version_fixes( toppath )
+
 
 %=== Read Atmlab settings
 %
@@ -52,3 +60,48 @@ if exist( 'atmlab_conf' ) == 2
 end
 
 
+%----------------------------------------------------------------------------
+
+function version_fixes( toppath )
+
+infolder  = 'obselete';
+outfolder = 'AUTO_fixes';
+
+
+%= Get functions residing in *infolder*
+%
+D = dir( fullfile( toppath, infolder, '*.m' ) );
+
+
+%= Loop and see if function already exists
+%
+to_include = [];
+%
+for i = 1 : length(D)
+
+  [pathstr,name] = fileparts( D(i).name );
+
+  if ~strcmp(name,'Contents')  &  exist( name ) < 2
+    to_include = [ to_include i ]; 
+  end
+
+end
+
+
+if ~isempty( to_include )
+
+  %= Create or empty target folder
+  if ~exist( fullfile( toppath, outfolder ) )
+    mkdir( toppath, outfolder );
+  else
+    delete( fullfile( toppath, outfolder, '*' ) );
+  end
+
+  for i = 1 : length(to_include)
+    copyfile( fullfile( toppath, infolder,  D(to_include(i)).name) , ...
+              fullfile( toppath, outfolder, D(to_include(i)).name) )
+  end
+
+  addpath( fullfile( toppath, outfolder ) ); 
+
+end

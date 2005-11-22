@@ -33,7 +33,7 @@ function tplot(h,col,s,fsize,fweight)
 %
 min_nargin( 2, nargin );
 %
-if ~isinteger(col)  |  col <= 0
+if ~iswhole(col)  |  col <= 0
   error('The argument *col* must be an integer > 0.');
 end
 %
