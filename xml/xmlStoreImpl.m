@@ -33,7 +33,7 @@ fid = xmlOpenOutputFile (filename);
 xmlWriteHeader (fid);
 
 if length (comment) > 0
-  xmlWriteComment (fid, comment);
+  xmlWritecomment (fid, comment);
 end
 
 if length (type) > 14 & type (1:14) == 'ArrayOfArrayOf'

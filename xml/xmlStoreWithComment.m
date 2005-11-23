@@ -15,6 +15,8 @@
 % IN    comment    Comment to store along with the data
 % IN    data       Data
 % IN    type       Data type
+% IN    precision  Precision for output of floating point numbers, could be
+%                  either 'FLOAT' or 'DOUBLE' (Default: 'FLOAT')
 
 % 2002-12-16  Created by Oliver Lemke.
 
