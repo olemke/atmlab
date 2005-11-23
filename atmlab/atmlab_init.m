@@ -31,6 +31,7 @@ addpath( fullfile( toppath, 'xml' ) );
 addpath( fullfile( toppath, 'tests' ) );
 addpath( fullfile( toppath, 'sensors' ) ); 
 addpath( fullfile( toppath, 'scattering' ) ); 
+addpath( fullfile( toppath, 'retrieval' ) ); 
 addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
 addpath( fullfile( toppath, 'mie' ) ); 

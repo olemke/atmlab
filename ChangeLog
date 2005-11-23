@@ -1,3 +1,11 @@
+2005-11-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-86
+
+	* retrieval/mci.m: Created.
+
+	* math/chi2.m: Created.
+
 2005-11-23  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-85
