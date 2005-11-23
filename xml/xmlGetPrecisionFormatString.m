@@ -16,6 +16,8 @@ if (strcmpi (precision, 'FLOAT'))
   precision = 7;
 elseif (strcmpi (precision, 'DOUBLE'))
   precision = 15;
+else
+  error('Invalid precision: %s', precision);
 end
 
 format = sprintf ('%%1.%de', precision);

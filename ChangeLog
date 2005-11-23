@@ -1,3 +1,13 @@
+2005-11-23  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-84
+	
+	* xml/xmlStore: Added help for precision argument.
+
+	* xml/xmlGetPrecisionFormatString.m:
+
+	Throw error if an invalid precision is given.
+
 2005-11-22  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-83
