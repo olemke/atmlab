@@ -8,6 +8,7 @@
 %       SPEED_OF_LIGHT
 %       BOLTZMANN_CONST
 %       PLANCK_CONST  
+%       AVOGADRO            [1/mol]
 %       STEFANBOLTZMANN     Total blackbody emission is STEFANBOLTZMANN*T^4
 %       CBGR                Temperature of cosmic background radiation 
 %       EARTH_RADIUS        Standard value for the Earth radius. Selected value
@@ -43,6 +44,9 @@ case 'BOLTZMANN_CONST'
 
 case 'PLANCK_CONST'
     const = 6.626180e-34;
+
+case 'AVOGADRO'
+    const = 6.0225e23;
 
 case 'STEFANBOLTZMANN'
     const = 2*pi^5*constants('BOLTZMANN_CONST')^4 / ...

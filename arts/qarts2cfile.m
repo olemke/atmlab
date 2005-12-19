@@ -609,9 +609,9 @@ elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER', 0 );
-  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'RNG_SEED', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'INCOMING_LOOKUP', 0 );
   rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D', 0);
+  rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MC_SEED', 0 );
   %
   if Q.CLOUDBOX.METHOD_PRMTRS.INCOMING_LOOKUP
     T{end+1} = file_or_data( 'mc_incoming', 'SLIData2', ...
@@ -621,12 +621,18 @@ elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   T{end+1} = 'IndexSet(f_index){value=0}';
   T{end+1} = 'scat_data_monoCalc{}';
   %
+  if Q.CLOUDBOX.METHOD_PRMTRS.MC_SEED < 0
+    T{end+1} = 'MCSetSeedFromTime{}';
+  else
+    T{end+1} = sprintf( 'IndexSet(mc_seed){%d}', ...
+                                            Q.CLOUDBOX.METHOD_PRMTRS.MC_SEED );
+  end
+  %
   T{end+1} = 'AgendaSet(iy_cloudbox_agenda){';
   T{end+1} = '   ScatteringMonteCarlo{';
   T{end+1} = sprintf('     std_err  = %d', Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
   T{end+1} = sprintf('     max_time = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
   T{end+1} = sprintf('     max_iter = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-  T{end+1} = sprintf('     rng_seed = %d', Q.CLOUDBOX.METHOD_PRMTRS.RNG_SEED );
   T{end+1} = sprintf('     incoming_lookup = %d', ...
                                     Q.CLOUDBOX.METHOD_PRMTRS.INCOMING_LOOKUP );
   T{end+1} = sprintf('     z_field_is_1D = %d', ...

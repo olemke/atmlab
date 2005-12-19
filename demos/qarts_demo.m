@@ -50,7 +50,10 @@ if isnan( arts_xmldata_path )
 end
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
+                                       'fascod', 'subarctic-winter' );
 Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
+Q.P_GRID              = z2p_simple( [200:500:45e3 46e3:1e3:90e3] );
 
 
 %= Spectroscopy
@@ -63,6 +66,7 @@ Q.GAS_SPECIES{4}{2} = 'H2O-MPM89';
 Q.GAS_SPECIES{5}{1} = 'N2-SelfContStandardType';
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
+Q.F_GRID            = linspace( 501.18e9, 502.4e9, 201 );
 Q.STOKES_DIM        = 1;
 %
 Q1.LINEFORMAT       = 'Arts';
