@@ -1,5 +1,12 @@
 2005-12-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-89
+
+	* Something had become wrong with tag numbers. Trying this 
+	number instead.
+
+2005-12-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-88
 
 	* arts/qarts2cfile.m: Now using MC_SEED. *MCSetSeedFromTime* used
