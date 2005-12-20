@@ -42,6 +42,9 @@ cd( workarea );
 
 ready = 0;
 
+s = rand( 'state' );
+
+rand( 'state', 1e6*sum(clock) )
 
 %=== Loop until a new folder with unique name has been created
 %
@@ -50,11 +53,15 @@ while ~ready
   tmpfolder = sprintf('Tmp%d',floor(1e6*rand(1)));
 
   if ~exist( tmpfolder, 'dir' )
-    mkdir(tmpfolder);
-    ready = 1;
+    [a,b] = mkdir(tmpfolder);     
+    if isempty(b)              % Check again if folder exist, for extra safety
+      ready = 1;
+    end
   end
 
 end
+
+rand( 'state', s );
 
 cd( startdir );
 

@@ -1,3 +1,12 @@
+2005-12-20  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-90
+
+	* files/create_tmpfolder.m: Made function safer. Now the random state 
+	is scrambled (but reset before returning) and it is checked also by
+	"mkdir" that the folder really not exist.
+	(Bengt reported problems for 2-processor machines).
+
 2005-12-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-89
