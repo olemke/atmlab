@@ -1,5 +1,12 @@
 2006-02-01  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-93
+
+	* graphs/plot2axes.m: Added this function by Jiro Doke. Downloaded from
+	the Matlab file exchange site.
+
+2006-02-01  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-92
 
 	* files/whichfiles.m: Created.
