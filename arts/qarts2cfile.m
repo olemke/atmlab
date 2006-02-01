@@ -448,7 +448,7 @@ return
 function ok = isdefined( H, fields )
   ok = 1;
   for it=1:length(fields)
-    if isnan(H.(fields{it}))
+    if ~iscell(H.(fields{it}))  &   isnan(H.(fields{it}))
       ok = 0;
     end
   end

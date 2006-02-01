@@ -1,3 +1,13 @@
+2006-02-01  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-92
+
+	* files/whichfiles.m: Created.
+
+	* files/loadstructfiles.m: Created.
+
+	* arts/qarts2cfile.m (isdefined): Included handling of cell arguments.
+
 2006-01-02  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-91
