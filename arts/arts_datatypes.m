@@ -44,6 +44,7 @@ inttypes = {
 };
 
 
+
 if ischar( ia )
   %
   if nargin > 1
@@ -65,7 +66,7 @@ if ischar( ia )
 
   oa = i - 1;
 
-elseif isinteger(ia) & isscalar(ia)
+elseif iswhole(ia) & isscalar(ia)
   %
   if nargin < 2
     datagroup = 'num';

@@ -1,3 +1,14 @@
+2006-02-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-94
+
+	* arts/qarts_batch.m: Now adapted to new(!) definition of DoNothing. 
+
+	* arts/arts_datatypes.m: Fixed a missed exchange of isinteger with
+	iswhole.
+
+	* arts/arts_batch.m: Removed old code. 
+
 2006-02-01  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-93

@@ -811,8 +811,8 @@ for i = 1:length(B.DATA)
   wsv_nr = eval([datatype,'_wsv_nr(dim+1)']) + 1;
   eval([datatype,'_wsv_nr(dim+1) = wsv_nr;'])
 
-  wsv_type = arts_datatypes(dim+1,datatype)
-  varname  = sprintf('%s_%d', lower(wsv_type), wsv_nr  )
+  wsv_type = arts_datatypes(dim+1,datatype);
+  varname  = sprintf('%s_%d', lower(wsv_type), wsv_nr  );
   T{end+1} = file_or_data( varname, wsv_type, B.DATA{i}.X, tmpdir );
   A{i}     = sprintf( 'BatchUpdate%s(%s,%s){}', B.DATA{i}.TYPE, ...
                                                       B.DATA{i}.WSV, varname );
