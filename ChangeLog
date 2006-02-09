@@ -1,3 +1,11 @@
+2006-02-09  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-95
+
+	* arts/qarts2cfile.m: Looked over the jacobianInit/Off part, after
+	a report of problems. Batch part does not work. Cause seems to be
+	on arts side.
+
 2006-02-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-94

@@ -116,7 +116,11 @@ case 'start'
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
-  T{4} = 'jacobianInit{}';
+  if Q.JACOBIAN_DO
+    T{4} = 'jacobianInit{}';
+  else
+    T{4} = 'jacobianOff{}';
+  end
   T{5} = 'gas_speciesInit{}';
 
 case 'stokes'

@@ -130,6 +130,8 @@ y = arts_y( Q );
 %
 if do_batch
   Y = arts_batch( Q );
+else
+  Y = [];
 end
 
 
