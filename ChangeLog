@@ -1,5 +1,12 @@
 2006-02-14  Stefan Buehler  <sbuehler@uni-bremen.de>
 
+	* atmlab-0-2-97
+
+	* retrieval/mci.m: Added M.verb flag to make the function
+	verbose. 
+
+2006-02-14  Stefan Buehler  <sbuehler@uni-bremen.de>
+
 	* atmlab-0-2-96
 
 	* retrieval/make_noise.m: Added. A simple helper function to

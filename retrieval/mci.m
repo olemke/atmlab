@@ -16,6 +16,8 @@
 %                Default is 1.                
 %      w_limit : Threshold level for what is considered as an OK databse hit.
 %                Used by *use_all* and controls D.n_hit. Default is 0.01.
+%      verb    : If set to 1 some text output is generated. Default
+%                is 0
 %
 %    MCI specific retrieval diagnostics is given in the structure array D, 
 %    having the fields
@@ -48,6 +50,9 @@ end
 if ~isfield( M, 'w_limit' )
   M.w_limit = 0.01;
 end
+if ~isfield( M, 'verb' )
+  M.verb = 0;
+end
 
 
 nb = size(Xb,2);
@@ -60,6 +65,10 @@ W  = zeros( nb, ny );
 
 for i = 1 : ny
 
+  if M.verb
+    disp(sprintf('Measurement %d',i));
+  end
+  
   w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) ) / exp(-m/2);
 
   if M.use_all
