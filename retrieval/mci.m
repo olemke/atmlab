@@ -61,14 +61,13 @@ ny = size(Y,2);
 lx = size(Xb,1);
 
 Xh = zeros( lx, ny );
-W  = zeros( nb, ny );
+
+if nargout > 3
+  W  = zeros( nb, ny );
+end
 
 for i = 1 : ny
 
-  if M.verb
-    disp(sprintf('Measurement %d',i));
-  end
-  
   w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) ) / exp(-m/2);
 
   if M.use_all
@@ -93,5 +92,11 @@ for i = 1 : ny
       W(:,i) = w;
     end
   end
+  
+  if M.verb
+    disp(sprintf('Measurement %d',i));
+    D(i)
+  end
+
 end
 

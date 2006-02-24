@@ -1,3 +1,13 @@
+2006-02-24  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-2-98
+
+	* retrieval/mci.m: Allocate W matrix only if W is desired as
+	output, to avoid memory waste..
+
+	* graphs/histogram.m: Added. Histogram plots with bins defined by
+	bin edges and counting of outsiders.
+
 2006-02-14  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-2-97
