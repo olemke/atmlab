@@ -1,3 +1,18 @@
+2006-03-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-99
+
+	* mie/epsice.m: Input arguments were given in wrong order in header.
+
+	* mie/eps*.m: All dielectric functions in the mie folder should from
+	now on not be used, beside for internally for Mie. This as these
+        functions do not use SI units (and header information is poor).
+	This is achieved by checking that calling function starts by 'mie'
+	or 'eps'.
+
+	* demos/qarts_doit_demo.m: BUG! Input to *epsice* were in wrong order.
+	Now using *eps_ice_liebe93*.
+
 2006-02-24  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-2-98

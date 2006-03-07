@@ -11,6 +11,13 @@ function result = epsoil(fGHz, TK, rob, mv, S, C)
 % S, C: Sand and Clay fractions, respectively
 % Mätzler, June 2002
 
+
+    a = dbstack;
+    %
+    if length(a)==1 | ~strncmp(a(2).file,'mie',3) | ~strncmp(a(2).file,'eps',3)
+      error('This function can just be used by the Mie functions.');
+    end
+
 ess=4.7;              % permittivity of solid material
 ross=2.65;            % density of solid material, g/cm^3
 alfa=0.65;

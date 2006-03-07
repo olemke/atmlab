@@ -111,7 +111,7 @@ T_grid = 250;
 
 % Calculate refractive indices 
 for f_i = 1:length(Q.F_GRID)
-  rfr_index(f_i,1) = sqrt(epsice(T_grid, Q.F_GRID(f_i)*1e-9));
+  rfr_index(f_i,1) = sqrt(eps_ice_liebe93( Q.F_GRID, T_grid ) );
 end
 
 % Scattering angles

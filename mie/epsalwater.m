@@ -7,6 +7,14 @@ function result = epsalwater(fGHz, TK, S)
 % Salinity S in promille
 % Program by Matzler, Aug. 2004
 
+
+    a = dbstack;
+    %
+    if length(a)==1 | ~strncmp(a(2).file,'mie',3) | ~strncmp(a(2).file,'eps',3)
+      error('This function can just be used by the Mie functions.');
+    end
+
+
 T=TK-273.16; % temp conversion to C
 
 a0=5.723;

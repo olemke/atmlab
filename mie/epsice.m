@@ -4,8 +4,14 @@ function z = epsice(f,TK)
 % and snow", in B. Schmitt et al. (eds.) Solar System Ices, Astrophys. 
 % and Space Sci. Library, Vol. 227, Kluwer Academic Publishers, 
 % Dordrecht, pp. 241-257 (1998). Input:
-% TK = temperature (K), range 20 to 273.15
 % f = frequency in GHz, range 0.01 to 3000
+% TK = temperature (K), range 20 to 273.15
+
+    a = dbstack;
+    %
+    if length(a)==1 | ~strncmp(a(2).file,'mie',3) | ~strncmp(a(2).file,'eps',3)
+      error('This function can just be used by the Mie functions.');
+    end
 	
 	B1 = 0.0207;
 	B2 = 1.16e-11;

@@ -5,6 +5,12 @@ function result = epswater93(fGHz, TK)
 % modified for version of MPM 1993
 % Mätzler, June 2002
 
+    a = dbstack;
+    %
+    if length(a)==1 | ~strncmp(a(2).file,'mie',3) | ~strncmp(a(2).file,'eps',3)
+      error('This function can just be used by the Mie functions.');
+    end
+
 TETA=1-300/TK;
 e0=77.66-103.3*TETA;
 e1=0.0671*e0;
