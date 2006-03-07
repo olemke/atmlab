@@ -1,5 +1,14 @@
 2006-03-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-100
+
+	* physics/eps_ice_matzler06.m: Added this function, provided by
+	C. Mätzler.
+
+2006-03-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* physics/eps_ice_matzler06.m: 
+
 	* atmlab-0-2-99
 
 	* mie/epsice.m: Input arguments were given in wrong order in header.
