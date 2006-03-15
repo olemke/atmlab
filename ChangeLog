@@ -1,3 +1,15 @@
+2006-03-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-101
+
+	* arts/qarts2cfile.m: Units for Jacobians:
+	  RJ presently deactivated due to bug in arts
+	  Planck gives now error message as this unit is not suitable for
+	         inversions.
+
+	* arts/qarts2cfile.m: Now applying sensor on mc_error only if sensor
+	is activated.
+
 2006-03-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-100

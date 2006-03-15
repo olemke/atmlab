@@ -339,7 +339,11 @@ case 'save_y'
   T{2} = add_savefile( 'y', tmpdir );
   %
   if isstruct( Q.CLOUDBOX )  &  strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
-    T{3} = 'mc_errorApplySensor{}';
+    if ~isnan( Q.SENSOR_RESPONSE )   
+      T{3} = 'mc_errorApplySensor{}';
+    else
+      T{3} = '';
+    end
     switch upper( Q.Y_UNIT )
       case '1'
         T{4} = '# No conversion to K';
@@ -355,9 +359,11 @@ case 'save_y'
       case '1'
         T{end+1} = '# No conversion to K';
       case 'RJ'
+        error('Jacobian in RJ unit does not work due to bug in arts.'); 
         T{end+1} = 'SparseToTbByRJ(jacobian,jacobian){}';
       case 'PLANCK'
-        T{end+1} = 'SparseToTbByPlanck(jacobian,jacobian){}';
+        error(...
+       'Planck Tb means a non-linear conversion, not suitable for jacobians.');
     end
     T{end+1} = add_savefile( 'jacobian', tmpdir );
     T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
