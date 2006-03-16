@@ -1,3 +1,24 @@
+2006-03-16  Mattias Ekstrom <mattias.ekstrom@chalmers.se>
+
+	* atmlab-0-2-102
+
+	* arts/qarts.m: Added entry for pointing Jacobian.
+
+	* arts/qarts2cfile.m: Added handling of pointing Jacobian.
+	Changed the way fields are checked if they are empty. Now it
+	should handle various combinations of cells, structures etc.
+
+	* demos/qarts_jacobian_demo.m: Added water Jacobian.
+
+	* arts1/alter_linedata.m: NEW. Simple function to alter the 
+	spectroscopic parameters of lines in the linefile.
+
+	* arts1/read_continua.m: NEW. Function to read a absmodel/continua
+	file into a Matlab structure.
+
+	* arts1/write_continua.m: NEW. Write a Matlab structure with 
+	continua tags, as created by read_continua, to a file.
+
 2006-03-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-101

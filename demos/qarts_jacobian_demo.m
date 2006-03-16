@@ -75,8 +75,10 @@ Q.GAS_SPECIES{2}{1}         = 'O3';
 Q.GAS_SPECIES_JAC{2}        = Q.GAS_SPECIES_JAC{1};
 %
 Q.GAS_SPECIES{3}{1}         = 'N2O';
+Q.GAS_SPECIES_JAC{3}.DO     = 0;
 Q.GAS_SPECIES{4}{1}         = 'H2O';
 Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
+Q.GAS_SPECIES_JAC{4}        = Q.GAS_SPECIES_JAC{1};
 Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
@@ -138,9 +140,9 @@ if ~nargout
   xlabel( 'Frequency [GHz]' )
   ylabel( 'Brightness temperature [K]' )
   title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
-  legend( [h1 h2], 'Spectrum', 'J*ones(nx,1)' );
+  legend( [h1 h2], 'Spectrum', 'J\timesones(nx,1)' );
 
-  figure(2);
+  figure(3);
   i   = 149;
   ind = ji{2}{1}:ji{2}{2};
   z   = p2z_simple( Q.GAS_SPECIES_JAC{2}.P_GRID );

@@ -267,6 +267,21 @@ case 'init_rte'
   T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
   T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   %
+  if Q.JACOBIAN_DO  &  ~isempty(Q.POINTING_JAC)
+      rqre_field( Q.POINTING_JAC, 'SENSOR_TIME' )
+      rqre_field( Q.POINTING_JAC, 'DZA' )
+      rqre_field( Q.POINTING_JAC, 'POLY_ORDER' )
+  
+      T{end+1} = file_or_data( 'sensor_time', 'Vector', ...
+                 Q.POINTING_JAC.SENSOR_TIME, tmpdir );
+      T{end+1} = 'jacobianAddPointing{';
+      T{end+1} = sprintf( '  dza        = %g', ...
+                                               Q.POINTING_JAC.DZA );
+      T{end+1} = sprintf( '  poly_order = %d', ...
+                                                 Q.POINTING_JAC.POLY_ORDER );
+      T{end+1} = '}';
+  end
+  %
   T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
 
 case 'cloudbox'
@@ -401,9 +416,16 @@ function s = file_or_data( artsvar, datatype, qvalue, tmpdir, nonDefFileId )
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else
-    if isnumeric( qvalue ) & isnan( qvalue )
-      fprintf('\nNaN found for %s.\n\n', artsvar );
-      error('See above');
+    if iscell( qvalue )
+      if isempty( qvalue )
+        fprintf('\n%s is empty.\n\n', artsvar );
+        error('See above');
+      end
+    else
+      if ~isstruct( qvalue )  &  isnan( qvalue )
+        fprintf('\nNaN found for %s.\n\n', artsvar );
+        error('See above');
+      end
     end
     if nargin >= 5
       filename = fullfile( tmpdir, [nonDefFileId,'.xml'] );
@@ -458,7 +480,11 @@ return
 function ok = isdefined( H, fields )
   ok = 1;
   for it=1:length(fields)
-    if ~iscell(H.(fields{it}))  &   isnan(H.(fields{it}))
+    if iscell(H.(fields{it}))
+      if isempty(H.(fields{it}))
+        ok = 0;
+      end
+    elseif isnan(H.(fields{it}))
       ok = 0;
     end
   end
