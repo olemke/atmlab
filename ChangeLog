@@ -1,3 +1,9 @@
+2006-03-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-103
+
+	* math/rot2D.m: Created.
+
 2006-03-16  Mattias Ekstrom <mattias.ekstrom@chalmers.se>
 
 	* atmlab-0-2-102
