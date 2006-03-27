@@ -1,3 +1,13 @@
+2006-03-27  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-104
+
+	* sensors/read_auramls_l2gp.m: Slightly modified version of function
+	made by Carlos Jimenez.
+
+	* atmplots/: Created data2rectgrid.m, edges2grid.m, grid2edges.m
+	rectgridplot.m and topocontour.m. 
+
 2006-03-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-103
