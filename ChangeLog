@@ -1,3 +1,16 @@
+2006-03-28  Stefan Buehler  <sbuehler@uni-bremen.de>
+
+	* atmlab-0-2-106
+
+	* retrieval/mci.m: Added sum_w and n_hit thresholds. Retrieval
+	returns NaN if these are not met. Introduced prior weight vector p
+	as optional input parameter.
+
+	* math/layermean.m: Added. Calculates layer mean values for a set
+	of vectors. Handy for calculating IWP.
+
+	* math/gauss.m: Added. The Gauss function.
+
 2006-03-27  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-105
