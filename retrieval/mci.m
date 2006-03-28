@@ -121,11 +121,19 @@ for i = 1 : ny
     ind = ind_hit;
   end
 
-  D(i).sum_w = sum( p(ind)*w(ind) );	% Weight with prior.
-  D(i).max_w = max( w(ind) );
-  D(i).n_con = length(ind);
-  D(i).n_hit = length(ind_hit);
-
+  % Catch the case that ind is empty
+  if length(ind) == 0
+    D(i).sum_w = 0;
+    D(i).max_w = 0;
+    D(i).n_con = 0;
+    D(i).n_hit = 0;
+  else
+    D(i).sum_w = sum( p(ind)*w(ind) );	% Weight with prior.
+    D(i).max_w = max( w(ind) );
+    D(i).n_con = length(ind);
+    D(i).n_hit = length(ind_hit);
+  end
+  
   % Prepare the weights for the selected training cases for the
   % retrieval. We also multiply in the prior weights here.
   Wi = repmat(p(ind).*w(ind)',lx,1);

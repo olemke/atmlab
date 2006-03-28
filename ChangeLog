@@ -1,5 +1,11 @@
 2006-03-28  Stefan Buehler  <sbuehler@uni-bremen.de>
 
+	* atmlab-0-2-107
+
+	* retrieval/mci.m: Catch the case that ind is empty. 
+
+2006-03-28  Stefan Buehler  <sbuehler@uni-bremen.de>
+
 	* atmlab-0-2-106
 
 	* retrieval/mci.m: Added sum_w and n_hit thresholds. Retrieval
