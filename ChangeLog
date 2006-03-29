@@ -1,3 +1,20 @@
+2006-03-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-108
+
+	* atmplots/coastlines.m: Other longitude ranges than 0-360 can now be
+	used.
+
+	* atmplots/rectgridplot.m: Handling of both row and column grid 
+	input.
+
+	* atmplots/rectgridplot.m: Changed selection of renderer to zbuffer.
+	This after reading some hints on the MathWorks site. Appears better
+	for this kind of plots.
+
+	* atmplots/grid2edges.m: Fixed errors in header. Handles now both row 
+	and column vector input.
+
 2006-03-28  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-2-107

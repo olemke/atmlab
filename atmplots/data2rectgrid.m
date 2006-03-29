@@ -13,7 +13,7 @@
 %    The mapping function must return a scalar for a vector input. Possible
 %    choices for *fun* are: @sum, @mean and @max. 
 %
-% FORMAT   [Z,N] = data2rectgrid(xedges,yedges,x,y,z,funh)
+% FORMAT   [Z,N] = data2rectgrid(xedges,yedges,x,y,z,funh[,lonrange])
 %        
 % OUT   Z        Data on rectangular grid. Size 
 %                is [length(xedges)-1,length(yedges)-1,size(z,2)].

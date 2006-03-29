@@ -50,7 +50,8 @@ if strcmp(shadtype,'flat')  |  strcmp(shadtype,'faceted')
 
 elseif strcmp(shadtype,'interp')
   %
-  pcolor( [x(1) edges2grid(x) x(end)], [y(1) edges2grid(y) y(end)], ... 
+  pcolor( [x(1) vec2row(edges2grid(x)) x(end)], ...
+          [y(1) vec2row(edges2grid(y)) y(end)], ... 
       [ F(1,1)   F(1,:)   F(1,end); 
         F(:,1)   F        F(:,end); 
         F(end,1) F(end,:) F(end,end) ]' );
@@ -59,6 +60,6 @@ else
   error('Valid shading types are ''flat'', ''faceted'' and ''interp''');
 end
 
-shading(shadtype)
+shading( shadtype )
 
-set(gcf,'Renderer','OpenGL')
+set( gcf, 'Renderer', 'zbuffer' );
