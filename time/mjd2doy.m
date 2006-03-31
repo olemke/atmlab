@@ -1,0 +1,31 @@
+% MJD2DOY   Conversion of MJD to day of year  
+%
+%    Calculates the day of the year (DOY) by combining *mjd2date* and 
+%    *dayofyear*. The fractional part of DOY is kept.
+%
+%    Note that DOY 1 starts 00:00 of January 1. The possible range of DOY is
+%    then [1,369.99999...].
+%
+% FORMAT   d = mjd2doy(mjd)
+%        
+% OUT   d     Day of year.
+% IN    mjd   Modified julian date. Can be a vector.
+
+% 2006-03-31   Created by Patrick Eriksson.
+
+function d = mjd2doy(mjd)
+
+[year, month, day, hour, minute, second] = mjd2date( mjd );
+
+%= *dayofyear* does not handle column vectors
+%
+if isvector(year) & length(year) > 1
+  year   = vec2row( year );
+  month  = vec2row( month );
+  day    = vec2row( day );
+  hour   = vec2row( hour );
+  minute = vec2row( minute );
+  second = vec2row( second );
+end
+
+d = dayofyear( year, month, day, hour, minute, second );

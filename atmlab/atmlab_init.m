@@ -28,6 +28,7 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 % Note that /obselete or /versionfixes shall NOT be included here
 %
 addpath( fullfile( toppath, 'xml' ) ); 
+addpath( fullfile( toppath, 'time' ) );
 addpath( fullfile( toppath, 'tests' ) );
 addpath( fullfile( toppath, 'sensors' ) ); 
 addpath( fullfile( toppath, 'scattering' ) ); 

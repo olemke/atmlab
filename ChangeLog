@@ -1,3 +1,20 @@
+2006-03-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-110
+
+	* time/: New folder for time utilities. Based on a set of functions by
+	Peter J. Acklam:
+	home.online.no/~pjacklam/matlab/software/util/timeutil/index.html
+
+	Primary purpose was to get conversion functyion for MJD but these 
+	functions provide also other features.
+	
+	* time/monthofyear.m: Introduced a fix to avoid any months 13.
+
+	* time/mjd2day.m: Created.
+
+	* time/mjd2month.m: Created.
+
 2006-03-30  Stefan Buehler  <sbuehler@uni-bremen.de>
 
 	* atmlab-0-2-109
