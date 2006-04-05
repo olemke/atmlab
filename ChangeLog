@@ -1,3 +1,18 @@
+2006-04-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-111
+
+	* math/boxcarfilter.m: Created.
+
+	* time/mjd2season.m: Created.
+
+	* demos/qarts_doit_demo.m: Added I_REINIT. Set to 0.
+
+	* arts/qarts2cfile.m: Included code to handle 
+	Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT.
+
+	* arts/qarts_cloudbox.m: Added i_REINIT as option for DOIT.
+
 2006-03-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-110

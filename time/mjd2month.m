@@ -3,7 +3,7 @@
 %    Calculates the month by combining *mjd2date* and  *dayofmonth*. 
 %    Fractional part of month is kept. Jan 15 is about 1.5.
 %
-% FORMAT   m = mjd2doy(mjd)
+% FORMAT   m = mjd2month(mjd)
 %        
 % OUT   m     Month number.
 % IN    mjd   Modified julian date. Can be a vector.
