@@ -1,6 +1,9 @@
 % BOXCARFILTER   Rectangular filtering of data series
 %
-%    XXX
+%    A rectangular filtering is performed. For each abscissa point, the 
+%    filtered value is based on all data points inside +-xw/2.
+%    The distance between the abscissa points is considered when calculating
+%    filtered values. Data are weighted with data range they represent.
 %
 % FORMAT   yf = boxcarfilter(x,y,xw)
 %        
@@ -8,6 +11,7 @@
 % IN    x    Data abscissa.
 %       y    Data values. Can be a vector with same length as *x* or
 %            a matrix. A second case the data series must be stored as columns.
+%       xw   Width (total) of the filter. 
 
 % 2006-04-05   Created by Patrick Eriksson.
 

@@ -1,5 +1,11 @@
 2006-04-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-112
+
+	* math/boxcarfilter.m: Finished header text.
+
+2006-04-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-111
 
 	* math/boxcarfilter.m: Created.
