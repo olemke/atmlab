@@ -1,3 +1,13 @@
+2006-04-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-113
+
+	* graphs/set_figsize.m: Created.
+	
+	* math/boxcarfilter.m: Made some improvements. The filter length
+	is now exactly xw (except close data ranges edges). Data must
+	now be given as column vector(s).
+
 2006-04-05  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-112
