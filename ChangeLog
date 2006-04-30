@@ -1,3 +1,9 @@
+2006-04-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-114
+
+	* forwardmodel/satviewdepth.m: Created.
+
 2006-04-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-113
