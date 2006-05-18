@@ -3,10 +3,13 @@
 %    A rectangular filtering is performed. For each abscissa point, the 
 %    filtered value is based on all data inside +-xw/2.
 %
-%    The distance between the abscissa points is considered when calculating
-%    filtered values. Data are weighted with data range they represent.
+%    The data are assumed to be equidistant, but gaps in the data series
+%    are allowed. The distance between data points is taken as 
+%    min( diff( x ) ).
+%
 %    The filter is throughout applied symmetrically. Parts of the filter
-%    extending outside the complete data range is neglected.
+%    extending outside the complete data range, r into data gaps, 
+%    are neglected.
 %
 % FORMAT   yf = boxcarfilter(x,y,xw)
 %        
@@ -36,11 +39,12 @@ yf = y;
 
 %= Length of each data range
 %
-l  = diff( grid2edges(x) );
+l  = min( diff( x ) );
 
 
+%= Make sure that *x* is a column vector
+%
 x = vec2col(x);
-l = vec2col(l);
 
 
 for i = 1:length(x)
@@ -53,12 +57,14 @@ for i = 1:length(x)
   ind     = find( d < xw/2 );
 
   % Calculate effective length 
-  leff      = l(ind);
-  if d(ind(1)) + l(ind(1)) > xw/2
-    leff(1)   = d(ind(1)) + l(ind(1)) - xw/2;
+  %
+  leff      = repmat( l, length(ind), 1 );
+  %
+  if d(ind(1)) + l > xw/2
+    leff(1)   = d(ind(1)) + l - xw/2;
   end
-  if d(ind(end)) + l(ind(end)) > xw/2;
-    leff(end) = d(ind(end)) + l(ind(end)) - xw/2;
+  if d(ind(end)) + l > xw/2;
+    leff(end) = d(ind(end)) + l - xw/2;
   end
 
   % Filter

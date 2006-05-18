@@ -2,12 +2,12 @@
 %
 %    A help function to plot a 2D rectangular field. The function uses *pcolor*
 %    and expands and shifts grids in such way that expected result is obtained.
-%    The renderer is also set to OpenGLÖ as this has been found to give better
+%    The renderer is also set to OpenGL as this has been found to give better
 %    performance.
 %    
 %    It is recommnded to use this function. First of you do not need to bother
 %    about required fixes for *pcolor*. The function *contourf* is easier to
-%    use but behaves strangle when it comes to color limits.
+%    use but behaves strange when it comes to color limits.
 %
 %    The data abscissas are defined with the edges of each grid cell. This
 %    means that the length of *x* and *y* shall be +1 compared to corresponding

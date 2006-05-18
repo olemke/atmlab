@@ -1,3 +1,13 @@
+2006-05-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-115
+
+	* math/rnnz.m: Created.
+
+	* math/boxcarfilter.m: Changed definition of length for each data 
+	point. The old version did not handle gaps in the data series 
+	satisfactorily.
+
 2006-04-30  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-114
