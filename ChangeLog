@@ -1,3 +1,13 @@
+2006-06-02  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-117
+
+	* atmlab/atmlab_init.m: obselete -> obsolete.
+
+	* obselete: Removed.
+
+	* obsolete: Added.
+
 2006-05-23  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-116

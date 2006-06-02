@@ -25,7 +25,7 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 % If you create a new sub-folder, it should be added here.
 % Please use reversed alphabetical order.
 %
-% Note that /obselete or /versionfixes shall NOT be included here
+% Note that /obsolete or /versionfixes shall NOT be included here
 %
 addpath( fullfile( toppath, 'xml' ) ); 
 addpath( fullfile( toppath, 'time' ) );
@@ -66,7 +66,7 @@ end
 
 function version_fixes( toppath )
 
-infolder  = 'obselete';
+infolder  = 'obsolete';
 outfolder = 'AUTO_fixes';
 
 

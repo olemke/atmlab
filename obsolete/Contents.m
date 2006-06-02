@@ -1,4 +1,4 @@
-% Functions obselete by newer Matlab version
+% Functions obsolete by newer Matlab version
 %
 %    The functions in this folder are made active by *atmlab_init*, if needed.
 %
