@@ -255,7 +255,6 @@ case 'init_rte'
   if iscellstr( Q.SURFACE_PROP_AGENDA )
     T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
   end
-  T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
   T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
   if iscellstr( Q.REFR_INDEX_AGENDA )
@@ -653,7 +652,9 @@ if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
   T = add_agenda( T, 'doit_conv_test_agenda', { ...
       sprintf('doit_conv_flagAbsBT{[%s]}', ...
       vector2commalist(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON(1:Q.STOKES_DIM)) ) } );
-  T = add_agenda( T, 'iy_cloudbox_agenda', { 'iyInterpCloudboxField{}' } );
+  T = add_agenda( T, 'iy_cloudbox_agenda', { 'DoNothing(ppath, ppath){}',...
+          'DoNothing(rte_pos,rte_pos){}', 'DoNothing(rte_los,rte_los){}', ...
+          'iyInterpCloudboxField{}' } );
 
 elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   %

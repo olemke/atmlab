@@ -17,7 +17,6 @@ function [Q,f,y_c,y] = qarts_doit_demo( ztan)
 % Since in DOIT the whole radiation field is calculated, one can
 % calculate several tangent altitudes at the same time
 ztan_DEFAULT = [3 6 9 12]*1e3; 
-atmdim_DEFAULT = 1;
 %
 set_defaults;
 
@@ -55,7 +54,7 @@ Q.GAS_SPECIES{3}{1} = 'N2-SelfContStandardType';
 %
 f = linspace( 501.18e9, 501.58e9, 3);
 Q.F_GRID            = f; 
-Q.STOKES_DIM        = 1;
+Q.STOKES_DIM        = 2;
 %
 Q1.LINEFORMAT       = 'Arts';
 Q1.LINEDATA         = fullfile( atmlab_example_data , 'lines501.4' );
@@ -69,11 +68,10 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 %= RTE 
 %
 Q.Z_SURFACE      = 500;
-Q.IY_SURFACE_AGENDA =  { 'NumericSet(surface_skin_t){290.}',...
-      'surfaceBlackbody{}', 'surfaceCalc{}'}
 %
-Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
-Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
+Q.SURFACE_PROP_AGENDA = ...
+   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
+     'surfaceFlat{"water-liebe93"}' };
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{5e3}' };
 Q.Y_UNIT            = 'RJ';
@@ -96,7 +94,7 @@ C.METHOD                        = 'DOIT';
 C.METHOD_PRMTRS.N_ZA_GRID       =  19;
 C.METHOD_PRMTRS.N_AA_GRID       =  10;
 C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, 'doit_za_grid.xml');
-C.METHOD_PRMTRS.EPSILON         = [0.1] % 0.01 0.01 0.01];
+C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
 %
 C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
 C.METHOD_PRMTRS.I_REINIT        = 0;
@@ -107,13 +105,12 @@ C.LIMITS = [ 7e3 14e3 ];
 % temperature interpolation is performed in ARTS calculation.
 T_grid = 250;
 
-% Creare scattering properties for a simple cloud assumption
+% Create scattering properties for a simple cloud assumption
 % (mono disperese particle distribution)
 
 % Calculate refractive indices 
-for f_i = 1:length(Q.F_GRID)
-  rfr_index(f_i,1) = sqrt(eps_ice_liebe93( Q.F_GRID, T_grid ) );
-end
+rfr_index = sqrt(eps_ice_liebe93( Q.F_GRID, T_grid ) )';
+
 
 % Scattering angles
 theta = 0:10:180;

@@ -75,7 +75,7 @@ Q.GAS_SPECIES{2}{1}         = 'O3';
 Q.GAS_SPECIES_JAC{2}        = Q.GAS_SPECIES_JAC{1};
 %
 Q.GAS_SPECIES{3}{1}         = 'N2O';
-Q.GAS_SPECIES_JAC{3}.DO     = 0;
+Q.GAS_SPECIES_JAC{3}        = Q.GAS_SPECIES_JAC{1};
 Q.GAS_SPECIES{4}{1}         = 'H2O';
 Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
 Q.GAS_SPECIES_JAC{4}        = Q.GAS_SPECIES_JAC{1};
@@ -96,18 +96,12 @@ Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 %= RTE 
 %
 Q.Z_SURFACE      = 500;
-%Q.SURFACE_PROP_AGENDA = ...
-%   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-%     'NumericSet(numeric_1){0.5}','surfaceSingleEmissivity(numeric_1){}' };
 Q.SURFACE_PROP_AGENDA = ...
    { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
      'surfaceFlat{"water-liebe93"}' };
 %
-Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
-Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
-%
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{10e3}' };
-Q.Y_UNIT            = 'RJ';
+Q.Y_UNIT            = '1';
 %
 zplat        = 600e3;
 Q.SENSOR_POS = Q.R_GEOID + zplat;

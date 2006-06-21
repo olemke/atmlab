@@ -51,10 +51,7 @@ if isnan( arts_xmldata_path )
 end
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                       'fascod', 'subarctic-winter' );
 Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
-Q.P_GRID              = z2p_simple( [200:500:45e3 46e3:1e3:90e3] );
 
 
 %= Spectroscopy
@@ -67,7 +64,6 @@ Q.GAS_SPECIES{4}{2} = 'H2O-MPM89';
 Q.GAS_SPECIES{5}{1} = 'N2-SelfContStandardType';
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
-Q.F_GRID            = linspace( 501.18e9, 502.4e9, 201 );
 Q.STOKES_DIM        = 1;
 %
 Q1.LINEFORMAT       = 'Arts';
@@ -86,9 +82,6 @@ Q.SURFACE_PROP_AGENDA = ...
    { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
      'surfaceFlat{"water-liebe93"}' };
 %
-%
-Q.IY_SPACE_AGENDA = { 'Copy(iy,i_space){}' };
-Q.PRE_RTE_WSMS    = { 'MatrixCBR(i_space,f_grid){}' };
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{5e3}' };
 Q.Y_UNIT            = 'RJ';

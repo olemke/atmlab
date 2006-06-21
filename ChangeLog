@@ -1,3 +1,26 @@
+2006-06-21  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-118
+
+	* tests/make_check.m: Created. A function working as doing make
+	check in arts. Run this function after important changes in arts
+	or Atmlab.
+
+	It would be nice if others could run this function ASAP. This to
+	check if running on different platforms gives substantial
+	differences in results.  The required accuracy limits are set quite
+	tight. Please report results, both positive and negative.
+
+	* demos/run_demos.m: Removed. Replaced by make_check.
+
+	* demos: Adapted demo functions to changes in surface_prop_agenda and
+	iy_space_agenda.
+
+	* arts/qarts.m: Defined default for *iy_space_agenda* corresponding
+	to cosmic background radiation.
+
+	* arts/qarts2cfile.m: Removed *iy_surface_agneda*.
+
 2006-06-02  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-117

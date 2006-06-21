@@ -45,7 +45,7 @@ C.BANDDATA     = [ 490e9 491e9  1;
 
 [L,tb_max]   = arts1_create_linefile( Q, C );
 
-keyboard
+
 
 % To save data to a file:
 %

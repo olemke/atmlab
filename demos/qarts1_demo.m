@@ -10,7 +10,7 @@
 % 2005-03-14   Created by Patrick Erikssom.
 
 
-function Q = qarts_demo( ztan )
+function  [Q,f,y] = qarts1_demo( ztan )
 
 if nargin == 0
   ztan = 30e3;
@@ -78,4 +78,6 @@ if ~nargout
   xlabel( 'Frequency [GHz]' )
   ylabel( 'Brightness temperature [K]' )
   title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
+else
+  f = Q.F_MONO;
 end
