@@ -1,3 +1,21 @@
+2006-08-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-119
+
+	* Now Qarts working with last changes in arts' absorption part.
+
+	* arts/qarts.m: Changed field names
+	   GAS_ABS_LOOKUP     ABS_LOOKUP
+	   GAS_SPECIES        ABS_SPECIES
+	   GAS_SPECIES_JAC    ABS_SPECIES_JAC
+
+	* qarts2cfile: Adapted to changes above and renaming of absorption
+	methods and agendas in arts.
+
+	* arts/arts_abstable_from_arts1.m: Adapted to renaming of ABS fields. 
+
+	* demos/: Adapted to renaming of ABS fields. 
+
 2006-06-21  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-118

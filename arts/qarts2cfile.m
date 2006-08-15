@@ -121,7 +121,7 @@ case 'start'
   else
     T{4} = 'jacobianOff{}';
   end
-  T{5} = 'gas_speciesInit{}';
+  T{5} = 'abs_speciesInit{}';
 
 case 'stokes'
   %
@@ -144,40 +144,40 @@ case 'load_atm'
   end
   %
   %- Add gas species
-  for i = 1 : length(Q.GAS_SPECIES)
+  for i = 1 : length(Q.ABS_SPECIES)
 
     %- Jacobians or not?
     do_jac = 0;
-    if Q.JACOBIAN_DO  &  ~isempty(Q.GAS_SPECIES_JAC)  &  ...
-                                                length(Q.GAS_SPECIES_JAC) >= i
-      rqre_field( Q.GAS_SPECIES_JAC{i}, 'DO' )
-      if Q.GAS_SPECIES_JAC{i}.DO
+    if Q.JACOBIAN_DO  &  ~isempty(Q.ABS_SPECIES_JAC)  &  ...
+                                                length(Q.ABS_SPECIES_JAC) >= i
+      rqre_field( Q.ABS_SPECIES_JAC{i}, 'DO' )
+      if Q.ABS_SPECIES_JAC{i}.DO
         do_jac = 1;
-        rqre_field( Q.GAS_SPECIES_JAC{i}, 'METHOD' )
-        rqre_field( Q.GAS_SPECIES_JAC{i}, 'UNIT' )
-        rqre_field( Q.GAS_SPECIES_JAC{i}, 'P_GRID' )
+        rqre_field( Q.ABS_SPECIES_JAC{i}, 'METHOD' )
+        rqre_field( Q.ABS_SPECIES_JAC{i}, 'UNIT' )
+        rqre_field( Q.ABS_SPECIES_JAC{i}, 'P_GRID' )
       end
     end
     
     %- Write to cfile
     if ~do_jac
-      T{end+1} = sprintf( 'gas_speciesAdd{[%s]}', ...
-			  arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
+      T{end+1} = sprintf( 'abs_speciesAdd{[%s]}', ...
+			  arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
     else
       if Q.ATMOSPHERE_DIM < 2
         lat_grid = [];
       else
-        rqre_field( Q.GAS_SPECIES_JAC{i}, 'LAT_GRID' )
-        lat_grid = Q.GAS_SPECIES_JAC{i}.LAT_GRID;
+        rqre_field( Q.ABS_SPECIES_JAC{i}, 'LAT_GRID' )
+        lat_grid = Q.ABS_SPECIES_JAC{i}.LAT_GRID;
       end
       if Q.ATMOSPHERE_DIM < 3
         lon_grid = [];
       else
-        rqre_field( Q.GAS_SPECIES_JAC{i}, 'LON_GRID' )
-        lon_grid = Q.GAS_SPECIES_JAC{i}.LON_GRID;
+        rqre_field( Q.ABS_SPECIES_JAC{i}, 'LON_GRID' )
+        lon_grid = Q.ABS_SPECIES_JAC{i}.LON_GRID;
       end
       T{end+1} = file_or_data( 'vector_1', 'Vector', ...
-          Q.GAS_SPECIES_JAC{i}.P_GRID, tmpdir, sprintf('gas%d_jac_p_grid',i) );
+          Q.ABS_SPECIES_JAC{i}.P_GRID, tmpdir, sprintf('gas%d_jac_p_grid',i) );
       T{end+1} = file_or_data( 'vector_2', 'Vector', ...
                            lat_grid, tmpdir, sprintf('gas%d_jac_lat_grid',i) );
       T{end+1} = file_or_data( 'vector_3', 'Vector', ...
@@ -185,19 +185,19 @@ case 'load_atm'
 
       T{end+1} = 'jacobianAddGas(vector_1,vector_2,vector_3){';
       T{end+1} = sprintf( '  species = %s', ...
-                                          arts_tgs_cnvrt({Q.GAS_SPECIES{i}}) );
+                                          arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
       T{end+1} = sprintf( '  method  = "%s"', ...
-                                                 Q.GAS_SPECIES_JAC{i}.METHOD );
+                                                 Q.ABS_SPECIES_JAC{i}.METHOD );
       T{end+1} = sprintf( '  unit    = "%s"', ...
-                                                   Q.GAS_SPECIES_JAC{i}.UNIT );
-      if strcmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'analytical' )
+                                                   Q.ABS_SPECIES_JAC{i}.UNIT );
+      if strcmp( Q.ABS_SPECIES_JAC{i}.METHOD, 'analytical' )
          T{end+1} = '  dx = 0.0';
-      elseif strcmp( Q.GAS_SPECIES_JAC{i}.METHOD, 'perturbation' )
-        rqre_field( Q.GAS_SPECIES_JAC{i}, 'DX' )
-        T{end+1} = sprintf( '  dx      = %.5e', Q.GAS_SPECIES_JAC{i}.DX );
+      elseif strcmp( Q.ABS_SPECIES_JAC{i}.METHOD, 'perturbation' )
+        rqre_field( Q.ABS_SPECIES_JAC{i}, 'DX' )
+        T{end+1} = sprintf( '  dx      = %.5e', Q.ABS_SPECIES_JAC{i}.DX );
       else
-        error( sprintf('Unknown selection for GAS_SPECIES_JAC.METHOD (%s)',...
-                                               Q.GAS_SPECIES_JAC{i}.METHOD ) );
+        error( sprintf('Unknown selection for ABS_SPECIES_JAC.METHOD (%s)',...
+                                               Q.ABS_SPECIES_JAC{i}.METHOD ) );
       end
       T{end+1} = '}';
     end
@@ -227,13 +227,12 @@ case 'save_atm'
 case 'load_abs'
   %
   T{1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, tmpdir );
-  T{2} = 'gas_abs_lookupInit{}';
-  T{3} = file_or_data( 'gas_abs_lookup', 'GasAbsLookup', Q.GAS_ABS_LOOKUP, ...
-                                                                      tmpdir );
-  T{4} = 'gas_abs_lookupAdapt{}';
+  T{2} = 'abs_lookupInit{}';
+  T{3} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, tmpdir );
+  T{4} = 'abs_lookupAdapt{}';
 
 case 'calc_abs'
-  T = add_agenda( T, 'scalar_gas_absorption_agenda', ...
+  T = add_agenda( T, 'abs_scalar_gas_agenda', ...
                                      { 'abs_scalar_gasExtractFromLookup{}' } );
   T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
 

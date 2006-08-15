@@ -60,26 +60,26 @@ end
 
 %= Spectroscopy
 %
-Q.GAS_SPECIES{1}{1}         = 'ClO';
-Q.GAS_SPECIES_JAC{1}.DO     = 1;
-Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
-%Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
-%Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
-Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [11e3:2e3:71e3] );
+Q.ABS_SPECIES{1}{1}         = 'ClO';
+Q.ABS_SPECIES_JAC{1}.DO     = 1;
+Q.ABS_SPECIES_JAC{1}.METHOD = 'analytical';
+%Q.ABS_SPECIES_JAC{1}.METHOD = 'perturbation';
+%Q.ABS_SPECIES_JAC{1}.DX     = 0.01;
+Q.ABS_SPECIES_JAC{1}.UNIT   = 'rel';
+Q.ABS_SPECIES_JAC{1}.P_GRID = z2p_simple( [11e3:2e3:71e3] );
 if atmdim >= 2
-  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -5:5;  
+  Q.ABS_SPECIES_JAC{1}.LAT_GRID = -5:5;  
 end
 %
-Q.GAS_SPECIES{2}{1}         = 'O3';
-Q.GAS_SPECIES_JAC{2}        = Q.GAS_SPECIES_JAC{1};
+Q.ABS_SPECIES{2}{1}         = 'O3';
+Q.ABS_SPECIES_JAC{2}        = Q.ABS_SPECIES_JAC{1};
 %
-Q.GAS_SPECIES{3}{1}         = 'N2O';
-Q.GAS_SPECIES_JAC{3}        = Q.GAS_SPECIES_JAC{1};
-Q.GAS_SPECIES{4}{1}         = 'H2O';
-Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
-Q.GAS_SPECIES_JAC{4}        = Q.GAS_SPECIES_JAC{1};
-Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
+Q.ABS_SPECIES{3}{1}         = 'N2O';
+Q.ABS_SPECIES_JAC{3}        = Q.ABS_SPECIES_JAC{1};
+Q.ABS_SPECIES{4}{1}         = 'H2O';
+Q.ABS_SPECIES{4}{2}         = 'H2O-MPM89';
+Q.ABS_SPECIES_JAC{4}        = Q.ABS_SPECIES_JAC{1};
+Q.ABS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
@@ -90,7 +90,7 @@ Q1.LINEDATA         = fullfile( atmlab_example_data , 'lines501.4' );
 
 %= Create absorption lookup table by ARTS1
 %
-Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
+Q.ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
 
 
 %= RTE 
@@ -139,12 +139,12 @@ if ~nargout
   figure(3);
   i   = 149;
   ind = ji{2}{1}:ji{2}{2};
-  z   = p2z_simple( Q.GAS_SPECIES_JAC{2}.P_GRID );
+  z   = p2z_simple( Q.ABS_SPECIES_JAC{2}.P_GRID );
   if atmdim == 1
     plot(full(J(i,ind)),z/1e3);
     xlabel( 'J [K/1]' )
   elseif atmdim == 2
-    lat = Q.GAS_SPECIES_JAC{2}.LAT_GRID;
+    lat = Q.ABS_SPECIES_JAC{2}.LAT_GRID;
     contourf(lat,z/1e3,reshape(full(J(i,ind)),length(z),length(lat)));
     shading flat
     xlabel( 'Latitude [deg]' )

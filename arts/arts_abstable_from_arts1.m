@@ -10,7 +10,7 @@
 %    and longitude profiles.
 %
 %    Needed Qarts fields:
-%       GAS_SPECIES
+%       ABS_SPECIES
 %       P_GRID
 %       F_GRID
 %       ATMOSPHERE_DIM
@@ -95,7 +95,7 @@ Q1.VMRS  = vmr_field;
 
 %=== Copy some fields from Q to Q1
 %
-Q1.TGS    = Q.GAS_SPECIES;
+Q1.TGS    = Q.ABS_SPECIES;
 if ischar(  Q.F_GRID )
   Q1.F_MONO = xmlLoad( Q.F_GRID );
 else
@@ -112,7 +112,7 @@ parts = {'tgs','load_atm','pf_grids','spectroscopy','calc_abs',...
 
 %=== Create absorption table
 %
-A.species           = Q.GAS_SPECIES;
+A.species           = Q.ABS_SPECIES;
 A.nonlinear_species = {};
 A.f_grid            = vec2col( qarts_get( Q.F_GRID ) );
 A.p_grid            = vec2col( qarts_get( Q.P_GRID ) );
