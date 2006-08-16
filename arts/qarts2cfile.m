@@ -375,8 +375,7 @@ case 'save_y'
       case '1'
         T{end+1} = '# No conversion to K';
       case 'RJ'
-        error('Jacobian in RJ unit does not work due to bug in arts.'); 
-        T{end+1} = 'SparseToTbByRJ(jacobian,jacobian){}';
+        T{end+1} = 'MatrixToTbByRJ(jacobian,jacobian){}';
       case 'PLANCK'
         error(...
        'Planck Tb means a non-linear conversion, not suitable for jacobians.');
@@ -409,7 +408,7 @@ end
 
 
 
-%----------------------------------------------------------- -------------------
+%------------------------------------------------------------------------------
 % Smaller help functions
 %------------------------------------------------------------------------------
 

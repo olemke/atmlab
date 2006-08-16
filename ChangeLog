@@ -1,3 +1,10 @@
+2006-08-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-120
+
+	* arts/qarts2cfile.m: Removed error when trying to use RJ for
+	Jacobians. This option works now in arts. MatrixToTbByRJ now used.
+
 2006-08-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-119
