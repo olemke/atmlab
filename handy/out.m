@@ -34,7 +34,9 @@
 %          do_output = out( level )
 %
 % OUT:     do_output   Boolean. True if level <= REPORT_LEVEL
-% IN:      level       Report level for the message.
+% IN:      level       Report level for the message. This can be specified
+%                      for each entry in *fid*. Default is 0. This values is
+%                      also applied if *level* is shorter than *fid*.  
 %          s           Message. Can be a string matrix (see str2mat).
 %                      If s is an integer, different vertical lines are
 %                      produced (see above).
@@ -48,6 +50,9 @@
 
 function do_output = out( level, s, fid )
 
+level_DEFAULT = 0;
+%
+set_defaults;
 
 if nargin < 3
   fid = 1;
@@ -56,7 +61,11 @@ end
 
 if length(fid) > 1
   for i = 1 : length(fid)
-    out( level, s, fid(i) );
+    if length(level) >= i
+      out( level(i), s, fid(i) );
+    else
+      out( 0, s, fid(i) );
+    end
   end
   return
 end

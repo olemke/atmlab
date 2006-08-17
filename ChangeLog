@@ -1,3 +1,15 @@
+2006-08-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-121
+
+	* retrieval/oem.m: Start on a general OEM function. Nothing is
+	finsihed.
+
+	* handy/rqre_field.m: Fixed bad spelling in header.
+
+	* handy/out.m: A default level was introduced, level=0. It is now
+	possible to vary the level for each fid entry.
+
 2006-08-16  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-120

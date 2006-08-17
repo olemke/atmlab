@@ -6,7 +6,7 @@
 %        
 % IN    Q           The structure.
 %       fieldname   Name of field.
-% OPT   accept_nan  Flat for treatment of NaNs. Default is 1.
+% OPT   accept_nan  Flag for treatment of NaNs. Default is 1.
 %                   Set to 0 to get an error if any NaN is found.
 
 % 2005-03-15   Created by Patrick Eriksson.
