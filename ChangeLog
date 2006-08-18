@@ -1,3 +1,24 @@
+2006-08-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-122
+
+	* arts/qarts2cfile.m: Ordinary parenthesises () is now used to index
+	Q.ABS_SPECIES_JAC. This makes it simpler to extract information
+	from Q.ABS_SPECIES_JAC.
+
+	Included options to extract jacobian_quantities and
+	jacobian_indices without doing RT calculations. Simplest extracted
+	by arts_jq.
+
+	* arts/arts_jq.m: Created.
+
+	* demos/qarts_jacobian_demo.m: Adapted to change above. 
+
+	* arts/arts_oem.m: Jsut started.
+
+	* arts/oem.m: Contibued work. At least, basic linear characterisation
+	works.
+	
 2006-08-17  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-121

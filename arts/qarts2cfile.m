@@ -76,16 +76,20 @@ if nargin == 1
 
   case 'get_atmfields'
     %
-    S = { 'start', 'load_atm', 'save_atm', 'stop' };
+    S = { 'start1', 'load_atm', 'save_atm', 'stop' };
 
   case 'y'
     %
-    S = {'start', 'stokes', 'load_atm', 'load_abs', 'calc_abs', 'init_rte', ...
+    S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
          'cloudbox', 'sensor', 'calc_rte', 'save_y', 'stop' };
+
+  case 'jq'
+    %
+    S = {'start1', 'start2', 'load_atm', 'init_rte', 'sensor', 'jq', 'stop' };
 
   case 'batch'
     %
-    S = {'start', 'stokes', 'load_atm', 'load_abs', 'calc_abs', 'init_rte', ...
+    S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
          'cloudbox', 'sensor', 'batch', 'stop' };
 
   otherwise
@@ -111,7 +115,7 @@ T = [];
 
 switch parts{i}
 
-case 'start'
+case 'start1'
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Main{';
@@ -123,11 +127,11 @@ case 'start'
   end
   T{5} = 'abs_speciesInit{}';
 
-case 'stokes'
+case 'start2'
   %
   rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
-  %
   T{1} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
+  T{2} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, tmpdir );
 
 case 'load_atm'
   %
@@ -150,12 +154,12 @@ case 'load_atm'
     do_jac = 0;
     if Q.JACOBIAN_DO  &  ~isempty(Q.ABS_SPECIES_JAC)  &  ...
                                                 length(Q.ABS_SPECIES_JAC) >= i
-      rqre_field( Q.ABS_SPECIES_JAC{i}, 'DO' )
-      if Q.ABS_SPECIES_JAC{i}.DO
+      rqre_field( Q.ABS_SPECIES_JAC(i), 'DO' )
+      if Q.ABS_SPECIES_JAC(i).DO
         do_jac = 1;
-        rqre_field( Q.ABS_SPECIES_JAC{i}, 'METHOD' )
-        rqre_field( Q.ABS_SPECIES_JAC{i}, 'UNIT' )
-        rqre_field( Q.ABS_SPECIES_JAC{i}, 'P_GRID' )
+        rqre_field( Q.ABS_SPECIES_JAC(i), 'METHOD' )
+        rqre_field( Q.ABS_SPECIES_JAC(i), 'UNIT' )
+        rqre_field( Q.ABS_SPECIES_JAC(i), 'P_GRID' )
       end
     end
     
@@ -167,17 +171,17 @@ case 'load_atm'
       if Q.ATMOSPHERE_DIM < 2
         lat_grid = [];
       else
-        rqre_field( Q.ABS_SPECIES_JAC{i}, 'LAT_GRID' )
-        lat_grid = Q.ABS_SPECIES_JAC{i}.LAT_GRID;
+        rqre_field( Q.ABS_SPECIES_JAC(i), 'LAT_GRID' )
+        lat_grid = Q.ABS_SPECIES_JAC(i).LAT_GRID;
       end
       if Q.ATMOSPHERE_DIM < 3
         lon_grid = [];
       else
-        rqre_field( Q.ABS_SPECIES_JAC{i}, 'LON_GRID' )
-        lon_grid = Q.ABS_SPECIES_JAC{i}.LON_GRID;
+        rqre_field( Q.ABS_SPECIES_JAC(i), 'LON_GRID' )
+        lon_grid = Q.ABS_SPECIES_JAC(i).LON_GRID;
       end
       T{end+1} = file_or_data( 'vector_1', 'Vector', ...
-          Q.ABS_SPECIES_JAC{i}.P_GRID, tmpdir, sprintf('gas%d_jac_p_grid',i) );
+          Q.ABS_SPECIES_JAC(i).P_GRID, tmpdir, sprintf('gas%d_jac_p_grid',i) );
       T{end+1} = file_or_data( 'vector_2', 'Vector', ...
                            lat_grid, tmpdir, sprintf('gas%d_jac_lat_grid',i) );
       T{end+1} = file_or_data( 'vector_3', 'Vector', ...
@@ -187,17 +191,17 @@ case 'load_atm'
       T{end+1} = sprintf( '  species = %s', ...
                                           arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
       T{end+1} = sprintf( '  method  = "%s"', ...
-                                                 Q.ABS_SPECIES_JAC{i}.METHOD );
+                                                 Q.ABS_SPECIES_JAC(i).METHOD );
       T{end+1} = sprintf( '  unit    = "%s"', ...
-                                                   Q.ABS_SPECIES_JAC{i}.UNIT );
-      if strcmp( Q.ABS_SPECIES_JAC{i}.METHOD, 'analytical' )
+                                                   Q.ABS_SPECIES_JAC(i).UNIT );
+      if strcmp( Q.ABS_SPECIES_JAC(i).METHOD, 'analytical' )
          T{end+1} = '  dx = 0.0';
-      elseif strcmp( Q.ABS_SPECIES_JAC{i}.METHOD, 'perturbation' )
-        rqre_field( Q.ABS_SPECIES_JAC{i}, 'DX' )
-        T{end+1} = sprintf( '  dx      = %.5e', Q.ABS_SPECIES_JAC{i}.DX );
+      elseif strcmp( Q.ABS_SPECIES_JAC(i).METHOD, 'perturbation' )
+        rqre_field( Q.ABS_SPECIES_JAC(i), 'DX' )
+        T{end+1} = sprintf( '  dx      = %.5e', Q.ABS_SPECIES_JAC(i).DX );
       else
         error( sprintf('Unknown selection for ABS_SPECIES_JAC.METHOD (%s)',...
-                                               Q.ABS_SPECIES_JAC{i}.METHOD ) );
+                                               Q.ABS_SPECIES_JAC(i).METHOD ) );
       end
       T{end+1} = '}';
     end
@@ -226,10 +230,9 @@ case 'save_atm'
 
 case 'load_abs'
   %
-  T{1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, tmpdir );
-  T{2} = 'abs_lookupInit{}';
-  T{3} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, tmpdir );
-  T{4} = 'abs_lookupAdapt{}';
+  T{1} = 'abs_lookupInit{}';
+  T{2} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, tmpdir );
+  T{3} = 'abs_lookupAdapt{}';
 
 case 'calc_abs'
   T = add_agenda( T, 'abs_scalar_gas_agenda', ...
@@ -271,12 +274,10 @@ case 'init_rte'
       rqre_field( Q.POINTING_JAC, 'POLY_ORDER' )
   
       T{end+1} = file_or_data( 'sensor_time', 'Vector', ...
-                 Q.POINTING_JAC.SENSOR_TIME, tmpdir );
+                                          Q.POINTING_JAC.SENSOR_TIME, tmpdir );
       T{end+1} = 'jacobianAddPointing{';
-      T{end+1} = sprintf( '  dza        = %g', ...
-                                               Q.POINTING_JAC.DZA );
-      T{end+1} = sprintf( '  poly_order = %d', ...
-                                                 Q.POINTING_JAC.POLY_ORDER );
+      T{end+1} = sprintf( '  dza        = %g', Q.POINTING_JAC.DZA );
+      T{end+1} = sprintf( '  poly_order = %d', Q.POINTING_JAC.POLY_ORDER );
       T{end+1} = '}';
   end
   %
@@ -314,11 +315,16 @@ case 'save_sensor'
   T{1} = add_savefile( 'sensor_response', tmpdir );
   T{2} = add_savefile( 'sensor_response_f', tmpdir );
   
-case 'calc_rte'
+case { 'calc_rte', 'jq' }
   %
   if Q.JACOBIAN_DO
     %
     T{end+1} = 'jacobianClose{}'; 
+    T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
+    T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
+    if strcmp( parts{i}, 'jq' )
+      T{end+1} = 'Exit{}';
+    end
     %
   end
   %
@@ -381,8 +387,6 @@ case 'save_y'
        'Planck Tb means a non-linear conversion, not suitable for jacobians.');
     end
     T{end+1} = add_savefile( 'jacobian', tmpdir );
-    T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
-    T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
   end
 
 case 'batch'
@@ -847,25 +851,25 @@ num_wsv_nr = zeros(8,1);
 int_wsv_nr = zeros(2,1);
 
 for i = 1:length(B.DATA)
-  rqre_field( B.DATA{i}, 'TYPE', 0 );
-  rqre_char( sprintf('Q.BATCH{%d}.TYPE',i), B.DATA{i}.TYPE );
-  rqre_field( B.DATA{i}, 'WSV', 0 );
-  rqre_char( sprintf('Q.BATCH{%d}.WSV',i), B.DATA{i}.WSV );
-  rqre_field( B.DATA{i}, 'X', 0 );
+  rqre_field( B.DATA(i), 'TYPE', 0 );
+  rqre_char( sprintf('Q.BATCH{%d}.TYPE',i), B.DATA(i).TYPE );
+  rqre_field( B.DATA(i), 'WSV', 0 );
+  rqre_char( sprintf('Q.BATCH{%d}.WSV',i), B.DATA(i).WSV );
+  rqre_field( B.DATA(i), 'X', 0 );
   
-  if size(B.DATA{i}.X,1) < B.N 
+  if size(B.DATA(i).X,1) < B.N 
     error(sprintf('Q.BATCH.DATA{%d}.X contains fewer cases than Q.BATCH.N',i));
   end
 
-  [dim,datatype] = arts_datatypes( B.DATA{i}.TYPE );
+  [dim,datatype] = arts_datatypes( B.DATA(i).TYPE );
   wsv_nr = eval([datatype,'_wsv_nr(dim+1)']) + 1;
   eval([datatype,'_wsv_nr(dim+1) = wsv_nr;'])
 
   wsv_type = arts_datatypes(dim+1,datatype);
   varname  = sprintf('%s_%d', lower(wsv_type), wsv_nr  );
-  T{end+1} = file_or_data( varname, wsv_type, B.DATA{i}.X, tmpdir );
-  A{i}     = sprintf( 'BatchUpdate%s(%s,%s){}', B.DATA{i}.TYPE, ...
-                                                      B.DATA{i}.WSV, varname );
+  T{end+1} = file_or_data( varname, wsv_type, B.DATA(i).X, tmpdir );
+  A{i}     = sprintf( 'BatchUpdate%s(%s,%s){}', B.DATA(i).TYPE, ...
+                                                      B.DATA(i).WSV, varname );
 end
 
 T        = add_agenda( T, 'batch_update_agenda', A );

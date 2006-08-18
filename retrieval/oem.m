@@ -15,12 +15,14 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
     O.linear = 1;
   end
   %
-  if ~isfield( O 'linear' ),    O.linear = 1;          end
-  if ~isfield( O 'outfids' ),   O.outfids = 1;         end
-  if ~isfield( O 'mform' ),     O.mform = 0;           end
+  if ~isfield( O, 'linear' ),    O.linear = 1;          end
+  if ~isfield( O, 'outfids' ),   O.outfids = 1;         end
+  if ~isfield( O, 'jexact' ),    O.jexact = 0;          end
   %
-  if ~isfield( O 'yf' ),        O.yf = 0;              end
-  if ~isfield( O 'K' ),         O.K = 0;               end
+  if ~isfield( O, 'yf' ),        O.yf = 0;              end
+  if ~isfield( O, 'J' ),         O.J = 0;               end
+  if ~isfield( O, 'G' ),         O.G = 0;               end
+  if ~isfield( O, 'A' ),         O.A = 0;               end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -30,11 +32,10 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
                                    
   min_nargin( 6, nargin );
 
-  rqre_datatype( O, 'struct' );
+  rqre_datatype( 'struct', O );
   %
-  rqre_bool( 'O.linear', Q.linear );
-  rqre_datatype( {'vector}, O.outfids );
-  rqre_bool( 'O.mform', Q.mform );
+  rqre_bool( 'O.linear', O.linear );
+  rqre_datatype( 'vector', O.outfids );
   %
   if ~O.linear
     rqre_fields( O, {'method','maxiter','stop_dx'}, 0 );
@@ -42,7 +43,6 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
       O.method = 'GN';  
     elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
       O.method = 'ML';  
-      O.mform  = 0;
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
@@ -50,8 +50,11 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
   end
 
   rqre_datatype( 'struct', Q );
-  rqre_datatype( 'struct', R );
-  rqre_datatype( 'a', comfun );
+  rqre_datatype( {'empty','struct'}, R );
+
+  if ~isa( comfun, 'function_handle' )
+    error('Input argument *comfun* must be a function handle.');
+  end
 
   rqre_datatype( 'numeric', Se );
   rqre_datatype( 'numeric', Sx );
@@ -69,42 +72,34 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
   if nargin >= 8
     rqre_datatype( 'vector', xa );
     if size(xa,1) ~= size(Sx,1)
-      error(*Mismatch in size between *Sx* and *xa*.');
+      error('Mismatch in size between *Sx* and *xa*.');
     end
     rqre_datatype( 'vector', y );
     if size(y,1) ~= size(Se,1)
-      error(*Mismatch in size between *Se* and *y*.');
+      error('Mismatch in size between *Se* and *y*.');
     end
   end
 
   if nargin < 9
-    if O.mform
-      Sxinv = NaN;
-    else
-      Sxinv = Sx \ eye(size(Sx));
-    end
+    Sxinv = Sx \ eye(size(Sx));
   end
   %
   if size(Sxinv,1) ~= size(Sxinv,2)
     error('Input argument *Sxinv* must be a square matrix.');
   end
-  if size(xa,1) ~= size(Sxinv,1)
-    error(*Mismatch in size between *Sxinv* and *xa*.');
+  if size(Sx,1) ~= size(Sxinv,1)
+    error('Mismatch in size between *Sxinv* and *Sx*.');
   end
 
   if nargin < 10
-    if O.mform
-      Seinv = NaN;
-    else
-      Seinv = Se \ eye(size(Se));
-    end
+    Seinv = Se \ eye(size(Se));
   end
   %
   if size(Seinv,1) ~= size(Seinv,2)
     error('Input argument *Seinv* must be a square matrix.');
   end
-  if size(y,1) ~= size(Seinv,1)
-    error(*Mismatch in size between *Seinv* and *y*.');
+  if size(Se,1) ~= size(Seinv,1)
+    error('Mismatch in size between *Seinv* and *Se*.');
   end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,41 +109,49 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
 
 %=== Initializations ==========================================================
 
-  %- State vector 
-  %
-  x = xa;
-
   %- Only inversion characterisation?
   %
   only_char = nargin < 8;
+  xa = NaN;
+
+  %- Retrieval variables
+  %
+  x      = xa;
+  yf     = NaN;
+  G      = NaN;
+  cost_x = NaN;
+  cost_y = NaN;
 
   %- Iteration variables
   %
-  ready      = 0;     % Iteration ready?
-  iter       = 0;     % Iteration number
+  ready      = 0;           % Iteration ready?
+  iter       = 0;           % Iteration number
+  nx         = length(xa);
 
-  %- Parts stiored in P
+  %- P structure
   %
   P.converged = 0;
+  P.dx        = [];
 
   %- Print initial screen message
   %
-  out( 1, 1, outfids );
-  out( 1, 'Analytical Bayesian inversion (OEM/MAP)' );
-  out( 2, 0 );
-  if linear
+  out( 1, 1, O.outfids );
+  out( 1, 'Analytical Bayesian inversion (OEM/MAP)', O.outfids );
+  out( 2, 0, O.outfids );
+  if O.linear
     out( 2, 'Linear inversion' );
   else
     if strcmp( upper(O.method), 'GN' )
       O.method = 'GM';  % too have a single choice below
-      out( 2, 'Non-linear inversion: Gauss-Newton' );
+      out( 2, 'Non-linear inversion: Gauss-Newton', O.outfids );
     elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
       O.method = 'ML';  % too have a single choice below
-      out( 2, 'Non-linear inversion: Marquardt-Levenberg' );
+      out( 2, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
     end
+    nlinprint( O.outfids );
   end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -161,17 +164,16 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
   while ~ready
 
     %- This starts a new iteration
+    %
     iter = iter + 1;
 
-    %- Calculate new Jacobian (K)   
+    %- Calculate new Jacobian (J)   
     %
-    [yf,K] = comfun( Q, R, x, iter, 1, 1 );
+    [yf,J] = comfun( Q, R, x, iter, 1, 1 );
 
-    
     %- Calculate gain matrix (contribution function)
     %
-    G = oem_gain( O, K, Sx, Sxinv, Se, Seinv );
-
+    [G,SJSJ] = oem_gain( O, J, Sxinv, Seinv );
 
     %- If only characterisation, we are ready
     %
@@ -182,29 +184,64 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
 
     %- Calculate new state
     %
-    xfound = 0;
-    xold
+    xfound  = 0;
+    subiter = 1;
+    dx      = NaN;
     % 
     while ~xfound
        
+      %- Linear 
       if O.linear
-        x = xa + G * ( y - yf );
+        xnew = xa + G * ( y - yf );
 
+      %- Non-linear
       else
-
-        xold = x;
-
         if strcmp( O.method, 'GN' )
-          x = xa + G * ( y - yf + K * ( xold - xa ) );
-
+          xnew = xa + G * ( y - yf + J * ( xold - xa ) );
         elseif strcmp( O.method, 'ML' )
-          % Calculate x without G
-
-        else
-          % should not happen !
+          error('ML not yet handled');
         end
       end
+
+      if O.linear  |  strcmp( O.method, 'GN' )
+        xfound = 1;
+      else
+        % ML stuff here
+      end
+
+      if ~xfound
+        nlinprint( O.outfids, iter, subiter, cost, xcost, ycost, dx );
+      end
     end
+
+    %- Convergence or max iterations reached ?
+    %
+    if O.linear
+      ready = 1;
+    else
+      %
+      % (Equation 5.31 in the Rodgers book was used here but it didn't work
+      % well for some cases)
+      %
+      dx = ( ( x_new - x )' * SJSJ * ( x_new - x ) ) / nx;
+      %
+      if O.linear  |  dx <= O.stop_dx
+        ready       = 1;
+        P.converged = 1;
+      end
+      %
+      P.dx = [ P.dx dx ];
+      %
+      if ~ready  &  iter == O.max_iter
+        ready = 1;
+      end
+      %
+      nlinprint( O.outfids, iter, subiter, cost, xcost, ycost, dx );
+    end
+
+    %- Update x
+    %
+    x = xnew;
 
   end
 
@@ -215,22 +252,49 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
 
 %=== Inversion characteristics ================================================
 
-  %- G does not exist for some method(s)
+  %- Update J?
   %
-  if isnan( G )
-    O.linear = 1;
-    G = oem_gain( O, K, Sx, Sxinv, Se, Seinv );
+  % Use obtained yf only if not already existing. This to avoid subtle
+  % discrepancies to yf found to give convergence above  
+  %
+  if O.jexact 
+    [ydummy,j] = comfun( Q, R, x, iter, 1, 1 );
+    if isnan(yf)
+      yf = ydummy;
+    end
   end
-  
-  %- Check what shall go to P
+
+  %- Fill P, part 1
   %
   if O.yf
+    %- For linear inversions yf can be lacking
+    if isnan(yf)
+      [yf,J] = comfun( Q, R, x, iter, 1, 0 );
+    end
+    %
     P.yf = yf;
   end
   %
-  if O.K
-    P.K = K;
+  if O.J
+    P.J = J;
   end
+
+  %- G is lacking for ML
+  %
+  if isnan( G )  &  ( O.G | O.A )
+    O.linear = 1;
+    G = oem_gain( O, J, Sxinv, Seinv );
+  end
+
+  %- Fill P, part 2
+  %
+  if O.G
+    P.G = G;
+  end
+  %
+  if O.A
+    P.A = G*J;
+  end  
     
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -259,16 +323,27 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,xa,y,Sxinv,Seinv)
 
 
 %=== oem_gain =================================================================
-  function G = oem_gain( O, K, Sx, Se )
+  function [G,SJSJ] = oem_gain( O, J, Sxinv, Seinv )
+    JtSeinv = J' * Seinv;
+    SJSJ    = Sxinv + JtSeinv * J;
+    %
     if O.linear  |  strcmp(O.method,'GN')
-      if O.mform
-
-      else
-        KtSeinv = K' * Seinv;
-        
-      end
+      G = ( SJSJ \ speye(size(Sxinv)) ) * JtSeinv;
     else
       G = NaN;
+    end
+  return
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+%=== nlinprint ================================================================
+  function nlinprint(outfids,iter,subiter,cost,xcost,ycost,dx)
+    if nargin == 1
+     out( 1,' Main     Sub-     Total    Profile  Spectrum Converg.', outfids);
+     out( 1,' iterat.  iterat.  cost     cost     cost     measure ', outfids);
+    else
+     out( 1, sprintf(' %8d %8d %8.2f %8.2f %8.2f %8.2f', iter, subiter, ...
+                                           cost, xcost, ycost, dx ), outfids );
     end
   return
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
