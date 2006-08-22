@@ -83,10 +83,6 @@ if nargin == 1
     S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
          'cloudbox', 'sensor', 'calc_rte', 'save_y', 'stop' };
 
-  case 'jq'
-    %
-    S = {'start1', 'start2', 'load_atm', 'init_rte', 'sensor', 'jq', 'stop' };
-
   case 'batch'
     %
     S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...

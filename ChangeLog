@@ -1,3 +1,30 @@
+2006-08-22  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-123
+
+	* arts/arts_oem_init.m: Started. Basic functionality ready.
+
+	* demos/arts_oem_demo.m: Started.
+
+	* math/regrid.m: Created.
+
+	* math/dimens.m: Created.
+
+	* arts/arts_x2field.m: Created.
+
+	* arts/arts_covmat.m: Created.
+
+	* arts/arts_atminterp.m: Created.
+
+	* arts/arts_oem.m: First working version. Far from finished. Only gas 
+	species so far handled.
+
+	* arts/arts_y.m: Some small fixes to avoid unnecessary calculations.
+
+	* arts/qarts.m (Q.ABS_SPECIES_SX): Added this field.
+
+	* arts/arts_jq.m: Code moved to arts_oem_init.
+
 2006-08-18  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-122

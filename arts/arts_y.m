@@ -18,6 +18,14 @@
 
 function [y,dy,J,jq,ji] = arts_y( Q )
 
+
+%- Avoid unnecessary Jacobian calculations
+%
+if nargout <= 2
+  Q.JACOBIAN_DO = 0;
+end
+
+
 tmpfolder   = create_tmpfolder;
 
 parts = qarts2cfile( 'y' );
@@ -46,17 +54,15 @@ y = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
 
 if Q.JACOBIAN_DO
   J = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
-  jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
-  ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
-  for i = 1 : length(ji)
-    for j = 1 : length(ji{i})
-      ji{i}{j} = ji{i}{j} + 1;
+  if nargout >= 4
+    jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
+    ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
+    for i = 1 : length(ji)
+      for j = 1 : length(ji{i})
+        ji{i}{j} = ji{i}{j} + 1;
+      end
     end
   end
-else
-  J  = NaN;
-  jq = NaN;
-  ji = NaN;
 end
 
 delete_tmpfolder( tmpfolder );
