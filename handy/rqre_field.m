@@ -15,7 +15,7 @@
 function rqre_field( Q, fieldname, accept_nan )
 
 if ~isfield( Q, fieldname )
-  error( sprintf('Structure %s is reuired to have field %s.', ...
+  error( sprintf('Structure %s is required to have field %s.', ...
                                                    inputname(1), fieldname ) );
 end
 

@@ -15,10 +15,18 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   if ~isfield( O, 'outfids' ),   O.outfids = 1;         end
   if ~isfield( O, 'jexact' ),    O.jexact = 0;          end
   %
+  if ~isfield( O, 'cost' ),      O.cost = 0;            end  
+  if ~isfield( O, 'Xiter' ),     O.Xiter = 0;           end  
   if ~isfield( O, 'yf' ),        O.yf = 0;              end
-  if ~isfield( O, 'J' ),         O.J = 0;               end
-  if ~isfield( O, 'G' ),         O.G = 0;               end
-  if ~isfield( O, 'A' ),         O.A = 0;               end
+  if ~isfield( O, 'J' ),         O.J  = 0;              end
+  if ~isfield( O, 'G' ),         O.G  = 0;              end
+  if ~isfield( O, 'A' ),         O.A  = 0;              end
+  if ~isfield( O, 'S' ),         O.S  = 0;              end
+  if ~isfield( O, 'So' ),        O.So = 0;              end
+  if ~isfield( O, 'Ss' ),        O.Ss = 0;              end
+  if ~isfield( O, 'd' ),         O.d  = 0;              end
+  if ~isfield( O, 'do' ),        O.do = 0;              end
+  if ~isfield( O, 'ds' ),        O.ds = 0;              end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -36,7 +44,8 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   if strcmp( upper(O.method), 'LI' )
     O.method = 'LI';
   else
-    rqre_fields( O, {'maxiter','stop_dx'}, 0 );
+    rqre_field( O, 'maxiter', 0 );
+    rqre_field( O, 'stop_dx', 0 );
     if strcmp( upper(O.method), 'GN' )
       O.method = 'GN';  
     elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
@@ -116,20 +125,30 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   x      = xa;
   yf     = NaN;
   G      = NaN;
-  cost_x = NaN;
-  cost_y = NaN;
 
   %- Iteration variables
   %
   ready      = 0;           % Iteration ready?
   iter       = 0;           % Iteration number
-  nx         = length(xa);
+  nx         = size( Sx, 1 );
+  ny         = size( Se, 1 );
   linear     = strcmp( O.method, 'LI' );
+  cost       = NaN;
+  cost_x     = NaN;
+  cost_y     = NaN;
 
   %- P structure
   %
   P.converged = 0;
   P.dx        = [];
+  if O.Xiter
+    P.Xiter   = [];
+  end
+  if O.cost  |  strcmp( O.method, 'ML' )
+    P.cost_x = [];
+    P.cost_y = [];
+    P.cost   = [];
+  end
 
   %- Print initial screen message
   %
@@ -140,15 +159,14 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     out( 2, 'Linear inversion' );
   else
     if strcmp( upper(O.method), 'GN' )
-      O.method = 'GM';  % too have a single choice below
       out( 2, 'Non-linear inversion: Gauss-Newton', O.outfids );
     elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
-      O.method = 'ML';  % too have a single choice below
       out( 2, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
     end
+    out( 2, 0, O.outfids );
     nlinprint( O.outfids );
   end
 
@@ -167,7 +185,6 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
     %- Calculate new Jacobian (J)   
     %
-    %[yf,J] = comfun( Q, R, x, iter, 1 );
     [yf,J] = feval( comfun, Q, R, x, iter, 1 );
 
     %- Some matrix products
@@ -194,7 +211,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       if iter == 1
         wdy = JtSeinv * ( y - yf );
       else
-        wdy = KtSeinv * ( y - yf ) - Sxinv * ( x - xa );
+        wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
       end
        
       %- Linear 
@@ -213,6 +230,19 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       %- yf not valid for xnew
       yf = NaN;
 
+      %- Cost values
+      if O.cost  |  strcmp( O.method, 'ML' )
+        yf       = feval( comfun, Q, R, xnew, iter+1 );
+        a        = xnew - xa;
+        cost_x   = (a' * Sxinv * a) / ny;  
+        a        = y - yf;
+        cost_y   = (a' * Seinv * a) / ny; 
+        cost     = cost_x + cost_y;
+        P.cost   = [ P.cost cost ];
+        P.cost_y = [ P.cost_y cost_y ];
+        P.cost_x = [ P.cost_x cost_x ];
+      end
+
       %- Has OK state been found?
       if linear  |  strcmp( O.method, 'GN' )
         xfound = 1;
@@ -221,7 +251,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       end
 
       if ~xfound
-        nlinprint( O.outfids, iter, subiter, cost, xcost, ycost, dx );
+        nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
       end
     end
 
@@ -234,7 +264,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       % (Equation 5.31 in the Rodgers book was used here but it didn't work
       % well for some cases)
       %
-      dx = ( ( x_new - x )' * SJSJ * ( x_new - x ) ) / nx;
+      dx = ( ( xnew - x )' * SJSJ * ( xnew - x ) ) / nx;
       %
       if linear  |  dx <= O.stop_dx
         ready       = 1;
@@ -243,16 +273,20 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       %
       P.dx = [ P.dx dx ];
       %
-      if ~ready  &  iter == O.max_iter
+      if ~ready  &  iter == O.maxiter
         ready = 1;
       end
       %
-      nlinprint( O.outfids, iter, subiter, cost, xcost, ycost, dx );
+      nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
     end
 
     %- Update x
     %
     x = xnew;
+
+    if O.Xiter
+      P.Xiter   = [ P.Xiter x ];
+    end
 
   end
 
@@ -264,9 +298,6 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 %=== Inversion characteristics ================================================
 
   %- Update J?
-  %
-  % Use obtained yf only if not already existing. This to avoid subtle
-  % discrepancies to yf found to give convergence above  
   %
   if O.jexact  &  ~only_char 
     [yf,J] = feval( comfun, Q, R, x, iter+1, 1 );
@@ -290,8 +321,14 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   %- Calculate G ?
   %
-  if O.G | O.A 
+  if O.G | O.A | O.S | O.So | O.Ss | O.d | O.do | O.ds
     G = ( SJSJ \ speye(size(Sxinv)) ) * JtSeinv;
+  end
+
+  %- Calculate A ?
+  %
+  if O.A | O.S | O.Ss | O.d | O.ds
+    A = G * J;
   end
 
   %- Fill P, part 2
@@ -300,8 +337,41 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     P.G = G;
   end
   %
-  if O.A
-    P.A = G*J;
+  if O.A 
+    P.A = A;
+  end  
+  %
+  if O.S  |  O.So  |  O.d  |  O.do
+    So = G * Se * G';
+    %
+    if O.So
+      P.So = So;
+    end
+    %
+    if O.do
+      P.do = sqrt( diag( So ) );
+    end
+  end  
+  %
+  if O.S  |  O.Ss  |  O.d  |  O.ds
+    AI = A - eye(size(A,1));
+    Ss = AI * Sx * AI';
+    %
+    if O.S
+      P.S = Ss + So;
+    end
+    %
+    if O.Ss
+      P.Ss = Ss;
+    end
+    %
+    if O.d
+      P.d = sqrt( diag( Ss ) + diag( So ) );
+    end
+    %
+    if O.ds
+      P.ds = sqrt( diag( Ss ) );
+    end
   end  
     
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -332,10 +402,12 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 %=== nlinprint ================================================================
   function nlinprint(outfids,iter,subiter,cost,xcost,ycost,dx)
     if nargin == 1
-     out( 1,' Main     Sub-     Total    Profile  Spectrum Converg.', outfids);
-     out( 1,' iterat.  iterat.  cost     cost     cost     measure ', outfids);
+     out( 1,'     Main      Sub-     Total   Profile  Spectrum  Converg.', ...
+                                                                     outfids );
+     out( 1,'  iterat.   iterat.      cost      cost      cost   measure', ...
+                                                                     outfids );
     else
-     out( 1, sprintf(' %8d %8d %8.2f %8.2f %8.2f %8.2f', iter, subiter, ...
+     out( 1, sprintf('%8d  %8d  %8.2f  %8.2f  %8.2f  %8.2f', iter, subiter, ...
                                            cost, xcost, ycost, dx ), outfids );
     end
   return

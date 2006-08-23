@@ -51,7 +51,8 @@ Q.SURFACE_PROP_AGENDA = ...
    { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
      'Ignore(rte_los){}','surfaceBlackbody{}' };
 %
-Q.PRE_RTE_WSMS        = { 'MatrixCBR(i_space,f_grid){}' };
+Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}', 'Ignore(rte_pos){}', ...
+                      'MatrixCBR(iy,f_grid){}', 'MatrixScale(iy,iy){0}' };
 %
 Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric{', ...
                           '  lmax      = -1', ...
@@ -72,7 +73,7 @@ Q.JACOBIAN_DO                 = 1;
 Q.ABS_SPECIES_JAC(1).DO       = 1;
 Q.ABS_SPECIES_JAC(1).METHOD   = 'analytical';
 Q.ABS_SPECIES_JAC(1).UNIT     = 'rel';
-Q.ABS_SPECIES_JAC(1).P_GRID   = z2p_simple( 21e3:3e3:66e3 );
+Q.ABS_SPECIES_JAC(1).P_GRID   = z2p_simple( 0e3:3e3:90e3 );
 %
 Q.ABS_SPECIES_SX(1).FORMAT    = 'param'; 
 Q.ABS_SPECIES_SX(1).SI        = 1;
@@ -105,13 +106,26 @@ Se = arts_covmat( 1, D, Q.F_GRID );
 
 %= Measurement
 %
-y = 1.1 * arts_y(Q);
+y = 1.1 * arts_y(Q) + si*randn(size(Se,1),1);
 
 
 %= OEM
 %
-O.yf = 1;
-O.A  = 1;
+O.method  = 'GN';
+O.stop_dx = 0.01;
+O.maxiter = 10;
+%
+O.cost    = 1;
+O.Xiter   = 1;
+O.yf      = 1;
+O.J       = 1;
+O.A       = 1;
+O.S       = 0;
+O.So      = 0;
+O.Ss      = 0;
+O.d       = 0; 
+O.do      = 1;
+O.ds      = 0;
 %
 [Qoem,R,Sx,xa] = arts_oem_init( Q, [] );
 %
@@ -120,6 +134,8 @@ O.A  = 1;
 arts_oem_init( 'clean', R );
 clear Qoem O
 
+
+z = p2z_simple( Q.ABS_SPECIES_JAC(1).P_GRID );
 
 keyboard
 return

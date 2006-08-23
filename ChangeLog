@@ -1,3 +1,9 @@
+2006-08-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-124
+
+	* retrieval/oem.m: Added more P output fields and GN is now working.
+
 2006-08-22  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-123
