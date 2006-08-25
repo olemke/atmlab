@@ -1,3 +1,9 @@
+2006-08-25  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-125
+
+	* arts/arts_oem.m: Added re-scaling of J needed for 'rel' unit. 
+
 2006-08-23  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-124

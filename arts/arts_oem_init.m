@@ -83,12 +83,13 @@ for i = 1 : nq
                                                        Q.ABS_SPECIES_JAC(ig) );
     R.t(ind)   = D(:);
     %
+    %- Get VMR for each retrieval point 
+    D          = arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
+                     get_vmrfield_i(Q.VMR_FIELD,ig), Q.ABS_SPECIES_JAC(ig) );
+    R.vmr(ind) = D(:);
+    %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
-      %- Get VMR for each retrieval point 
-      D          = arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
-                       get_vmrfield_i(Q.VMR_FIELD,ig), Q.ABS_SPECIES_JAC(ig) );
-      R.vmr(ind) = D(:);
     else
       if strcmp( R.jq{i}.mode, 'vmr' )
         xa(ind) = R.vmr(ind);

@@ -7,18 +7,28 @@ do_j_DEFAULT = 0;
 %
 set_defaults;
 
-Q0=Q;
+
 
 % Checks done *arts_oem_init* are not repeated here
+%
+if nargout < 2
+  do_j = 0;
+end
+
+
 
 
 %--- Map x to variables -------------------------------------------------------
 if iter > 1
 
-  %- Some other variables
+  %- General variables
   %
-  i_asj = find( [ Q.ABS_SPECIES_JAC.DO ] );
-  nq    = length( R.jq );
+  nq    = length( R.jq );                   % Number of retrieval quantities.
+  %
+  i_asj = find( [ Q.ABS_SPECIES_JAC.DO ] ); % Index of retrieval absorption
+  %                                           species.
+  i_rel = [];                               % Index for x-values retrieved in
+  %                                           relative units.
 
   %- Loop retrieval quantities
   %
@@ -38,6 +48,7 @@ if iter > 1
             Q.ABS_SPECIES_JAC(ig).P_GRID, Q.ABS_SPECIES_JAC(ig).LAT_GRID, ...
             Q.ABS_SPECIES_JAC(ig).LON_GRID, x(ind) .* R.vmr(ind), ...
                                             Q.P_GRID, Q.LAT_GRID, Q.LON_GRID );
+        i_rel = [ i_rel ind ];
       elseif strcmp( R.jq{i}.mode, 'vmr' )
         [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
             Q.ABS_SPECIES_JAC(ig).P_GRID, Q.ABS_SPECIES_JAC(ig).LAT_GRID, ...
@@ -61,14 +72,23 @@ end
 
 %--- Run ARTS -----------------------------------------------------------------
 
-if nargout == 1  |  ~do_j
+if ~do_j
   y = arts_y( Q );
 else
   [y,dy,J] = arts_y( Q );
 end
-%
+
 %------------------------------------------------------------------------------
 
+
+
+%--- Post-processing ----------------------------------------------------------
+
+if do_j  &  iter > 1  &  ~isempty( i_rel )
+  J(:,i_rel) =  J(:,i_rel) ./ repmat( x(i_rel)', size(J,1), 1 );
+end
+
+%------------------------------------------------------------------------------
 
 return
 

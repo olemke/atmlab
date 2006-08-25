@@ -72,11 +72,11 @@ Q.STOKES_DIM        = 1;
 Q.JACOBIAN_DO                 = 1;
 Q.ABS_SPECIES_JAC(1).DO       = 1;
 Q.ABS_SPECIES_JAC(1).METHOD   = 'analytical';
-Q.ABS_SPECIES_JAC(1).UNIT     = 'rel';
-Q.ABS_SPECIES_JAC(1).P_GRID   = z2p_simple( 0e3:3e3:90e3 );
+Q.ABS_SPECIES_JAC(1).UNIT     = 'vmr';
+Q.ABS_SPECIES_JAC(1).P_GRID   = z2p_simple( 0e3:1e3:90e3 );
 %
 Q.ABS_SPECIES_SX(1).FORMAT    = 'param'; 
-Q.ABS_SPECIES_SX(1).SI        = 1;
+Q.ABS_SPECIES_SX(1).SI        = 0.1e-6;
 Q.ABS_SPECIES_SX(1).CCO       = 0.01;  
 Q.ABS_SPECIES_SX(1).CFUN1     = 'exp';
 Q.ABS_SPECIES_SX(1).CL1       = 0.25*[1 1];
@@ -106,7 +106,9 @@ Se = arts_covmat( 1, D, Q.F_GRID );
 
 %= Measurement
 %
-y = 1.1 * arts_y(Q) + si*randn(size(Se,1),1);
+e = si*randn(size(Se,1),1);
+%
+y = 1.1 * arts_y(Q);
 
 
 %= OEM
