@@ -29,7 +29,8 @@ Q1 = qarts1;
 
 %= Spectroscopy
 %
-Q.ABS_SPECIES{1}{1} = 'O3';
+Q = q_gas_species( Q, 'O3', 1, 'rel', 'analytical', 0, ...
+                                                   z2p_simple( 0e3:1e3:90e3) );
 %
 Q1.LINEFORMAT       = 'Arts';
 Q1.LINEDATA         = fullfile( atmlab_example_data , 'o3line111ghz' );
@@ -69,18 +70,13 @@ Q.STOKES_DIM        = 1;
 
 %= Jacobian
 %
-Q.JACOBIAN_DO                 = 1;
-Q.ABS_SPECIES_JAC(1).DO       = 1;
-Q.ABS_SPECIES_JAC(1).METHOD   = 'analytical';
-Q.ABS_SPECIES_JAC(1).UNIT     = 'vmr';
-Q.ABS_SPECIES_JAC(1).P_GRID   = z2p_simple( 0e3:1e3:90e3 );
 %
-Q.ABS_SPECIES_SX(1).FORMAT    = 'param'; 
-Q.ABS_SPECIES_SX(1).SI        = 0.1e-6;
-Q.ABS_SPECIES_SX(1).CCO       = 0.01;  
-Q.ABS_SPECIES_SX(1).CFUN1     = 'exp';
-Q.ABS_SPECIES_SX(1).CL1       = 0.25*[1 1];
-Q.ABS_SPECIES_SX(1).CL1_GRID1 = [1100e2 1e-3];  
+%Q.ABS_SPECIES_SX(1).FORMAT    = 'param'; 
+%Q.ABS_SPECIES_SX(1).SI        = 0.1e-6;
+%Q.ABS_SPECIES_SX(1).CCO       = 0.01;  
+%Q.ABS_SPECIES_SX(1).CFUN1     = 'exp';
+%Q.ABS_SPECIES_SX(1).CL1       = 0.25*[1 1];
+%Q.ABS_SPECIES_SX(1).CL1_GRID1 = [1100e2 1e-3];  
 
 %============================================================================
 
@@ -88,8 +84,15 @@ Q.ABS_SPECIES_SX(1).CL1_GRID1 = [1100e2 1e-3];
 
 %= Create absorption lookup table by ARTS1
 %
-Q.ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
-
+filename = 'abstable111ghz.xml';
+%
+if 0
+  Q.ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
+  xmlStore( filename, Q.ABS_LOOKUP, 'GasAbsLookup' );
+end
+%
+Q.ABS_LOOKUP = filename;
+  
 
 
 %= Create Se

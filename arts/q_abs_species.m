@@ -1,15 +1,15 @@
-% Q_GAS_SPECIES   Adds a gas species to a Qarts structure
+% Q_ABS_SPECIES   Adds a gas species to a Qarts structure
 %
-%    The method modifies the fields GAS_SPECIES and GAS_SPECIES_JAC.
+%    The method modifies the fields ABS_SPECIES and J.ABS_SPECIES.
 %    The field ATMOSPHERE_DIM must be set.
 %
 %    Example on adding a species, without jacobians:
-%       Q = q_gas_species( Q, {'O2-PWR93'} );
+%       Q = q_abs_species( Q, {'O2-PWR93'} );
 %
 %    With jacobians:
 %       Q = q_gas_species( Q,{'H2O-PWR98'},1,'rel','analytical',NaN,p_grid);
 %
-% FORMAT   Q = q_gas_species( Q, tags, [ do_jac, unit, method, dx, p_grid, ...
+% FORMAT   Q = q_abs_species( Q, tags, [ do_jac, unit, method, dx, p_grid, ...
 %                                                        lat_grid, lon_grid ] )
 %        
 % OUT   Q          Modified Q structure.
@@ -27,7 +27,7 @@
 % 2005-06-23   Created by Patrick Eriksson.
 
 
-function Q = q_gas_species(...
+function Q = q_abs_species(...
                         Q,tags,do_jac,unit,method,dx,p_grid,lat_grid,lon_grid)
 
 
@@ -44,12 +44,12 @@ rqre_datatype( 'cellstr', tags );
 rqre_bool( 'argument *do_jac*', do_jac );
 
 
-%= Checl length of fields to set
+%= Check length of fields to set
 %
-i = length(Q.GAS_SPECIES);
+i = length(Q.ABS_SPECIES);
 %
-if length(Q.GAS_SPECIES_JAC) ~= i
-  error('Length of fields GAS_SPECIES and GAS_SPECIES_JAC must be identical.');
+if length(Q.J.ABS_SPECIES) ~= i
+  error('Length of fields ABS_SPECIES and J.ABS_SPECIES must be identical.');
 end
 
 
@@ -57,25 +57,25 @@ i = i + 1;
 
 
 for j = 1 : length(tags)
-  Q.GAS_SPECIES{i}{j} = tags{j};
+  Q.ABS_SPECIES{i}{j} = tags{j};
 end
 
 
-Q.GAS_SPECIES_JAC{i}.DO = do_jac;
+Q.J.ABS_SPECIES(i).DO = do_jac;
 
 
 if do_jac
 
-  Q.GAS_SPECIES_JAC{1}.UNIT   = unit;
-  Q.GAS_SPECIES_JAC{i}.METHOD = method;
-  Q.GAS_SPECIES_JAC{i}.DX     = dx;
-  Q.GAS_SPECIES_JAC{1}.P_GRID = p_grid;
+  Q.ABS_SPECIES_JAC(i).UNIT   = unit;
+  Q.ABS_SPECIES_JAC(i).METHOD = method;
+  Q.ABS_SPECIES_JAC(i).DX     = dx;
+  Q.ABS_SPECIES_JAC(i).GRID1  = p_grid;
 
   if Q.ATMOSPHERE_DIM >= 2
-    Q.GAS_SPECIES_JAC{1}.LAT_GRID = lat_grid;
+    Q.ABS_SPECIES_JAC(i).GRID2 = lat_grid;
 
     if Q.ATMOSPHERE_DIM >= 3
-      Q.GAS_SPECIES_JAC{1}.LON_GRID = lon_grid;
+      Q.ABS_SPECIES_JAC(i).GRID3 = lon_grid;
     end
   end
 end

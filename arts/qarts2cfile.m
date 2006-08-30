@@ -28,6 +28,8 @@
 %    Sorry, the Q fields needed for each part is not listed here.
 %    See the code.
 %
+%    For fields that can be given both as a Matlab variable or name of a 
+%    file, a file is generated automatically if the input a variable.
 %    Output is stored in files placed in *tmpdir*, with names identical
 %    the WSV name and extension '.xml' (e.g. y.xml).
 %
@@ -81,7 +83,7 @@ if nargin == 1
   case 'y'
     %
     S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
-         'cloudbox', 'sensor', 'calc_rte', 'save_y', 'stop' };
+         'cloudbox', 'sensor', 'j', 'y', 'stop' };
 
   case 'batch'
     %
@@ -92,18 +94,20 @@ if nargin == 1
     error( sprintf( 'Unknown run type (%s) was requested.', Q ) );
   end
 
-  return
-
+  return    % --->
 end
+%------------------------------------------------------------------------------
+
+
 
 
 
 %--- Version returning string struture ----------------------------------------
-%
 
 qcheck( @qarts, Q );
 
 S = {};
+
 
 for i = 1 : length(parts)
 
@@ -116,12 +120,7 @@ case 'start1'
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Main{';
   T{3} = 'output_file_formatSetAscii{}';
-  if Q.JACOBIAN_DO
-    T{4} = 'jacobianInit{}';
-  else
-    T{4} = 'jacobianOff{}';
-  end
-  T{5} = 'abs_speciesInit{}';
+  T{4} = 'abs_speciesInit{}';
 
 case 'start2'
   %
@@ -145,62 +144,8 @@ case 'load_atm'
   %
   %- Add gas species
   for i = 1 : length(Q.ABS_SPECIES)
-
-    %- Jacobians or not?
-    do_jac = 0;
-    if Q.JACOBIAN_DO  &  ~isempty(Q.ABS_SPECIES_JAC)  &  ...
-                                                length(Q.ABS_SPECIES_JAC) >= i
-      rqre_field( Q.ABS_SPECIES_JAC(i), 'DO' )
-      if Q.ABS_SPECIES_JAC(i).DO
-        do_jac = 1;
-        rqre_field( Q.ABS_SPECIES_JAC(i), 'METHOD' )
-        rqre_field( Q.ABS_SPECIES_JAC(i), 'UNIT' )
-        rqre_field( Q.ABS_SPECIES_JAC(i), 'P_GRID' )
-      end
-    end
-    
-    %- Write to cfile
-    if ~do_jac
-      T{end+1} = sprintf( 'abs_speciesAdd{[%s]}', ...
-			  arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
-    else
-      if Q.ATMOSPHERE_DIM < 2
-        lat_grid = [];
-      else
-        rqre_field( Q.ABS_SPECIES_JAC(i), 'LAT_GRID' )
-        lat_grid = Q.ABS_SPECIES_JAC(i).LAT_GRID;
-      end
-      if Q.ATMOSPHERE_DIM < 3
-        lon_grid = [];
-      else
-        rqre_field( Q.ABS_SPECIES_JAC(i), 'LON_GRID' )
-        lon_grid = Q.ABS_SPECIES_JAC(i).LON_GRID;
-      end
-      T{end+1} = file_or_data( 'vector_1', 'Vector', ...
-          Q.ABS_SPECIES_JAC(i).P_GRID, tmpdir, sprintf('gas%d_jac_p_grid',i) );
-      T{end+1} = file_or_data( 'vector_2', 'Vector', ...
-                           lat_grid, tmpdir, sprintf('gas%d_jac_lat_grid',i) );
-      T{end+1} = file_or_data( 'vector_3', 'Vector', ...
-                           lon_grid, tmpdir, sprintf('gas%d_jac_lon_grid',i) );
-
-      T{end+1} = 'jacobianAddGas(vector_1,vector_2,vector_3){';
-      T{end+1} = sprintf( '  species = %s', ...
+    T{end+1} = sprintf( 'abs_speciesAdd{[%s]}', ...
                                           arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
-      T{end+1} = sprintf( '  method  = "%s"', ...
-                                                 Q.ABS_SPECIES_JAC(i).METHOD );
-      T{end+1} = sprintf( '  unit    = "%s"', ...
-                                                   Q.ABS_SPECIES_JAC(i).UNIT );
-      if strcmp( Q.ABS_SPECIES_JAC(i).METHOD, 'analytical' )
-         T{end+1} = '  dx = 0.0';
-      elseif strcmp( Q.ABS_SPECIES_JAC(i).METHOD, 'perturbation' )
-        rqre_field( Q.ABS_SPECIES_JAC(i), 'DX' )
-        T{end+1} = sprintf( '  dx      = %.5e', Q.ABS_SPECIES_JAC(i).DX );
-      else
-        error( sprintf('Unknown selection for ABS_SPECIES_JAC.METHOD (%s)',...
-                                               Q.ABS_SPECIES_JAC(i).METHOD ) );
-      end
-      T{end+1} = '}';
-    end
   end
   %
   if Q.USE_RAW_ATMOSPHERE
@@ -264,19 +209,6 @@ case 'init_rte'
   T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, tmpdir );
   T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, tmpdir );
   %
-  if Q.JACOBIAN_DO  &  ~isempty(Q.POINTING_JAC)
-      rqre_field( Q.POINTING_JAC, 'SENSOR_TIME' )
-      rqre_field( Q.POINTING_JAC, 'DZA' )
-      rqre_field( Q.POINTING_JAC, 'POLY_ORDER' )
-  
-      T{end+1} = file_or_data( 'sensor_time', 'Vector', ...
-                                          Q.POINTING_JAC.SENSOR_TIME, tmpdir );
-      T{end+1} = 'jacobianAddPointing{';
-      T{end+1} = sprintf( '  dza        = %g', Q.POINTING_JAC.DZA );
-      T{end+1} = sprintf( '  poly_order = %d', Q.POINTING_JAC.POLY_ORDER );
-      T{end+1} = '}';
-  end
-  %
   T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
 
 case 'cloudbox'
@@ -311,18 +243,24 @@ case 'save_sensor'
   T{1} = add_savefile( 'sensor_response', tmpdir );
   T{2} = add_savefile( 'sensor_response_f', tmpdir );
   
-case { 'calc_rte', 'jq' }
+case 'j'
   %
-  if Q.JACOBIAN_DO
-    %
-    T{end+1} = 'jacobianClose{}'; 
-    T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
-    T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
-    if strcmp( parts{i}, 'jq' )
-      T{end+1} = 'Exit{}';
-    end
-    %
+  if isstruct( Q.J )  &  isfield( Q.J. 'SPECIES' )
+    T = j2cfile( Q.J, tmpdir );
+    do_j = 1;
+  elseif isnan( Q.J )  |  Q.J == 0 
+    T = 'jacobianOff{}';
+    do_j = 0;
+  else
+    error( 'Unknown selection for Q.JACOBIAN.' );
   end
+
+case 'save_jq'
+  %
+  T{1} = add_savefile( 'jacobian_quantities', tmpdir );
+  T{2} = add_savefile( 'jacobian_indices', tmpdir );
+
+case 'y'
   %
   %= Special solution for DOIT
   if isstruct(Q.CLOUDBOX)  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
@@ -338,11 +276,9 @@ case { 'calc_rte', 'jq' }
   %
   T{end+1} = 'RteCalc{}';
   %
-  if Q.JACOBIAN_DO
+  if do_j
     T{end+1} = 'jacobianCalc{}'; 
   end
-
-case 'save_y'
   %
   switch upper( Q.Y_UNIT )
     case '1'
@@ -371,7 +307,7 @@ case 'save_y'
     T{5} = add_savefile( 'mc_error', tmpdir );
   end
   %
-  if Q.JACOBIAN_DO
+  if do_j
   %
     switch upper( Q.Y_UNIT )
       case '1'
@@ -886,3 +822,88 @@ switch upper( Q.Y_UNIT )
 end
 %
 T{end+1} = add_savefile( 'ybatch', tmpdir );
+
+
+
+%------------------------------------------------------------------------------
+% j2cfile
+%------------------------------------------------------------------------------
+
+function T = j2cfile( Q, tmpdir )
+
+%- Check that all fields are present
+%
+qcheck( @qarts_batch, Q.J );
+
+T{1} = 'jacobianInit{}'; 
+
+
+%- Gas species
+for i = 1 : length(Q.J.ABS_SPECIES)
+  %
+  rqre_field( Q.J.ABS_SPECIES(i), 'DO' )
+  %
+  if Q.J.ABS_SPECIES(i).DO
+    %
+    rqre_field( Q.J.ABS_SPECIES(i), 'METHOD' )
+    rqre_field( Q.J.ABS_SPECIES(i), 'UNIT' )
+    rqre_field( Q.J.ABS_SPECIES(i), 'GRID1' )
+
+    if Q.ATMOSPHERE_DIM < 2
+      lat_grid = [];
+    else
+      rqre_field( Q.J.ABS_SPECIES(i), 'GRID2' )
+      lat_grid = Q.J.ABS_SPECIES(i).GRID2;
+    end
+    if Q.ATMOSPHERE_DIM < 3
+      lon_grid = [];
+    else
+      rqre_field( Q.J.ABS_SPECIES(i), 'GRID3' )
+      lon_grid = Q.J.ABS_SPECIES(i).GRID3;
+    end
+    T{end+1} = file_or_data( 'vector_1', 'Vector', ...
+              Q.J.ABS_SPECIES(i)GRID1, tmpdir, sprintf('gas%d_jac_p_grid',i) );
+    T{end+1} = file_or_data( 'vector_2', 'Vector', ...
+                           lat_grid, tmpdir, sprintf('gas%d_jac_lat_grid',i) );
+    T{end+1} = file_or_data( 'vector_3', 'Vector', ...
+                           lon_grid, tmpdir, sprintf('gas%d_jac_lon_grid',i) );
+
+    T{end+1} = 'jacobianAddGas(vector_1,vector_2,vector_3){';
+    T{end+1} = sprintf( '  species = %s', arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
+    T{end+1} = sprintf( '  method  = "%s"', Q.J.ABS_SPECIES(i).METHOD );
+    T{end+1} = sprintf( '  unit    = "%s"', Q.J.ABS_SPECIES(i).UNIT );
+    if strcmp( Q.J.ABS_SPECIES(i).METHOD, 'analytical' )
+       T{end+1} = '  dx = 0.0';
+    elseif strcmp( Q.J.ABS_SPECIES(i).METHOD, 'perturbation' )
+      rqre_field( Q.J.ABS_SPECIES(i), 'DX' )
+      T{end+1} = sprintf( '  dx      = %.5e', Q.J.ABS_SPECIES(i).DX );
+    else
+      error( sprintf('Unknown selection for J.ABS_SPECIES.METHOD (%s)',...
+                                                 Q.J.ABS_SPECIES(i).METHOD ) );
+    end
+    T{end+1} = '}';
+  end
+end
+
+
+%- Pointing
+%
+if Q.J.POINTING.DO
+  rqre_field( Q.POINTING_JAC, 'DZA' )
+  rqre_field( Q.POINTING_JAC, 'POLY_ORDER' )
+  
+  T{end+1} = 'jacobianAddPointing{';
+  T{end+1} = sprintf( '  dza        = %g', Q.POINTING_JAC.DZA );
+  T{end+1} = sprintf( '  poly_order = %d', Q.POINTING_JAC.POLY_ORDER );
+  T{end+1} = '}';
+end
+
+%- Close
+%
+if length(T) > 1
+  T{end+1} = 'jacobianClose{}'; 
+else
+  T{1} = 'jacobianOff{}';
+end
+
+

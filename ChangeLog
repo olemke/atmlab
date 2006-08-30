@@ -1,3 +1,18 @@
+2006-08-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-126
+
+	* Qarts NOT WORKING IN THIS VERSION. Work in progress. Need to 
+	commit/backup, due to an update of computer system.
+
+	* arts/q_abs_species.m: Replaces *q_gas_species*.
+
+	* arts/notes.txt: A temporary file.
+
+	* arts/qarts_jacobian.m: Created.
+
+	* arts/qarts.m: Moved jacobian fields to qarts_jacobian. 
+
 2006-08-25  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-125

@@ -1,0 +1,28 @@
+- Q shall only contain forward model variables. And match ARTS as
+closely as possible.
+  
+   - No covariance definitions in Q.
+
+
+- Use notation grid1, grid2 and grid3 for retrieval definitions. 
+
+   - This both in Q and for definition of covariances.
+   - To allow general Atmlab functions
+
+
+- The control file is created for each run. 
+
+   - This allows to use the variable2file functionality in qarts2file.
+   - As many variables as possible are stored to files in arts_oem_init.
+
+
+- Definition of Jacobian a large structure
+
+   - Following Q.CLOUDBOX/SENSOR/BATCH.
+   - Main field names follows corresponding jacobianAdd method 
+   - Each retrieval quantity has a DO field (where all can be 0).
+   - Solution for ABS_SPECIES:
+       J.ABS_SPECIES(1).DO       = 1;
+       J.ABS_SPECIES(1).METHOD   = 'analytical';
+       J.ABS_SPECIES(1).UNIT     = 'vmr';
+       J.ABS_SPECIES(1).P_GRID   = z2p_simple( 0e3:1e3:90e3 );
