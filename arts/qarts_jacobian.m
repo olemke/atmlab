@@ -21,11 +21,11 @@ function [J,I] = qarts_jacobian
 
 %-----------------------------------------------------------------------------
 J.ABS_SPECIES(1).DO     = 0;
-J.ABS_SPECIES(1).METHOD = [];
-J.ABS_SPECIES(1).UNIT   = [];
-J.ABS_SPECIES(1).GRID1  = [];
-J.ABS_SPECIES(1).GRID2  = [];
-J.ABS_SPECIES(1).GRID3  = [];
+J.ABS_SPECIES(1).METHOD = NaN;
+J.ABS_SPECIES(1).UNIT   = NaN;
+J.ABS_SPECIES(1).GRID1  = NaN;
+J.ABS_SPECIES(1).GRID2  = NaN;
+J.ABS_SPECIES(1).GRID3  = NaN;
 I.ABS_SPECIES = [ ...
 'Specification of absorption species jacobians.', ...
 '#    This field is an array of structures. These fields are defined:',...
@@ -45,8 +45,8 @@ I.ABS_SPECIES = [ ...
 ];
 %-----------------------------------------------------------------------------
 J.POINTING.DO         = 0;
-J.POINTING.DZA        = [];
-J.POINTING.POLY_ORDER = [];
+J.POINTING.DZA        = NaN;
+J.POINTING.POLY_ORDER = NaN;
 I.POINTING = [ ...
 'Structure for specification of pointing offset jacobians. The fields ', ...
 'correspond directly to keyword arguments of *jacobianAddPointing*:', ...

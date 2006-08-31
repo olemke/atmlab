@@ -34,9 +34,8 @@ addpath_ami;
 %
 Q  = qarts;
 Q1 = qarts1;
-H  = qarts_sensor;
 %
-Q.JACOBIAN_DO = 1;
+J  = qarts_jacobian;
 
 
 %= Atmosphere
@@ -61,25 +60,24 @@ end
 %= Spectroscopy
 %
 Q.ABS_SPECIES{1}{1}         = 'ClO';
-Q.ABS_SPECIES_JAC(1).DO     = 1;
-Q.ABS_SPECIES_JAC(1).METHOD = 'analytical';
-%Q.ABS_SPECIES_JAC(1).METHOD = 'perturbation';
-%Q.ABS_SPECIES_JAC(1).DX     = 0.01;
-Q.ABS_SPECIES_JAC(1).UNIT   = 'rel';
-Q.ABS_SPECIES_JAC(1).P_GRID = z2p_simple( [11e3:2e3:71e3] );
+J.ABS_SPECIES(1).DO         = 1;
+J.ABS_SPECIES(1).METHOD     = 'analytical';
+%J.ABS_SPECIES(1).METHOD    = 'perturbation';
+%J.ABS_SPECIES(1).DX        = 0.01;
+J.ABS_SPECIES(1).UNIT       = 'rel';
+J.ABS_SPECIES(1).GRID1      = z2p_simple( [11e3:2e3:71e3] );
 if atmdim >= 2
-  Q.ABS_SPECIES_JAC(1).LAT_GRID = -5:5;  
+  J.ABS_SPECIES(1).GRID2     = -5:5;  
 end
 %
 Q.ABS_SPECIES{2}{1}         = 'O3';
-Q.ABS_SPECIES_JAC(2)        = Q.ABS_SPECIES_JAC(1);
+J.ABS_SPECIES(2)            = J.ABS_SPECIES(1);
 %
 Q.ABS_SPECIES{3}{1}         = 'N2O';
-Q.ABS_SPECIES_JAC(3)        = Q.ABS_SPECIES_JAC(1);
+J.ABS_SPECIES(3)            = J.ABS_SPECIES(1);
 Q.ABS_SPECIES{4}{1}         = 'H2O';
 Q.ABS_SPECIES{4}{2}         = 'H2O-MPM89';
-Q.ABS_SPECIES_JAC(4)        = Q.ABS_SPECIES_JAC(1);
-Q.ABS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
+J.ABS_SPECIES(4)            = J.ABS_SPECIES(1);
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
@@ -100,8 +98,11 @@ Q.SURFACE_PROP_AGENDA = ...
    { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
      'surfaceFlat{"water-liebe93"}' };
 %
+Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}', 'Ignore(rte_pos){}', ...
+                      'MatrixCBR(iy,f_grid){}', 'MatrixScale(iy,iy){0}' };
+%
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{10e3}' };
-Q.Y_UNIT            = '1';
+Q.Y_UNIT            = 'RJ';
 %
 zplat        = 600e3;
 Q.SENSOR_POS = Q.R_GEOID + zplat;
@@ -109,6 +110,11 @@ if atmdim >= 2
   Q.SENSOR_POS = [ Q.SENSOR_POS -23 ];
 end
 Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan );
+
+
+%= Add jacobian part
+%
+Q.J = J;
 
 
 if nargout == 1
@@ -122,6 +128,7 @@ f        = Q.F_GRID;
 [y,dy,J,jq,ji] = arts_y( Q );
 
 
+
 %= Plot
 %
 if ~nargout
@@ -129,22 +136,22 @@ if ~nargout
   figure(1);
   h1 = plot( f/1e9, y, 'LineWidth', 2 );
   hold on
-  h2 = plot( f/1e9,J*ones(size(J,2),1) );
+  h2 = plot( f/1e9,J*ones(size(J,2),1), 'r--' );
   hold off
   xlabel( 'Frequency [GHz]' )
   ylabel( 'Brightness temperature [K]' )
   title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
   legend( [h1 h2], 'Spectrum', 'J\timesones(nx,1)' );
 
-  figure(3);
+  figure(2);
   i   = 149;
   ind = ji{2}{1}:ji{2}{2};
-  z   = p2z_simple( Q.ABS_SPECIES_JAC(2).P_GRID );
+  z   = p2z_simple( Q.J.ABS_SPECIES(2).GRID1 );
   if atmdim == 1
     plot(full(J(i,ind)),z/1e3);
     xlabel( 'J [K/1]' )
   elseif atmdim == 2
-    lat = Q.ABS_SPECIES_JAC(2).LAT_GRID;
+    lat = Q.J.ABS_SPECIES(2).GRID2;
     contourf(lat,z/1e3,reshape(full(J(i,ind)),length(z),length(lat)));
     shading flat
     xlabel( 'Latitude [deg]' )

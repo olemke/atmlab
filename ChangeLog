@@ -1,5 +1,15 @@
 2006-08-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
+	* atmlab-0-2-128
+
+	* Qarts is now running again. OEM part looks also OK (but far from
+	ready).
+
+	* demos/qarts_jacobian_demo.m: Made changes to get y and J*1 to get
+	closer.
+
+2006-08-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
 	* atmlab-0-2-127
 
 	* math/mat2col.m: Created.

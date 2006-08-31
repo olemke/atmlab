@@ -35,7 +35,11 @@ Q = q_abs_species( Q, {'O3'}, 1, 'rel', 'analytical', 0, ...
                                                    z2p_simple( 0e3:1e3:90e3) );
 %
 R.SX.ABS_SPECIES(1).FORMAT    = 'param'; 
-R.SX.ABS_SPECIES(1).SI        = 0.1e-6;
+if strcmp( Q.J.ABS_SPECIES(1).UNIT, 'rel' )
+  R.SX.ABS_SPECIES(1).SI        = 0.6;
+else
+  R.SX.ABS_SPECIES(1).SI        = 0.1e-6;
+end
 R.SX.ABS_SPECIES(1).CCO       = 0.01;  
 R.SX.ABS_SPECIES(1).CFUN1     = 'exp';
 R.SX.ABS_SPECIES(1).CL1       = 0.25*[1 1];
@@ -130,7 +134,7 @@ O.d       = 0;
 O.do      = 1;
 O.ds      = 0;
 %
-[Qoem,R,Sx,xa] = arts_oem_init( Q, [] );
+[Qoem,R,Sx,xa] = arts_oem_init( Q, R );
 %
 [x,P] = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %
@@ -138,7 +142,7 @@ arts_oem_init( 'clean', R );
 clear Qoem O
 
 
-z = p2z_simple( Q.ABS_SPECIES_JAC(1).P_GRID );
+z = p2z_simple( Q.J.ABS_SPECIES(1).GRID1 );
 
 keyboard
 return

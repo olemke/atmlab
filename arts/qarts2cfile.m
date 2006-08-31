@@ -21,7 +21,6 @@
 %       sensor
 %       save_sensor
 %       j
-%       save_jq
 %       y
 %       batch
 %       stop
@@ -255,11 +254,9 @@ case 'j'
   else
     error( 'Unknown selection for Q.JACOBIAN.' );
   end
-
-case 'save_jq'
   %
-  T{1} = add_savefile( 'jacobian_quantities', tmpdir );
-  T{2} = add_savefile( 'jacobian_indices', tmpdir );
+  T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
+  T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
 
 case 'y'
   %
@@ -847,8 +844,13 @@ for i = 1 : length(Q.J.ABS_SPECIES)
   if Q.J.ABS_SPECIES(i).DO
     %
     rqre_field( Q.J.ABS_SPECIES(i), 'METHOD' )
+    rqre_char( 'Q.J.ABS_SPECIES.METHOD', Q.J.ABS_SPECIES(i).METHOD )
     rqre_field( Q.J.ABS_SPECIES(i), 'UNIT' )
+    rqre_char( 'Q.J.ABS_SPECIES.UNIT', Q.J.ABS_SPECIES(i).UNIT )
     rqre_field( Q.J.ABS_SPECIES(i), 'GRID1' )
+    if isnan( Q.J.ABS_SPECIES(i).GRID1 )
+      error( sprintf('Q.J.ABS_SPECIES(%d).GRID1 includes NaN(s).',i) );
+    end
 
     if Q.ATMOSPHERE_DIM < 2
       lat_grid = [];

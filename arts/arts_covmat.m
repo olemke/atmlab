@@ -1,6 +1,6 @@
 % ARTS_COVMAT   Creates the covariance matrix for a single retrieval quantity
 %
-%   Converts specication data to a covariance matrix. The covariance is
+%   Converts speciation data to a covariance matrix. The covariance is
 %   described by the structure *D*, where different format options exist.
 %   The format is selected by the common field *FORMAT*. 
 %
@@ -78,11 +78,17 @@
 %      Not yet implemented.
 %
 % FORMAT   S = arts_covmat(dim,D,grid1,grid2,grid3,dtype)
-%        
+%              or
+%          S = arts_covmat(dim,D,J,dtype)
+%
 % OUT   S       Covariance matrix.
 % IN    dim     Dimensionality.
 %       D       Specification data.
 %       grid1   Retrieval grid in dimension 1.
+%       J       In this argument pattern, this argument shall be a structure.
+%               This structure is supposed to have fields GRID1, GRID2 and 
+%               GRID3, which then are used as exactly as grid1/2/3 in the
+%               first argument pattern.
 % OPT   grid2   Retrieval grid in dimension 2. Not needed if *dim* < 2.
 %       grid3   Retrieval grid in dimension 3. Not needed if *dim* < 3.
 %       dtype   Type of data. Only specified option so far is 'atm'. See
@@ -96,23 +102,51 @@ function S = arts_covmat(dim,D,grid1,grid2,grid3,dtype)
 
 %--- Check input
 %
-min_nargin( 2+dim, nargin );
-%
+min_nargin( 3, nargin );
 rqre_scalar( 'dim', dim, 1, 3 );
 rqre_datatype( 'struct', D );
-rqre_datatype( 'vector', grid1 );
-if dim >= 2
-  rqre_datatype( 'vector', grid2 );
-  if dim == 3
-    rqre_datatype( 'vector', grid3 );
+%
+if isvector( grid1 )
+  min_nargin( 2+dim, nargin );
+  rqre_datatype( 'vector', grid1 );
+  if dim >= 2
+    rqre_datatype( 'vector', grid2 );
+    if dim == 3
+      rqre_datatype( 'vector', grid3 );
+    end
   end
+  if nargin < 6
+    dtype = [];
+  end
+elseif isstruct( grid1 )
+  if nargin > 3
+    dtype = grid2;
+    if nargin > 4
+      error('To many input arguments for argument pattern 2.');
+    end
+  else
+    dtype = [];
+  end
+  Q = grid1;
+  rqre_field( Q, 'GRID1', 0 );
+  grid1 = Q.GRID1;   
+  if dim >= 2
+    rqre_field( Q, 'GRID2', 0 );
+    grid2 = Q.GRID2;   
+    if dim == 3
+      rqre_field( Q, 'GRID3', 0 );
+      grid3 = Q.GRID3;   
+    end
+  end
+else
+  error('Unknown type of input argument 3.');
 end
 
 
 
 %--- Unit conversions
 %
-if nargin >= 6  & ~isempty(dtype)
+if ~isempty(dtype)
   if strcmp(dtype,'atm')
     if ~strcmp( D.FORMAT, 'param' )
       error( ['Atmospheric unit conversion so far only handled for ',...

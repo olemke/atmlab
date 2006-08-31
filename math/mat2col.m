@@ -12,4 +12,4 @@
 
 function a = mat2col(A)
 
-a = A(:)
+a = A(:);

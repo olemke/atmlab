@@ -11,9 +11,6 @@ end
 %-----------------------------------------------------------------------------
 
 
-%-----------------------------------------------------------------------------
-
-
 
 
 
@@ -60,8 +57,6 @@ Q.VMR_FIELD          = vmr_field;
 
 
 
-
-
 %--- Initialization of variables ----------------------------------------------
 
 %- xa and Sx
@@ -75,9 +70,9 @@ Sx = sparse( nx, nx );
 
 %- Fields of R
 %
-R.p   = repmat( NaN, nx, 1 );
-R.t   = R.p;
-R.vmr = R.p;
+R.p    = repmat( NaN, nx, 1 );
+R.t    = R.p;
+R.vmr0 = R.p;
 
 
 %- Some other variables
@@ -111,16 +106,16 @@ for i = 1 : nq
     R.p(ind)   = repmat( grid1, length(ind)/length(grid1), 1 );
     R.t(ind)   = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, Q.T_FIELD, ...
                                                        Q.J.ABS_SPECIES(ig) ) );
-    R.vmr(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
+    R.vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
                        get_vmrfield_i(Q.VMR_FIELD,ig), Q.J.ABS_SPECIES(ig) ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
     else
       if strcmp( R.jq{i}.mode, 'vmr' )
-        xa(ind) = R.vmr(ind);
+        xa(ind) = R.vmr0(ind);
       elseif strcmp( R.jq{i}.mode, 'nd' )
-        xa(ind) = vmr2nd( R.vmr(ind), R.p(ind), R.t(ind) );
+        xa(ind) = vmr2nd( R.vmr0(ind), R.p(ind), R.t(ind) );
       else
         error( sprintf('Unknown gas species retrieval unit (%s).', ...
                                                               R.jq{i}.mode ) );
@@ -184,7 +179,7 @@ return
 
 function Q = force_file( Q, fieldname, datatype, R )
  
-  if ischar( getfield( Q, fieldname ) )
+  if ~ischar( getfield( Q, fieldname ) )
     filename = fullfile( R.workfolder, [fieldname,'.xml'] );
     xmlStore( filename, getfield( Q, fieldname ), datatype );
     setfield( Q, fieldname, filename );
@@ -199,10 +194,10 @@ function [jq,ji,t_field,z_field,vmr_field] = arts_internal( Q, R )
 
   if Q.USE_RAW_ATMOSPHERE
    parts = { 'start1', 'start2', 'load_atm', 'save_atm', 'init_rte', ...
-             'sensor', 'j', 'save_jq', 'stop' };
+             'sensor', 'j', 'stop' };
   else
     parts = { 'start1', 'start2', 'load_atm', 'init_rte', ...
-             'sensor', 'j', 'save_jq', 'stop' };
+             'sensor', 'j', 'stop' };
   end
 
   S = qarts2cfile( Q, parts, tmpfolder );

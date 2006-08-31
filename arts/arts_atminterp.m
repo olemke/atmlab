@@ -22,24 +22,61 @@
 function F = arts_atminterp( dim, Q1, F0, Q2 )
 
 
+rqre_scalar( 'dim', dim, 1, 3 );
+
+
+[grid11,grid12,grid13] = extract_grids( dim, Q1 );
+[grid21,grid22,grid23] = extract_grids( dim, Q2 );
+
+
 if dim == 1
 
-  F = regrid( qarts_get(F0), log(qarts_get(Q1.P_GRID)), ...
-                             log(qarts_get(Q2.P_GRID)), 'linear' );
+  F = regrid( qarts_get(F0), grid11, grid21, 'linear' );
 
 elseif dim == 2
 
-  F = regrid( qarts_get(F0), log(qarts_get(Q1.P_GRID)), ...
-                             log(qarts_get(Q2.P_GRID)), ...
-                    qarts_get(Q1.LAT_GRID), qarts_get(Q2.LAT_GRID), 'linear' );
+  F = regrid( qarts_get(F0), grid11, grid21, grid12, grid22, 'linear' );
 
 elseif dim == 3
 
-  F = regrid( qarts_get(F0), log(qarts_get(Q1.P_GRID)), ...
-                             log(qarts_get(Q2.P_GRID)), ...
-                    qarts_get(Q1.LAT_GRID), qarts_get(Q2.LAT_GRID), ...
-                    qarts_get(Q2.LON_GRID), qarts_get(Q2.LON_GRID), 'linear' );
-
-else
-  error('Atmospheric dimensionality must be 1-3.');
+  F = regrid( qarts_get(F0), grid11, grid21, grid12, grid22, ...
+                                                    grid13, grid23, 'linear' );
 end
+
+
+
+function [grid1,grid2,grid3] = extract_grids( dim, Q )
+
+if isfield( Q, 'P_GRID' )
+  grid1 = log( qarts_get( Q.P_GRID ) );
+elseif isfield( Q, 'GRID1' )
+  grid1 = log( qarts_get( Q.GRID1 ) );
+else
+  error('Neither field P_GRID or GRID1 found.');
+end
+
+if dim >= 2
+  if isfield( Q, 'LAT_GRID' )
+    grid2 = qarts_get( Q.LAT_GRID );
+  elseif isfield( Q, 'GRID2' )
+    grid2 = qarts_get( Q.GRID2 );
+  else
+    error('Neither field LAT_GRID or GRID2 found.');
+  end
+else
+  grid2 = NaN;
+end
+
+if dim >= 3
+  if isfield( Q, 'LON_GRID' )
+    grid3 = qarts_get( Q.LON_GRID );
+  elseif isfield( Q, 'GRID3' )
+    grid3 = qarts_get( Q.GRID3 );
+  else
+    error('Neither field LON_GRID or GRID3 found.');
+  end
+else
+  grid3 = NaN;
+end
+
+
