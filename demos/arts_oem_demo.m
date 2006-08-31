@@ -22,15 +22,24 @@ end
 addpath_ami;
 
 
-%= Set-up Q structures =======================================================
+%= Set-up Q and R structures ==================================================
 
-Q  = qarts;
-Q1 = qarts1;
+Q   = qarts;
+Q.J = qarts_jacobian;
+Q1  = qarts1;
+R   = [];
 
 %= Spectroscopy
 %
-Q = q_gas_species( Q, 'O3', 1, 'rel', 'analytical', 0, ...
+Q = q_abs_species( Q, {'O3'}, 1, 'rel', 'analytical', 0, ...
                                                    z2p_simple( 0e3:1e3:90e3) );
+%
+R.SX.ABS_SPECIES(1).FORMAT    = 'param'; 
+R.SX.ABS_SPECIES(1).SI        = 0.1e-6;
+R.SX.ABS_SPECIES(1).CCO       = 0.01;  
+R.SX.ABS_SPECIES(1).CFUN1     = 'exp';
+R.SX.ABS_SPECIES(1).CL1       = 0.25*[1 1];
+R.SX.ABS_SPECIES(1).CL1_GRID1 = [1100e2 1e-3];  
 %
 Q1.LINEFORMAT       = 'Arts';
 Q1.LINEDATA         = fullfile( atmlab_example_data , 'o3line111ghz' );
@@ -66,17 +75,6 @@ Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
 Q.F_GRID              = 1.108360400e+11 + linspace(-320e6,320e6,641);
 %
 Q.STOKES_DIM        = 1;
-
-
-%= Jacobian
-%
-%
-%Q.ABS_SPECIES_SX(1).FORMAT    = 'param'; 
-%Q.ABS_SPECIES_SX(1).SI        = 0.1e-6;
-%Q.ABS_SPECIES_SX(1).CCO       = 0.01;  
-%Q.ABS_SPECIES_SX(1).CFUN1     = 'exp';
-%Q.ABS_SPECIES_SX(1).CL1       = 0.25*[1 1];
-%Q.ABS_SPECIES_SX(1).CL1_GRID1 = [1100e2 1e-3];  
 
 %============================================================================
 

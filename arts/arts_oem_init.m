@@ -30,8 +30,8 @@ if nargin < 2,   R = [];  end
 min_nargin( 1, nargin );
 rqre_datatype( 'struct', Q );
 %
-if ~Q.JACOBIAN_DO
-  error('Inversion turned off (Q.JACOBIAN.DO = 0) !!!.');
+if ~isstruct(Q.J)
+  error('No jacobain defined !!!.');
 end
 
 
@@ -46,25 +46,10 @@ R.workfolder = create_tmpfolder;
 
 
 
-
-
-
-%--- Modify Q to simplify and avoid creating files repeatedly -----------------
-%
-% This is done here for quantities that can not be affected by the
-% the retrieval. In some other cases a well specified case is generated
-% and the fields are modified further below.
-
-
-%- Grids
-%
-Q = force_file( Q, 'P_GRID', 'Vector', R );
-
-
 %- Atmospheric fields
 %
 % Option USE_RAW_ATMOSPHERE is not handled here. As a start all fields are
-% set to be variables. Can be stored to files below, depending on Q.
+% set to be variables.
 %
 Q.USE_RAW_ATMOSPHERE = 0;
 Q.T_FIELD            = t_field;
@@ -72,9 +57,6 @@ Q.Z_FIELD            = z_field;
 Q.VMR_FIELD          = vmr_field;  
 
 
-%- Absorption
-%
-Q = force_file( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
 
 
 
@@ -102,7 +84,7 @@ R.vmr = R.p;
 %
 any_gas = false;
 any_tz  = false;
-i_asj   = find( [ Q.ABS_SPECIES_JAC.DO ] );
+i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );
 
 
 
@@ -124,17 +106,13 @@ for i = 1 : nq
     any_gas = true;
     ig      = i_asj(i);    % Gas species index
     %
-    %- Get p and T for each retrieval point 
-    grid1      = qarts_get( Q.ABS_SPECIES_JAC(ig).P_GRID );
+    %- Get p, t and vmr for each retrieval point
+    grid1      = qarts_get( Q.J.ABS_SPECIES(ig).GRID1 );
     R.p(ind)   = repmat( grid1, length(ind)/length(grid1), 1 );
-    D          = arts_atminterp( Q.ATMOSPHERE_DIM, Q, Q.T_FIELD, ...
-                                                       Q.ABS_SPECIES_JAC(ig) );
-    R.t(ind)   = D(:);
-    %
-    %- Get VMR for each retrieval point 
-    D          = arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
-                     get_vmrfield_i(Q.VMR_FIELD,ig), Q.ABS_SPECIES_JAC(ig) );
-    R.vmr(ind) = D(:);
+    R.t(ind)   = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, Q.T_FIELD, ...
+                                                       Q.J.ABS_SPECIES(ig) ) );
+    R.vmr(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
+                       get_vmrfield_i(Q.VMR_FIELD,ig), Q.J.ABS_SPECIES(ig) ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
@@ -149,9 +127,8 @@ for i = 1 : nq
       end
     end
     %
-    Sx(ind,ind) = arts_covmat( Q.ATMOSPHERE_DIM, Q.ABS_SPECIES_SX(ig), ... 
-              Q.ABS_SPECIES_JAC(ig).P_GRID, Q.ABS_SPECIES_JAC(ig).LAT_GRID, ...
-                                       Q.ABS_SPECIES_JAC(ig).LON_GRID, 'atm' );
+    Sx(ind,ind) = arts_covmat( Q.ATMOSPHERE_DIM, R.SX.ABS_SPECIES(ig), ... 
+                                                  Q.J.ABS_SPECIES(ig), 'atm' );
 
 
 
@@ -163,9 +140,23 @@ end
 
 
 
-%--- End stuff ----------------------------------------------------------------
+%--- Modify Q to simplify and avoid creating files repeatedly -----------------
+%
+% This is done here for quantities that can not be affected by the
+% the retrieval.
 
-%- Can be stored to files?
+%- Basic grids
+%
+Q = force_file( Q, 'F_GRID', 'Vector', R );
+Q = force_file( Q, 'P_GRID', 'Vector', R );
+if Q.ATMOSPHERE_DIM > 1
+  Q = force_file( Q, 'LAT_GRID', 'Vector', R );
+  if Q.ATMOSPHERE_DIM > 2
+    Q = force_file( Q, 'LON_GRID', 'Vector', R );
+  end
+end
+
+%- Atmospheric fields
 %
 if ~any_gas
   Q = force_file( Q, 'VMR_FIELD', 'Tensor4', R );
@@ -175,6 +166,11 @@ if ~any_tz
   Q = force_file( Q, 'T_FIELD', 'Tensor3', R );
   Q = force_file( Q, 'Z_FIELD', 'Tensor3', R );
 end
+
+
+%- Absorption
+%
+Q = force_file( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
 
 return
 
@@ -203,10 +199,10 @@ function [jq,ji,t_field,z_field,vmr_field] = arts_internal( Q, R )
 
   if Q.USE_RAW_ATMOSPHERE
    parts = { 'start1', 'start2', 'load_atm', 'save_atm', 'init_rte', ...
-             'sensor', 'jq', 'stop' };
+             'sensor', 'j', 'save_jq', 'stop' };
   else
     parts = { 'start1', 'start2', 'load_atm', 'init_rte', ...
-             'sensor', 'jq', 'stop' };
+             'sensor', 'j', 'save_jq', 'stop' };
   end
 
   S = qarts2cfile( Q, parts, tmpfolder );

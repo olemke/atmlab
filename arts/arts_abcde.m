@@ -5,7 +5,7 @@
 %
 %    A "normal" calculation is performed, corresponding to *arts_y*. Such
 %    an ARTS run include RteCalc and calculation of jacobians (pending on
-%    state of Q.JACOBIAN_DO). At the end of the control file, saving of the 
+%    state of Q.J). At the end of the control file, saving of the 
 %    variables specified in *vnames1* is added. These files are later 
 %    loaded into Matlab and the content is copied to the output argument
 %    V1.

@@ -44,16 +44,7 @@ rqre_datatype( 'cellstr', tags );
 rqre_bool( 'argument *do_jac*', do_jac );
 
 
-%= Check length of fields to set
-%
-i = length(Q.ABS_SPECIES);
-%
-if length(Q.J.ABS_SPECIES) ~= i
-  error('Length of fields ABS_SPECIES and J.ABS_SPECIES must be identical.');
-end
-
-
-i = i + 1;
+i = length(Q.ABS_SPECIES) + 1;
 
 
 for j = 1 : length(tags)
@@ -66,16 +57,16 @@ Q.J.ABS_SPECIES(i).DO = do_jac;
 
 if do_jac
 
-  Q.ABS_SPECIES_JAC(i).UNIT   = unit;
-  Q.ABS_SPECIES_JAC(i).METHOD = method;
-  Q.ABS_SPECIES_JAC(i).DX     = dx;
-  Q.ABS_SPECIES_JAC(i).GRID1  = p_grid;
+  Q.J.ABS_SPECIES(i).UNIT   = unit;
+  Q.J.ABS_SPECIES(i).METHOD = method;
+  Q.J.ABS_SPECIES(i).DX     = dx;
+  Q.J.ABS_SPECIES(i).GRID1  = p_grid;
 
   if Q.ATMOSPHERE_DIM >= 2
-    Q.ABS_SPECIES_JAC(i).GRID2 = lat_grid;
+    Q.J.ABS_SPECIES(i).GRID2 = lat_grid;
 
     if Q.ATMOSPHERE_DIM >= 3
-      Q.ABS_SPECIES_JAC(i).GRID3 = lon_grid;
+      Q.J.ABS_SPECIES(i).GRID3 = lon_grid;
     end
   end
 end

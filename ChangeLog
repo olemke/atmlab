@@ -1,3 +1,11 @@
+2006-08-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-127
+
+	* math/mat2col.m: Created.
+
+	* Some more work on Qarts. Not yet working.
+
 2006-08-29  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-126

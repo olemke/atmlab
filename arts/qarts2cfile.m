@@ -10,8 +10,8 @@
 %    together, following the format: parts = {'tgs','load_atm','save_atm'}
 %
 %    Defined parts are:
-%       start
-%       stokes
+%       start1
+%       start2
 %       load_atm
 %       save_atm
 %       load_abs
@@ -20,8 +20,9 @@
 %       cloudbox
 %       sensor
 %       save_sensor
-%       calc_rte
-%       save_y
+%       j
+%       save_jq
+%       y
 %       batch
 %       stop
 %
@@ -245,11 +246,11 @@ case 'save_sensor'
   
 case 'j'
   %
-  if isstruct( Q.J )  &  isfield( Q.J. 'SPECIES' )
-    T = j2cfile( Q.J, tmpdir );
+  if isstruct( Q.J )  &  isfield( Q.J, 'ABS_SPECIES' )
+    T = j2cfile( Q, tmpdir );
     do_j = 1;
   elseif isnan( Q.J )  |  Q.J == 0 
-    T = 'jacobianOff{}';
+    T{1} = 'jacobianOff{}';
     do_j = 0;
   else
     error( 'Unknown selection for Q.JACOBIAN.' );
@@ -282,29 +283,29 @@ case 'y'
   %
   switch upper( Q.Y_UNIT )
     case '1'
-      T{1} = '# No conversion to K';
+      T{end+1} = '# No conversion to K';
     case 'RJ'
-      T{1} = 'VectorToTbByRJ(y,y){}';
+      T{end+1} = 'VectorToTbByRJ(y,y){}';
     case 'PLANCK'
-      T{1} = 'VectorToTbByPlanck(y,y){}';
+      T{end+1} = 'VectorToTbByPlanck(y,y){}';
     otherwise
       error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
   end
-  T{2} = add_savefile( 'y', tmpdir );
+  T{end+1} = add_savefile( 'y', tmpdir );
   %
   if isstruct( Q.CLOUDBOX )  &  strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
     if ~isnan( Q.SENSOR_RESPONSE )   
-      T{3} = 'mc_errorApplySensor{}';
+      T{end+1} = 'mc_errorApplySensor{}';
     else
-      T{3} = '';
+      T{end+1} = '';
     end
     switch upper( Q.Y_UNIT )
       case '1'
-        T{4} = '# No conversion to K';
+        T{end+1} = '# No conversion to K';
       case { 'RJ', 'PLANCK' }
-        T{4} = 'VectorToTbByRJ(mc_error,mc_error){}';
+        T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}';
     end
-    T{5} = add_savefile( 'mc_error', tmpdir );
+    T{end+1} = add_savefile( 'mc_error', tmpdir );
   end
   %
   if do_j
@@ -833,7 +834,7 @@ function T = j2cfile( Q, tmpdir )
 
 %- Check that all fields are present
 %
-qcheck( @qarts_batch, Q.J );
+qcheck( @qarts_jacobian, Q.J );
 
 T{1} = 'jacobianInit{}'; 
 
@@ -862,13 +863,13 @@ for i = 1 : length(Q.J.ABS_SPECIES)
       lon_grid = Q.J.ABS_SPECIES(i).GRID3;
     end
     T{end+1} = file_or_data( 'vector_1', 'Vector', ...
-              Q.J.ABS_SPECIES(i)GRID1, tmpdir, sprintf('gas%d_jac_p_grid',i) );
+             Q.J.ABS_SPECIES(i).GRID1, tmpdir, sprintf('gas%d_jac_p_grid',i) );
     T{end+1} = file_or_data( 'vector_2', 'Vector', ...
                            lat_grid, tmpdir, sprintf('gas%d_jac_lat_grid',i) );
     T{end+1} = file_or_data( 'vector_3', 'Vector', ...
                            lon_grid, tmpdir, sprintf('gas%d_jac_lon_grid',i) );
 
-    T{end+1} = 'jacobianAddGas(vector_1,vector_2,vector_3){';
+    T{end+1} = 'jacobianAddAbsSpecies(vector_1,vector_2,vector_3){';
     T{end+1} = sprintf( '  species = %s', arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
     T{end+1} = sprintf( '  method  = "%s"', Q.J.ABS_SPECIES(i).METHOD );
     T{end+1} = sprintf( '  unit    = "%s"', Q.J.ABS_SPECIES(i).UNIT );
