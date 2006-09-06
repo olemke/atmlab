@@ -83,6 +83,11 @@ if nargin == 1
   case 'y'
     %
     S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
+         'cloudbox', 'sensor', 'y', 'stop' };
+
+  case 'y+j'
+    %
+    S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
          'cloudbox', 'sensor', 'j', 'y', 'stop' };
 
   case 'batch'
@@ -226,12 +231,23 @@ case 'cloudbox'
 case 'sensor'
   %
   if ischar(Q.SENSOR_RESPONSE) | issparse(Q.SENSOR_RESPONSE)
-    T{1} = file_or_data( 'sensor_response', 'Sparse', ...
-                         Q.SENSOR_RESPONSE, tmpdir );
+    T{1} = file_or_data( 'antenna_dim', 'Index', Q.ANTENNA_DIM, tmpdir );
+    T{2} = file_or_data( 'mblock_za_grid', 'Vector', Q.MBLOCK_ZA_GRID, tmpdir);
+    T{3} = file_or_data( 'mblock_aa_grid', 'Vector', Q.MBLOCK_AA_GRID, tmpdir);
+    T{4} = file_or_data( 'sensor_response', 'Sparse', ...
+                                                   Q.SENSOR_RESPONSE, tmpdir );
+    T{5} = file_or_data( 'sensor_response_f', 'Vector', ...
+                                                 Q.SENSOR_RESPONSE_F, tmpdir );
+    T{6} = file_or_data( 'sensor_response_za', 'Vector', ...
+                                                Q.SENSOR_RESPONSE_ZA, tmpdir );
+    T{7} = file_or_data( 'sensor_response_aa', 'Vector', ...
+                                                Q.SENSOR_RESPONSE_AA, tmpdir );
+    T{8} = file_or_data( 'sensor_response_pol', 'Index', ...
+                                               Q.SENSOR_RESPONSE_POL, tmpdir );
   elseif iscellstr(Q.SENSOR_RESPONSE) 
     T = Q.SENSOR_RESPONSE;
   elseif isstruct(Q.SENSOR_RESPONSE) 
-    T = sensor2cfile( Q.SENSOR_RESPONSE, tmpdir );
+    T = sensor2cfile( Q, tmpdir );
   elseif isnan(Q.SENSOR_RESPONSE)  |  Q.SENSOR_RESPONSE == 0 
     T{1} = 'sensorOff{}';
   else
@@ -241,22 +257,27 @@ case 'sensor'
 case 'save_sensor'
   %
   T{1} = add_savefile( 'sensor_response', tmpdir );
-  T{2} = add_savefile( 'sensor_response_f', tmpdir );
+  T{2} = add_savefile( 'antenna_dim', tmpdir );
+  T{3} = add_savefile( 'mblock_za_grid', tmpdir );
+  T{4} = add_savefile( 'mblock_aa_grid', tmpdir );
+  T{5} = add_savefile( 'sensor_response_f', tmpdir );
+  T{6} = add_savefile( 'sensor_response_za', tmpdir );
+  T{7} = add_savefile( 'sensor_response_aa', tmpdir );
+  T{8} = add_savefile( 'sensor_response_pol', tmpdir );
   
 case 'j'
   %
   if isstruct( Q.J )  &  isfield( Q.J, 'ABS_SPECIES' )
-    T = j2cfile( Q, tmpdir );
-    do_j = 1;
+    T        = j2cfile( Q, tmpdir );
+    T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
+    T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
+    do_j     = 1;
   elseif isnan( Q.J )  |  Q.J == 0 
     T{1} = 'jacobianOff{}';
     do_j = 0;
   else
     error( 'Unknown selection for Q.JACOBIAN.' );
   end
-  %
-  T{end+1} = add_savefile( 'jacobian_quantities', tmpdir );
-  T{end+1} = add_savefile( 'jacobian_indices', tmpdir );
 
 case 'y'
   %
@@ -636,7 +657,9 @@ end
 
 % 2005-01-26   Created by Mattias Ekström.
 
-function S = sensor2cfile( H, tmpdir )
+function S = sensor2cfile( Q, tmpdir )
+
+H = Q.SENSOR_RESPONSE;
 
 % Check that all fields are present
 qcheck( @qarts_sensor, H );
@@ -645,26 +668,13 @@ qcheck( @qarts_sensor, H );
 if (H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1)
   error('The field *SENSOR_NORM* in the sensor structure can only be 0 or 1.')
 end
-if (H.ANTENNA_DIM~=1 & H.ANTENNA_DIM~=2)
-  error('The field *ANTENNA_DIM* in the sensor structure must be 1 or 2.')
-end
-
-% Check for obligatory sensor fields
-oblig_fields = {'SENSOR_NORM', 'ANTENNA_DIM', 'MBLOCK_ZA_GRID'};
-if (H.ANTENNA_DIM==2)
-  oblig_fields{length(oblig_fields)+1} = 'MBLOCK_AA_GRID';
-end
-
-for it=1:length(oblig_fields)
-  if isnan(H.(oblig_fields{it}))
-    error(['The field *' oblig_fields{it} ...
-           '* in the sensor structure must be set.'])
-  end
+if (Q.ANTENNA_DIM~=1 & Q.ANTENNA_DIM~=2)
+  error('The field *ANTENNA_DIM* in Q must be 1 or 2.')
 end
 
 % Find out sensor structure
 parts{1} = 'init';
-if isdefined( H, {'ANTENNA_DIAGRAM','ANTENNA_LOS'} )
+if isdefined( H, {'ANTENNA_LOS'} )
   parts{length(parts)+1} = 'antenna';
 end
 if isdefined( H, {'SENSOR_ROT'} )
@@ -699,10 +709,10 @@ switch parts{it}
 
 case 'init'
   T{1} = ['# Sensor part created by Atmlab function sensor2cfile'];
-  T{2} = ['AntennaSet' num2str(H.ANTENNA_DIM) 'D{}'];
-  T{3} = file_or_data( 'mblock_za_grid', 'Vector', H.MBLOCK_ZA_GRID, tmpdir );
-  if H.ANTENNA_DIM==2
-    T{4} = file_or_data( 'mblock_aa_grid', 'Vector', H.MBLOCK_AA_GRID, tmpdir );
+  T{2} = ['AntennaSet' num2str(Q.ANTENNA_DIM) 'D{}'];
+  T{3} = file_or_data( 'mblock_za_grid', 'Vector', Q.MBLOCK_ZA_GRID, tmpdir );
+  if Q.ANTENNA_DIM==2
+    T{4} = file_or_data( 'mblock_aa_grid', 'Vector', Q.MBLOCK_AA_GRID, tmpdir);
   else
     T{4} = ['# No azimuthal measurement block angle grid loaded'];
   end
@@ -730,7 +740,8 @@ case 'mixer'
 
 case 'backend'
   T{1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
-  T{2} = file_or_data( 'arrayofmatrix_1', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
+  T{2} = file_or_data( 'arrayofmatrix_1', 'ArrayOfMatrix', ...
+                                                  H.CHANNEL_RESPONSE, tmpdir );
   T{3} = 'sensor_responseBackend(arrayofmatrix_1){}';
   
 case 'multimixer'
@@ -768,7 +779,7 @@ qcheck( @qarts_batch, B );
 
 %= Other data checks
 %
-if ~iscell( B.DATA )
+if ~isstruct( B.DATA )
   error('Q.BATCH.DATA must be a structure array.');
 end
 %

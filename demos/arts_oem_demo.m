@@ -76,9 +76,23 @@ Q.Y_UNIT              = 'RJ';
 Q.SENSOR_LOS          = 0;
 Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
 %
+Q.STOKES_DIM        = 1;
+
+
+%= Frequency and spectrometer.
+%
+% The spectrometer has rectangular response functions
+%
 Q.F_GRID              = 1.108360400e+11 + linspace(-320e6,320e6,641);
 %
-Q.STOKES_DIM        = 1;
+H                     = qarts_sensor;
+H.SENSOR_NORM         = 1;
+df                    = 2e6;
+H.F_BACKEND           = min(Q.F_GRID)+df : df : max(Q.F_GRID)-df;
+H.CHANNEL_RESPONSE    = { [-df/2 1; df/2 1] };
+%
+Q.SENSOR_RESPONSE     = H;
+Q.MBLOCK_ZA_GRID      = 0;
 
 %============================================================================
 
@@ -94,7 +108,9 @@ if 0
 end
 %
 Q.ABS_LOOKUP = filename;
-  
+
+
+y = arts_y(Q);
 
 
 %= Create Se
@@ -106,7 +122,7 @@ D.SI        = si;
 D.CCO       = 0;  
 D.CFUN1     = 'drc';
 %
-Se = arts_covmat( 1, D, Q.F_GRID );
+Se = arts_covmat( 1, D, Q.SENSOR_RESPONSE.F_BACKEND );
 
 
 %= Measurement

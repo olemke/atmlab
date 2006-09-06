@@ -107,10 +107,11 @@ Q.SENSOR_RESPONSE = H;
 if do_batch
   Q.BATCH              = qarts_batch;
   Q.BATCH.N            = 3;
-  Q.BATCH.DATA{1}.WSV  = 'sensor_los'; 
-  Q.BATCH.DATA{1}.TYPE = 'Matrix';
-  Q.BATCH.DATA{1}.X    = Q.SENSOR_LOS + 0.1*randn(5,1,1);
+  Q.BATCH.DATA(1).WSV  = 'sensor_los'; 
+  Q.BATCH.DATA(1).TYPE = 'Matrix';
+  Q.BATCH.DATA(1).X    = Q.SENSOR_LOS + 0.1*randn(5,1,1);
 end
+
 
 if nargout == 1
   return

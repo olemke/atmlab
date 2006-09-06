@@ -1,3 +1,23 @@
+2006-09-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-129
+
+	* arts/: Included try and catch in all functions creating a tmpfolder.
+	This to allow cleaning up if any error.
+
+	Work on OEM part to avoid repeating reading and saving of files, and
+	cleaning up. Not ready.
+
+	* arts/qarts2cfile.m: Added handling of ANTENNA_DIM,
+	MBLOCK_ZA_GRID, MBLOCK_AA_GRID, SENSOR_RESPONSE_F,
+	SENSOR_RESPONSE_AA, SENSOR_RESPONSE_ZA and SENSOR_RESPONSE_POL.
+
+	* arts/qarts.m: Updated description for SENSOR_RESPONSE.
+	Added ANTENNA_DIM, MBLOCK_ZA_GRID, MBLOCK_AA_GRID, SENSOR_RESPONSE_F,
+	SENSOR_RESPONSE_AA, SENSOR_RESPONSE_ZA and SENSOR_RESPONSE_POL.
+
+	* arts/qarts_sensor.m: Moved ANTENNA_DIM and mblocks grids to qarts. 
+
 2006-08-31  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-128

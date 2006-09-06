@@ -16,7 +16,6 @@ end
 
 %--- Start part --------------------------------------------------------------
 
-
 %- Default values
 %
 if nargin < 2,   R = [];  end
@@ -37,21 +36,53 @@ end
 R.workfolder = create_tmpfolder;
 
 
-%--- Use ARTS to get basic retrieval information and atmospheric fields
+%- Copy some data to R.
 %
+% This is done here to possible save time, as the data is forced to files below
+%
+R.p_grid   = qarts_get( Q.P_GRID );
+R.lat_grid = qarts_get( Q.LAT_GRID );
+R.lon_grid = qarts_get( Q.LON_GRID );
+
+
+
+
+
+%- Everything below is put into try-catch to enable that work folder is
+%- removed if something goes wrong.
+%
+try
+
+%--- Force some ARTS variables to be files ------------------------------------
+%
+% This is done to avoid creating the same file repeatedly in qarts2cfile.
+% This can be done for variables that never are part of the retrieval 
+% quantities. Some variables, beside the ones included here, are handled 
+% close to the end of the (main) function.
+
+%- Basic grids
+Q = force_file( Q, 'F_GRID', 'Vector', R );
+%
+Q = force_file( Q, 'P_GRID', 'Vector', R );
+if Q.ATMOSPHERE_DIM > 1
+  Q = force_file( Q, 'LAT_GRID', 'Vector', R );
+  if Q.ATMOSPHERE_DIM > 2
+    Q = force_file( Q, 'LON_GRID', 'Vector', R );
+  end
+end
+
+%- Absorption
+Q = force_file( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
+
+%- Sensor LOS and POS
+Q = force_file( Q, 'SENSOR_POS', 'Matrix', R );
+Q = force_file( Q, 'SENSOR_LOS', 'Matrix', R );
+
+
+
+%----- Use ARTS to get basic retrieval information and atmospheric fields -----
+
 [R.jq,R.ji,t_field,z_field,vmr_field] = arts_internal( Q, R );
-
-
-
-%- Atmospheric fields
-%
-% Option USE_RAW_ATMOSPHERE is not handled here. As a start all fields are
-% set to be variables.
-%
-Q.USE_RAW_ATMOSPHERE = 0;
-Q.T_FIELD            = t_field;
-Q.Z_FIELD            = z_field;
-Q.VMR_FIELD          = vmr_field;  
 
 
 
@@ -68,17 +99,17 @@ xa = zeros( nx, 1 );
 Sx = sparse( nx, nx );
 
 
-%- Fields of R
+%- R
 %
-R.p    = repmat( NaN, nx, 1 );
-R.t    = R.p;
-R.vmr0 = R.p;
+R.cfile_y  = NaN;
+R.cfile_yj = NaN;
+R.x_p      = repmat( NaN, nx, 1 );
+R.x_t      = R.x_p;
+R.x_vmr0   = R.x_p;
 
 
 %- Some other variables
 %
-any_gas = false;
-any_tz  = false;
 i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );
 
 
@@ -98,24 +129,23 @@ for i = 1 : nq
 
   case 'Abs. species'   %------------------------------------------------------
     %
-    any_gas = true;
     ig      = i_asj(i);    % Gas species index
     %
     %- Get p, t and vmr for each retrieval point
-    grid1      = qarts_get( Q.J.ABS_SPECIES(ig).GRID1 );
-    R.p(ind)   = repmat( grid1, length(ind)/length(grid1), 1 );
-    R.t(ind)   = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, Q.T_FIELD, ...
+    grid1        = R.jq{i}.grids{1} ;
+    R.x_p(ind)   = repmat( grid1, length(ind)/length(grid1), 1 );
+    R.x_t(ind)   = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                        Q.J.ABS_SPECIES(ig) ) );
-    R.vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
-                       get_vmrfield_i(Q.VMR_FIELD,ig), Q.J.ABS_SPECIES(ig) ) );
+    R.x_vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
+                       get_vmrfield_i(vmr_field,ig), Q.J.ABS_SPECIES(ig) ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
     else
       if strcmp( R.jq{i}.mode, 'vmr' )
-        xa(ind) = R.vmr0(ind);
+        xa(ind) = R.x_vmr0(ind);
       elseif strcmp( R.jq{i}.mode, 'nd' )
-        xa(ind) = vmr2nd( R.vmr0(ind), R.p(ind), R.t(ind) );
+        xa(ind) = vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
       else
         error( sprintf('Unknown gas species retrieval unit (%s).', ...
                                                               R.jq{i}.mode ) );
@@ -135,37 +165,41 @@ end
 
 
 
-%--- Modify Q to simplify and avoid creating files repeatedly -----------------
-%
-% This is done here for quantities that can not be affected by the
-% the retrieval.
-
-%- Basic grids
-%
-Q = force_file( Q, 'F_GRID', 'Vector', R );
-Q = force_file( Q, 'P_GRID', 'Vector', R );
-if Q.ATMOSPHERE_DIM > 1
-  Q = force_file( Q, 'LAT_GRID', 'Vector', R );
-  if Q.ATMOSPHERE_DIM > 2
-    Q = force_file( Q, 'LON_GRID', 'Vector', R );
-  end
-end
+%--- Continued modification of Q fields ---------------------------------------
 
 %- Atmospheric fields
 %
-if ~any_gas
-  Q = force_file( Q, 'VMR_FIELD', 'Tensor4', R );
-end
+% Option USE_RAW_ATMOSPHERE is not handled here.
 %
-if ~any_tz
-  Q = force_file( Q, 'T_FIELD', 'Tensor3', R );
-  Q = force_file( Q, 'Z_FIELD', 'Tensor3', R );
-end
+Q.USE_RAW_ATMOSPHERE = 0;
+%
+Q = force_file( Q, 'VMR_FIELD', 'Tensor4', R );
+Q = force_file( Q, 'T_FIELD', 'Tensor3', R );
+Q = force_file( Q, 'Z_FIELD', 'Tensor3', R );
+
+%- Sensor
+%
+% In arts_internal all sensor response variables are stored as files
+%
+Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
+Q.SENSOR_RESPONSE_F   = fullfile( R.workfolder, 'sensor_response_f.xml' );
+Q.SENSOR_RESPONSE_ZA  = fullfile( R.workfolder, 'sensor_response_za.xml' );
+Q.SENSOR_RESPONSE_AA  = fullfile( R.workfolder, 'sensor_response_aa.xml' );
+Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
+Q.ANTENNA_DIM         = fullfile( R.workfolder, 'antenna_dim.xml' );
+Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
+Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
 
 
-%- Absorption
+
+
+
+%- Something went wrong?
 %
-Q = force_file( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
+catch
+  delete_tmpfolder( R.workfolder );
+  rethrow(lasterror);
+end
 
 return
 
@@ -178,12 +212,21 @@ return
 %-----------------------------------------------------------------------------
 
 function Q = force_file( Q, fieldname, datatype, R )
- 
   if ~ischar( getfield( Q, fieldname ) )
-    filename = fullfile( R.workfolder, [fieldname,'.xml'] );
-    xmlStore( filename, getfield( Q, fieldname ), datatype );
-    setfield( Q, fieldname, filename );
+    filename = fullfile( R.workfolder, [lower(fieldname),'.xml'] );
+    xmlStore( filename, Q.(fieldname), datatype );
+    Q.(fieldname) = filename;
   end
+return
+
+
+
+function V = get_vmrfield_i( vmr_field, i )
+  s               = ones( 1, 4 );
+  s2              = size( vmr_field );
+  s(1:length(s2)) = s2;
+  V = zeros( s(2:end) );
+  V(:,:,:) = vmr_field(i,:,:,:);
 return
 
 
@@ -194,10 +237,10 @@ function [jq,ji,t_field,z_field,vmr_field] = arts_internal( Q, R )
 
   if Q.USE_RAW_ATMOSPHERE
    parts = { 'start1', 'start2', 'load_atm', 'save_atm', 'init_rte', ...
-             'sensor', 'j', 'stop' };
+             'sensor', 'save_sensor' 'j', 'stop' };
   else
     parts = { 'start1', 'start2', 'load_atm', 'init_rte', ...
-             'sensor', 'j', 'stop' };
+             'sensor', 'save_sensor', 'j', 'stop' };
   end
 
   S = qarts2cfile( Q, parts, tmpfolder );
@@ -232,11 +275,4 @@ return
 
 
 
-function V = get_vmrfield_i( vmr_field, i )
-  s               = ones( 1, 4 );
-  s2              = size( vmr_field );
-  s(1:length(s2)) = s2;
-  V = zeros( s(2:end) );
-  V(:,:,:) = vmr_field(i,:,:,:);
-return
 

@@ -21,23 +21,31 @@ function [y,dy,J,jq,ji] = arts_y( Q )
 
 %- Avoid unnecessary Jacobian calculations
 %
-if nargout <= 2
-  Q.J = NaN;
+do_j = 1;
+%
+if nargout <= 2  |  isnan(Q.SENSOR_RESPONSE)  |  Q.SENSOR_RESPONSE == 0
+  do_j = 0;
 end
 
 
 tmpfolder   = create_tmpfolder;
 
-parts = qarts2cfile( 'y' );
+try
+  %
+  if do_j
+    parts = qarts2cfile( 'y+j' );
+  else
+    parts = qarts2cfile( 'y+j' );
+  end
+  S     = qarts2cfile( Q, parts, tmpfolder );
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  qtool( S, cfile, [] );
+  arts( cfile );
 
-S = qarts2cfile( Q, parts, tmpfolder );
-
-cfile = fullfile( tmpfolder, 'cfile.arts' );
-
-qtool( S, cfile, [] );
-
-
-arts( cfile );
+catch
+  delete_tmpfolder( tmpfolder );
+  rethrow(lasterror);
+end
 
 
 if isstruct( Q.CLOUDBOX )  
@@ -52,23 +60,22 @@ end
 
 y = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
 
-if nargout > 2
-  if exist( fullfile( tmpfolder, 'jacobian.xml' ), 'file' )
-    J = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
-    if nargout >= 4
-      jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
-      ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
-      for i = 1 : length(ji)
-        for j = 1 : length(ji{i})
-          ji{i}{j} = ji{i}{j} + 1;
-        end
+
+if do_j
+  J = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
+  if nargout >= 4
+    jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
+    ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
+    for i = 1 : length(ji)
+      for j = 1 : length(ji{i})
+        ji{i}{j} = ji{i}{j} + 1;
       end
     end
-  else
-    J  = NaN;
-    jq = NaN;
-    ji = NaN;
   end
+else
+  J  = NaN;
+  jq = NaN;
+  ji = NaN;
 end
 
 

@@ -68,32 +68,42 @@ end
 tmpfolder   = create_tmpfolder;
 
 
-%= Get text for control file, but remove two last parts ('save_y' and 'stop')
-%
-parts = qarts2cfile( 'y' );
-parts = { parts{1:(end-2)} };
-S     = qarts2cfile( Q, parts, tmpfolder );
+try
+
+  %= Get text for control file, but remove two last part ('stop')
+  %
+  parts = qarts2cfile( 'y' );
+  parts = { parts{1:(end-1)} };
+  S     = qarts2cfile( Q, parts, tmpfolder );
 
 
-%= Add saving of variables
-%
-for i = 1:length(vnames1)
-  filename = fullfile( tmpfolder, [ vnames1{i}, '.xml' ] ); 
-  S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
+  %= Add saving of variables
+  %
+  for i = 1:length(vnames1)
+    filename = fullfile( tmpfolder, [ vnames1{i}, '.xml' ] ); 
+    S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
+  end
+
+
+  %= Add closing 
+  %
+  Sp = qarts2cfile( Q, {'stop'}, tmpfolder );
+  S  = { S{:} Sp{:} };
+
+
+  %= Create control file and run 
+  %
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  qtool( S, cfile, [] );
+  arts( cfile );
+
+
+catch
+  delete_tmpfolder( tmpfolder );
+  rethrow(lasterror);
 end
 
 
-%= Add closing 
-%
-Sp = qarts2cfile( Q, {'stop'}, tmpfolder );
-S  = { S{:} Sp{:} };
-
-
-%= Create control file and run 
-%
-cfile = fullfile( tmpfolder, 'cfile.arts' );
-qtool( S, cfile, [] );
-arts( cfile );
 
 
 %= Read stored variables

@@ -1,6 +1,12 @@
 function [y,J] = arts_oem( Q, R, x, iter, do_j )
 
 
+%- Everything is here put into try-catch to enable that work folder is
+%- removed if something goes wrong.
+%
+try
+
+
 %- Set default values
 %
 do_j_DEFAULT = 0;
@@ -29,6 +35,7 @@ if iter > 1
   %                                           species.
   i_rel = [];                               % Index for x-values retrieved in
   %                                           relative units.
+  any_gas = false;                          % Any gas species among rq
 
   %- Loop retrieval quantities
   %
@@ -40,25 +47,26 @@ if iter > 1
 
     case 'Abs. species'   %---------------------------------------------------
       %
-      ig  = i_asj(i);    % Gas species index
-      D   = [];
+      any_gas = true;
+      ig      = i_asj(i);    % Gas species index
+      D       = [];
       %
       if strcmp( R.jq{i}.mode, 'rel' )
         [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
             Q.J.ABS_SPECIES(ig).GRID1, Q.J.ABS_SPECIES(ig).GRID2, ...
-            Q.J.ABS_SPECIES(ig).GRID3, x(ind) .* R.vmr0(ind), ...
-                                            Q.P_GRID, Q.LAT_GRID, Q.LON_GRID );
+            Q.J.ABS_SPECIES(ig).GRID3, x(ind) .* R.x_vmr0(ind), ...
+                                            R.p_grid, R.lat_grid, R.lon_grid );
         i_rel = [ i_rel ind ];
       elseif strcmp( R.jq{i}.mode, 'vmr' )
         [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
             Q.J.ABS_SPECIES(ig).GRID1, Q.J.ABS_SPECIES(ig).GRID2, ...
             Q.J.ABS_SPECIES(ig).GRID3, x(ind), ...
-                                            Q.P_GRID, Q.LAT_GRID, Q.LON_GRID );
+                                            R.p_grid, R.lat_grid, R.lon_grid );
       else
         [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
            Q.J.ABS_SPECIES(ig).GRID1, Q.J.ABS_SPECIES(ig).GRID2, ...
-           Q.J.ABS_SPECIES(ig).GRID3, nd2vmr(x(ind),R.p(ind),R.t(ind)),...
-                                            Q.P_GRID, Q.LAT_GRID, Q.LON_GRID );
+           Q.J.ABS_SPECIES(ig).GRID3, nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
+                                            R.p_grid, R.lat_grid, R.lon_grid );
       end
       %
       Q.VMR_FIELD(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
@@ -70,12 +78,48 @@ end
 
 
 
+
+%--- Data to save ? -----------------------------------------------------------
+
+if any_gas
+  xmlStore
+end
+
+
+
 %--- Run ARTS -----------------------------------------------------------------
 
-if ~do_j
-  y = arts_y( Q );
+%- Create cfile if not done before
+%
+if do_j
+  if isnan( R.cfile_yj )
+    parts = qarts2cfile( 'y+j' );
+    S     = qarts2cfile( Q, parts, R.workfolder );
+    cfile = fullfile( R.workfolder, 'cfile.arts' );
+    qtool( S, cfile, [] );
+    R.cfile_yj = cfile;
+  else
+    cfile = R.cfile_yj;
+  end
 else
-  [y,dy,J] = arts_y( Q );
+  if isnan( R.cfile_y )
+    parts = qarts2cfile( 'y' );
+    S     = qarts2cfile( Q, parts, R.workfolder );
+    cfile = fullfile( R.workfolder, 'cfile.arts' );
+    qtool( S, cfile, [] );
+    R.cfile_y = cfile;
+  else
+    cfile = R.cfile_y;
+  end
+end
+
+%- Run ARTS and load result
+%
+arts( cfile );
+%
+y     = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
+if do_j  
+  J     = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
 end
 
 %------------------------------------------------------------------------------
@@ -91,6 +135,16 @@ if do_j  &  iter > 1  &  ~isempty( i_rel )
 end
 
 %------------------------------------------------------------------------------
+
+
+
+
+%- Something went wrong?
+%
+catch
+  delete_tmpfolder( R.workfolder );
+  rethrow(lasterror);
+end
 
 return
 

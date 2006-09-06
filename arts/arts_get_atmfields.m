@@ -43,13 +43,20 @@ Q.USE_RAW_ATMOSPHERE = 1;
 
 tmpfolder   = create_tmpfolder;
 
-parts = qarts2cfile( 'get_atmfields' );
-S = qarts2cfile( Q, parts, tmpfolder );
-cfile = fullfile( tmpfolder, 'cfile.arts' );
-qtool( S, cfile, [] );
-arts( cfile );
-t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
-z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml') );
-vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml') );
+try
 
-delete_tmpfolder( tmpfolder );
+  parts = qarts2cfile( 'get_atmfields' );
+  S = qarts2cfile( Q, parts, tmpfolder );
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  qtool( S, cfile, [] );
+  arts( cfile );
+  t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
+  z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml') );
+  vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml') );
+
+  delete_tmpfolder( tmpfolder );
+
+catch
+  delete_tmpfolder( tmpfolder );
+  rethrow(lasterror);
+end

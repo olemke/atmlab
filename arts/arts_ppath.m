@@ -80,89 +80,97 @@ end
 tmpfolder = create_tmpfolder;
 
 
-%= Create a name of a control file inside the temporary folder
-%
-cfile = fullfile( tmpfolder, 'cfile.arts' );
+try
+
+  %= Create a name of a control file inside the temporary folder
+  %
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
 
 
-%= Set the fields of Q.
-%
-Q.DIM  = dim;
-Q.LMAX = lmax;
-Q.TMPFOLDER = tmpfolder;
-if isscalar( z_ground )
-  Q.Z_GROUND = z_ground;
-else
-  Q.Z_GROUND = [];
+  %= Set the fields of Q.
+  %
+  Q.DIM  = dim;
+  Q.LMAX = lmax;
+  Q.TMPFOLDER = tmpfolder;
+  if isscalar( z_ground )
+    Q.Z_GROUND = z_ground;
+  else
+    Q.Z_GROUND = [];
+  end
+  Q.CLOUDBOX_LIMITS = cb_lims;
+  Q.REFRACTION      = do_refr; 
+
+
+  %= Create the control file
+  %
+  qtool( cfiletemplate, cfile, Q );
+
+
+  %= Save grids, z_field and t_field
+  %
+  xmlStore( fullfile( tmpfolder, 'p_grid.xml' ), p_grid, 'Vector');
+  %
+  if dim > 1
+   xmlStore( fullfile( tmpfolder, 'lat_grid.xml' ), lat_grid, 'Vector');
+  end
+  %
+  if dim > 2
+   xmlStore( fullfile( tmpfolder, 'lon_grid.xml' ), lon_grid, 'Vector');
+  end
+  %
+  xmlStore( fullfile( tmpfolder, 'z_field.xml' ), z_field, 'Tensor3');
+  %
+  xmlStore( fullfile( tmpfolder, 'r_geoid.xml' ), r_geoid, 'Matrix');
+
+
+  %= Handle z_ground
+  %
+  if ~isscalar( z_ground )
+    xmlStore( fullfile( tmpfolder, 'z_ground.xml' ), z_ground, 'Matrix');
+  end
+
+
+  %= Cloud box
+  %
+  if ~isempty( Q.CLOUDBOX_LIMITS )
+    xmlStore( fullfile( tmpfolder, 'cb_lims.xml' ), cb_lims, 'ArrayOfIndex');
+  end
+
+
+  %= Save rte_pos and rte_los
+  %
+  xmlStore( fullfile( tmpfolder, 'rte_pos.xml' ), rte_pos, 'Vector');
+  xmlStore( fullfile( tmpfolder, 'rte_los.xml' ), rte_los, 'Vector');
+
+
+  %= Refraction
+  %
+  if Q.REFRACTION
+  xmlStore( fullfile( tmpfolder, 't_field.xml' ), t_field, 'Tensor3');
+  A = zeros([1 size(vmr_field)]);
+  A(1,:,:,:) = vmr_field;
+  xmlStore( fullfile( tmpfolder, 'vmr_field.xml' ), A, 'Tensor4');
+  clear A
+  end
+
+
+
+  %= Execute ARTS and load the result
+  %
+  arts( cfile );
+  %
+  P = xmlLoad( fullfile( tmpfolder, 'ppath.xml' ) );
+
+
+  %= Remove the temporary folder
+  %
+  delete_tmpfolder( tmpfolder );
+
+
+catch
+  delete_tmpfolder( tmpfolder );
+  rethrow(lasterror);
 end
-Q.CLOUDBOX_LIMITS = cb_lims;
-Q.REFRACTION      = do_refr; 
-
-
-%= Create the control file
-%
-qtool( cfiletemplate, cfile, Q );
-
-
-%= Save grids, z_field and t_field
-%
-xmlStore( fullfile( tmpfolder, 'p_grid.xml' ), p_grid, 'Vector');
-%
-if dim > 1
- xmlStore( fullfile( tmpfolder, 'lat_grid.xml' ), lat_grid, 'Vector');
-end
-%
-if dim > 2
- xmlStore( fullfile( tmpfolder, 'lon_grid.xml' ), lon_grid, 'Vector');
-end
-%
-xmlStore( fullfile( tmpfolder, 'z_field.xml' ), z_field, 'Tensor3');
-%
-xmlStore( fullfile( tmpfolder, 'r_geoid.xml' ), r_geoid, 'Matrix');
-
-
-%= Handle z_ground
-%
-if ~isscalar( z_ground )
-  xmlStore( fullfile( tmpfolder, 'z_ground.xml' ), z_ground, 'Matrix');
-end
-
-
-%= Cloud box
-%
-if ~isempty( Q.CLOUDBOX_LIMITS )
-  xmlStore( fullfile( tmpfolder, 'cb_lims.xml' ), cb_lims, 'ArrayOfIndex');
-end
-
-
-%= Save rte_pos and rte_los
-%
-xmlStore( fullfile( tmpfolder, 'rte_pos.xml' ), rte_pos, 'Vector');
-xmlStore( fullfile( tmpfolder, 'rte_los.xml' ), rte_los, 'Vector');
-
-
-%= Refraction
-%
-if Q.REFRACTION
-xmlStore( fullfile( tmpfolder, 't_field.xml' ), t_field, 'Tensor3');
-A = zeros([1 size(vmr_field)]);
-A(1,:,:,:) = vmr_field;
-xmlStore( fullfile( tmpfolder, 'vmr_field.xml' ), A, 'Tensor4');
-clear A
-end
-
-
-
-%= Execute ARTS and load the result
-%
-arts( cfile );
-%
-P = xmlLoad( fullfile( tmpfolder, 'ppath.xml' ) );
-
-
-%= Remove the temporary folder
-%
-delete_tmpfolder( tmpfolder );
   
 
 return

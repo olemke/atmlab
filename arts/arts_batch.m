@@ -16,18 +16,24 @@ function Y = arts_batch( Q )
 
 tmpfolder   = create_tmpfolder;
 
-parts = qarts2cfile( 'batch' );
+try
 
-S = qarts2cfile( Q, parts, tmpfolder );
+  parts = qarts2cfile( 'batch' );
 
-cfile = fullfile( tmpfolder, 'cfile.arts' );
+  S = qarts2cfile( Q, parts, tmpfolder );
 
-qtool( S, cfile, [] );
+  cfile = fullfile( tmpfolder, 'cfile.arts' );
 
-arts( cfile );
+  qtool( S, cfile, [] );
 
-Y = xmlLoad( fullfile( tmpfolder, 'ybatch.xml' ) );
+  arts( cfile );
 
-delete_tmpfolder( tmpfolder );
+  Y = xmlLoad( fullfile( tmpfolder, 'ybatch.xml' ) );
+
+  delete_tmpfolder( tmpfolder );
 
 
+catch
+  delete_tmpfolder( tmpfolder );
+  rethrow(lasterror);
+end
