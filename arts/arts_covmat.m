@@ -1,6 +1,6 @@
 % ARTS_COVMAT   Creates the covariance matrix for a single retrieval quantity
 %
-%   Converts speciation data to a covariance matrix. The covariance is
+%   Converts specification data to a covariance matrix. The covariance is
 %   described by the structure *D*, where different format options exist.
 %   The format is selected by the common field *FORMAT*. 
 %
@@ -85,10 +85,8 @@
 % IN    dim     Dimensionality.
 %       D       Specification data.
 %       grid1   Retrieval grid in dimension 1.
-%       J       In this argument pattern, this argument shall be a structure.
-%               This structure is supposed to have fields GRID1, GRID2 and 
-%               GRID3, which then are used as exactly as grid1/2/3 in the
-%               first argument pattern.
+%       J       In this argument pattern, this argument shall be an
+%               ArrayOfVectors, where first vector is used as grid1 etc.
 % OPT   grid2   Retrieval grid in dimension 2. Not needed if *dim* < 2.
 %       grid3   Retrieval grid in dimension 3. Not needed if *dim* < 3.
 %       dtype   Type of data. Only specified option so far is 'atm'. See
@@ -118,7 +116,7 @@ if isvector( grid1 )
   if nargin < 6
     dtype = [];
   end
-elseif isstruct( grid1 )
+elseif iscell( grid1 )
   if nargin > 3
     dtype = grid2;
     if nargin > 4
@@ -127,15 +125,12 @@ elseif isstruct( grid1 )
   else
     dtype = [];
   end
-  Q = grid1;
-  rqre_field( Q, 'GRID1', 0 );
-  grid1 = Q.GRID1;   
+  J = grid1;
+  grid1 = J{1};   
   if dim >= 2
-    rqre_field( Q, 'GRID2', 0 );
-    grid2 = Q.GRID2;   
+    grid2 = J{2};   
     if dim == 3
-      rqre_field( Q, 'GRID3', 0 );
-      grid3 = Q.GRID3;   
+      grid3 = J{3};   
     end
   end
 else

@@ -1,3 +1,20 @@
+2006-09-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
+
+	* atmlab-0-2-130
+
+	* The ARTS/OEM part is now running again. Now with clearer flow
+	(hopefully), function headers written and improved calculations
+	speed. So far only gas species handled.
+
+	* arts/: Large modifications on function related to ARTS/OEM. For
+	example, arguments changed for several functions. Some other
+	changes:
+
+	* arts/arts_sx.m: Created.
+
+	* arts/qarts.m (Q.SURFACE_PROP_AGENDA): Default now defined, 
+	corresponding to a blackbody ground.
+
 2006-09-06  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-129

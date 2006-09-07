@@ -2,7 +2,7 @@
 %
 % FORMAT   arts_oem_demo
 
-% 200x-xx-xx   Created by XXX.
+% 2006-09-07   Created by Patrick Eriksson.
 
 function arts_oem_demo
 
@@ -22,31 +22,41 @@ end
 addpath_ami;
 
 
-%= Set-up Q and R structures ==================================================
-
+%= Set-up control structures ==================================================
+%
 Q   = qarts;
 Q.J = qarts_jacobian;
 Q1  = qarts1;
-R   = [];
+SX  = 0;
+
 
 %= Spectroscopy
 %
-Q = q_abs_species( Q, {'O3'}, 1, 'rel', 'analytical', 0, ...
-                                                   z2p_simple( 0e3:1e3:90e3) );
-%
-R.SX.ABS_SPECIES(1).FORMAT    = 'param'; 
-if strcmp( Q.J.ABS_SPECIES(1).UNIT, 'rel' )
-  R.SX.ABS_SPECIES(1).SI        = 0.6;
-else
-  R.SX.ABS_SPECIES(1).SI        = 0.1e-6;
-end
-R.SX.ABS_SPECIES(1).CCO       = 0.01;  
-R.SX.ABS_SPECIES(1).CFUN1     = 'exp';
-R.SX.ABS_SPECIES(1).CL1       = 0.25*[1 1];
-R.SX.ABS_SPECIES(1).CL1_GRID1 = [1100e2 1e-3];  
-%
 Q1.LINEFORMAT       = 'Arts';
 Q1.LINEDATA         = fullfile( atmlab_example_data , 'o3line111ghz' );
+%
+ret_unit = 'rel';
+%
+%- Definition of Sx
+D.FORMAT    = 'param'; 
+if strcmp( ret_unit, 'rel' )
+  D.SI      = 0.4;
+else
+  D.SI      = 0.1e-6;
+end
+D.CCO       = 0.01;  
+D.CFUN1     = 'exp';
+D.CL1       = 0.25*[1 1];
+D.CL1_GRID1 = [1100e2 1e-3];  
+%
+[Q,SX] = q_abs_species( Q, ...            
+                        { 'O3' }, ...                     % Tag group name
+                        1, ...                            % Do jacobians?
+                        SX, ...         
+                        D, ...
+                        { z2p_simple(0e3:1e3:90e3) }, ... % Retrieval grid(s)
+                        ret_unit  ...                     % Retrieval unit
+                      );
 
 
 %= Atmosphere
@@ -60,10 +70,8 @@ Q.P_GRID              = z2p_simple( 0:500:90e3 );
 
 %= RTE 
 %
+Q.STOKES_DIM          = 1;
 Q.Z_SURFACE           = 1e3;
-Q.SURFACE_PROP_AGENDA = ...
-   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-     'Ignore(rte_los){}','surfaceBlackbody{}' };
 %
 Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}', 'Ignore(rte_pos){}', ...
                       'MatrixCBR(iy,f_grid){}', 'MatrixScale(iy,iy){0}' };
@@ -75,8 +83,6 @@ Q.Y_UNIT              = 'RJ';
 %
 Q.SENSOR_LOS          = 0;
 Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
-%
-Q.STOKES_DIM        = 1;
 
 
 %= Frequency and spectrometer.
@@ -115,21 +121,21 @@ y = arts_y(Q);
 
 %= Create Se
 %
-si = 0.25;
+si = 0.05;
 %
-D.FORMAT    = 'param';
-D.SI        = si;
-D.CCO       = 0;  
-D.CFUN1     = 'drc';
+SE.FORMAT    = 'param';
+SE.SI        = si;
+SE.CCO       = 0;  
+SE.CFUN1     = 'drc';
 %
-Se = arts_covmat( 1, D, Q.SENSOR_RESPONSE.F_BACKEND );
+Se = arts_covmat( 1, SE, Q.SENSOR_RESPONSE.F_BACKEND );
 
 
 %= Measurement
 %
 e = si*randn(size(Se,1),1);
 %
-y = 1.1 * arts_y(Q);
+y = 2 * arts_y(Q) + e;
 
 
 %= OEM
@@ -150,15 +156,17 @@ O.d       = 0;
 O.do      = 1;
 O.ds      = 0;
 %
-[Qoem,R,Sx,xa] = arts_oem_init( Q, R );
+[Qoem,R,xa] = arts_oem_init( Q );
+Sx          = arts_sx( Q, R, SX );
+[x,P]       = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %
-[x,P] = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
-%
-arts_oem_init( 'clean', R );
+arts_oem( 'clean', R );
 clear Qoem O
 
 
 z = p2z_simple( Q.J.ABS_SPECIES(1).GRID1 );
 
-keyboard
-return
+
+plot( x, z/1e3 )
+xlabel( 'Retrieved profile' )
+ylabel( 'Approximative altitude [km]' );

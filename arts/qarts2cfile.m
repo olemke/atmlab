@@ -111,7 +111,9 @@ end
 
 qcheck( @qarts, Q );
 
-S = {};
+S    = {};
+do_j = 0;
+
 
 
 for i = 1 : length(parts)
@@ -274,7 +276,6 @@ case 'j'
     do_j     = 1;
   elseif isnan( Q.J )  |  Q.J == 0 
     T{1} = 'jacobianOff{}';
-    do_j = 0;
   else
     error( 'Unknown selection for Q.JACOBIAN.' );
   end
@@ -293,10 +294,11 @@ case 'y'
     %
   end
   %
-  T{end+1} = 'RteCalc{}';
-  %
   if do_j
+    T{end+1} = 'RteCalc{}';
     T{end+1} = 'jacobianCalc{}'; 
+  else
+    T{end+1} = 'RteCalcNoJacobian{}';
   end
   %
   switch upper( Q.Y_UNIT )

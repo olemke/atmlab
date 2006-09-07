@@ -185,7 +185,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
     %- Calculate new Jacobian (J)   
     %
-    [yf,J] = feval( comfun, Q, R, x, iter, 1 );
+    [R,yf,J] = feval( comfun, Q, R, x, iter );
 
     %- Some matrix products
     %
@@ -232,7 +232,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
       %- Cost values
       if O.cost  |  strcmp( O.method, 'ML' )
-        yf       = feval( comfun, Q, R, xnew, iter+1 );
+        [R,yf]   = feval( comfun, Q, R, xnew, iter+1 );
         a        = xnew - xa;
         cost_x   = (a' * Sxinv * a) / ny;  
         a        = y - yf;
@@ -300,16 +300,16 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   %- Update J?
   %
   if O.jexact  &  ~only_char 
-    [yf,J] = feval( comfun, Q, R, x, iter+1, 1 );
-    JtSeinv = J' * Seinv;
-    SJSJ    = Sxinv + JtSeinv * J;
+    [R,yf,J] = feval( comfun, Q, R, x, iter+1 );
+    JtSeinv  = J' * Seinv;
+    SJSJ     = Sxinv + JtSeinv * J;
   end
 
   %- Fill P, part 1
   %
   if O.yf
     if isnan(yf)
-      yf = feval( comfun, Q, R, x, iter+1, 0 );
+      [R,yf] = feval( comfun, Q, R, x, iter+1 );
     end
     %
     P.yf = yf;

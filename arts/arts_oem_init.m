@@ -1,25 +1,22 @@
-function [Q,R,Sx,xa] = arts_oem_init(Q,R)
+% ARTS_OEM_INIT   Initialization of OEM inversions by ARTS
+%
+%   See *arts_oem* for usage of this function.
+%
+% FORMAT   [R,y,J] = arts_oem( Q, R, x, iter )
+%        
+% OUT   Q     Qarts structure. See *qarts*.
+%       R     Retrieval data structure. See *arts_oem*.
+%       xa    A priori state vector.
+% IN    Q     Qarts structure. See *qarts*.
+
+% 2006-09-07   First working version by Patrick Eriksson.
 
 
-%- Handle special case of arts_oem_init('clean',R) ---------------------------
-
-if ischar(Q)  &  strcmp( Q, 'clean' )
-  delete_tmpfolder( R.workfolder );
-  return                               % --->
-end
-
-%-----------------------------------------------------------------------------
-
-
+function [Q,R,xa] = arts_oem_init(Q)
 
 
 
 %--- Start part --------------------------------------------------------------
-
-%- Default values
-%
-if nargin < 2,   R = [];  end
-
 
 %- Check input
 %
@@ -33,6 +30,7 @@ end
 
 %- Create work folder
 %
+R            = [];
 R.workfolder = create_tmpfolder;
 
 
@@ -90,19 +88,16 @@ Q = force_file( Q, 'SENSOR_LOS', 'Matrix', R );
 
 %--- Initialization of variables ----------------------------------------------
 
-%- xa and Sx
+%- xa
 %
 nq = length( R.jq );
 nx = R.ji{nq}{2};
 %
 xa = zeros( nx, 1 );
-Sx = sparse( nx, nx );
 
 
 %- R
 %
-R.cfile_y  = NaN;
-R.cfile_yj = NaN;
 R.x_p      = repmat( NaN, nx, 1 );
 R.x_t      = R.x_p;
 R.x_vmr0   = R.x_p;
@@ -111,12 +106,12 @@ R.x_vmr0   = R.x_p;
 %- Some other variables
 %
 i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );
+any_gas = false;
 
 
 
 
-
-%--- Loop retrieval quantities and fill xa and Sx ----------------------------
+%--- Loop retrieval quantities and fill xa and R fields ----------------------
 %-----------------------------------------------------------------------------
 
 for i = 1 : nq
@@ -126,18 +121,18 @@ for i = 1 : nq
   switch R.jq{i}.maintag
 
 
-
   case 'Abs. species'   %------------------------------------------------------
     %
     ig      = i_asj(i);    % Gas species index
+    any_gas = true;
     %
     %- Get p, t and vmr for each retrieval point
-    grid1        = R.jq{i}.grids{1} ;
+    grid1        = R.jq{i}.grids{1};
     R.x_p(ind)   = repmat( grid1, length(ind)/length(grid1), 1 );
     R.x_t(ind)   = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, t_field, ...
-                                                       Q.J.ABS_SPECIES(ig) ) );
+                                                             R.jq{i}.grids ) );
     R.x_vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
-                       get_vmrfield_i(vmr_field,ig), Q.J.ABS_SPECIES(ig) ) );
+                               get_vmrfield_i(vmr_field,ig), R.jq{i}.grids ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
@@ -151,10 +146,6 @@ for i = 1 : nq
                                                               R.jq{i}.mode ) );
       end
     end
-    %
-    Sx(ind,ind) = arts_covmat( Q.ATMOSPHERE_DIM, R.SX.ABS_SPECIES(ig), ... 
-                                                  Q.J.ABS_SPECIES(ig), 'atm' );
-
 
 
   otherwise   %----------------------------------------------------------------
@@ -165,13 +156,28 @@ end
 
 
 
+%--- More to put into R ? -----------------------------------------------------
+
+if any_gas
+  R.vmr_field = vmr_field;
+end
+
+
+
+
+
 %--- Continued modification of Q fields ---------------------------------------
 
 %- Atmospheric fields
 %
-% Option USE_RAW_ATMOSPHERE is not handled here.
+% Option USE_RAW_ATMOSPHERE is not handled here. 
 %
-Q.USE_RAW_ATMOSPHERE = 0;
+if Q.USE_RAW_ATMOSPHERE
+  Q.USE_RAW_ATMOSPHERE = 0;
+  Q.T_FIELD            = t_field;
+  Q.Z_FIELD            = z_field;
+  Q.VMR_FIELD          = vmr_field;
+end
 %
 Q = force_file( Q, 'VMR_FIELD', 'Tensor4', R );
 Q = force_file( Q, 'T_FIELD', 'Tensor3', R );
@@ -189,6 +195,26 @@ Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
 Q.ANTENNA_DIM         = fullfile( R.workfolder, 'antenna_dim.xml' );
 Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
 Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
+
+
+
+
+
+%--- Create control files -----------------------------------------------------
+%
+%- y+j
+parts = qarts2cfile( 'y+j' );
+S     = qarts2cfile( Q, parts, R.workfolder );
+cfile = fullfile( R.workfolder, 'cfile_yj.arts' );
+qtool( S, cfile, [] );
+R.cfile_yj = cfile;
+%
+%- Only y
+parts = qarts2cfile( 'y' );
+S     = qarts2cfile( Q, parts, R.workfolder );
+cfile = fullfile( R.workfolder, 'cfile_y.arts' );
+qtool( S, cfile, [] );
+R.cfile_y = cfile;
 
 
 

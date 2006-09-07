@@ -3,8 +3,13 @@
 %   Mimics the interpolation done in ARTS. For example, log(p) is used as
 %   vertical coordinate. 
 %
-%   Both Q1 and Q2 are assumed to have fields P_GRID, LAT_GRID and LON_GRID,
-%   though fields for dimensions not used can be left out. 
+%   There two options to specify grids, valid for both Q1 and Q2.
+%   The first option is that Q is a structure, including the fields 
+%   P_GRID, LAT_GRID and LON_GRID.
+%   The second option is that Q is an ArrayOfGrids, where the first
+%   grid is takan as p_grid etc.
+%
+%   Grids for dimensions not used can be left out, on both cases.
 %
 %   Any extrapolation results in NaN.
 %
@@ -12,9 +17,9 @@
 %        
 % OUT   F     Interpolated field.
 % IN    dim   Atmospheric dimensionality.
-%       Q1    Structure with original grids.
+%       Q1    Original grids. See further above.
 %       F0    Field to interpolate.
-%       Q2    Structure with new grids.
+%       Q2    New grids. See further above.
 
 % 2006-08-18   Created by Patrick Eriksson
 
@@ -47,34 +52,34 @@ end
 
 function [grid1,grid2,grid3] = extract_grids( dim, Q )
 
-if isfield( Q, 'P_GRID' )
+if isstruct(Q)  &  isfield( Q, 'P_GRID' )
   grid1 = log( qarts_get( Q.P_GRID ) );
-elseif isfield( Q, 'GRID1' )
-  grid1 = log( qarts_get( Q.GRID1 ) );
+elseif iscell(Q)
+  grid1 = log( Q{1} );
 else
-  error('Neither field P_GRID or GRID1 found.');
-end
+  error('No recognised format for Q (p dimension).');
+end 
 
 if dim >= 2
-  if isfield( Q, 'LAT_GRID' )
+  if isstruct(Q)  &  isfield( Q, 'LAT_GRID' )
     grid2 = qarts_get( Q.LAT_GRID );
-  elseif isfield( Q, 'GRID2' )
-    grid2 = qarts_get( Q.GRID2 );
+  elseif iscell(Q)
+    grid2 = Q{2};
   else
-    error('Neither field LAT_GRID or GRID2 found.');
-  end
+    error('No recognised format for Q (lat dimension).');
+  end 
 else
   grid2 = NaN;
 end
 
 if dim >= 3
-  if isfield( Q, 'LON_GRID' )
+  if isstruct(Q)  &  isfield( Q, 'LON_GRID' )
     grid3 = qarts_get( Q.LON_GRID );
-  elseif isfield( Q, 'GRID3' )
-    grid3 = qarts_get( Q.GRID3 );
+  elseif iscell(Q)
+    grid3 = Q{3};
   else
-    error('Neither field LON_GRID or GRID3 found.');
-  end
+    error('No recognised format for Q (lon dimension).');
+  end 
 else
   grid3 = NaN;
 end

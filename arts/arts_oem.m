@@ -1,4 +1,72 @@
-function [y,J] = arts_oem( Q, R, x, iter, do_j )
+% ARTS_OEM   Interface between *oem* and the ARTS forward model
+%
+%    This function together with *arts_oem_init* handles all bookkeeping and
+%    communication to perform OEM inversion with ARTS. The standard sequence
+%    of function calls is:
+%
+%       [Qoem,R,xa] = arts_oem_init( Q );
+%       Sx          = arts_sx( Q, R, SX );
+%       Se          = arts_covmat ...
+%       [x,P]       = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
+%       %
+%       arts_oem( 'clean', R );
+%       clear Qoem
+%
+%    Note that *arts_oem_init* can modify Q in such way that it can not be
+%    used for further calculations. 
+%
+%    An implementation strategy has been to avoid unnecessery reading and
+%    writing of files, in order to obtain high calculation speed. The drawback
+%    is that more variables must be kept in memory.
+%
+%    All pure forward model variables are stored in Q, while all extra data 
+%    needed to handle the inversions are put into R. This data can be used
+%    for further processing or "re-packing" of inversions results.
+%    These fields exist:
+%       workfolder: Path to the temporary working folder.
+%       jq        : ARTS description of jacobian quantities.
+%       ji        : Start and stop index in J for each jacobian quantities.
+%       cfile_y   : Name of control file to generate only y
+%       cfile_yj  : Name of control to generate y and J
+%       x_p       : The pressure corresponding to each element of x. 
+%       x_t       : The temperature corresponding to each element of x. 
+%       x_vmr0    : The a priori VMR corresponding to each element of x. 
+%       ---
+%       p_grid    : R can further contain fields corresponding to a number 
+%       lat_grid  : of ARTS WSVs. The same information exists in files and
+%       lon_grid  : these fields are included to minimize reading of files. 
+%       vmr_field : Only some example on these fields are here given.
+%       sensor_los:
+%       ...
+%
+% FORMAT   [R,y,J] = arts_oem( Q, R, x, iter )
+%        
+% OUT   R     Retrieval data structure. See above.
+%       y     Calculated measurement vector.
+%       J     Jacobian.
+% IN    Q     Qarts structure. See *qarts*.
+%       R     Retrieval data structure. See above.
+%       x     State vector.
+%       iter  Iteration number. Iteration number 1 is treated as x = xa
+%             can be assumed.
+
+% 2006-09-07   First working version by Patrick Eriksson.
+
+
+function [R,y,J] = arts_oem( Q, R, x, iter )
+
+
+
+%- Handle special case of arts_oem('clean',R) ---------------------------
+
+if ischar(Q)  &  strcmp( Q, 'clean' )
+  delete_tmpfolder( R.workfolder );
+  return                               % --->
+end
+
+%-----------------------------------------------------------------------------
+
+
 
 
 %- Everything is here put into try-catch to enable that work folder is
@@ -7,17 +75,14 @@ function [y,J] = arts_oem( Q, R, x, iter, do_j )
 try
 
 
-%- Set default values
-%
-do_j_DEFAULT = 0;
-%
-set_defaults;
-
-
-
 % Checks done *arts_oem_init* are not repeated here
+
+
+%- Shall jacobians be done ?
 %
-if nargout < 2
+if nargout == 3
+  do_j = 1;
+else
   do_j = 0;
 end
 
@@ -52,77 +117,60 @@ if iter > 1
       D       = [];
       %
       if strcmp( R.jq{i}.mode, 'rel' )
-        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-            Q.J.ABS_SPECIES(ig).GRID1, Q.J.ABS_SPECIES(ig).GRID2, ...
-            Q.J.ABS_SPECIES(ig).GRID3, x(ind) .* R.x_vmr0(ind), ...
+        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = ...
+                                  x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
+                                      x(ind) .* R.x_vmr0(ind), ...
                                             R.p_grid, R.lat_grid, R.lon_grid );
         i_rel = [ i_rel ind ];
       elseif strcmp( R.jq{i}.mode, 'vmr' )
-        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-            Q.J.ABS_SPECIES(ig).GRID1, Q.J.ABS_SPECIES(ig).GRID2, ...
-            Q.J.ABS_SPECIES(ig).GRID3, x(ind), ...
+        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = ...
+                                  x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
+                                      x(ind), ...
                                             R.p_grid, R.lat_grid, R.lon_grid );
       else
-        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-           Q.J.ABS_SPECIES(ig).GRID1, Q.J.ABS_SPECIES(ig).GRID2, ...
-           Q.J.ABS_SPECIES(ig).GRID3, nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
+        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = ...
+                                  x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
+                                      nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
                                             R.p_grid, R.lat_grid, R.lon_grid );
       end
       %
-      Q.VMR_FIELD(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
+      R.vmr_field(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
       %
     end
   end
+
+
+  %- Data to save ?
+  %
+  if any_gas
+    xmlStore( fullfile(R.workfolder,'vmr_field.xml'), R.vmr_field, 'Tensor4' );
+  end
+
 end
 %------------------------------------------------------------------------------
 
 
-
-
-%--- Data to save ? -----------------------------------------------------------
-
-if any_gas
-  xmlStore
-end
 
 
 
 %--- Run ARTS -----------------------------------------------------------------
 
-%- Create cfile if not done before
-%
 if do_j
-  if isnan( R.cfile_yj )
-    parts = qarts2cfile( 'y+j' );
-    S     = qarts2cfile( Q, parts, R.workfolder );
-    cfile = fullfile( R.workfolder, 'cfile.arts' );
-    qtool( S, cfile, [] );
-    R.cfile_yj = cfile;
-  else
-    cfile = R.cfile_yj;
-  end
+  cfile = R.cfile_yj;
 else
-  if isnan( R.cfile_y )
-    parts = qarts2cfile( 'y' );
-    S     = qarts2cfile( Q, parts, R.workfolder );
-    cfile = fullfile( R.workfolder, 'cfile.arts' );
-    qtool( S, cfile, [] );
-    R.cfile_y = cfile;
-  else
-    cfile = R.cfile_y;
-  end
+  cfile = R.cfile_y;
 end
-
-%- Run ARTS and load result
 %
 arts( cfile );
 %
-y     = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
+y     = xmlLoad( fullfile( R.workfolder, 'y.xml' ) );
 if do_j  
-  J     = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
+  J     = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
 end
 
 %------------------------------------------------------------------------------
+
+
 
 
 
@@ -155,11 +203,14 @@ return
 %--- Internal sub-functions ---------------------------------------------------
 
 function [rgrid1,rgrid2,rgrid3,x] = ...
-                 x2field( dim, rgrid1, rgrid2, rgrid3, x, grid1, grid2, grid3 )
+                 x2field( dim, rgrids, x, grid1, grid2, grid3 )
   %
   if dim == 1
     %
-    [rgrid1,f1,l1] = expand_grid( rgrid1, grid1 );
+    [rgrid1,f1,l1] = expand_grid( rgrids{1}, grid1 );
+    %
+    rgrid2 = NaN;
+    rgrid3 = NaN;
     %
     if ~isempty(f1)  |  ~isempty(l1)
       x = [ x(f1); vec2col(x); x(l1) ];   % x as row vector accepted !
@@ -169,14 +220,18 @@ function [rgrid1,rgrid2,rgrid3,x] = ...
     %
     x = reshape( x, length(rgrid1), length(rgrid2) );
     %
-    [rgrid1,f1,l1] = expand_grid( rgrid1, grid1 );
-    [rgrid2,f2,l2] = expand_grid( rgrid2, grid2 );
+    rgrid3 = NaN;
+    %
+    [rgrid1,f1,l1] = expand_grid( rgrids{1}, grid1 );
+    [rgrid2,f2,l2] = expand_grid( rgrids{2}, grid2 );
     %
     if ~isempty(f1)  |  ~isempty(l1)  |  ~isempty(f2)  |  ~isempty(l2)
       x = [ x(f1,f2) x(f1,:) x(f1,l2); 
             x(:,f2)  x       x(:,l2); 
             x(l1,f2) x(l1,:) x(l1,l2) ];
     end 
+  elseif dim == 2
+     error('3D not yet handled by x2field.');
   end
 return
 
