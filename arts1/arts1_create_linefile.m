@@ -11,7 +11,8 @@
 %           Everything is specified by a Qarts1 and a configure structure C.
 %           These fields are needed:
 %
-%           Q : Q.Z_PLAT, Q.Z_GROUND, Q.L_STEP, Q.REFR_ON and Q.ZA_PENCIL 
+%           Q : Q.P_ABS, Q.Z_PLAT, Q.Z_GROUND, Q.L_STEP, Q.REFR_ON and 
+%             Q.ZA_PENCIL 
 %             The ground is set to have zero emissivity, but it should be 
 %             avoided to include ZA_PENCIL's resulting in ground reflections.
 %

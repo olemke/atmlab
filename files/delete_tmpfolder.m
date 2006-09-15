@@ -22,6 +22,16 @@
 function delete_tmpfolder(tmpfolder)
 
 
+%== Check that not debug
+%
+atmlab( 'require', {'DEBUG'} );
+db = atmlab( 'DEBUG' );
+%
+if ~isnan(db)  &  db
+  return                   % --->
+end
+
+
 %=== Require that a work area is set as a personal setting
 %
 atmlab( 'require', {'WORK_AREA'} );
