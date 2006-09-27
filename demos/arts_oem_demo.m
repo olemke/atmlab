@@ -27,7 +27,7 @@ addpath_ami;
 Q   = qarts;
 Q.J = qarts_jacobian;
 Q1  = qarts1;
-SX  = 0;
+SX  = [];
 
 
 %= Spectroscopy

@@ -15,7 +15,7 @@
 %------------------------------------------------------------------------
 
 % HISTORY: 2004-09-26  Copied from AMI
-           2000-12-21  Created by Patrick Eriksson.
+%          2000-12-21  Created by Patrick Eriksson.
 
 
 function g = loggrid( ppoints, n_pr_decade )

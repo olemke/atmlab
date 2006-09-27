@@ -1,3 +1,18 @@
+2006-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-133
+
+	* forwardmodel/loggrid.m: Added a % that "was lost".
+
+	* handy/rqre_datatype.m: Small change in error message. 
+
+2006-09-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-132
+
+	* arts/arts_covmat.m: Fixed bug that appeared due to differences
+	in isvector (atmlab or matlab internal). 
+
 2006-09-15  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
 	* atmlab-0-2-131

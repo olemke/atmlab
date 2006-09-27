@@ -36,5 +36,5 @@ if ~ok
   for i = 1:length(datatypes)
     fprintf('   %s\n', datatypes{i} );
   end
-  error( '%s is not of any accepted type (see above)', inputname(2) );
+  error( '*%s* is not of any accepted type (see above)', inputname(2) );
 end

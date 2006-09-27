@@ -104,19 +104,7 @@ min_nargin( 3, nargin );
 rqre_scalar( 'dim', dim, 1, 3 );
 rqre_datatype( 'struct', D );
 %
-if isvector( grid1 )
-  min_nargin( 2+dim, nargin );
-  rqre_datatype( 'vector', grid1 );
-  if dim >= 2
-    rqre_datatype( 'vector', grid2 );
-    if dim == 3
-      rqre_datatype( 'vector', grid3 );
-    end
-  end
-  if nargin < 6
-    dtype = [];
-  end
-elseif iscell( grid1 )
+if iscell( grid1 )
   if nargin > 3
     dtype = grid2;
     if nargin > 4
@@ -132,6 +120,18 @@ elseif iscell( grid1 )
     if dim == 3
       grid3 = J{3};   
     end
+  end
+elseif isvector( grid1 )
+  min_nargin( 2+dim, nargin );
+  rqre_datatype( 'vector', grid1 );
+  if dim >= 2
+    rqre_datatype( 'vector', grid2 );
+    if dim == 3
+      rqre_datatype( 'vector', grid3 );
+    end
+  end
+  if nargin < 6
+    dtype = [];
   end
 else
   error('Unknown type of input argument 3.');
