@@ -1,3 +1,22 @@
+2006-09-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-134
+	
+	* arts/qarts2cfile.m: Output files are now binary for speed reasons. 
+
+	* arts/arts_sensor.m: Created.
+
+	* demos/qarts_demo.m: MBLOCK_ZA_GRID now a Qarts field. 
+
+	* arts/arts_y.m: Added workfolder as optional input argument. 
+
+	* arts/arts_abcde.m: Added workfolder as optional input argument. 
+
+	* arts/arts_abstable_from_arts1.m: Added workfolder as optional input 
+	argument. 
+
+	* arts/arts_batch.m: Added workfolder as optional input argument. 
+
 2006-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-133

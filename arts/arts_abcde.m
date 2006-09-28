@@ -36,18 +36,31 @@
 %    
 %    V2{1}{i} will here be the propogation path for pencil beam i.
 %
-% FORMAT   [V1,V2] = arts_y( Q, vnames1 [,vnames2] )
+% FORMAT   [V1,V2] = arts_y( Q, vnames1 [,vnames2, workfolder] )
 %        
 % OUT   V1        Array, containing the variables specied by *vnames1*.
 %       V2        Array of arrays, corresponding to *vnames2*.
 % IN    Q         Qarts structure.
 %       vnames1   A string array with variable names. See further above.
-%       vnames2   A string array with variable names. See further above.
+% OPT   vnames2   A string array with variable names. See further above.
+%       workfolder   If not defined or empty, a temporary folder is created.
+%                    Otherwise this is interpreted as the path to a folder 
+%                    where calculation output can be stored. These files
+%                    will be left in the folder. The files are not read if
+%                    corresponding output argument not is considered.
+%                    Default is [].
 
 % 2005-06-14   Created by Patrick Eriksson.
 
 
 function [V1,V2] = arts_abcde(Q,vnames1,vnames2)
+
+
+%- Default values
+%
+workfolder_DEFAULT = [];
+%
+set_defaults;
 
 
 %= Check input
@@ -61,11 +74,15 @@ end
 if nargin >=3  &  ~iscellstr( vnames2 )
   error('Argument *vnames2* must be a cell array of strings.');
 end
-
-
-%= Create work folder and control file
 %
-tmpfolder   = create_tmpfolder;
+rqre_datatype( {'empty','char'}, workfolder );
+
+
+folder_created = 0;
+%
+if isempty( workfolder )
+  workfolder   = create_tmpfolder;
+end
 
 
 try
@@ -74,32 +91,32 @@ try
   %
   parts = qarts2cfile( 'y' );
   parts = { parts{1:(end-1)} };
-  S     = qarts2cfile( Q, parts, tmpfolder );
+  S     = qarts2cfile( Q, parts, workfolder );
 
 
   %= Add saving of variables
   %
   for i = 1:length(vnames1)
-    filename = fullfile( tmpfolder, [ vnames1{i}, '.xml' ] ); 
+    filename = fullfile( workfolder, [ vnames1{i}, '.xml' ] ); 
     S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
   end
 
 
   %= Add closing 
   %
-  Sp = qarts2cfile( Q, {'stop'}, tmpfolder );
+  Sp = qarts2cfile( Q, {'stop'}, workfolder );
   S  = { S{:} Sp{:} };
 
 
   %= Create control file and run 
   %
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  cfile = fullfile( workfolder, 'cfile.arts' );
   qtool( S, cfile, [] );
   arts( cfile );
 
 
 catch
-  delete_tmpfolder( tmpfolder );
+  delete_tmpfolder( workfolder );
   rethrow(lasterror);
 end
 
@@ -109,7 +126,7 @@ end
 %= Read stored variables
 %
 for i = 1:length(vnames1)
-  filename = fullfile( tmpfolder, [ vnames1{i}, '.xml' ] ); 
+  filename = fullfile( workfolder, [ vnames1{i}, '.xml' ] ); 
   V1{i}     = xmlLoad( filename );
 end
 
@@ -123,7 +140,7 @@ if nargin >= 3
     j     = 1;
     ready = 0;
     while ~ready 
-      filename = fullfile( tmpfolder, 'cfile' );
+      filename = fullfile( workfolder, 'cfile' );
       filename = sprintf( '%s.%s.%d.xml', filename, vnames2{i}, j );
       if exist( filename, 'file' )
         V2{i}{j} = xmlLoad( filename );
@@ -136,6 +153,7 @@ if nargin >= 3
 end
 
 
-%= Delete work folder
-%
-delete_tmpfolder( tmpfolder );
+if folder_created
+  delete_tmpfolder( workfolder );
+end
+

@@ -95,6 +95,10 @@ if nargin == 1
     S = {'start1', 'start2', 'load_atm', 'load_abs', 'calc_abs', 'init_rte',...
          'cloudbox', 'sensor', 'batch', 'stop' };
 
+  case 'sensor'
+    %
+    S = { 'start1', 'start2', 'load_atm', 'sensor', 'save_sensor', 'stop' };
+
   otherwise
     error( sprintf( 'Unknown run type (%s) was requested.', Q ) );
   end
@@ -126,7 +130,7 @@ case 'start1'
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Main{';
-  T{3} = 'output_file_formatSetAscii{}';
+  T{3} = 'output_file_formatSetBinary{}';
   T{4} = 'abs_speciesInit{}';
 
 case 'start2'

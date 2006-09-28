@@ -3,7 +3,7 @@
 %    Qarts fields for atmosphere, absorption, sensor and RT must be
 %    specified.
 %
-% FORMAT   [y,dy,J,jq,ji] = arts_y( Q )
+% FORMAT   [y,dy,J,jq,ji] = arts_y( Q [, workfolder] )
 %        
 % OUT   y   Spectrum vector.
 %       dy  Estimate of calculation accuracy.
@@ -12,45 +12,58 @@
 %       ji  Jacobian indices. NaN returned if Q.J not defined.
 %           Indices are 1-based (that is, ARTS indices + 1);
 % IN    Q   Qarts structure.
+% OPT   workfolder   If not defined or empty, a temporary folder is created.
+%                    Otherwise this is interpreted as the path to a folder 
+%                    where calculation output can be stored. These files
+%                    will be left in the folder. The files are not read if
+%                    corresponding output argument not is considered.
+%                    Default is [].
 
 % 2004-09-17   Created by Patrick Eriksson.
 
 
-function [y,dy,J,jq,ji] = arts_y( Q )
+function [y,dy,J,jq,ji] = arts_y( Q, workfolder )
 
 
-%- Avoid unnecessary Jacobian calculations
+%- Default values
 %
-do_j = 1;
+workfolder_DEFAULT = [];
 %
-if nargout <= 2  |  isnan(Q.SENSOR_RESPONSE)  |  Q.SENSOR_RESPONSE == 0
-  do_j = 0;
+set_defaults;
+
+
+%- Check input
+%
+rqre_datatype( 'struct', Q );
+rqre_datatype( {'empty','char'}, workfolder );
+
+
+folder_created = 0;
+%
+if isempty( workfolder )
+  workfolder   = create_tmpfolder;
 end
 
 
-tmpfolder   = create_tmpfolder;
-
 try
   %
-  if do_j
-    parts = qarts2cfile( 'y+j' );
-  else
-    parts = qarts2cfile( 'y+j' );
-  end
-  S     = qarts2cfile( Q, parts, tmpfolder );
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  parts = qarts2cfile( 'y+j' );
+  S     = qarts2cfile( Q, parts, workfolder );
+  cfile = fullfile( workfolder, 'cfile.arts' );
   qtool( S, cfile, [] );
   arts( cfile );
 
 catch
-  delete_tmpfolder( tmpfolder );
+  if folder_created
+    delete_tmpfolder( workfolder );
+  end
   rethrow(lasterror);
 end
 
 
 if isstruct( Q.CLOUDBOX )  
   if strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
-    dy = xmlLoad( fullfile( tmpfolder, 'mc_error.xml' ) );
+    dy = xmlLoad( fullfile( workfolder, 'mc_error.xml' ) );
   else
     dy = NaN;
   end
@@ -58,25 +71,27 @@ else
   dy = NaN;
 end
 
-y = xmlLoad( fullfile( tmpfolder, 'y.xml' ) );
-
-
-if do_j
-  J = xmlLoad( fullfile( tmpfolder, 'jacobian.xml' ) );
-  if nargout >= 4
-    jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
-    ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
-    for i = 1 : length(ji)
-      for j = 1 : length(ji{i})
-        ji{i}{j} = ji{i}{j} + 1;
+if nargout >= 1
+  %
+  y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
+  %
+  if nargout >= 3
+    %
+    J = xmlLoad( fullfile( workfolder, 'jacobian.xml' ) );
+    %
+    if nargout >= 4
+      jq = xmlLoad( fullfile( workfolder, 'jacobian_quantities.xml' ) );
+      ji = xmlLoad( fullfile( workfolder, 'jacobian_indices.xml' ) );
+      for i = 1 : length(ji)
+        for j = 1 : length(ji{i})
+          ji{i}{j} = ji{i}{j} + 1;
+        end
       end
     end
   end
-else
-  J  = NaN;
-  jq = NaN;
-  ji = NaN;
 end
 
 
-delete_tmpfolder( tmpfolder );
+if folder_created
+  delete_tmpfolder( workfolder );
+end

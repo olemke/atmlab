@@ -25,29 +25,45 @@
 %       LINESHAPE_CUTOFF 
 %       ABSMODELS 
 %
-% FORMAT   A = arts_abstable_from_arts1( Q, Q1, dt )
+% FORMAT   A = arts_abstable_from_arts1( Q, Q1, dt [, workfolder ] )
 %        
 % OUT   A    Absorption table structure.
 % IN    Q    ARTS settings.
 % IN    Q1   ARTS1 settings.
 %       dt   Vector with temperature perturbations. Default is 0.
+% OPT   workfolder   If not defined or empty, a temporary folder is created.
+%                    Otherwise this is interpreted as the path to a folder 
+%                    where calculation output can be stored. These files
+%                    will be left in the folder. The files are not read if
+%                    corresponding output argument not is considered.
+%                    Default is [].
 
 % 2004-09-08   Created by Patrick Eriksson.
 
 
-function A = arts_abstable_from_arts1( Q, Q1, dt )
+function A = arts_abstable_from_arts1( Q, Q1, dt, workfolder )
 
 
 %= Default values
 %
-dt_DEFAULT = 0;
+dt_DEFAULT         = 0;
+workfolder_DEFAULT = [];
 %
 set_defaults;
 
 
-%=== Create temporary working folder
+%- Check input
 %
-tmpfolder   = create_tmpfolder;
+rqre_datatype( 'struct', Q );
+rqre_datatype( {'empty','char'}, workfolder );
+
+
+folder_created = 0;
+%
+if isempty( workfolder )
+  workfolder   = create_tmpfolder;
+end
+
 
 
 try 
@@ -106,7 +122,7 @@ try
 
   %=== Define control file for ARTS1 run
   %
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
+  cfile = fullfile( workfolder, 'cfile.arts' );
   parts = {'tgs','load_atm','pf_grids','spectroscopy','calc_abs',...
            'save_abs_per_tg'};
 
@@ -131,11 +147,11 @@ try
     %
     Q1.T_ABS = t_field + dt(i);
     %
-    S = qarts12cfile( Q1, parts, tmpfolder );
+    S = qarts12cfile( Q1, parts, workfolder );
     qtool( S, cfile, [] );
     arts1( cfile );
     %
-    X = arts1_loadfile( tmpfolder, 'abs_per_tg', 'AOMATRIX' );
+    X = arts1_loadfile( workfolder, 'abs_per_tg', 'AOMATRIX' );
     %
     for j = 1 : length(A.species)
       A.xsec(i,j,:,:) = X{j} ./ ...
@@ -144,13 +160,15 @@ try
     %
   end
 
-
-  %=== Delete working folder
-  %
-  delete_tmpfolder( tmpfolder );
+  if folder_created
+    delete_tmpfolder( workfolder );
+  end
 
 
 catch
-  delete_tmpfolder( tmpfolder );
+  if folder_created
+    delete_tmpfolder( workfolder );
+  end
+
   rethrow(lasterror);
 end

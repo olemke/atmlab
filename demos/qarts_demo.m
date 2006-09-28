@@ -93,7 +93,7 @@ Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan );
 
 %= Sensor
 %
-H.MBLOCK_ZA_GRID  = [-0.04:0.01:0.04];
+Q.MBLOCK_ZA_GRID  = [-0.04:0.01:0.04];
 H.ANTENNA_LOS     = 0;
 H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
 Q.SENSOR_RESPONSE = H;
