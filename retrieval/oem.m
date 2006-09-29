@@ -253,11 +253,13 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       if ~xfound
         nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
       end
-    end
+    end  % while ~xfound
+
 
     %- Convergence or max iterations reached ?
     %
     if linear
+      x     = xnew;
       ready = 1;
     else
       %
