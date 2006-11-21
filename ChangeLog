@@ -1,3 +1,19 @@
+2006-11-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-137
+
+	* forwardmodel/doppler_width.m: Created.
+
+	* forwardmodel/doppler_lshape.m: Created.
+
+	* forwardmodel/lorentz_lshape.m: Created. 
+
+2006-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-136
+
+	* graphs/set_linestyle.m: Created.
+
 2006-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* arts/ji2m.m: Created.
