@@ -5,7 +5,7 @@
 %
 %       dd = 2*sqrt(log(2)) * f0/c * sqrt(2*R*t/m)
 %
-% FORMAT   dd = doppler_lshape( m, f0, t )
+% FORMAT   dd = doppler_width( m, f0, t )
 %        
 % OUT   dd   Doppler width, for each temperature.
 % IN    m    Molecular weight. For example 48 for ozone.

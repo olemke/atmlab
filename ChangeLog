@@ -1,3 +1,11 @@
+2006-11-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-138
+
+	* forwardmodel/isotopologue_data.m: Created.
+
+	* forwardmodel/voigt_humlik.m: Added.
+
 2006-11-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-137
