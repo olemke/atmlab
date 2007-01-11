@@ -1,3 +1,11 @@
+2007-01-11  Mattias Ekstrom <mattias.ekstrom@chalmers.se>
+
+	* atmlab-0-2-140
+
+	* graphs/plotxx.m: NEW. Function similar to the MATLAB funtion
+	plotyy but works on the x-axis instead. Found on MathWorks
+	file exchange.
+
 2006-12-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-139
