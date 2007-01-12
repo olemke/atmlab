@@ -143,12 +143,18 @@ function printfield( field, s, fid )
   out(0,'-',fid);
   while ~ready
     j = ind(max(find( ind <= i+ncols )))-1;
+    if j <= i + 2    % Fix to handle cases when SCREEN_WIDTH is smaller than
+      j  = min( [ i+ncols-1 length(s) ] );  % maximum length of a "word"
+      jj = 1;
+    else
+      jj = 2;
+    end
     if any( pind < j )
       j = min(pind) - 1;
       pind = tail( pind, length(pind)-1 );
     end
     out(0,s(i:j),fid);
-    i = j + 2;
+    i = j + jj;
     if i > ls
       ready = 1;
     end
