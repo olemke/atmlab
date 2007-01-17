@@ -1,3 +1,10 @@
+2007-01-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-142
+
+	* arts1/qarts12cfile.m: Added missing } for refrSet. Bug reported and
+	solved by Craig Haley.
+
 2007-01-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-141

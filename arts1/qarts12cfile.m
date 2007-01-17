@@ -184,10 +184,11 @@ case 'init_rte'
     T{18} = '   on    = 1';
     T{19} = '   model = "Boudouris"';
     T{20} = sprintf('   lfac    = %.3f', Q.REFR_LFAC );
+    T{21} = '}';
   else
-    T{17} = 'refrOff{}'; T{18} = ' '; T{19} = ' '; T{20} = ' ';
+    T{17} = 'refrOff{}'; T{18} = ' '; T{19} = ' '; T{20} = ' '; T{21} = ' ';
   end
-  T{21} = 'refrCalc{}';
+  T{22} = 'refrCalc{}';
 
 case 'calc_rte'
   %
