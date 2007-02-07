@@ -1,7 +1,7 @@
 % QARTS_DOIT_DEMO  A demonstration of a simple 1D DOIT scattering
 %                  calculation
 %
-% FORMAT [Q,f,y] = qarts_doit_demo( [ztan] )
+% FORMAT [Q,f,y_c,y] = qarts_doit_demo( [ztan] )
 %
 %  OUT   Q          Qarts setting structure.
 %        f          Frequency grid.
