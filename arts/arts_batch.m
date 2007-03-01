@@ -36,7 +36,8 @@ rqre_datatype( {'empty','char'}, workfolder );
 folder_created = 0;
 %
 if isempty( workfolder )
-  workfolder   = create_tmpfolder;
+  workfolder     = create_tmpfolder;
+  folder_created = 1;
 end
 
 try

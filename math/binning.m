@@ -6,7 +6,7 @@
 %  limit. More precisely, the averaging ranges are [xlims(:,1),xlims(:,2)[.
 %
 %  The data abscissa is given as columns in *x*. There are two
-%  options. Either *x' i s a single column, which is interpreted as a common
+%  options. Either *x* is a single column, which is interpreted as a common
 %  abscissa for all data cases. Otherwise, *x* and *Y* must have same size.
 %
 % FORMAT   [xp,Yb,N] = binning( xlims, x, Y )
@@ -22,6 +22,7 @@
 
 function [xp,Yb,N] = binning( xlims, x, Y )
 
+  
 if size( xlims, 2 ) ~= 2
   error( 'The variable *xlims* must be a matrix with 2 columns.' );  
 end
