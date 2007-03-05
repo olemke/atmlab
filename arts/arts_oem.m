@@ -218,7 +218,7 @@ function [rgrid1,rgrid2,rgrid3,x] = ...
     %
   elseif dim == 2
     %
-    x = reshape( x, length(rgrid1), length(rgrid2) );
+    x = reshape( x, length(rgrids{1}), length(rgrids{2}) );
     %
     rgrid3 = NaN;
     %
@@ -230,7 +230,7 @@ function [rgrid1,rgrid2,rgrid3,x] = ...
             x(:,f2)  x       x(:,l2); 
             x(l1,f2) x(l1,:) x(l1,l2) ];
     end 
-  elseif dim == 2
+  elseif dim == 3
      error('3D not yet handled by x2field.');
   end
 return
@@ -240,9 +240,10 @@ return
 
 function [rgrid,f,l] = expand_grid( rgrid, grid )
   %
-  % *rgrid* is expanded to cover range of *grid*. The output arguments
-  % *f* and *l* can be used to expand the data to be interpolated following
-  % the usage at the end of this function.
+  % *rgrid* is expanded to cover range of *grid*, with some margin to avoid
+  % numerical problems.
+  % The output arguments *f* and *l* can be used to expand the data to be 
+  % interpolated following the usage at the end of this function.
   %
   n1 = length( grid );
   n2 = length( rgrid );
@@ -250,31 +251,39 @@ function [rgrid,f,l] = expand_grid( rgrid, grid )
   % Increasing vector
   if grid(2) > grid(1)
     if grid(1) < rgrid(1)
-      f = 1;
+      f  = 1;
+      vf = grid(1) - ( grid(2) - grid(1) ) / 2;
     else
-      f = [];
+      f  = [];
+      vf = [];
     end 
     if grid(n1) > rgrid(n2)
-      ll = n1; l = n2;
+      l = n2;
+      vl = grid(end) + ( grid(end) - grid(end-1) ) / 2;
     else
-      ll = []; l = [];
+      l = [];
+      vl = [];
     end 
   % Decreasing vector
   else
     if grid(1) > rgrid(1)
       f = 1;
+      vf = grid(1) + ( grid(1) - grid(2) ) / 2;
     else
       f = [];
+      vf = [];
     end 
     if grid(n1) < rgrid(n2)
-      ll = n1; l = n2;
+      l = n2;
+      vl = grid(end) - ( grid(end-1) - grid(end) ) / 2;
     else
-      ll = []; l = [];
+      l = [];
+      vl = [];
     end 
   end
   %
   if ~isempty(f)  |  ~isempty(l)
-    rgrid = [ grid(f); vec2col(rgrid); grid(ll) ];
+    rgrid = [ vf; vec2col(rgrid); vl ];
   end
   %
 return

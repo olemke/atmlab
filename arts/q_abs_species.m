@@ -61,11 +61,13 @@ for j = 1 : length(tags)
 end
 
 
+if isstruct( Q.J )
+  Q.J.ABS_SPECIES(i).DO = do_j;  
+end
 
 
 if do_j
-
-  Q.J.ABS_SPECIES(i).DO     = do_j;
+  
   Q.J.ABS_SPECIES(i).UNIT   = unit;
   Q.J.ABS_SPECIES(i).METHOD = method;
   Q.J.ABS_SPECIES(i).DX     = dx;

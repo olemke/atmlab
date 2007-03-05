@@ -40,7 +40,10 @@
 %      manner.
 %      Setting SI, CL1, CL2 or CL3 to a scalar is shorthand for a constant
 %      standard deviation/correlation length. No grids need to be specified
-%      in this case.
+%      in this case. Otherwise, SI, CL1, CL2 and CL3 are interpolated
+%      linearly to selected retrieval positions (no extrapolation).
+%      No checks of isze is done. Inconsintency in size between variables 
+%      will result in error from interpolation functions.
 %      ---
 %      SI         A priori standard deviation. Dimensionality must match *dim*.
 %                 Dimension order (dim1,dim2,dim3). 
@@ -150,8 +153,8 @@ if ~isempty(dtype)
     grid1 = log10(grid1);
     if isfield(D,'SI_GRID1'),  D.SI_GRID1  = log10(D.SI_GRID1);   end
     if isfield(D,'CL1_GRID1'), D.CL1_GRID1 = log10(D.CL1_GRID1);  end
-    if isfield(D,'CL1_GRID2'), D.CL1_GRID2 = log10(D.CL2_GRID1);  end
-    if isfield(D,'CL1_GRID3'), D.CL1_GRID3 = log10(D.CL3_GRID1);  end
+    if isfield(D,'CL2_GRID1'), D.CL2_GRID1 = log10(D.CL2_GRID1);  end
+    if isfield(D,'CL3_GRID1'), D.CL3_GRID1 = log10(D.CL3_GRID1);  end
   else
     error(sprintf('Unknown option for *dtype* (%s).',dtype));
   end

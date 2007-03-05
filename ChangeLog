@@ -1,3 +1,19 @@
+2007-03-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-147
+
+	* arts/arts_oem_init.m: Included error if obtained R.jq is empty
+	(should be a bug).
+
+	* arts/q_abs_species.m: Q.J.ABS_SPECIES(i).DO was not set correctly
+	when do_j was 0.
+
+	* demos/example_colorbar.m: Moved from graphs/ folder.
+
+	* arts/arts_oem_plot_x.m: Started. 
+
+	* arts/arts_covmat.m: Wrong grids were converted to pressure decades.
+
 2007-03-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-146

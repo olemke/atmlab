@@ -46,11 +46,6 @@ R.lon_grid = qarts_get( Q.LON_GRID );
 
 
 
-%- Everything below is put into try-catch to enable that work folder is
-%- removed if something goes wrong.
-%
-try
-
 %--- Force some ARTS variables to be files ------------------------------------
 %
 % This is done to avoid creating the same file repeatedly in qarts2cfile.
@@ -81,9 +76,13 @@ Q = force_file( Q, 'SENSOR_LOS', 'Matrix', R );
 %----- Use ARTS to get basic retrieval information and atmospheric fields -----
 
 [R.jq,R.ji,t_field,z_field,vmr_field] = arts_internal( Q, R );
-
-
-
+%
+if length( R.jq ) == 0 
+  % Ending up here means probably a bug!
+  error( 'No retrieval quantities defined!?' );
+end
+  
+  
 
 
 %--- Initialization of variables ----------------------------------------------
@@ -215,17 +214,6 @@ S     = qarts2cfile( Q, parts, R.workfolder );
 cfile = fullfile( R.workfolder, 'cfile_y.arts' );
 qtool( S, cfile, [] );
 R.cfile_y = cfile;
-
-
-
-
-
-%- Something went wrong?
-%
-catch
-  delete_tmpfolder( R.workfolder );
-  rethrow(lasterror);
-end
 
 return
 
