@@ -2,12 +2,12 @@
 %
 %    The function sets any property of plot title objects. The properties are 
 %    applied to the given handles and their childrens (all generations, 
-%    see *children*). To set the fontsize for all labels of a figure to 10
-%       set_labels( gcf, 'FontSize', 10 );
+%    see *children*). To set the fontsize for all titles of a figure to 10
+%       set_titles( gcf, 'FontSize', 10 );
 %
 %    See also *set_axes* and *set_labels*.
 %
-% FORMAT   set_titless(h,varargin)
+% FORMAT   set_titles(h,varargin)
 %        
 % IN    h   Handle to a figure, or figure objects.
 %           Arbitrary number of property / property value pairs.

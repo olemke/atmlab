@@ -1,3 +1,15 @@
+2007-03-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-148
+
+	* arts/arts_oem_plot_x.m: Removed.
+
+	* atmplots/atmplot_xdata.m: Created. 
+
+	* atmplots/vmrunit.m: Created.
+
+	* graphs/set_titles.m: Corrected header.
+
 2007-03-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-147
