@@ -1,7 +1,7 @@
 % ZEROWHITE   Creates a colormap with white for 0
 %
 %    This function creates a color map that gives white for values around
-%    zero.
+%    zero. An alternative version is found in *zerowhite2*.
 %
 %    Examples on color codings:
 %
