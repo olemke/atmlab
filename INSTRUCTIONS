@@ -23,7 +23,7 @@ described in examples/example_heading.m (you find an empty header in
 empty_header.m). The file example_heading.m contains also some hints
 regarding optional variables and how to set default variables.
 
-The changes done for each CVS commit shall be explained satisfactorily
+The changes done for each SVN commit shall be explained satisfactorily
 in ChangeLog. The new version number shall be transfered to the
 function atmlab/atmlab_version.
 
