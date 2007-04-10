@@ -117,19 +117,3 @@ persistent A
           
 [A,value] = prstnt_struct( A, @atmlab_defs, varargin );
 
-
-
-function A = atmlab_defs
-
-A.AMI_PATH          = NaN;
-A.ARTS_PATH         = NaN;
-A.ARTS_XMLDATA_PATH = NaN;
-A.ARTS1_DATA_PATH   = NaN;
-A.ARTS1_HDF         = NaN;
-A.ARTS1_PATH        = NaN;
-A.DEBUG             = NaN;
-A.FMODEL_VERBOSITY  = NaN;
-A.SCREEN_WIDTH      = NaN;
-A.VERBOSITY         = NaN;
-A.WORK_AREA         = NaN;
-

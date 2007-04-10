@@ -105,7 +105,7 @@ switch length( varg )
           error( 'See above' ); 
         end
         if isnan( getfield( A, varg{2}{i} ) )
-          fprintf('\nThe field %s is reuired but is NaN.\n\n', varg{2}{i} );
+          fprintf('\nThe field %s is required but is NaN.\n\n', varg{2}{i} );
           error( 'See above' ); 
         end
       end

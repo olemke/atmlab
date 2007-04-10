@@ -1,3 +1,15 @@
+2007-04-10  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-151
+
+	* atmlab/atmlab.m, atmlab/atmlab_defs.m:
+
+	Split out atmlab_defs into its own file. Matlab R2006a doesn't find
+	the inlined function if the user is not inside the atmlab directory
+	while calling an atmlab function which depends on it.
+
+	* handy/prstnt_struct.m: Typo.
+
 2007-04-03  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-150
