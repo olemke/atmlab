@@ -1,3 +1,13 @@
+2007-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-152
+
+	* arts/qarts2cfile.m (cloudbox2cfile): Adapted to changes in ARTS-MC
+	part, and changed scoping for agendas. 
+
+	ARTS-MC calculations can now be performed again, but only through 
+	ScatteringMonteCarlo. There is yet no interface to MCGeneral.
+
 2007-04-10  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-151

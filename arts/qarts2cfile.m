@@ -317,21 +317,6 @@ case 'y'
   end
   T{end+1} = add_savefile( 'y', tmpdir );
   %
-  if isstruct( Q.CLOUDBOX )  &  strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
-    if ~isnan( Q.SENSOR_RESPONSE )   
-      T{end+1} = 'mc_errorApplySensor{}';
-    else
-      T{end+1} = '';
-    end
-    switch upper( Q.Y_UNIT )
-      case '1'
-        T{end+1} = '# No conversion to K';
-      case { 'RJ', 'PLANCK' }
-        T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}';
-    end
-    T{end+1} = add_savefile( 'mc_error', tmpdir );
-  end
-  %
   if do_j
   %
     switch upper( Q.Y_UNIT )
@@ -639,7 +624,11 @@ elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
                                             Q.CLOUDBOX.METHOD_PRMTRS.MC_SEED );
   end
   %
+  T{end+1} = 'MCSetIncomingEmpty{}';
   T{end+1} = 'AgendaSet(iy_cloudbox_agenda){';
+  T{end+1} = '   Ignore(rte_gp_p){}';
+  T{end+1} = '   Ignore(rte_gp_lat){}';
+  T{end+1} = '   Ignore(rte_gp_lon){}';
   T{end+1} = '   ScatteringMonteCarlo{';
   T{end+1} = sprintf('     std_err  = %d', Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
   T{end+1} = sprintf('     max_time = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
@@ -649,6 +638,20 @@ elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   T{end+1} = sprintf('     z_field_is_1D = %d', ...
                                       Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
   T{end+1} = '   }';
+  %
+  if ~isnan( Q.SENSOR_RESPONSE )   
+    T{end+1} = 'mc_errorApplySensor{}';
+  else
+    T{end+1} = '';
+  end
+  switch upper( Q.Y_UNIT )
+    case '1'
+      T{end+1} = '# No conversion to K';
+    case { 'RJ', 'PLANCK' }
+      T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}';
+  end
+  T{end+1} = add_savefile( 'mc_error', tmpdir );
+  %
   T{end+1} = '}';
 
 else
