@@ -1,18 +1,13 @@
 --- Welcome to the Atmlab package of Matlab functions ---
 
-   Copyright (C) 2002,2003,2004
-   Patrick Eriksson <Patrick.Eriksson@rss.chalmers.se>
-   Christian Maetzler <christian.matzler@iap.unibe.ch>
-   Mashrab Kuvatov <kmashrab@uni-bremen.de>
-   Stefan Buehler <sbuehler@uni-bremen.de>
-   Carmen Verdes  <cverdes@uni-bremen.de>
-   Carlos Jimenez  <carlos.jimenez@ed.ac.uk>
-   Bengt Rydberg  <benryd@etek.chalmers.se>
-   Oliver Lemke  <olemke@core-dump.info>
-   Claudia Emde  <claudia@sat.physik.uni-bremen.de>
-   Mattias Ekström  <ekstrom@rss.chalmers.se>
-   Christian Melsheimer  <melsheimer@uni-bremen.de>
-   Thomas Kuhn  <tkuhn@uni-bremen.de>
+   Copyright (C) 2002-2007
+   Patrick Eriksson      <patrick.eriksson@chalmers.se>
+   Oliver Lemke          <olemke@irv.se>
+   Christian Maetzler    <christian.matzler@iap.unibe.ch>
+   Stefan Buehler        <sbuehler@irv.de>
+   Bengt Rydberg         <benryd@chalmers.se>
+   Mattias Ekström       <mattias.ekstrom@chalmers.se>
+   and many others
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

@@ -17,7 +17,8 @@ simplest is to include these lines in startup.m:
 
 If you have different Matlab environments, and you don't want to add
 all the Matlab stuff that you have to the search path, the file
-ATMLAB/atmlab/startup_menu.m gives you some hints on how this can be handled.
+ATMLAB/atmlab/examples/startup_menu.m gives you some hints on how this 
+can be handled.
 
 Matlab looks for startup.m in the folder where it is started. To
 ensure that Matlab always finds your startup.m, the Matlab path must
@@ -61,4 +62,4 @@ preferred choices. For example:
 Good luck!
 
 Patrick Eriksson
-(patrick@rss.chalmers.se)
+(patrick.eriksson@chalmers.se)

@@ -1,12 +1,12 @@
 %------------------------------------------------------------------------
-% NAME:     read_auramls_l2gp
+% NAME:     auramls_mls_l2gp
 %
 %           Read L2GP hdf5-eos data from EOS-MLS. For info about
 %           the MLS data see the Level 2 data and quality description
 %           document available from the MLS web site at
 %                 http://mls.jpl.nasa.gov   
 %
-% FORMAT:   P = read_auramls_l2gp( filename )
+% FORMAT:   P = auramls_mls_l2gp( filename )
 %
 % IN:       filename    full path to MLS L2GP file
 %
@@ -38,7 +38,7 @@
 %
 %          2006-03-27  
 
-function P = read_auramls_l2gp( filename )
+function P = auramls_read_l2gp( filename )
 
 
 %=== De-activation of older input argument

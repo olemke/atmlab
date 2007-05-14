@@ -1,1 +1,1 @@
-% Matlab version of functions normally found in atmospheric forward models
+% Matlab version of functions normally found in atmospheric forward models.

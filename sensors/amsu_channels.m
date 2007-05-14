@@ -1,6 +1,6 @@
 % AMSU_CHANNELS  Returns information about the AMSU A and B channels
 %
-%    The functio describes the main properties of the AMSU A and B
+%    The function describes the main properties of the AMSU A and B
 %    channels.
 %
 %    The bands of each channel are centered at v0 +- dv1 +- dv2,

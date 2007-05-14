@@ -1,8 +1,13 @@
 %------------------------------------------------------------------------
 % NAME:    interpp
 %
-%          Makes log-linear interpolation of pressure profiles.
+%          Makes log-linear interpolation. That is, the x-dimension is
+%          converted to log before doing the interpolation.
+%
 %          The profiles are assumed to be constant outside the end points.
+%
+%          A typical application of the function is interpolation of
+%          atmospheric vertical profiles.
 %
 % FORMAT:  X = interpp(pp,Xp,p)
 %

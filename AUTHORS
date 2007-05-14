@@ -1,15 +1,16 @@
 --- Atmlab people ---
 
-Some of the persons who have worked on Atmlab:
+Some of the persons who have worked on Atmlab are listed below. 
+Otherwise, look in header of each individual file.
 
 
-Patrick Eriksson <Patrick.Eriksson@rss.chalmers.se>
+Patrick Eriksson <patrick.eriksson@chalmers.se>
 ---
 Suggested and initiated Atmlab. Made the little design there is.
 Contributed with functions of various kind.
 
 
-Oliver Lemke <olemke@uni-bremen.de>
+Oliver Lemke <olemke@irv.se>
 ---
 Maintaining SVN repository and the mailing list.
 Created the XML format for data files.

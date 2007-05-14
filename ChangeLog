@@ -1,3 +1,62 @@
+2007-05-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-153
+
+	* Spring cleaning !!!
+
+	* geoplots/: Renaming of atmplots.
+	
+	* physics/: Moved 
+	   p2z_simple.m
+	   z2p_simple.m
+	   tropopause.m
+	
+	* retrieval/: Moved covmat_XXX functions to this folder.
+	
+	* randomize/:  Folder started and the following functions
+	were moved to this folder:
+	   make_noise.m
+	   randmvar.m
+	   randmvar_add_lognormal.m
+	   randmvar_add_normal.m
+	   randmvar_add_uniform.m
+	   randmvar_normal.m
+
+	* math/cdf_normal.m: Moved from atmscenarios/.
+
+	* math/interpp.m: Moved from forwardmodel/.
+	* math/loggrid.m: As above.
+
+	* parametrisations/: Folder started and the following functions
+	were moved to this folder:
+	   e_eq_ice.m
+	   e_eq_water.m
+	   eps_ice_liebe93.m
+	   eps_ice_matzler06.m
+	   eps_water_liebe93.m
+	   ice_psd_Donovan_03.m
+	   ice_psd_Heyms_84.m
+	   ice_psd_Ivanova_01.m
+	   ice_psd_Mcfar_97.m
+	   ice_psd_Mitchell_99.m
+	   ice_psd_ellipsoids.m
+	   ice_psd_gamma.m
+	   n_ice_wiscombe.m
+	   n_water_segelstein.m
+	   n_water_wiscombe.m
+	   pos2g.m
+	   wgs84.m
+	   wiscombe.m
+
+	* sensors/auramls_read_l2gp.m: Renaming of read_auramls_l2gp.m.
+
+	* sensors/: Removed all atovs_XXXX functions as the set up was quite 
+	specific for old Bremen group.
+
+	* Correction of spelling mistakes in several headers.
+	
+	* Revised or added Contents.m in all sub-folders.
+	
 2007-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-152
@@ -465,7 +524,7 @@
 	Peter J. Acklam:
 	home.online.no/~pjacklam/matlab/software/util/timeutil/index.html
 
-	Primary purpose was to get conversion functyion for MJD but these 
+	Primary purpose was to get conversion function for MJD but these 
 	functions provide also other features.
 	
 	* time/monthofyear.m: Introduced a fix to avoid any months 13.
