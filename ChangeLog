@@ -1,5 +1,19 @@
 2007-05-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-154
+
+	* gformat/: Started on an internal standardized format for gridded
+	data. Created these first functions:
+	   gf_clean.m
+           gf_import_artsGriddedField3.m
+           gf_increase_dim.m
+
+	* atmlab/atmlab_init.m: Updated with new folders. 
+
+	* handy/rnfield.m: Copied from matlab file exchange site. 
+
+2007-05-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-153
 
 	* Spring cleaning !!!
