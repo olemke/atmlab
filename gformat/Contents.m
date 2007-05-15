@@ -5,11 +5,12 @@
 %   following a common data format. 
 %
 %   The gridded data format (shortened to gf) has these mandatory fields
-%     dim          Dimension of data.
+%     name         Name of data (e.g. 'H20-161')
 %     source       Source of data.
+%     dim          Dimension of data.
 %     data         Data (dim1,dim2,...).
-%     data_name    Name on data (e.g. 'Temperature'). 
-%     data_unit    Unit of data (e.g. 'K').
+%     data_name    Name on data (e.g. 'Volume mixing ratio'). 
+%     data_unit    Unit of data (e.g. 'ppm').
 %     grid1        Grid along dimension 1.
 %     grid1_name   Name on grid 1 (e.g. 'Pressure').
 %     grid1_unit   Unit of grid 1 (e.g. 'Pa').

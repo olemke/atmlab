@@ -12,7 +12,7 @@
 function G = gf_clean(G)
   
 
-d = max( G(:).dim );
+d = max( [G.dim] );
  
 ready = 0;
   
@@ -20,7 +20,7 @@ while ~ready
     
   d = d + 1;
   
-  gname = sprintf( 'grid%d', d )
+  gname = sprintf( 'grid%d', d );
 
   if isfield( G(1), gname )
     G = rmfield( G, { gname, [gname,'_name'], [gname,'_unit'] } );
