@@ -62,8 +62,8 @@ elseif( abs( lat ) <= 89.99 )
     
   % For lat = +- 90 the azimuth angle gives the longitude along which the
   % LOS goes
-  else
-    aa = rad2deg * atan2( dz, dx );
-  end
+else
+  aa = rad2deg * atan2( dz, dx );
+
 end
 

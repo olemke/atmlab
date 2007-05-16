@@ -2,7 +2,7 @@
 %
 %    Removes unnecessary data (that is, grid data for dimensions not used).
 %
-% FORMAT   G = clean( G )
+% FORMAT   G = gf_clean( G )
 %        
 % OUT   G   Cleaned data.
 % IN    G   Original data.

@@ -25,6 +25,18 @@ if isfield( G, 'ABS_SPECIES' )
 end
 
 
+if isfield( G, 'R_GEOID' )
+  ok_surface( Q, G.R_GEOID, 'G.R_GEOID' );
+  Q.R_GEOID = G.R_GEOID.data;
+end
+
+
+if isfield( G, 'Z_SURFACE' )
+  ok_surface( Q, G.Z_SURFACE, 'G.Z_SURFACE' );
+  Q.Z_SURFACE = G.Z_SURFACE.data;
+end
+
+
 
 
 
@@ -32,6 +44,10 @@ end
 
 
 function ok_field( Q, Ge, fieldname )
+  if Q.ATMOSPHERE_DIM ~= Ge.dim
+    error( sprintf( 'Not correct dimensionaly for %s.', ...
+                                                             fieldname ) );
+  end
   if ~issame( Q.P_GRID, Ge.grid1 )
     error( sprintf( 'Difference between Q.P_GRID and grid1 for %s.', ...
                                                              fieldname ) );
@@ -45,4 +61,19 @@ function ok_field( Q, Ge, fieldname )
                                                              fieldname ) );
   end  
 return
-  
+
+
+function ok_surface( Q, Ge, fieldname )
+  if Q.ATMOSPHERE_DIM ~= Ge.dim + 1
+    error( sprintf( 'Not correct dimensionaly for %s.', ...
+                                                             fieldname ) );
+  end
+  if Q.ATMOSPHERE_DIM >= 2  &  ~issame( Q.LAT_GRID, Ge.grid1 )
+    error( sprintf( 'Difference between Q.LAT_GRID and grid2 for %s.', ...
+                                                             fieldname ) );
+  end
+  if Q.ATMOSPHERE_DIM >= 3  &  ~issame( Q.LON_GRID, Ge.grid2 )
+    error( sprintf( 'Difference between Q.LON_GRID and grid3 for %s.', ...
+                                                             fieldname ) );
+  end  
+return

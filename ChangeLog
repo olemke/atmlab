@@ -1,5 +1,17 @@
 2007-05-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-157
+
+	* obsolete/issame.m: Added.
+
+	* gformat/gf_copy_grids.m: Created. 
+
+	* forwardmodel/pathpoint2sensorposlos.m: Finished. 
+
+	* gformat/gf_export_qarts.m: Added handling of R_GEOID and Z_SURFACE.
+
+2007-05-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-156
 
 	* arts/arts_sph2cart.m: Created.
