@@ -1,3 +1,33 @@
+2007-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-159
+
+	* gformat/gf_interp.m: Finished.
+
+	* gformat/gf_export_qarts.m: Now handling Z_FIELD. 
+
+	* math/regrid.m: Now considering EXTRAP.
+
+	* math/expand2inf.m: Created.
+
+	* math/dimens.m: A scalar gives now 1, instead of []. 
+
+	* atmlab/atmlab.m: Introduced EXTRAP.
+
+	* atmlab/atmlab_defs.m: Introduced EXTRAP and set default values
+	for all fields not being paths.
+
+2007-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-158
+
+	* gformat/gf_interp.m: Started.
+
+	* gformat/gf_regrid.m: Interpolation option was not piped to regrid. 
+
+	* physics/pt2z.m: Unnecessary restriction to latitudes >=0. Now
+	[-90,90] are OK.
+
 2007-05-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-157

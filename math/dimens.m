@@ -12,4 +12,4 @@
 
 function n = dimens(A)
 
-n = max( find( size(A) > 1 ) );
+n = max([ 1 max( find( size(A) > 1 ) )] );

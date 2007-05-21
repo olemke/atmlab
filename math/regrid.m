@@ -7,6 +7,8 @@
 %    The data is assumed to have dimensions: A(x,y,z)
 %    Grids for dimensions not used must be left out.
 %
+%    The function considers the atmlab setting EXTRAP.
+%
 % FORMAT   B = regrid(A,x,xi,y,yi,z,zi[,iopt])
 %        
 % OUT   B      Interpolated data.
@@ -45,14 +47,24 @@ elseif nargin > 2+dim*2
 end
 %
 rqre_scalar( 'Dimensionality of A', dim, 1, 3 );
-
+%
 imethod = 'linear';
+
+
+%--- Extrapolation switch defined
+%
+atmlab( 'require', {'EXTRAP'} );
+
 
 
 if dim == 1
 
   if nargin == 4
     imethod = y;
+  end
+
+  if atmlab( 'EXTRAP' )
+    [A,x] = expand2inf( A, x );
   end
 
   B = interp1( x, A, vec2col(xi), imethod );
@@ -71,6 +83,10 @@ elseif dim == 2
   end
 
   [xi,yi] = ndgrid( xi, yi );
+
+  if atmlab( 'EXTRAP' )
+    [A,x,y] = expand2inf( A, x, y );
+  end
 
   B = interp2( y, x, A, yi, xi, imethod ); 
 
@@ -93,6 +109,10 @@ elseif dim == 3
   end
   
   [xi,yi,zi] = ndgrid( xi, yi, zi );
+
+  if atmlab( 'EXTRAP' )
+    [A,x,y,z] = expand2inf( A, x, y, z );
+  end
 
   B = interp3( y, x, z, A, yi, xi, zi, imethod ); 
 

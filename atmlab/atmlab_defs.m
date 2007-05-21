@@ -19,9 +19,10 @@ A.ARTS_XMLDATA_PATH = NaN;
 A.ARTS1_DATA_PATH   = NaN;
 A.ARTS1_HDF         = NaN;
 A.ARTS1_PATH        = NaN;
-A.DEBUG             = NaN;
-A.FMODEL_VERBOSITY  = NaN;
-A.SCREEN_WIDTH      = NaN;
-A.VERBOSITY         = NaN;
+A.DEBUG             = 0;
+A.EXTRAP            = 0;
+A.FMODEL_VERBOSITY  = 0;
+A.SCREEN_WIDTH      = 70;
+A.VERBOSITY         = 1;
 A.WORK_AREA         = NaN;
 

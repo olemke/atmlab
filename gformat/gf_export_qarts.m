@@ -9,6 +9,10 @@ if isfield( G, 'T_FIELD' )
   Q.T_FIELD = G.T_FIELD.data;
 end
 
+if isfield( G, 'Z_FIELD' )
+  ok_field( Q, G.Z_FIELD, 'G.Z_FIELD' );
+  Q.Z_FIELD = G.Z_FIELD.data;
+end
 
 if isfield( G, 'ABS_SPECIES' )
   for i = 1 : length(G.ABS_SPECIES)

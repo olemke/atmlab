@@ -60,6 +60,10 @@
 % Boolean to indicate if ARTS-1.0.x is compiled with HDF. If true, the binary
 % file format will be used.
 %----------------------------------------------------------------------------
+% ARTS1_PATH
+%
+% Path to executable for ARTS-1.0.x. 
+%----------------------------------------------------------------------------
 % DEBUG
 %
 % Flag to set to simplify debugging. No overall effect, but this flag is
@@ -67,9 +71,14 @@
 % work folders are not removed, to make it possible to check the content
 % in these folders.
 %----------------------------------------------------------------------------
-% ARTS1_PATH
+% EXTRAP
 %
-% Path to executable for ARTS-1.0.x. 
+% Flag to for automatic extrapolation of data at interpolation. Data are
+% then assumed to be constant outside end points. That is, data value at end 
+% points are assumed out to some very high value. See further function 
+% *expand2inf*.
+%     This flag applies is only considered for general interpolation
+% function. Specific functions handle this differently.
 %----------------------------------------------------------------------------
 % FMODEL_VERBOSITY
 %

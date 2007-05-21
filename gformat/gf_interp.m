@@ -1,16 +1,22 @@
-% GF_REGRID   Change of rectangular grid (1D to 3D)
+% GF_INTERP   Interpolation of data in G format.
 %
-%    Just an interface to *regrid* function.
+%    Basically an interface between the G format and interp1/2/3. That is,
+%    only data dimensions <= 3 are handled. Interpolation positions are
+%    given as row vectors with length equal to data
+%    dimensionality. Multiple points are given as rows in *pos*.
 %
-% FORMAT   G = gf_regrid( G, Gtmplt [, iopt] )
+%    The function considers the atmlab setting EXTRAP.
+%
+% FORMAT   X = gf_interp( G, pos [, iopt] )
 %        
-% OUT   G      Re-grided data.
-% IN    G      Original data.
-%       Gtmplt New grids are taken from (first element of) this data
-%              structure. Data dimension must match G.
-% OPT   iopt   Interpolation option. See *regrid*.
+% OUT   X      Interpolated data. Returned as a matrix, where each column 
+%              corresponds to an item of G.
+% IN    G      Data to be interpolated.
+%       pos    Interpolation points, where first column corresponds to
+%              dimension 1 etc.
+% OPT   iopt   Interpolation option ('linear', 'cubic' etc.)
 
-% 2007-05-15   Created by Patrick Eriksson.
+% 2007-05-21   Created by Patrick Eriksson.
 
 
 function X = gf_interp( G, pos, iopt )
@@ -20,7 +26,7 @@ if nargin < 3
 end
 
 
-X = zeros( max([1 size(pos,1)]), length(G) );
+X = zeros( max([1 size(pos,2)]), length(G) );
 
 
 for i = 1 : length( G )

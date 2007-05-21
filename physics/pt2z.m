@@ -33,7 +33,7 @@ rqre_datatype( 'vector', h2o );
 rqre_scalar( 'p0', p0, 0 );
 rqre_scalar( 'z0', z0 );
 if nargin > 5
-  rqre_scalar( 'lat', lat, 0, 90 );
+  rqre_scalar( 'lat', lat, -90, 90 );
 end
 %
 np = length( p );
@@ -72,7 +72,7 @@ if ~exist('lat','var')
 end
 % 
 re = wgs84( 2, lat );
-g0 = lat2g0( lat )
+g0 = lat2g0( lat );
 
 
 for iter = 1:2
@@ -143,7 +143,7 @@ function g0 = lat2g0(lat)
   90 9.83217
   ];
   %
-  g0 = interp1( A(:,1), A(:,2), lat );
+  g0 = interp1( A(:,1), A(:,2), abs(lat) );
   %
 return
 
