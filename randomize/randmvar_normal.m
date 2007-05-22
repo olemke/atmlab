@@ -2,7 +2,9 @@
 %
 %    Creates a set of random vectors fulfilling multivariate normal
 %    statistics. The statistics to fulfill is defined by giving the
-%    mean vector, standard deviations and the covariance matrix.
+%    mean vector, standard deviations and the correlation matrix.
+%
+%    See also *randmvar_normal2*.
 %
 % FORMAT   X = randmvar_normal( x, si, C, n )
 %        
@@ -44,6 +46,12 @@ end
 if ~isscalar(n)  |  ~iswhole(n)  |  n<1
   error('Input argument *n* must be a positive integer.');
 end
+
+% Check if C really is a correlation matrix (must be positive definite):
+covmat_test(C);
+
+% To get real random results we should reset the random seed. 
+randn('state',sum(100*clock));
 
 
 if length(si) > 1

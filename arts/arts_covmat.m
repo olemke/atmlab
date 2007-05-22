@@ -340,7 +340,7 @@ function C = make_cmatrix( x, cl, cfun )
   elseif strcmp( cfun, 'gau' )
     for row=1:(n-1)
       for col=(row+1):n
-        c = exp( -4 * ( (kg(row)-kg(col))/(cl(row)+cl(col)) )^2  );
+        c = exp( -4 * ( (x(row)-x(col))/(cl(row)+cl(col)) )^2  );
         C(row,col) = c; 
         C(col,row) = c;
       end

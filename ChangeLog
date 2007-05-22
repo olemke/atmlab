@@ -1,5 +1,17 @@
 2007-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-161
+
+	* randomize/randmvar_normal2.m: Created.
+
+	* randomize/randmvar_normal.m: Added check of semidefinite matrix
+	and scrambling of random seed.
+
+	* arts/arts_covmat.m (make_cmatrix): Incorrect variable name for x
+	in gau option.
+
+2007-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-160
 
 	* arts/arts_covmat.m: Now using interpd.
