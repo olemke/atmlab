@@ -5,8 +5,6 @@
 %    given as row vectors with length equal to data
 %    dimensionality. Multiple points are given as rows in *pos*.
 %
-%    The function considers the atmlab setting EXTRAP.
-%
 % FORMAT   X = gf_interp( G, pos [, iopt] )
 %        
 % OUT   X      Interpolated data. Returned as a matrix, where each column 
@@ -26,12 +24,13 @@ if nargin < 3
 end
 
 
-X = zeros( max([1 size(pos,2)]), length(G) );
+X = zeros( max([1 size(pos,1)]), length(G) );
 
 
 for i = 1 : length( G )
 
-  if G(i).dim ~= size(pos,2)
+  if ( G(i).dim  > 1  &  G(i).dim ~= size(pos,2) ) | ...
+     ( G(i).dim == 0  &  ~isempty(pos) )
     error( sprintf( 'Different dimension of *pos* and G(%d).', i ) );
   end
   
@@ -42,17 +41,16 @@ for i = 1 : length( G )
     
   elseif G(i).dim == 1
     %
-    X(:,i) = interp1( G(i).grid1, G(i).data, pos, iopt );
+    X(:,i) = interpd( pos, G(i).data, G(i).grid1, iopt );
 
-  elseif Gtmplt(1).dim == 2
+  elseif G(i).dim == 2
     %
-    X(:,i) = interp2( G(i).grid1, G(i).grid2, G(i).data, ...
-                                                   pos(:,1), pos(:,2), iopt );
+    X(:,i) = interpd( pos, G(i).data, G(i).grid1, G(i).grid2, iopt );
 
-  elseif Gtmplt(1).dim == 3
+  elseif G(i).dim == 3
     %
-    X(:,i) = interp3( G(i).grid1, G(i).grid2, G(i).grid3, G(i).data, ...
-                                         pos(:,1), pos(:,2), pos(:,3), iopt );
+    X(:,i) = interpd( pos, G(i).data, G(i).grid1, G(i).grid2, G(i).grid3, iopt);
+
   else
     error( 'The function handles only 1D - 3D cases.' );
   end

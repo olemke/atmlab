@@ -1,13 +1,16 @@
 % REGRID  Change of rectangular grid in 1D, 2D or 3D
 %
 %    Interpolation of data between two rectangular grids. Basically
-%    an interface to interp1, interp2 and interp3 ensuring that
-%    interpolated data get expected size.
+%    an interface to interp1, interp2 and interp3, with the attempt to avoid
+%    some of the confusion around naming/order of dimensions  in standard 
+%    Matlab functions.
 %
 %    The data is assumed to have dimensions: A(x,y,z)
 %    Grids for dimensions not used must be left out.
 %
 %    The function considers the atmlab setting EXTRAP.
+%
+%    For "pure" interpolation, see accompanying function *interpd*.
 %
 % FORMAT   B = regrid(A,x,xi,y,yi,z,zi[,iopt])
 %        
@@ -45,8 +48,6 @@ if nargin < 1+dim*2
 elseif nargin > 2+dim*2
   error( 'Too many input arguments.' );
 end
-%
-rqre_scalar( 'Dimensionality of A', dim, 1, 3 );
 %
 imethod = 'linear';
 

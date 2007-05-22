@@ -1,4 +1,4 @@
-% ARTS_COVMAT   Creates the covariance matrix for a single retrieval quantity
+% ARTS_COVMAT   Creates covariance matrix for a single retrieval quantity
 %
 %   Converts specification data to a covariance matrix. The covariance is
 %   described by the structure *D*, where different format options exist.
@@ -10,7 +10,7 @@
 %
 %   Correlation up to 3 dimensions are handled. The dimensions are here 
 %   denoted as 1, 2 and 3, in order to be general. The physical meaning
-%   of these dimension differs. For e.g. gas species they correspond to
+%   of these dimensions differ. For e.g. gas species they correspond to
 %   pressure/altitude, latitude and longitude. For atmospheric data
 %   *dtype* shall be set to 'atm', which result in that log10(p)
 %   is used as vertical coordinate (assumed to be dim 1). All pressure
@@ -22,8 +22,8 @@
 %      ---
 %      The covariance is here specified in a parameterised way. Values are
 %      calculated as S(i,j) = si(i)*si(j)*c1(i,j)*c2(i,j)*c3(i,j),
-%      where si(i) is the standard deviation at point i, and c1(i,j) is
-%      the dim1-correlation between point i and j. 
+%      where si(i) is the standard deviation at point i, c1(i,j) is
+%      the dim1-correlation between point i and j, etc. 
 %      Correlation structures are seperated in each dimension (c1, c2 and c3).
 %      This means that only the distance in dimension 1 is considered when
 %      calculating c1 etc. Correlation lengths can then specified seperately
@@ -42,7 +42,7 @@
 %      standard deviation/correlation length. No grids need to be specified
 %      in this case. Otherwise, SI, CL1, CL2 and CL3 are interpolated
 %      linearly to selected retrieval positions (no extrapolation).
-%      No checks of isze is done. Inconsintency in size between variables 
+%      No checks of size are done. Inconsistency in size between variables 
 %      will result in error from interpolation functions.
 %      ---
 %      SI         A priori standard deviation. Dimensionality must match *dim*.
@@ -196,12 +196,12 @@ if strcmp( D.FORMAT, 'param' )
       cl = repmat( D.CL1, n, 1 );
     else
       if dim == 1
-        cl = interp1( D.CL1_GRID1, D.CL1, x, 'linear' );
+        cl = interpd( x, D.CL1, D.CL1_GRID1, 'linear' );
       elseif dim == 2
-        cl = interp2( D.CL1_GRID1, D.CL1_GRID2, D.CL1, x, y, 'linear' );
+        cl = interpd( [x,y], D.CL1, D.CL1_GRID1, D.CL1_GRID2, 'linear' );
       else
-        cl = interp3( D.CL1_GRID1, D.CL1_GRID2, D.CL1_GRID3, D.CL1, ...
-                                                           x, y, z, 'linear' );
+        cl = interpd( [x,y,z], D.CL1, D.CL1_GRID1, D.CL1_GRID2, D.CL1_GRID3, ...
+                                                                     'linear' );
       end
       if any( isnan(cl) )
         error( ['NaN obtained for dim1 correlation length. ',...
@@ -220,10 +220,10 @@ if strcmp( D.FORMAT, 'param' )
         cl = repmat( D.CL2, n, 1 );
       else
         if dim == 2
-          cl = interp2( D.CL2_GRID1, D.CL2_GRID2, D.CL2, x, y, 'linear' );
+          cl = interpd( [x,y], D.CL2, D.CL2_GRID1, D.CL2_GRID2, 'linear' );
         else
-          cl = interp3( D.CL2_GRID1, D.CL2_GRID2, D.CL2_GRID3, D.CL2, ...
-                                                           x, y, z, 'linear' );
+          cl = interpd( [x,y,z], D.CL2, D.CL2_GRID1, D.CL2_GRID2, ...
+                                                       D.CL2_GRID3, 'linear' );
         end
         if any( isnan(cl) )
           error( ['NaN obtained for dim2 correlation length. ',...
@@ -242,8 +242,8 @@ if strcmp( D.FORMAT, 'param' )
       if isscalar( D.CL3 )
         cl = repmat( D.CL3, n, 1 );
       else
-        cl = interp3( D.CL3_GRID1, D.CL3_GRID2, D.CL3_GRID3, D.CL3, ...
-                                                           x, y, z, 'linear' );
+        cl = interpd( [x,y,z], D.CL3, D.CL3_GRID1, D.CL3_GRID2, ...
+                                                       D.CL3_GRID3, 'linear' );
       end
       if any( isnan(cl) )
         error( ['NaN obtained for dim3 correlation length. ',...
@@ -271,11 +271,11 @@ if strcmp( D.FORMAT, 'param' )
     si = repmat( D.SI, n, 1 );
   else
     if dim == 1
-      si = interp1( D.SI_GRID1, D.SI, x, 'linear' );
+      si = interpd( x, D.SI, D.SI_GRID1, 'linear' );
     elseif dim == 2
-      si = interp2( D.SI_GRID1, D.SI_GRID2, D.SI, x, y, 'linear' );
+      si = interpd( [x,y], D.SI, D.SI_GRID1, D.SI_GRID2, 'linear' );
     else
-      si = interp3( D.SI_GRID1, D.SI_GRID2, D.SI_GRID3, D.SI, x, y, z, ...
+      si = interpd( [x,y,z], D.SI, D.SI_GRID1, D.SI_GRID2, D.SI_GRID3, ...
                                                                     'linear' );
     end
   end

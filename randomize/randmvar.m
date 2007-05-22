@@ -21,7 +21,7 @@
 %    interpmeth : Method for interpolating data in 'cdf'. See *interp1*
 %                 for options. Default is 'linear'.
 %    datalims   : Min and max allowed values for obtained data. The purpose of
-%                 this field is to make it possible to create PDF peaks and
+%                 this field is to make it possible to create PDF peaks at
 %                 the end points of the data range. See example below.
 %
 %    To create 1e6 vectors of length 2 with uniformly distributed data:

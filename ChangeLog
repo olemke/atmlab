@@ -1,3 +1,15 @@
+2007-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-160
+
+	* arts/arts_covmat.m: Now using interpd.
+
+	* gformat/gf_interp.m: Now using interpd.
+
+	* math/interpd.m: Created.
+
+	* gformat/gf_interp.m: Fixed mistakes for dimensions ~=1.
+
 2007-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-159

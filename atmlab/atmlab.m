@@ -77,8 +77,9 @@
 % then assumed to be constant outside end points. That is, data value at end 
 % points are assumed out to some very high value. See further function 
 % *expand2inf*.
-%     This flag applies is only considered for general interpolation
-% function. Specific functions handle this differently.
+%     This functionality is implemented by the functions *interpd* and 
+% *regrid*, which should be used of all atmlab functions of general
+% character. Special functions may not obey this setting variable.
 %----------------------------------------------------------------------------
 % FMODEL_VERBOSITY
 %
