@@ -14,9 +14,6 @@
 
 function noise = make_noise(n,S)
 
-% Check if S really is a covariance matrix (must be positive definite):
-covmat_test(S)
-
 % To get real random results we should reset the random seed. 
 randn('state',sum(100*clock));
 

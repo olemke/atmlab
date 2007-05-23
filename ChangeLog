@@ -1,3 +1,22 @@
+2007-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-162
+
+	* retrieval/covmat_seperable_corrcoef.m: Started. 
+
+	* retrieval/covmat_from_cfun.m: Changed cfun option 'dia' to
+	'drc', as the old option is not a functional form. This option did
+	not include standard devs.
+	EXTRAP is not considered. Scalar Std and Cl now accepted.
+
+	* randomize/randmvar_normal2.m: Re-implementation (missed to make
+	add home on laptop).
+
+	* randomize/make_noise.m: Removed call of covmat_test, as the
+	same test is made when calling chol.
+
+	* randomize/randmvar_normal.m: As above, and allowd x to be a scalar.
+
 2007-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-161

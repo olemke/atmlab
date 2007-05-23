@@ -1,7 +1,7 @@
 % COVMAT_APPEND   Appends a set of covariance matrices.
 %
 %    The covariance matrices are assembled assuming no correlation between
-%    the quantities corresponding to each covaraince matrix. That is, 
+%    the quantities corresponding to each covariance matrix. That is, 
 %    the output has the structure:
 %       S = [S1  0  0 ...
 %             0 S2  0 ...

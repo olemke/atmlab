@@ -186,7 +186,7 @@ if strcmp( D.FORMAT, 'param' )
 
   %--- Correlation part
   %
-  C = ones( n, n );
+  C = 1;
   %
   %- x-dimension
   if strcmp( D.CFUN1, 'drc' )
@@ -305,7 +305,7 @@ return
 function C = make_cmatrix( x, cl, cfun )
   %
   n = length( x );
-  C = eye( n, n );
+  C = speye( n, n );
   %
   if strcmp( cfun, 'drc' )
     for row=1:(n-1)

@@ -1,11 +1,13 @@
 % COVMAT_FROM_CFUN   Correlation function based covariance matrix
 %
-%    This function sets up a covariance matrix from defined correlation 
+%    This function sets up a covariance matrix from a defined correlation 
 %    function. The correlation function is specified by giving a functional
 %    form (such as exponential decreasing) and correlation lengths. The
 %    correlation length is throughout defined as the distance where the 
 %    correlation has dropped to exp(-1). For off-diagonal values, the 
 %    correlation length is averaged between the two involved positions.
+%
+%    Correlation matrices are obtained by setting *Std* to [].
 %
 % FORMAT   S = covmat_from_cfun( xp, Std, cfun, [Cl, cco] )
 %        
@@ -14,16 +16,19 @@
 %       Std   Standard deviations. Given as a two vector matrix. First column
 %             holds position in same unit as *xp*. The second column is the 
 %             standard deviation at the postions of the first column. These
-%             values are then interpolated to *xp*.
-%             If set to [], unit standard deviation is assumed and the output
-%             corresponds to the correlation matrix.
+%             values are then interpolated to *xp*. Possible extrapolation
+%             follows EXTRAP.
+%             If set to a scalar, this value is applied for all *xp*.
+%             If set to [], unit standard deviation is assumed.
 %       cfun  Correlation function. Possible choices are
-%              'dia' : Diagonal matrix. Any given correlation is neglected.
+%              'drc' : Dirac. No correlation. Any given correlation length
+%                      is ignored here.
 %              'lin' : Linearly decreasing (down to zero).
 %              'exp' : Exponential decreasing (exp(-dx/cl)).
 %              'gau' : Gaussian (normal) deceasing (exp(-(dx/cl))^2).
 % OPT   Cl    Correlation lengths. Given as a column matrix as *Std*.
-%             Must be given for all *cfun* beside 'dia'.
+%             Must be given for all *cfun* beside 'dia'. Possible extrapolation
+%             follows EXTRAP. Scalar input is allowed.
 %       cco   Correlation cut-off. All values below this limit are set to 0. 
 
 % 2005-05-20   Created by Patrick Eriksson.
@@ -43,31 +48,54 @@ set_defaults;
 %
 min_nargin( 3, nargin );
 %
-if ~( isempty( Std )  |  size(Std,2) == 2 )
-  error( 'Argument *Std* must be a matrix with 2 columns, or be empty.' );
+if ~( isempty( Std )  |  isscalar(Std)  |  size(Std,2) == 2 )
+  error( 'Argument *Std* must be a 2-col matrix, a scalar or be empty.' );
 end
 %
 if ~ischar(cfun)  |  length(cfun) ~= 3
   error('Argument *cfun* must be a string of length 3.');
 end
 %
-if nargin > 4  &  ( size(Cl,2) ~= 2  | isvector(Cl) )
+if nargin >= 4  &  ~( isscalar(Cl)  |  size(Cl,2) == 2 )
   error( 'Argument *Cl* must be a matrix with 2 columns.' );
 end
 %
-if ~( isscalar( cco )  &  cco >= 0 )
-  error( 'Argument *cco* must be a scalar >=0' );
+if ~( isscalar( cco )  &  cco >= 0  &  cco < 1 )
+  error( 'Argument *cco* must be a scalar [0,1[' );
 end
 
+
+atmlab( 'require', {'EXTRAP'} );
 
 n  = length( xp );
 
 
+%- Determine standard deviations
+%
+if isempty( Std )
+  si = ones( n, 1 );
+elseif isscalar( Std )
+  si = repmat( Std, n, 1 );
+else  
+  if atmlab( 'EXTRAP' )
+    [si,x] = expand2inf( Std(:,2), Std(:,1) );
+    si     = vec2col( interp1( x, si, xp ) );
+  else
+    si = vec2col( interp1( Std(:,1), Std(:,2), xp ) );
+  end
+end
+%
+if any( isnan(si) )
+  error( 'NaN obtained when interpolating *Std* (extrapolation?)' );
+end
+
+
+
 %= Handle diagonal matrices separately (note return)
 %
-if strcmp( lower(cfun), 'dia' )
+if strcmp( lower(cfun), 'drc' )
   %
-  S = speye( n, n );
+  S = sparse( 1:n, 1:n, si.^2, n, n );
   return
   %
 end
@@ -82,11 +110,20 @@ D       = abs( X1 - X2 );
 
 %= Correlation length matrix 
 %
-cl = interp1( Cl(:,1), Cl(:,2), xp );
-[X1,X2] = meshgrid( cl, cl );
-L       = ( X1 + X2 ) / 2;
-%
-clear X1 X2
+if isscalar( Cl )
+  L = Cl;
+else
+  if atmlab( 'EXTRAP' )
+    [cl,x] = expand2inf( Cl(:,2), Cl(:,1) );
+    cl     = vec2col( interp1( x, cl, xp ) );
+  else
+    cl = vec2col( interp1( Cl(:,1), Cl(:,2), xp ) );
+  end
+  [X1,X2] = meshgrid( cl, cl );
+  L       = ( X1 + X2 ) / 2;
+  %
+  clear X1 X2
+end
 
 
 
@@ -97,7 +134,7 @@ switch lower(cfun)
   case 'lin'
     %
     S = 1 - (1-exp(-1)) * ( D./L );
-    S( find(S<0) ) = 0;
+    % Negativa values removed by cco
 
   case 'exp'
     %
@@ -115,22 +152,15 @@ end
 
 
 
-%- Remove values below correlation cut-off limit and convert to sparse
+%- Remove values below correlation cut-off limit, convert to sparse and
+%- include standard deviations
 %
-if cco > 0
-  S( find(abs(S) < cco )) = 0;
-end
+S( find( S < cco )) = 0;
 %
 [i,j,s] = find( S );
-S = sparse( i, j, s, n, n );
+S       = (si*si') .* sparse( i, j, s, n, n );
 
 
 
-%- Include standard deviations
-%
-if ~isempty( Std )
-  si = vec2col( interp1( Std(:,1), Std(:,2), xp ) );
-  S = (si*si') .* S;
-end
 
 
