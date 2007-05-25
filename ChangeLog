@@ -1,5 +1,13 @@
 2007-05-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-164
+
+	* sensors/cloudsat_l1b_read.m: As below. 
+
+	* sensors/cloudsat_iwc_read_std.m: Moved from Chalmers SVN repository.
+
+2007-05-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-163
 	
 	* retrieval/covmat_from_cfun.m: Added to *mapfun* as input
