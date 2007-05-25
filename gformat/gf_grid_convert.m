@@ -1,27 +1,47 @@
 % GF_GRID_CONVERT   Conversion of grid unit
 %
-%    This function allows a change of grid unit. The grid can be reversed
-%    and a log-transformation can be performed.
+%    This function allows a change of grid unit. The conversion of a grid g
+%    can be expressed as:
 %
-% FORMAT   G = gf_grid_convert( G, dim, rev [, do_log] )
+%       g = -(postcs~=1) * mapfun( -(precs~=1)*g )
+%
+%    To convert a pressure grid to increasing "pressure decades":
+%       gf_grid_convert( p_grid, [], 0, @log10, 1 )
+%    The reveresed conversion is:
+%       gf_grid_convert( p_grid, [], 1, @pow10 )
+%
+% FORMAT   G = gf_grid_convert( G [, dim, precs, mapfun, postcs] )
 %        
 % OUT   G        Data with converted grid.
-% IN    G        Original data.
-%       dim      Data dimension for which grid shall be converted.
-%       rev      Flag to reverse order of grid.
-% OPT   do_log   Flag to make log10 conversion. For values > 0, log10 is
-%                applied. For values < 0, a back-transformation is done. 
+% IN    G        Original data. Either in g-format or as a plain vector.
+% OPT   dim      Data dimension for which grid shall be converted.
+%       precs    Change sign before applying *mapfun*.
+%       mapfun   Mapping function. No mapping if empty, which is default.
+%       postcs   Change sign after applying *mapfun*.
 
 % 2007-05-15   Created by Patrick Eriksson.
 
 
-function G = gf_grid_convert( G, dim, rev, do_log )
+function G = gf_grid_convert( G, dim, precs, mapfun, postcs )
 
-if nargin < 3
-  do_log = 0;  
+%- Default values
+%
+dim_DEFAULT    = 1;
+precs_DEFAULT  = 0;
+mapfun_DEFAULT = [];
+postcs_DEFAULT = 0;
+%
+set_defaults;
+
+
+%- Check input
+%
+if ~isempty(mapfun)  &  ~isa( mapfun, 'function_handle' )
+  error( 'Input *mapfun* must be empty or a finction handle.' );
 end
 
-%- Handle orinary vectors
+
+%- Handle ordinary vectors
 %
 vecopt = 0;
 %
@@ -44,16 +64,18 @@ for i = 1 : length( G )
 
   g = G(i).(gridname);
   
-  if rev
-    g = g(end:-1:1);
+  if precs
+    g = -g;
   end
   
-  if do_log > 0
-    g = log10(g);
-  elseif do_log < 0
-    g = 10.^(g);
+  if ~isempty( mapfun )
+    g = mapfun( g );
   end
 
+  if postcs
+    g = -g;
+  end
+    
   G(i).(gridname) = g;
   
 end

@@ -1,3 +1,18 @@
+2007-05-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-163
+	
+	* retrieval/covmat_from_cfun.m: Added to *mapfun* as input
+	argument, to handle specification of correlation lengths in pressure 
+	decades.
+
+	* gformat/gf_grid_convert.m: Changed input to function, in order to
+	make it more general.
+
+	* math/pow10.m: Created.
+
+	* retrieval/covmat_seperable_corrcoef.m: Finished.
+
 2007-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-162

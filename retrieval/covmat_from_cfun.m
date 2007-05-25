@@ -9,37 +9,42 @@
 %
 %    Correlation matrices are obtained by setting *Std* to [].
 %
-% FORMAT   S = covmat_from_cfun( xp, Std, cfun, [Cl, cco] )
+% FORMAT   S = covmat_from_cfun( xp, Std, cfun, [Cl, cco, mapfun] )
 %        
-% OUT   S     The covariance matrix
-% IN    xp    The data abscissa.
-%       Std   Standard deviations. Given as a two vector matrix. First column
-%             holds position in same unit as *xp*. The second column is the 
-%             standard deviation at the postions of the first column. These
-%             values are then interpolated to *xp*. Possible extrapolation
-%             follows EXTRAP.
-%             If set to a scalar, this value is applied for all *xp*.
-%             If set to [], unit standard deviation is assumed.
-%       cfun  Correlation function. Possible choices are
-%              'drc' : Dirac. No correlation. Any given correlation length
-%                      is ignored here.
-%              'lin' : Linearly decreasing (down to zero).
-%              'exp' : Exponential decreasing (exp(-dx/cl)).
-%              'gau' : Gaussian (normal) deceasing (exp(-(dx/cl))^2).
-% OPT   Cl    Correlation lengths. Given as a column matrix as *Std*.
-%             Must be given for all *cfun* beside 'dia'. Possible extrapolation
-%             follows EXTRAP. Scalar input is allowed.
-%       cco   Correlation cut-off. All values below this limit are set to 0. 
+% OUT   S      The covariance matrix
+% IN    xp     The data abscissa.
+%       Std    Standard deviations. Given as a two vector matrix. First column
+%              holds position in same unit as *xp*. The second column is the 
+%              standard deviation at the postions of the first column. These
+%              values are then interpolated to *xp*. Possible extrapolation
+%              follows EXTRAP.
+%              If set to a scalar, this value is applied for all *xp*.
+%              If set to [], unit standard deviation is assumed.
+%       cfun   Correlation function. Possible choices are
+%               'drc' : Dirac. No correlation. Any given correlation length
+%                       is ignored here.
+%               'lin' : Linearly decreasing (down to zero).
+%               'exp' : Exponential decreasing (exp(-dx/cl)).
+%               'gau' : Gaussian (normal) deceasing (exp(-(dx/cl))^2).
+% OPT   Cl     Correlation lengths. Given as a column matrix as *Std*.
+%              Must be given for all *cfun* beside 'dia'. Possible 
+%              extrapolation follows EXTRAP. Scalar input is allowed.
+%       cco    Correlation cut-off. All values below this limit are set to 0.
+%       mapfun Mapping function from grid unit to unit for corrleation
+%              lengths. For example, if correlation lengths are given in
+%              pressure decades, while the basic coordinate is Pa, this is
+%              *mapfun* handled by setting *mapfun* to @log10. 
 
 % 2005-05-20   Created by Patrick Eriksson.
 
 
-function S = covmat_from_cfun(xp,Std,cfun,Cl,cco)
+function S = covmat_from_cfun(xp,Std,cfun,Cl,cco,mapfun)
 
 
 %= Default values
 %
-cco_DEFAULT = 0;
+cco_DEFAULT    = 0;
+mapfun_DEFAULT = [];
 %
 set_defaults;
 
@@ -98,6 +103,20 @@ if strcmp( lower(cfun), 'drc' )
   S = sparse( 1:n, 1:n, si.^2, n, n );
   return
   %
+end
+
+
+
+%= Conversion of length unit
+%
+if ~isempty(mapfun)
+  if ~isa( mapfun, 'function_handle' )
+    error( 'Input *mapfun* must be empty or a function handle.' );
+  end
+  xp = mapfun( xp );
+  if ~isscalar( Cl )
+    Cl(:,1) = mapfun( Cl(:,1) );
+  end
 end
 
 
