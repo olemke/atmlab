@@ -1,3 +1,11 @@
+2007-06-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-165
+
+	* arts/arts_abstable_from_arts1.m: A.t_pert now written as empty to XML
+	file if no perturbation. Better check of input *dt*.
+	(Problem reported by Craig Haley).
+
 2007-05-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-164

@@ -56,6 +56,11 @@ set_defaults;
 %
 rqre_datatype( 'struct', Q );
 rqre_datatype( {'empty','char'}, workfolder );
+%
+if isscalar(dt)  &  dt ~= 0
+  error( 'Only valid option for scalar *dt* is 0.' );
+end
+
 
 
 folder_created = 0;
@@ -136,7 +141,11 @@ try
   A.p_grid            = vec2col( qarts_get( Q.P_GRID ) );
   A.vmrs_ref          = vmr_field;
   A.t_ref             = vec2col( t_field );
-  A.t_pert            = dt;
+  if length(dt) >= 2
+    A.t_pert          = dt;
+  else
+    A.t_pert          = []
+  end
   A.nls_pert          = [];
   %
   nt = length(dt);
