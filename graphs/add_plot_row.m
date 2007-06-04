@@ -6,7 +6,7 @@
 %
 %    The size allocated for the plots is specified by giving lengths with
 %    respect to the vertical size of the figure area. This is valid both
-%    for the width and height. This means that if the width and height are set
+%    for widths and height. This means that if the width and height are set
 %    to the same value, the plot will be square. All plots have the same height
 %    but the width can differ. Note that the size given does not include the
 %    space used for axis numbering and label text, it includes only the actual
@@ -14,31 +14,23 @@
 %    the plot widths cannot add up to 1.
 %
 %    The plots can either be flushed to the right (flush='r'), flushed to
-%    the left (flush='l'), or be centered (flush='c'). If default settings
-%    are used, the width not occupied of plots is evenly distributed
-%    between the plots. For left and right flushing, 85% of the width is
-%    avaliable, and 0.85 is then a suitable width for rows containing 1
-%    plot. For centered plots, horisontal spaces are based 100% of the width.
-%
-%    Some examples:
-%       h1 = add_plot_row(0.3,[0.3 0.3],0.1,'r');
-%       h2 = add_plot_row(0.3,[0.85],0.1,'r');
-%    while for centered plots, this works better
-%       h1 = add_plot_row(0.3,[w1 w1],0.1,'c');
-%       h2 = add_plot_row(0.3,0.8,0.1,'c');
-%    as the avaliable width is here 100% of the total width. Make sure that
-%    the figure window has sufficient height for both plot rows before
-%    trying these examples. The width must be increased before creating the
-%    first rows the widths set are normalised to the size, and the size
-%    of the plots will change if the size of the figure is changed.
+%    the left (flush='l'), or be centered (flush='c'). For left and right
+%    flushing, 10% of the figure width at the end of the flushing. 
+%    The horisontal position of the plots can be fine tuned by the optional
+%    arguments *hspacefac* and *hshift*.
 %
 %    For normal plotting with the y-axis to the left, right flushing should
 %    be the standard choice, and it is also default.
 %
-%    The horisontal position of the plots can be fine tuned by the optional
-%    arguments *hspacefac* and *hshift*.
+%    Some examples:
+%       h1 = add_plot_row(0.3,[0.25 0.4 0.25]);
+%       h2 = add_plot_row(0.3,1.1);
+%    Make sure that the figure window has sufficient height for both plot rows
+%    before trying this example. The width must be increased before creating
+%    the first rows the widths set are normalised to the size, and the size of
+%    the plots will change if the size of the figure is changed.
 %
-% FORMAT   h = add_plot_row(height,widths[,vspacing,flush])
+% FORMAT   h = add_plot_row(height,widths,vspacing,hspacing,flush,hshift)
 %        
 % OUT   h          Handles to the created plots (axes).
 % IN    height     Height of plots. This length is given in fractions of the 
@@ -46,23 +38,30 @@
 %       widths     Widths of each plot as a vector. This lengths are given in
 %                  fractions of the vertical size. 
 % OPT   vspacing   Vertical spacing to plots above, or to the top of figure
-%                  area. This length is given in fractions of the horisontal
+%                  area. This length is given in fractions of the vertical
 %                  size. Default is 0.1.
+%       hspacing   Horisontal spacing of plots in row,. This length is given 
+%                  in fractions of the vertical size. Default is 0.1.
 %       flush      Flushing of plots. See further above. Default is 'r'.
-%       hspacefac  Scaling factor for the horisontal distance between the 
-%                  plots (0.2 means shorten the distance with a factor of 5
-%                  etc.). Default is 1.
 %       hshift     Horisontal shift of plots. Same unit as above. Default is 0.
 
 % 2002-12-11   Created by Patrick Eriksson.
 
 
-function h = add_plot_row(height,widths,vspacing,flush,hspacefac,hshift)
+function h = add_plot_row(height,widths,vspacing,hspacing,flush,hshift)
 
 
-%=== Basic check of input
+%=== Set default values
 %
-min_nargin( 2, nargin );
+vspacing_DEFAULT = 0.1;
+hspacing_DEFAULT = 0.1;
+flush_DEFAULT    = 'r';
+hshift_DEFAULT   = 0;
+%
+set_defaults;
+
+  
+%=== Basic check of input
 %
 if ~isscalar( height )
   error(' The argument *height* must be a scalar.');
@@ -72,40 +71,20 @@ if ~isvector( widths )
   error(' The argument *width* must be a vector.');
 end
 %
-if sum( widths ) > 1
-  error( 'The sum *widths* can not be > 1.');  
+if ~isscalar( vspacing )
+  error(' The argument *vspacing* must be a scalar.');
 end
 %
-if nargin < 3
-  vspacing = 0.1;
-else
-  if ~isscalar( vspacing )
-    error(' The argument *vspacing* must be a scalar.');
-  end
+if  ~isscalar( hspacing )
+  error( 'The argument *hspacing* must be a scalar.');
 end
 %
-if nargin < 4
-  flush = 'r';
-else
-  if ~( strcmp(flush,'l') | strcmp(flush,'c') | strcmp(flush,'r') )
-    error('The argument *flush* must be ''l'', ''c'' or ''r''.');
-  end
+if  ~( strcmp(flush,'l') | strcmp(flush,'c') | strcmp(flush,'r') )
+  error('The argument *flush* must be ''l'', ''c'' or ''r''.');
 end 
 %
-if nargin < 5
-  hspacefac = 1;
-else
-  if ~isscalar( hspacefac )
-    error(' The argument *hspacefac* must be a scalar.');
-  end
-end
-%
-if nargin < 6
-  hshift = 0;
-else
-  if ~isscalar( hshift )
-    error(' The argument *hshift* must be a scalar.');
-  end
+if ~isscalar( hshift )
+  error(' The argument *hshift* must be a scalar.');
 end
 
 
@@ -115,8 +94,7 @@ end
 hf = gcf;
 
 
-%=== Convert the height to be valid with respect to the vertical size (and
-%=== not the horisontal).
+%=== Convert horisontal sizes.
 %
 %- The case of unit='norm' forces the conversion to be done in a more tricky
 %- way, than required for other units.
@@ -125,11 +103,15 @@ hf = gcf;
 unit1 = get( hf, 'unit' );
 set( hf, 'unit', 'ce' );
 %
-pos    = get( hf, 'Position' );
-height = height * pos(3) / pos(4);
+pos      = get( hf, 'Position' );
+widths   = widths * pos(4) / pos(3);
+hspacing = hspacing * pos(4) / pos(3);
+hshift   = hshift * pos(4) / pos(3);
 %
 %- Reset unit
 set( hf, 'unit', unit1 );
+
+
 
 
 %=== Check at what height the plot row shall be placed
@@ -138,58 +120,45 @@ set( hf, 'unit', unit1 );
 hc = get( hf, 'Children' );
 %
 if isempty( hc )
-  hbase = 1;
+  vbase = 1;
 else
   %- Loop children and look at what height they start
-  hbase = pos(2) + pos(4);
+  vbase = pos(2) + pos(4);
   for ic = 1 : length(hc)
     cpos = get( hc(ic), 'position' );
-    if cpos(2) < hbase
-      hbase = cpos(2);
+    if cpos(2) < vbase
+      vbase = cpos(2);
     end 
   end
 end
 %
-hbase = hbase - vspacing - height;
+vbase = vbase - vspacing - height;
 %
-if hbase < 0
+if vbase < 0
   error('The given height is larger than free vertical space.');
 end
 
 
-%=== Calculate the horisontal space between the plots
-%
-%- The space between plots is made twice the space to the figure borders
-%
-nplots = length( widths );
-%
-if flush == 'c'
-  hspacing = (1 - sum(widths) ) / ( 2 + hspacefac*(nplots-1) );
-else
-  if nplots == 1
-    hspacing = 1;   % just a dummy value
-  else
-    hspacing = (0.85 - sum(widths) ) / (nplots-1);
-  end
-end
 
 
 %=== Place the axes
 %
+nplots = length( widths );
+%
 if flush == 'l'
-  vbase = 0.1;
+  hbase = 0.1;
 elseif flush == 'c'
-  vbase = hspacing;
+  hbase = 0.5 - (sum(widths) + hspacing*(nplots-1))/2;
 else
-  vbase = 0.95 - sum(widths) - hspacefac*hspacing*(nplots-1);
+  hbase = 0.9 - (sum(widths) + hspacing*(nplots-1));
 end
 %
-vbase = vbase + hshift;
+hbase = hbase + hshift;
 
 
 h     = zeros( nplots, 1 );
 %
 for ip = 1 : nplots
-  h(ip) = axes( 'position', [vbase hbase widths(ip) height] );
-  vbase = vbase + widths(ip) + hspacefac*hspacing;
+  h(ip) = axes( 'position', [hbase vbase widths(ip) height] );
+  hbase = hbase + widths(ip) + hspacing;
 end

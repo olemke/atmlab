@@ -1,3 +1,13 @@
+2007-06-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-167
+
+	* graphs/add_plot_row.m: This function did not work as described
+	in header. Function input made both code and usage
+	complicated. Introduced then the input argument hspacing. 
+	So function input and effect of function changed. This will brake old
+	usage of function. Sorry. Hopefully last modification of this function!
+
 2007-06-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-165
