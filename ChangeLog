@@ -8,6 +8,14 @@
 	So function input and effect of function changed. This will brake old
 	usage of function. Sorry. Hopefully last modification of this function!
 
+2007-06-04  Mathias Milz  <mathias.milz@ltu.se>
+
+	* atmlab-0-2-166
+
+	* sensors/airs_l12_swath_file.m, sensors/airs_l3_grid_file.m: 
+	added reading routines for airs level1/2 data (swath grid) and 
+	for airs level 3 data (lat-long grid) in hdf format.
+
 2007-06-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-165
