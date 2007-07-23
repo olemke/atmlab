@@ -9,7 +9,7 @@
 %
 %    Make sure that the data you're passing has the correct type.
 %
-% FORMAT   xmlStore(filename, comment, data, type, precision)
+% FORMAT   xmlStoreImpl(filename, comment, data, type, precision)
 %
 % IN    filename   Name of output file
 % IN    comment    Comment to store along with the data
@@ -19,7 +19,7 @@
 % 2002-12-16  Created by Oliver Lemke.
 
 
-function xmlStore(filename, comment, data, type, precision)
+function xmlStoreImpl(filename, comment, data, type, precision)
 
 %=== Basic ckeck of input
 %
