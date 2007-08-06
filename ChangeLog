@@ -1,3 +1,14 @@
+2007-08-06  Stefan Buehler  <sbuehler@irv.se>
+
+	* atmlab-0-2-169
+
+	* xml/xmlWriteGriddedField4.m: Added.
+
+	* xml/xmlReadGriddedField4.m: Added. 
+
+	* physics/twvcalc.m: Added. Calculates water vapor column values
+	in kg/m^2.
+
 2007-07-23  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-168
