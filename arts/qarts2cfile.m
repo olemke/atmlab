@@ -757,9 +757,9 @@ case 'multimixer'
   T{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
   T{2} = file_or_data( 'matrix_1', 'Matrix', H.SIDEBAND_FILTER, tmpdir );
   T{3} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
-  T{4} = file_or_data( 'arrayofmatrix_1', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
+  T{4} = file_or_data( 'matrix_2', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
   T{5} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
-  T{6} = 'sensor_responseBackend(matrix_1,arrayofmatrix_1){}';
+  T{6} = 'sensor_responseBackend(matrix_1,matrix_2){}';
   
 case 'close'
   T{1} = '# End of sensor part';
