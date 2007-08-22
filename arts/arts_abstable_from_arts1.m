@@ -81,7 +81,7 @@ try
   %
   if Q.USE_RAW_ATMOSPHERE
     %
-    [t_field,z_field,vmr_field] = arts_get_atmfields( Q ); 
+    [t_field,z_field,vmr_field] = arts_atmfields( Q ); 
   else
     t_field   = qarts_get( Q.T_FIELD );
     z_field   = qarts_get( Q.Z_FIELD );

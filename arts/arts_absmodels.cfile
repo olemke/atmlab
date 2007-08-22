@@ -1,0 +1,77 @@
+# This file contains standard choices for ARTS "continua".
+# Focus is on more recent complete absorption models.
+
+# H2O absorption models (lines + continuum)
+abs_cont_descriptionAppend{
+    tagname        = "H2O-MPM89"
+    model          = "MPM89"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "H2O-MPM93"
+    model          = "MPM93"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "H2O-CP98"
+    model         = "CruzPol"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "H2O-PWR98"
+    model         = "Rosenkranz"
+    userparameters = [ ]
+}
+## CKD MT 1.00 self continuum original parameters:
+abs_cont_descriptionAppend{
+    tagname        = "H2O-SelfContCKDMT100"
+    model          = "CKDMT100"
+    userparameters = [ ]
+}
+## CKD MT 1.00 H2O foreign continuum original parameters:
+abs_cont_descriptionAppend{
+    tagname        = "H2O-ForeignContCKDMT100"
+    model          = "CKDMT100"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "O2-MPM85"
+    model          = "MPM85"
+    userparameters = [ ]
+}
+
+# O2 absorption models (lines + continuum)
+abs_cont_descriptionAppend{
+    tagname        = "O2-MPM89"
+    model          = "MPM89"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "O2-MPM93"
+    model         = "MPM93"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "O2-PWR93"
+    model         = "Rosenkranz"
+    userparameters = [ ]
+}
+
+# N2 continua
+abs_cont_descriptionAppend{
+    tagname        = "N2-SelfContStandardType"
+    model          = "Rosenkranz"
+    userparameters = [ ]
+}
+abs_cont_descriptionAppend{
+    tagname        = "N2-SelfContBorysow"
+    model          = "BF86"
+    userparameters = [ ]
+}
+
+## far line wing continuum from CKD F77 program:
+abs_cont_descriptionAppend{
+    tagname        = "CO2-CKDMT100"
+    model          = "CKDMT100"
+    userparameters = [ ]
+}

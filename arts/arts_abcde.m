@@ -88,11 +88,11 @@ end
 
 try
 
-  %= Get text for control file, but remove two last part ('stop')
+  %= Get text for control file, but remove ending '}'
   %
   parts = qarts2cfile( 'y' );
-  parts = { parts{1:(end-1)} };
   S     = qarts2cfile( Q, parts, workfolder );
+  S     = S(1:end-1);
 
 
   %= Add saving of variables
@@ -105,8 +105,7 @@ try
 
   %= Add closing 
   %
-  Sp = qarts2cfile( Q, {'stop'}, workfolder );
-  S  = { S{:} Sp{:} };
+  S{end+1}  = '}';
 
 
   %= Create control file and run 

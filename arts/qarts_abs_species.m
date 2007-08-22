@@ -1,22 +1,24 @@
-% Q_ABS_SPECIES   Adds a gas species to the Q and SX structures
+% QARTS_ABS_SPECIES   Adds an absorption species to the Q and SX structures
 %
-%    The method modifies the fields ABS_SPECIES and J.ABS_SPECIES.
+%    The method modifies the fields ABS_SPECIES, ABS_NLS and J.ABS_SPECIES.
 %    The field ATMOSPHERE_DIM must be set.
 %
 %    Example on adding a species, without jacobians:
-%       Q = q_abs_species( Q, {'O2-PWR93'} );
+%       Q = qarts_abs_species( Q, {'H2O-PWR93'}, 1 );
 %
 %    With jacobians:
-%       [Q,SX] = q_gas_species( Q,{'H2O-PWR98'},1,SX,D,p_grid,'vmr');
+%       [Q,SX] = qarts_gas_species( Q,{'O2-PWR98'},0,1,SX,D,p_grid,'vmr');
 %
-% FORMAT   [Q,SX] = q_abs_species( Q, tags, do_j, SX, D, grids [, unit, 
-%                                                            method, dx )
+% FORMAT   [Q,SX] = q_abs_species( Q, tags [, nonlin, do_j, SX, D, grids, unit, 
+%                                                            method, dx ] )
 %        
 % OUT   Q          Modified Q structure.
 %       SX         Modified SX structure.
 % IN    Q          Original Q structure.
 %       tags       Tag names as cell string array.
-% OPT   do_j       Flag to do jacobians. Default is 0. If 0, the variables
+% OPT   nonlin     Boolean for including as "non-liner" in absorption
+%                  look-up table. Default is 0.
+%       do_j       Flag to do jacobians. Default is 0. If 0, the variables
 %                  below are not needed.
 %       SX         Original SX structure.
 %       D          Covariance definition. See *arts_covmat*.
@@ -30,7 +32,8 @@
 % 2005-06-23   Created by Patrick Eriksson.
 
 
-function [Q,SX] = q_abs_species(Q,tags,do_j,SX,D,grids,unit,method,dx)
+function [Q,SX] = ...
+                qarts_abs_species(Q,tags,nonlin,do_j,SX,D,grids,unit,method,dx)
 
 
 if nargin < 2  |  ( nargin > 2  &  nargin < 5 )
@@ -39,6 +42,7 @@ end
 
 %= Set defaults
 %
+nonlin_DEFAULT = 0;
 do_j_DEFAULT   = 0;
 unit_DEFAULT   = 'rel';
 method_DEFAULT = 'analytical';
@@ -50,6 +54,7 @@ set_defaults;
 %= Check input
 %
 rqre_datatype( 'cellstr', tags );
+rqre_bool( 'argument *nonlin*', do_j );
 rqre_bool( 'argument *do_j*', do_j );
 
 
@@ -59,6 +64,9 @@ i = length(Q.ABS_SPECIES) + 1;
 for j = 1 : length(tags)
   Q.ABS_SPECIES{i}{j} = tags{j};
 end
+
+
+Q.ABS_NLS(i) = nonlin;
 
 
 if isstruct( Q.J )

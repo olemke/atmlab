@@ -1,17 +1,21 @@
-% ARTS_Y   Calculates spectra using ARTS
+% ARTS_Y   Calculates spectra and jacobians using ARTS
 %
-%    Qarts fields for atmosphere, absorption, sensor and RT must be
-%    specified.
+%    Takes a qarts structure and calculates corresponding spectra, and 
+%    associated jacobians (if J_DO is set). As a minimum, a frequency grid,
+%    an atmosphere, a surface and clear-sky RTE variables must be specified.
 %
-% FORMAT   [y,dy,J,jq,ji] = arts_y( Q [, workfolder] )
+% FORMAT   [y,ydata,dy,J,jq,ji] = arts_y( Q [, workfolder] )
 %        
-% OUT   y   Spectrum vector.
-%       dy  Estimate of calculation accuracy.
-%       J   Jacobian. NaN returned if Q.J not defined.
-%       jq  Jacobian quantities. NaN returned if Q.J not defined.
-%       ji  Jacobian indices. NaN returned if Q.J not defined.
-%           Indices are 1-based (that is, ARTS indices + 1);
-% IN    Q   Qarts structure.
+% OUT   y            Spectrum vector.
+%       ydata        Data to determine frequency, position and LOS for each 
+%                    value of *y*. A structure with fields: 
+%                    'f', 'pos' and 'los'.
+%       dy           Estimate of calculation accuracy.
+%       J            Jacobian. NaN returned if Q.J not defined.
+%       jq           Jacobian quantities. NaN returned if Q.J not defined.
+%       ji           Jacobian indices. NaN returned if Q.J not defined.
+%                    Indices are 1-based (that is, ARTS indices + 1);
+% IN    Q            Qarts structure.
 % OPT   workfolder   If not defined or empty, a temporary folder is created.
 %                    Otherwise this is interpreted as the path to a folder 
 %                    where calculation output can be stored. These files
@@ -22,7 +26,7 @@
 % 2004-09-17   Created by Patrick Eriksson.
 
 
-function [y,dy,J,jq,ji] = arts_y( Q, workfolder )
+function [y,ydata,dy,J,jq,ji] = arts_y( Q, workfolder )
 
 
 %- Default values
@@ -38,6 +42,15 @@ rqre_datatype( 'struct', Q );
 rqre_datatype( {'empty','char'}, workfolder );
 
 
+%- Default output
+%
+dy = 0;
+J  = NaN;
+jq = NaN;
+ji = NaN;
+
+
+
 folder_created = 0;
 %
 if isempty( workfolder )
@@ -48,7 +61,12 @@ end
 
 try
   %
-  parts = qarts2cfile( 'y+j' );
+  if Q.J_DO
+    parts = qarts2cfile( 'y+j' );
+  else
+    parts = qarts2cfile( 'y' );    
+  end
+  %
   S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
   qtool( S, cfile, [] );
@@ -65,32 +83,46 @@ end
 if isstruct( Q.CLOUDBOX )  
   if strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
     dy = xmlLoad( fullfile( workfolder, 'mc_error.xml' ) );
-  else
-    dy = NaN;
   end
-else
-  dy = NaN;
 end
 
-if nargout >= 1
+
+y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
+
+
+if nargout >= 2
+  ydata.f   = xmlLoad( fullfile( workfolder, 'sensor_response_f.xml' ) );
+  ydata.pos = xmlLoad( fullfile( workfolder, 'sensor_pos.xml' ) );
+  ydata.los = xmlLoad( fullfile( workfolder, 'sensor_los.xml' ) );
   %
-  y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
+  za        = xmlLoad( fullfile( workfolder, 'sensor_response_za.xml' ) );
+  aa        = xmlLoad( fullfile( workfolder, 'sensor_response_aa.xml' ) );
   %
-  if nargout >= 3
-    %
-    J = xmlLoad( fullfile( workfolder, 'jacobian.xml' ) );
-    %
-    if nargout >= 4
-      jq = xmlLoad( fullfile( workfolder, 'jacobian_quantities.xml' ) );
-      ji = xmlLoad( fullfile( workfolder, 'jacobian_indices.xml' ) );
-      for i = 1 : length(ji)
-        for j = 1 : length(ji{i})
-          ji{i}{j} = ji{i}{j} + 1;
-        end
+  if ~isempty(za)
+    ydata.los(:,1) = ydata.los(:,1) + za;
+  end
+  if ~isempty(aa)
+    ydata.los(:,2) = ydata.los(:,2) + aa;
+  end
+
+end
+
+
+if nargout >= 4  &  Q.J_DO
+  %
+  J = xmlLoad( fullfile( workfolder, 'jacobian.xml' ) );
+  %
+  if nargout >= 5
+    jq = xmlLoad( fullfile( workfolder, 'jacobian_quantities.xml' ) );
+    ji = xmlLoad( fullfile( workfolder, 'jacobian_indices.xml' ) );
+    for i = 1 : length(ji)
+      for j = 1 : length(ji{i})
+        ji{i}{j} = ji{i}{j} + 1;
       end
     end
   end
 end
+
 
 
 if folder_created

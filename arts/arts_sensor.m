@@ -1,40 +1,49 @@
 % ARTS_SENSOR   Calculates sensor response matrix using ARTS
 %
-%   Calculates the sensor response matrix. This needs that fields 
-%   Q.SENSOR_RESPONSE holds a definition of the sensor responses
-%   (see *qarts_sensor*). The sensor output variables are all part
-%   of Qarts (e.g. SENSOR_RESPONSE, SENSOR_RESPONSE_F and ANTENNA_DIM).
+%    Takes a qarts structure and calculates corresponding sensor reponse 
+%    transfer matrix. 
 %
-%   This functioon can be used to pre-calculate the sensor response for
-%   later ARTS calculations.
+%    The result can be returned in two different ways. 
 %
-%   The sensor variables are either read into Matlab and stored in
-%   corresponding Q-field (filenames=0), or the Q-fileds are set to the 
-%   name of produced files (filenames=1). The later option requires that
-%   *workfolder* is set.
+%    1: Data are load into O if no workfolder is specified or *do_load* is
+%    set.
 %
-% FORMAT   Q = arts_sensor( Q [, workfolder, filenames ] )
+%    2. The fields of O contain the names of created xml files if a 
+%    workfolder is given (and do_load=false). This option is more efficient
+%    if the data shall be used for later ARTS runs (and not inside Matlab).
+%
+% FORMAT   O = arts_sensor( Q [, workfolder] )
 %        
-% OUT   Q   Qarts structure with sensor fields set.
-% IN    Q   Qarts structure.
+% OUT   O            Obtained data.  A structure with fields: 
+%                        SENSOR_RESPONSE   
+%                        SENSOR_RESPONSE_F
+%                        SENSOR_RESPONSE_ZA
+%                        SENSOR_RESPONSE_AA
+%                        SENSOR_RESPONSE_POLl
+%                        ANTENNA_DIM        
+%                        MBLOCK_ZA_GRID     
+%                        MBLOCK_AA_GRIDS
+%                    See further above.
+% IN    Q            Qarts structure.
 % OPT   workfolder   If not defined or empty, a temporary folder is created.
 %                    Otherwise this is interpreted as the path to a folder 
 %                    where calculation output can be stored. These files
 %                    will be left in the folder. The files are not read if
 %                    corresponding output argument not is considered.
 %                    Default is [].
-%       filenames    See above. Default is 0.
+%       do_load      Flag to trigger loading even if a workfolder has been
+%                    given.
 
-% 2006-09-28   Created by Patrick Eriksson.
+% 2007-08-22   Created by Patrick Eriksson.
 
 
-function Q = arts_sensor( Q, workfolder, filenames )
+function O = arts_sensor( Q, workfolder, do_load )
 
 
 %- Default values
 %
 workfolder_DEFAULT = [];
-filenames_DEFAULT  = 0;
+do_load_DEFAULT    = false;
 %
 set_defaults;
 
@@ -43,63 +52,63 @@ set_defaults;
 %
 rqre_datatype( 'struct', Q );
 rqre_datatype( {'empty','char'}, workfolder );
-rqre_bool( 'Input argument *filenames*', filenames );
-%
-if isempty( workfolder )  &  filenames
-  error( 'The option *filenames* requires that *workfolder* is defined*.' );
-end
+
 
 
 folder_created = 0;
 %
 if isempty( workfolder )
-  workfolder   = create_tmpfolder;
+  workfolder     = create_tmpfolder;
+  folder_created = 1;
 end
 
 
 try
   %
-  parts = qarts2cfile( 'sensor' );
+  parts = qarts2cfile( 'GetSensor' );
   S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
   qtool( S, cfile, [] );
   arts( cfile );
-
-  if filenames
-    Q.SENSOR_RESPONSE     = fullfile( workfolder, 'sensor_response.xml' );
-    Q.SENSOR_RESPONSE_F   = fullfile( workfolder, 'sensor_response_f.xml' );
-    Q.SENSOR_RESPONSE_ZA  = fullfile( workfolder, 'sensor_response_za.xml' );
-    Q.SENSOR_RESPONSE_AA  = fullfile( workfolder, 'sensor_response_aa.xml' );
-    Q.SENSOR_RESPONSE_POL = fullfile( workfolder, 'sensor_response_pol.xml' );
-    Q.ANTENNA_DIM         = fullfile( workfolder, 'antenna_dim.xml' );
-    Q.MBLOCK_ZA_GRID      = fullfile( workfolder, 'mblock_za_grid.xml' );
-    Q.MBLOCK_AA_GRID      = fullfile( workfolder, 'mblock_aa_grid.xml' );
-  else
-    Q.SENSOR_RESPONSE = ...
-             xmlLoad( fullfile( workfolder, 'sensor_response.xml' ) );
-    Q.SENSOR_RESPONSE_F = ...
-             xmlLoad( fullfile( workfolder, 'sensor_response_f.xml' ) );
-    Q.SENSOR_RESPONSE_ZA = ...
-             xmlLoad( fullfile( workfolder, 'sensor_response_za.xml' ) );
-    Q.SENSOR_RESPONSE_AA = ...
-             xmlLoad( fullfile( workfolder, 'sensor_response_aa.xml' ) );
-    Q.SENSOR_RESPONSE_POL = ...
-             xmlLoad( fullfile( workfolder, 'sensor_response_pol.xml' ) );
-    Q.ANTENNA_DIM = ...
-             xmlLoad( fullfile( workfolder, 'antenna_dim.xml' ) );
-    Q.MBLOCK_ZA_GRID = ...
-             xmlLoad( fullfile( workfolder, 'mblock_za_grid.xml' ) );
-    Q.MBLOCK_AA_GRID = ...
-             xmlLoad( fullfile( workfolder, 'mblock_aa_grid.xml' ) );
-  end  
-
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
 
 catch
   if folder_created
     delete_tmpfolder( workfolder );
   end
   rethrow(lasterror);
+end
+
+
+
+if folder_created  |  do_load
+  O.SENSOR_RESPONSE = ...
+                 xmlLoad( fullfile( workfolder, 'sensor_response.xml' ) );
+  O.SENSOR_RESPONSE_F = ...
+                 xmlLoad( fullfile( workfolder, 'sensor_response_f.xml' ) );
+  O.SENSOR_RESPONSE_ZA = ...
+                 xmlLoad( fullfile( workfolder, 'sensor_response_za.xml' ) );
+  O.SENSOR_RESPONSE_AA = ...
+                 xmlLoad( fullfile( workfolder, 'sensor_response_aa.xml' ) );
+  O.SENSOR_RESPONSE_POL = ...
+                 xmlLoad( fullfile( workfolder, 'sensor_response_pol.xml' ) );
+  O.ANTENNA_DIM = ...
+                 xmlLoad( fullfile( workfolder, 'antenna_dim.xml' ) );
+  O.MBLOCK_ZA_GRID = ...
+                 xmlLoad( fullfile( workfolder, 'mblock_za_grid.xml' ) );
+  O.MBLOCK_AA_GRID = ...
+                 xmlLoad( fullfile( workfolder, 'mblock_aa_grid.xml' ) );
+else
+  O.SENSOR_RESPONSE     = fullfile( workfolder, 'sensor_response.xml' );
+  O.SENSOR_RESPONSE_F   = fullfile( workfolder, 'sensor_response_f.xml' );
+  O.SENSOR_RESPONSE_ZA  = fullfile( workfolder, 'sensor_response_za.xml' );
+  O.SENSOR_RESPONSE_AA  = fullfile( workfolder, 'sensor_response_aa.xml' );
+  O.SENSOR_RESPONSE_POL = fullfile( workfolder, 'sensor_response_pol.xml' );
+  O.ANTENNA_DIM         = fullfile( workfolder, 'antenna_dim.xml' );
+  O.MBLOCK_ZA_GRID      = fullfile( workfolder, 'mblock_za_grid.xml' );
+  O.MBLOCK_AA_GRID      = fullfile( workfolder, 'mblock_aa_grid.xml' );
+end
+
+
+if folder_created
+  delete_tmpfolder( workfolder );  
 end

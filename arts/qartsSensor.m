@@ -1,14 +1,14 @@
-% QARTS_SENSOR   Defines setting fields for ARTS sensor response calculations
+% QARTSSENSOR   Defines setting fields for ARTS sensor response calculations
 %
 %    The function provides default values for all recognised fields and a 
 %    description of each field. Default value is normally NaN, but
 %    exceptions exist when some standard choice exists. To list default
-%    values just type 'arts_sensor'.
+%    values just type 'qartsSensor'.
 %
 %    This function is organised in such way that *qcheck* and *qinfo*
 %    can be used.
 %
-% FORMAT   [H,I] = arts_sensor
+% FORMAT   [H,I] = qartsSensor
 %        
 % OUT   H  Setting structure with default values for all recognised fields.
 %       I  Includes same fields as H, where the content of each field
@@ -17,7 +17,7 @@
 % 2005-01-26   Created by Mattias Ekström.
 
 
-function [H,I] = qarts_sensor
+function [H,I] = qartsSensor
  
 %-----------------------------------------------------------------------------
 H.ANTENNA_DIAGRAM = NaN;

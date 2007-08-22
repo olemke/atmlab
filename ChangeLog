@@ -1,3 +1,58 @@
+2007-08-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-171
+
+	* Large restructuring of qarts/qarts2cfile and surrounding
+	functions. Maintenance and extensions should now be simpler.  These
+	parts should work: setting up of absorption look-up table through
+	ARTS-1.1 (done by qarts_abstable + arts_abstable), setting up
+	sensor transfer matrix separately (arts_sensor) and calculation of
+	spectra without scattering or jacobians). Spectra can now be calculated
+	e.g. with on-the-fly absorption. Please test and comment.
+
+	It appears that the matlab reading of xml sparse files does not work
+	and sensor responses can not yet be loaded into Matlab.
+
+	* arts/arts_absmodels.cfile: Created.
+
+	* arts/arts_atmfields.m: Replaces arts_get_atmfields.m and is
+	fixed with respect to changes in qarts2cfile.m. Added r_geoid and
+	z_surface as output arguments.
+
+	* arts/arts_abcde.m: Fixed with respect to changes in qarts2cfile.m.
+
+	* arts: Removed functions
+           arts_get_atmfields.m
+	   q_abs_species.m
+	   qarts_batch.m
+           qarts_cloudbox.m
+           qarts_jacobian.m
+           qarts_sensor.m
+
+	* arts/qartsBatch.m: Replaces qarts_batch.
+
+	* arts/qartsJacobian.m: Replaces qarts_jacobian.
+
+	* arts/qartsSensor.m: Replaces qarts_sensor.
+	
+	* arts/qartsCloudbox.m: Replaces qarts_cloudbox.
+	
+	* arts/qarts2cfile.m: Large changes of internal code structure. 
+	Added functionality around absorption. Changed functionality
+	(using DO fields) around sensor, jacobian and cloudbox.
+
+	* arts/qarts.m: Polishing and update of text. Added fields around 
+	ABSORPTION, and CLOUDBOX_DO, J_DO and SENSOR_DO.
+
+	* arts/arts_y.m: Polished. And ydata added as output argument.
+
+	* arts/qarts_abs_species.m: Replaces q_abs_species.
+
+	* demos/qarts_demo.m: Updated following changes above. Batch and some
+	other options removed, to create as simple example as possible. 
+
+	* arts1/qarts1.m: Improved text in a few places. 
+
 2007-07-21  Mattias Ekstrom  <mattias.ekstrom@chalmers.se>
 
 	* atmlab-0-2-170
