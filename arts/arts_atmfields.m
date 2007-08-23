@@ -22,7 +22,8 @@
 %       STOKES_DIM
 %       F_GRID
 %
-% FORMAT [t_field,z_field,vmr_field] = arts_atmfields( Q [, p, lat, lon ])
+% FORMAT [t_field,z_field,vmr_field,r_geoid,z_surface] = 
+%                                          arts_atmfields( Q [, p, lat, lon ])
 %        
 % OUT   t_field     As the ARTS WSV with same name.
 %       z_field     As the ARTS WSV with same name.

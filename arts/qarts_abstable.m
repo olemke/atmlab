@@ -115,7 +115,9 @@ else
   if isempty(dt)
     dt   = max( t_max - t_min ) / 2;
   end
-  if isempty(dnls)  &  ~isempty( Q.ABS_NLS )
+  if isempty( Q.ABS_NLS )
+    dnls = 0;
+  elseif isempty(dnls) 
     dnls = max( max( vmr_max(Q.ABS_NLS,:)./ vmr(Q.ABS_NLS,:) ) );
   end
 end

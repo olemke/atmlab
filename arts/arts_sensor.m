@@ -5,16 +5,16 @@
 %
 %    The result can be returned in two different ways. 
 %
-%    1: Data are load into O if no workfolder is specified or *do_load* is
+%    1: Data are loaded into Q if no workfolder is specified or *do_load* is
 %    set.
 %
-%    2. The fields of O contain the names of created xml files if a 
+%    2. The fields of Q contain the names of created xml files if a 
 %    workfolder is given (and do_load=false). This option is more efficient
 %    if the data shall be used for later ARTS runs (and not inside Matlab).
 %
-% FORMAT   O = arts_sensor( Q [, workfolder] )
+% FORMAT   Q = arts_sensor( Q [, workfolder] )
 %        
-% OUT   O            Obtained data.  A structure with fields: 
+% OUT   Q            Q with the following fields set:
 %                        SENSOR_RESPONSE   
 %                        SENSOR_RESPONSE_F
 %                        SENSOR_RESPONSE_ZA
@@ -37,7 +37,7 @@
 % 2007-08-22   Created by Patrick Eriksson.
 
 
-function O = arts_sensor( Q, workfolder, do_load )
+function Q = arts_sensor( Q, workfolder, do_load )
 
 
 %- Default values
@@ -81,31 +81,31 @@ end
 
 
 if folder_created  |  do_load
-  O.SENSOR_RESPONSE = ...
+  Q.SENSOR_RESPONSE = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response.xml' ) );
-  O.SENSOR_RESPONSE_F = ...
+  Q.SENSOR_RESPONSE_F = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response_f.xml' ) );
-  O.SENSOR_RESPONSE_ZA = ...
+  Q.SENSOR_RESPONSE_ZA = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response_za.xml' ) );
-  O.SENSOR_RESPONSE_AA = ...
+  Q.SENSOR_RESPONSE_AA = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response_aa.xml' ) );
-  O.SENSOR_RESPONSE_POL = ...
+  Q.SENSOR_RESPONSE_POL = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response_pol.xml' ) );
-  O.ANTENNA_DIM = ...
+  Q.ANTENNA_DIM = ...
                  xmlLoad( fullfile( workfolder, 'antenna_dim.xml' ) );
-  O.MBLOCK_ZA_GRID = ...
+  Q.MBLOCK_ZA_GRID = ...
                  xmlLoad( fullfile( workfolder, 'mblock_za_grid.xml' ) );
-  O.MBLOCK_AA_GRID = ...
+  Q.MBLOCK_AA_GRID = ...
                  xmlLoad( fullfile( workfolder, 'mblock_aa_grid.xml' ) );
 else
-  O.SENSOR_RESPONSE     = fullfile( workfolder, 'sensor_response.xml' );
-  O.SENSOR_RESPONSE_F   = fullfile( workfolder, 'sensor_response_f.xml' );
-  O.SENSOR_RESPONSE_ZA  = fullfile( workfolder, 'sensor_response_za.xml' );
-  O.SENSOR_RESPONSE_AA  = fullfile( workfolder, 'sensor_response_aa.xml' );
-  O.SENSOR_RESPONSE_POL = fullfile( workfolder, 'sensor_response_pol.xml' );
-  O.ANTENNA_DIM         = fullfile( workfolder, 'antenna_dim.xml' );
-  O.MBLOCK_ZA_GRID      = fullfile( workfolder, 'mblock_za_grid.xml' );
-  O.MBLOCK_AA_GRID      = fullfile( workfolder, 'mblock_aa_grid.xml' );
+  Q.SENSOR_RESPONSE     = fullfile( workfolder, 'sensor_response.xml' );
+  Q.SENSOR_RESPONSE_F   = fullfile( workfolder, 'sensor_response_f.xml' );
+  Q.SENSOR_RESPONSE_ZA  = fullfile( workfolder, 'sensor_response_za.xml' );
+  Q.SENSOR_RESPONSE_AA  = fullfile( workfolder, 'sensor_response_aa.xml' );
+  Q.SENSOR_RESPONSE_POL = fullfile( workfolder, 'sensor_response_pol.xml' );
+  Q.ANTENNA_DIM         = fullfile( workfolder, 'antenna_dim.xml' );
+  Q.MBLOCK_ZA_GRID      = fullfile( workfolder, 'mblock_za_grid.xml' );
+  Q.MBLOCK_AA_GRID      = fullfile( workfolder, 'mblock_aa_grid.xml' );
 end
 
 

@@ -1,3 +1,27 @@
+2007-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-172
+
+	* Fixed some smaller problems. DOIT calculations now possible.
+	
+	* demos/qarts_doit_demo.m: Now working again.
+
+	* arts/qarts.m: Added field OUTPUT_FILE_FORMAT.
+
+	* arts/qarts2cfile.m: Added handling of OUTPUT_FILE_FORMAT.
+	Sperated adding of cloudbox variables and scattering calculation
+	method definitions. DOIT appears to work, but only for 
+	Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT = 1;
+	
+	* demos/qarts_demo2.m: Created. 
+
+	* arts/qarts_abstable.m: Fixed bug appearing when ABS_NLS=[]; 
+
+	* arts/arts_sensor.m: Output is now included in Q, instead of
+	separate structure.
+
+	* arts/arts_atmfields.m: Fixed error in header.
+
 2007-08-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-171

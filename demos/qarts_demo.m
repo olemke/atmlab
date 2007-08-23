@@ -11,7 +11,7 @@
 
 % 2007-08-21   Cleaned and updated by Patrick Eriksson.
 % 2005-01-26   Sensor part added by Mattias Ekstrom.
-% 2004-??-??   Created by Patrick Erikssom.
+% 2004-??-??   Created by Patrick Eriksson.
 
 
 function [Q,f,y] = qarts_demo( ztan )
@@ -33,6 +33,7 @@ Q  = qarts;
 %= General part
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
+Q.STOKES_DIM        = 1;
 %
 Q.ABS_SPECIES{1}{1} = 'ClO';
 Q.ABS_SPECIES{2}{1} = 'O3';
@@ -71,7 +72,6 @@ Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
 
 %= Set RTE variables
 %
-Q.STOKES_DIM        = 1;
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
 Q.Y_UNIT            = 'RJ';
 %

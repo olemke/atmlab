@@ -13,8 +13,8 @@
 %       Generl / GenarlSave
 %       AtmSrf / AtmSrfSave
 %       Absrpt / AbsrptSave
-%       SngSct / SngSctSave
 %       CldBox / CldBoxSave
+%       SctMth / SctMthSave
 %       RteSet / RteSetSave
 %       Sensor / SensorSave
 %       Jacobi 
@@ -103,7 +103,8 @@ if nargin == 1
    
   case 'y'
     %
-    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'RteExe' };
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'CldBox', ...
+          'SctMth', 'RteExe' };
     
   otherwise
     error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );
@@ -143,13 +144,21 @@ for ip = 1 : length(parts)
     %
     T = cfile_Absrpt( Q, parts{ip}, workfolder );
    
+   case 'RteSet'
+    %
+    T = cfile_RteSet( Q, parts{ip}, workfolder );
+   
    case 'Sensor'
     %
     T = cfile_Sensor( Q, parts{ip}, workfolder );
    
-   case 'RteSet'
+   case 'CldBox'
     %
-    T = cfile_RteSet( Q, parts{ip}, workfolder );
+    T = cfile_CldBox( Q, parts{ip}, workfolder );
+   
+   case 'SctMth'
+    %
+    T = cfile_SctMth( Q, parts{ip}, workfolder );
    
    case 'RteExe'
     %
@@ -199,7 +208,14 @@ function T = cfile_Generl( Q, partname, workfolder )
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Main{';
-  T{3} = 'output_file_formatSetBinary{}';
+  %
+  if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
+    T{3} = 'output_file_formatSetBinary{}';
+  elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
+    T{3} = 'output_file_formatSetAscii{}';
+  else
+    error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );
+  end
   %
   rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
   T{4} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
@@ -447,17 +463,6 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T{end+1} = add_savefile( 'stokes_dim', workfolder );
   end
   %
-  % Cloudbox
-  T2 = cfile_CldBox( Q, 'CldBox', workfolder );
-  T  = [ T T2 ];
-  %
-  % Sensor
-  T2 = cfile_Sensor( Q, 'Sensor', workfolder );
-  T  = [ T T2 ];
-  %
-  % Jacobian
-  T2 = cfile_Jacobi( Q, 'Jacobi', workfolder );
-  T  = [ T T2 ];
 return
 
 
@@ -471,20 +476,6 @@ function T = cfile_RteExe( Q, partname, workfolder )
   %
   if ~strcmp( partname, 'RteExe' )
     error( 'Only recognised choice is ''RteExe''.' );
-  end
-  %
-  if 0 % Not working part
-    %= Special solution for DOIT
-    if isstruct(Q.CLOUDBOX)  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
-      T{end+1} = 'CloudboxGetIncoming{}';
-      T{end+1} = 'DoitInit{}';
-      if ~Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT
-        T{end+1} = 'IndexSet(f_index){0}';
-        T{end+1} = 'doit_i_fieldSetClearsky{}';
-      end
-      T{end+1} = 'ScatteringDoit{}';
-      %
-    end
   end
   %
   if Q.J_DO
@@ -805,72 +796,31 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
-%    single scattering properties
-%
-function T = cfile_SngSct( Q, partname, workfolder )
-  %
-  if ~( strcmp( partname, 'SngSctBox' )  |  strcmp( partname, 'SngSctSave' ) )
-    error( 'Only recognised choices are ''SngSctBox'' and ''SngSctSave''.' );
-  end
-  %
-  error( 'This sub-function is not ready.' )
-  %
-  
-return
-
-
-
-%------------------------------------------------------------------------------
-% Sub-function handling:
-%
-%    cloudbox
+%    cloudbox_on
+%    cloudbox_limits
+%    pnd_field
+%    scat_data_raw
+%    spt_calc_agenda
+%    opt_prop_gas_agenda
 %
 function T = cfile_CldBox( Q, partname, workfolder )
   %
   if ~( strcmp( partname, 'CldBox' )  |  strcmp( partname, 'CldBoxSave' ) )
     error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );
   end
-  %
+
   if ~Q.CLOUDBOX_DO
     T{1} = 'cloudboxOff{}';
     return
   end
-
-  error( 'This sub-function is not ready.' )
   
-  % Old code: 
-
-  % Call SngSct
-  
-  if isstruct( Q.CLOUDBOX )
-    T = cloudbox2cfile( Q, workfolder );
-    T = add_agenda( T, 'opt_prop_gas_agenda', ...
-              { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
-  elseif isnan( Q.CLOUDBOX )  |  Q.CLOUDBOX == 0 
-    T{1} = 'cloudboxOff{}';
-  else
-    error( 'Unknown selection for Q.CLOUDBOX.' );
+  if ~isstruct( Q.CLOUDBOX )
+    error( 'Q.CLOUDBOX must be a structure.' );
   end
 
-  
   %= Check that all fields are present
   %
-  qcheck( @qarts_cloudbox, Q.CLOUDBOX );
-
-  %= Some basic checks
-  if Q.ATMOSPHERE_DIM == 2
-    error( 'Scattering is not defined for 2D.' );
-  elseif Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-    error( 'MC can only be applied for 3D.' );
-  end
-
-  T = [];
-
-  %= Agendas for scattering properties 
-  %
-  T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
-  T = add_agenda( T, 'opt_prop_part_agenda', ...
-     {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
+  qcheck( @qartsCloudbox, Q.CLOUDBOX );
 
   %= Cloudbox
   %
@@ -884,7 +834,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
        Q.CLOUDBOX.LIMITS = zeros(1,6);
        Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
     end
-    T{end+1} = 'cloudboxSetManuallyAltitude{';
+    T{1}     = 'cloudboxSetManuallyAltitude{';
     T{end+1} = sprintf('   z1   = %.3f', Q.CLOUDBOX.LIMITS(1) );
     T{end+1} = sprintf('   z2   = %.3f', Q.CLOUDBOX.LIMITS(2) );
     T{end+1} = sprintf('   lat1 = %.3f', Q.CLOUDBOX.LIMITS(3) );
@@ -930,7 +880,52 @@ function T = cfile_CldBox( Q, partname, workfolder )
     T{end+1} = 'pnd_fieldCalc{}';
   end
 
+  %= Agendas for scattering properties 
+  %
+  T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
+  T = add_agenda( T, 'opt_prop_gas_agenda', ...
+              { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
+  T = add_agenda( T, 'opt_prop_part_agenda', ...
+     {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
+  
 
+  %= Saving?
+  %
+  if strcmp( partname, 'CldBoxSave' )
+    T{end+1} = add_savefile( 'cloudbox_on', workfolder );
+    T{end+1} = add_savefile( 'cloudbox_limits', workfolder );
+    T{end+1} = add_savefile( 'pnd_field', workfolder );
+    T{end+1} = add_savefile( 'scat_data_raw', workfolder );
+  end
+return
+
+
+
+%------------------------------------------------------------------------------
+% Sub-function handling:
+%
+%    ???
+%
+function T = cfile_SctMth( Q, partname, workfolder )
+  %
+  if ~( strcmp( partname, 'SctMth' )  |  strcmp( partname, 'SctMthSave' ) )
+    error( 'Only recognised choices are ''SctMthBox'' and ''SctMthSave''.' );
+  end
+ 
+  if ~Q.CLOUDBOX_DO
+    T = {};
+    return
+  end
+ 
+  % It is assumed that cfile_CldBox has been called and checks of Q have
+  % been performed
+  
+  %= Some basic checks
+  if Q.ATMOSPHERE_DIM == 2
+    error( 'Scattering is not defined for 2D.' );
+  elseif Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+    error( 'MC can only be applied for 3D.' );
+  end
 
   %= DOIT / MC
   %
@@ -957,24 +952,25 @@ function T = cfile_CldBox( Q, partname, workfolder )
     if (~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'linear') | ...
        strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'polynomial')))
       error(['Unknown interpolation method. ',... 
-                                'SCAT_ZA_INTERP can be linear or polynomial.']);
+                               'SCAT_ZA_INTERP can be linear or polynomial.']);
     end
     
     if length(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON) < Q.STOKES_DIM
       error( ...
-         'Length of Q.CLOUDBOX.METHOD_PRMTRS.EPSILON must be >= Q.STOKES_DIM' );
+        'Length of Q.CLOUDBOX.METHOD_PRMTRS.EPSILON must be >= Q.STOKES_DIM' );
     end
      
+    T{1}     = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
+  		                             Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
     T{end+1} = 'DoitAngularGridsSet{';
-    T{end+1} = sprintf('   N_za_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID );
-    T{end+1} = sprintf('   N_aa_grid = %d', Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID );
+    T{end+1} = sprintf('   N_za_grid = %d', ...
+                                          Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID );
+    T{end+1} = sprintf('   N_aa_grid = %d', ...
+                                          Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID );
     T{end+1} = sprintf('   za_grid_opt_file = "%s"', ...
-                                     Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
+                                   Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
     T{end+1} = '}';
     
-    T{end+1} = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
-  		     Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
-
     if Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT
       T = add_agenda( T, 'doit_mono_agenda', ...
             { 'DoitScatteringDataPrepare{}', ...
@@ -982,6 +978,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
               'doit_i_fieldIterate{}',...
               'DoitCloudboxFieldPut{}' } );
     else
+      error( 'Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT must so far be 1.' );
       T = add_agenda( T, 'doit_mono_agenda', ...
             { 'DoitScatteringDataPrepare{}', ...
               'doit_i_fieldIterate{}',...
@@ -993,9 +990,9 @@ function T = cfile_CldBox( Q, partname, workfolder )
     T = add_agenda( T, 'pha_mat_spt_agenda', { ...
         'pha_mat_sptFromDataDOITOpt{}' });
     
-    if (isempty(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE))
-      T = add_agenda( T, 'doit_scat_field_agenda', { 'doit_scat_fieldCalc{}' ...
-  		   } );
+    if isempty(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE)
+      T = add_agenda( T, 'doit_scat_field_agenda', ...
+                                             { 'doit_scat_fieldCalc{}' } );
     else
       T = add_agenda( T, 'doit_scat_field_agenda', ...
                                              { 'doit_scat_fieldCalcLimb{}' } );
@@ -1010,7 +1007,18 @@ function T = cfile_CldBox( Q, partname, workfolder )
             'DoNothing(rte_pos,rte_pos){}', 'DoNothing(rte_los,rte_los){}', ...
             'iyInterpCloudboxField{}' } );
 
+    T{end+1} = 'CloudboxGetIncoming{}';
+    T{end+1} = 'DoitInit{}';
+    if ~Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT
+      T{end+1} = 'IndexSet(f_index){0}';
+      T{end+1} = 'doit_i_fieldSetClearsky{}';
+    end
+    T{end+1} = 'ScatteringDoit{}';
+    
+    
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+    %
+    error( 'MC is not yet handled by Qarts.' ); 
     %
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME', 0 );
@@ -1067,7 +1075,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
   else
     error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );
   end
-  
+
 return
 
 
