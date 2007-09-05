@@ -22,7 +22,7 @@ nr = str2num (xmlGetAttrValue (attrlist, 'nelem'));
 if ~binary
   result = fscanf (fid, '%d', nr);
 else
-  result = fread (fid2, nr, ftype);
+  result = fread (fid2, nr, itype);
 end
 xmlCheckSize (nr, size (result));
 
