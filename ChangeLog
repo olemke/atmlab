@@ -1,3 +1,38 @@
+2007-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-174
+
+	* arts/arts_oem.m: Revised.
+
+	* arts/arts_oem_init.m: Code cleaned and improved. 
+
+	* demos/arts_oem_demo.m: Revised. Now working.
+
+	* math/interpd.m: Improved error message.
+
+	* math/interpd.m: Added missing description of *pos*.
+
+	* arts/qarts_abs_species.m: Appending to ABS_NLS was not done
+	correctly.
+
+	* arts/qarts.m: The option to define jacobian by a pre-calculated
+	jacobian_quantities was removed. Was not implemented before. And
+	not straightforward to implement as the jacobian-agenda is needed
+	in parallel.
+
+	* arts/qarts2cfile.m: Updated jacobian, which is now working. 
+
+	* demos/qarts_jacobian_demo.m: Updated, and now working.
+
+	* demos/qarts_doit_demo.m: Now doing absorption in a more
+	efficient manner.
+
+	* arts/qarts2cfile.m (cfile_Absrpt): The CalcTable option missed
+	setting of abs_scalar_gas_agenda.
+
+	* arts/arts_sensor.m: Now using binary format. Change below fixed
+	old problem.
+
 2007-09-05  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-173
@@ -15,7 +50,7 @@
 	* arts/qarts.m: Added field OUTPUT_FILE_FORMAT.
 
 	* arts/qarts2cfile.m: Added handling of OUTPUT_FILE_FORMAT.
-	Sperated adding of cloudbox variables and scattering calculation
+	Separated adding of cloudbox variables and scattering calculation
 	method definitions. DOIT appears to work, but only for 
 	Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT = 1;
 	

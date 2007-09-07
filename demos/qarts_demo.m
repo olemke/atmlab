@@ -57,8 +57,7 @@ if isnan( arts_xmldata_path )
 end
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
-%
-Q.Z_SURFACE      = 500;
+Q.Z_SURFACE           = 500;
 
 
 

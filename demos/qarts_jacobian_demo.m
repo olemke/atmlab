@@ -8,6 +8,7 @@
 %       f          Frequency grid
 %       y          Calculated spectrum
 %       J          Jacobian
+%       ji         Definition of retrieval quantities.
 %       ji         Index for each retrieval quantity.
 % OPT   ztan       Tangent altitude. Default is 30 km.
 %       atmdim     Atmospheric dimensionality. Default is 2.
@@ -15,7 +16,7 @@
 % 2005-06-16   Created by Patrick Eriksson.
 
 
-function [Q,f,y,J,ji] = qarts_jacobian_demo( ztan, atmdim )
+function [Q,f,y,J,jq,ji] = qarts_jacobian_demo( ztan, atmdim )
 
 %= Set defualts
 %
@@ -25,39 +26,16 @@ atmdim_DEFAULT   = 2;
 set_defaults;
 
 
-%= Make sure that AMI is in the search path. Needed to read/write ARTS1 files
-%
-addpath_ami;
 
-
-%= Init Q structures
+%= Init setting structures
 %
 Q  = qarts;
-Q1 = qarts1;
 %
-J  = qarts_jacobian;
+J  = qartsJacobian;
 
 
-%= Atmosphere
-%
-Q.ATMOSPHERE_DIM      = atmdim;
-Q.USE_RAW_ATMOSPHERE  = 1;
-if atmdim > 1
-  Q.RAW_ATM_EXPAND_1D = 1;
-end
-arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
-if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
-end
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                        'fascod', 'tropical' );
-Q.P_GRID              = z2p_simple( 0:1e3:100e3 );
-if atmdim >= 2
-  Q.LAT_GRID          = -10:10;  
-end
 
-
-%= Spectroscopy
+%= Absorption species
 %
 Q.ABS_SPECIES{1}{1}         = 'ClO';
 J.ABS_SPECIES(1).DO         = 1;
@@ -65,9 +43,9 @@ J.ABS_SPECIES(1).METHOD     = 'analytical';
 %J.ABS_SPECIES(1).METHOD    = 'perturbation';
 %J.ABS_SPECIES(1).DX        = 0.01;
 J.ABS_SPECIES(1).UNIT       = 'rel';
-J.ABS_SPECIES(1).GRID1      = z2p_simple( [11e3:2e3:71e3] );
+J.ABS_SPECIES(1).GRID1      = z2p_simple( [11e3:2e3:61e3] );
 if atmdim >= 2
-  J.ABS_SPECIES(1).GRID2     = -5:5;  
+  J.ABS_SPECIES(1).GRID2     = -7:0.5:7;  
 end
 %
 Q.ABS_SPECIES{2}{1}         = 'O3';
@@ -76,32 +54,69 @@ J.ABS_SPECIES(2)            = J.ABS_SPECIES(1);
 Q.ABS_SPECIES{3}{1}         = 'N2O';
 J.ABS_SPECIES(3)            = J.ABS_SPECIES(1);
 Q.ABS_SPECIES{4}{1}         = 'H2O';
-Q.ABS_SPECIES{4}{2}         = 'H2O-MPM89';
+%Q.ABS_SPECIES{4}{2}         = 'H2O-MPM89';
 J.ABS_SPECIES(4)            = J.ABS_SPECIES(1);
+
+
+
+%= Other variables of general part
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
-%
-Q1.LINEFORMAT       = 'Arts';
-Q1.LINEDATA         = fullfile( atmlab_example_data , 'lines501.4' );
 
 
-%= Create absorption lookup table by ARTS1
+
+%= Define atmosphere and surface
 %
-Q.ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
+Q.ATMOSPHERE_DIM      = atmdim;
+%
+Q.USE_RAW_ATMOSPHERE  = 1;
+if atmdim > 1
+  Q.RAW_ATM_EXPAND_1D = 1;
+end
+%
+Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
+%
+if atmdim >= 2
+  Q.LAT_GRID          = -10:10;  
+end
+%
+arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
+if isnan( arts_xmldata_path )
+  error('You need to ARTS_XMLDATA_PATH to run this example.');
+end
+%
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
+                                                        'fascod', 'tropical' );
+Q.Z_SURFACE           = 500;
 
 
-%= RTE 
+
+%= Atmosphere
 %
-Q.Z_SURFACE      = 500;
-Q.SURFACE_PROP_AGENDA = ...
-   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-     'surfaceFlat{"water-liebe93"}' };
+Q.USE_RAW_ATMOSPHERE  = 1;
+arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
+if isnan( arts_xmldata_path )
+  error('You need to ARTS_XMLDATA_PATH to run this example.');
+end
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
+                                                        'fascod', 'tropical' );
+Q.P_GRID              = z2p_simple( 0:1e3:100e3 );
+
+
+
+%= Absorption
 %
-Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}', 'Ignore(rte_pos){}', ...
-                      'MatrixCBR(iy,f_grid){}', 'MatrixScale(iy,iy){0}' };
+Q.ABS_LINES_FORMAT = 'Arts';
+Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
 %
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{10e3}' };
+Q                  = qarts_abstable( Q );
+
+
+
+%= Set RTE variables
+%
+Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
 Q.Y_UNIT            = 'RJ';
 %
 zplat        = 600e3;
@@ -112,9 +127,12 @@ end
 Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan );
 
 
+
 %= Add jacobian part
 %
-Q.J = J;
+Q.J_DO = true;
+Q.J    = J;
+
 
 
 if nargout == 1
@@ -122,17 +140,18 @@ if nargout == 1
 end
 
 
+
 %= Calculate spectrum/spectra
 %
-f        = Q.F_GRID;
-[y,dy,J,jq,ji] = arts_y( Q );
+f                    = Q.F_GRID;
+[y,ydata,dy,J,jq,ji] = arts_y( Q );
 
 
 
 %= Plot
 %
 if ~nargout
-  
+
   figure(1);
   h1 = plot( f/1e9, y, 'LineWidth', 2 );
   hold on
@@ -161,4 +180,3 @@ if ~nargout
   end
   ylabel( 'Altitude [km]' )
 end
-

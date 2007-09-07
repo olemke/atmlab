@@ -66,7 +66,9 @@ for j = 1 : length(tags)
 end
 
 
-Q.ABS_NLS(i) = nonlin;
+if nonlin
+  Q.ABS_NLS = [ Q.ABS_NLS i ];
+end
 
 
 if isstruct( Q.J )

@@ -20,12 +20,9 @@ ztan_DEFAULT = [3 6 9 12]*1e3;
 %
 set_defaults;
 
-%= Make sure that AMI is in the search path. Needed to read/write ARTS1 files
-%
-addpath_ami;
 
 
-%= Init Q structures
+%= Init Q structure
 %
 Q  = qarts;
 
@@ -33,7 +30,7 @@ Q  = qarts;
 
 %= General part
 %
-f = linspace( 501.18e9, 501.58e9, 3);
+f                   = linspace( 501.18e9, 501.58e9, 3 );
 Q.F_GRID            = f; 
 Q.STOKES_DIM        = 2;
 %
@@ -68,9 +65,6 @@ Q.ABS_LINES_FORMAT = 'Arts';
 Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
 %
 Q                  = qarts_abstable( Q );
-Q.ABS_LOOKUP       = arts_abstable( Q );
-%
-Q.ABSORPTION       = 'LoadTable';
 
 
 

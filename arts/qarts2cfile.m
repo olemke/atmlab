@@ -15,7 +15,7 @@
 %       Absrpt / AbsrptSave
 %       CldBox / CldBoxSave
 %       SctMth / SctMthSave
-%       RteSet / RteSetSave
+%       RteSet
 %       Sensor / SensorSave
 %       Jacobi 
 %       RteExe
@@ -103,8 +103,8 @@ if nargin == 1
    
   case 'y'
     %
-    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'CldBox', ...
-          'SctMth', 'RteExe' };
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
+          'CldBox', 'SctMth', 'RteExe' };
     
   otherwise
     error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );
@@ -123,13 +123,11 @@ end
 qcheck( @qarts, Q );
 
 S    = {};
-do_j = 0;
-
 
 for ip = 1 : length(parts)
 
   T = [];
-  
+
   switch parts{ip}(1:6)
     
    case 'Generl'
@@ -152,6 +150,10 @@ for ip = 1 : length(parts)
     %
     T = cfile_Sensor( Q, parts{ip}, workfolder );
    
+   case 'Jacobi'
+    %
+    T = cfile_Jacobi( Q, parts{ip}, workfolder );
+   
    case 'CldBox'
     %
     T = cfile_CldBox( Q, parts{ip}, workfolder );
@@ -165,7 +167,7 @@ for ip = 1 : length(parts)
     T = cfile_RteExe( Q, parts{ip}, workfolder );
    
    otherwise
-    error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
+    error( sprintf( 'UnknoWn cfile part (%s) was requested.', parts{ip} ) );
   end
 
   S = { S{:} T{:} };
@@ -222,14 +224,19 @@ function T = cfile_Generl( Q, partname, workfolder )
   %  
   T{5} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
   %
-  T{6} = 'abs_speciesInit{}';
-  for i = 1 : length(Q.ABS_SPECIES)
-    T{end+1} = sprintf( 'abs_speciesAdd{[%s]}', ...
-                                          arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
-  end
+  
+  T{6} = sprintf( 'SpeciesSet(abs_species){[%s]}', ...
+                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
+  
+  %T{6} = 'abs_speciesInit{}';
+  %for i = 1 : length(Q.ABS_SPECIES)
+  %  T{end+1} = sprintf( 'abs_speciesAdd{[%s]}', ...
+  %                                        arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
+  %end
   %
   if strcmp( partname, 'GenerlSave' )
     T{end+1} = add_savefile( 'output_file_format', workfolder );
+    T{end+1} = add_savefile( 'stokes_dim', workfolder );
     T{end+1} = add_savefile( 'f_grid', workfolder );
     T{end+1} = add_savefile( 'abs_species', workfolder );
   end  
@@ -385,15 +392,18 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     T{end+1} = 'abs_h2oSet{}';
     T{end+1} = 'abs_n2Set{}';
     %
-    nls = '';
-    if length( Q.ABS_NLS )
-      nls = arts_tgs_cnvrt( { Q.ABS_SPECIES{ Q.ABS_NLS } } );
+    if isempty( Q.ABS_NLS )
+      T{end+1} = 'SpeciesSet(abs_nls){[]}';
+    else
+      T{end+1} = sprintf( 'SpeciesSet(abs_nls){[%s]}', ...
+                                arts_tgs_cnvrt({Q.ABS_SPECIES{Q.ABS_NLS}}) );
     end
-    T{end+1} = sprintf( 'abs_nlsSet{[%s]}', nls );
-    T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
-                                                                   workfolder );
     %
-    T{end+1} = 'abs_lookupCreate{}';
+    T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
+                                                                  workfolder );
+    T{end+1} = 'abs_lookupCreate{}'; 
+    T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
+                                     { 'abs_scalar_gasExtractFromLookup{}' } );
     %
     abstable = true;
     %   
@@ -428,21 +438,16 @@ return
 %    rte_agenda
 %    sensor_pos
 %    sensor_los
-%    cloudbox variables by other sub-function    
-%    sensor variables by other sub-function    
-%    jacobian variables by other sub-function    
 %
 function T = cfile_RteSet( Q, partname, workfolder )
   %
-  if ~( strcmp( partname, 'RteSet' )  |  strcmp( partname, 'RteSetSave' ) )
-    error( 'Only recognised choices are ''RteSet'' and ''RteSetSave''.' );
+  if ~strcmp( partname, 'RteSet' )
+    error( 'Only recognised choices is ''RteSet''.' );
   end
   %
   T = {};
   %
-  if iscellstr( Q.SURFACE_PROP_AGENDA )
-    T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
-  end
+  T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
   T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
   if iscellstr( Q.REFR_INDEX_AGENDA )
@@ -458,10 +463,6 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );
   T{end+1} = add_savefile( 'sensor_los', workfolder );
-  %
-  if strcmp( partname, 'RteSetSave' )
-    T{end+1} = add_savefile( 'stokes_dim', workfolder );
-  end
   %
 return
 
@@ -498,7 +499,7 @@ function T = cfile_RteExe( Q, partname, workfolder )
   T{end+1} = add_savefile( 'y', workfolder );
   %
   if Q.J_DO
-  %
+    %
     switch upper( Q.Y_UNIT )
       case '1'
         T{end+1} = '# No conversion to K';
@@ -514,121 +515,6 @@ return
 
 
 
-%------------------------------------------------------------------------------
-% Sub-function handling:
-%
-%    jacobians
-%
-function T = cfile_Jacobi( Q, partname, workfolder )
-  %
-  if ~strcmp( partname, 'Jacobi' ) 
-    error( 'Only recognised choice is ''Jacobi''.' );
-  end
-  %
-  if ~Q.J_DO
-    T{1} = 'jacobianOff{}';
-    return
-  end
-
-  error( 'This sub-function is not ready.' )
-
-  % Old code:
-
-  if isstruct( Q.J )  &  isfield( Q.J, 'ABS_SPECIES' )
-    T        = j2cfile( Q, workfolder );
-    T{end+1} = add_savefile( 'jacobian_quantities', workfolder );
-    T{end+1} = add_savefile( 'jacobian_indices', workfolder );
-    do_j     = 1;
-  elseif isnan( Q.J )  |  Q.J == 0 
-    T{1} = 'jacobianOff{}';
-  else
-    error( 'Unknown selection for Q.JACOBIAN.' );
-  end
-
-  %- Check that all fields are present
-  %
-  qcheck( @qarts_jacobian, Q.J );
-
-  T{1} = 'jacobianInit{}';
-
-
-  %- Gas species
-  for i = 1 : length(Q.J.ABS_SPECIES)
-    %
-    rqre_field( Q.J.ABS_SPECIES(i), 'DO' );
-    %
-    if Q.J.ABS_SPECIES(i).DO
-      %
-      rqre_field( Q.J.ABS_SPECIES(i), 'METHOD' );
-      rqre_char( 'Q.J.ABS_SPECIES.METHOD', Q.J.ABS_SPECIES(i).METHOD );
-      rqre_field( Q.J.ABS_SPECIES(i), 'UNIT' );
-      rqre_char( 'Q.J.ABS_SPECIES.UNIT', Q.J.ABS_SPECIES(i).UNIT );
-      rqre_field( Q.J.ABS_SPECIES(i), 'GRID1' );
-      if isnan( Q.J.ABS_SPECIES(i).GRID1 )
-        error( sprintf('Q.J.ABS_SPECIES(%d).GRID1 includes NaN(s).',i) );
-      end
-
-      if Q.ATMOSPHERE_DIM < 2
-        lat_grid = [];
-      else
-        rqre_field( Q.J.ABS_SPECIES(i), 'GRID2' );
-        lat_grid = Q.J.ABS_SPECIES(i).GRID2;
-      end
-      if Q.ATMOSPHERE_DIM < 3
-        lon_grid = [];
-      else
-        rqre_field( Q.J.ABS_SPECIES(i), 'GRID3' );
-        lon_grid = Q.J.ABS_SPECIES(i).GRID3;
-      end
-      T{end+1} = file_or_data( 'vector_1', 'Vector', ...
-               Q.J.ABS_SPECIES(i).GRID1, workfolder, sprintf('gas%d_jac_p_grid',i) );
-      T{end+1} = file_or_data( 'vector_2', 'Vector', ...
-                             lat_grid, workfolder, sprintf('gas%d_jac_lat_grid',i) );
-      T{end+1} = file_or_data( 'vector_3', 'Vector', ...
-                             lon_grid, workfolder, sprintf('gas%d_jac_lon_grid',i) );
-
-      T{end+1} = 'jacobianAddAbsSpecies(vector_1,vector_2,vector_3){';
-      T{end+1} = sprintf( '  species = %s', arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
-      T{end+1} = sprintf( '  method  = "%s"', Q.J.ABS_SPECIES(i).METHOD );
-      T{end+1} = sprintf( '  unit    = "%s"', Q.J.ABS_SPECIES(i).UNIT );
-      if strcmp( Q.J.ABS_SPECIES(i).METHOD, 'analytical' )
-         T{end+1} = '  dx = 0.0';
-      elseif strcmp( Q.J.ABS_SPECIES(i).METHOD, 'perturbation' )
-        rqre_field( Q.J.ABS_SPECIES(i), 'DX' );
-        T{end+1} = sprintf( '  dx      = %.5e', Q.J.ABS_SPECIES(i).DX );
-      else
-        error( sprintf('Unknown selection for J.ABS_SPECIES.METHOD (%s)',...
-                                                   Q.J.ABS_SPECIES(i).METHOD ) );
-      end
-      T{end+1} = '}';
-    end
-  end
-
-
-  %- Pointing
-  %
-  if Q.J.POINTING.DO
-    rqre_field( Q.POINTING_JAC, 'DZA' );
-    rqre_field( Q.POINTING_JAC, 'POLY_ORDER' );
-    
-    T{end+1} = 'jacobianAddPointing{';
-    T{end+1} = sprintf( '  dza        = %g', Q.POINTING_JAC.DZA );
-    T{end+1} = sprintf( '  poly_order = %d', Q.POINTING_JAC.POLY_ORDER );
-    T{end+1} = '}';
-  end
-
-  %- Close
-  %
-  if length(T) > 1
-    T{end+1} = 'jacobianClose{}';
-  else
-    T{1} = 'jacobianOff{}';
-  end  
-  
-return
-
-
-
 % Sub-function handling:
 %
 %    sensor variables
@@ -638,13 +524,12 @@ function T = cfile_Sensor( Q, partname, workfolder )
   if ~( strcmp( partname, 'Sensor' )  |  strcmp( partname, 'SensorSave' ) )
     error( 'Only recognised choices are ''Sensor'' and ''SensorSave''.' );
   end
-  %
+
+  do_parts = false;
+
   if ~Q.SENSOR_DO
     T{1} = 'sensorOff{}';
-    return
-  end
-
-  if ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
+  elseif ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
     T{1} = file_or_data( 'antenna_dim', 'Index', ...
                                             Q.ANTENNA_DIM, workfolder );
     T{2} = file_or_data( 'mblock_za_grid', 'Vector', ...
@@ -661,122 +546,127 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                             Q.SENSOR_RESPONSE_AA, workfolder );
     T{8} = file_or_data( 'sensor_response_pol', 'Index', ...
                                             Q.SENSOR_RESPONSE_POL, workfolder );
-    return   % --->
   elseif iscellstr(Q.SENSOR_RESPONSE) 
     T = Q.SENSOR_RESPONSE;
-    return   % --->
   elseif isstruct(Q.SENSOR_RESPONSE) 
-    % Code found below
+    do_parts = true;
   else
     error( 'Unrecognised choice for Q.SENSOR_RESPONSE.' );
   end
 
   %- Code for structure version:
-
-  H = Q.SENSOR_RESPONSE;
-  %
-  qcheck( @qartsSensor, H );
-
-  % Check that some fields have valid values
-  if (H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1)
-    error('The field *SENSOR_NORM* in *SENSOR_RESPONSE* can only be 0 or 1.')
-  end
-  if (Q.ANTENNA_DIM~=1 & Q.ANTENNA_DIM~=2)
-    error('The field *ANTENNA_DIM* in Q must be 1 or 2.');
-  end
-
-  % Find out sensor structure
-  parts{1} = 'init';
-  if isdefined( H, {'ANTENNA_LOS'} )
-    parts{end+1} = 'antenna';
-  end
-  if isdefined( H, {'SENSOR_ROT'} )
-    parts{end+1} = 'rotation';
-  end
-  if isdefined( H, {'SENSOR_POL'} )
-    parts{end+1} = 'polarisation';
-  end
-  if isdefined( H, {'LO','SIDEBAND_FILTER'} )
-    parts{end+1} = 'mixer';
-  end
-  if isdefined( H, {'F_BACKEND','CHANNEL_RESPONSE'} )
-    parts{end+1} = 'backend';
-  end
-  % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
-  if (strmatch('mixer',char(parts)) & strmatch('backend',char(parts)) & ...
-      length(H.LO)>1 );
-    parts = rmfield( parts, {'mixer' 'backend'} );
-    parts{end+1} = 'multimixer';
-  end
-  parts{end+1} = 'close';
-      
-  % Start writing to output structure
-  T = {};
-
-  for it = 1 : length(parts)
+  if do_parts
+    
+    H = Q.SENSOR_RESPONSE;
     %
-    U = [];
+    qcheck( @qartsSensor, H );
 
-    switch parts{it}
-
-    case 'init'
-      U{1} = ['# Start of sensor part:'];
-      U{2} = ['AntennaSet' num2str(Q.ANTENNA_DIM) 'D{}'];
-      U{3} = file_or_data( 'mblock_za_grid', 'Vector', ...
-                                                Q.MBLOCK_ZA_GRID, workfolder );
-      if Q.ANTENNA_DIM==2
-        U{4} = file_or_data( 'mblock_aa_grid', 'Vector', ...
-                                                Q.MBLOCK_AA_GRID, workfolder);
-      else
-        U{4} = ['# No azimuthal measurement block angle grid loaded'];
-      end
-      U{5} = ['IndexSet(sensor_norm){' num2str(H.SENSOR_NORM) '}'];
-      U{6} = 'sensor_responseInit{}';
-      
-    case 'antenna'
-      U{1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, workfolder );
-      U{2} = file_or_data( 'antenna_diagram', 'ArrayOfArrayOfMatrix', ...
-                                                H.ANTENNA_DIAGRAM, workfolder );
-      U{3} = 'sensor_responseAntenna1D{}';
-      
-    case 'rotation'
-      U{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, workfolder );
-      U{2} = 'sensor_responseRotation{}';
-
-    case 'polarisation'
-      U{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, workfolder );
-      U{2} = 'sensor_responsePolarisation{}';
-        
-    case 'mixer'
-      U{1} = file_or_data( 'lo', 'Vector', H.LO, workfolder );
-      U{2} = file_or_data( 'matrix_1', 'Matrix', ...
-                                               H.SIDEBAND_FILTER, workfolder );
-      U{3} = 'sensor_responseMixer(matrix_1){}';
-
-    case 'backend'
-      U{1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, workfolder );
-      U{2} = file_or_data( 'arrayofmatrix_1', 'ArrayOfMatrix', ...
-                                              H.CHANNEL_RESPONSE, workfolder );
-      U{3} = 'sensor_responseBackend(arrayofmatrix_1){}';
-      
-    case 'multimixer'
-      U{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
-      U{2} = file_or_data( 'matrix_1', 'Matrix', H.SIDEBAND_FILTER, tmpdir );
-      U{3} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
-      U{4} = file_or_data( 'matrix_2', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
-      U{5} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
-      U{6} = 'sensor_responseBackend(matrix_1,matrix_2){}';
-      
-    case 'close'
-      U{1} = '# End of sensor part';
-
-    otherwise
-      error(sprintf('Unknown action (%s) was requested.',parts{it}));
+    % Check that some fields have valid values
+    if (H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1)
+      error('The field *SENSOR_NORM* in *SENSOR_RESPONSE* can only be 0 or 1.')
+    end
+    if (Q.ANTENNA_DIM~=1 & Q.ANTENNA_DIM~=2)
+      error('The field *ANTENNA_DIM* in Q must be 1 or 2.');
     end
 
-    T = { T{:} U{:} };
+    % Find out sensor structure
+    parts{1} = 'init';
+    if isdefined( H, {'ANTENNA_LOS'} )
+      parts{end+1} = 'antenna';
+    end
+    if isdefined( H, {'SENSOR_ROT'} )
+      parts{end+1} = 'rotation';
+    end
+    if isdefined( H, {'SENSOR_POL'} )
+      parts{end+1} = 'polarisation';
+    end
+    if isdefined( H, {'LO','SIDEBAND_FILTER'} )
+      parts{end+1} = 'mixer';
+    end
+    if isdefined( H, {'F_BACKEND','CHANNEL_RESPONSE'} )
+      parts{end+1} = 'backend';
+    end
+    % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
+    if ( strmatch('mixer',char(parts)) & strmatch('backend',char(parts)) & ...
+        length(H.LO)>1 )
+      parts = rmfield( parts, {'mixer' 'backend'} );
+      parts{end+1} = 'multimixer';
+    end
+    parts{end+1} = 'close';
+        
+    % Start writing to output structure
+    T = {};
 
+    for it = 1 : length(parts)
+      %
+      U = [];
+
+      switch parts{it}
+
+      case 'init'
+        U{1} = ['# Start of sensor part:'];
+        U{2} = ['AntennaSet' num2str(Q.ANTENNA_DIM) 'D{}'];
+        U{3} = file_or_data( 'mblock_za_grid', 'Vector', ...
+                                                 Q.MBLOCK_ZA_GRID, workfolder );
+        if Q.ANTENNA_DIM==2
+          U{4} = file_or_data( 'mblock_aa_grid', 'Vector', ...
+                                                  Q.MBLOCK_AA_GRID, workfolder);
+        else
+          U{4} = ['# No azimuthal measurement block angle grid loaded'];
+        end
+        U{5} = ['IndexSet(sensor_norm){' num2str(H.SENSOR_NORM) '}'];
+        U{6} = 'sensor_responseInit{}';
+        
+      case 'antenna'
+        U{1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
+                                                                   workfolder );
+        U{2} = file_or_data( 'antenna_diagram', 'ArrayOfArrayOfMatrix', ...
+                                                  H.ANTENNA_DIAGRAM, ...
+                                                                   workfolder );
+        U{3} = 'sensor_responseAntenna1D{}';
+        
+      case 'rotation'
+        U{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, workfolder );
+        U{2} = 'sensor_responseRotation{}';
+
+      case 'polarisation'
+        U{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, workfolder );
+        U{2} = 'sensor_responsePolarisation{}';
+          
+      case 'mixer'
+        U{1} = file_or_data( 'lo', 'Vector', H.LO, workfolder );
+        U{2} = file_or_data( 'matrix_1', 'Matrix', ...
+                                                 H.SIDEBAND_FILTER, ...
+                                                                   workfolder );
+        U{3} = 'sensor_responseMixer(matrix_1){}';
+
+      case 'backend'
+        U{1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, workfolder );
+        U{2} = file_or_data( 'arrayofmatrix_1', 'ArrayOfMatrix', ...
+                                               H.CHANNEL_RESPONSE, workfolder );
+        U{3} = 'sensor_responseBackend(arrayofmatrix_1){}';
+        
+      case 'multimixer'
+        U{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
+        U{2} = file_or_data( 'matrix_1', 'Matrix', H.SIDEBAND_FILTER, tmpdir );
+        U{3} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
+        U{4} = file_or_data( 'matrix_2', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
+        U{5} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
+        U{6} = 'sensor_responseBackend(matrix_1,matrix_2){}';
+        
+      case 'close'
+        U{1} = '# End of sensor part';
+
+      otherwise
+        error(sprintf('Unknown action (%s) was requested.',parts{it}));
+      end
+
+      T = { T{:} U{:} };
+
+    end
   end
+  
+  %- Saving
   %
   T{end+1} = add_savefile( 'sensor_response_f', workfolder );
   T{end+1} = add_savefile( 'sensor_response_za', workfolder );
@@ -796,6 +686,117 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
+%    jacobians
+%
+function T = cfile_Jacobi( Q, partname, workfolder )
+  %
+  if ~strcmp( partname, 'Jacobi' ) 
+    error( 'Only recognised choice is ''Jacobi''.' );
+  end
+
+  do_parts = false;
+
+  if ~Q.J_DO
+    T{1} = 'jacobianOff{}';
+  elseif isstruct( Q.J )
+    do_parts = true;  % code below
+  elseif isnan( Q.J )  |  isnumeric(Q.J)
+    error( 'No description of jacobians found (NaN or numeric value).' );
+  else
+    error( 'Unknown selection for Q.JACOBIAN.' );
+  end
+
+  if do_parts
+
+    qcheck( @qartsJacobian, Q.J );
+
+    T{1} = 'jacobianInit{}';
+
+    %- Gas species
+    for i = 1 : length(Q.J.ABS_SPECIES)
+      %
+      rqre_field( Q.J.ABS_SPECIES(i), 'DO' );
+      %
+      if Q.J.ABS_SPECIES(i).DO
+        %
+        rqre_field( Q.J.ABS_SPECIES(i), 'METHOD' );
+        rqre_char( 'Q.J.ABS_SPECIES.METHOD', Q.J.ABS_SPECIES(i).METHOD );
+        rqre_field( Q.J.ABS_SPECIES(i), 'UNIT' );
+        rqre_char( 'Q.J.ABS_SPECIES.UNIT', Q.J.ABS_SPECIES(i).UNIT );
+        rqre_field( Q.J.ABS_SPECIES(i), 'GRID1' );
+        if isnan( Q.J.ABS_SPECIES(i).GRID1 )
+          error( sprintf('Q.J.ABS_SPECIES(%d).GRID1 includes NaN(s).',i) );
+        end
+
+        if Q.ATMOSPHERE_DIM < 2
+          lat_grid = [];
+        else
+          rqre_field( Q.J.ABS_SPECIES(i), 'GRID2' );
+          lat_grid = Q.J.ABS_SPECIES(i).GRID2;
+        end
+        if Q.ATMOSPHERE_DIM < 3
+          lon_grid = [];
+        else
+          rqre_field( Q.J.ABS_SPECIES(i), 'GRID3' );
+          lon_grid = Q.J.ABS_SPECIES(i).GRID3;
+        end
+        T{end+1} = file_or_data( 'vector_1', 'Vector', ...
+          Q.J.ABS_SPECIES(i).GRID1, workfolder, sprintf('gas%d_jac_p_grid',i) );
+        T{end+1} = file_or_data( 'vector_2', 'Vector', ...
+                        lat_grid, workfolder, sprintf('gas%d_jac_lat_grid',i) );
+        T{end+1} = file_or_data( 'vector_3', 'Vector', ...
+                        lon_grid, workfolder, sprintf('gas%d_jac_lon_grid',i) );
+
+        T{end+1} = 'jacobianAddAbsSpecies(vector_1,vector_2,vector_3){';
+        T{end+1} = sprintf( '  species = %s', ...
+                                           arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
+        T{end+1} = sprintf( '  method  = "%s"', Q.J.ABS_SPECIES(i).METHOD );
+        T{end+1} = sprintf( '  unit    = "%s"', Q.J.ABS_SPECIES(i).UNIT );
+        if strcmp( Q.J.ABS_SPECIES(i).METHOD, 'analytical' )
+           T{end+1} = '  dx = 0.0';
+        elseif strcmp( Q.J.ABS_SPECIES(i).METHOD, 'perturbation' )
+          rqre_field( Q.J.ABS_SPECIES(i), 'DX' );
+          T{end+1} = sprintf( '  dx      = %.5e', Q.J.ABS_SPECIES(i).DX );
+        else
+          error( sprintf('Unknown selection for J.ABS_SPECIES.METHOD (%s)',...
+                                                  Q.J.ABS_SPECIES(i).METHOD ) );
+        end
+        T{end+1} = '}';
+      end
+    end
+
+
+    %- Pointing
+    %
+    if Q.J.POINTING.DO
+      rqre_field( Q.POINTING_JAC, 'DZA' );
+      rqre_field( Q.POINTING_JAC, 'POLY_ORDER' );
+      
+      T{end+1} = 'jacobianAddPointing{';
+      T{end+1} = sprintf( '  dza        = %g', Q.POINTING_JAC.DZA );
+      T{end+1} = sprintf( '  poly_order = %d', Q.POINTING_JAC.POLY_ORDER );
+      T{end+1} = '}';
+    end
+    
+    if length(T) > 1
+      T{end+1} = 'jacobianClose{}';    
+    else
+      T{1} = 'jacobianOff{}';          
+    end
+  end  % do_parts
+  
+  %- Saving (jacobian saved as part RteExe)
+  %
+  T{end+1} = add_savefile( 'jacobian_quantities', workfolder );
+  T{end+1} = add_savefile( 'jacobian_indices', workfolder );
+  
+return
+
+
+
+%------------------------------------------------------------------------------
+% Sub-function handling:
+%
 %    cloudbox_on
 %    cloudbox_limits
 %    pnd_field
@@ -808,7 +809,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
   if ~( strcmp( partname, 'CldBox' )  |  strcmp( partname, 'CldBoxSave' ) )
     error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );
   end
-
+  
   if ~Q.CLOUDBOX_DO
     T{1} = 'cloudboxOff{}';
     return
@@ -904,7 +905,7 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
-%    ???
+%    variables for the different scattering methods
 %
 function T = cfile_SctMth( Q, partname, workfolder )
   %

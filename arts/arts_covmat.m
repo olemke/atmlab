@@ -200,8 +200,8 @@ if strcmp( D.FORMAT, 'param' )
       elseif dim == 2
         cl = interpd( [x,y], D.CL1, D.CL1_GRID1, D.CL1_GRID2, 'linear' );
       else
-        cl = interpd( [x,y,z], D.CL1, D.CL1_GRID1, D.CL1_GRID2, D.CL1_GRID3, ...
-                                                                     'linear' );
+        cl = interpd( [x,y,z], D.CL1, D.CL1_GRID1, D.CL1_GRID2, D.CL1_GRID3,...
+                                                                    'linear' );
       end
       if any( isnan(cl) )
         error( ['NaN obtained for dim1 correlation length. ',...

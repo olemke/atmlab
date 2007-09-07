@@ -15,7 +15,7 @@
 %    Note that *arts_oem_init* can modify Q in such way that it can not be
 %    used for further calculations. 
 %
-%    An implementation strategy has been to avoid unnecessery reading and
+%    The implementation strategy is to avoid unnecessery reading and
 %    writing of files, in order to obtain high calculation speed. The drawback
 %    is that more variables must be kept in memory.
 %
@@ -44,7 +44,7 @@
 % OUT   R     Retrieval data structure. See above.
 %       y     Calculated measurement vector.
 %       J     Jacobian.
-% IN    Q     Qarts structure. See *qarts*.
+% IN    Q     Qarts structure, as returned by *arts_oem_init*.
 %       R     Retrieval data structure. See above.
 %       x     State vector.
 %       iter  Iteration number. Iteration number 1 is treated as x = xa

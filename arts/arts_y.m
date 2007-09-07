@@ -59,14 +59,16 @@ if isempty( workfolder )
 end
 
 
+%- Avoid unnecessary jacobian calculations
+%
+if nargout < 4
+  Q.J_DO = 0;
+end
+
+
 try
   %
-  if Q.J_DO
-    parts = qarts2cfile( 'y+j' );
-  else
-    parts = qarts2cfile( 'y' );    
-  end
-  %
+  parts = qarts2cfile( 'y' );    
   S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
   qtool( S, cfile, [] );

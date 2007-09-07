@@ -2,13 +2,13 @@
 %
 %   See *arts_oem* for usage of this function.
 %
-% FORMAT   [R,y,J] = arts_oem( Q, R, x, iter )
+% FORMAT   [Q,R,xa] = arts_oem_init( Q )
 %        
-% OUT   Q     Qarts structure. See *qarts*.
-%       R     Retrieval data structure. See *arts_oem*.
-%       xa    A priori state vector.
-% IN    Q     Qarts structure. See *qarts*.
-
+% Out   Q    Modified Q structure
+%       R    Structure with retrieval variables. See *arts_oem*.
+%       xa   A priori state vector
+% In    Q    Qarts settings.
+%
 % 2006-09-07   First working version by Patrick Eriksson.
 
 
@@ -24,83 +24,32 @@ min_nargin( 1, nargin );
 rqre_datatype( 'struct', Q );
 %
 if ~isstruct(Q.J)
-  error('No jacobain defined !!!.');
+  error('No jacobian defined !!!.');
 end
-
 
 %- Create work folder
 %
 R            = [];
 R.workfolder = create_tmpfolder;
 
-
-%- Copy some data to R.
+%- Initialization of variables
 %
-% This is done here to possible save time, as the data is forced to files below
+Q.J_DO = 1;    % Ensure that jacobian calculations will be done
 %
-R.p_grid   = qarts_get( Q.P_GRID );
-R.lat_grid = qarts_get( Q.LAT_GRID );
-R.lon_grid = qarts_get( Q.LON_GRID );
+[Q,R,t_field,z_field,vmr_field] = init_local( Q, R );
 
-
-
-
-
-%--- Force some ARTS variables to be files ------------------------------------
-%
-% This is done to avoid creating the same file repeatedly in qarts2cfile.
-% This can be done for variables that never are part of the retrieval 
-% quantities. Some variables, beside the ones included here, are handled 
-% close to the end of the (main) function.
-
-%- Basic grids
-Q = force_file( Q, 'F_GRID', 'Vector', R );
-%
-Q = force_file( Q, 'P_GRID', 'Vector', R );
-if Q.ATMOSPHERE_DIM > 1
-  Q = force_file( Q, 'LAT_GRID', 'Vector', R );
-  if Q.ATMOSPHERE_DIM > 2
-    Q = force_file( Q, 'LON_GRID', 'Vector', R );
-  end
-end
-
-%- Absorption
-Q = force_file( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
-
-%- Sensor LOS and POS
-Q = force_file( Q, 'SENSOR_POS', 'Matrix', R );
-Q = force_file( Q, 'SENSOR_LOS', 'Matrix', R );
-
-
-
-%----- Use ARTS to get basic retrieval information and atmospheric fields -----
-
-[R.jq,R.ji,t_field,z_field,vmr_field] = arts_internal( Q, R );
-%
-if length( R.jq ) == 0 
-  % Ending up here means probably a bug!
-  error( 'No retrieval quantities defined!?' );
-end
-  
-  
-
-
-%--- Initialization of variables ----------------------------------------------
-
-%- xa
+%- R
 %
 nq = length( R.jq );
 nx = R.ji{nq}{2};
 %
-xa = zeros( nx, 1 );
+R.x_p    = repmat( NaN, nx, 1 );
+R.x_t    = R.x_p;
+R.x_vmr0 = R.x_p;
 
-
-%- R
+%- xa
 %
-R.x_p      = repmat( NaN, nx, 1 );
-R.x_t      = R.x_p;
-R.x_vmr0   = R.x_p;
-
+xa = zeros( nx, 1 );
 
 %- Some other variables
 %
@@ -126,12 +75,12 @@ for i = 1 : nq
     any_gas = true;
     %
     %- Get p, t and vmr for each retrieval point
-    grid1        = R.jq{i}.grids{1};
-    R.x_p(ind)   = repmat( grid1, length(ind)/length(grid1), 1 );
-    R.x_t(ind)   = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, t_field, ...
+    grid1         = R.jq{i}.grids{1};
+    R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
+    R.x_t(ind)    = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
     R.x_vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
-                               get_vmrfield_i(vmr_field,ig), R.jq{i}.grids ) );
+                            get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
@@ -154,7 +103,6 @@ end
 
 
 
-
 %--- More to put into R ? -----------------------------------------------------
 
 if any_gas
@@ -163,57 +111,22 @@ end
 
 
 
-
-
-%--- Continued modification of Q fields ---------------------------------------
-
-%- Atmospheric fields
-%
-% Option USE_RAW_ATMOSPHERE is not handled here. 
-%
-if Q.USE_RAW_ATMOSPHERE
-  Q.USE_RAW_ATMOSPHERE = 0;
-  Q.T_FIELD            = t_field;
-  Q.Z_FIELD            = z_field;
-  Q.VMR_FIELD          = vmr_field;
-end
-%
-Q = force_file( Q, 'VMR_FIELD', 'Tensor4', R );
-Q = force_file( Q, 'T_FIELD', 'Tensor3', R );
-Q = force_file( Q, 'Z_FIELD', 'Tensor3', R );
-
-%- Sensor
-%
-% In arts_internal all sensor response variables are stored as files
-%
-Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
-Q.SENSOR_RESPONSE_F   = fullfile( R.workfolder, 'sensor_response_f.xml' );
-Q.SENSOR_RESPONSE_ZA  = fullfile( R.workfolder, 'sensor_response_za.xml' );
-Q.SENSOR_RESPONSE_AA  = fullfile( R.workfolder, 'sensor_response_aa.xml' );
-Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
-Q.ANTENNA_DIM         = fullfile( R.workfolder, 'antenna_dim.xml' );
-Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
-Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
-
-
-
-
-
 %--- Create control files -----------------------------------------------------
 %
-%- y+j
-parts = qarts2cfile( 'y+j' );
-S     = qarts2cfile( Q, parts, R.workfolder );
-cfile = fullfile( R.workfolder, 'cfile_yj.arts' );
-qtool( S, cfile, [] );
-R.cfile_yj = cfile;
-%
 %- Only y
-parts = qarts2cfile( 'y' );
-S     = qarts2cfile( Q, parts, R.workfolder );
-cfile = fullfile( R.workfolder, 'cfile_y.arts' );
+Q.J_DO    = 0;
+parts     = qarts2cfile( 'y' );
+S         = qarts2cfile( Q, parts, R.workfolder );
+cfile     = fullfile( R.workfolder, 'cfile_y.arts' );
 qtool( S, cfile, [] );
 R.cfile_y = cfile;
+%
+%- y+j
+Q.J_DO     = 1;
+S          = qarts2cfile( Q, parts, R.workfolder );
+cfile      = fullfile( R.workfolder, 'cfile_yj.arts' );
+qtool( S, cfile, [] );
+R.cfile_yj = cfile;
 
 return
 
@@ -225,7 +138,7 @@ return
 %--- Internal sub-functions
 %-----------------------------------------------------------------------------
 
-function Q = force_file( Q, fieldname, datatype, R )
+function Q = force_file_local( Q, fieldname, datatype, R )
   if ~ischar( getfield( Q, fieldname ) )
     filename = fullfile( R.workfolder, [lower(fieldname),'.xml'] );
     xmlStore( filename, Q.(fieldname), datatype );
@@ -235,7 +148,7 @@ return
 
 
 
-function V = get_vmrfield_i( vmr_field, i )
+function V = get_vmrfield_local( vmr_field, i )
   s               = ones( 1, 4 );
   s2              = size( vmr_field );
   s(1:length(s2)) = s2;
@@ -245,46 +158,99 @@ return
 
 
 
-function [jq,ji,t_field,z_field,vmr_field] = arts_internal( Q, R )
+function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
-  tmpfolder   = R.workfolder;
-
-  if Q.USE_RAW_ATMOSPHERE
-   parts = { 'start1', 'start2', 'load_atm', 'save_atm', 'init_rte', ...
-             'sensor', 'save_sensor' 'j', 'stop' };
-  else
-    parts = { 'start1', 'start2', 'load_atm', 'init_rte', ...
-             'sensor', 'save_sensor', 'j', 'stop' };
-  end
-
-  S = qarts2cfile( Q, parts, tmpfolder );
-
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
-
-  qtool( S, cfile, [] );
-
-  arts( cfile );
-
-  jq = xmlLoad( fullfile( tmpfolder, 'jacobian_quantities.xml' ) );
-  ji = xmlLoad( fullfile( tmpfolder, 'jacobian_indices.xml' ) );
-
-  %- Fix different indexing
+  %- Copy some data to R
   %
-  for i = 1 : length(ji)
-    for j = 1 : length(ji{i})
-      ji{i}{j} = ji{i}{j} + 1;
+  % This is done here to possible save time; the data are forced to files below
+  %
+  R.p_grid   = qarts_get( Q.P_GRID );
+  R.lat_grid = qarts_get( Q.LAT_GRID );
+  R.lon_grid = qarts_get( Q.LON_GRID );
+
+  %- Force some ARTS variables to be files 
+  %
+  % This is done to avoid creating the same file repeatedly in qarts2cfile.
+  % This can be done for variables that never are part of the retrieval 
+  % quantities. Some variables, beside the ones included here, are handled 
+  % below.
+  Q = force_file_local( Q, 'F_GRID', 'Vector', R );
+  %
+  Q = force_file_local( Q, 'P_GRID', 'Vector', R );
+  if Q.ATMOSPHERE_DIM > 1
+    Q = force_file_local( Q, 'LAT_GRID', 'Vector', R );
+    if Q.ATMOSPHERE_DIM > 2
+      Q = force_file_local( Q, 'LON_GRID', 'Vector', R );
     end
   end
+  %
+  Q = force_file_local( Q, 'SENSOR_POS', 'Matrix', R );
+  Q = force_file_local( Q, 'SENSOR_LOS', 'Matrix', R );
 
-  if Q.USE_RAW_ATMOSPHERE  &  nargout >= 3
-    t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml' ) );
-    z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml' ) );
-    vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml' ) ); 
+  %- Atmospheric fields
+  %
+  % We do not want the option USE_RAW_ATMOSPHERE here
+  %
+  if Q.USE_RAW_ATMOSPHERE 
+    [t_field,z_field,vmr_field]       = arts_atmfields( Q );
+    [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD] = deal( t_field, z_field, vmr_field );   
+    Q.USE_RAW_ATMOSPHERE              = 0;
   else
     t_field   = qarts_get( Q.T_FIELD );
     z_field   = qarts_get( Q.Z_FIELD );
     vmr_field = qarts_get( Q.VMR_FIELD );
   end
+  %
+  Q = force_file_local( Q, 'T_FIELD', 'Tensor3', R );
+  Q = force_file_local( Q, 'Z_FIELD', 'Tensor3', R );
+  Q = force_file_local( Q, 'VMR_FIELD', 'Tensor4', R );
+  
+  %- Absorption
+  %
+  if strcmp( Q.ABSORPTION, 'LoadTable' )
+    Q = force_file_local( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
+  else
+    Q                  = qarts_abstable( Q );
+    Q.ABS_LOOKUP       = arts_abstable( Q, R.workfolder );
+    Q.ABSORPTION       = 'LoadTable';
+  end
+  
+  %- Run arts to create jacobian and sensor variables
+  %
+  parts = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'SensorSave', 'Jacobi' };
+  %
+  S     = qarts2cfile( Q, parts, R.workfolder );
+  cfile = fullfile( R.workfolder, 'cfile.arts' );
+  qtool( S, cfile, [] );
+  arts( cfile );
+
+  %- Jacobian
+  %
+  R.jq = xmlLoad( fullfile( R.workfolder, 'jacobian_quantities.xml' ) );
+  R.ji = xmlLoad( fullfile( R.workfolder, 'jacobian_indices.xml' ) );
+  %
+  if length( R.jq ) == 0 
+    % Ending up here means probably a bug!
+    error( 'No retrieval quantities defined!?' );
+  end
+  %
+  for i = 1 : length(R.ji)           % Fix different indexing
+    for j = 1 : length(R.ji{i})
+      R.ji{i}{j} = R.ji{i}{j} + 1;
+    end
+  end
+
+  %- Sensor
+  %
+  Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
+  Q.SENSOR_RESPONSE_F   = fullfile( R.workfolder, 'sensor_response_f.xml' );
+  Q.SENSOR_RESPONSE_ZA  = fullfile( R.workfolder, 'sensor_response_za.xml' );
+  Q.SENSOR_RESPONSE_AA  = fullfile( R.workfolder, 'sensor_response_aa.xml' );
+  Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
+  Q.ANTENNA_DIM         = fullfile( R.workfolder, 'antenna_dim.xml' );
+  Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
+  Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
+
 return
 
 

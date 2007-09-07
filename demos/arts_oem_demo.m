@@ -1,11 +1,12 @@
 % ARTS_OEM_DEMO   Demonstration of inversions using ARTS and OEM
 %
+%    The example treats ground-based measurements of ozone at 110.8 GHz.
+%
 % FORMAT   arts_oem_demo
 
 % 2006-09-07   Created by Patrick Eriksson.
 
 function arts_oem_demo
-
 
 
 %= Check if arts-xml-data is found
@@ -17,23 +18,64 @@ if isnan( arts_xmldata_path )
 end
 
 
-%= Make sure that AMI is in the search path. Needed to read/write ARTS1 files
+
+%- Init control structures 
 %
-addpath_ami;
+Q      = qarts;
+Q.J    = qartsJacobian;
+Q.J_DO = 1;
+SX     = [];
 
 
-%= Set-up control structures ==================================================
+
+%- Basic qarts settings
 %
-Q   = qarts;
-Q.J = qarts_jacobian;
-Q1  = qarts1;
-SX  = [];
-
-
-%= Spectroscopy
+Q.ATMOSPHERE_DIM      = 1;
+Q.STOKES_DIM          = 1;
 %
-Q1.LINEFORMAT       = 'Arts';
-Q1.LINEDATA         = fullfile( atmlab_example_data , 'o3line111ghz' );
+Q.P_GRID              = z2p_simple( 0:500:90e3 );
+Q.Z_SURFACE           = 500;
+%
+Q.USE_RAW_ATMOSPHERE  = 1;
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
+                                              'fascod', 'midlatitude-winter' );
+%
+Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric{5e3}' };
+Q.Y_UNIT              = 'RJ';
+%
+Q.SENSOR_LOS          = 70;
+Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
+
+
+
+%- Exclude cosmic background radiation. A relative change of the spectrum
+%- corresponds then to a relative change of the ozone profile.
+%
+Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}',  'Ignore(rte_pos){}', ...
+                      'nelemGet(f_grid){}', 'Copy(nrows,nelem){}', ...  
+                      'Copy(ncols,stokes_dim){}', 'MatrixSet(iy){0}' };
+
+
+
+%- Frequency and spectrometer.
+%
+% The spectrometer has rectangular response functions
+%
+Q.F_GRID              = 1.108360400e+11 + linspace(-320e6,320e6,641);
+%
+H                     = qartsSensor;
+H.SENSOR_NORM         = 1;
+df                    = 2e6;
+H.F_BACKEND           = min(Q.F_GRID)+df : df : max(Q.F_GRID)-df;
+H.CHANNEL_RESPONSE    = { [-df/2 1; df/2 1] };
+%
+Q.SENSOR_DO           = 1;
+Q.SENSOR_RESPONSE     = H;
+Q.MBLOCK_ZA_GRID      = 0;
+
+
+
+%- Define ozone as retrieval quantity
 %
 ret_unit = 'rel';
 %
@@ -46,11 +88,13 @@ else
 end
 D.CCO       = 0.01;  
 D.CFUN1     = 'exp';
-D.CL1       = 0.25*[1 1];
+D.CL1       = [0.2;0.3];      % Must be a column vector
 D.CL1_GRID1 = [1100e2 1e-3];  
 %
-[Q,SX] = q_abs_species( Q, ...            
+[Q,SX] = qarts_abs_species( ...
+                        Q, ...            
                         { 'O3' }, ...                     % Tag group name
+                        0, ...                            % Non-linear species?
                         1, ...                            % Do jacobians?
                         SX, ...         
                         D, ...
@@ -59,69 +103,27 @@ D.CL1_GRID1 = [1100e2 1e-3];
                       );
 
 
-%= Atmosphere
-%
-Q.ATMOSPHERE_DIM      = 1;
-Q.USE_RAW_ATMOSPHERE  = 1;
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                              'fascod', 'midlatitude-winter' );
-Q.P_GRID              = z2p_simple( 0:500:90e3 );
 
-
-%= RTE 
+%- Absorption
 %
-Q.STOKES_DIM          = 1;
-Q.Z_SURFACE           = 1e3;
+% Water vapour is always needed (no absorption is here included)
+Q = qarts_abs_species( Q, { 'H2O' } );
 %
-Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}', 'Ignore(rte_pos){}', ...
-                      'MatrixCBR(iy,f_grid){}', 'MatrixScale(iy,iy){0}' };
-%
-Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric{', ...
-                          '  lmax      = -1', ...
-                          '}' };
-Q.Y_UNIT              = 'RJ';
-%
-Q.SENSOR_LOS          = 0;
-Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
-
-
-%= Frequency and spectrometer.
-%
-% The spectrometer has rectangular response functions
-%
-Q.F_GRID              = 1.108360400e+11 + linspace(-320e6,320e6,641);
-%
-H                     = qarts_sensor;
-H.SENSOR_NORM         = 1;
-df                    = 2e6;
-H.F_BACKEND           = min(Q.F_GRID)+df : df : max(Q.F_GRID)-df;
-H.CHANNEL_RESPONSE    = { [-df/2 1; df/2 1] };
-%
-Q.SENSOR_RESPONSE     = H;
-Q.MBLOCK_ZA_GRID      = 0;
-
-%============================================================================
+Q.ABS_LINES_FORMAT    = 'Arts';
+Q.ABS_LINES           = fullfile( atmlab_example_data , 'o3line111ghz' );
+Q                     = qarts_abstable( Q );
 
 
 
-%= Create absorption lookup table by ARTS1
+%- Calculate a spectrum matching a priori
 %
-filename = 'abstable111ghz.xml';
-%
-if 0
-  Q.ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
-  xmlStore( filename, Q.ABS_LOOKUP, 'GasAbsLookup' );
-end
-%
-Q.ABS_LOOKUP = filename;
+y = arts_y( Q );
 
 
-y = arts_y(Q);
 
-
-%= Create Se
+%- Create Se
 %
-si = 0.05;
+si = 0.01;
 %
 SE.FORMAT    = 'param';
 SE.SI        = si;
@@ -131,14 +133,14 @@ SE.CFUN1     = 'drc';
 Se = arts_covmat( 1, SE, Q.SENSOR_RESPONSE.F_BACKEND );
 
 
-%= Measurement
+
+%- Measurement
 %
-e = si*randn(size(Se,1),1);
-%
-y = 2 * arts_y(Q) + e;
+y = 1.1 * y + si*randn(size(Se,1),1);
 
 
-%= OEM
+
+%- OEM
 %
 O.method  = 'GN';
 O.stop_dx = 0.01;

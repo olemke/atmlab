@@ -2,7 +2,7 @@
 %
 %    A more advanced example on usage of Qarts (compared to *qarts_demo*).
 %
-% FORMAT   [Q,f,y] = qarts_demo( [ ztan, atmdim ] )
+% FORMAT   [Q,f,y] = qarts_demo2( [ ztan, atmdim ] )
 %        
 % OUT   Q          Qarts setting structure.
 %       f          Frequency grid
@@ -122,8 +122,8 @@ Q.SENSOR_RESPONSE = H;
 % Pre-calculation not yet activated as reading of sparse matrices appear 
 % not to work.
 %
-Q.OUTPUT_FILE_FORMAT = 'ascii';  % Temporary solution until reading of
-                                 % binary sparse works.
+%Q.OUTPUT_FILE_FORMAT = 'ascii';  % Temporary solution until reading of
+%                                 % binary sparse works.
 Q = arts_sensor( Q );
 
 

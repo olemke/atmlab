@@ -14,7 +14,8 @@
 % FORMAT   B = interpd( pos, A, x [, y, z, iopt] )
 %        
 % OUT   B      Interpolated data.
-% IN    A      Data to be interpolated.
+% IN    pos    Matrix where each row gives position of new point as (x,y,z).
+%       A      Data to be interpolated.
 %       x      Grid in dimension 1.
 %       y      Grid in dimension 2.
 %       z      Grid in dimension 3.
@@ -35,7 +36,13 @@ rqre_datatype( 'numeric', A );
 rqre_datatype( 'vector', x );
 %
 if length(x) ~= size(A,1)
-  error('Mismatch in size between *x* and *A*.');
+  fprintf('Mismatch in size between *x* and *A*.\n');
+  fprintf('Note that *A* must be a COLUMN vector for 1D.\n');
+  fprintf('\nx = \n');
+  disp(x);
+  fprintf('A = \n');
+  disp(A)
+  error('See above');
 end
 %
 dim = dimens( A );
