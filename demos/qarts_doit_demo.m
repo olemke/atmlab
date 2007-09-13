@@ -13,9 +13,8 @@
 
 function [Q,f,y_c,y,ztan] = qarts_doit_demo( ztan )
 
-% Set default
-% Since in DOIT the whole radiation field is calculated, one can
-% calculate several tangent altitudes at the same time
+%- Set default values
+%
 ztan_DEFAULT = [3 6 9 12]*1e3; 
 %
 set_defaults;
@@ -86,9 +85,7 @@ y_c = arts_y( Q );
 
 
 
-% Scattering
-%
-H=create_tmpfolder;
+% Set up DOIT
 %
 C.METHOD                        = 'DOIT';
 % Angular grids
@@ -100,7 +97,11 @@ C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
 %
 C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
 C.METHOD_PRMTRS.I_REINIT        = 1;
-%
+
+
+
+%- Define cloudbox and particles
+
 C.LIMITS = [ 7e3 14e3 ];
 
 % Temperature for scattering data (if only one is given, no
@@ -113,7 +114,6 @@ T_grid = 250;
 % Calculate refractive indices 
 rfr_index = sqrt(eps_ice_liebe93( Q.F_GRID, T_grid ) )';
 
-
 % Scattering angles
 theta = 0:10:180;
 % Particle size [m]
@@ -124,17 +124,18 @@ imc = 0.01*1e-3;
 alt = [9e3 12e3]; 
 
 % Calculate scattering data using Mie
-scat_data = mie_scat_data(Q.F_GRID,  T_grid, rfr_index, theta, r); 
-xmlStore([H,'/scat_data.xml'] , scat_data, 'SingleScatteringData' );
-C.SCAT_DATA{1} = [H,'/scat_data.xml'];
+C.SCAT_DATA{1} = mie_scat_data(Q.F_GRID,  T_grid, rfr_index, theta, r); 
 
 % Calculate a pnd field for a homogeneous cloud
-pnd_field = box_pnd_mono_size_1d(alt, imc, r);
-xmlStore([H,'/pnd_field.xml'] , pnd_field, 'GriddedField3' );
-C.PND_FIELD{1} = [H,'/pnd_field.xml'];
+C.PND_FIELD{1} = box_pnd_mono_size_1d(alt, imc, r);
+
+
+
+%- Activate cloudbox
 %
 Q.CLOUDBOX_DO = 1;
 Q.CLOUDBOX    = C;  
+
 
 
 % Calculate radiances with scattering
@@ -142,6 +143,5 @@ Q.CLOUDBOX    = C;
 y = arts_y( Q );
 
 
-delete_tmpfolder(H);
 
 return

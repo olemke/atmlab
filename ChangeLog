@@ -1,3 +1,19 @@
+2007-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-175
+
+	* Some work to get MC working again, but got stuck. Cory is
+	contacted. More later.
+	
+	* demos/qarts_doit_demo.m: Usage of temporary folder removed. 
+
+	* arts/qarts2cfile.m: Changes around PND_FIELD and SCAT_DATA.
+	Some old (incorrect) code was removed. File names and data can now
+	be mixed for both variables.
+
+	* arts/qartsCloudbox.m: Description of PND_FIELD and SCAT_DATA now 
+	matches what is implemented.
+
 2007-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-174

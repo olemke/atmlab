@@ -849,46 +849,43 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   %= Particle field and single scattering data
   %
-  if (iscellstr(Q.CLOUDBOX.PND_FIELD) && ...
-      iscellstr(Q.CLOUDBOX.SCAT_DATA))
-    if (length(Q.CLOUDBOX.PND_FIELD) == length(Q.CLOUDBOX.SCAT_DATA)) 
-      T{end+1} = 'ParticleTypeInit{}';
-      for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
-        T{end+1} = 'ParticleTypeAdd{';
-        T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
-  			 Q.CLOUDBOX.SCAT_DATA{i} );
-        T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
-  			 Q.CLOUDBOX.PND_FIELD{i} );
-        T{end+1} = '}';
-      end
-      % 
-    elseif (length(Q.CLOUDBOX.SCAT_DATA) == 1 && ...
-  	  length(Q.CLOUDBOX.PND_FIELD) > 1)
-      
-      T{end+1} = 'ParticleTypeAddAll{';
-      T{end+1} = sprintf('   filename_scat_data =  "%s"', ...
-  		     Q.CLOUDBOX.SCAT_DATA{i} );
-      T{end+1} = sprintf('   filename_pnd_field =  "%s"', ...
-  		       Q.CLOUDBOX.PND_FIELD{i} );
-      T{end+1} = '}';
-      %
-    else
-      error(['Scattering data (Q.SCAT_DATA) or particle number density' ...
-  	   '(Q.PND_FIELD) is wrong. The safest option is to give' ...
-  	   ' filenames of the single scattering data and the' ...
-  	   ' corresponding particle number density fields.']);
-    end
-    T{end+1} = 'pnd_fieldCalc{}';
+  if length(Q.CLOUDBOX.PND_FIELD) ~= length(Q.CLOUDBOX.SCAT_DATA)
+    error( ...
+      'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must have same length.' );
   end
+  %
+  T{end+1} = 'ParticleTypeInit{}';
+  %
+  for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
+    if isstr( Q.CLOUDBOX.SCAT_DATA{i} )
+      sfile = Q.CLOUDBOX.SCAT_DATA{i};
+    else
+      sfile = sprintf( 'scat_data_raw_%d.xml', i );
+      xmlStore( sfile, Q.CLOUDBOX.SCAT_DATA{i}, 'SingleScatteringData' );
+    end
+    if isstr( Q.CLOUDBOX.PND_FIELD{i} )
+      pfile = Q.CLOUDBOX.PND_FIELD{i};
+    else
+      pfile = sprintf( 'pnd_field_raw_%d.xml', i );
+      xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3' );
+    end
+    %    
+    T{end+1} = 'ParticleTypeAdd{';
+    T{end+1} = sprintf('   filename_scat_data =  "%s"', sfile );
+    T{end+1} = sprintf('   filename_pnd_field =  "%s"', pfile );
+    T{end+1} = '}';
+  end
+  %
+  T{end+1} = 'pnd_fieldCalc{}';
 
   %= Agendas for scattering properties 
   %
-  T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
   T = add_agenda( T, 'opt_prop_gas_agenda', ...
               { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
   T = add_agenda( T, 'opt_prop_part_agenda', ...
      {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
-  
+  T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
+  % The last one is not used by MC, but ...
 
   %= Saving?
   %
@@ -924,7 +921,8 @@ function T = cfile_SctMth( Q, partname, workfolder )
   %= Some basic checks
   if Q.ATMOSPHERE_DIM == 2
     error( 'Scattering is not defined for 2D.' );
-  elseif Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+  end
+  if Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
     error( 'MC can only be applied for 3D.' );
   end
 
@@ -1019,60 +1017,24 @@ function T = cfile_SctMth( Q, partname, workfolder )
     
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
     %
-    error( 'MC is not yet handled by Qarts.' ); 
+    St = dbstack;
+    if ~strcmp( St(3).file, 'arts_y.m' )
+      error( 'MC part not fuylly implemented. Can only be used by *arts_y*.' );
+    end
     %
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER', 0 );
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'INCOMING_LOOKUP', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D', 0);
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MC_SEED', 0 );
     %
-    if Q.CLOUDBOX.METHOD_PRMTRS.INCOMING_LOOKUP
-      T{end+1} = file_or_data( 'mc_incoming', 'SLIData2', ...
-                         Q.CLOUDBOX.METHOD_PARAMS.INCOMING_LOOKUP, workfolder );
-    end
-    %
-    T{end+1} = 'IndexSet(f_index){value=0}';
-    T{end+1} = 'scat_data_monoCalc{}';
-    %
     if Q.CLOUDBOX.METHOD_PRMTRS.MC_SEED < 0
-      T{end+1} = 'MCSetSeedFromTime{}';
+      T{1} = 'MCSetSeedFromTime{}';
     else
-      T{end+1} = sprintf( 'IndexSet(mc_seed){%d}', ...
+      T{1} = sprintf( 'IndexSet(mc_seed){%d}', ...
                                             Q.CLOUDBOX.METHOD_PRMTRS.MC_SEED );
     end
-    %
-    T{end+1} = 'MCSetIncomingEmpty{}';
-    T{end+1} = 'AgendaSet(iy_cloudbox_agenda){';
-    T{end+1} = '   Ignore(rte_gp_p){}';
-    T{end+1} = '   Ignore(rte_gp_lat){}';
-    T{end+1} = '   Ignore(rte_gp_lon){}';
-    T{end+1} = '   ScatteringMonteCarlo{';
-    T{end+1} = sprintf('     std_err  = %d', Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
-    T{end+1} = sprintf('     max_time = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
-    T{end+1} = sprintf('     max_iter = %d', Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-    T{end+1} = sprintf('     incoming_lookup = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.INCOMING_LOOKUP );
-    T{end+1} = sprintf('     z_field_is_1D = %d', ...
-                                        Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    T{end+1} = '   }';
-    %
-    if ~isnan( Q.SENSOR_RESPONSE )   
-      T{end+1} = 'mc_errorApplySensor{}';
-    else
-      T{end+1} = '';
-    end
-    switch upper( Q.Y_UNIT )
-      case '1'
-        T{end+1} = '# No conversion to K';
-      case { 'RJ', 'PLANCK' }
-        T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}';
-    end
-    T{end+1} = add_savefile( 'mc_error', workfolder );
-    %
-    T{end+1} = '}';
-
+    
   else
     error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );
   end
