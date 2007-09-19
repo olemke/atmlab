@@ -44,18 +44,19 @@ rqre_datatype( {'empty','char'}, workfolder );
 
 %- Default output
 %
-dy = 0;
+dy = NaN;
 J  = NaN;
 jq = NaN;
 ji = NaN;
 
 
 
-%- MC is handled seperately
+%- MC? is handled seperately
 %
 if isstruct( Q.CLOUDBOX )  & strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
-  [y,ydata,dy] = do_mc( Q, workfolder );
-  return   % --->
+  mc = 1;
+else
+  mc = 0;
 end
 
 
@@ -110,7 +111,10 @@ if nargout >= 2
   if ~isempty(aa)
     ydata.los(:,2) = ydata.los(:,2) + aa;
   end
-
+  %
+  if mc
+    dy = xmlLoad( fullfile( workfolder, 'mc_error.xml' ) );
+  end
 end
 
 
@@ -135,52 +139,3 @@ if folder_created
   delete_tmpfolder( workfolder );
 end
 
-
-
-
-
-function [y,ydata,dy] = do_mc(Q,workfolder)
-  
-  folder_created = 0;
-  %
-  if isempty( workfolder )
-    workfolder     = create_tmpfolder;
-    folder_created = 1;
-  end
-
-  parts = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
-          'CldBox', 'SctMth' };
-  S     = qarts2cfile( Q, parts, workfolder );
-
-  S{end}   = 'StringSet(mc_unit){"RJBT"}'; 
-  S{end+1} = 'mc_antennaSetPencilBeam{}';
-  S{end+1} = 'IndexSet(f_index){0}';
-  S{end+1} = 'scat_data_monoCalc{}';
-  S{end+1} = 'MCGeneral{';
-  S{end+1} = sprintf( '  std_err       = %.5e', ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
-  S{end+1} = sprintf( '  max_time      = %d', ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
-  S{end+1} = sprintf( '  max_iter      = %d', ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-  S{end+1} = sprintf( '  z_field_is_1D = %d', ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-  S{end+1} = '}';  
-  filename = fullfile( workfolder, 'y.xml' );
-  S{end+1} = sprintf('WriteXML(y){"%s"}', filename );
-  S{end+1} = '}';  
-  
-  
-  cfile = fullfile( workfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
-  arts( cfile );
-
-  y     = xmlLoad( fullfile( workfolder, 'y.xml' ) );
-  ydata = 0;
-  dy    = 0;
-  
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
-
-return

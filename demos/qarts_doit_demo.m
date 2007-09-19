@@ -35,8 +35,11 @@ Q.STOKES_DIM        = 2;
 %
 Q.ABS_SPECIES{1}{1} = 'O3';
 Q.ABS_SPECIES{2}{1} = 'H2O';
-Q.ABS_SPECIES{2}{2} = 'H2O-MPM89';
-Q.ABS_SPECIES{3}{1} = 'N2-SelfContStandardType';
+
+warning( 'Not all absorbing species included due to bug in arts.' );
+
+%Q.ABS_SPECIES{2}{2} = 'H2O-MPM89';
+%Q.ABS_SPECIES{3}{1} = 'N2-SelfContStandardType';
 
 
 

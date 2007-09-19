@@ -33,7 +33,7 @@
 %            or
 %          do_output = out( level )
 %
-% OUT:     do_output   Boolean. True if level <= REPORT_LEVEL
+% OUT:     do_output   Boolean. True if level <= VERBOSITY
 % IN:      level       Report level for the message. This can be specified
 %                      for each entry in *fid*. Default is 0. This values is
 %                      also applied if *level* is shorter than *fid*.  
