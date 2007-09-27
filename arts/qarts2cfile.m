@@ -489,7 +489,7 @@ function T = cfile_RteExe( Q, partname, workfolder )
       T{2}  = sprintf( '  std_err       = -1' );
     else
       std_err = Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR * ...
-              2*f^2*constants('BOLTZMANN_CONST')/constants('SPEED_OF_LIGHT')^2
+              2*f^2*constants('BOLTZMANN_CONST')/constants('SPEED_OF_LIGHT')^2;
       T{2}  = sprintf( '  std_err       = %.5e', std_err );
     end
     T{3}  = sprintf( '  max_time      = %d', ...

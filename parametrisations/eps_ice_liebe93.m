@@ -20,6 +20,14 @@ function e = eps_ice_liebe93( f, t )
 theta = 300 ./ t;
 fghz  = f/1e9;
 
+    if fghz<0.01  |  fghz>1000
+      error('Valid range for frequency is 0.01-1000 GHz'); 
+    end
+    if t<20  |  t>273.15
+      error('Valid range for temperature is 20-273.15 K'); 
+    end
+
+
 a     = ( theta - 1 ) * exp( 17 - 22.1*theta );
 b     = 1e-5 * ( (0.233/(1-0.993/theta)).^2 + 6.33/theta - 1.31 ); 
 

@@ -1,3 +1,21 @@
+2007-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-178
+
+	* demos/qarts_scattering_demo.m: Demo for both DOIT and MC. Based
+	on, and replaces, qarts_doit_demo.
+
+	* demos/qarts_scattering_demo.m: Removed.
+
+2007-09-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-177
+
+	* parametrisations/eps_ice_liebe93.m: Now checking that input variables
+	are inside OK ranges.
+
+	* scattering/mie_scat_data.m: Added a check on sign on imaginary part. 
+
 2007-09-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-176

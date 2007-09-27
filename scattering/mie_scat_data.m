@@ -23,6 +23,13 @@
 
 function ssp = mie_scat_data(f_grid, T_grid, rfr_ind, theta, r) 
 
+% A safety check
+%
+if any( imag( rfr_ind ) ) < 0
+  error( 'Imaginary part of the refractive index is expected to be positive.' );
+end
+  
+  
 % Particle type is 'p20' for spherical particles
 ssp.ptype = 20;
 
