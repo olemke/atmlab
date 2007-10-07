@@ -6,10 +6,10 @@
 %
 % FORMAT   species = arts_tgs2species( a, iso )
 %        
-% OUT   species   Species names.
+% OUT   species   Species names. Returned as a cell array with strings.
 % IN    a         Tag group information, either in arts1 or arts format. See
 %                 arts_tgs_cnvrt for format descriptions.
-% OPT   iso       Include isotopomer numbers.
+% OPT   iso       Include isotopomer numbers. Default is false.
 
 % 2007-05-14   Created by Patrick Eriksson.
 
@@ -28,18 +28,18 @@ end
 
 
 
-for i = 1 : length(a)
+for it = 1 : length(a)
+  for is = 1 : length(a{it})
 
-  ind = find( a{i}{1} == '-' );
+    ind = find( a{it}{is} == '-' );
 
-  if isempty( ind )
-    species{i} = a{i}{1};
-  else 
-    if ~iso  |  length(ind)==1
-      species{i} = a{i}{1}(1:ind(1)-1);
+    % Expand to cover all possible cases
+    ind = [ ind repmat(length(a{it}{is})+1,1,2) ];
+  
+    if ~iso 
+      species{it}{is} = a{it}{is}(1:ind(1)-1);
     else
-      species{i} = a{i}{1}(1:ind(2)-1);
-    end
-  end
-
-end   
+      species{it}{is} = a{it}{is}(1:ind(2)-1);
+    end   
+  end   
+end  

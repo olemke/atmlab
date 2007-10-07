@@ -56,7 +56,6 @@ Q.USE_RAW_ATMOSPHERE = 1;
 tmpfolder   = create_tmpfolder;
 
 try
-
   parts = qarts2cfile( 'GetAtmSrf' );
   S = qarts2cfile( Q, parts, tmpfolder );
   cfile = fullfile( tmpfolder, 'cfile.arts' );

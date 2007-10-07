@@ -3,12 +3,28 @@
 %    The function assumes that all needed fields of Q are set, and
 %    calculates an absorption look-up table.
 %
-%    The function *qarts_abstable* can maybe be a help to set Q. 
+%    The following Qarts fields must be specified:
+%       ABS_LINES
+%       ABS_LINES_FORMAT
+%       ABS_LINESHAPE 
+%       ABS_LINESHAPE_CUTOFF
+%       ABS_LINESHAPE_FACTOR
+%       ABS_MODELS 
+%       ABS_NLS
+%       ABS_NLS_PERT
+%       ABS_P
+%       ABS_SPECIES
+%       ABS_T
+%       ABS_T_PERT 
+%       ABS_VMRS 
 %
-% FORMAT   A = arts_abstable( Q, workfolder, do_load )
-%        
-% OUT   A    Absorption table structure. Can be data or file name.
-% IN    Q    Qarts settings.
+%    The function *qarts_abstable* could be useful to set some of the fields
+%    listed above.
+%
+% FORMAT   A = arts_abstable( Q [, workfolder, do_load ] )
+%
+% OUT   A            Absorption table structure. Can be data or file name.
+% IN    Q            Qarts settings.
 % OPT   workfolder   If not defined or empty, a temporary folder is created.
 %                    Obtained data are then loaded into A.
 %                    Otherwise this is interpreted as the path to a folder 

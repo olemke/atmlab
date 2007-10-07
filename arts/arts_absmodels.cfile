@@ -1,7 +1,7 @@
 # This file contains standard choices for ARTS "continua".
 # Focus is on more recent complete absorption models.
 
-# H2O absorption models (lines + continuum)
+# Complete H2O absorption models (lines + continuum)
 abs_cont_descriptionAppend{
     tagname        = "H2O-MPM89"
     model          = "MPM89"
@@ -22,25 +22,36 @@ abs_cont_descriptionAppend{
     model         = "Rosenkranz"
     userparameters = [ ]
 }
-## CKD MT 1.00 self continuum original parameters:
+
+# H2O continua
+#
+# Rosenkranz-type H2O-H2O continuum:
+abs_cont_descriptionAppend{
+    tagname        = "H2O-SelfContStandardType"
+    model          = "Rosenkranz"
+    userparameters = [ ]
+}
+#
+# Rosenkranz-type H2O-dry air continuum:
+abs_cont_descriptionAppend{
+    tagname        = "H2O-ForeignContStandardType"
+    model          = "Rosenkranz"
+    userparameters = [ ]
+}
+#
+# Same for CKD MT 1.00
 abs_cont_descriptionAppend{
     tagname        = "H2O-SelfContCKDMT100"
     model          = "CKDMT100"
     userparameters = [ ]
 }
-## CKD MT 1.00 H2O foreign continuum original parameters:
 abs_cont_descriptionAppend{
     tagname        = "H2O-ForeignContCKDMT100"
     model          = "CKDMT100"
     userparameters = [ ]
 }
-abs_cont_descriptionAppend{
-    tagname        = "O2-MPM85"
-    model          = "MPM85"
-    userparameters = [ ]
-}
 
-# O2 absorption models (lines + continuum)
+# Full O2 absorption models (lines + continuum)
 abs_cont_descriptionAppend{
     tagname        = "O2-MPM89"
     model          = "MPM89"
@@ -57,6 +68,13 @@ abs_cont_descriptionAppend{
     userparameters = [ ]
 }
 
+# Standard O2-air continuum:
+abs_cont_descriptionAppend{
+    tagname        = "O2-SelfContStandardType"
+    model          = "Rosenkranz"
+    userparameters = [ ]
+}
+
 # N2 continua
 abs_cont_descriptionAppend{
     tagname        = "N2-SelfContStandardType"
@@ -69,7 +87,7 @@ abs_cont_descriptionAppend{
     userparameters = [ ]
 }
 
-## far line wing continuum from CKD F77 program:
+## CO2 far line wing continuum from CKD F77 program:
 abs_cont_descriptionAppend{
     tagname        = "CO2-CKDMT100"
     model          = "CKDMT100"

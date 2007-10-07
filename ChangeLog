@@ -1,3 +1,22 @@
+2007-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-179
+
+	* arts/arts_abstable.m: Wrote header.
+
+	* arts/arts_read_linefile.m: Added sorted and ilim as optional
+	arguments.
+
+	* arts/arts_tgs2species.m: Corrected. Did not work as described. 
+
+	* arts/arts_absmodels.cfile: Some models not sorted correctly. Added
+	some H2O continua only models.
+
+	* retrieval/oem.m: Using sparse identify matrices when calculating
+	Seinv and Sxinv.
+
+	* handy/rqre_scalar.m: Now works also if input is a structure.
+
 2007-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-178

@@ -73,7 +73,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   end
 
   if nargin < 7  |  isempty(Sxinv)
-    Sxinv = Sx \ eye(size(Sx));
+    Sxinv = Sx \ speye(size(Sx));
   end
   %
   if size(Sxinv,1) ~= size(Sxinv,2)
@@ -84,7 +84,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   end
 
   if nargin < 8  |  isempty(Seinv)
-    Seinv = Se \ eye(size(Se));
+    Seinv = Se \ speye(size(Se));
   end
   %
   if size(Seinv,1) ~= size(Seinv,2)

@@ -9,7 +9,7 @@
 %
 %   Default values for optional arguments should work for a single
 %   calculation. Temperature and "non-linear" species variations are then
-%   selected automtaiclly to precisely cover the variation of specified
+%   selected automatically to precisely cover the variation of specified
 %   atmospheric fields.
 %
 %   Note that ABS_NLS must be set.
