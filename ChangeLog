@@ -1,3 +1,17 @@
+2007-10-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-180
+
+	* Just some cleaning.
+
+	* atmscenarios/: Folder and simplecloud functions removed.
+	
+	* math/gauss_laguerre_apply.m: Moved here from atmscenarios/.
+
+	* math/gauss_laguerre.m: Moved here from atmscenarios/.
+
+	* parametrisations/gamma_lambda2d.m: Moved here from atmscenarios/.
+
 2007-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-179
