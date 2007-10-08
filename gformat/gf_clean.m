@@ -1,6 +1,9 @@
 % GF_CLEAN   Removes grid data for not used dimensions
 %
 %    Removes unnecessary data (that is, grid data for dimensions not used).
+%   
+%    The maximum dimension in the array determines what grids that can be 
+%    removed.
 %
 % FORMAT   G = gf_clean( G )
 %        

@@ -46,9 +46,9 @@ addpath( fullfile( toppath, 'geoplots' ) );
 addpath( fullfile( toppath, 'forwardmodel' ) );
 addpath( fullfile( toppath, 'files' ) ); 
 addpath( fullfile( toppath, 'demos' ) );
-addpath( fullfile( toppath, 'atmscenarios' ) ); 
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts1' ) ); 
+addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
 
 

@@ -8,7 +8,7 @@
 % OUT   G        Expanded data.
 % IN    G        Original data.
 %       newdim   New dimension.
-%       Gtmplt   Grid data for new dimensions are taken from (first element of
+%       Gtmplt   Grid data for new dimensions are taken from first element of
 %                this structure. 
 
 % 2007-05-14   Created by Patrick Eriksson.

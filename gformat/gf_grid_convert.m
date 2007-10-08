@@ -15,9 +15,10 @@
 % OUT   G        Data with converted grid.
 % IN    G        Original data. Either in g-format or as a plain vector.
 % OPT   dim      Data dimension for which grid shall be converted.
-%       precs    Change sign before applying *mapfun*.
+%                Default is 1.
+%       precs    Change sign before applying *mapfun*. Defult is false.
 %       mapfun   Mapping function. No mapping if empty, which is default.
-%       postcs   Change sign after applying *mapfun*.
+%       postcs   Change sign after applying *mapfun*. Defult is false.
 
 % 2007-05-15   Created by Patrick Eriksson.
 

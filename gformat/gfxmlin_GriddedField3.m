@@ -1,9 +1,9 @@
-% GF_IMPORT_ARTSGRIDDEDFIELD3
+% GFXMLIN_GRIDDEDFIELD3
 %
 %    Imports data having the arts xml GriddedField3 format. Imports either
 %    directly from file, or from corresponding matlab structure. 
 %
-% FORMAT   G = gf_import_artsGriddedField3( data [, name, type] )
+% FORMAT   G = gfxmlin_GriddedField3( data [, name, type] )
 %        
 % OUT   G          Imported data.
 % IN    data       Data, or name on xml file to read.
@@ -16,7 +16,7 @@
 % 2007-05-14   Created by Patrick Eriksson.
 
 
-function G = gf_import_artsGriddedField3( data, name, type )
+function G = gfxmlin_GriddedField3( data, name, type )
   
 
 if nargin < 2
