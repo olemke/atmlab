@@ -16,23 +16,15 @@
 
 
 function x = gridthinning(x0,mindx)
+
   
 x     = x0;
 n     = 1;
-xp    = x0(1);
 
 for itest = 2:length(x0)-1
-
-  if x(itest+1) - xp <= mindx
-    %
-  elseif x(itest) - xp < mindx
+  if x0(itest) - x(n) > mindx
     n     = n + 1;
-    xp    = xp + mindx;
-    x(n)  = xp;
-  else
-    n     = n + 1;
-    xp    = x(itest);
-    x(n)  = xp;    
+    x(n)  = x0(itest);
   end
 end
 

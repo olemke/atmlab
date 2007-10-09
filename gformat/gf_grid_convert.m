@@ -70,7 +70,7 @@ for i = 1 : length( G )
   end
   
   if ~isempty( mapfun )
-    g = mapfun( g );
+    g = feval( mapfun, g );
   end
 
   if postcs

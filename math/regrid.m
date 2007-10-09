@@ -66,6 +66,9 @@ if dim == 1
 
   if atmlab( 'EXTRAP' )
     [A,x] = expand2inf( A, x );
+  elseif length(x) < 2
+    error( ['Handling of scalar grids require that atmlab EXTRAP option ' ...
+            'is activated'] );
   end
 
   B = interp1( x, A, vec2col(xi), imethod );
@@ -87,6 +90,9 @@ elseif dim == 2
 
   if atmlab( 'EXTRAP' )
     [A,x,y] = expand2inf( A, x, y );
+  elseif length(x) < 2  |  length(y) < 2
+    error( ['Handling of scalar grids require that atmlab EXTRAP option ' ...
+            'is activated'] );
   end
 
   B = interp2( y, x, A, yi, xi, imethod ); 
@@ -113,6 +119,9 @@ elseif dim == 3
 
   if atmlab( 'EXTRAP' )
     [A,x,y,z] = expand2inf( A, x, y, z );
+  elseif length(x) < 2  |  length(y) < 2  |  length(z) < 2
+    error( ['Handling of scalar grids require that atmlab EXTRAP option ' ...
+            'is activated'] );
   end
 
   B = interp3( y, x, z, A, yi, xi, zi, imethod ); 

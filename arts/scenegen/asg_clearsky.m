@@ -1,4 +1,4 @@
-% ASG_CLEARSKY   Loads "clear sky" data
+% ASG_CLEARSKY   Assembles "clear sky" data
 %
 %    The function loads temperature and gas species profile data. The
 %    following ASG (main/sub) fields are considered:
@@ -10,12 +10,12 @@
 %       ABS_SPECIES(:).SOURCE
 %       ABS_SPECIES(:).TAG
 %
-%   The data are expanded to dimensionality given by GENERAL.DIM, but no
+%   The data are expanded to dimensionality given by ATMOSPHERE_DIM, but no
 %   re-gridding is performed.
 %
 % FORMAT   G = asg_clearsky(A)
 %        
-% OUT   G   Loaded data.
+% OUT   G   Assembled data.
 % IN    A   Settings for arts scene generator.
 
 % 2007-10-08   Created by Patrick Eriksson
@@ -91,9 +91,7 @@ end
 %
 for ig = 1 : length(G)
   %
-  G(ig).dim = A.ATMOSPHERE_DIM;
-  %
-  for id = G(ig).dim : A.ATMOSPHERE_DIM
+  for id = G(ig).dim+1 : A.ATMOSPHERE_DIM
     switch id
      case 2
       G(ig).grid2 = A.LAT0;
@@ -101,6 +99,9 @@ for ig = 1 : length(G)
       G(ig).grid3 = A.LON0;
     end
   end
+  %
+  G(ig).dim = A.ATMOSPHERE_DIM;
+  %
 end
 %
 G = gf_clean( G );

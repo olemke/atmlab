@@ -1,5 +1,22 @@
 2007-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-183
+
+	* arts/scenegen/: Smaller improvements in several functions.
+	
+	* arts/scenegen/asg_surface.m: Created.
+
+	* math/regrid.m: Now an error of any grid has length 1 and not 
+	EXTRAP option activated.
+
+	* forwardmodel/gridthinning.m: Simplest possible algorithm now 
+	applied.
+
+	* gformat/gf_grid_convert.m: Now using feval to call mapfun
+	(needed for Matlab 6).
+	
+2007-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-182
 
 	* arts/scenegen/asg.m: Started. Definition of asg settings. 
