@@ -1,4 +1,4 @@
-% GF_INCREASE_DIM   Increase dimension 
+% GF_INCREASE_DIM   Increase dimension of gformat data
 %
 %    Existing data are repeated to fill added dimensions. Grid size, name
 %    and unit for added dimensions are taken from *Gtmplt*.
@@ -23,8 +23,8 @@ end
 
 for i = 1 : length(G)
 
-  mapdata = ones( 1, newdim );
-  
+  mapdata = ones( 1, max([newdim,2]) );  % Ensure min length 2. Otherwise
+                                         % repmat does not work for dim=0.
   for d = G(i).dim+1 : newdim
 
     % Copy grid data

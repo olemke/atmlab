@@ -6,7 +6,9 @@
 %    Matlab functions.
 %
 %    The data is assumed to have dimensions: A(x,y,z)
-%    Grids for dimensions not used must be left out.
+%
+%    Grids for dimensions not used must be left out. That is, for 1D:
+%      B = regrid(A,x,xi[,iopt])
 %
 %    The function considers the atmlab setting EXTRAP.
 %
@@ -41,14 +43,12 @@ if length(x) ~= size(A,1)
   error('Mismatch in size between *x* and *A*.');
 end
 %
-dim = dimens( A );
+dim = floor( (nargin-1)/2 );
 %
-if nargin < 1+dim*2
-  error( 'Too few input arguments.' );
-elseif nargin > 2+dim*2
-  error( 'Too many input arguments.' );
+if dimens(A) > dim 
+  error( 'Dimension of A is higher than number of given grids.' );
 end
-%
+%  
 imethod = 'linear';
 
 

@@ -6,7 +6,7 @@
 %    Each dimension is treated seperately. For example, the grid union for
 %    dimension 2 is grids{2}. Only dimensions common for complete G array are
 %    considered. It is up to the user to ensure that all elements in the array
-%    has same physical dimensions (thta is, that all grid1 are of same type
+%    has same physical dimensions (that is, that all grid1 are of same type
 %    etc.).
 %
 % FORMAT   grids = gf_grid_union(G)

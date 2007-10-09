@@ -28,20 +28,21 @@ for i = 1 : length( G )
   
   if Gtmplt(1).dim == 1
     %
-    G(i).data  = regrid( G(i).data, G(i).grid1, Gtmplt(1).grid1 );
+    G(i).data  = regrid( G(i).data, G(i).grid1, Gtmplt(1).grid1, iopt );
     G(i).grid1 = Gtmplt(1).grid1;
 
   elseif Gtmplt(1).dim == 2
     %
     G(i).data  = regrid( G(i).data, G(i).grid1, Gtmplt(1).grid1, ...
-                                    G(i).grid2, Gtmplt(1).grid2 );
+                                    G(i).grid2, Gtmplt(1).grid2, iopt );
     G(i).grid1 = Gtmplt(1).grid1;
     G(i).grid2 = Gtmplt(1).grid2;
   
   elseif Gtmplt(1).dim == 3
     %
     G(i).data  = regrid( G(i).data, G(i).grid1, Gtmplt(1).grid1, ...
-                                    G(i).grid2, Gtmplt(1).grid2 );
+                                    G(i).grid2, Gtmplt(1).grid2, ...
+                                    G(i).grid3, Gtmplt(1).grid3, iopt );
     G(i).grid1 = Gtmplt(1).grid1;
     G(i).grid2 = Gtmplt(1).grid2;
     G(i).grid3 = Gtmplt(1).grid3;

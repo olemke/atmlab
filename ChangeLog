@@ -1,3 +1,23 @@
+2007-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-182
+
+	* arts/scenegen/asg.m: Started. Definition of asg settings. 
+
+	* arts/scenegen/asg_hydrostat.m: Created. 
+
+	* gformat/gf_increase_dim.m: Did not work for input with dim=0.
+
+	* gformat/gf_decrease_dim.m: Created. 
+
+	* arts/scenegen/asg_regrid.m: Created.
+
+	* math/regrid.m: Data dimension now extracted by number of given
+	grids. This to make it possible to work with grids of length 1
+	(for highest dimension).
+
+	* gformat/gf_regrid.m: Interpolaion option was not passed to regrid. 
+
 2007-10-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-181
