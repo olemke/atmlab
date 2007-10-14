@@ -26,7 +26,7 @@ function X = randmvar_normal(x,si,C,n)
 %
 min_nargin( 4, nargin );
 %
-if dimen(C) > 2  |  size(C,1) ~= size(C,2) 
+if dimens(C) > 2  |  size(C,1) ~= size(C,2) 
   error('Input argument *C* must be a square matrix.');
 end
 %
@@ -39,7 +39,7 @@ end
 %
 if ~( length(si) == 1  |  length(si) == l )
   error( ...
-  'Input argument *si* must be a scalar or a vector with length matching *C*.');
+ 'Input argument *si* must be a scalar or a vector with length matching *C*.');
 end
 %
 if ~isscalar(n)  |  ~iswhole(n)  |  n<1

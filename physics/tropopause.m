@@ -3,7 +3,7 @@
 %    The WMO definition of the tropopause: "The lowest level at which the lapse
 %    rate decreases to 2 °C/km or less, provided that the average lapse rate
 %    between this level and all higher levels within 2 km does not exceed 
-%    2 °C/km."
+%    2 C/km."
 %
 %    This function tries to determine this altitude. 
 %
@@ -19,7 +19,7 @@
 %       T       Temperature profiles.
 % OPT   zmin    Lowest possible altitude for tropopause. Default is 6 km.
 %       zmax    Highest possible altitude for tropopause. Deafult is 20 km.
-%       lrmlim  Lapre rate limit, in K/km. Default is 2 K/km, following WMO.
+%       lrmlim  Lapse rate limit, in K/km. Default is 2 K/km, following WMO.
 
 % 2007-03-01   Created by Patrick Eriksson
 

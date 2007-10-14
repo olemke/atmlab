@@ -51,7 +51,8 @@ else
 end
 %
 G(1) = gfxmlin_GriddedField3( source, 'Temperature', 't' );
-
+%
+G(1).tag = NaN;
 
 
 %- Absorption species
@@ -79,8 +80,10 @@ for is = 1 : length( A.ABS_SPECIES )
     end
   end
   %
-  G(end+1) = gfxmlin_GriddedField3( source, A.ABS_SPECIES(is).NAME, 'vmr' );
+  Gs     = gfxmlin_GriddedField3( source, A.ABS_SPECIES(is).NAME, 'vmr' );
+  Gs.tag = A.ABS_SPECIES(is).TAG;
   %
+  G(end+1) = Gs;
 end
 
 

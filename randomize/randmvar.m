@@ -25,7 +25,7 @@
 %                 the end points of the data range. See example below.
 %
 %    To create 1e6 vectors of length 2 with uniformly distributed data:
-%       C = covmat_from_cfun(1:2,[], ... );
+%       C = covmat1d_from_cfun(1:2,[], ... );
 %       P{1}.cdf = [0 0;1 1]; 
 %       P{2} = P{1};
 %       X = randmvar(P,C,1e6);

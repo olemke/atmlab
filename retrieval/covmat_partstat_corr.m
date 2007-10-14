@@ -1,8 +1,13 @@
-% COVMAT_SEPERABLE_CORRCOEF   Covariance matrix for multidimensional data
+% COVMAT_PARTSTAT_CORR   Covariance matrix for multidimensional data
 %
-%    Sets up a covariance matrix for data spanning several dimensions, with
-%    the assumption that the correlation in one dimension does not depend on
-%    other dimensions. 
+%    Sets up a covariance matrix for data spanning several dimensions and with
+%    partial stationary correlation. That is, it is assumed that there is no
+%    dependency between the correlation in one dimension with the other data
+%    dimensions. The correlation is allowed to vary along each dimension, but
+%    this independently between the data dimensions. A higher degree of
+%    freedom for the correlation is accepted by *covmat3d_from_cfun*.
+%
+%    Note that the standard deviation can vary freely.
 %
 %    The data are assumed to be stored with dimension 1 as innermost "loop",
 %    dimension 2 next etc. For 3D case, the data order is as follows:
@@ -11,9 +16,9 @@
 %
 %    Correlation coefficient matrix 1 (C1) describes then the correlation
 %    for x=[x1,x2,...xn]', and C2 the same thing for y, etc. The correlation
-%    along dimesnions 1 depends thus only on x, no dependency on y, z ...
+%    along dimensions 1 depends thus only on x, no dependency on y, z ...
 %
-% FORMAT   S = covmat_seperable_corrcoef( si, C1 [, C2, C3 ...] )
+% FORMAT   S = covmat_partstat_corr( si, C1 [, C2, C3 ...] )
 %        
 % OUT   S    Covariance matrix.
 % IN    si   Standard deviations: given as 
@@ -30,7 +35,7 @@
 % 2007-05-25   Created by Patrick Eriksson.
 
 
-function S = covmat_seperable_corrcoef(si,varargin)
+function S = covmat_partstat_corr(si,varargin)
 
 
 nc = length(varargin);
@@ -91,8 +96,8 @@ for i = 2 : nc
       S = sparse( irow(ind), icol(ind), (si*si)*s(ind), nold*nnew, nold*nnew );
     else
       si = vec2col(si);
-      S = sparse( irow(ind), icol(ind), si(irow(ind)).*si(icol(ind)).*s(ind),...
-                                                        nold*nnew, nold*nnew );
+      S = sparse( irow(ind), icol(ind), ...
+                  si(irow(ind)).*si(icol(ind)).*s(ind), nold*nnew, nold*nnew );
     end
   end
 end

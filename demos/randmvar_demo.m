@@ -3,15 +3,15 @@ echo on
 %- Random vectors with length 6 will be created.
 
 %- Two elements with normal distribution:
-Cm    = covmat_from_cfun( 1:2, [], 'lin', [1 1;2 1] );
+Cm    = covmat1d_from_cfun( 1:2, [], 'lin', [1 1;2 1] );
 [P,C] = randmvar_add_normal( [], [], [0 2], [1 0.5], Cm );
 
 %- Two elements with uniform distribution:
-Cm    = covmat_from_cfun( 1:2, [], 'dia' );
+Cm    = covmat1d_from_cfun( 1:2, [], 'drc' );
 [P,C] = randmvar_add_uniform( P, C, [0 1;-1 1], Cm );
 
 %- Two elements with log-normal distribution:
-Cm    = covmat_from_cfun( 1:2, [], 'exp', [1 0.6;2 0.4] );
+Cm    = covmat1d_from_cfun( 1:2, [], 'exp', [1 0.6;2 0.4] );
 [P,C] = randmvar_add_lognormal( P, C, [0 1], [0.3 1], Cm );
 
 %- Introduce some cross-correlation between normal and and other elements
@@ -20,8 +20,8 @@ C(1:2,3:6) = Cr;
 C(3:6,1:2) = Cr';
 
 
-%- Create 1e6 random vectors
-X = randmvar( P, C, 1e6 );
+%- Create 1e4 random vectors
+X = randmvar( P, C, 1e4 );
 
 %- Transpose X
 X = X';
@@ -35,10 +35,7 @@ X = X';
 full(C)
 corrcoef(X)
 
-%!!! All values OK except cross-correlation for last element, !!!
-%!!! which is too low                                         !!!
-%
-%
+
 %- Histogram for first uniform element
 hist(X(:,3),100);
 

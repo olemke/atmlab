@@ -1,3 +1,36 @@
+2007-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-184
+
+	* arts/scenegen/asg_fixed_relhumid.m: Created.
+
+	* retrieval/covmat3d.m: Created. Replaces arts_covmat.
+
+	* arts/scenegen/asg_randomize_std.m: Created.
+
+	* arts/scenegen/asg.m: Added description of field D for ABS_SPECIES 
+	and T.
+
+	* physics/pt2z.m: Did not work for row vector p grids.k
+
+	* arts/arts_covmat: Removed.
+	
+	* retrieval/covmat3d_from_cfun.m: Added by renaming arts_covmat.
+	Cleaned up input options. Option dtype moved to *covmat3d*.
+
+	* demos/randmvar_demo.m: Fixed.
+
+	* randomize/randmvar_normal.m: Call of dimens was incorrect. The
+	function was called dimen.
+
+	* retrieval/covmat_seperable_corrcoef.m: Renamed
+	
+	* retrieval/covmat_partstat_corr.m: Added by renaming
+	covmat_seperable_corrcoef.m.
+
+	* retrieval/covmat1d_from_cfun.m: New name of covmat_from_cfun.m.
+	Fixed all calls inside atmlab of this function.
+
 2007-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-183

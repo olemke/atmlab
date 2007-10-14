@@ -9,7 +9,7 @@
 %
 %    The mean state, *x*, can be given as a scalar if all values are identical.
 %
-% FORMAT   X = randmvar_normal( x, Sx, n )
+% FORMAT   X = randmvar_normal2( x, Sx, n )
 %        
 % OUT   X    Random data [length(x) x n].
 % IN    x    Mean vector. 
