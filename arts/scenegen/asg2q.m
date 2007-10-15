@@ -217,7 +217,7 @@ if ~isempty(Gsu)
       Q.R_GEOID = fullfile( A.WORKFOLDER, 'r_geoid.xml' );
       xmlStore( Q.R_GEOID , Gsu(i).data, 'Matrix' );
     else
-      Q.R_GEOID = Gcs(i).data;
+      Q.R_GEOID = Gsu(i).data;
     end
   end
   
@@ -236,7 +236,7 @@ if ~isempty(Gsu)
       Q.Z_SURFACE = fullfile( A.WORKFOLDER, 'z_surface.xml' );
       xmlStore( Q.Z_SURFACE , Gsu(i).data, 'Matrix' );
     else
-      Q.Z_SURFACE = Gcs(i).data;
+      Q.Z_SURFACE = Gsu(i).data;
     end
   end
   

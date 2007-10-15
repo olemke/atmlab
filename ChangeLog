@@ -1,3 +1,12 @@
+2007-10-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-185
+
+	* arts/scenegen/asg2q.m: Corrected a bug for surface part and
+	~CREATE_FILES.
+
+	* arts/scenegen/asg_fixed_relhumid.m: Settings now part of A. 
+
 2007-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-184
