@@ -18,7 +18,9 @@
 %
 %    Two options exist for H2O.RH_BRAKEP and H2O.RH_TOPP:
 %       1. Given as pressure levels.
-%       2. Distance to local tropopause (not yet implemented).
+%       2. Distance to local tropopause
+%    Option 1 is assumed if H2O.RH_TOPP <=  H2O.RH_BRAKEP, and vice versa.
+%    Read header of *tropoapuse* before selecting option 2.
 %
 %    The relative humidity with respect to water is considered for temperatures
 %    above 0C, and the humidity with respect to ice for lower temperatures.
@@ -52,6 +54,12 @@ else
 end
 
 
+if A.H2O.RH_TOPP >  A.H2O.RH_BRAKEP
+  do_z = 1;
+else
+  do_z = 0;
+end
+
 
 %- Find temperature 
 %
@@ -59,6 +67,17 @@ it = min( find( strcmp( {Gcs.name}, 'Temperature' ) ) );
 %
 if isempty( it )
   error( 'Could not locate any temperature data in Gcs.' );
+end
+
+%- Find altitude 
+%
+if do_z
+  %
+  iz = min( find( strcmp( {Gcs.name}, 'Altitude' ) ) );
+  %
+  if isempty( iz )
+    error( 'Could not locate any altitude data in Gcs.' );
+  end
 end
 
 
@@ -78,10 +97,19 @@ for ig = ih2o
         
       %- Find range of interest and obtain relavant data
       %
-      ind = find( Gcs(ig).grid1 >= A.H2O.RH_TOPP );
+      if do_z
+        z = interpp( Gcs(iz).grid1, Gcs(iz).data(:,ilat,ilon), Gcs(ig).grid1 );
+        t = interpp( Gcs(it).grid1, Gcs(it).data(:,ilat,ilon), Gcs(ig).grid1 );
+        z   = z - tropopause( z, t );
+        ind = find( z <= A.H2O.RH_TOPP ); 
+        z   = z(ind);
+        t   = t(ind);
+      else
+        ind = find( Gcs(ig).grid1 >= A.H2O.RH_TOPP );
+        t = interpp( Gcs(it).grid1, Gcs(it).data(:,ilat,ilon), ...
+                                                          Gcs(ig).grid1(ind) );
+      end
       %
-      t = interpp( Gcs(it).grid1, Gcs(it).data(:,ilat,ilon), ...
-                                                      Gcs(ig).grid1(ind) );
       ei = e_eq_ice( t );
       ew = e_eq_water( t );
       
@@ -95,10 +123,16 @@ for ig = ih2o
         
       %- Determine weight for vmr
       %
-      ww = ( log10(Gcs(ig).grid1(ind)) - log10(A.H2O.RH_TOPP) ) /...
+      if do_z
+        ww = ( z - A.H2O.RH_TOPP ) /...
+                       ( A.H2O.RH_BRAKEP - A.H2O.RH_TOPP );
+      else
+        ww = ( log10(Gcs(ig).grid1(ind)) - log10(A.H2O.RH_TOPP) ) /...
                        ( -log10(A.H2O.RH_TOPP) + log10(A.H2O.RH_BRAKEP)  );
+      end
+      %
       ww(find(ww>1)) = 1;
-      
+
       %- Create new profile
       %
       Gcs(ig).data(ind,ilat,ilon) = ww.*vmr + ...
