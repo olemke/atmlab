@@ -25,7 +25,7 @@ result = 'error';
 while ~feof (fid) & ~exit_loop
 
   c = fgets (fid, 1);
-  while ~feof (fid) & (c == 10 | c == 32)
+  while ~feof (fid) & (c == 10 | c == 13 | c == 32)
     c = fgets (fid, 1);
   end
 

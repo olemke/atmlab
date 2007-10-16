@@ -1,3 +1,9 @@
+2007-10-16  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-187
+
+	* xml/xmlReadTag.m: Fix reading of binary files in windows.
+
 2007-10-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-186
