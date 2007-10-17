@@ -1,29 +1,32 @@
-% GF_GRID_CONVERT   Conversion of grid unit
+% GF_GRID_CONVERT   Conversion of grid unit for gformat data
 %
-%    This function allows a change of grid unit. The conversion of a grid g
-%    can be expressed as:
+%    This function allows a change of grid unit. Basically an interface to
+%    *gridconvert*. See that function for further specification of *precs*,
+%    *mapfun*, and *postcs*.
 %
-%       g = -(postcs~=1) * mapfun( -(precs~=1)*g )
+%    The conversion is performed only for items of G where *dim* is part of
+%    used dimensions (defined by field DIMS).
 %
 %    To convert a pressure grid to increasing "pressure decades":
-%       gf_grid_convert( p_grid, [], 0, @log10, 1 )
-%    The reveresed conversion is:
-%       gf_grid_convert( p_grid, [], 1, @pow10 )
+%       G = gf_grid_convert( D, G, 1, 0, @log10, 1 );
+%    The reversed conversion is:
+%       G = gf_grid_convert( D, G, 1, 1, @pow10 );
 %
-% FORMAT   G = gf_grid_convert( G [, dim, precs, mapfun, postcs] )
+% FORMAT   G = gf_grid_convert( D, G, dim, precs, mapfun, postcs )
 %        
-% OUT   G        Data with converted grid.
-% IN    G        Original data. Either in g-format or as a plain vector.
+% OUT   G   Transformed gformat data.
+% IN    D   Gformat definition structure
+%       G   Original gformat data.
 % OPT   dim      Data dimension for which grid shall be converted.
 %                Default is 1.
-%       precs    Change sign before applying *mapfun*. Defult is false.
-%       mapfun   Mapping function. No mapping if empty, which is default.
-%       postcs   Change sign after applying *mapfun*. Defult is false.
+%       precs    See *gridconvert*. Defult is false.
+%       mapfun   See *gridconvert*. Default is [].
+%       postcs   See *gridconvert*. Defult is false.
 
-% 2007-05-15   Created by Patrick Eriksson.
+% 2007-10-17   Created by Patrick Eriksson.
 
 
-function G = gf_grid_convert( G, dim, precs, mapfun, postcs )
+function G = gf_grid_convert( D, G, dim, precs, mapfun, postcs )
 
 %- Default values
 %
@@ -37,53 +40,34 @@ set_defaults;
 
 %- Check input
 %
+rqre_datatype( 'struct', D );
+rqre_datatype( 'struct', G );
+rqre_field( D, 'DIM', 0 );
+rqre_field( G, 'DIMS', 0 );
+rqre_scalar( 'input argument *dim*', dim, 1 );
+if D.DIM < dim
+  error( 'Value of *dim* must be in range [1,D.DIM].' );
+end
+rqre_bool( 'input argument *precs*' );
+rqre_bool( 'input argument *postcs*' );
+%
 if ~isempty(mapfun)  &  ~isa( mapfun, 'function_handle' )
-  error( 'Input *mapfun* must be empty or a finction handle.' );
+  error( 'Input *mapfun* must be empty or a function handle.' );
 end
 
 
-%- Handle ordinary vectors
-%
-vecopt = 0;
-%
-if isvector(G)  & isnumeric(G)
-  vecopt  = 1;
-  dim     = 1;
-  g       = G;
-  G       = [];
-  G.grid1 = g;
-  G.dim   = 1;
-end
 
-gridname = sprintf('grid%d',dim);
+
+gridname = sprintf( 'GRID%d', dim );
   
-for i = 1 : length( G )
 
-  if G(i).dim < dim
-        error( sprintf( 'Selected dimension too high for G(%d).', i ) );
-  end
+for ig = 1 : length( G )
 
-  g = G(i).(gridname);
-  
-  if precs
-    g = -g;
-  end
-  
-  if ~isempty( mapfun )
-    g = feval( mapfun, g );
-  end
-
-  if postcs
-    g = -g;
-  end
+  if any( dim == G(ig) )
     
-  G(i).(gridname) = g;
+    G(i).(gridname) = gridconvert( G(i).(gridname), precs, mapfun, postcs );
+    
+  end
   
 end
 
-
-if vecopt
-  g = G.grid1;
-  G = [];
-  G = g;
-end

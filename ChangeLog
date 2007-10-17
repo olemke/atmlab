@@ -1,3 +1,39 @@
+2007-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-188
+
+	* Definition of gformat changed. In short, the dimensions are now
+	the same for items in G, but not all dimensions must be active. 
+
+	The arts scene generator is not yet updated to gformat changes.
+	
+	* gformat/gf_regrid.m: Updated. 
+
+	* gformat/gf_interp.m: Removed.
+
+	* gformat/gf_set.m: Created.
+
+	* gformat/gf_increase_dim.m: Updated.
+
+	* gformat/gf_grid_union.m: Updated. 
+
+	* forwardmodel/gridconvert.m: Created. 
+
+	* gformat/gf_grid_convert.m: Updated. Actual conversion lifted out
+	to *gridconvert*.
+
+	* gformat/gf_decrease_dim.m: Removed. Not very useful with new format.
+
+	* gformat/gf_copy_grids.m: Removed. Obselete with new format. Can
+	now be made as
+	   G2      = G;        % G has DIMS=[1 2 3];
+	   G2.DIMS = [ 2 3 ];
+	   G2      = gf_clean( D, G2 );
+	
+	* gformat/gf_clean.m: Updated to new format. 
+
+	* gformat/Contents.m: Description updated.
+
 2007-10-16  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-187

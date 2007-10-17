@@ -1,34 +1,34 @@
-% GF_CLEAN   Removes grid data for not used dimensions
+% GF_CLEAN   Removes grid for not used dimensions
 %
-%    Removes unnecessary data (that is, grid data for dimensions not used).
+%    Removes unnecessary data. That is, grid data for dimensions not used.
 %   
-%    The maximum dimension in the array determines what grids that can be 
-%    removed.
-%
-% FORMAT   G = gf_clean( G )
+% FORMAT   G = gf_clean( D, G )
 %        
-% OUT   G   Cleaned data.
-% IN    G   Original data.
+% OUT   G   Cleaned gformat data.
+% IN    D   Gformat definition structure
+%       G   Original gformat data.
 
-% 2007-05-14   Created by Patrick Eriksson.
+% 2007-10-17   Created by Patrick Eriksson.
 
-function G = gf_clean(G)
+function G = gf_clean(D,G)
+
+
+%- Check input
+%
+rqre_datatype( 'struct', D );
+rqre_datatype( 'struct', G );
+rqre_field( D, 'DIM', 0 );
+rqre_field( G, 'DIMS', 0 );
+
+
+for ig = 1 : length(G)
   
-
-d = max( [G.dim] );
- 
-ready = 0;
-  
-while ~ready
+  for id = 1 : D.DIM
     
-  d = d + 1;
-  
-  gname = sprintf( 'grid%d', d );
-
-  if isfield( G(1), gname )
-    G = rmfield( G, { gname, [gname,'_name'], [gname,'_unit'] } );
-  else
-    ready = 1;
+    if ~any( id == G(ig).DIMS)
+      
+      G(ig).(sprintf('GRID%d',id)) = [];
+    
+    end
   end
-  
 end
