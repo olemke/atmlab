@@ -48,8 +48,8 @@ rqre_scalar( 'input argument *dim*', dim, 1 );
 if D.DIM < dim
   error( 'Value of *dim* must be in range [1,D.DIM].' );
 end
-rqre_bool( 'input argument *precs*' );
-rqre_bool( 'input argument *postcs*' );
+rqre_bool( 'input argument *precs*', precs );
+rqre_bool( 'input argument *postcs*', postcs );
 %
 if ~isempty(mapfun)  &  ~isa( mapfun, 'function_handle' )
   error( 'Input *mapfun* must be empty or a function handle.' );
@@ -63,9 +63,9 @@ gridname = sprintf( 'GRID%d', dim );
 
 for ig = 1 : length( G )
 
-  if any( dim == G(ig) )
+  if any( dim == G(ig).DIMS )
     
-    G(i).(gridname) = gridconvert( G(i).(gridname), precs, mapfun, postcs );
+    G(ig).(gridname) = gridconvert( G(ig).(gridname), precs, mapfun, postcs );
     
   end
   

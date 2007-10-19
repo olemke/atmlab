@@ -1,3 +1,27 @@
+% ASG_DIMADD   Extrapolates ASG data to match Q.ATMOSPHERE_DIM
+%
+%    The function ensures that atmospheric fields are defined for 
+%    dimensions 1:Q.ATMOSPHERE_DIM and surface for 2:Q.ATMOSPHERE_DIM.
+%    Nothing is done if the DATA field is empty. 
+%
+%    The data is extended following settings in G.DIMADD. The extrapolation
+%    method is selected by the field METHOD. The following options exist:
+%
+%    FORMAT = 'expand'
+%    -----------------
+%    The data are simply expanded to fill missing higher dimensions. For 
+%    example, a 1D pressure profile is expanded to 2D by inserting the
+%    profile at each Q.LAT_GRID position.
+%
+% FORMAT   G = asg_regrid( D, G, Q )
+%        
+% OUT   G   Extrapolated ASG data.
+% IN    D   Gformat definition structure.
+%       G   ASG data.
+%       Q   Qarts setting structure.
+
+% 2007-10-19   Created by Patrick Eriksson
+
 function G = asg_dimadd( D, G, Q )
   
 

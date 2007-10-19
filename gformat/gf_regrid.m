@@ -35,8 +35,8 @@ if nargin < 5
   iopt = 'linear';
 end
 
+
 %- Some input checks
-%
 %
 rqre_datatype( 'struct', D );
 rqre_datatype( 'struct', G );

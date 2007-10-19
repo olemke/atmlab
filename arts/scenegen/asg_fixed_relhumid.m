@@ -1,113 +1,114 @@
 % ASG_FIXED_RELHUMID   Sets a fixed relative humidity
 %
 %    Water VMR profiles are set to the selected relative humidity inside
-%    selected altitude range. This is done for all items of Gcs where the field
-%    *name* starts with 'Water'.
+%    selected altitude range. This is done for all items of G where 
+%    G.NAME starts with 'Water'.
 %
-%    The function uses the following fields of A:
-%       H2O.FIXED_RH       Boolean
-%       H2O.RH             Relative humidity [-] (  not %, a value around 0-1.6)
-%       H2O.RH_BRAKEP      Brake point [Pa or m]
-%       H2O.RH_TOPP        Top altitude [Pa or m]
+%    The calculations are controled by the following fields
+%       SPCFC.FIXED_RH    Boolean
+%       SPCFC.RH          Relative humidity [-] (not %, a value around 1)
+%       SPCFC.RH_BRAKEP   Brake point [Pa or m]
+%       SPCFC.RH_TOPP     Top altitude [Pa or m]
 %
 %    Nothing is done if H2O.FIXED_RH is false. Otherwise:
 %
-%    The profiles are set to H2O.RH up to the altitude corresponding to
-%    H2O.RH_BRAKEP. A linear transition to the original profile is performed
-%    between H2O.RH_BRAKEP and H2O.RH_TOPP.
+%    The profiles are set to SPCFC.RH up to the altitude corresponding to
+%    SPCFC.RH_BRAKEP. A linear transition to the original profile is 
+%    performed between SPCFC.RH_BRAKEP and SPCFC.RH_TOPP.
 %
-%    Two options exist for H2O.RH_BRAKEP and H2O.RH_TOPP:
+%    Two options exist for SPCFC.RH_BRAKEP and SPCFC.RH_TOPP:
 %       1. Given as pressure levels.
 %       2. Distance to local tropopause
-%    Option 1 is assumed if H2O.RH_TOPP <=  H2O.RH_BRAKEP, and vice versa.
+%    Option 1 is assumed if SPCFC.RH_TOPP <=  SPCFC.RH_BRAKEP, and vice versa.
 %    Read header of *tropoapuse* before selecting option 2.
 %
-%    The relative humidity with respect to water is considered for temperatures
-%    above 0C, and the humidity with respect to ice for lower temperatures.
+%    The relative humidity with respect to water is considered for 
+%    temperatures above 0C, and the humidity with respect to ice for 
+%    lower temperatures.
 %
-% FORMAT   Gcs = asg_fixed_relhumid( A, Gcs )
+% FORMAT   G = asg_fixed_relhumid( D, G )
 %        
-% OUT   Gcs     As input *Gcs*, but with modified water profiles 
-% IN    A           Settings for arts scene generator.
-%       Gcs     Clear sky profiles in gformat. 
+% OUT   G   Modified ASG data.
+% IN    D   Gformat definition structure.
+%       G   ASG data.
 
-% 2007-10-12   Created by Patrick Eriksson.
+% 2007-10-19   Created by Patrick Eriksson
 
-
-function Gcs = asg_fixed_relhumid( A, Gcs )
-
-  
-%- Basic check of input
-%
-qcheck( @asg, A );
-%
-rqre_field( A.H2O, 'FIXED_RH', 0 );
-
-
-if ~A.H2O.FIXED_RH
-  return        % ---->
-else
-  rqre_field( A.H2O, 'RH', 0 );
-  rqre_scalar( 'A.H2O.RH', A.H2O.RH, 0, 2 );
-  rqre_field( A.H2O, 'RH_BRAKEP', 0 );
-  rqre_field( A.H2O, 'RH_TOPP', 0 );
-end
-
-
-if A.H2O.RH_TOPP >  A.H2O.RH_BRAKEP
-  do_z = 1;
-else
-  do_z = 0;
-end
+function G = asg_fixed_relhumid( D, G )
 
 
 %- Find temperature 
 %
-it = min( find( strcmp( {Gcs.name}, 'Temperature' ) ) );
+it = min( find( strncmp( lower({G.NAME}), 'temperature', 11 ) ) );
 %
 if isempty( it )
-  error( 'Could not locate any temperature data in Gcs.' );
-end
-
-%- Find altitude 
-%
-if do_z
-  %
-  iz = min( find( strcmp( {Gcs.name}, 'Altitude' ) ) );
-  %
-  if isempty( iz )
-    error( 'Could not locate any altitude data in Gcs.' );
-  end
+  error( 'Could not locate any temperature data in G.' );
 end
 
 
 %- Find water species
 %
-ih2o = find( strncmp( {Gcs.name}, 'Water', 5 ) );
+ih2o = find( strncmp( lower({G.NAME}), 'water', 5 ) );
 %
 if isempty( it )
-  error( 'Could not locate any water vapour data in Gcs.' );
+  error( 'Could not locate any water vapour data in G.' );
 end
+
+
+iz = [];
 
 
 for ig = ih2o
   
-  for ilon = 1:size(Gcs(ig).data,3)
-    for ilat = 1:size(Gcs(ig).data,2)
+  rqre_field( G(ig).SPCFC, 'FIXED_RH', 0 );
+
+  if ~G(ig).SPCFC.FIXED_RH
+    continue       % ---->
+  end
+  
+  rqre_field( G(ig).SPCFC, 'RH', 0 );
+  rqre_scalar( 'G(ig).SPCFC.RH', G(ig).SPCFC.RH, 0, 2 );
+  rqre_field( G(ig).SPCFC, 'RH_BRAKEP', 0 );
+  rqre_field( G(ig).SPCFC, 'RH_TOPP', 0 );
+
+  if G(ig).SPCFC.RH_TOPP >  G(ig).SPCFC.RH_BRAKEP
+    do_z = 1;
+  else
+    do_z = 0;
+  end
+
+  %- Find altitude 
+  %
+  if do_z  &  isempty(iz)
+    %
+    iz = min( find( strncmp( lower({G.NAME}), 'altitude', 8 ) ) );
+    %
+    if isempty( iz )
+      error( 'Could not locate any altitude data in G.' );
+    end
+    %
+    if isempty( G(iz).DATA )
+      error( 'Empty G.DATA for altitude field.' );
+    end
+  end
+  
+  
+  for ilon = 1:size(G(ig).DATA,3)
+    for ilat = 1:size(G(ig).DATA,2)
         
       %- Find range of interest and obtain relavant data
       %
       if do_z
-        z = interpp( Gcs(iz).grid1, Gcs(iz).data(:,ilat,ilon), Gcs(ig).grid1 );
-        t = interpp( Gcs(it).grid1, Gcs(it).data(:,ilat,ilon), Gcs(ig).grid1 );
+        z = interpp( G(iz).GRID1, G(iz).DATA(:,ilat,ilon), G(ig).GRID1 );
+        t = interpp( G(it).GRID1, G(it).DATA(:,ilat,ilon), G(ig).GRID1 );
         z   = z - tropopause( z, t );
-        ind = find( z <= A.H2O.RH_TOPP ); 
+        ind = find( z <= G(ig).SPCFC.RH_TOPP ); 
         z   = z(ind);
         t   = t(ind);
       else
-        ind = find( Gcs(ig).grid1 >= A.H2O.RH_TOPP );
-        t = interpp( Gcs(it).grid1, Gcs(it).data(:,ilat,ilon), ...
-                                                          Gcs(ig).grid1(ind) );
+        ind = find( G(ig).GRID1 >= G(ig).SPCFC.RH_TOPP );
+        t = interpp( G(it).GRID1, G(it).DATA(:,ilat,ilon), ...
+                                                          G(ig).GRID1(ind) );
       end
       %
       ei = e_eq_ice( t );
@@ -119,24 +120,24 @@ for ig = ih2o
       
       %- VMR for selected relative humidity
       %
-      vmr = A.H2O.RH * ( ww.*ew + (1-ww).*ei ) ./ Gcs(ig).grid1(ind);
+      vmr = G(ig).SPCFC.RH * ( ww.*ew + (1-ww).*ei ) ./ G(ig).GRID1(ind);
         
       %- Determine weight for vmr
       %
       if do_z
-        ww = ( z - A.H2O.RH_TOPP ) /...
-                       ( A.H2O.RH_BRAKEP - A.H2O.RH_TOPP );
+        ww = ( z - G(ig).SPCFC.RH_TOPP ) /...
+                       ( G(ig).SPCFC.RH_BRAKEP - G(ig).SPCFC.RH_TOPP );
       else
-        ww = ( log10(Gcs(ig).grid1(ind)) - log10(A.H2O.RH_TOPP) ) /...
-                       ( -log10(A.H2O.RH_TOPP) + log10(A.H2O.RH_BRAKEP)  );
+        ww = ( log10(G(ig).GRID1(ind)) - log10(G(ig).SPCFC.RH_TOPP) ) /...
+             ( -log10(G(ig).SPCFC.RH_TOPP) + log10(G(ig).SPCFC.RH_BRAKEP)  );
       end
       %
       ww(find(ww>1)) = 1;
 
       %- Create new profile
       %
-      Gcs(ig).data(ind,ilat,ilon) = ww.*vmr + ...
-                                          (1-ww).*Gcs(ig).data(ind,ilat,ilon);
+      G(ig).DATA(ind,ilat,ilon) = ww.*vmr + ...
+                                          (1-ww).*G(ig).DATA(ind,ilat,ilon);
     end
   end
 end

@@ -1,5 +1,17 @@
 2007-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-190
+
+	* Smaller fixes in several headers.
+	
+	* arts/scenegen/asg_dimadd.m: Wrote header.
+
+	* arts/scenegen/asg_fixed_relhumid.m: Updated. 
+
+	* arts/scenegen/asg_hydrostat.m: Updated.
+
+2007-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-189
 
 	* Revision of ASG, following changes in the gformat. Not finished.

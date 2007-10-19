@@ -5,101 +5,98 @@
 %    'Temperature' and 'Water vapour', respectively. If several items exist,
 %    the first one is used.
 %
+%    The G array must further contain an item for altitudes. The field NAME
+%    is expected to start as 'Altitude'. This is item of G can be empty,
+%    beside the field SPCFC, where settings for this functions is stored,
+%    as described below.
+%
 %    Hydrostatic equilibrium is calculated for each geographical position
 %    individually. The reference point (see *pt2z*) is taken from
-%    A.HSE. The same pressure of the reference point is applied for all
-%    positions, and is taken from A.HSE.P0 (should be a scalar). The
-%    altitude of the reference point is described by A.HSE.Z0, which is
+%    G.SPCFC. The same pressure of the reference point is applied for all
+%    positions, and is taken from G.SPCFC.P0 (should be a scalar). The
+%    altitude of the reference point is described by G.SPCFC.Z0, which is
 %    expected to be a surface described in gformat. The input can here be
 %    for lower data dimension. For example, a constant altitude can be set
 %    as:
-%       A.HSE.Z0.name       = 'Reference altitude for HSE';
-%       A.HSE.Z0.source     = mfilename;
-%       A.HSE.Z0.dim        = 0;
-%       A.HSE.Z0.data       = 6e3;
-%       A.HSE.Z0.data_name  = 'Altitude';
-%       A.HSE.Z0.data_unit  = 'm';
+%       G(i).SPCFC.Z0        = gf_set( D, asgG, [], 0, [], ...
+%                                     'Altitude at P0', 'Altitude', 'm' );
 %
-% FORMAT   G = asg_hydrostat( A, G )
+% FORMAT   G = asg_hydrostat( D, G, Q )
 %        
-% OUT   G           Expanded gformat array, appended with an item holding
-%                   altitudes. Name set to 'Altitude'.
-% IN    A           Settings for arts scene generator.
-%       G           Data (in gformat).
+% OUT   G   Expanded gformat array, appended with an item holding
+%           altitudes. Name set to 'Altitude'.
+% IN    A   Settings for arts scene generator.
+%       G   Data (in gformat).
+%       Q   Qarts setting structure.
 
 % 2007-10-09   Created by Patrick Eriksson
 
-function G = asg_hydrostat( A, G )
+function G = asg_hydrostat( D, G, Q )
 
 
-%- Some checks of A
+%- Locate position of 'Altitude field'
 %
-qcheck( @asg, A );
-rqre_field( A.HSE, 'P0', 0 );
-rqre_field( A.HSE, 'Z0', 0 );
-  
-  
-%- Find index of temperature and H2O in G 
+% Take first index if several found
 %
-% Take first index of several found
+iz = min( find( strncmp( lower({G.NAME}), 'altitude', 8 ) ) );
 %
-it = find( strcmp( lower({G(:).name}), 'temperature' ) );
+if isempty( iz )
+  error( 'Could not locate any altitude data in G.' );
+end
+%
+rqre_field( G(iz).SPCFC, 'P0', 0 );
+rqre_field( G(iz).SPCFC, 'Z0', 0 );
+qcheck( @asgG, G(iz).SPCFC.Z0 );
+
+
+%- Locate also position of temperature and water vapour
+%
+it = min( find( strncmp( lower({G(:).NAME}), 'temperature', 11 ) ) );
 if isempty( it )
   error( 'Could not locate temperature in G.' );
 end
 %
-iw = find( strcmp( lower({G(:).name}), 'water vapour' ) );
+iw = min( find( strcmp( lower({G(:).NAME}), 'water vapour' ) ) );
 if isempty( iw )
   error( 'Could not locate water vapour in G.' );
 end
-%
-it = it(1);
-iw = iw(1);
 
 
-%- Add new item to G
+%- Set string fields
 %
-iz    = length(G) + 1;
-G(iz) = G(it);
-%
-G(iz).name      = 'Altitude';
-G(iz).source    = 'asg_hydrostat';
-G(iz).data_name = 'Altitude';
-G(iz).data_unit = 'm';
+G(iz).NAME      = 'Altitude field';
+G(iz).SOURCE    = 'asg_hydrostat';
+G(iz).DATA_NAME = 'Altitude';
+G(iz).DATA_UNIT = 'm';
 
 
 %- Latitudes
 %
-if G(it).dim >= 2
-  lats = G(it).grid2;
+if any( G(it).DIMS == 2 )
+  lats = G(it).GRID2;
 else
   lats = 45;
 end
 
 
-
-%- Re-grid A.HSE.ZO
+%- Re-grid SPCFC.ZO
 %
-ind    = repmat( NaN, 1, G(it).dim );
-ind(1) = 1;
-Gtmplt = gf_decrease_dim( G(it), ind );
-%
-if A.HSE.Z0.dim < Gtmplt.dim
-  A.HSE.Z0 = gf_increase_dim( A.HSE.Z0, Gtmplt.dim, Gtmplt );
-end
-%
-Z0 = gf_regrid( A.HSE.Z0, Gtmplt, 'linear' );
-
+Z0 = asg_dimadd( D, G(iz).SPCFC.Z0, Q );
+Z0 = asg_regrid( D, Z0, Q );
 
 
 %- Run HSE
 %
-for ilon = 1 : size(G(it).data,3)
-  for ilat = 1 : size(G(it).data,2)
+G(iz).GRID1 = G(it).GRID1; 
+G(iz).GRID2 = G(it).GRID2; 
+G(iz).GRID3 = G(it).GRID3; 
+%
+for ilon = 1 : size(G(it).DATA,3)
+  for ilat = 1 : size(G(it).DATA,2)
 
-    G(iz).data(:,ilat,ilon) = pt2z( G(it).grid1, G(it).data(:,ilat,ilon), ...
-                                                 G(iw).data(:,ilat,ilon), ...
-                                A.HSE.P0, Z0.data(ilat,ilon), lats(ilat) );
+    G(iz).DATA(:,ilat,ilon) = pt2z( G(it).GRID1, G(it).DATA(:,ilat,ilon), ...
+                                                 G(iw).DATA(:,ilat,ilon), ...
+                             G(iz).SPCFC.P0, Z0.DATA(ilat,ilon), lats(ilat) );
     
   end
 end

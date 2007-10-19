@@ -1,94 +1,58 @@
-% ASG_REGRID   Re-gridding of data based on ASG settings
+% ASG_REGRID   Re-gridding of ASG data.
 %
-%    The following ASG fields are considered:
-%       ATMOSPHERE_DIM
-%       P_GRID
-%       LAT_GRID
-%       LON_GRID
-%
-%    The data are re-gridded to match P_GRID, LAT_GRID and LON_GRID. 
+%    The data are re-gridded to match Q.P_GRID, Q.LAT_GRID and Q.LON_GRID. 
 %    These grids must be set before calling this function (that is, scalar
 %    input is not allowed as for *asg_atmgrids*).
 %
 %    Interpolation in pressure is performed after conversion to pressure
-%    decades. 
+%    decades. Nothing is done if the DATA field is empty. 
 %
-% FORMAT   G = asg_regrid( A, G [,a_surface] )
+% FORMAT   G = asg_regrid( D, G, Q )
 %        
-% OUT   G           Re-gridded data.
-% IN    A           Settings for arts scene generator.
-%       G           Data (in gformat).
-% OPT   a_surface   Set to true if G contains "surface data" (e.g. data for
-%                   r_geoid and z_surface).
+% OUT   G   Re-gridded ASG data.
+% IN    D   Gformat definition structure.
+%       G   ASG data.
+%       Q   Qarts setting structure.
 
 % 2007-10-08   Created by Patrick Eriksson
 
 
-function G = asg_regrid(A,G,a_surface)
-
-if nargin < 3
-  a_surface = false;
-end
+function G = asg_regrid( D, G, Q )
 
 
-%- Basic check of input
+%- Basic checks
 %
-qcheck( @asg, A );
+% D and G are partially checked inside gf functions.
+% Full check of D, G and Q is only made in *asg_chdim* for efficiency reasons.
 
 
-
-%- Create a template G for re-gridding 
+%- Create array with new grids. 
 %
-% And convert to pressure decades for pressure diemsnion
+grids = { Q.P_GRID, Q.LAT_GRID, Q.LON_GRID };
+
+
+%- Switch to pressure decades
 %
-if a_surface
-  if any( [G(:).dim] ~= A.ATMOSPHERE_DIM-1 )
-    error( ['One or several items in *G* has a dimensionality that is ' ...
-            'inconsistent with A.ATMOSPHERE_DIM for a surface.'] );
-  end
-
-  Gtmplt.dim   = A.ATMOSPHERE_DIM - 1;
-
-  if A.ATMOSPHERE_DIM == 1
-    return  % Nothing to do
-  end
-  if A.ATMOSPHERE_DIM >= 2
-    Gtmplt.grid1 = A.LAT_GRID;
-  end
-  if A.ATMOSPHERE_DIM >= 3
-    Gtmplt.grid2 = A.LON_GRID;
-  end
-
-else
-  if any( [G(:).dim] ~= A.ATMOSPHERE_DIM )
-    error( ['One or several items in *G* has other dimensionality than ' ...
-            'A.ATMOSPHERE_DIM.'] );
-  end
-
-  Gtmplt.dim   = A.ATMOSPHERE_DIM;
-
-  Gtmplt.grid1 = -log10( A.P_GRID ); 
-  G            = gf_grid_convert( G, 1, 0, @log10, 1 );
-
-  if A.ATMOSPHERE_DIM >= 2
-    Gtmplt.grid2 = A.LAT_GRID;
-  end
-  if A.ATMOSPHERE_DIM >= 3
-    Gtmplt.grid3 = A.LON_GRID;
-  end
-end
+grids{1} = gridconvert( grids{1}, 0, @log10, 1 );
+G        = gf_grid_convert( D, G, 1, 0, @log10, 1 );
 
 
+for ig = 1 : length(G)
+
+  %- Do nothing if DATA field is empty.
+  
+  if ~isempty( G(ig).DATA )
     
-%- Do regridding
-%
-G = gf_regrid( G, Gtmplt, 'linear' );
-
-
-
-%- Convert back from pressure decades
-%
-if ~a_surface
-  G = gf_grid_convert( G, 1, 1, @pow10 );
+    dims = G(ig).DIMS;
+    
+    G(ig) = gf_regrid( D, G(ig), { grids{dims} }, dims );
+    
+  end
+  
 end
+
+
+%- Back to Pa
+%
+G        = gf_grid_convert( D, G, 1, 1, @pow10 );
 

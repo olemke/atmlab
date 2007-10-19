@@ -19,11 +19,11 @@
 %        
 % OUT   Q   Modified qarts setting structure.
 % IN    D   Gformat definition structure.
-%       G   Data in gformat.
+%       G   AGS data.
 %       Q   Qarts setting structure.
 
 
-% 2007-10-09   Created by Patrick Eriksson
+% 2007-10-19   Created by Patrick Eriksson
 
 
 function Q = asg_atmgrids( D, G, Q );
