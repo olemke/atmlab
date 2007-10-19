@@ -365,8 +365,16 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     end
     T{end+1} = sprintf( 'abs_linesReadFrom%s{', format );
     T{end+1} = sprintf( '   filename = "%s"', filename );
-    T{end+1} =  '   fmin     = 0';
-    T{end+1} =  '   fmax     = 10e25';
+    if isnan( Q.ABS_LINES_FMIN )
+      T{end+1} =  '   fmin     = 0';
+    else
+      T{end+1} =  sprintf( '   fmin     = %.6e', Q.ABS_LINES_FMIN );
+    end
+    if isnan( Q.ABS_LINES_FMIN )
+      T{end+1} =  '   fmax     = 10e25';
+    else
+      T{end+1} =  sprintf( '   fmax     = %.6e', Q.ABS_LINES_FMAX );
+    end
     T{end+1} = '}';
     T{end+1} = 'abs_lines_per_speciesCreateFromLines{}';
     %

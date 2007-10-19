@@ -2,13 +2,22 @@
 %
 %    Returns species (or isotopomer) name. For example,
 %    'H20-161-501e9-505e9' is converted to 'H2O' or 'H2O-161', depending on
-%    status of *iso*.
+%    status of *iso*. 
+% 
+%    Note that the internal arts format is not handled here (as in 
+%    *arts_tgs_cnvrt*). A string input is here interpreted as a single tag.
+%
+%    Two main ways to call this function:
+%       arts_tgs2species(Q.ABS_SPECIES)
+%       arts_tgs2species(Q.ABS_SPECIES{1}{1})
 %
 % FORMAT   species = arts_tgs2species( a, iso )
 %        
-% OUT   species   Species names. Returned as a cell array with strings.
-% IN    a         Tag group information, either in arts1 or arts format. See
-%                 arts_tgs_cnvrt for format descriptions.
+% OUT   species   Species names. Returned as a cell array with strings or a 
+%                 plain string, depending on format of *a*.
+% IN    a         Tag group information. A single tag can be given as a
+%                 plain string. Output is then also a plain string. 
+%                 Multiple tags given in the atmlab format *arts_tgs_cnvrt*.
 % OPT   iso       Include isotopomer numbers. Default is false.
 
 % 2007-05-14   Created by Patrick Eriksson.
@@ -23,7 +32,8 @@ end
   
 
 if ischar( a )
-  a = arts_tgs_cnvrt( a );
+  a           = { { a } };
+  return_char = 1;
 end
 
 
@@ -43,3 +53,8 @@ for it = 1 : length(a)
     end   
   end   
 end  
+
+
+if return_char
+  species = species{1}{1};
+end

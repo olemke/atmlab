@@ -2,7 +2,7 @@
 %
 %    The function convert tag groups description between Atmlab and ARTS
 %    formats. The ARTS format is a string, with each group inside " " and
-%    group items seperated with commas. Tag groups are stored Atmlab as
+%    group items seperated with commas. Tag groups are stored in Atmlab as
 %    a nested cell array. The primary length of the array corresponds to the
 %    the number of tag groups. The length of the array for each group
 %    is determined by the number of items. An example for the Atmlab version:

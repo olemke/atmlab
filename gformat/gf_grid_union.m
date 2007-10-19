@@ -6,9 +6,9 @@
 %    Dimensions to consider are selected by *dims*. Each of these dimensions is
 %    treated seperately. For example, the grid union for dimension
 %    corresponding to element 2 of *dims* is grids{2}. Items of G for which
-%    the selected diemsnion is not active, are automatically skipped.
+%    the selected dimension is not active, are automatically skipped.
 %
-% FORMAT   grids = gf_grid_union(D,G)
+% FORMAT   grids = gf_grid_union(D,G,dims)
 %        
 % OUT   grids   Joined grids, as a cell array of vectors
 % IN    D       Gformat definition structure
@@ -33,7 +33,7 @@ if any( dims < 1  |  dims > D.DIM )
 end
 
 
-for id = 1 : dims
+for id = 1 : length( dims )
   
   grids{id} = [];
   
@@ -43,12 +43,12 @@ for id = 1 : dims
     
     if any( G(ig).DIMS == dims(id) ) 
     
-      grids{id} = [ grids{id}; vec2col( getfield( G(i), gridname ) ) ];
+      grids{id} = [ grids{id}; vec2col( getfield( G(ig), gridname ) ) ];
     
     end
   
   end
-  
-  grids{d} = unique( grids{d} );
-  
+
+  grids{id} = unique( grids{id} );
+
 end

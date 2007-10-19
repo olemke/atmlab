@@ -19,6 +19,7 @@
 
 function G = gf_increase_dim( D, G, newdims, grids )
 
+
 %- Check input
 %
 rqre_datatype( 'struct', D );
@@ -46,7 +47,13 @@ end
 
 for ig = 1 : length(G)
 
-  if G(ig).DIMS(end) >= newdims(1)
+  if isempty(G(ig).DIMS)
+    maxdim = 0;
+  else
+    maxdim = G(ig).DIMS(end); 
+  end
+  
+  if maxdim >= newdims(1)
     error( sprintf( ['Not all new dimensions (*newdim*) above highest ',...
                      'value of G(%d).DIMS.'], ig ) ); 
   end
@@ -54,12 +61,20 @@ for ig = 1 : length(G)
   %- Create mapdata and include grids
   %
   % The *mapdata* vector must start with 1, matching highest old dimension
+  % if maxdim > 0.
   %
-  mapdata = ones( 1, newdims(end)-G(ig).DIMS(end)+1  ); 
-  %
+  if maxdim
+    dimos = 1;  % Old >= 1D
+  else
+    dimos = 0;    % Old = 0D
+  end 
+  %  
+  mapdata = ones( 1, newdims(end)-maxdim+dimos ); 
+
+  
   for id = 1 : length(newdims)
-    mapdata(newdims(id)-G(ig).DIMS(end)+1) = length( grids{id} );
-    G(ig).(sprintf('GRID%d',newdims(id)))  = grids{id};
+    mapdata(newdims(id)-maxdim+dimos)     = length( grids{id} );
+    G(ig).(sprintf('GRID%d',newdims(id))) = grids{id};
   end
   
   G(ig).DIMS = [ vec2row(G(ig).DIMS), newdims ];

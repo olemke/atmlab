@@ -1,3 +1,35 @@
+2007-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-189
+
+	* Revision of ASG, following changes in the gformat. Not finished.
+	Information is now obtained by:
+	   qinfo( @asgD )
+	   qinfo( @asgG )
+	
+	* arts/arts_tgs2species.m: Option to give input in arts tag format
+	now removed. A string is now interpreted as a single tag.
+
+	* arts/qarts.m: Added fields Q.ABS_LINES_FMIN and Q.ABS_LINES_FMAX.  
+
+	* arts/qarts2cfile.m: Added handling of Q.ABS_LINES_FMIN and
+	Q.ABS_LINES_FMAX.
+
+	* arts/scenegen/asg_dimadd.m: Created.
+
+	* arts/scenegen/asg_clearsky.m: Deleted
+
+	* gformat/gf_set.m: Added optional arguments: name, data_name, 
+	data_unit and source.
+
+	* arts/scenegen/asgG.m: Created. 
+
+	* arts/scenegen/asgD.m: Created. 
+
+	* arts/scenegen/asg_atmgrids.m: Updated to new definition of gformat.
+
+	* arts/scenegen/asg.m: Deleted. 
+	
 2007-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-188

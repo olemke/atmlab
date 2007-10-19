@@ -9,7 +9,8 @@
 %    To insert the vector v in G along dimension 2:
 %      G = gf_set( D, g_empty, grid2, v, 2 );
 %
-% FORMAT   G = gf_set( D, G, grids, data, dims )
+% FORMAT   G = gf_set( D, G, grids, data, dims [, name, data_name, 
+%                                                data_unit, source ] )
 %        
 % OUT   G       Modified gformat data.
 % IN    D       Gformat definition structure
@@ -20,15 +21,28 @@
 % OPT   dims    Data dimensions corresponding to *data*. Default is 
 %               to assign data to the n first data dimensions, where n is
 %               the dimensionality of *data*.
+%       name        A string. If not empty, the field NAME is set to *name*. 
+%                   Default is [].
+%       data_name   A string. If not empty, the field DATA_NAME is set to 
+%                   *data_name*. Default is [].
+%       data_unit   A string. If not empty, the field DATA_UNIT is set to 
+%                   *data_unit*. Default is [].
+%       source      A string. If not empty, the field SOURCE is set to 
+%                   *source*. Default is [].
 
 % 2007-10-17   Created by Patrick Eriksson.
 
-function G = gf_set( D, G, grids, data, dims )
+function G = gf_set(D,G,grids,data,dims,name,data_name,data_unit,source)
+
 
 
 %- Default values
 %
-dims_DEFAULT = [];
+dims_DEFAULT      = [];
+name_DEFAULT      = [];
+data_name_DEFAULT = [];
+data_unit_DEFAULT = [];
+source_DEFAULT    = [];
 %
 set_defaults;
 
@@ -42,6 +56,10 @@ rqre_field( G, 'DIMS', 0 );
 rqre_datatype( {'empty','vector','cell'}, grids );
 rqre_datatype( 'numeric', data );
 rqre_datatype( {'empty','vector'}, dims );
+rqre_datatype( {'empty','char'}, name );
+rqre_datatype( {'empty','char'}, data_name );
+rqre_datatype( {'empty','char'}, data_unit );
+rqre_datatype( {'empty','char'}, source );
 
 
 %- Handle different input versions
@@ -105,5 +123,17 @@ for ig = 1 : length(G)
   for id = 1 : length( grids )
     G(ig).(sprintf('GRID%d',dims(id))) = grids{id};
   end
-  
+
+  if ~isempty( name )
+    G(ig).NAME = name;
+  end
+  if ~isempty( data_name )
+    G(ig).DATA_NAME = data_name;
+  end
+  if ~isempty( data_unit )
+    G(ig).DATA_UNIT = data_unit;
+  end
+  if ~isempty( source )
+    G(ig).SOURCE = source;
+  end
 end
