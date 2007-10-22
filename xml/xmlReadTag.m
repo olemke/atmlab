@@ -105,7 +105,3 @@ while ~feof (fid) & ~exit_loop
   end
 end
 
-if (fid2)
-  fclose (fid2);
-end
-

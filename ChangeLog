@@ -1,5 +1,11 @@
 2007-10-22  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-2-192
+
+	* xml/xmlReadTag.m: Reverted... this needs more thought...
+
+2007-10-22  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-2-191
 
 	* xml/xmlReadTag.m: Properly close binary file.
