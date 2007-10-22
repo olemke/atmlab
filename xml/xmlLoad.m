@@ -21,10 +21,11 @@ if fid == -1
 end
 
 %=== Validate XML file header
-s = fscanf (fid, '%s', 1);
-limit = 10;
-while limit & s(size(s)) ~= '>'
-  s = strcat (s, fscanf (fid, '%s', 1));
+c = fgets (fid, 1);
+s = c;
+while ~feof (fid) & c ~= '>'
+  c = fgets (fid, 1);
+  s = strcat (s, c);
 end
 
 if ~strcmp (s, '<?xmlversion="1.0"?>')

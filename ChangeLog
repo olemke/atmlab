@@ -1,3 +1,11 @@
+2007-10-22  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-191
+
+	* xml/xmlReadTag.m: Properly close binary file.
+
+	* xml/xmlLoad.m: Improve parsing of xml header.
+
 2007-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-190
