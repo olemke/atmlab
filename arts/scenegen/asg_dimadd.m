@@ -4,7 +4,7 @@
 %    dimensions 1:Q.ATMOSPHERE_DIM and surface for 2:Q.ATMOSPHERE_DIM.
 %    Nothing is done if the DATA field is empty. 
 %
-%    The data is extended following settings in G.DIMADD. The extrapolation
+%    The data are extended following settings in G.DIMADD. The extrapolation
 %    method is selected by the field METHOD. The following options exist:
 %
 %    FORMAT = 'expand'

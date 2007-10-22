@@ -1,3 +1,15 @@
+2007-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-193
+
+	* arts/scenegen/asg_rndmz.m: Modified version of asg_randomize_std.m.
+
+	* arts/scenegen/asg_randomize_std.m: Renamed to asg_rndmz.m. 
+	
+	* arts/scenegen/asg2q.m: Updated.
+
+	* arts/scenegen/asg_surface.m: Removed.
+
 2007-10-22  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-192

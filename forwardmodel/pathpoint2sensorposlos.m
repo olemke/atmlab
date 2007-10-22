@@ -11,7 +11,7 @@
 %   
 %   A LOS is given as (za) for 1D and 2D, and (za,aa) for 3D, where za is
 %   zenith angle, and aa is azimuth angle. A negative za for 2D means a LOS
-%   towrads lower latitudes.
+%   towards lower latitudes.
 %
 % FORMAT   [spos,slos] = pathpoint2sensorposlos(dim,ppos,plos,r_sensor)
 %        

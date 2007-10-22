@@ -143,7 +143,7 @@ if strcmp( D.FORMAT, 'param' )
   else    % 2D and 3D
     %
     % Most general option:
-    if ~( isfield( D, 'SEPERABLE' )   &  D.SEPERABLE )
+    if ~( isfield( D, 'SEPERABLE' )  &  D.SEPERABLE )
       S = covmat3d_from_cfun( dim, D, G{1:dim} );
       %
     else % Seperable option:

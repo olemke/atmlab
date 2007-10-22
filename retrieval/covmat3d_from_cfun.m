@@ -90,7 +90,7 @@
 function S = covmat3d_from_cfun(dim,D,grid1,grid2,grid3)
 
 
-%--- Check input
+%--- Simple checks of input
 %
 min_nargin( 3, nargin );
 rqre_scalar( 'dim', dim, 1, 3 );
