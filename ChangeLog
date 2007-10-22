@@ -1,3 +1,12 @@
+2007-10-22  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-194
+
+	* xml/xmlReadTag.m:
+
+	Reading binary files should now really not let any more open files
+	behind....
+
 2007-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-193

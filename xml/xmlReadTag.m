@@ -17,7 +17,7 @@
 
 function result = xmlReadTag(fid, filename, itype, ftype, binary, fid2)
 
-data_ok = 0;
+toplevel = 0;
 exit_loop = 0;
 result = 'error';
 
@@ -56,6 +56,7 @@ while ~feof (fid) & ~exit_loop
       
       switch tag
        case 'arts'
+         toplevel = 1;
          format = xmlGetAttrValue (attrlist, 'format');
          if length (format) == length ('binary') & format == 'binary'
              binary = 1;
@@ -91,14 +92,21 @@ while ~feof (fid) & ~exit_loop
        otherwise
          func = str2func (strcat ('xmlRead', tag));
          result = feval (func, fid, attrlist, itype, ftype, binary, fid2);
-         data_ok = 1;
       end
     else %=== or is it a closing tag
       c = fgets (fid, 1);
+      s = c;
       while ~feof (fid) & c ~= '>'
         c = fgets (fid, 1);
+        s = strcat (s, c);
       end
-      exit_loop = 1;
+      if (~toplevel)
+        exit_loop = 1;
+      else
+        if (strcmp (s, 'arts>') & (fid2))
+          fclose (fid2);
+        end
+      end
     end
   else
     exit_loop = 1;
