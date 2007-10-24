@@ -1,21 +1,18 @@
-% ARTS_BATCH   ARTS batch calculations
+% ARTS_BATCH   Performs ARTS batch calculations
 %
-%    Qarts fields for atmosphere, absorption, sensor and RT must be
-%    specified.
+%    Largely as *arts_y* but calculates several spectra in a single run,
+%    batch calculations. The data to be changed between each spectrim is
+%    stored in Q.BATCH, with details drescribed in qartsBatch.
 %
-% FORMAT   Y = arts_y( Q [, workfolder ] )
+% FORMAT   Q = arts_sensor( Q [, workfolder] )
 %        
-% OUT   Y   Batch spectra.
-% IN    Q   Qarts structure.
+% OUT   Y            Calculated spectra.
+% IN    Q            Qarts structure.
 % OPT   workfolder   If not defined or empty, a temporary folder is created.
 %                    Otherwise this is interpreted as the path to a folder 
-%                    where calculation output can be stored. These files
-%                    will be left in the folder. The files are not read if
-%                    corresponding output argument not is considered.
-%                    Default is [].
+%                    where calculation output can be stored.
 
-% 2004-09-17   Created by Patrick Eriksson.
-
+% 2007-10-22   Created by Patrick Eriksson.
 
 function Y = arts_batch( Q, workfolder )
 
@@ -33,6 +30,7 @@ rqre_datatype( 'struct', Q );
 rqre_datatype( {'empty','char'}, workfolder );
 
 
+
 folder_created = 0;
 %
 if isempty( workfolder )
@@ -40,29 +38,24 @@ if isempty( workfolder )
   folder_created = 1;
 end
 
+
 try
-
-  parts = qarts2cfile( 'batch' );
-
-  S = qarts2cfile( Q, parts, workfolder );
-
+  %
+  parts = qarts2cfile( 'Batch' );
+  S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
-
   qtool( S, cfile, [] );
-
   arts( cfile );
-
-  Y = xmlLoad( fullfile( workfolder, 'ybatch.xml' ) );
-
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
-
 
 catch
   if folder_created
     delete_tmpfolder( workfolder );
   end
-
   rethrow(lasterror);
+end
+
+Y = xmlLoad( fullfile( workfolder, 'ybatch.xml' ) );
+
+if folder_created
+  delete_tmpfolder( workfolder );  
 end

@@ -1,3 +1,31 @@
+2007-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-195
+
+	* Work on both qarts and asg to handle batch calculations. Appears 
+	to work, but not carefully checked or documented yet.
+
+	* arts/scenegen/asg2q.m: Now handling batch cases.
+
+	* arts/scenegen/asg_copy_case.m: 
+
+	* arts/qartsBatch.m: Fields CALC_AGENDA and POST_AGENDA removed. 
+
+	* arts/qarts2cfile.m: New code to handle batch calculations. 
+
+	* arts/arts_batch.m: Updated. 
+
+	* arts/scenegen/asg_fixed_relhumid.m: Now considering multiple cases. 
+
+	* arts/scenegen/asgD.m: Now more detailed description of cases
+	dimension.
+
+	* arts/scenegen/asg_hydrostat.m: Now considering multiple cases. 
+
+	* arts/scenegen/asg_rndmz.m: Now considering multiple cases. 
+
+	* arts/scenegen/asg_copy_case.m: Created.
+
 2007-10-22  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-194

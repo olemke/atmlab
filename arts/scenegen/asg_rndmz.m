@@ -104,13 +104,19 @@ function G = do_param( G, ig )
   %
   S = covmat3d( dim, G.RNDMZ, G.GRID1, G.GRID2, G.GRID3, 'atm' );
 
-  %- Create disturbance
+  %- Create disturbance (loop around cases)
   %
   if strcmp( G.RNDMZ.TYPE, 'rel' )
-    G.DATA = G.DATA .* reshape( randmvar_normal2( 1, S, 1 ), size(G.DATA) );
-    
+    for ic = 1 : size( G.DATA, 4 )
+      G.DATA(:,:,:,ic) = G.DATA(:,:,:,ic) .* ...
+              reshape( randmvar_normal2( 1, S, 1 ), size(G.DATA(:,:,:,ic)) );
+    end
   elseif strcmp( G.RNDMZ.TYPE, 'abs' )
-    G.DATA = G.DATA + reshape( randmvar_normal2( 0, S, 1 ), size(G.DATA) );
+    for ic = 1 : size( G.DATA, 4 )
+      G.DATA(:,:,:,ic) = G.DATA(:,:,:,ic) + ...
+              reshape( randmvar_normal2( 0, S, 1 ), size(G.DATA(:,:,:,ic)) );
+    end
+    
   else
     error( sprintf( 'Unknown selection in G(ig).RNDMZ.TYPE.', ig ) );
   end

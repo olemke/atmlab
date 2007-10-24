@@ -105,6 +105,11 @@ if nargin == 1
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
           'CldBox', 'SctMth', 'RteExe' };
+
+  case 'Batch'
+    %
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
+          'CldBox', 'SctMth', 'BatchC' };
     
   otherwise
     error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );
@@ -165,9 +170,13 @@ for ip = 1 : length(parts)
    case 'RteExe'
     %
     T = cfile_RteExe( Q, parts{ip}, workfolder );
-   
+
+   case 'BatchC'
+    %
+    T = cfile_BatchC( Q, parts{ip}, workfolder );
+    
    otherwise
-    error( sprintf( 'UnknoWn cfile part (%s) was requested.', parts{ip} ) );
+    error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
   end
 
   S = { S{:} T{:} };
@@ -288,8 +297,10 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     end
   else
     T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
-    T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
     T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, workfolder);
+    if ~isnan( Q.Z_FIELD )
+      T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
+    end
   end
   %
   if ~isnan( Q.R_GEOID )  &  isscalar( Q.R_GEOID )
@@ -1073,60 +1084,77 @@ return
 %    batch calculations
 %
 function T = cfile_BatchC( Q, partname, workfolder )
-  %
-  error( 'This sub-function is not ready.' )
 
+  %- Some checks of data
+  %
   if ~isstruct( Q.BATCH )
     error( 'Batch calculations can only be described by a structure.' );
   end
-
-  % Old code:
-  B = Q.BATCH;
-
-  %= Check that all fields are present
   %
-  qcheck( @qarts_batch, B );
-
-  %= Other data checks
+  qcheck( @qartsBatch, Q.BATCH );
   %
-  if ~isstruct( B.DATA )
-    error('Q.BATCH.DATA must be a structure array.');
+  if length(Q.BATCH.DATA)  &  ~isstruct( Q.BATCH.DATA(1) )
+    error( 'Q.BATCH.DATA must be a structure array.' );
   end
   %
-  rqre_scalar( 'Q.BATCH.N', B.N, 1 );
+  rqre_scalar( 'Q.BATCH.N', Q.BATCH.N, 1 );
 
+  %- Store batch data and create batch_calc_agenda
+  %
   T = [];
   A = [];
-
-  num_wsv_nr = zeros(8,1);
-  int_wsv_nr = zeros(2,1);
-
-  for i = 1:length(B.DATA)
-    rqre_field( B.DATA(i), 'TYPE', 0 );
-    rqre_char( sprintf('Q.BATCH{%d}.TYPE',i), B.DATA(i).TYPE );
-    rqre_field( B.DATA(i), 'WSV', 0 );
-    rqre_char( sprintf('Q.BATCH{%d}.WSV',i), B.DATA(i).WSV );
-    rqre_field( B.DATA(i), 'X', 0 );
+  %
+  n_num = zeros(5,1);   % Number of "numeric" batch variables of different dim
+  n_int = zeros(5,1);   % Same for index variables
+  %
+  for i = 1 : length( Q.BATCH.DATA )
     
-    if size(B.DATA(i).X,1) < B.N 
-      error(sprintf('Q.BATCH.DATA{%d}.X contains fewer cases than Q.BATCH.N',i));
+    rqre_field( Q.BATCH.DATA(i), 'TYPE', 0 );
+    rqre_char( sprintf('Q.BATCH{%d}.TYPE',i), Q.BATCH.DATA(i).TYPE );
+    rqre_field( Q.BATCH.DATA(i), 'WSV', 0 );
+    rqre_char( sprintf('Q.BATCH{%d}.WSV',i), Q.BATCH.DATA(i).WSV );
+    rqre_field( Q.BATCH.DATA(i), 'X', 0 );
+  
+    %if size(Q.BATCH.DATA(i).X,1) < Q.BATCH.N 
+    %  error( sprintf( ...
+    %         'Q.BATCH.DATA{%d}.X contains fewer cases than Q.BATCH.N', i ) );
+    %end
+
+    %- Determine dimensionality and type (num or int) of variable
+    %
+    [dim,datatype] = arts_datatypes( Q.BATCH.DATA(i).TYPE );
+    %
+    if strcmp(datatype,'num')
+      n_num(dim) = n_num(dim) + 1;
+      vn         = n_num(dim);      % "variable number" 
+    else
+      n_int(dim) = n_int(dim) + 1;
+      vn         = n_int(dim);      % "variable number" 
     end
-
-    [dim,datatype] = arts_datatypes( B.DATA(i).TYPE );
-    wsv_nr = eval([datatype,'_wsv_nr(dim+1)']) + 1;
-    eval([datatype,'_wsv_nr(dim+1) = wsv_nr;']);
-
-    wsv_type = arts_datatypes(dim+1,datatype);
-    varname  = sprintf('%s_%d', lower(wsv_type), wsv_nr  );
-    T{end+1} = file_or_data( varname, wsv_type, B.DATA(i).X, workfolder );
-    A{i}     = sprintf( 'BatchUpdate%s(%s,%s){}', B.DATA(i).TYPE, ...
-                                                        B.DATA(i).WSV, varname );
+    
+    mainname  = Q.BATCH.DATA(i).WSV;
+    batchtype = arts_datatypes( dim+1, datatype );
+    batchname = sprintf( '%s_%d', lower(batchtype), vn );
+    
+    %type1p         = arts_datatypes( dim+1, datatype );
+    %varname        = sprintf( '%s_batch.xml', Q.BATCH.DATA(i).WSV );
+    
+    T{end+1} = file_or_data( batchname, batchtype, Q.BATCH.DATA(i).X, ...
+                             workfolder, sprintf('%s_batch.xml',mainname) );
+    A{end+1} = sprintf( '%sExtractFrom%s(%s,%s,ybatch_index){}', ...
+                        Q.BATCH.DATA(i).TYPE, ...
+                        batchtype, ...
+                        mainname, ...
+                        batchname );
   end
-
-  T        = add_agenda( T, 'batch_update_agenda', A );
-  T        = add_agenda( T, 'batch_calc_agenda', B.CALC_AGENDA );
-  T        = add_agenda( T, 'batch_post_agenda', B.POST_AGENDA );
-  T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', B.N );
+  %
+  A{end+1} = 'RteCalc{}';
+  %
+  T = add_agenda( T, 'ybatch_calc_agenda', A );
+  
+  %- Make actual calculations
+  %
+  T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', Q.BATCH.N );
   T{end+1} = 'ybatchCalc{}';
   %
   switch upper( Q.Y_UNIT )
@@ -1152,7 +1180,7 @@ return
 % Smaller help functions
 %------------------------------------------------------------------------------
 
-function s = file_or_data( artsvar, datatype, qvalue, workfolder, nonDefFileId )
+function s = file_or_data(artsvar,datatype,qvalue,workfolder,nonDefFileId)
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else

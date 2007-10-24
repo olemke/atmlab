@@ -7,7 +7,7 @@
 %   The input argument fieldlist is a cell array with each element matching 
 %   one of the CPR L1B/l2 HDF-EOS fields (omit to select all fields). With one
 %   exception: the 'Sigma-Zero' field is renamed in output as 's0'.
-%   See general docum,entation for avaliable fields.
+%   See general documentation for avaliable fields.
 %
 %   Example: 
 %     filelist = dir('*.hdf');

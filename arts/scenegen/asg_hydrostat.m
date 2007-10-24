@@ -1,9 +1,10 @@
 % ASG_HYDROSTAT   Calculates hydrostatic equilibrium for ASG data
 %
 %    The function demands that *G* contains temperature and water vapour
-%    data. These quantities are found by searching for the names
-%    'Temperature' and 'Water vapour', respectively. If several items exist,
-%    the first one is used.
+%    data. These quantities are found by searching for the names 'Temperature'
+%    and 'Water vapour', respectively. If several items exist, the first one is
+%    used. The number of cases created will match the maximum number of cases
+%    among the involved variables (altitude, temperature and water vapour).
 %
 %    The G array must further contain an item for altitudes. The field NAME
 %    is expected to start as 'Altitude'. This is item of G can be empty,
@@ -87,17 +88,50 @@ Z0 = asg_regrid( D, Z0, Q );
 
 %- Run HSE
 %
+G(iz).DIMS = G(it).DIMS;
+%
 G(iz).GRID1 = G(it).GRID1; 
 G(iz).GRID2 = G(it).GRID2; 
 G(iz).GRID3 = G(it).GRID3; 
 %
-for ilon = 1 : size(G(it).DATA,3)
-  for ilat = 1 : size(G(it).DATA,2)
+nc = max( [ size(G(it).DATA,4), size(G(it).DATA,4), size(G(iw).DATA,4) ] );
+%
+if nc > 1
+  if G(iz).DIMS(end) ~= 4
+    G(iz).DIMS(end+1) = 4;
+  end
+  G(iz).GRID4       = 1:nc; 
+end
+%
+G(iz).DATA = zeros( size(G(it).DATA,1), size(G(it).DATA,2), ...
+                    size(G(it).DATA,3), nc );
+%
+for ic = 1 : nc
+  
+  %- Find matching temperature case (take last case if necessary)
+  ic_t = size(G(it).DATA,4);
+  %
+  if ic <= ic_t
+    ic_t = ic;  
+  end
 
-    G(iz).DATA(:,ilat,ilon) = pt2z( G(it).GRID1, G(it).DATA(:,ilat,ilon), ...
-                                                 G(iw).DATA(:,ilat,ilon), ...
-                             G(iz).SPCFC.P0, Z0.DATA(ilat,ilon), lats(ilat) );
-    
+  %- Find matching water vapour case (take last case if necessary)
+  ic_w = size(G(iw).DATA,4);
+  %
+  if ic <= ic_w
+    ic_w = ic;  
+  end
+  
+  for ilon = 1 : size(G(it).DATA,3)
+    for ilat = 1 : size(G(it).DATA,2)
+
+      G(iz).DATA(:,ilat,ilon,ic) = pt2z( G(it).GRID1, ...
+                                         G(it).DATA(:,ilat,ilon,ic_t), ...
+                                         G(iw).DATA(:,ilat,ilon,ic_w), ...
+                                         G(iz).SPCFC.P0, ...
+                                         Z0.DATA(ilat,ilon), ...
+                                         lats(ilat) );
+      end
   end
 end
 

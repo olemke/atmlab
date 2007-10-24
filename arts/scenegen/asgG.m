@@ -35,12 +35,12 @@ I.DATA = [
 'but not e.g. the geoid radius).'
 ];
 %------------------------------------------------------------------------------
-G.DATA_NAME = []; 
+G.DATA_NAME = '-'; 
 I.DATA_NAME = [
 'Type ''help gformat'' for obtaining the definition of this field.'
 ];
 %------------------------------------------------------------------------------
-G.DATA_UNIT = []; 
+G.DATA_UNIT = '-'; 
 I.DATA_UNIT = [
 'Type ''help gformat'' for obtaining the definition of this field.'
 ];

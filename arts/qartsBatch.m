@@ -1,14 +1,14 @@
-% QARTS_BATCH   Defines setting fields for ARTS batch calculations
+% QARTSBATCH   Defines setting fields for ARTS batch calculations
 %
 %    The function provides default values for all recognised fields and a 
 %    description of each field. Default value is normally NaN, but
 %    exceptions exist when some standard choice exists. To list default
-%    values just type 'qarts_batch'.
+%    values just type 'qartsBatch'.
 %
 %    This function is organised in such way that *qcheck* and *qinfo*
 %    can be used.
 %
-% FORMAT   [B,I] = qarts_batch
+% FORMAT   [B,I] = qartsBatch
 %        
 % OUT   B  Setting structure with default values for all recognised fields.
 %       I  Includes same fields as B, where the content of each field
@@ -17,14 +17,9 @@
 % 2005-05-26   Created by Patrick Eriksson.
 
 
-function [B,I] = qarts_batch
+function [B,I] = qartsBatch
  
 
-%-----------------------------------------------------------------------------
-B.CALC_AGENDA = {'RteCalc{}'};
-I.CALC_AGENDA = [ ...
-'Corresponds directly to ARTS WSV *batch_calc_agenda*.'
-];
 %-----------------------------------------------------------------------------
 B.DATA = [];
 I.DATA = [ ...
@@ -44,14 +39,6 @@ I.DATA = [ ...
 B.N = NaN;
 I.N = [ ...
 'Number of batch cases to run.'
-];
-%-----------------------------------------------------------------------------
-B.POST_AGENDA = {'Ignore(ybatch){}','DoNothing(ybatch,ybatch){}'};
-I.POST_AGENDA = [ ...
-'Corresponds directly to ARTS WSV *batch_post_agenda*.', ...
-'#   Conversion of radiances to other units is included automatically, ', ...
-'where output unit follows *Q.Y_UNIT*. Neither saving to file needs to be ',...
-'inluded in this agenda.'
 ];
 %-----------------------------------------------------------------------------
 

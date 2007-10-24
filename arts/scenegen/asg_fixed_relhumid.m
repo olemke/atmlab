@@ -93,51 +93,69 @@ for ig = ih2o
   end
   
   
-  for ilon = 1:size(G(ig).DATA,3)
-    for ilat = 1:size(G(ig).DATA,2)
-        
-      %- Find range of interest and obtain relavant data
-      %
-      if do_z
-        z = interpp( G(iz).GRID1, G(iz).DATA(:,ilat,ilon), G(ig).GRID1 );
-        t = interpp( G(it).GRID1, G(it).DATA(:,ilat,ilon), G(ig).GRID1 );
-        z   = z - tropopause( z, t );
-        ind = find( z <= G(ig).SPCFC.RH_TOPP ); 
-        z   = z(ind);
-        t   = t(ind);
-      else
-        ind = find( G(ig).GRID1 >= G(ig).SPCFC.RH_TOPP );
-        t = interpp( G(it).GRID1, G(it).DATA(:,ilat,ilon), ...
-                                                          G(ig).GRID1(ind) );
-      end
-      %
-      ei = e_eq_ice( t );
-      ew = e_eq_water( t );
-      
-      %- Determine relative weight for ew
-      %
-      ww = t >= 273.15;
-      
-      %- VMR for selected relative humidity
-      %
-      vmr = G(ig).SPCFC.RH * ( ww.*ew + (1-ww).*ei ) ./ G(ig).GRID1(ind);
-        
-      %- Determine weight for vmr
-      %
-      if do_z
-        ww = ( z - G(ig).SPCFC.RH_TOPP ) /...
-                       ( G(ig).SPCFC.RH_BRAKEP - G(ig).SPCFC.RH_TOPP );
-      else
-        ww = ( log10(G(ig).GRID1(ind)) - log10(G(ig).SPCFC.RH_TOPP) ) /...
-             ( -log10(G(ig).SPCFC.RH_TOPP) + log10(G(ig).SPCFC.RH_BRAKEP)  );
-      end
-      %
-      ww(find(ww>1)) = 1;
+  for ic = 1:size(G(ig).DATA,4)
+    
+    %- Find matching temperature case (take last case if necessary)
+    ic_t = size(G(it).DATA,4);
+    %
+    if ic <= ic_t
+      ic_t = ic;  
+    end
 
-      %- Create new profile
-      %
-      G(ig).DATA(ind,ilat,ilon) = ww.*vmr + ...
-                                          (1-ww).*G(ig).DATA(ind,ilat,ilon);
+    %- Find matching temperature case (take last case if necessary)
+    ic_z = size(G(iz).DATA,4);
+    %
+    if ic <= ic_z
+      ic_z = ic;  
+    end
+    
+    for ilon = 1:size(G(ig).DATA,3)
+      for ilat = 1:size(G(ig).DATA,2)
+          
+        %- Find range of interest and obtain relavant data
+        %
+        if do_z
+          z = interpp( G(iz).GRID1, G(iz).DATA(:,ilat,ilon,ic_z), G(ig).GRID1 );
+          t = interpp( G(it).GRID1, G(it).DATA(:,ilat,ilon,ic_t), G(ig).GRID1 );
+          z   = z - tropopause( z, t );
+          ind = find( z <= G(ig).SPCFC.RH_TOPP ); 
+          z   = z(ind);
+          t   = t(ind);
+        else
+          ind = find( G(ig).GRID1 >= G(ig).SPCFC.RH_TOPP );
+          t = interpp( G(it).GRID1, G(it).DATA(:,ilat,ilon,ic_t), ...
+                                                            G(ig).GRID1(ind) );
+        end
+        %
+        ei = e_eq_ice( t );
+        ew = e_eq_water( t );
+        
+        %- Determine relative weight for ew
+        %
+        ww = t >= 273.15;
+        
+        %- VMR for selected relative humidity
+        %
+        vmr = G(ig).SPCFC.RH * ( ww.*ew + (1-ww).*ei ) ./ G(ig).GRID1(ind);
+          
+        %- Determine weight for vmr
+        %
+        if do_z
+          ww = ( z - G(ig).SPCFC.RH_TOPP ) /...
+                         ( G(ig).SPCFC.RH_BRAKEP - G(ig).SPCFC.RH_TOPP );
+        else
+          ww = ( log10(G(ig).GRID1(ind)) - log10(G(ig).SPCFC.RH_TOPP) ) /...
+               ( -log10(G(ig).SPCFC.RH_TOPP) + log10(G(ig).SPCFC.RH_BRAKEP)  );
+        end
+        %
+        ww(find(ww>1)) = 1;
+
+        %- Create new profile
+        %
+        G(ig).DATA(ind,ilat,ilon,ic) = ww.*vmr + ...
+                                          (1-ww).*G(ig).DATA(ind,ilat,ilon, ...
+                                                          ic);
+      end
     end
   end
 end
