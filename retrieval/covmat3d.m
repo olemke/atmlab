@@ -97,6 +97,7 @@ end
 
 
 
+
 %--- Unit conversions
 %
 if isempty(dtype)
@@ -119,7 +120,29 @@ end
 % column vectors are allowed.
 % 
 if strcmp( D.FORMAT, 'param' )
+
+  %- Check consistency inside D
   %
+  for id = 1 : length(G)
+    if ~isscalar(D.SI) & size(D.SI,id)~=length(D.(sprintf('SI_GRID%d',id)))
+      error( sprintf( 'Inconsistency between D.SI and D.SI_GRID%d.', id ) );
+    end
+    if ~isfield( D, 'SEPERABLE' )  |  ~D.SEPERABLE
+    if ~isscalar(D.CL1) & size(D.CL1,id)~=length(D.(sprintf('CL1_GRID%d',id)))
+      error( sprintf( 'Inconsistency between D.CL1 and D.CL1_GRID%d.', id ) );
+    end
+    if length(G)>=2  &  ...
+       ~isscalar(D.CL2) & size(D.CL2,id)~=length(D.(sprintf('CL2_GRID%d',id)))
+      error( sprintf( 'Inconsistency between D.CL2 and D.CL2_GRID%d.', id ) );
+    end          
+    if length(G)>=3  &  ...
+       ~isscalar(D.CL3) & size(D.CL3,id)~=length(D.(sprintf('CL3_GRID%d',id)))
+      error( sprintf( 'Inconsistency between D.CL3 and D.CL3_GRID%d.', id ) );
+    end          
+    end
+  end
+  
+
   if dim == 1               % 1D is handled separately. 
     %  
     if isscalar( D.SI )  
@@ -187,8 +210,8 @@ if strcmp( D.FORMAT, 'param' )
           si = interpd( [x,y], D.SI, D.SI_GRID1, D.SI_GRID2, 'linear' );
         else
           if dim == 3
-            x = repmat( x, length(grid3) );
-            y = repmat( y, length(grid3) );
+            x = repmat( x, length(grid3), 1 );
+            y = repmat( y, length(grid3), 1 );
             z = repmat( vec2row(grid3), length(grid1)*length(grid2), 1 );
             z = z(:);
             si = interpd( [x,y,z], D.SI, D.SI_GRID1, D.SI_GRID2, ...

@@ -1,3 +1,21 @@
+2007-10-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-196
+
+	* arts/scenegen/asg_rndmz.m: Try/catch around covmat3d for more 
+	detailed error message.
+
+	* retrieval/covmat3d.m: Now detailed check of SI, CL1, CL2 and CL3
+	fields of D.
+
+	* gformat/gf_increase_dim.m: Did not work when DIMS does not
+	include 1.
+
+	* sensors/cloudsat_read.m: Created.
+
+	* sensors/cloudsat_l1b_read.m: Removed. Replaced by the function 
+	above.
+	
 2007-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-195

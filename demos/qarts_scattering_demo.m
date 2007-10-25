@@ -110,7 +110,7 @@ C.LIMITS = [ 7e3 14e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
-T_grid = [200 270]; % MC does not accept a single temperature
+T_grid = [200 270];   % MC does not accept a single temperature
 
 
 % Create scattering properties for a simple cloud assumption
@@ -135,9 +135,6 @@ alt = [10e3 13e3];
 
 % Calculate scattering data using Mie
 C.SCAT_DATA{1} = mie_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r ); 
-
-% This file seems to work for both DOIT and MC
-%C.SCAT_DATA{1} = 'radar_ice_spheriod_random_ar1.0001_r85.0259_f501.2_544.8.xml';
 
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d(alt, imc, r);

@@ -45,7 +45,7 @@ if length(x) ~= size(A,1)
   error('See above');
 end
 %
-dim = dimens( A );
+dim = size(pos,2);
 %
 if nargin < 2+dim
   error( 'Too few input arguments.' );
@@ -53,7 +53,7 @@ elseif nargin > 3+dim
   error( 'Too many input arguments.' );
 end
 %
-if size(pos,2) ~= dim
+if dimens(A) > dim
   error('Mismatch in dimension between *pos* and *A*.');
 end
 %

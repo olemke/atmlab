@@ -79,7 +79,7 @@ if indim == 0
   if ~isscalar( data )
     error( 'No grids are given, but *data* is not a scalar.' );
   end
-else
+elseif ~isscalar( data )
   for id = 1 : indim
     if size(data,id) ~= length(grids{id})
       error( sprintf( ...
@@ -117,7 +117,11 @@ end
 
 for ig = 1 : length(G)
 
-  G(ig).DATA = reshape( data, n );
+  if isscalar(data)
+    G(ig).DATA = repmat( data, n );
+  else
+    G(ig).DATA = reshape( data, n );
+    end
   G(ig).DIMS = dims;
   
   for id = 1 : length( grids )

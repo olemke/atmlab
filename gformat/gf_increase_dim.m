@@ -60,20 +60,10 @@ for ig = 1 : length(G)
   
   %- Create mapdata and include grids
   %
-  % The *mapdata* vector must start with 1, matching highest old dimension
-  % if maxdim > 0.
+  mapdata = ones( 1, max([ 2 newdims(end) ]) ); 
   %
-  if maxdim
-    dimos = 1;  % Old >= 1D
-  else
-    dimos = 0;    % Old = 0D
-  end 
-  %  
-  mapdata = ones( 1, newdims(end)-maxdim+dimos ); 
-
-  
   for id = 1 : length(newdims)
-    mapdata(newdims(id)-maxdim+dimos)     = length( grids{id} );
+    mapdata(newdims(id))                  = length( grids{id} );
     G(ig).(sprintf('GRID%d',newdims(id))) = grids{id};
   end
   

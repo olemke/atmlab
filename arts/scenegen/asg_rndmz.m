@@ -102,7 +102,14 @@ function G = do_param( G, ig )
   
   %- Create covariance matrix for disturbance
   %
-  S = covmat3d( dim, G.RNDMZ, G.GRID1, G.GRID2, G.GRID3, 'atm' );
+  % Use try-ctch for more informative error message
+  %
+  try
+    S = covmat3d( dim, G.RNDMZ, G.GRID1, G.GRID2, G.GRID3, 'atm' );
+  catch 
+    fprintf( '%s\n\n', lasterr );
+    error( sprintf('Incorrect covariance definition for item %d.',ig) );
+  end
 
   %- Create disturbance (loop around cases)
   %
