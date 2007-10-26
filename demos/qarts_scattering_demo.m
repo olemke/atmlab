@@ -156,13 +156,13 @@ if do_mc
   Q.SENSOR_LOS                    = repmat( Q.SENSOR_LOS, 1, 2 );
   Q.SENSOR_LOS(:,2)               = 0;
   %
-  csize                           = 10;
+  csize                           = 1;
   C.LIMITS                        = [ C.LIMITS csize*[-2 2 -2 2] ];
   C.PND_FIELD{1}.lat_grid         = [ -90 csize*[-2 -1.5 1.5 2] 90 ];
   C.PND_FIELD{1}.lon_grid         = C.PND_FIELD{1}.lat_grid;
   p                               = C.PND_FIELD{1}.data;
   C.PND_FIELD{1}.data             = zeros( length( C.PND_FIELD{1}.p_grid ),...
-                                           length( C.PND_FIELD{1}.lat_grid ),...
+                                          length( C.PND_FIELD{1}.lat_grid ),...
                                            length( C.PND_FIELD{1}.lon_grid ) );
   C.PND_FIELD{1}.data(:,3:4,3:4)  = repmat(p,[1 2 2]);
 
@@ -181,7 +181,7 @@ else
   C.METHOD_PRMTRS.N_ZA_GRID       =  19;
   C.METHOD_PRMTRS.N_AA_GRID       =  10;
   C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, ...
-                                                            'doit_za_grid.xml');
+                                                           'doit_za_grid.xml');
   C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
   %
   C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';

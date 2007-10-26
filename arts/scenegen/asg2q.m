@@ -176,10 +176,18 @@ if ~isempty(i)  &  size(G(i).DATA,1)
   else
     Q.BATCH.DATA(end+1).WSV = 'z_field'; 
     Q.BATCH.DATA(end).TYPE  = 'Tensor3'; 
-    Q.BATCH.DATA(end).X     = fullfile( workfolder, 'z_field_batch.xml' );; 
-    xmlStore( Q.BATCH.DATA(end).X, get_cases(G(i).DATA,icases), 'Tensor4' );
+    Q.BATCH.DATA(end).X     = fullfile( workfolder, 'z_field_batch.xml' );
+    A = get_cases(G(i).DATA,icases);
+    xmlStore( Q.BATCH.DATA(end).X, A, 'Tensor4' );
+    %
+    %- Make sure that z_field also exists as this is needed by e.g.
+    %  cloudboxSetManuallyAltitude
+    Q.Z_FIELD = fullfile( workfolder, 'z_field.xml' );
+    xmlStore( Q.Z_FIELD , shiftdim(mean(A,1)), 'Tensor3' );
+    %
+    clear A;
+    %
   end
-  %
 end
 
 
@@ -349,11 +357,10 @@ if ~isempty(ind)
         Q.CLOUDBOX.PND_FIELD{i} = '';
       else
         Q.CLOUDBOX.PND_FIELD{i} = ...
-                         fullfile( workfolder, sprintf('pnd_field%d.xml',i) );
+                     fullfile( workfolder, sprintf('pnd_field_raw%d.xml',i) );
       
       end 
       %
-      A.data   = get_cases(G(ind(i)).DATA,icases(1));
       A.p_grid = G(ind(i)).GRID1;
       if any( G(ind(i)).DIMS == 2 )
         A.lat_grid = G(ind(i)).GRID2;
@@ -367,8 +374,12 @@ if ~isempty(ind)
       end
       %
       if do_batch
-        B{i} = A;
+        for ic = vec2row(icases)
+          A.data   = get_cases(G(ind(i)).DATA,ic);
+          B{ic}{i} = A;
+        end
       else
+        A.data = get_cases(G(ind(i)).DATA,icases(1));
         xmlStore( Q.CLOUDBOX.PND_FIELD{i}, A, 'GriddedField3' );
       end
     end

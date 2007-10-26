@@ -14,9 +14,9 @@
 %       AtmSrf / AtmSrfSave
 %       Absrpt / AbsrptSave
 %       CldBox / CldBoxSave
-%       SctMth / SctMthSave
+%       SctMth / SctMthSave / SctMthBatch
 %       RteSet
-%       Sensor / SensorSave
+%       Sensor / SensorSave 
 %       Jacobi 
 %       RteExe
 %       BatchC
@@ -109,7 +109,7 @@ if nargin == 1
   case 'Batch'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
-          'CldBox', 'SctMth', 'BatchC' };
+          'CldBox', 'SctMthBatch', 'BatchC' };
     
   otherwise
     error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );
@@ -498,62 +498,15 @@ function T = cfile_RteExe( Q, partname, workfolder )
     error( 'Only recognised choice is ''RteExe''.' );
   end
   %
-  if Q.CLOUDBOX_DO  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-    % Q fields checked in SctMth, where also unit set to radiance
-    do_mc   = 1;
-    f       = mean( qarts_get(Q.F_GRID) );
-    %
-    T{1}  = 'RteCalcMC{';
-    if Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR < 0
-      T{2}  = sprintf( '  std_err       = -1' );
-    else
-      std_err = Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR * ...
-              2*f^2*constants('BOLTZMANN_CONST')/constants('SPEED_OF_LIGHT')^2;
-      T{2}  = sprintf( '  std_err       = %.5e', std_err );
-    end
-    T{3}  = sprintf( '  max_time      = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
-    T{4}  = sprintf( '  max_iter      = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-    T{5}  = sprintf( '  z_field_is_1D = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    T{6}  = '}';  
-  else
-    do_mc = 0;
-    if Q.J_DO
-      T{1}     = 'RteCalc{}';
-      T{end+1} = 'jacobianCalc{}';
-    else
-      T{1}     = 'RteCalcNoJacobian{}';
-    end
-  end
-  %
-  switch upper( Q.Y_UNIT )
-    case '1'
-      T{end+1} = '# No conversion to K';
-    case 'RJ'
-      T{end+1} = 'VectorToTbByRJ(y,y){}';
-      if do_mc, T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}'; end
-    case 'PLANCK'
-      T{end+1} = 'VectorToTbByPlanck(y,y){}';
-      if do_mc, T{end+1} = 'VectorToTbByPlanck(mc_error,mc_error){}'; end
-    otherwise
-      error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
-  end
+  [T,do_mc] = add_rtecalc(Q);
+   
   T{end+1} = add_savefile( 'y', workfolder );
-  if do_mc, T{end+1} = add_savefile( 'mc_error', workfolder ); end
+  %
+  if do_mc
+    T{end+1} = add_savefile( 'mc_error', workfolder ); 
+  end
   %
   if Q.J_DO
-    %
-    switch upper( Q.Y_UNIT )
-      case '1'
-        T{end+1} = '# No conversion to K';
-      case 'RJ'
-        T{end+1} = 'MatrixToTbByRJ(jacobian,jacobian){}';
-      case 'PLANCK'
-        error(...
-       'Planck Tb means a non-linear conversion, not suitable for jacobians.');
-    end
     T{end+1} = add_savefile( 'jacobian', workfolder );
   end
 return
@@ -590,7 +543,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     T{7} = file_or_data( 'sensor_response_aa', 'Vector', ...
                                             Q.SENSOR_RESPONSE_AA, workfolder );
     T{8} = file_or_data( 'sensor_response_pol', 'Index', ...
-                                            Q.SENSOR_RESPONSE_POL, workfolder );
+                                           Q.SENSOR_RESPONSE_POL, workfolder );
   elseif iscellstr(Q.SENSOR_RESPONSE) 
     T = Q.SENSOR_RESPONSE;
   elseif isstruct(Q.SENSOR_RESPONSE) 
@@ -899,7 +852,8 @@ function T = cfile_CldBox( Q, partname, workfolder )
       'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must have same length.' );
   end
   %
-  T{end+1} = 'ParticleTypeInit{}';
+  T{end+1}  = 'ParticleTypeInit{}';
+  do_pfCALC = false;
   %
   for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
     if isstr( Q.CLOUDBOX.SCAT_DATA{i} )
@@ -914,14 +868,20 @@ function T = cfile_CldBox( Q, partname, workfolder )
       pfile = sprintf( 'pnd_field_raw_%d.xml', i );
       xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3' );
     end
-    %    
+    %
+    if length(pfile)
+      do_pfCALC = true;
+    end
+    %
     T{end+1} = 'ParticleTypeAdd{';
     T{end+1} = sprintf('   filename_scat_data =  "%s"', sfile );
     T{end+1} = sprintf('   filename_pnd_field =  "%s"', pfile );
     T{end+1} = '}';
   end
   %
-  T{end+1} = 'pnd_fieldCalc{}';
+  if do_pfCALC 
+    T{end+1} = 'pnd_fieldCalc{}';
+  end
 
   %= Agendas for scattering properties 
   %
@@ -951,8 +911,10 @@ return
 %
 function T = cfile_SctMth( Q, partname, workfolder )
   %
-  if ~( strcmp( partname, 'SctMth' )  |  strcmp( partname, 'SctMthSave' ) )
-    error( 'Only recognised choices are ''SctMthBox'' and ''SctMthSave''.' );
+  if ~( strcmp( partname, 'SctMth' )  |  strcmp( partname, 'SctMthSave' ) |...
+        strcmp( partname, 'SctMthBatch' ) )
+    error( ['Only recognised choices are ''SctMth'', ''SctMthSave'' ',...
+            'and ''SctMthBatch''.']);
   end
  
   if ~Q.CLOUDBOX_DO
@@ -1052,14 +1014,11 @@ function T = cfile_SctMth( Q, partname, workfolder )
             'DoNothing(rte_pos,rte_pos){}', 'DoNothing(rte_los,rte_los){}', ...
             'iyInterpCloudboxField{}' } );
 
-    T{end+1} = 'CloudboxGetIncoming{}';
-    T{end+1} = 'DoitInit{}';
-    if ~Q.CLOUDBOX.METHOD_PRMTRS.I_REINIT
-      T{end+1} = 'IndexSet(f_index){0}';
-      T{end+1} = 'doit_i_fieldSetClearsky{}';
+    if ~strcmp( partname, 'SctMthBatch' )
+      T{end+1} = 'CloudboxGetIncoming{}';
+      T{end+1} = 'DoitInit{}';
+      T{end+1} = 'ScatteringDoit{}';
     end
-    T{end+1} = 'ScatteringDoit{}';
-    
     
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
     %
@@ -1127,17 +1086,16 @@ function T = cfile_BatchC( Q, partname, workfolder )
     if strcmp(datatype,'num')
       n_num(dim) = n_num(dim) + 1;
       vn         = n_num(dim);      % "variable number" 
-    else
+    elseif strcmp(datatype,'int')
       n_int(dim) = n_int(dim) + 1;
       vn         = n_int(dim);      % "variable number" 
+    else
+      vn         = 1;               % Assume only one variable of other types
     end
     
     mainname  = Q.BATCH.DATA(i).WSV;
     batchtype = arts_datatypes( dim+1, datatype );
     batchname = sprintf( '%s_%d', lower(batchtype), vn );
-    
-    %type1p         = arts_datatypes( dim+1, datatype );
-    %varname        = sprintf( '%s_batch.xml', Q.BATCH.DATA(i).WSV );
     
     T{end+1} = file_or_data( batchname, batchtype, Q.BATCH.DATA(i).X, ...
                              workfolder, sprintf('%s_batch.xml',mainname) );
@@ -1148,7 +1106,8 @@ function T = cfile_BatchC( Q, partname, workfolder )
                         batchname );
   end
   %
-  A{end+1} = 'RteCalc{}';
+  Arc = add_rtecalc( Q );
+  A   = { A{:} Q.BATCH.WSM{:} Arc{:} };
   %
   T = add_agenda( T, 'ybatch_calc_agenda', A );
   
@@ -1156,17 +1115,6 @@ function T = cfile_BatchC( Q, partname, workfolder )
   %
   T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', Q.BATCH.N );
   T{end+1} = 'ybatchCalc{}';
-  %
-  switch upper( Q.Y_UNIT )
-    case '1'
-      T{end+1} = '# No conversion to K';
-    case 'RJ'
-      T{end+1} = 'MatrixToTbByRJ(ybatch,ybatch){}';
-    case 'PLANCK'
-      T{end+1} = 'MatrixToTbByPlanck(ybatch,ybatch){}';
-    otherwise
-      error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
-  end
   %
   T{end+1} = add_savefile( 'ybatch', workfolder );
   
@@ -1257,4 +1205,63 @@ function ok = isdefined( H, fields )
     end
   end
 return
+
+
+function [T,do_mc] = add_rtecalc(Q)
+  %
+  if Q.CLOUDBOX_DO  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+    % Q fields checked in SctMth, where also unit set to radiance
+    do_mc   = 1;
+    f       = mean( qarts_get(Q.F_GRID) );
+    %
+    T{1}  = 'RteCalcMC{';
+    if Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR < 0
+      T{2}  = sprintf( '  std_err       = -1' );
+    else
+      std_err = Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR * ...
+              2*f^2*constants('BOLTZMANN_CONST')/constants('SPEED_OF_LIGHT')^2;
+      T{2}  = sprintf( '  std_err       = %.5e', std_err );
+    end
+    T{3}  = sprintf( '  max_time      = %d', ...
+                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
+    T{4}  = sprintf( '  max_iter      = %d', ...
+                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
+    T{5}  = sprintf( '  z_field_is_1D = %d', ...
+                                      Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
+    T{6}  = '}';  
+  else
+    do_mc = 0;
+    if Q.J_DO
+      T{1}     = 'RteCalc{}';
+      T{end+1} = 'jacobianCalc{}';
+    else
+      T{1}     = 'RteCalcNoJacobian{}';
+    end
+  end
+  %
+  switch upper( Q.Y_UNIT )
+    case '1'
+      T{end+1} = '# No conversion to K';
+    case 'RJ'
+      T{end+1} = 'VectorToTbByRJ(y,y){}';
+      if do_mc, T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}'; end
+    case 'PLANCK'
+      T{end+1} = 'VectorToTbByPlanck(y,y){}';
+      if do_mc, T{end+1} = 'VectorToTbByPlanck(mc_error,mc_error){}'; end
+    otherwise
+      error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
+  end
+  %
+  if Q.J_DO
+    switch upper( Q.Y_UNIT )
+      case '1'
+        T{end+1} = '# No conversion to K';
+      case 'RJ'
+        T{end+1} = 'MatrixToTbByRJ(jacobian,jacobian){}';
+      case 'PLANCK'
+        error(...
+       'Planck Tb means a non-linear conversion, not suitable for jacobians.');
+    end
+  end
+return  
 %------------------------------------------------------------------------------

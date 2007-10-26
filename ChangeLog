@@ -1,5 +1,18 @@
 2007-10-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-2-198
+
+	* arts/scenegen/asg2q.m: Work to handle particles in batch
+	mode.
+
+	* arts/qarts2cfile.m: Added sub-function add_rtecalc, to easily
+	include call of relevant RteCalc function in batch part. Work
+	on batch part.
+
+	* arts/qartsBatch.m: Introduced field WSM.
+
+2007-10-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-2-197
 
 	*  New way to handle state for rand and randn. See below.
@@ -31,8 +44,8 @@
 
 	* arts/scenegen/asg_dimadd.m: Now working with surfaces in 1D cases.
 
-	* arts/scenegen/asg_regrid.m: Try catch to better explain error messages
-	from gf_regrid. Now working with surfaces in 1D cases.
+	* arts/scenegen/asg_regrid.m: Try catch to better explain error 
+	messages from gf_regrid. Now working with surfaces in 1D cases.
 
 2007-10-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
