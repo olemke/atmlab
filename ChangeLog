@@ -2,6 +2,8 @@
 
 	* atmlab-0-2-198
 
+	* Scattering batch calculations appear OK (in qarts and ASG).
+
 	* arts/scenegen/asg2q.m: Work to handle particles in batch
 	mode.
 
