@@ -6,8 +6,7 @@
 %       G = gf_regrid( D, G, {newgrid2,newgrid3}, 2:3 );
 %
 %    Regridding for dimensions above 3D is done by repeated 3D regridding.
-%    The looping is then performed for the highest dimensions involved.
-%    
+%    The looping is then performed for the highest dimensions involved.    
 %
 % FORMAT   G = gf_regrid( D, G, grids, dims, iopt )
 %        
@@ -92,7 +91,7 @@ for ig = 1 : length( G )
   
   %- Determine final size
   %
-  n = ones( 1, max([2 D.DIM]) ); % eshape demands atleast 2 values
+  n = ones( 1, max([2 D.DIM]) ); % reshape demands at least 2 values
   %
   for id = 1 : dim
     n(dims(id)) = length( grids{id} );

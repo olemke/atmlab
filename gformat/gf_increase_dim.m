@@ -52,10 +52,9 @@ for ig = 1 : length(G)
   else
     maxdim = G(ig).DIMS(end); 
   end
-  
+
   if maxdim >= newdims(1)
-    error( sprintf( ['Not all new dimensions (*newdim*) above highest ',...
-                     'value of G(%d).DIMS.'], ig ) ); 
+    continue;
   end
   
   %- Create mapdata and include grids

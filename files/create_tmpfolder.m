@@ -40,13 +40,10 @@ startdir = pwd;
 
 cd( workarea );
 
-ready = 0;
-
-s = rand( 'state' );
-
-rand( 'state', 1e6*sum(clock) )
 
 %=== Loop until a new folder with unique name has been created
+%
+ready = 0;
 %
 while ~ready
   
@@ -60,8 +57,6 @@ while ~ready
   end
 
 end
-
-rand( 'state', s );
 
 cd( startdir );
 

@@ -44,10 +44,6 @@ if ~isscalar(n)  |  ~iswhole(n)  |  n<1
 end
 
 
-% To get real random results we should reset the random seed. 
-randn('state',sum(100*clock));
-
-
 if length(x) == 1
   x = repmat( x, size(S,1), 1 );;
 end

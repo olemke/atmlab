@@ -52,7 +52,7 @@ addpath( fullfile( toppath, 'arts', 'scenegen' ) );
 addpath( fullfile( toppath, 'arts' ) ); 
 
 
-%=== Check if functions from never Matlab versions shall be included
+%=== Check if functions from newer Matlab versions shall be included
 %
 version_fixes( toppath )
 
@@ -62,6 +62,31 @@ version_fixes( toppath )
 atmlab('defaults');
 if exist( 'atmlab_conf' ) == 2
   atmlab_conf;
+end
+
+
+%=== Init random states
+%
+rand_state = atmlab( 'RAND_STATE' ); 
+%
+if isnan( rand_state )
+  
+  %- Create random state. Add window number to get different states for
+  %  different matlab runs (works only for linux).
+  %
+  nr = getenv('WINDOWID');
+  if isempty(nr)
+    nr = 0;
+  else
+    nr = str2num( nr );
+  end
+  %
+  rand( 'state', sum(100*clock) + nr );
+  randn( 'state', sum(100*clock) + nr );
+  
+else
+  rand( 'state', rand_state );
+  randn( 'state', rand_state );
 end
 
 

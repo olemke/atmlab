@@ -47,9 +47,6 @@ if ~isscalar(n)  |  ~iswhole(n)  |  n<1
 end
 
 
-% To get real random results we should reset the random seed. 
-randn('state',sum(100*clock));
-
 if length(si) > 1
   si = vec2col( si );
 end

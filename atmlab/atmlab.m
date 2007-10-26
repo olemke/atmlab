@@ -88,6 +88,13 @@
 %   ARTS (both versions):
 %     A number between 0 and 3, where 3 means highest level of verbosity.
 %----------------------------------------------------------------------------
+% RAND_STATE
+%
+% Initialisation of random states (for rand and randn). Performed inside
+% *atmlab_init*. Either NaN or an integer. If set to NaN, a semi-random 
+% state is generated (based on clock value). Otherwise the specified value
+% is used as state for both rand and randn.
+%----------------------------------------------------------------------------
 % SCREEN_WIDTH
 % 
 % The width, in number of characters, of the Matlab window.

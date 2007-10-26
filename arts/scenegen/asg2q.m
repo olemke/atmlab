@@ -21,10 +21,12 @@
 %       Z_SURFACE   
 %
 %    If length(icases)==1, and for variables where only one case is provided in
-%    G, the fields above are set directly. For vector *icases* and when
-%    several cases are defined, batch calculations are prepared. In the
-%    first case, the function *arts_y* should be used, while in the second
-%    case *arts_batch* must be used.
+%    G, the fields above are set directly. This should be followed by a call of
+%    the function *arts_y*.
+%
+%    For vector *icases* or when *icases* set to e.g. 'all', batch calculations
+%    are prepared. This should be followed by a call of the function
+%    *arts_batch*.
 %
 % FORMAT   Q = asg2q( D, G, Q, workfolder [, icases ] )
 %        
@@ -33,7 +35,9 @@
 %       G            ASG data.
 %       Q            Original qarts structure.
 %       workfolder   Folder where created files shall be saved.
-%       icases       Index of cases to consider. Default is 1.
+%       icases       Index of cases to consider. For automatic selection
+%                    in cases of bact calculations, set to 'batch' or 'all'.
+%                    Default is 1.
 
 % 2007-10-22   Created by Patrick Eriksson
 
@@ -104,10 +108,7 @@ Q.USE_RAW_ATMOSPHERE = 0;
 Q.RAW_ATMOSPHERE     = NaN;
 Q.RAW_ATM_EXPAND_1D  = 0;
 %
-if length(icases) == 1
-  Q.BATCH = NaN;
-else
-  Q.BATCH      = [];
+if length(icases) > 1
   Q.BATCH.DATA = [];
   Q.BATCH.N    = length(icases);
 end
@@ -184,57 +185,61 @@ end
 
 %- vmr_field
 %
-ind1 = find( strcmp( lower({G.DATA_NAME}), 'volume mixing ratio' ) );
+ind = find( strcmp( lower({G.DATA_NAME}), 'volume mixing ratio' ) );
 %
-if ~isempty(ind1)
+if ~isempty(ind)
   %
   do_batch = false;    % Shall gas species be handled in batch mode?
-  ind2     = [];
+  ind2     = [];       % Index of species having non-empty DATA
   %
-  for i = 1 : length(ind1)
-    s = [ size(G(ind1(i)).DATA) 1 1 ];
+  for i = 1 : length(ind)
+    s = [ size(G(ind(i)).DATA) 1 1 ];
     if s(1)
-      ind2 = [ ind2 ind1(i) ];
+      ind2 = [ ind2 ind(i) ];
     else
       continue;   % --->
     end
     if any( s(1:3) ~= sfield )
       error( sprintf( 'Data for %s have not expected size (item %d).',...
-                                                     G(ind1(i)).NAME, i) );
+                                                     G(ind(i)).NAME, i) );
     end
     %
     if s(4) > 1
       do_batch = true;
     end
     %
-    if ischar( G(ind1(i)).PROPS )
-      Q.ABS_SPECIES{i} = { G(ind1(i)).PROPS };
-    elseif iscell( G(ind1(i)).PROPS )
-      Q.ABS_SPECIES{i} = G(ind1(i)).PROPS;
+    if ischar( G(ind(i)).PROPS )
+      Q.ABS_SPECIES{i} = { G(ind(i)).PROPS };
+    elseif iscell( G(ind(i)).PROPS )
+      Q.ABS_SPECIES{i} = G(ind(i)).PROPS;
     else
       error( sprintf( 'Not handled tag format for %s (item %d).',...
-                                                     G(ind1(i)).NAME, i) );
+                                                     G(ind(i)).NAME, i) );
     end
   end
   %
-  if ~do_batch
-    Q.VMR_FIELD = zeros( [ length(ind2) sfield] );
-    for i = 1 : length(ind2)
-      Q.VMR_FIELD(i,:,:,:) = get_cases(G(ind2(i)).DATA,icases(1));
+  ind = ind2;   clear ind2
+  %
+  if ~isempty(ind)
+    if ~do_batch
+      Q.VMR_FIELD = zeros( [ length(ind) sfield] );
+      for i = 1 : length(ind)
+        Q.VMR_FIELD(i,:,:,:) = get_cases(G(ind(i)).DATA,icases(1));
+      end
+      filename = fullfile( workfolder, 'vmr_field.xml' );
+      xmlStore( filename, Q.VMR_FIELD, 'Tensor4' );
+      Q.VMR_FIELD = filename;
+    else
+      data = zeros( [ length(icases) length(ind) sfield] );
+      for i = 1 : length(ind)
+        data(:,i,:,:,:) = get_cases(G(ind(i)).DATA,icases);
+      end
+      Q.BATCH.DATA(end+1).WSV = 'vmr_field'; 
+      Q.BATCH.DATA(end).TYPE  = 'Tensor4'; 
+      Q.BATCH.DATA(end).X     = fullfile( workfolder, 'vmr_field_batch.xml' );
+      xmlStore( Q.BATCH.DATA(end).X, data, 'Tensor5' );
+      clear data
     end
-    filename = fullfile( workfolder, 'vmr_field.xml' );
-    xmlStore( filename, Q.VMR_FIELD, 'Tensor4' );
-    Q.VMR_FIELD = filename;
-  else
-    data = zeros( [ length(icases) length(ind2) sfield] );
-    for i = 1 : length(ind2)
-      data(:,i,:,:,:) = get_cases(G(ind2(i)).DATA,icases);
-    end
-    Q.BATCH.DATA(end+1).WSV = 'vmr_field'; 
-    Q.BATCH.DATA(end).TYPE  = 'Tensor4'; 
-    Q.BATCH.DATA(end).X     = fullfile( workfolder, 'vmr_field_batch.xml' );
-    xmlStore( Q.BATCH.DATA(end).X, data, 'Tensor5' );
-    clear data
   end
 end
 
@@ -297,6 +302,97 @@ end
 
 
 
+
+
+%--- Cloud box variables -----------------------------------------------------
+
+ind = find( strncmp( lower({G.DATA_NAME}), 'particle', 8 ) );
+%
+if ~isempty(ind)
+  %
+  do_batch = false;    % Shall particles be handled in batch mode?
+  ind2     = [];       % Index of particles having non-empty DATA
+  %
+  for i = 1 : length(ind)
+    s = [ size(G(ind(i)).DATA) 1 1 ];
+    if s(1)
+      ind2 = [ ind2 ind(i) ];
+    else
+      continue;   % --->
+    end
+    %
+    if s(4) > 1
+      do_batch = true;
+    end
+  end
+  %
+  ind = ind2;   clear ind2
+  %
+  if ~isempty(ind)
+    %
+    Q.CLOUDBOX_DO        = 1;
+    Q.CLOUDBOX.PND_FIELD = [];
+    Q.CLOUDBOX.SCAT_DATA = [];
+    %
+    for i = 1 : length(ind)
+      %
+      if ischar( G(ind(i)).PROPS )
+        Q.CLOUDBOX.SCAT_DATA{i} = G(ind(i)).PROPS;
+      else
+        Q.CLOUDBOX.SCAT_DATA{i} = ...
+                         fullfile( workfolder, sprintf('scat_data%d.xml',i) );
+        xmlStore( Q.CLOUDBOX.SCAT_DATA{i}, G(ind(i)).PROPS, ...
+                                                     'SingleScatteringData' );
+      end 
+      %
+      if do_batch
+        Q.CLOUDBOX.PND_FIELD{i} = '';
+      else
+        Q.CLOUDBOX.PND_FIELD{i} = ...
+                         fullfile( workfolder, sprintf('pnd_field%d.xml',i) );
+      
+      end 
+      %
+      A.data   = get_cases(G(ind(i)).DATA,icases(1));
+      A.p_grid = G(ind(i)).GRID1;
+      if any( G(ind(i)).DIMS == 2 )
+        A.lat_grid = G(ind(i)).GRID2;
+      else
+        A.lat_grid = 0;
+      end
+      if any( G(ind(i)).DIMS == 3 )
+        A.lon_grid = G(ind(i)).GRID3;
+      else
+        A.lon_grid = 0;
+      end
+      %
+      if do_batch
+        B{i} = A;
+      else
+        xmlStore( Q.CLOUDBOX.PND_FIELD{i}, A, 'GriddedField3' );
+      end
+    end
+    %
+    clear A;
+    %
+    if do_batch
+      Q.BATCH.DATA(end+1).WSV = 'pnd_field_raw'; 
+      Q.BATCH.DATA(end).TYPE  = 'ArrayOfGriddedField3'; 
+      Q.BATCH.DATA(end).X     = fullfile( workfolder, ...
+                                                  'pnd_field_raw_batch.xml' );
+      xmlStore( Q.BATCH.DATA(end).X, B, 'ArrayOfArrayOfGriddedField3' );
+      clear B;
+    end
+  end
+end
+
+
+
+
+
+
+
+%--- Sub-functions ----------------------------------------------------------
 
 function B = get_cases( A, icases )
   

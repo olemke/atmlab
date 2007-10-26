@@ -82,7 +82,7 @@ return
 function G = do_param( G, ig )
 
   %- Only fields are handled (so far?)
-  if G.DIMS(1) ~= 1
+  if G.SURFACE
     error( sprintf( ['G(%d).RNDMZ.FORMAT equals ''param'', which so far ',...
                                  'only works for atmospheric fields.'], ig ) );
   end

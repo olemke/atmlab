@@ -103,3 +103,9 @@ I.SPCFC = [
 'functions, such as *asg_hydrostat*.'
 ];
 %------------------------------------------------------------------------------
+G.SURFACE = false; 
+I.SURFACE = [
+'ASG field. False for atmospheric fields. True for "surfaces", which ',...
+'that the pressure dimensions not is used.'
+];
+%------------------------------------------------------------------------------

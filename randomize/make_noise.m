@@ -14,9 +14,6 @@
 
 function noise = make_noise(n,S)
 
-% To get real random results we should reset the random seed. 
-randn('state',sum(100*clock));
-
 % We use the Cholesky decomposition to generate random vectors with
 % the right correlation. This trick is stolen from Patrick's
 % randmvar_normal function in atmlab.

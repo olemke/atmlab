@@ -39,13 +39,18 @@ G        = gf_grid_convert( D, G, 1, 0, @log10, 1 );
 
 for ig = 1 : length(G)
 
-  %- Do nothing if DATA field is empty.
+  %- Do nothing if DATA or DIMS field is empty.
   
-  if ~isempty( G(ig).DATA )
+  if ~isempty( G(ig).DATA )  &  ~isempty( G(ig).DIMS )  
     
     dims = G(ig).DIMS;
     
-    G(ig) = gf_regrid( D, G(ig), { grids{dims} }, dims );
+    try
+      G(ig) = gf_regrid( D, G(ig), { grids{dims} }, dims );
+    catch
+      fprintf( '%s\n\n', lasterr );
+      error( sprintf('Message above applies to G(%d).',ig) );
+    end
     
   end
   

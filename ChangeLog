@@ -1,6 +1,44 @@
+2007-10-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-197
+
+	*  New way to handle state for rand and randn. See below.
+
+	* ASG now tested for clear sky and all combinations between 1D-3D and
+	RteCalc/batch calculations. Scattering calculations works also for
+	1D and 3D with RteCalc.
+	
+	* atmlab/atmlab.m: Included description of rand_state.
+
+	* atmlab/atmlab_defs.m: Included RAND_STATE with NaN as default. 
+
+	* atmlab/atmlab_init.m: Now includes setting of state for random
+	generators.
+
+	* files/create_tmpfolder.m:     Removed: rand('state',100*sum(clock))
+	* randomize/make_noise.m:       from these functions. This approach
+	* randomize/randmvar_normal.m:  is in fact quite dangerous when the 
+	* randomize/randmvar_normal2.m: functions are called repeatedly inside
+	                                a short time period. The same random
+	number(s) are then generated. This was discovered as duplicates of
+	randomly generated profiles were found. Of 10 1D profiles supposedly
+	different, it was found that only 2 or 3 different profiles were 
+	generated. This means that it is up to the user to init rand and
+	randn for each matlab session if different random states shall be
+	obtained. This can now be handled by atmlab option RAND_STATE.
+
+	* arts/scenegen/asgG.m: Introduced the field SURFACE. 
+
+	* arts/scenegen/asg_dimadd.m: Now working with surfaces in 1D cases.
+
+	* arts/scenegen/asg_regrid.m: Try catch to better explain error messages
+	from gf_regrid. Now working with surfaces in 1D cases.
+
 2007-10-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-196
+
+	* ASG now tested both for 2D and 3D.
 
 	* arts/scenegen/asg_rndmz.m: Try/catch around covmat3d for more 
 	detailed error message.

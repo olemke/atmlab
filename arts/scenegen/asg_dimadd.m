@@ -50,14 +50,18 @@ for ig = 1 : length(G)
   
   %- Determine new dimensions
   %
-  % Scalar input accepted for variables of type atmospheric fields
+  maxdim  = max( G(ig).DIMS( find(G(ig).DIMS <= Q.ATMOSPHERE_DIM) ) );
   %
-  maxdim  = G(ig).DIMS( find(G(ig).DIMS <= Q.ATMOSPHERE_DIM) );
   if isempty(maxdim)
-    maxdim = 0;
+    if G(ig).SURFACE
+      maxdim = 1;
+    else
+      maxdim = 0;
+    end
   end
+  %
   newdims = maxdim+1 : Q.ATMOSPHERE_DIM;
-  
+
   %- Already at Q.ATMOSPHERE_DIM?
   %
   if isempty( newdims )

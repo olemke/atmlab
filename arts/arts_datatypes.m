@@ -1,25 +1,37 @@
 % ARTS_DATATYPES   Mapping between ARTS data types and container dimensionality
 %
 %    This function can be used to automatically determine the name or
-%    dimensionality of an ARTS data type. Three examples:
-%       arts_datatypes(3) returns ['Tensor3','num']
-%       arts_datatypes('Vector') gives [1,'num']
-%       arts_datatypes(1,'int') gives ['ArrayOfIndex','int]
+%    dimensionality of an ARTS data type. Its main purpose is to determine
+%    the variable group for when going up one step in dimensionality.
 %
-%    Handled data type series are listed below. Scalar data types (Numeric
-%    and Index) are treated to have dimension 0.
+%    For example:
+%       [oa,datagroup] = arts_datatypes('Vector');
+%       arts_datatypes(oa+1,datagroup)
+%    gives 
+%       'Matrix'
+%    and
+%       [oa,datagroup] = arts_datatypes('ArrayOfString');
+%       arts_datatypes(oa+1,datagroup)
+%    gives 
+%       'ArrayOfArrayOfString'
 %
-% FORMAT   [oa,datagroup] = arts_datatypes( ia [, datagroup] )
+% FORMAT   [oa,datagroup] = arts_datatypes( artstype )
 %        
-% OUT   oa          Output argument. Either name of a ARTS data type or
-%                   dimension of wanted data type.
-%       datagroup   See corresponding input argument.
-% IN    ia          Input argument. Either name of a ARTS data type or
-%                   dimension of wanted data type.
-% OPT   datagroup   Type of data. Defined choices are:
-%                      'num' : Numeric, Vector, Matrix, Tensor3 ... Tensor7
-%                      'int' : Index, ArrayOfIndex
-%                   Default is 'num'.
+% OUT   oa          Variable dimensionality. 0 returned for aray variables
+%                   not part of 'num' and 'int' types.
+%       datagroup   Type of data. Defined choices are:
+%                      'num'  : Numeric, Vector, Matrix, Tensor3 ... Tensor7
+%                      'int'  : Index, ArrayOfIndex
+%                   *artstype* returned for all other array variables.
+% IN    artstype    ARTS variable group
+%
+%   or
+%
+% FORMAT   [artstype] = arts_datatypes( oa, datagroup )
+%        
+% OUT   artstype    ARTS variable group
+% IN    oa          As output argument above with same name.
+%       datagroup   As output argument above with same name.
 
 % 2005-05-26   Created by Patrick Eriksson.
 
@@ -45,32 +57,31 @@ inttypes = {
 
 
 
-if ischar( ia )
-  %
-  if nargin > 1
-    warning( 'ATMLAB:UnusedArguments', ...
-                                'Input argument *datagroup* will be ignored.' )
-  end
+if nargin == 1
   %
   i         = find( strcmp( numtypes, ia ) );
   datagroup = 'num';
   %
   if isempty(i)
     i         = find( strcmp( inttypes, ia ) );
+    oa        = i - 1;
     datagroup = 'int';
+  else
+    oa = i - 1;
+  end
+  %
+  if isempty(i)  & strncmp( ia, 'ArrayOf', 7 )
+    i         = 1;
+    oa        = 0; 
+    datagroup = ia;
   end
 
   if isempty(i)
     error( sprintf('The type %s was not found.', ia ) );
   end
 
-  oa = i - 1;
 
-elseif iswhole(ia) & isscalar(ia)
-  %
-  if nargin < 2
-    datagroup = 'num';
-  end
+else
   %
   rqre_char( 'input argument *datagroup*', datagroup );
   %
@@ -84,11 +95,16 @@ elseif iswhole(ia) & isscalar(ia)
     rqre_scalar( 'input argument *ia*', ia, 0, length(inttypes)-1 )
     oa  = inttypes{ia+1};
 
+  elseif strncmp( datagroup, 'ArrayOf', 7 )
+    % 
+    for i = 1:ia
+      datagroup = sprintf( 'ArrayOf%s', datagroup );
+    end
+    %
+    oa = datagroup;
+    
   else
      error( sprintf('Unknown datagroup (%s)',datagroup) );
   end
-
-else
-  error( 'Unknown type of *ia*.' );
 
 end

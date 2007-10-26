@@ -22,6 +22,7 @@ A.ARTS1_PATH        = NaN;
 A.DEBUG             = 0;
 A.EXTRAP            = 0;
 A.FMODEL_VERBOSITY  = 0;
+A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = NaN;
