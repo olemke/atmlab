@@ -1,5 +1,16 @@
 2007-10-29  Mattias Ekstrom  <mattias.ekstrom@chalmers.se>
 
+	* atmlab-0-2-200
+
+	* sensor/cloudsat_read.m: Now the scaling factor and offset in the
+	HDF files is included in the reading routine. This is a general
+	method that takes information from the HDF file itself, so this
+	works for all datatypes.
+	The conversion to SI units is still needed to be implemented for 
+	each datatype.
+
+2007-10-29  Mattias Ekstrom  <mattias.ekstrom@chalmers.se>
+
 	* atmlab-0-2-199
 
 	* sensor/cloudsat_read.m: Function now gives a warning instead of 

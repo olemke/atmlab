@@ -301,6 +301,22 @@ if ischar( P )
 end
 
 
+%- Factor and offset 
+%
+attributes = strvcat(fileinfo.Swath.Attributes.Name);
+for it=1:length(fieldlist)
+  ifactor = strmatch([hdfnames{it} '.factor'],attributes);
+  ioffset = strmatch([hdfnames{it} '.offset'],attributes);
+  
+  if ~isempty(ifactor) & ~isempty(ioffset)
+     factor = fileinfo.Swath.Attributes(ifactor).Value(1);
+     offset = fileinfo.Swath.Attributes(ioffset).Value(1);
+     
+     P.(fieldlist{it}) = P.(fieldlist{it})/factor - offset;
+  end
+end
+
+
 %- Unit conversions
 %
 % Handled seperately for each file type
