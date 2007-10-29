@@ -308,7 +308,7 @@ end
 if strcmp( fileinfo.Swath.Name, '2B-GEOPROF' )
   P = unit_2bgeoprof( P );
 else
-  error( 'Could not identify file type.' );
+  warning( 'Could not identify file type. No unit conversion performed.' );
 end
 
   

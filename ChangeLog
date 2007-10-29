@@ -1,3 +1,11 @@
+2007-10-29  Mattias Ekstrom  <mattias.ekstrom@chalmers.se>
+
+	* atmlab-0-2-199
+
+	* sensor/cloudsat_read.m: Function now gives a warning instead of 
+	an error when no unit conversion is implemented for the particular 
+	datatype. 
+
 2007-10-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-198
