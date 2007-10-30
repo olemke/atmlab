@@ -184,8 +184,7 @@ else
                                                            'doit_za_grid.xml');
   C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
   %
-  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
-  C.METHOD_PRMTRS.I_REINIT        = 1;
+  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
   %
 end
 

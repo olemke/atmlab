@@ -34,6 +34,8 @@ end
 if ischar( a )
   a           = { { a } };
   return_char = 1;
+else
+  return_char = 0;
 end
 
 

@@ -1,3 +1,20 @@
+2007-10-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-201
+
+	* demos/qarts_scattering_demo.m: METHOD_PRMTRS.SCAT_ZA_INTERP
+	now set to 'polynomial' as this was found to be better choice
+	for limb sounding cases.
+
+	* arts/arts_tgs2species.m: Variable return_char was not set for 
+	non-string input.
+
+	* arts/qarts2cfile.m: Removed if-statement around REINIT.
+
+	* demos/qarts_scattering_demo.m: Removed REINIT. 
+
+	* arts/qartsCloudbox.m: Removed DOIT field REINIT. 
+
 2007-10-29  Mattias Ekstrom  <mattias.ekstrom@chalmers.se>
 
 	* atmlab-0-2-200
