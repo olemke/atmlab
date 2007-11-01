@@ -1,4 +1,14 @@
-2007-11-01  Bengt Rydberg  <beryd@chalmers.se>
+2007-11-01  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-2-203
+
+	* gformat/gf_z2p_fascod.m added. 
+	  convert altitude to pressure.
+
+	* gformat/gf_p2z_fascod.m added.
+	  convert pressure to altitude.
+
+2007-11-01  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-2-202
 
