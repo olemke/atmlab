@@ -253,10 +253,11 @@ end
 %
 warning( 'off', 'MATLAB:hdfwarn:generic' );
 P = [];
+
 %
 try
   for i = 1 : length( fieldlist )
-    
+  
     ih = find( strcmp( hdfnames{i}, ...
                                   {fileinfo.Swath.GeolocationFields.Name} ) );
     
@@ -265,6 +266,7 @@ try
                                   fileinfo.Swath.GeolocationFields(ih).Name );
     else
       ih = find( strcmp( hdfnames{i}, {fileinfo.Swath.DataFields.Name} ) );
+    
       if isempty( ih )
         P = sprintf( 'Data do not contain field ''%s''.', fieldlist{i} );
         break;
@@ -307,24 +309,19 @@ attributes = strvcat(fileinfo.Swath.Attributes.Name);
 for it=1:length(fieldlist)
   ifactor = strmatch([hdfnames{it} '.factor'],attributes);
   ioffset = strmatch([hdfnames{it} '.offset'],attributes);
-  
-  if ~isempty(ifactor) & ~isempty(ioffset)
-     factor = fileinfo.Swath.Attributes(ifactor).Value(1);
-     offset = fileinfo.Swath.Attributes(ioffset).Value(1);
-     
-     P.(fieldlist{it}) = P.(fieldlist{it})/factor - offset;
+  iunit   = strmatch([hdfnames{it} '.units'],attributes);
+  if ~isempty(iunit)
+    unit=fileinfo.Swath.Attributes(iunit).Value;
+    unit=unitconv(unit,hdfnames{it});
+  else
+    unit=1;
   end
-end
 
-
-%- Unit conversions
-%
-% Handled seperately for each file type
-%
-if strcmp( fileinfo.Swath.Name, '2B-GEOPROF' )
-  P = unit_2bgeoprof( P );
-else
-  warning( 'Could not identify file type. No unit conversion performed.' );
+  if ~isempty(ifactor) & ~isempty(ioffset) 
+     factor = double(fileinfo.Swath.Attributes(ifactor).Value(1));
+     offset = double(fileinfo.Swath.Attributes(ioffset).Value(1));
+     P.(fieldlist{it}) = (P.(fieldlist{it})/factor - offset)*unit;
+  end
 end
 
   
@@ -373,29 +370,54 @@ function names = rename_fields( names, backwards )
 return
 
 
-
-%--- Unit conversion for 2B-GEOPROF
+%--- Unit conversion 
 %
 % Conversion information stored in internal variable *table*. 
 %  
-function P = unit_2bgeoprof( P )
-  
-  %- Conversion table
-  %
-  % Matlab name in column 1, conversion factor in column 2
-  %
-  table{1} = { 'Sigma_Zero',          1e-2 };
-  table{2} = { 'Spacecraft_altitude', 1e3  };
+function u=unitconv(unit,field)
 
-  names = fieldnames( P );
-  
-  for it = 1 : length(table)
-    ind = find( strcmp( names, table{it}{1} ) );
-    if ~isempty( ind )
-      P.(names{ind}) = table{it}{2} * P.(names{ind});
-    end
-  end
+if strcmp(unit,['mg m^{-3}']')
+   u=1e-3;
+elseif strcmp(unit,['um']')
+   u=1e-6;
+elseif strcmp(unit,['degrees']')
+   u=1;
+elseif strcmp(unit,['m']')
+   u=1;
+elseif strcmp(unit,['meters']')
+   u=1;
+elseif strcmp(unit,['dBZe']')
+   u=1;
+elseif strcmp(unit,['dB*100']')
+   u=1e-2;
+elseif strcmp(unit,['--']')
+   u=1;
+elseif strcmp(unit,['km']')
+   u=1e3;
+elseif strcmp(unit,['seconds']')
+   u=1;
+elseif strcmp(unit,['none']')
+   u=1;
+elseif strcmp(unit,['None']')
+   u=1;
+elseif strcmp(unit,['%']')
+   u=1;
+elseif strcmp(unit,['g m^{-2}']')
+   u=1;
+elseif strcmp(unit,['K']')
+   u=1;
+elseif strcmp(unit,['L^{-1}']')
+   u=1e3;
+elseif strcmp(unit,['cm^{-3}']')
+   u=1e6;
+elseif strcmp(unit,['dBZ']')
+   u=1;
+else 
+   u=1;
+warning( 'cloudsat_read:unknownUnit', ...
+        ['Could not identify field type unit in subfunction unitconv. ',...
+	     'No unit conversion performed for ',field,'. ',...
+	     'Unit is in ',unit','.'] );
+end
 
 return
-
-

@@ -35,7 +35,7 @@ set_defaults;
 
 
 L_size=100000;
-x=linspace(0,50,L_size)';
+x=linspace(0,100,L_size)';
 % get Laguerre polynomials
 for i=0:N+1
     if i==0

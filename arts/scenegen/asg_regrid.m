@@ -35,7 +35,7 @@ grids = { Q.P_GRID, Q.LAT_GRID, Q.LON_GRID };
 %
 grids{1} = gridconvert( grids{1}, 0, @log10, 1 );
 G        = gf_grid_convert( D, G, 1, 0, @log10, 1 );
-
+ 
 
 for ig = 1 : length(G)
 
@@ -56,7 +56,7 @@ for ig = 1 : length(G)
   
 end
 
-
+  
 %- Back to Pa
 %
 G        = gf_grid_convert( D, G, 1, 1, @pow10 );
