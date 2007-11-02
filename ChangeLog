@@ -1,3 +1,13 @@
+2007-11-02  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-2-204
+
+	* physics/z2p_cira86.m added. 
+	  convert altitude to pressure.
+
+	* physics/p2z_cira86.m added.
+	  convert pressure to altitude.
+
 2007-11-01  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-2-203
