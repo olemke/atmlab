@@ -183,8 +183,8 @@ else
   C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, ...
                                                            'doit_za_grid.xml');
   C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
-  %
-  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
+  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
+  C.METHOD_PRMTRS.ALL_F           = 0;
   %
 end
 

@@ -3,11 +3,22 @@
 %    Imports data having the arts xml GriddedField3 format. Imports either
 %    directly from file, or from corresponding matlab structure. 
 %
+%    If no format is specified (that is, empty D and G), D is set to match 
+%    the definition of the GriddedField3 type:
+%       D.DIM        = 3;
+%       D.GRID1_NAME = 'Pressure';
+%       D.GRID1_UNIT = 'Pa';
+%       D.GRID2_NAME = 'Latitude';
+%       D.GRID2_UNIT = 'deg';
+%       D.GRID3_NAME = 'Longitude';
+%       D.GRID3_UNIT = 'deg';
+%
 % FORMAT   G = gfxmlin_GriddedField3( D, G, data, name, type, dims )
 %        
-% OUT   G          Imported data.
-% IN    D       Gformat definition structure
-%       G       Original gformat data.
+% OUT   G       Imported data.
+%       D       Gformat definition structure.
+% IN    D       Gformat definition structure. Can be empty. See above.
+%       G       Original gformat data. Can be empty. See above.
 %       data    Data, or name on xml file to read.
 % OPT   name    Name of data. Default is [].
 %       type    Type of data. Default is []. Recognised options are
@@ -21,10 +32,21 @@
 % 2007-05-14   Created by Patrick Eriksson.
 
 
-function G = gfxmlin_GriddedField3( D, G, data, name, type, dims )
+function [G,D] = gfxmlin_GriddedField3( D, G, data, name, type, dims )
   
 
 %- Default values
+%
+if isempty(D)
+  D.DIM        = 3;
+  D.GRID1_NAME = 'Pressure';
+  D.GRID1_UNIT = 'Pa';
+  D.GRID2_NAME = 'Latitude';
+  D.GRID2_UNIT = 'deg';
+  D.GRID3_NAME = 'Longitude';
+  D.GRID3_UNIT = 'deg';
+  G            = [];
+end
 %
 name_DEFAULT = [];
 type_DEFAULT = [];
@@ -34,6 +56,10 @@ set_defaults;
 
 
 %- Determine dims, if not specified
+%
+if D.DIM < 3
+  error( 'D.DIM must be >= 3 to accommodate data of type GriddedField3.' ); 
+end
 %
 if isempty( dims )
   dims = [ 0 0 0 ];

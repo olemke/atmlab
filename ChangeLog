@@ -1,3 +1,19 @@
+2007-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-205
+
+	* gformat/gfxmlin_GriddedField3.m: Now possible to give empty G 
+	and D.
+
+	* graphs/suptitle.m: Copied from arts1/ami. 
+
+	* arts/qartsCloudbox.m: Defined field ALL_F for DOIT. Changed and 
+	improved description of SCAT_ZA_INTERP.
+
+	* arts/qarts2cfile.m: Added ALL_F for DOIT option. 
+
+	* demos/qarts_scattering_demo.m: Added ALL_F for DOIT option. 
+
 2007-11-02  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-2-204

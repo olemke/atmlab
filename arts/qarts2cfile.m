@@ -937,6 +937,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'ZA_GRID_OPT_FILE', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'SCAT_ZA_INTERP', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'EPSILON', 0 );
+    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'ALL_F', 0 );
     
     if (~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID) | ...
         ~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID))
@@ -944,11 +945,6 @@ function T = cfile_SctMth( Q, partname, workfolder )
   	   ' integer values.']);
     end
     
-    if (~ischar(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE))
-      error(['The field ZA_GRID_OPT_FILE is not a string. It must be' ...
-  	                     ' empty (""), if equidistant grids should be used.']);
-    end
-   
     if (~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'linear') | ...
        strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'polynomial')))
       error(['Unknown interpolation method. ',... 
@@ -959,7 +955,13 @@ function T = cfile_SctMth( Q, partname, workfolder )
       error( ...
         'Length of Q.CLOUDBOX.METHOD_PRMTRS.EPSILON must be >= Q.STOKES_DIM' );
     end
-     
+   
+    if isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )
+      filename = fullfile( workfolder, 'scat_za_grid.xml' ); 
+      xmlStore( filename, Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, 'Vector');
+      Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE = filename;
+    end
+    
     T{1}     = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
   		                             Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
     T{end+1} = 'DoitAngularGridsSet{';
@@ -973,7 +975,8 @@ function T = cfile_SctMth( Q, partname, workfolder )
     %
     T = add_agenda( T, 'doit_mono_agenda', ...
             { 'DoitScatteringDataPrepare{}', ...
-              'doit_i_fieldSetClearsky{}', ...
+              sprintf('doit_i_fieldSetClearsky{all_frequencies = %d}', ...
+                                     Q.CLOUDBOX.METHOD_PRMTRS.ALL_F ), ...
               'doit_i_fieldIterate{}',...
               'DoitCloudboxFieldPut{}' } );
     %
