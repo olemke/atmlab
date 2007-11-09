@@ -1,3 +1,11 @@
+2007-11-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-206
+
+	* handy/funshiftdim.m: Created.
+	* handy/fun2Dwrapper.m: Created.
+	* handy/fun1Dwrapper.m: Created.
+
 2007-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-205
