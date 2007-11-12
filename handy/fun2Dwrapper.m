@@ -40,8 +40,9 @@ if ~isnumeric(X)
 end
 %
 rqre_scalar( 'input argument *dim*', dim, 1 );
-if dim > dimens(X) -1
-  error( 'The selected dimension (*dim*) must be <= dimens(X)-1.' );
+%
+if dim > dimens(X) 
+  error( 'The selected dimension (*dim*) must be <= dimens(X).' );
 end
 %
 if ~isa( funhandle, 'function_handle' )
@@ -76,7 +77,7 @@ for i3 = 1 : size(X,3)
   if i3 == 1 & i4 == 1 & i5 == 1 & i6 == 1
     s    = size(X);
     s(1) = size(y,1);
-    s(1) = size(y,2);
+    s(2) = size(y,2);
     Y    = zeros( s );
   end
   
