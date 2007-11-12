@@ -1,3 +1,14 @@
+
+2007-11-12  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-2-208
+
+	* gformat/gfin_cloudsat_dBZe.m: Created. Read cloudsat
+	data into gformat.
+
+        * gformat/gf_bin.m: Created. The function bin gformat
+	data.
+	
 2007-11-12  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-2-207
@@ -5,12 +16,6 @@
 	* handy/fun2Dwrapper.m: modified. Changed errorcheck
 	 and an index.
 		
-	* gformat/gfin_cloudsat_dBZe.m: Created. Read cloudsat
-	data into gformat.
-
-	* gformat/gf_bin.m: Created. The function bin gformat
-	data.
-
 	* math/bining.m: modified. Completely changed this
 	binning function.
 
