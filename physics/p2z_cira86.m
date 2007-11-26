@@ -15,7 +15,7 @@
 %       DOY day of year 
 %           DOY must be a scalar
 % OUT
-%       P   Pressure in Pascal
+%       Z   Altitude in meter
 %
 % 2007-11-01   Created by Bengt Rydberg
 
