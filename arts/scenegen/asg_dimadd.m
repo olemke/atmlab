@@ -12,6 +12,17 @@
 %    The data are simply expanded to fill missing higher dimensions. For 
 %    example, a 1D pressure profile is expanded to 2D by inserting the
 %    profile at each Q.LAT_GRID position.
+%   
+%    FORMAT = 'expand_weighting'
+%    reguires the fields
+%    G.DIMADD.weight    which is a weighting vector with the same length
+%    as the corresponding missing data in Q.(P,LAT,LON)_GRID
+%    -----------------        
+%    The data are expanded to fill missing higher dimensions. For
+%    example 2D pressure and latitude dependent data are
+%    expanded to longitudinal dependency by applying the weights
+%    in G.DIMADD.weight. So G.DATA(p1,lat1,lon1)=  
+%    G.DATA(p1,lat1)*G.DIMADD.weight(1) 
 %
 % FORMAT   G = asg_regrid( D, G, Q )
 %        
@@ -78,7 +89,32 @@ for ig = 1 : length(G)
    case 'expand'
     %
     G(ig) = gf_increase_dim( D, G(ig), newdims, {expandg{newdims}} );
-    
+
+   case 'expand_weighting'
+    %
+    if length(newdims)==1 
+       if newdims~=3 
+          error('only longitudinal dependency can be added with this option')
+       end
+    else
+      error('only longitudinal dependency can be added with this option')
+    end
+    if length(Q.LON_GRID)~=length(G(ig).DIMADD.weights)
+      error('mismatch in size between Q.LON_GRID and G.DIMADD.weights')
+    end
+    G(ig) = gf_increase_dim( D, G(ig), newdims, {Q.LON_GRID} );
+    data=G(ig).DATA;
+    if isvector(data)
+       for jg=1:length(Q.LON_GRID)
+           data(:,jg)=data(:,jg)*G(ig).DIMADD.weights(jg);
+       end       
+    else
+       for jg=1:length(Q.LON_GRID)
+           data(:,:,jg)=data(:,:,jg)*G(ig).DIMADD.weights(jg);
+       end
+    end 
+    G(ig).DATA=data;
+
    otherwise
      error( sprintf( 'No recognised choice for G(%d).DIMADD.METHOD.', ig ) );
   end

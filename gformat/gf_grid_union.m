@@ -44,7 +44,7 @@ for id = 1 : length( dims )
     if any( G(ig).DIMS == dims(id) ) 
     
       grids{id} = [ grids{id}; vec2col( getfield( G(ig), gridname ) ) ];
-    
+     
     end
   
   end

@@ -1,4 +1,25 @@
+2007-11-26  Bengt Rydberg  <benryd@chalmers.se>
 
+        * atmlab-0-2-209
+
+        * gformat/gfin_crop.m: Created. crop gformat data.
+
+        * arts/scenegen/asg_zeropad.m: Created. 
+          The function pad asg_data with zeros
+
+        * arts/scenegen/asg_dimadd.m: modified.
+          added a knew method
+        
+        * arts/scenegen/asg_dbz2pnd.m: created.
+          The function converts radar reflectivity
+          to iwc and pndfields.
+
+        * arts/scenegen/asg_hydrostat.m: modified.
+          changed an index.
+
+        * arts/scenegen/asg_fixed_relhumid.m: modified.
+          added a col2vec to work better.
+     
 2007-11-12  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-2-208

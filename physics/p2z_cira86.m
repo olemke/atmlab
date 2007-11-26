@@ -77,7 +77,7 @@ if size(p,2)>1 & size(lat,2)>1
 
 else
 
-   [LMi,PMi,MMi]=meshgrid(lat,z,month2);
+   [LMi,PMi,MMi]=meshgrid(lat,p,month2);
    z=interp3(LM,log(PM),MM,Data.data,LMi,log(PMi),MMi);
 
 end

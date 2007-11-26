@@ -121,7 +121,6 @@ for ic = 1 : nc
   if ic <= ic_w
     ic_w = ic;  
   end
-  
   for ilon = 1 : size(G(it).DATA,3)
     for ilat = 1 : size(G(it).DATA,2)
 
@@ -129,7 +128,7 @@ for ic = 1 : nc
                                          G(it).DATA(:,ilat,ilon,ic_t), ...
                                          G(iw).DATA(:,ilat,ilon,ic_w), ...
                                          G(iz).SPCFC.P0, ...
-                                         Z0.DATA(ilat,ilon), ...
+                                         Z0.DATA(1,ilat,ilon), ...
                                          lats(ilat) );
       end
   end

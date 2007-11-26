@@ -108,7 +108,7 @@ for ig = ih2o
     if ic <= ic_z
       ic_z = ic;  
     end
-    
+
     for ilon = 1:size(G(ig).DATA,3)
       for ilat = 1:size(G(ig).DATA,2)
           
@@ -152,8 +152,8 @@ for ig = ih2o
 
         %- Create new profile
         %
-        G(ig).DATA(ind,ilat,ilon,ic) = ww.*vmr + ...
-                                          (1-ww).*G(ig).DATA(ind,ilat,ilon, ...
+        G(ig).DATA(ind,ilat,ilon,ic) = vec2col(ww.*vmr) + ...
+	                vec2col((1-ww)).*G(ig).DATA(ind,ilat,ilon, ...
                                                           ic);
       end
     end
