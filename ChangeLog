@@ -1,5 +1,15 @@
 2007-11-26  Bengt Rydberg  <benryd@chalmers.se>
 
+        * atmlab-0-2-211
+
+        * arts/scenegen/asg2y_3d_cloudsat.m: modified.
+          fixed a typo.  
+	
+	* arts/scenegen/asg_dimadd.m: modified.
+	  added a new dimadd method.
+	
+2007-11-26  Bengt Rydberg  <benryd@chalmers.se>
+
         * atmlab-0-2-210
 
         * arts/scenegen/asg2y_3d_1dbz_scene.m: Created. 

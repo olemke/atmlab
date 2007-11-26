@@ -14,7 +14,7 @@ function s = atmlab_version
 
 nr1 = 0;
 nr2 = 2;
-nr3 = 210;
+nr3 = 211;
 
 
 s = sprintf('atmlab-%d.%d.%d',nr1,nr2,nr3);

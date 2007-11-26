@@ -18,6 +18,11 @@
 %    G.DIMADD.weight    which is a weighting vector with the same length
 %    as the corresponding missing data in Q.(P,LAT,LON)_GRID
 %    -----------------        
+%    
+%    FORMAT = 'iafft'
+%    the data are expanded in longitude dimension  by an Iterative
+%    Amplitude Adapted Fourier Transform algorithm   
+%
 %    The data are expanded to fill missing higher dimensions. For
 %    example 2D pressure and latitude dependent data are
 %    expanded to longitudinal dependency by applying the weights
@@ -114,6 +119,15 @@ for ig = 1 : length(G)
        end
     end 
     G(ig).DATA=data;
+   case 'iafft' 
+    if length(newdims)==1 
+      if newdims~=3 
+          error('only longitudinal dependency can be added with this option')
+      end
+    else
+      error('only longitudinal dependency can be added with this option')
+    end  
+    G(ig) = asg_2d23d( D, G(ig), Q );   
 
    otherwise
      error( sprintf( 'No recognised choice for G(%d).DIMADD.METHOD.', ig ) );

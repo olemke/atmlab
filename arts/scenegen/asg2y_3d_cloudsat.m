@@ -29,7 +29,7 @@
 %         DIMADD.weights weights with the same size as LON_GRID
 %         PROPS
 %                    a psd and ssp defintiion structure 
-%                    C.PROPS(1) corresponds to the radar frequency                
+%                    C.PROPS(1) corresponds to the radar frequency             
 %                    C.PROPS(2) corresponds to the instrument frequencys 
 %                    with fields                    
 %             SSP    single scattering properties data
@@ -137,7 +137,7 @@ for ip = 1 : length(C.USE_LATS)
   
   %- Make calculations
   %
-  [y,ydata,dy,G1(ip)] = asg2y_3d_1dbz_scene_test( Gcs1, grids_cs, G(ip), ...
+  [y,ydata,dy,G1{ip}] = asg2y_3d_1dbz_scene( Gcs1, grids_cs, G(ip), ...
 					   grids_dbz, Q,workfolder );
   %
   if ip == 1
