@@ -53,7 +53,7 @@ rqre_scalar( 'Q.ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
 
 %- New grids for p, lat and lon . To be used with 'expand' option.
 %
-expandg = { [1.1e5 1e-9], [-90 90], [0 360] };
+expandg = { [1.1e5 1e-9], [-90 90], [-180 180] };
 
 
 for ig = 1 : length(G)

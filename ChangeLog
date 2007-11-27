@@ -1,3 +1,13 @@
+2007-11-27  Bengt Rydberg  <benryd@chalmers.se>
+
+        * atmlab-0-2-211
+	
+	* arts/scenegen/asg_dimadd.m: modified.
+	  changed longitude definition to [-180 180].
+
+	* arts/scenegen/asg_zeropad.m: modified.
+	  changed longitude definition to [-180 180].
+
 2007-11-26  Bengt Rydberg  <benryd@chalmers.se>
 
         * atmlab-0-2-211
