@@ -18,7 +18,7 @@
 %                   1 corresponds to Q.P_GRID, element 2 Q.LAT_GRID and 
 %                   element 3 Q.LON_GRID. 
 %       C           A cloud definition structure with fields
-%         DATA      name of datafile to be read in
+%         DATA           name of datafile to be read in
 %         LEG            leg of cloudsat data 
 %         USE_LATS       latitude midpoints
 %         DLAT           latitude (scalar)
@@ -42,25 +42,33 @@
 %                
 %       Q           Qarts structure. See above.
 %       workfolder  Used as input to *asg2q*.
-%
+
 %  2007-11-26 created by XXX
 
 function [Y,ydata,DY,G1] = asg2y_3d_cloudsat(Gcs,grids_cs,C,Q,workfolder)
-
+  
+  
 %- Load CloudSat data
 %
-C.AUX={'DEM_elevation','Longitude','TAI_start','Profile_time'};
-lat_limits = [ C.USE_LATS(1)-C.DLAT/2 C.USE_LATS(end)+C.DLAT/2 ];
+C.AUX       = {'DEM_elevation','Longitude','TAI_start','Profile_time'};
+lat_limits  = [ C.USE_LATS(1)-C.DLAT/2 C.USE_LATS(end)+C.DLAT/2 ];
 %make sure we read in also just outside lat_limits
-lat_out=[lat_limits(1)-0.1 lat_limits(end)+0.1];
-[Gdbz,Ddbz]=gfin_cloudsat_dBZe([],[],C.DATA,C.AUX,[],C.LEG,lat_out,[]);
-%
+lat_out     = [ lat_limits(1)-0.1 lat_limits(end)+0.1 ];
+[Gdbz,Ddbz] = gfin_cloudsat_dBZe([],[],C.DATA,C.AUX,[],C.LEG,lat_out,[]);
 
-%-reduce the latitude resolution
-% bin the data on a desired grid
+
+
+%- reduce the latitude resolution
+%  bin the data on a desired grid
 %
-grids{1}=Gdbz(1).GRID1;
-grids{2}=lat_limits(1):C.LAT_RES:lat_limits(end);
+grids{1} = Gdbz(1).GRID1;
+grids{2} = lat_limits(1) : C.LAT_RES : lat_limits(end);
+%
+% Make sure that end points not have slipped outside covered range due to
+% numerical problems.
+%grids{2}(1)   = lat_limits(1);
+%grids{2}(end) = lat_limits(end);
+%
 [Gdbz,Ddbz]=gf_bin(Ddbz,Gdbz,grids,[1 2]);
 
 

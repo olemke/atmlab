@@ -119,6 +119,7 @@ for ig = 1 : length(G)
        end
     end 
     G(ig).DATA=data;
+    
    case 'iafft' 
     if length(newdims)==1 
       if newdims~=3 

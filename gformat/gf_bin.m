@@ -50,9 +50,9 @@ for j=1:length(G)
         gname = sprintf( 'GRID%d', dims(ig) );
         old_grids{ig}=vec2col([G(j).(gname)]);
         if ~isempty(old_grids{ig}) 
-	   if grids{ig}(1)<old_grids{ig}(1) | grids{ig}(end)>old_grids{ig}(end)
-	      error('grids is outside the range of original grids')
-           end
+          if grids{ig}(1)<old_grids{ig}(1) | grids{ig}(end)>old_grids{ig}(end)
+            error('grids is outside the range of original grids')
+          end
            %find the dimension of data
 	   old_dim=find(G(j).DIMS==dims(ig));
            data=G(j).DATA;

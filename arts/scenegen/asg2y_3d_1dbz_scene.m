@@ -42,7 +42,7 @@
 %       Q           Qarts structure. See above.
 %       workfolder  Used as input to *asg2q*.
 
-% 200x-xx-xx   Created by XXX.
+% 2007-11-28   Created by Patrick Eriksson and Bengt Rydberg.
 
 
 function [y,ydata,dy,G] = ...
@@ -91,7 +91,6 @@ Q = asg_atmgrids( D, Gdbz, Q );
 
 %- Create final dbz field(s)
 %
-%
 Gdbz = asg_dimadd( D, Gdbz, Q );
 Gdbz = asg_regrid( D, Gdbz, Q );
 
@@ -131,37 +130,38 @@ Gcs = asg_hydrostat( D, Gcs, Q );
 % done in ARTS
 %
 Gdbz = asg_zeropad( D, Gdbz, Q);
-Gdbz.DATA(find(Gdbz.DATA==0))=min(Gdbz.DATA(:));
+Gdbz.DATA(find(Gdbz.DATA==0))=min(Gdbz.DATA(:));  % What is done here?
+
 
 %- Modify water vapour to match cloud distribution
 %
 % How?
 
-%- Convert dbz field(s) to pnd fields but first regrid atmospheric fields
-% to the dbz grid
-Q1=Q;
-Q1.P_GRID=Gdbz.GRID1;
-Q1.LAT_GRID=Gdbz.GRID2;
-Q1.LON_GRID=Gdbz.GRID3;
-Gcs1=asg_regrid( D, Gcs, Q1 );
 
+%- Convert dbz field(s) to pnd fields but first regrid atmospheric fields
+%  to the dbz grid
+%
+Q1          = Q;
+Q1.P_GRID   = Gdbz.GRID1;
+Q1.LAT_GRID = Gdbz.GRID2;
+Q1.LON_GRID = Gdbz.GRID3;
+Gcs1        = asg_regrid( D, Gcs, Q1 );
+%
 Gdbz = asg_dbz2pnd( D, [Gcs1 Gdbz], Q ,Gdbz.PROPS);
-Gdbz=Gdbz(length(Gcs1)+1:end);
+Gdbz = Gdbz(length(Gcs1)+1:end);
+
 
 %- Determine size of cloud box
 %
-% Do this by analysing Gdbz.DATA and comparing with grids in Q. 
-% Or more easily done before doing padding?
+iwc_ind = find( strcmp( lower({Gdbz.NAME}), 'iwc field' ) );
 %
-% Q.CLOUDBOX.LIMITS = ?
-iwc_ind=find(strcmp({Gdbz.NAME},'IWC field'));
-
 C1=[];
 C2=[];
 C3=[];
 C4=[];
 C5=[];
 C6=[];
+%
 for i=1:size(Gdbz(iwc_ind).DATA,3)
   [c1,c2]=find(Gdbz(iwc_ind).DATA(:,:,i));
   if ~isempty(c1)
@@ -177,6 +177,7 @@ for i=1:size(Gdbz(iwc_ind).DATA,3)
      C4=max([C4,vec2col(c2)']);
   end
 end
+%
 for i=1:size(Gdbz(iwc_ind).DATA,1)
   [c1,c2]=find(squeeze(Gdbz(iwc_ind).DATA(i,:,:)));
     if ~isempty(c2)
@@ -186,22 +187,26 @@ for i=1:size(Gdbz(iwc_ind).DATA,1)
        C6=max([C6,vec2col(c2)']);
    end
 end
+%
+p1   = Gdbz(iwc_ind).GRID1(C1);
+p2   = Gdbz(iwc_ind).GRID1(C2);
+lat1 = Gdbz(iwc_ind).GRID2(C3);
+lat2 = Gdbz(iwc_ind).GRID2(C4);
+z    = p2z_cira86([p1 p2]',mean([lat1 lat2]),160);
+lon1 = Gdbz(iwc_ind).GRID3(C5);
+lon2 = Gdbz(iwc_ind).GRID3(C6);
+%
+Q.CLOUDBOX.LIMITS = [z(1) z(2) lat1 lat2 lon1 lon2];
 
-p1=Gdbz(iwc_ind).GRID1(C1);
-p2=Gdbz(iwc_ind).GRID1(C2);
-lat1=Gdbz(iwc_ind).GRID2(C3);
-lat2=Gdbz(iwc_ind).GRID2(C4);
-z=p2z_cira86([p1 p2]',mean([lat1 lat2]),160);
-lon1=Gdbz(iwc_ind).GRID3(C5);
-lon2=Gdbz(iwc_ind).GRID3(C6);
-Q.CLOUDBOX.LIMITS=[z(1) z(2) lat1 lat2 lon1 lon2];
+
+%- Merge G arrays
+%
+G = [Gcs Gdbz];
 
 
 %- Run ARTS
 %
-Q = asg2q( D, [Gcs Gdbz], Q, workfolder );
+Q = asg2q( D, G, Q, workfolder );
 %
-'arts is now running'
 [y,ydata,dy] = arts_y( Q, workfolder )
 
-G=[Gcs Gdbz];

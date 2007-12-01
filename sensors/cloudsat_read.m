@@ -98,7 +98,7 @@ if nargin < 3
   choice1 = [];
 elseif ~ischar( choice1 )
   error( 'Input argument *choice1* must be a string' );
-  %
+else
   choice1 = lower( choice1 );
   %
   if ~( strcmp(choice1,'fields')  |  strcmp(choice1,'index')  |  ...
@@ -113,7 +113,7 @@ if nargin < 5
   choice2 = [];
 elseif ~ischar( choice2 )
   error( 'Input argument *choice2* must be a string' );
-  %
+else
   choice2 = lower( choice2 );
   %
   if ~( strcmp(choice2,'lat')     |  strcmp(choice2,'lon')  |  ...
@@ -126,7 +126,7 @@ end
 
 %- Get information about the file 
 %
-fileinfo = hdfinfo( filename, 'eos' ); 
+fileinfo = hdfinfo( filename, 'eos' );
 %
 allfields = { fileinfo.Swath.GeolocationFields.Name, ...
              fileinfo.Swath.DataFields.Name };
@@ -141,7 +141,7 @@ if isempty( fieldlist )  |  strcmp( choice1, 'fields' )
     return
   end
 
-  hdfnames  = allfields;  
+  hdfnames  = allfields;
   fieldlist = rename_fields( hdfnames, 1 );
 
 else
@@ -158,7 +158,7 @@ if ~isempty( choice1 )
   %- Index pre-defined
   if strcmp( choice1, 'index' )
     iout = c1arg;
-    clear c1arg
+    clear c1arg;
   
   %- Filtering according to leg, lat and lon
   else
@@ -233,7 +233,7 @@ if ~isempty( choice1 )
 
     iout = find( inleg & ...
                  P.Latitude  >= latlims(1) & P.Latitude  <= latlims(2) & ...
-                 P.Longitude >= lonlims(1) & P.Longitude <= lonlims(2) );   
+                 P.Longitude >= lonlims(1) & P.Longitude <= lonlims(2) );
     
     if isempty(iout)
       P = 'No data matching reading restrictions.';

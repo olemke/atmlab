@@ -40,9 +40,9 @@
 
 function [G,D]=gfin_cloudsat_dBZe( D, G, data, aux, z_grid, leg, latitude, dBZemin)
 
-
+  
 if ~isempty(G) & isempty(D)
-   error('If G is defined D must be defined')
+   error('If G is defined D must be defined');
 end
 
 %- Default values
@@ -103,14 +103,18 @@ end
 %read data 
 P = cloudsat_read(data,fields,'leg',leg,'lat',latitude);
 
+% what is this?
+% Using flipud is dangerous for vectors. Works only for column vectors.
 for i=1:length(fields)
     P.(fields{i}) = flipud(P.(fields{i})');
 end
 
 
+% The code was: else exist('z_grid','var') 
+% Correct that it shall be a "pure" else?
 if ~exist('z_grid','var') 
    P.z_grid=mean(P.Height')';
-else exist('z_grid','var') 
+else 
    if ~isempty(z_grid)
       P.z_grid=z_grid;
    else
@@ -163,27 +167,27 @@ for ik=kvec
            end
        end
        H(i).DIMS=dims(2);
-       H(i).DATA=y; 
+       H(i).DATA=y;
     elseif  S(1)==1 & S(2)==0
        %data is a scalar
        H(i).GRID1=[];
        H(i).GRID2=[];
-       H(i).GRID3=[]; 
-       H(i).DIMS=[]; 
-       H(i).DATA=y;   
+       H(i).GRID3=[];
+       H(i).DIMS=[];
+       H(i).DATA=y;
     elseif  S(1)==0 & S(2)==1
        %data is a matrix
        y1=zeros(length(P.z_grid),size(y,2));
-       warning off
+       warning off;
        %bin the data on altitude grid
        for iy=1:size(y,2)
            y1(:,iy)=binning(P.z_grid,P.Height(:,iy),y(:,iy));
        end
        y=y1;
-       warning on
+       warning on;
        if ik~=1
 	  warning(['the data in fields ',fields{ind},' has been binned',...
-                  ' to fit on a z_grid'])  
+                  ' to fit on a z_grid']);
        end
        for id = 1 : length(dims)
            gname = sprintf( 'GRID%d', dims(id) );
@@ -205,7 +209,7 @@ for ik=kvec
        H(i).DATA=y;
        H(i).DIMS=sort([dims(1) dims(2)]);
    else
-       error('unknown dimensionality of data')
+       error('unknown dimensionality of data');
    end
 
    H(i).SOURCE=data;
