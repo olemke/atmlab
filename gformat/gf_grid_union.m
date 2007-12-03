@@ -48,7 +48,6 @@ for id = 1 : length( dims )
     end
   
   end
-
   grids{id} = unique( grids{id} );
-
+  
 end

@@ -67,9 +67,13 @@ Q.P_GRID   = grids_cs{1};
 Q.LAT_GRID = grids_cs{2};
 Q.LON_GRID = grids_cs{3};
 %
-
 Q = asg_atmgrids( D, Gcs, Q );
 
+%This happens occasionally since the endpoints are
+%treated separately in the functions, and we remove it 
+if Q.P_GRID(end)==Q.P_GRID(end-1)
+   Q.P_GRID=Q.P_GRID(1:end-1);
+end
 
 %- Create final clear sky fields
 %
@@ -110,9 +114,9 @@ Q.LAT_GRID = min( [ step1 step2] );
 %
 if isscalar( grids_cs{3} ),  step1=grids_cs{3};  else, step1=0; end
 if isscalar( grids_dbz{3} ), step2=grids_dbz{3}; else, step2=0; end
-
 Q.LON_GRID = min( [ step1 step2] );
 %
+
 Q = asg_atmgrids( D, [Gcs Gdbz], Q );
 
 
@@ -130,7 +134,9 @@ Gcs = asg_hydrostat( D, Gcs, Q );
 % done in ARTS
 %
 Gdbz = asg_zeropad( D, Gdbz, Q);
-Gdbz.DATA(find(Gdbz.DATA==0))=min(Gdbz.DATA(:));  % What is done here?
+% As we fill data field with zeros, but the unit is in dBZe
+% we give all zero valued data the minimum value (-50 )
+Gdbz.DATA(find(Gdbz.DATA==0))=min(Gdbz.DATA(:));  
 
 
 %- Modify water vapour to match cloud distribution
@@ -188,21 +194,24 @@ for i=1:size(Gdbz(iwc_ind).DATA,1)
    end
 end
 %
-p1   = Gdbz(iwc_ind).GRID1(C1);
-p2   = Gdbz(iwc_ind).GRID1(C2);
-lat1 = Gdbz(iwc_ind).GRID2(C3);
-lat2 = Gdbz(iwc_ind).GRID2(C4);
-z    = p2z_cira86([p1 p2]',mean([lat1 lat2]),160);
-lon1 = Gdbz(iwc_ind).GRID3(C5);
-lon2 = Gdbz(iwc_ind).GRID3(C6);
-%
-Q.CLOUDBOX.LIMITS = [z(1) z(2) lat1 lat2 lon1 lon2];
 
-
-%- Merge G arrays
-%
-G = [Gcs Gdbz];
-
+if ~isempty(C1) %if C1 is empty we don't have any cloud particles
+    p1   = Gdbz(iwc_ind).GRID1(C1);
+    p2   = Gdbz(iwc_ind).GRID1(C2);
+    lat1 = Gdbz(iwc_ind).GRID2(C3);
+    lat2 = Gdbz(iwc_ind).GRID2(C4);
+    z    = p2z_cira86([p1 p2]',mean([lat1 lat2]),160);
+    lon1 = Gdbz(iwc_ind).GRID3(C5);
+    lon2 = Gdbz(iwc_ind).GRID3(C6);
+    %
+    Q.CLOUDBOX.LIMITS = [z(1) z(2) lat1 lat2 lon1 lon2];
+    
+    %- Merge G arrays
+    %
+    G = [Gcs Gdbz];
+else
+    G = Gcs;
+end
 
 %- Run ARTS
 %

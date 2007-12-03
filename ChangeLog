@@ -1,3 +1,21 @@
+2007-12-03  Bengt Rydberg  <benryd@chalmers.se>
+
+        * atmlab-0-2-213
+	
+	* arts/scenegen/asg2y_3d_cloudsat.m: modified.
+	  minor changes.
+
+	* arts/math/binning.m: modified error check.
+
+	* arts/gformat/gf_bin.m: modified error check.
+
+	* arts/gformat/gfin_cloudsat_dBZe.m: modified.
+	  added comments, and handling of file not found.
+
+	* arts/scattering/create_ssp.m: created.
+	  create single scattering properties data and is
+          an interface to mie_scat_data
+	
 2007-12-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-0-2-212
@@ -14,7 +32,7 @@
 
 2007-11-27  Bengt Rydberg  <benryd@chalmers.se>
 
-        * atmlab-0-2-211
+        * atmlab-0-2-212
 	
 	* arts/scenegen/asg_dimadd.m: modified.
 	  changed longitude definition to [-180 180].

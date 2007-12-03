@@ -81,9 +81,7 @@ if isempty( dims )
   return;           % --->
 end
 
-
 grids = gf_grid_union(D,G,dims);
-
 
 %- Set P_GRID
 %

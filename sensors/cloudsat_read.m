@@ -288,7 +288,9 @@ try
     % Make index crop
     %
     if ~isempty( iout )  &  size( P.(fieldlist{i}), 1 ) > 1
-      P.(fieldlist{i}) = P.(fieldlist{i})(iout,:);
+       if ~strcmp(fieldlist{i},'EC_height')
+          P.(fieldlist{i}) = P.(fieldlist{i})(iout,:);
+       end 
     end
   end
   %

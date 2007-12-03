@@ -103,15 +103,23 @@ end
 %read data 
 P = cloudsat_read(data,fields,'leg',leg,'lat',latitude);
 
-% what is this?
-% Using flipud is dangerous for vectors. Works only for column vectors.
+if ischar(P)
+   error('the selected cloudsat file was not found')
+end
+
+%The data in P is a function of (lat,alt) and the altitude is decreasing,
+%but we want is as function of (alt,lat) and increasing altitude,
+%therefore we transpose the data and flip it upside down
+%note that nothing happens with the latitude vector
+%since the flipud will be performed on a row vector for latitude 
+
 for i=1:length(fields)
     P.(fields{i}) = flipud(P.(fields{i})');
 end
 
 
 % The code was: else exist('z_grid','var') 
-% Correct that it shall be a "pure" else?
+% Correct that it shall be a "pure" else?yes
 if ~exist('z_grid','var') 
    P.z_grid=mean(P.Height')';
 else 

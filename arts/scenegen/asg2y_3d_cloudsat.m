@@ -3,6 +3,13 @@
 %    Calculates spectrum/spectra considering scattering, where the spatial
 %    structure of the clouds is taken from radar data.
 %
+%    Reads in Cloudsat radar data from selected parts
+%    of the orbits based on the fields of *C*.
+%    The radar data are shifted in latitude
+%    to be centered around 0 degrees.
+%    Prepares data for the function *asg2y_3d_1dbz_scene*
+%    which is later called 
+%
 %    FORMAT [Y,ydata,DY,G1] = asg2y_3d_cloudsat(Gcs,grids_cs,C,Q,workfolder)
 %
 % OUT   y           As returned by *arts_y*.
@@ -25,8 +32,7 @@
 %         LAT_RES        latitude resolution (scalar)
 %         LON_GRID       longitude grid 
 %         C.P_LIMS       pressure limits
-%         DIMADD.METHOD  only method that work is 'expand_weighting'
-%         DIMADD.weights weights with the same size as LON_GRID
+%         DIMADD         (see asg_dimadd)
 %         PROPS
 %                    a psd and ssp defintiion structure 
 %                    C.PROPS(1) corresponds to the radar frequency             
@@ -57,11 +63,11 @@ lat_out     = [ lat_limits(1)-0.1 lat_limits(end)+0.1 ];
 [Gdbz,Ddbz] = gfin_cloudsat_dBZe([],[],C.DATA,C.AUX,[],C.LEG,lat_out,[]);
 
 
-
 %- reduce the latitude resolution
 %  bin the data on a desired grid
 %
 grids{1} = Gdbz(1).GRID1;
+grids{1} = Gdbz(1).GRID1( find( Gdbz(1).GRID1>0 & Gdbz(1).GRID1<24e3 ) );
 grids{2} = lat_limits(1) : C.LAT_RES : lat_limits(end);
 %
 % Make sure that end points not have slipped outside covered range due to
@@ -70,8 +76,6 @@ grids{2} = lat_limits(1) : C.LAT_RES : lat_limits(end);
 %grids{2}(end) = lat_limits(end);
 %
 [Gdbz,Ddbz]=gf_bin(Ddbz,Gdbz,grids,[1 2]);
-
-
 
 % Switch to pressure grid. Sort data in order to get decreasing pressures and
 % increasing latitudes.
@@ -99,7 +103,7 @@ Gdbz(dbz_ind).DIMADD=C.DIMADD;
 % Find part of P.??? that is inside C.P_LIMS.
 %
 limits=[fliplr(C.P_LIMS);lat_limits];
-[Gdbz(dbz_ind),Ddbz]=gf_crop2(Ddbz,Gdbz(dbz_ind),limits,[1 2]);
+[Gdbz(dbz_ind),Ddbz]=gf_crop(Ddbz,Gdbz(dbz_ind),limits,[1 2]);
 grids_dbz{1} = Gdbz(dbz_ind).GRID1;
 %
 
@@ -132,16 +136,15 @@ for ip = 1 : length(C.USE_LATS)
   %  
   lat  = [C.USE_LATS(ip)-C.DLAT/2 C.USE_LATS(ip)+C.DLAT/2];
   limits=[fliplr(C.P_LIMS);lat];
-  [G(ip),Ddbz]=gf_crop2(Ddbz,Gdbz(dbz_ind),limits,[1 2]);  
+  [G(ip),Ddbz]=gf_crop(Ddbz,Gdbz(dbz_ind),limits,[1 2]);  
   
   %place the grid on 0 degree latitude
-  G(ip).GRID2= G(ip).GRID2-mean(G(ip).GRID2);
+  G(ip).GRID2= round( [G(ip).GRID2-mean(G(ip).GRID2)]*1000)/1000;
   grids_dbz{2} = G(ip).GRID2;
 
   %- Temperature and water vapor
   %
   % add the possibility to include ECMWF data
-  
   
   %- Make calculations
   %

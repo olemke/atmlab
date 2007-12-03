@@ -8,7 +8,7 @@
 %          G        original gformat data 
 %          Q        Qarts setting structure.            
 %          P        conversion structure of length 2
-%                   P(1) corresponds to the radar frequency                       
+%                   P(1) corresponds to the radar frequency                    
 %                   P(2) corresponds to the instrument frequencys 
 %                   with fields                  
 %            SSP    single scattering properties    

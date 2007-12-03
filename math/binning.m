@@ -35,7 +35,7 @@ if length(x)~=size(Y,1)
    error('Mismatch in size between Y and x.')
 end
 
-if x_new(1)<x(1) | x_new(end)>x(end)
+if min(x_new)<min(x) | max(x_new)>max(x)
    warning('x_new is outside the range of x')
 end
 
