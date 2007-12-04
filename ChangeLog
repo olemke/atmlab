@@ -1,5 +1,18 @@
 2007-12-04  Bengt Rydberg  <benryd@chalmers.se>
 
+	* atmlab-0-2-215
+
+	* arts/gformat/gfin_cloudsat_ecmwf.m: created.
+	  reads in cloudsat ecmwf data on gformat
+       
+	* arts/scenegen/asg2y_3d_cloudsat.m: modified.
+	  changed a function call to date2mjd
+        
+	* randomize/iaaft/iaaft_loop_3d.m: modified.
+	  changed a tic call
+
+2007-12-04  Bengt Rydberg  <benryd@chalmers.se>
+
         * atmlab-0-2-214
 	
 	* arts/scenegen/asg_2d23d.m: created.

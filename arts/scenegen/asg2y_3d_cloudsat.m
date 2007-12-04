@@ -83,7 +83,9 @@ grids{2} = lat_limits(1) : C.LAT_RES : lat_limits(end);
 tai_ind=find(strcmp({Gdbz.NAME},'TAI_start'));
 pt_ind=find(strcmp({Gdbz.NAME},'Profile_time'));
 dbz_ind=find(strcmp({Gdbz.NAME},'Radar_Reflectivity'));
-mjd1=utc2mjd(1993,1,1,0,0,0,0);
+
+mjd1=date2mjd(1993,1,1,0,0,0);
+
 sec_of_day=60*60*24;
 mjd=mjd1+(Gdbz(tai_ind).DATA+mean(Gdbz(pt_ind).DATA))/sec_of_day;
 DOY = mjd2doy(mjd);

@@ -131,7 +131,6 @@ fileinfo = hdfinfo( filename, 'eos' );
 allfields = { fileinfo.Swath.GeolocationFields.Name, ...
              fileinfo.Swath.DataFields.Name };
 
-
 %- Handle empty *fieldlist* and choice1=='fields* option
 %
 if isempty( fieldlist )  |  strcmp( choice1, 'fields' )
@@ -413,6 +412,10 @@ elseif strcmp(unit,['L^{-1}']')
 elseif strcmp(unit,['cm^{-3}']')
    u=1e6;
 elseif strcmp(unit,['dBZ']')
+   u=1;
+elseif strcmp(unit,['Pa']')
+   u=1;
+elseif strcmp(unit,['kg/kg']')
    u=1;
 else 
    u=1;
