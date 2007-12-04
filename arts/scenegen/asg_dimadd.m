@@ -19,7 +19,7 @@
 %    as the corresponding missing data in Q.(P,LAT,LON)_GRID
 %    -----------------        
 %    
-%    FORMAT = 'iafft'
+%    FORMAT = 'iaaft'
 %    the data are expanded in longitude dimension  by an Iterative
 %    Amplitude Adapted Fourier Transform algorithm   
 %
@@ -120,7 +120,7 @@ for ig = 1 : length(G)
     end 
     G(ig).DATA=data;
     
-   case 'iafft' 
+   case 'iaaft' 
     if length(newdims)==1 
       if newdims~=3 
           error('only longitudinal dependency can be added with this option')

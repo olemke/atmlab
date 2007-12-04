@@ -1,3 +1,20 @@
+2007-12-04  Bengt Rydberg  <benryd@chalmers.se>
+
+        * atmlab-0-2-214
+	
+	* arts/scenegen/asg_2d23d.m: created.
+	  expand 2-dimensional Gformat data into
+          3-dimensional data using an Iterative
+          Amplitude Adapted Fourier Transform (IAAFT) 
+          algorithm.
+
+	* randomize/iaaft/: created.
+	  This directory contains programs to make surrogate 
+	  cloud fields using the Iterative Adapted Fourier Transform 
+	  (IAAFT) method or the Stochastic Iterative Amplitude Adapted 
+	  Fourier Transform (SIAAFT) method.
+	  This Matlab version was written by Victor Venema.
+	
 2007-12-03  Bengt Rydberg  <benryd@chalmers.se>
 
         * atmlab-0-2-213

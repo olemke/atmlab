@@ -33,6 +33,7 @@ addpath( fullfile( toppath, 'tests' ) );
 addpath( fullfile( toppath, 'sensors' ) ); 
 addpath( fullfile( toppath, 'scattering' ) ); 
 addpath( fullfile( toppath, 'retrieval' ) ); 
+addpath( fullfile( toppath, 'randomize','iaaft' ) ); 
 addpath( fullfile( toppath, 'randomize' ) ); 
 addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
