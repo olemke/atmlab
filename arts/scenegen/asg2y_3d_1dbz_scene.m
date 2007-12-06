@@ -217,5 +217,5 @@ end
 %
 Q = asg2q( D, G, Q, workfolder );
 %
-[y,ydata,dy] = arts_y( Q, workfolder )
+[y,ydata,dy] = arts_y( Q, workfolder );
 

@@ -1,3 +1,12 @@
+2007-12-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-2-216
+
+	* arts/arts_y.m: CLOUDBOX instead of CLOUDBOX_DO was used to check
+	if scattering calculations made.
+
+	* arts/scenegen/asg2y_3d_1dbz_scene.m: Quitafied call of arts_y.
+
 2007-12-04  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-2-215
