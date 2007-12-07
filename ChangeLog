@@ -1,3 +1,11 @@
+2007-12-07  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-218
+
+	* arts/scenegen/asg_pathiwc.m: modified.
+	  now this function also returns relative humidity
+	  along propagation path.
+
 2007-12-06  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-217
