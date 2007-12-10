@@ -1,3 +1,18 @@
+%ASG_2D23D  expand 2-dimensional Gformat data into
+%           3-dimensional data using an Iterative
+%           Amplitude Adapted Fourier Transform (IAAFT)
+%           algorithm.
+% 
+%
+%OUT  G   Modified Gformat data
+%    
+%IN   D   Gformat definition structure.
+%     G   ASG data.
+%     Q   Qarts setting structure
+%         Only Q.SENSOR_LOS and Q.SENSOR_POS are considered
+%
+
+% 2007-12-04   Created by Bengt Rydberg
 
 function G = asg_2d23d( D, G, Q );
 

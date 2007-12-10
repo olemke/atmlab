@@ -1,3 +1,11 @@
+2007-12-10  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-219
+
+	* arts/scenegen/asg_pathiwc.m: modified.
+	  more input, and can now handle multiple
+	  propagation paths
+
 2007-12-07  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-218
