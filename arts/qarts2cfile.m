@@ -218,7 +218,7 @@ function T = cfile_Generl( Q, partname, workfolder )
   end
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
-  T{2} = 'Main{';
+  T{2} = 'Arts{';
   %
   if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
     T{3} = 'output_file_formatSetBinary{}';

@@ -1,3 +1,14 @@
+2007-12-10  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-2-220
+
+	* sensors/atovs_*: Added these functions again. We need them to
+	read AMSU data. They were removed by Patrick in atmlab version
+	atmlab-0-2-153 for being specific to Bremen. Patrick, please
+	explain which parts are too specific, I'll try to fix them.
+
+	* sensors/gmt_map.sh: Also added this again for now.
+
 2007-12-10  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-219
