@@ -76,7 +76,7 @@
 % 18.05.2004 by Carmen Verdes
 %--------------------------------------------------------------------------
 function DataSelectedFiles =...
-    atovs_select_datafile_2(dir_data, satellite, instrument_tip, year, month, day, time);
+    atovs_select_datafile(dir_data, satellite, instrument_tip, year, month, day, time);
 %-------------------------------
 % Check the input
 %
@@ -137,7 +137,7 @@ end
 if  strcmp(time, 'all')
     name_time  = ['-T:', time];
 else
-    name_file = ['-T:', time{1}, 'to', time{2}];
+    name_time = ['-T:', time{1}, 'to', time{2}];
 end
 % get the name of the index file, in the data directory
 % a index file exists for each specific year,

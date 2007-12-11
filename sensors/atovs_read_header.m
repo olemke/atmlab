@@ -31,7 +31,9 @@ try
 
 % open a file
 % 'b' means big-endian byte ordering
-file_id = fopen( file_name, 'r', 'b' );
+% It seems that big-endian was only necessary on Marvin (SAB 2007-12-11)
+%file_id = fopen( file_name, 'r', 'b' );
+file_id = fopen( file_name, 'r' );
 
 % read header
 [header, count] = fread( file_id, rec_len, 'int32' );

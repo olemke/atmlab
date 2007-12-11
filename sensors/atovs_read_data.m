@@ -50,11 +50,15 @@ switch inst_id
   [rec_format, rec_len, nchan, nfovs] = atovs_define_amsual1c;
  case 'HIRS'
   [rec_format, rec_len, nchan, nfovs] = atovs_define_hirsl1c;
+ otherwise
+  error('No known instrument.')
 end
 
 % open a file
 % 'b' means big-endian byte ordering
-file_id = fopen( file_name, 'r', 'b' );
+% It seems that big-endian was only necessary on Marvin (SAB 2007-12-11)
+%file_id = fopen( file_name, 'r', 'b' );
+file_id = fopen( file_name, 'r' );
 
 % skip the header
 fseek( file_id, rec_len * 4, -1 );

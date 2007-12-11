@@ -1,3 +1,20 @@
+2007-12-11  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atovs: Added. Will move atovs functions here.
+
+	* atovs/old_routines: Added. For unadapted Bremen routines. The
+	idea is to move adapted routines one directory up, or create new
+	replacement routines there. Should be removed at some point in the
+	future.
+
+	* sensors/atovs_read_data.m: Removed big endian option from data
+	read. 
+
+	* sensors/atovs_read_header.m: Removed big endian option from data
+	read. 
+
+	* sensors/atovs_select_datafile.m: Fixed function name.
+
 2007-12-10  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-0-2-220
