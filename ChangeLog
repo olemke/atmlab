@@ -1,3 +1,15 @@
+2007-12-11  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-220
+
+	* gformat/gf_merge.m: created.
+	  merge two gformat arrays.
+
+	* sensors/cloudsat_iwc_read_std.m: removed.
+
+	* gformat/gf_z2p_fascod.m:removed.
+
+
 2007-12-11  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atovs: Moved ATOVS specific functions here from sensors.
