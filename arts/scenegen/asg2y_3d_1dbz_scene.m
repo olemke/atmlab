@@ -139,11 +139,6 @@ Gdbz = asg_zeropad( D, Gdbz, Q);
 Gdbz.DATA(find(Gdbz.DATA==0))=min(Gdbz.DATA(:));  
 
 
-%- Modify water vapour to match cloud distribution
-%
-% How?
-
-
 %- Convert dbz field(s) to pnd fields but first regrid atmospheric fields
 %  to the dbz grid
 %
@@ -156,6 +151,10 @@ Gcs1        = asg_regrid( D, Gcs, Q1 );
 Gdbz = asg_dbz2pnd( D, [Gcs1 Gdbz], Q ,Gdbz.PROPS);
 Gdbz = Gdbz(length(Gcs1)+1:end);
 
+
+%- Modify water vapour to match cloud distribution
+%
+% How?
 
 %- Determine size of cloud box
 %

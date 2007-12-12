@@ -1,3 +1,11 @@
+2007-12-12  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-221
+
+	* arts/scenegen/asg_iwc_relhumid: created.
+	  modify the water vapour field in G
+	  depending on the iwc field
+	
 2007-12-11  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-220
