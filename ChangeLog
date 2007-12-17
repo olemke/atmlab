@@ -1,3 +1,10 @@
+2007-12-17  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-222
+
+	* arts/scenegen/asg_pathiwc.m: modified.
+	  changed an index.
+	
 2007-12-12  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-221

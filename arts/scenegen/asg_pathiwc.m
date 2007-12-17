@@ -85,7 +85,7 @@ for pp=1:size(Q.SENSOR_POS,1)
     %
 
     %the length from the sensor to the tangent point
-    l_sen=(pos(1))*cos((180-Q.SENSOR_LOS(1))*deg2rad);
+    l_sen=pos(1)*cos( (180-los(1)) *deg2rad);
 
     %length of each step
     l_step=1e2;

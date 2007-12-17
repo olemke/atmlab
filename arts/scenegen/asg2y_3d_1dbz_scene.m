@@ -151,10 +151,12 @@ Gcs1        = asg_regrid( D, Gcs, Q1 );
 Gdbz = asg_dbz2pnd( D, [Gcs1 Gdbz], Q ,Gdbz.PROPS);
 Gdbz = Gdbz(length(Gcs1)+1:end);
 
-
 %- Modify water vapour to match cloud distribution
 %
 % How?
+%if 1
+%   Gcs=asg_iwc_relhumid(D,Gcs,Gdbz,Q);
+%end
 
 %- Determine size of cloud box
 %
@@ -216,5 +218,5 @@ end
 %
 Q = asg2q( D, G, Q, workfolder );
 %
-[y,ydata,dy] = arts_y( Q, workfolder );
+[y,ydata,dy] = arts_y( Q, workfolder )
 
