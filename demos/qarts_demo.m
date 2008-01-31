@@ -29,7 +29,6 @@ set_defaults;
 Q  = qarts;
 
 
-
 %= General part
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
@@ -72,7 +71,7 @@ Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
 %= Set RTE variables
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
-Q.Y_UNIT            = 'RJ';
+Q.Y_UNIT            = 'RJBT';
 %
 zplat               = 600e3;
 Q.SENSOR_POS        = Q.R_GEOID + zplat;

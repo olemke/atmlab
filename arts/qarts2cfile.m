@@ -218,23 +218,33 @@ function T = cfile_Generl( Q, partname, workfolder )
   end
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
-  T{2} = 'Main{';
+  T{2} = 'Arts{';
+  %
+  if ~isempty( Q.DEFAULTS )
+    if ~iscellstr( Q.DEFAULTS )
+      error( 'Q.DEFAULTS must be given as a cell array of strings.' );
+    end
+    %
+    for i = 1 : length( Q.DEFAULTS )
+      T{end+1} = sprintf( 'INCLUDE "%s"', Q.DEFAULTS{i} );
+    end
+  end
   %
   if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
-    T{3} = 'output_file_formatSetBinary{}';
+    T{end+1} = 'output_file_formatSetBinary{}';
   elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
-    T{3} = 'output_file_formatSetAscii{}';
+    T{end+1} = 'output_file_formatSetAscii{}';
   else
     error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );
   end
   %
   rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
-  T{4} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
+  T{end+1} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
   %  
-  T{5} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
+  T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
   %
   
-  T{6} = sprintf( 'SpeciesSet(abs_species){[%s]}', ...
+  T{end+1} = sprintf( 'SpeciesSet(abs_species){[%s]}', ...
                                             arts_tgs_cnvrt(Q.ABS_SPECIES) );
   %
   if strcmp( partname, 'GenerlSave' )
@@ -415,7 +425,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
                                                                   workfolder );
     T{end+1} = 'abs_lookupCreate{}'; 
-    T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
+    T        = add_agenda( T, 'abs_scalar_gas_agenda', ... 
                                      { 'abs_scalar_gasExtractFromLookup{}' } );
     %
     abstable = true;
@@ -1013,7 +1023,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D', 0);
     %
-    T{1} = 'StringSet(mc_unit){"radiance"}';
+    T = {};
     %
   else
     error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );
@@ -1195,58 +1205,41 @@ return
 
 function [T,do_mc] = add_rtecalc(Q)
   %
+  rqre_char( 'Qarts field Y_UNIT', Q.Y_UNIT );
+  %
+  T{1} = sprintf( 'StringSet(y_unit){"%s"}', Q.Y_UNIT );
+  %
   if Q.CLOUDBOX_DO  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-    % Q fields checked in SctMth, where also unit set to radiance
-    do_mc   = 1;
-    f       = mean( qarts_get(Q.F_GRID) );
     %
-    T{1}  = 'RteCalcMC{';
+    do_mc = 1;
+    %
+    T{2} = 'RteCalcMC{';
     if Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR < 0
-      T{2}  = sprintf( '  std_err       = -1' );
+      T{3} = sprintf( '  std_err       = -1' );
     else
-      std_err = Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR * ...
-              2*f^2*constants('BOLTZMANN_CONST')/constants('SPEED_OF_LIGHT')^2;
-      T{2}  = sprintf( '  std_err       = %.5e', std_err );
+      T{3} = sprintf( '  std_err       = %.5e', ...
+                                     Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
     end
-    T{3}  = sprintf( '  max_time      = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
-    T{4}  = sprintf( '  max_iter      = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-    T{5}  = sprintf( '  z_field_is_1D = %d', ...
-                                      Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    T{6}  = '}';  
+    T{4} = sprintf( '  max_time      = %d', ...
+                                     Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
+    T{5} = sprintf( '  max_iter      = %d', ...
+                                     Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
+    T{6} = sprintf( '  z_field_is_1D = %d', ...
+                                     Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
+    T{7} = '}';  
   else
+    %
     do_mc = 0;
+    %
     if Q.J_DO
-      T{1}     = 'RteCalc{}';
-      T{end+1} = 'jacobianCalc{}';
+      rqre_field( Q.J, 'UNIT' );
+      rqre_char( 'Qarts field Y_UNIT', Q.J.UNIT );
+      T{2} = sprintf( 'StringSet(jacobian_unit){"%s"}', Q.J.UNIT );
+      %
+      T{3} = 'RteCalc{}';
+      T{4} = 'jacobianCalc{}';
     else
-      T{1}     = 'RteCalcNoJacobian{}';
-    end
-  end
-  %
-  switch upper( Q.Y_UNIT )
-    case '1'
-      T{end+1} = '# No conversion to K';
-    case 'RJ'
-      T{end+1} = 'VectorToTbByRJ(y,y){}';
-      if do_mc, T{end+1} = 'VectorToTbByRJ(mc_error,mc_error){}'; end
-    case 'PLANCK'
-      T{end+1} = 'VectorToTbByPlanck(y,y){}';
-      if do_mc, T{end+1} = 'VectorToTbByPlanck(mc_error,mc_error){}'; end
-    otherwise
-      error( sprintf( 'Unrecognised choice for Q.Y_UNIT (%s).', Q.Y_UNIT ) );
-  end
-  %
-  if Q.J_DO
-    switch upper( Q.Y_UNIT )
-      case '1'
-        T{end+1} = '# No conversion to K';
-      case 'RJ'
-        T{end+1} = 'MatrixToTbByRJ(jacobian,jacobian){}';
-      case 'PLANCK'
-        error(...
-       'Planck Tb means a non-linear conversion, not suitable for jacobians.');
+      T{2} = 'RteCalcNoJacobian{}';
     end
   end
 return  

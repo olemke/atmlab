@@ -28,4 +28,10 @@ if isvector(year) & length(year) > 1
   second = vec2row( second );
 end
 
-d = dayofyear( year, month, day, hour, minute, second );
+
+%- To ensure that d gets same size as mjd
+%
+d = zeros( size( mjd ) );
+
+
+d(:) = dayofyear( year, month, day, hour, minute, second );

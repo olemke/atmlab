@@ -89,7 +89,7 @@ Q                  = qarts_abstable( Q );
 %= Set RTE variables
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{5e3}' };
-Q.Y_UNIT            = 'RJ';
+Q.Y_UNIT            = 'RJBT';
 %
 zplat        = 600e3;
 sensor_pos   = Q.R_GEOID + zplat;

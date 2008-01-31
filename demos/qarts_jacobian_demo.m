@@ -53,9 +53,12 @@ J.ABS_SPECIES(2)            = J.ABS_SPECIES(1);
 %
 Q.ABS_SPECIES{3}{1}         = 'N2O';
 J.ABS_SPECIES(3)            = J.ABS_SPECIES(1);
-Q.ABS_SPECIES{4}{1}         = 'H2O';
-%Q.ABS_SPECIES{4}{2}         = 'H2O-MPM89';
+%
+Q.ABS_SPECIES{4}{1}         = 'H2O-*-480e9-505e9';
+Q.ABS_SPECIES{4}{2}         = 'H2O-MPM89';
 J.ABS_SPECIES(4)            = J.ABS_SPECIES(1);
+%
+Q.ABS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
 
 
 
@@ -117,7 +120,7 @@ Q                  = qarts_abstable( Q );
 %= Set RTE variables
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
-Q.Y_UNIT            = 'RJ';
+Q.Y_UNIT            = 'RJBT';
 %
 zplat        = 600e3;
 Q.SENSOR_POS = Q.R_GEOID + zplat;

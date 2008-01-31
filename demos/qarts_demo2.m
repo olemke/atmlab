@@ -131,7 +131,7 @@ Q = arts_sensor( Q );
 %= Set RTE variables
 %
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
-Q.Y_UNIT            = 'RJ';
+Q.Y_UNIT            = 'RJBT';
 %
 zplat               = 600e3;
 %

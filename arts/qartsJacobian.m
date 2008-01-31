@@ -16,7 +16,7 @@
 % 2006-08-29   Created by Patrick Eriksson.
 
 
-function [J,I] = qarts_jacobian
+function [J,I] = qartsJacobian
 
 
 %-----------------------------------------------------------------------------
@@ -53,5 +53,11 @@ I.POINTING = [ ...
 'correspond directly to keyword arguments of *jacobianAddPointing*:', ...
 '#   DZA         - size of perturbation', ...
 '#   POLY_ORDER  - order of the perturbation polynomial.'
+];
+%-----------------------------------------------------------------------------
+J.UNIT = '-';
+I.UNIT = [ ...
+'Matches the WSV *jacobian_unit*. For further information: arts -d ',...
+'jacobian_unit'
 ];
 %-----------------------------------------------------------------------------
