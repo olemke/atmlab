@@ -14,6 +14,17 @@
 
 function result = xmlLoad(filename)
 
+uncompressed_filename='';
+if strcmp( filename(length(filename)-2:end), '.gz')
+  uncompressed_filename = tempname();
+  cmd = [ 'gunzip -cd ' filename ' > ' uncompressed_filename ];
+  st = system (cmd);
+  if st
+    error ('Failed to uncompress XML file');
+  end
+  filename = uncompressed_filename;
+end
+
 fid = fopen (filename,'r');
 
 if fid == -1
@@ -36,4 +47,8 @@ end
 result = xmlReadTag(fid, filename, '', '', 0, 0);
 
 fclose (fid);
+
+if ~strcmp (uncompressed_filename, '')
+  delete (uncompressed_filename);
+end
 

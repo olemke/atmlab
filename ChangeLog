@@ -1,3 +1,9 @@
+2008-01-31  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-2-224
+
+	* xml/xmlLoad.m: Add rudimentary support to read zipped xml files.
+
 2008-01-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-2-223
