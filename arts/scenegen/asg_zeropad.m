@@ -69,7 +69,7 @@ for ig = 1 : length(G)
 
       %add the zeros
       if isvector(G(ig).DATA)
-	 G(ig).DATA=vec2col(G(ig).DATA);
+	     G(ig).DATA=vec2col(G(ig).DATA);
       end
       data_size=size(G(ig).DATA);
       ind=find(G(ig).DIMS==dim);
@@ -82,5 +82,8 @@ for ig = 1 : length(G)
       data(3:end-2,:,:)=old_data;
       %shift back dimensions
       G(ig).DATA=shiftdim(data,data_dim-ind+1);
+      if isvector(G(ig).DATA)
+	     G(ig).DATA=vec2col(G(ig).DATA);
+      end
    end
 end 

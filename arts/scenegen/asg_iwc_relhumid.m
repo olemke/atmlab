@@ -126,6 +126,9 @@ ei = e_eq_ice(G2(3).DATA);
 
 %create a pressure matrix
 P=zeros(size(G2(3).DATA));
+if dim==1
+   P=G2(3).GRID1;
+end
 
 if dim>1
    p=vec2col(G2(3).GRID1)*ones(1,length(G2(3).GRID2));

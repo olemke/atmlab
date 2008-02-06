@@ -48,7 +48,6 @@
 function [y,ydata,dy,G] = ...
                  asg2y_3d_1dbz_scene(Gcs,grids_cs,Gdbz,grids_dbz,Q,workfolder)
 
-
 %- Check input
 %
 % ???
@@ -154,9 +153,10 @@ Gdbz = Gdbz(length(Gcs1)+1:end);
 %- Modify water vapour to match cloud distribution
 %
 % How?
-%if 1
-%   Gcs=asg_iwc_relhumid(D,Gcs,Gdbz,Q);
-%end
+if 1
+   Gcs=asg_iwc_relhumid(D,Gcs,Gdbz,Q);
+   Gcs = asg_hydrostat( D, Gcs, Q );
+end
 
 %- Determine size of cloud box
 %
@@ -205,7 +205,7 @@ if ~isempty(C1) %if C1 is empty we don't have any cloud particles
     lon1 = Gdbz(iwc_ind).GRID3(C5);
     lon2 = Gdbz(iwc_ind).GRID3(C6);
     %
-    Q.CLOUDBOX.LIMITS = [z(1) z(2) lat1 lat2 lon1 lon2];
+    Q.CLOUDBOX.LIMITS = [z(1)-1e3 z(2)+1e3 lat1 lat2 lon1 lon2];
     
     %- Merge G arrays
     %

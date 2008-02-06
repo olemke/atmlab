@@ -1,3 +1,18 @@
+2008-02-06  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-225
+
+	* arts/scenegen/asg_cloudsat_ecmwf.m: added.
+	  read in cloudsat ecmwf data on gformat data
+
+	* arts/scenegen/asg2y_1d_cloudsat.m: added.
+	 Prepare ASG data for 1D scattering calculations,
+	 similiar to asg2y_3d_cloudsat.m
+
+	* arts/scenegen/asg2y_1d_1dbz_scene.m: added.
+	 Performs 1D scattering calculations based on ASG data
+	 similiar to asg2y_3d_1dbz_scene.m
+	
 2008-01-31  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-2-224

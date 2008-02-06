@@ -147,7 +147,8 @@ for ip = 1 : length(C.USE_LATS)
   %- Temperature and water vapor
   %
   % add the possibility to include ECMWF data
-  
+    
+ 
   %- Make calculations
   %
   [y,ydata,dy,G1{ip}] = asg2y_3d_1dbz_scene( Gcs1, grids_cs, G(ip), ...

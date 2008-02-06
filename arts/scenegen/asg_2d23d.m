@@ -92,7 +92,7 @@ end
 %the data is now on a lon_grid corresponding to our lat_grid
 %we want to have it on Q.LON_GRID, so we bin it on this grid
 G.DATA=Y.data;
-G.GRID3=G.GRID2;
+G.GRID3=G.GRID2-mean(G.GRID2);
 G.DIMS=[1 2 3];
 m1=mean(Q.LON_GRID);
 GRIDS{1}=Q.LON_GRID-m1;

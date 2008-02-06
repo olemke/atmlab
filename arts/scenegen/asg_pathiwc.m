@@ -70,7 +70,7 @@ for i=1:length(H(1).GRID3)
 end
 
 %create meshgrids to be used in interpolation
-[X,Y,Z]=meshgrid(H(1).GRID2,H(1).DATA(:,1,1),H(1).GRID3);
+[X,Y,Z]=meshgrid(H(1).GRID2,H(1).DATA(:,round(end/2),round(end/2)),H(1).GRID3);
 
 %loop over sensor positions and line of sights
 %
@@ -100,7 +100,7 @@ for pp=1:size(Q.SENSOR_POS,1)
     [r,lat,lon] = arts_cart2sph(x,y,z);
 
     %the geoid radius at the tangent point
-    re = interp1( [-90:1:90], wgs84( 2, [-90:1:90]), lat(end) );
+    %re = interp1( [-90:1:90], wgs84( 2, [-90:1:90]), lat(end) );
     re = Q.R_GEOID;  
 
     %interpolate the data field on the propagation path
@@ -113,11 +113,12 @@ for pp=1:size(Q.SENSOR_POS,1)
     z_grid=z_grid(ind);
     lat=lat(ind);
     lon=lon(ind);    
-
-    IWC=interp3(X,H(1).DATA,Z,H(4).DATA,lat,z_grid,lon);
-    HUM=interp3(X,H(1).DATA,Z,H(2).DATA,lat,z_grid,lon);
-    TEM=interp3(X,H(1).DATA,Z,H(3).DATA,lat,z_grid,lon);
-    PRE=exp(interp3(X,H(1).DATA,Z,log(Pr),lat,z_grid,lon));
+    
+    
+    IWC=interp3(X,Y,Z,H(4).DATA,lat,z_grid,lon);
+    HUM=interp3(X,Y,Z,H(2).DATA,lat,z_grid,lon);
+    TEM=interp3(X,Y,Z,H(3).DATA,lat,z_grid,lon);
+    PRE=exp(interp3(X,Y,Z,log(Pr),lat,z_grid,lon));
 
     %Equilibrium water vapor pressure
     ei = e_eq_ice(TEM);
