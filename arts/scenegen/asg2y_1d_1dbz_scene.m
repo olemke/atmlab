@@ -229,8 +229,6 @@ end
 %- Run ARTS
 %
 Q = asg2q( D, G, Q, workfolder );
-%
-
 Q                  = qarts_abstable( Q );
 Q.ABS_LOOKUP       = arts_abstable( Q );
 [y,ydata,dy] = arts_y( Q, workfolder )

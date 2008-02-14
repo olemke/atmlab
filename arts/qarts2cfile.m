@@ -154,7 +154,7 @@ for ip = 1 : length(parts)
    case 'Sensor'
     %
     T = cfile_Sensor( Q, parts{ip}, workfolder );
-   
+    
    case 'Jacobi'
     %
     T = cfile_Jacobi( Q, parts{ip}, workfolder );
@@ -178,8 +178,9 @@ for ip = 1 : length(parts)
    otherwise
     error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
   end
-
+  
   S = { S{:} T{:} };
+  
 
 end
 
@@ -234,18 +235,25 @@ function T = cfile_Generl( Q, partname, workfolder )
     T{end+1} = 'output_file_formatSetBinary{}';
   elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
     T{end+1} = 'output_file_formatSetAscii{}';
+  elseif isnan(Q.OUTPUT_FILE_FORMAT)
+    %do nothing
   else
     error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );
   end
   %
-  rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
-  T{end+1} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
+  if ~isnan(Q.STOKES_DIM)
+    rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
+    T{end+1} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
+  end
   %  
-  T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
+  if ~isnan(Q.F_GRID)
+    T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
+  end
   %
-  
-  T{end+1} = sprintf( 'SpeciesSet(abs_species){[%s]}', ...
-                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
+  if iscell(Q.ABS_SPECIES)
+    T{end+1} = sprintf( 'SpeciesSet(abs_species){[%s]}', ...
+                                          arts_tgs_cnvrt(Q.ABS_SPECIES) );
+  end
   %
   if strcmp( partname, 'GenerlSave' )
     T{end+1} = add_savefile( 'output_file_format', workfolder );
@@ -276,53 +284,84 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     error( 'Only recognised choices are ''AtmSrf'' and ''AtmSrfSave''.' );
   end
   %
-  rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
-  T{1} = sprintf( 'AtmosphereSet%dD{}', Q.ATMOSPHERE_DIM );
+  i=1;
+  T{i}=[];
+  if ~isnan(Q.ATMOSPHERE_DIM)
+    rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
+    T{i} = sprintf( 'AtmosphereSet%dD{}', Q.ATMOSPHERE_DIM );
+    i=i+1;
+  end
   %
-  T{2} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder );
+  if ~isnan(Q.P_GRID)
+    T{i} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder );
+    i=i+1;
+  end
   %
   if Q.ATMOSPHERE_DIM >= 2
-    T{end+1} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, workfolder );
+    T{i} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, workfolder );
+    i=i+1;
   end
   if Q.ATMOSPHERE_DIM == 3
-    T{end+1} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, workfolder );
+    T{i} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, workfolder );
+    i=i+1;
   end
   %
-  rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
+  if ~isnan(Q.USE_RAW_ATMOSPHERE)
+    rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
+  end
   %
-  if Q.USE_RAW_ATMOSPHERE
-    rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
-    rqre_bool( 'Qarts field RAW_ATM_EXPAND_1D', Q.RAW_ATM_EXPAND_1D );
-    T{end+1} = sprintf('AtmRawRead{"%s"}', Q.RAW_ATMOSPHERE );
-    if Q.RAW_ATM_EXPAND_1D
-      T{end+1} = 'AtmFieldsCalcExpand1D{}';
+  if ~isnan(Q.USE_RAW_ATMOSPHERE)
+    if Q.USE_RAW_ATMOSPHERE
+      rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
+      rqre_bool( 'Qarts field RAW_ATM_EXPAND_1D', Q.RAW_ATM_EXPAND_1D );
+      T{i} = sprintf('AtmRawRead{"%s"}', Q.RAW_ATMOSPHERE );
+      i=i+1;
+      if Q.RAW_ATM_EXPAND_1D
+        T{i} = 'AtmFieldsCalcExpand1D{}';
+        i=i+1;
+      else
+        T{i} = 'AtmFieldsCalc{}';
+        i=i+1;
+      end
     else
-      T{end+1} = 'AtmFieldsCalc{}';
-    end
-  else
-    T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
-    T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, workfolder);
-    if ~isnan( Q.Z_FIELD )
-      T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
+      T{i} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
+      i=i+1;
+      T{i} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, workfolder);
+      i=i+1;
+      if ~isnan( Q.Z_FIELD )
+        T{i} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
+        i=i+1;
+      end
     end
   end
   %
-  if ~isnan( Q.R_GEOID )  &  isscalar( Q.R_GEOID )
-    T{end+1} = sprintf( 'r_geoidSpherical{%e}', Q.R_GEOID );
-  else
-    T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, workfolder );
+  if ~isnan(Q.R_GEOID)
+    if ~isnan( Q.R_GEOID )  &  isscalar( Q.R_GEOID )
+      T{i} = sprintf( 'r_geoidSpherical{%e}', Q.R_GEOID );
+      i=i+1;
+    else
+      T{i} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, workfolder );
+      i=i+1;
+    end
   end
   %
-  if ~isnan( Q.Z_SURFACE )  &  isscalar( Q.Z_SURFACE )
-    T{end+1} = 'ncolsGet( r_geoid ){}';
-    T{end+1} = 'nrowsGet( r_geoid ){}';
-    T{end+1} = sprintf('MatrixSet(z_surface){%.3f}', Q.Z_SURFACE );
-  else
-    T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, workfolder );
+  if ~isnan(Q.Z_SURFACE)
+    if ~isnan( Q.Z_SURFACE )  &  isscalar( Q.Z_SURFACE )
+      T{i} = 'ncolsGet( r_geoid ){}';
+      i=i+1;
+      T{i} = 'nrowsGet( r_geoid ){}';
+      i=i+1;
+      T{i} = sprintf('MatrixSet(z_surface){%.3f}', Q.Z_SURFACE );
+      i=i+1;
+    else
+      T{i} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, workfolder );
+      i=i+1;
+    end
   end
   %
   if strcmp( partname, 'AtmSrfSave' )
-    T{end+1} = add_savefile( 'atmosphere_dim', workfolder );
+    T{i} = add_savefile( 'atmosphere_dim', workfolder );
+    i=i+1;
     T{end+1} = add_savefile( 'p_grid', workfolder );
     T{end+1} = add_savefile( 'lat_grid', workfolder );
     T{end+1} = add_savefile( 'lon_grid', workfolder );
@@ -332,6 +371,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     T{end+1} = add_savefile( 'r_geoid', workfolder );
     T{end+1} = add_savefile( 'z_surface', workfolder );
   end
+  
 return
 
 
@@ -352,23 +392,33 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     error( 'Only recognised choices are ''Absrpt'' and ''AbsrptSave''.' );
   end
   %
-  rqre_char( 'Qarts field ABSORPTION', Q.ABSORPTION );
-  %
-  if ~( strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION,'LoadTable') | ...
-        strcmp(Q.ABSORPTION,'CalcTable') );
-    error( 'Only recognised choices for *ABSORPTION* are ''OnTheFly'', ',...
+  if ~isnan(Q.ABSORPTION)
+    rqre_char( 'Qarts field ABSORPTION', Q.ABSORPTION );
+    %
+    if ~( strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION,'LoadTable') | ...
+          strcmp(Q.ABSORPTION,'CalcTable') );
+      error( 'Only recognised choices for *ABSORPTION* are ''OnTheFly'', ',...
            '''LoadTable'' and ''CalcTable''.' );
+    end
   end
   %
   T = {};
   %
   if strcmp( Q.ABSORPTION, 'OnTheFly' )  |  strcmp( Q.ABSORPTION, 'CalcTable' )
     %
-    T{end+1} = 'abs_lineshapeDefine{';
-    T{end+1} = sprintf('   shape               = "%s"', Q.ABS_LINESHAPE );
-    T{end+1} = sprintf('   normalizationfactor = "%s"', Q.ABS_LINESHAPE_FACTOR);
-    T{end+1} = sprintf('   cutoff              = %e', Q.ABS_LINESHAPE_CUTOFF );
-    T{end+1} = '}';
+    if ischar(Q.ABS_LINESHAPE) & ischar(Q.ABS_LINESHAPE_FACTOR) & ...
+                                 isscalar(Q.ABS_LINESHAPE_CUTOFF)
+      T{end+1} = 'abs_lineshapeDefine{';
+      T{end+1} = sprintf('   shape               = "%s"', Q.ABS_LINESHAPE );
+      T{end+1} = sprintf('   normalizationfactor = "%s"', Q.ABS_LINESHAPE_FACTOR);
+      T{end+1} = sprintf('   cutoff              = %e', Q.ABS_LINESHAPE_CUTOFF );
+      T{end+1} = '}';
+    elseif ~isnan(Q.ABS_LINESHAPE) & ~isnan(Q.ABS_LINESHAPE_FACTOR) & ...
+                                     ~isnan(Q.ABS_LINESHAPE_CUTOFF)
+      error( ['Q.ABS_LINESHAPE,Q.ABS_LINESHAPE_FACTOR, and ', ...
+              'Q.ABS_LINESHAPE_CUTOFF must either be NaNs or ', ...
+              'char, char, and scalar respectively.']);
+    end 
     %
     if ischar( Q.ABS_LINES )
       filename = Q.ABS_LINES;
@@ -378,25 +428,29 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       format   = 'Arts';
       arts_write_linefile( filename, Q.ABS_LINES );
     end
-    T{end+1} = sprintf( 'abs_linesReadFrom%s{', format );
-    T{end+1} = sprintf( '   filename = "%s"', filename );
-    if isnan( Q.ABS_LINES_FMIN )
-      T{end+1} =  '   fmin     = 0';
-    else
-      T{end+1} =  sprintf( '   fmin     = %.6e', Q.ABS_LINES_FMIN );
+    if ~isnan(Q.ABS_LINES)
+      T{end+1} = sprintf( 'abs_linesReadFrom%s{', format );
+      T{end+1} = sprintf( '   filename = "%s"', filename );
+      if isnan( Q.ABS_LINES_FMIN )
+        T{end+1} =  '   fmin     = 0';
+      else
+        T{end+1} =  sprintf( '   fmin     = %.6e', Q.ABS_LINES_FMIN );
+      end
+      if isnan( Q.ABS_LINES_FMIN )
+        T{end+1} =  '   fmax     = 10e25';
+      else
+        T{end+1} =  sprintf( '   fmax     = %.6e', Q.ABS_LINES_FMAX );
+      end
+      T{end+1} = '}';
+      T{end+1} = 'abs_lines_per_speciesCreateFromLines{}';
     end
-    if isnan( Q.ABS_LINES_FMIN )
-      T{end+1} =  '   fmax     = 10e25';
-    else
-      T{end+1} =  sprintf( '   fmax     = %.6e', Q.ABS_LINES_FMAX );
-    end
-    T{end+1} = '}';
-    T{end+1} = 'abs_lines_per_speciesCreateFromLines{}';
     %
-    rqre_char( 'ARTS field ABS_MODELS', Q.ABS_MODELS );
-    Tfile = file2strs( Q.ABS_MODELS );
-    T{end+1} = 'abs_cont_descriptionInit{}';
-    T = [ T Tfile ];
+    if ischar(Q.ABS_MODELS)
+      %rqre_char( 'ARTS field ABS_MODELS', Q.ABS_MODELS );
+      Tfile = file2strs( Q.ABS_MODELS );
+      T{end+1} = 'abs_cont_descriptionInit{}';
+      T = [ T Tfile ];
+    end
     %
   end
   %
@@ -442,7 +496,11 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
   end
   %
-  T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
+  if iscellstr(Q.EMISSION_AGENDA)
+    T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
+  elseif ~isnan(Q.EMISSION_AGENDA)
+    error( 'Q.EMISSION_AGENDA must either be NaN or cell array of strings.');
+  end
   %
   if abstable  &  strcmp( partname, 'AbsrptSave' )
     T{end+1} = add_savefile( 'abs_lookup', workfolder );
@@ -470,17 +528,39 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T = {};
   %
-  T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
-  T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
-  T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
+  if iscellstr(Q.SURFACE_PROP_AGENDA)
+    T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
+  elseif ~isnan(Q.SURFACE_PROP_AGENDA)
+    error( 'Q.SURFACE_PROP_AGENDA must either be NaN or cell array of strings.');
+  end
+  if iscellstr(Q.IY_SPACE_AGENDA)
+    T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
+  elseif ~isnan(Q.IY_SPACE_AGENDA)
+    error( 'Q.IY_SPACE_AGENDA must either be NaN or cell array of strings.');
+  end
+  if iscellstr(Q.PPATH_STEP_AGENDA)
+     T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
+  elseif ~isnan(Q.PPATH_STEP_AGENDA)
+    error( 'Q.PPATH_STEP_AGENDA must either be NaN or cell array of strings.');
+  end
   if iscellstr( Q.REFR_INDEX_AGENDA )
     T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
   elseif ~isnan( Q.REFR_INDEX_AGENDA )
     error( 'Q.REFR_INDEX_AGENDA must either be NaN or cell array of strings.');
   end
-  T = add_agenda( T, 'rte_agenda', Q.RTE_AGENDA );
-  T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS, workfolder );
-  T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS, workfolder );
+  if iscellstr(Q.RTE_AGENDA)
+    T = add_agenda( T, 'rte_agenda', Q.RTE_AGENDA );
+  elseif ~isnan(Q.RTE_AGENDA)
+    error( 'Q.RTe_AGENDA must either be NaN or cell array of strings.');
+  end
+  if ~isnan(Q.SENSOR_POS)
+    T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS,...
+                              workfolder );
+  end
+  if ~isnan(Q.SENSOR_LOS)
+    T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
+                              workfolder );
+  end
   %
   T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
   %
@@ -529,7 +609,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
   do_parts = false;
 
-  if ~Q.SENSOR_DO
+  if isnan(Q.SENSOR_DO)
+     T={};
+  elseif ~Q.SENSOR_DO
     T{1} = 'sensorOff{}';
   elseif ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
     T{1} = file_or_data( 'antenna_dim', 'Index', ...
@@ -681,6 +763,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     T{end+1} = add_savefile( 'mblock_za_grid', workfolder );
     T{end+1} = add_savefile( 'mblock_aa_grid', workfolder );
   end
+
 return
 
 
@@ -697,7 +780,9 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   end
 
   do_parts = false;
-
+  if isnan(Q.J_DO)
+     T={};
+  end
   if ~Q.J_DO
     T{1} = 'jacobianOff{}';
   elseif isstruct( Q.J )
@@ -812,6 +897,10 @@ function T = cfile_CldBox( Q, partname, workfolder )
     error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );
   end
   
+  if isnan(Q.CLOUDBOX_DO)
+     T={};
+     return
+  end
   if ~Q.CLOUDBOX_DO
     T{1} = 'cloudboxOff{}';
     return
@@ -889,10 +978,12 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   %= Agendas for scattering properties 
   %
-  T = add_agenda( T, 'opt_prop_gas_agenda', ...
+  if iscellstr(Q.OPT_PROP_GAS_AGENDA)
+    T = add_agenda( T, 'opt_prop_gas_agenda', ...
               { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
+  end
   T = add_agenda( T, 'opt_prop_part_agenda', ...
-     {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
+        {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
   T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
   % The last one is not used by MC, but ...
 
@@ -915,12 +1006,13 @@ return
 %
 function T = cfile_SctMth( Q, partname, workfolder )
   %
+ 
   if ~( strcmp( partname, 'SctMth' )  |  strcmp( partname, 'SctMthSave' ) |...
         strcmp( partname, 'SctMthBatch' ) )
     error( ['Only recognised choices are ''SctMth'', ''SctMthSave'' ',...
             'and ''SctMthBatch''.']);
   end
- 
+
   if ~Q.CLOUDBOX_DO
     T = {};
     return
@@ -1205,28 +1297,33 @@ return
 
 function [T,do_mc] = add_rtecalc(Q)
   %
-  rqre_char( 'Qarts field Y_UNIT', Q.Y_UNIT );
-  %
-  T{1} = sprintf( 'StringSet(y_unit){"%s"}', Q.Y_UNIT );
+  i=0;
+  if ischar(Q.Y_UNIT)
+    %
+    T{1} = sprintf( 'StringSet(y_unit){"%s"}', Q.Y_UNIT );
+    i=1;
+  elseif ~isnan(Q.Y_UNIT)
+    error( 'Q.Y_UNIT must either be NaN or char.');
+  end
   %
   if Q.CLOUDBOX_DO  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
     %
     do_mc = 1;
     %
-    T{2} = 'RteCalcMC{';
+    T{i+1} = 'RteCalcMC{';
     if Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR < 0
-      T{3} = sprintf( '  std_err       = -1' );
+      T{end+1} = sprintf( '  std_err       = -1' );
     else
-      T{3} = sprintf( '  std_err       = %.5e', ...
+      T{end+1} = sprintf( '  std_err       = %.5e', ...
                                      Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
     end
-    T{4} = sprintf( '  max_time      = %d', ...
+    T{end+1} = sprintf( '  max_time      = %d', ...
                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
-    T{5} = sprintf( '  max_iter      = %d', ...
+    T{end+1} = sprintf( '  max_iter      = %d', ...
                                      Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-    T{6} = sprintf( '  z_field_is_1D = %d', ...
+    T{end+1} = sprintf( '  z_field_is_1D = %d', ...
                                      Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    T{7} = '}';  
+    T{end+1} = '}';  
   else
     %
     do_mc = 0;
@@ -1234,12 +1331,12 @@ function [T,do_mc] = add_rtecalc(Q)
     if Q.J_DO
       rqre_field( Q.J, 'UNIT' );
       rqre_char( 'Qarts field Y_UNIT', Q.J.UNIT );
-      T{2} = sprintf( 'StringSet(jacobian_unit){"%s"}', Q.J.UNIT );
+      T{i+1} = sprintf( 'StringSet(jacobian_unit){"%s"}', Q.J.UNIT );
       %
-      T{3} = 'RteCalc{}';
-      T{4} = 'jacobianCalc{}';
+      T{end+1} = 'RteCalc{}';
+      T{end+1} = 'jacobianCalc{}';
     else
-      T{2} = 'RteCalcNoJacobian{}';
+      T{i+1} = 'RteCalcNoJacobian{}';
     end
   end
 return  

@@ -1,3 +1,16 @@
+2008-02-14  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-226
+
+	* arts/qarts2cfile.m: modified.
+	If a field in Q is nan, there is no error
+	message and nothing is done, it is assumed
+	that the necessary input are defined in
+	the defaults field. 
+
+	* arts/qarts.m: modified.
+	Default values are nan.
+
 2008-02-06  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-225
