@@ -1,3 +1,25 @@
+2008-02-18  Bengt Rydberg  <benryd@chalmers.se> 
+
+	* atmlab-0-2-227
+
+	* arts/qarts.m: modified.
+	Changed name of DEFAULTS field to INCLUDES,
+	and defaults for ABS_MODELS to continua.arts.
+
+	* arts/qarts2cfile.m: modified.
+	Adapted to changes in qarts.m.
+
+	* arts/scengen/amsu.m: created.
+	A new folder for amsu script.
+
+	* arts/scengen/amsu/asg_amsu.m: created.
+	asg_amsu performs 1-D radiative transfer simulations,
+        for AMSU setup, on states created from cloudsat files.
+        
+	* gformat/gf_merge.m: modified.
+	fixed a typo.
+	
+	
 2008-02-14  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-226

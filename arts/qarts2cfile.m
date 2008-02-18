@@ -209,7 +209,7 @@ return
 %    Start of cfile
 %    output_file_format
 %    stokes_dim
-%    f_grid
+%    f_grid  
 %    abs_species
 %
 function T = cfile_Generl( Q, partname, workfolder )
@@ -221,13 +221,13 @@ function T = cfile_Generl( Q, partname, workfolder )
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Arts{';
   %
-  if ~isempty( Q.DEFAULTS )
-    if ~iscellstr( Q.DEFAULTS )
+  if ~isempty( Q.INCLUDES )
+    if ~iscellstr( Q.INCLUDES )
       error( 'Q.DEFAULTS must be given as a cell array of strings.' );
     end
     %
-    for i = 1 : length( Q.DEFAULTS )
-      T{end+1} = sprintf( 'INCLUDE "%s"', Q.DEFAULTS{i} );
+    for i = 1 : length( Q.INCLUDES )
+      T{end+1} = sprintf( 'INCLUDE "%s"', Q.INCLUDES{i} );
     end
   end
   %
@@ -420,13 +420,15 @@ function T = cfile_Absrpt( Q, partname, workfolder )
               'char, char, and scalar respectively.']);
     end 
     %
-    if ischar( Q.ABS_LINES )
-      filename = Q.ABS_LINES;
-      format   = Q.ABS_LINES_FORMAT;
-    else
-      filename = fullfile( workfolder, 'linefile.al' );
-      format   = 'Arts';
-      arts_write_linefile( filename, Q.ABS_LINES );
+    if ~isnan(Q.ABS_LINES)
+      if ischar( Q.ABS_LINES )
+        filename = Q.ABS_LINES;
+        format   = Q.ABS_LINES_FORMAT;
+      else
+        filename = fullfile( workfolder, 'linefile.al' );
+        format   = 'Arts';
+        arts_write_linefile( filename, Q.ABS_LINES );
+      end
     end
     if ~isnan(Q.ABS_LINES)
       T{end+1} = sprintf( 'abs_linesReadFrom%s{', format );
@@ -446,10 +448,11 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     end
     %
     if ischar(Q.ABS_MODELS)
+      T{end+1} = sprintf( 'INCLUDE "%s"', Q.ABS_MODELS );
       %rqre_char( 'ARTS field ABS_MODELS', Q.ABS_MODELS );
-      Tfile = file2strs( Q.ABS_MODELS );
-      T{end+1} = 'abs_cont_descriptionInit{}';
-      T = [ T Tfile ];
+      %Tfile = file2strs( Q.ABS_MODELS );
+      %T{end+1} = 'abs_cont_descriptionInit{}';
+      %T = [ T Tfile ];
     end
     %
   end

@@ -28,7 +28,6 @@
 
 function [y,ydata,dy,J,jq,ji] = arts_y( Q, workfolder )
 
-
 %- Default values
 %
 workfolder_DEFAULT = [];

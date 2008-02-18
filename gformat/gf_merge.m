@@ -154,25 +154,24 @@ for ig1=1:length(G1)
        %Dims2=dims2(G2(ig2).DIMS);
 
        %check that the specified limits do not cover the same area
-    
+       
        for i=1:3
            if ~isempty(Lims1{i}) & ~isempty(Lims2{i})
  
               if max(Lims1{i})>max(Lims2{i})
-                 if max(Lims2{i})<min(Lims1{i})
+                 if max(Lims2{i})>min(Lims1{i})
                     error('lims1 and lims2 are intersecting')
                  end
               else
-                 if max(Lims1{i})<min(Lims2{i})
+                 if max(Lims1{i})>min(Lims2{i})
                     error('lims1 and lims2 are intersecting')
                  end
               end
            end
        end
 
-
        %find indices inside lims and create merged grids
-
+       
        for i=1:3
     
            gname=sprintf('GRID%d',i);
@@ -204,7 +203,7 @@ for ig1=1:length(G1)
               grids2{i}=[];
            end
 
-       end
+       end      
 
        Data1=G1(ig1).DATA(ind1{1},ind1{2},ind1{3});
        Data2=G2(ig2).DATA(ind2{1},ind2{2},ind2{3});
@@ -227,7 +226,7 @@ for ig1=1:length(G1)
             end
        
             if length(grids{l})>1
-               if length(Lims1{1})==2
+               if length(Lims1{l})==2
                   %check if the data point is inside lims1
                   if length(grids1{l})>0
                      t1(l)=max(grids1{l}(:))>=grids{l}(m) & ...

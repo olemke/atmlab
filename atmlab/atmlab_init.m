@@ -49,6 +49,7 @@ addpath( fullfile( toppath, 'files' ) );
 addpath( fullfile( toppath, 'demos' ) );
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts1' ) ); 
+addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
 

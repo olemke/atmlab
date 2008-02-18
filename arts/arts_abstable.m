@@ -40,7 +40,6 @@
 
 function A = arts_abstable( Q, workfolder, do_load )
 
-
 %- Default values
 %
 workfolder_DEFAULT = [];
