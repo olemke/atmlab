@@ -1,3 +1,16 @@
+2008-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-1
+
+	* A broken commit to backup made work. Do not update right now!
+	Just a first small step to catch up with latest changes in
+	arts. This will be atmlab 0.3.
+	
+	* arts/qarts2cfile.m: Some updates of header text.
+
+	* arts/qarts.m (qarts): All fields now set to NaN. Updated and
+	polished text.
+
 2008-02-18  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-227
@@ -142,7 +155,6 @@
 
 	* sensors/gmt_map.sh: Also added this again for now.
 
->>>>>>> .r5608
 2007-12-10  Bengt Rydberg  <benryd@chalmers.se> 
 
 	* atmlab-0-2-219

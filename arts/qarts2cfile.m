@@ -24,8 +24,8 @@
 %    The later options, including 'Save', adds commands to save main
 %    variables for the part.
 %
-%    Sorry, the Q fields needed for each part is not listed here.
-%    See the code.
+%    Nothing is done for fields set to NaN. This means that NaN effectively
+%    works as false (0) for fields acting as a flag (such as SENSOR_DO).
 %
 %    For fields that can be given both as a Matlab variable or name of a 
 %    file, a file is generated automatically if the input a variable.
