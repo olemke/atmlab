@@ -31,6 +31,8 @@ Q  = qarts;
 
 %= General part
 %
+Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
+%
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
 %
@@ -54,8 +56,10 @@ arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
+Q.RAW_ATM_EXPAND_1D   = 1;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
+Q.R_GEOID             = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE           = 500;
 
 

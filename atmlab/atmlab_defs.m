@@ -14,6 +14,7 @@
 function A = atmlab_defs
 
 A.AMI_PATH          = NaN;
+A.ARTS_INCLUDES     = NaN;
 A.ARTS_PATH         = NaN;
 A.ARTS_XMLDATA_PATH = NaN;
 A.ARTS1_DATA_PATH   = NaN;

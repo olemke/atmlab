@@ -1,3 +1,25 @@
+2008-05-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-2
+
+	* arts/qarts2cfile.m: General revision of GenerlSave andAtmSrf and
+	Absrpt parts, and modifications following changes below.
+
+	* handy/rqre_bool.m: The method now handles cases when the input
+	is a cell.
+
+	* arts/qarts.m: Changed NaN to {} for non-defined field.  This to 
+	allow e.g. Q.ABS_SPECIES{1}{1} = 'ClO';
+	This causes an error if the field is set to NaN. [] is saved for
+	defined, but empty, input.
+
+	Removed ABS_LINES_FMIN and ABS_LINES_FMAX. Sorting of line files is
+	supposed to be handled in some other way.
+
+	* atmlab/atmlab_defs.m As below.
+
+	* atmlab/atmlab.m: Introduced ARTS_INCLUDES
+
 2008-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-1

@@ -37,6 +37,11 @@
 % AMI is added by the function *addpath_ami*, where only the arts subfolder
 % is added to the Matlab search path.
 %----------------------------------------------------------------------------
+% ARTS_INCLUDES
+%
+% Path to main folder for ARTS include files. 
+% For example '/home/patrick/ARTS/arts2/include'.
+%----------------------------------------------------------------------------
 % ARTS_PATH
 %
 % Path to executable for ARTS. For example '/home/patrick/ARTS/arts2/src/arts'.

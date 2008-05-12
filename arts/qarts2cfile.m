@@ -10,7 +10,7 @@
 %    together, following the format: parts = {'Generl','AtmSrfSave'}
 %
 %    Defined parts are:
-%       Generl / GenarlSave
+%       Generl / GenerlSave
 %       AtmSrf / AtmSrfSave
 %       Absrpt / AbsrptSave
 %       CldBox / CldBoxSave
@@ -219,40 +219,44 @@ function T = cfile_Generl( Q, partname, workfolder )
   end
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
-  T{2} = 'Arts{';
+  T{2} = 'Arts2{';
   %
-  if ~isempty( Q.INCLUDES )
+  if isset( Q.INCLUDES )
     if ~iscellstr( Q.INCLUDES )
       error( 'Q.DEFAULTS must be given as a cell array of strings.' );
     end
     %
+    arts_includes = atmlab( 'ARTS_INCLUDES' );
+    %
     for i = 1 : length( Q.INCLUDES )
-      T{end+1} = sprintf( 'INCLUDE "%s"', Q.INCLUDES{i} );
+      s        = strrep( Q.INCLUDES{i}, 'ARTS_INCLUDES', arts_includes );
+      T{end+1} = sprintf( 'INCLUDE "%s"', s );
     end
   end
   %
-  if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
-    T{end+1} = 'output_file_formatSetBinary{}';
-  elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
-    T{end+1} = 'output_file_formatSetAscii{}';
-  elseif isnan(Q.OUTPUT_FILE_FORMAT)
-    %do nothing
-  else
-    error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );
+  if isset( Q.OUTPUT_FILE_FORMAT )
+    if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
+      T{end+1} = 'output_file_formatSetBinary';
+    elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
+      T{end+1} = 'output_file_formatSetAscii';
+    else
+      error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );
+    end
   end
   %
-  if ~isnan(Q.STOKES_DIM)
+  if isset( Q.STOKES_DIM )
     rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
-    T{end+1} = sprintf( 'IndexSet(stokes_dim){%d}', Q.STOKES_DIM );
+    T{end+1} = sprintf( 'IndexSet(stokes_dim,%d)', Q.STOKES_DIM );
   end
   %  
-  if ~isnan(Q.F_GRID)
+  if isset( Q.F_GRID )
     T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
   end
   %
-  if iscell(Q.ABS_SPECIES)
-    T{end+1} = sprintf( 'SpeciesSet(abs_species){[%s]}', ...
-                                          arts_tgs_cnvrt(Q.ABS_SPECIES) );
+  if isset( Q.ABS_SPECIES )
+    rqre_datatype( 'cell', Q.ABS_SPECIES )
+    T{end+1} = sprintf( 'SpeciesSet(abs_species,[%s])', ...
+                                               arts_tgs_cnvrt(Q.ABS_SPECIES) );
   end
   %
   if strcmp( partname, 'GenerlSave' )
@@ -284,84 +288,73 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     error( 'Only recognised choices are ''AtmSrf'' and ''AtmSrfSave''.' );
   end
   %
-  i=1;
-  T{i}=[];
-  if ~isnan(Q.ATMOSPHERE_DIM)
+  T = [];
+  %
+  if isset( Q.ATMOSPHERE_DIM )
     rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
-    T{i} = sprintf( 'AtmosphereSet%dD{}', Q.ATMOSPHERE_DIM );
-    i=i+1;
+    T{end+1} = sprintf( 'AtmosphereSet%dD', Q.ATMOSPHERE_DIM );
   end
   %
-  if ~isnan(Q.P_GRID)
-    T{i} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder );
-    i=i+1;
+  if isset( Q.P_GRID )
+    T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder );
   end
   %
-  if Q.ATMOSPHERE_DIM >= 2
-    T{i} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, workfolder );
-    i=i+1;
+  if isset( Q.LAT_GRID )
+    T{end+1} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, workfolder );
   end
-  if Q.ATMOSPHERE_DIM == 3
-    T{i} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, workfolder );
-    i=i+1;
+  if isset( Q.LON_GRID )
+    T{end+1} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, workfolder );
   end
   %
-  if ~isnan(Q.USE_RAW_ATMOSPHERE)
+  if isset( Q.USE_RAW_ATMOSPHERE )
     rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
-  end
-  %
-  if ~isnan(Q.USE_RAW_ATMOSPHERE)
     if Q.USE_RAW_ATMOSPHERE
       rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
       rqre_bool( 'Qarts field RAW_ATM_EXPAND_1D', Q.RAW_ATM_EXPAND_1D );
-      T{i} = sprintf('AtmRawRead{"%s"}', Q.RAW_ATMOSPHERE );
-      i=i+1;
+      T{end+1} = sprintf( ...
+       'AtmRawRead(t_field_raw,z_field_raw,vmr_field_raw,abs_species,"%s")',...
+                                                            Q.RAW_ATMOSPHERE );
       if Q.RAW_ATM_EXPAND_1D
-        T{i} = 'AtmFieldsCalcExpand1D{}';
-        i=i+1;
+        T{end+1} = 'AtmFieldsCalcExpand1D';
       else
-        T{i} = 'AtmFieldsCalc{}';
-        i=i+1;
+        T{end+1} = 'AtmFieldsCalc';
       end
     else
-      T{i} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
-      i=i+1;
-      T{i} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, workfolder);
-      i=i+1;
-      if ~isnan( Q.Z_FIELD )
-        T{i} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
-        i=i+1;
+      if isset( Q.T_FIELD )
+        T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
+      end      
+      if isset( Q.VMR_FIELD )
+        T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, ...
+                                                                   workfolder);
+      end      
+      if isset( Q.Z_FIELD )
+        T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
       end
     end
   end
   %
-  if ~isnan(Q.R_GEOID)
-    if ~isnan( Q.R_GEOID )  &  isscalar( Q.R_GEOID )
-      T{i} = sprintf( 'r_geoidSpherical{%e}', Q.R_GEOID );
-      i=i+1;
+  if isset(Q.R_GEOID)
+    if isscalar( Q.R_GEOID )
+      T{end+1} = sprintf( ...
+          'r_geoidSpherical(r_geoid,atmosphere_dim,lat_grid,lon_grid,%e)', ...
+                                                                   Q.R_GEOID );
     else
-      T{i} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, workfolder );
-      i=i+1;
+      T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, workfolder );
     end
   end
   %
-  if ~isnan(Q.Z_SURFACE)
-    if ~isnan( Q.Z_SURFACE )  &  isscalar( Q.Z_SURFACE )
-      T{i} = 'ncolsGet( r_geoid ){}';
-      i=i+1;
-      T{i} = 'nrowsGet( r_geoid ){}';
-      i=i+1;
-      T{i} = sprintf('MatrixSet(z_surface){%.3f}', Q.Z_SURFACE );
-      i=i+1;
+  if isset(Q.Z_SURFACE)
+    if isscalar( Q.Z_SURFACE )
+      T{end+1} = 'ncolsGet( ncols, r_geoid )';
+      T{end+1} = 'nrowsGet( nrows, r_geoid )';
+      T{end+1} = sprintf('MatrixSet(z_surface,nrows,ncols,%.3f)', Q.Z_SURFACE );
     else
-      T{i} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, workfolder );
-      i=i+1;
+      T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, workfolder );
     end
   end
   %
   if strcmp( partname, 'AtmSrfSave' )
-    T{i} = add_savefile( 'atmosphere_dim', workfolder );
-    i=i+1;
+    T{end+1} = add_savefile( 'atmosphere_dim', workfolder );
     T{end+1} = add_savefile( 'p_grid', workfolder );
     T{end+1} = add_savefile( 'lat_grid', workfolder );
     T{end+1} = add_savefile( 'lon_grid', workfolder );
@@ -388,123 +381,128 @@ function T = cfile_Absrpt( Q, partname, workfolder )
   %
   abstable = false;
   %
+  T = {};
+  %
   if ~( strcmp( partname, 'Absrpt' )  |  strcmp( partname, 'AbsrptSave' ) )
     error( 'Only recognised choices are ''Absrpt'' and ''AbsrptSave''.' );
   end
   %
-  if ~isnan(Q.ABSORPTION)
+  if isset( Q.ABSORPTION )
     rqre_char( 'Qarts field ABSORPTION', Q.ABSORPTION );
     %
-    if ~( strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION,'LoadTable') | ...
-          strcmp(Q.ABSORPTION,'CalcTable') );
+    if ~( strcmp(Q.ABSORPTION,'OnTheFly') | ...
+          strcmp(Q.ABSORPTION,'LoadTable') | strcmp(Q.ABSORPTION,'CalcTable') )
       error( 'Only recognised choices for *ABSORPTION* are ''OnTheFly'', ',...
            '''LoadTable'' and ''CalcTable''.' );
     end
-  end
-  %
-  T = {};
-  %
-  if strcmp( Q.ABSORPTION, 'OnTheFly' )  |  strcmp( Q.ABSORPTION, 'CalcTable' )
     %
-    if ischar(Q.ABS_LINESHAPE) & ischar(Q.ABS_LINESHAPE_FACTOR) & ...
-                                 isscalar(Q.ABS_LINESHAPE_CUTOFF)
-      T{end+1} = 'abs_lineshapeDefine{';
-      T{end+1} = sprintf('   shape               = "%s"', Q.ABS_LINESHAPE );
-      T{end+1} = sprintf('   normalizationfactor = "%s"', Q.ABS_LINESHAPE_FACTOR);
-      T{end+1} = sprintf('   cutoff              = %e', Q.ABS_LINESHAPE_CUTOFF );
-      T{end+1} = '}';
-    elseif ~isnan(Q.ABS_LINESHAPE) & ~isnan(Q.ABS_LINESHAPE_FACTOR) & ...
-                                     ~isnan(Q.ABS_LINESHAPE_CUTOFF)
-      error( ['Q.ABS_LINESHAPE,Q.ABS_LINESHAPE_FACTOR, and ', ...
-              'Q.ABS_LINESHAPE_CUTOFF must either be NaNs or ', ...
-              'char, char, and scalar respectively.']);
-    end 
-    %
-    if ~isnan(Q.ABS_LINES)
-      if ischar( Q.ABS_LINES )
-        filename = Q.ABS_LINES;
-        format   = Q.ABS_LINES_FORMAT;
-      else
-        filename = fullfile( workfolder, 'linefile.al' );
-        format   = 'Arts';
-        arts_write_linefile( filename, Q.ABS_LINES );
+    if strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION, 'CalcTable')
+      %
+      nset = isset(Q.ABS_LINESHAPE) + isset(Q.ABS_LINESHAPE_FACTOR) + ...
+                                                 isset(Q.ABS_LINESHAPE_CUTOFF);
+      %
+      if nset  
+        if nset < 3
+          error( ['Q.ABS_LINESHAPE, Q.ABS_LINESHAPE_FACTOR, and ', ...
+             'Q.ABS_LINESHAPE_CUTOFF must all be left empty, or all be set.']);
+        end
+        %
+        if ischar(Q.ABS_LINESHAPE) & ischar(Q.ABS_LINESHAPE_FACTOR) & ...
+                                               isscalar(Q.ABS_LINESHAPE_CUTOFF)
+          T{end+1} = sprintf( 'abs_lineshapeDefine(abs_lineshape,%s,%s,%e)', ...
+             Q.ABS_LINESHAPE, Q.ABS_LINESHAPE_FACTOR, Q.ABS_LINESHAPE_CUTOFF );
+        else     
+          error( ['Q.ABS_LINESHAPE,Q.ABS_LINESHAPE_FACTOR, and ', ...
+                  'Q.ABS_LINESHAPE_CUTOFF must either be NaNs or ', ...
+                  'char, char, and scalar respectively.']);
+        end
       end
-    end
-    if ~isnan(Q.ABS_LINES)
-      T{end+1} = sprintf( 'abs_linesReadFrom%s{', format );
-      T{end+1} = sprintf( '   filename = "%s"', filename );
-      if isnan( Q.ABS_LINES_FMIN )
-        T{end+1} =  '   fmin     = 0';
-      else
-        T{end+1} =  sprintf( '   fmin     = %.6e', Q.ABS_LINES_FMIN );
+      %
+      if isset( Q.ABS_LINES_FORMAT )
+        %
+        rqre_datatype( 'char', Q.ABS_LINES_FORMAT );
+        rqre_datatype( {'char','struct','empty'}, Q.ABS_LINES );
+        %
+        if strcmp(upper(Q.ABS_LINES_FORMAT),'ARTS') & ~ischar(Q.ABS_LINES)
+          filename = fullfile( workfolder, 'abs_lines.xml' );
+          T{end+1} = file_or_data( 'abs_lines', 'ArrayOfLineRecord', ...
+                                                      Q.ABS_LINES,workfolder );
+        
+        else
+          if ~ischar( Q.ABS_LINES )
+            error( 'Q.ABS_LINES must be a filename for formats beside Arts.' );
+          end
+          filename = Q.ABS_LINES;
+        end
+        %
+        T{end+1} = sprintf( 'abs_linesReadFrom%s(abs_lines,"%s",0,1e99)', ...
+                                                Q.ABS_LINES_FORMAT, filename );
       end
-      if isnan( Q.ABS_LINES_FMIN )
-        T{end+1} =  '   fmax     = 10e25';
-      else
-        T{end+1} =  sprintf( '   fmax     = %.6e', Q.ABS_LINES_FMAX );
+      %
+      if isset( Q.ABS_MODELS )
+        s = strrep( Q.ABSMODELS, 'ARTS_INCLUDES', atmlab( 'ARTS_INCLUDES' ) );
+        T{end+1} = sprintf( 'INCLUDE "%s"', Q.ABS_MODELS );
       end
-      T{end+1} = '}';
-      T{end+1} = 'abs_lines_per_speciesCreateFromLines{}';
+      %
     end
     %
-    if ischar(Q.ABS_MODELS)
-      T{end+1} = sprintf( 'INCLUDE "%s"', Q.ABS_MODELS );
-      %rqre_char( 'ARTS field ABS_MODELS', Q.ABS_MODELS );
-      %Tfile = file2strs( Q.ABS_MODELS );
-      %T{end+1} = 'abs_cont_descriptionInit{}';
-      %T = [ T Tfile ];
-    end
-    %
-  end
-  %
-  if strcmp( Q.ABSORPTION, 'OnTheFly' )
-    %
-    T = add_agenda( T, 'abs_scalar_gas_agenda', ...
-       { 'AbsInputFromRteScalars{}', 'abs_h2oSet{}', 'abs_n2Set{}', ...
-         'abs_coefCalc{}', 'abs_scalar_gasFromAbsCoef{}' } );
-    %
-  elseif strcmp( Q.ABSORPTION, 'CalcTable' )
-    %
-    T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, workfolder );
-    T{end+1} = file_or_data( 'abs_t', 'Vector', Q.ABS_T, workfolder );
-    T{end+1} = file_or_data( 'abs_t_pert', 'Vector', Q.ABS_T_PERT, workfolder );
-    T{end+1} = file_or_data( 'abs_vmrs', 'Matrix', Q.ABS_VMRS, workfolder );
-    T{end+1} = 'abs_h2oSet{}';
-    T{end+1} = 'abs_n2Set{}';
-    %
-    if isempty( Q.ABS_NLS )
-      T{end+1} = 'SpeciesSet(abs_nls){[]}';
-    else
-      T{end+1} = sprintf( 'SpeciesSet(abs_nls){[%s]}', ...
-                                arts_tgs_cnvrt({Q.ABS_SPECIES{Q.ABS_NLS}}) );
-    end
-    %
-    T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
+    if strcmp( Q.ABSORPTION, 'OnTheFly' )
+      %
+    elseif strcmp( Q.ABSORPTION, 'CalcTable' )
+      %
+      if isset( Q.ABS_P )
+        T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, workfolder );
+      end
+      if isset( Q.ABS_T )
+        T{end+1} = file_or_data( 'abs_t', 'Vector', Q.ABS_T, workfolder );
+      end
+      if isset( Q.ABS_T_PERT )
+      T{end+1} = file_or_data( 'abs_t_pert', 'Vector', Q.ABS_T_PERT, ...
                                                                   workfolder );
-    T{end+1} = 'abs_lookupCreate{}'; 
-    T        = add_agenda( T, 'abs_scalar_gas_agenda', ... 
-                                     { 'abs_scalar_gasExtractFromLookup{}' } );
-    %
-    abstable = true;
-    %   
-  elseif strcmp( Q.ABSORPTION, 'LoadTable' )
-    %
-    T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
+      end
+      if isset( Q.ABS_VMRS )
+        T{end+1} = file_or_data( 'abs_vmrs', 'Matrix', Q.ABS_VMRS, ...
                                                                   workfolder );
-    T{end+1} = 'abs_lookupAdapt{}';
-    T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
-                                     { 'abs_scalar_gasExtractFromLookup{}' } );
-    %
-    abstable = true;
-    %
-  end
-  %
-  if iscellstr(Q.EMISSION_AGENDA)
+      end
+      if isset( Q.ABS_NLS )
+        if isempty( Q.ABS_NLS )
+          T{end+1} = 'SpeciesSet(abs_nls,[])';
+        else
+          T{end+1} = sprintf( 'SpeciesSet(abs_nls,[%s])', ...
+                                  arts_tgs_cnvrt({Q.ABS_SPECIES{Q.ABS_NLS}}) );
+        end
+      
+      end
+      if isset( Q.ABS_NLS_PERT )
+        T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
+                                                                  workfolder );
+      
+      end
+      %
+      T{end+1} = 'abs_lookupCreate'; 
+      T        = add_agenda( T, 'abs_scalar_gas_agenda', ... 
+                                       { 'abs_scalar_gasExtractFromLookup' } );
+      %
+      abstable = true;
+      %   
+    elseif strcmp( Q.ABSORPTION, 'LoadTable' )
+      %
+      T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
+                                                                  workfolder );
+      T{end+1} = 'abs_lookupAdapt';
+      T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
+                                       { 'abs_scalar_gasExtractFromLookup' } );
+      %
+      abstable = true;
+      %
+    end
+  end %  isset( Q.ABSORPTION )
+
+  
+  if isset( Q.EMISSION_AGENDA )
     T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
-  elseif ~isnan(Q.EMISSION_AGENDA)
-    error( 'Q.EMISSION_AGENDA must either be NaN or cell array of strings.');
   end
-  %
+
   if abstable  &  strcmp( partname, 'AbsrptSave' )
     T{end+1} = add_savefile( 'abs_lookup', workfolder );
   end
@@ -1223,17 +1221,6 @@ function s = file_or_data(artsvar,datatype,qvalue,workfolder,nonDefFileId)
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else
-    if iscell( qvalue )
-      if isempty( qvalue )
-        fprintf('\n%s is empty.\n\n', artsvar );
-        error('See above');
-      end
-    else
-      if ~isstruct( qvalue )  &  isnan( qvalue )
-        fprintf('\nNaN found for %s.\n\n', artsvar );
-        error('See above');
-      end
-    end
     if nargin >= 5
       filename = fullfile( workfolder, [nonDefFileId,'.xml'] );
     else
@@ -1245,20 +1232,20 @@ function s = file_or_data(artsvar,datatype,qvalue,workfolder,nonDefFileId)
 return
 
 function s = add_readfile( artsvar, filename )
-  s = sprintf('ReadXML(%s){"%s"}', artsvar, filename );
+  s = sprintf('ReadXML(%s,"%s")', artsvar, filename );
 return
 
 
 function s = add_savefile( artsvar, workfolder )
   filename = fullfile( workfolder, [ artsvar, '.xml' ] );
-  s = sprintf('WriteXML(%s){"%s"}', artsvar, filename );
+  s = sprintf('WriteXML(output_file_format,%s,"%s")', artsvar, filename );
 return
 
 
 function T = add_agenda( T, agenda, strarray )
   if ~( iscellstr( strarray )  |  isempty( strarray ) )
     error( ...
-        sprintf('The field %s must be specified as cell array of strings.', ...
+      sprintf('The field %s must be specified as cell array of strings.', ...
                                                              upper(agenda) ) );
   end
   T{end+1} = sprintf( 'AgendaSet(%s){', agenda );
@@ -1281,6 +1268,15 @@ function T = add_wsms( T, field, strarray )
                                                                      field ) );
     end
   end
+return
+
+
+function flag = isset( qfield )
+  if iscell(qfield) & length(qfield) == 0
+    flag = 0;
+  else
+    flag = 1;
+  end  
 return
 
 
