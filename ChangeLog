@@ -1,3 +1,11 @@
+2008-05-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-3
+	
+	* arts/qarts2cfile.m: Some more, unfinished and untested, work. 
+
+	* CONFIGURE: Example lines for atmlab_conf used outdated settings.
+
 2008-05-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-2

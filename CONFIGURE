@@ -54,10 +54,9 @@ You can put any Matlab stuff you like in atmlab_conf. The most natural
 choice is to include calls of atmlab, to set the existing fields to our
 preferred choices. For example:
 
-  atmlab( 'WORK_AREA',   '/tmp' );
-  atmlab( 'FMODEL_NAME', 'arts' );
-  atmlab( 'FMODEL_EXEC', 'arts2 -r00' );
-
+  atmlab( 'SCREEN_WIDTH', 70     );
+  atmlab( 'VERBOSITY',     2     );
+  atmlab( 'WORK_AREA',    '/tmp' );
 
 Good luck!
 

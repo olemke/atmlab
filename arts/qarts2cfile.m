@@ -221,18 +221,7 @@ function T = cfile_Generl( Q, partname, workfolder )
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Arts2{';
   %
-  if isset( Q.INCLUDES )
-    if ~iscellstr( Q.INCLUDES )
-      error( 'Q.DEFAULTS must be given as a cell array of strings.' );
-    end
-    %
-    arts_includes = atmlab( 'ARTS_INCLUDES' );
-    %
-    for i = 1 : length( Q.INCLUDES )
-      s        = strrep( Q.INCLUDES{i}, 'ARTS_INCLUDES', arts_includes );
-      T{end+1} = sprintf( 'INCLUDE "%s"', s );
-    end
-  end
+  T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
   if isset( Q.OUTPUT_FILE_FORMAT )
     if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
@@ -439,10 +428,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                                 Q.ABS_LINES_FORMAT, filename );
       end
       %
-      if isset( Q.ABS_MODELS )
-        s = strrep( Q.ABSMODELS, 'ARTS_INCLUDES', atmlab( 'ARTS_INCLUDES' ) );
-        T{end+1} = sprintf( 'INCLUDE "%s"', Q.ABS_MODELS );
-      end
+      T = add_includes( T, 'Q.ABS_MODELS', Q.ABS_MODELS );
       %
     end
     %
@@ -529,41 +515,33 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T = {};
   %
-  if iscellstr(Q.SURFACE_PROP_AGENDA)
+  if isset( Q.SURFACE_PROP_AGENDA )
     T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
-  elseif ~isnan(Q.SURFACE_PROP_AGENDA)
-    error( 'Q.SURFACE_PROP_AGENDA must either be NaN or cell array of strings.');
   end
-  if iscellstr(Q.IY_SPACE_AGENDA)
+  if isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
-  elseif ~isnan(Q.IY_SPACE_AGENDA)
-    error( 'Q.IY_SPACE_AGENDA must either be NaN or cell array of strings.');
   end
-  if iscellstr(Q.PPATH_STEP_AGENDA)
+  if isset( Q.PPATH_STEP_AGENDA )
      T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
-  elseif ~isnan(Q.PPATH_STEP_AGENDA)
-    error( 'Q.PPATH_STEP_AGENDA must either be NaN or cell array of strings.');
   end
-  if iscellstr( Q.REFR_INDEX_AGENDA )
+  if isset( Q.REFR_INDEX_AGENDA )
     T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
-  elseif ~isnan( Q.REFR_INDEX_AGENDA )
-    error( 'Q.REFR_INDEX_AGENDA must either be NaN or cell array of strings.');
   end
-  if iscellstr(Q.RTE_AGENDA)
+  if isset( Q.RTE_AGENDA )
     T = add_agenda( T, 'rte_agenda', Q.RTE_AGENDA );
-  elseif ~isnan(Q.RTE_AGENDA)
-    error( 'Q.RTe_AGENDA must either be NaN or cell array of strings.');
   end
-  if ~isnan(Q.SENSOR_POS)
+  if isset( Q.SENSOR_POS )
     T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS,...
-                              workfolder );
+                                                                  workfolder );
   end
-  if ~isnan(Q.SENSOR_LOS)
+  if isset( Q.SENSOR_LOS )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
-                              workfolder );
+                                                                  workfolder );
   end
   %
-  T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
+  if isset( Q.PRE_RTE_WSMS )
+    T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
+  end
   %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );
   T{end+1} = add_savefile( 'sensor_los', workfolder );
@@ -591,7 +569,7 @@ function T = cfile_RteExe( Q, partname, workfolder )
     T{end+1} = add_savefile( 'mc_error', workfolder ); 
   end
   %
-  if Q.J_DO
+  if isset( Q.J_DO )  &  Q.J_DO
     T{end+1} = add_savefile( 'jacobian', workfolder );
   end
 return
@@ -610,10 +588,10 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
   do_parts = false;
 
-  if isnan(Q.SENSOR_DO)
-     T={};
+  if ~isset( Q.SENSOR_DO )
+     T = {};
   elseif ~Q.SENSOR_DO
-    T{1} = 'sensorOff{}';
+    T{1} = 'sensorOff';
   elseif ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
     T{1} = file_or_data( 'antenna_dim', 'Index', ...
                                             Q.ANTENNA_DIM, workfolder );
@@ -631,9 +609,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                             Q.SENSOR_RESPONSE_AA, workfolder );
     T{8} = file_or_data( 'sensor_response_pol', 'Index', ...
                                            Q.SENSOR_RESPONSE_POL, workfolder );
-  elseif iscellstr(Q.SENSOR_RESPONSE) 
-    T = Q.SENSOR_RESPONSE;
-  elseif isstruct(Q.SENSOR_RESPONSE) 
+  elseif iscellstr( Q.SENSOR_RESPONSE ) 
+    T = add_includes( T, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
+  elseif isstruct( Q.SENSOR_RESPONSE ) 
     do_parts = true;
   else
     error( 'Unrecognised choice for Q.SENSOR_RESPONSE.' );
@@ -780,6 +758,8 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     error( 'Only recognised choice is ''Jacobi''.' );
   end
 
+  error( 'Jacobian part of *qarts2cfile* not updated.' );
+
   do_parts = false;
   if isnan(Q.J_DO)
      T={};
@@ -897,6 +877,10 @@ function T = cfile_CldBox( Q, partname, workfolder )
   if ~( strcmp( partname, 'CldBox' )  |  strcmp( partname, 'CldBoxSave' ) )
     error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );
   end
+
+  error( 'Cloudbox part of *qarts2cfile* not updated.' );
+
+  % add consistency checks: Q.CLOUDBOX.METHOD and  Q.CLOUDBOX.METHOD_PRMTRS
   
   if isnan(Q.CLOUDBOX_DO)
      T={};
@@ -1133,6 +1117,8 @@ return
 %
 function T = cfile_BatchC( Q, partname, workfolder )
 
+  error(' Batch part of *qarts2cfile* not updated.' );
+  
   %- Some checks of data
   %
   if ~isstruct( Q.BATCH )
@@ -1243,9 +1229,9 @@ return
 
 
 function T = add_agenda( T, agenda, strarray )
-  if ~( iscellstr( strarray )  |  isempty( strarray ) )
+  if ~iscellstr( strarray ) 
     error( ...
-      sprintf('The field %s must be specified as cell array of strings.', ...
+      sprintf('The agenda %s must be specified as cell array of strings.', ...
                                                              upper(agenda) ) );
   end
   T{end+1} = sprintf( 'AgendaSet(%s){', agenda );
@@ -1294,49 +1280,83 @@ function ok = isdefined( H, fields )
 return
 
 
-function [T,do_mc] = add_rtecalc(Q)
+function T = add_includes( T, name, field );
   %
-  i=0;
-  if ischar(Q.Y_UNIT)
+  if isset( field )
+    if ~iscellstr( field )
+      error( sprintf('%s must be given as a cell array of strings.',name) );
+    end
     %
-    T{1} = sprintf( 'StringSet(y_unit){"%s"}', Q.Y_UNIT );
-    i=1;
-  elseif ~isnan(Q.Y_UNIT)
-    error( 'Q.Y_UNIT must either be NaN or char.');
+    arts_includes = atmlab( 'ARTS_INCLUDES' );
+    %
+    for i = 1 : length( field )
+      s        = strrep( field{i}, 'ARTS_INCLUDES', arts_includes );
+      T{end+1} = sprintf( 'INCLUDE "%s"', s );
+    end
+  end
+end
+
+
+function [T,do_mc] = add_rtecalc( Q )
+  %
+  T = {};
+  %
+  if isset( Q.Y_UNIT )
+    if ischar(Q.Y_UNIT)
+      T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
+    else
+      error( 'Q.Y_UNIT must either be a char.');
+    end  
   end
   %
-  if Q.CLOUDBOX_DO  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+  if isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO
     %
-    do_mc = 1;
+    % Some checks of !.CLOUDBOX performed already in cfile_CldBox
     %
-    T{i+1} = 'RteCalcMC{';
-    if Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR < 0
-      T{end+1} = sprintf( '  std_err       = -1' );
-    else
-      T{end+1} = sprintf( '  std_err       = %.5e', ...
-                                     Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
-    end
-    T{end+1} = sprintf( '  max_time      = %d', ...
-                                     Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
-    T{end+1} = sprintf( '  max_iter      = %d', ...
-                                     Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-    T{end+1} = sprintf( '  z_field_is_1D = %d', ...
-                                     Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    T{end+1} = '}';  
+    if strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+      %
+      do_mc = 1;
+      %
+      if ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR' )  |  ...
+         ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME' )  |  ...
+         ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER' )  |  ...
+         ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D' )       
+        error( ['With Q.CLOUDBOX_DO=1 and MC method selected, ',...
+                'METHOD_PRMTRS must contain the fields: STD_ERR, ',...
+                'MAX_TIME, MAX_ITER and Z_FIELD_IS_1D'] )
+      end
+      %
+      rqre_datatype( 'scalar', Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
+      rqre_datatype( 'scalar', Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
+      rqre_datatype( 'scalar', Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
+      rqre_datatype( 'bool', Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
+      %
+      T{end+1} = 'RteCalcMC(y,mc_error,iy_space_agenda,surface_prop_agenda,';
+      T{end+1} = '   opt_prop_gas_agenda,abs_scalar_gas_agenda,atmosphere_dim,';
+      T{end+1} = '   p_grid,lat_grid,lon_grid,z_field,t_field,vmr_field,';
+      T{end+1} = '   r_geoid,z_surface,cloudbox_on,cloudbox_limits,pnd_field,';
+      T{end+1} = '   scat_data_raw,sensor_response,sensor_pos,sensor_los,';
+      T{end+1} = '   f_grid,stokes_dim,antenna_dim,mblock_za_grid,';
+      T{end+1} = sprintf( 'mblock_aa_grid,y_unit,%.3e,%.1f,%.1f,%d',...
+                          Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR, ...
+                          Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME, ...
+                          Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, ...
+                          Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
   else
     %
     do_mc = 0;
     %
-    if Q.J_DO
-      rqre_field( Q.J, 'UNIT' );
-      rqre_char( 'Qarts field Y_UNIT', Q.J.UNIT );
-      T{i+1} = sprintf( 'StringSet(jacobian_unit){"%s"}', Q.J.UNIT );
-      %
-      T{end+1} = 'RteCalc{}';
-      T{end+1} = 'jacobianCalc{}';
-    else
-      T{i+1} = 'RteCalcNoJacobian{}';
-    end
+  end
+  %  
+  if isset( Q.J_DO )  &  Q.J_DO
+    % Existence of field UNIT made as part of cfile_Jacobi
+    rqre_char( 'Qarts field Y_UNIT', Q.J.UNIT );
+    T{i+1} = sprintf( 'StringSet(jacobian_unit,"%s")', Q.J.UNIT );
+    %
+    T{end+1} = 'RteCalc';
+    T{end+1} = 'jacobianCalc';
+  else
+    T{i+1} = 'RteCalcNoJacobian{}';
   end
 return  
 %------------------------------------------------------------------------------
