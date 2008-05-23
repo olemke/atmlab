@@ -24,9 +24,6 @@
 %    The later options, including 'Save', adds commands to save main
 %    variables for the part.
 %
-%    Nothing is done for fields set to NaN. This means that NaN effectively
-%    works as false (0) for fields acting as a flag (such as SENSOR_DO).
-%
 %    For fields that can be given both as a Matlab variable or name of a 
 %    file, a file is generated automatically if the input a variable.
 %    Output is stored in files placed in *workfolder*, with names identical
@@ -610,7 +607,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     T{8} = file_or_data( 'sensor_response_pol', 'Index', ...
                                            Q.SENSOR_RESPONSE_POL, workfolder );
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
-    T = add_includes( T, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
+    T = add_includes( {}, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
   elseif isstruct( Q.SENSOR_RESPONSE ) 
     do_parts = true;
   else
@@ -625,28 +622,28 @@ function T = cfile_Sensor( Q, partname, workfolder )
     qcheck( @qartsSensor, H );
 
     % Check that some fields have valid values
-    if (H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1)
+    if( H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1 )
       error('The field *SENSOR_NORM* in *SENSOR_RESPONSE* can only be 0 or 1.')
     end
-    if (Q.ANTENNA_DIM~=1 & Q.ANTENNA_DIM~=2)
+    if( Q.ANTENNA_DIM~=1 & Q.ANTENNA_DIM~=2 )
       error('The field *ANTENNA_DIM* in Q must be 1 or 2.');
     end
 
     % Find out sensor structure
     parts{1} = 'init';
-    if isdefined( H, {'ANTENNA_LOS'} )
+    if isset( H.ANTENNA_LOS )
       parts{end+1} = 'antenna';
     end
-    if isdefined( H, {'SENSOR_ROT'} )
+    if isset( H.SENSOR_ROT )
       parts{end+1} = 'rotation';
     end
-    if isdefined( H, {'SENSOR_POL'} )
+    if isset( H.SENSOR_POL )
       parts{end+1} = 'polarisation';
     end
-    if isdefined( H, {'LO','SIDEBAND_FILTER'} )
+    if isset( H.LO )  &  isset( SIDEBAND_FILTER )
       parts{end+1} = 'mixer';
     end
-    if isdefined( H, {'F_BACKEND','CHANNEL_RESPONSE'} )
+    if isset( H.F_BACKEND )  &  isset( CHANNEL_RESPONSE )
       parts{end+1} = 'backend';
     end
     % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
@@ -758,24 +755,22 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     error( 'Only recognised choice is ''Jacobi''.' );
   end
 
-  error( 'Jacobian part of *qarts2cfile* not updated.' );
-
   do_parts = false;
-  if isnan(Q.J_DO)
+  
+  if ~isset(Q.J_DO )
      T={};
-  end
-  if ~Q.J_DO
+  elseif ~Q.J_DO
     T{1} = 'jacobianOff{}';
   elseif isstruct( Q.J )
     do_parts = true;  % code below
-  elseif isnan( Q.J )  |  isnumeric(Q.J)
-    error( 'No description of jacobians found (NaN or numeric value).' );
   else
     error( 'Unknown selection for Q.JACOBIAN.' );
   end
 
   if do_parts
 
+    error( 'Jacobian part of *qarts2cfile* not completely updated.' );
+    
     qcheck( @qartsJacobian, Q.J );
 
     T{1} = 'jacobianInit{}';
@@ -878,21 +873,20 @@ function T = cfile_CldBox( Q, partname, workfolder )
     error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );
   end
 
-  error( 'Cloudbox part of *qarts2cfile* not updated.' );
-
   % add consistency checks: Q.CLOUDBOX.METHOD and  Q.CLOUDBOX.METHOD_PRMTRS
   
-  if isnan(Q.CLOUDBOX_DO)
+  if ~isset(Q.CLOUDBOX_DO)
      T={};
      return
   end
+  
   if ~Q.CLOUDBOX_DO
     T{1} = 'cloudboxOff{}';
     return
   end
   
   if ~isstruct( Q.CLOUDBOX )
-    error( 'Q.CLOUDBOX must be a structure.' );
+    error( 'Q.CLOUDBOX must be a structure if Q.CLOUD_BOX=1.' );
   end
 
   %= Check that all fields are present
@@ -901,76 +895,84 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   %= Cloudbox
   %
-  if isvector(Q.CLOUDBOX.LIMITS)  &  ~any(isnan( Q.CLOUDBOX.LIMITS ))
-    if length(Q.CLOUDBOX.LIMITS) ~= 2*Q.ATMOSPHERE_DIM
-      error( ...
-    'Length of Q.CLOUDBOX.LIMITS does not match atmospheric dimensionality.' );
-    end 
-    if length(Q.CLOUDBOX.LIMITS) < 6
-       limits = Q.CLOUDBOX.LIMITS;
-       Q.CLOUDBOX.LIMITS = zeros(1,6);
-       Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
+  if isset (Q.CLOUDBOX.LIMITS)
+    if isvector(Q.CLOUDBOX.LIMITS) 
+      if length(Q.CLOUDBOX.LIMITS) < 6
+        limits = Q.CLOUDBOX.LIMITS;
+        Q.CLOUDBOX.LIMITS = zeros(1,6);
+        Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
+      end
+      T{1}     = 'cloudboxSetManuallyAltitude{';
+      T{end+1} = sprintf('   z1   = %.3f', Q.CLOUDBOX.LIMITS(1) );
+      T{end+1} = sprintf('   z2   = %.3f', Q.CLOUDBOX.LIMITS(2) );
+      T{end+1} = sprintf('   lat1 = %.3f', Q.CLOUDBOX.LIMITS(3) );
+      T{end+1} = sprintf('   lat2 = %.3f', Q.CLOUDBOX.LIMITS(4) );
+      T{end+1} = sprintf('   lon1 = %.3f', Q.CLOUDBOX.LIMITS(5) );
+      T{end+1} = sprintf('   lon2 = %.3f', Q.CLOUDBOX.LIMITS(6) );
+      T{end+1} = '}';
+    else
+      error('Not valid specification Q.CLOUDBOX.LIMITS.');
     end
-    T{1}     = 'cloudboxSetManuallyAltitude{';
-    T{end+1} = sprintf('   z1   = %.3f', Q.CLOUDBOX.LIMITS(1) );
-    T{end+1} = sprintf('   z2   = %.3f', Q.CLOUDBOX.LIMITS(2) );
-    T{end+1} = sprintf('   lat1 = %.3f', Q.CLOUDBOX.LIMITS(3) );
-    T{end+1} = sprintf('   lat2 = %.3f', Q.CLOUDBOX.LIMITS(4) );
-    T{end+1} = sprintf('   lon1 = %.3f', Q.CLOUDBOX.LIMITS(5) );
-    T{end+1} = sprintf('   lon2 = %.3f', Q.CLOUDBOX.LIMITS(6) );
-    T{end+1} = '}';
-  else
-    error('Not valid specification Q.CLOUDBOX.LIMITS.');
   end
 
   %= Particle field and single scattering data
   %
-  if length(Q.CLOUDBOX.PND_FIELD) ~= length(Q.CLOUDBOX.SCAT_DATA)
-    error( ...
-      'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must have same length.' );
+  nset = isset(Q.CLOUDBOX.PND_FIELD) + isset(Q.CLOUDBOX.SCAT_DATA)
+  %
+  if nset == 1
+    error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must both ',...
+                                        'be set, or both be undefined ({}).' );
   end
-  %
-  T{end+1}  = 'ParticleTypeInit{}';
-  do_pfCALC = false;
-  %
-  for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
-    if isstr( Q.CLOUDBOX.SCAT_DATA{i} )
-      sfile = Q.CLOUDBOX.SCAT_DATA{i};
-    else
-      sfile = sprintf( 'scat_data_raw_%d.xml', i );
-      xmlStore( sfile, Q.CLOUDBOX.SCAT_DATA{i}, 'SingleScatteringData' );
-    end
-    if isstr( Q.CLOUDBOX.PND_FIELD{i} )
-      pfile = Q.CLOUDBOX.PND_FIELD{i};
-    else
-      pfile = sprintf( 'pnd_field_raw_%d.xml', i );
-      xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3' );
+  if nset
+    if length(Q.CLOUDBOX.PND_FIELD) ~= length(Q.CLOUDBOX.SCAT_DATA)
+      error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must have ',...
+                                                              'same length.' );
     end
     %
-    if length(pfile)
-      do_pfCALC = true;
+    T{end+1}  = 'ParticleTypeInit{}';
+    do_pfCALC = false;
+    %
+    for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
+      if isstr( Q.CLOUDBOX.SCAT_DATA{i} )
+        sfile = Q.CLOUDBOX.SCAT_DATA{i};
+      else
+        sfile = sprintf( 'scat_data_raw_%d.xml', i );
+        xmlStore( sfile, Q.CLOUDBOX.SCAT_DATA{i}, 'SingleScatteringData' );
+      end
+      if isstr( Q.CLOUDBOX.PND_FIELD{i} )
+        pfile = Q.CLOUDBOX.PND_FIELD{i};
+      else
+        pfile = sprintf( 'pnd_field_raw_%d.xml', i );
+        xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3' );
+      end
+      %
+      if length(pfile)
+        do_pfCALC = true;
+      end
+      %
+      T{end+1} = 'ParticleTypeAdd{';
+      T{end+1} = sprintf('   filename_scat_data =  "%s"', sfile );
+      T{end+1} = sprintf('   filename_pnd_field =  "%s"', pfile );
+      T{end+1} = '}';
     end
     %
-    T{end+1} = 'ParticleTypeAdd{';
-    T{end+1} = sprintf('   filename_scat_data =  "%s"', sfile );
-    T{end+1} = sprintf('   filename_pnd_field =  "%s"', pfile );
-    T{end+1} = '}';
+    if do_pfCALC 
+      T{end+1} = 'pnd_fieldCalc{}';
+    end
   end
-  %
-  if do_pfCALC 
-    T{end+1} = 'pnd_fieldCalc{}';
-  end
+      
 
   %= Agendas for scattering properties 
   %
-  if iscellstr(Q.OPT_PROP_GAS_AGENDA)
-    T = add_agenda( T, 'opt_prop_gas_agenda', ...
-              { 'ext_matInit{}', 'abs_vecInit{}', Q.OPT_PROP_GAS_AGENDA{:} } );
+  if isset(Q.CLOUDBOX.OPT_PROP_GAS_AGENDA)
+    T = add_agenda( T, 'opt_prop_gas_agenda', Q.CLOUDBOX.OPT_PROP_GAS_AGENDA );
   end
-  T = add_agenda( T, 'opt_prop_part_agenda', ...
-        {'ext_matInit{}','abs_vecInit{}','ext_matAddPart{}','abs_vecAddPart{}'} );
-  T = add_agenda( T, 'spt_calc_agenda', {'opt_prop_sptFromMonoData{}'} );
-  % The last one is not used by MC, but ...
+  if isset(Q.CLOUDBOX.OPT_PROP_PART_AGENDA)
+    T = add_agenda( T, 'opt_prop_part_agenda', Q.CLOUDBOX.OPT_PROP_PART_AGENDA);
+  end
+  if isset(Q.CLOUDBOX.SPT_CALC_AGENDA)
+    T = add_agenda( T, 'spt_calc_agenda', Q.CLOUDBOX.SPT_CALC_AGENDA );
+  end
 
   %= Saving?
   %
@@ -998,23 +1000,17 @@ function T = cfile_SctMth( Q, partname, workfolder )
             'and ''SctMthBatch''.']);
   end
 
-  if ~Q.CLOUDBOX_DO
-    T = {};
-    return
+  if ~isset(Q.CLOUDBOX_DO)
+     T={};
+     return
   end
  
-  % It is assumed that cfile_CldBox has been called and checks of Q have
-  % been performed
-  
-  %= Some basic checks
-  if Q.ATMOSPHERE_DIM == 2
-    error( 'Scattering is not defined for 2D.' );
-  end
-  if Q.ATMOSPHERE_DIM < 3  &  strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-    error( 'MC can only be applied for 3D.' );
-  end
-  
+  % It is assumed that cfile_CldBox has been called and checks of Q.CLOUDBOX 
+  % have been performed
 
+  
+  
+  
   %= DOIT / MC
   %
   if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
@@ -1026,23 +1022,18 @@ function T = cfile_SctMth( Q, partname, workfolder )
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'EPSILON', 0 );
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'ALL_F', 0 );
     
-    if (~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID) | ...
-        ~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID))
-      error(['The parameter N_ZA_GRID and N_AA_GRID must be given as',...
-  	   ' integer values.']);
+    if( ~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID)  |  ...
+        ~iswhole(Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID) )
+      error( ['The parameter N_ZA_GRID and N_AA_GRID must be given as',...
+       ' integer values.']);
     end
     
-    if (~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'linear') | ...
-       strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, 'polynomial')))
-      error(['Unknown interpolation method. ',... 
+    if( ~(strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP,'linear')  |  ...
+          strcmp(Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP,'polynomial') ) )
+      error( ['Unknown interpolation method. ',... 
                                'SCAT_ZA_INTERP can be linear or polynomial.']);
     end
     
-    if length(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON) < Q.STOKES_DIM
-      error( ...
-        'Length of Q.CLOUDBOX.METHOD_PRMTRS.EPSILON must be >= Q.STOKES_DIM' );
-    end
-   
     if isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )
       filename = fullfile( workfolder, 'scat_za_grid.xml' ); 
       xmlStore( filename, Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, 'Vector');
@@ -1050,14 +1041,14 @@ function T = cfile_SctMth( Q, partname, workfolder )
     end
     
     T{1}     = sprintf('doit_za_interpSet{interp_method = "%s"}', ...
-  		                             Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
+                                      Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
     T{end+1} = 'DoitAngularGridsSet{';
     T{end+1} = sprintf('   N_za_grid = %d', ...
-                                          Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID );
+                                           Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID );
     T{end+1} = sprintf('   N_aa_grid = %d', ...
-                                          Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID );
+                                           Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID );
     T{end+1} = sprintf('   za_grid_opt_file = "%s"', ...
-                                   Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
+                                    Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE );
     T{end+1} = '}';
     %
     T = add_agenda( T, 'doit_mono_agenda', ...
@@ -1068,7 +1059,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
               'DoitCloudboxFieldPut{}' } );
     %
     T = add_agenda( T, 'pha_mat_spt_agenda', { ...
-        'pha_mat_sptFromDataDOITOpt{}' });
+        'pha_mat_sptFromDataDOITOpt{}' } );
     
     if isempty(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE)
       T = add_agenda( T, 'doit_scat_field_agenda', ...
@@ -1079,7 +1070,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     end
     
     T = add_agenda( T, 'doit_rte_agenda', ...
-  		  { sprintf('doit_i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
+                  { sprintf('doit_i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
     T = add_agenda( T, 'doit_conv_test_agenda', { ...
         sprintf('doit_conv_flagAbsBT{[%s]}', vector2commalist( ...
                        Q.CLOUDBOX.METHOD_PRMTRS.EPSILON(1:Q.STOKES_DIM)) ) } );
@@ -1094,11 +1085,6 @@ function T = cfile_SctMth( Q, partname, workfolder )
     end
     
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-    %
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR', 0 );
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME', 0 );
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER', 0 );
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D', 0);
     %
     T = {};
     %
@@ -1266,20 +1252,6 @@ function flag = isset( qfield )
 return
 
 
-function ok = isdefined( H, fields )
-  ok = 1;
-  for it=1:length(fields)
-    if iscell(H.(fields{it}))
-      if isempty(H.(fields{it}))
-        ok = 0;
-      end
-    elseif isnan(H.(fields{it}))
-      ok = 0;
-    end
-  end
-return
-
-
 function T = add_includes( T, name, field );
   %
   if isset( field )
@@ -1290,11 +1262,14 @@ function T = add_includes( T, name, field );
     arts_includes = atmlab( 'ARTS_INCLUDES' );
     %
     for i = 1 : length( field )
+      if isnan( arts_includes )  &  strfind( field{i}, 'ARTS_INCLUDES' )
+        error( 'Atmlab setting ARTS_INCLUDES is requested, but is not set.' );
+      end
       s        = strrep( field{i}, 'ARTS_INCLUDES', arts_includes );
       T{end+1} = sprintf( 'INCLUDE "%s"', s );
     end
   end
-end
+return
 
 
 function [T,do_mc] = add_rtecalc( Q )
@@ -1311,7 +1286,7 @@ function [T,do_mc] = add_rtecalc( Q )
   %
   if isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO
     %
-    % Some checks of !.CLOUDBOX performed already in cfile_CldBox
+    % Some checks of Q.CLOUDBOX performed already in cfile_CldBox
     %
     if strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
       %
@@ -1342,6 +1317,7 @@ function [T,do_mc] = add_rtecalc( Q )
                           Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME, ...
                           Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, ...
                           Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
+    end   
   else
     %
     do_mc = 0;

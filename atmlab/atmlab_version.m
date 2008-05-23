@@ -1,8 +1,8 @@
 % ATMLAB_VERSION   Atmlab version number. 
 %
-%    If there is no output argument, a message is printed to the screen.
+%    Version number taken from the ChangeLog file.
 %
-%    This file shall be modified at each commit of Atmlab.
+%    If there is no output argument, a message is printed to the screen.
 %
 % FORMAT   s = atmlab_version
 %        
@@ -12,12 +12,36 @@
 
 function s = atmlab_version
 
-nr1 = 0;
-nr2 = 3;
-nr3 = 2;
+% Version information now taken from ChangeLog   
+
+toppath = fileparts( fileparts( which( 'atmlab_version' ) ) );
+
+changelog = fullfile( toppath, 'ChangeLog' );
+
+fid = fopen( changelog, 'r' );
+
+if fid < 0
+  s = 'atmlab-?.? (could not locate ChangeLog file)';
+  return
+end
+
+s = '';
+%
+while isempty( findstr( s, 'atmlab-' ) )
+  s = fgetl( fid );
+  if ~ischar(s)
+    error( 'Could not find any ''atmlab-'' in ChangeLog' );
+  end
+end
+%
+fclose(fid);
 
 
-s = sprintf('atmlab-%d.%d.%d',nr1,nr2,nr3);
+s = s( findstr(s,'atmlab-') : end );
+
+ind = find( s == '-' );
+
+s(ind(2:end)) = '.';
 
 if ~nargout
   

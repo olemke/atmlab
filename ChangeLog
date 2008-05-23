@@ -1,3 +1,25 @@
+2008-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-4
+
+	* atmlab/atmlab_version.m: Information now taken from ChangeLog.
+	Now not needed to edit this file before eqch commit. 
+							     
+	* arts/qarts2cfile.m: Updates od cloudbox and sensor parts. 
+
+	* arts/qarts.m: OPT_PROP_GAS_AGENDA removed.
+
+	* arts/qartsCloudbox.m: All fields now set to {}. New fields:
+	   OPT_PROP_GAS_AGENDA
+	   OPT_PROP_PART_AGENDA
+           SPT_CALC_AGENDA
+	
+	* arts/qartsSensor.m: All fields now set to {}.
+
+	* demos/data/lines501.4: As below.
+
+	* demos/data/o3line111ghz: Now follows xlm format.
+
 2008-05-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-3

@@ -29,9 +29,15 @@ set_defaults;
 Q  = qarts;
 
 
-%= General part
+%= Overall settings
+%
+Q.CLOUDBOX_DO       = 0;
+Q.J_DO              = 0;
 %
 Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
+
+
+%= General part
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
@@ -87,6 +93,9 @@ Q.SENSOR_LOS        = geomztan2za( Q.R_GEOID, zplat, ztan );
 %
 % Simple example, only including a narrow antenna pattern.
 %
+if 1
+  Q.SENSOR_DO = 0;
+else
 H                 = qartsSensor;
 %
 Q.MBLOCK_ZA_GRID  = [-0.04:0.02:0.04];
@@ -95,7 +104,7 @@ H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
 %
 Q.SENSOR_DO       = 1;
 Q.SENSOR_RESPONSE = H;
-
+end
 
 
 if nargout == 1
