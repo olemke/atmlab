@@ -1,6 +1,9 @@
 % QARTS_DEMO   A simple demonstration of Qarts
 %
-%    Gives an example on basic usage of Qarts.
+%    Gives an example on basic usage of Qarts. 
+%
+%    The example simulated Odin-SMR observations around 501 GHz, but 
+%    with a simplified set-up.
 %
 % FORMAT   [Q,f,y] = qarts_demo( [ ztan ] )
 %        
@@ -9,12 +12,14 @@
 %       y          Calculated spectrum
 % OPT   ztan       Tangent altitude. Default is 30 km.
 
+% 2008-05-27   Updated to ARTS2 by Patrick Eriksson.
 % 2007-08-21   Cleaned and updated by Patrick Eriksson.
 % 2005-01-26   Sensor part added by Mattias Ekstrom.
 % 2004-??-??   Created by Patrick Eriksson.
 
 
 function [Q,f,y] = qarts_demo( ztan )
+
 
 %= Set defualts
 %
@@ -34,7 +39,8 @@ Q  = qarts;
 Q.CLOUDBOX_DO       = 0;
 Q.J_DO              = 0;
 %
-Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
+Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
 
 
 %= General part
@@ -45,10 +51,9 @@ Q.STOKES_DIM        = 1;
 Q.ABS_SPECIES{1}{1} = 'ClO';
 Q.ABS_SPECIES{2}{1} = 'O3';
 Q.ABS_SPECIES{3}{1} = 'N2O';
-Q.ABS_SPECIES{4}{1} = 'H2O';
-Q.ABS_SPECIES{4}{2} = 'H2O-MPM89';
+Q.ABS_SPECIES{4}{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
+Q.ABS_SPECIES{4}{2} = 'H2O-PWR98';
 Q.ABS_SPECIES{5}{1} = 'N2-SelfContStandardType';
-
 
 
 %= Define atmosphere and surface
@@ -57,17 +62,18 @@ Q.ATMOSPHERE_DIM      = 1;
 %
 Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
 %
-Q.USE_RAW_ATMOSPHERE  = 1;
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
-Q.RAW_ATM_EXPAND_1D   = 1;
+%
+Q.USE_RAW_ATMOSPHERE  = 1;
+Q.RAW_ATM_EXPAND_1D   = 0;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
+%
 Q.R_GEOID             = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE           = 500;
-
 
 
 %= Absorption
@@ -77,16 +83,15 @@ Q.ABS_LINES_FORMAT = 'Arts';
 Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
 
 
-
-%= Set RTE variables
+%= Set RTE variables (refraction is here neglected)
 %
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
+Q.PPATH_LMAX        = 20e3;
+Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
 Q.Y_UNIT            = 'RJBT';
 %
 zplat               = 600e3;
 Q.SENSOR_POS        = Q.R_GEOID + zplat;
 Q.SENSOR_LOS        = geomztan2za( Q.R_GEOID, zplat, ztan );
-
 
   
 %= Sensor
@@ -110,7 +115,6 @@ end
 if nargout == 1
   return
 end
-
 
 
 %= Calculate spectrum/spectra

@@ -10,6 +10,7 @@
 % OPT   ztan       Tangent altitude. Default is 30 km.
 %       atmdim     Atmospheric dimensionality. Default is 1.
 
+% 2008-05-27   Updated to ARTS2 by Patrick Eriksson.
 % 2007-08-23   Created by Patrick Eriksson (based qarts_demo).
 
 
@@ -30,6 +31,14 @@ set_defaults;
 Q  = qarts;
 
 
+%= Overall settings
+%
+Q.CLOUDBOX_DO       = 0;
+Q.J_DO              = 0;
+%
+Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+
 
 %= General part
 %
@@ -39,39 +48,39 @@ Q.STOKES_DIM        = 1;
 Q.ABS_SPECIES{1}{1} = 'ClO';
 Q.ABS_SPECIES{2}{1} = 'O3';
 Q.ABS_SPECIES{3}{1} = 'N2O';
-Q.ABS_SPECIES{4}{1} = 'H2O';
-Q.ABS_SPECIES{4}{2} = 'H2O-MPM89';
+Q.ABS_SPECIES{4}{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
+Q.ABS_SPECIES{4}{2} = 'H2O-PWR98';
 Q.ABS_SPECIES{5}{1} = 'N2-SelfContStandardType';
-
 
 
 %= Define atmosphere and surface
 %
 Q.ATMOSPHERE_DIM      = atmdim;
-Q.USE_RAW_ATMOSPHERE  = 1;
 %
 Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
 %
-if atmdim >= 2
+arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
+if isnan( arts_xmldata_path )
+  error('You need to ARTS_XMLDATA_PATH to run this example.');
+end
+%
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
+                                                        'fascod', 'tropical' );
+%
+if atmdim == 1
+  Q.RAW_ATM_EXPAND_1D = 0;
+else
   %
   Q.RAW_ATM_EXPAND_1D = 1;
-  %
-  Q.LAT_GRID = -10:10;
+  Q.LAT_GRID          = -10:10;
   %
   if atmdim == 3
     Q.LON_GRID = -10:10;      
   end
 end
 %
-arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
-if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
-end
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                        'fascod', 'tropical' );
-%
+Q.R_GEOID        = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE      = 500;
-
 
 
 %= Load atmospheric and surface variables
@@ -83,7 +92,6 @@ Q.Z_SURFACE      = 500;
 Q.USE_RAW_ATMOSPHERE = 0;
 %
 [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD,Q.R_GEOID,Q.Z_SURFACE] = arts_atmfields( Q );
-
 
 
 %= Absorption
@@ -110,6 +118,9 @@ Q.ABSORPTION       = 'LoadTable';
 % Sensor reponse is here pre-calculated. Considerations around
 % loading/saving are identical to absorption, commented above.
 %
+if 1
+  Q.SENSOR_DO = 0;
+else
 H                 = qartsSensor;
 %
 Q.MBLOCK_ZA_GRID  = [-0.04:0.02:0.04];
@@ -125,16 +136,16 @@ Q.SENSOR_RESPONSE = H;
 %Q.OUTPUT_FILE_FORMAT = 'ascii';  % Temporary solution until reading of
 %                                 % binary sparse works.
 Q = arts_sensor( Q );
+end
 
 
-
-%= Set RTE variables
+%= Set RTE variables (refraction is here neglected)
 %
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{20e3}' };
+Q.PPATH_LMAX        = 20e3;
+Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
 Q.Y_UNIT            = 'RJBT';
 %
 zplat               = 600e3;
-%
 Q.SENSOR_POS        = [ Q.R_GEOID(1,1) + zplat, -23, 0 ];
 Q.SENSOR_POS        = Q.SENSOR_POS(1:atmdim);
 %
@@ -156,6 +167,7 @@ end
 [y,ydata] = arts_y( Q );
 %
 f = ydata.f;
+
 
 
 %= Plot

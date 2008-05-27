@@ -12,7 +12,11 @@
 %   selected automatically to precisely cover the variation of specified
 %   atmospheric fields.
 %
-%   Note that ABS_NLS must be set.
+%   The following fields must always be set:
+%      Q.ATMOSPHERE_DIM
+%      Q.P_GRID
+%      Q.USE_RAW_ATMOSPHERE
+%      Q.ABS_NLS
 %
 % FORMAT   Q = qarts_abstable( Q, nt, dt, nnls, dnls )
 %        
@@ -52,8 +56,23 @@ set_defaults;
 %
 rqre_datatype( 'struct', Q );
 %
-rqre_bool( 'ARTS field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
+if ~qarts_isset( Q.ATMOSPHERE_DIM )
+  error( 'Q.ATMOSPHERE_DIM must be set' );
+end
 rqre_scalar( 'ARTS field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
+%
+if ~qarts_isset( Q.P_GRID )
+  error( 'Q.P_GRID must be set' );
+end
+%
+if ~qarts_isset( Q.USE_RAW_ATMOSPHERE )
+  error( 'Q.USE_RAW_ATMOSPHERE must be set' );
+end
+rqre_bool( 'ARTS field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
+%
+if ~qarts_isset( Q.ABS_NLS )
+  error( 'Q.ABS_NLS must be set' );
+end
 
 
 

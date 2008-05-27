@@ -1,3 +1,15 @@
+2008-05-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-5
+
+	* A quick commit to transfer work done to laptop. More later ...
+
+	* arts/qarts_isset.m: Created.
+
+	* arts/qarts.m: Added fields
+	   PPATH_LMAX
+	   PPATH_LRAYTRACE
+
 2008-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-4

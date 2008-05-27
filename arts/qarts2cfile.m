@@ -220,7 +220,7 @@ function T = cfile_Generl( Q, partname, workfolder )
   %
   T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
-  if isset( Q.OUTPUT_FILE_FORMAT )
+  if qarts_isset( Q.OUTPUT_FILE_FORMAT )
     if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
       T{end+1} = 'output_file_formatSetBinary';
     elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
@@ -230,16 +230,16 @@ function T = cfile_Generl( Q, partname, workfolder )
     end
   end
   %
-  if isset( Q.STOKES_DIM )
+  if qarts_isset( Q.STOKES_DIM )
     rqre_scalar( 'Qarts field STOKES_DIM', Q.STOKES_DIM, 1, 4 );
     T{end+1} = sprintf( 'IndexSet(stokes_dim,%d)', Q.STOKES_DIM );
   end
   %  
-  if isset( Q.F_GRID )
+  if qarts_isset( Q.F_GRID )
     T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
   end
   %
-  if isset( Q.ABS_SPECIES )
+  if qarts_isset( Q.ABS_SPECIES )
     rqre_datatype( 'cell', Q.ABS_SPECIES )
     T{end+1} = sprintf( 'SpeciesSet(abs_species,[%s])', ...
                                                arts_tgs_cnvrt(Q.ABS_SPECIES) );
@@ -276,23 +276,23 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   %
   T = [];
   %
-  if isset( Q.ATMOSPHERE_DIM )
+  if qarts_isset( Q.ATMOSPHERE_DIM )
     rqre_scalar( 'Qarts field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
     T{end+1} = sprintf( 'AtmosphereSet%dD', Q.ATMOSPHERE_DIM );
   end
   %
-  if isset( Q.P_GRID )
+  if qarts_isset( Q.P_GRID )
     T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder );
   end
   %
-  if isset( Q.LAT_GRID )
+  if qarts_isset( Q.LAT_GRID )
     T{end+1} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, workfolder );
   end
-  if isset( Q.LON_GRID )
+  if qarts_isset( Q.LON_GRID )
     T{end+1} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, workfolder );
   end
   %
-  if isset( Q.USE_RAW_ATMOSPHERE )
+  if qarts_isset( Q.USE_RAW_ATMOSPHERE )
     rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
     if Q.USE_RAW_ATMOSPHERE
       rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
@@ -306,20 +306,20 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
         T{end+1} = 'AtmFieldsCalc';
       end
     else
-      if isset( Q.T_FIELD )
+      if qarts_isset( Q.T_FIELD )
         T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
       end      
-      if isset( Q.VMR_FIELD )
+      if qarts_isset( Q.VMR_FIELD )
         T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, ...
                                                                    workfolder);
       end      
-      if isset( Q.Z_FIELD )
+      if qarts_isset( Q.Z_FIELD )
         T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
       end
     end
   end
   %
-  if isset(Q.R_GEOID)
+  if qarts_isset(Q.R_GEOID)
     if isscalar( Q.R_GEOID )
       T{end+1} = sprintf( ...
           'r_geoidSpherical(r_geoid,atmosphere_dim,lat_grid,lon_grid,%e)', ...
@@ -329,7 +329,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     end
   end
   %
-  if isset(Q.Z_SURFACE)
+  if qarts_isset(Q.Z_SURFACE)
     if isscalar( Q.Z_SURFACE )
       T{end+1} = 'ncolsGet( ncols, r_geoid )';
       T{end+1} = 'nrowsGet( nrows, r_geoid )';
@@ -373,29 +373,29 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     error( 'Only recognised choices are ''Absrpt'' and ''AbsrptSave''.' );
   end
   %
-  if isset( Q.ABSORPTION )
+  if qarts_isset( Q.ABSORPTION )
     rqre_char( 'Qarts field ABSORPTION', Q.ABSORPTION );
     %
     if ~( strcmp(Q.ABSORPTION,'OnTheFly') | ...
           strcmp(Q.ABSORPTION,'LoadTable') | strcmp(Q.ABSORPTION,'CalcTable') )
       error( 'Only recognised choices for *ABSORPTION* are ''OnTheFly'', ',...
-           '''LoadTable'' and ''CalcTable''.' );
+                                          '''LoadTable'' and ''CalcTable''.' );
     end
     %
     if strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION, 'CalcTable')
       %
-      nset = isset(Q.ABS_LINESHAPE) + isset(Q.ABS_LINESHAPE_FACTOR) + ...
-                                                 isset(Q.ABS_LINESHAPE_CUTOFF);
+      nset = qarts_isset(Q.ABS_LINESHAPE) + qarts_isset(Q.ABS_LINESHAPE_FACTOR) + ...
+                                                 qarts_isset(Q.ABS_LINESHAPE_CUTOFF);
       %
       if nset  
         if nset < 3
           error( ['Q.ABS_LINESHAPE, Q.ABS_LINESHAPE_FACTOR, and ', ...
-             'Q.ABS_LINESHAPE_CUTOFF must all be left empty, or all be set.']);
+         'Q.ABS_LINESHAPE_CUTOFF must all be left empty ({}), or all be set.']);
         end
         %
         if ischar(Q.ABS_LINESHAPE) & ischar(Q.ABS_LINESHAPE_FACTOR) & ...
                                                isscalar(Q.ABS_LINESHAPE_CUTOFF)
-          T{end+1} = sprintf( 'abs_lineshapeDefine(abs_lineshape,%s,%s,%e)', ...
+          T{end+1} = sprintf( 'abs_lineshapeDefine(abs_lineshape,%s,%s,%e)',...
              Q.ABS_LINESHAPE, Q.ABS_LINESHAPE_FACTOR, Q.ABS_LINESHAPE_CUTOFF );
         else     
           error( ['Q.ABS_LINESHAPE,Q.ABS_LINESHAPE_FACTOR, and ', ...
@@ -404,7 +404,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
         end
       end
       %
-      if isset( Q.ABS_LINES_FORMAT )
+      if qarts_isset( Q.ABS_LINES_FORMAT )
         %
         rqre_datatype( 'char', Q.ABS_LINES_FORMAT );
         rqre_datatype( {'char','struct','empty'}, Q.ABS_LINES );
@@ -423,6 +423,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
         %
         T{end+1} = sprintf( 'abs_linesReadFrom%s(abs_lines,"%s",0,1e99)', ...
                                                 Q.ABS_LINES_FORMAT, filename );
+        T{end+1} = 'abs_lines_per_speciesCreateFromLines';
       end
       %
       T = add_includes( T, 'Q.ABS_MODELS', Q.ABS_MODELS );
@@ -433,21 +434,21 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
-      if isset( Q.ABS_P )
+      if qarts_isset( Q.ABS_P )
         T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, workfolder );
       end
-      if isset( Q.ABS_T )
+      if qarts_isset( Q.ABS_T )
         T{end+1} = file_or_data( 'abs_t', 'Vector', Q.ABS_T, workfolder );
       end
-      if isset( Q.ABS_T_PERT )
+      if qarts_isset( Q.ABS_T_PERT )
       T{end+1} = file_or_data( 'abs_t_pert', 'Vector', Q.ABS_T_PERT, ...
                                                                   workfolder );
       end
-      if isset( Q.ABS_VMRS )
+      if qarts_isset( Q.ABS_VMRS )
         T{end+1} = file_or_data( 'abs_vmrs', 'Matrix', Q.ABS_VMRS, ...
                                                                   workfolder );
       end
-      if isset( Q.ABS_NLS )
+      if qarts_isset( Q.ABS_NLS )
         if isempty( Q.ABS_NLS )
           T{end+1} = 'SpeciesSet(abs_nls,[])';
         else
@@ -456,7 +457,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
         end
       
       end
-      if isset( Q.ABS_NLS_PERT )
+      if qarts_isset( Q.ABS_NLS_PERT )
         T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
                                                                   workfolder );
       
@@ -479,10 +480,10 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       abstable = true;
       %
     end
-  end %  isset( Q.ABSORPTION )
+  end %  qarts_isset( Q.ABSORPTION )
 
   
-  if isset( Q.EMISSION_AGENDA )
+  if qarts_isset( Q.EMISSION_AGENDA )
     T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
   end
 
@@ -498,6 +499,8 @@ return
 %
 %    surface_prop_agenda
 %    iy_space_agenda
+%    ppath_lmax
+%    ppath_lraytrace
 %    ppath_step_agenda
 %    refr_index_agenda
 %    rte_agenda
@@ -512,31 +515,38 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T = {};
   %
-  if isset( Q.SURFACE_PROP_AGENDA )
+  if qarts_isset( Q.SURFACE_PROP_AGENDA )
     T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
   end
-  if isset( Q.IY_SPACE_AGENDA )
+  if qarts_isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   end
-  if isset( Q.PPATH_STEP_AGENDA )
-     T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
+  if qarts_isset( Q.PPATH_LMAX )
+    T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
+  end  
+  if qarts_isset( Q.PPATH_LRAYTRACE )
+    T{end+1} = sprintf( 'NumericSet( ppath_lraytrace, %.2e )', ...
+                                                           Q.PPATH_LRAYTRACE );
+  end  
+  if qarts_isset( Q.PPATH_STEP_AGENDA )
+    T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
   end
-  if isset( Q.REFR_INDEX_AGENDA )
+  if qarts_isset( Q.REFR_INDEX_AGENDA )
     T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
   end
-  if isset( Q.RTE_AGENDA )
+  if qarts_isset( Q.RTE_AGENDA )
     T = add_agenda( T, 'rte_agenda', Q.RTE_AGENDA );
   end
-  if isset( Q.SENSOR_POS )
+  if qarts_isset( Q.SENSOR_POS )
     T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS,...
                                                                   workfolder );
   end
-  if isset( Q.SENSOR_LOS )
+  if qarts_isset( Q.SENSOR_LOS )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
                                                                   workfolder );
   end
   %
-  if isset( Q.PRE_RTE_WSMS )
+  if qarts_isset( Q.PRE_RTE_WSMS )
     T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
   end
   %
@@ -566,7 +576,7 @@ function T = cfile_RteExe( Q, partname, workfolder )
     T{end+1} = add_savefile( 'mc_error', workfolder ); 
   end
   %
-  if isset( Q.J_DO )  &  Q.J_DO
+  if qarts_isset( Q.J_DO )  &  Q.J_DO
     T{end+1} = add_savefile( 'jacobian', workfolder );
   end
 return
@@ -585,7 +595,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
   do_parts = false;
 
-  if ~isset( Q.SENSOR_DO )
+  if ~qarts_isset( Q.SENSOR_DO )
      T = {};
   elseif ~Q.SENSOR_DO
     T{1} = 'sensorOff';
@@ -631,19 +641,19 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
     % Find out sensor structure
     parts{1} = 'init';
-    if isset( H.ANTENNA_LOS )
+    if qarts_isset( H.ANTENNA_LOS )
       parts{end+1} = 'antenna';
     end
-    if isset( H.SENSOR_ROT )
+    if qarts_isset( H.SENSOR_ROT )
       parts{end+1} = 'rotation';
     end
-    if isset( H.SENSOR_POL )
+    if qarts_isset( H.SENSOR_POL )
       parts{end+1} = 'polarisation';
     end
-    if isset( H.LO )  &  isset( SIDEBAND_FILTER )
+    if qarts_isset( H.LO )  &  qarts_isset( SIDEBAND_FILTER )
       parts{end+1} = 'mixer';
     end
-    if isset( H.F_BACKEND )  &  isset( CHANNEL_RESPONSE )
+    if qarts_isset( H.F_BACKEND )  &  qarts_isset( CHANNEL_RESPONSE )
       parts{end+1} = 'backend';
     end
     % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
@@ -675,7 +685,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
           U{4} = ['# No azimuthal measurement block angle grid loaded'];
         end
         U{5} = ['IndexSet(sensor_norm){' num2str(H.SENSOR_NORM) '}'];
-        U{6} = 'sensor_responseInit{}';
+        U{6} = 'sensor_responseInit';
         
       case 'antenna'
         U{1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
@@ -683,28 +693,28 @@ function T = cfile_Sensor( Q, partname, workfolder )
         U{2} = file_or_data( 'antenna_diagram', 'ArrayOfArrayOfMatrix', ...
                                                   H.ANTENNA_DIAGRAM, ...
                                                                    workfolder );
-        U{3} = 'sensor_responseAntenna1D{}';
+        U{3} = 'sensor_responseAntenna1D';
         
       case 'rotation'
         U{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, workfolder );
-        U{2} = 'sensor_responseRotation{}';
+        U{2} = 'sensor_responseRotation';
 
       case 'polarisation'
         U{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, workfolder );
-        U{2} = 'sensor_responsePolarisation{}';
+        U{2} = 'sensor_responsePolarisation';
           
       case 'mixer'
         U{1} = file_or_data( 'lo', 'Vector', H.LO, workfolder );
         U{2} = file_or_data( 'matrix_1', 'Matrix', ...
                                                  H.SIDEBAND_FILTER, ...
                                                                    workfolder );
-        U{3} = 'sensor_responseMixer(matrix_1){}';
+        U{3} = 'sensor_responseMixer(matrix_1)';
 
       case 'backend'
         U{1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, workfolder );
         U{2} = file_or_data( 'arrayofmatrix_1', 'ArrayOfMatrix', ...
                                                H.CHANNEL_RESPONSE, workfolder );
-        U{3} = 'sensor_responseBackend(arrayofmatrix_1){}';
+        U{3} = 'sensor_responseBackend(arrayofmatrix_1)';
         
       case 'multimixer'
         U{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
@@ -712,7 +722,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
         U{3} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
         U{4} = file_or_data( 'matrix_2', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
         U{5} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
-        U{6} = 'sensor_responseBackend(matrix_1,matrix_2){}';
+        U{6} = 'sensor_responseBackend(matrix_1,matrix_2)';
         
       case 'close'
         U{1} = '# End of sensor part';
@@ -757,10 +767,10 @@ function T = cfile_Jacobi( Q, partname, workfolder )
 
   do_parts = false;
   
-  if ~isset(Q.J_DO )
+  if ~qarts_isset(Q.J_DO )
      T={};
   elseif ~Q.J_DO
-    T{1} = 'jacobianOff{}';
+    T{1} = 'jacobianOff';
   elseif isstruct( Q.J )
     do_parts = true;  % code below
   else
@@ -773,7 +783,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     
     qcheck( @qartsJacobian, Q.J );
 
-    T{1} = 'jacobianInit{}';
+    T{1} = 'jacobianInit';
 
     %- Gas species
     for i = 1 : length(Q.J.ABS_SPECIES)
@@ -842,9 +852,9 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     end
     
     if length(T) > 1
-      T{end+1} = 'jacobianClose{}';    
+      T{end+1} = 'jacobianClose';    
     else
-      T{1} = 'jacobianOff{}';          
+      T{1} = 'jacobianOff';          
     end
   end  % do_parts
   
@@ -875,13 +885,13 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   % add consistency checks: Q.CLOUDBOX.METHOD and  Q.CLOUDBOX.METHOD_PRMTRS
   
-  if ~isset(Q.CLOUDBOX_DO)
+  if ~qarts_isset(Q.CLOUDBOX_DO)
      T={};
      return
   end
   
   if ~Q.CLOUDBOX_DO
-    T{1} = 'cloudboxOff{}';
+    T{1} = 'cloudboxOff';
     return
   end
   
@@ -895,7 +905,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   %= Cloudbox
   %
-  if isset (Q.CLOUDBOX.LIMITS)
+  if qarts_isset (Q.CLOUDBOX.LIMITS)
     if isvector(Q.CLOUDBOX.LIMITS) 
       if length(Q.CLOUDBOX.LIMITS) < 6
         limits = Q.CLOUDBOX.LIMITS;
@@ -917,7 +927,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   %= Particle field and single scattering data
   %
-  nset = isset(Q.CLOUDBOX.PND_FIELD) + isset(Q.CLOUDBOX.SCAT_DATA)
+  nset = qarts_isset(Q.CLOUDBOX.PND_FIELD) + qarts_isset(Q.CLOUDBOX.SCAT_DATA)
   %
   if nset == 1
     error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must both ',...
@@ -929,7 +939,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
                                                               'same length.' );
     end
     %
-    T{end+1}  = 'ParticleTypeInit{}';
+    T{end+1}  = 'ParticleTypeInit';
     do_pfCALC = false;
     %
     for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
@@ -957,20 +967,20 @@ function T = cfile_CldBox( Q, partname, workfolder )
     end
     %
     if do_pfCALC 
-      T{end+1} = 'pnd_fieldCalc{}';
+      T{end+1} = 'pnd_fieldCalc';
     end
   end
       
 
   %= Agendas for scattering properties 
   %
-  if isset(Q.CLOUDBOX.OPT_PROP_GAS_AGENDA)
+  if qarts_isset(Q.CLOUDBOX.OPT_PROP_GAS_AGENDA)
     T = add_agenda( T, 'opt_prop_gas_agenda', Q.CLOUDBOX.OPT_PROP_GAS_AGENDA );
   end
-  if isset(Q.CLOUDBOX.OPT_PROP_PART_AGENDA)
+  if qarts_isset(Q.CLOUDBOX.OPT_PROP_PART_AGENDA)
     T = add_agenda( T, 'opt_prop_part_agenda', Q.CLOUDBOX.OPT_PROP_PART_AGENDA);
   end
-  if isset(Q.CLOUDBOX.SPT_CALC_AGENDA)
+  if qarts_isset(Q.CLOUDBOX.SPT_CALC_AGENDA)
     T = add_agenda( T, 'spt_calc_agenda', Q.CLOUDBOX.SPT_CALC_AGENDA );
   end
 
@@ -1000,15 +1010,13 @@ function T = cfile_SctMth( Q, partname, workfolder )
             'and ''SctMthBatch''.']);
   end
 
-  if ~isset(Q.CLOUDBOX_DO)
+  if ~qarts_isset(Q.CLOUDBOX_DO)  |  ~Q.CLOUDBOX_DO
      T={};
      return
   end
  
   % It is assumed that cfile_CldBox has been called and checks of Q.CLOUDBOX 
   % have been performed
-
-  
   
   
   %= DOIT / MC
@@ -1052,36 +1060,36 @@ function T = cfile_SctMth( Q, partname, workfolder )
     T{end+1} = '}';
     %
     T = add_agenda( T, 'doit_mono_agenda', ...
-            { 'DoitScatteringDataPrepare{}', ...
+            { 'DoitScatteringDataPrepare', ...
               sprintf('doit_i_fieldSetClearsky{all_frequencies = %d}', ...
                                      Q.CLOUDBOX.METHOD_PRMTRS.ALL_F ), ...
-              'doit_i_fieldIterate{}',...
-              'DoitCloudboxFieldPut{}' } );
+              'doit_i_fieldIterate',...
+              'DoitCloudboxFieldPut' } );
     %
     T = add_agenda( T, 'pha_mat_spt_agenda', { ...
-        'pha_mat_sptFromDataDOITOpt{}' } );
+        'pha_mat_sptFromDataDOITOpt' } );
     
     if isempty(Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE)
       T = add_agenda( T, 'doit_scat_field_agenda', ...
-                                             { 'doit_scat_fieldCalc{}' } );
+                                             { 'doit_scat_fieldCalc' } );
     else
       T = add_agenda( T, 'doit_scat_field_agenda', ...
-                                             { 'doit_scat_fieldCalcLimb{}' } );
+                                             { 'doit_scat_fieldCalcLimb' } );
     end
     
     T = add_agenda( T, 'doit_rte_agenda', ...
-                  { sprintf('doit_i_fieldUpdateSeq%dD{}',Q.ATMOSPHERE_DIM) } );
+                  { sprintf('doit_i_fieldUpdateSeq%dD',Q.ATMOSPHERE_DIM) } );
     T = add_agenda( T, 'doit_conv_test_agenda', { ...
         sprintf('doit_conv_flagAbsBT{[%s]}', vector2commalist( ...
                        Q.CLOUDBOX.METHOD_PRMTRS.EPSILON(1:Q.STOKES_DIM)) ) } );
-    T = add_agenda( T, 'iy_cloudbox_agenda', { 'DoNothing(ppath, ppath){}',...
-            'DoNothing(rte_pos,rte_pos){}', 'DoNothing(rte_los,rte_los){}', ...
-            'iyInterpCloudboxField{}' } );
+    T = add_agenda( T, 'iy_cloudbox_agenda', { 'DoNothing(ppath, ppath)',...
+            'DoNothing(rte_pos,rte_pos)', 'DoNothing(rte_los,rte_los)', ...
+            'iyInterpCloudboxField' } );
 
     if ~strcmp( partname, 'SctMthBatch' )
-      T{end+1} = 'CloudboxGetIncoming{}';
-      T{end+1} = 'DoitInit{}';
-      T{end+1} = 'ScatteringDoit{}';
+      T{end+1} = 'CloudboxGetIncoming';
+      T{end+1} = 'DoitInit';
+      T{end+1} = 'ScatteringDoit';
     end
     
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
@@ -1160,7 +1168,7 @@ function T = cfile_BatchC( Q, partname, workfolder )
     
     T{end+1} = file_or_data( batchname, batchtype, Q.BATCH.DATA(i).X, ...
                              workfolder, sprintf('%s_batch.xml',mainname) );
-    A{end+1} = sprintf( '%sExtractFrom%s(%s,%s,ybatch_index){}', ...
+    A{end+1} = sprintf( '%sExtractFrom%s(%s,%s,ybatch_index)', ...
                         Q.BATCH.DATA(i).TYPE, ...
                         batchtype, ...
                         mainname, ...
@@ -1175,7 +1183,7 @@ function T = cfile_BatchC( Q, partname, workfolder )
   %- Make actual calculations
   %
   T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', Q.BATCH.N );
-  T{end+1} = 'ybatchCalc{}';
+  T{end+1} = 'ybatchCalc';
   %
   T{end+1} = add_savefile( 'ybatch', workfolder );
   
@@ -1243,18 +1251,9 @@ function T = add_wsms( T, field, strarray )
 return
 
 
-function flag = isset( qfield )
-  if iscell(qfield) & length(qfield) == 0
-    flag = 0;
-  else
-    flag = 1;
-  end  
-return
-
-
 function T = add_includes( T, name, field );
   %
-  if isset( field )
+  if qarts_isset( field )
     if ~iscellstr( field )
       error( sprintf('%s must be given as a cell array of strings.',name) );
     end
@@ -1276,7 +1275,7 @@ function [T,do_mc] = add_rtecalc( Q )
   %
   T = {};
   %
-  if isset( Q.Y_UNIT )
+  if qarts_isset( Q.Y_UNIT )
     if ischar(Q.Y_UNIT)
       T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
     else
@@ -1284,7 +1283,7 @@ function [T,do_mc] = add_rtecalc( Q )
     end  
   end
   %
-  if isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO
+  if qarts_isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO
     %
     % Some checks of Q.CLOUDBOX performed already in cfile_CldBox
     %
@@ -1324,15 +1323,15 @@ function [T,do_mc] = add_rtecalc( Q )
     %
   end
   %  
-  if isset( Q.J_DO )  &  Q.J_DO
+  if qarts_isset( Q.J_DO )  &  Q.J_DO
     % Existence of field UNIT made as part of cfile_Jacobi
-    rqre_char( 'Qarts field Y_UNIT', Q.J.UNIT );
-    T{i+1} = sprintf( 'StringSet(jacobian_unit,"%s")', Q.J.UNIT );
+    rqre_char( 'Qarts field J.UNIT', Q.J.UNIT );
+    T{end+1} = sprintf( 'StringSet(jacobian_unit,"%s")', Q.J.UNIT );
     %
     T{end+1} = 'RteCalc';
     T{end+1} = 'jacobianCalc';
   else
-    T{i+1} = 'RteCalcNoJacobian{}';
+    T{end+1} = 'RteCalcNoJacobian';
   end
 return  
 %------------------------------------------------------------------------------
