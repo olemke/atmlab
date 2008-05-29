@@ -45,6 +45,15 @@ set_defaults;
 Q  = qarts;
 
 
+%= Overall settings
+%
+Q.CLOUDBOX_DO       = 0;
+Q.J_DO              = 0;
+Q.SENSOR_DO         = 0;
+%
+Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+
 
 %= General part
 %
@@ -52,11 +61,12 @@ f                   = linspace( 501.18e9, 501.58e9, 3 );
 Q.F_GRID            = f; 
 Q.STOKES_DIM        = 2;
 %
-Q.ABS_SPECIES{1}{1} = 'O3';
-Q.ABS_SPECIES{2}{1} = 'H2O-*-495e9-510e9';   % Some local lines not in MPM
-Q.ABS_SPECIES{2}{2} = 'H2O-MPM89';
-Q.ABS_SPECIES{3}{1} = 'N2-SelfContStandardType';
-
+Q.ABS_SPECIES{1}{1} = 'ClO';
+Q.ABS_SPECIES{2}{1} = 'O3';
+Q.ABS_SPECIES{3}{1} = 'N2O';
+Q.ABS_SPECIES{4}{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
+Q.ABS_SPECIES{4}{2} = 'H2O-PWR98';
+Q.ABS_SPECIES{5}{1} = 'N2-SelfContStandardType';
 
 
 %= Define atmosphere and surface
@@ -65,36 +75,39 @@ Q.ATMOSPHERE_DIM      = 1;
 %
 Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
 %
-Q.USE_RAW_ATMOSPHERE  = 1;
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
+%
+Q.USE_RAW_ATMOSPHERE  = 1;
+Q.RAW_ATM_EXPAND_1D   = 0;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
 %
-Q.Z_SURFACE      = 500;
-
+Q.R_GEOID             = constants( 'EARTH_RADIUS' );
+Q.Z_SURFACE           = 500;
 
 
 %= Absorption
 %
 Q.ABS_LINES_FORMAT = 'Arts';
 Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
+Q.ABS_NLS          = [];
 %
 Q                  = qarts_abstable( Q );
 
 
-
 %= Set RTE variables
 %
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{5e3}' };
+Q.PPATH_LMAX        = 5e3;
+Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
 Q.Y_UNIT            = 'RJBT';
 %
 zplat        = 600e3;
 sensor_pos   = Q.R_GEOID + zplat;
-Q.SENSOR_POS = ones(length(ztan),1).*sensor_pos; 
-Q.SENSOR_LOS =  geomztan2za( Q.R_GEOID, zplat, ztan )';
+Q.SENSOR_POS = repmat( sensor_pos, length(ztan), 1 ); 
+Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan )';
 
 
 
@@ -102,6 +115,11 @@ Q.SENSOR_LOS =  geomztan2za( Q.R_GEOID, zplat, ztan )';
 %
 y_c = arts_y( Q );
 
+
+
+%= Setting structure for cloudbox and scattering solution method
+%
+C = qartsCloudbox;
 
 
 %- Define 1D cloudbox and particles
@@ -141,7 +159,12 @@ C.PND_FIELD{1} = box_pnd_mono_size_1d(alt, imc, r);
 
 
 % Set up scattering method
+
+%- Agenda used by both DOIT and MC
 %
+C.OPT_PROP_GAS_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddGas', ...
+                                                        'abs_vecAddGas' };
+
 if do_mc
 
   %- Expand to 3D
@@ -186,6 +209,9 @@ else
   C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
   C.METHOD_PRMTRS.ALL_F           = 0;
   %
+  C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
+                                                         'abs_vecAddPart' };
+  C.SPT_CALC_AGENDA = { 'opt_prop_sptFromMonoData' };
 end
 
 

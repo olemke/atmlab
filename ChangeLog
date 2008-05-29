@@ -1,3 +1,26 @@
+2008-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-6
+
+	* Larger revision of qarts, beside for sensor and jacobian parts.
+	The demos listed below run and results look OK. MC calculations
+	for more than frequency do not work, due to an incorrect treatment
+	of f_index in RteCalcMC (or rather poor treatment of f_index
+	generally inside arts).
+	
+	* demos/qarts_scattering_demo.m: Updated. 
+	* demos/qarts_demo.m: Updated, beside sensor part. 
+	* demos/qarts_demo2.m: Updated, beside sensor part. 
+
+	* arts/qarts2cfile.m: Changes in absorption, cloud box, scattering
+	method and basic parts to match recent changes in arts.
+
+	* arts/qarts_abstable.m: Improved header and check of Q. 
+
+	* time/mjd2localtime.m: Added to atmlab. 
+
+	* geoplots/shift_longitudes.m: Added to atmlab.
+
 2008-05-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-5

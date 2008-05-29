@@ -103,6 +103,7 @@ Q.USE_RAW_ATMOSPHERE = 0;
 %
 Q.ABS_LINES_FORMAT = 'Arts';
 Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
+Q.ABS_NLS          = [];
 %
 Q                  = qarts_abstable( Q );
 Q.ABS_LOOKUP       = arts_abstable( Q );
