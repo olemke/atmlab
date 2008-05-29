@@ -1,5 +1,14 @@
 2008-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-7
+
+	* MC calculations appear to work again (without f_index fix).
+	
+	* arts/qarts2cfile.m: Removed temporary fix for MC concerning
+	f_index. Possible after change in arts.
+
+2008-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-6
 
 	* Larger revision of qarts, beside for sensor and jacobian parts.

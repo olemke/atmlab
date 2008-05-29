@@ -1317,10 +1317,6 @@ function [T,do_mc] = add_rtecalc( Q )
     rqre_bool( 'CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D', ...
                         Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
     %
-      
-    T{end+1} = 'IndexSet(f_index,0)';
-    warning( 'WSV *f_index* not correctly treated.' )
-    
     T{end+1} = 'RteCalcMC(';
     T{end+1} = '   y,mc_error,iy_space_agenda,surface_prop_agenda,';
     T{end+1} = '   opt_prop_gas_agenda,abs_scalar_gas_agenda,atmosphere_dim,';
