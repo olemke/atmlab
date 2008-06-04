@@ -1,3 +1,12 @@
+2008-06-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-3-8
+
+	* xml/xmlReadArrayOfLineRecord.m:
+
+	Added routine to read ARTS XML catalogue files. Partly fixes
+	ticket #6.
+
 2008-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-7
