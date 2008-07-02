@@ -1,4 +1,31 @@
 2008-07-02  Oliver Lemke  <olemke@core-dump.info>
+	
+	* atmlab-0-3-10
+
+	* Quick commit (before the bus leaves) of writing routines for GFields. 
+	No time for testing, but should work.
+
+	* xml/xmlWriteGFieldWrapper:
+
+	Added wrapper function for writing GFields.
+	Called by the xmlReadGriddedFieldX function to write GFields of
+	arbitray dimensions.
+
+	* xml/xmlWriteGriddedField[34]:
+
+	Adapt it for the new GFields.
+
+	* xml/xmlReadGriddedField[12]:
+
+	Added.
+
+	* xml/xmlReadGFieldWrapper.m: Small doc fixes.
+
+	* xml/xmlWriteVector.m, xml/xmlWriteArrayOf.m
+
+	Add the option to pass an attrlist to the writing function.
+
+2008-07-02  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-3-9
 

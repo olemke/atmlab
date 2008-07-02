@@ -5,7 +5,7 @@
 %
 %    Calls *xmlReadTag* for every member of the GField structure.
 %
-% FORMAT   result = xmlReadGriddedField3(fid, attrlist, itype, ftype, binary, fid2)
+% FORMAT   result = xmlReadGFieldWrapper(fid, attrlist, itype, ftype, binary, fid2, dim)
 %
 % OUT   result     GField
 % IN    fid        File descriptor of XML file
@@ -16,7 +16,7 @@
 % IN    fid2       File descriptor of binary file
 % IN    dim        Dimension of the GField to read
 
-% 2004-02-20       Created by Oliver Lemke.
+% 2008-07-02       Created by Oliver Lemke.
 
 function result = xmlReadGFieldWrapper(fid, attrlist, itype, ftype, binary, fid2, dim)
 

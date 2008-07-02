@@ -9,10 +9,11 @@
 % IN    data       Array
 % IN    type       Data type as string
 % IN    precision  Precision for floats
+% IN    attrlist   Attribute list
 
 % 2002-12-16  Created by Oliver Lemke.
 
-function xmlWriteArrayOf(fid, data, type, precision)
+function xmlWriteArrayOf(fid, data, type, precision, attrlist)
 
 nrows = size (data, 1);
 ncols = size (data, 2);
@@ -23,8 +24,10 @@ end
 
 nelem = length (data);
 
-attrlist = [];
-attrlist = xmlAddAttribute ([], 'type', type);
+if (nargin < 5)
+  attrlist = [];
+end
+attrlist = xmlAddAttribute (attrlist, 'type', type);
 attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);
 for i = 1:nelem
