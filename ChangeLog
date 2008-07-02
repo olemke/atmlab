@@ -1,3 +1,37 @@
+2008-07-02  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-3-9
+
+	* This version break code compatibility for GriddedField3 and
+	GriddedField4!!!!
+
+	The structure elements for the grids are no longer named p_grid,
+	lat_grid, and lon_grid, but are now a cell array. A GriddedField3 for
+	example has changed in the following way:
+
+	gfield.p_grid   => gfield.grids{1}
+	gfield.lat_grid => gfield.grids{2}
+	gfield.lon_grid => gfield.grids{3}
+
+	Additionally an array with the names of the grids (gfield.gridnames)
+	has been added.
+
+	* xml/xmlReadTag.m: Return attribute list to calling function.
+
+	* xml/xmlReadGFieldWrapper:
+
+	Added wrapper function for reading GFields.
+	Called by the xmlReadGriddedFieldX function to read GFields of
+	arbitray dimensions.
+
+	* xml/xmlReadGriddedField[34]:
+
+	Adapt it for the new GFields.
+
+	* xml/xmlReadGriddedField[12]:
+
+	Added.
+
 2008-06-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-3-8

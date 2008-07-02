@@ -19,8 +19,4 @@
 
 function result = xmlReadGriddedField3(fid, attrlist, itype, ftype, binary, fid2)
 
-  result.p_grid   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.lat_grid = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.lon_grid = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-
+  result = xmlReadGFieldWrapper(fid, attrlist, itype, ftype, binary, fid2, 3);

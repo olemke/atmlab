@@ -15,7 +15,7 @@
 
 % 2002-11-28   Created by Oliver Lemke.
 
-function result = xmlReadTag(fid, filename, itype, ftype, binary, fid2)
+function [result,attrlist] = xmlReadTag(fid, filename, itype, ftype, binary, fid2)
 
 toplevel = 0;
 exit_loop = 0;
