@@ -1,3 +1,10 @@
+2008-07-24  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-11
+
+	* xml/xmlWriteGFieldWrapper.m (xmlWriteGFieldWrapper): Fixed "feature"
+	of crash for empty grids, together with Oliver.
+
 2008-07-02  Oliver Lemke  <olemke@core-dump.info>
 	
 	* atmlab-0-3-10

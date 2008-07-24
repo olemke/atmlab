@@ -21,7 +21,7 @@ function xmlWriteGFieldWrapper(fid, data, precision, dim)
 
   for i = 1:dim
     attrlist = xmlAddAttribute ([], 'name', data.gridnames{i});
-    if (iscellstr(data.grids{i}(1)))
+    if (length(data.grids{i})~=0 && iscellstr(data.grids{i}(1)))
       xmlWriteArrayOf (fid, data.grids{i}, 'String', precision, attrlist);
     else
       xmlWriteVector (fid, data.grids{i}, precision, attrlist);
