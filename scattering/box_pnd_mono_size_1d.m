@@ -1,5 +1,5 @@
 %-----------------------------------------------------------------------------
-%  PND_MONO_SIZE_1D  Generates simple particle numbr density field
+%  PND_MONO_SIZE_1D  Generates simple particle number density field
 % 
 %  This function generates the particle number density field for a 
 %  very simple 1D cirrus cloud layer. It assumes a monochromatic
@@ -9,9 +9,8 @@
 % 
 %  FORMAT pnd_field = box_pnd_mono_size_1d(z_limits, imc, r)
 % 
-%  OUT    pnd        particle number density (ARTS data format
-%                                         GriddedField3) 
-%  IN     z_limits   cloud altitude [z1 z2]  [m]
+%  OUT    pnd        particle number density (ARTS data format GField3) 
+%  IN     z_limits   cloud altitude     [z1 z2]  [m]
 %         imc        ice mass content   [kg/m^3]
 %         r          radius             [m]
 % 
@@ -39,9 +38,10 @@ p_grid = [1000e2 p_limits(1)+10 p_limits(1) p_limits(2) p_limits(2)-10 1];
 % Assign pnd values
 data(:,1,1) = [0 0 pnd pnd 0 0];
 
-% Create gridded field
-pnd_field.p_grid = p_grid;
-pnd_field.lat_grid = [0];
-pnd_field.lon_grid = [0];
-pnd_field.data = data;
+% Create GField3
+%
+pnd_field.grids     = { p_grid, [0], [0] };
+pnd_field.gridnames = { 'Pressure', 'Latitude', 'Longitude' };
+%
+pnd_field.data  = data;
 

@@ -1,10 +1,10 @@
-% GFXMLIN_GRIDDEDFIELD3   Import of XML GriddedField3 data to gformat 
+% GFXMLIN_GRIDDEDFIELD3   Import of XML GField3 data to gformat 
 %
-%    Imports data having the arts xml GriddedField3 format. Imports either
+%    Imports data having the arts xml GField3 format. Imports either
 %    directly from file, or from corresponding matlab structure. 
 %
 %    If no format is specified (that is, empty D and G), D is set to match 
-%    the definition of the GriddedField3 type:
+%    the definition of the GField3 type:
 %       D.DIM        = 3;
 %       D.GRID1_NAME = 'Pressure';
 %       D.GRID1_UNIT = 'Pa';

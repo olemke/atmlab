@@ -1,3 +1,19 @@
+2008-08-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-12
+
+	* Qarts updated to changes in arts, but work not finished. Gformat
+	and asg functions matching GFields are not yet updated.
+
+	* arts/qarts2cfile.m: Adjusted to introduction of y_f, y_pos, mc_std_err
+	etc. in arts.
+
+	* arts/arts_y.m: Adjusted to introduction of y_f, y_pos etc. in arts. 
+
+	* demos/qarts_scattering_demo.m: Adjusted to introduction of GFields. 
+
+	* scattering/box_pnd_mono_size_1d.m: As above. 
+
 2008-07-24  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-0-3-11

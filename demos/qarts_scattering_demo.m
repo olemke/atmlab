@@ -155,7 +155,7 @@ alt = [10e3 13e3];
 C.SCAT_DATA{1} = mie_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r ); 
 
 % Calculate a pnd field for a homogeneous cloud
-C.PND_FIELD{1} = box_pnd_mono_size_1d(alt, imc, r);
+C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
 
 % Set up scattering method
@@ -181,12 +181,12 @@ if do_mc
   %
   csize                           = 1;
   C.LIMITS                        = [ C.LIMITS csize*[-2 2 -2 2] ];
-  C.PND_FIELD{1}.lat_grid         = [ -90 csize*[-2 -1.5 1.5 2] 90 ];
-  C.PND_FIELD{1}.lon_grid         = C.PND_FIELD{1}.lat_grid;
+  C.PND_FIELD{1}.grids{2}         = [ -90 csize*[-2 -1.5 1.5 2] 90 ];
+  C.PND_FIELD{1}.grids{3}         = C.PND_FIELD{1}.grids{2};
   p                               = C.PND_FIELD{1}.data;
-  C.PND_FIELD{1}.data             = zeros( length( C.PND_FIELD{1}.p_grid ),...
-                                          length( C.PND_FIELD{1}.lat_grid ),...
-                                           length( C.PND_FIELD{1}.lon_grid ) );
+  C.PND_FIELD{1}.data             = zeros( length( C.PND_FIELD{1}.grids{1} ),...
+                                           length( C.PND_FIELD{1}.grids{2} ),...
+                                           length( C.PND_FIELD{1}.grids{3} ) );
   C.PND_FIELD{1}.data(:,3:4,3:4)  = repmat(p,[1 2 2]);
 
   %- MC variables

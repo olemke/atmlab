@@ -333,7 +333,8 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     if isscalar( Q.Z_SURFACE )
       T{end+1} = 'ncolsGet( ncols, r_geoid )';
       T{end+1} = 'nrowsGet( nrows, r_geoid )';
-      T{end+1} = sprintf('MatrixSet(z_surface,nrows,ncols,%.3f)', Q.Z_SURFACE );
+      T{end+1} = sprintf('MatrixSetConstant(z_surface,nrows,ncols,%.3f)', ...
+                                                                  Q.Z_SURFACE );
     else
       T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, workfolder );
     end
@@ -571,7 +572,11 @@ function T = cfile_RteExe( Q, partname, workfolder )
   %
   [T,do_mc] = add_rtecalc(Q);
    
-  T{end+1} = add_savefile( 'y', workfolder );
+  T{end+1} = add_savefile( 'y',     workfolder );
+  T{end+1} = add_savefile( 'y_f',   workfolder );
+  T{end+1} = add_savefile( 'y_pol', workfolder );
+  T{end+1} = add_savefile( 'y_pos', workfolder );
+  T{end+1} = add_savefile( 'y_los', workfolder );
   %
   if do_mc
     T{end+1} = add_savefile( 'mc_error', workfolder ); 
@@ -739,16 +744,15 @@ function T = cfile_Sensor( Q, partname, workfolder )
   
   %- Saving
   %
-  T{end+1} = add_savefile( 'sensor_response_f', workfolder );
-  T{end+1} = add_savefile( 'sensor_response_za', workfolder );
-  T{end+1} = add_savefile( 'sensor_response_aa', workfolder );
-  T{end+1} = add_savefile( 'sensor_response_pol', workfolder );
-  %
   if strcmp( partname, 'SensorSave' )
-    T{end+1} = add_savefile( 'sensor_response', workfolder );
-    T{end+1} = add_savefile( 'antenna_dim', workfolder );
-    T{end+1} = add_savefile( 'mblock_za_grid', workfolder );
-    T{end+1} = add_savefile( 'mblock_aa_grid', workfolder );
+    T{end+1} = add_savefile( 'sensor_response',     workfolder );
+    T{end+1} = add_savefile( 'sensor_response_f',   workfolder );
+    T{end+1} = add_savefile( 'sensor_response_za',  workfolder );
+    T{end+1} = add_savefile( 'sensor_response_aa',  workfolder );
+    T{end+1} = add_savefile( 'sensor_response_pol', workfolder );
+    T{end+1} = add_savefile( 'antenna_dim',         workfolder );
+    T{end+1} = add_savefile( 'mblock_za_grid',      workfolder );
+    T{end+1} = add_savefile( 'mblock_aa_grid',      workfolder );
   end
 
 return
@@ -1317,20 +1321,18 @@ function [T,do_mc] = add_rtecalc( Q )
     rqre_bool( 'CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D', ...
                         Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
     %
-    T{end+1} = 'RteCalcMC(';
-    T{end+1} = '   y,mc_error,iy_space_agenda,surface_prop_agenda,';
-    T{end+1} = '   opt_prop_gas_agenda,abs_scalar_gas_agenda,atmosphere_dim,';
-    T{end+1} = '   p_grid,lat_grid,lon_grid,z_field,t_field,vmr_field,r_geoid,';
-    T{end+1} = '   z_surface,cloudbox_on,cloudbox_limits,pnd_field,';
-    T{end+1} = '   scat_data_raw,sensor_response,sensor_pos,sensor_los,f_grid,';
-    T{end+1} = '   stokes_dim,antenna_dim,mblock_za_grid,mblock_aa_grid,y_unit,';
-    T{end+1} = sprintf( '   %.3e,%d,%d,%d',...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR, ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME, ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, ...
+    T{end+1} = sprintf( 'NumericSet(mc_std_err,%.3e)', ...
+                                       Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
+    T{end+1} = sprintf( 'IndexSet(mc_max_time,%d)', ...
+                                       Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
+    T{end+1} = sprintf( 'IndexSet(mc_max_iter,%d)', ...
+                                       Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
+    T{end+1} = sprintf( 'IndexSet(mc_z_field_is_1D,%d)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    T{end+1} = ')';
-  
+    %
+    T{end+1} = 'RteCalcMC';
+
+    
   %----------
   %- Non-MC 
   %----------

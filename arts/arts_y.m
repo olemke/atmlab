@@ -9,7 +9,7 @@
 % OUT   y            Spectrum vector.
 %       ydata        Data to determine frequency, position and LOS for each 
 %                    value of *y*. A structure with fields: 
-%                    'f', 'pos' and 'los'.
+%                    'f', 'pol', 'pos' and 'los', corresponding to *y_f* etc.
 %       dy           Estimate of calculation accuracy.
 %       J            Jacobian. NaN returned if Q.J not defined.
 %       jq           Jacobian quantities. NaN returned if Q.J not defined.
@@ -95,19 +95,10 @@ y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
 
 
 if nargout >= 2
-  ydata.f   = xmlLoad( fullfile( workfolder, 'sensor_response_f.xml' ) );
-  ydata.pos = xmlLoad( fullfile( workfolder, 'sensor_pos.xml' ) );
-  ydata.los = xmlLoad( fullfile( workfolder, 'sensor_los.xml' ) );
-  %
-  za        = xmlLoad( fullfile( workfolder, 'sensor_response_za.xml' ) );
-  aa        = xmlLoad( fullfile( workfolder, 'sensor_response_aa.xml' ) );
-  %
-  if ~isempty(za)
-    ydata.los(:,1) = ydata.los(:,1) + za;
-  end
-  if ~isempty(aa)
-    ydata.los(:,2) = ydata.los(:,2) + aa;
-  end
+  ydata.f   = xmlLoad( fullfile( workfolder, 'y_f.xml' ) );
+  ydata.pol = xmlLoad( fullfile( workfolder, 'y_pol.xml' ) );
+  ydata.pos = xmlLoad( fullfile( workfolder, 'y_pos.xml' ) );
+  ydata.los = xmlLoad( fullfile( workfolder, 'y_los.xml' ) );
   %
   if mc
     dy = xmlLoad( fullfile( workfolder, 'mc_error.xml' ) );
