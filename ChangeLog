@@ -1,3 +1,17 @@
+2008-09-04  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-13
+
+	* math/rms.m (rms): Added. Calculates RMS of a vector or matrix
+	(always scalar return, but that may be changed).
+
+	* arts/optimize_f_grid_hirs.m (optimize_f_grid_hirs): Added. Not
+	yet tested properly. 
+
+	* arts/optimize_f_grid_amsu.m (optimize_f_grid_amsu): Added. Used
+	to derive a reduced frequency grid for AMSU, now included in
+	amsub_fast.arts in arts includes directory.
+
 2008-08-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-12
