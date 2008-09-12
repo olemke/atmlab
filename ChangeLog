@@ -1,3 +1,11 @@
+2008-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-14
+
+	* arts/arts_y.m (arts_y): Identification of MC had not been updated.
+
+	* math/gauss.m (gauss): Now handles vector/matrix x.
+
 2008-09-04  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-0-3-13

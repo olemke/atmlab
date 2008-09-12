@@ -18,10 +18,12 @@ atmlab( 'FMODEL_VERBOSITY', 0 );
 
 
 
+
+
 %= Qarts
 %
-y0 = [ 4.149 27.912 ];
-dy = 1e-3;
+y0 = [ 4.107 27.918 ];
+dy = 1e-2;
 %
 try
   [Q,f,y] = qarts_demo;
@@ -35,8 +37,64 @@ if any( abs( [min(y) max(y)] - y0 ) > dy )
   reset_verbosity( va, vf );
   error('Unexpected result from *qarts_demo*');
 end
+%
+try
+  [Q,f,y] = qarts_demo2;
+catch
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *qarts_demo* ===\n\n');
+  rethrow(lasterror);
+end
+%
+if any( abs( [min(y) max(y)] - y0 ) > dy )
+  reset_verbosity( va, vf );
+  error('Unexpected result from *qarts_demo2*');
+end
 
 
+
+%= Qarts with DOIT
+%
+y0 = [ 152.47 -0.21 ];
+dy = 1e-2;
+%
+try
+  [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo;
+catch
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');
+  rethrow(lasterror);
+end
+%
+if any( abs( y(end+[-1:0])' - y0 ) > dy )
+  reset_verbosity( va, vf );
+  error('Unexpected result from *qarts_doit_demo*');
+end
+
+
+
+%= Qarts with MC
+%
+y0 = [ 152.47 -0.21 ];
+%
+try
+  [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo([],1);
+catch
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');
+  rethrow(lasterror);
+end
+%
+if any( abs( y(end+[-1:0])' - y0 ) > dy )
+  reset_verbosity( va, vf );
+  error('Unexpected result from *qarts_doit_demo*');
+end
+
+
+
+
+% Parts not updated
+if 0
 
 %= Qarts1
 %
@@ -76,27 +134,7 @@ if any( abs( (yj-y)./y ) > 0.06 )
   error('Unexpected result from *qarts_jacobian_demo*');
 end
 
-
-
-%= DOIT
-%
-y0 = [ 190.606 0.173 ];
-dy = 1e-2;
-%
-try
-  [Q,f,y_c,y] = qarts_doit_demo( 6e3 );
-catch
-  reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');
-  rethrow(lasterror);
 end
-%
-if any( abs( y(1:2)' - y0 ) > dy )
-  reset_verbosity( va, vf );
-  error('Unexpected result from *qarts_doit_demo*');
-end
-
-
 
 
 %== Finished

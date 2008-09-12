@@ -17,5 +17,4 @@
 
 function y = gauss(x,s,m)
 
-y = 1.0 / ( s * sqrt(2.0*pi) ) ...
-    * exp( -0.5 * ((x-m)/s)^2 );
+y = 1.0 / ( s * sqrt(2.0*pi) ) * exp( -0.5 * ((x-m)/s).^2 );

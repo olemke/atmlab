@@ -50,7 +50,7 @@ ji = NaN;
 
 
 
-if isstruct( Q.CLOUDBOX_DO )  & strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
+if Q.CLOUDBOX_DO  & strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
   mc = 1;
 else
   mc = 0;
