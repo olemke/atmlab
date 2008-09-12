@@ -1,5 +1,17 @@
 2008-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-15
+
+	* tests/make_check.m: Now updated and slightly extended. Now
+	checks that qarts_demo, qarts_demo2, qarts_scattering_demo (MC and
+	DOIT version) and qarts1_demo run OK and result is as expected.
+	
+	* demos/qarts1_demo.m: Now using lines501.4_v1
+
+	* demos/data/lines501.4_v1: Copy of lines501.4, but in old format.
+
+2008-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-14
 
 	* arts/arts_y.m (arts_y): Identification of MC had not been updated.

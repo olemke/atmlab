@@ -39,7 +39,7 @@ Q.TGS{5}{1} = 'N2-SelfContStandardType';
 Q.F_MONO         = linspace( 501.18e9, 501.58e9, 201 );
 %
 Q.LINEFORMAT    = 'Arts';
-Q.LINEDATA      = fullfile( atmlab_example_data , 'lines501.4' );
+Q.LINEDATA      = fullfile( atmlab_example_data , 'lines501.4_v1' );
 
 
 %= Atmosphere
