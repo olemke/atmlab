@@ -1,3 +1,17 @@
+2008-09-23  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-16
+
+	* graphs/histout2plotvecs.m: Added this function. It converts the
+	output of matlab's hist command to two vectors that can be plotted
+	with plot.
+	This function is handy to make histogram plots where only the top
+	contour is shown, not the bars.  In that style, several histograms
+	can be plotted in one graph.
+	The trick is that we are not just connecting the histogram points
+	by a straight line, but we plot little stairs corresponding to the
+	histogram bins.
+
 2008-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-15
