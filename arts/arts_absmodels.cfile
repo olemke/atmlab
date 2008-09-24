@@ -1,95 +1,133 @@
+Arts2 {
+
 # This file contains standard choices for ARTS "continua".
 # Focus is on more recent complete absorption models.
 
+#
 # Complete H2O absorption models (lines + continuum)
-abs_cont_descriptionAppend{
-    tagname        = "H2O-MPM89"
-    model          = "MPM89"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "H2O-MPM93"
-    model          = "MPM93"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "H2O-CP98"
-    model         = "CruzPol"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "H2O-PWR98"
-    model         = "Rosenkranz"
-    userparameters = [ ]
-}
+#
 
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-MPM89",
+                            "MPM89",
+                            [ ] )
+
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-MPM93",
+                            "MPM93",
+                            [ ] )
+
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-PWR98",
+                            "Rosenkranz",
+                            [ ] )
+
+
+
+#
 # H2O continua
 #
+
 # Rosenkranz-type H2O-H2O continuum:
-abs_cont_descriptionAppend{
-    tagname        = "H2O-SelfContStandardType"
-    model          = "Rosenkranz"
-    userparameters = [ ]
-}
-#
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-SelfContStandardType",
+                            "Rosenkranz",
+                            [ ] )
+
 # Rosenkranz-type H2O-dry air continuum:
-abs_cont_descriptionAppend{
-    tagname        = "H2O-ForeignContStandardType"
-    model          = "Rosenkranz"
-    userparameters = [ ]
-}
-#
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-ForeignContStandardType",
+                            "Rosenkranz",
+                            [ ] )
+
 # Same for CKD MT 1.00
-abs_cont_descriptionAppend{
-    tagname        = "H2O-SelfContCKDMT100"
-    model          = "CKDMT100"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "H2O-ForeignContCKDMT100"
-    model          = "CKDMT100"
-    userparameters = [ ]
-}
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-SelfContCKDMT100",
+                            "CKDMT100",
+                            [ ] )
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "H2O-ForeignContCKDMT100",
+                            "CKDMT100",
+                            [ ] )
 
+
+
+#
 # Full O2 absorption models (lines + continuum)
-abs_cont_descriptionAppend{
-    tagname        = "O2-MPM89"
-    model          = "MPM89"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "O2-MPM93"
-    model         = "MPM93"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "O2-PWR93"
-    model         = "Rosenkranz"
-    userparameters = [ ]
-}
+#
 
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "O2-MPM89",
+                            "MPM89",
+                            [ ] )
+
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "O2-MPM93",
+                            "MPM93",
+                            [ ] )
+
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "O2-PWR93",
+                            "Rosenkranz",
+                            [ ] )
+
+
+
+#
 # Standard O2-air continuum:
-abs_cont_descriptionAppend{
-    tagname        = "O2-SelfContStandardType"
-    model          = "Rosenkranz"
-    userparameters = [ ]
-}
+#
 
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "O2-SelfContStandardType",
+                            "Rosenkranz",
+                            [ ] )
+
+
+
+#
 # N2 continua
-abs_cont_descriptionAppend{
-    tagname        = "N2-SelfContStandardType"
-    model          = "Rosenkranz"
-    userparameters = [ ]
-}
-abs_cont_descriptionAppend{
-    tagname        = "N2-SelfContBorysow"
-    model          = "BF86"
-    userparameters = [ ]
-}
+#
 
-## CO2 far line wing continuum from CKD F77 program:
-abs_cont_descriptionAppend{
-    tagname        = "CO2-CKDMT100"
-    model          = "CKDMT100"
-    userparameters = [ ]
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "N2-SelfContStandardType",
+                            "Rosenkranz",
+                            [ ] )
+
+
+
+#
+# CO2 far line wing continuum from CKD F77 program:
+#
+
+abs_cont_descriptionAppend( abs_cont_names,
+                            abs_cont_models,
+                            abs_cont_parameters,
+                            "CO2-CKDMT100",
+                            "CKDMT100",
+                            [ ] )
+
 }

@@ -88,25 +88,25 @@ if nargin == 1
 
   case 'GetAtmSrf'
     %
-    S = { 'Generl', 'AtmSrfSave' };
+    S = { 'Generl', 'AtmSrfSave', 'CloseF' };
 
   case 'GetAbsTable'
     %
-    S = { 'Generl', 'AtmSrf', 'AbsrptSave' };
+    S = { 'Generl', 'AtmSrf', 'AbsrptSave', 'CloseF' };
 
   case 'GetSensor'
     %
-    S = { 'Generl', 'AtmSrf', 'SensorSave' };
+    S = { 'Generl', 'AtmSrf', 'SensorSave', 'CloseF' };
    
   case 'y'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
-          'CldBox', 'SctMth', 'RteExe' };
+          'CldBox', 'SctMth', 'RteExe', 'CloseF' };
 
   case 'Batch'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
-          'CldBox', 'SctMthBatch', 'BatchC' };
+          'CldBox', 'SctMthBatch', 'BatchC', 'CloseF' };
     
   otherwise
     error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );
@@ -135,7 +135,11 @@ for ip = 1 : length(parts)
    case 'Generl'
     %
     T = cfile_Generl( Q, parts{ip}, workfolder );
-   
+
+   case 'CloseF'
+    %
+    T = cfile_CloseF( Q, parts{ip}, workfolder );
+    
    case 'AtmSrf'
     %
     T = cfile_AtmSrf( Q, parts{ip}, workfolder );
@@ -181,10 +185,6 @@ for ip = 1 : length(parts)
 
 end
 
-%- Close control file
-%
-S{end+1} = '}';
-
 return
 %------------------------------------------------------------------------------
 %--- End main
@@ -217,6 +217,10 @@ function T = cfile_Generl( Q, partname, workfolder )
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Arts2{';
+  %
+  if qarts_isset( Q. WSMS_AT_START )
+    T = add_wsms( T, ' WSMS_AT_START', Q. WSMS_AT_START );
+  end
   %
   T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
@@ -251,6 +255,25 @@ function T = cfile_Generl( Q, partname, workfolder )
     T{end+1} = add_savefile( 'f_grid', workfolder );
     T{end+1} = add_savefile( 'abs_species', workfolder );
   end  
+return
+
+
+
+%------------------------------------------------------------------------------
+% Sub-function handling:
+%
+%    Closing of cfile
+%    WSMS_AT_END
+%
+function T = cfile_CloseF( Q, partname, workfolder )
+  %
+  T = [];
+  %
+  if qarts_isset( Q. WSMS_AT_END )
+    T = add_wsms( T, ' WSMS_AT_END', Q. WSMS_AT_END );
+  end
+  %
+  T{end+1} = '}';
 return
 
 
@@ -409,23 +432,28 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       if qarts_isset( Q.ABS_LINES_FORMAT )
         %
         rqre_datatype( 'char', Q.ABS_LINES_FORMAT );
-        rqre_datatype( {'char','struct','empty'}, Q.ABS_LINES );
         %
-        if strcmp(upper(Q.ABS_LINES_FORMAT),'ARTS') & ~ischar(Q.ABS_LINES)
-          filename = fullfile( workfolder, 'abs_lines.xml' );
-          T{end+1} = file_or_data( 'abs_lines', 'ArrayOfLineRecord', ...
-                                                      Q.ABS_LINES,workfolder );
-        
+        if strcmp( upper(Q.ABS_LINES_FORMAT), 'NONE' )
+          T{end+1} = 'abs_lines_per_speciesSetEmpty';
         else
-          if ~ischar( Q.ABS_LINES )
-            error( 'Q.ABS_LINES must be a filename for formats beside Arts.' );
+          %
+          rqre_datatype( {'char','struct','empty'}, Q.ABS_LINES );
+          %
+          if strcmp(upper(Q.ABS_LINES_FORMAT),'ARTS') & ~ischar(Q.ABS_LINES)
+            filename = fullfile( workfolder, 'abs_lines.xml' );
+            T{end+1} = file_or_data( 'abs_lines', 'ArrayOfLineRecord', ...
+                                                      Q.ABS_LINES,workfolder );
+          else
+            if ~ischar( Q.ABS_LINES )
+              error( 'Q.ABS_LINES must be a filename for formats beside Arts.' );
+            end
+            filename = Q.ABS_LINES;
           end
-          filename = Q.ABS_LINES;
-        end
-        %
-        T{end+1} = sprintf( 'abs_linesReadFrom%s(abs_lines,"%s",0,1e99)', ...
+          %
+          T{end+1} = sprintf( 'abs_linesReadFrom%s(abs_lines,"%s",0,1e99)', ...
                                                 Q.ABS_LINES_FORMAT, filename );
-        T{end+1} = 'abs_lines_per_speciesCreateFromLines';
+          T{end+1} = 'abs_lines_per_speciesCreateFromLines';
+        end
       end
       %
       T = add_includes( T, 'Q.ABS_MODELS', Q.ABS_MODELS );
@@ -548,8 +576,8 @@ function T = cfile_RteSet( Q, partname, workfolder )
                                                                   workfolder );
   end
   %
-  if qarts_isset( Q.PRE_RTE_WSMS )
-    T = add_wsms( T, 'PRE_RTE_WSMS', Q.PRE_RTE_WSMS );
+  if qarts_isset( Q. WSMS_BEFORE_RTE )
+    T = add_wsms( T, ' WSMS_BEFORE_RTE', Q. WSMS_BEFORE_RTE );
   end
   %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );

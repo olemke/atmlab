@@ -1,3 +1,22 @@
+2008-09-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-17
+
+	* arts/arts_absmodels.cfile: File updated to ARTS2 cfile format.
+
+	* arts/qarts.m: Q.ABS_LINES_FORMAT can now be set to None. This is
+	now the way to trigger a call of abs_lines_per_speciesSetEmpty. If
+	this field is left empty ({}) nothing is done. It is then assumed
+	that line data are specified in an include file.
+
+	Replaced PRE_RTE_WSMS with WSMS_BEFORE_RTE. Added WSMS_AT_START
+	and WSMS_AT_END. This to allow more flexibility. The approach
+	before was to only handle "standard cases" in qarts, but as arts
+	has become more flexible that approach was abandoned for
+	arts-0.3. I now found that these fields are needed to make it
+	possible to use the full flexibility of arts (though there could
+	still be some limitations).
+	
 2008-09-23  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-0-3-16
