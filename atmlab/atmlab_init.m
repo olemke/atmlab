@@ -52,6 +52,7 @@ addpath( fullfile( toppath, 'arts1' ) );
 addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
+addpath( fullfile( toppath, 'annealing' ) ); 
 
 
 %=== Check if functions from newer Matlab versions shall be included

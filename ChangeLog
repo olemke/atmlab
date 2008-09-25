@@ -1,3 +1,37 @@
+2008-09-25  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-18
+
+        * annealing: Added this directory, which contains a function
+	package to optimize frequency grid by simulated annealing. The
+	only inputs used are a batch of monochromatic brightness
+	temperatures, and a sensor response matrix, so the functions are
+	fairly general.
+	
+        * annealing/Contents.m: Added.
+	
+        * annealing/neighbour.m: Added. Pick a random neighbor to the
+	current selection.
+	
+        * annealing/pick_random_freq.m: Added. Pick a random frequency.
+	
+        * annealing/test_freq_set.m: Added. Test calculation of given
+	frequency selection.
+	
+        * annealing/weights.m: Added. Calculates weights for selected
+	frequencies by linear regression.
+	
+        * annealing/find_best_freq_set_anneal.m. Added. This is the main
+	annealing function. It finds the best set of N frequencies, where
+	N is fix.
+	
+        * annealing/loop_anneal.m: Added. This is a higher level function,
+	that loops over find_best_freq_set_anneal, increasing the number
+	of frequencies until the desired accuracy is reached. For a single
+	HIRS channel, 7 frequencies gave an accuracy of 0.007 K.
+
+	* atmlab/atmlab_init.m: Added directory annealing.
+
 2008-09-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-17
