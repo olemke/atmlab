@@ -31,7 +31,7 @@ while ~feof (fid) & c ~= '>'
   value = '';
   c = fgets (fid, 1);
   while ~feof (fid) & c ~= '"'
-    value = strcat(value, c);
+    value = [ value c ];
     c = fgets (fid, 1);
   end
 
