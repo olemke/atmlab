@@ -27,12 +27,12 @@ if nargin==1
    set_defaults;
 end
 
-fascod     = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'atmosphere',...
+fascod = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'atmosphere',...
                       'fascod',[s,'.z.xml']);
 
-data=xmlLoad(fascod);
+data   = xmlLoad(fascod);
 
-p=exp(interp1(data.data,log(data.p_grid),z));
+p      = exp(interp1(data.data,log(data.p_grid),z));
 
 if ~isempty(isnan(p))
    warning(['input data is nan or p values are out of range.',...

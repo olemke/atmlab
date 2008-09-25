@@ -4,7 +4,7 @@
 %          If it is desired G(1+i) will holds
 %          auxilirary data
 %
-% FORMAT   G=gfcloudsat_in( D, G, data, fields, z_grid, leg,latitude,dBZemin)
+% FORMAT   [G,D]=gfin_cloudsat_dBZe( D, G, data, aux, z_grid, leg, latitude, dBZemin)
 % 
 % IN       D        G format definition structure 
 %                   can be empty
@@ -89,7 +89,7 @@ end
 
 if any( dims == 0 )
     error( [ 'Setting of *dims* failed. Altitude, latitude or ',...
-             'longitude was nof found among the grid names.' ] );
+             'longitude was not found among the grid names.' ] );
 end
 
 if ~isempty(aux)

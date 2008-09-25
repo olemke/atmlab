@@ -1,3 +1,18 @@
+2008-09-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-20
+
+	* Made interface functions between gformat and xml GriddedField files.
+	
+	* gformat/gfout_artsxml.m: Created
+
+	* gformat/gfin_artsxml.m: Created.
+
+	* gformat/gfxmlin_GriddedField3.m: Replaced with more general
+	function gfin_artsxml.
+	
+	* gformat/gf_append.m: Created.
+
 2008-09-25  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-3-19
