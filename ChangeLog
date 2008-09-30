@@ -1,3 +1,14 @@
+2008-09-29  Gerrit Holl  <gerrit.holl@gmail.com>
+
+	* atmlab-0-3-21
+
+	* atovs/zamsu2llc.sh:
+
+	This file was an old version. A newer version exists in
+	atovs_tools/shell_scripts/zamsu2l1c.sh. I moved the never version here.
+	This is not ideal (there should be one and only one version) but for now
+	it's better than someone else getting the same confusion that I did.
+
 2008-09-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-20

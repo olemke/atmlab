@@ -32,15 +32,15 @@ case $HOSTOS in
 esac
 
 # If no absolute path is given for output file, prepend current dir
-[ "$(echo "$L1CFILE" | sed 's/^\(.\).*$/\1/')" != "/" ] \
+[ "$L1CFILE" ] && [ "$(echo "$L1CFILE" | sed 's/^\(.\).*$/\1/')" != "/" ] \
 && L1CFILE="$(pwd)/$L1CFILE"
 
 trap "cd $OLDDIR; [ -e $TMPD/atovin.log ] && cp $TMPD/atovin.log .; rm -rf $TMPD" QUIT TERM KILL EXIT
 
-if [ ! $# -eq 2 ]
+if [ ! $# -eq 2 -a ! $# -eq 1 ]
     then
     echo 1
-    echo "Usage: $(basename $0) INFILE OUTFILE"
+    echo "Usage: $(basename $0) INFILE [OUTFILE]"
     exit 1
 fi
 
@@ -52,7 +52,7 @@ if [ ! -r $AMSUFILE ]
     exit 1
 fi
 
-[ -e "$L1CFILE" ] && rm -f $L1CFILE
+[ "$L1CFILE" ] && [ -e "$L1CFILE" ] && rm -f $L1CFILE
 
 MKDIRERROR=no
 mkdir -p $TMPD || MKDIRERROR=yes
@@ -66,7 +66,7 @@ fi
 
 cd $TMPD
 
-FORMAT=`basename $AMSUFILE | sed "s/^...\.\(....\)\..*$/\1/"`
+FORMAT=`basename $AMSUFILE | sed "s/^.*NSS\.\(....\)\..*$/\1/"`
 case $FORMAT in
     AMAX) FORMAT=AMSU-A
     INFILE=aman.l1b;;
@@ -74,6 +74,8 @@ case $FORMAT in
     INFILE=ambn.l1b;;
     HIRX) FORMAT=HIRS
     INFILE=hrsn.l1b;;
+    MHSX) FORMAT=AMSU-B
+    INFILE=ambn.l1b;;
     *) echo "Unknown format $FORMAT"
     echo 1
     exit 1
@@ -133,7 +135,11 @@ then
 fi
 
 MVERROR=no
-mv `basename $INFILE l1b`l1c $L1CFILE || MVERROR=yes
+if [ "$L1CFILE" ]; then
+    mv `basename $INFILE l1b`l1c $L1CFILE || MVERROR=yes
+else
+    rm -f "`basename $INFILE l1b`l1c"
+fi
 
 if [ x$MVERROR = xyes ]
 then
