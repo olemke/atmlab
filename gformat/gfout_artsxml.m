@@ -17,6 +17,11 @@
 function gfout_artsxml( D, G, file )
   
 
+%- Check input
+%
+gf_check( D, G );
+
+
 %- Move data to structure matching GriddedField
 %
 for i = 1 :length(G)
@@ -39,8 +44,9 @@ end
 %
 dataformat = sprintf( 'GriddedField%d', D.DIM );
 %
-if length(G) > 1
+if length(G) == 1
+  xmlStore( file, X{1}, dataformat );
+else
   dataformat = [ 'ArrayOf', dataformat ]; 
+  xmlStore( file, X, dataformat );
 end
-%
-xmlStore( file, X, dataformat );

@@ -1,3 +1,17 @@
+2008-10-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-22
+
+	* gformat/gf_set.m (gf_set): 
+	* gformat/gf_append.m (gf_append): 
+	* gformat/gfin_artsxml.m (gfin_artsxml): 
+	* gformat/gfout_artsxml.m (gfout_artsxml): Added call of gf_check. 
+
+	* gformat/gf_check.m: Created. 
+
+	* gformat/gfout_artsxml.m (gfout_artsxml): Storage of length(G)==1 did
+	not work.
+
 2008-09-29  Gerrit Holl  <gerrit.holl@gmail.com>
 
 	* atmlab-0-3-21

@@ -141,3 +141,8 @@ for ig = 1 : length(G)
     G(ig).SOURCE = source;
   end
 end
+
+
+%- Check consistency between grids and data
+%  
+gf_check( D, G );

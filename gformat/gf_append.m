@@ -45,6 +45,8 @@ if max(dims) > D.DIM
   error( 'Max in *dims* above D.DIM.' );
 end
 %
+gf_check( Dnew, Gnew );
+%
 for d = 1 : length(dims)
   gnew = sprintf( 'GRID%d_NAME', d );
   if ~isempty( Dnew.(gnew) )
