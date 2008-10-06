@@ -1,3 +1,19 @@
+2008-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-23
+
+	* Work in progress ...
+
+	* arts/qarts_abs_species.m: Smaller changes to get oem to work again. 
+	* arts/qartsJacobian.m: 
+	* arts/arts_sx.m: 
+	* arts/arts_oem_init.m: 
+	* demos/arts_oem_demo.m:
+
+	* arts/qarts2cfile.m: Jacobian part updated. 
+
+	* retrieval/oem.m (oem): Wrote a (detailed) header and some updates.
+
 2008-10-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-22

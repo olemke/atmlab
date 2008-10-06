@@ -56,7 +56,7 @@ for i = 1 : nq
     %
     ig      = i_asj(i);    % Gas species index
     %
-    Sx(ind,ind) = arts_covmat( Q.ATMOSPHERE_DIM, SX.ABS_SPECIES{ig}, ... 
+    Sx(ind,ind) = covmat3d( Q.ATMOSPHERE_DIM, SX.ABS_SPECIES{ig}, ... 
                                                         R.jq{i}.grids, 'atm' );
 
 

@@ -67,7 +67,7 @@ end
 
 
 if nonlin
-  Q.ABS_NLS = [ Q.ABS_NLS i ];
+  Q.ABS_NLS = { Q.ABS_NLS, arts_tgs_cnvrt(Q.ABS_SPECIES) };
 end
 
 

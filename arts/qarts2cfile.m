@@ -98,7 +98,12 @@ if nargin == 1
     %
     S = { 'Generl', 'AtmSrf', 'SensorSave', 'CloseF' };
    
-  case 'y'
+  case 'y_init'
+    %
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'SensorSave', ...
+          'JacobiSave', 'CloseF' };
+    
+    case 'y'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
           'CldBox', 'SctMth', 'RteExe', 'CloseF' };
@@ -319,11 +324,13 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     rqre_bool( 'Qarts field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
     if Q.USE_RAW_ATMOSPHERE
       rqre_char( 'Qarts field RAW_ATMOSPHERE', Q.RAW_ATMOSPHERE );
-      rqre_bool( 'Qarts field RAW_ATM_EXPAND_1D', Q.RAW_ATM_EXPAND_1D );
+      if qarts_isset( Q.RAW_ATM_EXPAND_1D )
+        rqre_bool( 'Qarts field RAW_ATM_EXPAND_1D', Q.RAW_ATM_EXPAND_1D );
+      end
       T{end+1} = sprintf( ...
        'AtmRawRead(t_field_raw,z_field_raw,vmr_field_raw,abs_species,"%s")',...
                                                             Q.RAW_ATMOSPHERE );
-      if Q.RAW_ATM_EXPAND_1D
+      if qarts_isset( Q.RAW_ATM_EXPAND_1D )
         T{end+1} = 'AtmFieldsCalcExpand1D';
       else
         T{end+1} = 'AtmFieldsCalc';
@@ -634,22 +641,36 @@ function T = cfile_Sensor( Q, partname, workfolder )
   elseif ~Q.SENSOR_DO
     T{1} = 'sensorOff';
   elseif ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
-    T{1} = file_or_data( 'antenna_dim', 'Index', ...
-                                            Q.ANTENNA_DIM, workfolder );
-    T{2} = file_or_data( 'mblock_za_grid', 'Vector', ...
-                                            Q.MBLOCK_ZA_GRID, workfolder);
-    T{3} = file_or_data( 'mblock_aa_grid', 'Vector', ...
-                                            Q.MBLOCK_AA_GRID, workfolder);
-    T{4} = file_or_data( 'sensor_response', 'Sparse', ...
-                                            Q.SENSOR_RESPONSE, workfolder );
-    T{5} = file_or_data( 'sensor_response_f', 'Vector', ...
-                                            Q.SENSOR_RESPONSE_F, workfolder );
-    T{6} = file_or_data( 'sensor_response_za', 'Vector', ...
-                                            Q.SENSOR_RESPONSE_ZA, workfolder );
-    T{7} = file_or_data( 'sensor_response_aa', 'Vector', ...
-                                            Q.SENSOR_RESPONSE_AA, workfolder );
-    T{8} = file_or_data( 'sensor_response_pol', 'Index', ...
-                                           Q.SENSOR_RESPONSE_POL, workfolder );
+    T{1} = file_or_data( 'sensor_response', 'Sparse', ...
+                                                Q.SENSOR_RESPONSE, workfolder );
+    if qarts_isset( Q.ANTENNA_DIM )
+      T{end+1} = file_or_data( 'antenna_dim', 'Index', ...
+                                                    Q.ANTENNA_DIM, workfolder );
+    end
+    if qarts_isset( Q.MBLOCK_ZA_GRID )
+      T{end+1} = file_or_data( 'mblock_za_grid', 'Vector', ...
+                                                  Q.MBLOCK_ZA_GRID, workfolder);
+    end
+    if qarts_isset( Q.MBLOCK_AA_GRID )
+      T{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
+                                                  Q.MBLOCK_AA_GRID, workfolder);
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_F )
+      T{end+1} = file_or_data( 'sensor_response_f', 'Vector', ...
+                                              Q.SENSOR_RESPONSE_F, workfolder );
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_ZA )
+      T{end+1} = file_or_data( 'sensor_response_za', 'Vector', ...
+                                             Q.SENSOR_RESPONSE_ZA, workfolder );
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_AA )
+      T{end+1} = file_or_data( 'sensor_response_aa', 'Vector', ...
+                                             Q.SENSOR_RESPONSE_AA, workfolder );
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_POL )
+      T{end+1} = file_or_data( 'sensor_response_pol', 'Index', ...
+                                            Q.SENSOR_RESPONSE_POL, workfolder );
+    end
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
     T = add_includes( {}, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
   elseif isstruct( Q.SENSOR_RESPONSE ) 
@@ -665,34 +686,28 @@ function T = cfile_Sensor( Q, partname, workfolder )
     %
     qcheck( @qartsSensor, H );
 
-    % Check that some fields have valid values
-    if( H.SENSOR_NORM~=0 & H.SENSOR_NORM~=1 )
-      error('The field *SENSOR_NORM* in *SENSOR_RESPONSE* can only be 0 or 1.')
-    end
-    if( Q.ANTENNA_DIM~=1 & Q.ANTENNA_DIM~=2 )
-      error('The field *ANTENNA_DIM* in Q must be 1 or 2.');
-    end
-
     % Find out sensor structure
     parts{1} = 'init';
-    if qarts_isset( H.ANTENNA_LOS )
+    if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )
       parts{end+1} = 'antenna';
     end
-    if qarts_isset( H.SENSOR_ROT )
-      parts{end+1} = 'rotation';
-    end
-    if qarts_isset( H.SENSOR_POL )
-      parts{end+1} = 'polarisation';
-    end
-    if qarts_isset( H.LO )  &  qarts_isset( SIDEBAND_FILTER )
+    %if qarts_isset( H.SENSOR_ROT )
+    %    parts{end+1} = 'rotation';
+    %end
+    %if qarts_isset( H.SENSOR_POL )
+    %  parts{end+1} = 'polarisation';
+    %end
+    if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )
       parts{end+1} = 'mixer';
     end
-    if qarts_isset( H.F_BACKEND )  &  qarts_isset( CHANNEL_RESPONSE )
+    if qarts_isset( H.F_BACKEND )  |  qarts_isset( H.CHANNEL_RESPONSE )
       parts{end+1} = 'backend';
     end
     % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
-    if ( strmatch('mixer',char(parts)) & strmatch('backend',char(parts)) & ...
-        length(H.LO)>1 )
+    if( strmatch( 'mixer', char(parts) )   & ...
+        strmatch( 'backend', char(parts) ) & ...
+        length(H.LO) > 1 ...
+      )
       parts = rmfield( parts, {'mixer' 'backend'} );
       parts{end+1} = 'multimixer';
     end
@@ -703,60 +718,95 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
     for it = 1 : length(parts)
       %
-      U = [];
+      U = {};
 
       switch parts{it}
 
       case 'init'
         U{1} = ['# Start of sensor part:'];
-        U{2} = ['AntennaSet' num2str(Q.ANTENNA_DIM) 'D{}'];
-        U{3} = file_or_data( 'mblock_za_grid', 'Vector', ...
-                                                 Q.MBLOCK_ZA_GRID, workfolder );
-        if Q.ANTENNA_DIM==2
-          U{4} = file_or_data( 'mblock_aa_grid', 'Vector', ...
-                                                  Q.MBLOCK_AA_GRID, workfolder);
-        else
-          U{4} = ['# No azimuthal measurement block angle grid loaded'];
+        if qarts_isset( Q.ANTENNA_DIM ) 
+          if( Q.ANTENNA_DIM == 1  |  Q.ANTENNA_DIM == 2 )
+            U{end+1} = sprintf( 'AntennaSet%dD', Q.ANTENNA_DIM );
+          else
+            error('The field *ANTENNA_DIM* can only be set to 1 or 2.');
+          end
         end
-        U{5} = ['IndexSet(sensor_norm){' num2str(H.SENSOR_NORM) '}'];
-        U{6} = 'sensor_responseInit';
+        if qarts_isset( Q.MBLOCK_ZA_GRID ) 
+          U{end+1} = file_or_data( 'mblock_za_grid', 'Vector', ...
+                                                 Q.MBLOCK_ZA_GRID, workfolder );
+        
+        end        
+        if qarts_isset( Q.MBLOCK_AA_GRID ) 
+          U{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
+                                                  Q.MBLOCK_AA_GRID, workfolder);
+        end
+        if qarts_isset( H.SENSOR_NORM )
+          if H.SENSOR_NORM == 0  |   H.SENSOR_NORM == 1
+            U{end+1} = sprintf( 'IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
+          else
+            error('The field *SENSOR_RESPONSE.SENSOR_NORM* can only be 0 or 1.')
+          end 
+        end
+        U{end+1} = 'sensor_responseInit';
         
       case 'antenna'
-        U{1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
+        if qarts_isset( H.ANTENNA_LOS )
+          U{end+1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
                                                                    workfolder );
-        U{2} = file_or_data( 'antenna_diagram', 'ArrayOfArrayOfMatrix', ...
-                                                  H.ANTENNA_DIAGRAM, ...
-                                                                   workfolder );
-        U{3} = 'sensor_responseAntenna1D';
+        end
+        if qarts_isset( H.ANTENNA_RESPONSE )
+          U{end+1} = file_or_data( 'antenna_diagram', 'GriddedField4',...
+                                               H.ANTENNA_RESPONSE, workfolder );
+        end
+        U{end+1} = 'sensor_responseAntenna';
         
-      case 'rotation'
-        U{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, workfolder );
-        U{2} = 'sensor_responseRotation';
+      %case 'rotation'
+      %  U{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, workfolder );
+      %  U{2} = 'sensor_responseRotation';
 
-      case 'polarisation'
-        U{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, workfolder );
-        U{2} = 'sensor_responsePolarisation';
+      %case 'polarisation'
+      %  U{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, workfolder );
+      %  U{2} = 'sensor_responsePolarisation';
           
       case 'mixer'
-        U{1} = file_or_data( 'lo', 'Vector', H.LO, workfolder );
-        U{2} = file_or_data( 'matrix_1', 'Matrix', ...
-                                                 H.SIDEBAND_FILTER, ...
-                                                                   workfolder );
-        U{3} = 'sensor_responseMixer(matrix_1)';
+        if qarts_isset( H.LO ) 
+          U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder );
+        end
+        if qarts_isset( H.SIDEBAND_RESPONSE )           
+          U{end+1} = file_or_data( 'sideband_response', 'GriddedField1', ...
+                                              H.SIDEBAND_RESPONSE, workfolder );
+        end   
+        U{end+1} = 'sensor_responseMixer';
 
       case 'backend'
-        U{1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, workfolder );
-        U{2} = file_or_data( 'arrayofmatrix_1', 'ArrayOfMatrix', ...
-                                               H.CHANNEL_RESPONSE, workfolder );
-        U{3} = 'sensor_responseBackend(arrayofmatrix_1)';
+        if qarts_isset( H.F_BACKEND ) 
+          U{end+1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, ...
+                                                                   workfolder );
+        end        
+        if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
+          U{end+1} = file_or_data( 'backend_channel_response', ....
+               'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder );
+        end
+        U{end+1} = 'sensor_responseBackend';
         
       case 'multimixer'
-        U{1} = file_or_data( 'lo', 'Vector', H.LO, tmpdir );
-        U{2} = file_or_data( 'matrix_1', 'Matrix', H.SIDEBAND_FILTER, tmpdir );
-        U{3} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, tmpdir );
-        U{4} = file_or_data( 'matrix_2', 'Matrix',H.CHANNEL_RESPONSE,tmpdir);
-        U{5} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, tmpdir );
-        U{6} = 'sensor_responseBackend(matrix_1,matrix_2)';
+        if qarts_isset( H.LO ) 
+          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder );
+        end
+        if qarts_isset( H.SIDEBAND_RESPONSE )           
+          U{end+1} = file_or_data( 'sideband_response_multi', ...
+                      'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, workfolder );
+        end   
+        if qarts_isset( H.F_BACKEND ) 
+          U{end+1} = file_or_data( 'f_backend_multi', 'ArrayOfVector', ...
+                                                      H.F_BACKEND, workfolder );
+        end        
+        if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
+          U{end+1} = file_or_data( 'backend_channel_response_multi', ....
+                 'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ... 
+                                                                   workfolder );
+        end
+        U{6} = 'sensor_responseMultiMixerBackend';
         
       case 'close'
         U{1} = '# End of sensor part';
@@ -794,8 +844,8 @@ return
 %
 function T = cfile_Jacobi( Q, partname, workfolder )
   %
-  if ~strcmp( partname, 'Jacobi' ) 
-    error( 'Only recognised choice is ''Jacobi''.' );
+  if ~( strcmp( partname, 'Jacobi' ) |  strcmp( partname, 'JacobiSave' ) )
+    error( 'Only recognised choices are ''Jacobi'' and ''JacobiSave''.' );
   end
 
   do_parts = false;
@@ -812,8 +862,6 @@ function T = cfile_Jacobi( Q, partname, workfolder )
 
   if do_parts
 
-    error( 'Jacobian part of *qarts2cfile* not completely updated.' );
-    
     qcheck( @qartsJacobian, Q.J );
 
     T{1} = 'jacobianInit';
@@ -830,44 +878,38 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         rqre_field( Q.J.ABS_SPECIES(i), 'UNIT' );
         rqre_char( 'Q.J.ABS_SPECIES.UNIT', Q.J.ABS_SPECIES(i).UNIT );
         rqre_field( Q.J.ABS_SPECIES(i), 'GRID1' );
-        if isnan( Q.J.ABS_SPECIES(i).GRID1 )
-          error( sprintf('Q.J.ABS_SPECIES(%d).GRID1 includes NaN(s).',i) );
-        end
+        rqre_field( Q.J.ABS_SPECIES(i), 'GRID2' );
+        rqre_field( Q.J.ABS_SPECIES(i), 'GRID3' );
+        %
+        name1 = sprintf( 'gas%d_jac_p_grid', i );
+        T{end+1} = create_var( name1, 'Vector' );
+        T{end+1} = file_or_data( name1, 'Vector', Q.J.ABS_SPECIES(i).GRID1, ...
+                                                            workfolder, name1 );
+        name2 = sprintf( 'gas%d_jac_lat_grid', i );
+        T{end+1} = create_var( name2, 'Vector' );
+        T{end+1} = file_or_data( name2, 'Vector', Q.J.ABS_SPECIES(i).GRID2, ...
+                                                            workfolder, name2 );
+        name3 = sprintf( 'gas%d_jac_lon_grid', i );
+        T{end+1} = create_var( name3, 'Vector' );
+        T{end+1} = file_or_data( name3, 'Vector', Q.J.ABS_SPECIES(i).GRID3, ...
+                                                            workfolder, name3 );
 
-        if Q.ATMOSPHERE_DIM < 2
-          lat_grid = [];
-        else
-          rqre_field( Q.J.ABS_SPECIES(i), 'GRID2' );
-          lat_grid = Q.J.ABS_SPECIES(i).GRID2;
-        end
-        if Q.ATMOSPHERE_DIM < 3
-          lon_grid = [];
-        else
-          rqre_field( Q.J.ABS_SPECIES(i), 'GRID3' );
-          lon_grid = Q.J.ABS_SPECIES(i).GRID3;
-        end
-        T{end+1} = file_or_data( 'vector_1', 'Vector', ...
-          Q.J.ABS_SPECIES(i).GRID1, workfolder, sprintf('gas%d_jac_p_grid',i) );
-        T{end+1} = file_or_data( 'vector_2', 'Vector', ...
-                        lat_grid, workfolder, sprintf('gas%d_jac_lat_grid',i) );
-        T{end+1} = file_or_data( 'vector_3', 'Vector', ...
-                        lon_grid, workfolder, sprintf('gas%d_jac_lon_grid',i) );
-
-        T{end+1} = 'jacobianAddAbsSpecies(vector_1,vector_2,vector_3){';
-        T{end+1} = sprintf( '  species = %s', ...
-                                           arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
-        T{end+1} = sprintf( '  method  = "%s"', Q.J.ABS_SPECIES(i).METHOD );
-        T{end+1} = sprintf( '  unit    = "%s"', Q.J.ABS_SPECIES(i).UNIT );
+        T{end+1} = 'jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,'; 
+        T{end+1} = '   jacobian, atmosphere_dim, p_grid, lat_grid, lon_grid,';
+        T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
+        T{end+1} = sprintf( '  %s,', arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
+        T{end+1} = sprintf( '  "%s","%s",', Q.J.ABS_SPECIES(i).METHOD, ...
+                                                      Q.J.ABS_SPECIES(i).UNIT );
         if strcmp( Q.J.ABS_SPECIES(i).METHOD, 'analytical' )
-           T{end+1} = '  dx = 0.0';
+           T{end+1} = '  0.0';
         elseif strcmp( Q.J.ABS_SPECIES(i).METHOD, 'perturbation' )
           rqre_field( Q.J.ABS_SPECIES(i), 'DX' );
-          T{end+1} = sprintf( '  dx      = %.5e', Q.J.ABS_SPECIES(i).DX );
+          T{end+1} = sprintf( '  %.5e', Q.J.ABS_SPECIES(i).DX );
         else
           error( sprintf('Unknown selection for J.ABS_SPECIES.METHOD (%s)',...
                                                   Q.J.ABS_SPECIES(i).METHOD ) );
         end
-        T{end+1} = '}';
+        T{end+1} = ')';
       end
     end
 
@@ -891,11 +933,12 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     end
   end  % do_parts
   
-  %- Saving (jacobian saved as part RteExe)
+  %- Saving 
   %
-  T{end+1} = add_savefile( 'jacobian_quantities', workfolder );
-  T{end+1} = add_savefile( 'jacobian_indices', workfolder );
-  
+  if strcmp( partname, 'JacobiSave' )
+    T{end+1} = add_savefile( 'jacobian_quantities', workfolder );
+    T{end+1} = add_savefile( 'jacobian_indices', workfolder );
+  end
 return
 
 
@@ -1235,6 +1278,11 @@ return
 %------------------------------------------------------------------------------
 % Smaller help functions
 %------------------------------------------------------------------------------
+
+function s = create_var(artsvar,datatype)
+  s = sprintf( '%sCreate(%s)', datatype, artsvar );
+return
+
 
 function s = file_or_data(artsvar,datatype,qvalue,workfolder,nonDefFileId)
   if ischar( qvalue )

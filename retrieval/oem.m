@@ -1,35 +1,122 @@
-function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
+% OEM   Data inversion by "optimal estimation method"
 %
-% P  : Inversion "profile" (A, S, la, chi-values, x-iter, ...)
+%    The name OEM is here kept as it is so well established in the atmospheric
+%    community. A better name would be "the maximum a posteriori solution".
 %
-% Q  : Basic forward model and retrieval settings
-% R  : Retrieval bookkeeping
-% O  : OEM settings
+%    See "Inverse methods for atmospheric sounding: Theory and practice"
+%    by C.D. Rodgers for background and theory.
+%
+%    The OEM calculations are controlled by the structure O. This structure has
+%    the following fields:
+%       linear : Flag to trigger a linear inversion.
+%       outfids: File identifiers for output messages. Inlcude 1 for the
+%                screen.
+%       ---
+%       imethod: Iteration method. Choices are 'GN' for Gauss-Newton and
+%                'ML'/'LM' for Marquardt-Levenberg. 
+%       maxiter: Maximum number of iterations.
+%       stop_dx: Convergence criterion. The iteration is halted when the
+%                the change in x is < stop_dx (see Eq. 5.29 in Rodgers' book).
+%                A normalisation to the length of x is applied. 
+%       ---
+%       cost   : Flag to include cost values in X (and to calculate cost for
+%                linear inversions).
+%       d      : Flag to include in X the estimate of total retrieval error 
+%                (square root of diagonal elements of S). That is, the
+%                standard deviation for the sum of observation and smoothing 
+%                errors.
+%       do     : Flag to include in X the estimate of observation error 
+%                (square root of diagonal elements of So). 
+%       ds     : Flag to include in X the estimate of observation error 
+%                (square root of diagonal elements of Ss).
+%       yf     : Flag to include "fitted spectrum" in X. That is, the simulated
+%                measurement matching retrieved state.
+%       A      : Flag to include averaging kernel matrix in X.
+%       G      : Flag to include gain matrix in X.
+%       J      : Flag to include weighting function matrix in X.
+%       jexact : Flag to select recalculation of J after last iteration.
+%                If not set to 1, J will correspond to x before last iteration.
+%       S      : Flag to include covariance matrix for total error in X.
+%                That is, the sum of So and Ss.
+%       So     : Flag to include covariance matrix for observation error in X.
+%       Ss     : Flag to include covariance matrix for smoothing error in X.
+%       Xiter  : Flag to include all iteration states in X.
+%
+%   The results are gathered in a structure X, with fields:
+%       x      : Retrieved state.
+%       cost   : Total cost, normalised by length of y. A succesful retrieval
+%                shall then have a cost in the order of 1.
+%       cost_y : Cost corresponding to the measurement vector.
+%       cost_x : Cost corresponding to the state vector.
+%       d      : See above.
+%       do     : See above.
+%       ds     : See above.
+%       yf     : See above.
+%       A      : See above.
+%       G      : See above.
+%       J      : See above.
+%       S      : See above.
+%       So     : See above.
+%       Ss     : See above.
+%       Xiter  : The x-vector after each iteration.
+%   The field x is always included (if an actual inversion is performed).
+%   Other fields are included if corresponding O field is set.
+%
+%   Use the first format to check default values for O. The second format
+%   is intended for extracting retrieval characteristics (corresponding to
+%   a linear inversion). The third format performs a complete inversion.
+%
+% FORMAT   O = oem
+%            or
+%          X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv)
+%            or
+%          X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
+%        
+% OUT   O        O structure with default value for all recognised fields.
+%       X        Retrieved state and additional information.
+% IN    O        OEM setting structure.
+%       Q        Forward model setting structure.
+%       R        Rtreival variable structure.
+%       comfun   Handle to function for communication with forward model.
+%       Sx       Covariance matrix for a priori uncertainty.
+%       Se       Covariance matrix for observation uncertainties.
+%       Sxinv    The inverse of Sx. If set [], the inverse is calculated 
+%                internally.
+%       Sxinv    The inverse of Se. If set [], the inverse is calculated 
+%                internally.
+%       xa       A priori profile.
+%       y        Measurement vector.
 
+function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
 
 
 %=== Default values ===========================================================
+  if ~nargin, O=[]; end
 
-  if ~isfield( O, 'method' ),    O.method = 'LI';       end
+  if ~isfield( O, 'linear' ),    O.linear  = 0;         end
   if ~isfield( O, 'outfids' ),   O.outfids = 1;         end
-  if ~isfield( O, 'jexact' ),    O.jexact = 0;          end
   %
-  if ~isfield( O, 'cost' ),      O.cost = 0;            end  
-  if ~isfield( O, 'Xiter' ),     O.Xiter = 0;           end  
-  if ~isfield( O, 'yf' ),        O.yf = 0;              end
-  if ~isfield( O, 'J' ),         O.J  = 0;              end
-  if ~isfield( O, 'G' ),         O.G  = 0;              end
-  if ~isfield( O, 'A' ),         O.A  = 0;              end
-  if ~isfield( O, 'S' ),         O.S  = 0;              end
-  if ~isfield( O, 'So' ),        O.So = 0;              end
-  if ~isfield( O, 'Ss' ),        O.Ss = 0;              end
-  if ~isfield( O, 'd' ),         O.d  = 0;              end
-  if ~isfield( O, 'do' ),        O.do = 0;              end
-  if ~isfield( O, 'ds' ),        O.ds = 0;              end
+  if ~isfield( O, 'imethod' ),   O.imethod = 'ML';      end
+  if ~isfield( O, 'maxiter' ),   O.imethod = 99;        end
+  if ~isfield( O, 'stop_dx' ),   O.stop_dx = 1e-3;      end
+  %
+  if ~isfield( O, 'cost' ),      O.cost    = 0;         end  
+  if ~isfield( O, 'd' ),         O.d       = 0;         end
+  if ~isfield( O, 'do' ),        O.do      = 0;         end
+  if ~isfield( O, 'ds' ),        O.ds      = 0;         end
+  if ~isfield( O, 'yf' ),        O.yf      = 0;         end
+  if ~isfield( O, 'A' ),         O.A       = 0;         end
+  if ~isfield( O, 'G' ),         O.G       = 0;         end
+  if ~isfield( O, 'jexact' ),    O.jexact  = 0;         end
+  if ~isfield( O, 'J' ),         O.J       = 0;         end
+  if ~isfield( O, 'S' ),         O.S       = 0;         end
+  if ~isfield( O, 'So' ),        O.So      = 0;         end
+  if ~isfield( O, 'Ss' ),        O.Ss      = 0;         end
+  if ~isfield( O, 'Xiter' ),     O.Xiter   = 0;         end  
 
+  if ~nargin, X=O; return, end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 
 
 %=== Check input ==============================================================
@@ -38,14 +125,15 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   rqre_datatype( 'struct', O );
   %
-  rqre_char( 'O.method', O.method );
+  rqre_bool( 'O.linear', O.linear );
   rqre_datatype( 'vector', O.outfids );
   %
-  if strcmp( upper(O.method), 'LI' )
-    O.method = 'LI';
-  else
+  if ~O.linear
+    rqre_char( 'O.imethod', O.method );
     rqre_field( O, 'maxiter', 0 );
+    rqre_scalar( 'O.maxiter', O.maxiter, 0 );
     rqre_field( O, 'stop_dx', 0 );
+    rqre_scalar( 'O.stop_dx', O.stop_dx, 0 );
     if strcmp( upper(O.method), 'GN' )
       O.method = 'GN';  
     elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
@@ -122,7 +210,11 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   %- Retrieval variables
   %
-  x      = xa;
+  if nargin >= 9
+    x    = xa;
+  else
+    x    = NaN;
+  end
   yf     = NaN;
   G      = NaN;
 
@@ -132,22 +224,21 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   iter       = 0;           % Iteration number
   nx         = size( Sx, 1 );
   ny         = size( Se, 1 );
-  linear     = strcmp( O.method, 'LI' );
   cost       = NaN;
   cost_x     = NaN;
   cost_y     = NaN;
 
   %- P structure
   %
-  P.converged = 0;
-  P.dx        = [];
+  X.converged = 0;
+  X.dx        = [];
   if O.Xiter
-    P.Xiter   = [];
+    X.Xiter   = [];
   end
-  if O.cost  |  strcmp( O.method, 'ML' )
-    P.cost_x = [];
-    P.cost_y = [];
-    P.cost   = [];
+  if O.cost 
+    X.cost_x = [];
+    X.cost_y = [];
+    X.cost   = [];
   end
 
   %- Print initial screen message
@@ -155,7 +246,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   out( 1, 1, O.outfids );
   out( 1, 'Analytical Bayesian inversion (OEM/MAP)', O.outfids );
   out( 2, 0, O.outfids );
-  if linear
+  if O.linear
     out( 2, 'Linear inversion' );
   else
     if strcmp( upper(O.method), 'GN' )
@@ -215,7 +306,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       end
        
       %- Linear 
-      if linear
+      if O.linear
         xnew = xa + SJSJ \ wdy;
 
       %- Non-linear
@@ -238,13 +329,13 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
         a        = y - yf;
         cost_y   = (a' * Seinv * a) / ny; 
         cost     = cost_x + cost_y;
-        P.cost   = [ P.cost cost ];
-        P.cost_y = [ P.cost_y cost_y ];
-        P.cost_x = [ P.cost_x cost_x ];
+        X.cost   = [ X.cost cost ];
+        X.cost_y = [ X.cost_y cost_y ];
+        X.cost_x = [ X.cost_x cost_x ];
       end
 
       %- Has OK state been found?
-      if linear  |  strcmp( O.method, 'GN' )
+      if O.linear  |  strcmp( O.method, 'GN' )
         xfound = 1;
       else
         % ML stuff here
@@ -258,7 +349,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
     %- Convergence or max iterations reached ?
     %
-    if linear
+    if O.linear
       x     = xnew;
       ready = 1;
     else
@@ -268,12 +359,12 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       %
       dx = ( ( xnew - x )' * SJSJ * ( xnew - x ) ) / nx;
       %
-      if linear  |  dx <= O.stop_dx
+      if O.linear  |  dx <= O.stop_dx
         ready       = 1;
-        P.converged = 1;
+        X.converged = 1;
       end
       %
-      P.dx = [ P.dx dx ];
+      X.dx = [ X.dx dx ];
       %
       if ~ready  &  iter == O.maxiter
         ready = 1;
@@ -287,7 +378,7 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     x = xnew;
 
     if O.Xiter
-      P.Xiter   = [ P.Xiter x ];
+      X.Xiter   = [ X.Xiter x ];
     end
 
   end
@@ -307,20 +398,6 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     SJSJ     = Sxinv + JtSeinv * J;
   end
 
-  %- Fill P, part 1
-  %
-  if O.yf
-    if isnan(yf)
-      [R,yf] = feval( comfun, Q, R, x, iter+1 );
-    end
-    %
-    P.yf = yf;
-  end
-  %
-  if O.J
-    P.J = J;
-  end
-
   %- Calculate G ?
   %
   if O.G | O.A | O.S | O.So | O.Ss | O.d | O.do | O.ds
@@ -333,46 +410,64 @@ function [x,P] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     A = G * J;
   end
 
-  %- Fill P, part 2
-  %
-  if O.G
-    P.G = G;
+  %- Fill P
+
+  X.x = x;
+  
+  if O.yf
+    if isnan(yf)
+      [R,yf] = feval( comfun, Q, R, x, iter+1 );
+    end
+    %
+    X.yf = yf;
   end
-  %
+
+  if ~O.cost  &  isfield(X,'cost')
+    X = rmfield( X, { 'cost', 'cost_y', 'cost_x' } );
+  end
+  
+  if O.J
+    X.J = J;
+  end
+
+  if O.G
+    X.G = G;
+  end
+
   if O.A 
-    P.A = A;
+    X.A = A;
   end  
-  %
+
   if O.S  |  O.So  |  O.d  |  O.do
     So = G * Se * G';
     %
     if O.So
-      P.So = So;
+      X.So = So;
     end
     %
     if O.do
-      P.do = sqrt( diag( So ) );
+      X.do = sqrt( diag( So ) );
     end
   end  
-  %
+
   if O.S  |  O.Ss  |  O.d  |  O.ds
     AI = A - eye(size(A,1));
     Ss = AI * Sx * AI';
     %
     if O.S
-      P.S = Ss + So;
+      X.S = Ss + So;
     end
     %
     if O.Ss
-      P.Ss = Ss;
+      X.Ss = Ss;
     end
     %
     if O.d
-      P.d = sqrt( diag( Ss ) + diag( So ) );
+      X.d = sqrt( diag( Ss ) + diag( So ) );
     end
     %
     if O.ds
-      P.ds = sqrt( diag( Ss ) );
+      X.ds = sqrt( diag( Ss ) );
     end
   end  
     

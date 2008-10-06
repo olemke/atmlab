@@ -4,6 +4,11 @@
 %    description of each field.  To list default values just type 
 %    'qarts_jacobian'. The default value for all do-fields is 0.
 %
+%    In contrast to settings in qarts and qartsSensor, it is here expected that
+%    all data are taken from atmlab settings (no data from include files). This
+%    means that the data provided will throughout be piped to arts (if
+%    corresponding DO field is true).
+%
 %    This function is organised in such way that *qcheck* and *qinfo*
 %    can be used.
 %

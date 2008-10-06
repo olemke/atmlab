@@ -217,7 +217,7 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   
   %- Run arts to create jacobian and sensor variables
   %
-  parts = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'SensorSave', 'Jacobi' };
+  parts     = qarts2cfile( 'y_init' );
   %
   S     = qarts2cfile( Q, parts, R.workfolder );
   cfile = fullfile( R.workfolder, 'cfile.arts' );

@@ -6,20 +6,26 @@
 
 % 2006-09-07   Created by Patrick Eriksson.
 
-function arts_oem_demo
+function [x,P] = arts_oem_demo
 
 
-%= Check if arts-xml-data is found
+%- Check if needed atmlab settings are found
 %
-arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
-%
+arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
+end
+%
+arts_includes = atmlab( 'ARTS_INCLUDES' );
+if isnan( arts_includes )
+  error('You need to ARTS_INCLUDES to run this example.');
 end
 
 
 
+%----------------------------------------------------------------------------
 %- Init control structures 
+%----------------------------------------------------------------------------
 %
 Q      = qarts;
 Q.J    = qartsJacobian;
@@ -28,34 +34,71 @@ SX     = [];
 
 
 
-%- Basic qarts settings
+%----------------------------------------------------------------------------
+%- OEM settings
+%----------------------------------------------------------------------------
 %
-Q.ATMOSPHERE_DIM      = 1;
-Q.STOKES_DIM          = 1;
+O.method  = 'GN';
+%O.method  = 'LI';
+O.stop_dx = 0.01;
+O.maxiter = 10;
 %
-Q.P_GRID              = z2p_simple( 0:500:90e3 );
-Q.Z_SURFACE           = 500;
+O.cost    = 1;
+O.Xiter   = 1;
+O.yf      = 1;
+O.J       = 1;
+O.A       = 1;
+O.S       = 0;
+O.So      = 0;
+O.Ss      = 0;
+O.d       = 0; 
+O.do      = 1;
+O.ds      = 0;
+
+
+
+%----------------------------------------------------------------------------
+%- Forward model parameters
+%----------------------------------------------------------------------------
+
+Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'continua.arts' ) };
+Q.ATMOSPHERE_DIM    = 1;
+Q.STOKES_DIM        = 1;
+Q.ANTENNA_DIM       = 1;
+Q.CLOUDBOX_DO       = 0;
+
+%- Atmosphere
+%
+Q.R_GEOID             = constants( 'EARTH_RADIUS' );
+Q.Z_SURFACE           = 0;
+Q.P_GRID              = z2p_simple( -250:250:90e3 );
 %
 Q.USE_RAW_ATMOSPHERE  = 1;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                               'fascod', 'midlatitude-winter' );
+
+%- Absorption, part 1
 %
-Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric{5e3}' };
-Q.Y_UNIT              = 'RJ';
+Q.ABS_LINES_FORMAT    = 'Arts';
+Q.ABS_LINES           = fullfile( atmlab_example_data , 'o3line111ghz' );
+Q.ABS_NLS             = [];
+
+%- RTE
+%
+Q.PPATH_LMAX          = 250;
+Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
+Q.Y_UNIT              = 'RJBT';
 %
 Q.SENSOR_LOS          = 70;
 Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
 
-
-
 %- Exclude cosmic background radiation. A relative change of the spectrum
 %- corresponds then to a relative change of the ozone profile.
 %
-Q.IY_SPACE_AGENDA = { 'Ignore(rte_los){}',  'Ignore(rte_pos){}', ...
-                      'nelemGet(f_grid){}', 'Copy(nrows,nelem){}', ...  
-                      'Copy(ncols,stokes_dim){}', 'MatrixSet(iy){0}' };
-
-
+Q.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
+                      'nelemGet(nrows,f_grid)', 'Copy(ncols,stokes_dim)', ...
+                      'MatrixSetConstant(iy,nrows,ncols,0)' };
 
 %- Frequency and spectrometer.
 %
@@ -67,15 +110,26 @@ H                     = qartsSensor;
 H.SENSOR_NORM         = 1;
 df                    = 2e6;
 H.F_BACKEND           = min(Q.F_GRID)+df : df : max(Q.F_GRID)-df;
-H.CHANNEL_RESPONSE    = { [-df/2 1; df/2 1] };
 %
-Q.SENSOR_DO           = 1;
-Q.SENSOR_RESPONSE     = H;
-Q.MBLOCK_ZA_GRID      = 0;
+B.name                = 'Spectrometer channel response function';
+B.gridnames           = { 'Frequency' };
+B.grids               = { [-df/2 df/2] };
+B.dataname            = 'Response';
+B.data                = [1 1];
+%
+H.BACKEND_CHANNEL_RESPONSE{1} = B;
+Q.SENSOR_DO                   = 1;
+Q.SENSOR_RESPONSE             = H;
+Q.MBLOCK_ZA_GRID              = 0;
+%
+clear B
 
 
+%----------------------------------------------------------------------------
+%- Retrieval quantities
+%----------------------------------------------------------------------------
 
-%- Define ozone as retrieval quantity
+%- Ozone
 %
 ret_unit = 'rel';
 %
@@ -104,24 +158,22 @@ D.CL1_GRID1 = [1100e2 1e-3];
 
 
 
-%- Absorption
+%----------------------------------------------------------------------------
+%- Finish forward model part
+%----------------------------------------------------------------------------
+
+%- Absorption, part 2
 %
 % Water vapour is always needed (no absorption is here included)
 Q = qarts_abs_species( Q, { 'H2O' } );
 %
-Q.ABS_LINES_FORMAT    = 'Arts';
-Q.ABS_LINES           = fullfile( atmlab_example_data , 'o3line111ghz' );
-Q                     = qarts_abstable( Q );
+Q = qarts_abstable( Q );
 
 
 
-%- Calculate a spectrum matching a priori
-%
-y = arts_y( Q );
-
-
-
+%----------------------------------------------------------------------------
 %- Create Se
+%----------------------------------------------------------------------------
 %
 si = 0.01;
 %
@@ -129,34 +181,30 @@ SE.FORMAT    = 'param';
 SE.SI        = si;
 SE.CCO       = 0;  
 SE.CFUN1     = 'drc';
+SE.CL1       = 0; 
 %
-Se = arts_covmat( 1, SE, Q.SENSOR_RESPONSE.F_BACKEND );
+Se = covmat3d( 1, SE, Q.SENSOR_RESPONSE.F_BACKEND );
 
 
 
-%- Measurement
+
+
+%----------------------------------------------------------------------------
+%- Calculations
+%----------------------------------------------------------------------------
+
+
+%- Calculate a spectrum matching a priori
+%
+y = arts_y( Q );
+
+
+%- Crate a test measurement
 %
 y = 1.1 * y + si*randn(size(Se,1),1);
 
 
-
-%- OEM
-%
-O.method  = 'GN';
-O.stop_dx = 0.01;
-O.maxiter = 10;
-%
-O.cost    = 1;
-O.Xiter   = 1;
-O.yf      = 1;
-O.J       = 1;
-O.A       = 1;
-O.S       = 0;
-O.So      = 0;
-O.Ss      = 0;
-O.d       = 0; 
-O.do      = 1;
-O.ds      = 0;
+%- Perform retrieval
 %
 [Qoem,R,xa] = arts_oem_init( Q );
 Sx          = arts_sx( Q, R, SX );
@@ -166,9 +214,12 @@ arts_oem( 'clean', R );
 clear Qoem O
 
 
+%- Plot
+%
 z = p2z_simple( Q.J.ABS_SPECIES(1).GRID1 );
-
-
-plot( x, z/1e3 )
+%
+plot( x, z/1e3, 'r' )
 xlabel( 'Retrieved profile' )
 ylabel( 'Approximative altitude [km]' );
+
+
