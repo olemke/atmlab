@@ -1,5 +1,17 @@
 2008-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-24
+
+	* demos/arts_oem_demo.m: Some polishing. 
+
+	* retrieval/oem.m: Screen+file output and selection of output
+	variables now works as specified. Linear and Gauss-Newton
+	solutions handled at this point.
+
+	* handy/out.m: fid can now be [] (for zero verbosity).
+
+2008-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-23
 
 	* Work in progress ...

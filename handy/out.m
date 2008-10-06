@@ -41,7 +41,8 @@
 %                      If s is an integer, different vertical lines are
 %                      produced (see above).
 % OPT      fid         Vector with file identifiers. Default is 1, which
-%                      is standard output (screen).
+%                      is standard output (screen). For zero verbosity
+%                      set to [].
 %------------------------------------------------------------------------
 
 % HISTORY: 040907  Copied from AMI and modified to Atmlab by Patrick
@@ -58,6 +59,9 @@ if nargin < 3
   fid = 1;
 end
 
+if isempty(fid)
+  return
+end
 
 if length(fid) > 1
   for i = 1 : length(fid)

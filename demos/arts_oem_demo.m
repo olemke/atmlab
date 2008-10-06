@@ -6,7 +6,7 @@
 
 % 2006-09-07   Created by Patrick Eriksson.
 
-function [x,P] = arts_oem_demo
+function X = arts_oem_demo
 
 
 %- Check if needed atmlab settings are found
@@ -38,22 +38,23 @@ SX     = [];
 %- OEM settings
 %----------------------------------------------------------------------------
 %
-O.method  = 'GN';
-%O.method  = 'LI';
+O.linear  = 0;
+O.imethod = 'GN';
 O.stop_dx = 0.01;
 O.maxiter = 10;
 %
 O.cost    = 1;
-O.Xiter   = 1;
-O.yf      = 1;
-O.J       = 1;
-O.A       = 1;
+O.dx      = 1;
+O.e       = 1; 
+O.eo      = 1;
+O.es      = 0;
+O.yf      = 0;
+O.A       = 0;
+O.J       = 0;
 O.S       = 0;
 O.So      = 0;
 O.Ss      = 0;
-O.d       = 0; 
-O.do      = 1;
-O.ds      = 0;
+O.Xiter   = 0;
 
 
 
@@ -208,18 +209,25 @@ y = 1.1 * y + si*randn(size(Se,1),1);
 %
 [Qoem,R,xa] = arts_oem_init( Q );
 Sx          = arts_sx( Q, R, SX );
-[x,P]       = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
+X           = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %
 arts_oem( 'clean', R );
-clear Qoem O
+clear Qoem 
+
 
 
 %- Plot
 %
-z = p2z_simple( Q.J.ABS_SPECIES(1).GRID1 );
-%
-plot( x, z/1e3, 'r' )
-xlabel( 'Retrieved profile' )
-ylabel( 'Approximative altitude [km]' );
-
-
+if ~nargout
+  %
+  z = p2z_simple( Q.J.ABS_SPECIES(1).GRID1 );
+  %
+  if O.e & O.eo
+    plot( X.x, z/1e3, repmat(X.x,1,2)+[-X.e X.e], z/1e3, ':', ...
+                      repmat(X.x,1,2)+[-X.eo X.eo], z/1e3, '--' )
+  else
+    plot( X.x, z/1e3 )
+  end
+  xlabel( 'Retrieved profile' )
+  ylabel( 'Approximative altitude [km]' );
+end

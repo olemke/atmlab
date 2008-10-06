@@ -10,7 +10,7 @@
 %    the following fields:
 %       linear : Flag to trigger a linear inversion.
 %       outfids: File identifiers for output messages. Inlcude 1 for the
-%                screen.
+%                screen. Set to [] for zero verbosity.
 %       ---
 %       imethod: Iteration method. Choices are 'GN' for Gauss-Newton and
 %                'ML'/'LM' for Marquardt-Levenberg. 
@@ -19,15 +19,19 @@
 %                the change in x is < stop_dx (see Eq. 5.29 in Rodgers' book).
 %                A normalisation to the length of x is applied. 
 %       ---
-%       cost   : Flag to include cost values in X (and to calculate cost for
-%                linear inversions).
-%       d      : Flag to include in X the estimate of total retrieval error 
+%       cost   : Flag to include cost values in X and to calculate cost even
+%                if solution method does not require cost values. This affects
+%                also the output to *outfids*. If not set, the output can be 
+%                NaN.
+%       dx     : Flag to include the sequence of convergence values (defined
+%                as for *stop_dx*).
+%       e      : Flag to include in X the estimate of total retrieval error 
 %                (square root of diagonal elements of S). That is, the
 %                standard deviation for the sum of observation and smoothing 
 %                errors.
-%       do     : Flag to include in X the estimate of observation error 
+%       eo     : Flag to include in X the estimate of observation error 
 %                (square root of diagonal elements of So). 
-%       ds     : Flag to include in X the estimate of observation error 
+%       es     : Flag to include in X the estimate of observation error 
 %                (square root of diagonal elements of Ss).
 %       yf     : Flag to include "fitted spectrum" in X. That is, the simulated
 %                measurement matching retrieved state.
@@ -98,13 +102,14 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   if ~isfield( O, 'outfids' ),   O.outfids = 1;         end
   %
   if ~isfield( O, 'imethod' ),   O.imethod = 'ML';      end
-  if ~isfield( O, 'maxiter' ),   O.imethod = 99;        end
+  if ~isfield( O, 'maxiter' ),   O.maxiter = 99;        end
   if ~isfield( O, 'stop_dx' ),   O.stop_dx = 1e-3;      end
   %
   if ~isfield( O, 'cost' ),      O.cost    = 0;         end  
-  if ~isfield( O, 'd' ),         O.d       = 0;         end
-  if ~isfield( O, 'do' ),        O.do      = 0;         end
-  if ~isfield( O, 'ds' ),        O.ds      = 0;         end
+  if ~isfield( O, 'dx' ),        O.dx      = 0;         end
+  if ~isfield( O, 'e' ),         O.e       = 0;         end
+  if ~isfield( O, 'eo' ),        O.eo      = 0;         end
+  if ~isfield( O, 'es' ),        O.es      = 0;         end
   if ~isfield( O, 'yf' ),        O.yf      = 0;         end
   if ~isfield( O, 'A' ),         O.A       = 0;         end
   if ~isfield( O, 'G' ),         O.G       = 0;         end
@@ -123,21 +128,35 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
                                    
   min_nargin( 6, nargin );
 
+  %- O
+  %
   rqre_datatype( 'struct', O );
   %
+  %- Unknown fields in O?
+  fields0 = fieldnames( oem );
+  fields  = fieldnames( O );
+  e  = [];
+  for i = 1 : length(fields)
+    if ~strcmp( fields{i}, fields0 ), e{end+1} = fields{i}; end
+  end
+  if ~isempty(e)
+    for i = 1 : length(e), fprintf('   O.%s\n', e{i} ); end
+    error( 'The fields listed above  are not recognised but were found in O.');
+  else
+    clear fields0 fields e
+  end
+  %
   rqre_bool( 'O.linear', O.linear );
-  rqre_datatype( 'vector', O.outfids );
+  rqre_datatype( { 'empty', 'vector'}, O.outfids );
   %
   if ~O.linear
-    rqre_char( 'O.imethod', O.method );
-    rqre_field( O, 'maxiter', 0 );
+    rqre_char( 'O.imethod', O.imethod );
     rqre_scalar( 'O.maxiter', O.maxiter, 0 );
-    rqre_field( O, 'stop_dx', 0 );
     rqre_scalar( 'O.stop_dx', O.stop_dx, 0 );
-    if strcmp( upper(O.method), 'GN' )
-      O.method = 'GN';  
-    elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
-      O.method = 'ML';
+    if strcmp( upper(O.imethod), 'GN' )
+      O.imethod = 'GN';  
+    elseif strcmp( upper(O.imethod), 'ML' )  |  strcmp( upper(O.imethod), 'LM' )
+      O.imethod = 'ML';
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
@@ -231,7 +250,9 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   %- P structure
   %
   X.converged = 0;
-  X.dx        = [];
+  if O.dx
+    X.dx      = [];
+  end
   if O.Xiter
     X.Xiter   = [];
   end
@@ -247,16 +268,18 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   out( 1, 'Analytical Bayesian inversion (OEM/MAP)', O.outfids );
   out( 2, 0, O.outfids );
   if O.linear
-    out( 2, 'Linear inversion' );
+    out( 2, 'Linear inversion', O.outfids );
   else
-    if strcmp( upper(O.method), 'GN' )
+    if strcmp( upper(O.imethod), 'GN' )
       out( 2, 'Non-linear inversion: Gauss-Newton', O.outfids );
-    elseif strcmp( upper(O.method), 'ML' )  |  strcmp( upper(O.method), 'LM' )
+    elseif strcmp( upper(O.imethod), 'ML' )  
       out( 2, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
     end
+  end
+  if ~O.linear | O.cost
     out( 2, 0, O.outfids );
     nlinprint( O.outfids );
   end
@@ -311,9 +334,9 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
       %- Non-linear
       else
-        if strcmp( O.method, 'GN' )
+        if strcmp( O.imethod, 'GN' )
           xnew = x + SJSJ \ wdy; 
-        elseif strcmp( O.method, 'ML' )
+        elseif strcmp( O.imethod, 'ML' )
           error('ML not yet handled');
         end
       end
@@ -322,20 +345,22 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       yf = NaN;
 
       %- Cost values
-      if O.cost  |  strcmp( O.method, 'ML' )
+      if O.cost  |  strcmp( O.imethod, 'ML' )
         [R,yf]   = feval( comfun, Q, R, xnew, iter+1 );
         a        = xnew - xa;
         cost_x   = (a' * Sxinv * a) / ny;  
         a        = y - yf;
         cost_y   = (a' * Seinv * a) / ny; 
         cost     = cost_x + cost_y;
-        X.cost   = [ X.cost cost ];
-        X.cost_y = [ X.cost_y cost_y ];
-        X.cost_x = [ X.cost_x cost_x ];
+        if O.cost 
+          X.cost   = [ X.cost cost ];
+          X.cost_y = [ X.cost_y cost_y ];
+          X.cost_x = [ X.cost_x cost_x ];
+        end
       end
 
       %- Has OK state been found?
-      if O.linear  |  strcmp( O.method, 'GN' )
+      if O.linear  |  strcmp( O.imethod, 'GN' )
         xfound = 1;
       else
         % ML stuff here
@@ -354,7 +379,7 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       ready = 1;
     else
       %
-      % (Equation 5.31 in the Rodgers book was used here but it didn't work
+      % (Equation 5.31 in the Rodgers book was tested here but it didn't work
       % well for some cases)
       %
       dx = ( ( xnew - x )' * SJSJ * ( xnew - x ) ) / nx;
@@ -364,12 +389,16 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
         X.converged = 1;
       end
       %
-      X.dx = [ X.dx dx ];
+      if O.dx
+        X.dx = [ X.dx dx ];
+      end
       %
       if ~ready  &  iter == O.maxiter
         ready = 1;
       end
-      %
+    end
+
+    if ~O.linear | O.cost
       nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
     end
 
@@ -400,13 +429,13 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   %- Calculate G ?
   %
-  if O.G | O.A | O.S | O.So | O.Ss | O.d | O.do | O.ds
+  if O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es
     G = ( SJSJ \ speye(size(Sxinv)) ) * JtSeinv;
   end
 
   %- Calculate A ?
   %
-  if O.A | O.S | O.Ss | O.d | O.ds
+  if O.A | O.S | O.Ss | O.e | O.ds
     A = G * J;
   end
 
@@ -422,10 +451,6 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     X.yf = yf;
   end
 
-  if ~O.cost  &  isfield(X,'cost')
-    X = rmfield( X, { 'cost', 'cost_y', 'cost_x' } );
-  end
-  
   if O.J
     X.J = J;
   end
@@ -438,19 +463,19 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     X.A = A;
   end  
 
-  if O.S  |  O.So  |  O.d  |  O.do
+  if O.S  |  O.So  |  O.e  |  O.eo
     So = G * Se * G';
     %
     if O.So
       X.So = So;
     end
     %
-    if O.do
+    if O.eo
       X.do = sqrt( diag( So ) );
     end
   end  
 
-  if O.S  |  O.Ss  |  O.d  |  O.ds
+  if O.S  |  O.Ss  |  O.e  |  O.es
     AI = A - eye(size(A,1));
     Ss = AI * Sx * AI';
     %
@@ -462,12 +487,12 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       X.Ss = Ss;
     end
     %
-    if O.d
+    if O.e
       X.d = sqrt( diag( Ss ) + diag( So ) );
     end
     %
-    if O.ds
-      X.ds = sqrt( diag( Ss ) );
+    if O.es
+      X.es = sqrt( diag( Ss ) );
     end
   end  
     
@@ -480,7 +505,7 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   
   %= End screen meassages 
   %
-  out( 1, -1 );
+  out( 1, -1, O.outfids );
 
   return
 
