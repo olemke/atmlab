@@ -2,7 +2,7 @@
 
 	* atmlab-0-3-24
 
-	* demos/arts_oem_demo.m: Some polishing. 
+	* demos/arts_oem_demo.m: Some polishing. The demo works now again.
 
 	* retrieval/oem.m: Screen+file output and selection of output
 	variables now works as specified. Linear and Gauss-Newton
