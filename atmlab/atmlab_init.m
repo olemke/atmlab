@@ -37,7 +37,6 @@ addpath( fullfile( toppath, 'randomize','iaaft' ) );
 addpath( fullfile( toppath, 'randomize' ) ); 
 addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
-addpath( fullfile( toppath, 'parametrisations' ) );
 addpath( fullfile( toppath, 'math' ) ); 
 addpath( fullfile( toppath, 'handy' ) ); 
 addpath( fullfile( toppath, 'graphs', 'geoplots' ) ); 
@@ -55,7 +54,6 @@ addpath( fullfile( toppath, 'arts1' ) );
 addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
-addpath( fullfile( toppath, 'annealing' ) ); 
 
 
 %=== Check if functions from newer Matlab versions shall be included

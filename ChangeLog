@@ -1,5 +1,11 @@
 2008-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-27
+
+	* atmlab/atmlab_init.m: addpath not removed for all moved folders.
+
+2008-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-26
 
 	* More cleaning:
