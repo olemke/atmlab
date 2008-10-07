@@ -1,5 +1,19 @@
 2008-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-26
+
+	* More cleaning:
+
+	* geoplots moved to graphs/geoplots/.
+
+	* mie/ moved to forwardmodel/mie.
+
+	* gformat moved to forwardmodel/gformat/
+
+	* parametrisations/ moved to physics/parametrisations/.
+
+2008-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-25
 
 	* Some cleaning:
