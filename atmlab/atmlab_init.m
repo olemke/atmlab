@@ -25,13 +25,13 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 % If you create a new sub-folder, it should be added here.
 % Please use reversed alphabetical order.
 %
-% Note that /obsolete or /versionfixes shall NOT be included here
+% Note that /obsolete shall NOT be included here
 %
 addpath( fullfile( toppath, 'xml' ) ); 
 addpath( fullfile( toppath, 'time' ) );
 addpath( fullfile( toppath, 'tests' ) );
+addpath( fullfile( toppath, 'sensors', 'atovs' ) ); 
 addpath( fullfile( toppath, 'sensors' ) ); 
-addpath( fullfile( toppath, 'scattering' ) ); 
 addpath( fullfile( toppath, 'retrieval' ) ); 
 addpath( fullfile( toppath, 'randomize','iaaft' ) ); 
 addpath( fullfile( toppath, 'randomize' ) ); 
@@ -44,6 +44,9 @@ addpath( fullfile( toppath, 'handy' ) );
 addpath( fullfile( toppath, 'graphs' ) );
 addpath( fullfile( toppath, 'gformat' ) );
 addpath( fullfile( toppath, 'geoplots' ) ); 
+addpath( fullfile( toppath, 'forwardmodel', 'scattering' ) ); 
+addpath( fullfile( toppath, 'forwardmodel', 'gridcreation', 'annealing' ) ); 
+addpath( fullfile( toppath, 'forwardmodel', 'gridcreation' ) ); 
 addpath( fullfile( toppath, 'forwardmodel' ) );
 addpath( fullfile( toppath, 'files' ) ); 
 addpath( fullfile( toppath, 'demos' ) );

@@ -1,3 +1,30 @@
+2008-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-25
+
+	* Some cleaning:
+	
+	* math/covmat/: Folder created and all covmat*.m functions in
+	retrieval/ moved here.
+	
+	* scattering/ moved to forwardmodel/scattering/
+	
+	* forwardmodel/gridcreation/: Folder created and the following
+	functions moved here:
+	   gridconvert.m
+	   gridselect1D.m
+	   gridselect2D.m
+	   gridselect3D.m
+	   gridthinning.m
+	   optimize_f_grid_amsu.m
+	   optimize_f_grid_hirs.m
+	   optimize_za_grid.m
+	   symgrid.m
+	
+	* anealing/ moved to forwardmodel/gridcreation/
+	
+	* atovs/ moved to sensors/
+	
 2008-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-24
