@@ -1,3 +1,25 @@
+2008-10-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-28
+	
+	* retrieval/gpack.m: Started. Something like a Qpack2, with just
+	ground-based measurements as target. Some qpack features, such as
+	generation of random data sets, will not be included. On the other
+	hand, gpack will be designed to handle batch inversions and flexible
+	input of climatology and a priori data.
+
+	* forwardmodel/gformat/clmtlgy_define.m: Created.
+
+	* forwardmodel/gformat/clmtlgy_interp.m: Created.
+
+	* forwardmodel/gformat/gf_check.m: Grid data are now allowed to be
+	undefined for non-active dimensions.
+
+	* arts/qarts2cfile.m: Q.ABS_LINESHAPE and Q.ABS_LINESHAPE_FACTOR
+	not handled properly.
+
+	* retrieval/oem.m: Some variables were not renamed properly.
+
 2008-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-27

@@ -435,7 +435,7 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   %- Calculate A ?
   %
-  if O.A | O.S | O.Ss | O.e | O.ds
+  if O.A | O.S | O.Ss | O.e | O.es
     A = G * J;
   end
 
@@ -471,7 +471,7 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     end
     %
     if O.eo
-      X.do = sqrt( diag( So ) );
+      X.eo = sqrt( diag( So ) );
     end
   end  
 
@@ -488,7 +488,7 @@ function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
     end
     %
     if O.e
-      X.d = sqrt( diag( Ss ) + diag( So ) );
+      X.e = sqrt( diag( Ss ) + diag( So ) );
     end
     %
     if O.es

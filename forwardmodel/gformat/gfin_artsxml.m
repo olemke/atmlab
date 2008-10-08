@@ -9,6 +9,9 @@
 %    will be checked (as far as possible). This check demands that grid names
 %    and units are completely identical (if not empty on any side).
 %
+%    The data will be imported to the first N dimensions, where N is dimesnion
+%    of file data.
+%
 %    If file holds ArrayOfGriddedFieldX, one G element is created
 %    for each array element.
 %
@@ -114,8 +117,8 @@ if isempty( D )
   D = orderfields( D );
 else
   %
-  if dims_in ~= D.DIM 
-    s = 'Different dimemension in D and file data ';
+  if dims_in > D.DIM 
+    s = 'D.DIM lower than dimension of file data';
     error(sprintf( '%s (%d and %d, respectively).', s, D.DIM, dims_in ) );
   end
   %

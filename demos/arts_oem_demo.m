@@ -62,8 +62,8 @@ O.Xiter   = 0;
 %- Forward model parameters
 %----------------------------------------------------------------------------
 
-Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                        fullfile( 'ARTS_INCLUDES', 'continua.arts' ) };
+Q.INCLUDES          = { fullfile( arts_includes, 'general.arts' ), ...
+                        fullfile( arts_includes, 'continua.arts' ) };
 Q.ATMOSPHERE_DIM    = 1;
 Q.STOKES_DIM        = 1;
 Q.ANTENNA_DIM       = 1;
@@ -215,6 +215,7 @@ arts_oem( 'clean', R );
 clear Qoem 
 
 
+X
 
 %- Plot
 %

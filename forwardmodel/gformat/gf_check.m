@@ -15,16 +15,21 @@ function gf_check( D, G )
 for i = 1:length(G)
 
   for d = 1 : D.DIM
-    gname = sprintf( 'GRID%d', d );
-  
-    if ~isfield( G, gname )
-      error( sprintf( '%s is missing in G', gname ) );
+
+    if any( d == G(i).DIMS )
+      gname = sprintf( 'GRID%d', d );
+      if ~isfield( G, gname )
+        error( sprintf( '%s is missing in G', gname ) );
+      end
+      l = length(G.(gname));
+    else
+      l = 1;
     end
   
-    if length(G.(gname)) ~= size(G.DATA,d)
+    if l ~= size(G.DATA,d)
       fprintf( '\nSize of G.DATA  :' );
       fprintf( ' %d', size(G.DATA) );
-      fprintf( '\nLength of %s : %d\n\n', gname, length(G.(gname)) );
+      fprintf( '\nLength of %s : %d\n\n', gname, l );
       error( sprintf('Size mismatch between %s and G(%d).DATA (see above).',...
                       gname, i ) ); 
     end
