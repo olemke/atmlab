@@ -209,7 +209,7 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   %
   if strcmp( Q.ABSORPTION, 'LoadTable' )
     Q = force_file_local( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
-  else
+  elseif strcmp( Q.ABSORPTION, 'CalcTable' )
     Q                  = qarts_abstable( Q );
     Q.ABS_LOOKUP       = arts_abstable( Q, R.workfolder );
     Q.ABSORPTION       = 'LoadTable';
