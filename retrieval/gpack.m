@@ -139,9 +139,6 @@ function [Q,Sx] = createQandSx(G,workfolder)
   %
   Q.R_GEOID              = constants( 'EARTH_RADIUS' );
   %
-  Q.PPATH_LMAX           = 200;
-  Q.PPATH_STEP_AGENDA    = { 'ppath_stepGeometric' };
-  %
   Q.SENSOR_POS           = Q.R_GEOID + G.STATION_Z;
   %
   Q.J_DO                 = 1;
@@ -156,6 +153,20 @@ function [Q,Sx] = createQandSx(G,workfolder)
   %
   Q.Z_SURFACE            = G.STATION_Z;
 
+  %- RT variables
+  %
+  Q.PPATH_LMAX           = 200;
+  Q.PPATH_STEP_AGENDA    = { 'ppath_stepGeometric' };
+  %
+  if G.CBGR
+    Q.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
+                          'MatrixCBR( iy, stokes_dim, f_grid )' };
+  else
+    Q.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
+                          'nelemGet(nrows,f_grid)', 'Copy(ncols,stokes_dim)', ...
+                          'MatrixSetConstant(iy,nrows,ncols,0)' };
+  end
+  
   %- Add species
   %
   pvalues = [];

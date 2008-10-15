@@ -1,5 +1,11 @@
 2008-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-30
+	
+	* retrieval/gpack.m: Flag for cosmic background radiation added.
+
+2008-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-29
 	
 	* retrieval/gpack.m: Further work. Not finished, but the general
