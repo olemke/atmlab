@@ -672,6 +672,25 @@ function T = cfile_Sensor( Q, partname, workfolder )
       T{end+1} = file_or_data( 'sensor_response_pol', 'Index', ...
                                             Q.SENSOR_RESPONSE_POL, workfolder );
     end
+    % sensor_response_xxx_grid's only needed in a few cases
+    if qarts_isset( Q.J_DO ) & Q.J_DO  & Q.J.POLYFIT.DO
+      if qarts_isset( Q.SENSOR_RESPONSE_F_GRID )
+        T{end+1} = file_or_data( 'sensor_response_f_grid', 'Vector', ...
+                                       Q.SENSOR_RESPONSE_F_GRID, workfolder );
+      end
+      if qarts_isset( Q.SENSOR_RESPONSE_ZA_GRID )
+        T{end+1} = file_or_data( 'sensor_response_za_grid', 'Vector', ...
+                                       Q.SENSOR_RESPONSE_ZA_GRID, workfolder );
+      end
+      if qarts_isset( Q.SENSOR_RESPONSE_AA_GRID )
+        T{end+1} = file_or_data( 'sensor_response_aa_grid', 'Vector', ...
+                                       Q.SENSOR_RESPONSE_AA_GRID, workfolder );
+      end
+      if qarts_isset( Q.SENSOR_RESPONSE_POL_GRID )
+        T{end+1} = file_or_data( 'sensor_response_pol_grid', 'Index', ...
+                                       Q.SENSOR_RESPONSE_POL_GRID, workfolder );
+      end
+    end
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
     T = add_includes( {}, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
   elseif isstruct( Q.SENSOR_RESPONSE ) 
@@ -824,14 +843,18 @@ function T = cfile_Sensor( Q, partname, workfolder )
   %- Saving
   %
   if strcmp( partname, 'SensorSave' )
-    T{end+1} = add_savefile( 'sensor_response',     workfolder );
-    T{end+1} = add_savefile( 'sensor_response_f',   workfolder );
-    T{end+1} = add_savefile( 'sensor_response_za',  workfolder );
-    T{end+1} = add_savefile( 'sensor_response_aa',  workfolder );
-    T{end+1} = add_savefile( 'sensor_response_pol', workfolder );
-    T{end+1} = add_savefile( 'antenna_dim',         workfolder );
-    T{end+1} = add_savefile( 'mblock_za_grid',      workfolder );
-    T{end+1} = add_savefile( 'mblock_aa_grid',      workfolder );
+    T{end+1} = add_savefile( 'sensor_response',          workfolder );
+    T{end+1} = add_savefile( 'sensor_response_f',        workfolder );
+    T{end+1} = add_savefile( 'sensor_response_za',       workfolder );
+    T{end+1} = add_savefile( 'sensor_response_aa',       workfolder );
+    T{end+1} = add_savefile( 'sensor_response_pol',      workfolder );
+    T{end+1} = add_savefile( 'sensor_response_f_grid',   workfolder );
+    T{end+1} = add_savefile( 'sensor_response_za_grid',  workfolder );
+    T{end+1} = add_savefile( 'sensor_response_aa_grid',  workfolder );
+    T{end+1} = add_savefile( 'sensor_response_pol_grid', workfolder );
+    T{end+1} = add_savefile( 'antenna_dim',              workfolder );
+    T{end+1} = add_savefile( 'mblock_za_grid',           workfolder );
+    T{end+1} = add_savefile( 'mblock_aa_grid',           workfolder );
   end
 
 return
@@ -851,7 +874,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
 
   do_parts = false;
   
-  if ~qarts_isset(Q.J_DO )
+  if ~qarts_isset( Q.J_DO )
      T={};
   elseif ~Q.J_DO
     T{1} = 'jacobianOff';
@@ -896,7 +919,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
                                                             workfolder, name3 );
 
         T{end+1} = 'jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,'; 
-        T{end+1} = '   jacobian, atmosphere_dim, p_grid, lat_grid, lon_grid,';
+        T{end+1} = '   jacobian,atmosphere_dim,p_grid,lat_grid,lon_grid,';
         T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
         T{end+1} = sprintf( '  %s,', arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
         T{end+1} = sprintf( '  "%s","%s",', Q.J.ABS_SPECIES(i).METHOD, ...
@@ -914,17 +937,27 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       end
     end
 
-
     %- Pointing
     %
     if Q.J.POINTING.DO
-      rqre_field( Q.POINTING_JAC, 'DZA' );
-      rqre_field( Q.POINTING_JAC, 'POLY_ORDER' );
+      rqre_field( Q.J.POINTING, 'DZA' );
+      rqre_field( Q.J.POINTING, 'POLY_ORDER' );
       
-      T{end+1} = 'jacobianAddPointing{';
-      T{end+1} = sprintf( '  dza        = %g', Q.POINTING_JAC.DZA );
-      T{end+1} = sprintf( '  poly_order = %d', Q.POINTING_JAC.POLY_ORDER );
-      T{end+1} = '}';
+      T{end+1} = 'jacobianAddPointing(jacobian_quantities, jacobian_agenda,';
+      T{end+1} =  '   jacobian, sensor_pos, sensor_time';
+      T{end+1} = sprintf( '   %g,%d)', Q.J.POINTING.DZA, ...
+                                                    Q.J.POINTING.POLY_ORDER );
+    end
+
+    %- Polyfit
+    %
+    if Q.J.POLYFIT.DO
+      rqre_field( Q.J.POLYFIT, 'POLY_ORDER' );
+      
+      T{end+1} = 'jacobianAddPolyfit(jacobian_quantities, jacobian_agenda,';
+      T{end+1} =  '   jacobian, sensor_response_pol_grid,';
+      T{end+1} =  '   sensor_response_za_grid, sensor_pos,';
+      T{end+1} = sprintf( '   %d)', Q.J.POLYFIT.POLY_ORDER );
     end
     
     if length(T) > 1

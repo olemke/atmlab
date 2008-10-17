@@ -19,7 +19,11 @@
 %                        SENSOR_RESPONSE_F
 %                        SENSOR_RESPONSE_ZA
 %                        SENSOR_RESPONSE_AA
-%                        SENSOR_RESPONSE_POLl
+%                        SENSOR_RESPONSE_POL
+%                        SENSOR_RESPONSE_F_GRID
+%                        SENSOR_RESPONSE_ZA_GRID
+%                        SENSOR_RESPONSE_AA_GRID
+%                        SENSOR_RESPONSE_POL_GRID
 %                        ANTENNA_DIM        
 %                        MBLOCK_ZA_GRID     
 %                        MBLOCK_AA_GRIDS
@@ -91,6 +95,14 @@ if folder_created  |  do_load
                  xmlLoad( fullfile( workfolder, 'sensor_response_aa.xml' ) );
   Q.SENSOR_RESPONSE_POL = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response_pol.xml' ) );
+  Q.SENSOR_RESPONSE_F_GRID = ...
+              xmlLoad( fullfile( workfolder, 'sensor_response_f_grid.xml' ) );
+  Q.SENSOR_RESPONSE_ZA_GRID = ...
+              xmlLoad( fullfile( workfolder, 'sensor_response_za_grid.xml' ) );
+  Q.SENSOR_RESPONSE_AA_GRID = ...
+              xmlLoad( fullfile( workfolder, 'sensor_response_aa_grid.xml' ) );
+  Q.SENSOR_RESPONSE_POL_GRID = ...
+              xmlLoad( fullfile( workfolder, 'sensor_response_pol_grid.xml' ) );
   Q.ANTENNA_DIM = ...
                  xmlLoad( fullfile( workfolder, 'antenna_dim.xml' ) );
   Q.MBLOCK_ZA_GRID = ...
@@ -103,6 +115,14 @@ else
   Q.SENSOR_RESPONSE_ZA  = fullfile( workfolder, 'sensor_response_za.xml' );
   Q.SENSOR_RESPONSE_AA  = fullfile( workfolder, 'sensor_response_aa.xml' );
   Q.SENSOR_RESPONSE_POL = fullfile( workfolder, 'sensor_response_pol.xml' );
+  Q.SENSOR_RESPONSE_F_GRID = ...
+                         fullfile( workfolder, 'sensor_response_f_grid.xml' );
+  Q.SENSOR_RESPONSE_ZA_GRID = ...
+                         fullfile( workfolder, 'sensor_response_za_grid.xml' );
+  Q.SENSOR_RESPONSE_AA_GRID = ...
+                         fullfile( workfolder, 'sensor_response_aa_grid.xml' );
+  Q.SENSOR_RESPONSE_POL_GRID = ... 
+                         fullfile( workfolder, 'sensor_response_pol_grid.xml' );
   Q.ANTENNA_DIM         = fullfile( workfolder, 'antenna_dim.xml' );
   Q.MBLOCK_ZA_GRID      = fullfile( workfolder, 'mblock_za_grid.xml' );
   Q.MBLOCK_AA_GRID      = fullfile( workfolder, 'mblock_aa_grid.xml' );

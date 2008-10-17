@@ -95,6 +95,9 @@ for i = 1 : nq
       end
     end
 
+  case 'Polyfit'   %-----------------------------------------------------------
+    %
+    xa(ind) = 0;    
 
   otherwise   %----------------------------------------------------------------
     error('Unknown retrieval characteristics.'); 
@@ -247,6 +250,14 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   Q.SENSOR_RESPONSE_ZA  = fullfile( R.workfolder, 'sensor_response_za.xml' );
   Q.SENSOR_RESPONSE_AA  = fullfile( R.workfolder, 'sensor_response_aa.xml' );
   Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
+  Q.SENSOR_RESPONSE_F_GRID = ...
+                       fullfile( R.workfolder, 'sensor_response_f_grid.xml' );
+  Q.SENSOR_RESPONSE_ZA_GRID = ...
+                       fullfile( R.workfolder, 'sensor_response_za_grid.xml' );
+  Q.SENSOR_RESPONSE_AA_GRID  = ...
+                       fullfile( R.workfolder, 'sensor_response_aa_grid.xml' );
+  Q.SENSOR_RESPONSE_POL_GRID = ...
+                       fullfile( R.workfolder, 'sensor_response_pol_grid.xml' );
   Q.ANTENNA_DIM         = fullfile( R.workfolder, 'antenna_dim.xml' );
   Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
   Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );

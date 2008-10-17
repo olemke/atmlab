@@ -1,4 +1,4 @@
-function Xa = gpack(G,O,Y)
+function P = gpack(G,Y)
 
   
 %-----------------------------------------------------------------------------
@@ -21,11 +21,11 @@ workfolder = create_tmpfolder;
 %
 % This step includes calculation of sensor response data
 %
-[Q,Sx] = createQandSx( G, workfolder );
+[Q,Sx,O] = createQandSxandO( G, workfolder );
 
 %- Inverse of Sx
 %
-% Is fixex and should only be calculated once (to save time)
+% Is fixed and should only be calculated once (to save time)
 %
 Sxinv = Sx \ speye(size(Sx));
 
@@ -36,40 +36,40 @@ Sxinv = Sx \ speye(size(Sx));
 %- Invert measurements
 %-----------------------------------------------------------------------------
 
+P = [];
+  
 for m = 1 : length(Y)
   
   %- Set up data for next measurement
   %
-  [Q,y] = nextMeasurement( G, Q, Y, m );
+  [Q,Ythis] = nextMeasurement( G, Q, Y, m );
 
   %- Simulate a (noise free) measurement if y is empty
   if empty_y
     %
-    if m == 1
-      Xa = y;
+    if isempty(P)
+      P    = Y(m);
     else
-      Xa(m) = y;
+      P(m) = Y(m);
     end
-    Xa(m).y = arts_y( Q, workfolder );
+    %
+    P(m).y = arts_y( Q, workfolder );
   
   else
     %- Create Se
     %
-    Se = createSe( G, Y(m).tnoise_si );
+    Se = createSe( G, Ythis.tnoise_si );
 
     %- Perform retrieval
     %
     [Qoem,R,xa] = arts_oem_init( Q );
-    X           = oem( O, Qoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, y );
+    X           = oem( O, Qoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.y );
     %
     arts_oem( 'clean', R );
     clear Qoem 
-    %
-    if m == 1
-      Xa = X;
-    else
-      Xa(m) = X;
-    end
+    
+    %- Fill return structure
+    P = fillP( P, G, Q, Ythis, R, xa, X );
 
   end
 end
@@ -109,7 +109,7 @@ return
 
 % Creates Sx and fixed parts of Q 
 %
-function [Q,Sx] = createQandSx(G,workfolder)
+function [Q,Sx,O] = createQandSxandO(G,workfolder)
 
   %- Check if needed atmlab settings are found
   %
@@ -122,7 +122,29 @@ function [Q,Sx] = createQandSx(G,workfolder)
   Q   = qarts;
   Sx  = [];
   
-  %- Hard-coded settings
+  %- OEM 
+  %
+  % User settings
+  O.linear              = G.OEM_LINEAR;
+  O.imethod             = G.OEM_IMETHOD;
+  O.stop_dx             = G.OEM_STOP_DX;
+  O.maxiter             = G.OEM_MAXITER;
+  %
+  % Hard-coded settings
+  %
+  O.cost                = 1;
+  O.e                   = 1;
+  O.eo                  = 1;
+  O.es                  = 1;
+  if G.OUT_Y
+    O.yf                = 1;
+  end
+  if G.OUT_A
+    O.A                 = 1;
+  end
+
+    
+  %- Hard-coded Q settings
   %
   Q.INCLUDES          = { fullfile( arts_includes, 'general.arts' ), ...
                           fullfile( arts_includes, 'continua.arts' ) };
@@ -139,7 +161,7 @@ function [Q,Sx] = createQandSx(G,workfolder)
   %
   Q.R_GEOID              = constants( 'EARTH_RADIUS' );
   %
-  Q.SENSOR_POS           = Q.R_GEOID + G.STATION_Z;
+  Q.SENSOR_POS           = Q.R_GEOID + G.PLATFORM_Z;
   %
   Q.J_DO                 = 1;
   Q.J                    = qartsJacobian;
@@ -151,7 +173,7 @@ function [Q,Sx] = createQandSx(G,workfolder)
     
   %- Surface and atmosphere
   %
-  Q.Z_SURFACE            = G.STATION_Z;
+  Q.Z_SURFACE            = G.SURFACE_Z;
 
   %- RT variables
   %
@@ -217,36 +239,20 @@ function [Q,Sx] = createQandSx(G,workfolder)
     Q.SENSOR_RESPONSE = S;
     Q = arts_sensor( Q, workfolder );
   end
-return
-
-
-
-% Extracts atmospheric fields for selected measurement
-%
-function Q = create_atm_fields( G, Q, hse_p, hse_z, ...
-                                       year, month, day, hour, minute, second ) 
-
-  Q.VMR_FIELD = zeros( length(Q.ABS_SPECIES), length(Q.P_GRID), 1, 1 );
-
-  h2o = [];
-
-  for i = 1 : length(Q.ABS_SPECIES) 
-    Q.VMR_FIELD(i,:,1,1) = clmtlgy_interp( G.ATMDATA_D, G.SPECIES(i).ATMDATA,...
-                                  Q.P_GRID, G.STATION_LAT, G.STATION_LON, ...
-                                           year, month, day, hour, minute, 0 );
-    if isempty(h2o)
-      species = arts_tgs2species(Q.ABS_SPECIES{1}{1});
-      if strcmp( species, 'H2O' )
-        h2o = Q.VMR_FIELD(i,1,1,1);
-      end
+  
+  % Polyfit
+  %
+  if G.POLYFIT_DO
+    l = G.POLYFIT_ORDER + 1;
+    if length(G.POLYFIT_SI) ~= l
+      error('Length of *G.POLYFIT_SI* must be G.POLYFIT_ORDER + 1.');
     end
+    %
+    Q.J.POLYFIT.DO         = 1;
+    Q.J.POLYFIT.POLY_ORDER = G.POLYFIT_ORDER;
+    %
+    Sx = covmat_append( Sx, spdiags(vec2col(G.POLYFIT_SI).^2,0,l,l) );
   end
-
-  Q.T_FIELD = clmtlgy_interp( G.ATMDATA_D, G.T.ATMDATA, Q.P_GRID, ...
-                              G.STATION_LAT, G.STATION_LON, ...
-                              year, month, day, hour, minute, 0 );
-
-  Q.Z_FIELD = pt2z( Q.P_GRID, Q.T_FIELD, h2o, hse_p, hse_z, G.STATION_LAT );
 return
 
 
@@ -336,31 +342,136 @@ function empty_y = checkY( G, Y )
 return
 
 
+
 % Jump to next measurement
 %
 % y is set to Y(i) if spectrum is empty
 %
-function [Q,y] = nextMeasurement( G, Q, Y, i )
+function [Q,Ythis] = nextMeasurement( G, Q, Y, i )
 
+  Ythis = Y(i);
+  
   %- Observation direction
   %
-  Q.SENSOR_LOS = Y(i).zenith_angle;
+  Q.SENSOR_LOS = Ythis.zenith_angle;
 
+  %- Position set?
+  %
+  if ~isfield( Ythis, 'latitude' ),  Ythis.latitude  = G.PLATFORM_LAT; end
+  if ~isfield( Ythis, 'longitude' ), Ythis.longitude = G.PLATFORM_LON; end  
+  
+  %- Non mandatory time data
+  %
+  if ~isfield( Ythis, 'hour' ),   Ythis.hour = 12;  end
+  if ~isfield( Ythis, 'minute' ), Ythis.minute = 0; end
+  if ~isfield( Ythis, 'second' ), Ythis.second = 0; end
 
-  %- Create atmospheric / apriori profiles
+  %- Create atmospheric fields
   %
-  if ~isfield( Y, 'hour' ),   hour = 12;  else hour = Y(i).hour;     end
-  if ~isfield( Y, 'minute' ), minute = 0; else minute = Y(i).minute; end
-  if ~isfield( Y, 'second' ), second = 0; else second = Y(i).second; end
+  Q.VMR_FIELD = zeros( length(Q.ABS_SPECIES), length(Q.P_GRID), 1, 1 );
   %
-  Q = create_atm_fields( G, Q, Y(i).hse_p, Y(i).hse_z, ...
-                       Y(i).year, Y(i).month, Y(i).day, hour, minute, second );  
-
-  %- Set y
+  h2o = [];
   %
-  if length( Y.y )
-    y = Y.y;
-  else
-    y = Y(i);
+  for i = 1 : length(Q.ABS_SPECIES) 
+    Q.VMR_FIELD(i,:,1,1) = clmtlgy_interp( ...
+                           G.ATMDATA_D, G.SPECIES(i).ATMDATA, Q.P_GRID, ...
+                           Ythis.latitude, Ythis.longitude, ...
+                           Ythis.year, Ythis.month, Ythis.day, ...
+                           Ythis.hour, Ythis.minute, Ythis.second );
+    if isempty(h2o)
+      species = arts_tgs2species( Q.ABS_SPECIES{i}{1} );
+      if strcmp( species, 'H2O' )
+        h2o = Q.VMR_FIELD(i,1,1,1);
+      end
+    end
   end
+  %
+  Q.T_FIELD = clmtlgy_interp( G.ATMDATA_D, G.T.ATMDATA, Q.P_GRID, ...
+                           Ythis.latitude, Ythis.longitude, ...
+                           Ythis.year, Ythis.month, Ythis.day, ...
+                           Ythis.hour, Ythis.minute, Ythis.second ); 
+  %
+  Q.Z_FIELD = pt2z( Q.P_GRID, Q.T_FIELD, h2o, Ythis.hse_p, Ythis.hse_z, ...
+                                                              Ythis.latitude );
+return
+
+
+
+% Fill output structure
+%
+function P = fillP( P, G, Q, Ythis, R, xa, X )
+
+  i = length(P) + 1;
+
+  % Position and time 
+  P(i).laitude   = Ythis.latitude;
+  P(i).longitude = Ythis.longitude;
+  P(i).year      = Ythis.year;
+  P(i).month     = Ythis.month;
+  P(i).month     = Ythis.month;
+  P(i).day       = Ythis.day;
+  P(i).hour      = Ythis.hour;
+  P(i).minute    = Ythis.minute;
+  P(i).second    = Ythis.second;
+ 
+  % Retrieval diagnostics 
+  if G.OEM_LINEAR 
+    P(i).converged = X.converged;
+  end 
+  P(i).cost   = X.cost;
+  P(i).cost_x = X.cost_x;
+  P(i).cost_y = X.cost_y;
+  %  
+  if G.OUT_A
+    P(i).A   = X.A;
+  end
+
+  % Spectra
+  if G.OUT_Y
+    P(i).f   = G.F_BACKEND;
+    P(i).y   = Ythis.y;
+    P(i).yf  = X.yf;
+  end
+ 
+  % PTZ (a priori or forward model parameters)
+  if G.OUT_PTZ
+    P(i).p = vec2col( Q.P_GRID );
+    P(i).t = Q.T_FIELD;
+    P(i).z = Q.Z_FIELD;
+  end
+
+  % Retrieval quantities
+  %
+  ispecies = 0;
+  tdone    = 0;
+  %
+  for i = 1 : length(R.jq)
+
+    ind      = R.ji{i}{1} : R.ji{i}{2};
+    
+    if strcmp( R.jq{i}.maintag, 'Abs. species' )
+      %
+      ispecies = ispecies + 1;
+      s        = sprintf( 'species%d', ispecies );
+      %
+      if strcmp( Q.J.ABS_SPECIES(i).UNIT, 'rel' )
+        fac = R.x_vmr0(ind);
+      else
+        fac = ones( length(pgrid), 1 );
+      end
+      %
+      P(i).([s,'_name'])  = R.jq{i}.subtag;
+      P(i).([s,'_p'])     = vec2col( Q.J.ABS_SPECIES(ispecies).GRID1 );
+      P(i).([s,'_x'])     = fac .* X.x(ind);
+      P(i).([s,'_xa'])    = fac .* xa(ind);
+      P(i).([s,'_e'])     = fac .* X.e(ind);
+      P(i).([s,'_eo'])    = fac .* X.eo(ind);
+      P(i).([s,'_es'])    = fac .* X.es(ind);
+    
+    else
+      error( sprintf( 'Unknown retrieval quantity: %s', R.jq{i}.maintag ) );
+    end
+    
+  end
+  
 return

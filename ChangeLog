@@ -1,3 +1,13 @@
+2008-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-31
+
+	* Work in several functions to prepare for polynomial baseline fits.
+	
+	* retrieval/gpack.m (gpack): Removed input structore O. OEM
+	variables now part of G. Result now packed into an output
+	structure P. Possible to control the content of P.
+	
 2008-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-30
