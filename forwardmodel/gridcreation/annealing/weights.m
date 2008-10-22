@@ -85,7 +85,7 @@ for i=1:n_chan
     X = y_mono(now_active,:)';
 
     % Do least square fit for the weights, using backslash operator:
-    w = X\y_ref';
+    w = X\y_ref(i,:)';
 
     % We do not want negative weights. We identify them, add them
     % to the ignore list, and repeat the regression.

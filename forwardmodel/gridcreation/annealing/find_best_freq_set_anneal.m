@@ -104,19 +104,31 @@ x = size(H);
 n_channels = x(1);
 n_fmono    = x(2);
 
+% The first dimension of y_mono is the number of monochromatic
+% frequencies times the number of viewing angles, since spectra for
+% different viewing angles are appended in the output vector y.
+
 x = size(y_mono);
-if (x(1)~=n_fmono)
-  error('Dimensions of H and y_mono do not match!')
-end
+n_views = x(1)/n_fmono;
 n_cases = x(2);
 
 clear x;
 
+% Carrying the view dimension through the entire calculation would
+% make everything very complicated. Especially the calculation of
+% regression weights would no longer be straightforward.
+% So instead, we choose a different approach here: We treat the
+% measurement at different views as if they were different
+% atmospheric cases. That means we have to do some re-shaping of
+% the input variable y_mono here.
+% Original y_mono[n_fmono*n_views, n_cases]
+% New      y_mono[n_fmono, n_cases*n_views]
+
+y_mono_resh = reshape(y_mono,[n_fmono, n_cases*n_views]);
 
 
 % Reference y:
-y_ref = H * y_mono;
-
+y_ref = H * y_mono_resh;
 
 % Initial guess.
 s = logical(zeros(1,n_fmono));
@@ -137,8 +149,8 @@ e_shorthist = zeros(1,Nblock);
 % state changes.
 for i=1:Nblock
   sn = neighbour(s);  
-  W  = weights(sn, y_ref, H, y_mono);
-  e  = test_freq_set(sn, y_ref, W, y_mono);
+  W  = weights(sn, y_ref, H, y_mono_resh);
+  e  = test_freq_set(sn, y_ref, W, y_mono_resh);
   e_shorthist(i) = e;
   s = sn;
 end
@@ -185,10 +197,10 @@ while go_on
     sn = neighbour(s);  
     
     % Calculate weights.
-    W  = weights(sn, y_ref, H, y_mono);
+    W  = weights(sn, y_ref, H, y_mono_resh);
 
     % Calculate error (= energy).
-    en = test_freq_set(sn, y_ref, W, y_mono);
+    en = test_freq_set(sn, y_ref, W, y_mono_resh);
     
     % Energy difference:
     de = en - e;

@@ -9,13 +9,14 @@
 % with one frequency more, and so on until the desired accuracy is
 % reached.
 %
-% FORMAT R = find_best_freq_set_anneal(H, y_mono, n_start, acc, C)
+% FORMAT R = find_best_freq_set_anneal(H, y_mono, n_start, n_incr, acc, C)
 %
 % OUT R       An array of structures. Each structure has elements sb, Wb,
 %             eb, which correspond to the output arguments of
 %             find_best_freq_set_anneal.
 % IN  n_start The starting number of frequencies. (You should take
 %             at least one per channel.)
+%     n_incr  By how much to increment n in each iteration.
 %     acc     The desired accuracy, at which the looping is
 %             stopped. This is the RMS error in the solution, as
 %             returned by find_best_freq_set_anneal in eb.
@@ -23,17 +24,18 @@
 
 % 2008-09-25 Created by Stefan Buehler. 
 
-function R = loop_anneal(H, y_mono, n_start, acc, C)
+function R = loop_anneal(H, y_mono, n_start, n_incr, acc, C)
 
 % Set verbosity of find_best_freq_set_anneal to 0:
-C.verb = 0;
+C.verb = 1;
 
+disp('****************************************')
 disp(sprintf('Starting with n = %d.', n_start))
 
 go_on = true;
 i = 1;
+n = n_start;
 while go_on
-  n = n_start-1+i;
   [sb, Wb, eb] = find_best_freq_set_anneal(H,...
                                            y_mono,...
                                            n,...
@@ -42,12 +44,14 @@ while go_on
   R(i).Wb = Wb;
   R(i).eb = eb;
   
+  disp('****************************************')
   disp(sprintf('n = %d, acc = %g K', n, eb))
   
   if eb<=acc
     go_on = false;
   else
     i = i+1;
+    n = n+n_incr;
   end
 end
 

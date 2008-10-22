@@ -1,3 +1,20 @@
+2008-10-22  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-32
+
+	* forwardmodel/gridcreation/annealing/find_best_freq_set_anneal.m:
+	Adapted to multichannel instruments.
+
+	* forwardmodel/gridcreation/annealing/weights.m: Fixed small bug
+	for multichannel instruments.
+
+	* forwardmodel/gridcreation/annealing/loop_anneal.m: Added input
+	variable n_incr, which species by how much the number of
+	frequencies should be increased in each iteration. (Suggested
+	value is the number of instrument channels, if you optimize for a
+	multichannel instrument.) Also increased verbosity to 1, so that
+	one can see what is going on for long slow jobs.
+
 2008-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-31
