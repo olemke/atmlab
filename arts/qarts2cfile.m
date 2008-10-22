@@ -925,15 +925,14 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         T{end+1} = sprintf( '  "%s","%s",', Q.J.ABS_SPECIES(i).METHOD, ...
                                                       Q.J.ABS_SPECIES(i).UNIT );
         if strcmp( Q.J.ABS_SPECIES(i).METHOD, 'analytical' )
-           T{end+1} = '  0.0';
+           T{end+1} = '  0.0)';
         elseif strcmp( Q.J.ABS_SPECIES(i).METHOD, 'perturbation' )
           rqre_field( Q.J.ABS_SPECIES(i), 'DX' );
-          T{end+1} = sprintf( '  %.5e', Q.J.ABS_SPECIES(i).DX );
+          T{end+1} = sprintf( '  %.5e)', Q.J.ABS_SPECIES(i).DX );
         else
           error( sprintf('Unknown selection for J.ABS_SPECIES.METHOD (%s)',...
                                                   Q.J.ABS_SPECIES(i).METHOD ) );
         end
-        T{end+1} = ')';
       end
     end
 
@@ -955,7 +954,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       rqre_field( Q.J.POLYFIT, 'POLY_ORDER' );
       
       T{end+1} = 'jacobianAddPolyfit(jacobian_quantities, jacobian_agenda,';
-      T{end+1} =  '   jacobian, sensor_response_pol_grid,';
+      T{end+1} =  '   jacobian,sensor_response_pol_grid,sensor_response_f_grid,';
       T{end+1} =  '   sensor_response_za_grid, sensor_pos,';
       T{end+1} = sprintf( '   %d)', Q.J.POLYFIT.POLY_ORDER );
     end

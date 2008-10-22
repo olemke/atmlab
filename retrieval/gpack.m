@@ -403,6 +403,12 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
 
   i = length(P) + 1;
 
+  % Start and stop index for each retrieval quantity  
+  I = zeros( length(R.jq), 2 );
+  for q = 1 : length(R.jq)
+    I(q,:) = [ R.ji{q}{1}  R.ji{q}{2} ];
+  end
+  
   % Position and time 
   P(i).laitude   = Ythis.latitude;
   P(i).longitude = Ythis.longitude;
@@ -425,7 +431,9 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
   if G.OUT_A
     P(i).A   = X.A;
   end
-
+  %
+  mresp = mrespA( X.A, I );
+  
   % Spectra
   if G.OUT_Y
     P(i).f   = G.F_BACKEND;
@@ -445,33 +453,47 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
   ispecies = 0;
   tdone    = 0;
   %
-  for i = 1 : length(R.jq)
+  for q = 1 : length(R.jq)
 
-    ind      = R.ji{i}{1} : R.ji{i}{2};
+    unitfac = 1;
+    include = 1;
+    ind     = I(q,1) : I(q,2);
     
-    if strcmp( R.jq{i}.maintag, 'Abs. species' )
-      %
+    
+    if strcmp( R.jq{q}.maintag, 'Absorption species' )
+      %------------------------------------------------------------------------
       ispecies = ispecies + 1;
       s        = sprintf( 'species%d', ispecies );
       %
-      if strcmp( Q.J.ABS_SPECIES(i).UNIT, 'rel' )
-        fac = R.x_vmr0(ind);
-      else
-        fac = ones( length(pgrid), 1 );
+      if strcmp( Q.J.ABS_SPECIES(q).UNIT, 'rel' )
+        unitfac = R.x_vmr0(ind);
       end
       %
-      P(i).([s,'_name'])  = R.jq{i}.subtag;
+      P(i).([s,'_name'])  = R.jq{q}.subtag;
       P(i).([s,'_p'])     = vec2col( Q.J.ABS_SPECIES(ispecies).GRID1 );
-      P(i).([s,'_x'])     = fac .* X.x(ind);
-      P(i).([s,'_xa'])    = fac .* xa(ind);
-      P(i).([s,'_e'])     = fac .* X.e(ind);
-      P(i).([s,'_eo'])    = fac .* X.eo(ind);
-      P(i).([s,'_es'])    = fac .* X.es(ind);
     
+    
+    elseif strcmp( R.jq{q}.maintag, 'Polynomial baseline fit' )
+      %------------------------------------------------------------------------
+      if G.OUT_BASELINE
+        s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
+      else
+        include = 0;
+      end
+      
+      
     else
-      error( sprintf( 'Unknown retrieval quantity: %s', R.jq{i}.maintag ) );
+      error( sprintf( 'Unknown retrieval quantity: %s', R.jq{q}.maintag ) );
     end
-    
+
+    if include
+      P(i).([s,'_x'])  = unitfac .* X.x(ind);
+      P(i).([s,'_xa']) = unitfac .* xa(ind);
+      P(i).([s,'_e'])  = unitfac .* X.e(ind);
+      P(i).([s,'_eo']) = unitfac .* X.eo(ind);
+      P(i).([s,'_es']) = unitfac .* X.es(ind);
+      P(i).([s,'_mr']) = mresp(ind);
+    end
   end
   
 return

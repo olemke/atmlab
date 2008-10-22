@@ -69,7 +69,7 @@ for i = 1 : nq
   switch R.jq{i}.maintag
 
 
-  case 'Abs. species'   %------------------------------------------------------
+  case 'Absorption species'   %-----------------------------------------------
     %
     ig      = i_asj(i);    % Gas species index
     any_gas = true;
@@ -95,11 +95,11 @@ for i = 1 : nq
       end
     end
 
-  case 'Polyfit'   %-----------------------------------------------------------
+  case 'Polynomial baseline fit'   %------------------------------------------
     %
     xa(ind) = 0;    
 
-  otherwise   %----------------------------------------------------------------
+  otherwise   %---------------------------------------------------------------
     error('Unknown retrieval characteristics.'); 
   end
 end 

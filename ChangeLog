@@ -1,3 +1,13 @@
+2008-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-33
+
+	* retrieval/gpack.m
+	* arts/arts_oem.m
+	* arts/qarts2cfile.m
+	* arts/arts_oem_init.m: Improvements around gas and polyfit jacobians.
+	Polyfit part not completed.
+	
 2008-10-22  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-0-3-32

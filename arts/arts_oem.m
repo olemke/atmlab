@@ -110,7 +110,7 @@ if iter > 1
 
     switch R.jq{i}.maintag
 
-    case 'Abs. species'   %---------------------------------------------------
+      case 'Absorption species'   %---------------------------------------------
       %
       any_gas = true;
       ig      = i_asj(i);    % Gas species index
