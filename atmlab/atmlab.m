@@ -105,6 +105,14 @@
 % The width, in number of characters, of the Matlab window.
 % Used by the function *out* to make a frame around screen output.
 %----------------------------------------------------------------------------
+% SKIP_VFIXES
+%
+% Flag to skip "version fixes". This procedure performed at startup fills
+% the folder AUTO_FIXES with some functions lacking in older matlab versions.
+% If this field is set to true, it is assumed that the version fixes
+% procedure has been performed. No functions are copied (but AUTO_FIXES is
+% added to the search path if it exists).
+%----------------------------------------------------------------------------
 % VERBOSITY
 % 
 % The verbosity of Atmlab functions.  

@@ -1,5 +1,18 @@
 2008-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-35
+
+	* atmlab/atmlab.m: Added description of SKIP_VFIXES. This setting
+	can be activated if you are sure that AUTO_FIXES is up to date.
+	Should save some time, and avoid interference between parallel
+	processes.
+
+	* atmlab/atmlab_defs.m: Defualt for SKIP_VFIXES is 0.
+
+	* atmlab/atmlab_init.m: Added handling of SKIP_VFIXES. 
+
+2008-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-34
 
 	* arts/arts_oem.m: Polyfit and baseline now handled.

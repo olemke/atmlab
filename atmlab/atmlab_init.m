@@ -58,16 +58,23 @@ addpath( fullfile( toppath, 'arts', 'scenegen' ) );
 addpath( fullfile( toppath, 'arts' ) ); 
 
 
-%=== Check if functions from newer Matlab versions shall be included
-%
-version_fixes( toppath )
-
-
 %=== Read Atmlab settings
 %
 atmlab('defaults');
 if exist( 'atmlab_conf' ) == 2
   atmlab_conf;
+end
+
+
+%=== Check if functions from newer Matlab versions shall be included
+%
+if ~atmlab( 'SKIP_VFIXES' )
+  version_fixes( toppath )
+else
+  outfolder = 'AUTO_fixes';
+  if exist( fullfile( toppath, outfolder ) )
+    addpath( fullfile( toppath, outfolder ) );   
+  end
 end
 
 
@@ -100,44 +107,45 @@ end
 
 function version_fixes( toppath )
 
-infolder  = 'obsolete';
-outfolder = 'AUTO_fixes';
+  infolder  = 'obsolete';
+  outfolder = 'AUTO_fixes';
 
 
-%= Get functions residing in *infolder*
-%
-D = dir( fullfile( toppath, infolder, '*.m' ) );
+  %= Get functions residing in *infolder*
+  %
+  D = dir( fullfile( toppath, infolder, '*.m' ) );
 
 
-%= Loop and see if function already exists
-%
-to_include = [];
-%
-for i = 1 : length(D)
+  %= Loop and see if function already exists
+  %
+  to_include = [];
+  %
+  for i = 1 : length(D)
 
-  [pathstr,name] = fileparts( D(i).name );
+    [pathstr,name] = fileparts( D(i).name );
 
-  if ~strcmp(name,'Contents')  &  exist( name ) < 2
-    to_include = [ to_include i ]; 
+    if ~strcmp(name,'Contents')  &  exist( name ) < 2
+      to_include = [ to_include i ];
+    end
+
   end
 
-end
 
+  if ~isempty( to_include )
 
-if ~isempty( to_include )
+    %= Create or empty target folder
+    if ~exist( fullfile( toppath, outfolder ) )
+      mkdir( toppath, outfolder );
+    else
+      delete( fullfile( toppath, outfolder, '*' ) );
+    end
 
-  %= Create or empty target folder
-  if ~exist( fullfile( toppath, outfolder ) )
-    mkdir( toppath, outfolder );
-  else
-    delete( fullfile( toppath, outfolder, '*' ) );
+    for i = 1 : length(to_include)
+      copyfile( fullfile( toppath, infolder,  D(to_include(i)).name) , ...
+                fullfile( toppath, outfolder, D(to_include(i)).name) )
+    end
+
+    addpath( fullfile( toppath, outfolder ) ); 
+
   end
-
-  for i = 1 : length(to_include)
-    copyfile( fullfile( toppath, infolder,  D(to_include(i)).name) , ...
-              fullfile( toppath, outfolder, D(to_include(i)).name) )
-  end
-
-  addpath( fullfile( toppath, outfolder ) ); 
-
-end
+return
