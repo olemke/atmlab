@@ -72,12 +72,13 @@
 %
 % FORMAT   O = oem
 %            or
-%          X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv)
+%          [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv)
 %            or
-%          X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
+%          [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 %        
 % OUT   O        O structure with default value for all recognised fields.
 %       X        Retrieved state and additional information.
+%       R        Retreival variable structure from last calculation.
 % IN    O        OEM setting structure.
 %       Q        Forward model setting structure.
 %       R        Rtreival variable structure.
@@ -91,7 +92,7 @@
 %       xa       A priori profile.
 %       y        Measurement vector.
 
-function X = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
+function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
 
 

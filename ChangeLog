@@ -1,3 +1,14 @@
+2008-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-34
+
+	* arts/arts_oem.m: Polyfit and baseline now handled.
+
+	* retrieval/gpack.m: Polyfit and baseline data can now be extracted. 
+
+	* retrieval/oem.m: Added R as output argument, to faciliate re-packing
+	of retrieval result.
+
 2008-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-33

@@ -94,14 +94,20 @@ if iter > 1
 
   %- General variables
   %
-  nq    = length( R.jq );                   % Number of retrieval quantities.
+  nq      = length( R.jq );                  % Number of retrieval quantities.
   %
-  i_asj = find( [ Q.J.ABS_SPECIES.DO ] );   % Index of retrieval absorption
-  %                                           species.
-  i_rel = [];                               % Index for x-values retrieved in
-  %                                           relative units.
-  any_gas = false;                          % Any gas species among rq
-
+  i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );  % Index of retrieval absorption
+  %                                          species.
+  i_rel   = [];                              % Index for x-values retrieved in
+  %                                          relative units.
+  any_gas = false;                           % Any gas species among rq
+  %
+  bl      = 0;                               % Sum of all baseline terms
+  %  
+  old_j_loaded = 0;                          % To avoid repeated loading of
+  %                                            existing J
+  
+  
   %- Loop retrieval quantities
   %
   for i = 1 : nq
@@ -111,33 +117,41 @@ if iter > 1
     switch R.jq{i}.maintag
 
       case 'Absorption species'   %---------------------------------------------
-      %
-      any_gas = true;
-      ig      = i_asj(i);    % Gas species index
-      D       = [];
-      %
-      if strcmp( R.jq{i}.mode, 'rel' )
-        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = ...
-                                  x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
-                                      x(ind) .* R.x_vmr0(ind), ...
-                                            R.p_grid, R.lat_grid, R.lon_grid );
-        i_rel = [ i_rel ind ];
-      elseif strcmp( R.jq{i}.mode, 'vmr' )
-        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = ...
-                                  x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
-                                      x(ind), ...
-                                            R.p_grid, R.lat_grid, R.lon_grid );
-      else
-        [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = ...
-                                  x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
-                                      nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
-                                            R.p_grid, R.lat_grid, R.lon_grid );
-      end
-      %
-      R.vmr_field(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
-      %
-    end
-  end
+        %
+        any_gas = true;
+        ig      = i_asj(i);    % Gas species index
+        D       = [];
+        %
+        if strcmp( R.jq{i}.mode, 'rel' )
+          [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
+                                  R.jq{i}.grids, x(ind) .* R.x_vmr0(ind), ...
+                                             R.p_grid, R.lat_grid, R.lon_grid );
+          i_rel = [ i_rel ind ];
+        elseif strcmp( R.jq{i}.mode, 'vmr' )
+          [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
+                      R.jq{i}.grids, x(ind), R.p_grid, R.lat_grid, R.lon_grid );
+        else
+          [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
+                      R.jq{i}.grids, nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
+                                             R.p_grid, R.lat_grid, R.lon_grid );
+        end
+        %
+        R.vmr_field(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
+
+  
+      case 'Polynomial baseline fit'   %----------------------------------------
+        %       
+        if ~old_j_loaded
+          J = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
+        end
+        %
+        bl = bl + J(:,ind) * x(ind);
+        
+
+      otherwise   %-------------------------------------------------------------
+        error('Unknown retrieval quantitity.'); 
+    end 
+  end 
 
 
   %- Data to save ?
@@ -175,6 +189,15 @@ end
 
 
 %--- Post-processing ----------------------------------------------------------
+
+%- Add baseline
+%
+if iter > 1
+  %
+  R.bl = bl;
+  y    = y + bl;
+  %
+end
 
 %- Rescaling of jacobians in relative units
 %

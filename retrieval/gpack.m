@@ -63,7 +63,7 @@ for m = 1 : length(Y)
     %- Perform retrieval
     %
     [Qoem,R,xa] = arts_oem_init( Q );
-    X           = oem( O, Qoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.y );
+    [X,R]       = oem( O, Qoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.y );
     %
     arts_oem( 'clean', R );
     clear Qoem 
@@ -477,6 +477,9 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
       %------------------------------------------------------------------------
       if G.OUT_BASELINE
         s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
+        if ~isfield( P, 'baseline' )
+          P.baseline = R.bl;
+        end
       else
         include = 0;
       end

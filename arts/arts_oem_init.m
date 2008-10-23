@@ -100,7 +100,7 @@ for i = 1 : nq
     xa(ind) = 0;    
 
   otherwise   %---------------------------------------------------------------
-    error('Unknown retrieval characteristics.'); 
+    error('Unknown retrieval quantitity.'); 
   end
 end 
 
