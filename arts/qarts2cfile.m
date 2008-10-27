@@ -584,10 +584,6 @@ function T = cfile_RteSet( Q, partname, workfolder )
                                                                   workfolder );
   end
   %
-  if qarts_isset( Q. WSMS_BEFORE_RTE )
-    T = add_wsms( T, ' WSMS_BEFORE_RTE', Q. WSMS_BEFORE_RTE );
-  end
-  %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );
   T{end+1} = add_savefile( 'sensor_los', workfolder );
   %
@@ -723,6 +719,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
     if qarts_isset( H.F_BACKEND )  |  qarts_isset( H.CHANNEL_RESPONSE )
       parts{end+1} = 'backend';
     end
+    if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
+      parts{end+1} = 'beamswitch';
+    end
     % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
     if( strmatch( 'mixer', char(parts) )   & ...
         strmatch( 'backend', char(parts) ) & ...
@@ -827,6 +826,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                                                    workfolder );
         end
         U{6} = 'sensor_responseMultiMixerBackend';
+        
+      case 'beamswitch'
+        U{1} = 'sensor_responseBeamSwitching';
         
       case 'close'
         U{1} = '# End of sensor part';
@@ -952,11 +954,17 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     %
     if Q.J.POLYFIT.DO
       rqre_field( Q.J.POLYFIT, 'POLY_ORDER' );
-      
+      rqre_field( Q.J.POLYFIT, 'NO_POL_VARIATION' );
+      rqre_field( Q.J.POLYFIT, 'NO_ZA_VARIATION' );
+      rqre_field( Q.J.POLYFIT, 'NO_BLOCK_VARIATION' );
+      %
       T{end+1} = 'jacobianAddPolyfit(jacobian_quantities, jacobian_agenda,';
       T{end+1} =  '   jacobian,sensor_response_pol_grid,sensor_response_f_grid,';
       T{end+1} =  '   sensor_response_za_grid, sensor_pos,';
-      T{end+1} = sprintf( '   %d)', Q.J.POLYFIT.POLY_ORDER );
+      T{end+1} = sprintf( '   %d,%d,%d,%d)', Q.J.POLYFIT.POLY_ORDER, ...
+                                             Q.J.POLYFIT.NO_POL_VARIATION, ...
+                                             Q.J.POLYFIT.NO_ZA_VARIATION,...
+                                             Q.J.POLYFIT.NO_BLOCK_VARIATION );
     end
     
     if length(T) > 1
@@ -1403,6 +1411,10 @@ function [T,do_mc] = add_rtecalc( Q )
     end  
   end
 
+  if qarts_isset( Q. WSMS_BEFORE_RTE )
+    T = add_wsms( T, ' WSMS_BEFORE_RTE', Q. WSMS_BEFORE_RTE );
+  end
+
   do_mc = 0;
     
   %----------
@@ -1458,5 +1470,10 @@ function [T,do_mc] = add_rtecalc( Q )
       T{end+1} = 'RteCalcNoJacobian';
     end
   end
+
+  if qarts_isset( Q. WSMS_AFTER_RTE )
+    T = add_wsms( T, ' WSMS_BEFORE_RTE', Q. WSMS_AFTER_RTE );
+  end
+
 return  
 %------------------------------------------------------------------------------

@@ -62,8 +62,11 @@ I.POINTING = [ ...
 '#For details, see *jacobianAddPointing*.'
 ];
 %-----------------------------------------------------------------------------
-J.POLYFIT.DO          = 0;
-J.POLYFIT.POLY_ORDER  = [];
+J.POLYFIT.DO                 = 0;
+J.POLYFIT.POLY_ORDER         = [];
+J.POLYFIT.NO_POL_VARIATION   = 0;
+J.POLYFIT.NO_ZA_VARIATION    = 0;
+J.POLYFIT.NO_BLOCK_VARIATION = 0;
 I.POLYFIT = [ ...
 'Structure for specification of jacobians for polynomial baseline fits. ', ...
 'The sub-fields are:', ...

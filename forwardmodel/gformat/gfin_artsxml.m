@@ -98,7 +98,6 @@ else
 end
 
 
-
 %- Create D or check consistency with D
 %
 dims_in = length( X.grids );

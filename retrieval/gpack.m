@@ -215,16 +215,15 @@ function [Q,Sx,O] = createQandSxandO(G,workfolder)
 
   %- Sensor related stuff
   %
-  Q.Y_UNIT         = G.Y_UNIT;
-  Q.ANTENNA_DIM    = 1;
-  Q.MBLOCK_ZA_GRID = 0;
+  S                 = qartsSensor;
+  Q.SENSOR_DO       = 1;
+  S.SENSOR_NORM     = 1;
   %
-  S                = qartsSensor;
-  S.SENSOR_NORM    = 1;
-  do_sensor        = 0;
+  Q.Y_UNIT          = G.Y_UNIT;
+  Q.ANTENNA_DIM     = 1;
+  Q.MBLOCK_ZA_GRID  = G.MBLOCK_ZA_GRID;
   %
   if G.BACKEND_DO
-    do_sensor                  = 1;        
     Q.F_GRID                   = G.F_GRID;
     S.F_BACKEND                = G.F_BACKEND;
     S.BACKEND_CHANNEL_RESPONSE = G.BACKEND_CHANNEL_RESPONSE;
@@ -232,13 +231,10 @@ function [Q,Sx,O] = createQandSxandO(G,workfolder)
     Q.F_GRID                   = G.F_BACKEND;
   end
   %
-  if ~do_sensor
-    Q.SENSOR_DO = 0;
-  else
-    Q.SENSOR_DO       = 1;
-    Q.SENSOR_RESPONSE = S;
-    Q = arts_sensor( Q, workfolder );
-  end
+  S.BEAM_SWITCHING = G.BEAM_SWITCHING;
+  %
+  Q.SENSOR_RESPONSE = S;
+  Q = arts_sensor( Q, workfolder );
   
   % Polyfit
   %
@@ -410,7 +406,7 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
   end
   
   % Position and time 
-  P(i).laitude   = Ythis.latitude;
+  P(i).latitude  = Ythis.latitude;
   P(i).longitude = Ythis.longitude;
   P(i).year      = Ythis.year;
   P(i).month     = Ythis.month;

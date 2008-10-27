@@ -1,3 +1,22 @@
+2008-10-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-36
+
+	* retrieval/gpack.m (nextMeasurement): Added handling of
+	BEAM_SWITCHING. Now works for Onsala H2O retrievals, with results 
+	as close as can be expected to Qpack.
+	
+	* arts/qarts2cfile.m (cfile_Jacobi): Impelemted additions below.
+
+	* arts/qarts.m (qarts): Added WSMS_AFTER_RTE.
+
+	* arts/qartsJacobian.m (qartsJacobian): Added field
+	POLYFIT.NO_XXX_VARIATION.
+
+	* arts/qartsSensor.m (qartsSensor): Added field BEAM_SWITCHING.
+
+	* files/loadvar.m: Created.
+
 2008-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-35
