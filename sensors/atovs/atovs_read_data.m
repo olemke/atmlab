@@ -44,7 +44,7 @@ end
 
 % depending on instrument, define data record format
 switch inst_id
- case 'AMSU-B'
+ case {'AMSU-B', 'MHS'}
   [rec_format, rec_len, nchan, nfovs] = atovs_define_amsubl1c;
  case 'AMSU-A'
   [rec_format, rec_len, nchan, nfovs] = atovs_define_amsual1c;

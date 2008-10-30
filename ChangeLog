@@ -1,3 +1,10 @@
+2008-10-30  Gerrit Holl  <gerrit.holl@gmail.com>
+
+    * atmlab-0-3-37
+
+	* sensors/atovs/atovs_read_header.m, sensors/atovs/atovs_read_data.m:
+	  Added support for reading MHS data.
+
 2008-10-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-36
@@ -2327,7 +2334,7 @@
 	* atmlab-0-2-100
 
 	* physics/eps_ice_matzler06.m: Added this function, provided by
-	C. Mätzler.
+	C. M?tzler.
 
 2006-03-07  Patrick Eriksson  <Patrick.Eriksson@rss.chalmers.se>
 
@@ -3057,7 +3064,7 @@
 
 	* scattering/mie_scat_data.m: Included this function. It
 	calculates single scattering properties using the Mie functions by
-	Christian Mätzler. The return variable is a SingleScatteringData
+	Christian M?tzler. The return variable is a SingleScatteringData
 	structure which can be written to a file simply with xmlStore.
 
 2005-03-15  Oliver Lemke  <olemke@core-dump.info>
@@ -3257,7 +3264,7 @@
 
 	* mie/:
 
-	Update to version 3 provided by Christian Mätzler
+	Update to version 3 provided by Christian M?tzler
 	<christian.matzler@iap.unibe.ch>
 
 	* mie/{Besselplot4.m, Mie_1.m, Mie2_ab.m, Mie2_abs.m, Mie2_cd.m,
@@ -3291,7 +3298,7 @@
 
 	Added.
 
-2004-10-07  Mattias Ekström  <ekstrom@rss.chalmers.se>
+2004-10-07  Mattias Ekstr?m  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-2-25
 
@@ -3579,8 +3586,8 @@
 
 	* arts1/arts1_absmodels.cfile: Completed this file.
 
-	* handy/qinfo.m: Had to change new paragraph symbol from § to #
-	because § was not properly recognised by Matlab.
+	* handy/qinfo.m: Had to change new paragraph symbol from ? to #
+	because ? was not properly recognised by Matlab.
 
 2004-09-09  Carmen Verdes  <cverdes@uni-bremen.de>
 
@@ -3610,7 +3617,7 @@
 
 	* arts1/arts1_absmodels.cfile: Added this file but it is not ready.
 
-	* handy/qinfo.m: Included option of hard coding row brakes (by §
+	* handy/qinfo.m: Included option of hard coding row brakes (by ?
 	character), and possible to use trailing * for field names.	
 
 	* arts/arts_write_linefile.m: Copied from AMI function write_linefile.
@@ -4041,7 +4048,7 @@
 	* physics/planck_wlength.m: Created this complementary function,
 	taking wavelength as input instead of frequency.
 
-2003-10-24  Mattias Ekström  <ekstrom@rss.chalmers.se>
+2003-10-24  Mattias Ekstr?m  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-1-55
 
@@ -4118,7 +4125,7 @@
 	* xml/xmlReadSparse.m, xml/xmlWriteSparse.m: Make use of the
 	reading/writing routines mentioned above.
 
-2003-06-16  Mattias Ekström  <ekstrom@rss.chalmers.se>
+2003-06-16  Mattias Ekstr?m  <ekstrom@rss.chalmers.se>
 
 	* atmlab-0-1-50
 

@@ -65,6 +65,8 @@ switch  header( 8 )
   inst_id = 'AMSU-A';
  case 11
   inst_id = 'AMSU-B';
+ case 12
+  inst_id = 'MHS';
 end
 
 % disp( ['Instrument ID = ', inst_id] );
