@@ -11,6 +11,8 @@
 %       linear : Flag to trigger a linear inversion.
 %       outfids: File identifiers for output messages. Inlcude 1 for the
 %                screen. Set to [] for zero verbosity.
+%       msg    : Message to put at the start of output messages. Can include
+%                e.g. number of retrieval case.
 %       ---
 %       imethod: Iteration method. Choices are 'GN' for Gauss-Newton and
 %                'ML'/'LM' for Marquardt-Levenberg. 
@@ -101,6 +103,7 @@ function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   if ~isfield( O, 'linear' ),    O.linear  = 0;         end
   if ~isfield( O, 'outfids' ),   O.outfids = 1;         end
+  if ~isfield( O, 'msg' ),       O.msg = [];            end
   %
   if ~isfield( O, 'imethod' ),   O.imethod = 'ML';      end
   if ~isfield( O, 'maxiter' ),   O.maxiter = 99;        end
@@ -266,15 +269,17 @@ function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
   %- Print initial screen message
   %
   out( 1, 1, O.outfids );
-  out( 1, 'Analytical Bayesian inversion (OEM/MAP)', O.outfids );
-  out( 2, 0, O.outfids );
+  if ~isempty( O.msg )
+    out( 1, O.msg, O.outfids );
+    out( 3, 0, O.outfids );
+  end
   if O.linear
-    out( 2, 'Linear inversion', O.outfids );
+    out( 3, 'Linear inversion', O.outfids );
   else
     if strcmp( upper(O.imethod), 'GN' )
-      out( 2, 'Non-linear inversion: Gauss-Newton', O.outfids );
+      out( 3, 'Non-linear inversion: Gauss-Newton', O.outfids );
     elseif strcmp( upper(O.imethod), 'ML' )  
-      out( 2, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
+      out( 3, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
@@ -525,12 +530,12 @@ function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 %=== nlinprint ================================================================
   function nlinprint(outfids,iter,subiter,cost,xcost,ycost,dx)
     if nargin == 1
-     out( 1,'     Main      Sub-     Total   Profile  Spectrum  Converg.', ...
+     out( 2,'     Main      Sub-     Total   Profile  Spectrum  Converg.', ...
                                                                      outfids );
-     out( 1,'  iterat.   iterat.      cost      cost      cost   measure', ...
+     out( 2,'  iterat.   iterat.      cost      cost      cost   measure', ...
                                                                      outfids );
     else
-     out( 1, sprintf('%8d  %8d  %8.2f  %8.2f  %8.2f  %8.2f', iter, subiter, ...
+     out( 2, sprintf('%8d  %8d  %8.2f  %8.2f  %8.2f  %8.2f', iter, subiter, ...
                                            cost, xcost, ycost, dx ), outfids );
     end
   return

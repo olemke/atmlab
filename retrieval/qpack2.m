@@ -1,27 +1,27 @@
-function P = gpack(G,Y)
+function P = qpack2(Q,Y)
 
   
 %-----------------------------------------------------------------------------
 %- Initial part
 %-----------------------------------------------------------------------------
  
-%- Check G and force loaded data for some fields
+%- Check Q and force loaded data for some fields
 %
-G = checkAndModifyG( G );
+Q = checkAndModifyQ( Q );
 
 %- Initial check of Y
 %
-empty_y = checkY( G, Y );
+empty_y = checkY( Q, Y );
 
 %- Create a work folder
 %
 workfolder = create_tmpfolder;
 
-%- Set up fixed part of Q (for qarts) and Sx
+%- Set up fixed part of A (for qarts) and Sx
 %
 % This step includes calculation of sensor response data
 %
-[Q,Sx,O] = createQandSxandO( G, workfolder );
+[A,Sx,O] = createAandSxandO( Q, workfolder );
 
 %- Inverse of Sx
 %
@@ -42,7 +42,7 @@ for m = 1 : length(Y)
   
   %- Set up data for next measurement
   %
-  [Q,Ythis] = nextMeasurement( G, Q, Y, m );
+  [A,Ythis] = nextMeasurement( Q, A, Y, m );
 
   %- Simulate a (noise free) measurement if y is empty
   if empty_y
@@ -53,23 +53,26 @@ for m = 1 : length(Y)
       P(m) = Y(m);
     end
     %
-    P(m).y = arts_y( Q, workfolder );
+    fprintf( 'Simulating spectrum %d/%d\n', m, length(Y) );
+    P(m).y = arts_y( A, workfolder );
   
   else
     %- Create Se
     %
-    Se = createSe( G, Ythis.tnoise_si );
+    Se = createSe( Q, Ythis.tnoise_si );
 
     %- Perform retrieval
     %
-    [Qoem,R,xa] = arts_oem_init( Q );
-    [X,R]       = oem( O, Qoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.y );
+    O.msg = sprintf( 'Inversion case %d (of %d)', m, length(Y) );
+    %
+    [Aoem,R,xa] = arts_oem_init( A );
+    [X,R]       = oem( O, Aoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.y );
     %
     arts_oem( 'clean', R );
-    clear Qoem 
+    clear Aoem 
     
     %- Fill return structure
-    P = fillP( P, G, Q, Ythis, R, xa, X );
+    P = fillP( P, Q, A, Ythis, R, xa, X );
 
   end
 end
@@ -87,29 +90,29 @@ return
 %- Internal sub-functions
 %------------------------------------------------------------------------------
 
-% Check and load data into G
+% Check and load data into Q
 %
-function G = checkAndModifyG( G )
+function Q = checkAndModifyQ( Q )
   
-  G.F_BACKEND = qarts_get( G.F_BACKEND );
-  G.TNOISE_C  = qarts_get( G.TNOISE_C );
+  Q.F_BACKEND = qarts_get( Q.F_BACKEND );
+  Q.TNOISE_C  = qarts_get( Q.TNOISE_C );
 
-  if qarts_isset( G.TNOISE_C )
-    if ~issparse(G.TNOISE_C)
-      error( '*G.TNOISE_C* is required to be sparse (to save memory).' );
-    elseif size(G.TNOISE_C,1) ~= size(G.TNOISE_C,2)
-      error( '*G.TNOISE_C* must be square.' );
-    elseif size(G.TNOISE_C,1) ~= length(G.F_BACKEND)
-      error( 'Size of *G.TNOISE_C* must match length of *G.F_BACKEND*.' );
+  if qarts_isset( Q.TNOISE_C )
+    if ~issparse(Q.TNOISE_C)
+      error( '*Q.TNOISE_C* is required to be sparse (to save memory).' );
+    elseif size(Q.TNOISE_C,1) ~= size(Q.TNOISE_C,2)
+      error( '*Q.TNOISE_C* must be square.' );
+    elseif size(Q.TNOISE_C,1) ~= length(Q.F_BACKEND)
+      error( 'Size of *Q.TNOISE_C* must match length of *Q.F_BACKEND*.' );
     end
   end
 return
 
 
 
-% Creates Sx and fixed parts of Q 
+% Creates Sx and fixed parts of A 
 %
-function [Q,Sx,O] = createQandSxandO(G,workfolder)
+function [A,Sx,O] = createAandSxandO(Q,workfolder)
 
   %- Check if needed atmlab settings are found
   %
@@ -119,16 +122,16 @@ function [Q,Sx,O] = createQandSxandO(G,workfolder)
   end
 
   %- Init
-  Q   = qarts;
+  A   = qarts;
   Sx  = [];
   
   %- OEM 
   %
   % User settings
-  O.linear              = G.OEM_LINEAR;
-  O.imethod             = G.OEM_IMETHOD;
-  O.stop_dx             = G.OEM_STOP_DX;
-  O.maxiter             = G.OEM_MAXITER;
+  O.linear              = Q.OEM_LINEAR;
+  O.imethod             = Q.OEM_IMETHOD;
+  O.stop_dx             = Q.OEM_STOP_DX;
+  O.maxiter             = Q.OEM_MAXITER;
   %
   % Hard-coded settings
   %
@@ -136,55 +139,55 @@ function [Q,Sx,O] = createQandSxandO(G,workfolder)
   O.e                   = 1;
   O.eo                  = 1;
   O.es                  = 1;
-  if G.OUT_Y
+  if Q.OUT_Y
     O.yf                = 1;
   end
-  if G.OUT_A
+  if Q.OUT_A
     O.A                 = 1;
   end
 
     
-  %- Hard-coded Q settings
+  %- Hard-coded A settings
   %
-  Q.INCLUDES          = { fullfile( arts_includes, 'general.arts' ), ...
+  A.INCLUDES          = { fullfile( arts_includes, 'general.arts' ), ...
                           fullfile( arts_includes, 'continua.arts' ) };
   %
-  Q.ATMOSPHERE_DIM       = 1;
-  Q.STOKES_DIM           = 1;
-  Q.USE_RAW_ATMOSPHERE   = 0;
-  Q.CLOUDBOX_DO          = 0;
+  A.ATMOSPHERE_DIM       = 1;
+  A.STOKES_DIM           = 1;
+  A.USE_RAW_ATMOSPHERE   = 0;
+  A.CLOUDBOX_DO          = 0;
   %
-  Q.ABSORPTION           = 'OnTheFly';
-  Q.ABS_LINESHAPE        = 'Voigt_Kuntz6';
-  Q.ABS_LINESHAPE_CUTOFF = -1;
-  Q.ABS_LINESHAPE_FACTOR = 'quadratic'; 
+  A.ABSORPTION           = 'OnTheFly';
+  A.ABS_LINESHAPE        = 'Voigt_Kuntz6';
+  A.ABS_LINESHAPE_CUTOFF = -1;
+  A.ABS_LINESHAPE_FACTOR = 'quadratic'; 
   %
-  Q.R_GEOID              = constants( 'EARTH_RADIUS' );
+  A.R_GEOID              = constants( 'EARTH_RADIUS' );
   %
-  Q.SENSOR_POS           = Q.R_GEOID + G.PLATFORM_Z;
+  A.SENSOR_POS           = A.R_GEOID + Q.PLATFORM_Z;
   %
-  Q.J_DO                 = 1;
-  Q.J                    = qartsJacobian;
+  A.J_DO                 = 1;
+  A.J                    = qartsJacobian;
 
   %- Line data
   %
-  Q.ABS_LINES            = G.ABS_LINES;
-  Q.ABS_LINES_FORMAT     = G.ABS_LINES_FORMAT;
+  A.ABS_LINES            = Q.ABS_LINES;
+  A.ABS_LINES_FORMAT     = Q.ABS_LINES_FORMAT;
     
   %- Surface and atmosphere
   %
-  Q.Z_SURFACE            = G.SURFACE_Z;
+  A.Z_SURFACE            = Q.SURFACE_Z;
 
   %- RT variables
   %
-  Q.PPATH_LMAX           = 200;
-  Q.PPATH_STEP_AGENDA    = { 'ppath_stepGeometric' };
+  A.PPATH_LMAX           = 200;
+  A.PPATH_STEP_AGENDA    = { 'ppath_stepGeometric' };
   %
-  if G.CBGR
-    Q.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
+  if Q.CBGR
+    A.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
                           'MatrixCBR( iy, stokes_dim, f_grid )' };
   else
-    Q.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
+    A.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
                           'nelemGet(nrows,f_grid)', 'Copy(ncols,stokes_dim)', ...
                           'MatrixSetConstant(iy,nrows,ncols,0)' };
   end
@@ -193,14 +196,14 @@ function [Q,Sx,O] = createQandSxandO(G,workfolder)
   %
   pvalues = [];
   %
-  for i = 1 : length( G.SPECIES )
-    if G.SPECIES(i).RETRIEVE
-      Q = qarts_abs_species( Q, {G.SPECIES(i).TAG{:}}, 0, 1, [], [], ...
-                             {G.SPECIES(1).GRID}, G.SPECIES(i).UNIT );
-      Sx = covmat_append( Sx, G.SPECIES(1).SX );
-      pvalues = [ pvalues qarts_get(G.SPECIES(1).GRID) ];
+  for i = 1 : length( Q.SPECIES )
+    if Q.SPECIES(i).RETRIEVE
+      A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}}, 0, 1, [], [], ...
+                             {Q.SPECIES(1).GRID}, Q.SPECIES(i).UNIT );
+      Sx = covmat_append( Sx, Q.SPECIES(1).SX );
+      pvalues = [ pvalues qarts_get(Q.SPECIES(1).GRID) ];
     else
-      Q = qarts_abs_species( Q, {G.SPECIES(i).TAG} );
+      A = qarts_abs_species( A, {Q.SPECIES(i).TAG} );
     end
   end
   
@@ -209,45 +212,45 @@ function [Q,Sx,O] = createQandSxandO(G,workfolder)
   % Create by merge all calculation and retrievals grids, with points closer
   % than 50 m removed.
   %
-  Q.P_GRID = unique( pvalues );
-  Q.P_GRID = pow10( gridthinning( log10(Q.P_GRID),50/16e3) ); 
-  Q.P_GRID = Q.P_GRID(end:-1:1);
+  A.P_GRID = unique( pvalues );
+  A.P_GRID = pow10( gridthinning( log10(A.P_GRID),50/16e3) ); 
+  A.P_GRID = A.P_GRID(end:-1:1);
 
   %- Sensor related stuff
   %
   S                 = qartsSensor;
-  Q.SENSOR_DO       = 1;
+  A.SENSOR_DO       = 1;
   S.SENSOR_NORM     = 1;
   %
-  Q.Y_UNIT          = G.Y_UNIT;
-  Q.ANTENNA_DIM     = 1;
-  Q.MBLOCK_ZA_GRID  = G.MBLOCK_ZA_GRID;
+  A.Y_UNIT          = Q.Y_UNIT;
+  A.ANTENNA_DIM     = 1;
+  A.MBLOCK_ZA_GRID  = Q.MBLOCK_ZA_GRID;
   %
-  if G.BACKEND_DO
-    Q.F_GRID                   = G.F_GRID;
-    S.F_BACKEND                = G.F_BACKEND;
-    S.BACKEND_CHANNEL_RESPONSE = G.BACKEND_CHANNEL_RESPONSE;
+  if Q.BACKEND_DO
+    A.F_GRID                   = Q.F_GRID;
+    S.F_BACKEND                = Q.F_BACKEND;
+    S.BACKEND_CHANNEL_RESPONSE = Q.BACKEND_CHANNEL_RESPONSE;
   else
-    Q.F_GRID                   = G.F_BACKEND;
+    A.F_GRID                   = Q.F_BACKEND;
   end
   %
-  S.BEAM_SWITCHING = G.BEAM_SWITCHING;
+  S.BEAM_SWITCHING = Q.BEAM_SWITCHING;
   %
-  Q.SENSOR_RESPONSE = S;
-  Q = arts_sensor( Q, workfolder );
+  A.SENSOR_RESPONSE = S;
+  A = arts_sensor( A, workfolder );
   
   % Polyfit
   %
-  if G.POLYFIT_DO
-    l = G.POLYFIT_ORDER + 1;
-    if length(G.POLYFIT_SI) ~= l
-      error('Length of *G.POLYFIT_SI* must be G.POLYFIT_ORDER + 1.');
+  if Q.POLYFIT_DO
+    l = Q.POLYFIT_ORDER + 1;
+    if length(Q.POLYFIT_SI) ~= l
+      error('Length of *Q.POLYFIT_SI* must be Q.POLYFIT_ORDER + 1.');
     end
     %
-    Q.J.POLYFIT.DO         = 1;
-    Q.J.POLYFIT.POLY_ORDER = G.POLYFIT_ORDER;
+    A.J.POLYFIT.DO         = 1;
+    A.J.POLYFIT.POLY_ORDER = Q.POLYFIT_ORDER;
     %
-    Sx = covmat_append( Sx, spdiags(vec2col(G.POLYFIT_SI).^2,0,l,l) );
+    Sx = covmat_append( Sx, spdiags(vec2col(Q.POLYFIT_SI).^2,0,l,l) );
   end
 return
 
@@ -255,25 +258,25 @@ return
 
 % Creates observation error matrix, Se
 %
-function Se = createSe( G, tnoise_si )
+function Se = createSe( Q, tnoise_si )
 
   n    = length( tnoise_si );
-  nf   = length( G.F_BACKEND );
-  cset = qarts_isset( G.TNOISE_C );
+  nf   = length( Q.F_BACKEND );
+  cset = qarts_isset( Q.TNOISE_C );
   
   if n ~= 1  & n ~= nf
-    error( 'Length of *tnoise_si* must be 1 or match *G.F_BACKEND*.' );
+    error( 'Length of *tnoise_si* must be 1 or match *Q.F_BACKEND*.' );
   end
   
   if n == 1
     if cset
-      Se = (tnoise_si^2) .* G.TNOISE_C;
+      Se = (tnoise_si^2) .* Q.TNOISE_C;
     else
       Se = spdiags( repmat(tnoise^2,nf,1), 0, nf, nf );
     end
   else
     if cset
-      [i,j,s] = find( G.TNOISE_C );
+      [i,j,s] = find( Q.TNOISE_C );
       for k = 1 : length(i)
         s(k) = prod( thermal_si([i(k) j(k)]) ) * s(k);
       end
@@ -288,7 +291,7 @@ return
   
 % Check if mandatory fields of Y exist
 %
-function empty_y = checkY( G, Y )
+function empty_y = checkY( Q, Y )
 
   % Default values are not set here as Y could be very big and we do not want
   % to create a copy. Defaults are instead set below in getYthis.
@@ -328,9 +331,9 @@ function empty_y = checkY( G, Y )
     empty_y = 1;
   else
     for i = 1 : length(Y)
-      if length([Y(:).y]) ~= length(G.F_BACKEND)
+      if length(Y(i).y) ~= length(Q.F_BACKEND)
         error( sprintf(['Length of spectrum %d does not match length of ' ...
-                        '*G.F_BACKEND*'], i ) );
+                        '*Q.F_BACKEND*'], i ) );
       end
     end
     empty_y = 0;
@@ -343,18 +346,18 @@ return
 %
 % y is set to Y(i) if spectrum is empty
 %
-function [Q,Ythis] = nextMeasurement( G, Q, Y, i )
+function [A,Ythis] = nextMeasurement( Q, A, Y, i )
 
   Ythis = Y(i);
   
   %- Observation direction
   %
-  Q.SENSOR_LOS = Ythis.zenith_angle;
+  A.SENSOR_LOS = Ythis.zenith_angle;
 
   %- Position set?
   %
-  if ~isfield( Ythis, 'latitude' ),  Ythis.latitude  = G.PLATFORM_LAT; end
-  if ~isfield( Ythis, 'longitude' ), Ythis.longitude = G.PLATFORM_LON; end  
+  if ~isfield( Ythis, 'latitude' ),  Ythis.latitude  = Q.PLATFORM_LAT; end
+  if ~isfield( Ythis, 'longitude' ), Ythis.longitude = Q.PLATFORM_LON; end  
   
   %- Non mandatory time data
   %
@@ -364,30 +367,30 @@ function [Q,Ythis] = nextMeasurement( G, Q, Y, i )
 
   %- Create atmospheric fields
   %
-  Q.VMR_FIELD = zeros( length(Q.ABS_SPECIES), length(Q.P_GRID), 1, 1 );
+  A.VMR_FIELD = zeros( length(A.ABS_SPECIES), length(A.P_GRID), 1, 1 );
   %
   h2o = [];
   %
-  for i = 1 : length(Q.ABS_SPECIES) 
-    Q.VMR_FIELD(i,:,1,1) = clmtlgy_interp( ...
-                           G.ATMDATA_D, G.SPECIES(i).ATMDATA, Q.P_GRID, ...
+  for i = 1 : length(A.ABS_SPECIES) 
+    A.VMR_FIELD(i,:,1,1) = clmtlgy_interp( ...
+                           Q.ATMDATA_D, Q.SPECIES(i).ATMDATA, A.P_GRID, ...
                            Ythis.latitude, Ythis.longitude, ...
                            Ythis.year, Ythis.month, Ythis.day, ...
                            Ythis.hour, Ythis.minute, Ythis.second );
     if isempty(h2o)
-      species = arts_tgs2species( Q.ABS_SPECIES{i}{1} );
+      species = arts_tgs2species( A.ABS_SPECIES{i}{1} );
       if strcmp( species, 'H2O' )
-        h2o = Q.VMR_FIELD(i,1,1,1);
+        h2o = A.VMR_FIELD(i,1,1,1);
       end
     end
   end
   %
-  Q.T_FIELD = clmtlgy_interp( G.ATMDATA_D, G.T.ATMDATA, Q.P_GRID, ...
+  A.T_FIELD = clmtlgy_interp( Q.ATMDATA_D, Q.T.ATMDATA, A.P_GRID, ...
                            Ythis.latitude, Ythis.longitude, ...
                            Ythis.year, Ythis.month, Ythis.day, ...
                            Ythis.hour, Ythis.minute, Ythis.second ); 
   %
-  Q.Z_FIELD = pt2z( Q.P_GRID, Q.T_FIELD, h2o, Ythis.hse_p, Ythis.hse_z, ...
+  A.Z_FIELD = pt2z( A.P_GRID, A.T_FIELD, h2o, Ythis.hse_p, Ythis.hse_z, ...
                                                               Ythis.latitude );
 return
 
@@ -395,7 +398,7 @@ return
 
 % Fill output structure
 %
-function P = fillP( P, G, Q, Ythis, R, xa, X )
+function P = fillP( P, Q, A, Ythis, R, xa, X )
 
   i = length(P) + 1;
 
@@ -417,31 +420,34 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
   P(i).second    = Ythis.second;
  
   % Retrieval diagnostics 
-  if G.OEM_LINEAR 
+  %
+  P(i).tnoise_si = mean( Ythis.tnoise_si );
+  %
+  if Q.OEM_LINEAR 
     P(i).converged = X.converged;
   end 
   P(i).cost   = X.cost;
   P(i).cost_x = X.cost_x;
   P(i).cost_y = X.cost_y;
   %  
-  if G.OUT_A
-    P(i).A   = X.A;
+  if Q.OUT_A
+    As = splitA( X.A, I );
   end
   %
   mresp = mrespA( X.A, I );
   
   % Spectra
-  if G.OUT_Y
-    P(i).f   = G.F_BACKEND;
+  if Q.OUT_Y
+    P(i).f   = Q.F_BACKEND;
     P(i).y   = Ythis.y;
     P(i).yf  = X.yf;
   end
  
   % PTZ (a priori or forward model parameters)
-  if G.OUT_PTZ
-    P(i).p = vec2col( Q.P_GRID );
-    P(i).t = Q.T_FIELD;
-    P(i).z = Q.Z_FIELD;
+  if Q.OUT_PTZ
+    P(i).p = vec2col( A.P_GRID );
+    P(i).t = A.T_FIELD;
+    P(i).z = A.Z_FIELD;
   end
 
   % Retrieval quantities
@@ -461,21 +467,19 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
       ispecies = ispecies + 1;
       s        = sprintf( 'species%d', ispecies );
       %
-      if strcmp( Q.J.ABS_SPECIES(q).UNIT, 'rel' )
+      if strcmp( A.J.ABS_SPECIES(q).UNIT, 'rel' )
         unitfac = R.x_vmr0(ind);
       end
       %
       P(i).([s,'_name'])  = R.jq{q}.subtag;
-      P(i).([s,'_p'])     = vec2col( Q.J.ABS_SPECIES(ispecies).GRID1 );
+      P(i).([s,'_p'])     = vec2col( A.J.ABS_SPECIES(ispecies).GRID1 );
     
     
     elseif strcmp( R.jq{q}.maintag, 'Polynomial baseline fit' )
       %------------------------------------------------------------------------
-      if G.OUT_BASELINE
+      if Q.OUT_BASELINE
         s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
-        if ~isfield( P, 'baseline' )
-          P.baseline = R.bl;
-        end
+        P(i).baseline = R.bl;
       else
         include = 0;
       end
@@ -492,6 +496,9 @@ function P = fillP( P, G, Q, Ythis, R, xa, X )
       P(i).([s,'_eo']) = unitfac .* X.eo(ind);
       P(i).([s,'_es']) = unitfac .* X.es(ind);
       P(i).([s,'_mr']) = mresp(ind);
+      if Q.OUT_A
+        P(i).([s,'_A']) = As{q};
+      end
     end
   end
   
