@@ -330,7 +330,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
       T{end+1} = sprintf( ...
        'AtmRawRead(t_field_raw,z_field_raw,vmr_field_raw,abs_species,"%s")',...
                                                             Q.RAW_ATMOSPHERE );
-      if qarts_isset( Q.RAW_ATM_EXPAND_1D )
+      if qarts_isset( Q.RAW_ATM_EXPAND_1D ) & Q.RAW_ATM_EXPAND_1D
         T{end+1} = 'AtmFieldsCalcExpand1D';
       else
         T{end+1} = 'AtmFieldsCalc';

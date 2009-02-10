@@ -32,7 +32,7 @@ function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, do_mc, mc_err )
 
 %- Set default values
 %
-ztan_DEFAULT   = [7 10 13]*1e3; 
+ztan_DEFAULT   = [7 10 13]*1e3;
 do_mc_DEFAULT  = 0;
 mc_err_DEFAULT = 5;
 %
@@ -58,7 +58,7 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 %= General part
 %
 f                   = linspace( 501.18e9, 501.58e9, 3 );
-Q.F_GRID            = f; 
+Q.F_GRID            = f;
 Q.STOKES_DIM        = 2;
 %
 Q.ABS_SPECIES{1}{1} = 'ClO';
@@ -106,7 +106,7 @@ Q.Y_UNIT            = 'RJBT';
 %
 zplat        = 600e3;
 sensor_pos   = Q.R_GEOID + zplat;
-Q.SENSOR_POS = repmat( sensor_pos, length(ztan), 1 ); 
+Q.SENSOR_POS = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan )';
 
 
@@ -147,12 +147,12 @@ theta = 0:10:180;
 % Particle size [m]
 r = 50e-6;
 % ice mass content
-imc = 0.005*1e-3; 
+imc = 0.005*1e-3;
 % cloud altitude
-alt = [10e3 13e3]; 
+alt = [10e3 13e3];
 
 % Calculate scattering data using Mie
-C.SCAT_DATA{1} = mie_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r ); 
+C.SCAT_DATA{1} = mie_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
@@ -192,7 +192,7 @@ if do_mc
   %- MC variables
   C.METHOD                        = 'MC';
   % 
-  C.METHOD_PRMTRS.STD_ERR         = mc_err;      
+  C.METHOD_PRMTRS.STD_ERR         = mc_err;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
   C.METHOD_PRMTRS.MAX_ITER        = -1;
   C.METHOD_PRMTRS.Z_FIELD_IS_1D   = Q.RAW_ATM_EXPAND_1D;
@@ -219,7 +219,7 @@ end
 %- Activate cloudbox
 %
 Q.CLOUDBOX_DO = 1;
-Q.CLOUDBOX    = C;  
+Q.CLOUDBOX    = C;
 
 
 

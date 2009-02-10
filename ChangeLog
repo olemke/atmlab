@@ -1,3 +1,14 @@
+2009-02-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-39
+
+	* arts/qarts2cfile.m: AtmFieldsCalcExpand1D was called as soon as
+	Q.RAW_ATM_EXPAND_1D was set (even when set to 0).
+	Bug reported by Claudia.
+
+	* physics/constants.m: Changed value of Earth radius to match setting
+	in arts' constants.cc.
+
 2008-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-38

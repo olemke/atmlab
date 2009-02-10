@@ -56,7 +56,7 @@ case 'CBGR'
     const = 2.735;
 
 case 'EARTH_RADIUS'
-    const = 6.3667e6;
+    const = 6.378e6;
 
 case 'EARTHORBIT_RADIUS'
     const = 1.495e11;
