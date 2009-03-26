@@ -15,14 +15,12 @@
 
 function [lat,lon,M] = land_sea_mask
 
-atmlab( 'require', {'ARTS1_DATA_PATH'} );
-
-addpath_ami;
+atmlab( 'require', {'ARTS_XMLDATA_PATH'} );
 
 lat = -90:90;
 lon = 0:359;
 
-M = read_datafile( fullfile(atmlab('ARTS1_DATA_PATH'), 'earth', ...
-                    'land_sea_mask', 'land_sea_mask_360x181.aa' ), 'MATRIX' );
+M = xmlLoad( fullfile(atmlab('ARTS_XMLDATA_PATH'), 'earth', ...
+                    'land_sea_mask', 'land_sea_mask_360x181.xml.gz' ) );
 
 M = logical( M' );
