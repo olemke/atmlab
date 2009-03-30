@@ -1,3 +1,10 @@
+2009-03-30  Mathias Milz  <mathias.milz@ltu.se>
+
+	* sensors/amsub_tb2uth.m
+	  Added the function amsub_tb2uth.m which provides UTH from 
+	  AMSUB Channel 18 Tbs based on the equation from Buehler 
+	  and John 2005.
+
 2009-03-26  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-3-40
