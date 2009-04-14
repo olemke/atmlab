@@ -1,3 +1,11 @@
+2009-04-14  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-3-42
+
+	* xml/xmlLoad.m:
+
+	Make sure to delete the temp file in case of an error.
+
 2009-03-30  Mathias Milz  <mathias.milz@ltu.se>
 
 	* atmlab-0-3-41

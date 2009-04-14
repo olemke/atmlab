@@ -20,6 +20,7 @@ if strcmp( filename(length(filename)-2:end), '.gz')
   cmd = [ 'gunzip -cd ' filename ' > ' uncompressed_filename ];
   st = system (cmd);
   if st
+    delete (uncompressed_filename);
     error ('Failed to uncompress XML file');
   end
   filename = uncompressed_filename;
@@ -28,6 +29,9 @@ end
 fid = fopen (filename,'r');
 
 if fid == -1
+  if ~strcmp (uncompressed_filename, '')
+    delete (uncompressed_filename);
+  end
   error (sprintf ('Cannot open file %s', filename));
 end
 
@@ -40,6 +44,9 @@ while ~feof (fid) & c ~= '>'
 end
 
 if ~strcmp (s, '<?xmlversion="1.0"?>')
+  if ~strcmp (uncompressed_filename, '')
+    delete (uncompressed_filename);
+  end
   error ('Invalid xml header');
 end
 
