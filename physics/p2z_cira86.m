@@ -50,8 +50,8 @@ for i=1:12
                             'cira86',file_i);
     data=xmlLoad(cira86);
     if i==1
-       Data.p_grid=data.p_grid;
-       Data.lat_grid=data.lat_grid;
+       Data.p_grid=data.grids{1};
+       Data.lat_grid=data.grids{2};
        Data.lon_grid=0;
        %add janaury data after december
        Data.month(14)=12.5;

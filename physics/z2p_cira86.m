@@ -43,15 +43,14 @@ day=doy-days_in_prev_months(month1);
 month2=month1-1+day/...
       (days_in_prev_months(month1+1)-days_in_prev_months(month1));
 
-
 for i=1:12
     file_i     =['cira86_month',num2str(i),'.z.xml'];
     cira86     = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'atmosphere',...
                             'cira86',file_i);
     data=xmlLoad(cira86);
     if i==1
-       Data.p_grid=data.p_grid;
-       Data.lat_grid=data.lat_grid;
+       Data.p_grid=data.grids{1};
+       Data.lat_grid=data.grids{2};
        Data.lon_grid=0;
        %add janaury data after december
        Data.month(14)=12.5;

@@ -36,7 +36,7 @@ if length(x)~=size(Y,1)
 end
 
 if min(x_new)<min(x) | max(x_new)>max(x)
-   warning('x_new is outside the range of x')
+   %warning('x_new is outside the range of x')
 end
 
 x_new=vec2col(x_new);

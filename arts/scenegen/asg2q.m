@@ -361,16 +361,23 @@ if ~isempty(ind)
       
       end 
       %
-      A.p_grid = G(ind(i)).GRID1;
+      %A.p_grid = G(ind(i)).GRID1;
+      A.grids{1}=G(ind(i)).GRID1;
+      A.gridnames{1}='p_grid';
       if any( G(ind(i)).DIMS == 2 )
-        A.lat_grid = G(ind(i)).GRID2;
+        A.grids{2}=G(ind(i)).GRID2;
+        A.gridnames{2}='lat_grid'; 
       else
-        A.lat_grid = 0;
+        A.grids{2}=0;
+        A.gridnames{2}='lat_grid';
       end
       if any( G(ind(i)).DIMS == 3 )
-        A.lon_grid = G(ind(i)).GRID3;
+        A.grids{3}=G(ind(i)).GRID3;
+        A.gridnames{3}='lon_grid';
       else
-        A.lon_grid = 0;
+        %A.lon_grid = 0;
+        A.grids{3}=0;
+        A.gridnames{3}='lon_grid';
       end
       %
       if do_batch
@@ -379,7 +386,8 @@ if ~isempty(ind)
           B{ic}{i} = A;
         end
       else
-        A.data = get_cases(G(ind(i)).DATA,icases(1));
+        A.name=[];
+        A.data = get_cases(G(ind(i)).DATA,icases(1));                        
         xmlStore( Q.CLOUDBOX.PND_FIELD{i}, A, 'GriddedField3' );
       end
     end

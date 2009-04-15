@@ -1,3 +1,11 @@
+2009-04-15  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-3-43
+
+	* physics/parameterisation/sphere_part_fallspeed.m:
+
+	Added a function calculating spherical particles fallspeed.
+
 2009-04-14  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-3-42

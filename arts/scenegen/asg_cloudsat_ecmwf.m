@@ -9,34 +9,45 @@
 %  IN  data     name of datafiles
 %      leg      leg of cloudsat
 %      grids_cs grids
+%  OPT aux      auxilirary data (see gfin_cloudsat_ecmwf)
 %
 % example usage:
 %  leg=2;
 %  datadir='/home/bengt/CIWSIR/Dataset_gen/CloudSAT_data/Data/';
 %  data=[datadir,'2006166131201_00702_CS_ECMWF-AUX_GRANULE_P_R03_E00.hdf'];
 %  latitude=[-90 90];
-%  [G,D]=asg_cloudsat_ecmwf(data,leg,latitude)
+%  [G,D]=asg_cloudsat_ecmwf(data,leg,latitude,aux)
 
-function [G,D]=asg_cloudsat_ecmwf(data,leg,grids_cs)
+function [G,D]=asg_cloudsat_ecmwf(data,leg,grids_cs,aux)
+
+
 
 if leg==2
 
-    [G,D]=gfin_cloudsat_ecmwf([],[],data,[],leg,[-90 90]);
+    [G,D]=gfin_cloudsat_ecmwf([],[],data,aux,leg,[-90 90]);
 
 else
     %read in both leg 1 and 3
     
-    [G1,D]=gfin_cloudsat_ecmwf([],[],data,[],1,[-90 0]);
-    [G2,D]=gfin_cloudsat_ecmwf([],[],data,[],3,[0 90]);
+    [G1,D]=gfin_cloudsat_ecmwf([],[],data,aux,1,[-90 0]);
+    [G2,D]=gfin_cloudsat_ecmwf([],[],data,aux,3,[0 90]);
     
     %merge leg 1 and 3
 
-    for i=1:4
+    for i=1:length(G1)
         G(i)=G1(i);
         G(i).DATA=[G2(i).DATA G1(i).DATA];
         G(i).GRID2=[vec2col(G2(i).GRID2)' vec2col(G1(i).GRID2)'];
     end
 
+end
+
+
+if any(strcmp(aux,'DEM_elevation'))
+   dem=1;
+   ind=find(strcmp({G(:).NAME},'DEM_elevation'));
+   indv=find(G(ind).DATA==-9999);
+   G(ind).DATA(indv)=0;
 end
 
 %get the ecmwf data on a pressure grid
@@ -63,8 +74,13 @@ end
 %and lat_grid_ecmwf
 %interp linearly and extrap to the closest value 
   
+if dem
+ ilen=length(G)-2;
+else
+ ilen=length(G)-1;
+end
 
-for i=1:length(G)-1
+for i=1:ilen
 
     G(i+1).GRID1=p_grid_ecmwf;
     G(i+1).GRID2=grids_cs{2};
@@ -90,7 +106,17 @@ for i=1:length(G)-1
 
 end
  
-G=G(2:4);
+if dem
+ G=G(2:5);
+ indg=find(G(4).GRID2(1:end-1)-G(4).GRID2(2:end)~=0);
+ G(4).DATA=interp1(G(4).GRID2(indg),G(4).DATA(indg),...
+                   grids_cs{2},'nearest','extrap');
+ G(4).GRID2=grids_cs{2};
+ %plot(grids_cs{2},de,G(4).GRID2,G(4).DATA,'r')
+else
+ G=G(2:4);
+end
+
 G(1).NAME= 'Temperature field';
 G(1).DATA_UNIT='K';
 
