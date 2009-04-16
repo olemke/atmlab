@@ -1,3 +1,10 @@
+2009-04-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-44
+
+	* physics/parametrisations/sphere_part_fallspeed.m: The end ' was 
+	missing in two error messages.
+
 2009-04-15  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-3-43

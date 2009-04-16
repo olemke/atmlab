@@ -7,7 +7,7 @@
 % FORMAT   [u]=sphere_part_fallspeed(r,T,P)
 %
 % IN    r   particle radius  (vector) [m]
-%       T   temperature      (scalar) [K]
+%       T   temperature      (scalar) [K], allowed range is [233.15,303.15]
 %       P   pressure         (scalar) [Pa]
 %
 % OUT   u   fallspeed       [m/s]
@@ -27,7 +27,7 @@ if T<-40+273.15 | T>273.15+30 & min(r)<=40e-6
 end
 
 if length(T)>1
-  error('T must be a scalar!!!)
+  error('T must be a scalar!!!')
 end
 
 if length(P)>1
