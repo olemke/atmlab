@@ -1,3 +1,10 @@
+2009-04023  Marston Johnston <marston@chalmers.se>
+	* atmlab-0-3-45
+
+	* physics/parameterisations/pseudo_adiabatic_liwc.m:
+
+	Added function that calculates liquid/ice water content in a cloud.
+
 2009-04-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-44
