@@ -36,11 +36,14 @@
 %           If 2, text and plot output.
 %
 %
-% FORMAT [sb, Wb, eb] = find_best_freq_set_anneal(H,y_mono,n[,C])
+% FORMAT [sb, Wb, eb, h] = find_best_freq_set_anneal(H,y_mono,n[,C])
 %
 % OUT sb = The solution as a logical array.
 %     Wb = The associated weight matrix.
 %     eb = The associated error.
+%     h  = A structure containing the history of the annealing
+%          run. This is useful for making plots of the convergence
+%          behaviour.
 %
 % IN  H        Sensor response matrix
 %     y_mono   A batch of monochromatic Tbs (dimension must match
@@ -50,7 +53,7 @@
 
 % 2008-09-25 Created by Stefan Buehler. 
 
-function [sb, Wb, eb] = find_best_freq_set_anneal(H, y_mono, n, C)
+function [sb, Wb, eb, h] = find_best_freq_set_anneal(H, y_mono, n, C)
 
 
 %------------- Set overall control parameters. ----------
@@ -162,17 +165,17 @@ T = -mean(abs(diff(e_shorthist)))/log(0.99);
 % Save mean energy and other statistical parameters of this initial
 % block as start of the history series
 
-t_hist     = NaN(1,1000);
-e_hist     = NaN(1,1000);
-e_std_hist = NaN(1,1000);
-e_min_hist = NaN(1,1000);
-e_max_hist = NaN(1,1000);
+h.t_hist     = NaN(1,1000);
+h.e_hist     = NaN(1,1000);
+h.e_std_hist = NaN(1,1000);
+h.e_min_hist = NaN(1,1000);
+h.e_max_hist = NaN(1,1000);
 
-t_hist(1)     = T;
-e_hist(1)     = mean(e_shorthist);
-e_std_hist(1) = std(e_shorthist);
-e_min_hist(1) = min(e_shorthist);
-e_max_hist(1) = max(e_shorthist);
+h.t_hist(1)     = T;
+h.e_hist(1)     = mean(e_shorthist);
+h.e_std_hist(1) = std(e_shorthist);
+h.e_min_hist(1) = min(e_shorthist);
+h.e_max_hist(1) = max(e_shorthist);
 
 if verb>0
   disp(sprintf('mean(abs(delta_e)) = %g', mean(abs(diff(e_shorthist)))));
@@ -180,7 +183,7 @@ if verb>0
 end
 
 % Initialize best state energy:
-eb = e_max_hist(1);
+eb = h.e_max_hist(1);
 
 
 k = 1;
@@ -231,43 +234,43 @@ while go_on
     
   k = k+1;
   
-  t_hist(k)     = T;
-  e_hist(k)     = mean(e_shorthist(1:i));
-  e_std_hist(k) = std(e_shorthist(1:i));
-  e_min_hist(k) = min(e_shorthist(1:i));
-  e_max_hist(k) = max(e_shorthist(1:i));
+  h.t_hist(k)     = T;
+  h.e_hist(k)     = mean(e_shorthist(1:i));
+  h.e_std_hist(k) = std(e_shorthist(1:i));
+  h.e_min_hist(k) = min(e_shorthist(1:i));
+  h.e_max_hist(k) = max(e_shorthist(1:i));
 
   if verb>0
     disp(sprintf('T = %g K, e_min = %g K, e_mean = %g K, e_max = %g K',...
-                 t_hist(k),...    
-                 e_min_hist(k),...    
-                 e_hist(k),...    
-                 e_max_hist(k) ))
+                 h.t_hist(k),...    
+                 h.e_min_hist(k),...    
+                 h.e_hist(k),...    
+                 h.e_max_hist(k) ))
   end
     
   % Display results
   if verb>1
     figure(1)
-    semilogy([e_min_hist(1:k); ...
-              e_hist(1:k); ...
-              e_max_hist(1:k)]');
+    semilogy([h.e_min_hist(1:k); ...
+              h.e_hist(1:k); ...
+              h.e_max_hist(1:k)]');
     xlabel('Iteration')
     ylabel('RMS error [K]')
 
     figure(2)
-    semilogy(t_hist(1:k));
+    semilogy(h.t_hist(1:k));
     xlabel('Iteration')
     ylabel('Temperature [K]')
 
     figure(3)
-    loglog(t_hist(1:k), e_hist(1:k), '.');
+    loglog(h.t_hist(1:k), h.e_hist(1:k), '.');
     xlabel('Temperature [K]')
     ylabel('RMS error [K]')
   end
 
   % Should we decrease T? - Not if the mean error is still
   % decreasing. 
-  if e_hist(k) >= e_hist(k-1)
+  if h.e_hist(k) >= h.e_hist(k-1)
     T = T * Tfact;
   end
   

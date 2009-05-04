@@ -10,6 +10,10 @@
 % If there are negative weights, then these weights are set to
 % zero, and the regression is repeated without these channels.
 %
+% At the end, the weights are normalized so that the sum of all
+% weights for one channel is exactly 1, as done by Moncet et al.,
+% 2008. This should improve robustness and generalizability.
+%
 % FORMAT W = weights(s, y_ref, H, y_mono)
 %
 % OUT W       A matrix of channel weights. (Which can be used
@@ -110,5 +114,8 @@ for i=1:n_chan
   % weights to zero:
   W(i,ignored) = 0;
   
+  % Normalize weight sum to 1:
+  weight_sum = sum(W(i,now_active));
+  W(i,now_active) = W(i,now_active) / weight_sum;
 end
 

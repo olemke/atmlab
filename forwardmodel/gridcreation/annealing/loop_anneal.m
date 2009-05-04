@@ -12,7 +12,7 @@
 % FORMAT R = find_best_freq_set_anneal(H, y_mono, n_start, n_incr, acc, C)
 %
 % OUT R       An array of structures. Each structure has elements sb, Wb,
-%             eb, which correspond to the output arguments of
+%             eb, h, which correspond to the output arguments of
 %             find_best_freq_set_anneal.
 % IN  n_start The starting number of frequencies. (You should take
 %             at least one per channel.)
@@ -36,13 +36,14 @@ go_on = true;
 i = 1;
 n = n_start;
 while go_on
-  [sb, Wb, eb] = find_best_freq_set_anneal(H,...
-                                           y_mono,...
-                                           n,...
-                                           C);
+  [sb, Wb, eb, h] = find_best_freq_set_anneal(H,...
+                                              y_mono,...
+                                              n,...
+                                              C);
   R(i).sb = sb;
   R(i).Wb = Wb;
   R(i).eb = eb;
+  R(i).h  = h;
   
   disp('****************************************')
   disp(sprintf('n = %d, acc = %g K', n, eb))

@@ -1,4 +1,24 @@
+2009-05-04  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-46
+
+	* forwardmodel/gridcreation/annealing/find_best_freq_set_anneal.m:
+	Added additional output variable h. This is a structure containing
+	the history of the annealing run. It is useful for making plots of
+	the convergence behaviour.
+
+	* forwardmodel/gridcreation/annealing/loop_anneal.m: Added an
+	extra element h to output structure R, to pass on the
+	corresponding output argument of find_best_freq_set_anneal.
+
+	* forwardmodel/gridcreation/annealing/weights.m: Normalize
+	weights, so that sum for each channel is exactly one. (Weight sums
+	were very close to one already before. Forcing them to be exactly
+	one is believed to improve robustness and generalizability for the
+	final set of frequencies and weights.)
+
 2009-04023  Marston Johnston <marston@chalmers.se>
+
 	* atmlab-0-3-45
 
 	* physics/parameterisations/pseudo_adiabatic_liwc.m:
