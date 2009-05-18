@@ -1,0 +1,469 @@
+% ASG_DEMO   A simple demonstration how to use ASG
+%
+%    Gives an example on basic usage of ASG
+%
+%    The example generates two atmospheric states
+%    including clouds.
+%    In the example radar data from Cloudsat
+%    is used to create cloud structure.
+%    ECMWF and Fascod climatological
+%    data is used to create other atmospheric 
+%    parameters.
+%    A lot of default settings are made in this
+%    demo, which may be re-considered depending
+%    on what output data should be used for
+%
+% FORMAT [G]=asg_demo([ dim,instrument ])
+%
+% OUT     G    structure with atmospheric variables on gformat data
+%         FS   structure specifying some settings
+%
+% OPT     dim  desired dimensionality of data
+%              can be 1 (pressure) or 3(pressure,latitude,longitude)
+%              default=3 
+%         
+%         sensor  the choice of instrument determines
+%              which gas species to include in G
+%              can be odin (default) or amsu      
+
+% Created by Bengt Rydberg
+
+%Ajil Kottayil" <ajil.kottayil@ltu.se>
+%NEX Resebyrå in Luleå, 0920-280208
+%projectnumber: 805804
+
+
+function [G,FS]=asg_demo( dim,sensor )
+
+%= Set defualts
+%
+dim_DEFAULT     = 3;
+sensor_DEFAULT='odin';
+%
+set_defaults;
+
+
+%SET BASIC PROPERTIES 
+
+%SET CLOUD VARIABLES
+%-
+
+%define files from where to take data
+%cloudsat_dir='/odin/extdata/CLOUDSAT/R04/2B-GEOPROF';
+%cloudsat_file='2006190005036_01044_CS_2B-GEOPROF_GRANULE_P_R04_E01.hdf.zip';
+%cloudsat_file=fullfile(cloudsat_dir,cloudsat_file);
+FS.DATA='2006224035643_01541_CS_2B-GEOPROF_GRANULE_P_R04_E01.hdf';
+
+%define from what leg of cloudsat-orbit data will be taken from
+%Leg1=(-90,0);Leg2=(-90,90);Leg3=[0,90]
+FS.LEG=3;
+
+%define from which latitudes to read data
+FS.USE_LATS=[11.5 15.25];
+
+%define which latitude resolution to use  
+FS.LAT_RES=0.25; 
+
+%define pressure limits from where to consider Cloudat data
+FS.P_LIMS=[900e2 80e2];
+FS.DIM=dim;
+
+if dim==3
+     
+   %define the method to expand cloudsat data from 2-d to 3-d 
+   FS.DIMADD.METHOD='iaaft';
+   
+   %define how large latitude sections that will be considered
+   FS.DLAT=2;
+
+   %define longitude grid to use for cloud properties 
+   FS.LON_GRID=[-1:FS.LAT_RES:1];
+
+end
+
+%define properties for converting radar backscatter IWC/LWC fields
+f_grid=94e9;
+FS.PROPS=asg_ssp(f_grid);
+
+
+%SET ATMOSPHERIC PROPERTIES (no cloud) 
+%-
+
+%define files from where to take data
+ecmwf_dir='/odin/extdata/CLOUDSAT/R04/ECMWF-AUX/';
+ecmwf_file='2006190005036_01044_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf.zip';
+ecmwf_file=fullfile(ecmwf_dir,ecmwf_file);
+CS.FILE=ecmwf_file;
+CS.FILE='2006224035643_01541_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf';
+
+%define from what leg of cloudsat-orbit data will be taken from
+CS.LEG=FS.LEG;
+
+CS.INSTRUMENT=sensor;
+%CS.DO=1; 
+
+
+%grids_cs will be the grids of the atmospheric variables (not for clouds)
+%however the lat_grid will later be set tighter around the cloudbox
+%depending on the FS structure 
+p_grid=z2p_simple([0:1e3:25e3 35e3 45e3 60e3]);
+CS.GRIDS{1}=p_grid; 
+CS.GRIDS{2}=sort([-90 -50 -30:10:30 50 90 FS.USE_LATS]);
+
+if dim==3
+  lon_grid=[FS.LON_GRID(1) 0 FS.LON_GRID(end)];
+  CS.GRIDS{3}=unique(sort([-180 -150 -10  -5 lon_grid 5 10 150 180]));
+end
+
+%mandatory fields to include
+
+fields=[{'temperature'},{'Altitude'},{'Surface altitude'}];
+atmfields(1).type='temperature';
+atmfields(1).source='ecmwfftc';
+atmfields(2).type='altitude';
+atmfields(2).source='';
+atmfields(3).type='surface altitude';
+atmfields(3).source='ecmwf';
+
+%define which gas types to include (depends on choice of instrument)
+
+if strcmp('odin',sensor)
+
+   %gases to include for Odin 
+   gases=[{'H2O'},{'O3'},{'ClO'},{'N2O'},{'O2'},{'HNO3'},{'N2'}];
+   %ABSORPTION MODELS
+   abs_models{1}={'H2O','H2O-ForeignContStandardType',...
+                  'H2O-SelfContStandardType'};
+   abs_models{2}='O3';
+   abs_models{3}='ClO';
+   abs_models{4}='N2O';
+   abs_models{5}={'O2','O2-PWR98'};
+   abs_models{6}='HNO3';
+   abs_models{7}='N2-SelfContMPM93';
+    
+end 
+ 
+if strcmp('amsu',sensor)  
+
+   %gases to include for amsu
+   gases=[{'H2O'},{'O3'},{'O2'},{'N2'}];
+
+   %absorption models amsu
+   abs_models{1}='H2O-PWR98';
+   abs_models{2}='O3';
+   abs_models{3}='O2-PWR93';
+   abs_models{4}='N2-SelfContStandardType';
+
+end
+
+%define from where to read data
+%the baseline is that gas fields are read from fascod tropical climatology(ftc)
+%however for H2O and O3 ECMWF data are here merged with Fascod data(ecmwfftc) 
+%N2 is here fixed by giving it a numerical value 
+
+fascod     = fullfile( atmlab('ARTS_XMLDATA_PATH'),...
+                           'atmosphere', 'fascod' );
+
+len=length(atmfields);
+
+for i=1:length(gases) 
+
+  atmfields(len+i).type='gas_species';
+  atmfields(len+i).abs_models=abs_models{i};
+  atmfields(len+i).gas=gases{i};
+
+  if strcmp(gases{i},'H2O') | strcmp(gases{i},'O3')
+
+     atmfields(len+i).source='ecmwfftc';
+  
+  elseif strcmp(gases{i},'N2')
+
+     atmfields(len+i).source=0.7814;
+  
+  else
+
+     atmfields(len+i).source='ftc'; 
+   
+  end
+
+end
+
+
+%Baseline for parameters describing how perturbations will be performed
+
+RND.FORMAT    = 'param'; 
+RND.SEPERABLE = 1;
+RND.CCO       = 0.01;               % Cut-off for correlation values 
+RND.TYPE      = 'rel';              % Relative disturbances as default
+RND.DATALIMS  = [0];                % Do not allow negative values
+%
+RND.SI        = 0.4;                % 40% std. dev. as default
+%
+RND.CFUN1     = 'exp';              % Exp. correlation function for p-dim.
+RND.CL1       = [0.15 0.3 0.3]';    % Corr. length varies with altitude
+RND.CL1_GRID1 = [1100e2 10e2 1e-3];    
+%
+RND.CFUN2     = 'lin';              % Linear correlation function for lat-dim.
+RND.CL2       = 0.5;                % Corr. length 0.5 deg everywhere
+%
+RND.CFUN3     = 'lin';              % Linear correlation function for lat-dim.
+RND.CL3       = 0.5;                % Corr. length 0.5 deg everywhere
+
+%describe perturbations for each variable
+for i=1:length(atmfields)
+  
+  if strcmp(atmfields(i).type,'temperature')
+
+     atmfields(i).RND=RND;
+     atmfields(i).RND.TYPE='abs';
+     atmfields(i).RND.SI=1;
+   
+  elseif strcmp(atmfields(i).gas,'H2O')
+
+     atmfields(i).RND=RND;
+     atmfields(i).RND.SI=0.1;
+ 
+  elseif strcmp(atmfields(i).gas,'O3')
+     
+     atmfields(i).RND=RND;
+     atmfields(i).RND.SI=0.2;
+
+  elseif strcmp(atmfields(i).gas,'ClO') | strcmp(atmfields(i).gas,'N2O') | ...
+         strcmp(atmfields(i).gas,'HNO3') 
+
+     atmfields(i).RND=RND;
+  
+  else
+     
+     atmfields(i).RND=[];
+ 
+  end
+
+end
+ 
+%Read basic data 
+
+
+clear G H
+for i=1:length(atmfields)
+
+    G(i)=asgG;
+
+    if strcmp(atmfields(i).type,'temperature')
+
+       if strcmp(atmfields(i).source,'ftc') | ...
+          strcmp(atmfields(i).source,'ecmwfftc')
+            
+          G1 = gfin_artsxml( asgD, [], ...
+                             fullfile( fascod, 'tropical.t.xml' ), ...
+                             'Temperature field','t_field' );
+       end
+         
+       if strcmp(atmfields(i).source,'ecmwfftc') 
+        
+          H=asg_cloudsat_ecmwf(CS.FILE,CS.LEG,CS.GRIDS,{'DEM_elevation'});
+         
+          for j=1:length(H)
+              if strcmp(H(j).NAME,'Water vapour')          
+                H(j).NAME='H2O';
+              end
+              if strcmp(H(j).NAME,'Ozone')          
+                H(j).NAME='O3';
+              end
+          end
+   
+       end
+
+     end
+
+     if strcmp(atmfields(i).type,'altitude')
+  
+        %altitude field is here just initialised
+        G(i).NAME            = 'Altitude field'; 
+        G(i).DATA_NAME       = 'Altitude field';
+        G(i).DATA_UNIT       = 'm';
+        %G(i).SPCFC.P0        = 1013e2;
+        G(i).SPCFC.P0        = G(1).GRID1(1); 
+        grids=[{G(1).GRID1(1)} {0} {0} {0}]; 
+        G(i).SPCFC.Z0=gf_set( asgD, asgG,grids , 0, [], ...
+                               'Altitude at P0', 'Altitude', 'm' );
+        G(i).SPCFC.Z0.DIMS=[];
+        G(i).SPCFC.Z0.GRID1=[];
+        G(i).SPCFC.Z0.GRID2=[];
+        G(i).SPCFC.Z0.GRID3=[];
+        G(i).SPCFC.Z0.GRID4=[];
+
+     end 
+       
+     if strcmp(atmfields(i).type,'surface altitude')
+          
+        if strcmp(atmfields(i).source,'ecmwf')
+          
+           ind=find(strcmp('DEM_elevation',{H.NAME}));
+           G(i)=H(ind);
+           G(i).DATA_NAME='Surface altitude';
+           G(i).NAME='Surface altitude';
+           G(i).DIMADD.METHOD='expand';
+                   
+        end
+       
+     end
+            
+     
+     if strcmp(atmfields(i).type,'gas_species')
+
+        if strcmp(atmfields(i).source,'ftc') |  ...
+           strcmp(atmfields(i).source,'ecmwfftc')
+               
+           sourcefile= fullfile( fascod, ['tropical.',...
+                                 atmfields(i).gas,'.xml'] );
+           G1= gfin_artsxml( asgD, [],sourcefile,atmfields(i).gas,...
+                             'vmr_field' );
+        end
+            
+        if strcmp(atmfields(i).source,'ecmwfftc')
+
+           if ~exist('H')
+
+              H=asg_cloudsat_ecmwf(CS.FILE,CS.LEG,CS.GRIDS,...
+                                       {'DEM_elevation'});
+           end
+        end   
+            
+        if isnumeric(atmfields(i).source)
+
+           grids=[{G(1).GRID1} {0}];
+           data=atmfields(i).source*ones(length(grids{1}),1);
+           G(i)= gf_set( asgD, asgG, grids, data, [], ...
+                         atmfields(i).gas, 'Volume mixing ratio', '-' );
+  
+
+        end
+
+     end
+        
+     if strcmp(atmfields(i).source,'ftc') |  ...
+        strcmp(atmfields(i).source,'ecmwfftc')   
+
+         G(i).NAME=G1.NAME;
+         G(i).DIMS=1;
+         G(i).DATA=G1.DATA;
+         G(i).DATA_NAME=G1.DATA_NAME;
+         G(i).DATA_UNIT=G1.DATA_UNIT;
+         G(i).GRID1=G1.GRID1;
+         G(i).GRID2=G1.GRID2;
+         G(i).GRID3=G1.GRID3;
+         G(i).SOURCE=G1.SOURCE;
+            
+     end
+     
+     if strcmp(atmfields(i).source,'ecmwfftc')
+     
+        %merge data from ecmwf and fascod
+        G(i)=merge_data2(asgD,G(i).NAME,G(i),H);
+
+     end
+ 
+ 
+    G(i).PROPS=atmfields(i).abs_models;
+
+     
+    G(i).RNDMZ=atmfields(i).RND;
+
+end
+
+%rename H2O field 
+ind1=find(strcmp('H2O',{G.NAME}));
+G(ind1).NAME='Water vapour';
+G(ind1).SPCFC.FIXED_RH=0;  
+G(ind1).SPCFC.MOD_RH=0;  
+
+%-------------------------------------------------------------------------------
+%CREATE FULLSKY SCENARIOUS
+workfolder =create_tmpfolder;
+atmlab( 'EXTRAP', 1 );
+
+warning off
+[Gfs,lon] = asg_create_gfs1(G,CS.GRIDS,FS,workfolder);
+warning on
+FS.USE_LONS=lon;
+G=Gfs;
+%CHECK OUT IF THE CLOUDS ARE OVER LAND OR OCEAN
+%FS.L_OR_S=land_or_sea(FS.USE_LATS,FS.USE_LONS); %1 is over land
+
+
+
+%-------------------------------------------------------------------------------
+%sub-functions
+%
+
+function G=merge_data2(D,field,G,H)
+  
+    S=G;
+    ind1=find(strcmp(field,{G.NAME}));
+    ind2=find(strcmp(field,{H.NAME}));
+    lims1{1}=[H(ind2).GRID1([1 end])];
+    lims1{2}=[H(ind2).GRID2([1 end])];
+    m1=min(find(H(ind2).GRID1(end)>G(ind1).GRID1));
+    lims2{1}=[G(ind1).GRID1(m1) G(ind1).GRID1(end)];
+    G(ind1)=gf_merge(D,H(ind2),lims1,D,G(ind1),lims2);
+    G(ind1).DIMADD=S(ind1).DIMADD;
+
+return
+
+%-------------------------------------------------------------------------------
+
+function P=asg_ssp(f_grid)
+ %properties for adding pnd fields
+ alpha=0;Ni=10;xnorm=50e-6;
+ [x_i,w_i]=gauss_laguerre(alpha,Ni,xnorm);
+ Nj=3;xnormw=10e-6;
+ [x_k,w_k]=gauss_laguerre(alpha,Nj,xnormw);
+ %x_i will be the diameter of the particles considered
+ %calculate ssp
+ for i=1:2
+
+  if i==1 
+   F=create_ssp('sphere',f_grid,x_i/2);
+   P(i).x=x_i;
+   P(i).w=w_i;
+   P(i).x_norm=xnorm;
+   P(i).PSD='MH97';
+  else
+   T_grid=[273 283 293 303 313];
+   for i1=1:length(f_grid)
+     for j1=1:length(T_grid)
+       rfr_index(i1,j1) = sqrt(eps_water_liebe93( f_grid(i1), T_grid(j1) ));
+     end
+   end
+   F=create_ssp('sphere',f_grid,x_k,T_grid,rfr_index);
+   P(i).x=x_k;
+   P(i).w=w_k;
+   P(i).x_norm=xnormw;
+   P(i).PSD='Water';
+  end
+  P(i).SSP=F;
+  P(i).method='gauss-laguerre';
+  P(i).shape='sphere';  
+ end
+
+return
+
+
+%-------------------------------------------------------------------------------
+
+%Find out if we are over land or ocean 
+function [l_or_s]=land_or_sea(lat_fs,lon_fs)
+  [lat,lon,M]=land_sea_mask;
+  for ip=1:length(lat_fs)
+    if lon_fs(ip)<0
+      l_data=round(360+lon_fs(ip));
+    else
+      l_data=round(lon_fs(ip));
+    end
+    lat_ind=find(round(lat_fs(ip))==lat);
+    lon_ind=find(l_data==lon);
+    l_or_s(ip)=M(lat_ind,lon_ind);
+  end
+
+return

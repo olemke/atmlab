@@ -1,3 +1,15 @@
+2009-05-18  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-3-47
+
+	* arts/scenegen/asg_demo.m 
+
+	* arts/scenegen/asg2y_demo.m
+	
+	Added functions demonstrating how to generate synthetic 
+	atmospheric states and measurements.
+
+	
 2009-05-04  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-0-3-46
