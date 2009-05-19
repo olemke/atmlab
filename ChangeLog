@@ -1,3 +1,21 @@
+2009-05-19  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-3-48
+
+	* arts/scenegen/asg_demo.m moved to demos
+
+	* arts/scenegen/asg2y_demo.m moved to demos
+
+	* demos/data/2006224035643_01541_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf 
+                     2006224035643_01541_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf
+	  added data files used by asg_demo
+
+	* physics/parameterisation/water_psd.m: added function
+	  that calculates water particle size distributions
+
+	* arts/scenegen/asg_create_gfs.m :added function that
+	  generates synthetic atmospheric states
+	
 2009-05-18  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-3-47

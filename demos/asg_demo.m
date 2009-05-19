@@ -28,11 +28,6 @@
 
 % Created by Bengt Rydberg
 
-%Ajil Kottayil" <ajil.kottayil@ltu.se>
-%NEX Resebyrå in Luleå, 0920-280208
-%projectnumber: 805804
-
-
 function [G,FS]=asg_demo( dim,sensor )
 
 %= Set defualts
@@ -48,24 +43,26 @@ set_defaults;
 %SET CLOUD VARIABLES
 %-
 
-%define files from where to take data
-%cloudsat_dir='/odin/extdata/CLOUDSAT/R04/2B-GEOPROF';
-%cloudsat_file='2006190005036_01044_CS_2B-GEOPROF_GRANULE_P_R04_E01.hdf.zip';
-%cloudsat_file=fullfile(cloudsat_dir,cloudsat_file);
-FS.DATA='2006224035643_01541_CS_2B-GEOPROF_GRANULE_P_R04_E01.hdf';
+%DEFINE FILE FROM WHERE TO READ DATA
+toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
+datapath=fullfile(toppath,'demos','data');
+cloudsatfile='2006224035643_01541_CS_2B-GEOPROF_GRANULE_P_R04_E01.hdf';
+FS.DATA=fullfile(datapath,cloudsatfile);
 
-%define from what leg of cloudsat-orbit data will be taken from
+%DEFINE FROM WHAT LEG OF CLOUDSAT-ORBIT DATA WILL BE TAKEN FROM
 %Leg1=(-90,0);Leg2=(-90,90);Leg3=[0,90]
 FS.LEG=3;
 
-%define from which latitudes to read data
+%DEFINE FROM WHICH LATITUDES TO READ DATA
 FS.USE_LATS=[11.5 15.25];
 
-%define which latitude resolution to use  
+
+%DEFINE WHICH LATITUDE RESOLUTION TO USE  
 FS.LAT_RES=0.25; 
 
-%define pressure limits from where to consider Cloudat data
+%define pressure limits from where to consider Cloudsat data
 FS.P_LIMS=[900e2 80e2];
+
 FS.DIM=dim;
 
 if dim==3
@@ -85,26 +82,31 @@ end
 f_grid=94e9;
 FS.PROPS=asg_ssp(f_grid);
 
+%END OF CLOUD VARIABLES SETTINGS
 
 %SET ATMOSPHERIC PROPERTIES (no cloud) 
 %-
 
-%define files from where to take data
-ecmwf_dir='/odin/extdata/CLOUDSAT/R04/ECMWF-AUX/';
-ecmwf_file='2006190005036_01044_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf.zip';
-ecmwf_file=fullfile(ecmwf_dir,ecmwf_file);
-CS.FILE=ecmwf_file;
-CS.FILE='2006224035643_01541_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf';
+%define from where to read data
+%the baseline here is that gas fields are read from fascod tropical 
+%climatology(ftc)
+%however for H2O and O3 ECMWF data are here merged with Fascod data(ecmwfftc) 
+%N2 is here fixed by giving it a numerical value 
+%This in order to show some different options
+
+fascod     = fullfile( atmlab('ARTS_XMLDATA_PATH'),...
+                           'atmosphere', 'fascod' );
+ecmwffile='2006224035643_01541_CS_ECMWF-AUX_GRANULE_P_R04_E01.hdf';
+CS.FILE=fullfile(datapath,ecmwffile);
 
 %define from what leg of cloudsat-orbit data will be taken from
 CS.LEG=FS.LEG;
 
 CS.INSTRUMENT=sensor;
-%CS.DO=1; 
 
 
 %grids_cs will be the grids of the atmospheric variables (not for clouds)
-%however the lat_grid will later be set tighter around the cloudbox
+%however the grids will later be set tighter around the cloudbox
 %depending on the FS structure 
 p_grid=z2p_simple([0:1e3:25e3 35e3 45e3 60e3]);
 CS.GRIDS{1}=p_grid; 
@@ -156,13 +158,6 @@ if strcmp('amsu',sensor)
 
 end
 
-%define from where to read data
-%the baseline is that gas fields are read from fascod tropical climatology(ftc)
-%however for H2O and O3 ECMWF data are here merged with Fascod data(ecmwfftc) 
-%N2 is here fixed by giving it a numerical value 
-
-fascod     = fullfile( atmlab('ARTS_XMLDATA_PATH'),...
-                           'atmosphere', 'fascod' );
 
 len=length(atmfields);
 
@@ -260,7 +255,7 @@ for i=1:length(atmfields)
        end
          
        if strcmp(atmfields(i).source,'ecmwfftc') 
-        
+       
           H=asg_cloudsat_ecmwf(CS.FILE,CS.LEG,CS.GRIDS,{'DEM_elevation'});
          
           for j=1:length(H)
@@ -384,8 +379,10 @@ workfolder =create_tmpfolder;
 atmlab( 'EXTRAP', 1 );
 
 warning off
-[Gfs,lon] = asg_create_gfs1(G,CS.GRIDS,FS,workfolder);
+[Gfs,lon] = asg_create_gfs(G,CS.GRIDS,FS,workfolder);
+delete_tmpfolder(workfolder)
 warning on
+
 FS.USE_LONS=lon;
 G=Gfs;
 %CHECK OUT IF THE CLOUDS ARE OVER LAND OR OCEAN
