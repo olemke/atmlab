@@ -11,7 +11,7 @@
 %       s      number of values used for each mean after NaNs are
 %              removed
 % IN    n      Vector or matrix
-
+%
 % 2009-5-20  Created by Salomon Eliasson. 
 
 
@@ -23,7 +23,7 @@ if isvector( n ) && ( size(n,1) < size(n,2) )
   n   =  n';
 end
 
-% doing mean per column after removing NaNs
+% doing std per column after removing NaNs
 m  = zeros( 1, size( n, 2 ) );
 s  = zeros( size(m) );
 for j = 1:size( n, 2 )
