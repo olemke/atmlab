@@ -1,3 +1,11 @@
+2009-05-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-49
+
+	* handy/homedir.m: Created.
+
+	* handy/whoami.m: Added error message if system call fails.
+
 2009-05-19  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-3-48
