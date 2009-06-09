@@ -1,3 +1,11 @@
+2009-06-09  Bengt Rydberg  <benryd@chalmers.se>
+
+	* atmlab-0-3-50
+
+	* physics/parametrisations/dBZ2iwcMH97.m: Created.
+	Calculates iwc from radar reflectivity and temperature
+
+
 2009-05-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-49

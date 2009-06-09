@@ -62,6 +62,8 @@ end
 fields= {'Latitude','Height','Radar_Reflectivity',...
                     'CPR_Cloud_mask'};
 
+
+
 leg_DEFAULT      = 2;
 latitude_DEFAULT = [0 5];
 name_DEFAULT     = 'Radar_Reflectivity';
