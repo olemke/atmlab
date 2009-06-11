@@ -415,7 +415,7 @@ elseif strcmp(unit,['dBZ']')
    u=1;
 elseif strcmp(unit,['Pa']')
    u=1;
-elseif strcmp(unit,['kg/kg']')
+elseif strcmp(unit,['kg/kg']') |  strcmp(unit,['kg kg**-1']') 
    u=1;
 else 
    u=1;

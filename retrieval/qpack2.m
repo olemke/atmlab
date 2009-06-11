@@ -1,3 +1,7 @@
+% QPACK2   Retrievals using arts-2
+%
+% FORMAT   P = qpack2(Q,Y)
+
 function P = qpack2(Q,Y)
 
   
@@ -5,6 +9,14 @@ function P = qpack2(Q,Y)
 %- Initial part
 %-----------------------------------------------------------------------------
  
+%- Return directly if Y is totally empty
+%
+if isempty( Y )
+  out(1,1);out(1,'Y totally empty ([]).');out(1,-1);
+  P = [];
+  return;
+end
+  
 %- Check Q and force loaded data for some fields
 %
 Q = checkAndModifyQ( Q );
@@ -118,7 +130,7 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   %
   arts_includes = atmlab( 'ARTS_INCLUDES' );
   if isnan( arts_includes )
-    error('You need to ARTS_INCLUDES to run this example.');
+    error('You need to ARTS_INCLUDES to run qpack2.');
   end
 
   %- Init
@@ -213,7 +225,7 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   % than 50 m removed.
   %
   A.P_GRID = unique( pvalues );
-  A.P_GRID = pow10( gridthinning( log10(A.P_GRID),50/16e3) ); 
+  A.P_GRID = pow10( gridthinning( log10(A.P_GRID), 50/16e3 ) ); 
   A.P_GRID = A.P_GRID(end:-1:1);
 
   %- Sensor related stuff

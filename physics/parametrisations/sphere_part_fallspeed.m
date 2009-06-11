@@ -31,7 +31,7 @@ if length(T)>1
 end
 
 if length(P)>1
-  error('P must be a scalar!!!)
+  error('P must be a scalar!!!')
 end
 
 %dynamic viscosity of air (variation with temperature)
