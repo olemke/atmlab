@@ -1,4 +1,14 @@
+2009-06-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-53
+
+	* physics/parametrisations/dBZ2iwcMH97.m: Extended range for table
+	down to 190 K. And added treatment of points outside table range.
+	The function should now not return any NaN.
+
 2009-06-12  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-3-52
 
 	* forwardmodel/gridcreation/annealing/test_freq_set.m,
 	  forwardmodel/gridcreation/annealing/loop_anneal.m,

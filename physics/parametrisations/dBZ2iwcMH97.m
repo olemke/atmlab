@@ -78,9 +78,10 @@ if clo.do
   nwater=sqrt(eps_water_liebe93(f,273.15));
   Kwater=( abs( (nwater.^2-1)./ (nwater.^2+2) ) ).^2;
   % 
-  IWCv=logspace(-3.65,0.58,100);
-  Tv=200:2:272;
-  mode=1;
+  IWCv = logspace(-3.65,0.58,100);
+  Tv   = 190:2:272;
+  mode = 1;
+  %
   dx=D(2)-D(1);
   T_grid=F(1).T_grid;
   %loop over Tv and IWCv to find dBZ(T,IWC)
@@ -111,9 +112,8 @@ if clo.do
   P.IWC=IWCC;
   P.T=Tv;
   P.dBZ=dBZv; 
+  
   save(clo.file,'P')
-
-
 end
 
 load(clo.file)
@@ -126,3 +126,20 @@ ind=setdiff(1:length(dBZ(:)),ind);
 
 IWC=zeros(size(dBZ));
 IWC(ind)=interp2(P.dBZ,P.T,P.IWC,dBZ(ind),T(ind));
+
+
+%- Handle data outisde covered dBZ-T area
+%
+% Low dBZ and high/low T -> IWC = 0 
+ind      = find( dBZ<min(P.dBZ) |  T>max(P.T) |  T<min(P.T) );
+IWC(ind) = 0;
+%
+% High dBZ -> max(IWC)
+ind      = find( dBZ>max(P.dBZ) );
+IWC(ind) = mean( max( P.IWC' ) );
+
+
+if any(isnan(IWC))
+  fprintf( 'NaN found. Check cause!\n' );
+  keyboard
+end
