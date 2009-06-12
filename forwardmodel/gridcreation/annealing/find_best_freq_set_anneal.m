@@ -34,6 +34,9 @@
 % C.verb:   If 0, not output.
 %           If 1, only text output.
 %           If 2, text and plot output.
+% 
+% C.use_rel_error: Flag, if true then use relative error instead
+%                  of absolute error.
 %
 %
 % FORMAT [sb, Wb, eb, h] = find_best_freq_set_anneal(H,y_mono,n[,C])
@@ -60,10 +63,11 @@ function [sb, Wb, eb, h] = find_best_freq_set_anneal(H, y_mono, n, C)
 
 % Default options
 def = struct(...
-    'Nblock', 10000, ...   % Maximum number of cases in one block.
-    'Nsucc',  100, ...     % Desired number of successfull cases in one block.
-    'Tfact',  0.9, ...     % Temperature reduction factor.
-    'verb',   2 ...        % Verbosity.
+    'Nblock', 10000, ...       % Maximum number of cases in one block.
+    'Nsucc',  100, ...         % Desired number of successfull cases in one block.
+    'Tfact',  0.9, ...         % Temperature reduction factor.
+    'verb',   2, ...           % Verbosity.
+    'use_rel_error', false ... % Use absolute error by default.
     );        
 
 % Check input
@@ -75,7 +79,7 @@ else
   if ~isstruct(C)
     error('Input argument ''C'' is not a structure.')
   end
-  fs = {'Nblock', 'Nsucc', 'Tfact', 'verb'};
+  fs = {'Nblock', 'Nsucc', 'Tfact', 'verb', 'use_rel_error'};
   for nm=1:length(fs)
     if ~isfield(C,fs{nm})
       C.(fs{nm}) = def.(fs{nm}); 
@@ -97,6 +101,9 @@ Tfact  = C.Tfact;
 
 % Verbosity:
 verb = C.verb;
+
+% Relative error or absolute error minimization:
+use_rel_error = C.use_rel_error;
 
 %--------------------------------------------------------
 
@@ -153,7 +160,7 @@ e_shorthist = zeros(1,Nblock);
 for i=1:Nblock
   sn = neighbour(s);  
   W  = weights(sn, y_ref, H, y_mono_resh);
-  e  = test_freq_set(sn, y_ref, W, y_mono_resh);
+  e  = test_freq_set(sn, y_ref, W, y_mono_resh, use_rel_error);
   e_shorthist(i) = e;
   s = sn;
 end
@@ -203,7 +210,7 @@ while go_on
     W  = weights(sn, y_ref, H, y_mono_resh);
 
     % Calculate error (= energy).
-    en = test_freq_set(sn, y_ref, W, y_mono_resh);
+    en = test_freq_set(sn, y_ref, W, y_mono_resh, use_rel_error);
     
     % Energy difference:
     de = en - e;
@@ -241,11 +248,19 @@ while go_on
   h.e_max_hist(k) = max(e_shorthist(1:i));
 
   if verb>0
-    disp(sprintf('T = %g K, e_min = %g K, e_mean = %g K, e_max = %g K',...
-                 h.t_hist(k),...    
-                 h.e_min_hist(k),...    
-                 h.e_hist(k),...    
-                 h.e_max_hist(k) ))
+    if (use_rel_error)
+      disp(sprintf('T = %g, e_min = %g, e_mean = %g, e_max = %g [fractional errors]',...
+                   h.t_hist(k),...    
+                   h.e_min_hist(k),...    
+                   h.e_hist(k),...    
+                   h.e_max_hist(k) ))
+    else
+      disp(sprintf('T = %g K, e_min = %g K, e_mean = %g K, e_max = %g K',...
+                   h.t_hist(k),...    
+                   h.e_min_hist(k),...    
+                   h.e_hist(k),...    
+                   h.e_max_hist(k) ))
+    end
   end
     
   % Display results
@@ -255,17 +270,29 @@ while go_on
               h.e_hist(1:k); ...
               h.e_max_hist(1:k)]');
     xlabel('Iteration')
-    ylabel('RMS error [K]')
-
+    if (use_rel_error)
+      ylabel('RMS error [fractional]')
+    else
+      ylabel('RMS error [K]')
+    end
+  
     figure(2)
     semilogy(h.t_hist(1:k));
     xlabel('Iteration')
-    ylabel('Temperature [K]')
-
+    if (use_rel_error)
+      ylabel('Temperature [fractional]')
+    else
+      ylabel('Temperature [K]')
+    end
+      
     figure(3)
     loglog(h.t_hist(1:k), h.e_hist(1:k), '.');
     xlabel('Temperature [K]')
-    ylabel('RMS error [K]')
+    if (use_rel_error)
+      ylabel('RMS error [fractional]')
+    else
+      ylabel('RMS error [K]')
+    end
   end
 
   % Should we decrease T? - Not if the mean error is still

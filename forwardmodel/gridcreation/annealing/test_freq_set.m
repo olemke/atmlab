@@ -11,8 +11,10 @@
 %     H       Weight matrix
 %     y_mono  a batch of monochromatic Tbs (dimension must match
 %             y_ref and w)
+%     use_rel_error Flag: If true then use relative error instead
+%                   of absolute error.
 
-function e = test_freq_set(s, y_ref, H, y_mono)
+function e = test_freq_set(s, y_ref, H, y_mono, use_rel_error)
 
 % Number of channels:
 x = size(H);
@@ -28,12 +30,19 @@ H_red = H(:,s);
 %  H_red(i,:) = H_red(i,:) / H_norm;
 %end
 % We do no longer normalize, since the matrix H contains the
-% correct weights, calculated by linear regression.
+% correct weights, calculated by linear regression. (And in fact
+% H is also explicitly normalized to one.)
 
 y_mono_red = y_mono(s,:);
 
 y_test = H_red * y_mono_red;
 
-d = y_test - y_ref;
+if (use_rel_error)
+%  disp('Using relative error!')
+  d = (y_test - y_ref)./y_ref;  
+else
+%  disp('Using absolute error!')
+  d = y_test - y_ref;  
+end
 
 e = rms(d);

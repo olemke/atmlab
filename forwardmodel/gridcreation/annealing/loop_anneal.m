@@ -46,7 +46,11 @@ while go_on
   R(i).h  = h;
   
   disp('****************************************')
-  disp(sprintf('n = %d, acc = %g K', n, eb))
+  if (C.use_rel_error)
+    disp(sprintf('n = %d, acc = %g [fractional]', n, eb))
+  else
+    disp(sprintf('n = %d, acc = %g K', n, eb))
+  end
   
   if eb<=acc
     go_on = false;

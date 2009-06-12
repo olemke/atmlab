@@ -1,3 +1,11 @@
+2009-06-12  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* forwardmodel/gridcreation/annealing/test_freq_set.m,
+	  forwardmodel/gridcreation/annealing/loop_anneal.m,
+	  forwardmodel/gridcreation/annealing/find_best_freq_set_anneal.m:
+	Optionally allow optimization to be done for fractional instead of
+	absolute error.
+
 2009-06-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-51
