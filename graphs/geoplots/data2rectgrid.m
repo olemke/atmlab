@@ -4,7 +4,7 @@
 %    performs the operation specified by *funh* to create data on a
 %    rectangular grid. The grid cells are defined by the position of the edges
 %    by *xedges* and *yedges*. Data outside these ranges are ignored.
-%    Empty entries in *Z* are returned as NaN.
+%    Empty entries in *Z* are returned as *backv*.
 %
 %    The data values, *z*, must be given columns. If *z* has more than one 
 %    column this is interpreted as different "altitudes", and the operation 
@@ -24,11 +24,18 @@
 %       y        y-position of input data points.
 %       z        Input data values.
 %       funh     Handle to mapping function. 
+% OPT   backv    Value for empty bins. Default is NaN
 
 % 2005-03-27   Created by Patrick Eriksson.
 
 
-function [Z,N] = data2rectgrid(xedges,yedges,x,y,z,funh)
+function [Z,N] = data2rectgrid(xedges,yedges,x,y,z,funh,backv)
+
+%= Defaults values
+%
+backv_DEFAULT = NaN;
+%
+set_defaults;
 
 
 %= Check input
@@ -50,7 +57,7 @@ end
 %= Size outpout
 %
 N = zeros( length(xedges)-1, length(yedges)-1 );
-Z = repmat( NaN, [length(xedges)-1,length(yedges)-1,size(z,2)] );
+Z = repmat( backv, [length(xedges)-1,length(yedges)-1,size(z,2)] );
 
 
 % Fix to simplify code below

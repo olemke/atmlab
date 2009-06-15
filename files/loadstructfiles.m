@@ -16,16 +16,29 @@
 % IN    filenames   Cell array of strings with names of files to read.
 % OPT   fnames      Cell array of strings with names of fields to keep.
 %                   If not specified all fields will be kept.
+%       verbose     Set to 1 to get a simple file counter. Default is 0.
 
 % 2006-02-01   Created by Patrick Eriksson.
 
 
-function O = loadstructfiles(filenames,fnames)
+function O = loadstructfiles(filenames,fnames,verbose)
+
+%= Defaults values
+%
+verbose_DEFAULT = NaN;
+%
+set_defaults;
+
+
 
 n = 0;
 
 for i = 1 : length(filenames)
 
+  if verbose
+    fprintf( '%d/%d\n', i, length(filenames) );
+  end
+  
   %= Load data into a structure as we do not know name of variable
   %
   % We can then get the varaible name by *fieldnames* and use dynamic field

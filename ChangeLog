@@ -1,3 +1,11 @@
+2009-06-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-54
+
+	* graphs/geoplots/data2rectgrid.m: Added optional argument backv.
+
+	* files/loadstructfiles.m: Added optional argument verbose.
+
 2009-06-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-53
