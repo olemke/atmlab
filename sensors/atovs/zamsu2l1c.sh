@@ -74,6 +74,8 @@ case $FORMAT in
     INFILE=ambn.l1b;;
     HIRX) FORMAT=HIRS
     INFILE=hrsn.l1b;;
+    HIRS) FORMAT=HIRS
+    INFILE=hrsn.l1b;;
     MHSX) FORMAT=AMSU-B
     INFILE=ambn.l1b;;
     *) echo "Unknown format $FORMAT"
