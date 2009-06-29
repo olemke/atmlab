@@ -1,3 +1,11 @@
+2009-06-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-56
+
+	* files/loadstructfiles.m: Added verbose flag. 
+
+	* graphs/geoplots/coastlines.m: Corrected header text.
+
 2009-06-25  Oliver Lemke  <olemke(at)core-dump.info>
 
 	* atmlab-0-3-55

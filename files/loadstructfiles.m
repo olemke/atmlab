@@ -25,7 +25,8 @@ function O = loadstructfiles(filenames,fnames,verbose)
 
 %= Defaults values
 %
-verbose_DEFAULT = NaN;
+fnames_DEFAULT  = [];
+verbose_DEFAULT = 1;
 %
 set_defaults;
 
@@ -46,7 +47,7 @@ for i = 1 : length(filenames)
   %
   S = load( filenames{i} );
 
-  %= Only one varaibel shall be found
+  %= Only one variable shall be found
   %
   vname = fieldnames(S);
   %
@@ -54,7 +55,7 @@ for i = 1 : length(filenames)
     error(sprintf('More than 1 variable in %s',filenames{i}));
   end
 
-  if nargin == 1
+  if isempty(fnames)
     for j = 1:length(S.(vname{1}))
       n = n + 1;
       O(n) = S.(vname{1})(j);
