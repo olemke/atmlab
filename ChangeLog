@@ -1,3 +1,9 @@
+2009-06-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-57
+
+	* handy/homedir.m: Newline character now removed from output.
+
 2009-06-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-56
@@ -47,6 +53,7 @@
 
 	* sensors/cloudsat_read.m (unitconv): Added 'kg kg**-1' to known units.
 
+>>>>>>> .r6051
 2009-06-09  Bengt Rydberg  <benryd@chalmers.se>
 
 	* atmlab-0-3-50
