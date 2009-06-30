@@ -8,7 +8,7 @@
 %       2 : Latitude
 %       3 : Longitude
 %       4 : Time. The time format is not locked and grid4 is left unspecified.
-%           See *clmtlgy_define* for accpeted time formats.
+%           See *clmtlgy_interp* for accpeted time formats.
 %
 % FORMAT   D = clmtlgy_define
 %        

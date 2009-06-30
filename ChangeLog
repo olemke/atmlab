@@ -1,3 +1,19 @@
+2009-06-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-58
+
+	* retrieval/qpack2_README.txt: Started.
+
+	* retrieval/qpack2_defaults.m: Started. 
+
+	* arts/qartsJacobian.m: Corrected text for ABS_SPECIES. 
+
+	* arts/qarts_isset.m: Fixed typo in header. 
+
+	* arts/qarts.m: Fixed some typos. 
+
+	* forwardmodel/gformat/clmtlgy_define.m: Fixed typo in header. 
+
 2009-06-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-57

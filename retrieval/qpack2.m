@@ -1,5 +1,7 @@
 % QPACK2   Retrievals using arts-2
 %
+% Documentation started in qpack_READE.txt.
+%
 % FORMAT   P = qpack2(Q,Y)
 
 function P = qpack2(Q,Y)
@@ -9,7 +11,12 @@ function P = qpack2(Q,Y)
 %- Initial part
 %-----------------------------------------------------------------------------
  
-%- Return directly if Y is totally empty
+  
+%- Basic checks of input
+%
+if nargin ~= 2
+  error( 'The function requires two input arguments.' );
+end
 %
 if isempty( Y )
   out(1,1);out(1,'Y totally empty ([]).');out(1,-1);
@@ -17,23 +24,32 @@ if isempty( Y )
   return;
 end
   
-%- Check Q and force loaded data for some fields
+
+%- Check Q and force loaded data for some q fields
 %
-Q = checkAndModifyQ( Q );
+qcheck( @qpack2_defaults, Q );  
+%
+Q = loadQ( Q );
+
 
 %- Initial check of Y
 %
 empty_y = checkY( Q, Y );
 
+
 %- Create a work folder
 %
 workfolder = create_tmpfolder;
 
-%- Set up fixed part of A (for qarts) and Sx
+
+%- Set up fixed part of A and Sx
+%
+% Q of qarts is here denoted A
 %
 % This step includes calculation of sensor response data
 %
 [A,Sx,O] = createAandSxandO( Q, workfolder );
+
 
 %- Inverse of Sx
 %
@@ -104,12 +120,18 @@ return
 
 % Check and load data into Q
 %
-function Q = checkAndModifyQ( Q )
+function Q = loadQ( Q )
   
-  Q.F_BACKEND = qarts_get( Q.F_BACKEND );
-  Q.TNOISE_C  = qarts_get( Q.TNOISE_C );
+  if qarts_isset( Q.F_BACKEND )
+    Q.F_BACKEND = qarts_get( Q.F_BACKEND );
+  else
+    error( '*Q.F_BACKEND must be set' );
+  end
 
   if qarts_isset( Q.TNOISE_C )
+    %
+    Q.TNOISE_C  = qarts_get( Q.TNOISE_C );
+    %
     if ~issparse(Q.TNOISE_C)
       error( '*Q.TNOISE_C* is required to be sparse (to save memory).' );
     elseif size(Q.TNOISE_C,1) ~= size(Q.TNOISE_C,2)
@@ -211,9 +233,9 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   for i = 1 : length( Q.SPECIES )
     if Q.SPECIES(i).RETRIEVE
       A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}}, 0, 1, [], [], ...
-                             {Q.SPECIES(1).GRID}, Q.SPECIES(i).UNIT );
-      Sx = covmat_append( Sx, Q.SPECIES(1).SX );
-      pvalues = [ pvalues qarts_get(Q.SPECIES(1).GRID) ];
+                             {Q.SPECIES(i).GRID}, Q.SPECIES(i).UNIT );
+      Sx = covmat_append( Sx, Q.SPECIES(i).SX );
+      pvalues = [ pvalues qarts_get(Q.SPECIES(i).GRID) ];
     else
       A = qarts_abs_species( A, {Q.SPECIES(i).TAG} );
     end
@@ -316,7 +338,6 @@ function empty_y = checkY( Q, Y )
   % Time information
   if ~isfield(Y,'year') | ~isfield(Y,'month') | ~isfield(Y,'day')
     error( 'Y must include the fields ''year'', ''month'' and ''day''.' );
-    error( 'At least  data must be set.' );
   end
 
   % Zenith angle
@@ -330,23 +351,28 @@ function empty_y = checkY( Q, Y )
   end
 
   % HSE point
-  if ~isfield( Y, 'hse_p' )  |  ~isfield( Y, 'hse_p' ) 
+  if ~isfield( Y, 'hse_p' )  |  ~isfield( Y, 'hse_z' ) 
     error( 'Y must include the fields ''hse_p'' and ''hse_z''.' );
   end
     
   % All y empty 
   if isempty( Y(1).y )
-    if length([Y(:).y]) > 0
-      error( [ 'First spectrum in Y is empty. Then all other spectra must '...
-               'also be empty.'] );
+    for i = 2 : length(Y)
+      if length(Y(i).y) > 0
+        error( [ 'First spectrum in Y is empty. Then all other spectra must '...
+                 'also be empty.'] );
+      end
     end
     empty_y = 1;
+    
+  % Standard case
   else
     for i = 1 : length(Y)
       if length(Y(i).y) ~= length(Q.F_BACKEND)
         error( sprintf(['Length of spectrum %d does not match length of ' ...
                         '*Q.F_BACKEND*'], i ) );
       end
+      if 
     end
     empty_y = 0;
   end
@@ -381,11 +407,12 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
   %
   A.VMR_FIELD = zeros( length(A.ABS_SPECIES), length(A.P_GRID), 1, 1 );
   %
+  D   = clmtlgy_define;
   h2o = [];
   %
   for i = 1 : length(A.ABS_SPECIES) 
     A.VMR_FIELD(i,:,1,1) = clmtlgy_interp( ...
-                           Q.ATMDATA_D, Q.SPECIES(i).ATMDATA, A.P_GRID, ...
+                           D, Q.SPECIES(i).ATMDATA, A.P_GRID, ...
                            Ythis.latitude, Ythis.longitude, ...
                            Ythis.year, Ythis.month, Ythis.day, ...
                            Ythis.hour, Ythis.minute, Ythis.second );
@@ -397,7 +424,7 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
     end
   end
   %
-  A.T_FIELD = clmtlgy_interp( Q.ATMDATA_D, Q.T.ATMDATA, A.P_GRID, ...
+  A.T_FIELD = clmtlgy_interp( Q.D, Q.T.ATMDATA, A.P_GRID, ...
                            Ythis.latitude, Ythis.longitude, ...
                            Ythis.year, Ythis.month, Ythis.day, ...
                            Ythis.hour, Ythis.minute, Ythis.second ); 
