@@ -372,7 +372,6 @@ function empty_y = checkY( Q, Y )
         error( sprintf(['Length of spectrum %d does not match length of ' ...
                         '*Q.F_BACKEND*'], i ) );
       end
-      if 
     end
     empty_y = 0;
   end
@@ -424,7 +423,7 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
     end
   end
   %
-  A.T_FIELD = clmtlgy_interp( Q.D, Q.T.ATMDATA, A.P_GRID, ...
+  A.T_FIELD = clmtlgy_interp( D, Q.T.ATMDATA, A.P_GRID, ...
                            Ythis.latitude, Ythis.longitude, ...
                            Ythis.year, Ythis.month, Ythis.day, ...
                            Ythis.hour, Ythis.minute, Ythis.second ); 

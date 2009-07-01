@@ -5,7 +5,8 @@
 Scope
 -
 Qpack2 shall handle:
-1. Batch inversions of 1D cases
+1. Batch inversions of 1D cases (single spectra cases, but handling
+beam switching and frequency switching observations).
 2. Produce spectra matching the a priori assumptions.
 
 Option 2 is triggered by setting all spectra (Y.y) to be empty.
