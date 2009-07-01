@@ -1,10 +1,10 @@
-% QPACK2   Retrievals using arts-2
+% QPACK2_OEM   Retrievals using arts-2
 %
-% Documentation started in qpack_READE.txt.
+% Documentation started in atmlab/retrieval/qpack2/README.txt.
 %
 % FORMAT   P = qpack2(Q,Y)
 
-function P = qpack2(Q,Y)
+function P = qpack2_oem(Q,Y)
 
   
 %-----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ end
 
 %- Check Q and force loaded data for some q fields
 %
-qcheck( @qpack2_defaults, Q );  
+qcheck( @qpack2, Q );  
 %
 Q = loadQ( Q );
 

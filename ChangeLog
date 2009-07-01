@@ -1,5 +1,22 @@
 2009-07-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-60
+
+	* Qpack2 functions moved to a dedicated folder: retrievals/qpack2.
+	Functions also re-named.
+	
+	* retrieval/qpack2/README.txt: Some more text. 
+
+	* retrieval/qpack2/qpack2_oem.m: This was qpack2.  
+
+	* retrieval/qpack2/qpack2.m: This was qpack2_defaults. Renamed to
+	be consistent with other parts, where "definition function" shares
+	name with the module.
+
+	* atmlab/atmlab_init.m: New folder added.
+
+2009-07-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-59
 
 	* retrieval/qpack2*: Work on documentation (backup commit). 

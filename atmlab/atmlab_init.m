@@ -32,6 +32,7 @@ addpath( fullfile( toppath, 'time' ) );
 addpath( fullfile( toppath, 'tests' ) );
 addpath( fullfile( toppath, 'sensors', 'atovs' ) ); 
 addpath( fullfile( toppath, 'sensors' ) ); 
+addpath( fullfile( toppath, 'retrieval','qpack2' ) ); 
 addpath( fullfile( toppath, 'retrieval' ) ); 
 addpath( fullfile( toppath, 'randomize','iaaft' ) ); 
 addpath( fullfile( toppath, 'randomize' ) ); 
