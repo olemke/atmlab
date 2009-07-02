@@ -72,6 +72,7 @@ for m = 1 : length(Y)
   %
   [A,Ythis] = nextMeasurement( Q, A, Y, m );
 
+  
   %- Simulate a (noise free) measurement if y is empty
   if empty_y
     %
@@ -82,8 +83,11 @@ for m = 1 : length(Y)
     end
     %
     fprintf( 'Simulating spectrum %d/%d\n', m, length(Y) );
+    %
     P(m).y = arts_y( A, workfolder );
   
+    
+  %- Inversion
   else
     %- Create Se
     %
@@ -111,9 +115,12 @@ end
 delete_tmpfolder( workfolder );
 
 return
+%------------------------------------------------------------------------------
 
 
   
+
+
 %------------------------------------------------------------------------------
 %- Internal sub-functions
 %------------------------------------------------------------------------------
@@ -125,7 +132,7 @@ function Q = loadQ( Q )
   if qarts_isset( Q.F_BACKEND )
     Q.F_BACKEND = qarts_get( Q.F_BACKEND );
   else
-    error( '*Q.F_BACKEND must be set' );
+    error( 'Q.F_BACKEND must be set' );
   end
 
   if qarts_isset( Q.TNOISE_C )
@@ -133,11 +140,11 @@ function Q = loadQ( Q )
     Q.TNOISE_C  = qarts_get( Q.TNOISE_C );
     %
     if ~issparse(Q.TNOISE_C)
-      error( '*Q.TNOISE_C* is required to be sparse (to save memory).' );
+      error( 'Q.TNOISE_C is required to be sparse (to save memory).' );
     elseif size(Q.TNOISE_C,1) ~= size(Q.TNOISE_C,2)
-      error( '*Q.TNOISE_C* must be square.' );
+      error( 'Q.TNOISE_C must be square.' );
     elseif size(Q.TNOISE_C,1) ~= length(Q.F_BACKEND)
-      error( 'Size of *Q.TNOISE_C* must match length of *Q.F_BACKEND*.' );
+      error( 'Size of Q.TNOISE_C must match length of Q.F_BACKEND.' );
     end
   end
 return
@@ -162,23 +169,21 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   %- OEM 
   %
   % User settings
-  O.linear              = Q.OEM_LINEAR;
-  O.imethod             = Q.OEM_IMETHOD;
-  O.stop_dx             = Q.OEM_STOP_DX;
-  O.maxiter             = Q.OEM_MAXITER;
+  O.linear    = mandatory_qfield( Q, 'OEM_LINEAR' );
+  if ~O.linear
+    O.imethod   = mandatory_qfield( Q, 'OEM_IMETHOD', 'OEM_LINEAR' );
+    O.stop_dx   = mandatory_qfield( Q, 'OEM_STOP_DX', 'OEM_LINEAR' );
+    O.maxiter   = mandatory_qfield( Q, 'OEM_MAXITER', 'OEM_LINEAR' );
+  end
+  O.yf        = mandatory_qfield( Q, 'OUT_Y' );
+  O.A         = mandatory_qfield( Q, 'OUT_A' );
   %
   % Hard-coded settings
   %
-  O.cost                = 1;
-  O.e                   = 1;
-  O.eo                  = 1;
-  O.es                  = 1;
-  if Q.OUT_Y
-    O.yf                = 1;
-  end
-  if Q.OUT_A
-    O.A                 = 1;
-  end
+  O.cost      = 1;
+  O.e         = 1;
+  O.eo        = 1;
+  O.es        = 1;
 
     
   %- Hard-coded A settings
@@ -205,19 +210,19 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
 
   %- Line data
   %
-  A.ABS_LINES            = Q.ABS_LINES;
-  A.ABS_LINES_FORMAT     = Q.ABS_LINES_FORMAT;
+  A.ABS_LINES            = mandatory_qfield( Q, 'ABS_LINES' );
+  A.ABS_LINES_FORMAT     = mandatory_qfield( Q, 'ABS_LINES_FORMAT' );
     
   %- Surface and atmosphere
   %
-  A.Z_SURFACE            = Q.SURFACE_Z;
+  A.Z_SURFACE            = mandatory_qfield( Q, 'SURFACE_Z' );;
 
   %- RT variables
   %
   A.PPATH_LMAX           = 200;
   A.PPATH_STEP_AGENDA    = { 'ppath_stepGeometric' };
   %
-  if Q.CBGR
+  if mandatory_qfield( Q, 'CBGR' );
     A.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
                           'MatrixCBR( iy, stokes_dim, f_grid )' };
   else
@@ -256,14 +261,15 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   A.SENSOR_DO       = 1;
   S.SENSOR_NORM     = 1;
   %
-  A.Y_UNIT          = Q.Y_UNIT;
+  A.Y_UNIT          = mandatory_qfield( Q, 'Y_UNIT' );
   A.ANTENNA_DIM     = 1;
-  A.MBLOCK_ZA_GRID  = Q.MBLOCK_ZA_GRID;
+  A.MBLOCK_ZA_GRID  = mandatory_qfield( Q, 'MBLOCK_ZA_GRID' );
   %
-  if Q.BACKEND_DO
-    A.F_GRID                   = Q.F_GRID;
-    S.F_BACKEND                = Q.F_BACKEND;
-    S.BACKEND_CHANNEL_RESPONSE = Q.BACKEND_CHANNEL_RESPONSE;
+  if mandatory_qfield( Q, 'BACKEND_DO' )
+    A.F_GRID                   = mandatory_qfield( Q, 'F_GRID', 'BACKEND_DO' );
+    S.F_BACKEND                = Q.F_BACKEND;  % Already checked and loaded
+    S.BACKEND_CHANNEL_RESPONSE = mandatory_qfield( Q, ...
+                                    'BACKEND_CHANNEL_RESPONSE', 'BACKEND_DO' );
   else
     A.F_GRID                   = Q.F_BACKEND;
   end
@@ -275,19 +281,38 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   
   % Polyfit
   %
-  if Q.POLYFIT_DO
-    l = Q.POLYFIT_ORDER + 1;
-    if length(Q.POLYFIT_SI) ~= l
+  if mandatory_qfield( Q, 'POLYFIT_DO' )
+    %
+    order = mandatory_qfield( Q, 'POLYFIT_ORDER', 'POLYFIT_DO' );
+    si    = mandatory_qfield( Q, 'POLYFIT_SI', 'POLYFIT_DO' );
+    %
+    l = order + 1;
+    if length(si) ~= l
       error('Length of *Q.POLYFIT_SI* must be Q.POLYFIT_ORDER + 1.');
     end
     %
     A.J.POLYFIT.DO         = 1;
-    A.J.POLYFIT.POLY_ORDER = Q.POLYFIT_ORDER;
+    A.J.POLYFIT.POLY_ORDER = order;
     %
-    Sx = covmat_append( Sx, spdiags(vec2col(Q.POLYFIT_SI).^2,0,l,l) );
+    Sx = covmat_append( Sx, spdiags(vec2col(si).^2,0,l,l) );
   end
 return
 
+
+% Extraction of mandatory Q field
+%
+function r = mandatory_qfield( Q, fname, mainfield )
+  if qarts_isset( Q.(fname) )
+    r = Q.(fname);
+  else
+    if nargin == 2
+      error( sprintf('Q.%s must be set.',fname) );
+    else
+      error( sprintf('Q.%s is mandatory when %s is true/active.',...
+                                                             fname,mainfield) );
+    end
+  end
+return
 
 
 % Creates observation error matrix, Se
@@ -295,7 +320,7 @@ return
 function Se = createSe( Q, tnoise_si )
 
   n    = length( tnoise_si );
-  nf   = length( Q.F_BACKEND );
+  nf   = length( Q.F_BACKEND );       % F_BACKEND and TNOISE_C already checked
   cset = qarts_isset( Q.TNOISE_C );
   
   if n ~= 1  & n ~= nf
@@ -369,8 +394,8 @@ function empty_y = checkY( Q, Y )
   else
     for i = 1 : length(Y)
       if length(Y(i).y) ~= length(Q.F_BACKEND)
-        error( sprintf(['Length of spectrum %d does not match length of ' ...
-                        '*Q.F_BACKEND*'], i ) );
+        error( sprintf(['Length of spectrum %d (at least) does not match ' ...
+                        'length of Q.F_BACKEND.'], i ) );
       end
     end
     empty_y = 0;
@@ -380,8 +405,6 @@ return
 
 
 % Jump to next measurement
-%
-% y is set to Y(i) if spectrum is empty
 %
 function [A,Ythis] = nextMeasurement( Q, A, Y, i )
 
@@ -410,11 +433,10 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
   h2o = [];
   %
   for i = 1 : length(A.ABS_SPECIES) 
-    A.VMR_FIELD(i,:,1,1) = clmtlgy_interp( ...
-                           D, Q.SPECIES(i).ATMDATA, A.P_GRID, ...
-                           Ythis.latitude, Ythis.longitude, ...
-                           Ythis.year, Ythis.month, Ythis.day, ...
-                           Ythis.hour, Ythis.minute, Ythis.second );
+    A.VMR_FIELD(i,:,1,1) = clmtlgy_interp( D, Q.SPECIES(i).ATMDATA, A.P_GRID,...
+                                       Ythis.latitude, Ythis.longitude, ...
+                                       Ythis.year, Ythis.month, Ythis.day, ...
+                                       Ythis.hour, Ythis.minute, Ythis.second );
     if isempty(h2o)
       species = arts_tgs2species( A.ABS_SPECIES{i}{1} );
       if strcmp( species, 'H2O' )
@@ -424,9 +446,9 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
   end
   %
   A.T_FIELD = clmtlgy_interp( D, Q.T.ATMDATA, A.P_GRID, ...
-                           Ythis.latitude, Ythis.longitude, ...
-                           Ythis.year, Ythis.month, Ythis.day, ...
-                           Ythis.hour, Ythis.minute, Ythis.second ); 
+                              Ythis.latitude, Ythis.longitude, ...
+                              Ythis.year, Ythis.month, Ythis.day, ...
+                              Ythis.hour, Ythis.minute, Ythis.second ); 
   %
   A.Z_FIELD = pt2z( A.P_GRID, A.T_FIELD, h2o, Ythis.hse_p, Ythis.hse_z, ...
                                                               Ythis.latitude );
