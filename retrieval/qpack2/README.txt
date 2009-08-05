@@ -11,10 +11,11 @@ Qpack2 shall handle:
 
 Option 2 is triggered by setting all spectra (Y.y) to be empty.
 
-Quality checks are left to the user. For example, there is no check
-that the frequencies of the measurements are as expected
-(Q.F_BACKEND). This should be checked before when loading the
-measurements. That is, before calling qpack2.
+Quality checks are not hanlded by qpack2. For example, there is no
+check that the frequencies of the measurements are as expected
+(Q.F_BACKEND). This for efficiency reasons and the fact that such
+checks are hard to make in a totally general manner. Some checks can
+be performed by accompanying functions, such as qp2_check_f. 
 
 Beside the settings below, some general atmlab settings are used. This 
 includes
@@ -28,12 +29,11 @@ WORK_AREA
 A calculation run could like this:
 
 >> Q = q_h2o;
->> Y = get_onsala_Y( 'h2o', Q, date1, date2 );
->> P = qpack2_oem( Q, Y );
+>> Y = get_onsala_Y( 'h2o', date1, date2 );
+>> qp2_check_f( Q, Y, 1e3 );
+>> Y = rmfield( Y, 'f' );
+>> P = qp2_oem( Q, Y );
 
-The purpose of having Q as input to get_onsala_Y is to allow checking
-between Q and spectra loaded. For example, that frequencies of spectra
-match Q.F_BACKEND.
 
 
 
@@ -76,6 +76,10 @@ geometrical altitude (hse_z) is given for one presssure (hse_p).
 
 Optional fields are:
 
+Y.f
+-
+Frequency for each y value. Selected frequency should match Q.F_BACKEND.
+
 Y.hour
 Y.minute
 Y.second
@@ -115,14 +119,13 @@ ans =
 #############################################################################
 
 All fields are described and set to default/dummy values in
-qarts_defaults.m. Use qinfo to obtain the information. For everything,
-do
+qpack2.m. Use qinfo to obtain the information. For everything:
 
-qinfo( @qpack2_defaults )
+qinfo( @qpack2 )
 
 To read about a specific field, such as POLYFIT_SI:
 
-qinfo( @qpack2_defaults, 'POLYFIT_SI' )
+qinfo( @qpack2, 'POLYFIT_SI' )
 
 
 

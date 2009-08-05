@@ -1,10 +1,10 @@
-% QPACK2_OEM   Retrievals using arts-2
+% QP2_OEM   Retrievals using arts-2
 %
 % Documentation started in atmlab/retrieval/qpack2/README.txt.
 %
-% FORMAT   P = qpack2(Q,Y)
+% FORMAT   P = qp2(Q,Y)
 
-function P = qpack2_oem(Q,Y)
+function P = qp2_oem(Q,Y)
 
   
 %-----------------------------------------------------------------------------
