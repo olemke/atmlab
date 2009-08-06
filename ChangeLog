@@ -1,3 +1,17 @@
+2009-08-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-63
+
+	* retrieval/oem.m: Output field converged was not described in the header.
+
+	* retrieval/qpack2/qp2_oem.m: Crashed if Q.OUT_A = 0. 
+
+	* retrieval/qpack2/README.txt: Finished summary of data fields.
+
+	* retrieval/qpack2/README.tex: Started. 
+
+	* retrieval/qpack2/README.pdf: Added. 
+	
 2009-08-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-62

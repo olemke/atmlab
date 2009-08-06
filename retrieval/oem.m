@@ -49,24 +49,27 @@
 %       Xiter  : Flag to include all iteration states in X.
 %
 %   The results are gathered in a structure X, with fields:
-%       x      : Retrieved state.
-%       cost   : Total cost, normalised by length of y. A succesful retrieval
-%                shall then have a cost in the order of 1.
-%       cost_y : Cost corresponding to the measurement vector.
-%       cost_x : Cost corresponding to the state vector.
-%       d      : See above.
-%       do     : See above.
-%       ds     : See above.
-%       yf     : See above.
-%       A      : See above.
-%       G      : See above.
-%       J      : See above.
-%       S      : See above.
-%       So     : See above.
-%       Ss     : See above.
-%       Xiter  : The x-vector after each iteration.
-%   The field x is always included (if an actual inversion is performed).
-%   Other fields are included if corresponding O field is set.
+%       x         : Retrieved state.
+%       converged : Convergence flag. 1 if convergency criterion has been reached. 
+%                   Otherwise 0 for non-linear inversions. Set to NaN for
+%                   linear retrievals.
+%       cost      : Total cost, normalised by length of y. A succesful retrieval
+%                   shall then have a cost in the order of 1.
+%       cost_y    : Cost corresponding to the measurement vector.
+%       cost_x    : Cost corresponding to the state vector.
+%       d         : See above.
+%       do        : See above.
+%       ds        : See above.
+%       yf        : See above.
+%       A         : See above.
+%       G         : See above.
+%       J         : See above.
+%       S         : See above.
+%       So        : See above.
+%       Ss        : See above.
+%       Xiter     : The x-vector after each iteration.
+%   The fields x and converged are always included (if an actual inversion 
+%   is performed). Other fields are included if corresponding O field is set.
 %
 %   Use the first format to check default values for O. The second format
 %   is intended for extracting retrieval characteristics (corresponding to
@@ -253,7 +256,7 @@ function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
   %- P structure
   %
-  X.converged = 0;
+  X.converged = NaN;
   if O.dx
     X.dx      = [];
   end
@@ -390,16 +393,18 @@ function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
       %
       dx = ( ( xnew - x )' * SJSJ * ( xnew - x ) ) / nx;
       %
-      if O.linear  |  dx <= O.stop_dx
+      if dx <= O.stop_dx
         ready       = 1;
         X.converged = 1;
+      else
+        X.converged = 0;
       end
       %
       if O.dx
         X.dx = [ X.dx dx ];
       end
       %
-      if ~ready  &  iter == O.maxiter
+      if iter == O.maxiter
         ready = 1;
       end
     end

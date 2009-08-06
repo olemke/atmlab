@@ -135,7 +135,8 @@ qinfo( @qpack2, 'POLYFIT_SI' )
 ### P : Result and auxiliary data of retrieval
 #############################################################################
 
-A structure array. The following fields are always returned
+A structure array. The following fields are always provided
+---
 
 P.latitude
 P.longitude
@@ -153,26 +154,116 @@ Measurement time.
 
 P.tnoise_si
 -
-Mean of assumed thermal noise (a direct averaging, no weighting 
-with channel widths).
+Mean of assumed thermal noise (a direct averaging, no weighting with
+channel widths). This value has no direct physical meaning, but can be
+used as a mean to e.g. remove the most noisy measurements (without 
+having Y at hand).
+
+P.converged
+-
+See oem.m.
 
 P.cost
 P.cost_y
 P.cost_x
 -
-"Cost" values of retrieval, normalised with length of measurement
-vector. For some more information: help oem
+See oem.m.
 
 
-
-
-
-P.converged
+The following fields are also provided if Q.OUT_Y is set to true:
+---
 
 P.f
-P.y
-P.yf
+-
+Frequency vector of measurement (Q.F_BACKEND).
 
-P.p
-P.t
-P.z
+P.y
+-
+Measured spectrum.
+
+P.yf
+-
+Fitted spectrum. That is, the spectrum matching retrieved state vector.
+
+
+The following fields are also provided if Q.OUT_Y is set to true:
+---
+
+P.p P.t P.z 
+-
+A consistent set of pressure, temperature and altitude vectors. The
+vectors are identical to the ones that are provided to the forward
+model. If temperatures are retrieved, this information is used.
+Otherwise returned data match climatology temperatures. Altitudes are
+obtained by applying hydrostatic equilibrium.
+
+
+If any species is retrieved, these fields are always returned:
+---
+
+species1_name
+-
+Tag name of species.
+
+species1_p
+-
+Vertical/pressure retrieval grid for the species.
+
+species1_x
+- 
+Retrieved profile. Unit depends on Q.SPECIES(i).UNIT.
+
+species1_xa
+-
+A priori state for the species.
+
+species1_e
+-
+Total retrieval (observation + smooting) error for the species.
+
+species1_eo
+-
+Observation error for the species.
+
+species1_eo
+-
+Smoothing error for the species.
+
+species1_mr
+-
+Measurement response for the species.
+
+
+
+If Q.OUT_A is set to true, the following field is also provided
+---
+
+P.species1_A
+-
+Averaging kernels for the species. 
+
+
+
+If more than one species is retrieved, data for other species are
+returned as species2_name etc.
+
+
+
+If any baseline fit is performed and Q.OUT_BASELINE is set to true,
+the following field is also provided
+
+P.baseline
+-
+Retrieved baseline fit.
+
+
+
+Result for each baseline fit variable is also provided. For example,
+the following fields are added to handle polynomial coefficent 0:
+
+P.polyfit0_x
+P.polyfit0_xa
+P.polyfit0_e
+P.polyfit0_eo
+P.polyfit0_es
+P.polyfit0_mr
