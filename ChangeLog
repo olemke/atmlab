@@ -1,8 +1,22 @@
+2009-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-64
+
+	* retrieval/qpack2/README.tex: More text and qinfo stuff now
+	included in Appendices.
+
+	* retrieval/qpack2/make_readme.m: Started.
+
+	* handy/qinfo.m: Added the flag below also to this function.
+
+	* handy/out.m: Added flag to suppress drawing of frame lines.
+
 2009-08-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-63
 
-	* retrieval/oem.m: Output field converged was not described in the header.
+	* retrieval/oem.m: Output field converged was not described in the 
+	header.
 
 	* retrieval/qpack2/qp2_oem.m: Crashed if Q.OUT_A = 0. 
 

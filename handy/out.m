@@ -25,11 +25,14 @@
 %          The function can also be used to determine if figures etc.
 %          shall be produced (the last format example).
 %
+%          The vertical and horisontal frame lines can be removed by setting
+%          the optional argument *lines* to 0.
+%
 %          The output can also be directed to a file by using the optional
 %          argument *fid*. Note that you can write to several files and
 %          the screen by making *fid* a vector. The screen has identifier 1.
 %
-% FORMAT:  out( level, s [, fid] )
+% FORMAT:  out( level, s [, fid, lines] )
 %            or
 %          do_output = out( level )
 %
@@ -43,21 +46,21 @@
 % OPT      fid         Vector with file identifiers. Default is 1, which
 %                      is standard output (screen). For zero verbosity
 %                      set to [].
+%          lines       Flag to draw vertical and horisontal frame lines.
 %------------------------------------------------------------------------
 
 % HISTORY: 040907  Copied from AMI and modified to Atmlab by Patrick
 %                  Eriksson, who also made AMI version.
 
 
-function do_output = out( level, s, fid )
+function do_output = out( level, s, fid, lines )
 
 level_DEFAULT = 0;
+fid_DEFAULT   = 1;
+lines_DEFAULT = 1;
 %
 set_defaults;
 
-if nargin < 3
-  fid = 1;
-end
 
 if isempty(fid)
   return
@@ -66,9 +69,9 @@ end
 if length(fid) > 1
   for i = 1 : length(fid)
     if length(level) >= i
-      out( level(i), s, fid(i) );
+      out( level(i), s, fid(i), lines );
     else
-      out( 0, s, fid(i) );
+      out( 0, s, fid(i), lines );
     end
   end
   return
@@ -105,7 +108,9 @@ if ischar(s)
 
   for i = 1:size(s,1)
   
-    fprintf(fid,'| ');
+    if lines
+      fprintf(fid,'| ');
+    end
   
     %Indention
     for j = 1:(level-1)
@@ -118,8 +123,11 @@ if ischar(s)
       fprintf(fid,' ');
     end
   
-    fprintf(fid,'|\n');
-  
+    if lines
+      fprintf(fid,'|\n');
+    else
+      fprintf(fid,'\n');
+    end  
   end
 
 
@@ -127,27 +135,39 @@ else
 
   %=== Start line
   if s > 0
-    fprintf(fid,'\n/');
-    for j = 1:(ncols-2)
-      fprintf(fid,'-');
+    if lines 
+      fprintf(fid,'\n/');
+      for j = 1:(ncols-2)
+        fprintf(fid,'-');
+      end
+      fprintf(fid,'\\\n');
+    else
+      fprintf(fid,'\n');
     end
-    fprintf(fid,'\\\n');
 
   %=== Brake line
   elseif s == 0
-    fprintf(fid,'|');
-    for j = 1:(ncols-2)
-      fprintf(fid,'-');
+    if lines 
+      fprintf(fid,'|');
+      for j = 1:(ncols-2)
+        fprintf(fid,'-');
+      end
+      fprintf(fid,'|\n');
+    else
+      fprintf(fid,'\n');
     end
-    fprintf(fid,'|\n');
 
   %=== End line
   else
-    fprintf(fid,'\\');
-    for j = 1:(ncols-2)
-      fprintf(fid,'-');
+    if lines 
+      fprintf(fid,'\\');
+      for j = 1:(ncols-2)
+        fprintf(fid,'-');
+      end
+      fprintf(fid,'/\n');
+    else
+      fprintf(fid,'\n');
     end
-    fprintf(fid,'/\n');
   end
 
 end

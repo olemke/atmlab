@@ -18,22 +18,26 @@
 %    To create a file qdoc.txt with information for all fields:
 %       qinfo(@qdef,'all',''qdoc.txt');
 %
-% FORMAT   qinfo( qfun, field, fid )
+% FORMAT   qinfo( qfun [, field, fid, lines ] )
 %        
 % IN    qfun   Pointer to function providing default structure.
 % OPT   field  Field name, or 'all'. Default is all.
 %       fid    File identifier(s) for output. Or name on file to create.
 %              Default is to only print on screen.
+%       lines  As the same argument for *out*.
 
 % 2004-09-07   Created by Patrick Eriksson.
 
-function qinfo( qfun, field, fid )
+function qinfo( qfun, field, fid, lines )
 
 if nargin < 2
   field = 'all';
 end
 if nargin < 3
   fid = 1;
+end
+if nargin < 4
+  lines = 1;
 end
 
 if ischar(fid)
@@ -91,14 +95,14 @@ if strcmp( field, 'all' )  |  strcmp( tail(field,1), '*' )
     end
   end
 
-  out(0,1,fid);
+  out(0,1,fid,lines);
   for i = 1 : length(fields)  
-    printfield( fields{i}, getfield( INFO, fields{i} ), fid );
+    printfield( fields{i}, getfield( INFO, fields{i} ), fid, lines );
     if i < length(fields)
-      out(0,0,fid);
+      out(0,0,fid,lines);
     end
   end
-  out(0,-1,fid);
+  out(0,-1,fid,lines);
 
 
 else
@@ -113,9 +117,9 @@ else
     error(sprintf('Information for field %s is not a string.', field));
   end
 
-  out(0,1,fid);
-  printfield( field, s, fid );
-  out(0,-1,fid);
+  out(0,1,fid,lines);
+  printfield( field, s, fid, lines );
+  out(0,-1,fid,lines);
 
 end
 
@@ -128,7 +132,7 @@ end
 
 %----------------------------------------------------------------------------
 
-function printfield( field, s, fid )
+function printfield( field, s, fid, lines )
   %
   atmlab( 'require', {'SCREEN_WIDTH'} );
   ncols = atmlab( 'SCREEN_WIDTH' ) - 4;
@@ -139,8 +143,8 @@ function printfield( field, s, fid )
   ready = 0;
   i = 1;
   %
-  out(0,sprintf('Field: %s',field),fid);
-  out(0,'-',fid);
+  out(0,sprintf('Field: %s',field),fid,lines);
+  out(0,'-',fid,lines);
   while ~ready
     j = ind(max(find( ind <= i+ncols )))-1;
     if j <= i + 2    % Fix to handle cases when SCREEN_WIDTH is smaller than
@@ -153,7 +157,7 @@ function printfield( field, s, fid )
       j = min(pind) - 1;
       pind = tail( pind, length(pind)-1 );
     end
-    out(0,s(i:j),fid);
+    out(0,s(i:j),fid,lines);
     i = j + jj;
     if i > ls
       ready = 1;
