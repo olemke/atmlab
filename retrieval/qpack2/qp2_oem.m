@@ -505,8 +505,9 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
     else
       P(i).f   = Q.F_BACKEND;
     end
-    P(i).y   = Ythis.Y;
-    P(i).yf  = X.yf;
+    P(i).y        = Ythis.Y;
+    P(i).yf       = X.yf;
+    P(i).baseline = R.bl;
   end
  
   % PTZ (a priori or forward model parameters)

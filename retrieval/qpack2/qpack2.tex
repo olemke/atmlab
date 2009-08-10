@@ -269,6 +269,11 @@ Measured spectrum.
 \verb|yf|:\\
 Fitted spectrum. That is, the spectrum matching retrieved state vector.
 
+\newfield
+\verb|baseline|:\\
+Retrieved ``baseline''. That is, retrieved spectrum distortion through
+e.g.\ polynomial fitting.
+
 
 \subsubsection{With Q.OUT\_PTZ  true}
 %
@@ -287,8 +292,10 @@ obtained by applying hydrostatic equilibrium.
 %
 The retrieved species are indexed after the order they are specified
 in \verb|Q| and named as \verb|species1|, \verb|species2| \dots A
-number of fields is returned for each species. The following fields
-are always returned (exemplified for \verb|species1|):
+number of fields is returned for each species. The field names below
+are valid for species 1. If two species are retrieved there is also a
+field named as \verb|species2_name| etc. The following fields
+are always returned:
 
 \newfield 
 \verb|species1_name|:\\
@@ -318,9 +325,33 @@ Observation error for the species.
 \verb|species1_es|:\\
 Smoothing error for the species.
 
-\newfield 
+\newfield
 \verb|species1_mr|:\\
-Measurement response for the species.
+Measurement response for the species. This is the sum of the rows of
+\verb|species_A| (see below).
+
+
+\subsubsection{Additional species fields}
+%
+If \verb|Q.OUT_A| is set to be true, the following field is also
+included:
+
+\newfield
+\verb|species1_A|:\\
+The species specific averaging kernels. That is, this is the diagonal
+centred sub-matrix covering only the resolution between changes of the
+species at different altitudes. The resolution between variables of
+different retrieval quantities is thus not covered.
+
+
+\subsubsection{Baseline fit variables}
+%
+If any baseline fit is performed and \verb|Q.OUT_BASELINE| is set to true,
+the following field is also provided
+
+\newfield
+\verb|P.polyfit0_x|, \verb|P.polyfit0_xa|, \verb|P.polyfit0_e|,
+\verb|P.polyfit0_eo|, \verb|P.polyfit0_es| and \verb|P.polyfit0_mr|:\\
 
 
 
