@@ -1,8 +1,29 @@
-% QP2_OEM   Retrievals using arts-2
+% QP2_OEM   Qpack2 OEM retrievals.
 %
-% Documentation started in atmlab/retrieval/qpack2/README.txt.
+%    Main function of qpack2. Measurement data are inverted by oem.m (using
+%    arts-2). 
+%
+%    The data fields of the output structure P depends on selected retrieval
+%    quantities. In addition, the fields to be included in P can to some
+%    extent be controlled by the user. Options and avaliable output fields are
+%    described in qpack2.pdf.
+%
+%    The measurement matching the apriori conditions can be calculated through
+%    this function. This can be useful for test retrievals, or comparison with
+%    som measurement data. Such calculations are triggered by setting all
+%    measurement vectors in Y (that is, Y.Y) to be empty ([]). Note that the
+%    field shall be set to [], and not to {} that inside qpack2 and qarts
+%    identifies an undefined field.
 %
 % FORMAT   P = qp2(Q,Y)
+%
+% IN    Q        Qpack2 setting structure
+%       Y        Measurement data.
+% OUT   P        Retrieved data. Or possible simulated measurements. 
+%                See above.
+
+% 2009-08-10   Created by Patrick Eriksson.
+
 
 function P = qp2_oem(Q,Y)
 
@@ -91,14 +112,14 @@ for m = 1 : length(Y)
   else
     %- Create Se
     %
-    Se = createSe( Q, Ythis.tnoise_si );
+    Se = createSe( Q, Ythis.TNOISE );
 
     %- Perform retrieval
     %
     O.msg = sprintf( 'Inversion case %d (of %d)', m, length(Y) );
     %
     [Aoem,R,xa] = arts_oem_init( A );
-    [X,R]       = oem( O, Aoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.y );
+    [X,R]       = oem( O, Aoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.Y );
     %
     arts_oem( 'clean', R );
     clear Aoem 
@@ -114,6 +135,10 @@ end
 %
 delete_tmpfolder( workfolder );
 
+%- Sort fields of P
+%
+%P = orderfields( P );
+  
 return
 %------------------------------------------------------------------------------
 
@@ -353,38 +378,12 @@ return
 %
 function empty_y = checkY( Q, Y )
 
-  % Default values are not set here as Y could be very big and we do not want
-  % to create a copy. Defaults are instead set below in getYthis.
-  
-  % Spectrum
-  if ~isfield( Y, 'y' )
-    error( 'Y must include the field ''y''.' );
-  end
-
-  % Time information
-  if ~isfield(Y,'year') | ~isfield(Y,'month') | ~isfield(Y,'day')
-    error( 'Y must include the fields ''year'', ''month'' and ''day''.' );
-  end
-
-  % Zenith angle
-  if ~isfield( Y, 'zenith_angle' )
-    error( 'Y must include the field ''zenith_angle''.' );
-  end
-
-  % Thermal noise
-  if ~isfield( Y, 'tnoise_si' )
-    error( 'Y must include the field ''tnoise_si''.' );
-  end
-
-  % HSE point
-  if ~isfield( Y, 'hse_p' )  |  ~isfield( Y, 'hse_z' ) 
-    error( 'Y must include the fields ''hse_p'' and ''hse_z''.' );
-  end
+  qcheck( @qp2_y, Y );  
     
   % All y empty 
-  if isempty( Y(1).y )
+  if isempty( Y(1).Y )
     for i = 2 : length(Y)
-      if length(Y(i).y) > 0
+      if length(Y(i).Y) > 0
         error( [ 'First spectrum in Y is empty. Then all other spectra must '...
                  'also be empty.'] );
       end
@@ -394,7 +393,7 @@ function empty_y = checkY( Q, Y )
   % Standard case
   else
     for i = 1 : length(Y)
-      if length(Y(i).y) ~= length(Q.F_BACKEND)
+      if length(Y(i).Y) ~= length(Q.F_BACKEND)
         error( sprintf(['Length of spectrum %d (at least) does not match ' ...
                         'length of Q.F_BACKEND.'], i ) );
       end
@@ -413,18 +412,18 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
   
   %- Observation direction
   %
-  A.SENSOR_LOS = Ythis.zenith_angle;
+  A.SENSOR_LOS = Ythis.ZA;
 
   %- Position set?
   %
-  if ~isfield( Ythis, 'latitude' ),  Ythis.latitude  = Q.PLATFORM_LAT; end
-  if ~isfield( Ythis, 'longitude' ), Ythis.longitude = Q.PLATFORM_LON; end  
+  if ~qarts_isset( Ythis.LATITUDE ),  Ythis.LATITUDE  = Q.PLATFORM_LAT; end
+  if ~qarts_isset( Ythis.LONGITUDE ), Ythis.LONGITUDE = Q.PLATFORM_LON; end  
   
   %- Non mandatory time data
   %
-  if ~isfield( Ythis, 'hour' ),   Ythis.hour = 12;  end
-  if ~isfield( Ythis, 'minute' ), Ythis.minute = 0; end
-  if ~isfield( Ythis, 'second' ), Ythis.second = 0; end
+  if ~qarts_isset( Ythis.HOUR ),   Ythis.HOUR = 12;  end
+  if ~qarts_isset( Ythis.MINUTE ), Ythis.MINUTE = 0; end
+  if ~qarts_isset( Ythis.SECOND ), Ythis.SECOND = 0; end
 
   %- Create atmospheric fields
   %
@@ -435,9 +434,9 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
   %
   for i = 1 : length(A.ABS_SPECIES) 
     A.VMR_FIELD(i,:,1,1) = clmtlgy_interp( D, Q.SPECIES(i).ATMDATA, A.P_GRID,...
-                                       Ythis.latitude, Ythis.longitude, ...
-                                       Ythis.year, Ythis.month, Ythis.day, ...
-                                       Ythis.hour, Ythis.minute, Ythis.second );
+                                       Ythis.LATITUDE, Ythis.LONGITUDE, ...
+                                       Ythis.YEAR, Ythis.MONTH, Ythis.DAY, ...
+                                       Ythis.HOUR, Ythis.MINUTE, Ythis.SECOND );
     if isempty(h2o)
       species = arts_tgs2species( A.ABS_SPECIES{i}{1} );
       if strcmp( species, 'H2O' )
@@ -447,12 +446,12 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
   end
   %
   A.T_FIELD = clmtlgy_interp( D, Q.T.ATMDATA, A.P_GRID, ...
-                              Ythis.latitude, Ythis.longitude, ...
-                              Ythis.year, Ythis.month, Ythis.day, ...
-                              Ythis.hour, Ythis.minute, Ythis.second ); 
+                              Ythis.LATITUDE, Ythis.LONGITUDE, ...
+                              Ythis.YEAR, Ythis.MONTH, Ythis.DAY, ...
+                              Ythis.HOUR, Ythis.MINUTE, Ythis.SECOND );
   %
-  A.Z_FIELD = pt2z( A.P_GRID, A.T_FIELD, h2o, Ythis.hse_p, Ythis.hse_z, ...
-                                                              Ythis.latitude );
+  A.Z_FIELD = pt2z( A.P_GRID, A.T_FIELD, h2o, Ythis.HSE_P, Ythis.HSE_Z, ...
+                                                              Ythis.LATITUDE );
 return
 
 
@@ -469,27 +468,29 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
     I(q,:) = [ R.ji{q}{1}  R.ji{q}{2} ];
   end
   
-  % Position and time 
-  P(i).latitude  = Ythis.latitude;
-  P(i).longitude = Ythis.longitude;
-  P(i).year      = Ythis.year;
-  P(i).month     = Ythis.month;
-  P(i).month     = Ythis.month;
-  P(i).day       = Ythis.day;
-  P(i).hour      = Ythis.hour;
-  P(i).minute    = Ythis.minute;
-  P(i).second    = Ythis.second;
- 
-  % Retrieval diagnostics 
+  % Basic diagnostics 
   %
-  P(i).tnoise_si = mean( Ythis.tnoise_si );
+  P(i).cost   = X.cost;
+  P(i).cost_x = X.cost_x;
+  P(i).cost_y = X.cost_y;
+
+  % Time and position
+  P(i).year      = Ythis.YEAR;
+  P(i).month     = Ythis.MONTH;
+  P(i).day       = Ythis.DAY;
+  P(i).hour      = Ythis.HOUR;
+  P(i).minute    = Ythis.MINUTE;
+  P(i).second    = Ythis.SECOND;
+  P(i).latitude  = Ythis.LATITUDE;
+  P(i).longitude = Ythis.LONGITUDE;
+ 
+  % More retrieval diagnostics 
+  %
+  P(i).tnoise = mean( Ythis.TNOISE );
   %
   if Q.OEM_LINEAR 
     P(i).converged = X.converged;
   end 
-  P(i).cost   = X.cost;
-  P(i).cost_x = X.cost_x;
-  P(i).cost_y = X.cost_y;
   %  
   if Q.OUT_A
     As = splitA( X.A, I );
@@ -499,8 +500,12 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
   
   % Spectra
   if Q.OUT_Y
-    P(i).f   = Q.F_BACKEND;
-    P(i).y   = Ythis.y;
+    if qarts_isset( Ythis.F )
+      P(i).f   = Ythis.F;
+    else
+      P(i).f   = Q.F_BACKEND;
+    end
+    P(i).y   = Ythis.Y;
     P(i).yf  = X.yf;
   end
  

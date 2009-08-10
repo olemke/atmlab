@@ -1,9 +1,9 @@
-% QP2_CHECK_F   Check of frequencies of measurement data
+% QP2_CHECK_F   Checks if frequencies of measurement data are correct
 %
 %   The frequencies of measurement data (Y.f) are compared to Q.F_BACKEND.  A
-%   first demand is that Y(i).f has the same length as Q.F_BACKEND. If not, df 
+%   first demand is that Y(i).F has the same length as Q.F_BACKEND. If not, df 
 %   is set to NaN. The second step is to determine the max (absolute) difference
-%   between Y(i).f and Q.F_BACKEND, and check if this difference is below
+%   between Y(i).F and Q.F_BACKEND, and check if this difference is below
 %   *max_df*.
 %
 % FORMAT   [all_ok,df,i_ok,i_bad] = qp2_check_f(Q,Y,max_df)
@@ -23,9 +23,7 @@ function [all_ok,df,i_ok,i_bad] = qp2_check_f(Q,Y,max_df)
 
 %- Check of input
 %
-if ~isfield( Y, 'f' )
-  error( 'The measurement structure (Y) must include the field ''f''.' );
-end
+qcheck( @qp2_y, Y );  
 
 
 %- Init
@@ -44,10 +42,10 @@ i_ok   = ones( ny, 1 );
 %
 for i = 1 : ny
   
-  if length( Y(i).f ) ~= nf 
+  if length( Y(i).F ) ~= nf 
     this_df = NaN;
   else
-    this_df = max( abs( f0 - Y(i).f ) );
+    this_df = max( abs( f0 - Y(i).F ) );
   end
   
   if isnan(this_df)  |  this_df > df

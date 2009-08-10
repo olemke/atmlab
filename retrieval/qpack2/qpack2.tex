@@ -1,0 +1,644 @@
+%% 
+%% The (short) Qpack2 manual
+%%
+
+\documentclass[a4paper,11pt]{article}
+
+
+\usepackage{verbatim}
+
+%- Page layout
+%
+\pagestyle{empty}
+\usepackage[top=30mm,left=30mm,right=30mm,bottom=30mm,nohead]{geometry}
+
+
+\title{Qpack2}
+\author{Patrick Eriksson\\(\texttt{patrick.eriksson@chalmers.se})}
+\date{\today}
+
+
+\newcommand{\newfield}{\vspace{1ex}\noindent}
+
+
+%--------------------------------------------------------------------------------
+\begin{document}
+
+
+\maketitle
+
+\section{Scope}
+\label{sec:scope}
+%---
+Qpack2 is a package of Matlab functions for performing inversion
+work. Only cases where the aim is to retrieve vertical profiles of
+atmospheric quantities (1D cases) are handled. The package is also
+developed for ground-based observations and inversion of individual
+satelitte spectra/scans. This means that inversion of satellite
+scanning sequencies where atmospheric fields to be retrieved have a
+latitude or longitude extension (2D or 3D) can not be treated by
+Qpack2.
+
+The package should be highly general and flexible for covered
+measurements. For example, there is basically no limitations regarding
+observation geometry. Further, Qpack2 has been developed to be
+suitable for operational inversions, as long as not extreme
+calculation speed is required. Some important aspects here are that
+batch calculations are allowed and atmospheric a priori profiles can
+automatically be extracted from climatology data.
+
+The development of Qpack2 is done using the so called optimal
+estimation method as the core inversion methodology. Presently no
+other inversion methods are handled, but later additions are possible.
+
+
+
+\section{Background}
+\label{sec:background}
+%---
+Qpack2 is part of the more general Atmlab package of Matlab functions.
+The computational engine of Qpack2 is ARTS-2. The communication with
+ARTS-2 is made through the qarts part of Atmlab. OEM inversions are
+performed by the function \verb|oem.m| (part of Atmlab).
+
+This can be seen as a direct successor of Qpack, despite all code is
+written from scratch. However, for both Qpack versions the
+computations are controlled by a set of settings fields packed into a
+structure denoted as Q. Qpack was built around ARTS-1, this new Qpack
+version is mainly a consequence of that ARTS-2 is the maintained
+version. This gave also an oppertunity to make a more stringent
+implementation and to add some features. This should hopefully make it
+easier to add extensions to Qpack2. Data formats are now more clearly
+defined and the ambition level around documentation is higher (but
+still relatively modest). A main improvement compared to Qpack2 is
+that extraction of a priori data from climatology data is now an
+integrated part. On the other hand, the feature of classifying errors
+into different categories (0-3 in Qpack) and the associated plotting
+features are removed as it was hardly used.
+
+Quality checks are not handled by Qpack2. For example, there is no
+defualt check that the frequencies of the measurements are as
+expected. This for efficiency reasons and the fact that such checks
+are hard to make in a totally general manner. Some checks can be
+performed by accompanying functions, such as \verb|qp2_check_f|.
+
+
+\section{Documentation}
+\label{sec:doc}
+%---
+
+High level documentation is found in this document. Information on
+individual functions is obtained by the standard Matlab help
+command. For example:
+\begin{verbatim}
+>> help qp2_oem
+\end{verbatim}
+Some of the used data structures are documented following the
+pattern expected of the function \verb|qinfo|. For example, to list
+all fields (with documentation text) of \verb|Q| (see below):
+\begin{verbatim}
+>> qinfo(@qpack2)
+\end{verbatim}
+The documentation for a specific field is obtained as
+\begin{verbatim}
+>> qinfo(@qpack2,'F_BACKEND')
+\end{verbatim}
+Wildcards are allowed when naming fields:
+\begin{verbatim}
+>> qinfo(@qpack2,'ABS_*')
+\end{verbatim}
+
+
+\section{Main data structures}
+
+\subsection{Atmlab settings}
+%---
+At least the following atmlab settings are used: \verb|ARTS_PATH|,
+\verb|ARTS_INCLUDES|, \verb|EXTRAP|, \verb|FMODEL_VERBOSITY|,
+\verb|VERBOSITY| and \verb|WORK_AREA|.
+
+For further information:
+\begin{verbatim}
+>> arts('-d z_surface');
+\end{verbatim}
+
+
+\subsection{Forward model and retrieval settings}
+\label{sec:Q}
+%---
+Forward model parameters and retrieval variables are joined into a
+single structure, denoted as \verb|Q|. This structure has a fixed set
+of fields. That is, the structure must always contain exactly this set
+of fields. However, some fields are used only in particularly
+circumstances and not all fields must be set.
+
+The fields of \verb|Q| are listed and described in
+Appendix~\ref{app:q}. The same information is obtained inside Matlab
+through \verb|qinfo|, where the defintion function is
+\verb|qpack2|. The examples in Section~\ref{sec:doc} are here valid.
+
+Many of the fields of \verb|Q| are identical to the corresponding
+field of the qarts interface, and additional information can be found
+as:
+\begin{verbatim}
+>> qinfo(@qarts)
+\end{verbatim}
+On-line documentation of ARTS methods and workspace variables is
+obtained in a terminal as
+\begin{verbatim}
+$ arts -d z_surface
+\end{verbatim}
+or from within Matlab as
+\begin{verbatim}
+>> arts('-d z_surface');
+\end{verbatim}
+
+
+\subsection{Measurement data}
+\label{sec:Y}
+%---
+The series of measurements (spectra or scans) to be treated is packed
+into a data structure denoted as \verb|Y|. The data fields of this
+structure are described in \verb|qp2_y|, and available information can be
+obtained as
+\begin{verbatim}
+>> qinfo(@qp2_y)
+\end{verbatim}
+The same information is appended to this document in
+Appendix~\ref{app:y}. An example:
+\begin{verbatim}
+>> Y(3)
+
+ans = 
+          DAY: 3
+            F: {}
+         HOUR: 11
+        HSE_P: 10000
+        HSE_Z: 16000
+     LATITUDE: {}
+    LONGITUDE: {}
+       MINUTE: 57
+        MONTH: 3
+       SECOND: 58.0000
+       TNOISE: 0.0243
+            Y: [800x1 double]
+         YEAR: 2002
+           ZA: 65
+\end{verbatim}
+
+
+
+\subsection{Retrieved data}
+\label{sec:P}
+%---
+Retrieved data are returned as a structure array, in the same manner
+as the measurements are provided (\verb|Y|). The returned fields
+depend on the selection of retrieval quantities and on user
+settings. This makes it impossible to use qinfo here (as for \verb|Q|
+and \verb|Y|), and the fields are instead described below in this
+document.
+
+An example on a basically minimal \verb|P|:
+\begin{verbatim}
+K>> P(1)
+
+ans = 
+             cost: 1.3355
+           cost_x: 0.0021
+           cost_y: 1.3334
+             year: 2002
+            month: 3
+              day: 1
+             hour: 20
+           minute: 28
+           second: 28.0000
+         latitude: 58
+        longitude: -12
+           tnoise: 0.0274
+        converged: NaN
+    species1_name: 'H2O'
+       species1_p: [50x1 double]
+       species1_x: [50x1 double]
+      species1_xa: [50x1 double]
+       species1_e: [50x1 double]
+      species1_eo: [50x1 double]
+      species1_es: [50x1 double]
+      species1_mr: [50x1 double]
+\end{verbatim}
+
+
+
+\subsubsection{Fields always returned}
+%
+The following fields are always provided:
+
+\newfield 
+\verb|converged|:\\
+Convergence flag. See further \verb|oem.m|.
+
+\newfield 
+\verb|cost|, \verb|cost_x| and \verb|cost_y|:\\
+Cost values of retrieved state and fit to measurement. See further \verb|oem.m|.
+
+\newfield 
+\verb|P.latitude| and \verb|P.longitude|:\\
+The geographical position of the measurement.
+
+\newfield 
+\verb|tnoise|:\\
+Mean of assumed thermal noise. This is simple average, no weighting
+with channel widths is applied. This value has no direct physical
+meaning, but can be used as a mean to e.g. remove the most noisy
+measurements (without having \verb|Y| at hand).
+
+
+\subsubsection{With Q.OUT\_Y  true}
+%
+The following fields are also provided if \verb|Q.OUT_Y| is set to true:
+
+\newfield 
+\verb|f|:\\
+Frequency vector of measurement. Equals \verb|Y.F| if set, otherwise
+\verb|Q.F_BACKEND|.
+
+\newfield 
+\verb|y|:\\
+Measured spectrum.
+
+\newfield 
+\verb|yf|:\\
+Fitted spectrum. That is, the spectrum matching retrieved state vector.
+
+
+\subsubsection{With Q.OUT\_PTZ  true}
+%
+The following fields are also provided if \verb|Q.OUT_PTZ| is set to true:
+
+\newfield 
+\verb|p|, \verb|t| and \verb|z|:\\
+A consistent set of pressure, temperature and altitude vectors. The
+vectors are identical to the ones that are provided to the forward
+model. If temperatures are retrieved, this information is used.
+Otherwise returned data match climatology temperatures. Altitudes are
+obtained by applying hydrostatic equilibrium.
+
+
+\subsubsection{Species fields}
+%
+The retrieved species are indexed after the order they are specified
+in \verb|Q| and named as \verb|species1|, \verb|species2| \dots A
+number of fields is returned for each species. The following fields
+are always returned (exemplified for \verb|species1|):
+
+\newfield 
+\verb|species1_name|:\\
+Tag name of species.
+
+\newfield 
+\verb|species1_p|:\\
+Vertical/pressure retrieval grid for the species.
+
+\newfield 
+\verb|species1_x|:\\
+Retrieved profile. Unit depends on \verb|Q.SPECIES(i).UNIT|.
+
+\newfield 
+\verb|species1_xa|:\\
+A priori state for the species.
+
+\newfield 
+\verb|species1_e|:\\
+Total retrieval (observation + smooting) error for the species.
+
+\newfield 
+\verb|species1_eo|:\\
+Observation error for the species.
+
+\newfield 
+\verb|species1_es|:\\
+Smoothing error for the species.
+
+\newfield 
+\verb|species1_mr|:\\
+Measurement response for the species.
+
+
+
+
+
+
+
+\section{Standard inversions}
+\label{sec:stdinversions}
+%---
+
+
+\verb|Q.F_BACKEND|
+
+\begin{verbatim}
+>> Q = q_h2o;
+>> Y = get_onsala_Y( 'h2o', date1, date2 );
+>> P = qp2_oem( Q, Y );
+\end{verbatim}
+
+
+\begin{verbatim}
+>> if ~qp2_check_f( Q, Y, 1e3 );
+>>   error( 'Some mismatch between Q.F_BACKEND and frequencies of spectra.' );
+>> end
+>> [Y.F] = deal( {} ); % The field F is now obselete. {} is used inside 
+>>                     % qarts and qpack2 to flag undefined fields
+\end{verbatim}
+
+
+
+\appendix
+
+\newpage\noindent{\huge \bf Appendices}
+
+\section{The fields of Q}
+\label{app:q}
+%
+\verbatiminput{qpack2.txt}
+
+
+\newpage
+\section{The fields of Y}
+\label{app:y}
+%
+\verbatiminput{qp2_y.txt}
+
+
+
+\end{document}
+
+
+#############################################################################
+###   Qpack2
+#############################################################################
+
+Scope
+-
+Qpack2 shall handle:
+1. Batch inversions of 1D cases (only single spectra cases, but handling
+"double" observation modes such as beam switching and frequency switching).
+2. Produce spectra matching the a priori assumptions.
+
+Option 2 is triggered by setting all spectra (Y.y) to be empty.
+
+Quality checks are not hanlded by qpack2. For example, there is no
+check that the frequencies of the measurements are as expected
+(Q.F_BACKEND). This for efficiency reasons and the fact that such
+checks are hard to make in a totally general manner. Some checks can
+be performed by accompanying functions, such as qp2_check_f. 
+
+Beside the settings below, some general atmlab settings are used. This 
+includes
+ARTS_PATH
+ARTS_INCLUDES
+EXTRAP
+FMODEL_VERBOSITY
+VERBOSITY
+WORK_AREA
+
+A calculation run could like this:
+
+>> Q = q_h2o;
+>> Y = get_onsala_Y( 'h2o', date1, date2 );
+>> qp2_check_f( Q, Y, 1e3 );
+>> Y = rmfield( Y, 'f' );
+>> P = qp2_oem( Q, Y );
+
+
+
+
+
+#############################################################################
+### Y : Measurement data
+#############################################################################
+
+The measurements are provided to qpack2 as an array of structures. 
+Mandatory fields are:
+
+Y.y
+-
+The spectrum. All spectra in the array must have the same length.
+
+Y.year
+Y.month
+Y.day
+-
+The time of the measurement. All three fields are numeric. This
+information is primarily used to extract data from the climatology
+database provided.
+
+Y.zenith_angle
+- 
+Line of-sight zenith angle for the measurement. A scalar value.
+
+Y.tnoise_si
+-
+Magnitude of thermal noise (1 std). A scalar or a vector having the
+same length as y. If a scalar, the value is applied for all
+spectrometer channels.
+
+Y.hse_p
+Y.hse_z
+-
+The reference point when enforcing hydrostatic equilibrium. The
+geometrical altitude (hse_z) is given for one presssure (hse_p).
+
+
+Optional fields are:
+
+Y.f
+-
+Frequency for each y value. Selected frequency should match Q.F_BACKEND.
+
+Y.hour
+Y.minute
+Y.second
+-
+Allowing a more detailed specification of measurement time.
+
+Y.latitude
+Y.longitude
+-
+The geographical position of the measurement. If not given, the 
+position is taken from Q.PLATFORM_LAT and Q.PLATFORM_LON.
+
+An example:
+
+>> Y(3)
+
+ans = 
+
+            year: 2002
+           month: 3
+             day: 3
+            hour: 11
+          minute: 57
+          second: 58.0000
+    zenith_angle: 65
+           hse_p: 10000
+           hse_z: 16000
+       tnoise_si: 0.0243
+               y: [800x1 double]
+
+
+
+
+
+#############################################################################
+### Q : Forward model and retrieval data
+#############################################################################
+
+All fields are described and set to default/dummy values in
+qpack2.m. Use qinfo to obtain the information. For everything:
+
+qinfo( @qpack2 )
+
+To read about a specific field, such as POLYFIT_SI:
+
+qinfo( @qpack2, 'POLYFIT_SI' )
+
+
+
+
+
+#############################################################################
+### P : Result and auxiliary data of retrieval
+#############################################################################
+
+A structure array. The following fields are always provided
+---
+
+P.latitude
+P.longitude
+-
+Geographical position.
+
+P.year
+P.month
+P.day
+P.hour
+P.minute
+P.second
+-
+Measurement time. 
+
+P.tnoise_si
+-
+Mean of assumed thermal noise (a direct averaging, no weighting with
+channel widths). This value has no direct physical meaning, but can be
+used as a mean to e.g. remove the most noisy measurements (without 
+having Y at hand).
+
+P.converged
+-
+See oem.m.
+
+P.cost
+P.cost_y
+P.cost_x
+-
+See oem.m.
+
+
+The following fields are also provided if Q.OUT_Y is set to true:
+---
+
+P.f
+-
+Frequency vector of measurement (Q.F_BACKEND).
+
+P.y
+-
+Measured spectrum.
+
+P.yf
+-
+Fitted spectrum. That is, the spectrum matching retrieved state vector.
+
+
+The following fields are also provided if Q.OUT_PTZ is set to true:
+---
+
+P.p P.t P.z 
+-
+A consistent set of pressure, temperature and altitude vectors. The
+vectors are identical to the ones that are provided to the forward
+model. If temperatures are retrieved, this information is used.
+Otherwise returned data match climatology temperatures. Altitudes are
+obtained by applying hydrostatic equilibrium.
+
+
+If any species is retrieved, these fields are always returned:
+---
+
+species1_name
+-
+Tag name of species.
+
+species1_p
+-
+Vertical/pressure retrieval grid for the species.
+
+species1_x
+- 
+Retrieved profile. Unit depends on Q.SPECIES(i).UNIT.
+
+species1_xa
+-
+A priori state for the species.
+
+species1_e
+-
+Total retrieval (observation + smooting) error for the species.
+
+species1_eo
+-
+Observation error for the species.
+
+species1_eo
+-
+Smoothing error for the species.
+
+species1_mr
+-
+Measurement response for the species.
+
+
+
+If Q.OUT_A is set to true, the following field is also provided
+---
+
+P.species1_A
+-
+Averaging kernels for the species. 
+
+
+
+If more than one species is retrieved, data for other species are
+returned as species2_name etc.
+
+
+
+If any baseline fit is performed and Q.OUT_BASELINE is set to true,
+the following field is also provided
+
+P.baseline
+-
+Retrieved baseline fit.
+
+
+
+Result for each baseline fit variable is also provided. For example,
+the following fields are added to handle polynomial coefficent 0:
+
+P.polyfit0_x
+P.polyfit0_xa
+P.polyfit0_e
+P.polyfit0_eo
+P.polyfit0_es
+P.polyfit0_mr
