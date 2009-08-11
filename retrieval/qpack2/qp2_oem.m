@@ -8,6 +8,11 @@
 %    extent be controlled by the user. Options and avaliable output fields are
 %    described in qpack2.pdf.
 %
+%    The measurements to be inverted (Y) must all correspond to the same sensor
+%    characteristics. The sensor response is calculated before the first
+%    inversion is started and it is assumed that the reponse matrix obtained is
+%    valid for all cases. 
+%
 %    The measurement matching the apriori conditions can be calculated through
 %    this function. This can be useful for test retrievals, or comparison with
 %    som measurement data. Such calculations are triggered by setting all
@@ -268,7 +273,7 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
       Sx = covmat_append( Sx, Q.SPECIES(i).SX );
       pvalues = [ pvalues qarts_get(Q.SPECIES(i).GRID) ];
     else
-      A = qarts_abs_species( A, {Q.SPECIES(i).TAG} );
+      A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}} );
     end
   end
   
@@ -357,13 +362,13 @@ function Se = createSe( Q, tnoise_si )
     if cset
       Se = (tnoise_si^2) .* Q.TNOISE_C;
     else
-      Se = spdiags( repmat(tnoise^2,nf,1), 0, nf, nf );
+      Se = spdiags( repmat(tnoise_si^2,nf,1), 0, nf, nf );
     end
   else
     if cset
       [i,j,s] = find( Q.TNOISE_C );
       for k = 1 : length(i)
-        s(k) = prod( thermal_si([i(k) j(k)]) ) * s(k);
+        s(k) = prod( tnoise_si([i(k) j(k)]) ) * s(k);
       end
       Se = sparse(i,j,s);
     else

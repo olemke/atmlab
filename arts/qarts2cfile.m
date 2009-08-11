@@ -716,7 +716,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )
       parts{end+1} = 'mixer';
     end
-    if qarts_isset( H.F_BACKEND )  |  qarts_isset( H.CHANNEL_RESPONSE )
+    if qarts_isset( H.F_BACKEND )  |  qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
       parts{end+1} = 'backend';
     end
     if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
