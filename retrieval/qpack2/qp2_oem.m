@@ -110,7 +110,7 @@ for m = 1 : length(Y)
     %
     fprintf( 'Simulating spectrum %d/%d\n', m, length(Y) );
     %
-    P(m).y = arts_y( A, workfolder );
+    P(m).Y = arts_y( A, workfolder );
   
     
   %- Inversion
@@ -268,10 +268,22 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   %
   for i = 1 : length( Q.SPECIES )
     if Q.SPECIES(i).RETRIEVE
+      %
+      grid = qarts_get(Q.SPECIES(i).GRID);
+      n    = length( grid );
+      %
+      if diff( size(Q.SPECIES(i).SX) )
+        error( [ 'SX is not a square matrix for species ', int2str(i) ] );
+      end
+      if n ~= size(Q.SPECIES(i).SX,1)
+        error( [ 'Inconsistency in size between GRID and SX for species ', ...
+                                                               int2str(i) ] );
+      end
+      %
       A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}}, 0, 1, [], [], ...
                              {Q.SPECIES(i).GRID}, Q.SPECIES(i).UNIT );
       Sx = covmat_append( Sx, Q.SPECIES(i).SX );
-      pvalues = [ pvalues qarts_get(Q.SPECIES(i).GRID) ];
+      pvalues = [ pvalues grid ];
     else
       A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}} );
     end

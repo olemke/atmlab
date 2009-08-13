@@ -1,3 +1,10 @@
+2009-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.pre2
+
+	* qp2_oem.m (createAandSxandO): Added check of size consisteny between
+	GRID and SX for each species.
+
 2009-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.pre1: Changes now documented in this ChangeLog. A first

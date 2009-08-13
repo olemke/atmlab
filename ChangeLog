@@ -1,3 +1,15 @@
+2009-08-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-68
+
+	* arts/qarts2cfile.m (cfile_Sensor): All Q.SENSOR_ XXX variables
+	are now always loaded. Too complicated to have checks to figure
+	out which varaibles that are needed. Anyhow old version did not
+	work.
+
+	* forwardmodel/gridcreation/gridthinning.m: Changed check from
+	>mindx to >= mindx
+
 2009-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-67

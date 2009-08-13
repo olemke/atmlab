@@ -2,7 +2,7 @@
 %
 %    The input grid is thinned in such way that no points are closer than
 %    *mindx*. This with exceptions of the two end points that are always 
-%    kept, to ensure that the coverage of the grid is not decreased..
+%    kept, to ensure that the coverage of the grid is not decreased.
 %
 %    The input grid is assumed to be increasing.
 %
@@ -22,7 +22,7 @@ x     = x0;
 n     = 1;
 
 for itest = 2:length(x0)-1
-  if x0(itest) - x(n) > mindx
+  if x0(itest) - x(n) >= mindx
     n     = n + 1;
     x(n)  = x0(itest);
   end

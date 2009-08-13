@@ -668,24 +668,21 @@ function T = cfile_Sensor( Q, partname, workfolder )
       T{end+1} = file_or_data( 'sensor_response_pol', 'Index', ...
                                             Q.SENSOR_RESPONSE_POL, workfolder );
     end
-    % sensor_response_xxx_grid's only needed in a few cases
-    if qarts_isset( Q.J_DO ) & Q.J_DO  & Q.J.POLYFIT.DO
-      if qarts_isset( Q.SENSOR_RESPONSE_F_GRID )
-        T{end+1} = file_or_data( 'sensor_response_f_grid', 'Vector', ...
-                                       Q.SENSOR_RESPONSE_F_GRID, workfolder );
-      end
-      if qarts_isset( Q.SENSOR_RESPONSE_ZA_GRID )
-        T{end+1} = file_or_data( 'sensor_response_za_grid', 'Vector', ...
-                                       Q.SENSOR_RESPONSE_ZA_GRID, workfolder );
-      end
-      if qarts_isset( Q.SENSOR_RESPONSE_AA_GRID )
-        T{end+1} = file_or_data( 'sensor_response_aa_grid', 'Vector', ...
-                                       Q.SENSOR_RESPONSE_AA_GRID, workfolder );
-      end
-      if qarts_isset( Q.SENSOR_RESPONSE_POL_GRID )
-        T{end+1} = file_or_data( 'sensor_response_pol_grid', 'Index', ...
-                                       Q.SENSOR_RESPONSE_POL_GRID, workfolder );
-      end
+    if qarts_isset( Q.SENSOR_RESPONSE_F_GRID )
+      T{end+1} = file_or_data( 'sensor_response_f_grid', 'Vector', ...
+                                     Q.SENSOR_RESPONSE_F_GRID, workfolder );
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_ZA_GRID )
+      T{end+1} = file_or_data( 'sensor_response_za_grid', 'Vector', ...
+                                     Q.SENSOR_RESPONSE_ZA_GRID, workfolder );
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_AA_GRID )
+      T{end+1} = file_or_data( 'sensor_response_aa_grid', 'Vector', ...
+                                     Q.SENSOR_RESPONSE_AA_GRID, workfolder );
+    end
+    if qarts_isset( Q.SENSOR_RESPONSE_POL_GRID )
+      T{end+1} = file_or_data( 'sensor_response_pol_grid', 'Index', ...
+                                     Q.SENSOR_RESPONSE_POL_GRID, workfolder );
     end
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
     T = add_includes( {}, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
