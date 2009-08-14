@@ -2,73 +2,36 @@
 %
 %    The name OEM is here kept as it is so well established in the atmospheric
 %    community. A better name would be "the maximum a posteriori solution".
-%
 %    See "Inverse methods for atmospheric sounding: Theory and practice"
 %    by C.D. Rodgers for background and theory.
 %
-%    The OEM calculations are controlled by the structure O. This structure has
-%    the following fields:
-%       linear : Flag to trigger a linear inversion.
-%       outfids: File identifiers for output messages. Inlcude 1 for the
-%                screen. Set to [] for zero verbosity.
-%       msg    : Message to put at the start of output messages. Can include
-%                e.g. number of retrieval case.
-%       ---
-%       imethod: Iteration method. Choices are 'GN' for Gauss-Newton and
-%                'ML'/'LM' for Marquardt-Levenberg. 
-%       maxiter: Maximum number of iterations.
-%       stop_dx: Convergence criterion. The iteration is halted when the
-%                the change in x is < stop_dx (see Eq. 5.29 in Rodgers' book).
-%                A normalisation to the length of x is applied. 
-%       ---
-%       cost   : Flag to include cost values in X and to calculate cost even
-%                if solution method does not require cost values. This affects
-%                also the output to *outfids*. If not set, the output can be 
-%                NaN.
-%       dx     : Flag to include the sequence of convergence values (defined
-%                as for *stop_dx*).
-%       e      : Flag to include in X the estimate of total retrieval error 
-%                (square root of diagonal elements of S). That is, the
-%                standard deviation for the sum of observation and smoothing 
-%                errors.
-%       eo     : Flag to include in X the estimate of observation error 
-%                (square root of diagonal elements of So). 
-%       es     : Flag to include in X the estimate of observation error 
-%                (square root of diagonal elements of Ss).
-%       yf     : Flag to include "fitted spectrum" in X. That is, the simulated
-%                measurement matching retrieved state.
-%       A      : Flag to include averaging kernel matrix in X.
-%       G      : Flag to include gain matrix in X.
-%       J      : Flag to include weighting function matrix in X.
-%       jexact : Flag to select recalculation of J after last iteration.
-%                If not set to 1, J will correspond to x before last iteration.
-%       S      : Flag to include covariance matrix for total error in X.
-%                That is, the sum of So and Ss.
-%       So     : Flag to include covariance matrix for observation error in X.
-%       Ss     : Flag to include covariance matrix for smoothing error in X.
-%       Xiter  : Flag to include all iteration states in X.
+%    The OEM calculations are controlled by the structure O. The fields of O,
+%    and associated descriptions, are lsited by
+%       qinfo(@oem)
 %
-%   The results are gathered in a structure X, with fields:
+%    The results are gathered in a structure X, with fields:
 %       x         : Retrieved state.
-%       converged : Convergence flag. 1 if convergency criterion has been reached. 
-%                   Otherwise 0 for non-linear inversions. Set to NaN for
-%                   linear retrievals.
+%       converged : Convergence flag. 1 if convergency criterion has been 
+%                   reached. Otherwise 0 for non-linear inversions. Set to 
+%                   NaN for linear retrievals.
 %       cost      : Total cost, normalised by length of y. A succesful retrieval
 %                   shall then have a cost in the order of 1.
 %       cost_y    : Cost corresponding to the measurement vector.
 %       cost_x    : Cost corresponding to the state vector.
-%       d         : See above.
-%       do        : See above.
-%       ds        : See above.
-%       yf        : See above.
-%       A         : See above.
-%       G         : See above.
-%       J         : See above.
-%       S         : See above.
-%       So        : See above.
-%       Ss        : See above.
+%       e         : total retrieval error (square root of diagonal elements 
+%                   of S).
+%       eo        : observation error (square root of diagonal elements of So).
+%       es        : smoothing error (square root of diagonal elements of Ss).
+%       yf        : Fitted spectrum.
+%       A         : Averaging kernel matrix.
+%       G         : Gain matrix (also denoted as Dy).
+%       J         : Jacobian (weighting function matrix).
+%       S         : Covariance matrix for total error. That is, the sum
+%                   of So and Ss.
+%       So        : Covariance matrix for observation error.
+%       Ss        : Covariance matrix for smoothing error.
 %       Xiter     : The x-vector after each iteration.
-%   The fields x and converged are always included (if an actual inversion 
+%   The fields *x* and *converged* are always included (if an actual inversion 
 %   is performed). Other fields are included if corresponding O field is set.
 %
 %   Use the first format to check default values for O. The second format
@@ -90,68 +53,159 @@
 %       comfun   Handle to function for communication with forward model.
 %       Sx       Covariance matrix for a priori uncertainty.
 %       Se       Covariance matrix for observation uncertainties.
-%       Sxinv    The inverse of Sx. If set [], the inverse is calculated 
+%       Sxinv    The inverse of Sx. If set to [], the inverse is calculated 
 %                internally.
-%       Sxinv    The inverse of Se. If set [], the inverse is calculated 
+%       Sxinv    The inverse of Se. If set to [], the inverse is calculated 
 %                internally.
 %       xa       A priori profile.
 %       y        Measurement vector.
 
 function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 
+  
+%=============================================================================
+%=== Definition of O
+%=============================================================================
+  
+if ~nargin
+
+%-----------------------------------------------------------------------------
+O.A = 0;
+I.A = [ ...
+'Flag to include averaging kernel matrix in X. Default is 0.'
+];
+%-----------------------------------------------------------------------------
+O.cost = 0;
+I.cost = [ ...
+'Flag to include cost values in X and to calculate cost even if solution ',...
+'method does not require cost values. This affects also the output to ',...
+'*outfids*.'
+];
+%-----------------------------------------------------------------------------
+O.dx = 0;
+I.dx = [ ...
+'Flag to include the sequence of convergence values (defined as for *stop_dx*).'
+];
+%-----------------------------------------------------------------------------
+O.e = 0;
+I.e = [ ...
+'Flag to include in X the estimate of total retrieval error  (square root ',...
+'of diagonal elements of S). That is, the standard deviation for the sum ',...
+'of observation and smoothing errors.'
+];
+%-----------------------------------------------------------------------------
+O.eo = 0;
+I.eo = [ ...
+'Flag to include in X the estimate of observation error (square root of ',...
+'diagonal elements of So).'
+];
+%-----------------------------------------------------------------------------
+O.es = 0;
+I.es = [ ...
+'Flag to include in X the estimate of smootning error (square root of ',...
+'diagonal elements of Ss).'
+];
+%-----------------------------------------------------------------------------
+O.G = 0;
+I.G = [ ...
+'Flag to include gain matrix in X (alse denoted as Dy).'
+];
+%-----------------------------------------------------------------------------
+O.imethod = 'ML';
+I.imethod = [ ...
+'Iteration method. Choices are ''GN'' for Gauss-Newton and ''ML'' or',...
+'''LM'' for Marquardt-Levenberg.'
+];
+%-----------------------------------------------------------------------------
+O.J = 0;
+I.J = [ ...
+'Flag to include weighting function matrix in X.'
+];
+%-----------------------------------------------------------------------------
+O.jexact = 0;
+I.jexact = [ ...
+'Flag to select recalculation of J after last iteration. If not set to 1, ',...
+'J will correspond to x before last iteration.'
+];
+%-----------------------------------------------------------------------------
+O.linear = 0;
+I.linear = [ ...
+'Flag to trigger a linear inversion. Default is non-linear.'
+];
+%-----------------------------------------------------------------------------
+O.maxiter = 99;
+I.maxiter = [ ...
+'Maximum number of iterations.'
+];
+%-----------------------------------------------------------------------------
+O.msg = [];
+I.msg = [ ...
+'Message to put at the start of output messages. Can include e.g. number ',...
+'of retrieval case.'
+];
+%-----------------------------------------------------------------------------
+O.outfids = 1;
+I.outfids = [ ...
+'File identifiers for output messages. Inlcude 1 for the screen. Set to [] ',...
+'for no output att all.'
+];
+%-----------------------------------------------------------------------------
+O.S = 0;
+I.S = [ ...
+'Flag to include covariance matrix for total error in X. That is, the sum ',...
+'of So and Ss.'
+];
+%-----------------------------------------------------------------------------
+O.So = 0;
+I.So = [ ...
+'Flag to include covariance matrix for observation error in X.'
+];
+%-----------------------------------------------------------------------------
+O.Ss = 0;
+I.Ss = [ ...
+'Flag to include covariance matrix for smoothing error in X.'
+];
+%-----------------------------------------------------------------------------
+O.stop_dx = 1e-3;
+I.stop_dx = [ ...
+'Convergence criterion. The iteration is halted when the the change in x ',...
+'is < stop_dx (see Eq. 5.29 in Rodgers'' book). A normalisation to the ',...
+'length of x is applied.'
+];
+%-----------------------------------------------------------------------------
+O.yf = 0;
+I.yf = [ ...
+'Flag to include "fitted spectrum" in X. That is, the simulated ',...
+'measurement matching retrieved state.'
+];
+%----------------------------------------------------------------------------- 
+O.Xiter = 0;
+I.Xiter = [ ...
+'Flag to include all iteration states in X.'
+];
+%-----------------------------------------------------------------------------
+ 
+X = O;
+R = I; 
+return  
+end
+  
 
 
-%=== Default values ===========================================================
-  if ~nargin, O=[]; end
-
-  if ~isfield( O, 'linear' ),    O.linear  = 0;         end
-  if ~isfield( O, 'outfids' ),   O.outfids = 1;         end
-  if ~isfield( O, 'msg' ),       O.msg = [];            end
-  %
-  if ~isfield( O, 'imethod' ),   O.imethod = 'ML';      end
-  if ~isfield( O, 'maxiter' ),   O.maxiter = 99;        end
-  if ~isfield( O, 'stop_dx' ),   O.stop_dx = 1e-3;      end
-  %
-  if ~isfield( O, 'cost' ),      O.cost    = 0;         end  
-  if ~isfield( O, 'dx' ),        O.dx      = 0;         end
-  if ~isfield( O, 'e' ),         O.e       = 0;         end
-  if ~isfield( O, 'eo' ),        O.eo      = 0;         end
-  if ~isfield( O, 'es' ),        O.es      = 0;         end
-  if ~isfield( O, 'yf' ),        O.yf      = 0;         end
-  if ~isfield( O, 'A' ),         O.A       = 0;         end
-  if ~isfield( O, 'G' ),         O.G       = 0;         end
-  if ~isfield( O, 'jexact' ),    O.jexact  = 0;         end
-  if ~isfield( O, 'J' ),         O.J       = 0;         end
-  if ~isfield( O, 'S' ),         O.S       = 0;         end
-  if ~isfield( O, 'So' ),        O.So      = 0;         end
-  if ~isfield( O, 'Ss' ),        O.Ss      = 0;         end
-  if ~isfield( O, 'Xiter' ),     O.Xiter   = 0;         end  
-
-  if ~nargin, X=O; return, end
-%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-%=== Check input ==============================================================
+%==============================================================================
+%=== Start of calculations
+%==============================================================================
+  
+%=== Check of input ===========================================================
                                    
   min_nargin( 6, nargin );
 
   %- O
   %
   rqre_datatype( 'struct', O );
-  %
-  %- Unknown fields in O?
-  fields0 = fieldnames( oem );
-  fields  = fieldnames( O );
-  e  = [];
-  for i = 1 : length(fields)
-    if ~strcmp( fields{i}, fields0 ), e{end+1} = fields{i}; end
-  end
-  if ~isempty(e)
-    for i = 1 : length(e), fprintf('   O.%s\n', e{i} ); end
-    error( 'The fields listed above  are not recognised but were found in O.');
-  else
-    clear fields0 fields e
-  end
+  qcheck( @oem, O );
   %
   rqre_bool( 'O.linear', O.linear );
   rqre_datatype( { 'empty', 'vector'}, O.outfids );

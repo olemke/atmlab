@@ -104,7 +104,7 @@ if iter > 1
   %
   bl      = 0;                               % Sum of all baseline terms
   %  
-  old_j_loaded = 0;                          % To avoid repeated loading of
+  j_loaded = 0;                              % To avoid repeated loading of
   %                                            existing J
   
   
@@ -139,10 +139,15 @@ if iter > 1
         R.vmr_field(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
 
   
+      case 'Frequency'   %------------------------------------------------------
+        %
+        keyboard
+       
       case 'Polynomial baseline fit'   %----------------------------------------
         %       
-        if ~old_j_loaded
-          J = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
+        if ~j_loaded
+          J        = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
+          j_loaded = 1;
         end
         %
         bl = bl + J(:,ind) * x(ind);

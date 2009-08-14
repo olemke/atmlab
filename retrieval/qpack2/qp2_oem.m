@@ -195,6 +195,7 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   %- Init
   A   = qarts;
   Sx  = [];
+  O   = oem;
   
   %- OEM 
   %
@@ -322,6 +323,24 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   A.SENSOR_RESPONSE = S;
   A = arts_sensor( A, workfolder );
   
+  % Frequency
+  %
+  if mandatory_qfield( Q, 'FFIT_DO' )
+    %
+    si    = mandatory_qfield( Q, 'FFIT_SI', 'FFIT_DO' );
+    order = mandatory_qfield( Q, 'FFIT_ORDER', 'FFIT_DO' );
+    %
+    if length(si) < 1  |  length(si) > 2
+      error('Length of *Q.FFIT_SI* must be 1 or 2.');
+    end
+    %
+    A.J.FREQUENCY.DO    = 1;
+    A.J.FREQUENCY.ORDER = order;
+    A.J.FREQUENCY.DF    = mandatory_qfield( Q, 'FFIT_DF', 'FFIT_DO' );
+    %
+    Sx = covmat_append( Sx, spdiags(vec2col(si).^2,0,order+1,order+1) );
+  end
+
   % Polyfit
   %
   if mandatory_qfield( Q, 'POLYFIT_DO' )
@@ -330,8 +349,8 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
     si    = mandatory_qfield( Q, 'POLYFIT_SI', 'POLYFIT_DO' );
     %
     l = order + 1;
-    if length(si) ~= l
-      error('Length of *Q.POLYFIT_SI* must be Q.POLYFIT_ORDER + 1.');
+    if length(si) < l
+      error('Length of *Q.POLYFIT_SI* must be at least Q.POLYFIT_ORDER + 1.');
     end
     %
     A.J.POLYFIT.DO         = 1;

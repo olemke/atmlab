@@ -30,14 +30,14 @@
 \section{Scope}
 \label{sec:scope}
 %---
-Qpack2 is a set of Matlab functions for performing inversion
-work. Only cases where the aim is to retrieve vertical profiles of
-atmospheric quantities (1D cases) are handled. The package is also
-developed for ground-based observations and inversion of individual
-satellite spectra/scans. This means that inversion of satellite
-scanning sequences where atmospheric fields to be retrieved have a
-latitude or longitude extension (2D or 3D) can not be treated by
-Qpack2.
+Qpack2 is a set of Matlab functions for performing inversions
+inside the framework of ``optimal estimation''. Only cases where the
+aim is to retrieve vertical profiles of atmospheric quantities (1D
+cases) are handled. The package is also developed for ground-based
+observations and inversion of individual satellite spectra/scans. This
+means that inversion of satellite scanning sequences where atmospheric
+fields to be retrieved have a latitude or longitude extension (2D or
+3D) can not be treated by Qpack2.
 
 The package should be highly general and flexible for covered
 measurements. For example, there is basically no limitations regarding
@@ -46,10 +46,6 @@ suitable for operational inversions, as long as not most extreme
 calculation speed is required. Some important aspects here are that
 batch calculations are allowed and atmospheric a priori profiles can
 automatically be extracted from climatology data.
-
-The development of Qpack2 is done using the so called optimal
-estimation method as the core inversion methodology. Presently no
-other inversion methods are handled, but later additions are possible.
 
 
 
@@ -95,7 +91,7 @@ High level documentation is found in this document. Information on
 individual functions is obtained by the standard Matlab help
 command. For example:
 \begin{verbatim}
->> help qp2_oem
+>> help qpack2
 \end{verbatim}
 Some of the used data structures are documented following the
 pattern expected of the function \verb|qinfo.m|. For example, to list
@@ -113,6 +109,10 @@ Wildcards are allowed when naming fields:
 \end{verbatim}
 Details around development and bug fixes are described in the
 ChangeLog file of Qpack2 (\verb|atmlab/retrieval/qpack2/ChangeLog|).
+
+The versions of Qpack2 are numbered as Qpack2.x.y, where x is
+increased when a change can not be accomodated with backward
+compability and y is increased for each change/commit. 
 
 
 
@@ -166,7 +166,7 @@ This ensures that Q contains also fields newly defined. If any field
 is added to \verb|Q|, its default value provided by \verb|qpack2|
 shall not change the result of older setting files. If a needed
 addition is impossible to combine with consistency with existing
-settings, a new version must introduced (Qpack2.X).
+settings, a new version must introduced.
 
 
 \subsection{Measurement data}
@@ -402,7 +402,7 @@ standard inversion is performed as simple as:
 \begin{verbatim}
 >> Q = q_onsala_h2o;
 >> Y = get_onsala_Y( 'h2o', date1, date2 );
->> P = qp2_oem( Q, Y );
+>> P = qpack2( Q, Y );
 \end{verbatim}
 The function \verb|q_onsala_h2o| is found in Appendix~
 

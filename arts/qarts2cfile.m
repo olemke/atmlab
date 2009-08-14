@@ -559,6 +559,7 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   end
+  T = add_agenda( T, 'jacobian_y_agenda', {'RteCalcNoJacobian'} );  
   if qarts_isset( Q.PPATH_LMAX )
     T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
   end  
@@ -935,7 +936,22 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       end
     end
 
-    %- Pointing
+    %- Frequency
+    %
+    if Q.J.FREQUENCY.DO
+      rqre_field( Q.J.FREQUENCY, 'DF' );
+      rqre_field( Q.J.FREQUENCY, 'ORDER' );
+      %
+      if Q.J.FREQUENCY.ORDER < 0  &   Q.J.FREQUENCY.ORDER > 1
+        error('Q.J.FREQUENCY.ORDER must be 0 or 1.');
+      end
+      T{end+1} = 'jacobianAddFreqShiftAndStretch(jacobian_quantities,';
+      T{end+1} =  '   jacobian_agenda, jacobian, ';
+      T{end+1} = sprintf( '   %.3e, %d )', Q.J.FREQUENCY.DF, ...
+                                           Q.J.FREQUENCY.ORDER == 1 );
+    end
+
+  %- Pointing
     %
     if Q.J.POINTING.DO
       rqre_field( Q.J.POINTING, 'DZA' );

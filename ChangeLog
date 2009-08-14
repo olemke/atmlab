@@ -1,3 +1,14 @@
+2009-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-69
+
+	* arts/qarts2cfile.m: Changes to accomodate frequency fit retrievals. 
+
+	* arts/qartsJacobian.m: FREQUENCY field added. 
+
+	* retrieval/oem.m: The O structure now documented following the
+	qinfo standard (that is, description now part of code).
+
 2009-08-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-68

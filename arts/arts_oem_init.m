@@ -95,7 +95,7 @@ for i = 1 : nq
       end
     end
 
-  case 'Polynomial baseline fit'   %------------------------------------------
+  case { 'Frequency', 'Polynomial baseline fit' }
     %
     xa(ind) = 0;    
 

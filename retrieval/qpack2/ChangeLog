@@ -1,13 +1,20 @@
+2009-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.3
+
+	* Version numbering changed. Functionality of qp2_oem now
+	incorporated intio qpack2. Fields for frequency fits added.
+
 2009-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* Qpack2.pre2
+	* Qpack2.0.2
 
 	* qp2_oem.m (createAandSxandO): Added check of size consisteny between
 	GRID and SX for each species.
 
 2009-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* Qpack2.pre1: Changes now documented in this ChangeLog. A first
+	* Qpack2.0.1: Changes now documented in this ChangeLog. A first
 	version with a complete, but modest, documentation.  Basic
 	inversions without any pre-calculation of absorption or sensor
 	response are working. But still just a pre-version.
