@@ -8,16 +8,21 @@
 %       SPEED_OF_LIGHT
 %       BOLTZMANN_CONST
 %       PLANCK_CONST  
-%       AVOGADRO            [1/mol]
-%       STEFANBOLTZMANN     Total blackbody emission is STEFANBOLTZMANN*T^4
-%       CBGR                Temperature of cosmic background radiation 
-%       EARTH_RADIUS        Standard value for the Earth radius. Selected value
-%                           gives a circumference of 360*60 nautical miles.
-%       EARTHORBIT_RADIUS   Radius of the Earth orbit, around the Sun  
-%       NAUTICAL_MILE       1 nautical mile 
-%       SUN_RADIUS          Sun radius
-%       DEG2RAD             Conversion from degrees to radians
-%       RAD2DEG             Conversion from radians to degrees
+%       AVOGADRO                   [1/mol]
+%       STEFANBOLTZMANN            Total blackbody emission is STEFANBOLTZMANN*T^4
+%       CBGR                       Temperature of cosmic background radiation 
+%       EARTH_RADIUS               Standard value for the Earth radius. Selected value
+%                                   gives a circumference of 360*60 nautical miles.
+%       EARTHORBIT_RADIUS          Radius of the Earth orbit, around the Sun  
+%       NAUTICAL_MILE              1 nautical mile 
+%       SUN_RADIUS                 Sun radius
+%       DEG2RAD                    Conversion from degrees to radians
+%       RAD2DEG                    Conversion from radians to degrees
+%       GAS_CONST_DRY_AIR          Gass constant for dry air in J.kg-1.K-1
+%       GAS_CONST_WATER_VAPOR      Gass constant for dry air in J.kg-1.K-1
+%       SPECIFIC_HEAT_CONST_PRES   Specific heat at constant pressure J.kg-1.K-1
+%       SPECIFIC_HEAT_CONST_VOL    Specific heat at constant pressure J.kg-1.K-1
+%       LATENT_HEAT_VAPORIZATION   Latent heat of vaporization J.kg-1
 %
 % FORMAT   const = constants(name);
 %        
@@ -72,6 +77,21 @@ case 'DEG2RAD'
 
 case 'RAD2DEG'
     const = 57.29577951308232;
+
+case 'GAS_CONST_DRY_AIR'
+    const = 287;
+
+case 'GAS_CONST_WATER_VAPOR'
+    const = 461.5; 
+
+case 'SPECIFIC_HEAT_CONST_PRES'
+    const = 1005; 
+    
+case 'SPECIFIC_HEAT_CONST_VOL'
+    const = 718;
+    
+case 'LATENT_HEAT_VAPORIZATION'
+    const = 2501e3;
 
 otherwise
     error(strcat('Unknown constant: ', name))

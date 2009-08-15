@@ -16,7 +16,7 @@
 % 2004-06-29   Created by Mashrab Kuvatov.
 
 
-function [data, err] = atovs_read_data( file_name );
+function [data, err] = atovs_read_data( file_name )
 
 % no error
 err = 0;

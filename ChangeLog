@@ -1,3 +1,18 @@
+2009-08-15  Isaac Moradi  <isaac.moradi@ltu.se>
+
+	* atmlab-0-3-70
+	* physics/thermodynamic/mixing_ratio.m
+	* physics/thermodynamic/dew_point.m
+	* physics/thermodynamic/wet_bulb_potential_temp.m
+	* physics/thermodynamic/virtual_temperature.m
+	* physics/thermodynamic/wet_bulb_temperature.m
+	* physics/thermodynamic/water_vapor_density.m
+	* physics/thermodynamic/isentr_conden_temp.m
+	* physics/thermodynamic/potential_temperature.m
+	* physics/thermodynamic/equivalent_temperature.m	
+	  added 9 functions to calculate quantities related
+	  to the thermodynamic of water vapor. 
+
 2009-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-69
