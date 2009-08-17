@@ -141,6 +141,7 @@ if iter > 1
   
       case 'Frequency'   %------------------------------------------------------
         %
+        warning( 'x2arts for frequency not implemeted' )
         keyboard
        
       case 'Polynomial baseline fit'   %----------------------------------------

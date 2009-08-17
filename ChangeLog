@@ -1,3 +1,11 @@
+2009-08-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-71
+
+	* retrieval/oem.m: The problem of getting a poor conditional
+	number when retrieval quantities differ strongly in magnitude has
+	been solved in a general by the option O.sxnorm. :-)
+
 2009-08-15  Isaac Moradi  <isaac.moradi@ltu.se>
 
 	* atmlab-0-3-70

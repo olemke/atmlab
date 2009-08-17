@@ -173,6 +173,16 @@ I.stop_dx = [ ...
 'length of x is applied.'
 ];
 %-----------------------------------------------------------------------------
+O.sxnorm = 0;
+I.sxnorm = [ ...
+'Flag to internally perform a normalisation of x, based on the diagonal ',...
+'elements of Sx. This to avoid a pure condition number for a matrix ',...
+'inversion that is encountered when units are such that retrieved values ',...
+'vary strongly in magnitude.',...
+'#The inverse of Sx must be calculated internally if this option is used ',...
+'and there is no use in pre-calculating *Sxinv*.'
+];
+%-----------------------------------------------------------------------------
 O.yf = 0;
 I.yf = [ ...
 'Flag to include "fitted spectrum" in X. That is, the simulated ',...
@@ -197,6 +207,7 @@ end
 %==============================================================================
 %=== Start of calculations
 %==============================================================================
+
   
 %=== Check of input ===========================================================
                                    
@@ -240,7 +251,12 @@ end
     error('Input argument *Sx* must be a square matrix.');
   end
 
-  if nargin < 7  |  isempty(Sxinv)
+  if O.sxnorm
+    xnorm = sqrt( diag( Sx ) );
+    Sx    = Sx ./ (xnorm*xnorm');
+  end
+  
+  if nargin < 7  |  isempty(Sxinv)  |  O.sxnorm
     Sxinv = Sx \ speye(size(Sx));
   end
   %
@@ -278,7 +294,6 @@ end
   end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 
 
 
@@ -363,7 +378,11 @@ end
     %- Calculate new Jacobian (J)   
     %
     [R,yf,J] = feval( comfun, Q, R, x, iter );
-
+    %
+    if O.sxnorm
+      J = J .* repmat( xnorm', ny , 1 );
+    end
+    
     %- Some matrix products
     %
     JtSeinv = J' * Seinv;
@@ -391,19 +410,19 @@ end
         wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
       end
        
-      %- Linear 
-      if O.linear
-        xnew = xa + SJSJ \ wdy;
-
-      %- Non-linear
-      else
-        if strcmp( O.imethod, 'GN' )
-          xnew = x + SJSJ \ wdy; 
-        elseif strcmp( O.imethod, 'ML' )
-          error('ML not yet handled');
-        end
+      %- New x state
+      if O.linear | strcmp( O.imethod, 'GN' )
+        xstep = SJSJ \ wdy; 
+      elseif strcmp( O.imethod, 'ML' )
+        error('ML not yet handled');
       end
-
+      %
+      if O.sxnorm 
+        xnew = x + xnorm .* xstep;
+      else
+        xnew = x + xstep;
+      end
+     
       %- yf not valid for xnew
       yf = NaN;
 
@@ -411,6 +430,9 @@ end
       if O.cost  |  strcmp( O.imethod, 'ML' )
         [R,yf]   = feval( comfun, Q, R, xnew, iter+1 );
         a        = xnew - xa;
+        if O.sxnorm
+          a = a ./ xnorm;
+        end
         cost_x   = (a' * Sxinv * a) / ny;  
         a        = y - yf;
         cost_y   = (a' * Seinv * a) / ny; 
@@ -488,6 +510,11 @@ end
   %
   if O.jexact  &  ~only_char 
     [R,yf,J] = feval( comfun, Q, R, x, iter+1 );
+    %
+    if O.sxnorm
+      J = J .* repmat( xnorm', ny , 1 );
+    end
+    %
     JtSeinv  = J' * Seinv;
     SJSJ     = Sxinv + JtSeinv * J;
   end
@@ -496,6 +523,7 @@ end
   %
   if O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es
     G = ( SJSJ \ speye(size(Sxinv)) ) * JtSeinv;
+    % back-normalisation with xnorm must be done after calculation of A
   end
 
   %- Calculate A ?
@@ -503,6 +531,12 @@ end
   if O.A | O.S | O.Ss | O.e | O.es
     A = G * J;
   end
+  %
+  if O.sxnorm
+    G = G .* repmat( xnorm, 1, ny );
+  end
+  % All variables beside Sx and Sxinv are now in original space, and not
+  % normalised with xnorm
 
   %- Fill P
 
@@ -536,11 +570,14 @@ end
     end
     %
     if O.eo
-      X.eo = sqrt( diag( So ) );
+      X.eo = full( sqrt( diag( So ) ) );
     end
   end  
 
   if O.S  |  O.Ss  |  O.e  |  O.es
+    if O.sxnorm
+      Sx    = Sx .* (xnorm*xnorm');
+    end
     AI = A - eye(size(A,1));
     Ss = AI * Sx * AI';
     %
@@ -553,11 +590,11 @@ end
     end
     %
     if O.e
-      X.e = sqrt( diag( Ss ) + diag( So ) );
+      X.e = full( sqrt( diag( Ss ) + diag( So ) ) );
     end
     %
     if O.es
-      X.es = sqrt( diag( Ss ) );
+      X.es = full( sqrt( diag( Ss ) ) );
     end
   end  
     

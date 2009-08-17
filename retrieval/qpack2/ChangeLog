@@ -1,3 +1,8 @@
+2009-08-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* qpack2.m: Automatix selection of O.sxnorm, and FFIT can now
+	outputted through P.
+
 2009-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.3

@@ -203,9 +203,15 @@ I.OUT_BASELINE = [ ...
 'only controls the output.'
 ];
 %-----------------------------------------------------------------------------
-P.OUT_PTZ = 1;
+P.OUT_F = 0;
+I.OUT_F = [ ...
+'Flag to inlude frequency fit varaibles in result structure. Default is 0. ',...
+'Returned as a vector where firtst element is shift and second is stretch.'
+];
+%-----------------------------------------------------------------------------
+P.OUT_PTZ = 0;
 I.OUT_PTZ = [ ...
-'Flag to inlude p, t and z in result structure. Default is 1. ', ...
+'Flag to inlude p, t and z in result structure. Default is 0. ', ...
 'If set to true, matching vectors for pressure, temperature and geometrical ',...
 'altitude are included in the output from qp2_oem (P). These fields in P ',...
 'are denoted as p, t and z.'
@@ -363,9 +369,18 @@ workfolder = create_tmpfolder;
 
 %- Inverse of Sx
 %
-% Is fixed and should only be calculated once (to save time)
+% Is fixed and should only be calculated once (to save time) if not the option
+% of O.sxnorm must be used
 %
-Sxinv = Sx \ speye(size(Sx));
+si = sqrt( diag( Sx ) );
+if max(si) / min(si) <= 1e3
+  Sxinv    = Sx \ speye(size(Sx));
+  O.sxnorm = 0;
+else
+  Sxinv    = [];
+  O.sxnorm = 1;
+end
+
 
 
 
@@ -845,7 +860,7 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
   for q = 1 : length(R.jq)
 
     unitfac = 1;
-    include = 1;
+    include = 0;
     ind     = I(q,1) : I(q,2);
     
     
@@ -853,6 +868,7 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
       %------------------------------------------------------------------------
       ispecies = ispecies + 1;
       s        = sprintf( 'species%d', ispecies );
+      include  = 1;
       %
       if strcmp( A.J.ABS_SPECIES(q).UNIT, 'rel' )
         unitfac = R.x_vmr0(ind);
@@ -867,10 +883,15 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
       if Q.OUT_BASELINE
         s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
         P(i).baseline = R.bl;
-      else
-        include = 0;
+        include = 1;
       end
-      
+
+    elseif strcmp( R.jq{q}.maintag, 'Frequency' )
+      %------------------------------------------------------------------------
+      if Q.OUT_F
+        s       = 'ffit';
+        include = 1;
+      end
       
     else
       error( sprintf( 'Unknown retrieval quantity: %s', R.jq{q}.maintag ) );
