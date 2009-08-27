@@ -1,3 +1,10 @@
+2009-08-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-72
+
+	* math/lse.m: Added this free function found at softpedia.com.
+	It solves the least squares problem with an equality constraint.
+
 2009-08-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-71
