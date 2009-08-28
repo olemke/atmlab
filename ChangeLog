@@ -1,3 +1,11 @@
+2009-08-27  Bengt Rydberg  <bengt.rydberg@chalmers.se>
+
+	* atmlab-0-3-73
+
+	* math/wtls_line.m: Added the function. It returns weighted total 
+	least squares fit of a straigth line to a set of points with 
+	uncertainties in both coordinates.
+
 2009-08-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-72
