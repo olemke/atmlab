@@ -1,3 +1,37 @@
+2009-08-28  Isaac Moradi  <isaac.moradi@ltu.se>
+
+	* atmlab-0-3-74
+
+	* physics/parametrisations/e_eq_ice.m: moved it to the directory "thermodynmics"
+	* physics/parametrisations/e_eq_water.m: moved it to the directory "thermodynmics"
+	* physics/thermodynamic/relative_humidity.m
+	* physics/thermodynamic/r2e.m
+	* physics/thermodynamic/water_vapor_density.m
+	* physics/thermodynamic/dew_point.m
+	* physics/thermodynamic/e_eq_ice.m
+	* physics/thermodynamic/mixing_ratio.m
+	* physics/thermodynamic/equivalent_temperature.m
+	* physics/thermodynamic/latent_heat_vaporization.m
+	* physics/thermodynamic/e2T_eq_ice.m
+	* physics/thermodynamic/water_vapor_mixing_ratio.m
+	* physics/thermodynamic/virtual_temperature.m
+	* physics/thermodynamic/dew_point_temperature.m
+	* physics/thermodynamic/wet_bulb_potential_temp.m
+	* physics/thermodynamic/e_eq_water.m
+	* physics/thermodynamic/potential_temperature.m
+	* physics/thermodynamic/isentr_conden_temp.m
+	* physics/thermodynamic/water_vapor_pressure.m
+	* physics/thermodynamic/e2T_eq_water.m
+	added new functions to calculate thermodynamical properties of water vapor
+	and modified old function especially their documentations
+
+	* physics/thermodynamic/mixing_ratio.m
+	replaced it with a new function
+
+	* physics/thermodynamic/wet_bulb_temperature.m
+	deleted this functions. The equation provided in the cloud physics book
+	did not work for all cases so that I decided to remove it. 
+
 2009-08-27  Bengt Rydberg  <bengt.rydberg@chalmers.se>
 
 	* atmlab-0-3-73
