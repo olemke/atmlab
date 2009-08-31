@@ -3,8 +3,11 @@
 %    This function sets Q for inversion of the standard ground-based 
 %    measurements of water vapour performed at Onsala Space Observatory. 
 %    The calculations are done in a straightforward way and are not 
-%    optimised for calculation speed (here is no pre-calculation of 
-%    absorption or sensor response).
+%    optimised for calculation speed (there is no pre-calculation of 
+%    absorption).
+%
+%    This file is used for operational retrievals, but serves inside atmlab
+%    just as an example (input files used are not part of atmlab). 
 %
 % FORMAT   Q = q_onsala_h2o( [width] )
 %        
@@ -38,7 +41,7 @@ Q = qpack2;
 %
 % Measurement data are corrected for tropospheric attenuation and the
 % retrievals are performed assuming observations from tropopause level. Exact
-% choice of observation altitude is not critical (confirmned by simulations).
+% choice of observation altitude is not critical (confirmed by simulations).
 %
 Q.PLATFORM_Z          = 10e3;
 Q.PLATFORM_LAT        = 58;
@@ -81,7 +84,7 @@ species = 'H2O';
 %
 Q.SPECIES(1).TAG{1}   = species;
 Q.SPECIES(1).RETRIEVE = 1;
-Q.SPECIES(1).GRID     = z2p_simple(Q.PLATFORM_Z-2e3:2e3:106e3);
+Q.SPECIES(1).GRID     = z2p_simple(Q.PLATFORM_Z-1e3:2e3:105e3);
 %
 if 1 % To allow simple switch to test retrievals in "rel unit" 
   Q.SPECIES(1).UNIT   = 'vmr';
@@ -131,7 +134,8 @@ Q.CBGR                     = 0;
 Q.BACKEND_DO               = 1;
 Q.F_GRID                   = fullfile( data, ['f_grid_h2o_',width,'.xml'] );
 Q.F_BACKEND                = fullfile( data, ['f_backend_h2o_',width,'.xml'] );
-Q.BACKEND_CHANNEL_RESPONSE = fullfile( data, ['backend_channel_',width,'.xml'] );
+Q.BACKEND_CHANNEL_RESPONSE = ... 
+                           fullfile( data, ['backend_channel_',width,'.xml'] );
 %
 % Measurements performed as beam switching. Provided data are corrected and
 % match throughout beam switching between elevation angles of 25 and

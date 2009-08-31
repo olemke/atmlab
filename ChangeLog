@@ -1,3 +1,9 @@
+2009-08-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-75
+
+	* Physics/p2z_cira86.m: The output range of mjd2doy is now handled. 
+
 2009-08-28  Isaac Moradi  <isaac.moradi@ltu.se>
 
 	* atmlab-0-3-74

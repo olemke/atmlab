@@ -21,7 +21,7 @@
 
 function [z]=p2z_cira86(p,lat,doy)
  
-if doy>365 | doy<1
+if doy>367 | doy<1
    error('doy is out of range')
 end
 if length(doy)>1
@@ -33,6 +33,11 @@ end
 if length(lat)~=size(p,2) & size(p,2)~=1 
    error('lat and z does not match in size')
 end
+
+if doy > 365    % Fix to make sure that output range of mjd2doy is handled 
+  doy = 365;
+end
+
 
 days_in_prev_months = [0 31 59 90 120 151 181 212 243 273 304 334 365];
 month1=max(find(days_in_prev_months<doy));
