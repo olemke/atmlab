@@ -16,7 +16,8 @@ function result = xmlLoad(filename)
 
 uncompressed_filename='';
 if strcmp( filename(length(filename)-2:end), '.gz')
-  uncompressed_filename = tempname();
+  workarea = atmlab( 'WORK_AREA' );
+  uncompressed_filename = tempname(workarea);
   cmd = [ 'gunzip -cd ' filename ' > ' uncompressed_filename ];
   st = system (cmd);
   if st
