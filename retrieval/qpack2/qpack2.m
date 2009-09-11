@@ -1,4 +1,4 @@
-% QPACK2   Nain function of Qpack2
+% QPACK2   Main function of Qpack2
 %
 %    Read qpack2.pdf for an introduction to Qpack2.
 %
@@ -331,7 +331,7 @@ end
 %- Basic checks of input
 %
 if nargin ~= 2
-  error( 'The function requires two input arguments.' );
+  error( 'The function requires zedro or two input arguments.' );
 end
 %
 if isempty( Y )
@@ -380,7 +380,6 @@ else
   Sxinv    = [];
   O.sxnorm = 1;
 end
-
 
 
 

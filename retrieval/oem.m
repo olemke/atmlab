@@ -531,12 +531,6 @@ end
   if O.A | O.S | O.Ss | O.e | O.es
     A = G * J;
   end
-  %
-  if O.sxnorm
-    G = G .* repmat( xnorm, 1, ny );
-  end
-  % All variables beside Sx and Sxinv are now in original space, and not
-  % normalised with xnorm
 
   %- Fill P
 
@@ -551,19 +545,31 @@ end
   end
 
   if O.J
-    X.J = J;
+    if O.sxnorm
+      X.J = J ./ repmat( xnorm', ny , 1 );
+    else
+      X.J = J;
+    end
   end
 
   if O.G
-    X.G = G;
+    if O.sxnorm
+      X.G = G .* repmat( xnorm', ny , 1 );
+    else
+      X.G = G;
+    end
   end
 
   if O.A 
-    X.A = A;
+    X.A = A;  % No normalisation needed here
   end  
 
   if O.S  |  O.So  |  O.e  |  O.eo
     So = G * Se * G';
+    %
+    if O.sxnorm
+      So = So .* (xnorm*xnorm');
+    end
     %
     if O.So
       X.So = So;
@@ -575,11 +581,12 @@ end
   end  
 
   if O.S  |  O.Ss  |  O.e  |  O.es
-    if O.sxnorm
-      Sx    = Sx .* (xnorm*xnorm');
-    end
     AI = A - eye(size(A,1));
     Ss = AI * Sx * AI';
+    %
+    if O.sxnorm
+      Ss = Ss .* (xnorm*xnorm');
+    end
     %
     if O.S
       X.S = Ss + So;
