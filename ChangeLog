@@ -1,3 +1,10 @@
+2009-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-78
+
+	* arts/qarts2cfile.m (cfile_Sensor): antenna_diagram was still
+	used for antenna_response.
+
 2009-09-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-77

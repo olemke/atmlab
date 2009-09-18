@@ -185,8 +185,9 @@ for ip = 1 : length(parts)
     error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
   end
   
-  S = { S{:} T{:} };
-  
+  if ~isempty(T)
+   S = { S{:} T{:} };
+  end
 
 end
 
@@ -772,7 +773,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                                                    workfolder );
         end
         if qarts_isset( H.ANTENNA_RESPONSE )
-          U{end+1} = file_or_data( 'antenna_diagram', 'GriddedField4',...
+          U{end+1} = file_or_data( 'antenna_response', 'GriddedField4',...
                                                H.ANTENNA_RESPONSE, workfolder );
         end
         U{end+1} = 'sensor_responseAntenna';
