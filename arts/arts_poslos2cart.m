@@ -22,10 +22,12 @@
 
 % 2007-05-16   Created by Patrick Eriksson.
 
-
 function [x,y,z,dx,dy,dz] = arts_poslos2cart(r,lat,lon,za,aa)
 
-  
+if r == 0
+  error( 'This set of functions are not handling the case of r = 0.' );  
+end
+
 deg2rad = constants( 'DEG2RAD' );
 
 

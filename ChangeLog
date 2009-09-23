@@ -1,3 +1,28 @@
+2009-09-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-78
+
+	* math/rotationmat3D.m: Added this function copied from the Matlab
+	file exchange site.
+
+	* arts/arts_map_daa.m: Created.
+
+	* arts/arts_zaaa2cart.m: Created.
+
+	* arts/arts_cart2zaaa.m: Created.
+	
+	* The arts cart to sph/poslos functions are now all set to not be
+	defined for r=0. There is no clear way to define za and aa for r=0,
+	and it is best to avoid this case at all. Use the zaaa2cart function
+	pair instead.
+
+	* arts/arts_cart2sph.m (arts_cart2sph): Now an error if r=0. This gives
+	the same behaviour for arts_cart2poslos.m as this function is used.
+
+	* arts/arts_sph2cart.m (arts_sph2cart): As above.
+
+	* arts/arts_poslos2cart.m (arts_poslos2cart): As above.
+	
 2009-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-78

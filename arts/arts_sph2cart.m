@@ -24,7 +24,11 @@
 
 
 function [x,y,z] = arts_sph2cart(r,lat,lon)
-  
+
+if r == 0
+  error( 'This set of functions are not handling the case of r = 0.' );  
+end
+
 deg2rad = constants( 'DEG2RAD' );
 
 latrad = deg2rad * lat;
