@@ -1,3 +1,10 @@
+2009-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-79
+
+	* arts/arts_map_daa.m: Did not work. Reported by Bengt. Missed
+	one thing when vectorised the function just before commiting.
+
 2009-09-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-78

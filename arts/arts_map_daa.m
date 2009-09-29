@@ -34,9 +34,9 @@ end
 %  
 vrot = cross( [0 0 1], [x;y;z] );
 
-% Unit vector towards aa at za=90
+% Unit vectors towards aa0+aa at za=90
 %
-[x,y,z] = arts_zaaa2cart( 90, aa );
+[x,y,z] = arts_zaaa2cart( 90, aa0 + aa );
 
 % Apply rotation
 %
