@@ -28,7 +28,7 @@
 
 function [G,D]= asg_dbz2pnd_amsu( D, G, Q ,P);
 
-
+warning off
 for i=1:length(G)
     if strcmp(G(i).DATA_NAME,'Radar_Reflectivity')
        dBZ=G(i).DATA;
@@ -301,3 +301,4 @@ else
 end
 
 
+warning on

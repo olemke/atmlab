@@ -231,7 +231,7 @@ for ip = 1 : length(C.USE_LATS)
   if Q.P_GRID(end)==Q.P_GRID(end-1)
      Q.P_GRID=Q.P_GRID(1:end-1);
   end
-
+ 
   Gcs1([t_ind,s_ind,h_ind,o_ind])= asg_regrid( asgD,...
                                 Gcs1([t_ind,s_ind,h_ind,o_ind]) , Q ); 
   

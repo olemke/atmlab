@@ -31,6 +31,8 @@ iwc_ind=find(strncmp(lower({G.NAME}),'iwc',3));
 alt_ind=find(strncmp(lower({G.NAME}),'altitude',8));
 hum_ind=min(find(strcmp(lower({G.NAME}),'water vapour')));
 tem_ind=find(strncmp(lower({G.NAME}),'temperature',11));
+lwc_ind=find(strncmp(lower({G.NAME}),'lwc',3));
+
 
 if isempty( iwc_ind )
    error('G must contain IWC field')
@@ -48,6 +50,10 @@ if isempty( tem_ind )
    error('G must contain Temperature field')
 end
 
+if isempty( lwc_ind )
+   error('G must contain LWC field')
+end
+
 deg2rad = constants( 'DEG2RAD' );
 
 %regrid the fields on the same grids
@@ -60,7 +66,11 @@ Q2 = asg_atmgrids( D, G, Q );
     
 Q2.P_GRID=Q2.P_GRID(2:end-1);
 
-H=asg_regrid(D,G([alt_ind,hum_ind,tem_ind,iwc_ind]),Q2);
+if ~isempty(iwc_ind)
+    H=asg_regrid(D,G([alt_ind,hum_ind,tem_ind,iwc_ind,lwc_ind]),Q2);
+else
+    H=asg_regrid(D,G([alt_ind,hum_ind,tem_ind]),Q2);
+end
 
 %create a pressure matrix
 
@@ -74,11 +84,12 @@ end
 
 %loop over sensor positions and line of sights
 %
+
 for pp=1:size(Q.SENSOR_POS,1)
 
     pos=Q.SENSOR_POS(pp,:);
     los=Q.SENSOR_LOS(pp,:);
-
+    
     [x,y,z,dx,dy,dz] = arts_poslos2cart( pos(1),pos(2),pos(3),los(1),los(2) );
 
     %find the propagation path from the sensor to the tangent point
@@ -108,33 +119,44 @@ for pp=1:size(Q.SENSOR_POS,1)
 
     %remove high altitude points
     z_grid=r-re;
-    ind=find(z_grid<z_max);
+    ind=find(z_grid<z_max & z_grid>-1e3);
     
     z_grid=z_grid(ind);
     lat=lat(ind);
-    lon=lon(ind);    
-    
-    
-    IWC=interp3(X,Y,Z,H(4).DATA,lat,z_grid,lon);
+    lon=lon(ind);
+   
+     
+    if ~isempty(iwc_ind)
+       IWC=interp3(X,Y,Z,H(4).DATA,lat,z_grid,lon);
+    end
     HUM=interp3(X,Y,Z,H(2).DATA,lat,z_grid,lon);
     TEM=interp3(X,Y,Z,H(3).DATA,lat,z_grid,lon);
     PRE=exp(interp3(X,Y,Z,log(Pr),lat,z_grid,lon));
+    LWC=interp3(X,Y,Z,H(5).DATA,lat,z_grid,lon);
 
     %Equilibrium water vapor pressure
     ei = e_eq_ice(TEM);
 
     %Relative humidity w.r.t. ice
     RH=PRE.*HUM./ei*100;
-
-    %set all nan values to 0
-    IWC(find(isnan(IWC)))=0;
   
     P(pp).z=z_grid;
     P(pp).lat=lat;
     P(pp).lon=lon;
-    P(pp).iwc=IWC;
-    P(pp).iwp=sum( (P(pp).z(1:end-1)-P(pp).z(2:end))...
+    if ~isempty(iwc_ind)
+       %set all nan values to 0
+       IWC(find(isnan(IWC)))=0;
+       LWC(find(isnan(LWC)))=0;
+       P(pp).iwc=IWC;
+       P(pp).lwc=LWC;
+       P(pp).iwp=sum( (P(pp).z(1:end-1)-P(pp).z(2:end))...
                     .* (IWC(1:end-1)+IWC(2:end))/2 );
+    else
+      P(pp).iwc=zeros(size(z_grid));
+      P(pp).iwp=0;
+    end
     P(pp).rhi=RH;
-end
+    P(pp).t=TEM;
 
+
+end

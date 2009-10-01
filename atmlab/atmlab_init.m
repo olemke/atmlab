@@ -38,6 +38,7 @@ addpath( fullfile( toppath, 'randomize','iaaft' ) );
 addpath( fullfile( toppath, 'randomize' ) ); 
 addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics', 'parametrisations' ) ); 
+addpath( fullfile( toppath, 'physics', 'thermodynamic' ) ); 
 addpath( fullfile( toppath, 'physics' ) ); 
 addpath( fullfile( toppath, 'math', 'covmat' ) ); 
 addpath( fullfile( toppath, 'math' ) ); 

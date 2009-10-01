@@ -560,7 +560,7 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   end
-  T = add_agenda( T, 'jacobian_y_agenda', {'RteCalcNoJacobian'} );  
+  %T = add_agenda( T, 'jacobian_y_agenda', {'RteCalcNoJacobian'} );  
   if qarts_isset( Q.PPATH_LMAX )
     T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
   end  

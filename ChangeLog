@@ -1,3 +1,19 @@
+2009-10-01  Bengt Rydberg  <bengt.rydberg@chalmers.se>
+ 
+	* atmlab-0-3-81
+
+	* atmlab/atmlab_init.m: added a missinga addpath
+
+	* arts/scenegen/asg_pathiwc.m: modified.
+
+	* demos/asg_demo2.m: added a function/demo that generates atmospheric
+	  states
+	
+        * demos/asg2y_demo2.m: added a function/demo that can simulate
+	  amsu and mhs measurements on atmospheric states generated
+	  by asg_demo2.m
+
+	
 2009-10-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
  
 	* atmlab-0-3-80
