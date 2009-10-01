@@ -1,5 +1,12 @@
 2009-10-01  Bengt Rydberg  <bengt.rydberg@chalmers.se>
  
+	* atmlab-0-3-82
+
+	* demos/asg2y_demo2.m: modified.
+	
+
+2009-10-01  Bengt Rydberg  <bengt.rydberg@chalmers.se>
+ 
 	* atmlab-0-3-81
 
 	* atmlab/atmlab_init.m: added a missinga addpath

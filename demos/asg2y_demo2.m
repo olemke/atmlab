@@ -202,7 +202,7 @@ function [Q,instrument,FS]=asg_q(instrument,FS)
  R=R(ind1(1),ind1(1):length(s_r):end); 
  std1=0.5;
  std_max=6;
- [mc_std]=test5(R,std1,6);
+ [mc_std]=mc_error(R,std1,std_max);
 
  Q.CLOUDBOX.METHOD                      = 'MC';
  Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR       = mc_std;      
@@ -473,5 +473,30 @@ function H = amsu_antenna(za_grid,aa_grid)
  Q = arts_sensor( Q );
 
  H = Q.SENSOR_RESPONSE;
+
+return
+
+%-------
+
+function [mc_std]=mc_error(w,std,std_max)
+
+
+ mc_std=sqrt(std^2./w);
+
+ mc_std(find(mc_std>std_max))=std_max;
+
+ ind1=find(mc_std(:)==std_max); 
+ ind1b=ind1;
+ ind2=find(mc_std(:)<std_max); 
+
+ while length(ind1)>0
+  varp=std^2-sum(w(ind1b).^2.*mc_std(ind1b).^2);
+  mc_std(ind2)=min(sqrt(varp/sum(w(ind2))./w(ind2)),std_max);
+  ind1=find(mc_std(ind2)>std_max);
+  if length(ind1)>0
+     ind1b=sort([ind1b,ind2(ind1)])
+  end
+  ind2=setdiff(1:length(mc_std(:)),ind1b);   
+ end
 
 return
