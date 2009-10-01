@@ -1,5 +1,12 @@
-2009-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+2009-10-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+ 
+	* atmlab-0-3-80
 
+	* arts/arts_cart2zaaa.m (arts_cart2zaaa): Now returning azimuth
+	angles inside [-180,180]. To be consistent with arts.
+
+2009-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+ 
 	* atmlab-0-3-79
 
 	* arts/arts_map_daa.m: Did not work. Reported by Bengt. Missed

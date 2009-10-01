@@ -36,5 +36,5 @@ aa = rad2deg * atan2( dy, dx );
 
 ind = find( aa < 0 );
 
-aa(ind) = aa(ind) + 360;
+
 
