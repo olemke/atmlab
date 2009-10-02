@@ -1,6 +1,6 @@
-% ARTS_ZAAA2CART   Converts zenith and azimuth angles to a cartesian unit vector
+% ARTS_CART2ZAAA   Converts a cartesian directional vector to zenith and azimuth
 %
-%   This function and the sister function *arts_cart2zaaa* handles transformation
+%   This function and the sister function *arts_zaaa2cart* handles transformation
 %   of line-of-sights. This in contrast to the sph/poslos functions that
 %   handles positions, or combinations of positions and line-of-sight.
 %
@@ -9,13 +9,13 @@
 %     x : za=90, aa=0
 %     y : za=90, aa=90
 %
-% FORMAT   [dx,dy,dz] = arts_poslos2cart(za,aa)
+% FORMAT   [za,aa] = arts_cart2zaaa(dx,dy,dz)
 %        
-% OUT   dx   LOS component in x dimension.
+% OUT   za   Zenith angle.
+%       aa   Azimuth angle.
+% IN    dx   LOS component in x dimension.
 %       dy   LOS component in y dimension.
 %       dz   LOS component in z dimension.
-% IN    za   Zenith angle.
-%       aa   Azimuth angle.
 
 % 2009-09-23   Created by Patrick Eriksson.
 
@@ -34,7 +34,7 @@ za = rad2deg * acos( dz ./ r );
 
 aa = rad2deg * atan2( dy, dx );
 
-ind = find( aa < 0 );
+
 
 
 
