@@ -1,3 +1,9 @@
+2009-10-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-84
+
+	* physics/parametrisations/latslons2distance.m: Created.
+
 2009-10-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 	
 	* atmlab-0-3-83

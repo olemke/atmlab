@@ -9,7 +9,7 @@
 %     x : za=90, aa=0
 %     y : za=90, aa=90
 %
-% FORMAT   [dx,dy,dz] = arts_poslos2cart(za,aa)
+% FORMAT   [dx,dy,dz] = arts_zaaa2cart(za,aa)
 %        
 % OUT   dx   LOS component in x dimension.
 %       dy   LOS component in y dimension.
