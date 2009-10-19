@@ -340,7 +340,9 @@ end
 
   %- Print initial screen message
   %
-  out( 1, 1, O.outfids );
+  if out(2) | ~isempty( O.msg )
+    out( 1, 1, O.outfids );
+  end
   if ~isempty( O.msg )
     out( 1, O.msg, O.outfids );
     out( 3, 0, O.outfids );
@@ -358,7 +360,7 @@ end
     end
   end
   if ~O.linear | O.cost
-    out( 2, 0, O.outfids );
+    out( 3, 0, O.outfids );
     nlinprint( O.outfids );
   end
 
@@ -614,8 +616,10 @@ end
   
   %= End screen meassages 
   %
-  out( 1, -1, O.outfids );
-
+  if out(2) | ~isempty( O.msg )
+    out( 1, -1, O.outfids );
+  end
+  
   return
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

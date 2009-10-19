@@ -51,8 +51,7 @@ for i = 1 : nq
 
   switch R.jq{i}.maintag
 
-
-  case 'Abs. species'   %------------------------------------------------------
+  case 'Absorption species'   %-----------------------------------------------
     %
     ig      = i_asj(i);    % Gas species index
     %
@@ -60,8 +59,7 @@ for i = 1 : nq
                                                         R.jq{i}.grids, 'atm' );
 
 
-
   otherwise   %----------------------------------------------------------------
-    error('Unknown retrieval characteristics.'); 
+    error( sprintf('Unknown retrieval characteristics (%s).',R.jq{i}.maintag) ); 
   end
 end

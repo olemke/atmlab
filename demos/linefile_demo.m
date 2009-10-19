@@ -1,4 +1,4 @@
-% LINEFILE_DEMO   Demosntration on usage of ARTS1_CREATE_LINEFILE
+% LINEFILE_DEMO   Demonstration on usage of ARTS1_CREATE_LINEFILE
 %
 %   Selects H2O transitions (only local ones) for a range around 490.5 GHz.
 %   A SSB reciever is assumed, with image band around 498.5 GHz. The 

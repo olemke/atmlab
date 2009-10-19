@@ -928,7 +928,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
                                                             workfolder, name3 );
 
         T{end+1} = 'jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,'; 
-        T{end+1} = '   jacobian,atmosphere_dim,p_grid,lat_grid,lon_grid,';
+        T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
         T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
         T{end+1} = sprintf( '  %s,', arts_tgs_cnvrt({Q.ABS_SPECIES{i}}) );
         T{end+1} = sprintf( '  "%s","%s",', Q.J.ABS_SPECIES(i).METHOD, ...
@@ -955,7 +955,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         error('Q.J.FREQUENCY.ORDER must be 0 or 1.');
       end
       T{end+1} = 'jacobianAddFreqShiftAndStretch(jacobian_quantities,';
-      T{end+1} =  '   jacobian_agenda, jacobian, ';
+      T{end+1} =  '   jacobian_agenda, ';
       T{end+1} = sprintf( '   %.3e, %d )', Q.J.FREQUENCY.DF, ...
                                            Q.J.FREQUENCY.ORDER == 1 );
     end
@@ -967,7 +967,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       rqre_field( Q.J.POINTING, 'POLY_ORDER' );
       
       T{end+1} = 'jacobianAddPointing(jacobian_quantities, jacobian_agenda,';
-      T{end+1} =  '   jacobian, sensor_pos, sensor_time';
+      T{end+1} =  '   sensor_pos, sensor_time';
       T{end+1} = sprintf( '   %g,%d)', Q.J.POINTING.DZA, ...
                                                     Q.J.POINTING.POLY_ORDER );
     end
@@ -981,7 +981,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       rqre_field( Q.J.POLYFIT, 'NO_BLOCK_VARIATION' );
       %
       T{end+1} = 'jacobianAddPolyfit(jacobian_quantities, jacobian_agenda,';
-      T{end+1} =  '   jacobian,sensor_response_pol_grid,sensor_response_f_grid,';
+      T{end+1} =  '   sensor_response_pol_grid,sensor_response_f_grid,';
       T{end+1} =  '   sensor_response_za_grid, sensor_pos,';
       T{end+1} = sprintf( '   %d,%d,%d,%d)', Q.J.POLYFIT.POLY_ORDER, ...
                                              Q.J.POLYFIT.NO_POL_VARIATION, ...

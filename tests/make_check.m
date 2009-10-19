@@ -110,32 +110,21 @@ if any( abs( y(ind)' - y0 ) > 3*dy(ind)' )
 end
 
 
-
-
-% Parts not updated
-if 0
-
-
-
-%= Jacobian calculations
+%= OEM
 %
 try
-  [Q,f,y,J,ji] = qarts_jacobian_demo( 30e3, 1 );
+  X = arts_oem_demo;
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_jacobian_demo* ===\n\n');
+  fprintf('\n=== Error while running *arts_oem_demo* ===\n\n');
   rethrow(lasterror);
 end
 %
-yj = J*ones(size(J,2),1);
-yj = yj + mean(y) - mean(yj);
-%
-if any( abs( (yj-y)./y ) > 0.06 )
+if X.cost(end) > 1.3
   reset_verbosity( va, vf );
-  error('Unexpected result from *qarts_jacobian_demo*');
+  error('Unexpected result from *arts_oem_demo*');  
 end
 
-end
 
 
 %== Finished

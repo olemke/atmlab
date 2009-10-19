@@ -31,7 +31,7 @@ Q      = qarts;
 Q.J    = qartsJacobian;
 Q.J_DO = 1;
 SX     = [];
-
+O      = oem;
 
 
 %----------------------------------------------------------------------------
@@ -86,6 +86,9 @@ Q.ABS_LINES           = fullfile( atmlab_example_data , 'o3line111ghz' );
 Q.ABS_NLS             = [];
 
 %- RTE
+%
+Q.WSMS_BEFORE_RTE    = { 'atm_checkedCalc' };
+Q.YCALC_WSMS         = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
 Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
@@ -215,7 +218,6 @@ arts_oem( 'clean', R );
 clear Qoem 
 
 
-X
 
 %- Plot
 %

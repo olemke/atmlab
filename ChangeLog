@@ -1,5 +1,19 @@
 2009-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-86
+
+	* arts/arts_sx.m: Updated.
+
+	* retrieval/oem.m: Fixed ugly output for combination non-lin and out2. 
+
+	* demos/arts_oem_demo.m: Updated.
+
+	* demos/qarts_jacobian_demo.m: Removed.
+	
+	* tests/make_check.m: Added run of arts_oem_init. 
+
+2009-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-85
 	
 	* tests/make_check.m: Updated 
