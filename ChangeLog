@@ -1,3 +1,26 @@
+2009-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-85
+	
+	* tests/make_check.m: Updated 
+
+	* arts/arts_y.m: Now reading y_error.
+
+	* demos/qarts_scattering_demo.m: Updated. 
+
+	* demos/qarts_demo2.m: Updated.
+
+	* demos/qarts_demo.m: Updated and expanded. general.arts is now not
+	used, to provide a more extensive example. 
+
+	* arts/qarts.m: Removed fields: RTE_AGENDA and WSMS_AFTER_RTE.
+	New fields: IY_CLEARSKY_AGENDA, YCALC_WSMS. Header text improved.
+
+	* arts/qarts2cfile.m: Updated to work with yCalc. Now no WSM calls
+	are added by default, beside saving. 
+ 
+	* sensors/auramls_read_l2gp.m: Corrected header text.
+
 2009-10-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-84

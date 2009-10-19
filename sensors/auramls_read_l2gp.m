@@ -1,30 +1,30 @@
 %------------------------------------------------------------------------
-% NAME:     auramls_mls_l2gp
+% NAME:     auramls_read_l2gp
 %
 %           Read L2GP hdf5-eos data from EOS-MLS. For info about
 %           the MLS data see the Level 2 data and quality description
 %           document available from the MLS web site at
 %                 http://mls.jpl.nasa.gov   
 %
-% FORMAT:   P = auramls_mls_l2gp( filename )
+% FORMAT:   P = auramls_read_l2gp( filename )
 %
 % IN:       filename    full path to MLS L2GP file
 %
 % OUT:      P           L2GP structure. These fields are returned, with 
 %                       example on size:
-%                                L2GPVALUE: [3494x29 double]
-%                            L2GPPRECISION: [3494x29 double]
-%                                  QUALITY: [1x3494 double]
-%                                   STATUS: [1x3494 double]
-%                                 LATITUDE: [1x3494 double]
-%                                LONGITUDE: [1x3494 double]
-%                              CHUNKNUMBER: [1x3494 double]
-%                                     TIME: [1x3494 double]
-%                           LOCALSOLARTIME: [1x3494 double]
-%                         SOLARZENITHANGLE: [1x3494 double]
-%                       ORBITGEODETICANGLE: [1x3494 double]
-%                         LINEOFSIGHTANGLE: [1x3494 double]
-%                                 PRESSURE: [1x29 double]
+%                             L2GPVALUE: [47x3495 double]
+%                         L2GPPRECISION: [47x3495 double]
+%                               QUALITY: [3495x1 double]
+%                                STATUS: [3495x1 double]
+%                              LATITUDE: [3495x1 double]
+%                             LONGITUDE: [3495x1 double]
+%                           CHUNKNUMBER: [3495x1 double]
+%                                  TIME: [3495x1 double]
+%                        LOCALSOLARTIME: [3495x1 double]
+%                      SOLARZENITHANGLE: [3495x1 double]
+%                    ORBITGEODETICANGLE: [3495x1 double]
+%                      LINEOFSIGHTANGLE: [3495x1 double]
+%                              PRESSURE: [47x1 double]
 %------------------------------------------------------------------------
 
 % HISTORY: 2004.08.01  Created by Carlos Jimenez

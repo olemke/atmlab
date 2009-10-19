@@ -100,6 +100,9 @@ Q                  = qarts_abstable( Q );
 
 %= Set RTE variables
 %
+Q.WSMS_BEFORE_RTE    = { 'atm_checkedCalc' };
+Q.YCALC_WSMS         = { 'yCalc' };
+%
 Q.PPATH_LMAX        = 5e3;
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
 Q.Y_UNIT            = 'RJBT';
@@ -172,7 +175,7 @@ if do_mc
   Q.RAW_ATM_EXPAND_1D             = 1;
   Q.LAT_GRID                      = -15:5:15;
   Q.LON_GRID                      = -15:5:15;
-  %
+  %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 3 );
   Q.SENSOR_POS(:,2)               = -23;
   Q.SENSOR_POS(:,3)               = 0;
@@ -191,7 +194,9 @@ if do_mc
 
   %- MC variables
   C.METHOD                        = 'MC';
-  % 
+  %
+  Q.IY_CLEARSKY_AGENDA            = { 'iyMC' };    
+  %
   C.METHOD_PRMTRS.STD_ERR         = mc_err;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
   C.METHOD_PRMTRS.MAX_ITER        = -1;

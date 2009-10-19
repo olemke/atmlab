@@ -22,7 +22,9 @@
 %       BatchC
 %
 %    The later options, including 'Save', adds commands to save main
-%    variables for the part.
+%    variables for the part. These save commands are the only WSM calls that
+%    are added automaticlly to the control file, everything else must be
+%    specified by the qarts fields or be handled by include control files.
 %
 %    For fields that can be given both as a Matlab variable or name of a 
 %    file, a file is generated automatically if the input a variable.
@@ -37,8 +39,12 @@
 %      'GetAtmSrf'  : To obtain variables defining the atmosphere and the 
 %                     surface.
 %      'GetAbsTable': To obtain an absorption table.
+%      'GetSensor'  : To obtain a sensor response matrix.
 %      'y':         : A complete calcultion, possibly including sensor,
 %                     scattering and jacobians.
+%      'y_init':    : Sets up for calculation following the 'y' option, but
+%                     no radiative transfer calculations performed.
+%      'batc'       : Batch calculations.
 %
 %    In most of these cases there is a function to directly perform the
 %    calculations, named as arts_"runtype", for example arts_y.
@@ -471,6 +477,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
+      T = add_agenda( T, 'abs_scalar_gas_agenda', { 'abs_scalar_gasCalcLBL' } );
+      %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
       if qarts_isset( Q.ABS_P )
@@ -560,7 +568,6 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
   end
-  %T = add_agenda( T, 'jacobian_y_agenda', {'RteCalcNoJacobian'} );  
   if qarts_isset( Q.PPATH_LMAX )
     T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
   end  
@@ -574,9 +581,6 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.REFR_INDEX_AGENDA )
     T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
   end
-  if qarts_isset( Q.RTE_AGENDA )
-    T = add_agenda( T, 'rte_agenda', Q.RTE_AGENDA );
-  end
   if qarts_isset( Q.SENSOR_POS )
     T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS,...
                                                                   workfolder );
@@ -584,6 +588,9 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.SENSOR_LOS )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
                                                                   workfolder );
+  end
+  if qarts_isset( Q.IY_CLEARSKY_AGENDA )
+    T = add_agenda( T, 'iy_clearsky_agenda', Q.IY_CLEARSKY_AGENDA );
   end
   %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );
@@ -595,7 +602,7 @@ return
 
 % Sub-function handling:
 %
-%    y
+%    y and associated variables
 %    jacobian
 %
 function T = cfile_RteExe( Q, partname, workfolder )
@@ -604,17 +611,18 @@ function T = cfile_RteExe( Q, partname, workfolder )
     error( 'Only recognised choice is ''RteExe''.' );
   end
   %
-  [T,do_mc] = add_rtecalc(Q);
-   
-  T{end+1} = add_savefile( 'y',     workfolder );
-  T{end+1} = add_savefile( 'y_f',   workfolder );
-  T{end+1} = add_savefile( 'y_pol', workfolder );
-  T{end+1} = add_savefile( 'y_pos', workfolder );
-  T{end+1} = add_savefile( 'y_los', workfolder );
-  %
-  if do_mc
-    T{end+1} = add_savefile( 'mc_error', workfolder ); 
+  T = add_rtecalcstart( Q );
+  %   
+  if qarts_isset( Q.YCALC_WSMS )
+    T = add_wsms( T, 'YCALC_WSMS', Q.YCALC_WSMS );
   end
+  %
+  T{end+1} = add_savefile( 'y',       workfolder );
+  T{end+1} = add_savefile( 'y_error', workfolder );
+  T{end+1} = add_savefile( 'y_f',     workfolder );
+  T{end+1} = add_savefile( 'y_pol',   workfolder );
+  T{end+1} = add_savefile( 'y_pos',   workfolder );
+  T{end+1} = add_savefile( 'y_los',   workfolder );
   %
   if qarts_isset( Q.J_DO )  &  Q.J_DO
     T{end+1} = add_savefile( 'jacobian', workfolder );
@@ -667,7 +675,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                              Q.SENSOR_RESPONSE_AA, workfolder );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_POL )
-      T{end+1} = file_or_data( 'sensor_response_pol', 'Index', ...
+      T{end+1} = file_or_data( 'sensor_response_pol', 'ArrayOfIndex', ...
                                             Q.SENSOR_RESPONSE_POL, workfolder );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_F_GRID )
@@ -683,7 +691,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                      Q.SENSOR_RESPONSE_AA_GRID, workfolder );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_POL_GRID )
-      T{end+1} = file_or_data( 'sensor_response_pol_grid', 'Index', ...
+      T{end+1} = file_or_data( 'sensor_response_pol_grid', 'ArrayOfIndex', ...
                                      Q.SENSOR_RESPONSE_POL_GRID, workfolder );
     end
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
@@ -983,8 +991,6 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     
     if length(T) > 1
       T{end+1} = 'jacobianClose';    
-    else
-      T{1} = 'jacobianOff';          
     end
   end  % do_parts
   
@@ -1413,24 +1419,10 @@ function T = add_includes( T, name, field );
 return
 
 
-function [T,do_mc] = add_rtecalc( Q )
-  %
+function T = add_rtecalcstart( Q )
+
   T = {};
-  %
-  if qarts_isset( Q.Y_UNIT )
-    if ischar(Q.Y_UNIT)
-      T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
-    else
-      error( 'Q.Y_UNIT must either be a char.');
-    end  
-  end
 
-  if qarts_isset( Q. WSMS_BEFORE_RTE )
-    T = add_wsms( T, ' WSMS_BEFORE_RTE', Q. WSMS_BEFORE_RTE );
-  end
-
-  do_mc = 0;
-    
   %----------
   %- MC 
   %----------
@@ -1438,8 +1430,6 @@ function [T,do_mc] = add_rtecalc( Q )
                                         strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
     %
     % Some checks of Q.CLOUDBOX performed already in cfile_CldBox
-    %
-    do_mc = 1;
     %
     if ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR' )  |  ...
        ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME' )  |  ...
@@ -1464,30 +1454,28 @@ function [T,do_mc] = add_rtecalc( Q )
                                        Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
     T{end+1} = sprintf( 'IndexSet(mc_z_field_is_1D,%d)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-    %
-    T{end+1} = 'RteCalcMC';
-
-    
-  %----------
-  %- Non-MC 
-  %----------
-  else
-    %  
-    if qarts_isset( Q.J_DO )  &  Q.J_DO
-      % Existence of field UNIT made as part of cfile_Jacobi
-      rqre_char( 'Qarts field J.UNIT', Q.J.UNIT );
-      T{end+1} = sprintf( 'StringSet(jacobian_unit,"%s")', Q.J.UNIT );
-      %
-      T{end+1} = 'RteCalc';
-      T{end+1} = 'jacobianCalc';
+  end
+  
+  if qarts_isset( Q.Y_UNIT )
+    if ischar(Q.Y_UNIT)
+      T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
     else
-      T{end+1} = 'RteCalcNoJacobian';
+      error( 'Q.Y_UNIT must be a character string.');
+    end  
+  end
+
+  if qarts_isset( Q.J_DO )  &  Q.J_DO
+    if qarts_isset( Q.J.UNIT )
+      if ischar(Q.J.UNIT)
+        T{end+1} = sprintf( 'StringSet(jacobian_unit,"%s")', Q.J.UNIT );
+      else  
+        error( 'Q.J.UNIT must be a character string.');
+      end  
     end
   end
 
-  if qarts_isset( Q. WSMS_AFTER_RTE )
-    T = add_wsms( T, ' WSMS_BEFORE_RTE', Q. WSMS_AFTER_RTE );
+  if qarts_isset( Q.WSMS_BEFORE_RTE )
+    T = add_wsms( T, 'WSMS_BEFORE_RTE', Q.WSMS_BEFORE_RTE );
   end
-
 return  
 %------------------------------------------------------------------------------

@@ -10,7 +10,7 @@
 %       ydata        Data to determine frequency, position and LOS for each 
 %                    value of *y*. A structure with fields: 
 %                    'f', 'pol', 'pos' and 'los', corresponding to *y_f* etc.
-%       dy           Estimate of calculation accuracy.
+%       dy           Estimate of calculation accuracy (see *y_error*).
 %       J            Jacobian. NaN returned if Q.J not defined.
 %       jq           Jacobian quantities. NaN returned if Q.J not defined.
 %       ji           Jacobian indices. NaN returned if Q.J not defined.
@@ -50,7 +50,8 @@ ji = NaN;
 
 
 
-if Q.CLOUDBOX_DO  & strcmp(upper(Q.CLOUDBOX.METHOD),'MC')
+if qarts_isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO  &  ...
+                                        strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
   mc = 1;
 else
   mc = 0;
@@ -99,10 +100,11 @@ if nargout >= 2
   ydata.pol = xmlLoad( fullfile( workfolder, 'y_pol.xml' ) );
   ydata.pos = xmlLoad( fullfile( workfolder, 'y_pos.xml' ) );
   ydata.los = xmlLoad( fullfile( workfolder, 'y_los.xml' ) );
-  %
-  if mc
-    dy = xmlLoad( fullfile( workfolder, 'mc_error.xml' ) );
-  end
+end
+
+
+if nargout >= 3
+  dy = xmlLoad( fullfile( workfolder, 'y_error.xml' ) );
 end
 
 

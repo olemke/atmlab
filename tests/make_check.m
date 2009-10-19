@@ -22,7 +22,7 @@ atmlab( 'FMODEL_VERBOSITY', 0 );
 
 %= Qarts
 %
-y0 = [ 4.11 27.92 ];  % Selected to fit all of three first tests
+y0 = [ 4.115 27.94 ];  % Selected to fit all of three first tests
 dy = 1e-2;
 %
 try
@@ -73,11 +73,11 @@ end
 
 %= Qarts with DOIT
 %
-y0 = [ 152.47 -0.21 ];
+y0 = [ 152.52 -0.21 ];
 dy = 1e-2;
 %
 try
-  [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo;
+  [Q,f,ztan,y_c,y] = qarts_scattering_demo;
 catch
   reset_verbosity( va, vf );
   fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');
@@ -96,7 +96,7 @@ end
 y0 = [ 150.3 -0.1 ];
 %
 try
-  [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo([],1);
+  [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( [], 1 );
 catch
   reset_verbosity( va, vf );
   fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');

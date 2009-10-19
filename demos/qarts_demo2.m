@@ -1,6 +1,7 @@
-% QARTS_DEMO   A demonstration of Qarts
+% QARTS_DEMO2   A demonstration of Qarts
 %
-%    A more advanced example on usage of Qarts (compared to *qarts_demo*).
+%    As *qarts_demo*, but with more advanced calculation options where primarily
+%    pre-calculation of asorption and sensor characteristics is exemplified.
 %
 % FORMAT   [Q,f,y] = qarts_demo2( [ ztan, atmdim ] )
 %        
@@ -33,14 +34,11 @@ Q  = qarts;
 
 %= Overall settings
 %
-Q.CLOUDBOX_DO       = 0;
-Q.J_DO              = 0;
-%
 Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
                         fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
 
 
-%= General part
+%= Basic stuff
 %
 Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
 Q.STOKES_DIM        = 1;
@@ -83,6 +81,7 @@ Q.R_GEOID        = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE      = 500;
 
 
+
 %= Load atmospheric and surface variables
 %
 % This step is here unnecessary. It is just a demonstration for how a 1D
@@ -92,6 +91,7 @@ Q.Z_SURFACE      = 500;
 Q.USE_RAW_ATMOSPHERE = 0;
 %
 [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD,Q.R_GEOID,Q.Z_SURFACE] = arts_atmfields( Q );
+
 
 
 %= Absorption
@@ -119,28 +119,30 @@ Q.ABSORPTION       = 'LoadTable';
 % Sensor reponse is here pre-calculated. Considerations around
 % loading/saving are identical to absorption, commented above.
 %
-if 1
+if 1                  % Commit only with 1 here, to make *make_check* to work
   Q.SENSOR_DO = 0;
 else
-H                 = qartsSensor;
-%
-Q.MBLOCK_ZA_GRID  = [-0.04:0.02:0.04];
-H.ANTENNA_LOS     = 0;
-H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
-%
-Q.SENSOR_DO       = 1;
-Q.SENSOR_RESPONSE = H;
-%
-% Pre-calculation not yet activated as reading of sparse matrices appear 
-% not to work.
-%
-%Q.OUTPUT_FILE_FORMAT = 'ascii';  % Temporary solution until reading of
-%                                 % binary sparse works.
-Q = arts_sensor( Q );
+  H                  = qartsSensor;
+  %
+  H.SENSOR_NORM      = 1;
+  %
+  Q.ANTENNA_DIM      = 1;
+  Q.MBLOCK_ZA_GRID   = [-0.04:0.02:0.04];
+  H.ANTENNA_LOS      = 0;
+  H.ANTENNA_RESPONSE = fullfile( atmlab_example_data, 'antenna.xml' );
+  %
+  Q.SENSOR_DO        = 1;
+  Q.SENSOR_RESPONSE  = H;
+  %
+  % Calculate:
+  Q = arts_sensor( Q );
 end
 
 
 %= Set RTE variables (refraction is here neglected)
+%
+Q.WSMS_BEFORE_RTE    = { 'FlagOff(iy_aux_do)', 'atm_checkedCalc' };
+Q.YCALC_WSMS         = { 'yCalc' };
 %
 Q.PPATH_LMAX        = 20e3;
 Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
