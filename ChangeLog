@@ -1,3 +1,9 @@
+2009-10-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-87
+
+	* handy/hostname.m: EOL character was included in returned string. 
+
 2009-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-86

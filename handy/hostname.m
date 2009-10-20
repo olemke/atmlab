@@ -11,3 +11,5 @@ function hname = hostname
 
 
 [st,hname] = system( 'hostname' );
+
+hname = hname(1:end-1);
