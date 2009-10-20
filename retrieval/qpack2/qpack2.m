@@ -301,6 +301,13 @@ I.TNOISE_C = [ ...
 'uncorrelated between the channels.'
 ];
 %-----------------------------------------------------------------------------
+P.YCALC_WSMS = { 'atm_checkedCalc', 'yCalc' }; 
+I.YCALC_WSMS = [ ...
+'Identical to the qarts field with the same name. It should be noted that ', ...
+'the Qpack2 does not have the field matching qarts''s WSMS_BEFORE_RTE and ',...
+'all WSMs calls must be put into this field for Qpack2.'
+];
+%-----------------------------------------------------------------------------
 P.Y_UNIT = {}; 
 I.Y_UNIT = [ ...
 'Identical to the qarts field with the same name.', ...
@@ -545,9 +552,11 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
     
   %- Surface and atmosphere
   %
-  A.Z_SURFACE            = mandatory_qfield( Q, 'SURFACE_Z' );;
+  A.Z_SURFACE            = mandatory_qfield( Q, 'SURFACE_Z' );
 
   %- RT variables
+  %
+  A.YCALC_WSMS           = mandatory_qfield( Q, 'YCALC_WSMS' );
   %
   A.PPATH_LMAX           = 200;
   A.PPATH_STEP_AGENDA    = { 'ppath_stepGeometric' };

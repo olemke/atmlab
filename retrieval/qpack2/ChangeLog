@@ -1,4 +1,12 @@
+2009-10-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.pre7
+
+	* qpack2.m: Added field YCALC_WSMS (with defualt value).
+
 2009-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.pre6
 
 	* qpack2.m: Corrected header.
 
