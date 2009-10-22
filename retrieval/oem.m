@@ -255,6 +255,8 @@ end
   if O.sxnorm
     xnorm = sqrt( diag( Sx ) );
     Sx    = Sx ./ (xnorm*xnorm');
+  else
+    xnorm = NaN;
   end
   
   if nargin < 7  |  isempty(Sxinv)  |  O.sxnorm
@@ -388,8 +390,8 @@ end
     %
     % If not already done, calculate cost for previous iteration
     if iter > 1  &  O.cost  &  isnan( cost )
-      [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, x, xf, Sxinv, O );      
-      nlinprint( O.outfids, iter-1, NaN, cost, cost_x, cost_y, dx );
+      [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );  
+      nlinprint( O.outfids, iter-1, subiter, cost, cost_x, cost_y, dx );
       X.cost(iter-1)   = cost;
       X.cost_y(iter-1) = cost_y;
       X.cost_x(iter-1) = cost_x;
@@ -435,36 +437,19 @@ end
         xnew = x + xstep;
       end
      
-      %- yf and cost values not valid for xnew (the NaNs used as flags)
+      %- Flag that yf and cost values are not valid for xnew
       %
-      yf = NaN;
+      yf     = NaN;
       cost   = NaN;
       cost_x = NaN;
       cost_y = NaN;
 
-      if 0
-        a        = xnew - xa;
-        if O.sxnorm
-          a = a ./ xnorm;
-        end
-        cost_x   = (a' * Sxinv * a) / ny;  
-        a        = y - yf;
-        cost_y   = (a' * Seinv * a) / ny; 
-        cost     = cost_x + cost_y;
-        if O.cost 
-          X.cost   = [ X.cost cost ];
-          X.cost_y = [ X.cost_y cost_y ];
-          X.cost_x = [ X.cost_x cost_x ];
-        end
-      end
-
       %- Has OK state been found?
+      %
       if O.linear  |  strcmp( O.imethod, 'GN' )
         xfound = 1;
       else
         % ML stuff here
-        %[R,yf] = feval( comfun, Q, R, xnew, iter+1 );
-        %[cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, x, xf, Sxinv, O );
       end
 
       if ~xfound
@@ -501,10 +486,6 @@ end
       end
     end
 
-    if ~O.linear | O.cost
-      nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
-    end
-
     %- Update x
     %
     x = xnew;
@@ -520,7 +501,7 @@ end
 
 
 
-%=== Inversion characteristics ================================================
+%=== Update inversion characteristics =========================================
 
   %- Update J?
   %
@@ -548,8 +529,18 @@ end
     A = G * J;
   end
 
+  if O.cost  &  isnan( cost )
+    if isnan(yf)
+      [R,yf] = feval( comfun, Q, R, x, iter+1 );
+    end
+    [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );  
+    nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
+    X.cost(iter-1)   = cost;
+    X.cost_y(iter-1) = cost_y;
+    X.cost_x(iter-1) = cost_x;
+  end
   
-  %- Fill P
+%=== Fill P ===================================================================
 
   X.x = x;
   
@@ -668,11 +659,13 @@ end
   
 %=== calc_cost ================================================================
   %
-  function [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, x, xf, Sxinv, O );
-    a        = xnew - xa;
+  function [cost,cost_y,cost_x] = ...
+                              calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm )
+    a        = x - xa;
     if O.sxnorm
       a = a ./ xnorm;
     end
+    ny       = length( y );
     cost_x   = (a' * Sxinv * a) / ny;  
     a        = y - yf;
     cost_y   = (a' * Seinv * a) / ny; 

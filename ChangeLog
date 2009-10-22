@@ -1,5 +1,12 @@
 2009-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-89
+
+	* retrieval/oem.m: Printing of cost values delayed to next iteration,
+	when possible, to obtain fewer calls of arts.
+
+2009-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-88
 
 	* arts/arts_polybasis_func.m (arts_polybasis_func): Created.
