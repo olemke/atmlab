@@ -229,6 +229,7 @@ end
       O.imethod = 'GN';  
     elseif strcmp( upper(O.imethod), 'ML' )  |  strcmp( upper(O.imethod), 'LM' )
       O.imethod = 'ML';
+      O.cost    = 1;    % Notdefault value here !!!
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
@@ -303,7 +304,7 @@ end
   %
   only_char = nargin < 8;
 
-  %- Retrieval variables
+  %- Retrieval and iteration variables
   %
   if nargin >= 9
     x    = xa;
@@ -312,31 +313,15 @@ end
   end
   yf     = NaN;
   G      = NaN;
-
-  %- Iteration variables
+  cost   = NaN;
+  cost_x = NaN;
+  cost_y = NaN;
+  %
+  nx         = size( Sx, 1 );
+  ny         = size( Se, 1 );
   %
   ready      = 0;           % Iteration ready?
   iter       = 0;           % Iteration number
-  nx         = size( Sx, 1 );
-  ny         = size( Se, 1 );
-  cost       = NaN;
-  cost_x     = NaN;
-  cost_y     = NaN;
-
-  %- P structure
-  %
-  X.converged = NaN;
-  if O.dx
-    X.dx      = [];
-  end
-  if O.Xiter
-    X.Xiter   = [];
-  end
-  if O.cost 
-    X.cost_x = [];
-    X.cost_y = [];
-    X.cost   = [];
-  end
 
   %- Print initial screen message
   %
@@ -364,6 +349,22 @@ end
     nlinprint( O.outfids );
   end
 
+  %- P structure
+  %
+  X.converged = NaN;
+  if O.dx
+    X.dx      = [];
+  end
+  if O.Xiter
+    X.Xiter   = [];
+  end
+  if O.cost 
+    X.cost_x = [];
+    X.cost_y = [];
+    X.cost   = [];
+  end
+
+  
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -383,6 +384,15 @@ end
     %
     if O.sxnorm
       J = J .* repmat( xnorm', ny , 1 );
+    end
+    %
+    % If not already done, calculate cost for previous iteration
+    if iter > 1  &  O.cost  &  isnan( cost )
+      [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, x, xf, Sxinv, O );      
+      nlinprint( O.outfids, iter-1, NaN, cost, cost_x, cost_y, dx );
+      X.cost(iter-1)   = cost;
+      X.cost_y(iter-1) = cost_y;
+      X.cost_x(iter-1) = cost_x;
     end
     
     %- Some matrix products
@@ -425,12 +435,14 @@ end
         xnew = x + xstep;
       end
      
-      %- yf not valid for xnew
+      %- yf and cost values not valid for xnew (the NaNs used as flags)
+      %
       yf = NaN;
+      cost   = NaN;
+      cost_x = NaN;
+      cost_y = NaN;
 
-      %- Cost values
-      if O.cost  |  strcmp( O.imethod, 'ML' )
-        [R,yf]   = feval( comfun, Q, R, xnew, iter+1 );
+      if 0
         a        = xnew - xa;
         if O.sxnorm
           a = a ./ xnorm;
@@ -451,6 +463,8 @@ end
         xfound = 1;
       else
         % ML stuff here
+        %[R,yf] = feval( comfun, Q, R, xnew, iter+1 );
+        %[cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, x, xf, Sxinv, O );
       end
 
       if ~xfound
@@ -494,9 +508,9 @@ end
     %- Update x
     %
     x = xnew;
-
+    %
     if O.Xiter
-      X.Xiter   = [ X.Xiter x ];
+      X.Xiter(:,iter) = x;
     end
 
   end
@@ -534,6 +548,7 @@ end
     A = G * J;
   end
 
+  
   %- Fill P
 
   X.x = x;
@@ -635,6 +650,7 @@ end
 %= Internal sub-functions =====================================================
 
 %=== nlinprint ================================================================
+  %
   function nlinprint(outfids,iter,subiter,cost,xcost,ycost,dx)
     if nargin == 1
      out( 2,'     Main      Sub-     Total   Profile  Spectrum  Converg.', ...
@@ -646,4 +662,22 @@ end
                                            cost, xcost, ycost, dx ), outfids );
     end
   return
+  %
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  
+%=== calc_cost ================================================================
+  %
+  function [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, x, xf, Sxinv, O );
+    a        = xnew - xa;
+    if O.sxnorm
+      a = a ./ xnorm;
+    end
+    cost_x   = (a' * Sxinv * a) / ny;  
+    a        = y - yf;
+    cost_y   = (a' * Seinv * a) / ny; 
+    cost     = cost_x + cost_y;
+  return
+  %
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  

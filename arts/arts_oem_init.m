@@ -163,6 +163,13 @@ return
 
 function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
+  %- Check special cases
+  %
+  if Q.J.FREQUENCY.DO  &  ~isstruct( Q.SENSOR_RESPONSE )
+    error( ['When any frequency fit is performed (Q.J.FREQUENCY.DO=1), ',...
+           'Q.SENSOR_RESPONSE must follow qartsSensor (i.e. be a structure).'] )
+  end
+  
   %- Copy some data to R
   %
   % This is done here to possible save time; the data are forced to files below
@@ -245,6 +252,16 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
   %- Sensor
   %
+  if Q.J.FREQUENCY.DO
+    R.SENSOR_RESPONSE = Q.SENSOR_RESPONSE;
+    %
+    if Q.J.FREQUENCY.ORDER > 0  &  1e3 < max(abs(R.SENSOR_RESPONSE.F_BACKEND-...
+           qarts_get( fullfile( R.workfolder, 'sensor_response_f_grid.xml')) ) )
+      error(['A frequency stretch retrieval demands that ', ...
+      'R.SENSOR_RESPONSE.F_BACKEND and Q.SENSOR_RESPONSE_F_GRID are identical']);
+    end
+  end
+  %
   Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
   Q.SENSOR_RESPONSE_F   = fullfile( R.workfolder, 'sensor_response_f.xml' );
   Q.SENSOR_RESPONSE_ZA  = fullfile( R.workfolder, 'sensor_response_za.xml' );
@@ -258,10 +275,8 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
                        fullfile( R.workfolder, 'sensor_response_aa_grid.xml' );
   Q.SENSOR_RESPONSE_POL_GRID = ...
                        fullfile( R.workfolder, 'sensor_response_pol_grid.xml' );
-  Q.ANTENNA_DIM         = fullfile( R.workfolder, 'antenna_dim.xml' );
   Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
   Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
-
 return
 
 

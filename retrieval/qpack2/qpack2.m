@@ -360,18 +360,11 @@ Q = loadQ( Q );
 empty_y = checkY( Q, Y );
 
 
-%- Create a work folder
-%
-workfolder = create_tmpfolder;
-
-
 %- Set up fixed part of A and Sx
 %
 % Q of qarts is here denoted A
 %
-% This step includes calculation of sensor response data
-%
-[A,Sx,O] = createAandSxandO( Q, workfolder );
+[A,Sx,O] = createAandSxandO( Q );
 
 
 %- Inverse of Sx
@@ -397,6 +390,10 @@ end
 
 P = [];
   
+if empty_y
+  workfolder = create_tmpfolder;
+end
+
 for m = 1 : length(Y)
   
   %- Set up data for next measurement
@@ -443,7 +440,9 @@ end
 
 %- Remove work folder
 %
-delete_tmpfolder( workfolder );
+if empty_y
+  delete_tmpfolder( workfolder );
+end
 
 %- Sort fields of P
 %
@@ -511,8 +510,8 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
     O.stop_dx   = mandatory_qfield( Q, 'OEM_STOP_DX', 'OEM_LINEAR' );
     O.maxiter   = mandatory_qfield( Q, 'OEM_MAXITER', 'OEM_LINEAR' );
   end
-  O.yf        = mandatory_qfield( Q, 'OUT_Y' );
-                mandatory_qfield( Q, 'OUT_A' );
+  O.yf          = mandatory_qfield( Q, 'OUT_Y' );
+                  mandatory_qfield( Q, 'OUT_A' );
   %
   % Hard-coded settings
   %
@@ -533,7 +532,8 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   A.USE_RAW_ATMOSPHERE   = 0;
   A.CLOUDBOX_DO          = 0;
   %
-  A.ABSORPTION           = 'OnTheFly';
+  A.ABSORPTION           = 'CalcTable';
+  A.ABS_NLS              = [];
   A.ABS_LINESHAPE        = 'Voigt_Kuntz6';
   A.ABS_LINESHAPE_CUTOFF = -1;
   A.ABS_LINESHAPE_FACTOR = 'quadratic'; 
@@ -628,7 +628,6 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   S.BEAM_SWITCHING = Q.BEAM_SWITCHING;
   %
   A.SENSOR_RESPONSE = S;
-  A = arts_sensor( A, workfolder );
   
   % Frequency
   %

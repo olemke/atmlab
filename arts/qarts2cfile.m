@@ -252,7 +252,7 @@ function T = cfile_Generl( Q, partname, workfolder )
   end
   %  
   if qarts_isset( Q.F_GRID )
-    T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder );
+    T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder, 1 );
   end
   %
   if qarts_isset( Q.ABS_SPECIES )
@@ -317,7 +317,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end
   %
   if qarts_isset( Q.P_GRID )
-    T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder );
+    T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder, 1 );
   end
   %
   if qarts_isset( Q.LAT_GRID )
@@ -457,7 +457,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
           if strcmp(upper(Q.ABS_LINES_FORMAT),'ARTS') & ~ischar(Q.ABS_LINES)
             filename = fullfile( workfolder, 'abs_lines.xml' );
             T{end+1} = file_or_data( 'abs_lines', 'ArrayOfLineRecord', ...
-                                                      Q.ABS_LINES,workfolder );
+                                                      Q.ABS_LINES, workfolder );
           else
             if ~ischar( Q.ABS_LINES )
               error( 'Q.ABS_LINES must be a filename for formats beside Arts.' );
@@ -482,14 +482,14 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
       if qarts_isset( Q.ABS_P )
-        T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, workfolder );
+        T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, workfolder, 1 );
       end
       if qarts_isset( Q.ABS_T )
         T{end+1} = file_or_data( 'abs_t', 'Vector', Q.ABS_T, workfolder );
       end
       if qarts_isset( Q.ABS_T_PERT )
       T{end+1} = file_or_data( 'abs_t_pert', 'Vector', Q.ABS_T_PERT, ...
-                                                                  workfolder );
+                                                                   workfolder );
       end
       if qarts_isset( Q.ABS_VMRS )
         T{end+1} = file_or_data( 'abs_vmrs', 'Matrix', Q.ABS_VMRS, ...
@@ -664,7 +664,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     end
     if qarts_isset( Q.SENSOR_RESPONSE_F )
       T{end+1} = file_or_data( 'sensor_response_f', 'Vector', ...
-                                              Q.SENSOR_RESPONSE_F, workfolder );
+                                           Q.SENSOR_RESPONSE_F, workfolder, 1 );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_ZA )
       T{end+1} = file_or_data( 'sensor_response_za', 'Vector', ...
@@ -680,7 +680,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     end
     if qarts_isset( Q.SENSOR_RESPONSE_F_GRID )
       T{end+1} = file_or_data( 'sensor_response_f_grid', 'Vector', ...
-                                     Q.SENSOR_RESPONSE_F_GRID, workfolder );
+                                      Q.SENSOR_RESPONSE_F_GRID, workfolder, 1 );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_ZA_GRID )
       T{end+1} = file_or_data( 'sensor_response_za_grid', 'Vector', ...
@@ -796,7 +796,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
           
       case 'mixer'
         if qarts_isset( H.LO ) 
-          U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder );
+          U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder, 1 );
         end
         if qarts_isset( H.SIDEBAND_RESPONSE )           
           U{end+1} = file_or_data( 'sideband_response', 'GriddedField1', ...
@@ -807,17 +807,17 @@ function T = cfile_Sensor( Q, partname, workfolder )
       case 'backend'
         if qarts_isset( H.F_BACKEND ) 
           U{end+1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, ...
-                                                                   workfolder );
+                                                                workfolder, 1 );
         end        
         if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
           U{end+1} = file_or_data( 'backend_channel_response', ....
-               'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder );
+            'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder, 1 );
         end
         U{end+1} = 'sensor_responseBackend';
         
       case 'multimixer'
         if qarts_isset( H.LO ) 
-          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder );
+          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, 1 );
         end
         if qarts_isset( H.SIDEBAND_RESPONSE )           
           U{end+1} = file_or_data( 'sideband_response_multi', ...
@@ -825,7 +825,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
         end   
         if qarts_isset( H.F_BACKEND ) 
           U{end+1} = file_or_data( 'f_backend_multi', 'ArrayOfVector', ...
-                                                      H.F_BACKEND, workfolder );
+                                                   H.F_BACKEND, workfolder, 1 );
         end        
         if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
           U{end+1} = file_or_data( 'backend_channel_response_multi', ....
@@ -917,15 +917,15 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         name1 = sprintf( 'gas%d_jac_p_grid', i );
         T{end+1} = create_var( name1, 'Vector' );
         T{end+1} = file_or_data( name1, 'Vector', Q.J.ABS_SPECIES(i).GRID1, ...
-                                                            workfolder, name1 );
+                                                         workfolder, 0, name1 );
         name2 = sprintf( 'gas%d_jac_lat_grid', i );
         T{end+1} = create_var( name2, 'Vector' );
         T{end+1} = file_or_data( name2, 'Vector', Q.J.ABS_SPECIES(i).GRID2, ...
-                                                            workfolder, name2 );
+                                                         workfolder, 0, name2 );
         name3 = sprintf( 'gas%d_jac_lon_grid', i );
         T{end+1} = create_var( name3, 'Vector' );
         T{end+1} = file_or_data( name3, 'Vector', Q.J.ABS_SPECIES(i).GRID3, ...
-                                                            workfolder, name3 );
+                                                         workfolder, 0, name3 );
 
         T{end+1} = 'jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,'; 
         T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
@@ -955,9 +955,8 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         error('Q.J.FREQUENCY.ORDER must be 0 or 1.');
       end
       T{end+1} = 'jacobianAddFreqShiftAndStretch(jacobian_quantities,';
-      T{end+1} =  '   jacobian_agenda, ';
-      T{end+1} = sprintf( '   %.3e, %d )', Q.J.FREQUENCY.DF, ...
-                                           Q.J.FREQUENCY.ORDER == 1 );
+      T{end+1} =  sprintf('   jacobian_agenda, "iybinterp", %.3e, %d )', ...
+                                   Q.J.FREQUENCY.DF, Q.J.FREQUENCY.ORDER == 1 );
     end
 
   %- Pointing
@@ -1310,7 +1309,7 @@ function T = cfile_BatchC( Q, partname, workfolder )
     batchname = sprintf( '%s_%d', lower(batchtype), vn );
     
     T{end+1} = file_or_data( batchname, batchtype, Q.BATCH.DATA(i).X, ...
-                             workfolder, sprintf('%s_batch.xml',mainname) );
+                              workfolder, 0, sprintf('%s_batch.xml',mainname) );
     A{end+1} = sprintf( '%sExtractFrom%s(%s,%s,ybatch_index)', ...
                         Q.BATCH.DATA(i).TYPE, ...
                         batchtype, ...
@@ -1345,16 +1344,21 @@ function s = create_var(artsvar,datatype)
 return
 
 
-function s = file_or_data(artsvar,datatype,qvalue,workfolder,nonDefFileId)
+function s = file_or_data(artsvar,datatype,qvalue,workfolder,dprecision,...
+                                                                  nonDefFileId)
   if ischar( qvalue )
     s = add_readfile( artsvar, qvalue );
   else
-    if nargin >= 5
+    if nargin > 5
       filename = fullfile( workfolder, [nonDefFileId,'.xml'] );
     else
       filename = fullfile( workfolder, [artsvar,'.xml'] );
     end
-    xmlStore( filename, qvalue, datatype );
+    if nargin > 4  &  dprecision
+      xmlStore( filename, qvalue, datatype, 'DOUBLE' );
+    else
+      xmlStore( filename, qvalue, datatype, 'FLOAT' );
+    end
     s = add_readfile( artsvar, filename );
   end
 return

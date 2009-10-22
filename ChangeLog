@@ -1,3 +1,20 @@
+2009-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-88
+
+	* arts/arts_polybasis_func.m (arts_polybasis_func): Created.
+
+	* arts/arts_sensor.m: No reading done if nargout=0. 
+
+	* arts/qarts2cfile.m: Double precision now used for variables 
+	involing frequency or pressure.
+
+	* arts/arts_oem_init.m: Some changes to handle frequency fits. 
+
+	* arts/arts_oem.m (arts_oem): Added handling of frequency fits.
+
+	* retrieval/oem.m (oem): Started on rearrengements. Not ready.
+
 2009-10-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-87

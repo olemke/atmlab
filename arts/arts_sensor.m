@@ -83,7 +83,8 @@ catch
 end
 
 
-
+if nargout
+  
 if folder_created  |  do_load
   Q.SENSOR_RESPONSE = ...
                  xmlLoad( fullfile( workfolder, 'sensor_response.xml' ) );
@@ -128,6 +129,7 @@ else
   Q.MBLOCK_AA_GRID      = fullfile( workfolder, 'mblock_aa_grid.xml' );
 end
 
+end
 
 if folder_created
   delete_tmpfolder( workfolder );  

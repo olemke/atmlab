@@ -141,9 +141,21 @@ if iter > 1
   
       case 'Frequency'   %------------------------------------------------------
         %
-        warning( 'x2arts for frequency not implemeted' )
-        keyboard
-       
+        % Shift part
+        df = x(ind(1));
+        %
+        % Stretch part
+        if length( ind ) > 1
+          df = df + x(ind(2)) * ...
+                          arts_polybasis_func( R.SENSOR_RESPONSE.F_BACKEND, 1 );
+        end     
+        %
+        % Update sensor reponse
+        Q.SENSOR_RESPONSE           = R.SENSOR_RESPONSE;
+        Q.SENSOR_RESPONSE.F_BACKEND = Q.SENSOR_RESPONSE.F_BACKEND + df;
+        %
+        arts_sensor( Q, R.workfolder );
+        
       case 'Polynomial baseline fit'   %----------------------------------------
         %       
         if ~j_loaded

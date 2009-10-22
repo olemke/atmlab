@@ -1,3 +1,9 @@
+2009-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.pre8
+
+	* qpack2.m: The CalcTable option now used for ABSORPTION. 
+
 2009-10-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.pre7
