@@ -535,9 +535,9 @@ end
     end
     [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );  
     nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
-    X.cost(iter-1)   = cost;
-    X.cost_y(iter-1) = cost_y;
-    X.cost_x(iter-1) = cost_x;
+    X.cost(iter)   = cost;
+    X.cost_y(iter) = cost_y;
+    X.cost_x(iter) = cost_x;
   end
   
 %=== Fill P ===================================================================

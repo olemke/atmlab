@@ -412,6 +412,8 @@ for m = 1 : length(Y)
     %
     fprintf( 'Simulating spectrum %d/%d\n', m, length(Y) );
     %
+    A = qarts_abstable( A );
+    % 
     P(m).Y = arts_y( A, workfolder );
   
     
@@ -793,7 +795,7 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
                               Ythis.HOUR, Ythis.MINUTE, Ythis.SECOND );
   %
   A.Z_FIELD = pt2z( A.P_GRID, A.T_FIELD, h2o, Ythis.HSE_P, Ythis.HSE_Z, ...
-                                                              Ythis.LATITUDE );
+                                                              Ythis.LATITUDE );  
 return
 
 
@@ -861,9 +863,6 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
 
   % Retrieval quantities
   %
-  ispecies = 0;
-  tdone    = 0;
-  %
   for q = 1 : length(R.jq)
 
     unitfac = 1;
@@ -873,7 +872,7 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
     
     if strcmp( R.jq{q}.maintag, 'Absorption species' )
       %------------------------------------------------------------------------
-      ispecies = ispecies + 1;
+      ispecies = q;
       s        = sprintf( 'species%d', ispecies );
       include  = 1;
       %
