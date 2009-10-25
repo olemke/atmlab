@@ -255,11 +255,12 @@ end
   if O.sxnorm
     xnorm = sqrt( diag( Sx ) );
     Sx    = Sx ./ (xnorm*xnorm');
+    Sxinv = [];
   else
     xnorm = NaN;
   end
   
-  if nargin < 7  |  isempty(Sxinv)  |  O.sxnorm
+  if nargin < 7  |  isempty(Sxinv)
     Sxinv = Sx \ speye(size(Sx));
   end
   %
@@ -421,7 +422,11 @@ end
       if iter == 1
         wdy = JtSeinv * ( y - yf );
       else
-        wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
+        if O.sxnorm 
+          wdy = JtSeinv * ( y - yf ) - Sxinv * ( ( x - xa ) ./ xnorm );
+        else
+          wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
+        end
       end
        
       %- New x state
@@ -468,7 +473,13 @@ end
       % (Equation 5.31 in the Rodgers book was tested here but it didn't work
       % well for some cases)
       %
-      dx = ( ( xnew - x )' * SJSJ * ( xnew - x ) ) / nx;
+      dd = xnew - x;
+      %
+      if O.sxnorm 
+        dd = dd ./ xnorm;
+      end
+      %
+      dx = ( dd' * SJSJ * dd ) / nx;
       %
       if dx <= O.stop_dx
         ready       = 1;
@@ -478,7 +489,7 @@ end
       end
       %
       if O.dx
-        X.dx = [ X.dx dx ];
+        X.dx(iter) = dx;
       end
       %
       if iter == O.maxiter
@@ -661,14 +672,14 @@ end
   %
   function [cost,cost_y,cost_x] = ...
                               calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm )
-    a        = x - xa;
+    dd       = x - xa;
     if O.sxnorm
-      a = a ./ xnorm;
+      dd = dd ./ xnorm;
     end
     ny       = length( y );
-    cost_x   = (a' * Sxinv * a) / ny;  
-    a        = y - yf;
-    cost_y   = (a' * Seinv * a) / ny; 
+    cost_x   = (dd' * Sxinv * dd) / ny;  
+    dd       = y - yf;
+    cost_y   = (dd' * Seinv * dd) / ny; 
     cost     = cost_x + cost_y;
   return
   %

@@ -76,31 +76,41 @@ Q.POLYFIT_ORDER       = 5;
 Q.POLYFIT_SI          = [1 0.5 0.2 0.1 0.05 0.05]; 
 
   
+%- FREQUENCY
+%
+Q.FFIT_DO             = 1;
+Q.FFIT_ORDER          = 0;
+Q.FFIT_SI             = [50e3]; 
+Q.FFIT_DF             = 50e3; 
+%
+Q.OUT_F               = 1;
+
+
 %- Species
 %
 % Only water vapour is retrieved here
 %
 species = 'H2O';
 %
-Q.SPECIES(1).TAG{1}   = species;
-Q.SPECIES(1).RETRIEVE = 1;
-Q.SPECIES(1).GRID     = z2p_simple(Q.PLATFORM_Z-1e3:2e3:105e3);
+Q.SPECIES(1).TAG{1}{1} = species;
+Q.SPECIES(1).RETRIEVE  = 1;
+Q.SPECIES(1).GRID      = z2p_simple(Q.PLATFORM_Z-1e3:2e3:105e3);
 %
-if 1 % To allow simple switch to test retrievals in "rel unit" 
-  Q.SPECIES(1).UNIT   = 'vmr';
-  Q.SPECIES(1).SX     = covmat1d_from_cfun( Q.SPECIES(1).GRID, 1.5e-6, ...
-                                                'lin', 0.2, 0.00, @log10 ) + ...
-                        covmat1d_from_cfun( Q.SPECIES(1).GRID, 0.3e-6, ...
-                                                'lin', 0.5, 0.00, @log10 );
+if 1 % To allow simple  switch to test retrievals in "rel unit" 
+  Q.SPECIES(1).UNIT    = 'vmr';
+  Q.SPECIES(1).SX      = covmat1d_from_cfun( Q.SPECIES(1).GRID, 1.5e-6, ...
+                                                 'lin', 0.2, 0.00, @log10 ) + ...
+                         covmat1d_from_cfun( Q.SPECIES(1).GRID, 0.3e-6, ...
+                                                 'lin', 0.5, 0.00, @log10 );
 else
-  Q.SPECIES(1).UNIT   = 'rel';
-  Q.SPECIES(1).SX     = covmat1d_from_cfun( Q.SPECIES(1).GRID, 0.5, 'lin', ...
-                                                       0.2, 0.00, @log10 ) + ...
-                        covmat1d_from_cfun( Q.SPECIES(1).GRID, 0.1, 'lin', ...
-                                                       0.5, 0.00, @log10 );
+  Q.SPECIES(1).UNIT    = 'rel';
+  Q.SPECIES(1).SX      = covmat1d_from_cfun( Q.SPECIES(1).GRID, 0.5, 'lin', ...
+                                                        0.2, 0.00, @log10 ) + ...
+                         covmat1d_from_cfun( Q.SPECIES(1).GRID, 0.1, 'lin', ...
+                                                        0.5, 0.00, @log10 );
 end
 %
-Q.SPECIES(1).ATMDATA  = loadvar( fullfile( atmdata, 'mls_h2omean' ), 'G' );
+Q.SPECIES(1).ATMDATA   = loadvar( fullfile( atmdata, 'mls_h2omean' ), 'G' );
 
 % Other examples/possibilities for water vapour a priori:
 %

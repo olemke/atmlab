@@ -590,12 +590,12 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
                                                                int2str(i) ] );
       end
       %
-      A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}}, 0, 1, [], [], ...
+      A = qarts_abs_species( A, Q.SPECIES(i).TAG{1}, 0, 1, [], [], ...
                              {Q.SPECIES(i).GRID}, Q.SPECIES(i).UNIT );
       Sx = covmat_append( Sx, Q.SPECIES(i).SX );
       pvalues = [ pvalues grid ];
     else
-      A = qarts_abs_species( A, {Q.SPECIES(i).TAG{:}} );
+      A = qarts_abs_species( A, Q.SPECIES(i).TAG{1} );
     end
   end
   
@@ -863,6 +863,8 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
 
   % Retrieval quantities
   %
+  i_asj   = find( [ A.J.ABS_SPECIES.DO ] );  % Index of retrieval absorption
+  %
   for q = 1 : length(R.jq)
 
     unitfac = 1;
@@ -872,7 +874,7 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
     
     if strcmp( R.jq{q}.maintag, 'Absorption species' )
       %------------------------------------------------------------------------
-      ispecies = q;
+      ispecies = i_asj(q);
       s        = sprintf( 'species%d', ispecies );
       include  = 1;
       %

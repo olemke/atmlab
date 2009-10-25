@@ -57,6 +57,12 @@ elseif iscell( a )
     %
     for j = 1 : length( a{i} )
       %
+      if any( a{i}{j} == ',' )
+        error( sprintf( ['Tag definitions like ''H2O,H2O-MPM89'' are not ',...
+          'allowed in qarts. Type help arts_tgs_cnvrt and see TGS{3} for ',...
+          'the correct way to input such a case. Incorrect choice here ',...
+          'is: %s'], a{i}{j} ) );
+      end
       b = [ b, a{i}{j} ];
       if j < length( a{i} )
         b = [ b, ',' ];
