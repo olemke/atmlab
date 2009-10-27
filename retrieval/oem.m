@@ -5,6 +5,14 @@
 %    See "Inverse methods for atmospheric sounding: Theory and practice"
 %    by C.D. Rodgers for background and theory.
 %
+%    The Marquardt-Levenberg method is implemented following Eq. 5.36 of Rodgers'
+%    book. The gamma factor, here denoted as ga, is not allowed to exceed
+%    O.ga_max. When a succesful iteration has been performed, ga is decreased
+%    following O.ga_factor_ok. For cases when a lower cost is not obtained, ga is
+%    increased by O.ga_factor_not_ok. Values of ga below 1 will be treated as
+%    zero. If not a lower cost is obtained for ga=0, then ga=1 is tested. 
+%    O.ga_start is used as start value for ga.
+%
 %    The OEM calculations are controlled by the structure O. The fields of O,
 %    and associated descriptions, are lsited by
 %       qinfo(@oem)
@@ -111,6 +119,33 @@ I.G = [ ...
 'Flag to include gain matrix in X (alse denoted as Dy).'
 ];
 %-----------------------------------------------------------------------------
+O.ga_factor_not_ok = 3;
+I.ga_factor_not_ok = [ ...
+'The factor with which the Marquardt-Levenberg factor is increased when not ',...
+'a lower cost value is obtained. This starts a new sub-teration. This value ',...
+'must be > 1.'    
+];
+%-----------------------------------------------------------------------------
+O.ga_factor_ok = 2;
+I.ga_factor_ok = [ ...
+'The factor with which the Marquardt-Levenberg factor is decreased after a ',...
+'lower cost values has been reached. This value must be > 1.'    
+];
+%-----------------------------------------------------------------------------
+O.ga_max = 100;
+I.ga_max = [ ...
+'Maximum value for gamma factor for the Marquardt-Levenberg method. The ',...
+'stops if this value is reached and cost value is still not decreased. ',...'
+'This value must be > 0.'
+];
+%-----------------------------------------------------------------------------
+O.ga_start = 4;
+I.ga_start = [ ...
+'Start value for gamma factor for the Marquardt-Levenberg method. Type:',...
+'#   help oem',...
+'#for a definition of the gamma factor. This value must be >= 0.'
+];
+%-----------------------------------------------------------------------------
 O.imethod = 'ML';
 I.imethod = [ ...
 'Iteration method. Choices are ''GN'' for Gauss-Newton and ''ML'' or',...
@@ -126,6 +161,16 @@ O.jexact = 0;
 I.jexact = [ ...
 'Flag to select recalculation of J after last iteration. If not set to 1, ',...
 'J will correspond to x before last iteration.'
+];
+%-----------------------------------------------------------------------------
+O.jfast = 0;
+I.jfast = [ ...
+'Flag to always calculate the Jacobian in parallel to the spectrum. This ',...
+'field is only used for the Marquardt-Levenberg case. This option can save ',...
+'time if the calculation of the Jacobian is very fast and the convergence ',...
+'is smooth (few cases where ga has to be increased). The advanatge of this ',...
+'option is that the next iteration can be started without a call of the ',...
+'forward model.'
 ];
 %-----------------------------------------------------------------------------
 O.linear = 0;
@@ -221,6 +266,8 @@ end
   rqre_bool( 'O.linear', O.linear );
   rqre_datatype( { 'empty', 'vector'}, O.outfids );
   %
+  doing_ml = 0;
+  %
   if ~O.linear
     rqre_char( 'O.imethod', O.imethod );
     rqre_scalar( 'O.maxiter', O.maxiter, 0 );
@@ -229,7 +276,21 @@ end
       O.imethod = 'GN';  
     elseif strcmp( upper(O.imethod), 'ML' )  |  strcmp( upper(O.imethod), 'LM' )
       O.imethod = 'ML';
-      O.cost    = 1;    % Notdefault value here !!!
+      O.cost    = 1;  % Note default value here, cost must anyhow be calculated
+      doing_ml  = 1;
+      %
+      if O.ga_start < 0
+        error( 'O.ga_start must be >= 0.' );
+      end
+      if O.ga_max <= 1
+        error( 'O.ga_max must be > 1.' );
+      end
+      if O.ga_factor_ok <= 1
+        error( 'O.ga_factor_ok must be > 1.' );
+      end
+      if O.ga_factor_not_ok <= 1
+        error( 'O.ga_factor_not_ok must be > 1.' );
+      end
     else
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
@@ -325,7 +386,14 @@ end
   %
   ready      = 0;           % Iteration ready?
   iter       = 0;           % Iteration number
-
+  j_updated  = 0;
+  %
+  if doing_ml
+    ga       = O.ga_start;  % ML gamma factor
+  else
+    ga       = NaN; 
+  end
+  
   %- Print initial screen message
   %
   if out(2) | ~isempty( O.msg )
@@ -375,6 +443,8 @@ end
 
 %=== Iterate ==================================================================
 
+if ~only_char
+  
   while ~ready
 
     %- This starts a new iteration
@@ -383,90 +453,131 @@ end
 
     %- Calculate new Jacobian (J)   
     %
-    [R,yf,J] = feval( comfun, Q, R, x, iter );
+    if ~j_updated 
+      [R,yf,J]  = feval( comfun, Q, R, x, iter );
+      j_updated = 1;
+    end
     %
     if O.sxnorm
       J = J .* repmat( xnorm', ny , 1 );
     end
+
+    %- Cost values
     %
-    % If not already done, calculate cost for previous iteration
-    if iter > 1  &  O.cost  &  isnan( cost )
+    % For methods beside ML, there is no need to calculate the cost value to
+    % to check if new state is OK. So it is more efficient then to calculate
+    % the cost when spectrum and jacobian are recalculated for next iteration.
+    %
+    if ( iter==1  &  doing_ml )  |  ...
+       ( iter >1  &  O.cost  &  isnan( cost ) )
       [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );  
-      nlinprint( O.outfids, iter-1, subiter, cost, cost_x, cost_y, dx );
+    end
+    %
+    if iter == 1  &  doing_ml
+      nlinprint( O.outfids, iter-1, NaN, cost, cost_x, cost_y, NaN );
+    elseif iter > 1
+      nlinprint( O.outfids, iter-1, ga, cost, cost_x, cost_y, dx );
       X.cost(iter-1)   = cost;
       X.cost_y(iter-1) = cost_y;
       X.cost_x(iter-1) = cost_x;
     end
+
+    %- gamma for ML
+    %
+    if iter > 1  &  ~isnan( ga )
+      if ga >= O.ga_factor_ok
+        ga = ga / O.ga_factor_ok;
+      else
+        ga = 0;
+      end
+    end
     
     %- Some matrix products
     %
-    JtSeinv = J' * Seinv;
-    SJSJ    = Sxinv + JtSeinv * J;
-
-    %- If only characterisation, we are ready
-    %
-    if only_char
-      ready = 1;
-      break;
+    JtSeinv  = J' * Seinv;
+    JtSeinvJ = JtSeinv * J;
+    
+    %- Weighted difference between y and yf
+    if iter == 1
+      wdy = JtSeinv * ( y - yf );
+    else
+      if O.sxnorm 
+        wdy = JtSeinv * ( y - yf ) - Sxinv * ( ( x - xa ) ./ xnorm );
+      else
+        wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
+      end
     end
-
+    
     %- Calculate new state
     %
-    xfound  = 0;
-    subiter = 1;
-    dx      = NaN;
+    cost0  = cost;
+    xfound = 0;
+    dx     = NaN;
     % 
     while ~xfound
 
-      %- Weighted difference between y and yf
-      if iter == 1
-        wdy = JtSeinv * ( y - yf );
+      %- New/try x state
+      %
+      if doing_ml  &  ga > 0
+        SJSJ    = (1+ga)*Sxinv + JtSeinvJ;      
       else
-        if O.sxnorm 
-          wdy = JtSeinv * ( y - yf ) - Sxinv * ( ( x - xa ) ./ xnorm );
-        else
-          wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
-        end
+        SJSJ    = Sxinv + JtSeinvJ;
       end
-       
-      %- New x state
-      if O.linear | strcmp( O.imethod, 'GN' )
-        xstep = SJSJ \ wdy; 
-      elseif strcmp( O.imethod, 'ML' )
-        error('ML not yet handled');
-      end
+      %
+      xstep = SJSJ \ wdy; 
       %
       if O.sxnorm 
         xnew = x + xnorm .* xstep;
       else
         xnew = x + xstep;
       end
-     
-      %- Flag that yf and cost values are not valid for xnew
-      %
-      yf     = NaN;
-      cost   = NaN;
-      cost_x = NaN;
-      cost_y = NaN;
-
+      
       %- Has OK state been found?
-      %
       if O.linear  |  strcmp( O.imethod, 'GN' )
+        %
         xfound = 1;
-      else
-        % ML stuff here
+        %
+      else  % ML
+        %
+        if O.jfast
+          [R,yf,J]  = feval( comfun, Q, R, xtry, iter+1 );
+          j_updated   = 1; 
+        else
+          [R,yf] = feval( comfun, Q, R, xtry, iter+1 );
+        end
+        %
+        [cost,cost_y,cost_x] = ...
+                             calc_cost( y, yf, Seinv, xa, xnew, Sxinv, O, xnorm );
+        if cost < cost_old
+          xfound = 1;
+        else
+          nlinprint( O.outfids, -99, ga, cost, cost_x, cost_y, NaN );
+          if ga < 1
+            ga = 1;
+          else
+            if ga < O.ga_max
+              ga = ga * O.ga_factor_not_ok;
+              if ga > O.ga_max
+                ga = O.ga_max;
+              end
+            else
+              brake;    % New x could not be found !!!
+            end
+          end
+        end
       end
-
-      if ~xfound
-        nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
-      end
+    
     end  % while ~xfound
 
-
+    %- Ready if linear or ML failed
+    if ~xfound  |  O.linear
+      ready = 1;
+    
+    %-Convergence reached  
+    else
     %- Convergence or max iterations reached ?
     %
     if O.linear
-      x     = xnew;
       ready = 1;
     else
       %
@@ -492,7 +603,10 @@ end
         X.dx(iter) = dx;
       end
       %
-      if iter == O.maxiter
+      if doing_ml  &  ga >= O.ga_max
+        xnew  = x;    % Iteration was not succesful
+        ready = 1;
+      elseif iter == O.maxiter
         ready = 1;
       end
     end
@@ -506,7 +620,7 @@ end
     end
 
   end
-
+end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -516,7 +630,7 @@ end
 
   %- Update J?
   %
-  if O.jexact  &  ~only_char 
+  if O.jexact  &  ~j_updated
     [R,yf,J] = feval( comfun, Q, R, x, iter+1 );
     %
     if O.sxnorm
@@ -545,11 +659,11 @@ end
       [R,yf] = feval( comfun, Q, R, x, iter+1 );
     end
     [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );  
-    nlinprint( O.outfids, iter, subiter, cost, cost_x, cost_y, dx );
-    X.cost(iter)   = cost;
-    X.cost_y(iter) = cost_y;
-    X.cost_x(iter) = cost_x;
   end
+  nlinprint( O.outfids, iter, ga, cost, cost_x, cost_y, dx );
+  X.cost(iter)   = cost;
+  X.cost_y(iter) = cost_y;
+  X.cost_x(iter) = cost_x;
   
 %=== Fill P ===================================================================
 
@@ -623,7 +737,7 @@ end
       X.es = full( sqrt( diag( Ss ) ) );
     end
   end  
-    
+
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -653,14 +767,14 @@ end
 
 %=== nlinprint ================================================================
   %
-  function nlinprint(outfids,iter,subiter,cost,xcost,ycost,dx)
+  function nlinprint(outfids,iter,ga,cost,xcost,ycost,dx)
     if nargin == 1
-     out( 2,'     Main      Sub-     Total   Profile  Spectrum  Converg.', ...
+     out( 2,'    Main    Gamma       Total   Profile   Spectrum    Converg.', ...
                                                                      outfids );
-     out( 2,'  iterat.   iterat.      cost      cost      cost   measure', ...
+     out( 2,' iterat.   factor        cost      cost       cost     measure', ...
                                                                      outfids );
     else
-     out( 2, sprintf('%8d  %8d  %8.2f  %8.2f  %8.2f  %8.2f', iter, subiter, ...
+     out( 2, sprintf('%8d%9d%12.3f%10.2f%11.2f%12.2f', iter, ga, ...
                                            cost, xcost, ycost, dx ), outfids );
     end
   return
@@ -684,4 +798,3 @@ end
   return
   %
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  

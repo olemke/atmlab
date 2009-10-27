@@ -174,6 +174,30 @@ I.OEM_LINEAR = [ ...
 '#For more details: help oem',
 ];
 %-----------------------------------------------------------------------------
+P.OEM_GA_FACTOR_NOT_OK = {};
+I.OEM_GA_FACTOR_NOT_OK = [ ...
+'Matches the field ga_factor_not_ok of the O structure used as input to oem.m.',...
+'#For more details: help oem',
+];
+%-----------------------------------------------------------------------------
+P.OEM_GA_FACTOR_OK = {};
+I.OEM_GA_FACTOR_OK = [ ...
+'Matches the field ga_factor_ok of the O structure used as input to oem.m.',...
+'#For more details: help oem',
+];
+%-----------------------------------------------------------------------------
+P.OEM_GA_MAX = {};
+I.OEM_GA_MAX = [ ...
+'Matches the field ga_max of the O structure used as input to oem.m.',...
+'#For more details: help oem',
+];
+%-----------------------------------------------------------------------------
+P.OEM_GA_START = {};
+I.OEM_GA_START = [ ...
+'Matches the field ga_start of the O structure used as input to oem.m.', ...
+'#For more details: help oem',
+];
+%-----------------------------------------------------------------------------
 P.OEM_MAXITER = {};
 I.OEM_MAXITER = [ ...
 'Matches the field maxiter of the O structure used as input to oem.m. ', ...
@@ -394,7 +418,9 @@ if empty_y
   workfolder = create_tmpfolder;
 end
 
-for m = 1 : length(Y)
+ny = length(Y);
+
+for m = 1 : ny
   
   %- Set up data for next measurement
   %
@@ -410,7 +436,7 @@ for m = 1 : length(Y)
       P(m) = Y(m);
     end
     %
-    fprintf( 'Simulating spectrum %d/%d\n', m, length(Y) );
+    fprintf( 'Simulating spectrum %d/%d\n', m, ny );
     %
     A = qarts_abstable( A );
     % 
@@ -425,7 +451,9 @@ for m = 1 : length(Y)
 
     %- Perform retrieval
     %
-    O.msg = sprintf( 'Inversion case %d (of %d)', m, length(Y) );
+    if ny > 1
+      O.msg = sprintf( 'Inversion case %d (of %d)', m, ny );
+    end
     %
     [Aoem,R,xa] = arts_oem_init( A );
     [X,R]       = oem( O, Aoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.Y );
@@ -508,9 +536,15 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   % User settings
   O.linear    = mandatory_qfield( Q, 'OEM_LINEAR' );
   if ~O.linear
-    O.imethod   = mandatory_qfield( Q, 'OEM_IMETHOD', 'OEM_LINEAR' );
-    O.stop_dx   = mandatory_qfield( Q, 'OEM_STOP_DX', 'OEM_LINEAR' );
-    O.maxiter   = mandatory_qfield( Q, 'OEM_MAXITER', 'OEM_LINEAR' );
+    O.imethod   = mandatory_qfield( Q, 'OEM_IMETHOD', 'non-linear OEM' );
+    O.stop_dx   = mandatory_qfield( Q, 'OEM_STOP_DX', 'non-linear OEM' );
+    O.maxiter   = mandatory_qfield( Q, 'OEM_MAXITER', 'non-linear OEM' );
+    if strcmp( upper(O.imethod), 'ML' )  |  strcmp( upper(O.imethod), 'LM' )
+      O.ga_start         = mandatory_qfield( Q, 'OEM_GA_START', 'OEM ML' );
+      O.ga_factor_ok     = mandatory_qfield( Q, 'OEM_GA_FACTOR_OK', 'OEM ML' );
+      O.ga_factor_not_ok = mandatory_qfield( Q, 'OEM_GA_FACTOR_NOT_OK', 'OEM ML' );
+      O.ga_max           = mandatory_qfield( Q, 'OEM_GA_MAX', 'OEM ML' );
+    end
   end
   O.yf          = mandatory_qfield( Q, 'OUT_Y' );
                   mandatory_qfield( Q, 'OUT_A' );
