@@ -1,3 +1,12 @@
+2009-10-27  Mathias Milz  <mathias.milz@ltu.se>
+
+	* atmlab-0-3-93
+
+	* handy/sphdist.m:
+	
+	added function sphdist.m. It calclates the distance between to 
+	points with given latitudes longitudes on a spheroid.
+
 2009-10-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-92
