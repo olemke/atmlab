@@ -261,10 +261,6 @@ ans =
 The following fields are always provided:
 
 \newfield 
-\verb|converged|:\\
-Convergence flag. See further \verb|oem.m|.
-
-\newfield 
 \verb|cost|, \verb|cost_x| and \verb|cost_y|:\\
 Cost values of retrieved state and fit to measurement. See further \verb|oem.m|.
 
@@ -283,6 +279,21 @@ Mean of assumed thermal noise. This is simple average, no weighting
 with channel widths is applied. This value has no direct physical
 meaning, but can be used as a mean to e.g. remove the most noisy
 measurements (without having \verb|Y| at hand).
+
+
+
+\subsubsection{For non-linear inversions}
+%
+The following fields are also provided for non-linear inversions:
+
+\newfield 
+\verb|converged|:\\
+Convergence flag. See further \verb|oem.m|.
+
+\newfield 
+\verb|dx|:\\
+Change in the state vector x between each iteration. See further \verb|oem.m|.
+
 
 
 \subsubsection{With Q.OUT\_Y  true}

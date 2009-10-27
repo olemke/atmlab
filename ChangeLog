@@ -1,3 +1,15 @@
+2009-10-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-94
+
+	* retrieval/oem.m: Rearranged large part of the function. Now each
+	approach (linear, GN and ML) has largely its own code. This to
+	make the code more efficient and clearer.
+
+	* physics/parametrisations/latslons2distance.m: Removed. Same
+	basic functionality as sphdist. Removed as less general and less
+	straightforward calculations.
+
 2009-10-27  Mathias Milz  <mathias.milz@ltu.se>
 
 	* atmlab-0-3-93

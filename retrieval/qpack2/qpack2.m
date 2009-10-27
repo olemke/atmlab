@@ -552,6 +552,7 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   % Hard-coded settings
   %
   O.cost      = 1;
+  O.dx        = 1;
   O.e         = 1;
   O.eo        = 1;
   O.es        = 1;
@@ -866,8 +867,9 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
   %
   P(i).tnoise = mean( Ythis.TNOISE );
   %
-  if Q.OEM_LINEAR 
+  if ~Q.OEM_LINEAR 
     P(i).converged = X.converged;
+    P(i).dx        = X.dx;
   end 
   %  
   if Q.OUT_A

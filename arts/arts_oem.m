@@ -39,16 +39,17 @@
 %       sensor_los:
 %       ...
 %
-% FORMAT   [R,y,J] = arts_oem( Q, R, x, iter )
+% FORMAT   [R,y,J] = arts_oem( Q, R, x, istate )
 %        
-% OUT   R     Retrieval data structure. See above.
-%       y     Calculated measurement vector.
-%       J     Jacobian.
-% IN    Q     Qarts structure, as returned by *arts_oem_init*.
-%       R     Retrieval data structure. See above.
-%       x     State vector.
-%       iter  Iteration number. Iteration number 1 is treated as x = xa
-%             can be assumed.
+% OUT   R      Retrieval data structure. See above.
+%       y      Calculated measurement vector.
+%       J      Jacobian.
+% IN    Q      Qarts structure, as returned by *arts_oem_init*.
+%       R      Retrieval data structure. See above.
+%       x      State vector.
+%       iter   Iteration number. The case of x = xa is treated as iter=1. If 
+%              another initial linearisation point is used, iter must be set
+%              to >= 2.
 
 % 2006-09-07   First working version by Patrick Eriksson.
 
