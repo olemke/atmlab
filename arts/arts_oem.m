@@ -101,6 +101,8 @@ if iter > 1
   %                                          species.
   i_rel   = [];                              % Index for x-values retrieved in
   %                                          relative units.
+  i_log   = [];                              % Index for x-values retrieved in
+  %                                          log dimension.
   any_gas = false;                           % Any gas species among rq
   %
   bl      = 0;                               % Sum of all baseline terms
@@ -123,18 +125,29 @@ if iter > 1
         ig      = i_asj(i);    % Gas species index
         D       = [];
         %
-        if strcmp( R.jq{i}.mode, 'rel' )
+        xthis = x(ind);
+        runit = R.jq{i}.mode;
+        %
+        if strcmp( runit(1:3), 'log' )
+          xthis = exp( xthis );
+          i_log = [ i_log ind ];
+          runit = runit( 4 : end );
+        end
+        %
+        if strcmp( runit, 'rel' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-                                  R.jq{i}.grids, x(ind) .* R.x_vmr0(ind), ...
+                                   R.jq{i}.grids, xthis .* R.x_vmr0(ind), ...
                                              R.p_grid, R.lat_grid, R.lon_grid );
           i_rel = [ i_rel ind ];
-        elseif strcmp( R.jq{i}.mode, 'vmr' )
+        elseif strcmp( runit, 'vmr' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-                      R.jq{i}.grids, x(ind), R.p_grid, R.lat_grid, R.lon_grid );
-        else
+                      R.jq{i}.grids, xthis, R.p_grid, R.lat_grid, R.lon_grid );
+        elseif strcmp( runit, 'nd' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-                      R.jq{i}.grids, nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
+                       R.jq{i}.grids, nd2vmr(xthis,R.x_p(ind),R.x_t(ind)),...
                                              R.p_grid, R.lat_grid, R.lon_grid );
+        else
+          error(sprintf('Unknown absorption species unit: %s', R.jq{i}.mode ));
         end
         %
         R.vmr_field(ig,:,:,:) = arts_atminterp( Q.ATMOSPHERE_DIM, D, X, Q );
@@ -179,6 +192,9 @@ if iter > 1
     xmlStore( fullfile(R.workfolder,'vmr_field.xml'), R.vmr_field, 'Tensor4' );
   end
 
+else
+  i_rel = [];  % FIX !!!!!!!!!!!!!!!!!!!
+  i_log = [];
 end
 %------------------------------------------------------------------------------
 
@@ -218,10 +234,20 @@ if iter > 1
   %
 end
 
-%- Rescaling of jacobians in relative units
+%- Needed rescalings of jacobians:
+%    1. For relative unit parts we need to do J/x
+%    2. For log unit parts we need to do J*x
+%    Note that 1 and 2 cancel each other
 %
-if do_j  &  iter > 1  &  ~isempty( i_rel )
-  J(:,i_rel) =  J(:,i_rel) ./ repmat( x(i_rel)', size(J,1), 1 );
+if do_j  &  ( ~isempty( i_rel )  |  ~isempty( i_log ) )
+  if iter > 1  &  ~isempty( i_rel )
+    ind = setdiff( i_rel, i_log );
+    J(:,ind) =  J(:,ind) ./ repmat( x(ind)', size(J,1), 1 );
+  end
+  if ~isempty( i_log )
+    ind = setdiff( i_log, i_rel );
+    J(:,ind) =  J(:,ind) .* repmat( x(ind)', size(J,1), 1 );
+  end
 end
 
 %------------------------------------------------------------------------------

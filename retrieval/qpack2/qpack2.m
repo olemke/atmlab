@@ -302,7 +302,7 @@ I.SPECIES = [ ...
 'For more information: arts -d jacobianAddAbsSpecies', ...
 '#<GRID> Pressure retrieval grid for the species. A vector.',...
 '#<SX> Covariance matrix of a priori knowledge for the species. Size must ',...
-'match the grid field. A matrix. Can be sparse..'
+'match the grid field. A matrix. Can be sparse. Data shall match <UNIT>.'
 ];
 %-----------------------------------------------------------------------------
 P.SURFACE_Z = {};
@@ -905,6 +905,7 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
 
     unitfac = 1;
     include = 0;
+    do_log  = 0;
     ind     = I(q,1) : I(q,2);
     
     
@@ -913,8 +914,13 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
       ispecies = i_asj(q);
       s        = sprintf( 'species%d', ispecies );
       include  = 1;
+      runit    = A.J.ABS_SPECIES(q).UNIT;
       %
-      if strcmp( A.J.ABS_SPECIES(q).UNIT, 'rel' )
+      if strcmp( runit(1:3), 'log' )
+        do_log = 1;
+        runit = runit( 4 : end );
+      end
+      if strcmp( runit, 'rel' )
         unitfac = R.x_vmr0(ind);
       end
       %
@@ -942,11 +948,19 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
     end
 
     if include
-      P(i).([s,'_x'])  = unitfac .* X.x(ind);
-      P(i).([s,'_xa']) = unitfac .* xa(ind);
-      P(i).([s,'_e'])  = unitfac .* X.e(ind);
-      P(i).([s,'_eo']) = unitfac .* X.eo(ind);
-      P(i).([s,'_es']) = unitfac .* X.es(ind);
+      if ~do_log
+        P(i).([s,'_x'])  = unitfac .* X.x(ind);
+        P(i).([s,'_xa']) = unitfac .* xa(ind);
+        P(i).([s,'_e'])  = unitfac .* X.e(ind);
+        P(i).([s,'_eo']) = unitfac .* X.eo(ind);
+        P(i).([s,'_es']) = unitfac .* X.es(ind);
+      else
+        P(i).([s,'_x'])  = unitfac .* exp( X.x(ind) );
+        P(i).([s,'_xa']) = unitfac .* exp( xa(ind) );
+        P(i).([s,'_e'])  = unitfac .* exp( X.e(ind) );
+        P(i).([s,'_eo']) = unitfac .* exp( X.eo(ind) );
+        P(i).([s,'_es']) = unitfac .* exp( X.es(ind) );
+      end
       P(i).([s,'_mr']) = mresp(ind);
       if Q.OUT_A
         P(i).([s,'_A']) = As{q};

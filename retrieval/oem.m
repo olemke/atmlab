@@ -257,7 +257,7 @@ end
 
 
 %==============================================================================
-%=== Start of calculations
+%=== Start of calculation part
 %==============================================================================
 
 
@@ -365,6 +365,8 @@ end
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+  
   
   
 %=== Stuff common to all calculation options ==================================
@@ -379,9 +381,9 @@ end
     out( 3, 0, O.outfids );
   end
 
-  %- Init of X
+  %- Make sure that X is initialised as a structure
   %
-  X.converged = NaN;   % Expecyed output for the linear case
+  X.converged = NaN;   % Expected output for the linear case
 
   %- xa is used as initial linearisation point
   %
@@ -407,6 +409,8 @@ end
   
 
   
+  
+  
 %=== Only characterisation ====================================================
 
   if nargin < 8
@@ -416,14 +420,16 @@ end
 
   
   
+  
+  
 %=== Make inversion ===========================================================
 %  
   else
     
-    % The different cases are handled separately to avoid a lot of flags and
-    % control variables. Helps also to save memory and to make the calculations
-    % in most efficient way. The drawback is that more or less the same code is
-    % found at several places.
+    % The different cases are handled separately to avoid a lot of flags, if
+    % statements and control variables. Helps also to save memory and to make the
+    % calculations in most efficient way. The drawback is that more or less the
+    % same code is found at several places.
     
 
     
@@ -444,10 +450,10 @@ end
       %- Calculate cost, if requested output
       X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
       nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
-                                                   X.cost_y(iter), dx );
+                                                    X.cost_y(iter), dx );
 
       %- Some matrix products (also used in common part below)
-      JtSeinv  = J' * Seinv;
+      JtSeinv = J' * Seinv;
       SJSJ    = Sxinv + JtSeinv * J;
 
       %- Calculate x
@@ -459,7 +465,7 @@ end
         x = x + xstep;
       end
       %
-      iter = 2;
+      iter = iter + 1;      
       if O.Xiter
         X.Xiter(:,iter) = x;
       end
@@ -469,6 +475,8 @@ end
       j_updated = 0;
 
       % cost for last state is handled below in a common way
+        
+        
         
 
         
@@ -496,7 +504,7 @@ end
                                                       X.cost_y(iter), dx );
       
         %- Some matrix products (also used in common part below)
-        JtSeinv  = J' * Seinv;
+        JtSeinv = J' * Seinv;
         SJSJ    = Sxinv + JtSeinv * J;
 
         %- Weighted difference between y and yf
@@ -536,8 +544,12 @@ end
       yf        = NaN;
       j_updated = 0;
 
+      % cost for last state is handled below in a common way
       
       
+      
+
+        
     %=== ML iteration ========================================================
     %
     elseif strcmp( O.imethod, 'ML' )
@@ -550,8 +562,10 @@ end
       end
       
       %- Iteration
-      ga = O.ga_start;
-      converged = 0;
+      ga_treshold = 1;
+      ga          = O.ga_start;
+      converged   = 0;
+      first_iter  = 1;
       %
       while ~converged  &  iter <= O.maxiter
 
@@ -562,7 +576,7 @@ end
 
         %- If first iteration, cost is unknown.
         %- For later iterations, the gamma factor shall be decreased
-        if iter == 1
+        if first_iter
           [cost,cost_y,cost_x] = ...
                               calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );
           %
@@ -572,8 +586,9 @@ end
             X.cost_y(iter) = cost_y;
             X.cost_x(iter) = cost_x;
           end
+          first_iter = 0;
         else
-          if ga >= O.ga_factor_ok
+          if ga >= O.ga_factor_ok * ga_treshold;
             ga = ga / O.ga_factor_ok;
           else
             ga = 0;
@@ -631,7 +646,7 @@ end
           %
           if cost < cost_old
             xfound = 1;
-            iter = iter + 1;
+            iter   = iter + 1;
             if O.cost
               X.cost(iter)   = cost;
               X.cost_y(iter) = cost_y;
@@ -642,8 +657,8 @@ end
             end
           else
             nlinprint( O.outfids, -99, ga, cost, cost_x, cost_y, NaN );
-            if ga < 1
-              ga = 1;
+            if ga < ga_treshold
+              ga = ga_treshold;
             else
               if ga < O.ga_max
                 ga = ga * O.ga_factor_not_ok;
@@ -653,7 +668,6 @@ end
               else
                 X.converged = -1;
                 yf          = NaN;
-                j_updated   = 0;
                 brake;    % New x could not be found !!!
               end
             end   
@@ -669,291 +683,38 @@ end
         end
       end % while ~converged
       
+      %- J can not be used for error characterisation if ga > 0
+      %
+      if ga > 0
+        j_updated = 0;
+        J         = NaN;
+      end
+      
+      
+      
     else
       error( 'Unknown retrieval option.' );    
     end
-  end
+  end % of retrieval option part
 
-
-if 0
-
-%=== Initializations ==========================================================
-
-  %- Only inversion characterisation?
-  %
-  only_char = nargin < 8;
-
-
-  %- Retrieval and iteration variables
-  %
-  if nargin >= 9
-    x    = xa;
-  else
-    x    = NaN;
-  end
-  yf     = NaN;
-  G      = NaN;
-  cost   = NaN;
-  cost_x = NaN;
-  cost_y = NaN;
-  %
-  nx         = size( Sx, 1 );
-  ny         = size( Se, 1 );
-  %
-  ready      = 0;           % Iteration ready?
-  iter       = 0;           % Iteration number
-  j_updated  = 0;
-  %
-  if doing_ml
-    ga       = O.ga_start;  % ML gamma factor
-  else
-    ga       = NaN; 
-  end
-  
-  %- Print initial screen message
-  %
-  if out(2) | ~isempty( O.msg )
-    out( 1, 1, O.outfids );
-  end
-  if ~isempty( O.msg )
-    out( 1, O.msg, O.outfids );
-    out( 3, 0, O.outfids );
-  end
-  if O.linear
-    out( 3, 'Linear inversion', O.outfids );
-  else
-    if strcmp( upper(O.imethod), 'GN' )
-      out( 3, 'Non-linear inversion: Gauss-Newton', O.outfids );
-    elseif strcmp( upper(O.imethod), 'ML' )  
-      out( 3, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
-    else
-      error( ['Unknown choice for iteration method. ', ...
-                                 'Possible choices are ''GN'' and ''ML''.' ] );
-    end
-  end
-  if ~O.linear | O.cost
-    out( 3, 0, O.outfids );
-    nlinprint( O.outfids );
-  end
-
-  %- P structure
-  %
-  X.converged = NaN;
-  if O.dx
-    X.dx      = [];
-  end
-  if O.Xiter
-    X.Xiter   = [];
-  end
-  if O.cost 
-    X.cost_x = [];
-    X.cost_y = [];
-    X.cost   = [];
-  end
 
   
-%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-
-%=== Iterate ==================================================================
-
-if ~only_char
   
-  while ~ready
-
-    %- This starts a new iteration
-    %
-    iter = iter + 1;
-
-    %- Calculate new Jacobian (J)   
-    %
-    if ~j_updated 
-      [R,yf,J]  = feval( comfun, Q, R, x, iter );
-      j_updated = 1;
-    end
-    %
-    if O.sxnorm
-      J = J .* repmat( xnorm', ny , 1 );
-    end
-
-    %- Cost values
-    %
-    % For methods beside ML, there is no need to calculate the cost value to
-    % to check if new state is OK. So it is more efficient then to calculate
-    % the cost when spectrum and jacobian are recalculated for next iteration.
-    %
-    if ( iter==1  &  doing_ml )  |  ...
-       ( iter >1  &  O.cost  &  isnan( cost ) )
-      [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );  
-    end
-    %
-    if iter == 1  &  doing_ml
-      nlinprint( O.outfids, iter-1, NaN, cost, cost_x, cost_y, NaN );
-    elseif iter > 1
-      nlinprint( O.outfids, iter-1, ga, cost, cost_x, cost_y, dx );
-      X.cost(iter-1)   = cost;
-      X.cost_y(iter-1) = cost_y;
-      X.cost_x(iter-1) = cost_x;
-    end
-
-    %- gamma for ML
-    %
-    if iter > 1  &  ~isnan( ga )
-      if ga >= O.ga_factor_ok
-        ga = ga / O.ga_factor_ok;
-      else
-        ga = 0;
-      end
-    end
-    
-    %- Some matrix products
-    %
-    JtSeinv  = J' * Seinv;
-    JtSeinvJ = JtSeinv * J;
-    
-    %- Weighted difference between y and yf
-    if iter == 1
-      wdy = JtSeinv * ( y - yf );
-    else
-      if O.sxnorm 
-        wdy = JtSeinv * ( y - yf ) - Sxinv * ( ( x - xa ) ./ xnorm );
-      else
-        wdy = JtSeinv * ( y - yf ) - Sxinv * ( x - xa );
-      end
-    end
-    
-    %- Calculate new state
-    %
-    cost0  = cost;
-    xfound = 0;
-    dx     = NaN;
-    % 
-    while ~xfound
-
-      %- New/try x state
-      %
-      if doing_ml  &  ga > 0
-        SJSJ    = (1+ga)*Sxinv + JtSeinvJ;      
-      else
-        SJSJ    = Sxinv + JtSeinvJ;
-      end
-      %
-      xstep = SJSJ \ wdy; 
-      %
-      if O.sxnorm 
-        xnew = x + xnorm .* xstep;
-      else
-        xnew = x + xstep;
-      end
-      
-      %- Has OK state been found?
-      if O.linear  |  strcmp( O.imethod, 'GN' )
-        %
-        xfound = 1;
-        %
-      else  % ML
-        %
-        if O.jfast
-          [R,yf,J]  = feval( comfun, Q, R, xtry, iter+1 );
-          j_updated   = 1; 
-        else
-          [R,yf] = feval( comfun, Q, R, xtry, iter+1 );
-        end
-        %
-        [cost,cost_y,cost_x] = ...
-                            calc_cost( y, yf, Seinv, xa, xnew, Sxinv, O, xnorm );
-        if cost < cost_old
-          xfound = 1;
-        else
-          nlinprint( O.outfids, -99, ga, cost, cost_x, cost_y, NaN );
-          if ga < 1
-            ga = 1;
-          else
-            if ga < O.ga_max
-              ga = ga * O.ga_factor_not_ok;
-              if ga > O.ga_max
-                ga = O.ga_max;
-              end
-            else
-              brake;    % New x could not be found !!!
-            end
-          end
-        end
-      end
-    
-    end  % while ~xfound
-
-    %- Ready if linear or ML failed
-    if ~xfound  |  O.linear
-      ready = 1;
-    end  
-    %-Convergence reached  
-
-    %- Convergence or max iterations reached ?
-    %
-    if O.linear
-      ready = 1;
-    else
-      %
-      % (Equation 5.31 in the Rodgers book was tested here but it didn't work
-      % well for some cases)
-      %
-      dd = xnew - x;
-      %
-      if O.sxnorm 
-        dd = dd ./ xnorm;
-      end
-      %
-      dx = ( dd' * SJSJ * dd ) / nx;
-      %
-      if dx <= O.stop_dx
-        ready       = 1;
-        X.converged = 1;
-      else
-        X.converged = 0;
-      end
-      %
-      if O.dx
-        X.dx(iter) = dx;
-      end
-      %
-      if doing_ml  &  ga >= O.ga_max
-        xnew  = x;    % Iteration was not succesful
-        ready = 1;
-      elseif iter == O.maxiter
-        ready = 1;
-      end
-    end
-
-    %- Update x
-    %
-    x = xnew;
-    %
-    if O.Xiter
-      X.Xiter(:,iter) = x;
-    end
-
-  end
-end
-%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-end
-
 
 
 %=== Update/calculate basic inversion variables ===============================
 
   %- Update J?
   %
-  if O.jexact  &  ~j_updated
-    [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
-    %
-    JtSeinv  = J' * Seinv;
-    SJSJ     = Sxinv + JtSeinv * J;
+  if O.J | O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es
+    if isnan(J) |  ( O.jexact  &  ~j_updated )
+      [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
+      %
+      JtSeinv  = J' * Seinv;
+      SJSJ     = Sxinv + JtSeinv * J;
+    end
   end
-
+  
   %- Calculate G ?
   %
   if O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es
@@ -969,10 +730,14 @@ end
 
   
   
+  
+  
 %=== Fill X ===================================================================
 
   X.x = x;
 
+  % Cost and yf are not calculated for linear and GN
+    
   if O.cost  &  length(X.cost) < iter
     if isnan(yf)
       [R,yf] = feval( comfun, Q, R, x, iter );
@@ -984,7 +749,7 @@ end
 
   if O.yf
     if isnan(yf)
-      [R,yf] = feval( comfun, Q, R, x, iter+1 );
+      [R,yf] = feval( comfun, Q, R, x, iter );
     end
     %
     X.yf = yf;
@@ -1055,7 +820,6 @@ end
 
 
 
-
 %=== End of main part =========================================================
   
   %= End screen meassages 
@@ -1088,6 +852,7 @@ end
      out( 2,'Iteration   factor        cost      cost       cost     measure',...
                                                                      outfids );
     else
+     if iter == 1, ga = NaN; end
      out( 2, sprintf('%9d%9d%12.3f%10.2f%11.2f%12.2f', iter, ga, ...
                                            cost, xcost, ycost, dx ), outfids );
     end
