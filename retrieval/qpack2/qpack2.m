@@ -298,7 +298,8 @@ I.SPECIES = [ ...
 '#<RETRIEVED> If set to 0 the species is not retrieved. Otherwise the ', ...
 'species is retrieved.', ...
 '#If *RETRIEVED*, the following the fields must be set:', ...
-'#<UNIT> Retrieval unit. Allowed choices are ''rel'', ''vmr'' or ''nd''. ', ...
+'#<UNIT> Retrieval unit. Allowed choices are ''rel'', ''vmr'', ''nd'', ', ...
+'#''logrel'', ''logvmr'' and ''lognd''. ', ...
 'For more information: arts -d jacobianAddAbsSpecies', ...
 '#<GRID> Pressure retrieval grid for the species. A vector.',...
 '#<SX> Covariance matrix of a priori knowledge for the species. Size must ',...
@@ -914,13 +915,11 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
       ispecies = i_asj(q);
       s        = sprintf( 'species%d', ispecies );
       include  = 1;
-      runit    = A.J.ABS_SPECIES(q).UNIT;
       %
-      if strcmp( runit(1:3), 'log' )
-        do_log = 1;
-        runit = runit( 4 : end );
-      end
-      if strcmp( runit, 'rel' )
+      if strcmp( A.J.ABS_SPECIES(q).UNIT, 'logrel' )
+        do_log  = 1;
+        unitfac = R.x_vmr0(ind);
+      elseif strcmp( A.J.ABS_SPECIES(q).UNIT, 'rel' )
         unitfac = R.x_vmr0(ind);
       end
       %
@@ -951,16 +950,13 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
       if ~do_log
         P(i).([s,'_x'])  = unitfac .* X.x(ind);
         P(i).([s,'_xa']) = unitfac .* xa(ind);
-        P(i).([s,'_e'])  = unitfac .* X.e(ind);
-        P(i).([s,'_eo']) = unitfac .* X.eo(ind);
-        P(i).([s,'_es']) = unitfac .* X.es(ind);
       else
         P(i).([s,'_x'])  = unitfac .* exp( X.x(ind) );
         P(i).([s,'_xa']) = unitfac .* exp( xa(ind) );
-        P(i).([s,'_e'])  = unitfac .* exp( X.e(ind) );
-        P(i).([s,'_eo']) = unitfac .* exp( X.eo(ind) );
-        P(i).([s,'_es']) = unitfac .* exp( X.es(ind) );
       end
+      P(i).([s,'_e'])  = unitfac .* X.e(ind);
+      P(i).([s,'_eo']) = unitfac .* X.eo(ind);
+      P(i).([s,'_es']) = unitfac .* X.es(ind);
       P(i).([s,'_mr']) = mresp(ind);
       if Q.OUT_A
         P(i).([s,'_A']) = As{q};

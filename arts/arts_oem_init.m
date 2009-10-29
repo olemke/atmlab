@@ -82,29 +82,18 @@ for i = 1 : nq
     R.x_vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
                             get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
     %
-    runit = R.jq{i}.mode;
-    %
-    if strcmp( runit(1:3), 'log' )
-      do_log = 1;
-      runit = runit( 4 : end );
-    else 
-      do_log = 0;
-    end
-    %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind) = 1;
     elseif strcmp( R.jq{i}.mode, 'vmr' )
       xa(ind) = R.x_vmr0(ind);
     elseif strcmp( R.jq{i}.mode, 'nd' )
       xa(ind) = vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
+    elseif strcmp( R.jq{i}.mode, 'logrel' )
+      xa(ind) = 0;
     else
       error( sprintf('Unknown gas species retrieval unit (%s).', ...
                                                               R.jq{i}.mode ) );
     end
-    %
-    if do_log
-      xa(ind) = log( xa(ind) );
-    end   
     
   case { 'Frequency', 'Polynomial baseline fit' }
     %

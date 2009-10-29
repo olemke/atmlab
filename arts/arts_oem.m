@@ -100,15 +100,12 @@ if iter > 1
   i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );  % Index of retrieval absorption
   %                                          species.
   i_rel   = [];                              % Index for x-values retrieved in
-  %                                          relative units.
-  i_log   = [];                              % Index for x-values retrieved in
   %                                          log dimension.
   any_gas = false;                           % Any gas species among rq
   %
   bl      = 0;                               % Sum of all baseline terms
   %  
-  j_loaded = 0;                              % To avoid repeated loading of
-  %                                            existing J
+  j_loaded = 0;                              % To avoid repeated loading of J
   
   
   %- Loop retrieval quantities
@@ -125,26 +122,21 @@ if iter > 1
         ig      = i_asj(i);    % Gas species index
         D       = [];
         %
-        xthis = x(ind);
-        runit = R.jq{i}.mode;
-        %
-        if strcmp( runit(1:3), 'log' )
-          xthis = exp( xthis );
-          i_log = [ i_log ind ];
-          runit = runit( 4 : end );
-        end
-        %
-        if strcmp( runit, 'rel' )
+        if strcmp( R.jq{i}.mode, 'rel' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-                                   R.jq{i}.grids, xthis .* R.x_vmr0(ind), ...
+                                  R.jq{i}.grids, x(ind) .* R.x_vmr0(ind), ...
                                              R.p_grid, R.lat_grid, R.lon_grid );
           i_rel = [ i_rel ind ];
-        elseif strcmp( runit, 'vmr' )
+        elseif strcmp( R.jq{i}.mode, 'vmr' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-                      R.jq{i}.grids, xthis, R.p_grid, R.lat_grid, R.lon_grid );
-        elseif strcmp( runit, 'nd' )
+                      R.jq{i}.grids, x(ind), R.p_grid, R.lat_grid, R.lon_grid );
+        elseif strcmp( R.jq{i}.mode, 'nd' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
-                       R.jq{i}.grids, nd2vmr(xthis,R.x_p(ind),R.x_t(ind)),...
+                      R.jq{i}.grids, nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)),...
+                                             R.p_grid, R.lat_grid, R.lon_grid );
+        elseif strcmp( R.jq{i}.mode, 'logrel' )
+          [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
+                             R.jq{i}.grids, exp(x(ind)) .* R.x_vmr0(ind), ...
                                              R.p_grid, R.lat_grid, R.lon_grid );
         else
           error(sprintf('Unknown absorption species unit: %s', R.jq{i}.mode ));
@@ -237,17 +229,10 @@ end
 %- Needed rescalings of jacobians:
 %    1. For relative unit parts we need to do J/x
 %    2. For log unit parts we need to do J*x
-%    Note that 1 and 2 cancel each other
+%    Note that 1 and 2 cancel each other for logrel
 %
-if do_j  &  ( ~isempty( i_rel )  |  ~isempty( i_log ) )
-  if iter > 1  &  ~isempty( i_rel )
-    ind = setdiff( i_rel, i_log );
-    J(:,ind) =  J(:,ind) ./ repmat( x(ind)', size(J,1), 1 );
-  end
-  if ~isempty( i_log )
-    ind = setdiff( i_log, i_rel );
-    J(:,ind) =  J(:,ind) .* repmat( x(ind)', size(J,1), 1 );
-  end
+if iter > 1  &  do_j  &  ~isempty( i_rel )
+  J(:,i_rel) =  J(:,i_rel) ./ repmat( x(i_rel)', size(J,1), 1 );
 end
 
 %------------------------------------------------------------------------------
