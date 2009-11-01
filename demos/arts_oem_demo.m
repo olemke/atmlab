@@ -38,23 +38,23 @@ O      = oem;
 %- OEM settings
 %----------------------------------------------------------------------------
 %
-O.linear  = 0;
-O.imethod = 'GN';
-O.stop_dx = 0.01;
-O.maxiter = 10;
+O.linear     = 0;
+O.itermethod = 'GN';
+O.stop_dx    = 0.01;
+O.maxiter    = 10;
 %
-O.cost    = 1;
-O.dx      = 1;
-O.e       = 1; 
-O.eo      = 1;
-O.es      = 0;
-O.yf      = 0;
-O.A       = 0;
-O.J       = 0;
-O.S       = 0;
-O.So      = 0;
-O.Ss      = 0;
-O.Xiter   = 0;
+O.cost       = 1;
+O.dx         = 1;
+O.e          = 1; 
+O.eo         = 1;
+O.es         = 0;
+O.yf         = 0;
+O.A          = 0;
+O.J          = 0;
+O.S          = 0;
+O.So         = 0;
+O.Ss         = 0;
+O.Xiter      = 0;
 
 
 
@@ -108,11 +108,12 @@ Q.IY_SPACE_AGENDA = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
 %
 % The spectrometer has rectangular response functions
 %
-Q.F_GRID              = 1.108360400e+11 + linspace(-320e6,320e6,641);
+Q.F_GRID              = qarts_get( fullfile( atmlab_example_data , ...
+                                                        'f_grid_111ghz.xml' ) );
 %
 H                     = qartsSensor;
 H.SENSOR_NORM         = 1;
-df                    = 2e6;
+df                    = 0.5e6;
 H.F_BACKEND           = min(Q.F_GRID)+df : df : max(Q.F_GRID)-df;
 %
 B.name                = 'Spectrometer channel response function';
@@ -210,9 +211,9 @@ y = 1.1 * y + si*randn(size(Se,1),1);
 
 %- Perform retrieval
 %
-[Qoem,R,xa] = arts_oem_init( Q );
-Sx          = arts_sx( Q, R, SX );
-X           = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
+[O,Qoem,R,xa] = arts_oem_init( O, Q );
+Sx            = arts_sx( Q, R, SX );
+X             = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %
 arts_oem( 'clean', R );
 clear Qoem 

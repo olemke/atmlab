@@ -1,4 +1,9 @@
-% MAKE_CHECK   Performs a check of Atmlab - ARTS
+% MAKE_CHECK   Performs a check of different parts of Atmlab and arts-2
+%
+%    The function runs some of the scripts in atmlab/demo and perform some
+%    special tests (placed in atmlab/tests). The scripts perform tests of atmlab,
+%    but make also some additional tests of arts-2. For example, that different
+%    jacobian calculation/retrieval options give consistent results.
 %
 % FORMAT   make_check
 
@@ -20,10 +25,28 @@ atmlab( 'FMODEL_VERBOSITY', 0 );
 
 
 
-%= Qarts
+%= Qarts1
 %
 y0 = [ 4.115 27.94 ];  % Selected to fit all of three first tests
 dy = 1e-2;
+%
+try
+  [Q,f,y] = qarts1_demo;
+catch
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *qarts1_demo* ===\n\n');
+  rethrow(lasterror);
+end
+%
+if any( abs( [min(y) max(y)] - y0 ) > dy )
+  reset_verbosity( va, vf );
+  error('Unexpected result from *qarts1_demo*');
+end
+
+
+
+
+%= Qarts
 %
 try
   [Q,f,y] = qarts_demo;
@@ -50,24 +73,6 @@ if any( abs( [min(y) max(y)] - y0 ) > dy )
   reset_verbosity( va, vf );
   error('Unexpected result from *qarts_demo2*');
 end
-
-
-
-%= Qarts1
-%
-try
-  [Q,f,y] = qarts1_demo;
-catch
-  reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts1_demo* ===\n\n');
-  rethrow(lasterror);
-end
-%
-if any( abs( [min(y) max(y)] - y0 ) > dy )
-  reset_verbosity( va, vf );
-  error('Unexpected result from *qarts1_demo*');
-end
-
 
 
 
@@ -110,6 +115,19 @@ if any( abs( y(ind)' - y0 ) > 3*dy(ind)' )
 end
 
 
+
+%= Jacobian tests
+%
+try
+  test_arts_jacobians;
+catch
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *test_arts_jacobians* ===\n\n');
+  rethrow(lasterror);
+end
+
+
+
 %= OEM
 %
 try
@@ -123,6 +141,18 @@ end
 if X.cost(end) > 1.3
   reset_verbosity( va, vf );
   error('Unexpected result from *arts_oem_demo*');  
+end
+
+
+
+%= Qpack2
+%
+try
+  test_qpack2;
+catch
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *test_qpack2* ===\n\n');
+  rethrow(lasterror);
 end
 
 

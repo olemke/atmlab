@@ -12,13 +12,6 @@
 function test_arts_jacobians
 
 
-%= Select cases to run
-%
-% Case 1 is always included
-%
-do_tests = [ 1:4 ];
-
-
 %= Make quite
 %
 verbosity = atmlab( 'VERBOSITY' );
@@ -28,115 +21,103 @@ atmlab( 'VERBOSITY', 0 );
 atmlab( 'FMODEL_VERBOSITY', 0 );
 
 
-%= Init
+%= Test consistency between 1-3D
 %
-addpath_ami;
+Q = qarts_demo2( 30e3, 3 );
 %
-Q = set_q;
+Q.J_DO    = 1;
+Q.J       = qartsJacobian;
+%
+Q.J.ABS_SPECIES(1).DO     = 1;
+Q.J.ABS_SPECIES(1).UNIT   = 'vmr';
+Q.J.ABS_SPECIES(1).METHOD = 'analytical';
+Q.J.ABS_SPECIES(1).GRID1  = z2p_simple( [0:4e3:100e3] );
+Q.J.ABS_SPECIES(1).GRID2  = -4:4;
+Q.J.ABS_SPECIES(1).GRID3  = -4:4;
+%
+Q.J.ABS_SPECIES(2)        = Q.J.ABS_SPECIES(1);
+Q.J.ABS_SPECIES(2).UNIT   = 'rel';
 
-
-
-%= Test 1: Just spectrum 
+% 3D
+[y3,ydata,dy,J3,jq,ji3]   = arts_y( Q );
+  
+% 2D
+Q.ATMOSPHERE_DIM          = 2;
+Q.LON_GRID                = [];
+Q.R_GEOID                 = Q.R_GEOID(:,1);
+Q.SENSOR_LOS              = Q.SENSOR_LOS(1);
+Q.SENSOR_POS              = Q.SENSOR_POS(1:2);
+Q.T_FIELD                 = Q.T_FIELD(:,:,1);
+Q.VMR_FIELD               = Q.VMR_FIELD(:,:,:,1);
+Q.Z_FIELD                 = Q.Z_FIELD(:,:,1);
+Q.Z_SURFACE               = Q.Z_SURFACE(:,1);
 %
-Q.JACOBIAN_DO = 0;
+[y2,ydata,dy,J2,jq,ji2]   = arts_y( Q );
+
+% 1D
+Q.ATMOSPHERE_DIM          = 1;
+Q.LAT_GRID                = [];
+Q.R_GEOID                 = Q.R_GEOID(1);
+Q.SENSOR_POS              = Q.SENSOR_POS(1);
+Q.T_FIELD                 = Q.T_FIELD(:,1);
+Q.VMR_FIELD               = Q.VMR_FIELD(:,:,1);
+Q.Z_FIELD                 = Q.Z_FIELD(:,1);
+Q.Z_SURFACE               = Q.Z_SURFACE(1);
 %
-if 1
-  %
-  y0 = arts_y( Q );
-  %
-  t = [  y0(1)   min(y0)   max(y0)   y0(end)];
-  e = [12.6083   11.7278   33.0063   14.7772];
-  %
-  if max(abs( t - e )) > 1e-3
-    disp( ' ' )
-    disp( 'Expected values:' )
-    disp( e )
-    disp( 'Obtained values:' )
-    disp( t )
-    error('Incorrect spectrum values obtained')
-  else
-    disp( 'Spectrum values with sensor : OK' );
-  end
-  %
+[y1,ydata,dy,J1,jq,ji1]   = arts_y( Q );
+
+if max( abs( y1-y2 ) ) > 1e-3
+  error( 'Inconsistency for *y* between 1D and 2D.' )
+end
+if max( abs( y1-y3 ) ) > 1e-3
+  error( 'Inconsistency for *y* between 1D and 3D.' )
+end
+if max( abs( y2-y3 ) ) > 1e-3
+  error( 'Inconsistency for *y* between 2D and 3D.' )
+end
+
+y11 = J1(:,ji1{1}{1}:ji1{1}{2}) * repmat( 1e-9, ji1{1}{2}-ji1{1}{1}+1, 1 );
+y21 = J2(:,ji2{1}{1}:ji2{1}{2}) * repmat( 1e-9, ji2{1}{2}-ji1{1}{1}+1, 1 );
+y31 = J3(:,ji3{1}{1}:ji3{1}{2}) * repmat( 1e-9, ji3{1}{2}-ji1{1}{1}+1, 1 );
+
+y12 = J1(:,ji1{2}{1}:ji1{2}{2}) * repmat( 1, ji1{2}{2}-ji1{2}{1}+1, 1 );
+y22 = J2(:,ji2{2}{1}:ji2{2}{2}) * repmat( 1, ji2{2}{2}-ji2{2}{1}+1, 1 );
+y32 = J3(:,ji3{2}{1}:ji3{2}{2}) * repmat( 1, ji3{2}{2}-ji3{2}{1}+1, 1 );
+
+if max( abs( y11-y21 ) ) > 1e-2
+  error( 'Inconsistency for jacobian vmr calculations between 1D and 2D.' )
+end
+if max( abs( y11-y31 ) ) > 1e-2
+  error( 'Inconsistency for jacobian vmr calculations between 1D and 3D.' )
+end
+if max( abs( y21-y31 ) ) > 1e-2
+  error( 'Inconsistency for jacobian vmr calculations between 2D and 3D.' )
+end
+
+if max( abs( y12-y22 ) ) > 1e-3
+  error( 'Inconsistency for jacobian rel calculations between 1D and 2D.' )
+end
+if max( abs( y12-y32 ) ) > 1e-3
+  error( 'Inconsistency for jacobian rel calculations between 1D and 3D.' )
+end
+if max( abs( y22-y32 ) ) > 1e-3
+  error( 'Inconsistency for jacobian rel calculations between 2D and 3D.' )
 end
 
 
+% Disturb vmr_field and test for 1D
+%
+Q.VMR_FIELD(1,:) = 5e-11 + Q.VMR_FIELD(1,:);
+Q.VMR_FIELD(2,:) = 1.1 * Q.VMR_FIELD(2,:);
+%
+y1d              = arts_y( Q );
 
-%= Test 2: Gas jacobians, relative unit, with sensor
-%
-% Compare analytical and perturbation calculations
-%
-Q.JACOBIAN_DO               = 1;
-Q.GAS_SPECIES_JAC{1}.DO     = 1;
-Q.GAS_SPECIES_JAC{1}.DX     = 0.01e-6;
-%
-if any( do_tests == 2 )
-  %
-  [y,dy,Ja] = arts_y( Q );
-  %
-  if max(abs( y - y0 )) > 1e-4
-    error( 'Spectrum vector changed when activating analytical gas jacobians');
-  end
-  %
-  Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
-  [y,dy,Jp] = arts_y( Q );
-  %
-  if max(abs( y - y0 )) > 1e-4
-    error( 'Spectrum vector changed when activating analytical gas jacobians');
-  end
-  %
-  cmpr_J( Ja, Jp, 'Gas jacobians, relative unit' );
-  %
+y11 = J1(:,ji1{1}{1}:ji1{1}{2}) * repmat( 5e-11, ji1{1}{2}-ji1{1}{1}+1, 1 );
+y12 = J1(:,ji1{2}{1}:ji1{2}{2}) * repmat( 0.1, ji1{2}{2}-ji1{2}{1}+1, 1 );
+
+if max( abs( (y1d-y1)./(y11+y12) - 1 ) ) > 0.01
+  error( 'Inconsistency with jacobians found when disturbing *y*.' )
 end
-
-
-
-%= Turn off sensor
-%
-Q.SENSOR_RESPONSE = NaN;
-
-
-
-%= Test 3: Gas jacobians, VMR unit
-%
-% Compare analytical and perturbation calculations
-%
-Q.GAS_SPECIES_JAC{1}.UNIT   = 'vmr';
-Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
-%
-if any( do_tests == 3 )
-  %
-  [y,dy,Ja] = arts_y( Q );
-  %
-  Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
-  %
-  [y,dy,Jp] = arts_y( Q );
-  %
-  cmpr_J( Ja, Jp, 'Gas jacobians, VMR unit' );
-  %
-end
-
-
-
-%= Test 4: Gas jacobians, ND unit
-%
-% Compare analytical and perturbation calculations
-%
-Q.GAS_SPECIES_JAC{1}.UNIT   = 'nd';
-Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
-%
-if any( do_tests == 4 )
-  %
-  [y,dy,Ja] = arts_y( Q );
-  %
-  Q.GAS_SPECIES_JAC{1}.METHOD = 'perturbation';
-  %
-  [y,dy,Jp] = arts_y( Q );
-  %
-  cmpr_J( Ja, Jp, 'Gas jacobians, ND unit' );
-  %
-end
-
 
 
 
@@ -169,87 +150,3 @@ return
 
 %----------------------------------------------------------------------------
 
-function Q = set_q
-
-
-%= Init Q structures
-%
-Q  = qarts;
-Q1 = qarts1;
-H  = qarts_sensor;
-
-
-
-%= Atmosphere
-%
-Q.ATMOSPHERE_DIM      = 2;
-Q.USE_RAW_ATMOSPHERE  = 1;
-if Q.ATMOSPHERE_DIM > 1
-  Q.RAW_ATM_EXPAND_1D = 1;
-end
-arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
-if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
-end
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                        'fascod', 'tropical' );
-Q.P_GRID              = z2p_simple( 0e3:1e3:100e3 );
-if Q.ATMOSPHERE_DIM >= 2
-  Q.LAT_GRID          = -10:10;  
-end
-
-
-%= Spectroscopy
-%
-Q.GAS_SPECIES{1}{1}         = 'O3';
-Q.GAS_SPECIES_JAC{1}.DO     = 0;
-Q.GAS_SPECIES_JAC{1}.METHOD = 'analytical';
-Q.GAS_SPECIES_JAC{1}.DX     = 0.01;
-Q.GAS_SPECIES_JAC{1}.UNIT   = 'rel';
-Q.GAS_SPECIES_JAC{1}.P_GRID = z2p_simple( [20e3:4e3:100e3] );
-if Q.ATMOSPHERE_DIM >= 2
-  Q.GAS_SPECIES_JAC{1}.LAT_GRID = -10:2:10;  
-end
-%
-Q.GAS_SPECIES{2}{1}         = 'ClO';
-Q.GAS_SPECIES{3}{1}         = 'N2O';
-Q.GAS_SPECIES{4}{1}         = 'H2O';
-Q.GAS_SPECIES{4}{2}         = 'H2O-MPM89';
-Q.GAS_SPECIES{5}{1}         = 'N2-SelfContStandardType';
-%
-Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
-Q.STOKES_DIM        = 1;
-%
-Q1.LINEFORMAT       = 'Arts';
-Q1.LINEDATA         = fullfile( atmlab_example_data , 'lines501.4' );
-
-
-%= Create absorption lookup table by ARTS1
-%
-Q.GAS_ABS_LOOKUP = arts_abstable_from_arts1( Q, Q1, linspace(-40,40,3) );
-
-
-%= RTE 
-%
-Q.Z_SURFACE      = 500;
-Q.SURFACE_PROP_AGENDA = ...
-   { 'InterpAtmFieldToRteGps(surface_skin_t,t_field){}', ...
-     'surfaceFlat{"water-liebe93"}' };
-%
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric{50e3}' };
-Q.Y_UNIT            = 'RJ';
-%
-zplat        = 600e3;
-Q.SENSOR_POS = Q.R_GEOID + zplat;
-if Q.ATMOSPHERE_DIM >= 2
-  Q.SENSOR_POS = [ Q.SENSOR_POS -23 ];
-end
-Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, 25e3 );
-
-
-%= Sensor
-%
-H.MBLOCK_ZA_GRID  = [-0.04:0.01:0.04];
-H.ANTENNA_LOS     = 0;
-H.ANTENNA_DIAGRAM = fullfile( atmlab_example_data, 'antenna.xml' );
-Q.SENSOR_RESPONSE = H;

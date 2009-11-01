@@ -1,3 +1,9 @@
+2009-11-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.pre11
+
+	* qpack2.m: Now handles logrel option and adopted to changes in oem.m.  
+
 2009-10-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.pre10

@@ -109,9 +109,14 @@ if nargin == 1
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'SensorSave', ...
           'JacobiSave', 'CloseF' };
     
-    case 'y'
+  case 'y_after_init'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
+          'CldBox', 'SctMth', 'RteExe', 'CloseF' };
+   
+  case 'y'
+    %
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'JacobiSave', ...
           'CldBox', 'SctMth', 'RteExe', 'CloseF' };
 
   case 'Batch'

@@ -161,11 +161,11 @@ I.MBLOCK_ZA_GRID = [ ...
 'switching calculations.'
 ];
 %-----------------------------------------------------------------------------
-P.OEM_IMETHOD = {};
-I.OEM_IMETHOD = [ ...
-'Matches the field imethod of the O structure used as input to oem.m. ', ...
-'Only needed if O.OEM_LINEAR is set to 0.', ...
-'#For more details: help oem',
+P.OEM_ITERMETHOD = {};
+I.OEM_ITERMETHOD = [ ...
+'Matches the field itermethod of the O structure used as input to oem.m. ', ...
+'Only needed if O.OEM_LINEAR is set to 0. ', ...
+'For more details: help oem',
 ];
 %-----------------------------------------------------------------------------
 P.OEM_LINEAR = {};
@@ -437,7 +437,9 @@ for m = 1 : ny
       P(m) = Y(m);
     end
     %
-    fprintf( 'Simulating spectrum %d/%d\n', m, ny );
+    if out(1)
+      fprintf( 'Simulating spectrum %d/%d\n', m, ny );
+    end
     %
     A = qarts_abstable( A );
     % 
@@ -456,8 +458,8 @@ for m = 1 : ny
       O.msg = sprintf( 'Inversion case %d (of %d)', m, ny );
     end
     %
-    [Aoem,R,xa] = arts_oem_init( A );
-    [X,R]       = oem( O, Aoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.Y );
+    [O,Aoem,R,xa] = arts_oem_init( O, A );
+    [X,R]         = oem( O, Aoem, R, @arts_oem, Sx, Se, Sxinv, [], xa, Ythis.Y );
     %
     arts_oem( 'clean', R );
     clear Aoem 
@@ -537,13 +539,13 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   % User settings
   O.linear    = mandatory_qfield( Q, 'OEM_LINEAR' );
   if ~O.linear
-    O.imethod   = mandatory_qfield( Q, 'OEM_IMETHOD', 'non-linear OEM' );
-    O.stop_dx   = mandatory_qfield( Q, 'OEM_STOP_DX', 'non-linear OEM' );
-    O.maxiter   = mandatory_qfield( Q, 'OEM_MAXITER', 'non-linear OEM' );
-    if strcmp( upper(O.imethod), 'ML' )  |  strcmp( upper(O.imethod), 'LM' )
+    O.itermethod = mandatory_qfield( Q, 'OEM_ITERMETHOD', 'non-linear OEM' );
+    O.stop_dx    = mandatory_qfield( Q, 'OEM_STOP_DX', 'non-linear OEM' );
+    O.maxiter    = mandatory_qfield( Q, 'OEM_MAXITER', 'non-linear OEM' );
+    if strcmp( upper(O.itermethod), 'ML' )  |  strcmp( upper(O.itermethod), 'LM' )
       O.ga_start         = mandatory_qfield( Q, 'OEM_GA_START', 'OEM ML' );
       O.ga_factor_ok     = mandatory_qfield( Q, 'OEM_GA_FACTOR_OK', 'OEM ML' );
-      O.ga_factor_not_ok = mandatory_qfield( Q, 'OEM_GA_FACTOR_NOT_OK', 'OEM ML' );
+      O.ga_factor_not_ok = mandatory_qfield( Q, 'OEM_GA_FACTOR_NOT_OK', 'OEM ML');
       O.ga_max           = mandatory_qfield( Q, 'OEM_GA_MAX', 'OEM ML' );
     end
   end
@@ -825,6 +827,10 @@ function [A,Ythis] = nextMeasurement( Q, A, Y, i )
     end
   end
   %
+  if isempty( h2o )
+    error( 'Water must always be included among the absorption species.' );
+  end
+  %
   A.T_FIELD = clmtlgy_interp( D, Q.T.ATMDATA, A.P_GRID, ...
                               Ythis.LATITUDE, Ythis.LONGITUDE, ...
                               Ythis.YEAR, Ythis.MONTH, Ythis.DAY, ...
@@ -948,15 +954,15 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
 
     if include
       if ~do_log
-        P(i).([s,'_x'])  = unitfac .* X.x(ind);
         P(i).([s,'_xa']) = unitfac .* xa(ind);
+        P(i).([s,'_x'])  = unitfac .* X.x(ind);
       else
-        P(i).([s,'_x'])  = unitfac .* exp( X.x(ind) );
         P(i).([s,'_xa']) = unitfac .* exp( xa(ind) );
+        P(i).([s,'_x'])  = unitfac .* exp( X.x(ind) );
       end
       P(i).([s,'_e'])  = unitfac .* X.e(ind);
       P(i).([s,'_eo']) = unitfac .* X.eo(ind);
-      P(i).([s,'_es']) = unitfac .* X.es(ind);
+      P(i).([s,'_es']) = unitfac .* X.es(ind);  
       P(i).([s,'_mr']) = mresp(ind);
       if Q.OUT_A
         P(i).([s,'_A']) = As{q};

@@ -49,16 +49,6 @@ jq = NaN;
 ji = NaN;
 
 
-
-if qarts_isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO  &  ...
-                                        strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-  mc = 1;
-else
-  mc = 0;
-end
-
-
-
 folder_created = 0;
 %
 if isempty( workfolder )

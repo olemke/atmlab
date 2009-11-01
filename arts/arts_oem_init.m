@@ -12,7 +12,7 @@
 % 2006-09-07   First working version by Patrick Eriksson.
 
 
-function [Q,R,xa] = arts_oem_init(Q)
+function [O,Q,R,xa] = arts_oem_init(O,Q)
 
 
 
@@ -56,6 +56,11 @@ xa = zeros( nx, 1 );
 i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );
 any_gas = false;
 
+%- O
+%
+O.i_rel = [];
+O.i_log = [];
+
 
 
 
@@ -84,12 +89,14 @@ for i = 1 : nq
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind) = 1;
+      O.i_rel = [ O.i_rel ind ];
     elseif strcmp( R.jq{i}.mode, 'vmr' )
       xa(ind) = R.x_vmr0(ind);
     elseif strcmp( R.jq{i}.mode, 'nd' )
       xa(ind) = vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       xa(ind) = 0;
+      O.i_log = [ O.i_log ind ];
     else
       error( sprintf('Unknown gas species retrieval unit (%s).', ...
                                                               R.jq{i}.mode ) );
@@ -118,7 +125,7 @@ end
 %
 %- Only y
 Q.J_DO    = 0;
-parts     = qarts2cfile( 'y' );
+parts     = qarts2cfile( 'y_after_init' );
 S         = qarts2cfile( Q, parts, R.workfolder );
 cfile     = fullfile( R.workfolder, 'cfile_y.arts' );
 qtool( S, cfile, [] );

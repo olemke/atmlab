@@ -59,10 +59,10 @@ Q.OUT_BASELINE        = 1;
 
 %- OEM
 %
-Q.OEM_LINEAR          = 1;
+Q.OEM_LINEAR          = 0;
 %
 % Setting below only of interest for tests of non-linear inversions
-Q.OEM_IMETHOD         = 'GN';
+Q.OEM_ITERMETHOD      = 'GN';
 Q.OEM_STOP_DX         = 0.01;
 Q.OEM_MAXITER         = 10;
 
@@ -80,7 +80,7 @@ Q.POLYFIT_SI          = [1 0.5 0.2 0.1 0.05 0.05];
 %
 Q.FFIT_DO             = 1;
 Q.FFIT_ORDER          = 0;
-Q.FFIT_SI             = [50e3]; 
+Q.FFIT_SI             = 50e3; 
 Q.FFIT_DF             = 50e3; 
 %
 Q.OUT_F               = 1;
@@ -94,7 +94,7 @@ species = 'H2O';
 %
 Q.SPECIES(1).TAG{1}{1} = species;
 Q.SPECIES(1).RETRIEVE  = 1;
-Q.SPECIES(1).GRID      = z2p_simple(Q.PLATFORM_Z-1e3:2e3:105e3);
+Q.SPECIES(1).GRID      = z2p_simple(Q.PLATFORM_Z-2e3:2e3:105e3);
 %
 if 1 % To allow simple  switch to test retrievals in "rel unit" 
   Q.SPECIES(1).UNIT    = 'vmr';
@@ -120,14 +120,9 @@ Q.SPECIES(1).ATMDATA   = loadvar( fullfile( atmdata, 'mls_h2omean' ), 'G' );
 %Q.SPECIES(1).ATMDATA  = loadvar( fullfile( atmdata, 'waccm_old_h2o' ), 'G' );
 
 
-
 %- Temperature
 %
 Q.T.ATMDATA           = loadvar( fullfile( atmdata, 'mls_tmean' ), 'G' );
-%
-% Other examples/possibilities for temperature a priori:
-%
-%Q.T.ATMDATA           = loadvar( fullfile( atmdata, 'waccm_old_t' ), 'G' );
 
 
 %- Line data
@@ -145,7 +140,7 @@ Q.BACKEND_DO               = 1;
 Q.F_GRID                   = fullfile( data, ['f_grid_h2o_',width,'.xml'] );
 Q.F_BACKEND                = fullfile( data, ['f_backend_h2o_',width,'.xml'] );
 Q.BACKEND_CHANNEL_RESPONSE = ... 
-                           fullfile( data, ['backend_channel_',width,'.xml'] );
+                             fullfile( data, ['backend_channel_',width,'.xml'] );
 %
 % Measurements performed as beam switching. Provided data are corrected and
 % match throughout beam switching between elevation angles of 25 and

@@ -1,3 +1,31 @@
+2009-11-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-97
+
+	* demos/data/f_grid_111ghz.xml: Created.
+
+	* arts/qarts2cfile.m: Added option y_after_init, as old y did not
+	always work for arts_y.
+
+	* arts/arts_oem_init.m: O.i_rel and O.i_log now set. 
+
+	* arts/arts_oem.m: Post-processing of jacobians removed (now
+	handled by oem.m).
+
+	* demos/arts_oem_demo.m: Adopted to changes in oem.m.
+
+	* tests/test_arts_jacobians.m: Re-written. New tests.
+
+	* tests/make_check.m: Added runs of test_arts_jacobians and
+	test_qpack2.
+
+	* tests/test_qpack2.m: Created. 
+
+	* retrieval/oem.m: Extended header. Added fields i_rel and
+	i_log. Renamed imethod to itermethod. A rescalaing for log-scale
+	Jacobians is performed for the characterisation part. That is, the
+	characterisation is throughout performed in "lin-scale". 
+
 2009-10-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-96

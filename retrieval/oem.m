@@ -14,14 +14,31 @@
 %    O.ga_start is used as start value for ga.
 %
 %    The OEM calculations are controlled by the structure O. The fields of O,
-%    and associated descriptions, are lsited by
+%    and associated descriptions, are listed by
 %       qinfo(@oem)
+%
+%    The communication with the forward model is handled by the function
+%    handle comfun. If comfun is set to @arts_oem, the following calls will 
+%    be made:
+%       [R,yf,J]  = arts_oem( Q, R, x, iter );
+%       [R,yf]    = arts_oem( Q, R, x, iter );
+%    That is, this function expects the comfun function to provide spectrum 
+%    and jacobian (only spectrum in the second case) for present state (the x 
+%    vector). The oem function does not use any information in Q and R, and
+%    the comfun function is free to use these variables freely for bookkeeping
+%    etc. This function handles y, x, Sx and Se as totally generic variables
+%    and unit conversion and similar tasks are left to the comfun and
+%    post-processing. This with two exceptions, jacobian rescaling is
+%    performed following the O-fields i_rel and i_log (see further information
+%    for these fields).
 %
 %    The results are gathered in a structure X, with fields:
 %       x         : Retrieved state.
 %       converged : Convergence flag. 1 if convergency criterion has been 
-%                   reached. Otherwise 0 for non-linear inversions. Set to 
-%                   NaN for linear retrievals.
+%                   reached. Otherwise 0 for non-linear inversions when the
+%                   maximum number of iterations is reached, or -1 for 
+%                   Marquardt-Levenberg when the maximum value for gamma is
+%                   passed. Set to NaN for linear retrievals.
 %       cost      : Total cost, normalised by length of y. A succesful retrieval
 %                   shall then have a cost in the order of 1.
 %       cost_y    : Cost corresponding to the measurement vector.
@@ -63,7 +80,7 @@
 %       R        Retreival variable structure from last calculation.
 % IN    O        OEM setting structure.
 %       Q        Forward model setting structure.
-%       R        Rtreival variable structure.
+%       R        Retreival variable structure.
 %       comfun   Handle to function for communication with forward model.
 %       Sx       Covariance matrix for a priori uncertainty.
 %       Se       Covariance matrix for observation uncertainties.
@@ -152,10 +169,32 @@ I.ga_start = [ ...
 '#for a definition of the gamma factor. This value must be >= 0.'
 ];
 %-----------------------------------------------------------------------------
-O.imethod = 'ML';
-I.imethod = [ ...
+O.itermethod = 'ML';
+I.itermethod = [ ...
 'Iteration method. Choices are ''GN'' for Gauss-Newton and ''ML'' or',...
 '''LM'' for Marquardt-Levenberg.'
+];
+%-----------------------------------------------------------------------------
+O.i_log = [];
+I.i_log = [ ...
+'Index of values in x that are retrieved in a log-scale (e.g. the logarithm ',...
+'of VMR/VMRa (see i_rel)). The actual inversion is performed with jacobians ',...
+'provided (that is, must be given to oem.m scaled correctly), but the ',...
+'log-scale transformation is removed for the error characterisation for ',...
+'the jacobians matching this field. No index should be found in both i_rel ',...
+'and i_log.'
+];
+%-----------------------------------------------------------------------------
+O.i_rel = [];
+I.i_rel = [ ...
+'Index of values in x that are retrieved in a relative/fractional unit and a',...
+'rescaling of the jacobians is needed. An example on a relative retrieval ',... 
+'is x = VMR/VMRa, where VMRa is the volume mixing ratio for the a priori ',...
+'state. Accordingly, the corresponding jacobians must describe changes with ',...
+'respect to the a priori state, and a direct calculation for x != xa will ',...
+'not give a correct results. A rescaling back to xa is then needed and this ',...
+'operation can be performed by oem.m by setting this field to the indexes ',...
+'for which a rescaling is needed.'
 ];
 %-----------------------------------------------------------------------------
 O.J = 0;
@@ -181,7 +220,7 @@ I.jfast = [ ...
 %-----------------------------------------------------------------------------
 O.linear = 0;
 I.linear = [ ...
-'Flag to trigger a linear inversion. Fields like imethod are ignored if ',...
+'Flag to trigger a linear inversion. Fields like itermethod are ignored if ',...
 'this option is selected. Default is non-linear (0).'
 ];
 %-----------------------------------------------------------------------------
@@ -261,7 +300,6 @@ end
 %==============================================================================
 
 
-
 %=== Check of input ===========================================================
                                    
   min_nargin( 6, nargin );
@@ -275,13 +313,14 @@ end
   rqre_datatype( { 'empty', 'vector'}, O.outfids );
   %
   if ~O.linear
-    rqre_char( 'O.imethod', O.imethod );
+    rqre_char( 'O.itermethod', O.itermethod );
     rqre_scalar( 'O.maxiter', O.maxiter, 0 );
     rqre_scalar( 'O.stop_dx', O.stop_dx, 0 );
-    if strcmp( upper(O.imethod), 'GN' )
-      O.imethod = 'GN';  
-    elseif strcmp( upper(O.imethod), 'ML' )  |  strcmp( upper(O.imethod), 'LM' )
-      O.imethod = 'ML';
+    if strcmp( upper(O.itermethod), 'GN' )
+      O.itermethod = 'GN';  
+    elseif strcmp( upper(O.itermethod), 'ML' )  |  ...
+           strcmp( upper(O.itermethod), 'LM' )
+      O.itermethod = 'ML';
       O.cost    = 1;  % Note default value here, cost must anyhow be calculated
       %
       if O.ga_start < 0
@@ -300,6 +339,10 @@ end
       error( ['Unknown choice for iteration method. ', ...
                                  'Possible choices are ''GN'' and ''ML''.' ] );
     end
+  end
+  %
+  if ~isempty( intersect( O.i_log, O.i_rel ) )
+    error( 'No index can be found in both O.i_rel and O.i_log.' );
   end
 
   rqre_datatype( 'struct', Q );
@@ -366,8 +409,7 @@ end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-  
-  
+
   
 %=== Stuff common to all calculation options ==================================
 
@@ -446,7 +488,7 @@ end
 
       %- Calculate Jacobian
       [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
-      
+
       %- Calculate cost, if requested output
       X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
       nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
@@ -482,7 +524,7 @@ end
         
     %=== GN iteration ========================================================
     %
-    elseif strcmp( O.imethod, 'GN' )
+    elseif strcmp( O.itermethod, 'GN' )
       
       %- Messages
       out( 3, 'Non-linear inversion: Gauss-Newton', O.outfids );
@@ -497,7 +539,7 @@ end
 
         %- Calculate Jacobian
         [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
-      
+
         %- Calculate cost, if requested output
         X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
         nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
@@ -552,7 +594,7 @@ end
         
     %=== ML iteration ========================================================
     %
-    elseif strcmp( O.imethod, 'ML' )
+    elseif strcmp( O.itermethod, 'ML' )
       
       %- Messages
       out( 3, 'Non-linear inversion: Marquardt-Levenberg', O.outfids );
@@ -668,7 +710,7 @@ end
               else
                 X.converged = -1;
                 yf          = NaN;
-                brake;    % New x could not be found !!!
+                break;    % New x could not be found !!!
               end
             end   
           end
@@ -706,9 +748,14 @@ end
 
   %- Update J?
   %
-  if O.J | O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es
-    if isnan(J) |  ( O.jexact  &  ~j_updated )
+  if O.J | O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es    
+    %
+    if isnan(J)  |  ( O.jexact  &  ~j_updated )  |  ~isempty( O.i_log )
       [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
+      %
+      if ~isempty( O.i_log )
+        J(:,O.i_log) =  J(:,O.i_log) ./ repmat( exp(x(O.i_log)'), size(J,1), 1 );
+      end
       %
       JtSeinv  = J' * Seinv;
       SJSJ     = Sxinv + JtSeinv * J;
@@ -900,6 +947,10 @@ end
     %
     if O.sxnorm
       J = J .* repmat( xnorm', size(J,1), 1 );
+    end
+    %
+    if ~isempty( O.i_rel )
+      J(:,O.i_rel) =  J(:,O.i_rel) ./ repmat( x(O.i_rel)', size(J,1), 1 );
     end
   return
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -4,10 +4,10 @@
 %    communication to perform OEM inversion with ARTS. The standard sequence
 %    of function calls is:
 %
-%       [Qoem,R,xa] = arts_oem_init( Q );
-%       Sx          = arts_sx( Q, R, SX );
-%       Se          = arts_covmat ...
-%       [x,P]       = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
+%       [O,Qoem,R,xa] = arts_oem_init( O, Q );
+%       Sx            = arts_sx( Q, R, SX );
+%       Se            = arts_covmat ...
+%       P             = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %       %
 %       arts_oem( 'clean', R );
 %       clear Qoem
@@ -99,8 +99,6 @@ if iter > 1
   %
   i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );  % Index of retrieval absorption
   %                                          species.
-  i_rel   = [];                              % Index for x-values retrieved in
-  %                                          log dimension.
   any_gas = false;                           % Any gas species among rq
   %
   bl      = 0;                               % Sum of all baseline terms
@@ -126,7 +124,6 @@ if iter > 1
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
                                   R.jq{i}.grids, x(ind) .* R.x_vmr0(ind), ...
                                              R.p_grid, R.lat_grid, R.lon_grid );
-          i_rel = [ i_rel ind ];
         elseif strcmp( R.jq{i}.mode, 'vmr' )
           [D.P_GRID,D.LAT_GRID,D.LON_GRID,X] = x2field( Q.ATMOSPHERE_DIM, ...
                       R.jq{i}.grids, x(ind), R.p_grid, R.lat_grid, R.lon_grid );
@@ -183,10 +180,6 @@ if iter > 1
   if any_gas
     xmlStore( fullfile(R.workfolder,'vmr_field.xml'), R.vmr_field, 'Tensor4' );
   end
-
-else
-  i_rel = [];  % FIX !!!!!!!!!!!!!!!!!!!
-  i_log = [];
 end
 %------------------------------------------------------------------------------
 
@@ -224,15 +217,6 @@ if iter > 1
   R.bl = bl;
   y    = y + bl;
   %
-end
-
-%- Needed rescalings of jacobians:
-%    1. For relative unit parts we need to do J/x
-%    2. For log unit parts we need to do J*x
-%    Note that 1 and 2 cancel each other for logrel
-%
-if iter > 1  &  do_j  &  ~isempty( i_rel )
-  J(:,i_rel) =  J(:,i_rel) ./ repmat( x(i_rel)', size(J,1), 1 );
 end
 
 %------------------------------------------------------------------------------
