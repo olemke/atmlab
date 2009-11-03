@@ -11,8 +11,12 @@
 
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor3(fid, data, precision)
+function xmlWriteTensor3(fid, data, precision, attrlist)
 
+if nargin < 4
+  attrlist = [];
+end
+  
 s = size (data);
 
 for i = (ndims (data)+1):3
@@ -23,7 +27,6 @@ np = s(1);
 nr = s(2);
 nc = s(3);
 
-attrlist = [];
 attrlist = xmlAddAttribute (attrlist, 'npages', sprintf ('%d', np));
 attrlist = xmlAddAttribute (attrlist, 'nrows', sprintf ('%d', nr));
 attrlist = xmlAddAttribute (attrlist, 'ncols', sprintf ('%d', nc));

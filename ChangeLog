@@ -1,3 +1,22 @@
+2009-11-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-98
+
+	* xml/xmlWriteGFieldWrapper.m: data.dataname sent as attlist
+	informtion to functions writing data.
+
+	* xml/xmlWriteTensor3.m: Added attrlist as input.
+	* xml/xmlWriteTensor4.m: Added attrlist as input.
+	* xml/xmlWriteTensor5.m: Added attrlist as input.
+	* xml/xmlWriteTensor6.m: Added attrlist as input.
+	* xml/xmlWriteTensor7.m: Added attrlist as input.
+
+	* forwardmodel/gformat/gfin_artsxml.m: Data with gridname could
+	not be read for non-defined cases (as dim 4 for the clmtlgy format).
+ 
+	* forwardmodel/gformat/clmtlgy_interp.m: Upper limit for DOY is
+	now <= 367;
+
 2009-11-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-97

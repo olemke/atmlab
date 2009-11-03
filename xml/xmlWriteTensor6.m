@@ -11,7 +11,11 @@
 
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor6(fid, data, precision)
+function xmlWriteTensor6(fid, data, precision, attrlist)
+
+if nargin < 4
+  attrlist = [];
+end
 
 s = size (data);
 
@@ -26,7 +30,6 @@ np = s(4);
 nr = s(5);
 nc = s(6);
 
-attrlist = [];
 attrlist = xmlAddAttribute (attrlist, 'nvitrines', sprintf ('%d', nv));
 attrlist = xmlAddAttribute (attrlist, 'nshelves', sprintf ('%d', ns));
 attrlist = xmlAddAttribute (attrlist, 'nbooks', sprintf ('%d', nb));

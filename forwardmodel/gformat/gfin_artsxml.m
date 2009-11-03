@@ -122,8 +122,8 @@ else
   end
   %
   for d = 1 : dims_in
-    if ~isempty( X.gridnames{d} ) 
-      gname = sprintf( 'GRID%d_NAME', d );
+    gname = sprintf( 'GRID%d_NAME', d );
+    if ~( isempty( X.gridnames{d} ) | isempty( D.(gname) ) ) 
       if ~strcmp( D.(gname), X.gridnames{d} )
         s = sprintf('Different data type for input dimension %d!\n',d);
         s = sprintf('%s  file data type    : %s\n', s, X.gridnames{d} );
@@ -131,8 +131,8 @@ else
         error( s );
       end
     end
-    if ~isempty( X.DATAUNIT ) 
-      gname = sprintf( 'GRID%d_UNIT', d );
+    gname = sprintf( 'GRID%d_UNIT', d );
+    if ~( isempty( X.DATAUNIT ) | isempty( D.(gname) ) ) 
       if ~strcmp( D.(gname), X.GRIDUNITS{d} )
         s = sprintf('Different data unit for input dimension %d!\n',d);
         s = sprintf('%s  file data unit    : %s\n', s, X.GRIDUNITS{d} );

@@ -9,7 +9,7 @@
 % IN    data      Vector
 % IN    precision Precision
 % IN    attrlist  Attribute list
-                                                                                                                               
+ 
 % 2002-12-13  Created by Oliver Lemke.
 
 function xmlWriteVector(fid, data, precision, attrlist)

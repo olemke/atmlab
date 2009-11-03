@@ -63,7 +63,7 @@ gf_check( D, G );
 %- Time format
 %
 if ~isfield( G, 'TFORMAT' )
-  if size(G.DATA,4) == 1  |  ( min(G.GRID4)>=0 & max(G.GRID4) < 367 )
+  if size(G.DATA,4) == 1  |  ( min(G.GRID4)>=0 & max(G.GRID4) <= 367 )
     tformat = 'doy';       % Use doy as dummy for the "non-interp" case
   elseif max(G.GRID4) < 1000*365
     tformat = 'mjd';   
@@ -79,7 +79,7 @@ switch lower(tformat)
     t = mjd2doy( date2mjd( year, month, day, hour, minute, second ) );
   case 'mjd'
     t = date2mjd( year, month, day, hour, minute, second );
-  case 'mjd'
+  case 'datenum'
     t = datenum( year, month, day, hour, minute, second );
   otherwise
     error( 'Unknown slection for *tformat*.' );

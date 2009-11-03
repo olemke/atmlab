@@ -13,6 +13,10 @@
 
 function xmlWriteTensor7(fid, data, precision)
 
+if nargin < 4
+  attrlist = [];
+end
+
 s = size (data);
 
 for i = (ndims (data)+1):7
@@ -27,7 +31,6 @@ np = s(5);
 nr = s(6);
 nc = s(7);
 
-attrlist = [];
 attrlist = xmlAddAttribute (attrlist, 'nlibraries', sprintf ('%d', nl));
 attrlist = xmlAddAttribute (attrlist, 'nvitrines', sprintf ('%d', nv));
 attrlist = xmlAddAttribute (attrlist, 'nshelves', sprintf ('%d', ns));
