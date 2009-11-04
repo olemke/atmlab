@@ -16,8 +16,9 @@ for i = 1:length(G)
 
   for d = 1 : D.DIM
 
+    gname = sprintf( 'GRID%d', d );
+    
     if any( d == G(i).DIMS )
-      gname = sprintf( 'GRID%d', d );
       if ~isfield( G, gname )
         error( sprintf( '%s is missing in G', gname ) );
       end
@@ -27,10 +28,13 @@ for i = 1:length(G)
     end
   
     if l ~= size(G.DATA,d)
+      fprintf( '\nG.DIMS          :' );      
+      fprintf( ' %d', G.DIMS );
       fprintf( '\nSize of G.DATA  :' );
       fprintf( ' %d', size(G.DATA) );
       fprintf( '\nLength of %s : %d\n\n', gname, l );
-      error( sprintf('Size mismatch between %s and G(%d).DATA (see above).',...
+      error( sprintf( ...
+          'Inconsistency between G.DIMS, %s or G(%d).DATA (see above).',...
                       gname, i ) ); 
     end
   end

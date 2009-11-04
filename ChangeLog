@@ -1,5 +1,12 @@
 2009-11-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-99
+
+	* forwardmodel/gformat/gf_check.m: Error message was misleading for
+	cases where G.DIMS is incorrectly set.
+
+2009-11-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-98
 
 	* xml/xmlWriteGFieldWrapper.m: data.dataname sent as attlist

@@ -87,6 +87,8 @@ Q.FFIT_DO              = 1;
 Q.FFIT_ORDER           = 0;
 Q.FFIT_SI              = 50e3; 
 Q.FFIT_DF              = 50e3; 
+%
+Q.OUT_F                = 1;
 
 
 %- Species
