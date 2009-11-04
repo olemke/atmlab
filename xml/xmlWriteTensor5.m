@@ -11,7 +11,7 @@
 
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor5(fid, data, precisionattrlist)
+function xmlWriteTensor5(fid, data, precision, attrlist)
 
 if nargin < 4
   attrlist = [];

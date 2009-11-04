@@ -1,5 +1,11 @@
 2009-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* Qpack2.0.pre14
+
+	* qpack2.m: Added field F_SWITCHING. 
+
+2009-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* Qpack2.0.pre13
 
 	* q_onsala_h2o.m: Q.OUT_F had been removed by mistake. 

@@ -1,3 +1,18 @@
+2009-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-100
+
+	* arts/qarts2cfile.m: Added handling of new fields below.
+	
+	* arts/qartsSensor.m: Added fields F_SWITCHING, ANTENNA_DO, MIXER_DO
+	and BACKEND_DO.
+	
+
+	* xml/xmlWriteGFieldWrapper.m: Changed back to allow fields name
+	and dataname optional.
+
+	* xml/xmlWriteTensor5.m: A typo in function declaration. 
+
 2009-11-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-99

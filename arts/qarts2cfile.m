@@ -716,19 +716,17 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
     % Find out sensor structure
     parts{1} = 'init';
-    if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )
+    if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )  |  ...
+                                   ( qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO )
       parts{end+1} = 'antenna';
     end
-    %if qarts_isset( H.SENSOR_ROT )
-    %    parts{end+1} = 'rotation';
-    %end
-    %if qarts_isset( H.SENSOR_POL )
-    %  parts{end+1} = 'polarisation';
-    %end
-    if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )
+    if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )  |  ...
+                                       ( qarts_isset( H.MIXER_DO ) & H.MIXER_DO )
       parts{end+1} = 'mixer';
     end
-    if qarts_isset( H.F_BACKEND )  |  qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
+    if qarts_isset( H.F_BACKEND )  |  ...
+                                qarts_isset( H.BACKEND_CHANNEL_RESPONSE )  |  ...
+                                   ( qarts_isset( H.BACKEND_DO ) & H.BACKEND_DO )
       parts{end+1} = 'backend';
     end
     if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
@@ -791,14 +789,6 @@ function T = cfile_Sensor( Q, partname, workfolder )
         end
         U{end+1} = 'sensor_responseAntenna';
         
-      %case 'rotation'
-      %  U{1} = file_or_data( 'sensor_rot', 'Vector', H.SENSOR_ROT, workfolder );
-      %  U{2} = 'sensor_responseRotation';
-
-      %case 'polarisation'
-      %  U{1} = file_or_data( 'sensor_pol', 'Matrix', H.SENSOR_POL, workfolder );
-      %  U{2} = 'sensor_responsePolarisation';
-          
       case 'mixer'
         if qarts_isset( H.LO ) 
           U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder, 1 );
@@ -818,9 +808,27 @@ function T = cfile_Sensor( Q, partname, workfolder )
           U{end+1} = file_or_data( 'backend_channel_response', ....
             'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder, 1 );
         end
-        U{end+1} = 'sensor_responseBackend';
+        if ~qarts_isset( H.F_SWITCHING )
+          U{end+1} = 'sensor_responseBackend';
+        else
+          df = qarts_get( H.F_SWITCHING );
+          if ~( isvector( df )  &  length( df ) == 2 )
+            error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );
+          end
+          U{end+1} = 'sensor_responseBackendFrequencySwitch(sensor_response,'; 
+          U{end+1} = '   sensor_response_f,sensor_response_pol,';
+          U{end+1} = '   sensor_response_za,sensor_response_aa,';
+          U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
+          U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
+          U{end+1} = '   f_backend,backend_channel_response,sensor_norm,';
+          U{end+1} = sprintf( '   %.6e,%.6e)', df(1), df(2) );
+        end
         
-      case 'multimixer'
+       case 'multimixer'
+        if qarts_isset( H.F_SWITCHING )
+          error( 'The sensor *F_SWITCHING* option can not be used together ',...
+                                                          'with multiple LO.' );
+        end
         if qarts_isset( H.LO ) 
           U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, 1 );
         end
@@ -837,7 +845,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
                  'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ... 
                                                                    workfolder );
         end
-        U{6} = 'sensor_responseMultiMixerBackend';
+        U{end+1} = 'sensor_responseMultiMixerBackend';
         
       case 'beamswitch'
         U{1} = 'sensor_responseBeamSwitching';

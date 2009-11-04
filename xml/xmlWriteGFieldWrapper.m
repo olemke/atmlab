@@ -14,7 +14,11 @@
 function xmlWriteGFieldWrapper(fid, data, precision, dim)
 
   % GriddedField
-  attrlist = xmlAddAttribute ([], 'name', data.name);
+  if isfield( data, 'name' )
+    attrlist = xmlAddAttribute ([], 'name', data.name);
+  else
+    attrlist = [];
+  end
   xmlWriteTag (fid, ['GriddedField' sprintf('%d', dim)], attrlist);
 
   % Grids
@@ -28,7 +32,11 @@ function xmlWriteGFieldWrapper(fid, data, precision, dim)
   end
 
   % Data
-  attrlist = xmlAddAttribute ([], 'name', data.dataname);
+  if isfield( data, 'dataname' )
+    attrlist = xmlAddAttribute ([], 'name', data.dataname);
+  else
+    attrlist = [];
+  end
   switch dim
     case 1
       xmlWriteVector (fid, data.data, precision, attrlist);
