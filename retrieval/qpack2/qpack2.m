@@ -882,9 +882,9 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
   
   % Basic diagnostics 
   %
-  P(i).cost   = X.cost;
-  P(i).cost_x = X.cost_x;
-  P(i).cost_y = X.cost_y;
+  P(i).cost   = X.cost(end);
+  P(i).cost_x = X.cost_x(end);
+  P(i).cost_y = X.cost_y(end);
 
   % Time and position
   P(i).year      = Ythis.YEAR;
@@ -902,7 +902,7 @@ function P = fillP( P, Q, A, Ythis, R, xa, X )
   %
   if ~Q.OEM_LINEAR 
     P(i).converged = X.converged;
-    P(i).dx        = X.dx;
+    P(i).dx        = X.dx(end);
   end 
   %  
   if Q.OUT_A

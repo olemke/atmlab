@@ -57,9 +57,9 @@ Q.SURFACE_Z            = Q.PLATFORM_Z;
 %- Output variables
 %
 Q.OUT_Y                = 1;
-Q.OUT_A                = 1;
 Q.OUT_PTZ              = 1;
 Q.OUT_BASELINE         = 1;
+Q.OUT_A                = 1;
   
 
 %- OEM
@@ -74,11 +74,11 @@ Q.OEM_MAXITER          = 5;
 
 %- Polyfit
 %
-% A polynomial of order 5 is used for "baseline fit".
+% A polynomial of order 6 is used for "baseline fit".
 %
 Q.POLYFIT_DO           = 1;
-Q.POLYFIT_ORDER        = 5;
-Q.POLYFIT_SI           = [1 0.5 0.2 0.1 0.05 0.05]; 
+Q.POLYFIT_ORDER        = 6;
+Q.POLYFIT_SI           = [1 0.5 0.2 0.1 0.05 0.05 0.05]; 
 
   
 %- FREQUENCY
@@ -88,7 +88,9 @@ Q.FFIT_ORDER           = 0;
 Q.FFIT_SI              = 50e3; 
 Q.FFIT_DF              = 50e3; 
 %
-Q.OUT_F                = 1;
+if Q.FFIT_DO
+  Q.OUT_F              = 1;
+end
 
 
 %- Species
@@ -143,12 +145,9 @@ Q.MBLOCK_ZA_GRID           = [-65 0];
 
 %- Correlation of thermal noise 
 %
-% Autocorrelators give some correlation of thermal noise between neighbouring
-% channels. Values below give good fit to estimates made by Peter.
-%
 f          = qarts_get(Q.F_BACKEND);
 cfun       = 'gau';
-cl         = 1.85 * ( f(2) - f(1) );
-cco        = 0.02;
+cl         = 1.4 * ( f(2) - f(1) );
+cco        = 0.05;
 %
 Q.TNOISE_C = covmat1d_from_cfun( f, [], cfun, cl, cco );

@@ -1,3 +1,14 @@
+2009-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.pre15
+
+	* q_onsala_h2o.m: cl now set to 1.4 (after examination of residuals), 
+	POLYFIT_ODER = 6 and OUT_A=1 (needed for comparisons with satelitte
+	data).
+
+	* qpack2.m: Now just last value of cost, cost_x, cost_y and dx 
+	are moved to P.
+
 2009-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.pre14
