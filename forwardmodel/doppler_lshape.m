@@ -1,7 +1,7 @@
 % DOPPLER_LSHAPE   Doppler line shape
 %
 %    Calculates the line shape caused by the molecular thermal motion,
-%    the Doppler line shape. Note that he width is defined HWHM (half
+%    the Doppler line shape. Note that the width is defined HWHM (half
 %    width at halv maximum).
 %
 % FORMAT   l = doppler_lshape( f, f0, dd )

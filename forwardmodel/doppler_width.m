@@ -3,7 +3,7 @@
 %    The Doppler width is here defined as FWHM/2. That is, half
 %    width at half maximum (HWHM). More precisely, it is calculated as
 %
-%       dd = 2*sqrt(log(2)) * f0/c * sqrt(2*R*t/m)
+%       dd = sqrt(log(2)) * f0/c * sqrt(2*R*t/m)
 %
 % FORMAT   dd = doppler_width( m, f0, t )
 %        

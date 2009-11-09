@@ -1,3 +1,13 @@
+2009-11-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-102
+
+	* forwardmodel/gridcreation/grid_for_1line.m: Created.
+
+	* forwardmodel/doppler_lshape.m: Corrected header.
+
+	* forwardmodel/doppler_width.m: Corrected header.
+
 2009-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-101
