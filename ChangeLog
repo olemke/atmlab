@@ -1,3 +1,17 @@
+2009-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-103
+
+	* physics/p2z_cira86.m: Now using the CIRA86 climatology, which
+	makes the function much faster. Internally now using
+	clmtlgy_interp, and for simplicity input and output are changed to
+	match this function (e.g. p can now not be a matrix). This could brake
+	some functions using the p2z_cira86. 
+	DOY can now be vector input. 
+
+	* forwardmodel/gformat/clmtlgy_interp.m: Added option to specify
+	doy, mjd or datenum directly (and not only year,month ...).
+
 2009-11-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-102

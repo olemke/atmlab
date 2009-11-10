@@ -16,7 +16,9 @@
 %     If this field is not found, an intelligent guess will be made based
 %     values in time grid. Valid range for 'doy' is [1,367].
 %
-% FORMAT   F = clmtlgy_interp( D, G, p [, lat, lon, ...
+% FORMAT   F = clmtlgy_interp( D, G, p [, lat, lon, time ] )
+%             or
+%          F = clmtlgy_interp( D, G, p [, lat, lon, ...
 %                           year, month, day, hour, minute, second, tformat ] )
 %        
 % OUT   F        Derived field/profile(s).
@@ -24,7 +26,12 @@
 %       G        Climatology data (in gformat).
 %       p        Pressure value or vector.
 % OPT   lat      Latitude value or vector. Default is [].
-%       p        Longitude value or vector. Default is [].
+%       lon      Longitude value or vector. Default is [].
+%        -
+%       time     If only one argument is given after lon, this value is 
+%                interpreted as time following G.TFORMAT/time grid. That is,
+%                doy, mjd or datenum.
+%        -
 %       year     Year value or vector. Default is [].
 %       month    Month value or vector. Default is [].
 %       day      Day value or vector. Default is [].
@@ -74,17 +81,20 @@ else
   tformat = G.TFORMAT;
 end
 %
-switch lower(tformat)
-  case 'doy'
-    t = mjd2doy( date2mjd( year, month, day, hour, minute, second ) );
-  case 'mjd'
-    t = date2mjd( year, month, day, hour, minute, second );
-  case 'datenum'
-    t = datenum( year, month, day, hour, minute, second );
-  otherwise
-    error( 'Unknown slection for *tformat*.' );
+if nargin == 6
+  t = year;
+else
+  switch lower(tformat)
+    case 'doy'
+      t = mjd2doy( date2mjd( year, month, day, hour, minute, second ) );
+    case 'mjd'
+      t = date2mjd( year, month, day, hour, minute, second );
+    case 'datenum'
+      t = datenum( year, month, day, hour, minute, second );
+    otherwise
+      error( 'Unknown slection for *tformat*.' );
+  end
 end
-
 
 
 if size(G.DATA,1) > 1  &  ~isempty(p)
