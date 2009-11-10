@@ -1,5 +1,14 @@
 2009-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-104
+
+	* physics/z2p_cira86.m: Now using the CIRA86 climatology. 
+
+	* forwardmodel/gformat/clmtlgy_interp.m: The interpolation for
+	pressure is now done linearly for log(p). (Was before linearly for p.
+
+2009-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-103
 
 	* physics/p2z_cira86.m: Now using the CIRA86 climatology, which

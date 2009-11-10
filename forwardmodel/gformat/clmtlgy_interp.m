@@ -7,6 +7,8 @@
 %     the size is 1. For example, a climatology holding zonal mean profiles
 %     should have size 1 for the longitude (third) dimension.
 %     
+%     The interpolation for pressure is done linearly for log(p).
+%
 %     The time dimension (fourth) can use different formats. The following 
 %     time formats are handled:
 %        'doy'     : day of the year (see *mjd2doy* for definition)
@@ -99,7 +101,8 @@ end
 
 if size(G.DATA,1) > 1  &  ~isempty(p)
   dims     = 1;
-  grids{1} = p;
+  grids{1} = log(p);
+  G.GRID1  = log( G.GRID1 );
 else
   dims = [];
 end
