@@ -1,3 +1,11 @@
+2009-11-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-105
+
+	* arts/qartsSensor.m (qartsSensor): Added FILL_FGRID.
+
+	* arts/qarts2cfile.m (cfile_Sensor): Added handling of FILL_FGRID. 
+
 2009-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-104

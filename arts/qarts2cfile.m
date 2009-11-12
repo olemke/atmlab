@@ -720,6 +720,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                    ( qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO )
       parts{end+1} = 'antenna';
     end
+    if qarts_isset( H.FILL_FGRID )
+      parts{end+1} = 'fill_fgrid';
+    end
     if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )  |  ...
                                        ( qarts_isset( H.MIXER_DO ) & H.MIXER_DO )
       parts{end+1} = 'mixer';
@@ -778,6 +781,18 @@ function T = cfile_Sensor( Q, partname, workfolder )
         end
         U{end+1} = 'sensor_responseInit';
         
+      case 'fill_fgrid'
+        v = qarts_get( H.FILL_FGRID );
+        if ~( isvector( v )  &  length( v ) == 2 )
+          error( 'The sensor *FILL_FGRID* must be a vector of length 2.' );
+        end
+        U{end+1} = 'sensor_responseFillFgrid( sensor_response,'; 
+        U{end+1} = '   sensor_response_f,sensor_response_pol,';
+        U{end+1} = '   sensor_response_za, sensor_response_aa,';
+        U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
+        U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
+        U{end+1} = sprintf( '   %d,%d)', v(1), v(2) );
+       
       case 'antenna'
         if qarts_isset( H.ANTENNA_LOS )
           U{end+1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...

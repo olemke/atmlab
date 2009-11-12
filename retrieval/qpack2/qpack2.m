@@ -162,6 +162,20 @@ I.FFIT_SI = [ ...
 'data for stretch even if such a fit is not made.'
 ];
 %-----------------------------------------------------------------------------
+P.FILL_FGRID = {};
+I.FILL_FGRID = [ ...
+'If field is set, *sensor_responseFillFgrid* is used. In short, this ',...
+'activates a polynomial interpolation of the spectra to a finer grid. This ',...
+'in order to decrease the impact of that the sensor response methods treat ', ...
+'the spectra to be piecewise linear functions. This grid filling can improve ',...
+'considerable the calculation accaracy for a given length of *f_grid. But ',...
+'negative effects can happen for unlucky choices of grid.',...
+'# If set, this field must be a vector of length 2, where the first ',...
+'values is polynomial order for the interpolation, and the second is the ',...
+'number of points to insert in each gap of *f_grid*. See further ',...
+'*sensor_responseFillFgrid*.'
+];
+%-----------------------------------------------------------------------------
 P.MBLOCK_ZA_GRID = [0];
 I.MBLOCK_ZA_GRID = [ ...
 'Identical to the qarts field with the same name. Default is [0].', ...
@@ -566,9 +580,10 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
       O.ga_max           = mandatory_qfield( Q, 'OEM_GA_MAX', 'OEM ML' );
     end
   end
-  O.yf          = mandatory_qfield( Q, 'OUT_Y' );
-                  mandatory_qfield( Q, 'OUT_A' );
   %
+  O.yf = mandatory_qfield( Q, 'OUT_Y' );
+  O.A  = mandatory_qfield( Q, 'OUT_A' );
+
   % Hard-coded settings
   %
   O.cost      = 1;
@@ -576,7 +591,6 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   O.e         = 1;
   O.eo        = 1;
   O.es        = 1;
-  O.A         = 1;
 
     
   %- Hard-coded A settings
@@ -684,8 +698,10 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   %
   S.BEAM_SWITCHING = Q.BEAM_SWITCHING;
   S.F_SWITCHING    = Q.F_SWITCHING;
+  S.FILL_FGRID     = Q.FILL_FGRID;
   %
   A.SENSOR_RESPONSE = S;
+  
   
   % Frequency
   %
