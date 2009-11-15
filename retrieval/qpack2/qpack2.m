@@ -582,7 +582,6 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   end
   %
   O.yf = mandatory_qfield( Q, 'OUT_Y' );
-  O.A  = mandatory_qfield( Q, 'OUT_A' );
 
   % Hard-coded settings
   %
@@ -591,7 +590,7 @@ function [A,Sx,O] = createAandSxandO(Q,workfolder)
   O.e         = 1;
   O.eo        = 1;
   O.es        = 1;
-
+  O.A         = 1;
     
   %- Hard-coded A settings
   %

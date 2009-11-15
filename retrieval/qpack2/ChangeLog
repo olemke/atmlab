@@ -1,3 +1,9 @@
+2009-11-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.pre16
+
+	* qpack2.m: O.A now always set to 1. Also needed to output mr. 
+
 2009-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.pre15

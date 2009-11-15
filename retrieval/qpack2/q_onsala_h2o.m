@@ -141,6 +141,7 @@ Q.BACKEND_CHANNEL_RESPONSE = ...
 % 90 degrees, without any "zenith load"
 Q.BEAM_SWITCHING           = 1;
 Q.MBLOCK_ZA_GRID           = [-65 0];
+Q.FILL_FGRID               = [ 5 4 ];
 
 
 %- Correlation of thermal noise 

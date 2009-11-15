@@ -94,7 +94,7 @@ else
     case 'datenum'
       t = datenum( year, month, day, hour, minute, second );
     otherwise
-      error( 'Unknown slection for *tformat*.' );
+      error( 'Unknown selection for *tformat*.' );
   end
 end
 

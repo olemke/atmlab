@@ -3,11 +3,14 @@
 %
 % Calculates number density values from VMR-values.
 %
-% Input:	vmr	vector(s) of VMR-values [-]
-%		p	vector of pressure values [Pa]
-%		t	vector of temperature values [K]
+% If any of vmr, p or t is not a scalar, the otehrs must have the 
+% same size or be scalars.
 %
-% Output:	n	vector of number density values [1/m3]
+% Input: vmr    vector(s) of VMR-values [-]
+%        p      vector of pressure values [Pa]
+%        t      vector of temperature values [K]
+%
+% Output:   n   vector of number density values [1/m3]
 %
 % Patrick Eriksson 1993
 % PE 2001-12-12, Adapted to AMI
@@ -18,14 +21,5 @@ function n = vmr2nd(vmr,p,t)
 
 kb = constants( 'BOLTZMANN_CONST' );
 
-vmr	= vec2col(vmr);
-p	= vec2col(p);
-t	= vec2col(t);
+n = (vmr.*p./(kb*t)); 
 
-[rows,cols] = size(vmr);
-
-if cols == 1
-   n	= (vmr.*p./(kb*t)); 
-else
-   n	= (vmr.*(p*ones(1,cols))./(kb*(t*ones(1,cols)))); 
-end
