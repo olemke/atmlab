@@ -1,5 +1,13 @@
 2009-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-3-108
+
+	* math/polysinfit.m: Created.
+
+	* forwardmodel/prbroad_width.m: t0/t -> t0./t 
+
+2009-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-3-107
 
 	* forwardmodel/lorentz_lshape.m: Corrected header.

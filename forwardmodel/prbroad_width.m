@@ -22,4 +22,4 @@
 
 function dp = prbroad_width(ga,n,t0,p,t)
   
-dp = ga * p .* (t0/t).^n;
+dp = ga * p .* (t0./t).^n;
