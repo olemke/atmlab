@@ -4,7 +4,7 @@
 %    basic version is denoted as the Lorentz line shape.
 %
 %    The line shape can be expressed as
-%      l = 1/pi * (f/f0)^prefac * ( dp/((f-f0)^2+dp) + dp/((f+f0)^2+dp) )
+%      l = 1/pi * (f/f0)^prefac * ( dp/((f-f0)^2+dp^2) + dp/((f+f0)^2+dp^2) )
 %    where the second term (including f+f0) is considered only if *mirror*
 %    is set.
 %

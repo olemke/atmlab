@@ -1,3 +1,15 @@
+2009-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-3-107
+
+	* forwardmodel/lorentz_lshape.m: Corrected header.
+
+	* forwardmodel/prbroad_width.m: Created.
+
+	* physics/p2z_cira86.m: As below.
+
+	* physics/z2p_cira86.m: Temprature can now be obtained in parallel. 
+
 2009-11-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-106
