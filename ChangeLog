@@ -1,3 +1,9 @@
+2009-11-20  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-3-109
+
+	* sensors/ssmt2_read.m: Add reading routine for SSM/T-2 data.
+
 2009-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-3-108
