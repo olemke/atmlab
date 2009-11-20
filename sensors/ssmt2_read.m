@@ -53,6 +53,19 @@ if nargin == 1
   apply_calibration = true;
 end
 
+uncompressed_filename='';
+if strcmp( filename(length(filename)-2:end), '.gz')
+  workarea = atmlab( 'WORK_AREA' );
+  uncompressed_filename = tempname(workarea);
+  cmd = [ 'gunzip -cd ' filename ' > ' uncompressed_filename ];
+  st = system (cmd);
+  if st
+    delete (uncompressed_filename);
+    error ('Failed to uncompress SSM/T-2 file');
+  end
+  filename = uncompressed_filename;
+end
+
 HDRSIZE = 692;
 DATSIZE = 692;
 NPOS    = 28;
@@ -105,8 +118,12 @@ try
     fseek (fid, recn*692, 'bof');
 
     rec.orbit = fread (fid, 1, 'uint32');
-
-    if (~rec.orbit), fclose (fid); return; end
+    
+    if (~rec.orbit)
+      fclose (fid);
+      if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
+      return;
+    end
 
     rec.scan  = fread (fid, 1, 'uint16');
     rec.t1x   = fread (fid, 1, 'uint16');
@@ -145,8 +162,10 @@ try
   end
 catch
   fclose (fid);
+  if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
   return;
 end
 
 fclose(fid);
+if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
 
