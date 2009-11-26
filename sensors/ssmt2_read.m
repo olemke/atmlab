@@ -142,7 +142,9 @@ try
     rec.rawcal = fread (fid, 172, 'uint8');
 
     rec.slope  = fread (fid, NCHAN, 'int16')' / 10000;
-    rec.offset = fread (fid, NCHAN, 'int16')' / 20;
+    %FIXME OLE: The offset factor was changed at some point 
+    %rec.offset  = fread (fid, NCHAN, 'int16')' / 100;
+    rec.offset  = fread (fid, NCHAN, 'int16')' / 20;
 
     rec.qc_earth = fread (fid, 1, 'uint16');
     rec.qc_scene = fread (fid, 1, 'uint16');

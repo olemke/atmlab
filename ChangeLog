@@ -1,3 +1,9 @@
+2009-11-26  Oliver Lemke  <olemke(at)core-dump.info>
+
+	* atmlab-0-3-111
+
+	* sensors/ssmt2_read.m: Add FIXME for change in offset calculation.
+
 2009-11-20  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-3-110
