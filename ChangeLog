@@ -1,5 +1,14 @@
 2009-11-26  Oliver Lemke  <olemke(at)core-dump.info>
 
+	* atmlab-0-3-112
+
+	* sensors/atovs/atovs_get_l1c.m:
+
+	Wrapper function to convert an AMSU file from level 1B to level 1C and
+	read it.
+
+2009-11-26  Oliver Lemke  <olemke(at)core-dump.info>
+
 	* atmlab-0-3-111
 
 	* sensors/ssmt2_read.m: Add FIXME for change in offset calculation.
