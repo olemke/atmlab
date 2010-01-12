@@ -1,3 +1,12 @@
+2010-01-12  Oliver Lemke  <olemke(at)core-dump.info>
+
+	* atmlab-0-3-113
+
+	* sensors/ssmt2_read.m:
+	
+	Only read S.nscan scanlines instead of all the way to EOF.
+	Avoids reading garbage at the end of the file.
+
 2009-11-26  Oliver Lemke  <olemke(at)core-dump.info>
 
 	* atmlab-0-3-112

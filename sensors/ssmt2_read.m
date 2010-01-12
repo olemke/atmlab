@@ -113,7 +113,7 @@ S.qc_cal   = fread (fid, NCHAN, 'uint16');
 %
 recn = 0;
 try
-  while (~feof (fid))
+  while (~feof (fid) && recn < S.nscan)
     recn = recn + 1;
     fseek (fid, recn*692, 'bof');
 
