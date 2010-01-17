@@ -28,7 +28,7 @@ es = e_eq_water(T);
 if nargin < 3
     rh = 100 .* ew ./ es;
 else
-    rh = 100 .* ew .* (p - es) / (es .* (p -ew));
+    rh = 100 .* ew .* (p - es) ./ (es .* (p -ew));
 end
 
 
