@@ -1,5 +1,5 @@
-function se = create_ascii4GMTplot(se,field)
-%%   create_ascii4GMTplot
+function se = create_ascii4gmtplot(se,field)
+%%   create_ascii4gmtplot
 %
 % Purpose: To create an ascii file containing (lon,lat,value)
 %          This function is called if the data is not gridded!

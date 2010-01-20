@@ -1,6 +1,6 @@
-function file = xtraNaNlegend()
+function file = xtra_nan_legend()
 
-%%%%%%%%%%%%%%%% xtraNaNlegend %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% xtra_nan_legend %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Purpose: To create an extra legend box for the missing values
 %          (allways grey)
@@ -10,11 +10,11 @@ function file = xtraNaNlegend()
 % Author: Salomon Eliasson
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%create NaN.cpt for NaN colorbox
-file = 'color_NaN.cpt'; %save to local file
+%create nan.cpt for NaN colorbox
+file = 'color_nan.cpt'; %save to local file
 fid = fopen(file,'w');
 %##################### HEADER ###############################
-fprintf(fid,'%s\n','#cpt file created by: xtraNaNlegend.m');
+fprintf(fid,'%s\n','#cpt file created by: xtra_nan_legend.m');
 fprintf(fid,'%s\n','# Created for NaN colorbox');
 fprintf(fid,'%s\n%s\n','#COLOR_MODEL = RGB','#'); %currently only hew rainbow
                                                   %############################################################

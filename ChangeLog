@@ -1,5 +1,13 @@
 2010-01-20  Oliver Lemke  <olemke(at)core-dump.info>
 
+	* atmlab-0-3-117
+
+	* graphs/gmt/xtra_nan_legend.m, graphs/gmt/create_ascii4gmtplot.m:
+
+	Make these also lowercase.
+
+2010-01-20  Oliver Lemke  <olemke(at)core-dump.info>
+
 	* atmlab-0-3-116
 
 	* graphs/plot/gmt_plot.m: Make function name lowercase.

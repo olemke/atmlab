@@ -147,7 +147,7 @@ if out.grid
     catch ME
         keyboard
     end
-else out = create_ascii4GMTplot(out,field);                                     % create ascii (not gridded)
+else out = create_ascii4gmtplot(out,field);                                     % create ascii (not gridded)
 end
 
 create_gmt_earth(out);                                                          % main function

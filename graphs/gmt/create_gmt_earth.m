@@ -264,10 +264,10 @@ else
     a.cptfile = se.cptfile;
 end
 
-a.cptnan = 'color_NaN.cpt';                                                     % extra legend box for missing values
+a.cptnan = 'color_nan.cpt';                                                     % extra legend box for missing values
 z = dir (a.cptnan);
 if isempty(z)
-    xtraNaNlegend();
+    xtra_nan_legend();
 end
 
 function a = mkpltimage(se)                                                     %% mkpltimage %%
