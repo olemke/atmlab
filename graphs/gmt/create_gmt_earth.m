@@ -1,7 +1,7 @@
 function create_gmt_earth(se)
 %           create_gmt_earth
 %
-% See GMT_plot for input details
+% See gmt_plot for input details
 %
 % 4/12-2009 Salomon Eliasson
 

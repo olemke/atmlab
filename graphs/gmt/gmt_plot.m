@@ -2,7 +2,7 @@
 % 
 % It is assumed that the data is CENTERED at the corresponding lat/lon points.
 %
-% FORMAT   filename = GMT_plot(in,field)
+% FORMAT   filename = gmt_plot(in,field)
 %        
 % OUT   filename    The filename of the figure.
 %
@@ -133,7 +133,7 @@
 % 
 % 2010-01-20   Created by Salomon Eliasson
 
-function filename = GMT_plot(in,field)
+function filename = gmt_plot(in,field)
 
 if ~exist('field','var'), field = 'datafield'; end
 

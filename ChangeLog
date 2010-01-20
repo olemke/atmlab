@@ -1,3 +1,9 @@
+2010-01-20  Oliver Lemke  <olemke(at)core-dump.info>
+
+	* atmlab-0-3-116
+
+	* graphs/plot/gmt_plot.m: Make function name lowercase.
+
 2010-01-20  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-3-115
