@@ -44,6 +44,7 @@ addpath( fullfile( toppath, 'math', 'covmat' ) );
 addpath( fullfile( toppath, 'math' ) ); 
 addpath( fullfile( toppath, 'handy' ) ); 
 addpath( fullfile( toppath, 'graphs', 'geoplots' ) ); 
+addpath( fullfile( toppath, 'graphs', 'gmt' ) ); 
 addpath( fullfile( toppath, 'graphs' ) );
 addpath( fullfile( toppath, 'forwardmodel', 'scattering' ) ); 
 addpath( fullfile( toppath, 'forwardmodel', 'mie' ) ); 

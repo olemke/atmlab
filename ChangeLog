@@ -1,4 +1,10 @@
-2010-01-20  Salomon Eliasson  <seliasson@ubuntu6>
+2010-01-20  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-3-115
+
+	* graphs/gmt: Added plotting rountines for GMT (Generic Mapping Tools).
+
+	* atmlab/atmlab_init.m (atmlab_init): Added graphs/gmt to path.
 
 	* atmlab/atmlab_defs.m: Added 3 extra defaults. outdir, pdfviewer
 	and psviewer. These are necessary for the GMT plotting routines
