@@ -28,4 +28,6 @@ A.SCREEN_WIDTH      = 70;
 A.SKIP_VFIXES       = 0;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = NaN;
-
+A.OUTDIR            = '.';
+A.PDFVIEWER         = NaN;
+A.PSVIEWER          = NaN;
