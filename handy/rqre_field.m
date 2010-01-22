@@ -2,26 +2,40 @@
 %
 %    Issues an error if criterion not fulfilled.
 %
-% FORMAT   rqre_field( Q, fieldname [, accept_nan ] )
+% FORMAT   rqre_field( Q, fieldname [, nonstdname ] )
 %        
-% IN    Q           The structure.
-%       fieldname   Name of field.
-% OPT   accept_nan  Flag for treatment of NaNs. Default is 1.
-%                   Set to 0 to get an error if any NaN is found.
+% IN    Q             The structure.
+%       fieldname     Name of field.
+% OPT   nonstdname    Name of variable to use in error message. Default is
+%                     to use the function *inputname* to determine the
+%                     variable name.
 
 % 2005-03-15   Created by Patrick Eriksson.
 
 
-function rqre_field( Q, fieldname, accept_nan )
+function rqre_field( Q, fieldname, nonstdname )
+%
+if nargin < 3, nonstdname = []; end
+ 
+%- Handle the cellstr case in recursive manner
+if iscellstr( fieldname )
+  for i = 1 : length(fieldname)
+    rqre_field( Q, fieldname{1}, nonstdname );
+  end
+  return
+end
+                                                                           %&%
+assert( ischar( fieldname ) );                                             %&%
+assert( ischar( nonstdname )  ||  isempty( nonstdname ) );                 %&%
+  
 
-if ~isfield( Q, fieldname )
-  error( sprintf('Structure %s is required to have field %s.', ...
-                                                   inputname(1), fieldname ) );
+if isempty(nonstdname)
+  vname = sprintf( 'The variable *%s*', inputname(1) );
+else
+  assert( ischar( nonstdname ) );                                          %&%
+  vname = sprintf( '%s', nonstdname );
 end
 
-if nargin > 3  &  ~accept_nan
-  if any( isnan( getfield(Q,fieldname) ) )
-    error( sprintf( 'Not allowed NaN found in %s.%s.', inputname(1), ...
-                                                                 fieldname ) );
-  end
+if ~isfield( Q, fieldname )
+  error( sprintf('%s is required to have the field *%s*.', vname, fieldname ) );
 end

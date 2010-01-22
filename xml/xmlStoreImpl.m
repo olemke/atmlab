@@ -23,7 +23,7 @@ function xmlStoreImpl(filename, comment, data, type, precision)
 
 %=== Basic ckeck of input
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 %
 if nargin < 5
   precision = 'FLOAT';

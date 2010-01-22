@@ -24,7 +24,7 @@ function X = randmvar_normal(x,si,C,n)
 
 %= Check input
 %
-min_nargin( 4, nargin );
+rqre_nargin( 4, nargin );
 %
 if dimens(C) > 2  |  size(C,1) ~= size(C,2) 
   error('Input argument *C* must be a square matrix.');

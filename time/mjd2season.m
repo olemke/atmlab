@@ -13,12 +13,14 @@
 % 2006-03-31   Created by Patrick Eriksson.
 
 function s = mjd2season(mjd,month1)
-
+%
 if nargin < 2
   month1 = 12;
 end
-
-rqre_scalar( 'month1', month1, 1, 12 )
+                                                                            %&%
+rqre_datatype( mjd, @isnumeric );                                           %&%
+rqre_alltypes( month1, {@istensor0,@iswhole} );                             %&%
+rqre_in_range( month1, 1, 12 );                                             %&%
 
 
 m = floor(mjd2month(mjd)) - month1 + 1;

@@ -43,13 +43,8 @@
 
 
 function Q = asg2q( D, G, Q, workfolder, icases )
-
-  
-%- Default values
 %
-icases_DEFAULT = 1;
-%
-set_defaults;
+icases = optargs( varargin, { 1 } );
 
 
 %- Basic checks of input
@@ -61,7 +56,7 @@ end
 
 %- Check that atmospheric grids are set
 %
-rqre_scalar( 'Q.ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
+rqre_scalar( Q.ATMOSPHERE_DIM, 1, 3, 'Q.ATMOSPHERE_DIM' );
 %
 if isnan( Q.P_GRID )  |  isscalar( Q.P_GRID )
   error( 'No valid grid found for Q.P_GRID.' );

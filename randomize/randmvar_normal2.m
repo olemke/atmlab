@@ -24,7 +24,7 @@ function X = randmvar_normal2(x,S,n)
 
 %= Check input
 %
-min_nargin( 3, nargin );
+rqre_nargin( 3, nargin );
 %
 if ~isvector(x) 
   error('Input argument *x* must be a vector.');

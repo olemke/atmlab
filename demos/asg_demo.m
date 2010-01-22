@@ -28,14 +28,9 @@
 
 % Created by Bengt Rydberg
 
-function [G,FS]=asg_demo( dim,sensor )
-
-%= Set defualts
+function [G,FS]=asg_demo( dim, varargin )
 %
-dim_DEFAULT     = 3;
-sensor_DEFAULT='odin';
-%
-set_defaults;
+[sensor] = optargs( varargin, { 'odin' } );
 
 
 %SET BASIC PROPERTIES 

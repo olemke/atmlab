@@ -18,11 +18,9 @@
 % 2005-06-08   Created by Patrick Eriksson.
 
 
-function s = vector2commalist(x,fstring)
-
-fstring_DEFAULT = '%1g';
+function s = vector2commalist(x,varargin)
 %
-set_defaults;
+[fstring] = optargs( varargin, { '%1g' } );
 
 s = '';
 

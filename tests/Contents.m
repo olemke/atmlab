@@ -1,2 +1,2 @@
-% Functions to testing parts of atmlab.
+% Functions for testing parts of atmlab.
 

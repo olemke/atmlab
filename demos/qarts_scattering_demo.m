@@ -28,16 +28,9 @@
 % 2005-06-13  Created by Claudia Emde
 
 
-function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, do_mc, mc_err )
-
-%- Set default values
+function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( varargin )
 %
-ztan_DEFAULT   = [7 10 13]*1e3;
-do_mc_DEFAULT  = 0;
-mc_err_DEFAULT = 5;
-%
-set_defaults;
-
+[ztan,do_mc,mc_err] = optargs( varargin, { [7 10 13]*1e3, 0, 5 } );
 
 
 %= Init Q structure

@@ -53,38 +53,32 @@
 % 2005-06-14   Created by Patrick Eriksson.
 
 
-function [V1,V2] = arts_abcde(Q,vnames1,vnames2)
-
-
-%- Default values
+function [V1,V2] = arts_abcde(Q,vnames1,vnames2,workfolder)
 %
-workfolder_DEFAULT = [];
-%
-set_defaults;
-
-
-%= Check input
-%
-min_nargin(2,nargin);
-%
-if ~iscellstr( vnames1 )
-  error('Argument *vnames1* must be a cell array of strings.');
+if nargin < 4
+  workfolder = [];
 end
-%
-if nargin >=3  &  ~iscellstr( vnames2 )
-  error('Argument *vnames2* must be a cell array of strings.');
-end
-%
-rqre_datatype( {'empty','char'}, workfolder );
+                                                                 %&%
+                                                                 %&%
+%= Check input                                                   %&%
+%                                                                %&%
+rqre_nargin(2,nargin);                                           %&%
+%                                                                %&%
+rqre_datatype( Q, @isstruct );                                   %&%
+rqre_datatype( vnames1, @iscellstr );                            %&%
+if nargin >=3                                                    %&%
+  rqre_datatype( vnames2, @iscellstr );                          %&%
+end                                                              %&%
+%                                                                %&%
+rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
 
 
-folder_created = 0;
-%
 if isempty( workfolder )
   workfolder     = create_tmpfolder;
   folder_created = 1;
+else
+  folder_created = 0;
 end
-
 
 try
 
@@ -94,7 +88,6 @@ try
   S     = qarts2cfile( Q, parts, workfolder );
   S     = S(1:end-1);
 
-
   %= Add saving of variables
   %
   for i = 1:length(vnames1)
@@ -102,16 +95,14 @@ try
     S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
   end
 
-
   %= Add closing 
   %
   S{end+1}  = '}';
 
-
   %= Create control file and run 
   %
   cfile = fullfile( workfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
 
 
@@ -119,8 +110,6 @@ catch
   delete_tmpfolder( workfolder );
   rethrow(lasterror);
 end
-
-
 
 
 %= Read stored variables

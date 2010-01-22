@@ -56,7 +56,7 @@ function qtool(S,outfile,Q,dbg)
 
 %= Input
 %
-min_nargin( 3, nargin );
+rqre_nargin( 3, nargin );
 %
 if nargin < 4
   dbg = 0;

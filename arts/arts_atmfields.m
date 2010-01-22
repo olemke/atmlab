@@ -39,7 +39,15 @@
 % 2004-09-11   Created by Patrick Eriksson.
 
 
-function [t_field,z_field,vmr_field,r_geoid,z_surface] = arts_atmfields(Q,p,lat,lon)
+function [t_field,z_field,vmr_field,r_geoid,z_surface] = ...
+                                                      arts_atmfields(Q,p,lat,lon)
+
+%= Check input                                                   %&%
+%                                                                %&%
+rqre_nargin(1,nargin);                                           %&%
+%                                                                %&%
+rqre_datatype( Q, @isstruct );                                   %&%
+% p,lat and lon checked inside qarts2cfile                       %&%
 
 if nargin >= 2
   Q.P_GRID = p;
@@ -51,7 +59,7 @@ if nargin >= 4
   Q.LON_GRID = lon;
 end
 
-Q.USE_RAW_ATMOSPHERE = 1;
+Q.USE_RAW_ATMOSPHERE = true;
 
 tmpfolder   = create_tmpfolder;
 
@@ -59,7 +67,7 @@ try
   parts = qarts2cfile( 'GetAtmSrf' );
   S = qarts2cfile( Q, parts, tmpfolder );
   cfile = fullfile( tmpfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
   t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
   z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml') );

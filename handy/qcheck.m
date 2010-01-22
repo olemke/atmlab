@@ -13,11 +13,11 @@
 %    where the INFO structure shall have the same fields as Q, and each
 %    field of INFO holds a basic string with a description of the field.
 %
-%    For a practical example, see e.g. the function *qarts1*. Test e.g.
+%    For a practical example, see e.g. the function *qarts*. Test e.g.
 %      more on
-%      qinfo(@qarts1,'all');
+%      qinfo(@qarts,'all');
 %    or 
-%      qinfo(@qarts1,'LINE*');
+%      qinfo(@qarts,'W*');
 %
 % FORMAT   qcheck( qfun, Q )
 %        

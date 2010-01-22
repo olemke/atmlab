@@ -11,17 +11,17 @@
 
 
 function As = splitA(A,ji)
-
-
-if ~ismatrix(A)  |  size(A,1)~=size(A,2)
-  error( 'Input argument *A* must be a square matrix.' );
-end
-if ~ismatrix(ji)  &  size(ji,2)
-  error( 'Input argument *ji* must be a matrix with 2 columns.' );
-end
-if ji(end,2) ~= size(A,1)
-  error( 'Inconsistency between *A* and *ji*.' );
-end
+                                                                            %&%
+rqre_nargin( 2, nargin );                                                   %&%
+if ~istensor2(A)  |  size(A,1)~=size(A,2)                                   %&%
+  error( 'Input argument *A* must be a square matrix.' );                   %&%
+end                                                                         %&%
+if ~istensor2(ji)  &  size(ji,2)                                            %&%
+  error( 'Input argument *ji* must be a matrix with 2 columns.' );          %&%
+end                                                                         %&%
+if ji(end,2) ~= size(A,1)                                                   %&%
+  error( 'Inconsistency between *A* and *ji*.' );                           %&%
+end                                                                         %&%
 
 for i = 1:size(ji,1)
   ind   = ji(i,1) : ji(i,2);

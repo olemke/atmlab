@@ -15,11 +15,10 @@
 
 
 function S = file2strs( filename )
-
-
-%= Input
-%
-min_nargin( 1, filename );
+                                                                           %&%
+%= Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin( 1, nargin );                                                  %&%
 
 
 %= Open file for reading

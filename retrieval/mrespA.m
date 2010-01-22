@@ -1,8 +1,10 @@
-% MRESPA   Measurement response
+% MRESPA   Get measurement response from an averaging kernel matrix
 %
-% FORMAT   mresp = mrespA( A, ji )
+% FORMAT   [mresp,As] = mrespA( A, ji )
 %        
 % OUT   mresp   Measurement response.
+%       As      Array of matrices. One matrix for each retrieval quantity. 
+%               As returned by *splitA*.
 % IN    A       Complete averaging kernel matrix.
 %       ji      Matrix of two columns, where the columns hold start and end 
 %               index for each retrieval quantity.
@@ -10,7 +12,7 @@
 % 2006-09-29   Created by Patrick Eriksson.
 
 
-function mresp = mrespA(A,ji)
+function [mresp,As] = mrespA(A,ji)
 
 % Checks are done in *splitA*
 

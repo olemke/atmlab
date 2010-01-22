@@ -3,7 +3,7 @@
 %    Internal function that should never be called directly.
 %    Use *xmlLoad* instead.
 %
-% FORMAT   result = xmlReadArrayOfLineRecord(fid, attrlist, itype, ftype, binary, fid2)
+% FORMAT   result = xmlReadArrayOfLineRecord(fid,attrlist,itype,ftype,binary,fid2)
 %
 % OUT   result     Array
 % IN    fid        File descriptor of XML file
@@ -15,18 +15,15 @@
 
 % 2002-09-25   Created by Oliver Lemke.
 
-function result = xmlReadArrayOfLineRecord(fid, attrlist, itype, ftype, binary, fid2)
+function result = xmlReadArrayOfLineRecord(fid,attrlist,itype,ftype,binary,fid2)
 
 ne = str2num (xmlGetAttrValue (attrlist, 'nelem'));
 
-%=== Default values
+%=== Some old setting varaibles
 %
-flims_DEFAULT  = [0 Inf];
-sorted_DEFAULT = 0;
-ilim_DEFAULT   = 0;
-%
-set_defaults;
-
+flims  = [0 Inf];
+sorted = 0;
+ilim   = 0;
 
 
 %=== Present version number

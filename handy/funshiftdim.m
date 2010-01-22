@@ -20,38 +20,32 @@
 
 
 function Y = funshiftdim(X,dim,funhandle,varargin)
-
-  
-%- Set default vales
 %
-dim_DEFAULT      = 1;
-varargin_DEFAULT = { 'X' };
-%
-set_defaults;
-
-  
-%- Check input
-%
-if ~isnumeric(X)
-  error( 'Input argument *X* must be of numeric type.' );
-end
-%
-rqre_scalar( 'input argument *dim*', dim, 1 );
-if dim > dimens(X)
-  error( 'The selected dimension (*dim*) must be <= dimens(X).' );
-end
-%
-if ~isa( funhandle, 'function_handle' )
-  error( 'Input argument *funhandle* must be a function handle.' );  
+if nargin < 4
+  varargin = { 'X' };
 end
 %
 ix = find( strcmp(varargin,'X') );
-%
-if isempty(ix)
-  error( 'One of the varargin arguments must be the string ''X''.' );
-elseif length(ix) > 1
-  error( 'Found several ''X'' among the varargin arguments.' );
-end
+                                                                          %&%
+                                                                          %&%  
+%- Check input                                                            %&%
+%                                                                         %&%
+rqre_nargin( 3, nargin );                                                 %&%
+%                                                                         %&%
+rqre_datatype( X, @isnumeric );                                           %&%
+rqre_alltypes( dim, {@istensor0,@iswhole} );                              %&%
+rqre_in_range( dim, 1, 6 );                                               %&%
+if dim > dimens(X)                                                        %&%
+  error( 'The selected dimension (*dim*) must be <= dimens(X).' );        %&%
+end                                                                       %&%
+%                                                                         %&%
+rqre_datatype( X, @isfunction_handle );                                   %&%
+%                                                                         %&%
+if isempty(ix)                                                            %&%
+  error( 'One of the varargin arguments must be the string ''X''.' );     %&%
+elseif length(ix) > 1                                                     %&%
+  error( 'Found several ''X'' among the varargin arguments.' );           %&%
+end                                                                       %&%
 
 
 %- Move selected dimension to front

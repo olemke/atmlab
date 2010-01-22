@@ -15,15 +15,9 @@
 % 2005-05-21   Created by Patrick Eriksson.
 
 
-function c = cdf_normal(x,xm,si)
-
-
-%= Set default values
+function c = cdf_normal(x,varargin)
 %
-xm_DEFAULT = 0;
-si_DEFAULT = 1;
-%
-set_defaults;
+[xm,si] = optargs( varargin, { 0, 1 } );
 
 
 c = erf( (x-xm)/sqrt(2)/si )/2 + 0.5;

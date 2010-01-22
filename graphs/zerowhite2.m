@@ -34,16 +34,9 @@
 % 2007-03-12   Created by Patrick Eriksson.
 
 
-function zerowhite2(dx,rgb,pbl,nbl)
-
-
-%- Default values
+function zerowhite2(dx,varargin)
 %
-rgb_DEFAULT = 'nzp';
-pbl_DEFAULT = 0.5;
-nbl_DEFAULT = 0.5;
-%
-set_defaults;
+[rgb,pbl,nbl] = optargs( varargin, { 'nzp', 0.5, 0.5 } );
 
   
 if dx <= 0

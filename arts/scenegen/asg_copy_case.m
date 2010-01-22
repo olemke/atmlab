@@ -17,12 +17,8 @@
 % 2007-10-22   Created by Patrick Eriksson
 
 function G = asg_copy_case( D, G, ncopies, icopy )
-  
-%- Default values
 %
-icopy_DEFAULT = [];
-%
-set_defaults;
+icopy = optargs( varargin, { [] } );
 
   
 for ig = 1 : length(G)

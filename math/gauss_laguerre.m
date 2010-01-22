@@ -24,14 +24,9 @@
 
 % History: 2005-05-13  Created by Bengt Rydberg
 
-function [x_i,w_i]=gauss_laguerre(alpha,N,xnorm);
-
-
-%= Set defaults
+function [x_i,w_i]=gauss_laguerre(alpha,N,varargin)
 %
-xnorm_DEFAULT = 1;
-%
-set_defaults;
+[xnorm] = optargs( varargin, { 1 } );
 
 
 L_size=100000;

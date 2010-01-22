@@ -1,17 +1,17 @@
 % OEM   Data inversion by "optimal estimation method"
 %
 %    The name OEM is here kept as it is so well established in the atmospheric
-%    community. A better name would be "the maximum a posteriori solution".
-%    See "Inverse methods for atmospheric sounding: Theory and practice"
-%    by C.D. Rodgers for background and theory.
+%    community. A better name would be "the maximum a posteriori solution". See
+%    "Inverse methods for atmospheric sounding: Theory and practice" by C.D.
+%    Rodgers for background and theory.
 %
-%    The Marquardt-Levenberg method is implemented following Eq. 5.36 of Rodgers'
-%    book. The gamma factor, here denoted as ga, is not allowed to exceed
-%    O.ga_max. When a succesful iteration has been performed, ga is decreased
-%    following O.ga_factor_ok. For cases when a lower cost is not obtained, ga is
-%    increased by O.ga_factor_not_ok. Values of ga below 1 will be treated as
-%    zero. If not a lower cost is obtained for ga=0, then ga=1 is tested. 
-%    O.ga_start is used as start value for ga.
+%    The Marquardt-Levenberg method is implemented following Eq. 5.36 of
+%    Rodgers' book. The gamma factor, here denoted as ga, is not allowed to
+%    exceed O.ga_max. When a succesful iteration has been performed, ga is
+%    decreased following O.ga_factor_ok. For cases when a lower cost is not
+%    obtained, ga is increased by O.ga_factor_not_ok. Values of ga below 1 will
+%    be treated as zero. If not a lower cost is obtained for ga=0, then ga=1 is
+%    tested. O.ga_start is used as start value for ga.
 %
 %    The OEM calculations are controlled by the structure O. The fields of O,
 %    and associated descriptions, are listed by
@@ -101,43 +101,43 @@ function [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 if ~nargin
 
 %-----------------------------------------------------------------------------
-O.A = 0;
+O.A = false;
 I.A = [ ...
 'Flag to include averaging kernel matrix in X. Default is 0.'
 ];
 %-----------------------------------------------------------------------------
-O.cost = 0;
+O.cost = false;
 I.cost = [ ...
 'Flag to include cost values in X and to calculate cost even if solution ',...
 'method does not require cost values. This affects also the output to ',...
 '*outfids*.'
 ];
 %-----------------------------------------------------------------------------
-O.dx = 0;
+O.dx = false;
 I.dx = [ ...
 'Flag to include the sequence of convergence values (defined as for *stop_dx*).'
 ];
 %-----------------------------------------------------------------------------
-O.e = 0;
+O.e = false;
 I.e = [ ...
 'Flag to include in X the estimate of total retrieval error  (square root ',...
 'of diagonal elements of S). That is, the standard deviation for the sum ',...
 'of observation and smoothing errors.'
 ];
 %-----------------------------------------------------------------------------
-O.eo = 0;
+O.eo = false;
 I.eo = [ ...
 'Flag to include in X the estimate of observation error (square root of ',...
 'diagonal elements of So).'
 ];
 %-----------------------------------------------------------------------------
-O.es = 0;
+O.es = false;
 I.es = [ ...
 'Flag to include in X the estimate of smootning error (square root of ',...
 'diagonal elements of Ss).'
 ];
 %-----------------------------------------------------------------------------
-O.G = 0;
+O.G = false;
 I.G = [ ...
 'Flag to include gain matrix in X (alse denoted as Dy).'
 ];
@@ -197,18 +197,18 @@ I.i_rel = [ ...
 'for which a rescaling is needed.'
 ];
 %-----------------------------------------------------------------------------
-O.J = 0;
+O.J = false;
 I.J = [ ...
 'Flag to include weighting function matrix in X.'
 ];
 %-----------------------------------------------------------------------------
-O.jexact = 0;
+O.jexact = false;
 I.jexact = [ ...
 'Flag to select recalculation of J after last iteration. If not set to 1, ',...
 'J will correspond to x before last iteration. Also used for the linear case.'
 ];
 %-----------------------------------------------------------------------------
-O.jfast = 0;
+O.jfast = false;
 I.jfast = [ ...
 'Flag to always calculate the Jacobian in parallel to the spectrum. This ',...
 'field is only used for the Marquardt-Levenberg case. This option can save ',...
@@ -218,7 +218,7 @@ I.jfast = [ ...
 'forward model.'
 ];
 %-----------------------------------------------------------------------------
-O.linear = 0;
+O.linear = false;
 I.linear = [ ...
 'Flag to trigger a linear inversion. Fields like itermethod are ignored if ',...
 'this option is selected. Default is non-linear (0).'
@@ -241,18 +241,18 @@ I.outfids = [ ...
 'for no output att all.'
 ];
 %-----------------------------------------------------------------------------
-O.S = 0;
+O.S = false;
 I.S = [ ...
 'Flag to include covariance matrix for total error in X. That is, the sum ',...
 'of So and Ss.'
 ];
 %-----------------------------------------------------------------------------
-O.So = 0;
+O.So = false;
 I.So = [ ...
 'Flag to include covariance matrix for observation error in X.'
 ];
 %-----------------------------------------------------------------------------
-O.Ss = 0;
+O.Ss = false;
 I.Ss = [ ...
 'Flag to include covariance matrix for smoothing error in X.'
 ];
@@ -264,7 +264,7 @@ I.stop_dx = [ ...
 'length of x is applied.'
 ];
 %-----------------------------------------------------------------------------
-O.sxnorm = 0;
+O.sxnorm = false;
 I.sxnorm = [ ...
 'Flag to internally perform a normalisation of x, based on the diagonal ',...
 'elements of Sx. This to avoid a pure condition number for a matrix ',...
@@ -274,13 +274,13 @@ I.sxnorm = [ ...
 'and there is no use in pre-calculating *Sxinv*.'
 ];
 %-----------------------------------------------------------------------------
-O.yf = 0;
+O.yf = false;
 I.yf = [ ...
 'Flag to include "fitted spectrum" in X. That is, the simulated ',...
 'measurement matching retrieved state.'
 ];
 %----------------------------------------------------------------------------- 
-O.Xiter = 0;
+O.Xiter = false;
 I.Xiter = [ ...
 'Flag to include all iteration states in X.'
 ];
@@ -301,66 +301,110 @@ end
 
 
 %=== Check of input ===========================================================
-                                   
-  min_nargin( 6, nargin );
+                                                                            %&%
+  rqre_nargin( 6, nargin );                                                 %&%
+                                                                            %&%
+  %- O                                                                      %&%
+  %                                                                         %&%
+  rqre_datatype( O, @isstruct );                                            %&%
+  qcheck( @oem, O );                                                        %&%
+  %                                                                         %&%
+  rqre_datatype( O.linear, @isboolean, 'O.linear' );                        %&%
+  rqre_datatype( O.outfids, {@isempty,@isvector}, 'O.outfids' );            %&%
+  %                                                                         %&%
+  if ~O.linear                                                              %&%
+    rqre_datatype( O.itermethod, @ischar, 'O.itermethod' );                 %&%
+    rqre_datatype( O.maxiter, @istensor0, 'O.maxiter' );                    %&%
+    rqre_datatype( O.stop_dx, @istensor0, 'O.stop_dx' );                    %&%
+    rqre_in_range( O.maxiter, 1, [], 'O.maxiter' );                         %&%
+    rqre_in_range( O.stop_dx, 0, [], 'O.stop_dx' );                         %&%
+    %                                                                       %&%
+    if strcmp( upper(O.itermethod), 'GN' )                                  %&% 
+    elseif strcmp( upper(O.itermethod), 'ML' )  |  ...                      %&%
+           strcmp( upper(O.itermethod), 'LM' )                              %&%
+      %                                                                     %&%
+      rqre_datatype( O.ga_start, @istensor0, 'O.ga_start' );                %&%
+      rqre_datatype( O.ga_max, @istensor0, 'O.ga_max' );                    %&%
+      rqre_datatype( O.ga_factor_ok, @istensor0, 'O.ga_factor_ok' );        %&%
+      rqre_datatype( O.ga_factor_not_ok, @istensor0, 'O.ga_factor_not_ok' );%&%
+      %                                                                     %&%
+      rqre_in_range( O.ga_start, 0, [], 'O.ga_start' );                     %&%
+      if O.ga_max <= 1                                                      %&%
+        error( 'O.ga_max must be > 1.' );                                   %&%
+      end                                                                   %&%
+      if O.ga_factor_ok <= 1                                                %&%
+        error( 'O.ga_factor_ok must be > 1.' );                             %&%
+      end                                                                   %&%
+      if O.ga_factor_not_ok <= 1                                            %&%
+        error( 'O.ga_factor_not_ok must be > 1.' );                         %&%
+      end                                                                   %&%
+    else                                                                    %&%
+      error( ['Unknown choice for iteration method. ', ...                  %&%
+                             'Possible choices are ''GN'' and ''ML''.' ] ); %&%
+    end                                                                     %&%
+  end                                                                       %&%
+  %                                                                         %&%
+  if ~isempty( intersect( O.i_log, O.i_rel ) )                              %&%
+    error( 'No index can be part of both O.i_rel and O.i_log.' );           %&%
+  end                                                                       %&%
+                                                                            %&%
+  rqre_datatype( Q, @isstruct );                                            %&%
+  rqre_datatype( R, {@isempty,@isstruct} );                                 %&%
+  rqre_datatype( comfun, @isfunction_handle );                              %&%
+                                                                            %&%
+  rqre_datatype( Se, @istensor2 );                                          %&%
+  rqre_datatype( Sx, @istensor2 );                                          %&%
+  if size(Se,1) ~= size(Se,2)                                               %&%
+    error('Input argument *Se* must be a square matrix.');                  %&%
+  end                                                                       %&%
+  if size(Sx,1) ~= size(Sx,2)                                               %&%
+    error('Input argument *Sx* must be a square matrix.');                  %&%
+  end                                                                       %&%
+                                                                            %&%
+  if nargin >= 7  &&  ~isempty(Sxinv)                                       %&%
+    if size(Sxinv,1) ~= size(Sxinv,2)                                       %&%
+      error('Input argument *Sxinv* must be a square matrix.');             %&%
+    end                                                                     %&%
+    if size(Sx,1) ~= size(Sxinv,1)                                          %&%
+      error('Mismatch in size between *Sxinv* and *Sx*.');                  %&%
+    end                                                                     %&%
+  end                                                                       %&%
+  %                                                                         %&%
+  if nargin >= 8  &&  ~isempty(Seinv)                                       %&%
+    if size(Seinv,1) ~= size(Seinv,2)                                       %&%
+      error('Input argument *Seinv* must be a square matrix.');             %&%
+    end                                                                     %&%
+    if size(Se,1) ~= size(Seinv,1)                                          %&%
+      error('Mismatch in size between *Seinv* and *Se*.');                  %&%
+    end                                                                     %&%
+  end                                                                       %&%
+                                                                            %&%
+  if nargin == 9                                                            %&%
+    error( 'No need to specify *xa* if no *y* is given.' );                 %&%
+  end                                                                       %&%
+                                                                            %&%
+  if nargin >= 10                                                           %&%
+    rqre_datatype( xa, @isvector );                                         %&%
+    if size(xa,1) ~= size(Sx,1)                                             %&%
+      error('Mismatch in size between *Sx* and *xa*.');                     %&%
+    end                                                                     %&%
+    rqre_datatype( y, @isvector );                                          %&%
+    if size(y,1) ~= size(Se,1)                                              %&%
+      error('Mismatch in size between *Se* and *y*.');                      %&%
+    end                                                                     %&%
+  end                                                                       %&%
 
-  %- O
+  %- Some post-processing of input                                          
   %
-  rqre_datatype( 'struct', O );
-  qcheck( @oem, O );
-  %
-  rqre_bool( 'O.linear', O.linear );
-  rqre_datatype( { 'empty', 'vector'}, O.outfids );
-  %
-  if ~O.linear
-    rqre_char( 'O.itermethod', O.itermethod );
-    rqre_scalar( 'O.maxiter', O.maxiter, 0 );
-    rqre_scalar( 'O.stop_dx', O.stop_dx, 0 );
-    if strcmp( upper(O.itermethod), 'GN' )
-      O.itermethod = 'GN';  
-    elseif strcmp( upper(O.itermethod), 'ML' )  |  ...
-           strcmp( upper(O.itermethod), 'LM' )
+  if strcmp( upper(O.itermethod), 'GN' )
+    O.itermethod = 'GN';  
+  elseif strcmp( upper(O.itermethod), 'ML' )  |  ...
+         strcmp( upper(O.itermethod), 'LM' )
       O.itermethod = 'ML';
-      O.cost    = 1;  % Note default value here, cost must anyhow be calculated
-      %
-      if O.ga_start < 0
-        error( 'O.ga_start must be >= 0.' );
-      end
-      if O.ga_max <= 1
-        error( 'O.ga_max must be > 1.' );
-      end
-      if O.ga_factor_ok <= 1
-        error( 'O.ga_factor_ok must be > 1.' );
-      end
-      if O.ga_factor_not_ok <= 1
-        error( 'O.ga_factor_not_ok must be > 1.' );
-      end
-    else
-      error( ['Unknown choice for iteration method. ', ...
-                                 'Possible choices are ''GN'' and ''ML''.' ] );
-    end
+      O.cost       = true;  % Note default value here, cost must 
+      %                       anyhow be calculated
   end
   %
-  if ~isempty( intersect( O.i_log, O.i_rel ) )
-    error( 'No index can be found in both O.i_rel and O.i_log.' );
-  end
-
-  rqre_datatype( 'struct', Q );
-  rqre_datatype( {'empty','struct'}, R );
-
-  if ~isa( comfun, 'function_handle' )
-    error('Input argument *comfun* must be a function handle.');
-  end
-
-  rqre_datatype( 'numeric', Se );
-  rqre_datatype( 'numeric', Sx );
-  if size(Se,1) ~= size(Se,2)
-    error('Input argument *Se* must be a square matrix.');
-  end
-  if size(Sx,1) ~= size(Sx,2)
-    error('Input argument *Sx* must be a square matrix.');
-  end
-
   if O.sxnorm
     xnorm = sqrt( diag( Sx ) );
     Sx    = Sx ./ (xnorm*xnorm');
@@ -368,44 +412,16 @@ end
   else
     xnorm = NaN;
   end
-  
+  %
   if nargin < 7  |  isempty(Sxinv)
     Sxinv = Sx \ speye(size(Sx));
   end
   %
-  if size(Sxinv,1) ~= size(Sxinv,2)
-    error('Input argument *Sxinv* must be a square matrix.');
-  end
-  if size(Sx,1) ~= size(Sxinv,1)
-    error('Mismatch in size between *Sxinv* and *Sx*.');
-  end
-
   if nargin < 8  |  isempty(Seinv)
     Seinv = Se \ speye(size(Se));
   end
-  %
-  if size(Seinv,1) ~= size(Seinv,2)
-    error('Input argument *Seinv* must be a square matrix.');
-  end
-  if size(Se,1) ~= size(Seinv,1)
-    error('Mismatch in size between *Seinv* and *Se*.');
-  end
 
-  if nargin == 9
-    error('No need to specify *xa* if no *y* is given.');
-  end
-
-  if nargin >= 10
-    rqre_datatype( 'vector', xa );
-    if size(xa,1) ~= size(Sx,1)
-      error('Mismatch in size between *Sx* and *xa*.');
-    end
-    rqre_datatype( 'vector', y );
-    if size(y,1) ~= size(Se,1)
-      error('Mismatch in size between *Se* and *y*.');
-    end
-  end
-
+    
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 

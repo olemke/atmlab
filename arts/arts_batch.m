@@ -15,20 +15,18 @@
 % 2007-10-22   Created by Patrick Eriksson.
 
 function Y = arts_batch( Q, workfolder )
-
-
-%- Default values
 %
-workfolder_DEFAULT = [];
-%
-set_defaults;
-
-
-%- Check input
-%
-rqre_datatype( 'struct', Q );
-rqre_datatype( {'empty','char'}, workfolder );
-
+if nargin < 2
+  workfolder = [];
+end
+                                                                 %&%
+                                                                 %&%
+%= Check input                                                   %&%
+%                                                                %&%
+rqre_nargin(2,nargin);                                           %&%
+%                                                                %&%
+rqre_datatype( Q, @isstruct );                                   %&%
+rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
 
 
 folder_created = 0;
@@ -44,7 +42,7 @@ try
   parts = qarts2cfile( 'Batch' );
   S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
 
 catch

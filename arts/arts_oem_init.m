@@ -1,42 +1,85 @@
 % ARTS_OEM_INIT   Initialization of OEM inversions by ARTS
 %
-%   See *arts_oem* for usage of this function.
+%    This function together with *arts_oem* handle bookkeeping and
+%    communication to perform OEM inversion with ARTS. Not all possible
+%    retrieval set-ups are handled. It should be possible to apply this
+%    function for most cases, while *arts_oem* is less general (where 
+%    handling of "non-standard" sensor retrievals are most problematic).
 %
-% FORMAT   [Q,R,xa] = arts_oem_init( Q )
+%    The standard sequence of function calls is:
+%
+%       [Qoem,O,R,xa] = arts_oem_init( Q, O );
+%       Sx            = arts_sx( Qoem, R );
+%       Se            = covmat ...
+%       X             = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
+%       %
+%       arts_oem( 'clean', R );
+%       clear Qoem
+%
+%    Fo "non-standard" cases, you have to make a function that can replace
+%    *arts_oem* and give its function handle as input to *oem*.
+%
+%    Note that *arts_oem_init* can modify Q in such way that it can not be
+%    used for further calculations. 
+%
+%    The implementation strategy is to avoid unnecessery reading and
+%    writing of files, in order to obtain high calculation speed. The drawback
+%    is that more variables must be kept in memory.
+%
+%    All pure forward model variables are stored in Q, while all extra data 
+%    needed to handle the inversions are put into R. This data can be used
+%    for further processing or "re-packing" of inversions results.
+%    These fields exist:
+%       workfolder: Path to the temporary working folder.
+%       jq        : ARTS description of jacobian quantities.
+%       ji        : Start and stop index in J for each jacobian quantities.
+%       cfile_y   : Name of control file to generate only y
+%       cfile_yj  : Name of control to generate y and J
+%       x_p       : The pressure corresponding to each element of x. 
+%       x_t       : The temperature corresponding to each element of x. 
+%       x_vmr0    : The a priori VMR corresponding to each element of x. 
+%       ---
+%       p_grid    : R can further contain fields corresponding to a number 
+%       lat_grid  : of ARTS WSVs. The same information exists in files and
+%       lon_grid  : these fields are included to minimize reading of files. 
+%       vmr_field : Only some example on these fields are here given.
+%       sensor_los:
+%       ...
+%
+% FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O)
 %        
 % Out   Q    Modified Q structure
+%       O    Modified O structure
 %       R    Structure with retrieval variables. See *arts_oem*.
 %       xa   A priori state vector
-% In    Q    Qarts settings.
-%
-% 2006-09-07   First working version by Patrick Eriksson.
+% In    O    OEM settings.
+%       Q    Qarts settings.
 
+% 2010-01-11   Created by Patrick Eriksson.
 
-function [O,Q,R,xa] = arts_oem_init(O,Q)
-
+function [Q,O,R,xa] = arts_oem_init(Q,O)
 
 
 %--- Start part --------------------------------------------------------------
+                                                                           %&%
+%- Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin( 2, nargin );                                                  %&%
+if ~qarts_isset( Q.J_DO) | ~Q.J_DO                                         %&%
+  error( 'Q.J_DO must be set to true.' );                                  %&%
+end                                                                        %&%
 
-%- Check input
-%
-min_nargin( 1, nargin );
-rqre_datatype( 'struct', Q );
-%
-if ~isstruct(Q.J)
-  error('No jacobian defined !!!.');
-end
 
 %- Create work folder
 %
 R            = [];
 R.workfolder = create_tmpfolder;
 
+
 %- Initialization of variables
 %
-Q.J_DO = 1;    % Ensure that jacobian calculations will be done
-%
 [Q,R,t_field,z_field,vmr_field] = init_local( Q, R );
+
 
 %- R
 %
@@ -47,14 +90,17 @@ R.x_p    = repmat( NaN, nx, 1 );
 R.x_t    = R.x_p;
 R.x_vmr0 = R.x_p;
 
+
 %- xa
 %
 xa = zeros( nx, 1 );
 
+
 %- Some other variables
 %
-i_asj   = find( [ Q.J.ABS_SPECIES.DO ] );
+i_asj   = find( [ Q.ABS_SPECIES.RETRIEVE ] );
 any_gas = false;
+
 
 %- O
 %
@@ -82,10 +128,10 @@ for i = 1 : nq
     %- Get p, t and vmr for each retrieval point
     grid1         = R.jq{i}.grids{1};
     R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
-    R.x_t(ind)    = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, t_field, ...
+    R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
-    R.x_vmr0(ind) = mat2col( arts_atminterp( Q.ATMOSPHERE_DIM, Q, ...
-                            get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
+    R.x_vmr0(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...
+                           get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind) = 1;
@@ -97,12 +143,12 @@ for i = 1 : nq
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       xa(ind) = 0;
       O.i_log = [ O.i_log ind ];
-    else
-      error( sprintf('Unknown gas species retrieval unit (%s).', ...
-                                                              R.jq{i}.mode ) );
+    else                                                                   %&%
+      error( sprintf('Unknown gas species retrieval unit (%s).', ...       %&%
+                                                         R.jq{i}.mode ) ); %&%
     end
     
-  case { 'Frequency', 'Polynomial baseline fit' }
+  case { 'Frequency', 'Polynomial baseline fit', 'Sensor pointing' }
     %
     xa(ind) = 0;    
 
@@ -124,18 +170,18 @@ end
 %--- Create control files -----------------------------------------------------
 %
 %- Only y
-Q.J_DO    = 0;
+Q.J_DO    = false;
 parts     = qarts2cfile( 'y_after_init' );
 S         = qarts2cfile( Q, parts, R.workfolder );
 cfile     = fullfile( R.workfolder, 'cfile_y.arts' );
-qtool( S, cfile, [] );
+strs2file( cfile, S );
 R.cfile_y = cfile;
 %
 %- y+j
-Q.J_DO     = 1;
+Q.J_DO     = true;
 S          = qarts2cfile( Q, parts, R.workfolder );
 cfile      = fullfile( R.workfolder, 'cfile_yj.arts' );
-qtool( S, cfile, [] );
+strs2file( cfile, S );
 R.cfile_yj = cfile;
 
 return
@@ -170,13 +216,6 @@ return
 
 function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
-  %- Check special cases
-  %
-  if Q.J.FREQUENCY.DO  &  ~isstruct( Q.SENSOR_RESPONSE )
-    error( ['When any frequency fit is performed (Q.J.FREQUENCY.DO=1), ',...
-           'Q.SENSOR_RESPONSE must follow qartsSensor (i.e. be a structure).'] )
-  end
-  
   %- Copy some data to R
   %
   % This is done here to possible save time; the data are forced to files below
@@ -211,7 +250,7 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   if Q.USE_RAW_ATMOSPHERE 
     [t_field,z_field,vmr_field]       = arts_atmfields( Q );
     [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD] = deal( t_field, z_field, vmr_field );   
-    Q.USE_RAW_ATMOSPHERE              = 0;
+    Q.USE_RAW_ATMOSPHERE              = false;
   else
     t_field   = qarts_get( Q.T_FIELD );
     z_field   = qarts_get( Q.Z_FIELD );
@@ -227,29 +266,29 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   if strcmp( Q.ABSORPTION, 'LoadTable' )
     Q = force_file_local( Q, 'ABS_LOOKUP', 'GasAbsLookup', R );
   elseif strcmp( Q.ABSORPTION, 'CalcTable' )
-    Q                  = qarts_abstable( Q );
-    Q.ABS_LOOKUP       = arts_abstable( Q, R.workfolder );
-    Q.ABSORPTION       = 'LoadTable';
+    Q            = qarts_abstable( Q );
+    Q.ABS_LOOKUP = arts_abstable( Q, R.workfolder );
+    Q.ABSORPTION = 'LoadTable';
   end
   
   %- Run arts to create jacobian and sensor variables
   %
-  parts     = qarts2cfile( 'y_init' );
+  parts = qarts2cfile( 'y_init' );
   %
   S     = qarts2cfile( Q, parts, R.workfolder );
   cfile = fullfile( R.workfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
 
   %- Jacobian
   %
   R.jq = xmlLoad( fullfile( R.workfolder, 'jacobian_quantities.xml' ) );
   R.ji = xmlLoad( fullfile( R.workfolder, 'jacobian_indices.xml' ) );
-  %
-  if length( R.jq ) == 0 
-    % Ending up here means probably a bug!
-    error( 'No retrieval quantities defined!?' );
-  end
+  %                                                                      %&%
+  if length( R.jq ) == 0                                                 %&%
+    % Ending up here means probably a bug!                               %&%
+    error( 'No retrieval quantities defined!?' );                        %&%
+  end                                                                    %&%
   %
   for i = 1 : length(R.ji)           % Fix different indexing
     for j = 1 : length(R.ji{i})
@@ -259,15 +298,19 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
   %- Sensor
   %
-  if Q.J.FREQUENCY.DO
+  %- Check special cases                                                   %&%
+  %                                                                        %&%
+  if qarts_isset(Q.FFIT) & Q.FFIT.RETRIEVE
+    if ~isstruct( Q.SENSOR_RESPONSE )                                      %&%
+      error( ['When any frequency fit is performed ',...                   %&%
+              '(Q.FFIT_RETRIEVAL=true), Q.SENSOR_RESPONSE must follow ',...%&%
+              'qartsSensor (i.e. be a structure).'] );                     %&%
+    end                                                                    %&% 
+    %- A copy of Q.SENSOR_RESPONSE is needed here
     R.SENSOR_RESPONSE = Q.SENSOR_RESPONSE;
-    %
-    if Q.J.FREQUENCY.ORDER > 0  &  1e3 < max(abs(R.SENSOR_RESPONSE.F_BACKEND-...
-           qarts_get( fullfile( R.workfolder, 'sensor_response_f_grid.xml')) ) )
-      error(['A frequency stretch retrieval demands that ', ...
-      'R.SENSOR_RESPONSE.F_BACKEND and Q.SENSOR_RESPONSE_F_GRID are identical']);
-    end
   end
+  %
+  Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
   %
   Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
   Q.SENSOR_RESPONSE_F   = fullfile( R.workfolder, 'sensor_response_f.xml' );

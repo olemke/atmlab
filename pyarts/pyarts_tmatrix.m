@@ -28,16 +28,9 @@
 % 2005-06-08   Created by Patrick Eriksson.
 
 
-function pyarts_tmatrix(tmpfolder,outfile,shape,orient,r,aratio,f,t,...
-                                                       wphase,za_grid,aa_grid)
-
-%- Default values
+function pyarts_tmatrix(tmpfolder,outfile,shape,orient,r,aratio,f,t,varargin)
 %
-wphase_DEFAULT  = 'ice';
-za_grid_DEFAULT = 0:10:180;
-aa_grid_DEFAULT = 0:10:180;
-%
-set_defaults;
+[wphase,za_grid,aa_grid] = optargs( varargin, { 'ice', 0:10:180, 0:10:180 } );
 
 
 Q.OUTFILE = outfile;

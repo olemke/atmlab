@@ -23,30 +23,10 @@ atmlab( 'FMODEL_VERBOSITY', 0 );
 
 
 
-
-
-%= Qarts1
-%
-y0 = [ 4.115 27.94 ];  % Selected to fit all of three first tests
-dy = 1e-2;
-%
-try
-  [Q,f,y] = qarts1_demo;
-catch
-  reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts1_demo* ===\n\n');
-  rethrow(lasterror);
-end
-%
-if any( abs( [min(y) max(y)] - y0 ) > dy )
-  reset_verbosity( va, vf );
-  error('Unexpected result from *qarts1_demo*');
-end
-
-
-
-
 %= Qarts
+%
+y0 = [ 4.115 27.94 ];  % Selected to fit both tests
+dy = 1e-2;
 %
 try
   [Q,f,y] = qarts_demo;

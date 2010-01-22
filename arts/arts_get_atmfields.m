@@ -48,7 +48,7 @@ try
   parts = qarts2cfile( 'get_atmfields' );
   S = qarts2cfile( Q, parts, tmpfolder );
   cfile = fullfile( tmpfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
   t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
   z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml') );

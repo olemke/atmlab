@@ -27,7 +27,7 @@ function scale_axes(h,hscfac,vscfac)
 
 %=== Check input and defaults
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 %
 if ~isscalar( hscfac )  |  hscfac <= 0
   error('The horisonal scaling factor must be a scalar >= 0.');

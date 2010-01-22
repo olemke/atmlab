@@ -29,7 +29,7 @@
 % 2004-09-07   Created by Patrick Eriksson.
 
 function qinfo( qfun, field, fid, lines )
-
+%
 if nargin < 2
   field = 'all';
 end
@@ -37,7 +37,7 @@ if nargin < 3
   fid = 1;
 end
 if nargin < 4
-  lines = 1;
+  lines = true;
 end
 
 if ischar(fid)

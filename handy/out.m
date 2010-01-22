@@ -53,13 +53,21 @@
 %                  Eriksson, who also made AMI version.
 
 
-function do_output = out( level, s, fid, lines )
-
-level_DEFAULT = 0;
-fid_DEFAULT   = 1;
-lines_DEFAULT = 1;
+function do_output = out( varargin )
 %
-set_defaults;
+[level,s,fid,lines] = optargs( varargin, {0,0,1,true} );
+                                                                          %&%
+                                                                          %&%  
+%- Check input                                                            %&%
+%                                                                         %&%
+rqre_nargin( 1, nargin );                                                 %&%
+%                                                                         %&%
+rqre_alltypes( level, {@isvector,@iswhole} );                             %&%
+rqre_datatype( s, {@ischar,@iswhole} );                                   %&%
+rqre_alltypes( fid, {@isnumeric,@isvector} );                             %&%
+rqre_datatype( lines, @isboolean );                                       %&%
+%                                                                         %&%
+atmlab( 'require', {'VERBOSITY','SCREEN_WIDTH'} );                        %&%
 
 
 if isempty(fid)
@@ -77,16 +85,8 @@ if length(fid) > 1
   return
 end
 
-
-%=== Check data
-%
-atmlab( 'require', {'VERBOSITY','SCREEN_WIDTH'} );
 verbosity = atmlab( 'VERBOSITY' );
 ncols     = atmlab( 'SCREEN_WIDTH' );
-rqre_scalar( 'Atmlab setting VERBOSITY', verbosity, 0 );
-rqre_scalar( 'Atmlab setting SCREEN_WIDTH', ncols, 0 );
-rqre_scalar( 'Input argument *level*', level, 0 );
-
 
 if level <= verbosity
   do_output = 1;

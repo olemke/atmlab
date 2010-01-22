@@ -10,11 +10,11 @@
 
 
 function fid = fileopen(filename,varargin)
-
-
-%= Input
-%
-min_nargin( 1, nargin );
+                                                                           %&%
+%= Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin( 1, nargin );                                                  %&%
+rqre_datatype( filename, @ischar );                                        %&%
 
 
 %= Call fopen

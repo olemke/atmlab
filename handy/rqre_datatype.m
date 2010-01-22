@@ -1,40 +1,76 @@
-% RQRE_DATATYPE   Checks if variable is of expected data type
+% RQRE_DATATYPE   Checks if variable is of any expected data types
 %
-%    Issues an error if criterion not fulfilled.
+%    The input argument *funchandles* is a single or a cell array of handles to
+%    functions performing type checking, such as @isnumeric. For example, the
+%    following will generate an error message:
+%       a = 'a';
+%       rqre_datatype( a, {@isnumeric,@iscell} )
 %
-%    The input argument *datatypes* can either be a string with a
-%    single data type, or cell array of strings with a set of types.
+%    Issues an error if criterion not fulfilled. This error assumes that all
+%    functions are named as isxxxx, where xxxx is the name of the data type.
 %
-%    There must be a function named *isDATATYPE* for each accapted
-%    data type.
+%    Use *rqre_alltypes* to check if a combination of type checks is fullfilled.
 %
-% FORMAT   rqre_datatype( datatypes, a )
+% FORMAT   rqre_datatype( a, funchandles [,nonstdname] )
 %        
-% IN    datatypes   Accepted datatypes
-%       a           Variable to check.
+% IN    a             Variable to check.
+%       funchandles   One or several handles to type checking functions.
+% OPT   nonstdname    Name of variable to use in error message. Default is
+%                     to use the function *inputname* to determine the
+%                     variable name.
 
 % 2005-03-16   Created by Patrick Eriksson.
 
 
-function rqre_datatype( datatypes, a )
+function rqre_datatype( a, funchandles, nonstdname )
+ 
+  
+%- A single function handle
+%
+if isa( funchandles, 'function_handle' )
+  if funchandles(a)
+    return                     % Return, a match has been found
+  end
+  % Repack for error message
+  funchandles = { funchandles };  
 
-if ischar( datatypes )
-  datatypes = { datatypes };
-end
+  
+%- A cell array of function handles (?)
+%
+else
+                                                                            %&%
+  assert( all( cellfun( 'isclass', funchandles, 'function_handle' ) ), ...  %&%
+        'The argument *funchandles* does not contain function handles.' );  %&%
+  %                                                                         %&%
+  if ~isvector( funchandles )                                               %&%
+    error( 'The argument *funchandles* must be a vector (row or column).' );%&%
+  end                                                                       %&%
 
-ok = 0;
-
-for i = 1:length(datatypes)
-  if eval(['is',datatypes{i},'(a)'])
-    ok = 1;
-    break;
+  for i = 1:length(funchandles)
+    if funchandles{i}(a)
+      return                     % Return, a match has been found
+    end
   end
 end
 
-if ~ok
-  fprintf('Accepted data types:\n');
-  for i = 1:length(datatypes)
-    fprintf('   %s\n', datatypes{i} );
+
+%- Error messages
+%
+if nargin < 3
+  vname = sprintf( 'The variable *%s*', inputname(1) );
+else
+  assert( ischar( nonstdname )  &&  ~isempty( nonstdname ) );               %&%
+  vname = nonstdname;
+end
+
+if length(funchandles) == 1
+  s = func2str( funchandles{1} );
+  error( '%s must be %s.', vname, s(3:end) );
+else
+  fprintf('Accepted data types are\n');
+  for i = 1:length(funchandles)
+    s = func2str( funchandles{i} );
+    fprintf('   %s\n', s(3:end) );
   end
-  error( '*%s* is not of any accepted type (see above)', inputname(2) );
+  error( sprintf( '%s is not of any accepted types, listed above.', vname ) );
 end

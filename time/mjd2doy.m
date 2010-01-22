@@ -4,22 +4,24 @@
 %    *dayofyear*. The fractional part of DOY is kept.
 %
 %    Note that DOY 1 starts 00:00 of January 1. The possible range of DOY is
-%    then [1,369.99999...].
+%    then [1,367[.
 %
 % FORMAT   d = mjd2doy(mjd)
 %        
 % OUT   d     Day of year.
-% IN    mjd   Modified julian date. Can be a vector.
+% IN    mjd   Modified julian date. Can be a tensor.
 
 % 2006-03-31   Created by Patrick Eriksson.
 
 function d = mjd2doy(mjd)
+                                                                            %&%
+rqre_datatype( mjd, @isnumeric );                                           %&%
 
-[year, month, day, hour, minute, second] = mjd2date( mjd );
+[year, month, day, hour, minute, second] = mjd2date( mjd(:) );
 
 %= *dayofyear* does not handle column vectors
 %
-if isvector(year) & length(year) > 1
+if dimens(year) < 2  & length(year) > 1
   year   = vec2row( year );
   month  = vec2row( month );
   day    = vec2row( day );

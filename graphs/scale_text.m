@@ -18,7 +18,7 @@ function scale_text(h,scfac)
 
 %=== Check input
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 %
 if ~isvector( h )
   error('The argument *h* must be a numeric vector.');

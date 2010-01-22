@@ -83,16 +83,14 @@ if nargin == 1
 
 else
   %
-  rqre_char( 'input argument *datagroup*', datagroup );
+  rqre_datatype( datagroup, @ischar );                               %&%
   %
   if strcmp( lower(datagroup), 'num' )
     % 
-    rqre_scalar( 'input argument *ia*', ia, 0, length(numtypes)-1 )
     oa  = numtypes{ia+1};
 
   elseif strcmp( lower(datagroup), 'int' )
     % 
-    rqre_scalar( 'input argument *ia*', ia, 0, length(inttypes)-1 )
     oa  = inttypes{ia+1};
 
   elseif strncmp( datagroup, 'ArrayOf', 7 )

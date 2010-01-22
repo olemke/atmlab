@@ -1,3 +1,127 @@
+2010-01-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-0
+
+	* README has been updated and read it. Some of the points below
+	are described more in detail in that file.
+	
+	* Some more strict format rules have been introduced, for
+	simplified checks of user input and to avoid possible loop-holes
+	in the code. New rules:
+	- A boolean or a flag signifies now a logical of size 1. That is, true
+	or false. A scalar 0 or 1 is not the same. These are numbers. 
+	- Strictly one dimensional (numerical) tensors shall now be column
+	vectors. Grids are examples on such objects. 
+	These rules are not yet applied everywhere, but try to adopt now
+	to avoid future problems.
+
+	* Has started the convention that lines including the comment %&%
+	are different types of checks, that can be removed for operational
+	applications (when everything is well tested). This to make it
+	possible to add heavy checks, but still have the possibility to
+	obtain highest possible calculation speed.
+
+	* Note that a set of e.g. temperatures very well can be a row
+	vector. This is just a matter of you decide to store the
+	temperatures. In this case it is a matrix (with one row). For
+	example, the temperature input to vmr2nd can be a row vector. On
+	the other hand, if you would use temperature as the grid for some
+	other variable, this grid is an one dimensional object.
+	This issue is associated with:
+	
+	* The default size demand for function input is that all data have
+	the same size or are scalars, in order to allow element-by-element
+	math (such as .*). This follows the standard Matlab
+	approach. However, this rule can normally only be followed for
+	functions where all the input is numeric and goes into a single
+	equation (such as vmr2nd). Exceptions are the numerous cases when
+	some input is a flag or a data grid. For such cases, the header
+	needs to describe type and size demands. See further README.
+
+	* Folders have been renamed and moved. This is an attempt to sort
+	the functions in a more clear way. For example, there is now a
+	folder h2o/, having the sub-folders parametrisations/ (mainly
+	Bengt's PSD functions) and thermodynamics/ (Isaac's functions).
+	
+	* Version fixes are removed. The few added functions should now be
+	at hand for everybody. And this feature should be obsolete.
+
+	* Everything associated with arts-1 is removed.
+
+	* set_defaults.m: Is removed (used eval, which is not an
+	OK solution). Replaced by optargs.
+	* optargs.m: Replaces set_defaults.
+
+	* The set of rqre_xxx functions has been revised. Type specific
+	functions have been removed (such as rqre_scalar). All type
+	checking should be handled by rqre_datatypes and rqre_alltypes.
+	List of new functions below. Order of input arguments changed in
+	some cases, for consistency reasons.
+
+	* min_nargin is replaced by rqre_nargin.
+ 
+	* Some new isxxx functions have been created (see below). ismatrix
+	is removed.
+
+	* meannan is removed. Caused confusion due to a similar function
+	in the statistical toolbox. (And someone else removed stdnans).
+	Probably best to do this explicetely, to know what exactly what
+	you are doing.
+
+	* The gformat is totally revised. In short, the D part is removed
+	and there is a new set of functions. See some of demo scripts for
+	example usage. The "sub-class" atmdata now defined.
+
+	* Qarts: The scope of qarts has been extended. Before just pure
+	forward model variables were treated (including jacobian
+	calculations). Retrieval settings, such as Sx data, and L2 output
+	fields can now also be specified. Qpack2 was before a layer above
+	qarts. This can now be avoided and qpack2 is rather a "glue"
+	between the Q, O, Y and L2 parts.
+
+	The stuff of qartsJacobian is now part of the main Q. Maybe most
+	important is that Q.ABS_SPECIES is now a structure. For example,
+	Q.J.ABS_SPECIES.UNIT is now Q.ABS_SPECIES.UNIT. Q.ABS_SPECIES has
+	the field TAG. This is a string array, that can be set in two
+	ways, e.g.: 
+	   Q.ABS_SPECIES(1).TAG{1} = 'ClO'; 
+	   Q.ABS_SPECIES(2).TAG    = { 'O3' };
+
+	* arts/scenegen: Not yet updated.
+
+	* Qpack2: There is now no Qpack2 setting structure. You use now
+	the qarts Q and oem O directly. The main task of qpack2 now is to
+	transfer data from the measurement structure to Q. Works presently
+	just for single spectrum observations, but planned to be more
+	general. Documentation not yet completed.
+
+	* Removed functions, outside the arts and gformat folders:
+		mat2v6.m
+		ismatrix.m
+	        rqre_bool.m
+	        rqre_char.m
+	        rqre_scalar.m
+	        set_defaults.m
+		meannans.m
+		stdnans.m
+
+	* New functions, outside the arts and gformat folders:
+	        optargs.m
+	        istensor0.m
+		istensor1.m
+		istensor2.m
+		istensor3.m
+		isboolean.m
+		isfunction_handle.m
+		rqre_gridmatch.m
+		rqre_in_range.m
+		rqre_nargin.m
+		rqre_same_size.m
+ 		rqre_alltypes.m
+		rqre_element_math.m
+	        strs2file.m
+	        (..., list probably not complete)
+	
 2010-01-20  Oliver Lemke  <olemke(at)core-dump.info>
 
 	* atmlab-0-3-117

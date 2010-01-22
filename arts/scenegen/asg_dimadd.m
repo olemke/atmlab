@@ -47,7 +47,7 @@ qcheck( @asgD, D );
 qcheck( @asgG, G );
 qcheck( @qarts, Q );
 %
-rqre_scalar( 'Q.ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
+rqre_in_range( Q.ATMOSPHERE_DIM, 1, 3, 'Q.ATMOSPHERE_DIM' );
 
 
 

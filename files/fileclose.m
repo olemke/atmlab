@@ -9,11 +9,10 @@
 
 
 function st = fileclose(fid)
-
-
-%= Input
-%
-min_nargin( 1, nargin );
+                                                                           %&%
+%= Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin( 1, nargin );                                                  %&%
 
 
 %= Call fclose

@@ -11,12 +11,14 @@
 % 2006-03-31   Created by Patrick Eriksson.
 
 function m = mjd2month(mjd)
+                                                         %&%
+rqre_datatype( mjd, @isnumeric );                        %&%
 
-[year, month, day, hour, minute, second] = mjd2date( mjd );
+[year, month, day, hour, minute, second] = mjd2date( mjd(:) );
 
-%= *dayofyear* does not handle column vectors
+%= *monthofyear* does not handle column vectors
 %
-if isvector(year) & length(year) > 1
+if dimens(year) < 2  & length(year) > 1
   year   = vec2row( year );
   month  = vec2row( month );
   day    = vec2row( day );
@@ -25,4 +27,9 @@ if isvector(year) & length(year) > 1
   second = vec2row( second );
 end
 
-m = monthofyear( year, month, day, hour, minute, second );
+%- To ensure that m gets same size as mjd
+%
+m = zeros( size( mjd ) );
+
+
+m(:) = monthofyear( year, month, day, hour, minute, second );

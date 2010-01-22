@@ -27,7 +27,7 @@ function scale_fig(scfac)
 
 %=== Check input
 %
-min_nargin( 1, nargin );
+rqre_nargin( 1, nargin );
 %
 if ~isscalar( scfac )  |  scfac <= 0
   error('The scaling factor must be a scalar >= 0.');

@@ -1,8 +1,7 @@
 % ARTS_Y   Calculates spectra and jacobians using ARTS
 %
 %    Takes a qarts structure and calculates corresponding spectra, and 
-%    associated jacobians (if J_DO is set). As a minimum, a frequency grid,
-%    an atmosphere, a surface and clear-sky RTE variables must be specified.
+%    associated jacobians (if J_DO is set). 
 %
 % FORMAT   [y,ydata,dy,J,jq,ji] = arts_y( Q [, workfolder] )
 %        
@@ -25,20 +24,15 @@
 
 % 2004-09-17   Created by Patrick Eriksson.
 
-
 function [y,ydata,dy,J,jq,ji] = arts_y( Q, workfolder )
-
-%- Default values
 %
-workfolder_DEFAULT = [];
-%
-set_defaults;
-
-
-%- Check input
-%
-rqre_datatype( 'struct', Q );
-rqre_datatype( {'empty','char'}, workfolder );
+if nargin < 2, workfolder = []; end
+                                                                         %&%
+                                                                         %&%
+%- Check input                                                           %&%
+%                                                                        %&%
+rqre_datatype( Q, @isstruct );                                           %&%
+rqre_datatype( workfolder, {@isempty,@ischar} );                         %&%
 
 
 %- Default output
@@ -49,18 +43,20 @@ jq = NaN;
 ji = NaN;
 
 
-folder_created = 0;
+%- Create workfolder?
 %
 if isempty( workfolder )
   workfolder     = create_tmpfolder;
   folder_created = 1;
+else
+  folder_created = 0;
 end
 
 
 %- Avoid unnecessary jacobian calculations
 %
 if nargout < 4
-  Q.J_DO = 0;
+  Q.J_DO = false;
 end
 
 
@@ -69,7 +65,7 @@ try
   parts = qarts2cfile( 'y' );    
   S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
 
 catch
@@ -80,9 +76,7 @@ catch
 end
 
 
-
 y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
-
 
 
 if nargout >= 2
@@ -112,7 +106,6 @@ if nargout >= 4  &  Q.J_DO
     end
   end
 end
-
 
 
 if folder_created

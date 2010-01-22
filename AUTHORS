@@ -6,7 +6,7 @@ Otherwise, look in header of each individual file.
 
 Patrick Eriksson <patrick.eriksson@chalmers.se>
 ---
-Suggested and initiated Atmlab. Made the little design there is.
+Initiated Atmlab. Made the little design there is.
 Contributed with functions of various kind.
 
 
@@ -16,6 +16,13 @@ Maintaining SVN repository and the mailing list.
 Created the XML format for data files.
 
 
+
+Function sets have been imported made by these persons:
+
 Christian Mätzler <christian.matzler@iap.unibe.ch>
 ---
-Mie scattering functions.
+Mie scattering functions (ATMLAB/mie).
+
+Peter J. Acklam (pjacklam@online.no)
+---
+Time and date utilities (main part of (ATMLAB/time). 

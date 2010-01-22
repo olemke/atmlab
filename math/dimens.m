@@ -1,6 +1,6 @@
-% DIMENS  Number of dimensions.
+% DIMENS  Effective dimension of data
 %
-%    As *ndims* but returns 1 for a column vector.
+%    As *ndims*, but returns 1 for a column vector and 0 for scalar values.
 %
 % FORMAT   n = dimens(A)
 %        
@@ -12,4 +12,4 @@
 
 function n = dimens(A)
 
-n = max([ 1 max( find( size(A) > 1 ) )] );
+n = max( [ 0 find( size(A) > 1 ) ] );

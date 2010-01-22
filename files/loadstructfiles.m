@@ -21,15 +21,9 @@
 % 2006-02-01   Created by Patrick Eriksson.
 
 
-function O = loadstructfiles(filenames,fnames,verbose)
-
-%= Defaults values
+function O = loadstructfiles(filenames,varargin)
 %
-fnames_DEFAULT  = [];
-verbose_DEFAULT = 1;
-%
-set_defaults;
-
+[fnames,verbose] = optargs( varargin, { [], 1 } );
 
 
 n = 0;

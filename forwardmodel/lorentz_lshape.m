@@ -1,7 +1,7 @@
 % LORENTZ_LSHAPE   Different versions of pressure broadened line shape
 %
-%    Calculates different versions of the pressure induced line shape. The most
-%    basic version is denoted as the Lorentz line shape.
+%    Calculates different versions of the pressure induced line shape. The 
+%    most basic version is denoted as the Lorentz line shape.
 %
 %    The line shape can be expressed as
 %      l = 1/pi * (f/f0)^prefac * ( dp/((f-f0)^2+dp^2) + dp/((f+f0)^2+dp^2) )
@@ -11,30 +11,40 @@
 %    Default values correspond to the basic Lorentz shape. The van
 %    Vleck-Weisskopf line shape is obtained witj prefac=2 and mirror=true.
 %
-% FORMAT   l = doppler_lshape( f, f0, dp )
+% FORMAT   l = doppler_lshape( f, f0, dp [, prefac, mirror ] )
 %        
-% OUT   l    Line shape. Dimensions [f,dp]. 
-% IN    f    Frequency vector.
-%       f0   Centre frequency. Only scalar input allowed.
-%       dp   Pressure broadened line width. Following standard definition,
-%            which corresponds to FWHM/2. Can be a vector. 
+% OUT   l       Line shape. Dimensions [f,dp]. 
+% IN    f       Frequency vector.
+%       f0      Centre frequency. Only scalar input allowed.
+%       dp      Pressure broadened line width. Following standard definition,
+%               which corresponds to FWHM/2. Can be a vector. 
 % OPT   prefac  Exponent for (f/f0) term. Default is 0.
 %       mirror  To consider the mirror transition at -f0. Default is false.
 
 % 2006-11-21   Created by Patrick Eriksson.
 
 
-function l = lorentz_lshape(f,f0,dp,prefac,mirror)
-
-prefac_DEFAULT = 0;
-mirror_DEFAULT = false;
+function l = lorentz_lshape( f, f0, dp, varargin )
 %
-set_defaults
+[prefac,mirror] = optargs( varargin, { 0, false } );
+                                                                           %&%
+                                                                           %&%
+%- Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin( 3, nargin )                                                   %&%
+%                                                                          %&%
+rqre_datatype( f, {@istensor1} );                                          %&%
+rqre_scalar( f0, [], 0 );                                                  %&%
+rqre_datatype( dp, {@istensor0,@istensor1} );                              %&%
+%                                                                          %&%
+rqre_scalar( prefac, [], 0, 2 );                                           %&%
+rqre_datatype( f, {@iswhole} );                                            %&%
+rqre_boolean( mirror );                                                    %&%
 
-  
+
+%- Allocate output
+%
 l = zeros( length(f), length(dp) );
-
-f = vec2col( f );
 
 
 if prefac == 0

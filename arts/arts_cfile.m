@@ -24,7 +24,8 @@ S = qarts2cfile( Q, parts, folder );
 
 cfile = fullfile( folder, 'cfile.arts' );
 
-qtool( S, cfile, [], 0 );
+strs2file( cfile, S );
+
 
 
 

@@ -41,22 +41,17 @@
 % 2007-08-22   Created by Patrick Eriksson.
 
 
-function Q = arts_sensor( Q, workfolder, do_load )
-
-
-%- Default values
+function Q = arts_sensor( Q, varargin )
 %
-workfolder_DEFAULT = [];
-do_load_DEFAULT    = false;
-%
-set_defaults;
-
-
-%- Check input
-%
-rqre_datatype( 'struct', Q );
-rqre_datatype( {'empty','char'}, workfolder );
-
+[workfolder,do_load] = optargs( varargin, { [], false } );
+                                                                 %&%
+%= Check input                                                   %&%
+%                                                                %&%
+rqre_nargin(1,nargin);                                           %&%
+%                                                                %&%
+rqre_datatype( Q, @isstruct );                                   %&%
+rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
+rqre_datatype( do_load, @isboolean );                            %&%
 
 
 folder_created = 0;
@@ -72,7 +67,7 @@ try
   parts = qarts2cfile( 'GetSensor' );
   S     = qarts2cfile( Q, parts, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
-  qtool( S, cfile, [] );
+  strs2file( cfile, S );
   arts( cfile );
 
 catch

@@ -26,7 +26,7 @@ function [P,C] = randmvar_add_normal(P,C,xm,si,Cm)
 
 %= Check input
 %
-min_nargin( 5, nargin );
+rqre_nargin( 5, nargin );
 %
 if ndims(C) > 2  |  size(C,1) ~= size(C,1) 
   error('Input argument *C* must be a square matrix.');

@@ -60,16 +60,16 @@ iz = [];
 
 for ig = ih2o
   
-  rqre_field( G(ig).SPCFC, 'FIXED_RH', 0 );
+  rqre_field( G(ig).SPCFC, 'FIXED_RH', 0, 'G.SPCFC for water' );
 
   if ~G(ig).SPCFC.FIXED_RH
     continue       % ---->
   end
   
-  rqre_field( G(ig).SPCFC, 'RH', 0 );
-  rqre_scalar( 'G(ig).SPCFC.RH', G(ig).SPCFC.RH, 0, 2 );
-  rqre_field( G(ig).SPCFC, 'RH_BRAKEP', 0 );
-  rqre_field( G(ig).SPCFC, 'RH_TOPP', 0 );
+  rqre_field( G(ig).SPCFC, 'RH', 0, 'G.SPCFC' );
+  rqre_in_range( G(ig).SPCFC.RH, 0, 2, 'G.SPCFC.RH',  );
+  rqre_field( G(ig).SPCFC, 'RH_BRAKEP', 0, 'G.SPCFC' );
+  rqre_field( G(ig).SPCFC, 'RH_TOPP', 0, 'G.SPCFC' );
 
   if G(ig).SPCFC.RH_TOPP >  G(ig).SPCFC.RH_BRAKEP
     do_z = 1;

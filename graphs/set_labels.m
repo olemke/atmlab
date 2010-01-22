@@ -20,7 +20,7 @@ function set_labels(h,varargin)
 
 %=== Check input
 %
-min_nargin( 1, nargin );
+rqre_nargin( 1, nargin );
 %
 if ~isvector( h )
   error('The argument *h* must be a numeric vector.');

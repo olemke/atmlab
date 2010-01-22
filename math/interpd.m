@@ -1,121 +1,187 @@
-% INTERPD  Interpolation of 1D, 2D or 3D data
+% INTERPD  Point interpolation of 1D-5D data
 %
-%    Interpolation of data to a set of positions. Basically an interface to 
-%    interp1, interp2 and interp3, with the attempt to avoid some of the 
-%    confusion around naming/order of dimensions in standard Matlab functions.
+%    Point interpolation of data. Basically an interface to interp1 and
+%    interpn. In addition, the function considers the atmlab setting EXTRAP to
+%    allow extrapolation. EXTRAP must be set to true or false.
 %
-%    The data is assumed to have dimensions: A(x,y,z)
-%    Grids for dimensions not used must be left out.
+%    The grids of the data to be interpolated (*A*) are packed into the vector
+%    array *agrids*. The interpolation points are given as a matrix where each
+%    column corresponds to a dimension of *A*. Accordingly, each row in *pos*
+%    gives the corrdinate for an interpolation point.
 %
-%    The function considers the atmlab setting EXTRAP.
+%    With EXTRA true, it is accepted to make an extrapolation also for trailing
+%    singleton dimensions, which corresponds to that *pos* has more columns
+%    than there are grids in *agrid*.
 %
-%    For "regridding", see accompanying function *regrid*.
+%    The Atmlab convention of that 1D objects (including grids) are column
+%    vectors is here strictly followed.
 %
-% FORMAT   B = interpd( pos, A, x [, y, z, iopt] )
+%    For regridding, see accompanying function *regrid*.
+%
+% FORMAT   B = interpd(agrids,A,pos,iopt)
 %        
-% OUT   B      Interpolated data.
-% IN    pos    Matrix where each row gives position of new point as (x,y,z).
-%       A      Data to be interpolated.
-%       x      Grid in dimension 1.
-%       y      Grid in dimension 2.
-%       z      Grid in dimension 3.
-% OPT   iopt   Interpolation option. See e.g. *interp2*. Default is 'linear'.
+% OUT   B        Result of interpolation. A column vector.
+% IN    agrids   Grids of A, as an array of vectors.
+%       A        Data to be interpolated. 
+%       pos      Matrix where each row is a position.
+% OPT   iopt     Interpolation option. See *interpn*. Default is 'linear'.
 
 % 2007-05-22   Created by Patrick Eriksson.
 
 
-function B = interpd(pos,A,x,y,z,iopt)
+function B = interpd(agrids,A,pos,iopt)
+%  
+if nargin < 4, iopt = 'linear'; end
+                                                                          %&%
+                                                                          %&%
+%- Check input                                                            %&%
+%                                                                         %&%
+rqre_nargin( 3, nargin )                                                  %&%
+rqre_datatype( agrids, @iscell );                                         %&%
+rqre_datatype( A, @isnumeric );                                           %&%
+rqre_datatype( pos, @istensor2 );                                         %&%
+indim  = length(agrids);
+outdim = size(pos,2);
+if dimens(A) > length(agrids)                                             %&%
+  error( 'Dimensionality of A is higher than number of given grids.' );   %&%
+end                                                                       %&%
+if outdim < indim                                                         %&%
+  error('There can not be fewer columns in *pos* than grids in *agrids*.');%&%
+end                                                                       %&%
+for d = 1 : indim                                                         %&%
+  rqre_datatype( agrids{d}, @istensor1, 'Grids in *agrids*' );            %&%
+  rqre_gridmatch( A, d, agrids{d} );                                      %&%
+end                                                                       %&%
+
+%--- Extrapolation switch
+%                                                                         %&%
+atmlab( 'require', {'EXTRAP'} );                                          %&%
+%
+extrap = atmlab( 'EXTRAP' );
+%                                                                         %&%
+rqre_datatype( extrap, @isboolean );                                      %&%
 
 
-%- Check input
+%- Check a or determine a's effective dimensions
 %
-rqre_datatype( 'numeric', pos );
-%
-rqre_datatype( 'numeric', A );
-%
-rqre_datatype( 'vector', x );
-%
-if length(x) ~= size(A,1)
-  fprintf('Mismatch in size between *x* and *A*.\n');
-  fprintf('Note that *A* must be a COLUMN vector for 1D.\n');
-  fprintf('\nx = \n');
-  disp(x);
-  fprintf('A = \n');
-  disp(A)
-  error('See above');
+if extrap    % Ignore singleton dimensions
+  dims = find( size( A ) > 1 );
+  A    = getdims( A, dims );
+else
+  if outdim ~= indim                                                      %&%
+    error( ['With EXTRAP false, the number of columns in *pos* ',...      %&%
+                'and the number of grids in *agrids* must be equal.'] );  %&%
+  end                                                                     %&%
+  asize = size( A );                                                      %&%
+  if length(asize) < outdim  ||  any( asize(1:outdim)==1 )                %&%
+    error( ['With EXTRAP false there can not be any singleton ',...       %&%
+                                              'dimmensions in *A*.'] );   %&%
+  end                                                                     %&%
+  dims = 1:outdim;
 end
-%
-dim = size(pos,2);
-%
-if nargin < 2+dim
-  error( 'Too few input arguments.' );
-elseif nargin > 3+dim
-  error( 'Too many input arguments.' );
-end
-%
-if dimens(A) > dim
-  error('Mismatch in dimension between *pos* and *A*.');
-end
-%
-imethod = 'linear';
 
+dim = length( dims );
 
-%--- Extrapolation switch defined
-%
-atmlab( 'require', {'EXTRAP'} );
+if dim == 0
+  %
+  B = repmat( A, size(pos,1), 1 );
 
-
-
-if dim == 1
-
-  if nargin == 4
-    imethod = y;
+elseif dim == 1
+  %
+  if extrap
+    xi = handle_expand( agrids{dims(1)}, pos(:,dims(1)) );
+  else
+    xi = pos(:,dims(1));
   end
-
-  if atmlab( 'EXTRAP' )
-    [A,x] = expand2inf( A, x );
-  end
-
-  B = interp1( x, A, pos, imethod );
+  %
+  B = interp1( agrids{dims(1)}, A, xi, iopt );
 
 elseif dim == 2
-
-  rqre_datatype( 'vector', y );
-
-  if length(y) ~= size(A,2)
-    error('Mismatch in size between *y* and *A*.');
+  %
+  if extrap
+    xi = handle_expand( agrids{dims(1)}, pos(:,dims(1)) );
+    yi = handle_expand( agrids{dims(2)}, pos(:,dims(2)) );
+  else
+    xi = pos(:,dims(1));
+    yi = pos(:,dims(2));
   end
-
-  if nargin == 5
-    imethod = z;
-  end
-
-  if atmlab( 'EXTRAP' )
-    [A,x,y] = expand2inf( A, x, y );
-  end
-
-  B = interp2( y, x, A, pos(:,2), pos(:,1), imethod ); 
+  %
+  B = interpn( agrids{dims(1)}, agrids{dims(2)}, A, xi, yi, iopt ); 
 
 elseif dim == 3
-
-  rqre_datatype( 'vector', y );
-  rqre_datatype( 'vector', z );
-
-  if length(y) ~= size(A,2)
-    error('Mismatch in size between *y* and *A*.');
+  %
+  if extrap
+    xi = handle_expand( agrids{dims(1)}, pos(:,dims(1)) );
+    yi = handle_expand( agrids{dims(2)}, pos(:,dims(2)) );
+    zi = handle_expand( agrids{dims(3)}, pos(:,dims(3)) );
+  else
+    xi = pos(:,dims(1));
+    yi = pos(:,dims(2));
+    zi = pos(:,dims(3));
   end
-  if length(z) ~= size(A,3)
-    error('Mismatch in size between *z* and *A*.');
-  end
+  %
+  B = interpn( agrids{dims(1)}, agrids{dims(2)}, agrids{dims(3)}, ...
+                                                      A, xi, yi, zi, iopt ); 
 
-  if nargin == 6
-    imethod = iopt;
+elseif dim == 4
+  %
+  if extrap
+    xi = handle_expand( agrids{dims(1)}, pos(:,dims(1)) );
+    yi = handle_expand( agrids{dims(2)}, pos(:,dims(2)) );
+    zi = handle_expand( agrids{dims(3)}, pos(:,dims(3)) );
+    ui = handle_expand( agrids{dims(4)}, pos(:,dims(4)) );
+  else
+    xi = pos(:,dims(1));
+    yi = pos(:,dims(2));
+    zi = pos(:,dims(3));
+    ui = pos(:,dims(4));
   end
+  %
+  [xi,yi,zi,ui] = ndgrid( xi, yi, zi, ui );
+  %
+  B = interpn( agrids{dims(1)}, agrids{dims(2)}, ...
+               agrids{dims(3)}, agrids{dims(4)}, A, xi, yi, zi, ui, iopt ); 
+
+elseif dim == 5
+  %
+  if extrap
+    xi = handle_expand( agrids{dims(1)}, pos(:,dims(1)) );
+    yi = handle_expand( agrids{dims(2)}, pos(:,dims(2)) );
+    zi = handle_expand( agrids{dims(3)}, pos(:,dims(3)) );
+    ui = handle_expand( agrids{dims(4)}, pos(:,dims(4)) );
+    vi = handle_expand( agrids{dims(5)}, pos(:,dims(5)) );
+  else
+    xi = pos(:,dims(1));
+    yi = pos(:,dims(2));
+    zi = pos(:,dims(3));
+    ui = pos(:,dims(4));
+    vi = pos(:,dims(5));
+  end
+  %
+  B = interpn( agrids{dims(1)}, agrids{dims(2)}, agrids{dims(3)}, ...
+               agrids{dims(4)}, agrids{dims(5)}, A, xi, yi, zi, ui, vi, iopt ); 
+
+else                                                             %&%
+  error( 'Interpolation above 5D is not handled.' );             %&%
+end
+
+return
+
+
+
+%---
+function xi = handle_expand(x,xi)
   
-  if atmlab( 'EXTRAP' )
-    [A,x,y,z] = expand2inf( A, x, y, z );
-  end
+v1 = min( x );
+i1 = find( xi<v1 );
 
-  B = interp3( y, x, z, A, pos(:,2), pos(:,1), pos(:,3), imethod ); 
+v2 = max( x );
+i2 = find( xi>v2 );
 
+if ~isempty(v1) 
+  xi(i1) = v1;
+end
+
+if ~isempty(v2) 
+  xi(i2) = v2;
 end

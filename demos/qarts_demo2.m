@@ -1,7 +1,11 @@
 % QARTS_DEMO2   A demonstration of Qarts
 %
-%    As *qarts_demo*, but with more advanced calculation options where primarily
-%    pre-calculation of asorption and sensor characteristics is exemplified.
+%    As *qarts_demo*, but with more advanced calculation options.
+%    Pre-calculation of absorption and sensor characteristics is 
+%    exemplified. VMR_FIELD is set through ABS_SPECIES.ATMDATA.
+%
+%    Input temperature data are 2D, and it can not be expected that 
+%    1D results shall be identical to 2D and 3D.
 %
 % FORMAT   [Q,f,y] = qarts_demo2( [ ztan, atmdim ] )
 %        
@@ -15,16 +19,18 @@
 % 2007-08-23   Created by Patrick Eriksson (based qarts_demo).
 
 
-function [Q,f,y] = qarts_demo2( ztan, atmdim )
-
-  
-%= Set defualts
+function [Q,f,y] = qarts_demo2( varargin )
 %
-atmdim_DEFAULT   = 1;
-ztan_DEFAULT     = 30e3;
-%
-set_defaults;
+[ztan,atmdim] = optargs( varargin, { 30e3, 1 } );
 
+
+arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
+%
+if isnan( arts_xmldata_path )
+  error('You need to ARTS_XMLDATA_PATH to run this example.');
+end
+%
+fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
 
 
 %= Init Q structures
@@ -34,82 +40,92 @@ Q  = qarts;
 
 %= Overall settings
 %
-Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                        fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+Q.INCLUDES               = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                             fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
 
 
-%= Basic stuff
+%= Atmospheric species
 %
-Q.F_GRID            = linspace( 501.18e9, 501.58e9, 201 );
-Q.STOKES_DIM        = 1;
+% Note that ATMDATA for nitrogen is set to a scalar
 %
-Q.ABS_SPECIES{1}{1} = 'ClO';
-Q.ABS_SPECIES{2}{1} = 'O3';
-Q.ABS_SPECIES{3}{1} = 'N2O';
-Q.ABS_SPECIES{4}{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
-Q.ABS_SPECIES{4}{2} = 'H2O-PWR98';
-Q.ABS_SPECIES{5}{1} = 'N2-SelfContStandardType';
+Q.ABS_SPECIES(1).TAG{1}  = 'ClO';
+Q.ABS_SPECIES(1).ATMDATA = gf_artsxml( fullfile( fascod, ...
+                            'subarctic-winter.ClO.xml' ), 'ClO', 'vmr_field' ); 
+%
+Q.ABS_SPECIES(2).TAG{1}  = 'O3';
+Q.ABS_SPECIES(2).ATMDATA = gf_artsxml( fullfile( fascod, ...
+                              'subarctic-summer.O3.xml' ), 'O3', 'vmr_field' ); 
+%
+Q.ABS_SPECIES(3).TAG{1}  = 'N2O';
+Q.ABS_SPECIES(3).ATMDATA = gf_artsxml( fullfile( fascod, ...
+                            'subarctic-winter.N2O.xml' ), 'N2O', 'vmr_field' ); 
+%
+Q.ABS_SPECIES(4).TAG{1}  = 'H2O-*-490e9-510e9'; % Some local lines not in PWR98
+Q.ABS_SPECIES(4).TAG{2}  = 'H2O-PWR98';
+Q.ABS_SPECIES(4).ATMDATA = gf_artsxml( fullfile( fascod, ...
+                            'subarctic-summer.H2O.xml' ), 'H2O', 'vmr_field' ); 
+%
+Q.ABS_SPECIES(5).TAG{1}  = 'N2-SelfContStandardType';
+Q.ABS_SPECIES(5).ATMDATA = gf_set( atmdata_empty(0), 0.781, [] );
 
 
-%= Define atmosphere and surface
+%= Temperature and geoemtrical altitudes are taken from CIRA86
 %
-Q.ATMOSPHERE_DIM      = atmdim;
+Q.T_ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
+         'climatology', 'cira86', 'cira86.t.xml' ), 'Temperature', 't_field' );
+Q.Z_ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
+           'climatology', 'cira86', 'cira86.z.xml' ), 'Altitudes', 'z_field' );
+
+
+%= Set-up atmosphere and surface
 %
-Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
+Q.ATMOSPHERE_DIM         = atmdim;
 %
-arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
-if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
-end
+Q.P_GRID                 = z2p_simple( [0:500:45e3 46e3:1e3:100e3]' );
 %
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                        'fascod', 'tropical' );
-%
-if atmdim == 1
-  Q.RAW_ATM_EXPAND_1D = 0;
+if atmdim < 2
+  Q.LAT_GRID             = 0;          % Only used for interpolation of ATMDATA
 else
-  %
-  Q.RAW_ATM_EXPAND_1D = 1;
-  Q.LAT_GRID          = -10:10;
-  %
-  if atmdim == 3
-    Q.LON_GRID = -10:10;      
-  end
+  Q.LAT_GRID             = [-10:10]';  % A true latitude grid
 end
 %
-Q.R_GEOID        = constants( 'EARTH_RADIUS' );
-Q.Z_SURFACE      = 500;
-
-
-
-%= Load atmospheric and surface variables
+if atmdim < 3
+  Q.LON_GRID             = 0;          % Only used for interpolation of ATMDATA
+else
+  Q.LON_GRID             = [-10:10]';  % A true longitude grid
+end
 %
-% This step is here unnecessary. It is just a demonstration for how a 1D
-% atmosphere can be expanded by ARTS and obtained fields can be loaded for
-% some modification. 
-%
-Q.USE_RAW_ATMOSPHERE = 0;
-%
-[Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD,Q.R_GEOID,Q.Z_SURFACE] = arts_atmfields( Q );
+Q.R_GEOID                = constants( 'EARTH_RADIUS' );
+Q.Z_SURFACE              = 500;
 
+
+%= Set-up VMR_FIELD, T_FIELD and Z_FIELD
+%
+Q.USE_RAW_ATMOSPHERE     = false;
+Q.VMR_FIELD              = qarts_vmr_field( Q );
+Q.T_FIELD                = qarts_t_or_z_field( Q, 't', 45 );% Note interp.
+Q.Z_FIELD                = qarts_t_or_z_field( Q, 'z', 45 );% to DOY 45
 
 
 %= Absorption
+%
+%
+Q.F_GRID                 = linspace( 501.18e9, 501.58e9, 201 )';
+Q.STOKES_DIM             = 1;
 %
 % Absorption is here precalculated. The look-up table is here loaded (into
 % Q.ABS_LOOKUP), which will be followed by a saving of data. This
 % unnecessary loading/saving can be avoided by giving *arts_abstable* a
 % folder where the look-up can be saved: Q.ABS_LOOKUP = arts_abstable(Q,folder);
 %
-Q.ABS_LINES_FORMAT = 'Arts';
-Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
-Q.ABS_NLS          = [];
+Q.ABS_LINES_FORMAT       = 'Arts';
+Q.ABS_LINES              = fullfile( atmlab_example_data , 'lines501.4' );
+Q.ABS_NLS                = [];
 %
-Q                  = qarts_abstable( Q );
-Q.ABS_LOOKUP       = arts_abstable( Q );
-%
-Q.ABSORPTION       = 'LoadTable';
-
+Q                        = qarts_abstable( Q, 8, 10 );  % Ask Stefan why these
+Q.ABS_LOOKUP             = arts_abstable( Q );          % high numbers are
+%                                                       % needed
+Q.ABSORPTION             = 'LoadTable';
 
 
 %= Sensor
@@ -120,19 +136,19 @@ Q.ABSORPTION       = 'LoadTable';
 % loading/saving are identical to absorption, commented above.
 %
 if 1                  % Commit only with 1 here, to make *make_check* to work
-  Q.SENSOR_DO = 0;
+  Q.SENSOR_DO = false;
 else
-  H                  = qartsSensor;
+  H                      = qartsSensor;
   %
-  H.SENSOR_NORM      = 1;
+  H.SENSOR_NORM          = true;
   %
-  Q.ANTENNA_DIM      = 1;
-  Q.MBLOCK_ZA_GRID   = [-0.04:0.02:0.04];
-  H.ANTENNA_LOS      = 0;
-  H.ANTENNA_RESPONSE = fullfile( atmlab_example_data, 'antenna.xml' );
+  Q.ANTENNA_DIM          = 1;
+  Q.MBLOCK_ZA_GRID       = [-0.04:0.02:0.04]';
+  H.ANTENNA_LOS          = 0;
+  H.ANTENNA_RESPONSE     = fullfile( atmlab_example_data, 'antenna.xml' );
   %
-  Q.SENSOR_DO        = 1;
-  Q.SENSOR_RESPONSE  = H;
+  Q.SENSOR_DO            = true;
+  Q.SENSOR_RESPONSE      = H;
   %
   % Calculate:
   Q = arts_sensor( Q );
@@ -141,20 +157,20 @@ end
 
 %= Set RTE variables (refraction is here neglected)
 %
-Q.WSMS_BEFORE_RTE    = { 'FlagOff(iy_aux_do)', 'atm_checkedCalc' };
-Q.YCALC_WSMS         = { 'yCalc' };
+Q.WSMS_BEFORE_RTE        = { 'FlagOff(iy_aux_do)', 'atm_checkedCalc' };
+Q.YCALC_WSMS             = { 'yCalc' };
 %
-Q.PPATH_LMAX        = 20e3;
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
-Q.Y_UNIT            = 'RJBT';
+Q.PPATH_LMAX             = 20e3;
+Q.PPATH_STEP_AGENDA      = { 'ppath_stepGeometric' };
+Q.Y_UNIT                 = 'RJBT';
 %
-zplat               = 600e3;
-Q.SENSOR_POS        = [ Q.R_GEOID(1,1) + zplat, -23, 0 ];
-Q.SENSOR_POS        = Q.SENSOR_POS(1:atmdim);
+zplat                    = 600e3;
+Q.SENSOR_POS             = [ Q.R_GEOID(1,1) + zplat, -23, 0 ];
+Q.SENSOR_POS             = Q.SENSOR_POS(1:atmdim);
 %
-Q.SENSOR_LOS        = geomztan2za( Q.R_GEOID(1,1), zplat, ztan );
+Q.SENSOR_LOS             = geomztan2za( Q.R_GEOID(1,1), zplat, ztan );
 if atmdim == 3
-  Q.SENSOR_LOS      = [ Q.SENSOR_LOS, 5 ];
+  Q.SENSOR_LOS           = [ Q.SENSOR_LOS, 5 ];
 end
 
 

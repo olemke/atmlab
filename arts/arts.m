@@ -27,24 +27,20 @@ function status = arts(cfile,errortol)
 if nargin < 2
   errortol = 0;
 end
+                                                                 %&%
+atmlab( 'require', {'ARTS_PATH','FMODEL_VERBOSITY'} );           %&%
 
-
-atmlab( 'require', {'ARTS_PATH'} );
 exec = atmlab( 'ARTS_PATH' );
-if isempty( exec )
-  error('Path to ARTS executable must be a string.');
-end
-
-
-atmlab( 'require', {'FMODEL_VERBOSITY'} );
 rlevel = atmlab( 'FMODEL_VERBOSITY' );
-if isempty( rlevel )
-  rlevel = 0;
-end
-
+                                                                 %&%
+if isempty( exec )                                               %&%
+  error('Path to ARTS executable must be a string.');            %&%
+end                                                              %&%
+if isempty( rlevel )                                             %&%
+  rlevel = 0;                                                    %&%
+end                                                              %&%
 
 status = system( sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
-
 
 if status  &  ~errortol
   fprintf('\n');

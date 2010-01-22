@@ -31,7 +31,7 @@ function tplot(h,col,s,fsize,fweight)
 
 %=== Input arguments
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 %
 if ~iswhole(col)  |  col <= 0
   error('The argument *col* must be an integer > 0.');

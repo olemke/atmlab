@@ -27,14 +27,9 @@
 
 % History: 2005-06-28  Created by Bengt Rydberg
 
-
-function Y = gauss_laguerre_apply(Y,x_i,w_i,xnorm)
-
-%= Set defaults
+function Y = gauss_laguerre_apply(Y,x_i,w_i,varargin)
 %
-xnorm_DEFAULT = 1;
-%
-set_defaults;
+[xnorm] = optargs( varargin, { 1 } );
 
 
 %= Check input

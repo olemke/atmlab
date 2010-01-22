@@ -1,11 +1,14 @@
 % ISEVEN   True for even integers.
 %
-%    Determines if the elements of an array are even integers. The input *n*
-%    can be of any type that gives true as input to *isnumeric.
+%    Determines if all the elements of an array are even integers. 
+%    
+%    Note that this function differs from *isinteger*, which is a type 
+%    test. Here also double numbers are accapted, as long as they are
+%    even integers.
 %
 % FORMAT   bool = iseven(n)
 %        
-% OUT   bool   1 if even integer, else 0.
+% OUT   bool   true if even integer, else false.
 % IN    n      A variable of any valid numeric data type.
 
 % 2002-12-10  Created by Patrick Eriksson. 
@@ -13,10 +16,10 @@
 
 function bool = iseven(n)
 
+bool = false;
 
-if ~isnumeric( n )
-  error('Only numeric input is allowed.');
-end
+if isempty(n) | ~isnumeric(n), return, end
 
+if any( rem(n(:),2) == 1 ), return, end
 
-bool = rem(n,2) == 0;
+bool = true;

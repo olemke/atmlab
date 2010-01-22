@@ -45,8 +45,8 @@ if isempty( iz )
   error( 'Could not locate any altitude data in G.' );
 end
 %
-rqre_field( G(iz).SPCFC, 'P0', 0 );
-rqre_field( G(iz).SPCFC, 'Z0', 0 );
+rqre_field( G(iz).SPCFC, 'P0', false, 'G.SPCFC' );
+rqre_field( G(iz).SPCFC, 'Z0', false, 'G.SPCFC' );
 qcheck( @asgG, G(iz).SPCFC.Z0 );
 
 

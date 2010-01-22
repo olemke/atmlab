@@ -57,7 +57,7 @@
 function [A,value] = prstnt_struct( A, def_fun, varargin )
 
 
-min_nargin( 3, nargin );
+rqre_nargin( 3, nargin );
 
 
 if isempty( A )

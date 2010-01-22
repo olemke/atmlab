@@ -26,9 +26,8 @@
 % 2007-11-13   Created by Bengt Rydberg
 
 function G=asg_zeropad(D,G,Q,DX)
-
-DX_DEFAULT  = [1 0.01 0.01];
-set_defaults;
+%
+DX = optargs( varargin, { [1 0.01 0.01] } );
 
 
 %- Basic checks of input
@@ -37,7 +36,7 @@ qcheck( @asgD, D );
 qcheck( @asgG, G );
 qcheck( @qarts, Q );
 %
-rqre_scalar( 'Q.ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
+rqre_in_range( Q.ATMOSPHERE_DIM, 1, 3 );
 
 %- New grids for p, lat and lon .
 %

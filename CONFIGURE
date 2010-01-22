@@ -12,8 +12,10 @@ atmlab_init, which is found in ATMLAB/atmlab. To view the search path, use
 the Matlab function path. If you will always be using Atmlab, the
 simplest is to include these lines in startup.m:
 
+   wd0 = pwd;
    cd ATMLAB/atmlab
    atmlab_init;
+   cd( wd0 );
 
 If you have different Matlab environments, and you don't want to add
 all the Matlab stuff that you have to the search path, the file
@@ -24,7 +26,7 @@ Matlab looks for startup.m in the folder where it is started. To
 ensure that Matlab always finds your startup.m, the Matlab path must
 be extended already before calling Matlab. How this is done depends on
 the environment (operative system, shell etc.). If you are a bash
-user, a line like this will do the job:
+user, a line like this will do the job
 
    export MATLABPATH=/home/patrick/Configure/Matlab:
 

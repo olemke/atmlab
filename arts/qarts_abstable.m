@@ -18,7 +18,7 @@
 %      Q.USE_RAW_ATMOSPHERE
 %      Q.ABS_NLS
 %
-% FORMAT   Q = qarts_abstable( Q, nt, dt, nnls, dnls )
+% FORMAT   Q = qarts_abstable( Q [, nt, dt, nnls, dnls ] )
 %        
 % OUT   Q      Q structure wth some fields automatically set. These fields
 %              are:
@@ -39,41 +39,32 @@
 % 2007-08-22   Created by Patrick Eriksson.
 
 
-function Q = qarts_abstable( Q, nt, dt, nnls, dnls )
-
-
-%- Default values
+function Q = qarts_abstable( Q, varargin )
 %
-nt_DEFAULT   = 3;
-dt_DEFAULT   = [];
-nnls_DEFAULT = 3;
-dnls_DEFAULT = [];
-%
-set_defaults;
-
-
-%- Check input
-%
-rqre_datatype( 'struct', Q );
-%
-if ~qarts_isset( Q.ATMOSPHERE_DIM )
-  error( 'Q.ATMOSPHERE_DIM must be set' );
-end
-rqre_scalar( 'ARTS field ATMOSPHERE_DIM', Q.ATMOSPHERE_DIM, 1, 3 );
-%
-if ~qarts_isset( Q.P_GRID )
-  error( 'Q.P_GRID must be set' );
-end
-%
-if ~qarts_isset( Q.USE_RAW_ATMOSPHERE )
-  error( 'Q.USE_RAW_ATMOSPHERE must be set' );
-end
-rqre_bool( 'ARTS field USE_RAW_ATMOSPHERE', Q.USE_RAW_ATMOSPHERE );
-%
-if ~qarts_isset( Q.ABS_NLS )
-  error( 'Q.ABS_NLS must be set' );
-end
-
+[nt,dt,nnls,dnls] = optargs( varargin, { 3, [], 3, [] } );
+                                                                 %&%
+%= Check input                                                   %&%
+%                                                                %&%
+rqre_nargin(1,nargin);                                           %&%
+%                                                                %&%
+rqre_datatype( Q, @isstruct );                                   %&%
+%                                                                %&%
+if ~qarts_isset( Q.ATMOSPHERE_DIM )                              %&%
+  error( 'Q.ATMOSPHERE_DIM must be set' );                       %&%
+end                                                              %&%
+rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...      %&%
+                                           'Q.ATMOSPHERE_DIM' ); %&%
+if ~qarts_isset( Q.P_GRID )                                      %&%
+  error( 'Q.P_GRID must be set' );                               %&%
+end                                                              %&%
+if ~qarts_isset( Q.USE_RAW_ATMOSPHERE )                          %&%
+  error( 'Q.USE_RAW_ATMOSPHERE must be set' );                   %&%
+end                                                              %&%
+rqre_datatype( Q.USE_RAW_ATMOSPHERE, @isboolean, ...             %&%
+                                       'Q.USE_RAW_ATMOSPHERE' ); %&%
+if ~qarts_isset( Q.ABS_NLS )                                     %&%
+  error( 'Q.ABS_NLS must be set' );                              %&%
+end                                                              %&%
 
 
 %- Obtain atmospheric profiles
@@ -132,7 +123,7 @@ else
   vmr = ( vmr_max + vmr_min ) / 2;
   %
   if isempty(dt)
-    dt   = max( t_max - t_min ) / 2;
+    dt   = max([ max(t_max-t_min)/2 (nt-1)/2]);  % No idea to have steps < 1K
   end
   if isempty( Q.ABS_NLS )
     dnls = 0;
@@ -154,7 +145,7 @@ Q.ABS_T      = t;
 if dt == 0  |  nt < 2
   Q.ABS_T_PERT = [];
 else
-  Q.ABS_T_PERT = linspace( -dt, dt, nt );
+  Q.ABS_T_PERT = linspace( -dt, dt, nt )';
 end  
 %
 Q.ABS_VMRS   = vmr;
@@ -162,7 +153,7 @@ Q.ABS_VMRS   = vmr;
 if dnls == 0  |  nnls < 2  |  isempty( Q.ABS_NLS )
   Q.ABS_NLS_PERT = [];
 else
-  Q.ABS_NLS_PERT = linspace( 2-dnls, dnls, nnls );
+  Q.ABS_NLS_PERT = linspace( 2-dnls, dnls, nnls )';
 end  
 
 

@@ -16,7 +16,7 @@ function set_figsize(width,height)
 
 %=== Basic check of input
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 
 
 %=== Store present units

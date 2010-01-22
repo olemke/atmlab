@@ -11,28 +11,25 @@
 %    demo, which may be re-considered depending
 %    on what data should be used for
 %
-% FORMAT [G,y,ydata,dy]=asg2y_demo([ instrument ])
+% FORMAT [G,y,ydata,dy]=asg2y_demo( Q, [ instrument ])
 %
 % OUT     G      structure with atmospheric variables on gformat data
 %         y      As returned by *arts_y*.
 %         ydata  As returned by *arts_y*.
 %         dy     As returned by *arts_y*.        
 %
+% IN      Q       qarts setting structure
+%
 % OPT     sensor  choice of instrument 
 %                 can be odin (default) or amsu      
-%
-%         Q       qarts setting structure
 
 % Created by Bengt Rydberg
 
 
-function [G,y,ydata,dy]=asg2y_demo(sensor,Q)
+function [G,y,ydata,dy]=asg2y_demo(Q,varargin)
+%
+[sensor] = optargs( varargin, { 'odin' } );
 
-%= Set defualts
-%
-sensor_DEFAULT='odin';
-%
-set_defaults;
 
 %-----------------------------------
 %generate cloudy atmospheric states

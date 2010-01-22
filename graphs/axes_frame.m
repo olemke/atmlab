@@ -19,7 +19,7 @@ function axes_frame(h,on_or_off)
 
 %=== Check input
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 %
 if ~( strcmp( on_or_off, 'off' )  |  strcmp( on_or_off, 'on' ) )
   error('Valid actions are ''off'' and ''on''.');

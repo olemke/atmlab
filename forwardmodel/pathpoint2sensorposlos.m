@@ -26,26 +26,28 @@
 
 
 function [spos,slos] = pathpoint2sensorposlos(dim,ppos,plos,r_sensor)
-  
-
-%- Check input
-%
-rqre_scalar( 'input variable *dim*', dim, 1, 3 );
-rqre_datatype( 'vector', ppos )
-rqre_datatype( 'vector', plos )
-rqre_scalar( 'input variable *r_sensor*', r_sensor, 0 );
-%
-if length(ppos) ~= dim
-  error('Length of *ppos* must be equal to *dim*.' );
-end
-%
-if  ~( (dim<=2 & length(plos)==1)  | (dim==3 & length(plos)==2) ) 
-  error('Length of *plos* does not match *dim*.' );
-end
-%
-if abs(plos(1)) < 90
-  error( 'The function accepts only zenith angles > 90 degrees.' );
-end
+                                                                         %&%
+                                                                         %&%
+%- Check input                                                           %&%
+%                                                                        %&%
+rqre_alltypes( dim, {@istensor0,@iswhole} );                             %&%
+rqre_in_range( dim, 1, 3 );                                              %&%
+rqre_datatype( ppos, @isvector );                                        %&%
+rqre_datatype( plos, @isvector );                                        %&%
+rqre_datatype( r_sensor, @istensor0 );                                   %&%
+rqre_in_range( r_sensor, 0 );                                            %&%
+%                                                                        %&%
+if length(ppos) ~= dim                                                   %&%
+  error('Length of *ppos* must be equal to *dim*.' );                    %&%
+end                                                                      %&%
+%                                                                        %&%
+if  ~( (dim<=2 & length(plos)==1)  | (dim==3 & length(plos)==2) )        %&%
+  error('Length of *plos* does not match *dim*.' );                      %&%
+end                                                                      %&%
+%                                                                        %&%
+if abs(plos(1)) < 90                                                     %&%
+  error( 'The function accepts only zenith angles > 90 degrees.' );      %&%
+end                                                                      %&%
 
 
 %- Make calculations always in 3D

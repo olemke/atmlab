@@ -9,10 +9,10 @@
 %    best described by the tangent altitude. Down-looking cases correspond
 %    to negative tangent altitudes.
 %
-% FORMAT   zs = satviewdepth(z,Abs,ztan,tau,Re)
+% FORMAT   zs = satviewdepth(z,Abs,ztan[,tau,Re])
 %        
 % OUT   zs    Viewing altitude, for each combination of frequency and tangent
-%             altitudes.
+%             altitudes ([ztan,f]).
 % IN    z     Altitudes for absorption.
 %       Abs   Absorption, where each column corresponds to an altitude.
 %       ztan  Tangent altitude(s).
@@ -22,22 +22,28 @@
 % 2006-04-26   Created by Parick Eriksson.
 
 
-function zs = satviewdepth(z,Abs,ztan,tau,Re)
-
-
-tau_DEFAULT = 1;
-Re_DEFAULT  = constants( 'EARTH_RADIUS' );
+function zs = satviewdepth(z,Abs,ztan,varargin)
 %
-set_defaults;
-
-
-if ~issorted(z)
-  error('Argument *z* must be a sorted increasing vector.');
-end
-
-if length(z) ~= size(Abs,2)
-  error('Size mismatch between *z* and *Abs*.');
-end
+[tau,Re] = optargs( varargin, { 1, constants('EARTH_RADIUS') } );
+                                                                           %&%
+                                                                           %&%
+%- Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin( 3, nargin )                                                   %&%
+%                                                                          %&%
+rqre_datatype( z, {@istensor1} );                                          %&%
+rqre_datatype( Abs, {@istensor2} );                                        %&%
+rqre_datatype( ztan, {@istensor1} );                                       %&%
+%                                                                          %&%
+rqre_scalar( tau, [], 0 );                                                 %&%
+rqre_scalar( Re, [], 0 );                                                  %&%
+%                                                                          %&%
+if ~issorted(z)                                                            %&%
+  error('Argument *z* must be a sorted increasing vector.');               %&%
+end                                                                        %&%
+if length(z) ~= size(Abs,2)                                                %&%
+  error('Size mismatch between *z* and *Abs*.');                           %&%
+end                                                                        %&%
 
 
 %= Return argument

@@ -18,7 +18,7 @@ function ht = axes_title(h,s,varargin)
 
 %=== Check input
 %
-min_nargin( 2, nargin );
+rqre_nargin( 2, nargin );
 %
 if ~iseven( length(varargin) )
   error('Input arguments beside *s* must be property pairs.');

@@ -6,6 +6,8 @@
 %    A file is tried to be loaded if *a* is a string. Otherwise b is just
 %    set to a.
 %
+%    Use *qarts_get_gformat* for variables of gformat type.
+%
 % FORMAT   b = qarts_get( a )
 %        
 % OUT   b          Variable value.

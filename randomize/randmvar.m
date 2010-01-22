@@ -49,7 +49,7 @@ function X = randmvar(P,C,n)
 
 %= Check input
 %
-min_nargin( 3, nargin );
+rqre_nargin( 3, nargin );
 %
 if ~iscell(P)
   error('Input argument *P* must be a cell array.');

@@ -28,7 +28,7 @@ function fit_to_paper(psize,vborder,hborder)
 
 %=== Basic check of input
 %
-min_nargin( 1, nargin );
+rqre_nargin( 1, nargin );
 
 
 %=== Default values

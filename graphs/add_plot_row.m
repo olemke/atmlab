@@ -48,17 +48,9 @@
 % 2002-12-11   Created by Patrick Eriksson.
 
 
-function h = add_plot_row(height,widths,vspacing,hspacing,flush,hshift)
-
-
-%=== Set default values
+function h = add_plot_row(height,widths,varargin)
 %
-vspacing_DEFAULT = 0.1;
-hspacing_DEFAULT = 0.1;
-flush_DEFAULT    = 'r';
-hshift_DEFAULT   = 0;
-%
-set_defaults;
+[vspacing,hspacing,flush,hshift] = optargs( varargin, { 0.1, 0.1, 'r', 0 } );
 
   
 %=== Basic check of input

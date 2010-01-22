@@ -12,7 +12,7 @@ function scale_print(scfac)
 
 %=== Basic check of input
 %
-min_nargin( 1, nargin );
+rqre_nargin( 1, nargin );
 
 
 h = gcf;
