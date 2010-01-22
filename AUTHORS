@@ -10,10 +10,15 @@ Initiated Atmlab. Made the little design there is.
 Contributed with functions of various kind.
 
 
-Oliver Lemke <olemke@irv.se>
+Oliver Lemke <olemke@ltu.se>
 ---
 Maintaining SVN repository and the mailing list.
 Created the XML format for data files.
+
+
+Salomon Eliasson <s.eliasson@ltu.se>
+---
+GMT plotting interface.
 
 
 
