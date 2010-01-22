@@ -1,4 +1,3 @@
-Revise jacobian part of qarts
 Revise tests
 
 Fix that bl can be handled by ARTS
@@ -9,16 +8,8 @@ Is pyarts used?
 Finish README
 
 
-
 Ask Bengt to revise
   h2o/parametrisations
   asg
-  h2o/thermodynamics/pseudo_adiabatic_liwc (use constants)
   create_ssp
 
-Ask Isaac
-  h2o/thermodynamics/latent_heat_vaporization (constant missing, heading incorrect)
-  relative_humidity.m: Only RH with respect to liqiud water.
-
-Ask Salomon 
-  To describe new atmlab settings in atmlab.m
