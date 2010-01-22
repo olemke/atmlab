@@ -228,35 +228,35 @@ function filename = sort_figures(se)                                            
 
 if strcmp(se.figuretype,'ps')
     command = sprintf('rm -f .gmt{commands4,defaults4}');
-    exec_cmd(command)
+    exec_gmt_cmd(command)
     filename=[se.filename '.ps'];
 elseif strcmp(se.figuretype,'eps')
     %ps->eps
-    command = sprintf('ps2eps -f -B --loose %s.ps',se.filename);exec_cmd(command)
-    command = sprintf('epstool --copy -b %s.eps %s2.eps',se.filename,se.filename);exec_cmd(command)
-    command = sprintf('mv %s2.eps %s.eps',se.filename,se.filename);exec_cmd(command)
+    command = sprintf('ps2eps -f -B --loose %s.ps',se.filename);exec_gmt_cmd(command)
+    command = sprintf('epstool --copy -b %s.eps %s2.eps',se.filename,se.filename);exec_gmt_cmd(command)
+    command = sprintf('mv %s2.eps %s.eps',se.filename,se.filename);exec_gmt_cmd(command)
     command = sprintf('rm -f %s.ps .gmt{commands4,defaults4}',se.filename);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
     filename = [se.filename '.eps'];
 elseif strcmp(se.figuretype,'pdf') %turn the eps into a .pdf file
-    command = sprintf('ps2eps -f -B --loose %s.ps',se.filename);exec_cmd(command)
-    command = sprintf('epstool --copy -b %s.eps %s2.eps',se.filename,se.filename);exec_cmd(command)
-    command = sprintf('mv %s2.eps %s.eps',se.filename,se.filename);exec_cmd(command)
-    command = sprintf('rm -f %s.pdf',se.filename);exec_cmd(command)
-    command = sprintf('epstopdf %s.eps',se.filename);exec_cmd(command)
+    command = sprintf('ps2eps -f -B --loose %s.ps',se.filename);exec_gmt_cmd(command)
+    command = sprintf('epstool --copy -b %s.eps %s2.eps',se.filename,se.filename);exec_gmt_cmd(command)
+    command = sprintf('mv %s2.eps %s.eps',se.filename,se.filename);exec_gmt_cmd(command)
+    command = sprintf('rm -f %s.pdf',se.filename);exec_gmt_cmd(command)
+    command = sprintf('epstopdf %s.eps',se.filename);exec_gmt_cmd(command)
     command = sprintf('rm -f %s.{ps,eps} .gmt{commands4,defaults4}',se.filename);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
     filename=[se.filename '.pdf'];
 end
 
 command=sprintf('rm -f %s.{grd,asc}',se.filename);
-exec_cmd(command)
+exec_gmt_cmd(command)
 
 ! rm -f *.cpt
 
 if isdir(se.outdir)
     command=sprintf('mv %s %s/',filename,se.outdir);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 else
     se.outdir=pwd;
 end
@@ -280,11 +280,3 @@ end
 filename = sprintf('%s/%s',se.outdir,filename);
 fprintf('GMT plot stored at:  %s\n',filename)
 
-function exec_cmd(cmd)
-% this function is also in create_gmt_earth
-if ~iscell(cmd), cmd = {cmd}; end
-
-for x = cmd
-    fprintf('%s\n',char(x));
-    system(char(x));
-end

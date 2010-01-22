@@ -8,46 +8,46 @@ function create_gmt_earth(se)
 se = setup_create_GMT_earth(se);                                                % Most options are assigned here
 
 command = 'export PATH=$PATH:/usr/lib/gmt/bin';                                 % GMT script
-exec_cmd(command)
+exec_gmt_cmd(command)
 
 command = sprintf('rm -f %s.{ps,eps}',se.filename);                             % Remove earlier .ps files
-exec_cmd(command)
+exec_gmt_cmd(command)
 
 command = 'gmtset PAPER_MEDIA a0';                                              % Set paper sizeBASEMAP_AXES
-exec_cmd(command)
+exec_gmt_cmd(command)
 
 if isfield(se,'headersize')                                                     % Size of title
     command = sprintf('gmtset HEADER_FONT_SIZE %dp',se.headersize);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se,'basemap_axis')                                                   % Annotations of axis
     command = sprintf('gmtset BASEMAP_AXES %s',se.basemap_axis);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se,'nearneighbor')                                                   % Nearneighbor
     command = se.nearneighbor;
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 elseif ~se.grid && strcmp(se.plot.grid.name,'nearneighbor')
     command = nearneighbor(se.plot.grid);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se,'grdimage')                                                       % Image
     command = se.grdimage;
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 elseif strcmp(se.plot.plotimage.name,'grdimage')
     command = grdimage(se.plot.plotimage);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se,'pscoast')                                                        % Coastlines
     command = se.pscoast;
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 else
     command = pscoast(se.plot.coast);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se,'locations')                                                      % Location markers
@@ -56,25 +56,25 @@ end
 
 if isfield(se.plot,'pscontour') && ~isempty(se.pscontour)                       % Contourlines
     command = pscontour(se.plot.pscontour);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se,'psxy')                                                           % Psbox
     command = se.psxy;
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 elseif isfield(se.plot,'psbox')
     command = psbox(se);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 
 if isfield(se.plot,'legend') && ~isempty(se.plot.legend)                        % Legends
     command = psscale(se.plot.legend);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 if isfield(se.plot,'nanlegend') && ~isempty(se.plot.nanlegend)
     disp('processing psscale for NaN')
     command = psscale(se.plot.nanlegend);
-    exec_cmd(command)
+    exec_gmt_cmd(command)
 end
 % an empty ps file
 system(sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps',...
@@ -121,17 +121,6 @@ if isfield(se,'pscontour')                                                      
 end
 
 [se.plot.legend,se.plot.nanlegend] = mklegend(se);                              % Legend/s
-
-
-function exec_cmd(cmd)                                                          % Execute command
-
-if ~iscell(cmd), cmd = {cmd}; end
-
-for x = cmd
-    fprintf('%s\n',char(x));
-    system(char(x));
-end
-
 
 function se = defaults(se)                                                      %% defaults %%
 
@@ -216,7 +205,6 @@ elseif isnumeric(se.search)
 else
     a.search = se.search;
 end
-
 
 function a = create_colortables(se)                                             %% create color tables %%
 

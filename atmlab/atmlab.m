@@ -103,6 +103,18 @@
 %    The work area is primarily used for forward model calculations, but
 % there could be other applications.
 %----------------------------------------------------------------------------
+% PDFVIEWER
+%
+% Command to view PDF files.
+%----------------------------------------------------------------------------
+% PSVIEWER
+%
+% Command to view PostScript files.
+%----------------------------------------------------------------------------
+% OUTDIR
+%
+% FIXME: OLE
+%----------------------------------------------------------------------------
 
 % 2003-07-06   Created by Patrick Eriksson.
 
@@ -112,4 +124,21 @@ function value = atmlab( varargin )
 persistent A
           
 [A,value] = prstnt_struct( A, @atmlab_defs, varargin );
+
+
+function A = atmlab_defs
+
+A.ARTS_INCLUDES     = NaN;
+A.ARTS_PATH         = NaN;
+A.ARTS_XMLDATA_PATH = NaN;
+A.DEBUG             = 0;
+A.EXTRAP            = 0;
+A.FMODEL_VERBOSITY  = 0;
+A.OUTDIR            = '.';
+A.PDFVIEWER         = NaN;
+A.PSVIEWER          = NaN;
+A.RAND_STATE        = NaN;
+A.SCREEN_WIDTH      = 70;
+A.VERBOSITY         = 1;
+A.WORK_AREA         = NaN;
 

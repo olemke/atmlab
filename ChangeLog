@@ -1,5 +1,29 @@
 2010-01-22  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-4
+
+	* atmlab/atmlab.m, atmlab/atmlab_defs.m:
+
+	Merged atmlab_defs back into atmlab.m. Seems to work now. There was a
+	problem in Matlab R2006a where it couldn't find the inlined function.
+	See atmlab-0-2-151.
+
+	Added documentation for new variables.
+
+	* graphs/gmt/exec_gmt_cmd.m:
+
+	Made this into a standalone function.
+
+	Added basic error handling.
+
+	* graphs/gmt/gmt_plot.m, graphs/gmt/create_gmt_earth.m:
+
+	Use exec_gmt_cmd.
+
+	* atmlab.spec: Removed cruft.
+
+2010-01-22  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-3
 
 	* AUTHORS:
