@@ -311,6 +311,10 @@ end
 
 if verb>0
   disp('Best combination:')
-  disp(sprintf('RMS error:   %g K', eb))
+  if (use_rel_error)
+    disp(sprintf('RMS error:   %g [fractional]', eb))
+  else
+    disp(sprintf('RMS error:   %g [K]', eb))
+  end
 end
 

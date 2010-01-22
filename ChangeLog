@@ -1,3 +1,11 @@
+2010-01-22  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-0-4-5
+
+	* gridcreation/annealing/find_best_freq_set_anneal.m: Committed
+	cosmetic change in output. (Had forgotten to commit this a long
+	time ago.) 
+
 2010-01-22  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-4
