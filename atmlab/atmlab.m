@@ -113,7 +113,7 @@
 %----------------------------------------------------------------------------
 % OUTDIR
 %
-% FIXME: OLE
+% Specify a directory where a figure/matfile/whatever should be saved.
 %----------------------------------------------------------------------------
 
 % 2003-07-06   Created by Patrick Eriksson.
