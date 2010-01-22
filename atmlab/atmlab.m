@@ -3,11 +3,10 @@
 %   This function is based on *prstnt_struct* and for general help see 
 %   the on-line help for that function. 
 %
-%   Existing fields, and possible settings, are listed below. The default 
-%   value for all fields is to be empty.
+%   Existing fields, and possible settings, are listed below. 
 %
 %   For adding personal settings at startup, see the file CONFIGURE. To 
-%   add or change settings after startup, follow the example below. x
+%   add or change settings after startup, follow the example below. 
 %
 %   To check all present settings
 %      atmlab;
@@ -29,14 +28,6 @@
 %                  *prstnt_struct*.
 %
 %----------------------------------------------------------------------------
-% AMI_PATH
-%
-% The path to the AMI top folder. AMI contains Matlab functions needed for 
-% communication with ARTS1. If you are not using ARTS1, just leave this field
-% empty. 
-% AMI is added by the function *addpath_ami*, where only the arts subfolder
-% is added to the Matlab search path.
-%----------------------------------------------------------------------------
 % ARTS_INCLUDES
 %
 % Path to main folder for ARTS include files. 
@@ -53,22 +44,6 @@
 % Contact the ARTS team if you want access to the data. The data is used
 % as input for ARTS example/utility functions. 
 %----------------------------------------------------------------------------
-% ARTS1_DATA_PATH
-%
-% Path to main folder of arts-data. 
-% The arts-data is a compilation of useful data for ARTS1 calculations.
-% Contact the ARTS team if you want access to the data. The data is used
-% as input for ARTS1 example/utility functions. 
-%----------------------------------------------------------------------------
-% ARTS1_HDF
-%
-% Boolean to indicate if ARTS-1.0.x is compiled with HDF. If true, the binary
-% file format will be used.
-%----------------------------------------------------------------------------
-% ARTS1_PATH
-%
-% Path to executable for ARTS-1.0.x. 
-%----------------------------------------------------------------------------
 % DEBUG
 %
 % Flag to set to simplify debugging. No overall effect, but this flag is
@@ -78,10 +53,9 @@
 %----------------------------------------------------------------------------
 % EXTRAP
 %
-% Flag to for automatic extrapolation of data at interpolation. Data are
-% then assumed to be constant outside end points. That is, data value at end 
-% points are assumed out to some very high value. See further function 
-% *expand2inf*.
+% Flag for automatic extrapolation of data at interpolation. The approach is to
+% treat data to be constant outside end points. That is, the data values at end
+% points are assumed to be valid to -Inf andf Inf, respectively. 
 %     This functionality is implemented by the functions *interpd* and 
 % *regrid*, which should be used of all atmlab functions of general
 % character. Special functions may not obey this setting variable.
@@ -97,21 +71,13 @@
 %
 % Initialisation of random states (for rand and randn). Performed inside
 % *atmlab_init*. Either NaN or an integer. If set to NaN, a semi-random 
-% state is generated (based on clock value). Otherwise the specified value
-% is used as state for both rand and randn.
+% state is generated. Otherwise the specified value is used as state for 
+% both rand and randn.
 %----------------------------------------------------------------------------
 % SCREEN_WIDTH
 % 
 % The width, in number of characters, of the Matlab window.
 % Used by the function *out* to make a frame around screen output.
-%----------------------------------------------------------------------------
-% SKIP_VFIXES
-%
-% Flag to skip "version fixes". This procedure performed at startup fills
-% the folder AUTO_FIXES with some functions lacking in older matlab versions.
-% If this field is set to true, it is assumed that the version fixes
-% procedure has been performed. No functions are copied (but AUTO_FIXES is
-% added to the search path if it exists).
 %----------------------------------------------------------------------------
 % VERBOSITY
 % 

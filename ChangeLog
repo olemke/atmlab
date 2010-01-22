@@ -1,5 +1,13 @@
 2010-01-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-4-1
+
+	* sensors: Not re-added.
+
+	* Some empty sub-folders were still hanging around.
+	
+2010-01-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-4-0
 
 	* README has been updated and read it. Some of the points below

@@ -112,9 +112,8 @@ clc
 %
 %--- Qarts --------------------------------------------------------------------
 %
-%- Calculations with ARTS, and other forward models (presently only ARTS1), 
-%- are controled by a structure, denoted as Q. For each forward model there
-%- is a function defining all existing fields. For ARTS, it is called *qarts*:
+%- Calculations with ARTS are controled by a structure, denoted as Q. The
+%- function defining all existing fields is called *qarts*:
 %
 pause   % Press a key
 %
@@ -183,7 +182,7 @@ pause   % Press a key
 clc
 %
 %- Ask if *qarts_demo* shall be run using the Atmlab function *yes_or_no*.
-%- *qarts_demo* requires that both ARTS and ARTS1 are available, and that
+%- *qarts_demo* requires that both ARTS is available, and that
 %- corresponding Atmlab settings are given.
 %
 if yes_or_no( 'Run *qarts_demo*' )
