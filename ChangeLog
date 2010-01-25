@@ -1,3 +1,10 @@
+2010-01-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-8
+
+	* arts/scenegen/asg2q.m: Rewritten, to follow new version of
+	gformat. Batch calculations now not handled. 
+
 2010-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-7
