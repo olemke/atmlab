@@ -1,9 +1,9 @@
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
-% 
+%
 % It is assumed that the data is CENTERED at the corresponding lat/lon points.
 %
 % FORMAT   filename = gmt_plot(in,field)
-%        
+%
 % OUT   filename    The filename of the figure.
 %
 %
@@ -130,24 +130,28 @@
 %                             second letter for vertical position: T, M, B
 %                             (default: LT)
 %
-% 
+%
 % 2010-01-20   Created by Salomon Eliasson
 
 function filename = gmt_plot(in,field)
 
 if ~exist('field','var'), field = 'datafield'; end
 
-out = set_GMT_plot(in,field);                                             % setup
+out = set_GMT_plot(in,field);                                                   % setup
 
 if out.grid
     out.grdfile = [out.filename '.grd'];
     try
-        write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                         % writegmt (gridded)
+        write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                 % writegmt (gridded)
         fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
     catch ME
-        keyboard
+        if strcmp(ME.identifier,'MATLAB:netcdf:putVar:dataSizeMismatch')
+            error('Dimension mismatch: data,lat,lon')
+        else
+            keyboard
+        end
     end
-else out = create_ascii4gmtplot(out,field);                                     % create ascii (not gridded)
+else out = create_ascii4GMTplot(out,field);                                     % create ascii (not gridded)
 end
 
 create_gmt_earth(out);                                                          % main function
@@ -182,7 +186,11 @@ end
 if ~isfield(se,'grid')
     if issame(size(se.lat),size(se.(field))) && ...
             issame(size(se.lon),size(se.(field)))
-        
+        if ~isvector(se.(field))
+            se.(field) = reshape(se.(field),1,numel(se.(field)));
+            se.lat = reshape(se.lat,1,numel(se.(field)));
+            se.lon = reshape(se.lon,1,numel(se.(field)));
+        end
         se.grid = false;
         txt1 = 'is NOT';txt2='1';txt3='is';
     else
@@ -270,8 +278,8 @@ end
 if isnan(openwith)
     disp('No viewer program defined. ')
     disp('Add something like the following to your startup file')
-    disp('To view PS files with ghost view: atmlab( ''PSVIEWER'',''gv'');')    
-    disp('To view PDF files with ex pee dee eff: atmlab( ''PDFVIEWER'',''xpdf -z width'');')    
+    disp('To view PS files with ghost view: atmlab( ''PSVIEWER'',''gv'');')
+    disp('To view PDF files with ex pee dee eff: atmlab( ''PDFVIEWER'',''xpdf -z width'');')
 end
 
 if se.display

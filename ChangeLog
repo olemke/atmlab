@@ -1,3 +1,10 @@
+2010-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-7
+
+	* graphs/gmt/gmt_plot.m: Turns matrixes of ungridded data into
+	vectors for plotting.
+
 2010-01-22  Salomon Eliasson  <seliasson@seliasson-laptop>
 
 	* atmlab-0-4-6
