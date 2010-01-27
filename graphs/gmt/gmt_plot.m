@@ -184,8 +184,10 @@ if ~strcmp(class(se.(field)),'double')                                          
 end
 
 if ~isfield(se,'grid')
-    if issame(size(se.lat),size(se.(field))) && ...
-            issame(size(se.lon),size(se.(field)))
+    a = sum(size(se.lat) == size(se.(field)))==ndims(se.(field));
+    b = sum(size(se.lon) == size(se.(field)))==ndims(se.(field));
+    
+    if a && b
         if ~isvector(se.(field))
             se.(field) = reshape(se.(field),1,numel(se.(field)));
             se.lat = reshape(se.lat,1,numel(se.(field)));

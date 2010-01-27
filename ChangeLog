@@ -1,3 +1,10 @@
+2010-01-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-9
+
+	* graphs/gmt/gmt_plot.m: replaced the issame function as it's in a
+	special toolbox.
+
 2010-01-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-8
