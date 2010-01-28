@@ -1,3 +1,14 @@
+2010-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-10
+
+	* physics/fresnel.m: Added input checks. 
+
+	* physics/snell.m: Created. Handles imaginary n2. 
+
+	* handy/rqre_element_math.m: Consistency check did not work when
+	both varaibles where non-scalars. 
+
 2010-01-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-9

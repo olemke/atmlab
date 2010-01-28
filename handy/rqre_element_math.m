@@ -18,7 +18,7 @@ function rqre_element_math( a, b )
 rqre_datatype( a, @isnumeric, inputname(1) );
 rqre_datatype( b, @isnumeric, inputname(2) );
   
-if ~( isscalar(a)  ||  isscalar(b)  ||  all( size(a) ~= size(b) ) )
-  error( ['The variables *%s* and *%s* must have the same size, or one has ' ...
-                              'to be a scalar.' ], inputname(1), inputname(2) );
+if ~( isscalar(a)  ||  isscalar(b)  ||  all( size(a) == size(b) ) )
+  error( ['The variables *%s* and *%s* must have the same size, or one has '...
+                             'to be a scalar.' ], inputname(1), inputname(2) );
 end
