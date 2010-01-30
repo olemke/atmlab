@@ -1,3 +1,12 @@
+2010-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-11
+
+	* physics/fresnel.m: More detailed header text, describing
+	assumptions and cases handled.
+
+	* physics/snell.m: Non-scalar was not handled. Missing .* and ./. 
+
 2010-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-10

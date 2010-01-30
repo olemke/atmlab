@@ -50,7 +50,7 @@ RAD2DEG = constants( 'RAD2DEG' );
 
 
 if isr1 & isr2
-  theta2 = asin( n1 * sin( DEG2RAD * theta1 ) / n2 );
+  theta2 = asin( n1 .* sin( DEG2RAD * theta1 ) ./ n2 );
   if isreal( theta2 )
     theta2 = RAD2DEG * theta2;
   else
@@ -58,12 +58,12 @@ if isr1 & isr2
   end
   
 elseif isr1
-  mr2  = ( real(n2) / n1 ).^2;
-  mi2  = ( imag(n2) / n1 ).^2;
+  mr2  = ( real(n2) ./ n1 ).^2;
+  mi2  = ( imag(n2) ./ n1 ).^2;
   sin1 = sin( DEG2RAD * theta1 );
-  s2   = sin1 * sin1; 
-  Nr   = sqrt( ( mr2-mi2+s2 + sqrt( (mr2-mi2-s2).^2 + 4*mr2*mi2 ) ) / 2.0 );
-  theta2 = asin( sin1 / Nr );
+  s2   = sin1 .* sin1; 
+  Nr   = sqrt( ( mr2-mi2+s2 + sqrt( (mr2-mi2-s2).^2 + 4*mr2.*mi2 ) ) / 2.0 );
+  theta2 = asin( sin1 ./ Nr );
   if isreal( theta2 )
     theta2 = RAD2DEG * theta2;
   else
