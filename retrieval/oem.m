@@ -697,10 +697,10 @@ end
           else
             [R,yf] = feval( comfun, Q, R, xnew, iter+1 );
           end
-          
+
           %- Check if lower cost has been reached
           [cost,cost_y,cost_x] = ...
-                            calc_cost( y, yf, Seinv, xa, xnew, Sxinv, O, xnorm );
+                          calc_cost( y, yf, Seinv, xa, xnew, Sxinv, O, xnorm );
           %
           if cost < cost_old
             xfound = 1;
@@ -735,7 +735,8 @@ end
 
         %- Test for convergence
         if xfound
-          [converged,dx,X] = test_convergence( x, xnew, SJSJ, O, xnorm, X, iter);
+          [converged,dx,X] = ...
+                          test_convergence( x, xnew, SJSJ, O, xnorm, X, iter );
           nlinprint( O.outfids, iter, ga, cost, cost_x, cost_y, dx );
           x = xnew;
         end
@@ -747,8 +748,6 @@ end
         j_updated = 0;
         J         = NaN;
       end
-      
-      
       
     else
       error( 'Unknown retrieval option.' );    

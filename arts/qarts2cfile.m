@@ -722,7 +722,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     end
     return                           % Return
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
-    T = add_includes( {}, 'Q.SENSOR_RESPONSE', Q.SENSOR_RESPONSE );
+    T = Q.SENSOR_RESPONSE;
     return                           % Return
   end
 

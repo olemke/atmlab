@@ -42,34 +42,30 @@ function S = covmat1d_from_cfun(xp,Std,cfun,varargin)
 %
 [Cl,cco,mapfun] = optargs( varargin, { [], 0, [] } );
 
-
-%= Check input
-%
-rqre_nargin( 3, nargin );
-%
-if ~( isempty( Std )  |  isscalar(Std)  |  size(Std,2) == 2 )
-  error( 'Argument *Std* must be a 2-col matrix, a scalar or be empty.' );
-end
-%
-if ~ischar(cfun)  |  length(cfun) ~= 3
-  error('Argument *cfun* must be a string of length 3.');
-end
-%
-if nargin >= 4  &  ~( isscalar(Cl)  |  size(Cl,2) == 2 )
-  error( 'Argument *Cl* must be a matrix with 2 columns.' );
-end
-%
-if ~( isscalar( cco )  &  cco >= 0  &  cco < 1 )
-  error( 'Argument *cco* must be a scalar [0,1[' );
-end
-
-
-atmlab( 'require', {'EXTRAP'} );
-
-n  = length( xp );
+%= Check input                                                              %&%
+%                                                                           %&%
+rqre_nargin( 3, nargin );                                                   %&%
+rqre_datatype( xp, @istensor1 );                                            %&%
+if ~istensor2(Std)                                                          %&%
+  error( 'Argument *Std* must be a 2-col matrix, a scalar or be empty.' );  %&%
+end                                                                         %&%
+if ~ischar(cfun)  |  length(cfun) ~= 3                                      %&%
+  error( 'Argument *cfun* must be a string of length 3.' );                 %&%
+end                                                                         %&%
+if nargin >= 4  &  ~istensor2(Cl)                                           %&%
+  error( 'Argument *Cl* must be a matrix with 2 columns.' );                %&%
+end                                                                         %&%
+rqre_datatype( cco, @istensor0 );                                           %&%
+if cco < 0  |  cco >= 1                                                     %&%
+  error( 'Argument *cco* must be a scalar [0,1[' );                         %&%
+end                                                                         %&%
+%                                                                           %&%
+atmlab( 'require', {'EXTRAP'} );                                            %&%
 
 
 %- Determine standard deviations
+%
+n  = length( xp );
 %
 if isempty( Std )
   si = ones( n, 1 );
@@ -77,17 +73,15 @@ elseif isscalar( Std )
   si = repmat( Std, n, 1 );
 else  
   if atmlab( 'EXTRAP' )
-    [si,x] = expand2inf( Std(:,2), Std(:,1) );
-    si     = vec2col( interp1( x, si, xp ) );
+    si = interp1( Std(:,1), Std(:,2), handle_expand(Std(:,1),xp) );
   else
-    si = vec2col( interp1( Std(:,1), Std(:,2), xp ) );
+    si = interp1( Std(:,1), Std(:,2), xp );
   end
 end
-%
-if any( isnan(si) )
-  error( 'NaN obtained when interpolating *Std* (extrapolation?)' );
-end
-
+%                                                                           %&%
+if any( isnan(si) )                                                         %&%
+  error( 'NaN obtained when interpolating *Std* (extrapolation?)' );        %&%
+end                                                                         %&%
 
 
 %= Handle diagonal matrices separately (note return)
@@ -98,7 +92,6 @@ if strcmp( lower(cfun), 'drc' )
   return
   %
 end
-
 
 
 %= Conversion of length unit
@@ -114,7 +107,6 @@ if ~isempty(mapfun)
 end
 
 
-
 %= Distance matrix
 %
 [X1,X2] = meshgrid( xp, xp );
@@ -127,17 +119,15 @@ if isscalar( Cl )
   L = Cl;
 else
   if atmlab( 'EXTRAP' )
-    [cl,x] = expand2inf( Cl(:,2), Cl(:,1) );
-    cl     = vec2col( interp1( x, cl, xp ) );
+    cl = interp1( Cl(:,1), Cl(:,2), handle_expand(Cl(:,1),xp) );
   else
-    cl = vec2col( interp1( Cl(:,1), Cl(:,2), xp ) );
+    cl = interp1( Cl(:,1), Cl(:,2), xp );
   end
   [X1,X2] = meshgrid( cl, cl );
   L       = ( X1 + X2 ) / 2;
   %
   clear X1 X2
 end
-
 
 
 %= Create correlation matrix
@@ -157,12 +147,10 @@ switch lower(cfun)
     %
     S = exp( -(D./L).^2 );
 
-  otherwise
-    %
-    error( sprintf('Unknown correlation function (%s)',cfun) );
-
+  otherwise                                                                 %&%
+    %                                                                       %&%
+    error( sprintf('Unknown correlation function (%s)',cfun) );             %&%
 end
-
 
 
 %- Remove values below correlation cut-off limit, convert to sparse and
@@ -173,7 +161,25 @@ S( find( S < cco )) = 0;
 [i,j,s] = find( S );
 S       = (si*si') .* sparse( i, j, s, n, n );
 
+return
 
 
 
-
+%---
+function xi = handle_expand(x,xi)
+  %
+  v1 = min( x );
+  i1 = find( xi<v1 );
+  %
+  v2 = max( x );
+  i2 = find( xi>v2 );
+  %
+  if ~isempty(v1) 
+    xi(i1) = v1;
+  end
+  %
+  if ~isempty(v2) 
+    xi(i2) = v2;
+  end
+  %
+return

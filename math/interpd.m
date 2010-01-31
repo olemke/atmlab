@@ -168,20 +168,21 @@ end
 return
 
 
-
 %---
 function xi = handle_expand(x,xi)
-  
-v1 = min( x );
-i1 = find( xi<v1 );
-
-v2 = max( x );
-i2 = find( xi>v2 );
-
-if ~isempty(v1) 
-  xi(i1) = v1;
-end
-
-if ~isempty(v2) 
-  xi(i2) = v2;
-end
+  %
+  v1 = min( x );
+  i1 = find( xi<v1 );
+  %
+  v2 = max( x );
+  i2 = find( xi>v2 );
+  %
+  if ~isempty(v1) 
+    xi(i1) = v1;
+  end
+  %
+  if ~isempty(v2) 
+    xi(i2) = v2;
+  end
+  %
+return
