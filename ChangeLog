@@ -1,5 +1,11 @@
 2010-02-01  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-15
+	
+	* graphs/gmt/exec_gmt_cmd.m: Fix problems found by mlint.
+
+2010-02-01  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-14
 	
 	* atmlab/atmlab.m: Add variable GMT_CUSTOM_PATH.
