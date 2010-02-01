@@ -12,24 +12,22 @@ grdimage = sprintf('grdimage');
 %location of file
 if isfield(in,'file')
     grdimage = sprintf('%s %s.grd',grdimage,in.file);
-else
-    error 'needs in.file'
+else error('needs in.file')
 end
 
+% selects portrait
 grdimage=sprintf('%s -P',grdimage);
 
 %lat lon bounds
 if isfield(in,'region')
     grdimage = sprintf('%s -R%s',grdimage,in.region);
-else
-    error 'needs in.region (plot region)'
+else error('needs in.region (plot region)')
 end
 
 %projection type
 if isfield(in,'proj')
     grdimage = sprintf('%s -J%s',grdimage,in.proj);
-else
-    error 'needs in.proj (projection)'
+else error('needs in.proj (projection)')
 end
 
 %title of plot
@@ -42,8 +40,7 @@ grdimage = sprintf('%s -Ya5',grdimage);
 %colortable
 if isfield(in,'cptfile')
     grdimage = sprintf('%s -C%s',grdimage,in.cptfile);
-else
-    error 'needs colortable (in.cptfile)'
+else error('needs colortable (in.cptfile)')
 end
 
 % assuming more pscode will be appended later

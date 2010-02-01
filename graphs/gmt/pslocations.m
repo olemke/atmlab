@@ -38,7 +38,9 @@ for loc = in.locations
     psloc = sprintf('%s -G%s -Wthinner',psloc,color);
     
     % selects Overlay plot mode
-    psloc = sprintf('%s -O',psloc);
+    if ~isempty(dir(sprintf('%s.ps',in.filename)))
+        psloc = sprintf('%s -O',psloc);
+    end
     
     % assuming more pscode will be appended later
     psloc = sprintf('%s -K',psloc);
@@ -70,8 +72,9 @@ for loc = in.locations
         pstxt = sprintf('%s -Sthin -G%s',pstxt,color);
         
         % selects Overlay plot mode
-        pstxt = sprintf('%s -O',pstxt);
-        
+        if ~isempty(dir(sprintf('%s.ps',in.filename)))
+            pstxt = sprintf('%s -O',pstxt);
+        end
         % assuming more pscode will be appended later
         pstxt = sprintf('%s -K',pstxt);
         

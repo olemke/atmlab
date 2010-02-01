@@ -131,6 +131,11 @@
 %                             (default: LT)
 %
 %
+% If you don't want to plot data and only want a map (compatible with all options)
+% in.nodata                 | tells gmt that there is no data.
+% in.(field)=[];            | gives the same effect as in.nodata.
+%                  
+%
 % 2010-01-20   Created by Salomon Eliasson
 
 function filename = gmt_plot(in,field)
@@ -144,19 +149,20 @@ if out.grid
     try
         write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                 % writegmt (gridded)
         fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
-    catch ME
-        if strcmp(ME.identifier,'MATLAB:netcdf:putVar:dataSizeMismatch')
+    catch me
+        if strcmp(me.identifier,'MATLAB:netcdf:putVar:dataSizeMismatch')
             error('Dimension mismatch: data,lat,lon')
         else
-            keyboard
+            m=me.stack(1);
+            error('%s line %d: %s',m.name,m.line,me.message)
         end
     end
-else out = create_ascii4GMTplot(out,field);                                     % create ascii (not gridded)
+else out = create_ascii4gmtplot(out,field);                                     % create ascii (not gridded)
 end
 
 create_gmt_earth(out);                                                          % main function
 
-filename=sort_figures(out);                                                      % finalize
+filename=sort_figures(out);                                                     % finalize
 
 function se = set_GMT_plot(se,field)                                            %% Set up %%
 
@@ -170,6 +176,20 @@ se.outdir = atmlab('OUTDIR');                                                   
 
 se = makefilename(se);
 
+if isfield(se,'nodata')&&se.nodata||isempty(se.(field))
+    se.sidebar=0;
+    se.legend=0;
+    se.grid=0;
+    if ~isfield(se,'region')                                                    % REGION
+        se.region='-180/180/-90/90';
+    elseif isfield(se,field)
+        se.region = sprintf('%d/%d/%d/%d',...
+        min(min(se.lon)),max(max(se.lon)),...
+        min(min(se.lat)),max(max(se.lat)));
+    se.nodata=1;
+    end
+    return
+end
 if ~sum(~isnan(se.(field)))                                                     % data?
     error('%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
@@ -215,6 +235,19 @@ if isfield(se,'region')                                                         
     if x{1}(2) > 180
         [se.(field),se.lat,se.lon] = flipdata(se.(field),se.lat,se.lon);
     end
+end
+
+if isfield(se,'center') && se.center~=0
+    x = (se.(field)(:,1)+se.(field)(:,end))/2;
+    if min(se.lon)>-180
+        se.lon = [-180,se.lon];
+        se.(field) = [x,se.(field)];
+    end
+    if max(se.lon)<180
+        se.lon = [se.lon,180];
+        se.(field) = [se.(field),x];
+    end
+    
 end
 
 function se = makefilename(se)                                                  %% Make file name %%

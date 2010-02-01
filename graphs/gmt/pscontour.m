@@ -42,8 +42,9 @@ end
 pscontour = sprintf('%s -A-',pscontour);
 
 % selects Overlay plot mode
-pscontour = sprintf('%s -O',pscontour);
-
+if ~isempty(dir(sprintf('%s.ps',in.file)))
+    pscontour = sprintf('%s -O',pscontour);
+end
 %Draw coastlines. Append attributes [Defaults: width = 1, color = black, texture = solid].
 if isfield(in,'width')
     pscontour = sprintf('%s -W%dp',pscontour,in.width);

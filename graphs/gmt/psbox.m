@@ -30,7 +30,11 @@ for i = 1:length(thick)
 
     stdin=[a{1},' M\n',a{2},' D\n',a{3},' D\n',a{4},' D\n',a{5},' D\n',a{6},' D\n',a{7},' D'];
     box = sprintf('echo -e "%s" |',stdin);
-    box = sprintf('%s psxy -R%s -J%s -A -O',box,region,proj);
+    box = sprintf('%s psxy -R%s -J%s -A',box,region,proj);
+    
+    if ~isempty(dir(sprintf('%s.ps',in.file)))
+        box = sprintf('%s -O',box);
+    end
     
     % color and size of box
     

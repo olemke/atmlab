@@ -9,7 +9,7 @@ function exec_gmt_cmd(cmd)
 
 if ~iscell(cmd), cmd = {cmd}; end
 
-for x = cmd
+for x = cmd'
     fprintf('%s\n',char(x));
     ret = system(char(x));
     if (ret == 127)

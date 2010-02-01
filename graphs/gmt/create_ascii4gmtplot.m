@@ -15,6 +15,11 @@ function se = create_ascii4gmtplot(se,field)
 %
 % 4/12-2009 Salomon Eliasson
 
+% if I don't want to plot data
+if isfield(se,'nodata')&&se.nodata
+    return
+end
+
 se.asciifile = [scodes('TMP_DIR'),'/',se.filename '.asc'];
 [fid,message] = fopen(se.asciifile,'w');
 if fid == -1

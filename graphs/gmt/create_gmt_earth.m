@@ -5,7 +5,7 @@ function create_gmt_earth(se)
 %
 % 4/12-2009 Salomon Eliasson
 
-se = setup_create_GMT_earth(se);                                                % Most options are assigned here
+se = setup_create_gmt_earth(se);                                                % Most options are assigned here
 
 command = 'export PATH=$PATH:/usr/lib/gmt/bin';                                 % GMT script
 exec_gmt_cmd(command)
@@ -29,7 +29,7 @@ end
 if isfield(se,'nearneighbor')                                                   % Nearneighbor
     command = se.nearneighbor;
     exec_gmt_cmd(command)
-elseif ~se.grid && strcmp(se.plot.grid.name,'nearneighbor')
+elseif ~se.grid && isfield(se.plot,'grid')
     command = nearneighbor(se.plot.grid);
     exec_gmt_cmd(command)
 end
@@ -37,7 +37,7 @@ end
 if isfield(se,'grdimage')                                                       % Image
     command = se.grdimage;
     exec_gmt_cmd(command)
-elseif strcmp(se.plot.plotimage.name,'grdimage')
+elseif ~isfield(se,'nodata') && strcmp(se.plot.plotimage.name,'grdimage') 
     command = grdimage(se.plot.plotimage);
     exec_gmt_cmd(command)
 end
@@ -51,7 +51,8 @@ else
 end
 
 if isfield(se,'locations')                                                      % Location markers
-    pslocations(se);
+    command = pslocations(se);
+    exec_gmt_cmd(command)
 end
 
 if isfield(se.plot,'pscontour') && ~isempty(se.pscontour)                       % Contourlines
@@ -82,7 +83,7 @@ system(sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps',...
 
 % close the ps file with
 
-function se = setup_create_GMT_earth(se)                                        %% setup_create_GMT_earth %%
+function se = setup_create_gmt_earth(se)                                        %% setup_create_gmt_earth %%
 
 se = defaults(se);
 
@@ -98,13 +99,15 @@ if ~isfield(se,'proj')                                                          
 else se.plot.proj = se.proj;
 end
 
-if ~se.grid && ~isfield(se,'nearneighbor')                                      % GRIDDING
+if ~se.grid && ~isfield(se,'nearneighbor') && ~isfield(se,'nodata')                                      % GRIDDING
     se.plot.grid = mkgrid(se);
 end
 
-se.plot.color = create_colortables(se);                                         % COLOR TABLE
+if ~isfield(se,'nodata')
+    se.plot.color = create_colortables(se);                                         % COLOR TABLE
+end
 
-if ~isfield(se,'plotimage')                                                     % PLOT IMAGE
+if ~isfield(se,'plotimage') && ~isfield(se,'nodata')                                                    % PLOT IMAGE
     se.plot.plotimage = mkpltimage(se);
 end
 
@@ -152,18 +155,12 @@ region = sprintf('%s/%s/%s/%s',lonmin,lonmax,latmin,latmax);
 
 function proj = setup_projection(se)                                            %% setup_projection %%
 
-if ~isfield(se,'projection')
-    projection = 'Q'; %Cylindrical Equidistant Projection
-else projection  = se.projection;
-end
+projection = 'Q'; %Cylindrical Equidistant Projection
 
 x = textscan(se.plot.region','%f','delimiter','/');                             % region
 
-if ~isfield(se,'center')                                                        % centre
-    if ~strcmp(se.plot.region,'0/360/-90/90')
-        center = (x{1}(1)+x{1}(2))/2;
-    else center = 180; %centerd over Tropical Warm Pool
-    end
+if ~isfield(se,'center')
+    center = (x{1}(1)+x{1}(2))/2;
 else center = se.center;
 end
 
@@ -387,7 +384,6 @@ elseif isfield(se.datarange,'max') && ~isfield(se.datarange,'min')
     se.datarange.min = 0;
     fprintf('setting se.datafield.min = %3.1f\n',se.datarange.min)
 end
-fprintf('%s%5.2f%s%5.2f\n','max = ',se.datarange.max,',  min = ',se.datarange.min);
 if se.datarange.max == se.datarange.min
     se.plot.nlevels=1;
 elseif ~isfield(se,'nlevels')

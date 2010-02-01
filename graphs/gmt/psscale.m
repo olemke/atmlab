@@ -38,7 +38,9 @@ if isfield(in,'equalboxsize')
 end
 
 % selects Overlay plot mode
-psscale = sprintf('%s -O',psscale);
+if ~isempty(dir(sprintf('%s.ps',in.file)))
+    psscale = sprintf('%s -O',psscale);
+end
 
 ut = sprintf('%s.ps',in.file);
 command = sprintf('%s >> %s',psscale,ut);

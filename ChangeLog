@@ -1,3 +1,15 @@
+2010-02-01  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-13
+	
+	* graphs/gmt/exec_gmt_cmd.m: bug
+
+	* graphs/gmt/gmt_plot.m: Fixed option in.center, so that you can
+	center the plot at any longitude. Added option in.nodata if you
+	only want an empty map. e.g for locations and what not. Also fixed
+	bug so that gmt only appends to files that exist. And fixed bug so
+	that orientation = portrait (is turned later)
+
 2010-01-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-12

@@ -14,15 +14,13 @@ pscoast = sprintf('pscoast');
 %lat lon bounds
 if isfield(in,'region')
     pscoast = sprintf('%s -R%s',pscoast,in.region);
-else
-    error 'needs in.region'
+else error('needs in.region')
 end
 
 %projection type
 if isfield(in,'proj')
     pscoast = sprintf('%s -J%s',pscoast,in.proj);
-else
-    error 'needs in.proj'
+else error('needs in.proj')
 end
 
 % set the minimal area of features to plot
@@ -32,8 +30,6 @@ end
 
 % Sets map boundary annotation and tickmark intervals;
 pscoast = sprintf('%s -B%s',pscoast,in.ticks);
-%pscoast = sprintf('%s -B40g20/20g20',pscoast);
-
 
 if isfield(in,'resolution')
     pscoast = sprintf('%s -D%s',pscoast,in.resolution);
@@ -44,13 +40,17 @@ if isfield(in,'rivers')
 end
 
 % selects Overlay plot mode
-pscoast = sprintf('%s -O',pscoast);
+if ~isempty(dir(sprintf('%s.ps',in.file)))
+    pscoast = sprintf('%s -O',pscoast);
+end
+
+% set portrait
+pscoast=sprintf('%s -P',pscoast);
 
 %Draw coastlines. Append attributes [Defaults: width = 1, color = black, texture = solid].
 if isfield(in,'width')
     pscoast = sprintf('%s -W%dp',pscoast,in.width);
-else
-    pscoast = sprintf('%s -W',pscoast);
+else pscoast = sprintf('%s -W',pscoast);
 end
 
 % assuming more pscode will be appended later
