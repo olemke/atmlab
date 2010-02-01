@@ -111,6 +111,14 @@
 %
 % Command to view PostScript files.
 %----------------------------------------------------------------------------
+% GMT_CUSTOM_PATH
+%
+% If your GMT binaries are installed in a non-default path, you can specify
+% it here. For example, if your GMT binaries are installed in
+% /usr/lib/gmt/bin add this to your startup.m:
+%
+% atmlab( 'GMT_CUSTOM_PATH', '/usr/lib/gmt/bin' );
+%----------------------------------------------------------------------------
 % OUTDIR
 %
 % Specify a directory where a figure/matfile/whatever should be saved.
@@ -140,5 +148,6 @@ A.PSVIEWER          = NaN;
 A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
 A.VERBOSITY         = 1;
+A.GMT_CUSTOM_PATH   = '';
 A.WORK_AREA         = NaN;
 

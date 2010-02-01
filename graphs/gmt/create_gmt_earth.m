@@ -7,9 +7,6 @@ function create_gmt_earth(se)
 
 se = setup_create_gmt_earth(se);                                                % Most options are assigned here
 
-command = 'export PATH=$PATH:/usr/lib/gmt/bin';                                 % GMT script
-exec_gmt_cmd(command)
-
 command = sprintf('rm -f %s.{ps,eps}',se.filename);                             % Remove earlier .ps files
 exec_gmt_cmd(command)
 

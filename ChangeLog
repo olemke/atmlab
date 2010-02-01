@@ -1,3 +1,17 @@
+2010-02-01  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-14
+	
+	* atmlab/atmlab.m: Add variable GMT_CUSTOM_PATH.
+
+	* graphs/gmt/create_gmt_earth.m:
+
+	Removed 'export PATH=...' statement. It had no effect.
+
+	* graphs/gmt/exec_gmt_cmd.m:
+
+	If GMT_CUSTOM_PATH is set, append it to PATH for every command.
+
 2010-02-01  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-13
