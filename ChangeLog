@@ -1,5 +1,15 @@
 2010-02-02  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-17
+	
+	* arts/netcdf/arts_nc_read_arrayofmatrix.m:
+
+	Add function to read an ArrayOfMatrix from an Arts NetCDF file.
+
+	* atmlab/atmlab_init.m: Updated paths.
+
+2010-02-02  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-16
 	
 	* arts/xml: Moved xml here to have arts interface in one place.
