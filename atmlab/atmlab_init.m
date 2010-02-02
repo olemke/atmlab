@@ -27,7 +27,7 @@ toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
 % If you create a new sub-folder, it should be added here.
 % Please use reversed alphabetical order.
 %
-addpath( fullfile( toppath, 'xml' ) ); 
+addpath( fullfile( toppath, 'netcdf' ) ); 
 addpath( fullfile( toppath, 'time' ) );
 addpath( fullfile( toppath, 'tests' ) );
 addpath( fullfile( toppath, 'sensors', 'atovs' ) ); 
@@ -58,6 +58,7 @@ addpath( fullfile( toppath, 'covmat' ) );
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
+addpath( fullfile( toppath, 'arts', 'xml' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
 
 
