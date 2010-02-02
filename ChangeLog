@@ -1,5 +1,24 @@
 2010-02-02  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-18
+	
+	* files/loadncvar.m:
+
+	Utility function to read a variable by name from a NetCDF file.
+
+	* arts/netcdf/arts_nc_read_arrayofmatrix.m: Fix function name.
+
+	* arts/netcdf/arts_nc_read_arrayofvector.m,
+	arts/netcdf/arts_nc_read_tensor3.m, arts/netcdf/arts_nc_read_tensor4.m:
+
+	Added.
+
+	* arts/netcdf/arts_nc_read_matrix.m, arts/netcdf/arts_nc_read_vector.m:
+
+	Very simple functions but added these anyway for completeness.
+
+2010-02-02  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-17
 	
 	* arts/netcdf/arts_nc_read_arrayofmatrix.m:

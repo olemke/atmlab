@@ -1,8 +1,8 @@
-% NC_READ_ARTS_ARRAYOFMATRIX   Read ArrayOfMatrix from ARTS NetCDF file.
+% ARTS_NC_READ_ARRAYOFMATRIX   Read ArrayOfMatrix from ARTS NetCDF file.
 %
 %    Reads an ArrayOfMatrix from a NetCDF file saved with Arts.
 %
-% FORMAT   ret = nc_read_arts_arrayofmatrix(filename)
+% FORMAT   ret = arts_nc_read_arrayofmatrix(filename)
 %        
 % OUT   ret      ArrayOfMatrix
 %       
@@ -10,7 +10,7 @@
 
 % 2010-02-01   Created by Oliver Lemke.
 
-function ret = nc_read_arts_arrayofmatrix (filename)
+function ret = arts_nc_read_arrayofmatrix (filename)
 
 ncid = netcdf.open (filename, 'NOWRITE');
 
