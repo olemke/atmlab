@@ -1,3 +1,16 @@
+2010-02-03  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-20
+
+	* arts/netcdf/arts_nc_write_arrayofmatrix.m,
+	arts/netcdf/arts_nc_write_arrayofvector.m,
+	arts/netcdf/arts_nc_write_matrix.m,
+	arts/netcdf/arts_nc_write_tensor3.m,
+	arts/netcdf/arts_nc_write_tensor4.m,
+	arts/netcdf/arts_nc_write_vector.m:
+
+	Add writing routines for Arts compatible NetCDF files.
+
 2010-02-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-19
