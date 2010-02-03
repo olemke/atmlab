@@ -673,7 +673,11 @@ function T = cfile_Sensor( Q, partname, workfolder )
   rqre_datatype( Q.SENSOR_RESPONSE, ...                                     %&%
            {@ischar,@issparse,@iscellstr,@isstruct}, 'Q.SENSOR_RESPONSE' ); %&%
 
-  if ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
+  do_parts = 0;
+  %
+  if isstruct( Q.SENSOR_RESPONSE )
+    do_parts = 1;
+  elseif ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
     T{1} = file_or_data( 'sensor_response', 'Sparse', ...
                                            Q.SENSOR_RESPONSE, workfolder );
     if qarts_isset( Q.ANTENNA_DIM )
@@ -720,177 +724,175 @@ function T = cfile_Sensor( Q, partname, workfolder )
       T{end+1} = file_or_data( 'sensor_response_pol_grid', 'ArrayOfIndex', ...
                                      Q.SENSOR_RESPONSE_POL_GRID, workfolder );
     end
-    return                           % Return
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
     T = Q.SENSOR_RESPONSE;
-    return                           % Return
   end
 
-  
   %- Structure version:
-  %                                                                        %&%
-  assert( isstruct( Q.SENSOR_RESPONSE ) );                                 %&%
-    
-  H = Q.SENSOR_RESPONSE;
   %
-  qcheck( @qartsSensor, H );
+  if do_parts  
+    %
+    H = Q.SENSOR_RESPONSE;
+    %
+    qcheck( @qartsSensor, H );
 
-  % Find out sensor structure
-  parts{1} = 'init';
-  if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )  |  ...
+    % Find out sensor structure
+    parts{1} = 'init';
+    if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )  |...
                                  ( qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO )
-    parts{end+1} = 'antenna';
-  end
-  if qarts_isset( H.FILL_FGRID )
-    parts{end+1} = 'fill_fgrid';
-  end
-  if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )  |  ...
+      parts{end+1} = 'antenna';
+    end
+    if qarts_isset( H.FILL_FGRID )
+      parts{end+1} = 'fill_fgrid';
+    end
+    if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )  |  ...
                                      ( qarts_isset( H.MIXER_DO ) & H.MIXER_DO )
-    parts{end+1} = 'mixer';
-  end
-  if qarts_isset( H.F_BACKEND )  |  ...
+      parts{end+1} = 'mixer';
+    end
+    if qarts_isset( H.F_BACKEND )  |  ...
                               qarts_isset( H.BACKEND_CHANNEL_RESPONSE )  |  ...
                                  ( qarts_isset( H.BACKEND_DO ) & H.BACKEND_DO )
-    parts{end+1} = 'backend';
-  end
-  if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
-    parts{end+1} = 'beamswitch';
-  end
-  % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
-  if( strmatch( 'mixer', char(parts) )   &  ...
-      strmatch( 'backend', char(parts) ) &  length(H.LO) > 1 )
-    parts = rmfield( parts, {'mixer' 'backend'} );
-    parts{end+1} = 'multimixer';
-  end
-  parts{end+1} = 'close';
-      
-  % Start writing to output structure
-  T = {};
+      parts{end+1} = 'backend';
+    end
+    if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
+      parts{end+1} = 'beamswitch';
+    end
+    % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
+    if( strmatch( 'mixer', char(parts) )   &  ...
+        strmatch( 'backend', char(parts) ) &  length(H.LO) > 1 )
+      parts = rmfield( parts, {'mixer' 'backend'} );
+      parts{end+1} = 'multimixer';
+    end
+    parts{end+1} = 'close';
+        
+    % Start writing to output structure
+    T = {};
 
-  for it = 1 : length(parts)
-    %
-    U = {};
+    for it = 1 : length(parts)
+      %
+      U = {};
 
-    switch parts{it}
+      switch parts{it}
 
-    case 'init'
-      U{1} = ['# Start of sensor part:'];
-      if qarts_isset( Q.ANTENNA_DIM ) 
-        rqre_alltypes( Q.ANTENNA_DIM, {@istensor0,@iswhole}, ...            %&%
+      case 'init'
+        U{1} = ['# Start of sensor part:'];
+        if qarts_isset( Q.ANTENNA_DIM ) 
+          rqre_alltypes( Q.ANTENNA_DIM, {@istensor0,@iswhole}, ...          %&%
                                                           'Q.STOKES_DIM' ); %&%
-        rqre_in_range( Q.ANTENNA_DIM, 1, 2, 'Q.ANTENNA_DIM' );              %&%
-        U{end+1} = sprintf( 'AntennaSet%dD', Q.ANTENNA_DIM );
-      end
-      if qarts_isset( Q.MBLOCK_ZA_GRID ) 
-        U{end+1} = file_or_data( 'mblock_za_grid', 'Vector', ...
-                                               Q.MBLOCK_ZA_GRID, workfolder );
-      end        
-      if qarts_isset( Q.MBLOCK_AA_GRID ) 
-        U{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
-                                                Q.MBLOCK_AA_GRID, workfolder);
-      end
-      if qarts_isset( H.SENSOR_NORM )
-        rqre_datatype( H.SENSOR_NORM, @isboolean, ...                       %&%
+          rqre_in_range( Q.ANTENNA_DIM, 1, 2, 'Q.ANTENNA_DIM' );            %&%
+          U{end+1} = sprintf( 'AntennaSet%dD', Q.ANTENNA_DIM );
+        end
+        if qarts_isset( Q.MBLOCK_ZA_GRID ) 
+          U{end+1} = file_or_data( 'mblock_za_grid', 'Vector', ...
+                                                Q.MBLOCK_ZA_GRID, workfolder );
+        end        
+        if qarts_isset( Q.MBLOCK_AA_GRID ) 
+          U{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
+                                                 Q.MBLOCK_AA_GRID, workfolder);
+        end
+        if qarts_isset( H.SENSOR_NORM )
+          rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%
                                          'Q.SENSOR_RESPONSE.SENSOR_NORM' ); %&%
-        U{end+1} = sprintf( 'IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
-      end
-      U{end+1} = 'sensor_responseInit';
-      
-    case 'fill_fgrid'
-      v = qarts_get( H.FILL_FGRID );
-      if ~( isnumeric(v) & isvector(v) & length(v) == 2 )                   %&%
-        error( 'The sensor *FILL_FGRID* must be a vector of length 2.' );   %&%
-      end                                                                   %&%
-      U{end+1} = 'sensor_responseFillFgrid( sensor_response,'; 
-      U{end+1} = '   sensor_response_f,sensor_response_pol,';
-      U{end+1} = '   sensor_response_za, sensor_response_aa,';
-      U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
-      U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
-      U{end+1} = sprintf( '   %d,%d)', v(1), v(2) );
-     
-    case 'antenna'
-      if qarts_isset( H.ANTENNA_LOS )
-        U{end+1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
-                                                                 workfolder );
-      end
-      if qarts_isset( H.ANTENNA_RESPONSE )
-        U{end+1} = file_or_data( 'antenna_response', 'GriddedField4',...
-                                             H.ANTENNA_RESPONSE, workfolder );
-      end
-      U{end+1} = 'sensor_responseAntenna';
-      
-    case 'mixer'
-      if qarts_isset( H.LO ) 
-        U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder, 1 );
-      end
-      if qarts_isset( H.SIDEBAND_RESPONSE )           
-        U{end+1} = file_or_data( 'sideband_response', 'GriddedField1', ...
-                                            H.SIDEBAND_RESPONSE, workfolder );
-      end   
-      U{end+1} = 'sensor_responseMixer';
-
-     case 'backend'
-      if qarts_isset( H.F_BACKEND ) 
-        U{end+1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, ...
-                                                              workfolder, 1 );
-      end        
-      if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
-        U{end+1} = file_or_data( 'backend_channel_response', ....
-          'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder, 1 );
-      end
-      if ~qarts_isset( H.F_SWITCHING )
-        U{end+1} = 'sensor_responseBackend';
-      else
-        df = qarts_get( H.F_SWITCHING );
-        if ~( isnumeric(df) & isvector(df) & length(df)==2 )                 %&%
-          error( 'The sensor *F_SWITCHING* must be a vector of length 2.' ); %&%
-        end                                                                  %&%
-        U{end+1} = 'sensor_responseBackendFrequencySwitch(sensor_response,'; 
+          U{end+1} = sprintf( 'IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
+        end
+        U{end+1} = 'sensor_responseInit';
+        
+      case 'fill_fgrid'
+        v = qarts_get( H.FILL_FGRID );
+        if ~( isnumeric(v) & isvector(v) & length(v) == 2 )                 %&%
+          error( 'The sensor *FILL_FGRID* must be a vector of length 2.' ); %&%
+        end                                                                 %&%
+        U{end+1} = 'sensor_responseFillFgrid( sensor_response,'; 
         U{end+1} = '   sensor_response_f,sensor_response_pol,';
-        U{end+1} = '   sensor_response_za,sensor_response_aa,';
+        U{end+1} = '   sensor_response_za, sensor_response_aa,';
         U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
         U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
-        U{end+1} = '   f_backend,backend_channel_response,sensor_norm,';
-        U{end+1} = sprintf( '   %.6e,%.6e)', df(1), df(2) );
-      end
-      
-     case 'multimixer'
-      if qarts_isset( H.F_SWITCHING )
-        error( 'The sensor *F_SWITCHING* option can not be used together ',...
-                                                        'with multiple LO.' );
-      end
-      if qarts_isset( H.LO ) 
-        U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, 1 );
-      end
-      if qarts_isset( H.SIDEBAND_RESPONSE )           
-        U{end+1} = file_or_data( 'sideband_response_multi', ...
-                    'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, workfolder );
-      end   
-      if qarts_isset( H.F_BACKEND ) 
-        U{end+1} = file_or_data( 'f_backend_multi', 'ArrayOfVector', ...
-                                                 H.F_BACKEND, workfolder, 1 );
-      end        
-      if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
-        U{end+1} = file_or_data( 'backend_channel_response_multi', ....
-               'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ... 
-                                                                 workfolder );
-      end
-      U{end+1} = 'sensor_responseMultiMixerBackend';
-      
-    case 'beamswitch'
-      U{1} = 'sensor_responseBeamSwitching';
-      
-    case 'close'
-      U{1} = '# End of sensor part';
+        U{end+1} = sprintf( '   %d,%d)', v(1), v(2) );
+       
+      case 'antenna'
+        if qarts_isset( H.ANTENNA_LOS )
+          U{end+1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
+                                                                  workfolder );
+        end
+        if qarts_isset( H.ANTENNA_RESPONSE )
+          U{end+1} = file_or_data( 'antenna_response', 'GriddedField4',...
+                                              H.ANTENNA_RESPONSE, workfolder );
+        end
+        U{end+1} = 'sensor_responseAntenna';
+        
+      case 'mixer'
+        if qarts_isset( H.LO ) 
+          U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder, 1 );
+        end
+        if qarts_isset( H.SIDEBAND_RESPONSE )           
+          U{end+1} = file_or_data( 'sideband_response', 'GriddedField1', ...
+                                             H.SIDEBAND_RESPONSE, workfolder );
+        end   
+        U{end+1} = 'sensor_responseMixer';
 
-    otherwise
-      error(sprintf('Unknown action (%s) was requested.',parts{it}));
+       case 'backend'
+        if qarts_isset( H.F_BACKEND ) 
+          U{end+1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, ...
+                                                               workfolder, 1 );
+        end        
+        if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
+          U{end+1} = file_or_data( 'backend_channel_response', ....
+           'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder, 1 );
+        end
+        if ~qarts_isset( H.F_SWITCHING )
+          U{end+1} = 'sensor_responseBackend';
+        else
+          df = qarts_get( H.F_SWITCHING );
+          if ~( isnumeric(df) & isvector(df) & length(df)==2 )              %&%
+          error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );%&%
+          end                                                               %&%
+          U{end+1} = 'sensor_responseBackendFrequencySwitch(sensor_response,'; 
+          U{end+1} = '   sensor_response_f,sensor_response_pol,';
+          U{end+1} = '   sensor_response_za,sensor_response_aa,';
+          U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
+          U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
+          U{end+1} = '   f_backend,backend_channel_response,sensor_norm,';
+          U{end+1} = sprintf( '   %.6e,%.6e)', df(1), df(2) );
+        end
+        
+       case 'multimixer'
+        if qarts_isset( H.F_SWITCHING )
+          error( 'The sensor *F_SWITCHING* option can not be used together ',...
+                                                         'with multiple LO.' );
+        end
+        if qarts_isset( H.LO ) 
+          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, 1 );
+        end
+        if qarts_isset( H.SIDEBAND_RESPONSE )           
+          U{end+1} = file_or_data( 'sideband_response_multi', ...
+                     'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, workfolder );
+        end   
+        if qarts_isset( H.F_BACKEND ) 
+          U{end+1} = file_or_data( 'f_backend_multi', 'ArrayOfVector', ...
+                                                  H.F_BACKEND, workfolder, 1 );
+        end        
+        if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
+          U{end+1} = file_or_data( 'backend_channel_response_multi', ....
+                 'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ... 
+                                                                  workfolder );
+        end
+        U{end+1} = 'sensor_responseMultiMixerBackend';
+        
+      case 'beamswitch'
+        U{1} = 'sensor_responseBeamSwitching';
+        
+      case 'close'
+        U{1} = '# End of sensor part';
+
+      otherwise
+        error(sprintf('Unknown action (%s) was requested.',parts{it}));
+      end
+
+      T = { T{:} U{:} };
+
     end
-
-    T = { T{:} U{:} };
-
   end
-
+  
   
   %- Saving
   %

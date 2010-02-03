@@ -1,3 +1,10 @@
+2010-02-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-19
+
+	* retrieval/oem.m: More stable format options for screen/file
+	output of cost vales etc.
+
 2010-02-02  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-18

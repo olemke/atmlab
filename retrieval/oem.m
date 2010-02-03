@@ -915,7 +915,7 @@ end
                                                                      outfids );
     else
      if iter == 1, ga = NaN; end
-     out( 2, sprintf('%9d%9d%12.3f%10.2f%11.2f%12.2f', iter, ga, ...
+     out( 2, sprintf('%9.0f%9.1f%12.3f%10.2f%11.2f%12.2f', iter, ga, ...
                                            cost, xcost, ycost, dx ), outfids );
     end
   return
