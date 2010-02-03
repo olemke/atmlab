@@ -240,20 +240,30 @@ end
  
 %Read basic data 
 
+
 clim='subarctic-summer';
 clear G H
 for i=1:length(atmfields)
 
-    G(i)=asgG;
+     %D=asgD;
+     
+     G(i)=asgG;
+
+     %G = gf_empty( 3 )
+
+
 
     if strcmp(atmfields(i).type,'temperature')
 
        if strcmp(atmfields(i).source,'ftc') | ...
-          strcmp(atmfields(i).source,'ecmwfftc')
-            
-          G1 = gfin_artsxml( asgD, [], ...
-                             fullfile( fascod, [clim,'.t.xml'] ), ...
+          strcmp(atmfields(i).source,'ecmwfftc') 
+          %G1 = gfin_artsxml( asgD, [], ...
+          %                   fullfile( fascod, [clim,'.t.xml'] ), ...
+          %                   'Temperature field','t_field' );
+          G1 = gf_artsxml(fullfile( fascod, [clim,'.t.xml'] ), ...
                              'Temperature field','t_field' );
+          
+ 
        end
          
        if strcmp(atmfields(i).source,'ecmwfftc') 
@@ -283,8 +293,9 @@ for i=1:length(atmfields)
         %G(i).SPCFC.P0       = G(1).GRID1(1); 
         G(i).SPCFC.P0        =CS.GRIDS{1}(1);
         grids=[{G(1).GRID1(1)} {0} {0} {0}]; 
-        G(i).SPCFC.Z0=gf_set( asgD, asgG,grids , 0, [], ...
-                               'Altitude at P0', 'Altitude', 'm' );
+        %G(i).SPCFC.Z0=gf_set( asgD, asgG,grids , 0, [], ...
+        %                       'Altitude at P0', 'Altitude', 'm' );
+        G(i).SPCFC.Z0=gf_set( asgG,0,grids,[],[]);
         G(i).SPCFC.Z0.DIMS=[];
         G(i).SPCFC.Z0.GRID1=[];
         G(i).SPCFC.Z0.GRID2=[];
@@ -314,8 +325,17 @@ for i=1:length(atmfields)
            strcmp(atmfields(i).source,'ecmwfftc')               
            sourcefile= fullfile( fascod, [clim,'.',...
                                  atmfields(i).gas,'.xml'] );
-           G1= gfin_artsxml( asgD, [],sourcefile,atmfields(i).gas,...
-                             'vmr_field' );
+           %G1= gfin_artsxml( asgD, [],sourcefile,atmfields(i).gas,...
+           %                  'vmr_field' );
+
+           G1= gf_artsxml( sourcefile,atmfields(i).gas,...
+                            'vmr_field' );
+
+           
+           %G1 = gf_artsxml( fullfile( fascod, [clim,'.t.xml'] ), ...
+           %                  'Temperature field','t_field' );
+         
+          
         end
             
         if strcmp(atmfields(i).source,'ecmwfftc')
@@ -329,12 +349,16 @@ for i=1:length(atmfields)
             
         if isnumeric(atmfields(i).source)
 
-           grids=[{G(1).GRID1} {0}];
+           grids=[{G(1).GRID1} {0} {0} {0}];
            data=atmfields(i).source*ones(length(grids{1}),1);
-           G(i)= gf_set( asgD, asgG, grids, data, [], ...
-                         atmfields(i).gas, 'Volume mixing ratio', '-' );
+           %G(i)= gf_set( asgD, asgG, grids, data, [], ...
+           %              atmfields(i).gas, 'Volume mixing ratio', '-' );
+           %keyboard
+           G(i)= gf_set( gf_empty( 1 ),data,grids,[],[]);
+           G1= gf_set(  asgG,data,grids,[],[]);
   
-
+         %G(i).SPCFC.Z0=gf_set( asgG,0,grids,[],[]);
+       
         end
 
      end
@@ -348,8 +372,8 @@ for i=1:length(atmfields)
          G(i).DATA_NAME=G1.DATA_NAME;
          G(i).DATA_UNIT=G1.DATA_UNIT;
          G(i).GRID1=G1.GRID1;
-         G(i).GRID2=G1.GRID2;
-         G(i).GRID3=G1.GRID3;
+         %G(i).GRID2=G1.GRID2;
+         %G(i).GRID3=G1.GRID3;
          G(i).SOURCE=G1.SOURCE;
             
      end
@@ -368,6 +392,10 @@ for i=1:length(atmfields)
     G(i).RNDMZ=atmfields(i).RND;
 
 end
+
+
+keyboard
+
 
 %rename H2O field 
 ind1=find(strcmp('H2O',{G.NAME}));
@@ -397,7 +425,7 @@ G=Gfs;
 %
 
 function G=merge_data2(D,field,G,H)
-  
+ 
     S=G;
     ind1=find(strcmp(field,{G.NAME}));
     ind2=find(strcmp(field,{H.NAME}));
@@ -405,7 +433,9 @@ function G=merge_data2(D,field,G,H)
     lims1{2}=[H(ind2).GRID2([1 end])];
     m1=min(find(H(ind2).GRID1(end)>G(ind1).GRID1));
     lims2{1}=[G(ind1).GRID1(m1) G(ind1).GRID1(end)];
-    G(ind1)=gf_merge(D,H(ind2),lims1,D,G(ind1),lims2);
+    addpath /home/bengt/ARTS/atmlab_sep08/atmlab/gformat
+    G(ind1)=gf_merge(asgD,H(ind2),lims1,asgD,G(ind1),lims2);
+    rmpath /home/bengt/ARTS/atmlab_sep08/atmlab/gformat
     G(ind1).DIMADD=S(ind1).DIMADD;
 
 return

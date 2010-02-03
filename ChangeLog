@@ -1,3 +1,17 @@
+2010-02-03  Bengt Rydberg  <bengt.rydberg@chalmers.se>
+
+	* atmlab-0-4-21
+
+	* scattering/radar_ref.m added
+        * scattering/mie_phase_mat.m added
+	* scattering/mie_ext.m added
+        * scattering/mie_arts_scat_data.m added 
+	* scattering/mie_back.m added
+
+	Added functions that calculate particle
+	scattering properties, but they are
+	only interface to extisting atmlab functions
+
 2010-02-03  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-20
