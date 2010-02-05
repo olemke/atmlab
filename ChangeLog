@@ -1,3 +1,24 @@
+2010-02-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-23
+
+	* scattering/radar_ref.m: Removed, replaced by backcoef2dBZ.m.
+
+	* scattering/backcoef2dBZ.m: New.
+
+	* scattering/mie_phase_mat.m: Adopts now to stokes_dim.
+
+	* scattering/mie_ext.m: Adopts now to stokes_dim.
+
+	* scattering/mie_scat_data.m (mie_scat_data): Removed. Replaced by
+	mie_arts_scat_data.
+
+2010-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-22
+
+	* scattering/create_ssp.m: Now obselete and thus removed.
+
 2010-02-03  Bengt Rydberg  <bengt.rydberg@chalmers.se>
 
 	* atmlab-0-4-21
