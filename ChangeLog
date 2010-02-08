@@ -1,3 +1,14 @@
+2010-02-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-25
+	
+	* demos/qarts_scattering_demo.m: Now works with "new qarts".
+
+	* arts/qarts2cfile.m: Several things were not updated correctly
+	for scattering calculations.
+
+	* arts/qartsCloudbox.m: Typo in documentation.
+	
 2010-02-08  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-24

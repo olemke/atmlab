@@ -1096,8 +1096,8 @@ function T = cfile_CldBox( Q, partname, workfolder )
   %
   qcheck( @qartsCloudbox, Q.CLOUDBOX );
 
-  rqre_datatypes( Q.CLOUDBOX.METHOD, @ischar, 'Q.Q.CLOUDBOX.METHOD' );      %&%
-  if any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC'} ) )               %&%
+  rqre_datatype( Q.CLOUDBOX.METHOD, @ischar, 'Q.Q.CLOUDBOX.METHOD' );       %&%
+  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC'} ) )              %&%
     error( 'Q.CLOUDBOX.METHOD must be ''DOIT'' or ''MC''.' )                %&%
   end                                                                       %&%
 
@@ -1536,14 +1536,14 @@ function T = add_rtecalcstart( Q )
     %                                                                       %&%
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, {'STD_ERR','MAX_TIME',...         %&%
                                        'MAX_ITER', 'Z_FIELD_IS_1D' }, ...   %&%
-                             0, 'Q.CLOUDBOX.METHOD_PRMTRS when using MC' ); %&%
+                                'Q.CLOUDBOX.METHOD_PRMTRS when using MC' ); %&%
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR, @istensor0, ...        %&%
                                       'Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR' ); %&%
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME, @istensor0, ...       %&%
                                      'Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME' ); %&%
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, @istensor0, ...       %&%
                                      'Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D, @istensor0, ...  %&%
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D, @isboolean, ...  %&%
                                 'Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D' ); %&%
     %
     T{end+1} = sprintf( 'NumericSet(mc_std_err,%.3e)', ...

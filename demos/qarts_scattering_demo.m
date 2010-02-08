@@ -40,9 +40,9 @@ Q  = qarts;
 
 %= Overall settings
 %
-Q.CLOUDBOX_DO       = 0;
-Q.J_DO              = 0;
-Q.SENSOR_DO         = 0;
+Q.CLOUDBOX_DO       = false;
+Q.J_DO              = false;
+Q.SENSOR_DO         = false;
 %
 Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
                         fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
@@ -50,31 +50,31 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 
 %= General part
 %
-f                   = linspace( 501.18e9, 501.58e9, 3 );
+f                   = linspace( 501.18e9, 501.58e9, 3 )';
 Q.F_GRID            = f;
 Q.STOKES_DIM        = 2;
 %
-Q.ABS_SPECIES{1}{1} = 'ClO';
-Q.ABS_SPECIES{2}{1} = 'O3';
-Q.ABS_SPECIES{3}{1} = 'N2O';
-Q.ABS_SPECIES{4}{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
-Q.ABS_SPECIES{4}{2} = 'H2O-PWR98';
-Q.ABS_SPECIES{5}{1} = 'N2-SelfContStandardType';
+Q.ABS_SPECIES(1).TAG{1} = 'ClO';
+Q.ABS_SPECIES(2).TAG{1} = 'O3';
+Q.ABS_SPECIES(3).TAG{1} = 'N2O';
+Q.ABS_SPECIES(4).TAG{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
+Q.ABS_SPECIES(4).TAG{2} = 'H2O-PWR98';
+Q.ABS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
 
 
 %= Define atmosphere and surface
 %
 Q.ATMOSPHERE_DIM      = 1;
 %
-Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] );
+Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] )';
 %
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-Q.USE_RAW_ATMOSPHERE  = 1;
-Q.RAW_ATM_EXPAND_1D   = 0;
+Q.USE_RAW_ATMOSPHERE  = true;
+Q.RAW_ATM_EXPAND_1D   = false;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
 %
@@ -148,7 +148,7 @@ imc = 0.005*1e-3;
 alt = [10e3 13e3];
 
 % Calculate scattering data using Mie
-C.SCAT_DATA{1} = mie_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
+C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
@@ -165,9 +165,9 @@ if do_mc
 
   %- Expand to 3D
   Q.ATMOSPHERE_DIM                = 3;
-  Q.RAW_ATM_EXPAND_1D             = 1;
-  Q.LAT_GRID                      = -15:5:15;
-  Q.LON_GRID                      = -15:5:15;
+  Q.RAW_ATM_EXPAND_1D             = true;
+  Q.LAT_GRID                      = [-15:5:15]';
+  Q.LON_GRID                      = [-15:5:15]';
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 3 );
   Q.SENSOR_POS(:,2)               = -23;
@@ -216,7 +216,7 @@ end
 
 %- Activate cloudbox
 %
-Q.CLOUDBOX_DO = 1;
+Q.CLOUDBOX_DO = true;
 Q.CLOUDBOX    = C;
 
 
