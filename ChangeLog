@@ -1,3 +1,9 @@
+2010-02-08  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-24
+
+	* files/loadncvar.m: Fix typo in docs.
+
 2010-02-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-23

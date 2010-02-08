@@ -1,4 +1,4 @@
-% LOADNCVAR   Loads a specific varaible from a NetCDF file
+% LOADNCVAR   Loads a specific variable from a NetCDF file
 %
 %    The function enables direct loading of a named variable from a NetCDF file.
 %
