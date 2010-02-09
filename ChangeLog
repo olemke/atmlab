@@ -1,3 +1,13 @@
+2010-02-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-26
+
+	* arts/various: This folder is a storage for arts related function.
+	Moved arts_cart2poslos, arts_poslos2cart, arts_cart2sph,
+	arts_sph2cart, arts_cart2zaaa and arts_zaaa2cart to arts/.
+	
+	* arts/arts_cart2poslos.m: Angle part did not work for vector input. 
+
 2010-02-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-25

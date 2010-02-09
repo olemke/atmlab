@@ -22,8 +22,8 @@ rad2deg = constants( 'RAD2DEG' );
 r   = sqrt( x.*x + y.*y + z.*z );
 if r > 0
   lat = rad2deg * asin( y ./ r );
-else
-  error( 'This set of functions are not handling the case of r = 0.' );
+else                                                                       %&%
+  error( 'This set of functions are not handling the case of r = 0.' );    %&%
 end
 lon = rad2deg * atan2( z, x ); 
 

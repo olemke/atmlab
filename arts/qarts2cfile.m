@@ -508,12 +508,12 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                                                   workfolder );
       end
       if qarts_isset( Q.ABS_NLS )
-        rqre_datatype( Q.ABS_NLS, {@isempty,@ischar}, 'Q.ABS_NLS' );       %&%
+        rqre_datatype( Q.ABS_NLS, {@isempty,@iscellstr}, 'Q.ABS_NLS' );     %&%
         if isempty( Q.ABS_NLS )
           T{end+1} = 'SpeciesSet(abs_nls,[])';
         else
           T{end+1} = sprintf( 'SpeciesSet(abs_nls,[%s])', ...
-                                  arts_tgs_cnvrt({Q.ABS_SPECIES{Q.ABS_NLS}}) );
+                                                   arts_tgs_cnvrt(Q.ABS_NLS) );
         end
       end
       if qarts_isset( Q.ABS_NLS_PERT )

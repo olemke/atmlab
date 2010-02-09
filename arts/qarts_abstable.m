@@ -35,6 +35,7 @@
 %       nnls   Number of variations for "non-linear" species. Default is 3.
 %       dnls   Maximum size of variation for "non-linear" species. If set 
 %              to be empty, an automatic selection is made. Default is [].
+%              Should otherwise be a value in the range [1,2].
 
 % 2007-08-22   Created by Patrick Eriksson.
 
@@ -42,29 +43,29 @@
 function Q = qarts_abstable( Q, varargin )
 %
 [nt,dt,nnls,dnls] = optargs( varargin, { 3, [], 3, [] } );
-                                                                 %&%
-%= Check input                                                   %&%
-%                                                                %&%
-rqre_nargin(1,nargin);                                           %&%
-%                                                                %&%
-rqre_datatype( Q, @isstruct );                                   %&%
-%                                                                %&%
-if ~qarts_isset( Q.ATMOSPHERE_DIM )                              %&%
-  error( 'Q.ATMOSPHERE_DIM must be set' );                       %&%
-end                                                              %&%
-rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...      %&%
-                                           'Q.ATMOSPHERE_DIM' ); %&%
-if ~qarts_isset( Q.P_GRID )                                      %&%
-  error( 'Q.P_GRID must be set' );                               %&%
-end                                                              %&%
-if ~qarts_isset( Q.USE_RAW_ATMOSPHERE )                          %&%
-  error( 'Q.USE_RAW_ATMOSPHERE must be set' );                   %&%
-end                                                              %&%
-rqre_datatype( Q.USE_RAW_ATMOSPHERE, @isboolean, ...             %&%
-                                       'Q.USE_RAW_ATMOSPHERE' ); %&%
-if ~qarts_isset( Q.ABS_NLS )                                     %&%
-  error( 'Q.ABS_NLS must be set' );                              %&%
-end                                                              %&%
+                                                                           %&%
+%= Check input                                                             %&%
+%                                                                          %&%
+rqre_nargin(1,nargin);                                                     %&%
+%                                                                          %&%
+rqre_datatype( Q, @isstruct );                                             %&%
+%                                                                          %&%
+if ~qarts_isset( Q.ATMOSPHERE_DIM )                                        %&%
+  error( 'Q.ATMOSPHERE_DIM must be set' );                                 %&%
+end                                                                        %&%
+rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...                %&%
+                                           'Q.ATMOSPHERE_DIM' );           %&%
+if ~qarts_isset( Q.P_GRID )                                                %&%
+  error( 'Q.P_GRID must be set' );                                         %&%
+end                                                                        %&%
+if ~qarts_isset( Q.USE_RAW_ATMOSPHERE )                                    %&%
+  error( 'Q.USE_RAW_ATMOSPHERE must be set' );                             %&%
+end                                                                        %&%
+rqre_datatype( Q.USE_RAW_ATMOSPHERE, @isboolean, ...                       %&%
+                                       'Q.USE_RAW_ATMOSPHERE' );           %&%
+if ~qarts_isset( Q.ABS_NLS )                                               %&%
+  error( 'Q.ABS_NLS must be set' );                                        %&%
+end                                                                        %&%
 
 
 %- Obtain atmospheric profiles
@@ -153,6 +154,7 @@ Q.ABS_VMRS   = vmr;
 if dnls == 0  |  nnls < 2  |  isempty( Q.ABS_NLS )
   Q.ABS_NLS_PERT = [];
 else
+  rqre_in_range( dnls, 1, 2 );                                              %&%
   Q.ABS_NLS_PERT = linspace( 2-dnls, dnls, nnls )';
 end  
 

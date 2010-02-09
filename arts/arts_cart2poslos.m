@@ -44,26 +44,26 @@ dlon   = -sinlon./coslat./r.*dx + coslon./coslat./r.*dz;
 % LOS angles
 za = rad2deg * acos( dr );
 %
-if( za < 1e-4  ||  za > 180-1e-4  )
-  aa = 0;
-  
-elseif( abs( lat ) <= 89.99 )
-  %
-  aa = rad2deg * acos( r .* dlat ./ sin( deg2rad * za ) );
-
-  ind = find( isnan(aa) );
-  %
-  if ~isempty(ind)
-    aa(ind) = 180 *(1 - dlat(ind) >= 0);
-  else
-    ind = find( dlon < 0 );
-    aa(ind) = -aa(ind);
-  end
+for i = 1 : length(za)
+  if( za(i) < 1e-4  ||  za(i) > 180-1e-4  )
+    aa(i) = 0;
     
-  % For lat = +- 90 the azimuth angle gives the longitude along which the
-  % LOS goes
-else
-  aa = rad2deg * atan2( dz, dx );
+  elseif( abs( lat(i) ) <= 89.99 )
+    %
+    aa(i) = rad2deg * acos( r(i) .* dlat(i) ./ sin( deg2rad * za(i) ) );
 
+    ind = find( isnan(aa) );
+    %
+    if isnan( aa(i) )
+      aa(i) = 180 *(1 - dlat(i) >= 0);
+    elseif dlon(i) < 0
+      aa(i) = -aa(i);
+    end
+      
+    % For lat = +- 90 the azimuth angle gives the longitude along which the
+    % LOS goes
+  else
+    aa(i) = rad2deg * atan2( dz(i), dx(i) );
+
+  end
 end
-
