@@ -1,5 +1,13 @@
 2010-02-10  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-28
+
+	* files/loadncvar.m:
+
+	Extend function to also support loading of several variables at once.
+
+2010-02-10  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-27
 
 	* files/loadncfile.m:
