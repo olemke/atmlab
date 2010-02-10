@@ -1,3 +1,11 @@
+2010-02-10  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-27
+
+	* files/loadncfile.m:
+
+	Add function that loads a whole netcdf file into a single structure.
+
 2010-02-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-26
