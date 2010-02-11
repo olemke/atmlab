@@ -1106,10 +1106,10 @@ function T = cfile_CldBox( Q, partname, workfolder )
   if qarts_isset (Q.CLOUDBOX.LIMITS)
     rqre_alltypes( Q.CLOUDBOX.LIMITS, {@isnumeric,@isvector}, ...           %&%
                                                     'Q.CLOUDBOX.LIMITS' );  %&%
-    if length(Q.CLOUDBOX.LIMITS) < 6
-      limits = Q.CLOUDBOX.LIMITS;
-      Q.CLOUDBOX.LIMITS = zeros(1,6);
-      Q.CLOUDBOX.LIMITS(1:length(limits)) = limits;
+    nlims = length(Q.CLOUDBOX.LIMITS);
+    if  nlims < 6
+      limits          = zeros(1,6);
+      limits(1:nlims) = Q.CLOUDBOX.LIMITS;
     else
       limits = Q.CLOUDBOX.LIMITS(1:6);
     end
@@ -1233,7 +1233,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, @ischar, ...    %&%
                                'Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP' ); %&%
     if ~any( strcmp( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, ...           %&%
-                                                {'linear''polynomial'} ) )  %&%
+                                               {'linear','polynomial'} ) )  %&%
       error( ['Unknown interpolation method. ',...                          %&%
               'Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP can be ',...         %&%
               '''linear'' or ''polynomial''.'] );                           %&%

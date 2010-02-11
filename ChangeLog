@@ -1,3 +1,12 @@
+2010-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-29
+
+	* demos/qarts_scattering_demo.m: Fixed some typos.
+
+	* arts/qarts2cfile.m: There were still some errors for DOIT
+	calculations.
+
 2010-02-10  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-28

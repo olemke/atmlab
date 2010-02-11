@@ -22,7 +22,7 @@
 %        dy         Error estimate. Only valid for MC.
 % OPT    ztan       Tangent altitudes. Default is [7 10 13] km.
 %        do_mc      Flag to run MC instead of DOIT. Default is 0.
-%        mc_err     Target calculation accuracy for MC, in K. Deafult is 5K.
+%        mc_err     Target calculation accuracy for MC, in K. Default is 5K.
 
 % 2007-07-27  Extended to also handle MC by Patrick Eriksson.
 % 2005-06-13  Created by Claudia Emde
@@ -205,7 +205,7 @@ else
                                                            'doit_za_grid.xml');
   C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
   C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
-  C.METHOD_PRMTRS.ALL_F           = 0;
+  C.METHOD_PRMTRS.ALL_F           = true;
   %
   C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
                                                          'abs_vecAddPart' };
