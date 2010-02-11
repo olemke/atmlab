@@ -1,5 +1,18 @@
 2010-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-4-30
+
+	* arts/qarts2cfile.m: Started on support for FOS. 
+
+	* demos/qarts_scattering_demo.m: Made lat and lon grids more
+	dense. Old very coarse grid caused an inconsistency between 1D and
+	3D cases. This seems to improve the consistency between MC and
+	DOIT (1D) results (though not yet had time for a very detailed MC
+	run).
+	Added code to allow tests of FOS (with some stuff hard-coded).
+
+2010-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-4-29
 
 	* demos/qarts_scattering_demo.m: Fixed some typos.

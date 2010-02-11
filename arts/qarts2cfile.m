@@ -1097,8 +1097,8 @@ function T = cfile_CldBox( Q, partname, workfolder )
   qcheck( @qartsCloudbox, Q.CLOUDBOX );
 
   rqre_datatype( Q.CLOUDBOX.METHOD, @ischar, 'Q.Q.CLOUDBOX.METHOD' );       %&%
-  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC'} ) )              %&%
-    error( 'Q.CLOUDBOX.METHOD must be ''DOIT'' or ''MC''.' )                %&%
+  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC','FOS'} ) )        %&%
+    error( 'Q.CLOUDBOX.METHOD must be ''DOIT'', ''MC'' or ''FOS''.' )       %&%
   end                                                                       %&%
 
   %= Cloudbox
@@ -1303,6 +1303,10 @@ function T = cfile_SctMth( Q, partname, workfolder )
     end
     
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
+    %
+    T = {};
+    %
+  elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'FOS' )
     %
     T = {};
     %

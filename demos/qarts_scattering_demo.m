@@ -30,7 +30,7 @@
 
 function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( varargin )
 %
-[ztan,do_mc,mc_err] = optargs( varargin, { [7 10 13]*1e3, 0, 5 } );
+[ztan,method,mc_err] = optargs( varargin, { [7 10 13]*1e3, 'doit', 5 } );
 
 
 %= Init Q structure
@@ -161,13 +161,71 @@ C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 C.OPT_PROP_GAS_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddGas', ...
                                                         'abs_vecAddGas' };
 
-if do_mc
+if strcmp( lower(method), 'mc' )
+  %
+  C.METHOD                        = 'MC';
+  Q.IY_CLEARSKY_AGENDA            = { 'iyMC' };    
+  %
+  C.METHOD_PRMTRS.STD_ERR         = mc_err;
+  C.METHOD_PRMTRS.MAX_TIME        = -1;
+  C.METHOD_PRMTRS.MAX_ITER        = -1;
+  C.METHOD_PRMTRS.Z_FIELD_IS_1D   = Q.RAW_ATM_EXPAND_1D;
+  %
+elseif strcmp( lower(method), 'doit' )
+  %
+  C.METHOD                        = 'DOIT';
+  % Angular grids
+  C.METHOD_PRMTRS.N_ZA_GRID       =  19;
+  C.METHOD_PRMTRS.N_AA_GRID       =  10;
+  C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, ...
+                                                           'doit_za_grid.xml');
+  C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
+  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
+  C.METHOD_PRMTRS.ALL_F           = true;
+  %
+  C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
+                                                         'abs_vecAddPart' };
+  C.SPT_CALC_AGENDA = { 'opt_prop_sptFromMonoData' };
 
-  %- Expand to 3D
+elseif strcmp( lower(method), 'fos' )
+  %
+  fos_file = '/tmp/fos_angles.xml';
+  %
+  C.METHOD                        = 'FOS';
+  Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(ppath)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lat)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lon)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   iyFOS';
+  Q.WSMS_BEFORE_RTE{end+1}        = '}';
+  Q.WSMS_BEFORE_RTE{end+1}        = sprintf( ...
+                                       'ReadXML(fos_angles, "%s")', fos_file );
+  %
+  if 0
+    fos = eq_point_set_polar( 2, 28 );
+    fos = rotate_in( fos );
+    fos = fliplr( fos' );
+    fos = 180/pi*fos;
+    ind = find( fos(:,2) > 180 );
+    fos(ind,2) = fos(ind,2) - 360;
+  else
+    fos = fos28nonrot;
+  end
+  xmlStore( fos_file, fos, 'Matrix' );
+  %
+else
+  error( 'Allowed options for *method* are ''doit'', ''mc'' and ''fos''.' );
+end
+
+
+%- Map to 3D for MC and FOS
+if any( strcmp( lower(method), {'mc','fos'} ) )
+  %
   Q.ATMOSPHERE_DIM                = 3;
   Q.RAW_ATM_EXPAND_1D             = true;
-  Q.LAT_GRID                      = [-15:5:15]';
-  Q.LON_GRID                      = [-15:5:15]';
+  Q.LAT_GRID                      = [-15:0.5:15]';
+  Q.LON_GRID                      = [-15:0.5:15]';
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 3 );
   Q.SENSOR_POS(:,2)               = -23;
@@ -184,32 +242,7 @@ if do_mc
                                            length( C.PND_FIELD{1}.grids{2} ),...
                                            length( C.PND_FIELD{1}.grids{3} ) );
   C.PND_FIELD{1}.data(:,3:4,3:4)  = repmat(p,[1 2 2]);
-
-  %- MC variables
-  C.METHOD                        = 'MC';
   %
-  Q.IY_CLEARSKY_AGENDA            = { 'iyMC' };    
-  %
-  C.METHOD_PRMTRS.STD_ERR         = mc_err;
-  C.METHOD_PRMTRS.MAX_TIME        = -1;
-  C.METHOD_PRMTRS.MAX_ITER        = -1;
-  C.METHOD_PRMTRS.Z_FIELD_IS_1D   = Q.RAW_ATM_EXPAND_1D;
-  %
-else
-  %
-  C.METHOD                        = 'DOIT';
-  % Angular grids
-  C.METHOD_PRMTRS.N_ZA_GRID       =  19;
-  C.METHOD_PRMTRS.N_AA_GRID       =  10;
-  C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, ...
-                                                           'doit_za_grid.xml');
-  C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
-  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
-  C.METHOD_PRMTRS.ALL_F           = true;
-  %
-  C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
-                                                         'abs_vecAddPart' };
-  C.SPT_CALC_AGENDA = { 'opt_prop_sptFromMonoData' };
 end
 
 
@@ -226,4 +259,73 @@ Q.CLOUDBOX    = C;
 [y,ydata,dy] = arts_y( Q );
 
 
+return
+
+
+
+
+function fos_angles = fos28nonrot
+fos_angles = [
+         0         0
+   38.4684   36.0000
+   38.4684  108.0000
+   38.4684  180.0000
+   38.4684 -108.0000
+   38.4684  -36.0000
+   72.5750   13.5000
+   72.5750   58.5000
+   72.5750  103.5000
+   72.5750  148.5000
+   72.5750 -166.5000
+   72.5750 -121.5000
+   72.5750  -76.5000
+   72.5750  -31.5000
+  107.4250   36.0000
+  107.4250   81.0000
+  107.4250  126.0000
+  107.4250  171.0000
+  107.4250 -144.0000
+  107.4250  -99.0000
+  107.4250  -54.0000
+  107.4250   -9.0000
+  141.5316   67.5000
+  141.5316  139.5000
+  141.5316 -148.5000
+  141.5316  -76.5000
+  141.5316   -4.5000
+  180.0000         0 ];
+return
+
+
+function fos_angles = fos10nonrot
+fos_angles = [
+         0         0
+   63.4349   45.0000
+   63.4349  135.0000
+   63.4349 -135.0000
+   63.4349  -45.0000
+  116.5651   90.0000
+  116.5651  180.0000
+  116.5651  -90.0000
+  116.5651         0
+  180.0000         0 ];
+return
+
+
+
+function in = rotate_in( in )
+
+  DEG2RAD = constants( 'DEG2RAD' );
+  RAD2DEG = constants( 'RAD2DEG' );
+
+  rot = in(2,2) / 4;
+  
+  [x,y,z] = arts_zaaa2cart( RAD2DEG*in(2,:), RAD2DEG*in(1,:) );
+  
+  u = rotationmat3D( rot, [0 1 0]) * [x;y;z];
+
+  [za,aa] = arts_cart2zaaa( u(1,:), u(2,:), u(3,:) );
+
+  in = DEG2RAD * [aa;za];
+  
 return
