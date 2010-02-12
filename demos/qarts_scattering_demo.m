@@ -21,7 +21,8 @@
 %        y          Calculated cloudy randiances  [RJ BT].
 %        dy         Error estimate. Only valid for MC.
 % OPT    ztan       Tangent altitudes. Default is [7 10 13] km.
-%        do_mc      Flag to run MC instead of DOIT. Default is 0.
+%        method     Scattering method to use. Default is 'doit'. Other option
+%                   is 'mc'. (Upper or lower case letters do not matter).
 %        mc_err     Target calculation accuracy for MC, in K. Default is 5K.
 
 % 2007-07-27  Extended to also handle MC by Patrick Eriksson.
@@ -201,9 +202,10 @@ elseif strcmp( lower(method), 'fos' )
   Q.WSMS_BEFORE_RTE{end+1}        = '}';
   Q.WSMS_BEFORE_RTE{end+1}        = sprintf( ...
                                        'ReadXML(fos_angles, "%s")', fos_file );
+  Q.WSMS_BEFORE_RTE{end+1}        = 'IndexSet( fos_n, 1 )';
   %
   if 0
-    fos = eq_point_set_polar( 2, 28 );
+    fos = eq_point_set_polar( 2, 5 );
     fos = rotate_in( fos );
     fos = fliplr( fos' );
     fos = 180/pi*fos;
@@ -212,6 +214,9 @@ elseif strcmp( lower(method), 'fos' )
   else
     fos = fos28nonrot;
   end
+  
+  fos(:,3) = 4*pi / size(fos,1);
+  
   xmlStore( fos_file, fos, 'Matrix' );
   %
 else
