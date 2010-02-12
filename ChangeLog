@@ -1,3 +1,9 @@
+2010-02-12  Salomon Eliasson  <seliasson@ltu.se>
+
+	* atmlab-0-4-31
+	
+	* graphs/gmt/gmt_plot.m: fixed bug in filename and title
+
 2010-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-30

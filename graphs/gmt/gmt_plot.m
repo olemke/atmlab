@@ -263,8 +263,8 @@ if ~isfield(se,'title')
 end
 
 % replace bad symbols for filename and mask them for the title
-se.filename = regexprep(se.title,'[:=, ()*<>!?]','_');
-se.title = regexprep(se.title,'([=,()+*<>!?])','\\$1\\');
+se.filename = regexprep(se.title,'[:=, ()*/<>!?]','_');
+se.title = regexprep(se.title,'([=,()+*<>!?])','\\$1');
 se.title = regexprep(se.title,'[:]',' ');
 
 function filename = sort_figures(se)                                             %% Sort figures %%
