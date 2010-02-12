@@ -263,7 +263,7 @@ if ~isfield(se,'title')
 end
 
 % replace bad symbols for filename and mask them for the title
-se.filename = regexprep(se.title,'[:=, ()*/<>!?]','_');
+se.filename = regexprep(se.filename,'[:=, ()*/<>!?]','_');
 se.title = regexprep(se.title,'([=,()+*<>!?])','\\$1');
 se.title = regexprep(se.title,'[:]',' ');
 
