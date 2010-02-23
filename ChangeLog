@@ -1,3 +1,9 @@
+2010-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-34
+
+	* geoplots/rectgridplot.m: Input check of grids was not correct. 
+
 2010-02-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-33

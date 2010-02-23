@@ -27,13 +27,17 @@
 function rectgridplot(x,y,F,varargin)
 %
 [shadtype] = optargs( varargin, { 'flat' } );
-                                                                         %&%
-                                                                         %&%
-%= Check input                                                           %&%
-%                                                                        %&%
-rqre_nargin( 3, nargin );                                                %&%
-rqre_gridmatch( F, 1, x );                                               %&%
-rqre_gridmatch( F, 2, y );                                               %&%
+                                                                            %&%
+                                                                            %&%
+%= Check input                                                              %&%
+%                                                                           %&%
+rqre_nargin( 3, nargin );                                                   %&%
+if length(x)-1 ~= size(F,1)                                                 %&%
+  error( 'Length of *x* does not ,atch size of *F*.' );                     %&%
+end                                                                         %&%
+if length(y)-1 ~= size(F,2)                                                 %&%
+  error( 'Length of *y* does not ,atch size of *F*.' );                     %&%
+end                                                                         %&%
 
 
 if strcmp(shadtype,'flat')  |  strcmp(shadtype,'faceted')
@@ -48,8 +52,8 @@ elseif strcmp(shadtype,'interp')
         F(:,1)   F        F(:,end); 
         F(end,1) F(end,:) F(end,end) ]' );
 
-else                                                                     %&%
-  error('Valid shading types are ''flat'', ''faceted'' and ''interp'''); %&%
+else                                                                        %&%
+  error('Valid shading types are ''flat'', ''faceted'' and ''interp''');    %&%
 end
 
 shading( shadtype )
