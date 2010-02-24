@@ -1,3 +1,10 @@
+2010-02-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-35
+
+	* geoplots/rectgridplot.m (rectgridplot): New error message had a
+	typo. 
+
 2010-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-34

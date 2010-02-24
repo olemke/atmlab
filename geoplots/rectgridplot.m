@@ -33,10 +33,10 @@ function rectgridplot(x,y,F,varargin)
 %                                                                           %&%
 rqre_nargin( 3, nargin );                                                   %&%
 if length(x)-1 ~= size(F,1)                                                 %&%
-  error( 'Length of *x* does not ,atch size of *F*.' );                     %&%
+  error( 'Length of *x* does not match size of *F*.' );                     %&%
 end                                                                         %&%
 if length(y)-1 ~= size(F,2)                                                 %&%
-  error( 'Length of *y* does not ,atch size of *F*.' );                     %&%
+  error( 'Length of *y* does not match size of *F*.' );                     %&%
 end                                                                         %&%
 
 
