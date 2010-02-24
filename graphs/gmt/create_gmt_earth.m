@@ -20,6 +20,10 @@ end
 
 if isfield(se,'basemap_axis')                                                   % Annotations of axis
     command = sprintf('gmtset BASEMAP_AXES %s',se.basemap_axis);
+     exec_gmt_cmd(command)
+end
+if isfield(se,'header_offset')                                                  % Distance from axis to Annotation
+    command = sprintf('gmtset HEADER_OFFSET %c',se.header_offset);
     exec_gmt_cmd(command)
 end
 
@@ -124,11 +128,13 @@ end
 
 function se = defaults(se)                                                      %% defaults %%
 
-if ~isfield(se,'legend')
+if ~isfield(se,'legend_orient') || ~isempty(se.legend_orient)
     se.legend=true;
-end
-if ~isfield(se,'sidebar')
-    se.sidebar = true;
+    if ~isfield(se,'sidebar')
+        se.sidebar = true;
+    end
+else
+    se.legend=false;
 end
 
 function region = region(se)                                                    %% region %%
@@ -318,10 +324,6 @@ function [a,b] = mklegend(se)                                                   
 
 % automatically orient legend if a vertical legend no longer makes sense
 if se.legend
-    a.cptfile = se.plot.color.cptfile;
-    a.sidebar=se.sidebar;
-    a.equalboxsize = '';
-    a.file = se.filename;
     if ~isfield(se,'unit')
         a.unit = '-?-';
     else a.unit = char(se.unit);
@@ -355,6 +357,11 @@ if se.legend
         end
     else b = '';
     end
+    if ~exist('a','var'), a='';return, end
+    a.cptfile = se.plot.color.cptfile;
+    a.sidebar=se.sidebar;
+    a.equalboxsize = '';
+    a.file = se.filename;
 else a = ''; b = '';
 end
 
