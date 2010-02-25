@@ -17,7 +17,7 @@ function Ze = backcoef2dBZ( lambda, b )
 %                                                                           %&%
 rqre_datatype( lambda, @istensor0 );                                        %&%
 rqre_in_range( lambda, 0.3e-3, 1 );                                         %&%
-rqre_datatype( Z, {@isnumeric} );                                           %&%
+rqre_datatype( b, {@isnumeric} );                                           %&%
 
 
 %calculate dielectric factor of water

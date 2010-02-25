@@ -85,26 +85,26 @@ Q.Z_SURFACE           = 500;
 
 %= Absorption
 %
-Q.ABS_LINES_FORMAT = 'Arts';
-Q.ABS_LINES        = fullfile( atmlab_example_data , 'lines501.4' );
-Q.ABS_NLS          = [];
+Q.ABS_LINES_FORMAT    = 'Arts';
+Q.ABS_LINES           = fullfile( atmlab_example_data , 'lines501.4' );
+Q.ABS_NLS             = [];
 %
-Q                  = qarts_abstable( Q );
+Q                     = qarts_abstable( Q );
 
 
 %= Set RTE variables
 %
-Q.WSMS_BEFORE_RTE    = { 'atm_checkedCalc' };
-Q.YCALC_WSMS         = { 'yCalc' };
+Q.WSMS_BEFORE_RTE     = { 'atm_checkedCalc' };
+Q.YCALC_WSMS          = { 'yCalc' };
 %
-Q.PPATH_LMAX        = 5e3;
-Q.PPATH_STEP_AGENDA = { 'ppath_stepGeometric' };
-Q.Y_UNIT            = 'RJBT';
+Q.PPATH_LMAX          = 5e3;
+Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
+Q.Y_UNIT              = 'RJBT';
 %
-zplat        = 600e3;
-sensor_pos   = Q.R_GEOID + zplat;
-Q.SENSOR_POS = repmat( sensor_pos, length(ztan), 1 );
-Q.SENSOR_LOS = geomztan2za( Q.R_GEOID, zplat, ztan )';
+zplat                 = 600e3;
+sensor_pos            = Q.R_GEOID + zplat;
+Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
+Q.SENSOR_LOS          = geomztan2za( Q.R_GEOID, zplat, ztan )';
 
 
 
@@ -154,6 +154,7 @@ C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
+C.PND_FIELD{1}.data = 10 * C.PND_FIELD{1}.data;
 
 % Set up scattering method
 

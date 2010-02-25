@@ -1,3 +1,11 @@
+2010-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-37
+
+	* scattering/backcoef2dBZ.m: Typo in input check that caused error. 
+
+	* scattering/dBZ2backcoef.m: Created.
+
 2010-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-36
