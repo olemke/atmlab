@@ -1,3 +1,9 @@
+2010-02-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-38
+	
+	* graphs/gmt/gmt_plot.m: Fixed filename to never be empty
+
 2010-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-37
