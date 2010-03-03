@@ -1,3 +1,10 @@
+<<<<<<< .mine
+2010-03-03  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-39
+	
+	* graphs/gmt/gmt_plot.m: Overwrote in.outdir even though it was set.
+
 2010-02-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-38
