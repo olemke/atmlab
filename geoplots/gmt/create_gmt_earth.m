@@ -65,8 +65,7 @@ if isfield(se,'psxy')                                                           
     command = se.psxy;
     exec_gmt_cmd(command)
 elseif isfield(se.plot,'psbox')
-    command = psbox(se);
-    exec_gmt_cmd(command)
+    psbox(se);
 end
 
 if isfield(se.plot,'legend') && ~isempty(se.plot.legend)                        % Legends

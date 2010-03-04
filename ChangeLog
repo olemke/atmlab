@@ -1,5 +1,13 @@
 2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-49
+
+	* geoplots/gmt/create_gmt_earth.m: Fixed bug with psbox
+
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geoplots/gmt/create_gmt_earth.m (create_gmt_earth): 
+
 	* atmlab-0-4-48
 
 	* geoplots/gmt/save_nc_gmt_input.m:
