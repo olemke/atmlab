@@ -1,4 +1,21 @@
-<<<<<<< .mine
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-40
+	
+	* graphs/gmt/save_ungridded4GMTplot.m: 
+	Added function that sets up variables for save_nc_gmt_input.
+
+	* graphs/gmt/save_nc_gmt_input.m: Added function to save netcdf data
+
+	* graphs/gmt/nearneighbor.m: Updated for netcdf
+
+	* graphs/gmt/create_gmt_earth.m: Updated for netcdf
+
+	* graphs/gmt/pscontour.m: Updated for netcdf but still needs work
+
+	* graphs/gmt/gmt_plot.m: 
+	Adapted to save ungridded data as netcdf instead of ascii.
+
 2010-03-03  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-39

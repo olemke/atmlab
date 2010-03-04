@@ -186,7 +186,7 @@ function a = mkgrid(se)                                                         
 %
 %
 a.region = se.plot.region;
-a.asciifile = se.asciifile;
+a.ungriddedfile = se.ungriddedfile;
 a.file = se.filename;
 a.name = 'nearneighbor';
 
@@ -314,7 +314,7 @@ function a = mkpscontour(se)                                                    
 a.file = se.filename;
 a.region = se.plot.region;
 a.proj = se.plot.proj;
-a.cptfile = se.plot.color.cptcontour;
+a.cptfile = se.plot.color.cptfile;
 if ~isfield(se,'ctwidth')
     a.width = 0.5;
 else a.width = se.ctwidth;

@@ -1,4 +1,4 @@
-function pscontour(in)
+function command = pscontour(in)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % purpose:
@@ -9,14 +9,16 @@ function pscontour(in)
 % Author:Salomon Eliasson
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pscontour = sprintf('pscontour');
-
 %location of file
-if isfield(in,'asciifile')
-    pscontour = sprintf('%s %s',pscontour,in.asciifile);
+
+error('Doesn''t work yet')
+if isfield(in,'file')
+    pscontour = sprintf('pscontour %s.grd',in.file);
 else
-    error 'needs in.asciifile '
+    error 'needs in.file '
 end
+
+pscontour = sprintf('%s -bic',pscontour); %for binary input\
 
 %lat lon bounds
 if isfield(in,'region')
@@ -55,8 +57,6 @@ end
 % assuming more pscode will be appended later
 pscontour = sprintf('%s -K',pscontour);
 
-ut = sprintf('%s.ps',se.file);
+ut = sprintf('%s.ps',in.file);
 
 command = sprintf('%s >> %s',pscontour,ut);
-
-system(command); fprintf('%s\n',command)

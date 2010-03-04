@@ -11,12 +11,14 @@ function command = nearneighbor(in)
 
 nearneighbor = sprintf('nearneighbor');
 
+nearneighbor = sprintf('%s -bic',nearneighbor); %for binary input
+
 %location of file
-if isfield(in,'asciifile')
-    nearneighbor = sprintf('%s %s',nearneighbor,in.asciifile);
+if isfield(in,'ungriddedfile')
+    nearneighbor = sprintf('%s %s',nearneighbor,in.ungriddedfile);
     nearneighbor = sprintf('%s -F -G%s.grd',nearneighbor,in.file);
 else
-    error 'needs in.asciifile '
+    error 'needs in.ungriddedfile '
 end
 
 %lat lon bounds

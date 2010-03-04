@@ -1,4 +1,4 @@
-function se = create_ascii4gmtplot(se,field)
+function se = save_ungridded4GMTplot(se,field)
 %%   create_ascii4gmtplot
 %
 % Purpose: To create an ascii file containing (lon,lat,value)
@@ -11,7 +11,7 @@ function se = create_ascii4gmtplot(se,field)
 % Indata: A structure containing:
 %         vectors of lat,lon,data. all the same length
 %
-% Outdata: se.asciifile: the full path of the generated asciifile
+% Outdata: se.ungriddedfile: the full path of the generated.ungriddedfile
 %
 % 4/12-2009 Salomon Eliasson
 
@@ -20,16 +20,6 @@ if isfield(se,'nodata')&&se.nodata
     return
 end
 
-se.asciifile = [scodes('TMP_DIR'),'/',se.filename '.asc'];
-[fid,message] = fopen(se.asciifile,'w');
-if fid == -1
-    error(message)
-end
-if numel(size(se.(field))) == 3
-    se.(field) = squeeze(se.(field));
-end
+se.ungriddedfile = [scodes('TMP_DIR'),'/',se.filename '.nc'];
 
-%% Write to file
-for i = 1:length(se.lon)
-    fprintf(fid,'%f %f %f\n',se.lon(i),se.lat(i),se.(field)(i));
-end
+save_nc_gmt_input (se.ungriddedfile, se.(field), se.lat, se.lon);
