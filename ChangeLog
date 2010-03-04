@@ -1,3 +1,9 @@
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-43
+
+	* geoplots/gmt/gmt_plot.m: rm illegal character from descr.
+
 2010-03-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-42
