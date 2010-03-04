@@ -1,7 +1,15 @@
 2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-41
+	
+	* geoplots/gmt: Moved gmt functions to a more appropriate location.
+
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-0-4-40
 	
+	* geoplots/gmt: Moved gmt functions to a more appropriate location.
+
 	* graphs/gmt/save_ungridded4GMTplot.m: 
 	Added function that sets up variables for save_nc_gmt_input.
 
