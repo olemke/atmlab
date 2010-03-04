@@ -10,16 +10,13 @@ function exec_gmt_cmd(cmd)
 if ~iscell(cmd), cmd = {cmd}; end
 
 for x = cmd'
-    fprintf('%s\n',char(x));
-    
-    if atmlab('GMT_CUSTOM_PATH')
-        fullcmd = ['export PATH=$PATH:' atmlab('GMT_CUSTOM_PATH') '; ' char(x)];
-    else
-        fullcmd = char(x);
-    end
+    fullcmd = char(x);
+
+    fprintf('%s\n',fullcmd);
+
     ret = system(fullcmd);
     if (ret == 127)
-        error('Command not found: "%s"', char(x))
+        error('Command not found: "%s"', fullcmd)
     end
 end
 

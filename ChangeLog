@@ -1,5 +1,16 @@
 2010-03-04  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-46
+
+	* atmlab/atmlab.m, geoplots/gmt/exec_gmt_cmd.m:
+
+	Get rid of GMT_CUSTOM_PATH. If the user wants to add a custom path he
+	can easily do so by adding it in his startup file:
+
+	setenv('PATH',[getenv('PATH') ':/opt/local/bin']);
+
+2010-03-04  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-45
 
 	* geoplots/gmt/save_ungridded4GMTplot.m:
