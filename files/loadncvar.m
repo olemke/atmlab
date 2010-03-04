@@ -2,7 +2,7 @@
 %
 %    The function enables direct loading of a named variable from a NetCDF
 %    file. varname can be either a string to load one variable or a cell
-%    array of string.
+%    array of several variable names.
 %
 %    When multiple varnames are given the return value is a structure
 %    containing the loaded variables.

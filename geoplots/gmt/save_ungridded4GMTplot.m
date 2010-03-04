@@ -20,6 +20,6 @@ if isfield(se,'nodata')&&se.nodata
     return
 end
 
-se.ungriddedfile = [scodes('TMP_DIR'),'/',se.filename '.nc'];
+se.ungriddedfile = [se.outdir,'/',se.filename '.nc'];
 
 save_nc_gmt_input (se.ungriddedfile, se.(field), se.lat, se.lon);

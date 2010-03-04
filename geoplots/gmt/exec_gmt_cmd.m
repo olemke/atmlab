@@ -13,7 +13,7 @@ for x = cmd'
     fprintf('%s\n',char(x));
     
     if atmlab('GMT_CUSTOM_PATH')
-        fullcmd = ['PATH=$PATH:' atmlab('GMT_CUSTOM_PATH') ' ' char(x)];
+        fullcmd = ['export PATH=$PATH:' atmlab('GMT_CUSTOM_PATH') '; ' char(x)];
     else
         fullcmd = char(x);
     end

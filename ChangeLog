@@ -1,3 +1,24 @@
+2010-03-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-45
+
+	* geoplots/gmt/save_ungridded4GMTplot.m:
+
+	Use se.outdir instead of scodes('TMP_DIR') for xyz nc file.
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Use exec_gmt_cmd instead of system() when calling psxy to create an
+	empty page. Otherwise the command will not be found if it is in a
+	custom path.
+
+	* geoplots/gmt/exec_gmt_cmd.m:
+
+	Use export to set the custom path. Otherwise commands will not be
+	found if they're invoked after a pipe.
+
+	* files/loadncvar.m: Update docs.
+
 2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-44

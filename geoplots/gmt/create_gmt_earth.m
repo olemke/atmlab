@@ -79,8 +79,9 @@ if isfield(se.plot,'nanlegend') && ~isempty(se.plot.nanlegend)
     exec_gmt_cmd(command)
 end
 % an empty ps file
-system(sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps',...
-    se.plot.region,se.plot.proj,se.filename));
+command = sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps', ...
+                  se.plot.region,se.plot.proj,se.filename);
+exec_gmt_cmd(command)
 
 % close the ps file with
 
