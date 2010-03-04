@@ -1,3 +1,15 @@
+2010-03-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-51
+	
+	* geoplots/gmt/pspoly.m: Add function to draw polygons.
+
+	* geoplots/gmt/gmt_plot.m: Add docs for in.pspoly.
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Add pspoly support. Extend setup_psbox to setup_psboxpoly.
+
 2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-50

@@ -68,6 +68,10 @@ elseif isfield(se.plot,'psbox')
     psbox(se);
 end
 
+if isfield(se.plot,'pspoly')
+    pspoly(se);
+end
+
 if isfield(se.plot,'legend') && ~isempty(se.plot.legend)                        % Legends
     command = psscale(se.plot.legend);
     exec_gmt_cmd(command)
@@ -117,7 +121,11 @@ if ~isfield(se,'coast')                                                         
 end
 
 if isfield(se,'psbox')                                                          % PSBOX
-    se.plot.psbox = setup_psbox(se);
+    se.plot.psbox = setup_psboxpoly(se, 'psbox');
+end
+
+if isfield(se,'pspoly')                                                          % PSBOX
+    se.plot.pspoly = setup_psboxpoly(se, 'pspoly');
 end
 
 if isfield(se,'pscontour')                                                      % Contour lines
@@ -399,25 +407,25 @@ if ~isfield(se,'ptype')
     se.ptype = 'equal'; %contour spacing
 end
 
-function out = setup_psbox(se)                                                  %% ps box %%
+function out = setup_psboxpoly(se, field)                                                  %% ps box %%
 
-l = size(se.psbox,1);
-if isfield(se,'psboxcolor')
-    if length(se.psboxcolor)~=l
+l = size(se.(field),1);
+if isfield(se,[field 'color'])
+    if length(se.([field 'color']))~=l
         error('Need same number of colors as boxes')
     end
-else se.psboxcolor(1:l) = {'k'}; %default is black
+else se.([field 'color'])(1:l) = {'k'}; %default is black
 end
 
-if isfield(se,'psboxthick')
-    if length(se.psboxthick)~=l
+if isfield(se,([field 'thick']))
+    if length(se.([field 'thick']))~=l
         error('Need same number of sizes as boxes')
     end
 else out.thick(1:l)={10}; %default size=10
 end
-c = list_colors('colors',se.psboxcolor);
+c = list_colors('colors',se.([field 'color']));
 for i=1:length(c)
     colors{i}=c{i}.*255; % instead of from 0:1
 end
 out.colors=colors;
-out.psbox=se.psbox;
+out.(field)=se.(field);

@@ -125,6 +125,16 @@ function filename = gmt_plot(in,field)
 % in.psboxthick       | Default is 20 for every region boundary {20}.
 %                     append thick value in a cell for every boxregion boundary.
 %
+% in.pspoly (%double) | {[lon1 lat1; lon2 lat2; ...]}
+%                       Draws a polygon. Use one cell row per polygon:
+%                       {[p1lon1 p1lat1; p1lon2 p1lat2; ...];
+%                        [p2lon1 p2lat1; p2lon2 p2lat2; ...];
+%                        ...}
+%
+% in.pspolycolor       | See in.psboxcolor
+%
+% in.pspolythick       | See in.psboxthick
+%%
 % Location markers:
 %
 % in.locations(x).lat       | Latitude of location marker x
