@@ -1,5 +1,15 @@
 2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-44
+
+	* math/binning_fast.m:
+	Added function that bins data into a specified grid with no frills.
+
+	
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* math/binning_fast.m: 
+
 	* atmlab-0-4-43
 
 	* geoplots/gmt/gmt_plot.m: rm illegal character from descr.
