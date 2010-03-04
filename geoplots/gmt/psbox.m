@@ -42,12 +42,6 @@ for i = 1:length(thick)
     s = thick{i};
     box = sprintf('%s -W%d/%d/%d/%d',box,s,c(1),c(2),c(3));
     box = sprintf('%s -K>> %s.ps',box,se.filename);
-    
-    command = box;
-    
-    [test,message] = system(command);
-    if test ~= 0
-        error (message)
-    end
-    fprintf('%s\n',command)
+
+    exec_gmt_cmd(box)
 end

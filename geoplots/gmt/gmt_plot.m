@@ -1,6 +1,6 @@
-% GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
-%
 function filename = gmt_plot(in,field)
+%
+% GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
 % It is assumed that the data is CENTERED at the corresponding lat/lon points.
 %
@@ -332,7 +332,7 @@ if isnan(openwith)
 end
 
 if se.display
-    system( sprintf('%s %s/%s &',openwith,se.outdir,filename));
+    exec_gmt_cmd( sprintf('%s %s/%s &',openwith,se.outdir,filename));
 end
 filename = sprintf('%s/%s',se.outdir,filename);
 fprintf('GMT plot stored at:  %s\n',filename)

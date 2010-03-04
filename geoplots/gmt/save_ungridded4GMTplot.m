@@ -1,5 +1,4 @@
 function se = save_ungridded4GMTplot(se,field)
-%%   create_ascii4gmtplot
 %
 % Purpose: To create an ascii file containing (lon,lat,value)
 %          This function is called if the data is not gridded!

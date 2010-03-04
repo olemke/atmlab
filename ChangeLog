@@ -1,5 +1,21 @@
 2010-03-04  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-0-4-47
+
+	* geoplots/gmt/makecpt.m, geoplots/gmt/psbox.m: Use exec_gmt_cmd.
+
+	* geoplots/gmt/gmt_plot.m:
+
+	Fix documentation to properly show in help and doc.
+
+	* geoplots/gmt/exec_gmt_cmd.m:
+
+	Add optional silent argument to suppress echoing of commands.
+
+	* geoplots/gmt/save_ungridded4GMTplot.m: Minor doc fix.
+
+2010-03-04  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-0-4-46
 
 	* atmlab/atmlab.m, geoplots/gmt/exec_gmt_cmd.m:

@@ -31,10 +31,5 @@ end
 cptfile = 'ctable.cpt';
 command = sprintf('%s > %s',makecpt,cptfile);
 
-fprintf('%s\n',command)
-
-[test,message] = system(command);
-if test ~= 0
-  error (message)
-end
+exec_gmt_cmd(command)
 
