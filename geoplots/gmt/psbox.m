@@ -9,14 +9,14 @@ function psbox(se)
 
 colors = se.plot.psbox.colors;
 thick = se.plot.psbox.thick;
-psbox = se.plot.psbox.psbox;
+pb = se.plot.psbox.psbox;
 region = se.plot.region;
 proj = se.plot.plotimage.proj;
 
 a=cell(5,1);
 for i = 1:length(thick)
-    b = psbox(i,1:2);
-    t = psbox(i,3:4);
+    b = pb(i,1:2);
+    t = pb(i,3:4);
     
     %stdin
     %% get full coordinates

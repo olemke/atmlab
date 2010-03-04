@@ -218,10 +218,10 @@ if ~strcmp(class(se.(field)),'double')                                          
 end
 
 if (isfield(se,'grid')&&se.grid==0)||~isfield(se,'grid')
-    a = sum(size(se.lat) == size(se.(field)))==ndims(se.(field));
-    b = sum(size(se.lon) == size(se.(field)))==ndims(se.(field));
     
-    if a && b
+    isgridded = size(se.(field),1) == length(se.lat) && size(se.(field),2) == length(se.lon);
+
+    if ~isgridded
         se.(field) = se.(field)(:);
         se.lat = se.lat(:);
         se.lon = se.lon(:);

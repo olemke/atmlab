@@ -1,3 +1,16 @@
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-48
+
+	* geoplots/gmt/save_nc_gmt_input.m:
+	netcdf.create doesn't accept ~ as home. now use strrep to handle this.
+
+	* geoplots/gmt/psbox.m: fixed ugly variable names 
+
+	* geoplots/gmt/gmt_plot.m: 
+	Fixed buggy way of determining if the
+	data is gridded or not
+
 2010-03-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-47
