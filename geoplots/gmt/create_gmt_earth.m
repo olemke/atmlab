@@ -401,48 +401,23 @@ end
 
 function out = setup_psbox(se)                                                  %% ps box %%
 
-if ~isfield(se,'psboxes')
-    a = size(se.psbox);
-    x = a(1);
-else l = se.psboxes; x = length(l);
-end
-
+l = size(se.psbox,1);
 if isfield(se,'psboxcolor')
-    if length(se.psboxcolor)~=x
+    if length(se.psboxcolor)~=l
         error('Need same number of colors as boxes')
-    else
-        if ~isfield(se,'psboxes')
-            colors=se.psboxcolor;
-        else
-            k=1;
-            for i=1:length(l)
-                colors(k:k+l(i)-1) = se.psboxcolor(i);
-                k = k+l(i);
-            end
-        end
     end
-else colors=cell(1,x); colors(:) = {'k'}; %default is black
+else se.psboxcolor(1:l) = {'k'}; %default is black
 end
 
 if isfield(se,'psboxthick')
-    if length(se.psboxthick)~=x
+    if length(se.psboxthick)~=l
         error('Need same number of sizes as boxes')
-    else
-        if ~isfield(se,'psboxes')
-            colors=se.psboxcolor;
-        else
-            k=1;
-            for i=1:length(l)
-                out.thick(k:k+l(i)-1) = se.psboxthick(i);
-                k = k+l(i);
-            end
-        end
     end
-else out.thick=cell(1,x); out.thick(:)={10}; %default size=10
+else out.thick(1:l)={10}; %default size=10
 end
-c = list_colors('colors',colors);
+c = list_colors('colors',se.psboxcolor);
 for i=1:length(c)
-    colors{i}=c{i}.*255;
+    colors{i}=c{i}.*255; % instead of from 0:1
 end
 out.colors=colors;
 out.psbox=se.psbox;

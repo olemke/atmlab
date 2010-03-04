@@ -1,5 +1,15 @@
 2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-50
+	
+	* geoplots/gmt/create_gmt_earth.m: corrected psbox setup
+
+	* geoplots/gmt/psbox.m: fixed inconsistency buge
+
+2010-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geoplots/gmt/psbox.m: 
+
 	* atmlab-0-4-49
 
 	* geoplots/gmt/create_gmt_earth.m: Fixed bug with psbox

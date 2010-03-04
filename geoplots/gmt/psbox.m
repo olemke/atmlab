@@ -1,4 +1,4 @@
-function psbox(se)
+function psbox(in)
 %% my_psbox
 % purpose:
 %         Makes boxes
@@ -7,14 +7,14 @@ function psbox(se)
 % Author:Salomon Eliasson
 %%
 
-colors = se.plot.psbox.colors;
-thick = se.plot.psbox.thick;
-pb = se.plot.psbox.psbox;
-region = se.plot.region;
-proj = se.plot.plotimage.proj;
+colors = in.plot.psbox.colors;
+thick = in.plot.psbox.thick;
+pb = in.plot.psbox.psbox;
+region = in.plot.region;
+proj = in.plot.plotimage.proj;
 
 a=cell(5,1);
-for i = 1:length(thick)
+for i = 1:size(pb,1)
     b = pb(i,1:2);
     t = pb(i,3:4);
     
@@ -32,7 +32,7 @@ for i = 1:length(thick)
     box = sprintf('echo -e "%s" |',stdin);
     box = sprintf('%s psxy -R%s -J%s -A',box,region,proj);
     
-    if ~isempty(dir(sprintf('%s.ps',in.file)))
+    if ~isempty(dir(sprintf('%s.ps',in.filename)))
         box = sprintf('%s -O',box);
     end
     
@@ -41,7 +41,7 @@ for i = 1:length(thick)
     c = colors{i};
     s = thick{i};
     box = sprintf('%s -W%d/%d/%d/%d',box,s,c(1),c(2),c(3));
-    box = sprintf('%s -K>> %s.ps',box,se.filename);
+    box = sprintf('%s -K>> %s.ps',box,in.filename);
 
     exec_gmt_cmd(box)
 end
