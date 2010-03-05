@@ -18,12 +18,12 @@ try
   cmd = ['zamsu2l1c.sh "' filename '" "' atovs_file '"'];
   [result,err] = system(cmd);
   if result ~= 0
-    error(err);
+    error('atmlab:atovs_get_l1c:zamsu2l1c', err);
   end
   [data, err] = atovs_read_data( atovs_file );
 catch
   delete_tmpfolder(tf);
-  error(err);
+  error('atmlab:atovs_get_l1c:zamsu2l1c', err);
 end
 
 delete_tmpfolder(tf);

@@ -1,3 +1,9 @@
+2010-03-05	Gerrit Holl	<gerrit.holl@ltu.se>
+	
+	* atmlab-0-4-52
+
+	* sensors/atovs/atovs_get_l1c.m: Add error identifier.
+
 2010-03-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-51
