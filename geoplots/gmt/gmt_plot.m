@@ -113,12 +113,14 @@ function filename = gmt_plot(in,field)
 %
 % Extras:
 %
+%
 % in.psbox (%double)  | [lat1 lon1 lat2 lon2] % [Bottom left corner; Top right corner]
 %                     to add further boxes append an extra row.
-% in.psboxes          | vector containing number of boxes in one region. e.g
-%                     all IPCC regions have 1 box per region.
+% in.psboxes          | The index of the last row of the regions. e.g 3 7, if
+%                       you have 2 regions defined by 3 resp 4 boxes. This is
+%                       useful for defining psboxcolor.
 %
-%       example       | [in.psbox,in.psboxes]=list_regions({'twp','aus'});
+%
 %
 % in.psboxcolor       | Default is black for every region ( 'k'={[0 0 0]}). otherwise RGB*255.
 %                     append color vector in a cell for every boxregion.
@@ -197,10 +199,13 @@ if ~isfield(se,'outdir')
 end
 se = makefilename(se);
 
-if ~isfield(se,field)
+if isfield(se,'nodata')&&se.nodata
+    field = '';
+end
+if ~isempty(field) && ~isfield(se,field)
     error('The field: "%s" is not in the structure',field)
 end
-if isfield(se,'nodata')&&se.nodata||isempty(se.(field))
+if isempty(field) || isempty(se.(field))
     se.sidebar=0;
     se.legend=0;
     se.grid=0;

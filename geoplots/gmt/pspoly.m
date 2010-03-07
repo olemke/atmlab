@@ -11,13 +11,13 @@ colors = in.plot.pspoly.colors;
 thick = in.plot.pspoly.thick;
 pp = in.plot.pspoly.pspoly;
 region = in.plot.region;
-proj = in.plot.plotimage.proj;
+proj = in.plot.coast.proj;
 
 for i = 1:size(pp,1)    
     %stdin
     %% get full coordinates
-    a=cell(size(ppcur,1)+1,1);
     ppcur = pp{i};
+    a=cell(size(ppcur,1)+1,1);
     for j = 1:size(ppcur,1)
         a{j}=sprintf('%d %d',ppcur(j,1), ppcur(j,2));
     end

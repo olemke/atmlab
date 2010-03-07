@@ -1,3 +1,18 @@
+2010-03-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-53
+	
+	* geoplots/gmt/gmt_plot.m:
+	Fixed bug if using nodata and removed reference to local function
+	in help.
+
+	* geoplots/gmt/create_gmt_earth.m: 
+	Fixed bug pspoly in conjuction with in.nodata
+	
+	* geoplots/gmt/psbox.m: Fixed bug for if you use this without data
+
+	* geoplots/gmt/pspoly.m: Fixde bug for if you use this without data
+
 2010-03-05	Gerrit Holl	<gerrit.holl@ltu.se>
 	
 	* atmlab-0-4-52

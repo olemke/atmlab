@@ -11,7 +11,7 @@ colors = in.plot.psbox.colors;
 thick = in.plot.psbox.thick;
 pb = in.plot.psbox.psbox;
 region = in.plot.region;
-proj = in.plot.plotimage.proj;
+proj = in.plot.coast.proj;
 
 a=cell(5,1);
 for i = 1:size(pb,1)

@@ -132,7 +132,9 @@ if isfield(se,'pscontour')                                                      
     se.plot.pscontour = mkpscontour(se);
 end
 
-[se.plot.legend,se.plot.nanlegend] = mklegend(se);                              % Legend/s
+if ~isfield(se,'nodata') || ~se.nodata
+    [se.plot.legend,se.plot.nanlegend] = mklegend(se);                          % Legend/s
+end
 
 function se = defaults(se)                                                      %% defaults %%
 
