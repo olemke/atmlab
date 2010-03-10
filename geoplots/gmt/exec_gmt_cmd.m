@@ -11,6 +11,9 @@ function exec_gmt_cmd(cmd, silent)
 % Author: Oliver Lemke
 
 if ~iscell(cmd), cmd = {cmd}; end
+
+cmd = cmd(:);
+
 if ~exist('silent', 'var'), silent=false; end
 
 for x = cmd'

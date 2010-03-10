@@ -1,3 +1,12 @@
+2010-03-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-54
+
+	* geoplots/gmt/exec_gmt_cmd.m: 
+	Added cmd = cmd(:); to always guarantee the correct dimensions.
+
+	* geoplots/gmt/gmt_plot.m: Cleaned up 'sort figures' subfunction
+
 2010-03-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-53

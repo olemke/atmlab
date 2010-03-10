@@ -296,39 +296,29 @@ se.title = regexprep(se.title,'[:]',' ');
 
 function filename = sort_figures(se)                                             %% Sort figures %%
 
+command{1} = [];
 if strcmp(se.figuretype,'ps')
-    command = sprintf('rm -f .gmt{commands4,defaults4}');
-    exec_gmt_cmd(command)
+    command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
     filename=[se.filename '.ps'];
-elseif strcmp(se.figuretype,'eps')
-    %ps->eps
-    command = sprintf('ps2eps -f -B --loose %s.ps',se.filename);exec_gmt_cmd(command)
-    command = sprintf('epstool --copy -b %s.eps %s2.eps',se.filename,se.filename);exec_gmt_cmd(command)
-    command = sprintf('mv %s2.eps %s.eps',se.filename,se.filename);exec_gmt_cmd(command)
-    command = sprintf('rm -f %s.ps .gmt{commands4,defaults4}',se.filename);
-    exec_gmt_cmd(command)
-    filename = [se.filename '.eps'];
-elseif strcmp(se.figuretype,'pdf') %turn the eps into a .pdf file
-    command = sprintf('ps2eps -f -B --loose %s.ps',se.filename);exec_gmt_cmd(command)
-    command = sprintf('epstool --copy -b %s.eps %s2.eps',se.filename,se.filename);exec_gmt_cmd(command)
-    command = sprintf('mv %s2.eps %s.eps',se.filename,se.filename);exec_gmt_cmd(command)
-    command = sprintf('rm -f %s.pdf',se.filename);exec_gmt_cmd(command)
-    command = sprintf('epstopdf %s.eps',se.filename);exec_gmt_cmd(command)
-    command = sprintf('rm -f %s.{ps,eps} .gmt{commands4,defaults4}',se.filename);
-    exec_gmt_cmd(command)
-    filename=[se.filename '.pdf'];
+else
+    command{end+1} = sprintf('ps2eps -f -B --loose %s.ps ',se.filename);
+    command{end+1} = sprintf('epstool --copy -b %s.eps %s2.eps ',se.filename,se.filename);
+    command{end+1} = sprintf('mv %s2.eps %s.eps ',se.filename,se.filename);
+    command{end+1} = sprintf('rm -f %s.ps ',se.filename);
+    if strcmp(se.figuretype,'pdf')
+            command{end+1} = sprintf('epstopdf %s.eps ',se.filename);
+            command{end+1} = sprintf('rm -f %s.eps ',se.filename);
+    end
+    filename = [se.filename '.' se.figuretype];
 end
+command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
 
-if isfield(se,'keep_intermediate')
-    command=sprintf('rm -f %s.{grd,asc,cpt}',se.filename);
-    exec_gmt_cmd(command)
+if ~isfield(se,'keep_intermediate') || ~se.keep_intermediate
+    command{end+1} = sprintf('rm -f %s.{grd,asc,cpt} ',se.filename);
 end
-
-%!rm -f *.cpt
 
 if isdir(se.outdir)
-    command=sprintf('mv %s %s/',filename,se.outdir);
-    exec_gmt_cmd(command)
+    command{end+1} = sprintf('mv %s %s/  ',filename,se.outdir);
 else
     se.outdir=pwd;
 end
@@ -347,8 +337,10 @@ if isnan(openwith)
 end
 
 if se.display
-    exec_gmt_cmd( sprintf('%s %s/%s &',openwith,se.outdir,filename));
+    command{end+1} = sprintf('%s %s/%s &',openwith,se.outdir,filename);
 end
+
+exec_gmt_cmd(command(2:end)) % execute commands
+
 filename = sprintf('%s/%s',se.outdir,filename);
 fprintf('GMT plot stored at:  %s\n',filename)
-
