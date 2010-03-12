@@ -31,7 +31,7 @@
 
 function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( varargin )
 %
-[ztan,method,mc_err] = optargs( varargin, { [7 10 13]*1e3, 'doit', 5 } );
+[ztan,method,m_arg] = optargs( varargin, { [7 10 13]*1e3, 'mc', 5 } );
 
 
 %= Init Q structure
@@ -121,7 +121,7 @@ C = qartsCloudbox;
 
 %- Define 1D cloudbox and particles
 
-C.LIMITS = [ 7e3 14e3 ];
+C.LIMITS = [ 6e3 14e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
@@ -154,7 +154,7 @@ C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
-C.PND_FIELD{1}.data = 10 * C.PND_FIELD{1}.data;
+%C.PND_FIELD{1}.data = 10 * C.PND_FIELD{1}.data;
 
 % Set up scattering method
 
@@ -168,7 +168,7 @@ if strcmp( lower(method), 'mc' )
   C.METHOD                        = 'MC';
   Q.IY_CLEARSKY_AGENDA            = { 'iyMC' };    
   %
-  C.METHOD_PRMTRS.STD_ERR         = mc_err;
+  C.METHOD_PRMTRS.STD_ERR         = m_arg;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
   C.METHOD_PRMTRS.MAX_ITER        = -1;
   C.METHOD_PRMTRS.Z_FIELD_IS_1D   = Q.RAW_ATM_EXPAND_1D;
@@ -194,6 +194,9 @@ elseif strcmp( lower(method), 'fos' )
   fos_file = '/tmp/fos_angles.xml';
   %
   C.METHOD                        = 'FOS';
+  Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( fos_y_agenda ){';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   fos_yStandard';
+  Q.WSMS_BEFORE_RTE{end+1}        = '}';
   Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(ppath)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
@@ -225,13 +228,34 @@ else
 end
 
 
-%- Map to 3D for MC and FOS
-if any( strcmp( lower(method), {'mc','fos'} ) )
+%- Map to 2D or 3D?
+%
+latlon_grid = [-15:0.5:15]';
+csize       = 1;
+%
+if strcmp( lower(method), 'fos' )  &  m_arg == 2
+  %
+  Q.ATMOSPHERE_DIM                = 2;
+  Q.RAW_ATM_EXPAND_1D             = true;
+  Q.LAT_GRID                      = latlon_grid;
+  %  
+  Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 2 );
+  Q.SENSOR_POS(:,2)               = -23;
+  %
+  C.LIMITS                        = [ C.LIMITS csize*[-2 2] ];
+  C.PND_FIELD{1}.grids{2}         = [ -90 csize*[-2 -1.5 1.5 2] 90 ];
+  p                               = C.PND_FIELD{1}.data;
+  C.PND_FIELD{1}.data             = zeros( length( C.PND_FIELD{1}.grids{1} ),...
+                                           length( C.PND_FIELD{1}.grids{2} ) );
+  C.PND_FIELD{1}.data(:,3:4)      = repmat(p,[1 2]);
+  %  
+elseif strcmp( lower(method), 'mc' )  |  ...
+     ( strcmp( lower(method), 'fos' )  &  m_arg == 3 )  
   %
   Q.ATMOSPHERE_DIM                = 3;
   Q.RAW_ATM_EXPAND_1D             = true;
-  Q.LAT_GRID                      = [-15:0.5:15]';
-  Q.LON_GRID                      = [-15:0.5:15]';
+  Q.LAT_GRID                      = latlon_grid;
+  Q.LON_GRID                      = latlon_grid;
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 3 );
   Q.SENSOR_POS(:,2)               = -23;
