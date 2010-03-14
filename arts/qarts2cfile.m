@@ -606,6 +606,11 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T = add_agenda( T, 'iy_clearsky_agenda', Q.IY_CLEARSKY_AGENDA );
   end
   %
+  if qarts_isset( Q.IY_AUX_DO )
+    rqre_datatype( Q.IY_AUX_DO, @isboolean, 'Q.IY_AUX_DO' );                %&%
+    T{end+1} = sprintf( 'IndexSet( iy_aux_do, %d )', Q.IY_AUX_DO );
+  end
+  %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );
   T{end+1} = add_savefile( 'sensor_los', workfolder );
   %
@@ -636,6 +641,7 @@ function T = cfile_RteExe( Q, partname, workfolder )
   T{end+1} = add_savefile( 'y_pol',   workfolder );
   T{end+1} = add_savefile( 'y_pos',   workfolder );
   T{end+1} = add_savefile( 'y_los',   workfolder );
+  T{end+1} = add_savefile( 'y_aux',   workfolder );
   %
   if qarts_isset( Q.J_DO ) 
     rqre_datatype( Q.J_DO, @isboolean, 'Q.J_DO' );                          %&%

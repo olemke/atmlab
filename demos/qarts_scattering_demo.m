@@ -1,9 +1,10 @@
 % QARTS_SCATTERING_DEMO  Demonstration of scattering calculations by Qarts
 %
-%   ARTS has two modules for performing scattering calculations: DOIT and
-%   MC. The DOIT method is implemented for both 1D and 3D, but is only
-%   recommended for 1D. MC is only implemented for 3D. This function
-%   runs a simple scenario with DOIT-1D or MC. 
+%   ARTS has three modules for performing scattering calculations: DOIT, FOS,
+%   and MC. The DOIT method is implemented for both 1D and 3D, but is only
+%   recommended for 1D. MC is only implemented for 3D. FOS is defined for all
+%   atmospheric dimensionalities. This function runs a simple scenario with
+%   DOIT-1D, MC (3D) or FOS (1/2/3D).
 %
 %   The 1D scenario used for DOIT is expanded to 3D for MC. The cloud is then
 %   given a rectangular shape (in lat and lon). The 1D cloud values are applied
@@ -12,7 +13,9 @@
 %   degrees. That is, a perfect match between DOIT and MC can not be
 %   expected as the "3D cloud" has a smaller extension than the 1D one.
 %
-% FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, do_mc, mc_err )
+%   The cloud is expanded in same way for FOS, when 2D or 3D is selected.
+%
+% FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, method, m_arg )
 %
 %  OUT   Q          Qarts setting structure.
 %        f          Frequency grid.
@@ -21,10 +24,14 @@
 %        y          Calculated cloudy randiances  [RJ BT].
 %        dy         Error estimate. Only valid for MC.
 % OPT    ztan       Tangent altitudes. Default is [7 10 13] km.
-%        method     Scattering method to use. Default is 'doit'. Other option
-%                   is 'mc'. (Upper or lower case letters do not matter).
-%        mc_err     Target calculation accuracy for MC, in K. Default is 5K.
+%        method     Scattering method to use. Default is 'mc'. Other options
+%                   are 'doit' and 'fos'. (Upper or lower case letters do not 
+%                   matter).
+%        m_arh      Method argument. Not used for DOIT. For MC it is the
+%                   Target calculation accuracy for MC, in K. Default is 5K.
+%                   For FOS this is atmospheric dimensionality to use.
 
+% 2010-02-12  Extended to also handle FOS by Patrick Eriksson.
 % 2007-07-27  Extended to also handle MC by Patrick Eriksson.
 % 2005-06-13  Created by Claudia Emde
 
@@ -154,7 +161,7 @@ C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
-%C.PND_FIELD{1}.data = 10 * C.PND_FIELD{1}.data;
+%C.PND_FIELD{1}.data = 5 * C.PND_FIELD{1}.data;
 
 % Set up scattering method
 

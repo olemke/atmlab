@@ -1,3 +1,13 @@
+2010-03-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-56
+
+	* arts/arts_y.m: Added y_aux as output varaible. 
+
+	* arts/qarts2cfile.m: Added handling of Q.IY_AUX_DO. 
+
+	* arts/qarts.m: Added IY_AUX_DO. 
+
 2010-03-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-55
