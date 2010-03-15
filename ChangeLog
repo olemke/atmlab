@@ -1,3 +1,9 @@
+2010-03-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-57
+
+	* forwardmodel/di2planckTb.m: Created. So far just a test.
+
 2010-03-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-56
