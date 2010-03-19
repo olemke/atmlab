@@ -1,5 +1,5 @@
-% BINNING_FAST bins ungridded data onto a grid 
 function [data,lat,lon] = binning_fast(in)
+%% BINNING_FAST bins ungridded data onto a grid 
 %
 % Bins ungridded data to a grid using d = in.gridsize where, 
 % lat = -90+0.5*d:d:90-0.5*d;

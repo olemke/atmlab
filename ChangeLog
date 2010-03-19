@@ -1,3 +1,10 @@
+2010-03-19	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-0-4-58
+
+	* math/binning_fast.m: Put the H1-line in the same block of comments as
+	the documentation, so that 'help binning_fast' gives anything useful.
+
 2010-03-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-57
