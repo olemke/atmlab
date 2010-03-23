@@ -25,6 +25,9 @@ function [data,lat,lon] = binning_fast(in)
 %
 % 2010-03-04 Salomon Eliasson
 
+%requires: -180 <= lon < 180
+in.lon(in.lon==180)=-180; 
+
 d = in.gridsize;
 lat = -90+0.5*d:d:90-0.5*d;
 lon = -180+0.5*d:d:180-0.5*d;

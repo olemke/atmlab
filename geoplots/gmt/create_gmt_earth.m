@@ -208,7 +208,7 @@ else
     a.increment = se.increment;
 end
 
-if ~isfield(se,'search ')
+if ~isfield(se,'search')
     a.search = '30m'; %i.e. ½ degree
 elseif isnumeric(se.search)
     a.search = sprintf('%dm',se.search);

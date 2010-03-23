@@ -178,7 +178,6 @@ if out.grid
         end
     end
 else
-    %out = create_ascii4gmtplot(out,field);                                   % create ascii (not gridded)
     out = save_ungridded4GMTplot(out,field);                                   % create ascii (not gridded)
 end
 

@@ -1,3 +1,14 @@
+2010-03-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-59
+	
+	* geoplots/gmt/gmt_plot.m: removed comment
+
+	* geoplots/gmt/create_gmt_earth.m: found bug in in.search
+
+	* math/binning_fast.m: 
+	prepped so that -180 <= lon < 180.
+	
 2010-03-19	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-0-4-58
