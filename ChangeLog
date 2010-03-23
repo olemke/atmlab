@@ -1,5 +1,12 @@
 2010-03-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-60
+
+	* math/binning_fast.m: Added error if lat==90. There is no good
+	fix for this.
+
+2010-03-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-0-4-59
 	
 	* geoplots/gmt/gmt_plot.m: removed comment
