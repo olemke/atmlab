@@ -1,5 +1,15 @@
 2010-03-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-61
+	
+	* math/binning_fast.m: generalized for a 0:360 or -180:180 grid
+	and place data with lat = 90 in the northernmost gridbox.
+
+2010-03-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* math/binning_fast.m: generalized for a 0:360 or -180:180 grid
+	and place data with lat = 90 in the northernmost gridbox.
+
 	* atmlab-0-4-60
 
 	* math/binning_fast.m: Added error if lat==90. There is no good

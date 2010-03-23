@@ -25,19 +25,22 @@ function [data,lat,lon] = binning_fast(in)
 %
 % 2010-03-04 Salomon Eliasson
 
-%requires: -180 <= lon < 180
-in.lon(in.lon==180)=-180; 
-
-if sum(in.lat==90)
-    %requires: -90 <= lat < 90 (no automatic fix for this)
-    error('Can''t handle lat = 90')
-end
-
+% requires: -180 <= lon < 180 
 d = in.gridsize;
+test = in.lon>180;
+
+in.lon(test)=in.lon(test)-360;
+in.lon(in.lon==180)=-180; 
+in.lat(in.lat==90)=90-d/2; %put it in the last gridbox
+
+if any(test(:))
+    lon = 0+0.5*d:d:360-0.5*d;
+else lon = -180+0.5*d:d:180-0.5*d;
+end
 lat = -90+0.5*d:d:90-0.5*d;
-lon = -180+0.5*d:d:180-0.5*d;
-newlon = floor(in.lon(:)/d - -180/d ) + 1;                                      % assign index value
-newlat = floor(in.lat(:)/d - -90/d ) + 1;                                       % assign index value
+
+newlon = floor(in.lon/d - -180/d ) + 1;                                         % assign index value
+newlat = floor(in.lat/d - -90/d ) + 1;                                          % assign index value
 indata = in.data(:);
 data = cell(180/d, 360/d);
 
