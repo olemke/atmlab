@@ -1,3 +1,17 @@
+2010-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-62
+
+	* demos/qarts_scattering_demo.m: Top altitude of clouxbox limits
+	moved up as older limit was found to cut the pnd field. 
+
+	Found that DOIT and FOS gave more deviating results when making
+	the cloud "thinner". That should not happen. Tested to change 
+	C.METHOD_PRMTRS.SCAT_ZA_INTERP from linear to polynomial, and this
+	was found to decrease the problem strongly. So the polynomial
+	option is now used. The agreement between DOIT and FOS (for
+	default pnd value) is now better than before. 
+	
 2010-03-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-61

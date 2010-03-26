@@ -27,7 +27,7 @@
 %        method     Scattering method to use. Default is 'mc'. Other options
 %                   are 'doit' and 'fos'. (Upper or lower case letters do not 
 %                   matter).
-%        m_arh      Method argument. Not used for DOIT. For MC it is the
+%        m_arg      Method argument. Not used for DOIT. For MC it is the
 %                   Target calculation accuracy for MC, in K. Default is 5K.
 %                   For FOS this is atmospheric dimensionality to use.
 
@@ -58,7 +58,8 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 
 %= General part
 %
-f                   = linspace( 501.18e9, 501.58e9, 3 )';
+%f                   = linspace( 501.18e9, 501.58e9, 3 )';
+f                   = linspace( 501.580e9, 501.581e9, 2 )';  
 Q.F_GRID            = f;
 Q.STOKES_DIM        = 2;
 %
@@ -128,7 +129,7 @@ C = qartsCloudbox;
 
 %- Define 1D cloudbox and particles
 
-C.LIMITS = [ 6e3 14e3 ];
+C.LIMITS = [ 6e3 16e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
@@ -153,7 +154,7 @@ r = 50e-6;
 % ice mass content
 imc = 0.005*1e-3;
 % cloud altitude
-alt = [10e3 13e3];
+alt = [11e3 13e3];
 
 % Calculate scattering data using Mie
 C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
@@ -161,7 +162,7 @@ C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
-%C.PND_FIELD{1}.data = 5 * C.PND_FIELD{1}.data;
+%C.PND_FIELD{1}.data = 0.2 * C.PND_FIELD{1}.data;
 
 % Set up scattering method
 
@@ -189,7 +190,7 @@ elseif strcmp( lower(method), 'doit' )
   C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, ...
                                                            'doit_za_grid.xml');
   C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
-  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'linear';
+  C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
   C.METHOD_PRMTRS.ALL_F           = true;
   %
   C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
@@ -224,6 +225,7 @@ elseif strcmp( lower(method), 'fos' )
     fos(ind,2) = fos(ind,2) - 360;
   else
     fos = fos28nonrot;
+    %fos = fos2
   end
   
   fos(:,3) = 4*pi / size(fos,1);
@@ -346,6 +348,13 @@ fos_angles = [
   116.5651  -90.0000
   116.5651         0
   180.0000         0 ];
+return
+
+
+function fos_angles = fos2
+fos_angles = [
+        45         0
+       135         0 ];
 return
 
 
