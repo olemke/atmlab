@@ -1,5 +1,13 @@
 2010-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-4-63
+
+	* demos/data: Removed the two example CloudSat files. The case
+	using the files is not working, and the files have together a size
+	of >200 Mb.
+
+2010-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-4-62
 
 	* demos/qarts_scattering_demo.m: Top altitude of clouxbox limits
