@@ -7,8 +7,8 @@
 %    gives
 %       P =
 %            Latitude: [37081x1 double]
+%           Longitude: [37081x1 double]
 %          Sigma_Zero: [37081x1 double]
-%      CPR_Cloud_mask: [37081x125 double]
 %
 %    Some field names are renamed as the corresponding name in HDF can not
 %    be used in matlab. For example, 'Sigma-Zero' is renamed to
