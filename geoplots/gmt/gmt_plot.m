@@ -313,7 +313,8 @@ end
 command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
 
 if ~isfield(se,'keep_intermediate') || ~se.keep_intermediate
-    command{end+1} = sprintf('rm -f %s.{grd,asc,cpt} ',se.filename);
+    command{end+1} = sprintf('rm -f %s.{grd,asc} ',se.filename);
+    command{end+1} = sprintf('rm -f *.cpt');
 end
 
 if isdir(se.outdir)
