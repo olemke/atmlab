@@ -47,7 +47,7 @@ Q.ABS_SPECIES(3).TAG{1}  = 'H2O-PWR98';
 %
 Q.ATMOSPHERE_DIM         = 1;
 %
-Q.P_GRID                 = z2p_simple( [0:250:25e3]' );
+Q.P_GRID                 = z2p_simple( [-750:250:40e3]' );
 
 
 %= Reference atmosphere

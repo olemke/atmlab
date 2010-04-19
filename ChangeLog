@@ -1,5 +1,11 @@
 2010-04-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-0-4-67
+
+	* demos/qarts_abstable_demo.m: Changed setting slightly.
+
+2010-04-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-0-4-66
 
 	* demos/qarts_abstable_demo.m: Created
