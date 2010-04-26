@@ -2,7 +2,7 @@
 %
 %    Writes a Vector to a NetCDF file for use with Arts.
 %
-% FORMAT   arts_nc_write_vector(filename)
+% FORMAT   arts_nc_write_vector(filename,v)
 %        
 % IN    filename Name of NetCDF file.
 % IN    v        Vector variable.

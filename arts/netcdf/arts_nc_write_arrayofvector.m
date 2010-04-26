@@ -3,7 +3,7 @@
 %    Writes an ArrayOfVector to a NetCDF file for use with Arts.
 %    Array elements must be column vectors!
 %
-% FORMAT   arts_nc_write_arrayofvector(filename)
+% FORMAT   arts_nc_write_arrayofvector(filename,v)
 %        
 % IN    filename Name of NetCDF file.
 % IN    v        ArrayOfVector variable.

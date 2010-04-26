@@ -18,7 +18,7 @@
 %      Q.USE_RAW_ATMOSPHERE
 %      Q.ABS_NLS
 %
-% FORMAT   Q = qarts_abstable( Q [, nt, dt, nnls, dnls ] )
+% FORMAT   Q = qarts_abstable( Q [, nt, dt, dnls ] )
 %        
 % OUT   Q      Q structure wth some fields automatically set. These fields
 %              are:
@@ -32,17 +32,17 @@
 % OPT   nt     Number of temperature variations. Default is 3.
 %       dt     Maximum size of temperature variation. If set to be empty,
 %              an automatic selection is made. Default is [].
-%       nnls   Number of variations for "non-linear" species. Default is 3.
-%       dnls   Maximum size of variation for "non-linear" species. If set 
-%              to be empty, an automatic selection is made. Default is [].
-%              Should otherwise be a value in the range [1,2].
+%       dnls   Relative disturbances for "non-linear" species.
+%              Default is [], that signifies no disturbances.
+%              Otherwise required to be a vector, the vector values are used 
+%              as variations. A value of 2 means here "twice the reference".
 
 % 2007-08-22   Created by Patrick Eriksson.
 
 
 function Q = qarts_abstable( Q, varargin )
 %
-[nt,dt,nnls,dnls] = optargs( varargin, { 3, [], 3, [] } );
+[nt,dt,dnls] = optargs( varargin, { 3, [], 3 } );
                                                                            %&%
 %= Check input                                                             %&%
 %                                                                          %&%
@@ -66,6 +66,9 @@ rqre_datatype( Q.USE_RAW_ATMOSPHERE, @isboolean, ...                       %&%
 if ~qarts_isset( Q.ABS_NLS )                                               %&%
   error( 'Q.ABS_NLS must be set' );                                        %&%
 end                                                                        %&%
+rqre_alltypes( nt, {@istensor0,@iswhole} );                                %&%
+rqre_datatype( dt, {@istensor0} );                                         %&%
+rqre_datatype( dnls, {@istensor1} );                                       %&%
 
 
 %- Obtain atmospheric profiles
@@ -97,9 +100,7 @@ if Q.ATMOSPHERE_DIM == 1
   end
   %
   vmr = vmr_field;
-  if isempty(dnls)
-    dnls = 0;
-  end
+  %
 else
   %
   t_max   = t_field;
@@ -126,11 +127,6 @@ else
   if isempty(dt)
     dt   = max([ max(t_max-t_min)/2 (nt-1)/2]);  % No idea to have steps < 1K
   end
-  if isempty( Q.ABS_NLS )
-    dnls = 0;
-  elseif isempty(dnls) 
-    dnls = max( max( vmr_max(Q.ABS_NLS,:)./ vmr(Q.ABS_NLS,:) ) );
-  end
 end
 
 
@@ -151,11 +147,14 @@ end
 %
 Q.ABS_VMRS   = vmr;
 %
-if dnls == 0  |  nnls < 2  |  isempty( Q.ABS_NLS )
+if isempty( Q.ABS_NLS )  |  isempty( dnls )
   Q.ABS_NLS_PERT = [];
 else
-  rqre_in_range( dnls, 1, 2 );                                              %&%
-  Q.ABS_NLS_PERT = linspace( 2-dnls, dnls, nnls )';
+  if length(dnls) < 2
+    error( 'The argument *dnls* can not be a scalar.' );
+  else
+    Q.ABS_NLS_PERT = dnls;
+  end
 end  
 
 

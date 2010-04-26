@@ -2,7 +2,7 @@
 %
 %    Writes a Tensor4 to a NetCDF file for use with Arts.
 %
-% FORMAT   arts_nc_write_tensor4(filename)
+% FORMAT   arts_nc_write_tensor4(filename,v)
 %        
 % IN    filename Name of NetCDF file.
 % IN    v        Tensor4 variable.

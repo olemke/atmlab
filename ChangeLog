@@ -1,3 +1,17 @@
+2010-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-68
+
+	* arts/qarts2cfile.m (add_readfile): Handling of NetCDF added
+	(but only for data already in such a file).
+
+	* arts/netcdf/arts_nc_write_xxx.m: The variable v was missing in
+	the header format string (for all write functions).
+
+	* arts/qarts_abstable.m: The variations for non-linear species can
+	now only be set in a direct manner. *dnls* must now give the
+	variations to apply. No automatic choice exists. 
+
 2010-04-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-67

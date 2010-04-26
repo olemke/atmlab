@@ -58,8 +58,8 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 
 %= General part
 %
-%f                   = linspace( 501.18e9, 501.58e9, 3 )';
-f                   = linspace( 501.580e9, 501.581e9, 2 )';  
+f                   = linspace( 501.18e9, 501.58e9, 3 )';
+%f                   = linspace( 501.580e9, 501.581e9, 2 )';  
 Q.F_GRID            = f;
 Q.STOKES_DIM        = 2;
 %
@@ -215,6 +215,7 @@ elseif strcmp( lower(method), 'fos' )
   Q.WSMS_BEFORE_RTE{end+1}        = sprintf( ...
                                        'ReadXML(fos_angles, "%s")', fos_file );
   Q.WSMS_BEFORE_RTE{end+1}        = 'IndexSet( fos_n, 1 )';
+  Q.WSMS_BEFORE_RTE{end+1}        = 'FlagOff( fos_use_mean_scat_data )';
   %
   if 0
     fos = eq_point_set_polar( 2, 5 );

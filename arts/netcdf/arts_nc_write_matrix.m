@@ -2,7 +2,7 @@
 %
 %    Writes a Matrix to a NetCDF file for use with Arts.
 %
-% FORMAT   arts_nc_write_matrix(filename)
+% FORMAT   arts_nc_write_matrix(filename,v)
 %        
 % IN    filename Name of NetCDF file.
 % IN    v        Matrix variable.

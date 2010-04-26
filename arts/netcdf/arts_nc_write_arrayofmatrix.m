@@ -2,7 +2,7 @@
 %
 %    Writes an ArrayOfMatrix to a NetCDF file for use with Arts.
 %
-% FORMAT   arts_nc_write_arrayofmatrix(filename)
+% FORMAT   arts_nc_write_arrayofmatrix(filename,v)
 %        
 % IN    filename Name of NetCDF file.
 % IN    v        ArrayOfMatrix variable.

@@ -1465,7 +1465,17 @@ function s = file_or_data(artsvar,datatype,qvalue,workfolder,dprecision,...
 return
 
 function s = add_readfile( artsvar, filename )
-  s = sprintf('ReadXML(%s,"%s")', artsvar, filename );
+  [p,n,ext] = fileparts( filename );
+  switch lower(ext)
+   case '.xml'
+     s = sprintf('ReadXML(%s,"%s")', artsvar, filename );
+   case '.nc'
+     s = sprintf('ReadNetCDF(%s,"%s")', artsvar, filename );     
+   otherwise
+    error( sprintf( ... 
+    'Unknown file extension (%s), Allowed options are ''xml'' and ''nc''', ...
+        ext ) );
+  end
 return
 
 
