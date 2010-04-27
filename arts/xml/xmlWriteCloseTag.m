@@ -2,7 +2,7 @@
 %
 %    Internal function.
 %
-% FORMAT   xmlWriteTag(fid, name)
+% FORMAT   xmlWriteCloseTag(fid, name)
 %
 % IN    fid        File descriptor of output file
 % IN    name       Tag name

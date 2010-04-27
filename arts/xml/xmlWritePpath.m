@@ -3,37 +3,38 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWritePpath(fid, data, precision)
+% FORMAT   xmlWritePpath(fid, fidb, data, precision)
 %
 % IN    fid        File descriptor
+% IN    fidb       File descriptor for binary file
 % IN    data       Ppath
 % IN    precision  Precision for floats
 
 % 2003-01-09  Created by Oliver Lemke.
 
-function xmlWritePpath(fid, data, precision)
+function xmlWritePpath(fid, fidb, data, precision)
 
 xmlWriteTag (fid, 'Ppath', []);
 
-xmlWriteIndex (fid, data.dim, precision);
-xmlWriteIndex (fid, data.np, precision);
-xmlWriteIndex (fid, data.refraction, precision);
-xmlWriteString (fid, data.method, precision);
-xmlWriteNumeric (fid, data.constant, precision);
-xmlWriteMatrix (fid, data.pos, precision);
-xmlWriteVector (fid, data.z, precision);
-xmlWriteVector (fid, data.l_step, precision);
-xmlWriteArrayOf (fid, data.gp_p, 'GridPos', precision);
-xmlWriteArrayOf (fid, data.gp_lat, 'GridPos', precision);
-xmlWriteArrayOf (fid, data.gp_lon, 'GridPos', precision);
-xmlWriteMatrix (fid, data.los, precision);
-xmlWriteString (fid, data.background, precision);
-xmlWriteVector (fid, data.tan_pos, precision);
-xmlWriteVector (fid, data.geom_tan_pos, precision);
-xmlWriteVector (fid, data.p, precision);
-xmlWriteVector (fid, data.t, precision);
-xmlWriteMatrix (fid, data.vmr, precision);
-xmlWriteArrayOf (fid, data.next_parts, 'Index', precision);
+xmlWriteIndex (fid, fidb, data.dim, precision);
+xmlWriteIndex (fid, fidb, data.np, precision);
+xmlWriteIndex (fid, fidb, data.refraction, precision);
+xmlWriteString (fid, fidb, data.method, precision);
+xmlWriteNumeric (fid, fidb, data.constant, precision);
+xmlWriteMatrix (fid, fidb, data.pos, precision);
+xmlWriteVector (fid, fidb, data.z, precision);
+xmlWriteVector (fid, fidb, data.l_step, precision);
+xmlWriteArrayOf (fid, fidb, data.gp_p, 'GridPos', precision);
+xmlWriteArrayOf (fid, fidb, data.gp_lat, 'GridPos', precision);
+xmlWriteArrayOf (fid, fidb, data.gp_lon, 'GridPos', precision);
+xmlWriteMatrix (fid, fidb, data.los, precision);
+xmlWriteString (fid, fidb, data.background, precision);
+xmlWriteVector (fid, fidb, data.tan_pos, precision);
+xmlWriteVector (fid, fidb, data.geom_tan_pos, precision);
+xmlWriteVector (fid, fidb, data.p, precision);
+xmlWriteVector (fid, fidb, data.t, precision);
+xmlWriteMatrix (fid, fidb, data.vmr, precision);
+xmlWriteArrayOf (fid, fidb, data.next_parts, 'Index', precision);
 
 xmlWriteCloseTag (fid, 'Ppath');
 

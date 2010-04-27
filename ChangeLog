@@ -1,3 +1,18 @@
+2010-04-27  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-69
+
+	* arts/xml/xmlWrite*.m, arts/xml/xmlStoreImpl.m:
+
+	Preparations for binary support. Add extra argument fidb to all
+	functions.
+
+	Remove unnecessary 'clear' at the end of several functions.
+
+	* arts/xml/xmlStore.m: Update docs.
+
+	* arts/xml/xmlReadTag.m: Use strcmp.
+
 2010-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-68

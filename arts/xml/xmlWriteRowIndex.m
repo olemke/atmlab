@@ -3,15 +3,16 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteRowIndex(fid, data, precision)
+% FORMAT   xmlWriteRowIndex(fid, fidb, data, precision)
 %
 % IN    fid        File descriptor
+% IN    fidb       File descriptor for binary file
 % IN    data       Index Vector
 % IN    precision  Precision for floats
 
 % 2003-06-18  Created by Oliver Lemke.
 
-function xmlWriteIndexVector(fid, data, precision)
+function xmlWriteIndexVector(fid, fidb, data, precision)
 
 nrows = size (data, 1);
 ncols = size (data, 2);
@@ -28,6 +29,4 @@ xmlWriteTag (fid, 'RowIndex', ...
 fprintf (fid, '%d\n', data);
 
 xmlWriteCloseTag (fid, 'RowIndex');
-
-clear fid nrows ncols nelem;
 

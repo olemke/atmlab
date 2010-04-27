@@ -58,7 +58,7 @@ while ~feof (fid) & ~exit_loop
        case 'arts'
          toplevel = 1;
          format = xmlGetAttrValue (attrlist, 'format');
-         if length (format) == length ('binary') & format == 'binary'
+         if strcmp (format, 'binary')
              binary = 1;
              fid2 = fopen (strcat (filename, '.bin'), 'rb');
          end

@@ -3,17 +3,18 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteTensor4(fid, data, precision)
+% FORMAT   xmlWriteTensor4(fid, fidb, data, precision)
 %
 % IN    fid    File descriptor
+% IN    fidb       File descriptor for binary file
 % IN    data   Tensor4
 % IN    precision  Precision for floats
 
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteTensor4(fid, data, precision, attrlist)
+function xmlWriteTensor4(fid, fidb, data, precision, attrlist)
 
-if nargin < 4
+if nargin < 5
   attrlist = [];
 end
   
@@ -47,6 +48,4 @@ form = strcat (form, '\n');
 fprintf (fid, form, data);
 
 xmlWriteCloseTag (fid, 'Tensor4');
-
-clear attrlist form format nb np nr nc;
 

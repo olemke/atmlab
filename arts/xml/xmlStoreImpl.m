@@ -36,13 +36,15 @@ if length (comment) > 0
   xmlWritecomment (fid, comment);
 end
 
+fidb = -1;
+
 if length (type) > 14 & type (1:14) == 'ArrayOfArrayOf'
-  xmlWriteArrayOfArrayOf (fid, data, type(15:length(type)), precision);
+  xmlWriteArrayOfArrayOf (fid, fidb, data, type(15:length(type)), precision);
 elseif length (type) > 7 & type (1:7) == 'ArrayOf'
-  xmlWriteArrayOf (fid, data, type (8:length(type)), precision);
+  xmlWriteArrayOf (fid, fidb, data, type (8:length(type)), precision);
 else
   func = str2func (strcat ('xmlWrite', type));
-  feval (func, fid, data, precision);
+  feval (func, fid, fidb, data, precision);
 end
 
 xmlWriteFooter (fid);

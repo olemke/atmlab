@@ -3,18 +3,19 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteVector(fid, data, precision, attrlist)
+% FORMAT   xmlWriteVector(fid, fidb, data, precision, attrlist)
 %
 % IN    fid       File descriptor
+% IN    fidb      File descriptor for binary file
 % IN    data      Vector
 % IN    precision Precision
 % IN    attrlist  Attribute list
  
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteVector(fid, data, precision, attrlist)
+function xmlWriteVector(fid, fidb, data, precision, attrlist)
 
-if nargin < 4
+if nargin < 5
   attrlist = [];
 end
 
@@ -33,6 +34,4 @@ xmlWriteTag (fid, 'Vector', attrlist);
 fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
 
 xmlWriteCloseTag (fid, 'Vector');
-
-clear fid nrows ncols nelem;
 

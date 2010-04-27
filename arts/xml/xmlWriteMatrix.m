@@ -3,15 +3,16 @@
 %    Internal function that should never be called directly.
 %    Use *xmlStore* instead.
 %
-% FORMAT   xmlWriteMatrix(fid, data, precision)
+% FORMAT   xmlWriteMatrix(fid, fidb, data, precision)
 %
 % IN    fid        File descriptor
+% IN    fidb       File descriptor for binary file
 % IN    data       Matrix
 % IN    precision  Precision for floats
 
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteMatrix(fid, data, precision)
+function xmlWriteMatrix(fid, fidb, data, precision)
 
 s = size (data);
 

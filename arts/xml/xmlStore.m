@@ -1,4 +1,4 @@
-% Writes  data to an XML file.
+% Writes data to an XML file.
 %
 %    This is the generic writing routine for XML files. You have to give
 %    the filename, the data and the type of data as a string.
@@ -15,7 +15,8 @@
 % IN    data       Data
 % IN    type       Data type
 % IN    precision  Precision for output of floating point numbers, could be
-%                  either 'FLOAT' or 'DOUBLE' (Default: 'FLOAT')
+%                  either 'FLOAT' or 'DOUBLE' or 'BINARY' (Default:'FLOAT')
+%                  Binary files always have double precision
 
 % 2002-12-16  Created by Oliver Lemke.
 
