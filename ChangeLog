@@ -1,3 +1,10 @@
+2010-04-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-70
+
+	* geoplots/gmt/create_gmt_earth.m (create_gmt_earth): fixed
+	in.center to work for -180 - 180 and  0 - 360
+
 2010-04-27  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-69

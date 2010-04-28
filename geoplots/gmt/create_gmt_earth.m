@@ -20,7 +20,7 @@ end
 
 if isfield(se,'basemap_axis')                                                   % Annotations of axis
     command = sprintf('gmtset BASEMAP_AXES %s',se.basemap_axis);
-     exec_gmt_cmd(command)
+    exec_gmt_cmd(command)
 end
 if isfield(se,'header_offset')                                                  % Distance from axis to Annotation
     command = sprintf('gmtset HEADER_OFFSET %c',se.header_offset);
@@ -38,7 +38,7 @@ end
 if isfield(se,'grdimage')                                                       % Image
     command = se.grdimage;
     exec_gmt_cmd(command)
-elseif ~isfield(se,'nodata') && strcmp(se.plot.plotimage.name,'grdimage') 
+elseif ~isfield(se,'nodata') && strcmp(se.plot.plotimage.name,'grdimage')
     command = grdimage(se.plot.plotimage);
     exec_gmt_cmd(command)
 end
@@ -83,7 +83,7 @@ if isfield(se.plot,'nanlegend') && ~isempty(se.plot.nanlegend)
 end
 % an empty ps file
 command = sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps', ...
-                  se.plot.region,se.plot.proj,se.filename);
+    se.plot.region,se.plot.proj,se.filename);
 exec_gmt_cmd(command)
 
 % close the ps file with
@@ -174,7 +174,14 @@ x = textscan(se.plot.region','%f','delimiter','/');                             
 
 if ~isfield(se,'center')
     center = (x{1}(1)+x{1}(2))/2;
-else center = se.center;
+else
+    center = se.center;
+    if center>180, center = center-360;end
+    if center < x{1}(1) || center > x{1}(2)
+        disp ('You have picked a projection center outside of the plot region')
+        disp('Choosing the middle of the region instead')
+        center = (x{1}(1)+x{1}(2))/2;
+    end
 end
 
 if ~isfield(se,'map_width')                                                     % map width
@@ -182,11 +189,7 @@ if ~isfield(se,'map_width')                                                     
 else map_width = se.map_width;
 end
 
-if center < x{1}(1) || center > x{1}(2)
-    disp ('You have picked a projection center outside of the plot region')
-    disp('Chooseing the middle of the region instead')
-    center = (x{1}(1)+x{1}(2))/2;
-end
+
 
 proj = sprintf('%s%d/%di',projection,center,map_width);
 
