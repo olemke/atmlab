@@ -235,14 +235,18 @@ function T = cfile_Generl( Q, partname, workfolder )
   T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
   if qarts_isset( Q.OUTPUT_FILE_FORMAT )
-    if strcmp( Q.OUTPUT_FILE_FORMAT, 'binary' )  
-      T{end+1} = 'output_file_formatSetBinary';
-    elseif strcmp( Q.OUTPUT_FILE_FORMAT, 'ascii' )  
-      T{end+1} = 'output_file_formatSetAscii';
-    else                                                                    %&%
+    rqre_datatype( Q.OUTPUT_FILE_FORMAT, @ischar, 'Q.OUTPUT_FILE_FORMAT' ); %&%
+    if ~any( strcmp( lower(Q.OUTPUT_FILE_FORMAT), {'binary','ascii'} ) )    %&%
       error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );     %&%
-    end
+    end                                                                     %&%
+    T{end+1} = sprintf( 'output_file_formatSet%s%s', ...
+      upper(Q.OUTPUT_FILE_FORMAT(1)), lower(Q.OUTPUT_FILE_FORMAT(2:end)) );
   end
+  %
+  rqre_datatype( Q.INPUT_FILE_FORMAT, @ischar, 'Q.INPUT_FILE_FORMAT' );     %&%
+  if ~any( strcmp( lower(Q.INPUT_FILE_FORMAT), {'binary','double'} ) )      %&%
+    error( 'Q.INPUT_FILE_FORMAT must be ''binary'' or ''double''.' );       %&%
+  end                                                                       %&%
   %
   if qarts_isset( Q.STOKES_DIM )
     rqre_alltypes( Q.STOKES_DIM, {@istensor0,@iswhole}, 'Q.STOKES_DIM' );   %&%
@@ -251,7 +255,8 @@ function T = cfile_Generl( Q, partname, workfolder )
   end
   %  
   if qarts_isset( Q.F_GRID )
-    T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder, 1 );
+    T{end+1} = file_or_data( 'f_grid', 'Vector', Q.F_GRID, workfolder, ...
+                                                     Q.INPUT_FILE_FORMAT );
   end
   %
   if qarts_isset( Q.ABS_SPECIES )
@@ -319,19 +324,22 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end
   %
   if qarts_isset( Q.P_GRID )
-    T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder, 1 );
+    T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder, ...
+                                                     Q.INPUT_FILE_FORMAT );
   end
   %
   if qarts_isset( Q.LAT_GRID )   % Grids of length 1 shall not be given to arts
     grid     = qarts_get( Q.LAT_GRID );
     if length(grid) > 1
-      T{end+1} = file_or_data( 'lat_grid', 'Vector', grid, workfolder );
+      T{end+1} = file_or_data( 'lat_grid', 'Vector', grid, workfolder, ...
+                                                     Q.INPUT_FILE_FORMAT );
     end
   end
   if qarts_isset( Q.LON_GRID )   % Grids of length 1 shall not be given to arts
     grid = qarts_get( Q.LON_GRID );
     if length(grid) > 1
-      T{end+1} = file_or_data( 'lon_grid', 'Vector', grid, workfolder );
+      T{end+1} = file_or_data( 'lon_grid', 'Vector', grid, workfolder, ...
+                                                     Q.INPUT_FILE_FORMAT );
     end
   end
   %
@@ -354,14 +362,16 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
       end
     else
       if qarts_isset( Q.T_FIELD )
-        T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, workfolder );
+        T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end      
       if qarts_isset( Q.VMR_FIELD )
         T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, ...
-                                                                   workfolder);
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end      
       if qarts_isset( Q.Z_FIELD )
-        T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, workfolder );
+        T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end
     end
   end
@@ -373,7 +383,8 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
           'r_geoidSpherical(r_geoid,atmosphere_dim,lat_grid,lon_grid,%e)', ...
                                                                    Q.R_GEOID );
     else
-      T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, workfolder );
+      T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
     end
   end
   %
@@ -385,7 +396,8 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
       T{end+1} = sprintf('MatrixSetConstant(z_surface,nrows,ncols,%.3f)', ...
                                                                   Q.Z_SURFACE );
     else
-      T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, workfolder );
+      T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
     end
   end
   %
@@ -468,7 +480,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
           if strcmp(upper(Q.ABS_LINES_FORMAT),'ARTS') & ~ischar(Q.ABS_LINES)
             filename = fullfile( workfolder, 'abs_lines.xml' );
             T{end+1} = file_or_data( 'abs_lines', 'ArrayOfLineRecord', ...
-                                                      Q.ABS_LINES, workfolder );
+                            Q.ABS_LINES, workfolder, Q.INPUT_FILE_FORMAT );
           else
             if ~ischar( Q.ABS_LINES )                                       %&%
               error( ...                                                    %&%
@@ -494,18 +506,20 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
       if qarts_isset( Q.ABS_P )
-        T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, workfolder, 1 );
+        T{end+1} = file_or_data( 'abs_p', 'Vector', Q.ABS_P, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end
       if qarts_isset( Q.ABS_T )
-        T{end+1} = file_or_data( 'abs_t', 'Vector', Q.ABS_T, workfolder );
+        T{end+1} = file_or_data( 'abs_t', 'Vector', Q.ABS_T, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end
       if qarts_isset( Q.ABS_T_PERT )
       T{end+1} = file_or_data( 'abs_t_pert', 'Vector', Q.ABS_T_PERT, ...
-                                                                   workfolder );
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end
       if qarts_isset( Q.ABS_VMRS )
         T{end+1} = file_or_data( 'abs_vmrs', 'Matrix', Q.ABS_VMRS, ...
-                                                                  workfolder );
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end
       if qarts_isset( Q.ABS_NLS )
         rqre_datatype( Q.ABS_NLS, {@isempty,@iscellstr}, 'Q.ABS_NLS' );     %&%
@@ -518,7 +532,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       end
       if qarts_isset( Q.ABS_NLS_PERT )
         T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
-                                                                  workfolder );
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       end
       %
       T{end+1} = 'abs_lookupCreate'; 
@@ -530,7 +544,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     elseif strcmp( Q.ABSORPTION, 'LoadTable' )
       %
       T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
-                                                                  workfolder );
+                                         workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
       T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
                                        { 'abs_scalar_gasExtractFromLookup' } );
@@ -596,11 +610,11 @@ function T = cfile_RteSet( Q, partname, workfolder )
   end
   if qarts_isset( Q.SENSOR_POS )
     T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS,...
-                                                                  workfolder );
+                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
   if qarts_isset( Q.SENSOR_LOS )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
-                                                                  workfolder );
+                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
   if qarts_isset( Q.IY_CLEARSKY_AGENDA )
     T = add_agenda( T, 'iy_clearsky_agenda', Q.IY_CLEARSKY_AGENDA );
@@ -684,51 +698,51 @@ function T = cfile_Sensor( Q, partname, workfolder )
   if isstruct( Q.SENSOR_RESPONSE )
     do_parts = 1;
   elseif ischar(Q.SENSOR_RESPONSE)  |  issparse(Q.SENSOR_RESPONSE)
-    T{1} = file_or_data( 'sensor_response', 'Sparse', ...
-                                           Q.SENSOR_RESPONSE, workfolder );
+    T{1} = file_or_data( 'sensor_response', 'Sparse', Q.SENSOR_RESPONSE, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
     if qarts_isset( Q.ANTENNA_DIM )
-      T{end+1} = file_or_data( 'antenna_dim', 'Index', ...
-                                               Q.ANTENNA_DIM, workfolder );
+      T{end+1} = file_or_data( 'antenna_dim', 'Index', Q.ANTENNA_DIM, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.MBLOCK_ZA_GRID )
-      T{end+1} = file_or_data( 'mblock_za_grid', 'Vector', ...
-                                             Q.MBLOCK_ZA_GRID, workfolder);
+      T{end+1} = file_or_data( 'mblock_za_grid', 'Vector', Q.MBLOCK_ZA_GRID,...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.MBLOCK_AA_GRID )
-      T{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
-                                                  Q.MBLOCK_AA_GRID, workfolder);
+      T{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', Q.MBLOCK_AA_GRID,...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_F )
       T{end+1} = file_or_data( 'sensor_response_f', 'Vector', ...
-                                           Q.SENSOR_RESPONSE_F, workfolder, 1 );
+                    Q.SENSOR_RESPONSE_F, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_ZA )
       T{end+1} = file_or_data( 'sensor_response_za', 'Vector', ...
-                                             Q.SENSOR_RESPONSE_ZA, workfolder );
+                   Q.SENSOR_RESPONSE_ZA, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_AA )
       T{end+1} = file_or_data( 'sensor_response_aa', 'Vector', ...
-                                             Q.SENSOR_RESPONSE_AA, workfolder );
+                   Q.SENSOR_RESPONSE_AA, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_POL )
       T{end+1} = file_or_data( 'sensor_response_pol', 'ArrayOfIndex', ...
-                                            Q.SENSOR_RESPONSE_POL, workfolder );
+                  Q.SENSOR_RESPONSE_POL, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_F_GRID )
       T{end+1} = file_or_data( 'sensor_response_f_grid', 'Vector', ...
-                                      Q.SENSOR_RESPONSE_F_GRID, workfolder, 1 );
+               Q.SENSOR_RESPONSE_F_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_ZA_GRID )
       T{end+1} = file_or_data( 'sensor_response_za_grid', 'Vector', ...
-                                     Q.SENSOR_RESPONSE_ZA_GRID, workfolder );
+              Q.SENSOR_RESPONSE_ZA_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_AA_GRID )
       T{end+1} = file_or_data( 'sensor_response_aa_grid', 'Vector', ...
-                                     Q.SENSOR_RESPONSE_AA_GRID, workfolder );
+              Q.SENSOR_RESPONSE_AA_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_POL_GRID )
       T{end+1} = file_or_data( 'sensor_response_pol_grid', 'ArrayOfIndex', ...
-                                     Q.SENSOR_RESPONSE_POL_GRID, workfolder );
+             Q.SENSOR_RESPONSE_POL_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
   elseif iscellstr( Q.SENSOR_RESPONSE ) 
     T = Q.SENSOR_RESPONSE;
@@ -790,11 +804,11 @@ function T = cfile_Sensor( Q, partname, workfolder )
         end
         if qarts_isset( Q.MBLOCK_ZA_GRID ) 
           U{end+1} = file_or_data( 'mblock_za_grid', 'Vector', ...
-                                                Q.MBLOCK_ZA_GRID, workfolder );
+                       Q.MBLOCK_ZA_GRID, workfolder, Q.INPUT_FILE_FORMAT );
         end        
         if qarts_isset( Q.MBLOCK_AA_GRID ) 
           U{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
-                                                 Q.MBLOCK_AA_GRID, workfolder);
+                       Q.MBLOCK_AA_GRID, workfolder, Q.INPUT_FILE_FORMAT );
         end
         if qarts_isset( H.SENSOR_NORM )
           rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%
@@ -818,32 +832,34 @@ function T = cfile_Sensor( Q, partname, workfolder )
       case 'antenna'
         if qarts_isset( H.ANTENNA_LOS )
           U{end+1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
-                                                                  workfolder );
+                                        workfolder, Q.INPUT_FILE_FORMAT );
         end
         if qarts_isset( H.ANTENNA_RESPONSE )
           U{end+1} = file_or_data( 'antenna_response', 'GriddedField4',...
-                                              H.ANTENNA_RESPONSE, workfolder );
+                    H.ANTENNA_RESPONSE, workfolder, Q.INPUT_FILE_FORMAT );
         end
         U{end+1} = 'sensor_responseAntenna';
         
       case 'mixer'
         if qarts_isset( H.LO ) 
-          U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, workfolder, 1 );
+          U{end+1} = file_or_data( 'lo', 'Numeric', H.LO, ...
+                                        workfolder, Q.INPUT_FILE_FORMAT );
         end
         if qarts_isset( H.SIDEBAND_RESPONSE )           
           U{end+1} = file_or_data( 'sideband_response', 'GriddedField1', ...
-                                             H.SIDEBAND_RESPONSE, workfolder );
+                   H.SIDEBAND_RESPONSE, workfolder, Q.INPUT_FILE_FORMAT );
         end   
         U{end+1} = 'sensor_responseMixer';
 
        case 'backend'
         if qarts_isset( H.F_BACKEND ) 
           U{end+1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, ...
-                                                               workfolder, 1 );
+                                        workfolder, Q.INPUT_FILE_FORMAT );
         end        
         if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
-          U{end+1} = file_or_data( 'backend_channel_response', ....
-           'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, workfolder, 1 );
+          U{end+1} = file_or_data( 'backend_channel_response', ...
+            'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ...
+                                        workfolder, Q.INPUT_FILE_FORMAT );
         end
         if ~qarts_isset( H.F_SWITCHING )
           U{end+1} = 'sensor_responseBackend';
@@ -867,20 +883,22 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                                          'with multiple LO.' );
         end
         if qarts_isset( H.LO ) 
-          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, 1 );
+          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, ...
+                                                     Q.INPUT_FILE_FORMAT );
         end
         if qarts_isset( H.SIDEBAND_RESPONSE )           
           U{end+1} = file_or_data( 'sideband_response_multi', ...
-                     'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, workfolder );
+                     'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
         end   
         if qarts_isset( H.F_BACKEND ) 
           U{end+1} = file_or_data( 'f_backend_multi', 'ArrayOfVector', ...
-                                                  H.F_BACKEND, workfolder, 1 );
+                            H.F_BACKEND, workfolder, Q.INPUT_FILE_FORMAT );
         end        
         if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
           U{end+1} = file_or_data( 'backend_channel_response_multi', ....
                  'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ... 
-                                                                  workfolder );
+                                         workfolder, Q.INPUT_FILE_FORMAT );
         end
         U{end+1} = 'sensor_responseMultiMixerBackend';
         
@@ -974,15 +992,15 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         name1    = sprintf( 'gas%d_jac_p_grid', i );
         T{end+1} = create_var( name1, 'Vector' );
         T{end+1} = file_or_data( name1, 'Vector', Q.ABS_SPECIES(i).GRIDS{1},...
-                                                        workfolder, 0, name1 );
+                                  workfolder, Q.INPUT_FILE_FORMAT, name1 );
         name2 = sprintf( 'gas%d_jac_lat_grid', i );
         T{end+1} = create_var( name2, 'Vector' );
         T{end+1} = file_or_data( name2, 'Vector', Q.ABS_SPECIES(i).GRIDS{2},...
-                                                        workfolder, 0, name2 );
+                                  workfolder, Q.INPUT_FILE_FORMAT, name2 );
         name3 = sprintf( 'gas%d_jac_lon_grid', i );
         T{end+1} = create_var( name3, 'Vector' );
         T{end+1} = file_or_data( name3, 'Vector', Q.ABS_SPECIES(i).GRIDS{3},...
-                                                        workfolder, 0, name3 );
+                                  workfolder, Q.INPUT_FILE_FORMAT, name3 );
 
         T{end+1} ='jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,';
         T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
@@ -1148,13 +1166,15 @@ function T = cfile_CldBox( Q, partname, workfolder )
         sfile = Q.CLOUDBOX.SCAT_DATA{i};
       else
         sfile = fullfile( workfolder, sprintf( 'scat_data_raw_%d.xml', i ) );
-        xmlStore( sfile, Q.CLOUDBOX.SCAT_DATA{i}, 'SingleScatteringData' );
+        xmlStore( sfile, Q.CLOUDBOX.SCAT_DATA{i}, 'SingleScatteringData',...
+                                                       Q.INPUT_FILE_FORMAT );
       end
       if isstr( Q.CLOUDBOX.PND_FIELD{i} )
         pfile = Q.CLOUDBOX.PND_FIELD{i};
       else
         pfile = fullfile( workfolder, sprintf( 'pnd_field_raw_%d.xml', i ) ); 
-        xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3' );
+        xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3', ...
+                                                       Q.INPUT_FILE_FORMAT );
       end
       %
       if length(pfile)
@@ -1251,7 +1271,8 @@ function T = cfile_SctMth( Q, partname, workfolder )
     
     if isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )      
       optfile = fullfile( workfolder, 'scat_za_grid.xml' ); 
-      xmlStore( filename, Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, 'Vector');
+      xmlStore( filename, Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, ...
+                                           'Vector', Q.INPUT_FILE_FORMAT );
     else     
       optfile = Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE;
     end
@@ -1387,7 +1408,7 @@ function T = cfile_BatchC( Q, partname, workfolder )
     batchname = sprintf( '%s_%d', lower(batchtype), vn );
     
     T{end+1} = file_or_data( batchname, batchtype, Q.BATCH.DATA(i).X, ...
-                              workfolder, 0, sprintf('%s_batch.xml',mainname) );
+         workfolder, Q.INPUT_FILE_FORMAT, sprintf('%s_batch.xml',mainname) );
     A{end+1} = sprintf( '%sExtractFrom%s(%s,%s,ybatch_index)', ...
                         Q.BATCH.DATA(i).TYPE, ...
                         batchtype, ...
@@ -1422,7 +1443,7 @@ function s = create_var(artsvar,datatype)
 return
 
 
-function s = file_or_data(artsvar,datatype,qvalue,workfolder,dprecision,...
+function s = file_or_data(artsvar,datatype,qvalue,workfolder,dformat,...
                                                                   nonDefFileId)
   if strcmp( datatype, 'Index' )                                           %&%
     rqre_datatype( qvalue, {@ischar,@iswhole}, ...                         %&%
@@ -1455,11 +1476,7 @@ function s = file_or_data(artsvar,datatype,qvalue,workfolder,dprecision,...
     else
       filename = fullfile( workfolder, [artsvar,'.xml'] );
     end
-    if nargin > 4  &  dprecision
-      xmlStore( filename, qvalue, datatype, 'DOUBLE' );
-    else
-      xmlStore( filename, qvalue, datatype, 'FLOAT' );
-    end
+    xmlStore( filename, qvalue, datatype, dformat );
     s = add_readfile( artsvar, filename );
   end
 return

@@ -1,3 +1,15 @@
+2010-05-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-72
+
+	* The default for Qarts is now to create binary files for arts.
+	
+	* arts/qarts.m: Added Q.INPUT_FILE_FORMAT. 
+
+	* arts/qarts2cfile.m: Now using Q.INPUT_FILE_FORMAT. 
+
+	* demos/qarts_demo.m: Updated to recent arts changes.
+
 2010-05-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-71
