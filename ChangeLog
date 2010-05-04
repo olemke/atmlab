@@ -1,3 +1,23 @@
+2010-05-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-71
+
+	* arts/xml/xmlWrite*.m, arts/xml/xmlStore.m, arts/xml/xmlStoreImpl.m,
+	arts/xml/xmlLoad.m:
+
+	Add full support for writing ARTS XML binary files.
+
+	The xmlStore precision argument now takes one of three values:
+
+	FLOAT, DOUBLE and BINARY.
+
+	* arts/xml/xmlOpenOutputFile.m:
+
+	Open ASCII XML file with 't' option. Important for compatibility on
+	Windows.
+
+	* arts/xml/xmlOpenBinaryOutputFile.m: Added.
+
 2010-04-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-70

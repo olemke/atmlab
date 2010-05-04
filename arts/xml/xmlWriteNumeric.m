@@ -16,7 +16,11 @@ function xmlWriteNumeric(fid, fidb, data, precision)
 
 xmlWriteTag (fid, 'Numeric', []);
 
-fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'double');
+else
+    fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+end
 
 xmlWriteCloseTag (fid, 'Numeric');
 

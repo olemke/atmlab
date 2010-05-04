@@ -16,7 +16,8 @@
 % IN    type       Data type
 % IN    precision  Precision for output of floating point numbers, could be
 %                  either 'FLOAT' or 'DOUBLE' or 'BINARY' (Default:'FLOAT')
-%                  Binary files always have double precision
+%                  Binary files always have double precision and 4-byte
+%                  integer with little-endian byte-order
 
 % 2002-12-16  Created by Oliver Lemke.
 

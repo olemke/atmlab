@@ -11,7 +11,7 @@
 
 function fid = xmlOpenOutputFile(filename)
 
-fid = fopen (filename,'w+');
+fid = fopen (filename,'w+t');
 
 if fid == -1
   error (sprintf ('Cannot open file %s', filename));

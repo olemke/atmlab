@@ -32,14 +32,18 @@ xmlWriteTag (fid, 'Matrix', attrlist);
 data = reshape (data, [nr nc]);
 data = data';
 
-format=xmlGetPrecisionFormatString (precision);
-form=format;
-for i = 1:(nc-1)
-  form = sprintf ('%s %s', form, format);
-end
-form = strcat (form, '\n');
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'double');
+else
+    format=xmlGetPrecisionFormatString (precision);
+    form=format;
+    for i = 1:(nc-1)
+      form = sprintf ('%s %s', form, format);
+    end
+    form = strcat (form, '\n');
 
-fprintf (fid, form, data);
+    fprintf (fid, form, data);
+end
 
 xmlWriteCloseTag (fid, 'Matrix');
 

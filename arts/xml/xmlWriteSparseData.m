@@ -26,7 +26,11 @@ nelem = length (data);
 xmlWriteTag (fid, 'SparseData', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
-fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'double');
+else
+    fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+end
 
 xmlWriteCloseTag (fid, 'SparseData');
 

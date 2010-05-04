@@ -31,7 +31,11 @@ attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 
 xmlWriteTag (fid, 'Vector', attrlist);
 
-fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'double');
+else
+    fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+end
 
 xmlWriteCloseTag (fid, 'Vector');
 

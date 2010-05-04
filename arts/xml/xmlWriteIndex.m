@@ -16,7 +16,11 @@ function xmlWriteIndex(fid, fidb, data, precision)
 
 xmlWriteTag (fid, 'Index', []);
 
-fprintf (fid, '%d\n', data);
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'integer*4');
+else
+    fprintf (fid, '%d\n', data);
+end
 
 xmlWriteCloseTag (fid, 'Index');
 

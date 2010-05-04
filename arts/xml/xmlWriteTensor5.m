@@ -40,14 +40,17 @@ xmlWriteTag (fid, 'Tensor5', attrlist);
 
 data = permute (data, [5 4 3 2 1]);
 
-format=xmlGetPrecisionFormatString (precision);
-form=format;
-for i = 1:(nc-1)
-  form = sprintf ('%s %s', form, format);
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'double');
+else
+    format=xmlGetPrecisionFormatString (precision);
+    form=format;
+    for i = 1:(nc-1)
+        form = sprintf ('%s %s', form, format);
+    end
+    form = strcat (form, '\n');
+    fprintf (fid, form, data);
 end
-form = strcat (form, '\n');
-
-fprintf (fid, form, data);
 
 xmlWriteCloseTag (fid, 'Tensor5');
 

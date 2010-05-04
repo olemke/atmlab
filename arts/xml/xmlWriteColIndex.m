@@ -26,7 +26,11 @@ nelem = length (data);
 xmlWriteTag (fid, 'ColIndex', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
-fprintf (fid, '%d\n', data);
+if (strcmp(precision, 'BINARY'))
+    fwrite (fidb, data, 'integer*4');
+else
+    fprintf (fid, '%d\n', data);
+end
 
 xmlWriteCloseTag (fid, 'ColIndex');
 

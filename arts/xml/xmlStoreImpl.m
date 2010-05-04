@@ -29,14 +29,25 @@ if nargin < 5
   precision = 'FLOAT';
 end
 
+precision = upper(precision);
+
+if (~strcmp(precision, 'FLOAT')) ...
+        && (~strcmp(precision, 'DOUBLE')) ...
+        && (~strcmp(precision, 'BINARY'))
+    error ('Invalid value for precision. Must be either FLOAT, DOUBLE or BINARY');
+end
+
+fidb = -1;
+if (strcmp(precision, 'BINARY'))
+    fidb = xmlOpenBinaryOutputFile (filename);
+end
+
 fid = xmlOpenOutputFile (filename);
-xmlWriteHeader (fid);
+xmlWriteHeader (fid, fidb);
 
 if length (comment) > 0
   xmlWritecomment (fid, comment);
 end
-
-fidb = -1;
 
 if length (type) > 14 & type (1:14) == 'ArrayOfArrayOf'
   xmlWriteArrayOfArrayOf (fid, fidb, data, type(15:length(type)), precision);
@@ -50,5 +61,5 @@ end
 xmlWriteFooter (fid);
 fclose (fid);
 
-clear fid func;
+if (fidb ~= -1), fclose(fidb); end
 

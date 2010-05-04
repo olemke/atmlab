@@ -27,7 +27,7 @@ if strcmp( filename(length(filename)-2:end), '.gz')
   filename = uncompressed_filename;
 end
 
-fid = fopen (filename,'r');
+fid = fopen (filename,'rt');
 
 if fid == -1
   if ~strcmp (uncompressed_filename, '')
