@@ -868,7 +868,8 @@ function T = cfile_Sensor( Q, partname, workfolder )
           if ~( isnumeric(df) & isvector(df) & length(df)==2 )              %&%
           error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );%&%
           end                                                               %&%
-          U{end+1} = 'sensor_responseBackendFrequencySwitch(sensor_response,'; 
+          U{end+1} = 'sensor_responseBackendFrequencySwitching(';
+          U{end+1} = '   sensor_response,'; 
           U{end+1} = '   sensor_response_f,sensor_response_pol,';
           U{end+1} = '   sensor_response_za,sensor_response_aa,';
           U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';

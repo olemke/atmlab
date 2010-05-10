@@ -2,8 +2,8 @@
 %
 %    This function together with *arts_oem* handle bookkeeping and
 %    communication to perform OEM inversion with ARTS. Not all possible
-%    retrieval set-ups are handled. It should be possible to apply this
-%    function for most cases, while *arts_oem* is less general (where 
+%    retrieval set-ups are handled. However, it should be possible to apply
+%    this function for most cases, while *arts_oem* is less general (where
 %    handling of "non-standard" sensor retrievals are most problematic).
 %
 %    The standard sequence of function calls is:
@@ -46,18 +46,20 @@
 %       sensor_los:
 %       ...
 %
-% FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O)
+% FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O[,workfolder])
 %        
-% Out   Q    Modified Q structure
-%       O    Modified O structure
-%       R    Structure with retrieval variables. See *arts_oem*.
-%       xa   A priori state vector
-% In    O    OEM settings.
-%       Q    Qarts settings.
+% Out   Q            Modified Q structure
+%       O            Modified O structure
+%       R            Structure with retrieval variables. See *arts_oem*.
+%       xa           A priori state vector
+% In    O            OEM settings.
+%       Q            Qarts settings.
+% Opt   workfolder   Use this as "workfolder" (see above). If not given, a
+%                    folder is created (in WORK_AREA). 
 
 % 2010-01-11   Created by Patrick Eriksson.
 
-function [Q,O,R,xa] = arts_oem_init(Q,O)
+function [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
 
 
 %--- Start part --------------------------------------------------------------
@@ -70,10 +72,17 @@ if ~qarts_isset( Q.J_DO) | ~Q.J_DO                                         %&%
 end                                                                        %&%
 
 
-%- Create work folder
+R = [];
+
+
+%- Workfolder
 %
-R            = [];
-R.workfolder = create_tmpfolder;
+if nargin == 3
+  rqre_datatype( workfolder, @ischar );                                    %&%
+  R.workfolder = workfolder;
+else
+  R.workfolder = create_tmpfolder;
+end
 
 
 %- Initialization of variables

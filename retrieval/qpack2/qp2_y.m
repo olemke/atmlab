@@ -1,11 +1,12 @@
 % QP2_Y   Defines recognised fields for qpack2 measurement data
 %
+%    This function is organised in such way that *qcheck* and *qinfo*
+%    can be used. To list all existing fields:
+%       qinfo( @qp2_y );
+%
 %    Allowed formats differ between the fields. For information about a 
 %    specific field, type e.g.:
 %       qinfo( @qp2_y, 'Y' );
-%
-%    This function is organised in such way that *qcheck* and *qinfo*
-%    can be used.
 %
 % FORMAT   [Q,I] = qp2_y
 %        
@@ -34,7 +35,7 @@ I.F = [ ...
 %-----------------------------------------------------------------------------
 Q.HOUR = {};
 I.HOUR = [ ...
-'Optional data. Allows a more detailed specification of measurement time.',...
+'Optional data. Allows a more detailed specification of measurement time. ',...
 'Otherwise as field DAY.'
 ];
 %-----------------------------------------------------------------------------
@@ -62,7 +63,7 @@ I.LONGITUDE = [ ...
 %-----------------------------------------------------------------------------
 Q.MINUTE = {};
 I.MINUTE = [ ...
-'Optional data. Allows a more detailed specification of measurement time.',...
+'Optional data. Allows a more detailed specification of measurement time. ',...
 'Otherwise as field DAY.'
 ];
 %-----------------------------------------------------------------------------
@@ -75,7 +76,7 @@ I.MONTH = [ ...
 %-----------------------------------------------------------------------------
 Q.SECOND = {};
 I.SECOND = [ ...
-'Optional data. Allows a more detailed specification of measurement time.',...
+'Optional data. Allows a more detailed specification of measurement time. ',...
 'Otherwise as field DAY.'
 ];
 %-----------------------------------------------------------------------------

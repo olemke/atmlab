@@ -2,36 +2,26 @@
 %
 %    Read qpack2.pdf for an introduction to Qpack2.
 %
-%    The function can be used in two main ways:
-%------------------------------------------------------------------------------
-%
-%    1: The function defines all Qpack2 fields. Most fields are initiated 
-%    to {}, that indicates that no value has been specified. Allowed
-%    formats differ between the fields. For information about a specific 
-%    field, type e.g.:
-%       qinfo( @qpack2, 'BEAM_SWITCHING' );
-%    That is, the function is organised in such way that *qinfo*
-%    can be applied.
-%
-% FORMAT   [Q,I] = qpack2
-%        
-% OUT   Q  Setting structure with default values for all recognised fields.
-%       I  Includes same fields as Q, where the content of each field
-%          is a description string (used by *qinfo*).
-%------------------------------------------------------------------------------
-%
-%    2. To make OEM type inversions. The measurement data are inverted by 
-%    combining the function oem.m and the qarts interface to arts-2. 
-%
-%    The data fields of the output structure P depends on selected retrieval
-%    quantities. In addition, the fields to be included in P can to some
-%    extent be controlled by the user. Options and avaliable output fields are
-%    described in qpack2.pdf.
+%    The main task to make OEM type inversions. The measurement data in *Y* are
+%    inverted by combining the function oem.m and Qarts (interface to arts-2).
+%    Forward model and retrieval variables are packed into the Qarts structure
+%    Q. OEM specific parameters are found in O.
 %
 %    The measurements to be inverted (Y) must all correspond to the same sensor
 %    characteristics. The sensor response is calculated before the first
 %    inversion is started and it is assumed that the reponse matrix obtained is
 %    valid for all cases.
+%
+%    The data fields of the output structure L2 depends on selected retrieval
+%    quantities and settings in Q.
+%
+% FORMAT   L2 = qpack2(Q,O,Y)
+%
+% IN    Q        Qarts setting structure. See *qarts*.
+%       O        OEM settings. See *oem*.
+%       Y        Measurement data. See *qp2_y*.
+% OUT   L2       Retrieved data. See *qp2_l2*.
+%
 %
 %    The measurement matching the apriori conditions can be calculated through
 %    this function. This can be useful for test retrievals, or comparison with
@@ -40,14 +30,11 @@
 %    field shall be set to [], and not to {} that inside qpack2 and qarts
 %    identifies an undefined field.
 %
-% FORMAT   L2 = qpack2(Q,Y)
+%    The calculated spctre are inserted into Y, and the format is:
 %
-% IN    Q        Qpack2 setting structure
-%       Y        Measurement data.
-% OUT   L2       Retrieved data. Or possibly Y with simulated measurements 
-%                attached, see further above.
+% FORMAT   Y = qpack2(Q,O,Y)
 
-% 2009-08-14   Created by Patrick Eriksson.
+% 2010-05-10   Created by Patrick Eriksson.
 
 
 function L2 = qpack2(Q,O,Y)
@@ -64,7 +51,6 @@ rqre_datatype( Y, @isstruct );                                              %&%
 qcheck( @qarts, Q );                                                        %&%
 qcheck( @oem, O );                                                          %&%
 qcheck( @qp2_y, Y );                                                        %&%
-% Basic checks of Y                                                         %&%
 %                                                                           %&%
 empty_y = checkY( Y );
 
@@ -76,24 +62,18 @@ empty_y = checkY( Y );
 
 L2 = [];
   
-if empty_y
-  workfolder = create_tmpfolder;
-end
+workfolder = create_tmpfolder;
 
 ny = length(Y);
 
 for m = 1 : ny
-  
-  %- Set up data for next measurement
-  %
-
   
   %- Simulate a (noise free) measurement if y is empty
   if empty_y
     %
     Qm = qp2_y2Q( Q, Y, m );
     %
-    if isempty( L2 )
+    if m == 1
       L2    = Y(m);
     else
       L2(m) = Y(m);
@@ -116,7 +96,7 @@ for m = 1 : ny
     end
     %
     [Qm,Se]     = qp2_y2Q( Q, Y, m );
-    [Qm,O,R,xa] = arts_oem_init( Qm, O );
+    [Qm,O,R,xa] = arts_oem_init( Qm, O, workfolder );
     
     %- Sx
     if m == 1
@@ -139,29 +119,29 @@ for m = 1 : ny
     
     %- Fill return structure
     %
-    if isempty( L2 )
+    if m == 1
       L2    = qp2_l2( Qm, R, xa, O, X, Y, m );
     else
       L2(m) = qp2_l2( Qm, R, xa, O, X, Y, m );
     end
   
-    %- Remove workfolder
-    %
-    arts_oem( 'clean', R );
-    clear Qm R  % Just to be safe
-    
-  end
-end
+  end % empty_y
+end % for m
 
 
-%- Remove work folder
+%- Clean-up
 %
 if empty_y
   delete_tmpfolder( workfolder );
+else
+  arts_oem( 'clean', R );
 end
-
 return
 %------------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+
+
 
 % Checks if all Y.Y have the same length
 %
@@ -194,6 +174,7 @@ return
 
 
 
+
 function  [Q,Se] = qp2_y2Q( Q, Y, m );
 
   % If output does not include Se, it assumed that no retrieval will 
@@ -205,7 +186,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     % 1. Make sure that some fields are set as demanded                     %&%
     % 2. "Load" data into Q to avoid repated reading of files               %&%
     if ~qarts_isset(Q.ATMOSPHERE_DIM)                                       %&%
-      error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' );        %&%
+      error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set.' );             %&%
     end                                                                     %&%
     Q.ATMOSPHERE_DIM = qarts_get( Q.ATMOSPHERE_DIM ); 
     rqre_datatype( Q.ATMOSPHERE_DIM, @istensor0, Q.ATMOSPHERE_DIM );        %&% 
@@ -219,16 +200,10 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    %&%
       error( 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;%&%
     end                                                                     %&%
-    Q.ABS_SPECIES = qarts_get_gformat( Q.ABS_SPECIES ); 
-    for i = 1 : length(Q.ABS_SPECIES)                                       %&%
-      rqre_datatype( Q.ABS_SPECIES(i).ATMDATA, @isatmdata, ...              %&%
-                                  sprintf('Q.ABS_SPECIES(%d).ATMDATA',i) ); %&%
-    end                                                                     %&%
     if ~qarts_isset(Q.T_ATMDATA)                                            %&%
       error( 'Qpack2 requires that Q.T_ATMDATA is set.' );                  %&%
     end                                                                     %&%
-    Q.T_ATMDATA = qarts_get_gformat( Q.T_ATMDATA ); 
-    rqre_datatype( Q.T_ATMDATA, @isatmdata, Q.T_ATMDATA );                  %&%
+    % The details of the ATMDATA fields are checked in qarts_vmr_field etc  %&%
     if ~qarts_isset(Q.ABSORPTION)                                           %&%
       error( 'Qpack2 requires that Q.ABSORPTION is set.' );                 %&%
     end                                                                     %&%
@@ -296,7 +271,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     se = 0;
   end
   %
-  mjd = date2mjd( Y(m).YEAR, Y(m).MONTH, Y(m).DAY, ho, mi, se );;
+  mjd = date2mjd( Y(m).YEAR, Y(m).MONTH, Y(m).DAY, ho, mi, se );
   %
   Q.VMR_FIELD = qarts_vmr_field( Q, mjd, ho );
   Q.T_FIELD   = qarts_t_or_z_field( Q, 't', mjd, ho );

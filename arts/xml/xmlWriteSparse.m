@@ -27,8 +27,8 @@ xmlWriteTag (fid, 'Sparse', attrlist);
 
 [r,c] = find (data);
 
-xmlWriteRowIndex (fid, fidb, r - 1);
-xmlWriteColIndex (fid, fidb, c - 1);
+xmlWriteRowIndex (fid, fidb, r - 1, precision);
+xmlWriteColIndex (fid, fidb, c - 1, precision);
 xmlWriteSparseData (fid, fidb, nonzeros(data), precision);
 
 xmlWriteCloseTag (fid, 'Sparse');

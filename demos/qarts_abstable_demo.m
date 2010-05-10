@@ -62,8 +62,9 @@ Q.Z_SURFACE              = 500;
 
 %= Absorption settings
 %
-%
-Q.F_GRID                 = [19.35 22.235 37.0 85.5]'*1e9;
+% For 22 GHz channel, the centre of the H2O transition is avoided by taking
+% a frequency half way to band edge.
+Q.F_GRID                 = [19.35 22.235-0.06 37.0 85.5]'*1e9;
 Q.STOKES_DIM             = 1;
 %
 Q.ABS_LINES_FORMAT       = 'None';

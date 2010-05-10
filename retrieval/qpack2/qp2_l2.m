@@ -1,10 +1,10 @@
 % QP2_L2    Standardised L2 output for Qpack2
 %
 %    The function allows that a L2 structure is generated where the set of
-%    fields can be controled through Q. The fields of L2 are determined by the
+%    fields can be controlled through Q. The fields of L2 are determined by the
 %    settings of the L2 field of the retrieval quantities and Q.L2_EXTRA.
 %    Possible choices for L2_EXTRA are:
-%    ----------: These data are transfered from X, the output of *oem*
+%    ----------: These data are transferred from X, the output of *oem*
 %         'dx' : Last value of X.dx. See qinfo(@oem,'dx')
 %       'cost' : Last value of X.cost. See qinfo(@oem,'dx')
 %          'e' : See qinfo(@oem,'e')
@@ -69,14 +69,14 @@ if nargin == 1
   %
   for i = 1 : length( Q.L2_EXTRA )
     switch Q.L2_EXTRA{i} 
-     case {'dx','cost','e','eo','es','yf','A','G','J','S','So','Ss'}
-      L2.(Q.L2_EXTRA{i})= true;
-     case 'mresp'
-      L2.A = true;
-     case {'date','xa','y','bl','tnoise','ptz'}
-      %
-     otherwise
-      error( sprintf('Unknow out variable: %s', Q.L2_EXTRA{i} ) );
+      case {'dx','cost','e','eo','es','yf','A','G','J','S','So','Ss'}
+        L2.(Q.L2_EXTRA{i})= true;
+      case 'mresp'
+        L2.A = true;
+      case {'date','xa','y','bl','tnoise','ptz'}
+        %
+      otherwise
+        error( sprintf('Unknow out variable: %s', Q.L2_EXTRA{i} ) );
     end        
   end
   %

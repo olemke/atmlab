@@ -1,3 +1,19 @@
+2010-05-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-73
+
+	* retrivel/qpack2/*: Polishing and minor changes. Rempved local
+	ChangeLog.
+	
+	* demos/qpack2_demo.m: New file. Just a start. Not ready. 
+
+	* arts/xml/xmlWriteSparse.m (xmlWriteSparse): Added precision to
+	calls of xmlWriteRowIndex and xmlWriteColIndex.
+
+	* arts/arts_oem_init.m: A predefined workfolder can now be used.
+
+	* retrieval/qpack1b: Removed this first try for qpack2.
+
 2010-05-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-72

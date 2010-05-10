@@ -18,20 +18,21 @@
 
 % 2009-07-01   Created by Patrick Eriksson.
 
-function [Q,O] = q_onsala_h2o(varargin)
+function [Q,O,specdesc] = qpack2_demo(varargin)
 %
 width = optargs( varargin, { '20MHz' } );
 
+error( 'Not yet active' );
 
 %- Atmlab settings
 %
 arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
 arts_includes     = atmlab( 'ARTS_INCLUDES' );
 if isnan( arts_xmldata_path )                                               %&%
-  error( 'You need to set ARTS_XMLDATA_PATH to run this example.' );        %&%
+  error( 'You need to set ARTS_XMLDATA_PATH to run this file.' );           %&%
 end                                                                         %&%
 if isnan( arts_includes )                                                   %&%
-  error( 'You need to ARTS_INCLUDES to run this example.' );                %&%
+  error( 'You need to ARTS_INCLUDES to run this file.' );                   %&%
 end                                                                         %&%
 
 
@@ -58,7 +59,7 @@ Q.J_DO                = true;
 
 %- Radiative transfer
 %
-Q.Y_UNIT               = 'RJBT'; 
+Q.Y_UNIT              = 'RJBT'; 
 Q.WSMS_BEFORE_RTE     = { 'atm_checkedCalc' };
 Q.YCALC_WSMS          = { 'yCalc' };
 %
@@ -84,7 +85,7 @@ Q.Z_SURFACE          = 10e3;
 
 %- Absorption
 %
-Q.ABS_LINES           = fullfile( data, 'h20_22ghz.xml' );
+Q.ABS_LINES           = fullfile( data, 'linedata_22ghz.xml' );
 Q.ABS_LINES_FORMAT    = 'Arts';
 %
 Q.ABSORPTION          = 'CalcTable';
@@ -139,8 +140,8 @@ Q.L2_EXTRA = { 'cost', 'dx', 'xa', 'y', 'yf', 'bl', 'ptz', 'mresp', ...
 
 %- Temperature
 %
-Q.T_ATMDATA           = gf_artsxml( fullfile( arts_xmldata_path, ...
-         'climatology', 'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
+Q.T_ATMDATA = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
+                        'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
 
 
 %- Species
