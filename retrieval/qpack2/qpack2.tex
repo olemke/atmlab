@@ -6,6 +6,7 @@
 
 
 \usepackage{verbatim}
+\usepackage{url}
 
 %- Page layout
 %
@@ -13,7 +14,7 @@
 \usepackage[top=30mm,left=30mm,right=30mm,bottom=30mm,nohead]{geometry}
 
 
-\title{Qpack2}
+\title{Qpack2 -- a Matlab environment for atmospheric retrievals}
 \author{Patrick Eriksson\\(\texttt{patrick.eriksson@chalmers.se})}
 \date{\today}
 
@@ -30,14 +31,17 @@
 \section{Scope}
 \label{sec:scope}
 %---
-Qpack2 is a set of Matlab functions for performing inversions
-inside the framework of ``optimal estimation''. Only cases where the
-aim is to retrieve vertical profiles of atmospheric quantities (1D
-cases) are handled. The package is also developed for ground-based
-observations and inversion of individual satellite spectra/scans. This
-means that inversion of satellite scanning sequences where atmospheric
-fields to be retrieved have a latitude or longitude extension (2D or
-3D) can not be treated by Qpack2.
+Qpack2 is a Matlab environment for performing inversions of atmospheric
+observations inside the framework of ``optimal estimation''. So far, only
+cases where the aim is to retrieve vertical profiles of atmospheric
+quantities (1D cases) are handled. Accordingly, the present main
+application areas of Qpack2 are ground-based observations and inversion of
+individual satellite spectra/scans. Inversion of satellite scanning
+sequences where atmospheric fields to be retrieved have a latitude or
+longitude extension (2D or 3D) could be considered as part of future
+developement\footnote{The core parts (ARTS-2 and Qarts) give handle already
+  2D and 3D, and the main step is to find flexible extensions for
+  describing the measurement data and the retrieval set-up.}.
 
 The package should be general and flexible for covered
 measurements. For example, there is basically no limitations regarding
@@ -47,45 +51,51 @@ calculation speed is required. Some important aspects here are that
 batch calculations are allowed and atmospheric a priori profiles can
 automatically be extracted from climatology data.
 
-All features of ARTS-2 (see below) can not be accessed with
-Qpack2. Important variables are hard-coded or set in an automatic way
-(such as \verb|p_grid|). The idea is instead to provide a retrieval
-software that is of a broad scope, but is still relatively easy to
-use.
 
 
 \section{Background}
 \label{sec:background}
 %---
-Qpack2 is part of the more general Atmlab package of Matlab functions.
-The computational engine of Qpack2 is ARTS-2. The communication with
-ARTS-2 is made through the qarts part of Atmlab. OEM inversions are
-performed by the function \verb|oem.m| (part of Atmlab).
+Qpack2 is part of the more general Atmlab package of Matlab functions. The
+communication with ARTS-2 is made through the Qarts system and OEM
+inversions are performed by the function \verb|oem.m|. The computational
+engine, i.e.\ the forward model, of Qpack2 is ARTS-2.
 
 This can be seen as a direct successor of Qpack, despite all code is
-written from scratch. However, for both Qpack versions the
-computations are controlled by a set of settings fields packed into a
-structure denoted as Q. Qpack was built around ARTS-1, this new Qpack
-version is mainly a consequence of that ARTS-2 is the maintained
-version. This gave also an opportunity to make a more stringent
+written from scratch. However, for both Qpack versions the computations are
+controlled by a set of settings fields packed into a structure denoted as Q
+(though Qpack2 has also a structure O). Qpack was built around ARTS-1, this
+new Qpack version is mainly a consequence of that ARTS-2 is the maintained
+version of ARTS. This gave also an opportunity to make a more stringent
 implementation and to add some features. This should hopefully make it
 easier to add extensions to Qpack2. Data formats are now more clearly
-defined and the ambition level around documentation is higher (but
-still relatively modest). A main improvement compared to Qpack2 is
-that extraction of a priori data from climatology data is now an
-integrated part. On the other hand, the feature of classifying errors
-into different categories (0-3 in Qpack) and the associated plotting
-features are removed as it was hardly used.
+defined and the ambition level around documentation is higher (but still
+relatively modest). A main improvement compared to Qpack2 is that
+extraction of a priori data from climatology data is now an integrated
+part. On the other hand, the feature of classifying errors into different
+categories (0-3 in Qpack) and the associated plotting features are removed
+as it was hardly used.
 
-Quality checks are not handled by Qpack2. For example, there is no
-default check that the frequencies of the measurements are as
-expected. This for efficiency reasons and the fact that such checks
-are hard to make in a totally general manner. Some checks can be
-performed by accompanying functions, such as \verb|qp2_check_f|.
+Quality checks are not handled by Qpack2. For example, there is no default
+check that the frequencies of the measurements are as expected. This for
+efficiency reasons and the fact that such checks are hard to make in a
+totally general manner. Checks are left for accompanying dedicated
+functions, such as \verb|qp2_check_f|.
 
-A field of the structures used inside Qpack2 is flagged as undefined
-by setting it to \verb|{}|, and e.g.\ \verb|[]| be taken as an active
-selection.
+%A field of the structures used inside Qpack2 is flagged as undefined
+%by setting it to \verb|{}|, and e.g.\ \verb|[]| be taken as an active
+%selection.
+
+
+\section{Download and installation}
+\label{sec:download}
+%---
+The simplest is to obtain and update ARTS-2 and Atmlab through svn.
+Instructions for ARTS-2 is found at \url{www.sat.ltu.se/arts/getarts}. The
+installation details are here not repeated. A plain installation of ARTS-2
+suffices.
+
+Download options for Atmlab are found at \url{www.sat.ltu.se/arts/tools}.
 
 
 \section{Documentation}
@@ -102,15 +112,15 @@ Some of the used data structures are documented following the
 pattern expected of the function \verb|qinfo.m|. For example, to list
 all fields (with documentation text) of \verb|Q| (see below):
 \begin{verbatim}
->> qinfo(@qpack2)
+>> qinfo(@qarts)
 \end{verbatim}
 The documentation for a specific field is obtained as
 \begin{verbatim}
->> qinfo(@qpack2,'F_BACKEND')
+>> qinfo(@qarts,'F_BACKEND')
 \end{verbatim}
 Wildcards are allowed when naming fields:
 \begin{verbatim}
->> qinfo(@qpack2,'ABS_*')
+>> qinfo(@qarts,'ABS_*')
 \end{verbatim}
 Details around development and bug fixes are described in the
 ChangeLog file of Qpack2 (\verb|atmlab/retrieval/qpack2/ChangeLog|).
