@@ -27,9 +27,10 @@ user, a line like this will do the job
 
    export MATLABPATH=/home/patrick/Configure/Matlab:
 
-Some functionality of Atmlab requires personal settings. Most parts
-of Atmlab will work without a file with personal settings. There will
-be an error message if a needed personal setting is lacking. 
+Some functionality of Atmlab requires personal settings. Most parts of Atmlab
+will work without a file with personal settings (but not features involving
+arts, most notably qarts and qpack2). There will be an error message if a
+needed personal setting is lacking.
 
 The personal settings are handled by a function with name atmlab.
 Check out existing fields, and their present settings, by executing

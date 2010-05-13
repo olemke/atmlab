@@ -13,7 +13,7 @@
 %    valid for all cases.
 %
 %    The data fields of the output structure L2 depends on selected retrieval
-%    quantities and settings in Q.
+%    quantities and settings in Q. See further *qp2_l2*.
 %
 % FORMAT   L2 = qpack2(Q,O,Y)
 %

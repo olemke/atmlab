@@ -12,19 +12,28 @@
 
 function qp2_make_pdf(clean_files)
 
+  
 wd = pwd;
 %
 if ~strcmp( wd(end+(-5:0)), 'qpack2' )
   error( 'This function must be exucuted from the qpack2 sub-folder.' );
 end
+
+
+sw = atmlab( 'SCREEN_WIDTH' );
+     atmlab( 'SCREEN_WIDTH', 70 );
+
   
-  
-fid = fileopen( 'qpack2.txt', 'w' );
-qinfo( @qpack2, 'all', fid, 0 );
+fid = fileopen( 'qarts.txt', 'w' );
+qinfo( @qarts, 'all', fid, false );
+fileclose( fid );
+
+fid = fileopen( 'oem.txt', 'w' );
+qinfo( @oem, 'all', fid, false );
 fileclose( fid );
 
 fid = fileopen( 'qp2_y.txt', 'w' );
-qinfo( @qp2_y, 'all', fid, 0 );
+qinfo( @qp2_y, 'all', fid, false );
 fileclose( fid );
 
 
@@ -33,8 +42,11 @@ fileclose( fid );
 
 
 if nargin  &  clean_files
-  delete('qpack2.txt');
+  delete('qarts.txt');
+  delete('oem.txt');
   delete('qp2_y.txt');
   delete('qpack2.log');
   delete('qpack2.aux');
 end
+
+atmlab( 'SCREEN_WIDTH', sw );

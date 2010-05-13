@@ -143,8 +143,8 @@ function printfield( field, s, fid, lines )
   ready = 0;
   i = 1;
   %
-  out(0,sprintf('Field: %s',field),fid,lines);
-  out(0,'-',fid,lines);
+  out(0,sprintf('%s:',field),fid,lines);
+  %out(0,'-',fid,lines);
   while ~ready
     j = ind(max(find( ind <= i+ncols )))-1;
     if j <= i + 2    % Fix to handle cases when SCREEN_WIDTH is smaller than
@@ -153,7 +153,7 @@ function printfield( field, s, fid, lines )
     else
       jj = 2;
     end
-    if any( pind < j )
+    if any( pind <= j )
       j = min(pind) - 1;
       pind = tail( pind, length(pind)-1 );
     end

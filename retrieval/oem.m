@@ -556,11 +556,13 @@ end
         %- Calculate Jacobian
         [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
 
-        %- Calculate cost, if requested output
-        X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
-        nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
-                                                      X.cost_y(iter), dx );
-      
+        %- Calculate cost
+        if O.cost
+          X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
+          nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
+                                                          X.cost_y(iter), dx );
+        end
+        
         %- Some matrix products (also used in common part below)
         JtSeinv = J' * Seinv;
         SJSJ    = Sxinv + JtSeinv * J;
@@ -942,14 +944,11 @@ end
   %
   function X = calc_cost_for_X(y,yf,Seinv,xa,x,Sxinv,O,xnorm,X,iter)
     %
-    if O.cost
-      %
-      [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );
-      %
-      X.cost(iter)   = cost;
-      X.cost_y(iter) = cost_y;
-      X.cost_x(iter) = cost_x;
-    end
+    [cost,cost_y,cost_x] = calc_cost( y, yf, Seinv, xa, x, Sxinv, O, xnorm );
+    %
+    X.cost(iter)   = cost;
+    X.cost_y(iter) = cost_y;
+    X.cost_x(iter) = cost_x;
   return
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     

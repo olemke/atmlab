@@ -1,3 +1,21 @@
+2010-05-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-75
+
+	* retrieval/qpack2/qpack2.tex: A first complete version. 
+
+	* handy/qinfo.m (printfield): Fixed "any( pind < j )" that is now
+	"any( pind <= j )".
+
+	* retrieval/qpack2/qp2_make_pdf.m: Updated to new set of
+	appendices. Sceen width now fixed in the function.
+
+	* arts/qarts.m: Fixed a number of typos.
+
+	* demos/qpack2_demo.m: Created a complete demo case.
+
+	* retrieval/qpack2: Some polishing of function headers.
+	
 2010-05-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-74

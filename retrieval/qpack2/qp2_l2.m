@@ -2,7 +2,9 @@
 %
 %    The function allows that a L2 structure is generated where the set of
 %    fields can be controlled through Q. The fields of L2 are determined by the
-%    settings of the L2 field of the retrieval quantities and Q.L2_EXTRA.
+%    settings of the L2 field of the retrieval quantities (such as
+%    Q.POLYFIT.L2) and Q.L2_EXTRA. 
+%
 %    Possible choices for L2_EXTRA are:
 %    ----------: These data are transferred from X, the output of *oem*
 %         'dx' : Last value of X.dx. See qinfo(@oem,'dx')
@@ -82,7 +84,11 @@ if nargin == 1
   %
   return;           % --->
 end
- 
+
+%- To handle ase when no putput is selected
+%
+L2 = [];
+
 
 %- Set up some do-variables to avoid repetition of any(strcmp))
 %
@@ -108,8 +114,9 @@ end
 
 % Retrieval diagnostics 
 %
+L2.converged = X.converged;
+%
 if ~O.linear
-  L2.converged = X.converged;
   if any( strcmp( Q.L2_EXTRA, 'dx' ) )
     L2.dx = X.dx(end);
   end

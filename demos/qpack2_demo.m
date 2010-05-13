@@ -1,45 +1,95 @@
-% Q_ONSALA_H2O   Definition of Q and O for Onsala water vapour inversions
+% QPACK2_DEMO   Demonstration of the Qpack2 retrieval system
 %
-%    This function sets Q and O for inversion of the standard ground-based 
-%    measurements of water vapour performed at Onsala Space Observatory. 
-%    The calculations are done in a straightforward way and are not 
-%    optimised for calculation speed (there is no pre-calculation of 
-%    absorption).
+%    The main features of Qpack2 are demonstrated. The example case is airborne
+%    measurements of ozone at 110.8 GHz. Synthetic measurement data are
+%    generated internally. See the code and intrnal comments for details.
 %
-%    This file is used for operational retrievals, but serves inside atmlab
-%    just as an example (input files used are not part of atmlab). 
+%    Everything is here put into a single file. For practical retrievals it
+%    is probably better to put the definitions of Q (together with O?) in a
+%    separate function (i.e. [Q,O] = q_mycase). A function to import
+%    measurement data into the "Y format" (see *qp2_y*) is needed. The
+%    retrieval result is returned in the L2 format produced by *qp2_l2*.
 %
-% FORMAT   [Q,O] = q_onsala_h2o( [width] )
+% FORMAT   L2 = qpack2_demo
 %        
-% OUT   Q       Qpack2 setting structure. See *qpack2*.
-%       O       OEM setting structure. See *oem*.
-% OPT   width   Observation mode, in terms of observed frequency range.
-%               A text string. Default is '20MHz'
+% OUT      L2   L2 data output from *qpack2*.
 
-% 2009-07-01   Created by Patrick Eriksson.
+% 2010-05-12   Created by Patrick Eriksson.
 
-function [Q,O,specdesc] = qpack2_demo(varargin)
+function L2 = qpack2_demo
+  
+  
+%- Qarts settings
 %
-width = optargs( varargin, { '20MHz' } );
+Q    = q_demo;           % Local file, found below
 
-error( 'Not yet active' );
 
+%- Measurement data
+%
+Y = y_demo( Q );         % Local file, found below
+
+
+%- Check that all frequencies are OK
+%
+if ~qp2_check_f( Q, Y, 1e3 );
+  error( 'Some mismatch between Q.F_BACKEND and frequencies of spectra.' );
+end
+%
+[Y.F] = deal( {} );      % The field F is now obselete. {} is used inside 
+                         % qarts and qpack2 to flag undefined fields
+
+
+%- OEM variables
+%
+O = qp2_l2( Q );         % This ensures that OEM returns the varibles needed 
+%                          to fill the L2 structure, as defined in Q
+O.linear = false;
+%
+if ~O.linear 
+  O.itermethod = 'GN';
+  O.stop_dx    = 0.01;
+  O.maxiter    = 5;
+end
+
+
+%- Make inversion
+%
+L2 = qpack2( Q, O, Y );
+
+
+%- Plot, if no output argument
+%
+if ~nargout
+  plot( L2(1).species1_x*1e6, p2z_simple(L2(1).species1_p)/1e3, 'b', ...
+        L2(2).species1_x*1e6, p2z_simple(L2(2).species1_p)/1e3, 'r', ...
+        L2(1).species1_xa*1e6, p2z_simple(L2(1).species1_p)/1e3, 'k-' );
+  xlabel( 'Ozone [VMR]' );
+  ylabel( 'Approximate altitude [km]' );
+  legend( 'Retrieval 1', 'Retrieval 2', 'True and a priori' );
+end
+return
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+
+
+
+
+
+function Q = q_demo
+ 
 %- Atmlab settings
 %
 arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
 arts_includes     = atmlab( 'ARTS_INCLUDES' );
-if isnan( arts_xmldata_path )                                               %&%
-  error( 'You need to set ARTS_XMLDATA_PATH to run this file.' );           %&%
-end                                                                         %&%
-if isnan( arts_includes )                                                   %&%
-  error( 'You need to ARTS_INCLUDES to run this file.' );                   %&%
-end                                                                         %&%
-
-
-%- Input folders
+if isnan( arts_xmldata_path ) 
+  error( 'You need to set ARTS_XMLDATA_PATH to run this exmaple.' );
+end
+if isnan( arts_includes )
+  error( 'You need to ARTS_INCLUDES to run this example.' );
+end                                                      
 %
-data    = fullfile( pwd, 'SensorData' );
-atmdata = fullfile( pwd, 'AtmData' );
+fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
 
 
 %- Init Q
@@ -65,64 +115,65 @@ Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
 Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
-%
-% Exclude cosmic background radiation:
-Q.IY_SPACE_AGENDA     = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
-                          'nelemGet(nrows,f_grid)', 'Copy(ncols,stokes_dim)',...
-                          'MatrixSetConstant(iy,nrows,ncols,0)' };
 
 
 %- Surface
 %
-% Measurement data are corrected for tropospheric attenuation and the
-% retrievals are performed assuming observations from tropopause level. Exact
-% choice of observation altitude is not critical (confirmed by simulations).
-% The altitude is set to 10 km.
-%
 Q.R_GEOID            = constants( 'EARTH_RADIUS' );
-Q.Z_SURFACE          = 10e3;
+Q.Z_SURFACE          = 5e3;          % Just a dummy value. A 10 km
+                                     % observation altitude is assumed here
 
 
 %- Absorption
 %
-Q.ABS_LINES           = fullfile( data, 'linedata_22ghz.xml' );
+Q.ABS_LINES           = fullfile( atmlab_example_data, 'o3line111ghz' );
 Q.ABS_LINES_FORMAT    = 'Arts';
 %
 Q.ABSORPTION          = 'CalcTable';
 Q.ABS_NLS             = [];
 
-%- GRIDS
+%- Pressure grid
 %
-z_toa                 = 105e3;
+z_toa                 = 95e3;
 %
-Q.P_GRID              = z2p_simple( Q.Z_SURFACE-2e3:250:z_toa )';
-Q.F_GRID              = fullfile( data, ['f_grid_h2o_',width,'.xml'] );
+Q.P_GRID              = z2p_simple( Q.Z_SURFACE-1e3 : 250 : z_toa )';
 
 
-%- Sensor variables
+
+%- Frequency, spectrometer and pencil beam antenna
+%
+% The hypothetical spectrometer has rectangular response functions
+%
+Q.F_GRID              = qarts_get( fullfile( atmlab_example_data , ...
+                                                      'f_grid_111ghz.xml' ) );
 %
 H                     = qartsSensor;
 %
 H.SENSOR_NORM         = true;
-H.FILL_FGRID          = [ 5 4 ];
-Q.ANTENNA_DIM         = 1;
 %
-H.F_BACKEND                = fullfile( data, ['f_backend_h2o_',width,'.xml'] );
-H.BACKEND_CHANNEL_RESPONSE = fullfile( data, ['backend_channel_',width,'.xml']);
+df                    = 0.5e6;
+H.F_BACKEND           = [ min(Q.F_GRID)+df : df : max(Q.F_GRID)-df ]';
 %
-% Measurements performed as beam switching. Provided data are corrected and
-% match throughout beam switching between elevation angles of 25 and
-% 90 degrees, without any "zenith load"
-H.BEAM_SWITCHING      = true;
-Q.MBLOCK_ZA_GRID      = [-65 0]';
-%  
+B.name                = 'Spectrometer channel response function';
+B.gridnames           = { 'Frequency' };
+B.grids               = { [-df/2 df/2] };
+B.dataname            = 'Response';
+B.data                = [1 1];
+%
+H.BACKEND_CHANNEL_RESPONSE{1} = B;
+clear B
+%
 Q.SENSOR_DO           = true;
 Q.SENSOR_RESPONSE     = H;
+%
+Q.ANTENNA_DIM         = 1;
+Q.MBLOCK_ZA_GRID      = 0;
+
 
 
 %- Correlation of thermal noise 
 %
-f    = qarts_get(H.F_BACKEND);
+f    = H.F_BACKEND;
 cl   = 1.4 * ( f(2) - f(1) );
 cfun = 'gau';
 cco  = 0.05;
@@ -132,7 +183,7 @@ Q.TNOISE_C = covmat1d_from_cfun( f, [], cfun, cl, cco );
 clear H f
 
 
-%- Define L2 structure (beside retrieval quantities above)
+%- Define L2 structure (beside retrieval quantities below)
 %
 Q.L2_EXTRA = { 'cost', 'dx', 'xa', 'y', 'yf', 'bl', 'ptz', 'mresp', ...
                'e', 'eo', 'es', 'date' };
@@ -145,24 +196,45 @@ Q.T_ATMDATA = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
 
 
 %- Species
-%
-% Only water vapour is retrieved here
-%
-Q.ABS_SPECIES(1).TAG      = { 'H2O' };
+
+% Ozone, only species is retrieved here
+Q.ABS_SPECIES(1).TAG      = { 'O3' };
 Q.ABS_SPECIES(1).RETRIEVE = true;
 Q.ABS_SPECIES(1).L2       = true;
-Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE-2e3:2e3:z_toa)', [], [] };
+Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:2e3:z_toa)', [], [] };
 Q.ABS_SPECIES(1).UNIT     = 'vmr';
 Q.ABS_SPECIES(1).SX       = ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 1.5e-6, ...
                                                'lin', 0.2, 0.00, @log10 ) + ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.3e-6, ...
                                                'lin', 0.5, 0.00, @log10 );
-Q.ABS_SPECIES(1).ATMDATA  = fullfile( atmdata, ...
-                                             'mls_retriveved_total_mean_h2o' );
+Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
+                            'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
+
+%- Water 
+%
+Q.ABS_SPECIES(2).TAG      = { 'H2O-PWR98' };
+Q.ABS_SPECIES(2).RETRIEVE = false;
+Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
+                          'midlatitude-winter.H2O.xml' ), 'H2O', 'vmr_field' );
+
+%- Oxygen
+%
+Q.ABS_SPECIES(3).TAG      = { 'O2-PWR93' };
+Q.ABS_SPECIES(3).RETRIEVE = false;
+Q.ABS_SPECIES(3).ATMDATA  = gf_artsxml( fullfile( fascod, ...
+                            'midlatitude-winter.O2.xml' ), 'O2', 'vmr_field' );
+
+%- Nitrogen
+%
+Q.ABS_SPECIES(4).TAG      = { 'N2-SelfContStandardType' };
+Q.ABS_SPECIES(4).RETRIEVE = false;
+Q.ABS_SPECIES(4).ATMDATA  = gf_artsxml( fullfile( fascod, ...
+                            'midlatitude-winter.N2.xml' ), 'N2', 'vmr_field' );
 
 
-%- FREQUENCY
+
+%- Frequency (shift retrieval here, shift+stretch also possible)
 %
 Q.FFIT.RETRIEVE           = true;
 Q.FFIT.DF                 = 50e3; 
@@ -170,31 +242,100 @@ Q.FFIT.ORDER              = 0;
 Q.FFIT.SX                 = 50e3^2;  
 Q.FFIT.L2                 = true;
 
+Q.FFIT.RETRIEVE           = true;
+Q.FFIT.DF                 = 100e3; 
+Q.FFIT.ORDER              = 1;
+Q.FFIT.SX                 = [300e3^2 0;0 100e3^2]; 
+Q.FFIT.L2                 = true;
+
 
 %- Polyfit
 %
-% A polynomial of order 6 is used for "baseline fit".
+% A polynomial of order 3 is used for "baseline fit".
 %
 Q.POLYFIT.RETRIEVE        = true;
-Q.POLYFIT.ORDER           = 6;
-Q.POLYFIT.L2              = false;
+Q.POLYFIT.ORDER           = 3;
+Q.POLYFIT.L2              = true;
 Q.POLYFIT.SX0             = 1^2; 
 Q.POLYFIT.SX1             = 0.5^2; 
 Q.POLYFIT.SX2             = 0.2^2;
 Q.POLYFIT.SX3             = 0.1^2; 
-Q.POLYFIT.SX4             = 0.05^2; 
-Q.POLYFIT.SX5             = 0.05^2; 
-Q.POLYFIT.SX6             = 0.05^2; 
+
+return
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
 
 
-%- OEM 
+
+
+
+function Y = y_demo(Q)
+
+% The data should be loaded from one or several files, but are here genereted
+% by a forward model call to show how qpack2 can also be used to generate
+% simulaled measurements (matching a priori assumptions).
+
+% The simulated data model airborn measurements at two different zenith
+% angles, from two nearby positions. 
+  
+% Init Y
 %
-O = qp2_l2( Q );
+Y = qp2_y;
+
+% Set a date
 %
-O.linear = false;
+Y.YEAR  = 2008;
+Y.MONTH = 2;
+Y.DAY   = 25;
+
+% Lat / lon
 %
-if ~O.linear 
-  O.itermethod = 'GN';
-  O.stop_dx    = 0.01;
-  O.maxiter  = 5;
+Y.LATITUDE  = 45;
+Y.LONGITUDE = exp(1);
+
+% An airborn measurement assumed here
+%
+Y.Z_PLATFORM = 10.5e3;
+Y.ZA         = 70;
+
+% Reference point for hydrostatic equilibrium
+%
+Y.HSE_P = 100e2;
+Y.HSE_Z = 16e3;
+
+% Set backend frequencies
+%
+Y.F = Q.SENSOR_RESPONSE.F_BACKEND;
+
+% Thermal noise standard deviation
+%
+Y.TNOISE = 0.05;
+
+% Simulate a measurement
+%
+Y.Y = [];                           % A flag to tell qpack2 to calculate the
+%                                     spectrum ({} signifies undefined!).
+
+% Add a second measurement
+%
+Y(2) = Y(1);
+%
+Y(2).LONGITUDE = pi;
+Y(2).ZA        = 45;
+
+% Calculate simulated spectra
+%
+Y = qpack2( Q, oem, Y );            % Dummy oem structure OK here 
+
+% Add thermal noise
+%
+% The correlation specified in Q is included
+%
+for i = 1 : length(Y)
+  Y(i).Y = Y(i).Y + Y(i).TNOISE * make_noise(1,Q.TNOISE_C);
 end
+
+% Add a constant "baseline shift" for measurement 2
+%
+Y(2).Y = Y(2).Y + 1;

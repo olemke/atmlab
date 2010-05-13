@@ -104,7 +104,7 @@ The comment %&% marks lines that can be removed for 'operational
 applications'. That is, calculations where the code has been carefully
 tested and data checks are skipped to obtain a higher calculation
 speed. The code is stripped from lines including %&% and pure comment
-lines by the script ???? (not yet implemented). 
+lines by the script ???? (to be implemented). 
 
 
 

@@ -2,11 +2,18 @@
 %
 %    The example treats ground-based measurements of ozone at 110.8 GHz.
 %
-% FORMAT   arts_oem_demo
+%    A figure with the inversion result is generated if the function is
+%    called with no output arguments. Otherwise, the output from *oem* is
+%    returned (work folder is deleted).
+%
+% FORMAT   [X,R] = arts_oem_demo
+%
+% OUT   X   As same output from *oem*.
+%       R   As same output from *oem*.
 
 % 2006-09-07   Created by Patrick Eriksson.
 
-function P = arts_oem_demo
+function [X,R] = arts_oem_demo
 
 
 %- Check if needed atmlab settings are found
@@ -85,7 +92,8 @@ Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
 %- corresponds then to a relative change of the ozone profile.
 %
 Q.IY_SPACE_AGENDA     = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
-                          'nelemGet(nrows,f_grid)', 'Copy(ncols,stokes_dim)', ...
+                          'nelemGet(nrows,f_grid)', ...
+                          'Copy(ncols,stokes_dim)', ...
                           'MatrixSetConstant(iy,nrows,ncols,0)' };
 
 
@@ -129,7 +137,7 @@ Q.MBLOCK_ZA_GRID      = 0;
 Q.ABS_SPECIES(1).TAG      = { 'H2O' };
 Q.ABS_SPECIES(1).RETRIEVE = false;
 
-% Ozone, that is retrieved
+% Ozone, retrieved
 %
 Q.ABS_SPECIES(2).TAG      = { 'O3' };
 Q.ABS_SPECIES(2).RETRIEVE = true;
@@ -143,7 +151,7 @@ Q.ABS_SPECIES(2).SX       = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
 
 
 %----------------------------------------------------------------------------
-%- Create absorption look-up table
+%- Set-up/create absorption look-up table
 %----------------------------------------------------------------------------
 
 Q.ABS_LINES_FORMAT         = 'Arts';
@@ -151,11 +159,15 @@ Q.ABS_LINES                = fullfile( atmlab_example_data , 'o3line111ghz' );
 Q.ABS_NLS                  = [];
 %
 Q                          = qarts_abstable( Q ); 
+% The absorption table will with the settings above be calculated
+% automatically. If you want to pre-calculate the table, for later re-usage, 
+% do: 
+%Q.ABS_LOOKUP               = arts_abstable( Q ); 
 
 
 
 %----------------------------------------------------------------------------
-%- Init retrieval (such as xa) and create Sx
+%- Init retrieval variables (such as xa) and create Sx
 %----------------------------------------------------------------------------
   
 [Qoem,O,R,xa] = arts_oem_init( Q, O );
@@ -203,11 +215,6 @@ X = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %
 arts_oem( 'clean', R );
 clear Qoem 
-
-%- Repack X to structure 
-if nargout
-  P = arts_X2P( X, R );
-end    
 
 
 %- Plot
