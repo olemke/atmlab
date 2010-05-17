@@ -280,7 +280,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   
   %- Prepare absorption table, if ABSORPTION = 'CalcTable'
   %
-  if strcmp( Q.ABSORPTION, 'CalcTable' )
+  if strcmp( Q.ABSORPTION, 'CalcTable' )  &  ~qarts_isset( Q.ABS_P )
     Q = qarts_abstable( Q );
   end
   

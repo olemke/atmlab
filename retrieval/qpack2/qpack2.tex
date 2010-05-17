@@ -216,6 +216,7 @@ inside of Qpack2.
 \subsection{Forward model and retrieval settings}
 \label{sec:Q}
 %---
+\subsubsection{General features}
 Forward model parameters and most retrieval variables are joined into a single
 structure, denoted as \verb|Q|. This structure has a fixed set of fields. That
 is, the structure must always contain exactly this set of fields. However, some
@@ -275,6 +276,30 @@ The best introduction to the practical usage of ARTS is obtained through the
 control file examples found in ARTS's folder \verb|tests|. For an introduction
 of the usage of ARTS through Qarts, there are several example scripts in
 Atmlab's folder \verb|demos|, such as \verb|qarts_demo|. 
+
+
+\subsubsection{Qpack2 specifics}
+%
+Most fields of \verb|Q| can be unspecified (\verb|{}|), but Qpack2 handles some
+fields in special way:
+\begin{itemize}
+\item \verb|Q.ATMOSPHERE_DIM| must be set, to 1.
+\item \verb|Q.R_GEOID| must be set.
+\item \verb|Q.Q.USE_RAW_ATMOSPHERE| must be set to false. 
+\item \verb|Q.ABS_SPECIES.ATMDATA| must be set.
+\item \verb|Q.T_ATMDATA| must be set. Geometrical altitudes of the pressure
+  levels (the WSV \verb|z_field|) are found by applying hydrostatic
+  equilibrium.
+\item \verb|Q.ABSORPTION| must be set. If this field is set to 'CalcTable' and
+  \verb|Q.ABS_P| is unspecified, the function \verb|qarts_abstable| is called
+  (with default arguments) for each retrieval case (using the a priori state as
+  the reference for the absorption table calculations). If you want to use a
+  single absorption table, this table must be generated separately.  
+\item \verb|Q.TNOISE_C| must be set.
+\item The a priori knowledge covariance matrix (Sx) is created by
+  \verb|arts_sx| and the \verb|SX| sub-fields of the retrieval quantities must
+  be set.
+\end{itemize}
 
 
 
