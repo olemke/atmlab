@@ -1,11 +1,10 @@
-% A standardised format for handling gridded data.
+% GFORMAT: A standardised format for handling gridded data.
 %
-%   The gformat consists of structures, here denoted as D and G.
+%   The gformat is a structure, denoted as G.  
+%  The stucture has the following
+%   fields:
 %
-%   The data format for your particular application is described by the
-%   structure D. This structure has the following mandatory fields:
-%   ------------------------------------------------------------------------
-%    DIM        : Maximum dimension of data. A positive integer. 
+%    TYPE       : 
 %    GRID1_NAME : Description of data dimension 1, such as 'Pressure'.
 %    GRID1_UNIT : Unit for data dimension 1, such as 'Pa'.
 %    GRID2_NAME : Description of data dimension 1, such as 'Latitude'.

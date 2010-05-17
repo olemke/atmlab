@@ -1,5 +1,5 @@
 %% 
-%% The (short) Qpack2 manual
+%% The Qpack2 manual
 %%
 
 \documentclass[a4paper,11pt]{article}
@@ -14,7 +14,7 @@
 \usepackage[top=30mm,left=30mm,right=30mm,bottom=30mm,nohead]{geometry}
 
 
-\title{Qpack2 -- a Matlab environment for atmospheric retrievals}
+\title{Qpack2 -- atmospheric retrievals by OEM in Matlab}
 \author{Patrick Eriksson\\(\texttt{patrick.eriksson@chalmers.se})}
 \date{\today}
 
@@ -32,21 +32,20 @@
 \label{sec:scope}
 %---
 Qpack2 is a retrieval system, implemented in Matlab, for performing inversions
-of atmospheric observations inside the framework of ``optimal estimation''. So
-far, only cases where the aim is to retrieve vertical profiles of atmospheric
-quantities (1D cases) are handled. Accordingly, the present main application
-areas of Qpack2 are ground-based observations and inversion of individual
-satellite spectra/scans. Inversion of satellite scanning sequences where
-atmospheric fields to be retrieved have a latitude or longitude extension (2D
-or 3D) could be considered as part of future development.
+of atmospheric observations inside the framework of ``optimal estimation''
+(OEM). So far, only cases where the aim is to retrieve vertical profiles of
+atmospheric quantities (1D cases) are handled. Accordingly, the present main
+application areas of Qpack2 are ground-based observations and inversion of
+individual satellite spectra/scans. Inversion of satellite scanning sequences
+where atmospheric fields to be retrieved have also a latitude or longitude
+extension (2D or 3D) could be considered as part of future development.
 
-The package should be general and flexible for covered
-measurements. For example, there is basically no limitations regarding
-observation geometry. Further, Qpack2 has been developed to be
-suitable for operational inversions, as long as not most extreme
-calculation speed is required. Some important aspects here are that
-batch calculations are allowed and atmospheric a priori profiles can
-automatically be extracted from climatology data.
+The package should be general and flexible for covered measurements. For
+example, there is basically no limitations regarding observation geometry.
+Further, Qpack2 has been developed to be suitable for operational inversions,
+as long as not most extreme calculation speed is required. Some important
+aspects here are that batch calculations are allowed and atmospheric a priori
+profiles can automatically be extracted from climatology data.
 
 
 
@@ -54,25 +53,25 @@ automatically be extracted from climatology data.
 \label{sec:background}
 %---
 Qpack2 is part of the more general Atmlab package of Matlab functions. In fact,
-it is largely a merge of some of the systems in Atmlab. The
+it is largely a merge of some of the systems in Atmlab. The computational
+engine, i.e.\ the forward model, of Qpack2 is ARTS-2 (not part of Atmlab). The
 communication with ARTS-2 is made through the Qarts system. OEM inversions are
 performed by the function \verb|oem.m|. Climatology data are stored and
-interpolated through the atmdata format. The computational engine, i.e.\ the
-forward model, of Qpack2 is ARTS-2 (not part of Atmlab). 
+interpolated through the atmdata format.
 
-This can be seen as a direct successor of Qpack, despite all code is written
-from scratch. However, for both Qpack versions the computations are controlled
-by a set of settings fields packed into a structure denoted as Q (though Qpack2
-has also a structure O). Qpack was built around ARTS-1, this new Qpack version
-is mainly a consequence of that ARTS-2 is the maintained version of ARTS. This
-gave also an opportunity to make a more stringent implementation and to add
-some features. This should hopefully make it easier to maintain and extend
-Qpack2. Data formats are now more clearly defined and the ambition level around
-documentation is higher (but still modest). A main improvement compared to
-Qpack2 is that extraction of a priori data from climatology data is now an
-integrated part. On the other hand, the feature of classifying errors into
-different categories (0-3 in Qpack) and the associated plotting features are
-removed as it was hardly used.
+This can be seen as a direct successor of Qpack ({\it Eriksson et al.}, 2005),
+despite all code is written from scratch. However, for both Qpack versions the
+computations are controlled by a set of settings fields packed into a structure
+denoted as Q (though Qpack2 has also a structure O). Qpack was built around
+ARTS-1, this new Qpack version is mainly a consequence of that ARTS-2 is the
+maintained version of ARTS. This gave also an opportunity to make a more
+stringent implementation and to add some features. This should hopefully make
+it easier to maintain and extend Qpack2. Data formats are now more clearly
+defined and the ambition level around documentation is higher (but still
+modest). A main improvement compared to Qpack2 is that extraction of a priori
+data from climatology data is now an integrated part. On the other hand, the
+feature of classifying errors into different categories (0-3 in Qpack) and the
+associated plotting features are removed as it was hardly used.
 
 ARTS-2 is below just denoted as ARTS.
 
@@ -117,14 +116,14 @@ The standard choice is to place these calls of \verb|atmlab| in
 \section{Documentation}
 \label{sec:doc}
 %---
-The overall documentation is found in this document. Detailed information is
-mainly found in the implementation files. Information on individual functions
-is obtained by the standard Matlab help command. For example:
+The overall documentation is found in this document. The detailed information
+is mainly stored in the implementation files. Information on individual
+functions is obtained by the standard Matlab help command. For example:
 \begin{verbatim}
->> help qpack2
+>> help oem
 \end{verbatim}
 Some of the used data structures are documented matching the requirements of
-\verb|qinfo.m|. For example, to list all fields and documentation text of
+\verb|qinfo.m|. For example, to list all fields and the documentation text of
 Qarts' \verb|Q|:
 \begin{verbatim}
 >> qinfo(@qarts)
@@ -133,7 +132,7 @@ The documentation for a specific field is obtained as
 \begin{verbatim}
 >> qinfo(@qarts,'F_BACKEND')
 \end{verbatim}
-Wildcards are allowed when naming fields:
+Wildcards are allowed when defining fields:
 \begin{verbatim}
 >> qinfo(@qarts,'ABS_*')
 \end{verbatim}
@@ -150,13 +149,13 @@ change/commit.
 %---
 A retrieval by Qpack2 has three main steps:
 \begin{verbatim}
-% 1: define forward model and retrieval settings
+% 1: Define forward model and retrieval settings
 [Q,O] = my_q_fun;
 
-% 2: import the measurement data to be inverted
+% 2: Import the measurement data to be inverted
 Y = my_y_fun;
 
-% 3: perform the inversion
+% 3: Perform the inversion
 L2 = qpack2( Q, O, Y );
 \end{verbatim}
 The variables \verb|Q|, \verb|O|, \verb|Y| and \verb|L2| are all structures,
@@ -167,43 +166,46 @@ match directly the \verb|Q| of the Qarts interface to ARTS. All forward model
 variables are part of \verb|Q|, and retrieval variables such as grids and a
 priori data are also defined in \verb|Q|. The exceptions are settings directly
 associated with OEM, that are stored in \verb|O|. This division reflects the
-fact that OEM is a stand-alone function, with the aim of being applicable for
-all cases as long as an interface to a ``forward model'' is provided.
+fact that the OEM operations are made by a stand-alone function. This function,
+\verb|oem|, is implemented in a general manner, to be applicable for any
+retrievaL case as long as an interface to a ``forward model'' is provided.
 
-The measurement data structure \verb|Y| can be an array. That is, a set of
-observations can be inverted in a single call of \verb|qpack2|. This on the
+The measurement data structure \verb|Y| can be an array. That is, a series of
+observations can be inverted in a single call of \verb|qpack2|, on the
 condition that a \verb|Q| and \verb|O| are valid for all observations. This
 implies e.g.\ that basic sensor characteristics such as backend frequencies
-must be common for all the data cases in \verb|Y|. On the other hand,
-both observation position and direction can differ between the observations,
-and the data from e.g.\ an aircraft flight could be inverted in a single run.
+must be common for all the data cases in \verb|Y|. On the other hand, both
+observation position and direction can differ between the observations, and the
+data from e.g.\ an aircraft flight could be inverted in a single run.
 
 The usage of the (dummy) functions \verb|my_q_fun| and \verb|my_y_fun| in steps
-2 and 3 is just a suggestion for how to organise set-up part, but it is
-probably a good idea to separate the inversion settings and the task of
-importing measurement data. 
+1 and 2 is just a suggestion for how to organise the definition phase of the
+run, but it is probably a good idea to separate the inversion settings and the
+task of importing measurement data.
 
 When \verb|Q|, \verb|O| and \verb|Y| are created, it is just to call
 \verb|qpack2|, and everything should work automatically. The input of
-\verb|qpack2| is fixed (always \verb|Q|, \verb|O| and \verb|Y|). The standard
-output is the retrieval result, packed as ``level 2'' data structure
-(\verb|L2|). The function can also provide simulated measurements. This option
-is triggered by setting the spectrum field to be empty (if \verb|Y| is an
-array, this must be done for elements):
+\verb|qpack2| is fixed (throughout \verb|Q|, \verb|O| and \verb|Y|). The output
+is normally the result of the retrieval, packed as a ``level 2'' data
+structure (\verb|L2|). The function can also provide simulated measurements.
+This option is triggered by setting the spectrum field to be empty (if \verb|Y|
+is an array, this must be done for elements):
 \begin{verbatim}
+...
 Yempty.Y = []; 
 Ysim = qpack2( Q, O, Ye );
 \end{verbatim}
 The output is a copy of \verb|Ye|, with the field \verb|Ysim.Y| set to the
-result of the forward model run. The simulated data matches the a priori state
-of the retrieval set-up.
+result of the forward model run. The simulated data match the a priori state of
+the retrieval set-up.
 
 A full example is found in the file \verb|qpack2_demo| (placed in the folder
 \verb|demos|). The example works with simulated data, created by \verb|qpack2|
 itself. The example file is also appended to this document as Appendix
 \ref{app:qfun}. A related example is \verb|arts_oem_demo|. It does not use
 Qpack2, but shows how an OEM inversion is performed with ARTS as the forward
-model, which is exactly what Qpack2 performs.
+model, and the calculation steps in this example gives a good view of the
+inside of Qpack2.
 
  
 
@@ -214,13 +216,13 @@ model, which is exactly what Qpack2 performs.
 \subsection{Forward model and retrieval settings}
 \label{sec:Q}
 %---
-Forward model parameters and retrieval variables (pure OEM settings excluded)
-are joined into a single structure, denoted as \verb|Q|. This structure has a
-fixed set of fields. That is, the structure must always contain exactly this
-set of fields. However, some fields are used only in particularly circumstances
-and not all fields must be set. A field of \verb|Q| is flagged as undefined by
-setting it to \verb|{}|, and e.g.\ \verb|[]| is taken as an active selection.
-This applies also to structures \verb|O| and \verb|Y|.
+Forward model parameters and most retrieval variables are joined into a single
+structure, denoted as \verb|Q|. This structure has a fixed set of fields. That
+is, the structure must always contain exactly this set of fields. However, some
+fields are used only in particularly circumstances and not all fields must be
+set. A field of \verb|Q| is flagged as undefined by setting it to \verb|{}|,
+and e.g.\ \verb|[]| is taken as an active selection. This applies also to
+structures \verb|O| and \verb|Y|.
 
 The structure \verb|Q| of Qpack2 is identical to the \verb|Q| of Qarts. Qpack2
 makes only slight modifications of \verb|Q| before it is given to Qarts. The
@@ -235,30 +237,30 @@ Qarts is documented through the qinfo feature:
 \begin{verbatim}
 >> qinfo(@qarts)
 \end{verbatim}
-See further Section \ref{sec:download}. The call of \verb|qinfo| above provides
-a description of all defined fields, and this information is also found here as
-Appendix~\ref{app:q}.
-It is recommended to initialise
-\verb|Q| as
+The call of \verb|qinfo| above provides a description of all defined fields
+(Sec.\ \ref{sec:download}) and this information is also found here as
+Appendix~\ref{app:q}. It is recommended to initialise \verb|Q| as
 \begin{verbatim}
 Q = qpack2;
 \end{verbatim}
-This ensures that Q contains also fields introduced more lately. If any field
-is added to \verb|Q|, it shall not change the result of older setting files. If
-a needed addition can not be accomodated with backward compability, this
-generates a new version of Qarts.
+This ensures that Q contains all defined fields, also ones introduced more
+lately. If any field is added to \verb|Q|, it shall not change the result of
+older setting files. If a needed addition can not be accomodated with backward
+compability, this generates a new version of Qarts.
 
 All features of ARTS can be accessed through Qarts. Calculations of standard
-type can largely be handled by defining the fields of Qarts that match directly
-ARTS workspace variables (WSV), such as \verb|z_surface|. Qarts has also
-several fields that allows inclusion of workspace method (WSM) calls. Some of
-these fields match ARTS agendas and have then a dedicated purpose (e.g.\
-\verb|SURFACE_PROP_AGENDA|). There are also fields where you are free to
-include any set of WSM calls (e.g.\ \verb|WSMS_BEFORE_RTE|). You can also use
-ARTS's include feature through the field \verb|INCLUDES|. 
+type can largely be handled by defining the fields of Qarts that have a direct
+matching ARTS workspace variables (WSV). That is, the name is the same in Qarts
+and ARTS, beside that Qarts use uppercase for its fields and ARTS lowercase for
+its variables (e.g.\ \verb|Z_SURFACE| and \verb|z_surface|, respectively).
+Qarts has also several fields that allow inclusion of workspace method (WSM)
+calls. Some of these fields match ARTS agendas and have then a dedicated
+purpose (e.g.\ \verb|SURFACE_PROP_AGENDA|). There are also fields where you are
+free to include any set of WSM calls (e.g.\ \verb|WSMS_BEFORE_RTE|). You can
+also use ARTS's include feature through the field \verb|INCLUDES|.
 
 Accordingly, Qarts is a relatively clean and open interface to ARTS, and to
-set-up a calculation demands primarily an understanding of ARTS. On-line
+set-up a calculation demands primarily an understanding of ARTS. Built-in
 documentation of ARTS WSMs and WSVs is obtained in a terminal as
 \begin{verbatim}
 $ arts -d z_surface
@@ -269,11 +271,10 @@ or from within Matlab as
 \end{verbatim}
 See the documentation of ARTS for more in-depth documentation. 
 
-The best introduction to the practical usage of ARTS is probably obtianed
-through the control file examples found in ARTS's folder \verb|tests|. For an
-introduction of the usage of ARTS through Qarts, there are several example
-scripts in Atmlab's folder \verb|demos|, such as \verb|qarts_demo|.
-
+The best introduction to the practical usage of ARTS is obtained through the
+control file examples found in ARTS's folder \verb|tests|. For an introduction
+of the usage of ARTS through Qarts, there are several example scripts in
+Atmlab's folder \verb|demos|, such as \verb|qarts_demo|. 
 
 
 
@@ -303,10 +304,9 @@ O.linear = true;
 \subsection{Measurement data}
 \label{sec:Y}
 %---
-The series of measurements (spectra or scans) to be treated is packed
-into a data structure denoted as \verb|Y|. The data fields of this
-structure are described in \verb|qp2_y|, and available information is
-obtained as
+The series of measurements (spectra or scans) to be treated is packed into a
+data structure denoted as \verb|Y|. The data fields of this structure are
+described in \verb|qp2_y|, following the \verb|qinfo| format:
 \begin{verbatim}
 >> qinfo(@qp2_y)
 \end{verbatim}
@@ -316,31 +316,29 @@ Appendix~\ref{app:y}. An example:
 >> Y(3)
 
 ans = 
-          DAY: 3
-            F: {}
-         HOUR: 11
-        HSE_P: 10000
-        HSE_Z: 16000
-     LATITUDE: {}
-    LONGITUDE: {}
-       MINUTE: 57
-        MONTH: 3
-       SECOND: 58.0000
-       TNOISE: 0.0243
-            Y: [800x1 double]
-         YEAR: 2002
-           ZA: 65
-   Z_PLATFORM: 5
+
+           DAY: 3
+             F: [800x1 double]
+          HOUR: 11
+         HSE_P: 10000
+         HSE_Z: 1.5677e+04
+      LATITUDE: 57.4000
+     LONGITUDE: 11.9300
+        MINUTE: 57
+         MONTH: 3
+        SECOND: 58.0000
+        TNOISE: 0.0243
+             Y: [800x1 double]
+          YEAR: 2002
+            ZA: 65
+    Z_PLATFORM: 5
 \end{verbatim}
-As mentioned above, fields not defined are identified by the setting
-\verb|{}|. The simplest way to ensure this is to initialise all fields
-using \verb|qp2_y| as
+The simplest way to initialise \verb|Y| is to use \verb|qp2_y| as
 \begin{verbatim}
 for i = 1 : n
   Y(i) = qp2_y;
   load( file{i} )
   Y(i).Y = ...
-  ...
 end
 \end{verbatim}
 
@@ -358,7 +356,7 @@ The only mandatory field of \verb|L2| is \verb|converged|. The remaining
 content of L2 is controlled by the Qarts field \verb|L2_EXTRA| and the
 \verb|L2| sub-field for the retrieval quantities (e.g.\ \verb|Q.POLYFIT.L2|).
 As an example on a complete \verb|L2|, the first element of the output of
-\verb|qpack2_demo| is:
+\verb|qpack2_demo| is (the polyfit part is truncated):
 \begin{verbatim}
 >> L2(1)
 
@@ -549,6 +547,91 @@ length 2. The set of fields are:
 \verb|P.ffit_e|,
 \verb|P.ffit_eo|, \verb|P.ffit_es| and\\\verb|P.ffit_mr|:\\
 As corresponding fields above for species (\verb|species1_x| etc.).
+
+
+
+\section{Data types and file formats}
+\label{sec:formats}
+
+\subsection{Qpack2 variables}
+%
+The data types in Qpack2 (and in Qarts) follow largely ARTS. Regarding basic
+data types, there are two main things to consider. Firstly, a distinction is
+made between the logical 0 and 1, and the integers 0 and 1. Accordingly,
+booleans, sometine also denoted as flags, must be set to \verb|true| or
+\verb|false|. Secondly, vectors are demanded to be columns.
+
+A notable feature of Qpack2 and Qarts is that data fields, booleans and scalars
+excluded, can either be set directly or be set to the name of a file (including
+data of the expected type). Both these settings are possible
+\begin{verbatim}
+Q.F_GRID = [ 501.18e9 : 1e6 : 501.58e9 ]';
+Q.F_GRID = 'f_odinsmr_ac2a.xml;
+\end{verbatim}
+Note the transpose in the first case (to create a column vector).
+
+The fields \verb|Q.ABS_SPECIES.ATMDATA|, \verb|Q.T_ATMDATA| and
+\verb|Q.Z_ATMDATA| are intended for data of climatology character. The data
+format used here is called atmdata. The format is similar to the GriddedField
+format in ARTS, but has also fields for e.g.\ units. The atmdata format is
+based on the general gformat:
+\begin{verbatim}
+>> help gformat
+\end{verbatim}
+For a description of the specialities of atmdata:
+\begin{verbatim}
+>> help isatmdata
+\end{verbatim}
+For example, the MSIS temperature climatology found in arts-xml-data is stored
+as GriddedField4 but imported as
+\begin{verbatim}
+Q.T_ATMDATA = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
+                        'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
+\end{verbatim}
+data of atmdata type are obtained:
+\begin{verbatim}
+>> Q.T_ATMDATA
+
+ans = 
+
+          TYPE: 'atmdata'
+          NAME: 'Temperature'
+        SOURCE: [1x65 char]
+           DIM: 4
+          DATA: [4-D double]
+     DATA_NAME: 'Temperature'
+     DATA_UNIT: 'K'
+         GRID1: [141x1 double]
+    GRID1_NAME: 'Pressure'
+    GRID1_UNIT: 'Pa'
+         GRID2: [19x1 double]
+    GRID2_NAME: 'Latitude'
+    GRID2_UNIT: 'deg'
+         GRID3: 0
+    GRID3_NAME: 'Longitude'
+    GRID3_UNIT: 'deg'
+         GRID4: [13x1 double]
+    GRID4_NAME: 'doy'
+    GRID4_UNIT: ''
+\end{verbatim}
+
+
+
+\subsection{File formats}
+%
+The standard format for data input files is ``ARTS xml''. These files are
+hardly created by hand, but stored from Matlab (through \verb|xmlStore|) or
+from ARTS (through \verb|WriteXML|). If ARTS is compiled with support for
+NetCDF, that format can also be used (\verb|arts_nc_write_|{\it datatype} and
+\verb|WriteNetCDF|, respectively).
+
+
+
+
+\section*{References}
+Eriksson, P., C. Jim\'enez, and S. A. Buehler, Qpack, a general tool for
+instrument simulation and retrieval work, {\it J. Quant. Spectrosc. Radiat.
+  Transfer}, 91, 47-64, 2005.
 
 
 

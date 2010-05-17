@@ -3,6 +3,9 @@
 %    The check considers only field names. The content of the fields is not
 %    considered.
 %
+%    For a description of the gformat
+%       help gformat
+%
 % FORMAT   b = isgformat( G )
 %        
 % OUT   b     True or false.

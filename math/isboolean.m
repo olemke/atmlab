@@ -2,7 +2,7 @@
 %
 %    Determines if a variable is a boolean, that is, a logical with size 1x1.
 %
-% FORMAT   bool = isboolEAN(a)
+% FORMAT   bool = isboolean(a)
 %        
 % OUT   bool   true if boolean, else false.
 % IN    a      A variable of any data type.

@@ -12,7 +12,7 @@
 %   The valid range for hour is [0,24].
 %
 %   The identification of atmdata is performed by checking the TYPE field and
-%   grid names. Thesehe fields of G must be set as follows: TYEP = 'atmdata',
+%   grid names. These fields of G must be set as follows: TYPE = 'atmdata',
 %   GRID1_NAME = 'pressure', GRID2_NAME = 'latitude', GRID3_NAME =longitude',
 %   GRID4_NAME = 'doy', 'mjd' or 'datenum', and GRID5_NAME = 'hour'. Only used
 %   grids are checked (determined by G(i).DIM). No distinction is made between
