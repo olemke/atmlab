@@ -1,3 +1,11 @@
+2010-05-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-77
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Fixed the help section to
+	give more useful instructions, and output a specific error message
+	if the dimensions of the data are not (lat,lon)
+
 2010-05-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-76

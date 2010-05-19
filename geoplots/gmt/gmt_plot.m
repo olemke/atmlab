@@ -17,32 +17,28 @@ function filename = gmt_plot(in,field)
 %
 % MANDITORY INPUT
 %
-% in.lon = array of longitudes
-% in.lat = array of latitudes
-% in.(field):
-%    2) length(in.lon) = length(in.lat) = length(in.(field)) <= ungridded data
-%    3) size(in.(field)) = [length(in.lat),length(in.lon)], 
-%                  where length(in.lat)~=length(in.lon)
-%    4) size(in.(field)) = square region where
-%       length(in.lat)==length(in.lon) and dims in.(field)(lat,lon) is assumed
+% 1) in.(field) % the data
+% 2) in.lat     % the corresponding latitudes
+% 3) in.lon     % the corresponding longitudes
 %
-%   -----------------------------------------------------------------------
+% If your data is ungridded the dimensions must be:
+% length(in.lon) = length(in.lat) = length(in.(field))
+% 
+% If your data is gridded the data MUST have the dimensions:
+% [length(in.lat),lenght(in.lon)] = size(in.(field));
+%  << transpose: in.(field) = in.(field)'; if this is not the case >>
 %
 % NOTE: If your data is UNGRIDDED I recommend setting:
-%          in.grid=0,
 %          in.increment = arcminutes (default = 60)
 %
-% Define the fields as empty if you don't want the following functions used.
+%   -----------------------------------------------------------------------
 %
 % OPTIONAL INPUT      |DEFAULTS
 %                     |
 % Filename, title etc.
-% in.grid             | 1 (i.e assumed gridded) and size(lat,lon)). If
-%                       ungridded, then lat,lon,data vectors must be the same
-%                       length.
 % in.title            |'string';
 % in.outdir           |'name/a/directory'
-% in.filename          |'yourfilename', default generated from title
+% in.filename         |'yourfilename', default generated from title
 % in.figuretype       |'pdf', you can pick 'eps' or 'ps' instead.
 %
 % in.display          | true (if 0, make pdf without displaying figure.
@@ -201,8 +197,12 @@ se = makefilename(se);
 if isfield(se,'nodata')&&se.nodata
     field = '';
 end
-if ~isempty(field) && ~isfield(se,field)
+if ~isempty(field) 
+    if ~isfield(se,field)
     error('The field: "%s" is not in the structure',field)
+    end
+    [a,b]=size(se.(field));
+    if a>b, error('in.%s must have the dimensions %dx%d (lat,lon)',field,b,a);end
 end
 if isempty(field) || isempty(se.(field))
     se.sidebar=0;
@@ -231,23 +231,20 @@ if ~strcmp(class(se.(field)),'double')                                          
     se.(field) = double(se.(field));
 end
 
-if (isfield(se,'grid')&&se.grid==0)||~isfield(se,'grid')
-    
-    isgridded = size(se.(field),1) == length(se.lat) && size(se.(field),2) == length(se.lon);
 
-    if ~isgridded
-        se.(field) = se.(field)(:);
-        se.lat = se.lat(:);
-        se.lon = se.lon(:);
-        se.grid = false;
-        txt1 = 'is NOT';txt2='1';txt3='is';
-    else
-        se.grid = true;
-        txt1 = 'is';txt2='0';txt3='isn''t';
-    end
-    fprintf('Assuming the data %s gridded...\n',txt1)
-    fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
+isgridded = size(se.(field),1) == length(se.lat) && size(se.(field),2) == length(se.lon);
+if ~isgridded
+    se.(field) = se.(field)(:);
+    se.lat = se.lat(:);
+    se.lon = se.lon(:);
+    se.grid = false;
+    txt1 = 'is NOT';txt2='1';txt3='is';
+else
+    se.grid = true;
+    txt1 = 'is';txt2='0';txt3='isn''t';
 end
+fprintf('Assuming the data %s gridded...\n',txt1)
+fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
 
 fprintf('max data value: %2.1f\nmin data value: %2.1f\n',...
     max(max((se.(field)))),min(min(se.(field))))
