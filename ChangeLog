@@ -1,3 +1,10 @@
+2010-05-21	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-0-4-80
+	
+	* math/binning_fast.m: Fix loss-of-precision error leading to
+	index-out-of-bounds.
+
 2010-05-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-0-4-79
