@@ -1,6 +1,6 @@
 2010-05-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-0-4-78
+	* atmlab-0-4-79
 
 	* demos/asgXXXX: Added error message to all asg demos that it is
 	not working. 
@@ -10,7 +10,7 @@
 
 2010-05-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
-	* atmlab-0-4-77
+	* atmlab-0-4-78
 
 	* geoplots/gmt/gmt_plot.m (gmt_plot): Fixed the help section to
 	give more useful instructions, and output a specific error message
