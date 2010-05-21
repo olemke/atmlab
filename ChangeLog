@@ -2,6 +2,17 @@
 
 	* atmlab-0-4-81
 
+	* math/binning_fast: Realised my solution to the loss-of-precision error
+	can potentially lead to different results from the previous method, but
+	not yet sure how often this occurs in practice and whether the previous or
+	the current one is actually correct. Chose instead to go the easy way out
+	and cast to double, but this problem needs a more serious fix after
+	discussion with Salomon.
+
+2010-05-21	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-0-4-81
+
 	* math/binning_fast: Fix missing ) surreptitiously creeping up between
 	last Matlab-edit and -run and commiting the code.
 

@@ -39,8 +39,8 @@ else lon = -180+0.5*d:d:180-0.5*d;
 end
 lat = -90+0.5*d:d:90-0.5*d;
 
-newlon = floor(in.lon/d) + floor(180/d ) + 1;                                         % assign index value
-newlat = floor(in.lat/d) + floor(90/d ) + 1;                                          % assign index value
+newlon = floor(double(in.lon)/d - -180/d ) + 1;                                         % assign index value
+newlat = floor(double(in.lat)/d - -90/d ) + 1;                                          % assign index value
 indata = in.data(:);
 data = cell(180/d, 360/d);
 
