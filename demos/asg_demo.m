@@ -32,6 +32,7 @@ function [G,FS]=asg_demo( dim, varargin )
 %
 [sensor] = optargs( varargin, { 'odin' } );
 
+error( 'Can not be used presently. Not yet updated.' );
 
 %SET BASIC PROPERTIES 
 

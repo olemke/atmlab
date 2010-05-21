@@ -32,6 +32,8 @@
 
 function [Y,P]=asg2y_demo2(sensor,G,FS)
 
+  error( 'Can not be used presently. Not yet updated.' );
+
 atmlab('FMODEL_VERBOSITY',0)
 
 %-----------------------------------

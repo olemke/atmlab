@@ -30,6 +30,8 @@ function [G,y,ydata,dy]=asg2y_demo(Q,varargin)
 %
 [sensor] = optargs( varargin, { 'odin' } );
 
+error( 'Can not be used presently. Not yet updated.' );
+
 
 %-----------------------------------
 %generate cloudy atmospheric states

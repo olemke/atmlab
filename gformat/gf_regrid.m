@@ -10,6 +10,9 @@
 %    to dimensions above G.DIM is then possible (*grids* can contain 
 %    more than G.DIM grids).
 %
+%    The function is "vectorised". That is, can be called as
+%      G(2:3) = gf_regrid( G(2:3), ...
+%
 % FORMAT   G = gf_regrid( G, grids, iopt )
 %        
 % OUT   G      Re-grided gformat data.
@@ -33,15 +36,6 @@ rqre_datatype( G, @isgformat );                                    %&%
 % Grids of G are checked inside *regrid*                           %&%
 rqre_datatype( grids, @iscell );                                   %&%
 rqre_datatype( iopt, @ischar );                                    %&%
-                                                                   %&%
-%--- Extrapolation switch defined?                                 %&%
-%                                                                  %&%
-atmlab( 'require', {'EXTRAP'} );                                   %&%
-                                                                   %&%
-                                                                   %&%
-extrap = atmlab( 'EXTRAP' );
-%                                                                  %&%
-rqre_datatype( extrap, @isboolean );                               %&%
 
 
 for i = 1 : length( G )

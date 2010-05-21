@@ -40,6 +40,7 @@
 % Created by Bengt Rydberg
 function [G,FS]=asg_demo2(sensor,cs_file,ecmwf_file,leg,lat,lat_res,dlat)
 
+error( 'Can not be used presently. Not yet updated.' );
 
 %SET BASIC PROPERTIES 
 

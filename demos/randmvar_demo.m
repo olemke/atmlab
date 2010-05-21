@@ -3,15 +3,15 @@ echo on
 %- Random vectors with length 6 will be created.
 
 %- Two elements with normal distribution:
-Cm    = covmat1d_from_cfun( 1:2, [], 'lin', [1 1;2 1] );
+Cm    = covmat1d_from_cfun( [1:2]', [], 'lin', [1 1;2 1] );
 [P,C] = randmvar_add_normal( [], [], [0 2], [1 0.5], Cm );
 
 %- Two elements with uniform distribution:
-Cm    = covmat1d_from_cfun( 1:2, [], 'drc' );
+Cm    = covmat1d_from_cfun( [1:2]', [], 'drc' );
 [P,C] = randmvar_add_uniform( P, C, [0 1;-1 1], Cm );
 
 %- Two elements with log-normal distribution:
-Cm    = covmat1d_from_cfun( 1:2, [], 'exp', [1 0.6;2 0.4] );
+Cm    = covmat1d_from_cfun( [1:2]', [], 'exp', [1 0.6;2 0.4] );
 [P,C] = randmvar_add_lognormal( P, C, [0 1], [0.3 1], Cm );
 
 %- Introduce some cross-correlation between normal and and other elements

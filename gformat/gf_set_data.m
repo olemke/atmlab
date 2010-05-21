@@ -3,7 +3,7 @@
 %    To insert the matrix A in G:
 %      G = gf_set_data( G, A, {grid1,grid2} );
 %
-%    To set G to a scalar and set some of the gformat fields:
+%    To set G to a scalar:
 %      G = gf_set_data( G, 1e3, [] );
 %
 % FORMAT   G = gf_set_data(data,grids,grid_names,grid_units)

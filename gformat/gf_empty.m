@@ -23,10 +23,10 @@ rqre_in_range( dim, 0 );                                        %&%
 G.TYPE      = 'basic';
 G.NAME      = [];
 G.SOURCE    = [];
+G.DIM       = dim;
 G.DATA      = [];
 G.DATA_NAME = [];
 G.DATA_UNIT = [];
-G.DIM       = dim;
 
 for i = 1 : dim
   G = gf_set_grid( G, i, [], [], [] );

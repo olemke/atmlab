@@ -1,29 +1,21 @@
 % ARTS_SX   Creation of Sx matrix based on Qarts/ARTS data
 %
-%    This is a standardised function to set up Sx. In short, *arts_covmat*
-%    is called for each retreival quantity. That is, the function handles
-%    only covariances inside each quantity. The result will be a (sparse)
-%    matrix with non-zero elements in blocks around the diagonal.
+%    This is a standardised function to set up Sx. The function simply includes
+%    the covariance matrices defined in the SX sub-fields along the diagonal of
+%    the complete Sx matrix. That is, the function handles only covariances
+%    inside each retrieval quantity. The result will be a (sparse) matrix with
+%    non-zero elements in blocks around the diagonal.
 %
-%    The covariances are defined by the structure SX. Each field is a single
-%    or an aray of structures that can be passed to *arts_covmat*. Each such
-%    structure is here denoted as D. Note that indexing in D-arrays must be
-%    done as {i}, as the fields can differ between quantities. 
-%    These fields are recognised:
-%       ABS_SPECIES : An array of D's. The indexing must match Q.ABS_SPECIES,
-%                     and thus J.ABS_SPECIES. 
-%
-% FORMAT   Sx = arts_sx( Q, R, SX )
+% FORMAT   Sx = arts_sx( Q, R )
 %        
 % OUT   Sx   Covariance matrix (sparse).
 % IN    Q     Qarts structure. See *qarts*.
 %       R     Retrieval data structure. See *arts_oem*.
-%       SX    Defintion of covariances. See above.
 
 % 2006-09-07   Created by Patrick Eriksson.
 
 
-function Sx = arts_sx( Q, R, SX )
+function Sx = arts_sx( Q, R )
 
 
 

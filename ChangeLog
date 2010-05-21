@@ -1,3 +1,13 @@
+2010-05-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-78
+
+	* demos/asgXXXX: Added error message to all asg demos that it is
+	not working. 
+
+	* demos/randmvar_demo.m: Adopted to new requirement that vectors
+	shall be columns.
+
 2010-05-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-77
@@ -5,6 +15,20 @@
 	* geoplots/gmt/gmt_plot.m (gmt_plot): Fixed the help section to
 	give more useful instructions, and output a specific error message
 	if the dimensions of the data are not (lat,lon)
+
+2010-05-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-0-4-77
+
+	* retrieval/qpack2/qpack2.m: ABS_P must now be unset to trigger
+	call of qarts_abstable (it was not possible to precalculate ABS_P ...)
+
+	* retrieval/qpack2/qpack2.tex: Extended with some Qpack2 specifics.
+
+	* arts/arts_sx.m (arts_sx): Header text referred to old version.
+
+	* gformat/Contents.m: Rewritten, to mach changes in definition of
+	gformat.
 
 2010-05-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
