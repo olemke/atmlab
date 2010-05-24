@@ -1,3 +1,9 @@
+2010-05-24  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-0-4-82
+
+	* CONFIGURE: Fix paths.
+
 2010-05-21	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-0-4-81
