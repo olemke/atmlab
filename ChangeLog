@@ -1,3 +1,22 @@
+2010-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-83
+	
+	* geoplots/gmt/create_gmt_earth.m: 
+	Now automatically pick the increment and search radius for the
+	data dependent on the approximate density of the data
+
+	* geoplots/gmt/gmt_plot.m: Cleaned up a bit.
+	
+	* math/binning_fast.m:
+	Adjusted code to allow for longitude ranges to be either in the
+	-180:180 or 0:360 format.
+	Also allow binning of user defined regions and not just global.
+	Avoid crashes due to precision errors. 
+	The function did not loose speed after this update and is
+	backwards compatible.
+	
+
 2010-05-24  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-0-4-82

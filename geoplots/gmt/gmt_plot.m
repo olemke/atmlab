@@ -56,21 +56,19 @@ function filename = gmt_plot(in,field)
 %
 %
 % For gridding:
-% in.search           |30 ; %search for data within 30arcmin
-%                      Can also give a string arg if you don't want minutes e.g
-%                      in.search = '250k' (250km)
-%                      string appended with 'k' for search radius in km
-% in.increment        |60 ; %increment the grid by 60arcmin (k = km)
-%                      Can also give a string arg if you don't want minutes e.g
-%                      in.increment = '500k' (500km)
+% in.search           |'30m' ; %search for data within 30arcmin
+% in.increment        |'60m' ; %increment the grid by 60arcmin (1deg)
+%                     | If nothing is given the increment and search radius is 
+%                     | loosely based on the density of the data points
+%
 %
 % Projection & grid:
 % in.grdimage         | to explicitly set the grdimage command line
 % in.nearneighbor     | to explicitly set the nearneighbor command line
 % in.projection       |'Q'; Cylindrical Equidistant Projection
-% in.center           |180; (longitude) 180 for entire earth otherwise middle
+% in.center           |0; (longitude)
 % in.map_width        |9; nine inches
-% in.proj             |'Q180/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
+% in.proj             |'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
 % in.region           e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
 % in.plotimage        |grdimage;
 %
@@ -174,123 +172,43 @@ if out.grid
         end
     end
 else
-    out = save_ungridded4GMTplot(out,field);                                   % create ascii (not gridded)
+    out = save_ungridded4GMTplot(out,field);                                    % create ascii (not gridded)
 end
 
 create_gmt_earth(out);                                                          % main function
 
 filename=sort_figures(out);                                                     % finalize
 
-function se = set_GMT_plot(se,field)                                            %% Set up %%
+function se = set_GMT_plot(se,field)                                            %% SETUP %%
 
+se.field = field;
 if ~isfield(se,'display')                                                       % view the figure?
     se.display=1;                                                               % 0 if you just want to create plot
 end
 
 if ~isfield(se,'figuretype'), se.figuretype='pdf'; end                          % default figure type = .eps
 
-if ~isfield(se,'outdir')
-    se.outdir = atmlab('OUTDIR');                                               % output dir
-end
-se = makefilename(se);
+se = makefilename(se);                                                          % generate a valid filename and title
 
-if isfield(se,'nodata')&&se.nodata
-    field = '';
-end
-if ~isempty(field) 
-    if ~isfield(se,field)
-    error('The field: "%s" is not in the structure',field)
-    end
-    [a,b]=size(se.(field));
-    if a>b, error('in.%s must have the dimensions %dx%d (lat,lon)',field,b,a);end
-end
-if isempty(field) || isempty(se.(field))
-    se.sidebar=0;
-    se.legend=0;
-    se.grid=0;
-    if ~isfield(se,'region')                                                    % REGION
-        se.region='-180/180/-90/90';
-    elseif isfield(se,field)
-        se.region = sprintf('%d/%d/%d/%d',...
-        min(min(se.lon)),max(max(se.lon)),...
-        min(min(se.lat)),max(max(se.lat)));
-    se.nodata=1;
-    end
+if (isfield(se,'nodata')&&se.nodata) || (isempty(field) || isempty(se.(field))) % only the coastlines?
+    se = nodata(se);
     return
 end
-if ~sum(~isnan(se.(field)))                                                     % data?
-    error('%s%s','Data does not contain any valid',...
-        ' values for contour levels to be based on...')
-end
 
-if ndims(se.(field))==3                                                         % test if I need to use squeeze
-    se.(field) = squeeze(se.(field));
-end
+se = isgridded(se,field);                                                       % Check to see if the data  is gridded or not
 
-if ~strcmp(class(se.(field)),'double')                                          %the data has to be double (or single?)
-    se.(field) = double(se.(field));
-end
-
-
-isgridded = size(se.(field),1) == length(se.lat) && size(se.(field),2) == length(se.lon);
-if ~isgridded
-    se.(field) = se.(field)(:);
-    se.lat = se.lat(:);
-    se.lon = se.lon(:);
-    se.grid = false;
-    txt1 = 'is NOT';txt2='1';txt3='is';
-else
-    se.grid = true;
-    txt1 = 'is';txt2='0';txt3='isn''t';
-end
-fprintf('Assuming the data %s gridded...\n',txt1)
-fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
-
-fprintf('max data value: %2.1f\nmin data value: %2.1f\n',...
-    max(max((se.(field)))),min(min(se.(field))))
+isdata(se,field)                                                                % is there useable data?
 
 if ~isfield(se,'datarange')                                                     % contour range
-    se.datarange.max = max(max(se.(field)));
-    se.datarange.min = min(min(se.(field)));
-end
-if isfield(se,'region')                                                         % if region: check latlon format
-    x = textscan(se.region','%f','delimiter','/');
-    if x{1}(2) > 180
-        [se.(field),se.lat,se.lon] = flipdata(se.(field),se.lat,se.lon);
-    end
+    se.datarange.max = max(se.(field)(:));
+    se.datarange.min = min(se.(field)(:));
 end
 
-if isfield(se,'center') && se.center~=0
-    x = (se.(field)(:,1)+se.(field)(:,end))/2;
-    if min(se.lon)>-180
-        se.lon = [-180,se.lon];
-        se.(field) = [x,se.(field)];
-    end
-    if max(se.lon)<180
-        se.lon = [se.lon,180];
-        se.(field) = [se.(field),x];
-    end
-    
-end
+se = regionspecial(se,field);                                                   % if region: check latlon format
 
-function se = makefilename(se)                                                  %% Make file name %%
+se = ifcenter(se,field);                                                        % if map center is given
 
-if ~isfield(se,'filename')
-    if ~isfield(se,'title') || isempty(se.title)
-        se.filename = 'default';
-    else se.filename = se.title;
-    end
-end
-if ~isfield(se,'title')
-    se.title = se.filename;
-end
-
-% replace bad symbols for filename and mask them for the title
-se.filename = regexprep(se.filename,'[:=, ()*/<>!?]','_');
-se.title = regexprep(se.title,'([=,()+*<>!?])','\\$1');
-se.title = regexprep(se.title,'[:]',' ');
-
-function filename = sort_figures(se)                                             %% Sort figures %%
+function filename = sort_figures(se)                                            %% SORT FIGURES %%
 
 command{1} = [];
 if strcmp(se.figuretype,'ps')
@@ -341,3 +259,121 @@ exec_gmt_cmd(command(2:end)) % execute commands
 
 filename = sprintf('%s/%s',se.outdir,filename);
 fprintf('GMT plot stored at:  %s\n',filename)
+
+%% SUBFUNCTIONS FOR SETUP
+%
+function se = makefilename(se)                                                  %% MAKE FILE NAME %%
+
+if ~isfield(se,'outdir')
+    se.outdir = atmlab('OUTDIR');                                               % output dir
+end
+if ~isfield(se,'filename')
+    if ~isfield(se,'title') || isempty(se.title)
+        se.filename = 'default';
+    else se.filename = se.title;
+    end
+end
+if ~isfield(se,'title')
+    se.title = se.filename;
+end
+
+% replace bad symbols for filename and mask them for the title
+se.filename = regexprep(se.filename,'[:=, ()*/<>!?]','_');
+se.title = regexprep(se.title,'([=,()+*<>!?])','\\$1');
+se.title = regexprep(se.title,'[:]',' ');
+
+function se = nodata(se)                                                        %% NODATA %%
+% if you want to only plot coastlines
+
+se.sidebar=0;
+se.legend=0;
+se.grid=0;
+if ~isfield(se,'region')                                                    
+    se.region='-180/180/-90/90';
+elseif all(isfield(se,{'lat','lon'}))
+    se.region = sprintf('%d/%d/%d/%d',...
+        min(min(se.lon)),max(max(se.lon)),...
+        min(min(se.lat)),max(max(se.lat)));
+    se.nodata=1;
+end
+
+function se = isgridded(se,field)                                               %% ISGRIDDED %%
+%% Test if the data is gridded
+
+if ndims(se.(field))==3                                                         % test if I need to use squeeze
+    se.(field) = squeeze(se.(field));
+end
+
+ig = size(se.(field),1) == length(se.lat) && ...                                % Check to see if the data 
+    size(se.(field),2) == length(se.lon);                                       % is gridded or not
+if ~ig
+    se.(field) = se.(field)(:);
+    se.lat = se.lat(:);
+    se.lon = se.lon(:);
+    se.grid = false;
+    txt1 = 'is NOT';txt2='1';txt3='is';
+else
+    
+    se.grid = true;
+    txt1 = 'is';txt2='0';txt3='isn''t';
+end
+
+fprintf('Assuming the data %s gridded...\n',txt1)
+fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
+
+fprintf('max data value: %2.1f\nmin data value: %2.1f\n',...
+max(max((se.(field)))),min(min(se.(field))))
+
+if ~strcmp(class(se.(field)),'double')                                          %the data has to be double
+    se.(field) = double(se.(field));
+end
+
+function isdata(se,field)                                                       %% ISDATA %%
+%% is there useable data?
+
+if ~isempty(field)                                                              % is there data?
+    if ~isfield(se,field)
+        error('The field: "%s" is not in the structure',field)
+    end
+
+    if se.grid
+        [a,b]=size(se.(field));                                                 % does the gridded data have dims (lat,lon)?
+        if a>b
+            error('in.%s must have the dimensions %dx%d (lat,lon)',field,b,a)
+        end
+    end
+end
+
+if ~sum(~isnan(se.(field)))                                                     % data?
+    error('%s%s','Data does not contain any valid',...
+        ' values for contour levels to be based on...')
+end
+
+function se = regionspecial(se,field)                                           %% REGIONSPECIAL %%
+%% if region: check latlon format
+if isfield(se,'region')                           
+    if ~ischar(se.region)
+        %[blcorner,trcorner]
+        r = se.region;
+        se.region = sprintf('%d/%d/%d/%d',min(r(:,2)),max(r(:,4)),min(r(:,1)),max(r(:,3)));
+    end
+    x = textscan(se.region','%f','delimiter','/');
+    if x{1}(2) > 180
+        [se.(field),se.lat,se.lon] = flipdata(se.(field),se.lat,se.lon);
+    end
+end
+
+function se = ifcenter(se,field)                                                %% IFCENTER %%
+%% if map center is given
+
+if isfield(se,'center') && se.center~=0
+    x = (se.(field)(:,1)+se.(field)(:,end))/2;
+    if min(se.lon)>-180
+        se.lon = [-180,se.lon];
+        se.(field) = [x,se.(field)];
+    end
+    if max(se.lon)<180
+        se.lon = [se.lon,180];
+        se.(field) = [se.(field),x];
+    end
+end

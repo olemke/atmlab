@@ -194,17 +194,24 @@ end
 proj = sprintf('%s%d/%di',projection,center,map_width);
 
 function a = mkgrid(se)                                                         %% mkgrid %%
-%%
-% a.search is determined only by the spaceing between lonitudes
-%
-%
+% If nothing is given the increment and search radius is loosely based on the
+% density of the data points
+
 a.region = se.plot.region;
 a.ungriddedfile = se.ungriddedfile;
 a.file = se.filename;
 a.name = 'nearneighbor';
 
 if ~isfield(se,'increment')
-    a.increment = '60m'; %i.e. One degree
+    
+    % find the approx density of points
+    x = length( unique( floor(se.lat)));
+    y = length( unique( floor(se.lon)));
+    A = x*y;
+    delta = sqrt(numel(se.(se.field)) / A);
+    inc = ceil(60/delta *2); % times 2 is to make it a bit bigger
+    if inc>60, inc=60; end
+    a.increment = sprintf('%dm',inc); %i.e. One degree
 elseif isnumeric(se.increment)
     a.increment = sprintf('%dm',se.increment);
 else
@@ -212,7 +219,8 @@ else
 end
 
 if ~isfield(se,'search')
-    a.search = '30m'; %i.e. ½ degree
+    sc = ceil( str2double(a.increment(1:end-1)));
+    a.search = sprintf('%dm',sc);
 elseif isnumeric(se.search)
     a.search = sprintf('%dm',se.search);
 else
