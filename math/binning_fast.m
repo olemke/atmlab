@@ -10,7 +10,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %
 % In:
 %       
-%       1)  in (manditory):
+%       1)  in (mandatory):
 %               structure containing 
 %               i)   data
 %               ii)  lat

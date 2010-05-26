@@ -1,5 +1,12 @@
 2010-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-0-4-84
+	
+	* math/binning_fast.m (binning_fast): spelling
+
+
+2010-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-0-4-83
 	
 	* geoplots/gmt/create_gmt_earth.m: 
