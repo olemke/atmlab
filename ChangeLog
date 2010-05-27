@@ -1,3 +1,12 @@
+2010-05-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-85
+
+	* files/loadncfile.m:
+	Unfortunately had to remove '~'-wildcards ( used instead of
+	creating function output variables which don't get used), because
+	this is not compatible with the student version of MATLAB.
+
 2010-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-84

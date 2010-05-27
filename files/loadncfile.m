@@ -19,7 +19,7 @@ function ret = loadncfile( filename )
   
 ncid = netcdf.open (filename, 'NOWRITE');
 
-[~,nvars,ngatts] = netcdf.inq(ncid);
+[scrap,nvars,ngatts] = netcdf.inq(ncid);
 
 for i = 0:ngatts-1
    attname = netcdf.inqAttName (ncid, -1, i);
@@ -28,7 +28,7 @@ for i = 0:ngatts-1
 end
 
 for i = 0:nvars-1
-   [varname, ~, ~, natts] = netcdf.inqVar (ncid, i);
+   [varname, scrap, scrap, natts] = netcdf.inqVar (ncid, i);
    svarname = genvarname(varname);
    ret.(svarname) = netcdf.getVar (ncid, i);
    for j = 0:natts-1
