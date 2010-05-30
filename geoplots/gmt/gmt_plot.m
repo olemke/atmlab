@@ -304,8 +304,16 @@ if ndims(se.(field))==3                                                         
     se.(field) = squeeze(se.(field));
 end
 
-ig = size(se.(field),1) == length(se.lat) && ...                                % Check to see if the data 
-    size(se.(field),2) == length(se.lon);                                       % is gridded or not
+%% Check to see if the data is gridded or not.
+[a,b]=size(se.(field));
+
+pos1 = a==length(se.lat)&b==length(se.lon); %(lat,lon)
+pos2 = b==length(se.lat)&a==length(se.lon); %(lon,lat)
+
+% if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
+% assume it's not.
+ig = ~(pos1 && pos2) && (pos1 || pos2);
+
 if ~ig
     se.(field) = se.(field)(:);
     se.lat = se.lat(:);
@@ -313,7 +321,7 @@ if ~ig
     se.grid = false;
     txt1 = 'is NOT';txt2='1';txt3='is';
 else
-    
+    if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
     se.grid = true;
     txt1 = 'is';txt2='0';txt3='isn''t';
 end
@@ -327,6 +335,7 @@ max(max((se.(field)))),min(min(se.(field))))
 if ~strcmp(class(se.(field)),'double')                                          %the data has to be double
     se.(field) = double(se.(field));
 end
+
 
 function isdata(se,field)                                                       %% ISDATA %%
 %% is there useable data?

@@ -1,3 +1,11 @@
+2010-05-30  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-86
+	
+	* geoplots/gmt/gmt_plot.m: A better way  of determining if the
+	data is gridded or not. Also allow gridded data to be either
+	(lat,lon) or (lon,lat)
+
 2010-05-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-85
