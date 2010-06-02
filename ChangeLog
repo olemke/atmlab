@@ -1,3 +1,11 @@
+2010-06-02  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-0-4-86
+	
+	* math/average_bins.m : Added function
+	AVERAGE_BINS returns grid averages, sum, and numel from a cell of
+	gridded data. e.g. from binning_fast.
+
 2010-05-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-0-4-86
