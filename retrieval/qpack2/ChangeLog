@@ -1,0 +1,8 @@
+2010-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.0: Selecting this as the starting point for Qpack2.0.
+	Mainly due to the upcoming workshop and that a basic "user guide"
+	is completed. A fairly complete treatment of ground-based
+	measurements is provided. Limb sounding not yet handled in an OK
+	manner.
+
