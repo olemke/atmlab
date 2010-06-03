@@ -1,6 +1,8 @@
 2010-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-1-0-0: Declaring this as version 1.0. Mainly due to the
+	* atmlab-1-0-0
+
+	* Declaring this as version 1.0. Mainly due to the
 	polishing for the upcoming workshop, but also to indicate that
 	the (few) common features of atmlab should be fixed and that most
 	functions should be stable.
