@@ -60,6 +60,7 @@ addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) );
 addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts', 'xml' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
+addpath( fullfile( toppath, 'collocations' ) ); 
 
 
 %=== Read Atmlab settings

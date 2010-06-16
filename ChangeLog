@@ -1,3 +1,22 @@
+2010-06-16	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-1
+
+	* collocations/collocate.m: Added function collocate.m to collocate data
+	between two matrices. I will add higher-level functions later that
+	collocate between satellite datasets for time periods, as well as
+	functions to easily read (selected parts of) such collocations for a given
+	time period.
+
+	* AUTHORS: Added myself.
+
+	* atmlab/atmlab_init.m: Added collocations/ directory.
+
+	* README: Fixed e-mail addresses for Oliver and Stefan (irv.se has ceased
+	to exist long ago and irv.de has AFAIK never existed at all).
+
+	* ChangeLog: Documented changes made to various files.
+
 2010-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-0

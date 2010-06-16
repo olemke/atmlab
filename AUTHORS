@@ -21,10 +21,14 @@ Salomon Eliasson <s.eliasson@ltu.se>
 GMT plotting interface.
 
 
+Gerrit Holl <gerrit.holl@ltu.se>
+---
+Collocation code.
+
 
 Function sets have been imported made by these persons:
 
-Christian Mätzler <christian.matzler@iap.unibe.ch>
+Christian M?tzler <christian.matzler@iap.unibe.ch>
 ---
 Mie scattering functions (ATMLAB/mie).
 
