@@ -1,0 +1,33 @@
+The highest level function is collocate_and_store_date_range.
+Example usage:
+
+>> collocate_and_store_date_range([2009 1 1], [2009 12 31], 'cloudsat', 'cpr', 'noaa18', 'mhs')
+
+This will collect collocations for a full year and write them to the disk. The
+location it's written to depends on configuration settings in colloc_config.
+
+TODO: more documentation
+
+The highest level function that returns results (rather than writing them
+away) is collocate_date.
+Example usage of collocate_date:
+
+>> [O D M] = collocate_date(2010, 2, 1, 'cloudsat', 'cpr', 'noaa18', 'mhs')
+(...)
+O = 
+
+    noaa18: [173253x29 double]
+
+
+D = 
+
+    noaa18: [173253x45 double]
+
+
+M = 
+
+    noaa18: [3890x8 double]
+
+Columns are documented at http://satpage/docs/datasets/collocations/ and
+defined in colloc_config('cols_cpr_mhs') with the fields overlap, data and
+meandata.

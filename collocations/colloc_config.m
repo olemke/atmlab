@@ -16,6 +16,10 @@ function A = colloc_config_defs
 A.stdout = 1;
 A.stderr = 2;
 
+% overwrite existing collocations
+
+A.overwrite = false;
+
 % set where to find data
 % in $SENSOR_yeardir, $YEAR and $SAT are replaced
 
@@ -47,6 +51,12 @@ A.avhrr_basedir = '/local/gerrit/data/avhrr/l1b';
 A.avhrr_yeardir = '$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
+A.collocation_cpr_mhs_basedir = '~/data/collocations';
+A.collocation_cpr_mhs_yeardir = '$YEAR';
+A.collocation_cpr_mhs_filename = 'collocations_$SAT.mat';
+A.collocation_cpr_mhs_data_filename = 'collocations_data_$SAT.mat';
+A.collocation_cpr_mhs_meandata_filename = 'collocations_meandata_$SAT.mat';
+
 % define what reading function to use for what sensor
 
 A.read_cpr = @colloc_read_cpr;
@@ -63,6 +73,10 @@ A.process_meandata_cpr_mhs = @colloc_process_meandata_cpr_mhs;
 A.process_cpr_amsub = @colloc_process_cpr_mhs;
 A.process_data_cpr_amsub = @colloc_process_data_cpr_mhs;
 A.process_meandata_cpr_amsub = @colloc_process_meandata_cpr_mhs;
+
+% define what functions to use to find filenames
+
+A.filename_cpr_mhs = @colloc_get_path_cpr_poes_radiometer;
 
 % define approximate granule durations
 

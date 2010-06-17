@@ -1,5 +1,38 @@
 2010-06-17	Gerrit Holl	<gerrit.holl@ltu.se>
 	
+	* atmlab-1-0-3
+
+	* collocations/overlap_granule.m: Sort output from find_granules_by_date,
+	granules are not always ordered sequentially on the disc.
+
+	* collocations/colloc_get_path_cpr_poes_radiometer.m: Determine the full
+	path of the files to which CloudSat-MHS collocations for the given date
+	and satellite should be written. Needs configuration (see online help).
+
+	* collocations/colloc_config.m: Add configuration as needed by
+	colloc_get_path_cpr_poes_radiometer.m,
+
+	* collocations/collocate_and_store_date.m: For a given date, check whether
+	a collocation datafile exists. If it doesn't (or cscol('overwrite') is
+	set), collocate the indicated satellites and sensors with each other and
+	store the result in the appropiate datafile. Needs configuration (see
+	online help).
+
+	* collocations/collocate_date.m: This m-file collects all collocations for
+	the given date between the indicated sensor pairs and returns the result
+	in a structure. Needs configuration (see online help).
+
+	* collocations/README: Beginning of documentation.
+
+	* collocations/write_collocations.m: Write collocation data for
+	year/month/day in structure S to a filename. The filename is determined
+	from the satellite and sensors used. Needs configuration (see online
+	help).
+
+	* time/daterange.m: Return a range of dates, as a matrix.
+
+2010-06-17	Gerrit Holl	<gerrit.holl@ltu.se>
+	
 	* atmlab-1-0-2
 
     * collocations/collocate_granule.m: Given a pair of satellite/sensor
