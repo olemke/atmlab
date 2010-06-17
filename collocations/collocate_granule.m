@@ -1,0 +1,159 @@
+function [overlap, data, meandata] = ...
+    collocate_granule(sat1, sensor1, sat2, sensor2, date1)
+
+% collocate_granule Collocate granules from sat/sensor pairs
+%
+% Given the names of the satellite and the sensors, as well as the starting
+% date/time for the primary satellite/sensor-pair, this will find all
+% collocations between the two. It finds the granule for the primary
+% sat/sensor-pair, all the overlapping granules for the secondary
+% sat/sensor-pair, and collocates with each of those granules. It then
+% collects additional information and, if applicable, calculates mean
+% values for each of the collocations (for example, for CloudSat/MHS, it
+% return a matrix with one row for each CloudSat pixel, as well as a matrix
+% with one row for each MHS pixel).
+%
+% A special value for 'sat2' can be 'poes', which is short for 'every POES
+% satellite'.
+%
+% FORMAT
+%
+%   [overlap, data, meandata] = ...
+%       collocate_granule(sat1, sensor1, sat2, sensor2, date1)
+%
+% IN
+%
+%   sat1        string      Primary satellite (example: 'CloudSat')
+%   sensor1     string      Primary sensor (example: 'cpr')
+%   sat2        string      Secondary satellite (example: 'noaa18')
+%   sensor2     string      Secondary sensor (example: 'mhs')
+%   date1       vector      Date vector for starting time sat1/sensor1
+%
+% OUT
+%
+%   overlap     structure   With fields for each satellite (normally just 
+%                           one, but for 'poes' multiple), collocation
+%                           information along with times, distances, etc.
+%   data        structure   With fields for each satellite, data
+%                           corresponding to the collocation information,
+%                           IWP, brightness temperatures, etc.
+%   meandata    structure   With fields for each satellite, for instruments
+%                           with very different footprint sizes, statistics
+%                           for the smaller within the larger: number of
+%                           points, mean, standard deviation, etc.
+%                           Otherwise empty.
+%
+% $Id$
+
+%% output
+
+fid = colloc_config('stdout');
+eid = colloc_config('stderr');
+
+%% get handles for reading, processing
+
+fh1 = colloc_config(['read_' sensor1]);
+fh2 = colloc_config(['read_' sensor2]);
+fhp = colloc_config(['process_' sensor1 '_' sensor2]);
+fhpd = colloc_config(['process_data_', sensor1 '_' sensor2]);
+fhpm = colloc_config(['process_meandata_', sensor1 '_' sensor2]);
+
+%% find path to datafile for sat1/sensor1
+%date1_cell = num2cell(date1);
+
+datafile = find_datafile_by_date(date1, sat1, sensor1);
+
+if isempty(datafile)
+    error('atmlab:collocate_granule', ...
+        'No data found for %s %s at %s', ...
+        sat1, sensor1, mat2str(date1));
+end
+
+%% set 'date2_all', 'overlap', and 'sat2_all_names'
+% find date/times for which to search for secondary granules
+% Also pass on the primary satellite, because for poes/poes, we don't want
+% overlaps where sat1==sat2
+
+[date2_all, sat2_all_names] = overlap_granule(sat1, sensor1, ...
+    date1, sat2, sensor2);
+
+% pre-allocate overlap-structure
+% TODO: rather than [], have good width already
+uniq_names = unique(sat2_all_names);
+overlap = cell2struct(repmat({[]}, [length(uniq_names) 1]), uniq_names);
+
+data = overlap; % same pre-allocation
+meandata = overlap; % this one as well
+M_c = overlap; M_d = overlap; M_m = overlap; % and those
+
+%% read data for sat1/sensor1
+logtext(fid, 'Reading %s\n', datafile);
+data1 = fh1(datafile);
+logtext(fid, 'Read %s\n', datafile);
+
+%% loop through all the granules to collocate with
+
+for i = 1:size(date2_all, 1)
+    datecell = num2cell(date2_all(i, 1:5));
+    satname = sat2_all_names{i};
+
+    try
+        datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, amsub_or_mhs(satname));
+    catch ME
+        if strcmp(ME.identifier, 'collocate:find_datafile_by_date')
+            logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
+                datecell{:}, ME.message);
+            continue
+        else
+            ME.rethrow();
+        end
+    end
+    
+    logtext(fid, 'Reading %s\n', datafile2);
+    data2 = fh2(datafile2);
+    logtext(fid, 'Read %s\n', datafile2);
+    
+    % make sure we're using the same time axis epoch
+    [data1.time, data2.time] = unify_time_axis(data1.time, data2.time);
+    % find the intervals for which both are active
+    [iv1, iv2] = find_common_time(data1.time, data2.time, colloc_config('interval'));
+    if ~(any(iv1) && any(iv2)) % no overlap
+        continue
+    end
+    
+    % perform collocations
+    logtext(fid, 'Collocating\n');
+    collocations = collocate(data1.time(iv1), data1.lat(iv1, :), data1.lon(iv1, :), ...
+        data2.time(iv2, :), data2.lat(iv2, :), data2.lon(iv2, :), ...
+        colloc_config('distance'), colloc_config('interval'));
+    logtext(fid, 'Finished collocating\n');
+    if any(collocations)
+        % compensate for the fact that we passed only a subset to collocate
+        collocations(:, 1) = collocations(:, 1) + find(iv1, 1, 'first') - 1;
+        collocations(:, 3) = collocations(:, 3) + find(iv2, 1, 'first') - 1;
+    else
+        logtext(fid, 'No collocations\n');
+        continue
+    end
+    % process data
+    % should return a matrix with info
+    logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
+    M_c.(satname) = fhp(collocations, ...
+        sat1, date1, data1, ...
+        satname, date2_all(i, :), data2);
+
+    if nargout > 1 % also data
+        M_d.(satname) = fhpd(collocations, M_c.(satname), ...
+            sat1, date1, data1, ...
+            satname, date2_all(i, :), data2);
+    end
+    
+    if nargout > 2 % also meandata
+        M_m.(satname) = fhpm(collocations, M_c.(satname), M_d.(satname), date1, data1, date2_all(i, :), data2);
+    end
+    
+    [overlap, data, meandata] = colloc_concatenate_colloc_data_mean(...
+        overlap, M_c, data, M_d, meandata, M_m);
+    
+    logtext(fid, 'Info collected\n');
+end

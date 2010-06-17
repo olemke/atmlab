@@ -1,3 +1,92 @@
+2010-06-17	Gerrit Holl	<gerrit.holl@ltu.se>
+	
+	* atmlab-1-0-2
+
+    * collocations/collocate_granule.m: Given a pair of satellite/sensor
+	(sat1, sensor1, sat2, sensor2) and a starting time for a granule for the
+	first satellite/sensor pair (as a datevec), collocate the
+	sat1/sensor1-granule with /all/ sat2/sensor2-granules that have overlap
+	+/- the collocation interval time.
+	Depends on appropiate settings in colloc_config and on:
+	+ overlap_granule
+	+ find_datafile_by_date
+	+ colloc_read_*
+	+ colloc_process_*
+	+ colloc_concatenate_colloc_data_mean
+	+ unify_time_axis
+	+ find_common_time
+	+ collocate
+	+ amsub_or_mhs
+	+ logtext
+
+    * collocations/overlap_granule.m: Given a pair of satellite/sensor (sat1,
+	sensor1, sat2, sensor2) and a starting time for a granule for the first
+	satellite/sensor pair (as a datevec), give the starting times for all
+	granules from sat2/sensor2 that have a time overlap +/- the collocation
+	interval time. Used by collocate_granule. Depends on appropiate settings
+	in colloc_config and on:
+    + find_granules_by_date
+    + amsub_or_mhs
+
+    * collocations/find_granules_by_date.m: Given a satellite/sensor pair and
+	a date, gives the starting times for all granules for this
+	satellite/sensor pair for this date. Depends on appropiate settings in
+	colloc_config.
+
+    * collocations/colloc_read_poes_radiometer.m,
+	collocations/colloc_read_cpr.m: Wrappers around well-established read
+	functions for data, but return data in a common format so that the caller,
+	in this case collocate_granule, can determine the names to call
+	dynamically, with the help of colloc_config, and doesn't need to know how
+	to process or to call a processing function, thus reducing the need for
+	long switch-statements. Depends on appropiate settings in colloc_config
+	and on compensate_wraparound.
+
+	* collocations/colloc_process_cpr_mhs.m,
+	collocations/colloc_process_data_cpr_mhs.m,
+	collocations/colloc_process_meandata_cpr_mhs.m: After collocate_granule
+	has read data (colloc_read_*), found what to collocate it with
+	(overlap_granule) and collocated it (collocate), use those three (up to
+	three) functions to gather interesting information to store. Depend on
+	find_datafile_by_date and appropiate settings in colloc_config.
+
+    * collocations/colloc_config.m: This function, in the style of 'atmlab',
+	contains configurations, constants and globals (at least that's how I use
+	them) used throughout my collocation code and a bit beyond. Currently
+	contains defaults applicable to the SAT-cluster, but it should be
+	generically configurable.
+
+    * collocations/colloc_concatenate_colloc_data_mean.m: Specialised helper
+	function needed to concatenate different outputs of overlap_granule. See
+	source code for detailed rationale.
+
+    * sensors/cloudsat_read_zipped.m: Unzip, read and remove unzipped CS.
+
+    * time/compensate_wraparound.m: AMSU stores time in (milli)seconds since
+	00:00 UT, if an orbit crosses the UT date boundary, this reduces to 0.
+	That makes it hard to compare times, so this compensates for it.
+
+    * time/unify_time_axis.m: For two different time vectors, correct at most
+	one of them so that their epoch will be common. In particular, if two
+	satellite datasets store time as "time since 00:00 UT", they might start
+	on subsequent dates and one of them should be corrected for them to be
+	compared. Used by collocate_granule.
+
+    * time/find_common_time.m: For two time vectors (or actually, can be done
+	for any vector), mark the parts covered by both, +/- an interval.
+	Used by collocate_granule.
+
+    * handy/logtext.m: Log text along with callers filename and line-number.
+	If the output is the Matlab desktop, also make links.
+
+    * handy/amsub_or_mhs.m: Which sensor is on this satellite? Depends on
+	appropiate settings in colloc_config.
+
+    * handy/find_datafile_by_date.m: Given a satellite-sensor-pair and a
+	starting date/time for a granule, return the filename containing data. See
+	also find_granules_by_date. Depends on appropiate settings in
+	colloc_config.
+
 2010-06-16	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-1
