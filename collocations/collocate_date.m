@@ -71,11 +71,11 @@ for i = 1:ngrans
             [year, month, day, hour, minute]);
     catch ME
         switch ME.identifier
-            case 'collocate:find_datafile_by_date'
+            case 'atmlab:find_datafile_by_date'
                 logtext(cscol('stderr'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     year, month, day, hour, minute, sat1, sensor1, ME.message);
                 continue
-            case {'collocations:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c'}
+            case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c'}
                 logtext(cscol('stderr'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     year, month, day, hour, minute, sat1, sensor1, ME.message);
                 continue

@@ -52,11 +52,28 @@ eid = colloc_config('stderr');
 
 %% get handles for reading, processing
 
+dummy = @(varargin) (-1);
 fh1 = colloc_config(['read_' sensor1]);
 fh2 = colloc_config(['read_' sensor2]);
 fhp = colloc_config(['process_' sensor1 '_' sensor2]);
-fhpd = colloc_config(['process_data_', sensor1 '_' sensor2]);
-fhpm = colloc_config(['process_meandata_', sensor1 '_' sensor2]);
+
+try
+    fhpd = colloc_config(['process_data_', sensor1 '_' sensor2]);
+    fhpm = colloc_config(['process_meandata_', sensor1 '_' sensor2]);
+catch ME
+    switch (ME.identifier)
+        case 'atmlab:prstnt_struct:undefined'
+            if any(strfind(ME.message, '_meandata_'))
+                fhpm = dummy;
+            else % failed already at _data_
+                fhpd = dummy;
+                fhpm = dummy;
+            end
+        otherwise
+            ME.rethrow();
+    end
+end
+
 
 %% find path to datafile for sat1/sensor1
 %date1_cell = num2cell(date1);
@@ -100,7 +117,7 @@ for i = 1:size(date2_all, 1)
     try
         datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, amsub_or_mhs(satname));
     catch ME
-        if strcmp(ME.identifier, 'collocate:find_datafile_by_date')
+        if strcmp(ME.identifier, 'atmlab:find_datafile_by_date')
             logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                 datecell{:}, ME.message);
             continue
@@ -142,13 +159,13 @@ for i = 1:size(date2_all, 1)
         sat1, date1, data1, ...
         satname, date2_all(i, :), data2);
 
-    if nargout > 1 % also data
+    if nargout > 1 && ~isequal(fhpd, dummy) % also data
         M_d.(satname) = fhpd(collocations, M_c.(satname), ...
             sat1, date1, data1, ...
             satname, date2_all(i, :), data2);
     end
     
-    if nargout > 2 % also meandata
+    if nargout > 2 && ~isequal(fhpm, dummy) % also meandata
         M_m.(satname) = fhpm(collocations, M_c.(satname), M_d.(satname), date1, data1, date2_all(i, :), data2);
     end
     

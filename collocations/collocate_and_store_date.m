@@ -37,8 +37,10 @@ function collocate_and_store_date(year, month, day, ...
 getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
 fn = getfn(year, month, day, sat1, sat2);
 
+C = {-1 -1 -1};
+
 if ~exist(fn, 'file') || colloc_config('overwrite')
-    [C{1:3}] = ...
+    [C{1:colloc_config(['no_' sensor1 '_' sensor2])}] = ...
          collocate_date(year, month, day, sat1, sensor1, sat2, sensor2);
 
     write_collocations(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);

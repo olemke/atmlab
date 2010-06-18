@@ -1,3 +1,26 @@
+2010-06-18	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-4
+
+	* handy/prstnt_struct.m: If a field is not defined, generate a *useful*
+	exception, e.g, one that can be checked when catched. So make a meaningful
+	errorid and add the missing field to the error string. I think this should
+	not break anything, but in theory it could break poorly designed code.
+
+	* collocations/README: Add more information on how to find collocations,
+	but particularly, add documentation on how to add code for a new pair of
+	collocations.
+
+	* collocations/colloc_get_path_poes_poes.m,
+	collocations/colloc_process_poes_poes.m,
+	collocations/colloc_process_data_poes_poes.m,
+	collocations/colloc_config.m: Add support for poes/poes-collocations.
+
+	* collocations/collocate_and_store_date.m,
+	collocations/collocate_granule.m: Consider number of outputs.
+
+	* collocations/collocate_date.m: Catch for renamed error identifiers.
+
 2010-06-17	Gerrit Holl	<gerrit.holl@ltu.se>
 	
 	* atmlab-1-0-3

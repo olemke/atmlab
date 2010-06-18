@@ -87,8 +87,10 @@ switch length( varg )
     else
 
       if ~isfield( A, varg{1} )
-        fprintf('\nThe field %s is not defined.\n\n', varg{1} ); 
-        error( 'See above' ); 
+%        fprintf('\nThe field %s is not defined.\n\n', varg{1} );
+        
+        error('atmlab:prstnt_struct:undefined', ...
+            'The field %s is not defined', varg{1}); 
       end
 
       value = getfield( A, varg{1} );

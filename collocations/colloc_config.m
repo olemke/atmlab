@@ -51,11 +51,17 @@ A.avhrr_basedir = '/local/gerrit/data/avhrr/l1b';
 A.avhrr_yeardir = '$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
+% $YEAR, $SAT etc. are replaced by colloc_get_path_*
 A.collocation_cpr_mhs_basedir = '~/data/collocations';
 A.collocation_cpr_mhs_yeardir = '$YEAR';
 A.collocation_cpr_mhs_filename = 'collocations_$SAT.mat';
 A.collocation_cpr_mhs_data_filename = 'collocations_data_$SAT.mat';
 A.collocation_cpr_mhs_meandata_filename = 'collocations_meandata_$SAT.mat';
+
+A.collocation_poes_poes_basedir = '~/data/collocations_poes_poes';
+A.collocation_poes_poes_yeardir = '$YEAR';
+A.collocation_poes_poes_filename = 'collocations_$SAT1_$SAT2.mat';
+A.collocation_poes_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 
 % define what reading function to use for what sensor
 
@@ -74,9 +80,33 @@ A.process_cpr_amsub = @colloc_process_cpr_mhs;
 A.process_data_cpr_amsub = @colloc_process_data_cpr_mhs;
 A.process_meandata_cpr_amsub = @colloc_process_meandata_cpr_mhs;
 
+A.no_cpr_mhs = 3;
+A.no_cpr_amsub = 3;
+
+A.process_mhs_mhs = @colloc_process_poes_poes;
+A.process_mhs_amsub = @colloc_process_poes_poes;
+A.process_amsub_mhs = @colloc_process_poes_poes;
+A.process_amsub_amsub = @colloc_process_poes_poes;
+
+A.process_data_mhs_mhs = @colloc_process_data_poes_poes;
+A.process_data_mhs_amsub = @colloc_process_data_poes_poes;
+A.process_data_amsub_mhs = @colloc_process_data_poes_poes;
+A.process_data_amsub_amsub = @colloc_process_data_poes_poes;
+
+A.no_mhs_mhs = 2;
+A.no_mhs_amsub = 2;
+A.no_amsub_mhs = 2;
+A.no_amsub_amsub = 2;
+
 % define what functions to use to find filenames
 
 A.filename_cpr_mhs = @colloc_get_path_cpr_poes_radiometer;
+A.filename_cpr_amsub = @colloc_get_path_cpr_poes_radiometer;
+
+A.filename_mhs_mhs = @colloc_get_path_poes_poes;
+A.filename_mhs_amsub = @colloc_get_path_poes_poes;
+A.filename_amsub_mhs = @colloc_get_path_poes_poes;
+A.filename_amsub_amsub = @colloc_get_path_poes_poes;
 
 % define approximate granule durations
 
@@ -166,3 +196,29 @@ A.cols_cpr_mhs.meandata = struct(...
 	'FRAC', 7, ...
 	'INHIRS', 8, ...
     'NCOLS', 8);
+
+% for POES/POES
+
+A.cols_poes_poes.overlap = struct(...
+    'LAT1', 1, ...
+    'LONG1', 2, ...
+    'START1', 3, ...
+    'TIME1', 4, ...
+    'I1', 5, ...
+    'C1', 6, ...
+    'LAT2', 7, ...
+    'LONG2', 8, ...
+    'START2', 9, ...
+    'TIME2', 10, ...
+    'I2', 11, ...
+    'C2', 12, ...
+    'DIST', 13, ...
+    'INT', 14, ...
+    'NCOLS', 14);
+
+A.cols_poes_poes.data = struct(...
+	'AMSU_B1', 1:5, ...
+	'MHS1', 1:5, ...
+    'AMSU_B2', 6:10, ...
+    'MHS2', 6:10, ...
+    'NCOLS', 10);
