@@ -49,7 +49,7 @@ switch lower(sat2)
     case 'poes'
         sats = colloc_config('POES_satellite_names');
         for i = 1:length(sats)
-            empty.(sats{i}) = [];
+            empty.(sats{i}) = []; % FIXME: get good width
         end
     otherwise
         empty.(sat2) = [];

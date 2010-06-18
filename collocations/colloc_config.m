@@ -7,9 +7,25 @@ function value = colloc_config(varargin)
 % $Id: cscol.m 5374 2010-06-03 15:52:26Z gerrit $
 
 persistent A
-           
-[A,value] = prstnt_struct( A, @colloc_config_defs, varargin );
- 
+
+try
+    [A,value] = prstnt_struct( A, @colloc_config_defs, varargin );
+catch ME
+    switch (ME.identifier)
+        % see if any aliases can be identified
+        case 'atmlab:prstnt_struct:undefined' 
+            elem = varargin{1};
+            aliases = colloc_config('alias');
+            nm = fieldnames(aliases);
+            for i = 1:length(nm)
+                elem = strrep(elem, nm{i}, aliases.(nm{i}));
+            end
+            varargin{1} = elem;
+            [A,value] = prstnt_struct( A, @colloc_config_defs, varargin);
+        otherwise
+            ME.rethrow();
+    end
+end
  
 function A = colloc_config_defs
 
@@ -19,6 +35,22 @@ A.stderr = 2;
 % overwrite existing collocations
 
 A.overwrite = false;
+
+% all POES satellites with MHS/AMSUB
+
+A.POES_satellite_names = {'noaa15', 'noaa16', 'noaa17', 'noaa18', 'noaa19', 'metopa'};
+A.POES_satellite_numbers = [15 16 17 18 19 29499]; % for metopa, use NORAD number
+A.POES_satellites_amsub = {'noaa15', 'noaa16', 'noaa17'};
+A.POES_satellites_mhs = {'noaa18', 'noaa19', 'metopa'};
+
+% define some aliases
+
+A.alias.mhs = 'poes';
+A.alias.amsub = 'poes';
+
+for i=1:length(A.POES_satellite_names)
+    A.alias.(A.POES_satellite_names{i}) = 'poes';
+end
 
 % set where to find data
 % in $SENSOR_yeardir, $YEAR and $SAT are replaced
@@ -52,11 +84,11 @@ A.avhrr_yeardir = '$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
 % $YEAR, $SAT etc. are replaced by colloc_get_path_*
-A.collocation_cpr_mhs_basedir = '~/data/collocations';
-A.collocation_cpr_mhs_yeardir = '$YEAR';
-A.collocation_cpr_mhs_filename = 'collocations_$SAT.mat';
-A.collocation_cpr_mhs_data_filename = 'collocations_data_$SAT.mat';
-A.collocation_cpr_mhs_meandata_filename = 'collocations_meandata_$SAT.mat';
+A.collocation_cpr_poes_basedir = '~/data/collocations';
+A.collocation_cpr_poes_yeardir = '$YEAR';
+A.collocation_cpr_poes_filename = 'collocations_$SAT.mat';
+A.collocation_cpr_poes_data_filename = 'collocations_data_$SAT.mat';
+A.collocation_cpr_poes_meandata_filename = 'collocations_meandata_$SAT.mat';
 
 A.collocation_poes_poes_basedir = '~/data/collocations_poes_poes';
 A.collocation_poes_poes_yeardir = '$YEAR';
@@ -73,40 +105,23 @@ A.read_hirs = @colloc_read_poes_radiometer;
 
 % define what processing functions to use for what sensor pair
 
-A.process_cpr_mhs = @colloc_process_cpr_mhs;
-A.process_data_cpr_mhs = @colloc_process_data_cpr_mhs;
-A.process_meandata_cpr_mhs = @colloc_process_meandata_cpr_mhs;
-A.process_cpr_amsub = @colloc_process_cpr_mhs;
-A.process_data_cpr_amsub = @colloc_process_data_cpr_mhs;
-A.process_meandata_cpr_amsub = @colloc_process_meandata_cpr_mhs;
+A.process_cpr_poes = @colloc_process_cpr_mhs;
+A.process_data_cpr_poes = @colloc_process_data_cpr_mhs;
+A.process_meandata_cpr_poes = @colloc_process_meandata_cpr_mhs;
 
-A.no_cpr_mhs = 3;
-A.no_cpr_amsub = 3;
+A.no_cpr_poes = 3;
 
-A.process_mhs_mhs = @colloc_process_poes_poes;
-A.process_mhs_amsub = @colloc_process_poes_poes;
-A.process_amsub_mhs = @colloc_process_poes_poes;
-A.process_amsub_amsub = @colloc_process_poes_poes;
+A.process_poes_poes = @colloc_process_poes_poes;
 
-A.process_data_mhs_mhs = @colloc_process_data_poes_poes;
-A.process_data_mhs_amsub = @colloc_process_data_poes_poes;
-A.process_data_amsub_mhs = @colloc_process_data_poes_poes;
-A.process_data_amsub_amsub = @colloc_process_data_poes_poes;
+A.process_data_poes_poes = @colloc_process_data_poes_poes;
 
-A.no_mhs_mhs = 2;
-A.no_mhs_amsub = 2;
-A.no_amsub_mhs = 2;
-A.no_amsub_amsub = 2;
+A.no_poes_poes = 2;
 
 % define what functions to use to find filenames
 
-A.filename_cpr_mhs = @colloc_get_path_cpr_poes_radiometer;
-A.filename_cpr_amsub = @colloc_get_path_cpr_poes_radiometer;
+A.filename_cpr_poes = @colloc_get_path_cpr_poes_radiometer;
 
-A.filename_mhs_mhs = @colloc_get_path_poes_poes;
-A.filename_mhs_amsub = @colloc_get_path_poes_poes;
-A.filename_amsub_mhs = @colloc_get_path_poes_poes;
-A.filename_amsub_amsub = @colloc_get_path_poes_poes;
+A.filename_poes_poes = @colloc_get_path_poes_poes;
 
 % define approximate granule durations
 
@@ -131,16 +146,10 @@ A.interval = 900; % seconds
 A.distance_for_average_MHS = 7.5; % km
 A.distance_for_average_HIRS = 5; % For HIRS/4
 
-% all POES satellites with MHS/AMSUB
-
-A.POES_satellite_names = {'noaa15', 'noaa16', 'noaa17', 'noaa18', 'noaa19', 'metopa'};
-A.POES_satellite_numbers = [15 16 17 18 19 29499]; % for metopa, use NORAD number
-A.POES_satellites_amsub = {'noaa15', 'noaa16', 'noaa17'};
-A.POES_satellites_mhs = {'noaa18', 'noaa19', 'metopa'};
 
 % column definitions
 
-A.cols_cpr_mhs.overlap = struct(...
+A.cols_cpr_poes.overlap = struct(...
     'C_LONG',    1, ...
 	'C_LAT',     2, ...
 	'C_START',   3, ...
@@ -172,7 +181,7 @@ A.cols_cpr_mhs.overlap = struct(...
 	'H_INT',     29, ...
 	'NCOLS',     29);
 
-A.cols_cpr_mhs.data = struct(...
+A.cols_cpr_poes.data = struct(...
 	'ROIWP',     1, ...
 	'dROIWP',    2, ...
 	'IOROIWP',   3, ...
@@ -186,7 +195,7 @@ A.cols_cpr_mhs.data = struct(...
 	'NCOLS', 45);
 
 % mean files
-A.cols_cpr_mhs.meandata = struct(...
+A.cols_cpr_poes.meandata = struct(...
 	'FIRST', 1, ... % meandata should always start with first/last
 	'LAST', 2, ...
 	'NO', 3, ...

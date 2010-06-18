@@ -1,4 +1,39 @@
 2010-06-18	Gerrit Holl	<gerrit.holl@ltu.se>
+	
+	* atmlab-1-0-5
+
+	* collocations/colloc_colname2no.m: Convert column names to column
+	numbers, used when reading collocations, because one can refer to columns
+	by name (B_LAT, C_LAT, B_DIST, etc.).
+
+	* collocations/colloc_config.m: Add aliases for the POES sensors and
+	satellites to 'poes', so that it's not needed to add all different
+	combinations of not only mhs/amsub, but also (shudder)
+	noaa15–noaa19+metopa. Renamed mhs-thingies to poes.
+
+	* collocations/collocation_read.m: Use this function to read earlier
+	written collocations.
+
+	* collocations/collocate_date.m: Added a FIXME to remind me of something
+	on my TODO-list.
+
+	* collocations/README: Add info on how to set up the configuration, how to
+	read previously collocated collocations with collocation_read, updated
+	information on how to add code for a new pair of collocations.
+
+	* collocations/TODO: Added most important TODO-items.
+
+	* collocations/collocation_restrain.m: Limit collocations (or actually any
+	matrix) to certain ranges (such as latitude within [-20 20]).
+
+	* collocations/read_collocs_data_mean.m: Helper function for
+	collocation_read, particularly with the meandata that has smaller
+	dimensions and pointers to the other two.
+
+	* handy/structsearch.m: Search in a structure recursively. Used by
+	colloc_colname2no.
+
+2010-06-18	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-4
 

@@ -1,0 +1,15 @@
+- Sometimes, MSPPS starts the minute after the corresponding
+  MHS/AMSUB-granule. In the current implementation, near the end of
+  colloc_process_data_cpr_mhs, this is not accounted for. When this happens,
+  the MSPPS data is missed.
+- Currently, when processing CloudSat/MHS-collocations, I read the files for
+  AMSUA and HIRS twice: once when getting collocation info, once when getting
+  collocation data. This is not good.
+- In both collocate_date and collocate_granule, I predefine 'overlap', 'data'
+  and 'meandata' as empty matrices (0x0). This should actually be 0xwidth, so
+  that data as stored in the collocation files can always be vertically
+  concatenated, and I can get rid of the 'isempty'-test in collocation_read.
+- Add the following functionality from my own matlab-files:
+    - restrain_collocations
+    - cscolmhs-collocations
+    - read avhrr for mhs
