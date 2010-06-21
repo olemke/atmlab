@@ -1,3 +1,29 @@
+2010-06-21	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-6
+
+	* collocations/colloc_process_cpr_mhs.m,
+	collocations/colloc_process_data_cpr_mhs.m,
+	collocations/colloc_get_path_cpr_poes_radiometer.m: Fix errors in
+	docstring.
+
+	* collocations/colloc_get_path_cpr_avhrr.m,
+	collocations/colloc_read_avhrr.m,
+	collocations/colloc_process_cpr_avhrr.m,
+	collocations/colloc_process_data_cpr_avhrr.m: Add support for
+	CPR/AVHRR-collocations.
+
+	* collocations/colloc_config.m: Add support for CPR/AVHRR, fix typo.
+
+	* collocations/collocate_granule.m: Don't assume AMSUB/MHS, should also
+	work for AVHRR.
+
+	* handy/find_datafile_by_date.m: Get rid of commented-out previous
+	implementation.
+
+	* collocations/README: Add information on how to add the location of the
+	actual source files (duh!).
+
 2010-06-18	Gerrit Holl	<gerrit.holl@ltu.se>
 	
 	* atmlab-1-0-5

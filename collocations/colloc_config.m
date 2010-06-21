@@ -52,6 +52,10 @@ for i=1:length(A.POES_satellite_names)
     A.alias.(A.POES_satellite_names{i}) = 'poes';
 end
 
+% define locations of tools
+
+A.sat2netcdf = '/storage4/home/gerrit/downloads/sat2netcdf-0.4.jar';
+
 % set where to find data
 % in $SENSOR_yeardir, $YEAR and $SAT are replaced
 
@@ -79,8 +83,8 @@ A.mspps_basedir = '/storage3/data/mspps';
 A.mspps_yeardir = '$SAT_orbital_$YEAR';
 A.mspps_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
-A.avhrr_basedir = '/local/gerrit/data/avhrr/l1b';
-A.avhrr_yeardir = '$YEAR';
+A.avhrr_basedir = '/storage3/data/avhrr';
+A.avhrr_yeardir = '$SAT_gac_$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
 % $YEAR, $SAT etc. are replaced by colloc_get_path_*
@@ -95,6 +99,11 @@ A.collocation_poes_poes_yeardir = '$YEAR';
 A.collocation_poes_poes_filename = 'collocations_$SAT1_$SAT2.mat';
 A.collocation_poes_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 
+A.collocation_cpr_avhrr_basedir = '~/data/collocations_cpr_avhrr';
+A.collocation_cpr_avhrr_yeardir = '$YEAR';
+A.collocation_cpr_avhrr_filename = 'collocations_$SAT.mat';
+A.collocation_cpr_avhrr_data_filename = 'collocations_data_$SAT.mat';
+
 % define what reading function to use for what sensor
 
 A.read_cpr = @colloc_read_cpr;
@@ -102,6 +111,7 @@ A.read_mhs = @colloc_read_poes_radiometer;
 A.read_amsua = @colloc_read_poes_radiometer;
 A.read_amsub = @colloc_read_poes_radiometer;
 A.read_hirs = @colloc_read_poes_radiometer;
+A.read_avhrr = @colloc_read_avhrr;
 
 % define what processing functions to use for what sensor pair
 
@@ -117,11 +127,18 @@ A.process_data_poes_poes = @colloc_process_data_poes_poes;
 
 A.no_poes_poes = 2;
 
+A.process_cpr_avhrr = @colloc_process_cpr_avhrr;
+A.process_data_cpr_avhrr = @colloc_process_data_cpr_avhrr;
+
+A.no_cpr_avhrr = 2;
+
 % define what functions to use to find filenames
 
 A.filename_cpr_poes = @colloc_get_path_cpr_poes_radiometer;
 
 A.filename_poes_poes = @colloc_get_path_poes_poes;
+
+A.filename_cpr_avhrr = @colloc_get_path_cpr_avhrr;
 
 % define approximate granule durations
 
@@ -131,7 +148,7 @@ A.filename_poes_poes = @colloc_get_path_poes_poes;
 
 A.granule_duration_mhs = 6130; % seconds; upper estimate
 A.granule_duration_amsua = 6130;
-A.granule_duration_aumsb = 6130;
+A.granule_duration_amsub = 6130;
 A.granule_duration_hirs = 6130;
 
 A.granule_duration_cpr = 5932; % seconds
@@ -147,7 +164,7 @@ A.distance_for_average_MHS = 7.5; % km
 A.distance_for_average_HIRS = 5; % For HIRS/4
 
 
-% column definitions
+%% column definitions
 
 A.cols_cpr_poes.overlap = struct(...
     'C_LONG',    1, ...
@@ -230,4 +247,30 @@ A.cols_poes_poes.data = struct(...
 	'MHS1', 1:5, ...
     'AMSU_B2', 6:10, ...
     'MHS2', 6:10, ...
+    'NCOLS', 10);
+
+% for CPR/AVHRR
+
+A.cols_cpr_avhrr.overlap = struct(...
+    'C_LAT', 1, ...
+    'C_LONG', 2, ...
+    'C_START', 3, ...
+    'C_TIME', 4, ...
+    'C_ROW', 5, ...
+    'AVHRR_LAT', 6, ...
+    'AVHRR_LONG', 7, ...
+    'AVHRR_START', 8, ...
+    'AVHRR_TIME', 9, ...
+    'AVHRR_ROW', 10, ...
+    'AVHRR_COL', 11, ...
+    'DIST', 12, ...
+    'INT', 13, ...
+    'NCOLS', 10);
+
+A.cols_cpr_avhrr.data = struct(...
+    'ROIWP', 1, ...
+    'dROIWP', 2, ...
+    'IOROIWP', 3, ...
+    'dIOROIWP', 4, ...
+    'AVHRR', 5:10, ...
     'NCOLS', 10);

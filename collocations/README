@@ -104,6 +104,17 @@ More information in the help of 'collocation_read'.
 
 HOW TO ADD A NEW SET OF SENSORS
 
+0. In colloc_config, define where the data can be found, if it is not there
+yet. For example, for AVHRR, I added:
+
+A.avhrr_basedir = '/storage3/data/avhrr';
+A.avhrr_yeardir = '$SAT_gac_$YEAR';
+A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
+
+Those give the base directory, the directory for each year and the regular
+expression to extract the hour and the minute from the files inside the
+directory.
+
 1. In colloc_config, define configuration variables describing the location of
 where collocations should be stored. For example, to add POES/POES, I added:
 

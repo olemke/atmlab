@@ -10,6 +10,11 @@
   that data as stored in the collocation files can always be vertically
   concatenated, and I can get rid of the 'isempty'-test in collocation_read.
 - Add the following functionality from my own matlab-files:
-    - restrain_collocations
     - cscolmhs-collocations
-    - read avhrr for mhs
+- Optimise reading: collocate_date simply loops through every granule and does
+  collocate_granule, that means if two granules from sensor A collocate with
+  the same granule from sensor B (which they usually do), this one is read
+  twice. Bad, particularly for AVHRR where reading takes a long time.
+- After 21 June's fix getting rid of amsub_or_mhs in collocate_granule.m, find
+  a different solution when collocating with all POES satellites (caller,
+  probably).

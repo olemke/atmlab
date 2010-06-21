@@ -12,7 +12,7 @@ function [fn, fnd, fnm] = colloc_get_path_cpr_poes_radiometer(year, month, day, 
 %
 % FORMAT
 %
-%   [fn, fnd, fnm] = filename_cpr_mhs(year, month, day, sat1, sat2)
+%   [fn, fnd, fnm] = colloc_get_path_cpr_poes_radiometer(year, month, day, sat1, sat2)
 %
 % IN
 %

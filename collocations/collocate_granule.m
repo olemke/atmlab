@@ -115,7 +115,7 @@ for i = 1:size(date2_all, 1)
     satname = sat2_all_names{i};
 
     try
-        datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, amsub_or_mhs(satname));
+        datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, sensor2);
     catch ME
         if strcmp(ME.identifier, 'atmlab:find_datafile_by_date')
             logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...

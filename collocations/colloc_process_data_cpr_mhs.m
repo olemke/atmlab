@@ -11,7 +11,8 @@ function M = colloc_process_data_cpr_mhs(~, M_c, sat1, ~, data1, sat2, date2, da
 %
 % FORMAT
 %
-%   M = process_data_cpr_mhs(collocations, date1, data1, date2, data2)
+%   M = process_data_cpr_mhs(collocations, M_c, sat1, date1, data1, ...
+%       sat2, date2, data2)
 %
 % IN
 %
