@@ -61,7 +61,11 @@ end
 %% pre-allocate at least one row
 
 M = zeros(0, sum(cellfun(@length, colno)));
-paths = cell(size(colno));
+% make sure it all has length 3 (child will know to ignore empty ones)
+paths = {[], [], []};
+for i = length(colno)+1:3
+    colno{i} = [];
+end
 
 %% loop through all the dates
 
@@ -70,9 +74,12 @@ for i = 1:size(dates, 1)
     date = dates(i, :);
     %% read collocations for date
     
-    [paths{1:length(colno)}] = getpath(date(1), date(2), date(3), sat1, sat2);
+    [paths{1:length(cols_in)}] = getpath(date(1), date(2), date(3), sat1, sat2);
     collocations_day = read_collocs_data_mean(...
         paths{1:3}, cols, colno);
+    if isempty(collocations_day)
+        continue
+    end
 
     %% apply limitations
     if exist('limits', 'var')

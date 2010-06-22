@@ -4,7 +4,7 @@ function value = colloc_config(varargin)
 %
 % Similar to 'atmlab'.
 %
-% $Id: cscol.m 5374 2010-06-03 15:52:26Z gerrit $
+% $Id$
 
 persistent A
 

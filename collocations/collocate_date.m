@@ -72,12 +72,16 @@ for i = 1:ngrans
     catch ME
         switch ME.identifier
             case 'atmlab:find_datafile_by_date'
-                logtext(cscol('stderr'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
+                logtext(colloc_config('stderr'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     year, month, day, hour, minute, sat1, sensor1, ME.message);
                 continue
             case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c'}
-                logtext(cscol('stderr'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
+                logtext(colloc_config('stderr'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     year, month, day, hour, minute, sat1, sensor1, ME.message);
+                continue
+            case {'MATLAB:hdfinfo:invalidFile'}
+                logtext(colloc_config('stderr'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
+                    sat1, sensor1, year, month, day, hour, minute, ME.message);
                 continue
             otherwise
                 ME.rethrow();

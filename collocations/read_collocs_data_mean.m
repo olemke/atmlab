@@ -74,6 +74,11 @@ if ~exist('meandata', 'var')
     meandata.data_averaged = zeros(n, 0);
 end
 
+if isempty(overlap.collocations) % nothing
+    M = [];
+    return
+end
+
 % get the actual data
 M = [overlap.collocations(rows, cols_overlap) ...
      data.data(rows, cols_data) ...

@@ -1,3 +1,21 @@
+2010-06-22	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-7
+
+	* collocations/colloc_get_path_poes_poes.m, collocations/colloc_config.m:
+	Fix $Id$-tag
+
+	* collocations/collocation_read.m: Fix bug in case of <3 outputs.
+
+	* collocations/README: Add one more example.
+
+	* collocations/collocate_date.m: Log to correct place.
+
+	* collocations/collocate.m: Fix error ids.
+
+	* collocations/read_collocs_data_mean.m: Don't try to concatenate things
+	if there are no collocs.
+
 2010-06-21	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-6

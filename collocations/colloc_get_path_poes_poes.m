@@ -27,7 +27,7 @@ function [fn, fnd] = colloc_get_path_poes_poes(year, month, day, sat1, sat2)
 %   fnd     string      Full path to data file
 %   fnm     string      Full path to mean data file
 %
-% $Id: colloc_get_path_cpr_poes_radiometer.m 6412 2010-06-17 15:52:49Z gerrit $
+% $Id$
 
 basedir = colloc_config('collocation_poes_poes_basedir');
 basefile = colloc_config('collocation_poes_poes_filename');

@@ -37,18 +37,18 @@ nel1 = numel(lat1);
 nel2 = numel(lat2);
 
 % check dimensions
-assert(size(long1, 1)==nrows1, 'collocations:collocate', 'length long1 != length lat1');
-assert(size(long2, 1)==nrows2, 'collocations:collocate', 'length long2 != length long1');
-assert(length(t1)==nrows1, 'collocations:collocate', 'length t1 != length lat1');
-assert(length(t2)==nrows2, 'collocations:collocate', 'length t2 != length long2');
-assert(size(long1, 2)==ncols1, 'collocations:collocate', 'width long1 != width lat1');
-assert(size(long2, 2)==ncols2, 'collocations:collocate', 'width long2 != width lat2');
+assert(size(long1, 1)==nrows1, 'atmlab:collocate', 'length long1 != length lat1');
+assert(size(long2, 1)==nrows2, 'atmlab:collocate', 'length long2 != length long1');
+assert(length(t1)==nrows1, 'atmlab:collocate', 'length t1 != length lat1');
+assert(length(t2)==nrows2, 'atmlab:collocate', 'length t2 != length long2');
+assert(size(long1, 2)==ncols1, 'atmlab:collocate', 'width long1 != width lat1');
+assert(size(long2, 2)==ncols2, 'atmlab:collocate', 'width long2 != width lat2');
 
 % check correct numbers
-assert(max(max(abs(long1)))<=180, 'collocations:collocate', 'Invalid data in long1');
-assert(max(max(abs(lat1)))<=90, 'collocations:collocate', 'Invalid data in lat1');
-assert(max(max(abs(long2)))<=180, 'collocations:collocate', 'Invalid data in long2');
-assert(max(max(abs(lat2)))<=180, 'collocations:collocate', 'Invalid data in lat2');
+assert(max(max(abs(long1)))<=180, 'atmlab:collocate', 'Invalid data in long1');
+assert(max(max(abs(lat1)))<=90, 'atmlab:collocate', 'Invalid data in lat1');
+assert(max(max(abs(long2)))<=180, 'atmlab:collocate', 'Invalid data in long2');
+assert(max(max(abs(lat2)))<=180, 'atmlab:collocate', 'Invalid data in lat2');
 
 %% make t, rows, cols at the same grid --> no need for ind2sub
 

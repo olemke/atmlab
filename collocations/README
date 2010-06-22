@@ -100,6 +100,31 @@ ROIWP, but only within 20 degrees of the equator, one would write:
 18-Jun-2010 17:25:31.351:read_collocs_data_mean:48:Reading ~/data/collocations/2008/01/14/collocations_meandata_noaa18.mat
 18-Jun-2010 17:25:31.356:collocation_read:80:1888 -> 412 collocations
 
+or, 
+>> [M, cols] = collocation_read(...
+    'noaa16', 'amsub', 'noaa15', 'amsub', ... % sat/sensor pairs
+    [2001 1 1], [2001 1 15], ... % period
+    {{'LAT1', 'LONG1', 'C1', 'C2', 'DIST', 'INT'}, ... % geometrical info
+     {'AMSU_B1', 3:5, 'AMSU_B2', 3:5}}, ... % actual measurements
+     struct(...
+        'LAT1', [65 90], ... % latitude between 65 and 90 (inclusive) (only polar)
+        'C1', [40 50], ...   % noaa16 near-nadir (columns 40–50)
+        'C2', [40 50], ...   % noaa15 near-nadir (columns 40–50)
+        'DIST', [0 5], ...   % max 5 km
+        'INT', [0 300], ...  % max 5 minutes
+        'AMSU_B1', [0 400], ... % all requested NOAA-16 chans unflagged
+        'AMSU_B2', [0 400]);    % all requested NOAA-15 chans unflagged
+(output omitted)
+>> whos
+  Name        Size            Bytes  Class     Attributes
+
+  M         446x12            42816  double              
+  cols        1x1              1504  struct              
+>> plot(...                    % make a scatter plot...
+    M(:, cols.AMSU_B1(3)), ... % of NOAA-16/AMSU-B channel 20 ...
+    M(:, cols.AMSU_B2(3)), ... % versus NOAA-15/AMSU-B channel 20. ..
+    'k.')
+
 More information in the help of 'collocation_read'.
 
 HOW TO ADD A NEW SET OF SENSORS
