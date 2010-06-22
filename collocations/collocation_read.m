@@ -75,8 +75,19 @@ for i = 1:size(dates, 1)
     %% read collocations for date
     
     [paths{1:length(cols_in)}] = getpath(date(1), date(2), date(3), sat1, sat2);
-    collocations_day = read_collocs_data_mean(...
-        paths{1:3}, cols, colno);
+    try
+        collocations_day = read_collocs_data_mean(...
+            paths{1:3}, cols, colno);
+    catch ME
+        switch (ME.identifier)
+            case 'MATLAB:load:couldNotReadFile'
+                logtext(colloc_config('stderr'), 'Problem for %04d-%02d-%02d: %s', ...
+                    date(1), date(2), date(3), ME.message);
+                continue
+            otherwise
+                ME.rethrow();
+        end
+    end
     if isempty(collocations_day)
         continue
     end

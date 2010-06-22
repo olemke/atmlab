@@ -88,18 +88,18 @@ A.avhrr_yeardir = '$SAT_gac_$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
 % $YEAR, $SAT etc. are replaced by colloc_get_path_*
-A.collocation_cpr_poes_basedir = '~/data/collocations';
+A.collocation_cpr_poes_basedir = '~gerrit/data/collocations';
 A.collocation_cpr_poes_yeardir = '$YEAR';
 A.collocation_cpr_poes_filename = 'collocations_$SAT.mat';
 A.collocation_cpr_poes_data_filename = 'collocations_data_$SAT.mat';
 A.collocation_cpr_poes_meandata_filename = 'collocations_meandata_$SAT.mat';
 
-A.collocation_poes_poes_basedir = '~/data/collocations_poes_poes';
+A.collocation_poes_poes_basedir = '~gerrit/data/collocations_poes_poes';
 A.collocation_poes_poes_yeardir = '$YEAR';
 A.collocation_poes_poes_filename = 'collocations_$SAT1_$SAT2.mat';
 A.collocation_poes_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 
-A.collocation_cpr_avhrr_basedir = '~/data/collocations_cpr_avhrr';
+A.collocation_cpr_avhrr_basedir = '~gerrit/data/collocations_cpr_avhrr';
 A.collocation_cpr_avhrr_yeardir = '$YEAR';
 A.collocation_cpr_avhrr_filename = 'collocations_$SAT.mat';
 A.collocation_cpr_avhrr_data_filename = 'collocations_data_$SAT.mat';
