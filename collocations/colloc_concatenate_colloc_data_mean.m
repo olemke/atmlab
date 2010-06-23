@@ -46,6 +46,9 @@ fields = fieldnames(overlap); % fields that exist in NEW one will be used
 for n = 1:length(fields) % loop through all fields
     sat = fields{n};
     
+    if ~isfield(overlap_new, sat) % ignore
+        continue
+    end
     overlap_cat.(sat) = [overlap_cat.(sat); overlap_new.(sat)];
     data_cat.(sat) = [data_cat.(sat); data_new.(sat)];
     

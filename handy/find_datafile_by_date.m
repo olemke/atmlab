@@ -33,14 +33,23 @@ basedir = colloc_config([sensor '_basedir']);
 yeardir = colloc_config([sensor '_yeardir']);
 yeardir = strrep(yeardir, '$YEAR', num2str(datevec(1)));
 yeardir = strrep(yeardir, '$SAT', satname);
+if isempty(yeardir) % not per year, calculate it instead
+    calculator = colloc_config([sensor '_getpath']);
+    fn = calculator(datevec(1), datevec(2), datevec(3), satname);
+    datafile = fullfile(basedir, fn);
+    if ~exist(datafile, 'file')
+        error(errid, 'No datafile found for %s %s [%s]', satname, sensor, num2str(datevec));
+    end
+    return
+end
 
-datadir = fullfile(basedir, yeardir, num2str(datevec(2), '%02d'), num2str(datevec(3), '%02d'));
 granules = find_granules_by_date(datevec(1), datevec(2), datevec(3), satname, sensor);
 found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
 
 % find_granules_by_date returns granules in the order that their files are
 % returned by dir, so this is consistent
 
+datadir = fullfile(basedir, yeardir, num2str(datevec(2), '%02d'), num2str(datevec(3), '%02d'));
 files = dir(datadir);
 file_is_granule = arrayfun(@(x) any(regexp(x.name, colloc_config([sensor '_regexp']))), files);
 granule_files = files(file_is_granule);

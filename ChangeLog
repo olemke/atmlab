@@ -1,3 +1,58 @@
+2010-06-23	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-9
+
+	* collocations/colloc_process_poes_poes.m: Fix error in documentation.
+
+	* collocations/colloc_get_filename_hirscs.m: For HIRS-CS, data are not
+	stored per day, so instead of configuration a regexp in colloc_config,
+	need to use a deditacted file for this special case.
+
+	* collocations/collocation_read.m: Fix error in documentation. Add newline
+	to warning message. Output a notice in case of no collocations. Support
+	input {'a', 'cell', 'string'} rather than {{'like', 'this'}} if only
+	geometrical information is requested.
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Don't crash on
+	fields occuring in the "base" but not in the "new" structure.
+
+	* collocations/find_granules_by_date.m: Add support for "special cases",
+	if there is no yeardir, just return the date, and add support for regexps
+	not giving the hour and the minute as named matches.
+
+	* collocations/colloc_read_avhrr.m: Fix error in documentation.
+
+	* collocations/colloc_read_hirscs.m: Add support for HIRS-CS. Sometimes
+	gzipped, but sometimes not!
+
+	* collocations/colloc_config.m: Add support for HIRS-CS/MHS-collocations.
+
+	* collocations/collocate_and_store_date.m: Try to check for existance of
+	destination files also if collocation with 'poes'. Ideally should
+	collocate only those that don't exist yet, but this implementation simply
+	uses any(exist).
+
+	* collocations/README: Expand: Add some warning messages, add supported
+	collocation pairs, add a summary on adding a pair, document the new
+	alternate method for get_filename, add config. about how long a granule
+	takes.
+
+	* collocations/colloc_get_path_hirscs_poes_radiometer.m: Get the path for
+	collocated HIRSCS/POES-collocations.
+
+	* collocations/colloc_process_hirscs_poes.m,
+	collocations/colloc_process_data_hirscs_poes.m: Add support for
+	HIRS-CS/MHS-collocations. Special thing here: only the closest one to
+	HIRS.
+
+	* collocations/collocate_granule.m: Add a(n) (unfortunately ugly) hack for
+	the special case 'poes' because of the different names for amsub/mhs.
+	Also, only correct time axis if satellites did indeed start on different
+	dates, and keep the old time axis.
+
+	* handy/find_datafile_by_date.m: If datafiles are not stored per day,
+	needs a special function to answer this question.
+
 2010-06-22	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-8

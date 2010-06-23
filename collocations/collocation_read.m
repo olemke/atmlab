@@ -9,8 +9,9 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %
 % FORMAT
 %
-%   [M, cols_out] = collocation_read(sat1, sat2, start_date, end_date, ...
-%                   cols_in, limits)
+%   [M, cols] = collocation_read(...
+%       sat1, sensor1, sat2, sensor2, ...
+%       start_date, end_date, cols_in, limits)
 %
 % IN
 %
@@ -35,7 +36,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   M           NxM matrix  Matrix containing collected info
 %   cols        structure   Structure describing the names of the columns
 %
-% TODO documentation example
+% For examples, see atmlab/collocations/README
 %
 % $Id$
 
@@ -46,6 +47,9 @@ cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 
 %% convert column names to numbers
 
+if iscellstr(cols_in)
+    cols_in = {cols_in};
+end
 [colno, name_struct] = colloc_colname2no(sensor1, sensor2, cols_in);
 
 %% convert limits structure to matrix as wanted by restrain_collocations
@@ -81,7 +85,7 @@ for i = 1:size(dates, 1)
     catch ME
         switch (ME.identifier)
             case 'MATLAB:load:couldNotReadFile'
-                logtext(colloc_config('stderr'), 'Problem for %04d-%02d-%02d: %s', ...
+                logtext(colloc_config('stderr'), 'Problem for %04d-%02d-%02d: %s\n', ...
                     date(1), date(2), date(3), ME.message);
                 continue
             otherwise
@@ -89,6 +93,7 @@ for i = 1:size(dates, 1)
         end
     end
     if isempty(collocations_day)
+        logtext(colloc_config('stdout'), 'no collocations\n');
         continue
     end
 

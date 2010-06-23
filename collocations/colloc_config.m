@@ -56,8 +56,12 @@ end
 
 A.sat2netcdf = '/storage4/home/gerrit/downloads/sat2netcdf-0.4.jar';
 
-% set where to find data
+%% set where to find data
 % in $SENSOR_yeardir, $YEAR and $SAT are replaced
+% If $SENSOR_yeardir is set, it assumes data are sorted per year/month/day
+% and look for a file matching 'regexp' there.
+% If $SENSOR_yeardir is empty, it assumes data are sorted differently
+% and will call a function defined in $SENSOR_getpath
 
 A.cpr_basedir = '/storage3/data/cloudsat';
 A.cpr_yeardir = '$YEAR';
@@ -87,6 +91,10 @@ A.avhrr_basedir = '/storage3/data/avhrr';
 A.avhrr_yeardir = '$SAT_gac_$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
+A.hirscs_basedir = '/storage3/data/hirscs';
+A.hirscs_yeardir = '';
+A.hirscs_getpath = @colloc_get_filename_hirscs;
+
 % $YEAR, $SAT etc. are replaced by colloc_get_path_*
 A.collocation_cpr_poes_basedir = '~gerrit/data/collocations';
 A.collocation_cpr_poes_yeardir = '$YEAR';
@@ -104,6 +112,11 @@ A.collocation_cpr_avhrr_yeardir = '$YEAR';
 A.collocation_cpr_avhrr_filename = 'collocations_$SAT.mat';
 A.collocation_cpr_avhrr_data_filename = 'collocations_data_$SAT.mat';
 
+A.collocation_hirscs_poes_basedir = '~gerrit/data/collocations_hirscs_mhs';
+A.collocation_hirscs_poes_yeardir = '$YEAR';
+A.collocation_hirscs_poes_filename = 'collocations_$SAT1_$SAT2.mat';
+A.collocation_hirscs_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
+
 % define what reading function to use for what sensor
 
 A.read_cpr = @colloc_read_cpr;
@@ -112,6 +125,7 @@ A.read_amsua = @colloc_read_poes_radiometer;
 A.read_amsub = @colloc_read_poes_radiometer;
 A.read_hirs = @colloc_read_poes_radiometer;
 A.read_avhrr = @colloc_read_avhrr;
+A.read_hirscs = @colloc_read_hirscs;
 
 % define what processing functions to use for what sensor pair
 
@@ -132,6 +146,11 @@ A.process_data_cpr_avhrr = @colloc_process_data_cpr_avhrr;
 
 A.no_cpr_avhrr = 2;
 
+A.process_hirscs_poes = @colloc_process_hirscs_poes;
+A.process_data_hirscs_poes = @colloc_process_data_hirscs_poes;
+
+A.no_hirscs_poes = 2;
+
 % define what functions to use to find filenames
 
 A.filename_cpr_poes = @colloc_get_path_cpr_poes_radiometer;
@@ -139,6 +158,8 @@ A.filename_cpr_poes = @colloc_get_path_cpr_poes_radiometer;
 A.filename_poes_poes = @colloc_get_path_poes_poes;
 
 A.filename_cpr_avhrr = @colloc_get_path_cpr_avhrr;
+
+A.filename_hirscs_poes = @colloc_get_path_hirscs_poes_radiometer;
 
 % define approximate granule durations
 
@@ -152,6 +173,8 @@ A.granule_duration_amsub = 6130;
 A.granule_duration_hirs = 6130;
 
 A.granule_duration_cpr = 5932; % seconds
+
+A.granule_duration_hirscs = 86400; % one granule per day
 
 % maximum collocation distance and time
 
@@ -274,3 +297,32 @@ A.cols_cpr_avhrr.data = struct(...
     'dIOROIWP', 4, ...
     'AVHRR', 5:10, ...
     'NCOLS', 10);
+
+% for HIRSCS/MHS
+
+A.cols_hirscs_poes.overlap = struct(...
+    'H_LAT', 1, ...
+    'H_LONG', 2, ...
+    'H_I', 3, ...
+    'H_START', 4, ...
+    'H_TIME', 5, ...
+    'H_ZEN', 6, ...
+    'H_ALT', 7, ...
+    'H_LINE', 8, ...
+    'H_POSI', 9, ...
+    'MHS_LAT', 10, ...
+    'MHS_LONG', 11, ...
+    'MHS_ROW', 12, ...
+    'MHS_COL', 13, ...
+    'MHS_START', 14, ...
+    'MHS_TIME', 15, ...
+    'DIST', 16, ...
+    'INT', 17, ...
+    'NCOLS', 17);
+
+A.cols_hirscs_poes.data = struct(...
+    'VIS', 1, ...
+    'BT', 2:20, ...
+    'LC', 21:39, ...
+    'MHS', 40:44, ...
+    'NCOLS', 44);

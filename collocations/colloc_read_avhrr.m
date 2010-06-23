@@ -9,7 +9,7 @@ function data = colloc_read_avhrr(file, channels)
 %
 % FORMAT
 %
-%   data = colloc_read_avhrr(file)
+%   data = colloc_read_avhrr(file[, channels])
 %
 % IN
 %

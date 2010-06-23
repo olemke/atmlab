@@ -72,6 +72,26 @@ Columns are documented at http://satpage/docs/datasets/collocations/ and
 defined in colloc_config('cols_cpr_mhs') with the fields overlap, data and
 meandata.
 
+CAUTION! If doubles exist in the original data. they will REMAIN in the
+collocations. So when collocating with POES, there WILL be doubles. There is
+no functionality in atmlab yet to get rid of those!
+
+SUPPORTED COLLOCATION PAIRS
+
+When collocating, the secondary satellite can be 'poes' which is short for
+noaa15–noaa19 + metopa.
+
+- cloudsat cpr vs. poes mhs/amsub
+
+- poes mhs/amsub vs. poes mhs/amsub
+
+- poes hirscs vs. poes mhs/amsub
+
+HIRSCS data is available for a different range of poes than mhs/amsub, and the
+satellite names are abbreviated. Hence, the satellite name for hirscs should
+be the abbreviated satellite name as it is stored in the filesystem.
+This is likely to change in the near future!
+
 RAW COLLOCATIONS
 
 The raw, low-level function to collocate is called 'collocate'. This takes
@@ -129,19 +149,77 @@ More information in the help of 'collocation_read'.
 
 HOW TO ADD A NEW SET OF SENSORS
 
-0. In colloc_config, define where the data can be found, if it is not there
-yet. For example, for AVHRR, I added:
+To add a new pair of sensors, the collocation system needs to know:
+- how to find all data for a particular date
+- how long one granule file takes
+- how to read the granule files
+
+If all source datasets are already supported in existing pairs, steps 1–4 can
+be skipped.
+
+1.
+In colloc_config, define where the data can be found, if it is not there
+yet. You need to define a base directory in SENSOR_basedir.
+
+WARNING! When colloc_config is edited, all values are reset to default. If any
+collocations are running, this will cause problems!
+
+For most datasets, data are stored per day, at least on the SAT cluster.
+If this is the case, one needs to define, besides SENSOR_basedir,
+SENSOR_yeardir and SENSOR_regexp. The latter is a regular expression matched
+against all filenames in the directory for the particular day.
+find_datafile_by_date will then return the filename for the first match, whereas
+find_granules_by_date will use the named matches for 'hour' and 'minute'
+to return [year month day hour minute] for each of the days.
+
+For example, for AVHRR, I added:
 
 A.avhrr_basedir = '/storage3/data/avhrr';
 A.avhrr_yeardir = '$SAT_gac_$YEAR';
 A.avhrr_regexp = '\.S(?<hour>\d{2})(?<minute>\d{2})\.';
 
-Those give the base directory, the directory for each year and the regular
-expression to extract the hour and the minute from the files inside the
-directory.
+Alternately, the data may not be stored per day, such as is the case for
+hirscs. In that case, it has to be one granule per day, and one needs to
+link a function that will calculates the sole granule for that day. The
+yeardir should be empty, as this is used to check whether to assume data
+sorted per day. For example, for hirscs, I added:
 
-1. In colloc_config, define configuration variables describing the location of
-where collocations should be stored. For example, to add POES/POES, I added:
+A.hirscs_basedir = '/storage3/data/hirscs';
+A.hirscs_yeardir = '';
+A.hirscs_getpath = @colloc_get_filename_hirscs;
+
+Then, the path will be:
+
+fullfile(hirscs_basedir, colloc_get_filename_hircs(year, month, day, sat))
+
+Maybe in some cases, neither of the above situations applies, although the
+latter approach should be quite flexible. Those cases are not currently
+supported, but will be supported when needed.
+
+2.
+In colloc_config, define how long a granule takes. For example, for hirscs,
+I added:
+
+A.granule_duration_hirscs = 86400; % one granule per day
+
+3. In colloc_config, define configuration variables describing what m-file
+should be used to read each of the datasets. For the POES/POES example, this
+was already there, because POES are read for CloudSat/MHS-collocations as
+well. For reference, those lines are like:
+
+A.read_mhs = @colloc_read_poes_radiometer;
+
+
+4. Create the m-files just linked to. In this case,
+colloc_read_poes_radiometer already existed because CloudSat/MHS-collocations
+use this. All readers should take a string as an input, the path to the file
+to read, and should output a structure with at least the fields 'lat', 'lon'
+and 'time'. One probably wants to add some more information for
+post-collocating processing, see step 8. See existing readers for examples.
+
+
+3. In colloc_config, define configuration variables describing the location of
+where the collocations should be stored. For example, to add POES/POES, I added:
 
 A.collocation_poes_poes_basedir = '~/data/collocations_poes_poes';
 A.collocation_poes_poes_yeardir = '$YEAR';
@@ -151,7 +229,7 @@ A.collocation_poes_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 Those can be redefined at a later stage, and the function calculating the
 filename (see step3) should thus use those rather than hardcoded paths.
 
-2. In colloc_config, define configuration variables describing what m-file
+4. In colloc_config, define configuration variables describing what m-file
 should be used to calculate the filename from year/month/day/sat1/sat2. For
 example, for POES/POES, I added:
 
@@ -159,27 +237,13 @@ A.filename_poes_poes = @colloc_get_path_poes_poes;
 
 Note that 'mhs' and 'amsub' are aliases for 'poes'.
 
-3. Create the m-files just linked to. The existing colloc_get_path_* can serve
+5. Create the m-files just linked to. The existing colloc_get_path_* can serve
 as an example, It should take 5 input arguments (year, month, day, sat1, sat2)
 and give up to 3 output arguments (path for collocations, path for
 collocation data and path for mean collocation data). Here, you should use the
 variables stored in step 1 and replace strings like $SAT1 and $SAT2 with
 appropiate names using a function like strrep. Because colloc_config is
 configurable, the user can deviate from default paths and naming patterns.
-
-4. In colloc_config, define configuration variables describing what m-file
-should be used to read each of the datasets. For the POES/POES example, this
-was already there, because POES are read for CloudSat/MHS-collocations as
-well. For reference, those lines are like:
-
-A.read_mhs = @colloc_read_poes_radiometer;
-
-5. Create the m-files just linked to. In this case,
-colloc_read_poes_radiometer already existed because CloudSat/MHS-collocations
-use this. All readers should take a string as an input, the path to the file
-to read, and should output a structure with at least the fields 'lat', 'lon'
-and 'time'. One probably wants to add some more information for
-post-collocating processing, see step 8. See existing readers for examples.
 
 6. In colloc_config, define configuration variables describing what m-file
 should be used to process the collocations. After collocating, one probably

@@ -36,10 +36,15 @@ function collocate_and_store_date(year, month, day, ...
 
 getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
 fn = getfn(year, month, day, sat1, sat2);
+if strcmp(sat2, 'poes')
+    fileexists = any(cellfun(@(v) exist(getfn(year, month, day, sat1, v), 'file'), colloc_config('POES_satellite_names')));
+else
+    fileexists = exist(fn, 'file');
+end
 
 C = {-1 -1 -1};
 
-if ~exist(fn, 'file') || colloc_config('overwrite')
+if ~fileexists || colloc_config('overwrite')
     [C{1:colloc_config(['no_' sensor1 '_' sensor2])}] = ...
          collocate_date(year, month, day, sat1, sensor1, sat2, sensor2);
 

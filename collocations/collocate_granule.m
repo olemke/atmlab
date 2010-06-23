@@ -106,16 +106,27 @@ M_c = overlap; M_d = overlap; M_m = overlap; % and those
 %% read data for sat1/sensor1
 logtext(fid, 'Reading %s\n', datafile);
 data1 = fh1(datafile);
+data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
 logtext(fid, 'Read %s\n', datafile);
+logtext(fid, 'Found %d other granules to collocate with\n', size(date2_all, 1));
 
 %% loop through all the granules to collocate with
 
 for i = 1:size(date2_all, 1)
     datecell = num2cell(date2_all(i, 1:5));
     satname = sat2_all_names{i};
+    
+    %% TODO/FIXME: GET RID OF UGLY SPECIAL CASE HACK!
+    if strcmp(sat2, 'poes') && any(strcmp(sensor2, {'amsub', 'mhs'}))
+        sens = amsub_or_mhs(satname);
+    else
+        sens = sensor2;
+    end
+    %% END OF UGLY SPECIAL CASE HACK!
+    %% Continue sensibly.
 
     try
-        datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, sensor2);
+        datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, sens);
     catch ME
         if strcmp(ME.identifier, 'atmlab:find_datafile_by_date')
             logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
@@ -128,13 +139,20 @@ for i = 1:size(date2_all, 1)
     
     logtext(fid, 'Reading %s\n', datafile2);
     data2 = fh2(datafile2);
+    data2.time_orig = data2.time; % store, see note at data1.time_orig
     logtext(fid, 'Read %s\n', datafile2);
     
-    % make sure we're using the same time axis epoch
-    [data1.time, data2.time] = unify_time_axis(data1.time, data2.time);
+    if date2_all(i, 3) ~= date1(1, 3)
+        % make sure we're using the same time axis epoch
+        [data1.time, data2.time] = unify_time_axis(data1.time_orig, data2.time_orig);
+    else
+        data1.time = data1.time_orig;
+        data2.time = data2.time_orig;
+    end
     % find the intervals for which both are active
     [iv1, iv2] = find_common_time(data1.time, data2.time, colloc_config('interval'));
     if ~(any(iv1) && any(iv2)) % no overlap
+        logtext(fid, 'no time overlap, so nothing to collocate\n');
         continue
     end
     

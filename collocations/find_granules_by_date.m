@@ -33,6 +33,10 @@ basedir = colloc_config([sensor '_basedir']);
 yeardir = colloc_config([sensor '_yeardir']);
 yeardir = strrep(yeardir, '$YEAR', num2str(year));
 yeardir = strrep(yeardir, '$SAT', sat);
+if isempty(yeardir) % assume only one (see note in README)
+    M = [year month day 0 0];
+    return;
+end
 matchy = colloc_config([sensor '_regexp']);
 
 datadir = fullfile(basedir, yeardir, num2str(month, '%02d'), num2str(day, '%02d'));
@@ -43,8 +47,14 @@ M = zeros(nfiles, 5);
 for i = 1:nfiles
     fname = files(i).name;
     nam = regexp(fname, matchy, 'names');
-    if ~isempty(nam)
-        M(i, :) = [year month day str2double(nam.hour) str2double(nam.minute)];
+    if ~isempty(nam)      
+        M(i, 1:3) = [year month day];
+        if isfield(nam, 'hour')
+            M(i, 4) = str2double(nam.hour);
+        end
+        if isfield(nam, 'minute')
+            M(i, 5) = str2double(nam.minute);
+        end
     end
 end
 % remove lines with zeroes

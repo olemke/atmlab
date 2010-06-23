@@ -10,7 +10,9 @@ function M = colloc_process_poes_poes(collocations, ...
 %
 % FORMAT
 %
-%   M = colloc_process_poes_poes(collocations, date1, data1, date2, data2)
+%   M = colloc_process_poes_poes(collocations, ...
+%       name1, date1, data1, ...
+%       name2, date2, data2);
 %
 % IN
 %
