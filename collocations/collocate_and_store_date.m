@@ -45,10 +45,23 @@ end
 C = {-1 -1 -1};
 
 if ~fileexists || colloc_config('overwrite')
-    [C{1:colloc_config(['no_' sensor1 '_' sensor2])}] = ...
-         collocate_date(year, month, day, sat1, sensor1, sat2, sensor2);
-
-    write_collocations(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);
+    try
+        [C{1:colloc_config(['no_' sensor1 '_' sensor2])}] = ...
+            collocate_date(year, month, day, sat1, sensor1, sat2, sensor2);
+        writethingy = true;
+     catch ME
+         if strcmp(ME.identifier, 'atmlab:collocate_date:nosource')
+             logtext(colloc_config('stderr'), ...
+                 'No succesful collocations at %04d-%02d-%02d, not writing\n', ...
+                 year, month, day);
+             writethingy = false;
+         else
+             ME.rethrow();
+         end
+    end
+    if writethingy
+        write_collocations(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);
+    end
 else
     logtext(colloc_config('stdout'), 'Already exists: %s\n', fn);
 end

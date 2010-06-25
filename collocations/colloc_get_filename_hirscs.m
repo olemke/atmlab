@@ -27,6 +27,6 @@ subdir = ['LC_' sat];
 basename = ['HIRS.' sat '.Y' year_twodigit '.D' doy '.nc'];
 filename = fullfile(subdir, basename);
 
-if ~exist(filename, 'file') % try gzipped instead
+if ~exist(fullfile(colloc_config('hirscs_basedir'), filename), 'file') % try gzipped instead
     filename = [filename '.gz'];
 end

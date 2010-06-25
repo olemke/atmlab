@@ -1,3 +1,28 @@
+2010-06-24	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-1-0
+
+	* collocations/colloc_get_filename_hirscs.m: Fix bug in test if file is
+	gzipped or not.
+
+	* collocations/collocate_date.m, collocations/collocate_and_store_date.m,
+	collocations/collocate_granule.m:
+	If nothing successful, don't write a thing
+
+	* collocations/colloc_read_hirscs.m: convert to double, was losing
+	precision in unixtime (precision with single there only 30 seconds)
+
+	* collocations/README: Added jumpstart
+
+	* collocations/TODO: Reorganised
+
+	* time/find_common_time.m: Fix bug occuring when time is not increasing
+	all the time. Bug occured with hirscs because time jumps back and forth;
+	correction was not done OK.
+
+	* handy/structsearch.m: Give more helpful error message if invalid field
+	is requested.
+
 2010-06-23	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-9

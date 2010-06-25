@@ -59,6 +59,7 @@ data = empty;
 meandata = empty;
 nout = max(nargout, 1);
 S = {empty, empty, empty};
+anysuccess = false;
 
 for i = 1:ngrans
     hour = grans(i, 4);
@@ -69,13 +70,14 @@ for i = 1:ngrans
     try
         [S{1:nout}] = collocate_granule(sat1, sensor1, sat2, sensor2, ...
             [year, month, day, hour, minute]);
+        anysuccess = true;
     catch ME
         switch ME.identifier
             case 'atmlab:find_datafile_by_date'
                 logtext(colloc_config('stderr'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     year, month, day, hour, minute, sat1, sensor1, ME.message);
                 continue
-            case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c'}
+            case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:collocate_granule:noother'}
                 logtext(colloc_config('stderr'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     year, month, day, hour, minute, sat1, sensor1, ME.message);
                 continue
@@ -91,4 +93,7 @@ for i = 1:ngrans
         overlap, S{1}, data, S{2}, meandata, S{3});
 end
 
+if ~anysuccess
+    error('atmlab:collocate_date:nosource', 'no source data found at all');
+end
 end

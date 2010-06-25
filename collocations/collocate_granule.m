@@ -93,6 +93,11 @@ end
 
 [date2_all, sat2_all_names] = overlap_granule(sat1, sensor1, ...
     date1, sat2, sensor2);
+if size(date2_all, 1)==0
+    error('atmlab:collocate_granule:noother', ...
+        'No overlapping granules found for [%s] %s/%s with %s/%s', ...
+        num2str(date1), sat1, sensor1, sat2, sensor2);
+end
 
 % pre-allocate overlap-structure
 % TODO: rather than [], have good width already

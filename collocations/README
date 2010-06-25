@@ -6,6 +6,21 @@ see the online help for each of those m-files.
 
 If anything doesn't work or is unclear, e-mail Gerrit at gerrit.holl@ltu.se
 
+JUMPSTART
+
+collocating:
+
+>> collocate_and_store_date_range([2009 1 1], [2009 12 31], 'cloudsat', 'cpr', 'noaa18', 'mhs');
+
+reading collocations:
+
+>> [M, cols] = collocation_read('cloudsat', 'cpr', 'noaa18', 'mhs', [2009 1 1], [2009 12 31], {{'C_LAT', 'C_LONG', 'B_DIST'}, {'MHS', 3:5}, {'MEAN'}}, struct('C_LAT', [-20 20]));
+
+other functions you might be interested in: collocate; collocate_granule;
+collocate_date; colloc_config. The others are more for internal use.
+
+for more information and understanding why your variant doesn't work, read on.
+
 HOW TO SET UP THE CONFIGURATION
 
 The collocation settings are in 'colloc_config', which is similar to 'atmlab'.
@@ -30,6 +45,10 @@ _regexp. Those are based on the names from the NOAA CLASS archive, and need to
 be changed only if your system uses different names, as well as settings for
 internal usage that are mainly there because they're globals.
 
+Just in case I have failed to update this part of the documentation, go
+through the entire colloc_config and see if anything needs to change. Then add
+this to your startup file.
+
 HOW TO FIND COLLOCATIONS FOR EXISTING SENSOR PAIRS
 
 Use collocate_and_store_date_range to get and store collocations for a range
@@ -50,7 +69,7 @@ those are as for the SAT-cluster.
 If one wants results directly, without storing them to the disk, one can get
 at most one date at the time. In this case, use collocate_date:
 
-Example use of collocate_date:
+Example use of collocate_date to get overlap, data, meandata:
 
 >> [O D M] = collocate_date(2010, 2, 1, 'cloudsat', 'cpr', 'noaa18', 'mhs')
 (...logging output...)
@@ -90,7 +109,6 @@ noaa15–noaa19 + metopa.
 HIRSCS data is available for a different range of poes than mhs/amsub, and the
 satellite names are abbreviated. Hence, the satellite name for hirscs should
 be the abbreviated satellite name as it is stored in the filesystem.
-This is likely to change in the near future!
 
 RAW COLLOCATIONS
 
@@ -145,6 +163,9 @@ or,
     M(:, cols.AMSU_B2(3)), ... % versus NOAA-15/AMSU-B channel 20. ..
     'k.')
 
+Currently, the only restrictions possible are ranges of individual values
+requested. A plan for the future is the ability to pass handles so that more
+complicated restrictions (such as C1==C2) can be addressed.
 More information in the help of 'collocation_read'.
 
 HOW TO ADD A NEW SET OF SENSORS
@@ -153,9 +174,11 @@ To add a new pair of sensors, the collocation system needs to know:
 - how to find all data for a particular date
 - how long one granule file takes
 - how to read the granule files
+- what information to store along with the collocations
+- where to store the collocations
 
-If all source datasets are already supported in existing pairs, steps 1–4 can
-be skipped.
+The steps are described in detail below. If all source datasets are already
+supported in existing pairs, steps 1–4 can be skipped.
 
 1.
 In colloc_config, define where the data can be found, if it is not there

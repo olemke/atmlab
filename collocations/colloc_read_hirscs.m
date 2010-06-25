@@ -41,7 +41,7 @@ end
 [~, nvars] = netcdf.inq(ncid);
 for i = 0:nvars-1
     nm = netcdf.inqVar(ncid, i);
-    data.(nm) = netcdf.getVar(ncid, i);
+    data.(nm) = netcdf.getVar(ncid, i, 'double');
 end
 netcdf.close(ncid);
 
