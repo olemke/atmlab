@@ -1,6 +1,6 @@
 2010-06-24	Gerrit Holl	<gerrit.holl@ltu.se>
 
-	* atmlab-1-1-0
+	* atmlab-1-0-10
 
 	* collocations/colloc_get_filename_hirscs.m: Fix bug in test if file is
 	gzipped or not.
