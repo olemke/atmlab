@@ -202,6 +202,10 @@ isdata(se,field)                                                                
 if ~isfield(se,'datarange')                                                     % contour range
     se.datarange.max = max(se.(field)(:));
     se.datarange.min = min(se.(field)(:));
+elseif ~isfield(se.datarange,'min')
+    se.datarange.min = min(se.(field)(:));
+elseif ~isfield(se.datarange,'max')
+    se.datarange.max = max(se.(field)(:));
 end
 
 se = regionspecial(se,field);                                                   % if region: check latlon format
