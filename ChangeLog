@@ -1,3 +1,17 @@
+2010-07-02  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-1-0-12
+
+	* gridcreation/profile_refine.m: Added. Uses grid_refine to
+	interpolate a set of atmospheric profiles to a finer vertical
+	grid. Interpolation is done linerly in ln(p), as usual in
+	arts. This is intended for the interpolation of radiosonde data to
+	a finer vertical grid for RT simulation.
+
+	* gridcreation/grid_refine.m: Added. Refines a grid by adding
+	additional points, so that the spacing everywhere is smaller than
+	the desired delta. Retains the points of the original grid.
+
 2010-07-01  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-11
