@@ -1,5 +1,17 @@
 2010-07-06  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-14
+
+	* files/getncattributes.m:
+
+	Function to get global attributes from NetCDF file.
+
+	* files/loadncvar.m: Optionally load global attributes.
+
+	* arts/netcdf/arts_nc_read_*: Read global attributes.
+
+2010-07-06  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-13
 
 	* files/addncattributes.m:

@@ -5,11 +5,13 @@
 % FORMAT   ret = arts_nc_read_tensor3(filename)
 %        
 % OUT   ret      Tensor3
+% OUT   gattr    Global attributes
 %       
 % IN    filename Name of NetCDF input file.
 
 % 2010-02-02   Created by Oliver Lemke.
 
-function ret = arts_nc_read_tensor3 (filename)
+function [ret, gattr] = arts_nc_read_tensor3 (filename)
 
-ret = permute (loadncvar (filename, 'Tensor3'), [3 2 1]);
+[v, gattr] = loadncvar (filename, 'Tensor3', true);
+ret = permute (v, [3 2 1]);

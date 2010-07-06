@@ -5,11 +5,13 @@
 % FORMAT   ret = arts_nc_read_matrix(filename)
 %        
 % OUT   ret      Matrix
+% OUT   gattr    Global attributes
 %       
 % IN    filename Name of NetCDF input file.
 
 % 2010-02-02   Created by Oliver Lemke.
 
-function ret = arts_nc_read_matrix (filename)
+function [ret, gattr] = arts_nc_read_matrix (filename)
 
-ret = loadncvar (filename, 'Matrix')';
+[v, gattr] =loadncvar (filename, 'Matrix', true);
+ret = v';

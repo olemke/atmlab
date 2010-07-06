@@ -11,18 +11,26 @@
 %    grid = loadncvar( 'mydata.nc', { 'lat', 'lon' } );
 %    
 %
-% FORMAT   ret = loadncvar( filename, varname )
+% FORMAT   [ret, attr] = loadncvar( filename, varname )
 %        
 % OUT   ret        Loaded variable.
+% OUT   attr       Global attributes.
 % IN    filename   Name of NetCDF file.
 %       varname    Name of variable.
 
 % 2010-02-02   Created by Oliver Lemke.
 
-
-function ret = loadncvar( filename, varname )
+function [ret, attr] = loadncvar( filename, varname, varargin )
   
+readattr = optargs( varargin, { false } );
+
 ncid = netcdf.open (filename, 'NOWRITE');
+
+if (readattr)
+  attr = getncattributes (ncid);
+else
+  attr = [];
+end
 
 if ischar(varname)
     varid = netcdf.inqVarId (ncid, varname);

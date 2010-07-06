@@ -5,14 +5,17 @@
 % FORMAT   ret = arts_nc_read_arrayofmatrix(filename)
 %        
 % OUT   ret      ArrayOfMatrix
+% OUT   gattr    Global attributes
 %       
 % IN    filename Name of NetCDF input file.
 
 % 2010-02-01   Created by Oliver Lemke.
 
-function ret = arts_nc_read_arrayofmatrix (filename)
+function [ret, gattr] = arts_nc_read_arrayofmatrix (filename)
 
 ncid = netcdf.open (filename, 'NOWRITE');
+
+gattr = getncattributes (ncid);
 
 varid = netcdf.inqVarId (ncid, 'Matrix_nrows');
 nr = netcdf.getVar (ncid, varid);

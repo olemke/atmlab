@@ -5,14 +5,17 @@
 % FORMAT   ret = arts_nc_read_arrayofvector(filename)
 %        
 % OUT   ret      ArrayOfVector
+% OUT   gattr    Global attributes
 %       
 % IN    filename Name of NetCDF input file.
 
 % 2010-02-02   Created by Oliver Lemke.
 
-function ret = arts_nc_read_arrayofvector (filename)
+function [ret, gattr] = arts_nc_read_arrayofvector (filename)
 
 ncid = netcdf.open (filename, 'NOWRITE');
+
+gattr = getncattributes (ncid);
 
 varid = netcdf.inqVarId (ncid, 'Vector_nelem');
 nv = netcdf.getVar (ncid, varid);
