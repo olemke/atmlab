@@ -1,3 +1,13 @@
+2010-07-06  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-13
+
+	* files/addncattributes.m:
+
+	Function to add global attributes to a NetCDF file.
+
+	* arts/netcdf/arts_nc_write_*: Add support for global attributes.
+
 2010-07-02  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-1-0-12

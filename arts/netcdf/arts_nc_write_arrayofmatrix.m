@@ -2,16 +2,23 @@
 %
 %    Writes an ArrayOfMatrix to a NetCDF file for use with Arts.
 %
-% FORMAT   arts_nc_write_arrayofmatrix(filename,v)
+% FORMAT   arts_nc_write_arrayofmatrix(filename, v, varargin)
 %        
-% IN    filename Name of NetCDF file.
-% IN    v        ArrayOfMatrix variable.
+% IN    filename  Name of NetCDF file.
+% IN    v         ArrayOfMatrix variable.
+% OPT   varargin  Cell array of name/value pair cells for global attributes
 
 % 2010-02-03   Created by Oliver Lemke.
 
-function arts_nc_write_arrayofmatrix (filename, v)
+function arts_nc_write_arrayofmatrix (filename, v, varargin)
 
 ncid = netcdf.create (filename, 'NC_CLOBBER');
+
+attributes = optargs( varargin, { [] } );
+
+if (~isempty(attributes))
+      addncattributes (ncid, attributes);
+end
 
 ndim = netcdf.defDim (ncid, 'nelem', length(v));
 
