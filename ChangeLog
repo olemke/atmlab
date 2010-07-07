@@ -1,3 +1,12 @@
+2010-07-07  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-1-0-15
+
+	* gridcreation/profile_refine.m: Renamed delta to delta_ln_p to
+	make it more obvious that it is in ln units. Also added a check
+	that the value is below 10. (An ln(Pa) of 10 correspons roughly to
+	an altitude difference of 70 km.)
+
 2010-07-06  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-14
