@@ -63,28 +63,41 @@ S = {empty, empty, empty};
 anysuccess = false;
 
 for i = 1:ngrans
+    % keep track, because first granule is probably yesterday
+    thisyear = grans(i, 1);
+    thismonth = grans(i, 2);
+    thisday = grans(i, 3);
     hour = grans(i, 4);
     minute = grans(i, 5);
     
     logtext(fid, 'Collocating %s %s with %s %s %04d-%02d-%02d %02d:%02d\n', ...
-        sat1, sensor1, sat2, sensor2, year, month, day, hour, minute);
+        sat1, sensor1, sat2, sensor2, thisyear, thismonth, thisday, hour, minute);
+    
+    if ~isequal([thisyear thismonth thisday], [year month day]);
+        % only take collocations happening in part of granule occuring on
+        % the day requested
+        oneday = 2;
+    else % take any collocations happening on the day requested
+        oneday = 1;
+    end
+    
     try
         [S{1:nout}] = collocate_granule(sat1, sensor1, sat2, sensor2, ...
-            [year, month, day, hour, minute]);
+            [thisyear, thismonth, thisday, hour, minute], oneday);
         anysuccess = true;
     catch ME
         switch ME.identifier
             case 'atmlab:find_datafile_by_date'
                 logtext(colloc_config('stderr'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
-                    year, month, day, hour, minute, sat1, sensor1, ME.message);
+                    thisyear, thismonth, thisday, hour, minute, sat1, sensor1, ME.message);
                 continue
             case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:collocate_granule:noother'}
                 logtext(colloc_config('stderr'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
-                    year, month, day, hour, minute, sat1, sensor1, ME.message);
+                    thisyear, thismonth, thisday, hour, minute, sat1, sensor1, ME.message);
                 continue
             case {'MATLAB:hdfinfo:invalidFile'}
                 logtext(colloc_config('stderr'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
-                    sat1, sensor1, year, month, day, hour, minute, ME.message);
+                    sat1, sensor1, thisyear, thismonth, thisday, hour, minute, ME.message);
                 continue
             otherwise
                 ME.rethrow();

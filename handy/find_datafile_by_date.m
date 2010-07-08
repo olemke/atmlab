@@ -43,7 +43,7 @@ if isempty(yeardir) % not per year, calculate it instead
     return
 end
 
-granules = find_granules_by_date(datevec(1), datevec(2), datevec(3), satname, sensor);
+granules = find_granules_by_date(datevec(1), datevec(2), datevec(3), satname, sensor, false);
 found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
 
 % find_granules_by_date returns granules in the order that their files are

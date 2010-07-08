@@ -1,5 +1,5 @@
 function [overlap, data, meandata] = ...
-    collocate_granule(sat1, sensor1, sat2, sensor2, date1)
+    collocate_granule(sat1, sensor1, sat2, sensor2, date1, oneday)
 
 % collocate_granule Collocate granules from sat/sensor pairs
 %
@@ -16,10 +16,14 @@ function [overlap, data, meandata] = ...
 % A special value for 'sat2' can be 'poes', which is short for 'every POES
 % satellite'.
 %
+% The argument 'oneday' specifies whether data should be limited to the
+% starting date for sat1 (oneday=1), the day after this (oneday=2), or no
+% limitation (oneday=0, default).
+%
 % FORMAT
 %
 %   [overlap, data, meandata] = ...
-%       collocate_granule(sat1, sensor1, sat2, sensor2, date1)
+%       collocate_granule(sat1, sensor1, sat2, sensor2, date1, oneday)
 %
 % IN
 %
@@ -28,6 +32,8 @@ function [overlap, data, meandata] = ...
 %   sat2        string      Secondary satellite (example: 'noaa18')
 %   sensor2     string      Secondary sensor (example: 'mhs')
 %   date1       vector      Date vector for starting time sat1/sensor1
+%   oneday      number      Limit data to one day.
+%                           1=start date for sat1, 2=day after
 %
 % OUT
 %
@@ -44,6 +50,10 @@ function [overlap, data, meandata] = ...
 %                           Otherwise empty.
 %
 % $Id$
+
+if ~exist('oneday', 'var')
+    oneday = 0;
+end
 
 %% output
 
@@ -160,6 +170,21 @@ for i = 1:size(date2_all, 1)
     end
     % find the intervals for which both are active
     [iv1, iv2] = find_common_time(data1.time, data2.time, colloc_config('interval'));
+    % limit to one day (if needed)
+    switch oneday
+        case 1
+            % only consider data on the same date as the start for data1
+            if data1.time(1) < 86400
+                sameday = data1.time < 86400;
+            else
+                sameday = data1.time < 2*86400;
+            end
+            iv1 = iv1 & sameday;
+        case 2
+            % only consider data on date after the start date for data1
+            sameday = data1.time > 86400;
+            iv1 = iv1 & sameday;
+    end
     if ~(any(iv1) && any(iv2)) % no overlap
         logtext(fid, 'no time overlap, so nothing to collocate\n');
         continue

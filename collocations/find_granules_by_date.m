@@ -1,13 +1,16 @@
-function M = find_granules_by_date(year, month, day, sat, sensor)
+function M = find_granules_by_date(year, month, day, sat, sensor, ...
+    with_yesterday)
 
 % find_granules_by_date Find all granule start times for date/sat/sensor
 %
-% This function finds all granule start times for the indicated
-% date and satellite
+% This function finds all granule start times for granules with any coverage
+% for the the indicated for the indicated satellite/sensor pair. This
+% includes the last granule of the date before, unless this is explicitly
+% prohibited.
 %
 % FORMAT
 %
-%   M = find_granules_by_date(year, month, day, sat, sensor)
+%   M = find_granules_by_date(year, month, day, sat, sensor, with_yesterday)
 %
 % OUT
 %
@@ -16,16 +19,21 @@ function M = find_granules_by_date(year, month, day, sat, sensor)
 %
 % IN
 %
-%  year     (numeric)  Year for which to find the times.
-%  month    (numeric)  Month for which to find the times.
-%  day      (numeric)  Day for which to find the times.
-%  sat      string     Describing the satellite.
-%  sensor   string     Describing the sensor.
+%  year             (numeric)  Year for which to find the times.
+%  month            (numeric)  Month for which to find the times.
+%  day              (numeric)  Day for which to find the times.
+%  sat              string     Describing the satellite.
+%  sensor           string     Describing the sensor.
+%  with_yesterday   bool       Include last of yesterday (defaults to true)
 %
 % For POES satellites (NOAA-15 – NOAA-19 and MetOp-A), AMSU, MHS, HIRS and
 % AVHRR have the same granule times.
 %
 % $Id$
+
+if ~exist('with_yesterday', 'var')
+    with_yesterday = true;
+end
 
 % TODO: add code to locate collocation files here
 
@@ -55,6 +63,15 @@ for i = 1:nfiles
         if isfield(nam, 'minute')
             M(i, 5) = str2double(nam.minute);
         end
+    end
+end
+% add yesterday
+if with_yesterday
+    yesterday = datevec(datenum([year month day])-1);
+    M_yesterday = find_granules_by_date(yesterday(1), yesterday(2), yesterday(3), ...
+        sat, sensor, false);
+    if ~isempty(M_yesterday) % maybe today is genesis/big bang/epoch/birth/1970-01-01
+        M = [M_yesterday(end, :); M];
     end
 end
 % remove lines with zeroes

@@ -83,8 +83,8 @@ for n = 1:length(fields) % loop through all fields
     if any(meandata_new.(sat)) % that have anything this iteration
         n_before = size(overlap_old.(sat), 1);
         if ~all(rows)
-            logtext(2, 'NOT IMPLEMENTED, CONTINUE BY HAND :P\n');
-            keyboard;
+            error('atmlab:colloc_concatenate_colloc_data_mean:NotImplemented', ...
+                'Ridding doubles with meandata is not implemented yet');
         end
 
         meandata_new.(sat)(:, 1:2) = meandata_new.(sat)(:, 1:2) + n_before;

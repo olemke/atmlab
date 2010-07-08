@@ -1,3 +1,27 @@
+2010-07-08	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-19
+	
+	* collocations/collocate_date.m: When collocating a particular date, do
+	this a bit more nicely than just taking all granules starting on this
+	date. Instead, collocate all granules containing any data for this date,
+	and then cut off those collocations that are outside the date boundary,
+	for the primary satellite.
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Raise an error when
+	trying to use the not-implemented feature.
+
+	* collocations/find_granules_by_date.m: To assist collocate_date, also
+	return yesterdays last granule, as this also covers something for the
+	date. If available, that is.
+
+	* collocations/overlap_granule.m, handy/find_datafile_by_date.m:
+	Adapt for changed default behaviour for find_granules_by_date
+
+	* collocation/collocate_granule: To assist collocate_date, add a flag
+	forcing it to return only collocations on the same day as either the start
+	or the end of the first granule.
+
 2010-07-08  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-18
