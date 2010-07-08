@@ -1,3 +1,27 @@
+2010-07-08	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-17
+
+	* collocations/collocation_read.m: Add additional error check in exception
+	handling.
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: When concatenating
+	data, get rid of doubles. Now takes additional 'unicol' argument that
+	determines what columns in the data are used to identify whether a
+	collocation is a repetition of a previous one (should be something like
+	lat1/long1/time1/lat2/long2/time2).
+
+	* handy/unique2.m: Return those rows in second matrix not occuring in the
+	first matrix (as a logical).
+
+	* collocations/collocate_date.m, collocations/collocate_granule.m: Adapt for new
+	colloc_concatenate_colloc_data_mean; pass on unicol argument.
+
+	* collocations/colloc_config.m, collocations/README: add unicol to 'cols'
+	structures.
+
+	* collocations/find_granules_by_date.m: Fix error in docstring.
+
 2010-07-08  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-16

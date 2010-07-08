@@ -7,7 +7,7 @@ function M = find_granules_by_date(year, month, day, sat, sensor)
 %
 % FORMAT
 %
-%   M = find_granules_by_date(year, month, day, sat)
+%   M = find_granules_by_date(year, month, day, sat, sensor)
 %
 % OUT
 %

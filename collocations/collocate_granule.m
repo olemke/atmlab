@@ -50,6 +50,10 @@ function [overlap, data, meandata] = ...
 fid = colloc_config('stdout');
 eid = colloc_config('stderr');
 
+%% need column numbers for preventing doubles
+
+cols = colloc_config(['cols_' sensor1 '_' sensor2]);
+
 %% get handles for reading, processing
 
 dummy = @(varargin) (-1);
@@ -193,7 +197,8 @@ for i = 1:size(date2_all, 1)
     end
     
     [overlap, data, meandata] = colloc_concatenate_colloc_data_mean(...
-        overlap, M_c, data, M_d, meandata, M_m);
+        overlap, M_c, data, M_d, meandata, M_m, ...
+        cols.overlap.unicol);
     
     logtext(fid, 'Info collected\n');
 end

@@ -1,11 +1,17 @@
 function [overlap_cat, data_cat, meandata_cat] = ...
-    colloc_concatenate_colloc_data_mean(overlap, overlap_new, data, data_new, ...
-    meandata, meandata_new)
+    colloc_concatenate_colloc_data_mean(...
+    overlap_old, overlap_new, ...
+    data_old, data_new, ...
+    meandata_old, meandata_new, unicol)
 
 % colloc_concatenate_colloc_data_mean Concatenate collocation structures
 %
 % Concatenate collocation structures: a structure where each field is a
-% matrix, and those are concatenated vertically by field.
+% matrix, and those are concatenated vertically by field. It will remove
+% double entries based on the 'unicol' argument; if there is any repetition
+% for the values of the columns in unicol, they will be removed from
+% structures to be added before doing so (the original ones will be left
+% as-is).
 % Meandata is a special case.
 % Meandata, as processed by process_meandata_*, contains columns (the first
 % two) referring to the first and the last line in the collocation matrix
@@ -18,17 +24,22 @@ function [overlap_cat, data_cat, meandata_cat] = ...
 % FORMAT
 %
 %    [overlap_cat, data_cat, meandata_cat] = ...
-%       colloc_concatenate_colloc_data_mean(overlap, overlap_new, data, ...
-%           data_new, meandata_new)
+%       colloc_concatenate_colloc_data_mean(...
+%           overlap_old, overlap_new, ...
+%           data_old, data_new, ...
+%           meandata_old, meandata_new, unicol)
 %
 % IN
 %
-%   overlap         structure
+%   overlap_old     structure
 %   overlap_new     structure
-%   data            structure
+%   data_old        structure
 %   data_new        structure
-%   meandata        structure
+%   meandata_old    structure
 %   meandata_new    structure
+%   unicol          array       Column numbers to determine unique row. Can
+%                               only be from overlap (not data or
+%                               meandata).
 %
 % OUT
 %
@@ -38,27 +49,43 @@ function [overlap_cat, data_cat, meandata_cat] = ...
 %
 % $Id$
 
-overlap_cat = overlap;
-data_cat = data;
-meandata_cat = meandata;
+% in case nothing to be done
+overlap_cat = overlap_old;
+data_cat = data_old;
+meandata_cat = meandata_old;
+if ~exist('unicol', 'var')
+    unicol = [];
+end
 
-fields = fieldnames(overlap); % fields that exist in NEW one will be used
+fields = fieldnames(overlap_new); % fields that exist in NEW one will be used
 for n = 1:length(fields) % loop through all fields
     sat = fields{n};
     
     if ~isfield(overlap_new, sat) % ignore
         continue
     end
-    overlap_cat.(sat) = [overlap_cat.(sat); overlap_new.(sat)];
-    data_cat.(sat) = [data_cat.(sat); data_new.(sat)];
+    
+    if ~isempty(unicol) && ~isempty(overlap_old.(sat))
+        rows = unique2(overlap_old.(sat)(:, unicol), ...
+                       overlap_new.(sat)(:, unicol));
+    else
+        rows = true(size(overlap_new.(sat), 1), 1);
+    end
+    overlap_cat.(sat) = [overlap_old.(sat); overlap_new.(sat)(rows, :)];
+    data_cat.(sat) = [data_old.(sat); data_new.(sat)(rows, :)];
     
     %% correct meandata FIRST/LAST columns
     % the first two columns of meandata should always be FIRST and LAST;
     % those refer to line numbers in the overlap matrices. From
     % collocate_granule, this is per granule. When concatenating
     % granules, those numbers need to be corrected.
+    % Another complication arises because of removing lines.
     if any(meandata_new.(sat)) % that have anything this iteration
-        n_before = size(overlap.(sat), 1);
+        n_before = size(overlap_old.(sat), 1);
+        if ~all(rows)
+            logtext(2, 'NOT IMPLEMENTED, CONTINUE BY HAND :P\n');
+            keyboard;
+        end
 
         meandata_new.(sat)(:, 1:2) = meandata_new.(sat)(:, 1:2) + n_before;
         % and proceed with cat'ing
