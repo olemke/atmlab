@@ -49,6 +49,20 @@ netcdf.close(ncid);
 
 data.lon = wrapTo180(data.lon);
 
+% rotate bt, lc
+
+data.bt = data.bt.';
+data.lc = data.lc.';
+
 % compensate time wrapping around
 
 data.time = compensate_wraparound(data.time);
+
+% get rid of doubles
+
+[~, I] = unique([data.time data.lat data.lon], 'rows');
+allfields = fieldnames(data);
+for i = 1:length(allfields);
+    field = allfields{i};
+    data.(field) = data.(field)(I, :);
+end

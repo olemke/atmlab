@@ -1,5 +1,15 @@
 2010-07-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-20
+
+	* collocations/colloc_read_hirscs.m: Check for doubles and return only one
+	copy of each double. Also rotate bt and lc fields to be more consistent.
+
+	* collocations/colloc_process_data_hirscs_poes.m: Adapt for rotated bt and
+	lc fields.
+
+2010-07-08	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-19
 	
 	* collocations/collocate_date.m: When collocating a particular date, do

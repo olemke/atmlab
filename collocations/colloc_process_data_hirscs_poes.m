@@ -56,6 +56,6 @@ c = c.data;
 tb2 = reshape(shiftdim(data2.tb, 1), [5 numel(data2.lat)]);
 
 M(:, c.VIS) = data1.vis(i1);
-M(:, c.BT) = data1.bt(:, i1)';
-M(:, c.LC) = data1.lc(:, i1)';
+M(:, c.BT) = data1.bt(i1, :);
+M(:, c.LC) = data1.lc(i1, :);
 M(:, c.MHS) = tb2(:, i2)';
