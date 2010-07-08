@@ -1,3 +1,9 @@
+2010-07-08  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-18
+
+	* math/average_bins2.m: Complete rewrite to make it more flexible.
+
 2010-07-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-17
