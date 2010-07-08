@@ -1,3 +1,15 @@
+2010-07-08  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-16
+
+	* math/average_bins2.m:
+
+	Temporarely added this function to calculate additional properties
+	like median and standard deviation. Should be merged later with
+	average_bins. I didn't want to touch Salomon's original function
+	because I'm not sure why it uses three loops instead of two which
+	makes calculating the mean and std hard.
+
 2010-07-07  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-1-0-15
