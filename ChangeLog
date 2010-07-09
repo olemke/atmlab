@@ -1,3 +1,13 @@
+2010-07-09  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-21
+
+	* math/average_bins2.m: Renamed to binned_statistics.m.
+
+	* math/average_bins.m: Removed.
+
+	* math/binned_statistics.m: Update documentation.
+
 2010-07-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-20
