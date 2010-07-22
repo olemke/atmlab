@@ -66,9 +66,8 @@ earth_radius = constants('EARTH_RADIUS')/1e3; % km
 
 %% find collocations
 
-% arbitrarily deciding I expect no more collocations than 2*datapoints
-% (too much pre-allocation is better than none)
-collocations = zeros(2*numel(lat1), 4, 'uint32');
+% arbitrary start for pre-alloc, but getting more if needed later
+collocations = zeros(numel(lat1), 4, 'uint32');
 
 % Bin the measurements into bins, where the 'data' is the index of the
 % measurement. We only need to consider those bins where:
@@ -155,6 +154,10 @@ for i = 1:size(grid1, 1) % latitude
                 end
             end % for each in grid1
         end % if we have any candidate-collocations in this cell
+        if count > .8*size(collocations, 1) % pre-allocate more
+            collocations = [collocations; ...
+                zeros(size(collocations, 1), 4, 'uint32')];
+        end
     end % for all grid rows
 end % for all grid columns
 
