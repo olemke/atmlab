@@ -117,6 +117,12 @@ A.collocation_hirscs_poes_yeardir = '$YEAR';
 A.collocation_hirscs_poes_filename = 'collocations_$SAT1_$SAT2.mat';
 A.collocation_hirscs_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 
+A.collocation_collocation_cpr_poes_avhrr_basedir = '/storage4/user_data/gerrit/collocations_collocation_cpr_poes_avhrr';
+A.collocation_collocation_cpr_poes_avhrr_yeardir = '$YEAR';
+A.collocation_collocation_cpr_poes_avhrr_filename = 'collocations_$SAT1_$SAT2.mat';
+A.collocation_collocation_cpr_poes_avhrr_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
+A.collocation_collocation_cpr_poes_avhrr_meandata_filename = 'collocations_meandata_$SAT1_$SAT2.mat';
+
 % define what reading function to use for what sensor
 
 A.read_cpr = @colloc_read_cpr;
@@ -126,6 +132,7 @@ A.read_amsub = @colloc_read_poes_radiometer;
 A.read_hirs = @colloc_read_poes_radiometer;
 A.read_avhrr = @colloc_read_avhrr;
 A.read_hirscs = @colloc_read_hirscs;
+A.read_collocation_cpr_poes = @colloc_read_collocation_cpr_poes;
 
 % define what processing functions to use for what sensor pair
 
@@ -151,6 +158,12 @@ A.process_data_hirscs_poes = @colloc_process_data_hirscs_poes;
 
 A.no_hirscs_poes = 2;
 
+A.process_collocation_cpr_poes_avhrr = @colloc_process_collocation_cpr_poes_avhrr;
+A.process_data_collocation_cpr_poes_avhrr = @colloc_process_data_collocation_cpr_poes_avhrr;
+A.process_meandata_collocation_cpr_poes_avhrr = @colloc_process_meandata_collocation_cpr_poes_avhrr;
+
+A.no_collocation_cpr_poes_avhrr = 3;
+
 % define what functions to use to find filenames
 
 A.filename_cpr_poes = @colloc_get_path_cpr_poes_radiometer;
@@ -160,6 +173,8 @@ A.filename_poes_poes = @colloc_get_path_poes_poes;
 A.filename_cpr_avhrr = @colloc_get_path_cpr_avhrr;
 
 A.filename_hirscs_poes = @colloc_get_path_hirscs_poes_radiometer;
+
+A.filename_collocation_cpr_poes_avhrr = @colloc_get_path_collocation_cpr_poes_avhrr;
 
 % define approximate granule durations
 
@@ -174,7 +189,8 @@ A.granule_duration_hirs = 6130;
 
 A.granule_duration_cpr = 5932; % seconds
 
-A.granule_duration_hirscs = 86400; % one granule per day
+A.granule_duration_hirscs = 86400; % one granule per da
+A.granule_duration_collocation_cpr_poes = 86400;
 
 % maximum collocation distance and time
 
@@ -330,3 +346,31 @@ A.cols_hirscs_poes.data = struct(...
     'LC', 21:39, ...
     'MHS', 40:44, ...
     'NCOLS', 44);
+
+% for collocation cpr poes/avhrr
+
+A.cols_collocation_cpr_poes_avhrr.overlap = struct(...
+    'CPR_POES_START', 1, ...
+    'CPR_POES_LINENO', 2, ...
+    'AVHRR_LAT', 3, ...
+    'AVHRR_LONG', 4, ...
+    'AVHRR_START', 5, ...
+    'AVHRR_TIME', 6, ...
+    'AVHRR_ROW', 7, ...
+    'AVHRR_COL', 8, ...
+    'DIST_MHS_AVHRR', 9, ...
+    'INT_MHS_AVHRR', 10, ...
+    'unicol', [1 2 3 4 6], ...
+    'NCOLS', 10);
+
+A.cols_collocation_cpr_poes_avhrr.data = struct(...
+    'AVHRR', 1:5, ...
+    'NCOLS', 5);
+
+A.cols_collocation_cpr_poes_avhrr.meandata = struct(...
+    'FIRST', 1, ... % meandata should always start with first/last
+    'LAST', 2, ...
+    'NO', 3:7, ...
+    'MEAN', 8:12, ...
+    'SD', 13:17, ...
+    'NCOLS', 17);

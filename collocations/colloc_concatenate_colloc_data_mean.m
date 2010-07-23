@@ -65,14 +65,17 @@ for n = 1:length(fields) % loop through all fields
         continue
     end
     
-    if ~isempty(unicol) && ~isempty(overlap_old.(sat))
+    if ~isempty(unicol) && ~isempty(overlap_old.(sat)) % get rid of doubles
         rows = unique2(overlap_old.(sat)(:, unicol), ...
                        overlap_new.(sat)(:, unicol));
     else
         rows = true(size(overlap_new.(sat), 1), 1);
     end
     overlap_cat.(sat) = [overlap_old.(sat); overlap_new.(sat)(rows, :)];
-    data_cat.(sat) = [data_old.(sat); data_new.(sat)(rows, :)];
+    
+    if any(data_new.(sat)) % that have anything this iteration
+        data_cat.(sat) = [data_old.(sat); data_new.(sat)(rows, :)];
+    end
     
     %% correct meandata FIRST/LAST columns
     % the first two columns of meandata should always be FIRST and LAST;

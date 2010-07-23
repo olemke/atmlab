@@ -16,16 +16,16 @@ function M = colloc_process_hirscs_poes(collocations, ...
 %
 % IN
 %
-%   collocations    Nx4 matrix  As returned by collocate or collocate2
+%   collocations    Nx4 matrix  As returned by collocate
 %   name1           string      Name of primary satellite (not used here)
 %   date1           1x5 vector  Contains [year month day hour minute] for the
 %                               start of the primary granule.
 %   data1           structure   Fields time, lat and lon should be present; as
-%                               returned by read_hirscs
+%                               returned by colloc_config('read_hirscs')
 %   name2           string      Name of secondary satellite (not used here)
 %   date2           1x5 vector  As date1, but for secondary granule.
 %   data2           structure   As data1, but for secondary granule; as
-%                               returned by read_mhs.
+%                               returned by colloc_config('read_mhs').
 %
 % OUT
 %

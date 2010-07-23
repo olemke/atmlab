@@ -241,7 +241,7 @@ and 'time'. One probably wants to add some more information for
 post-collocating processing, see step 8. See existing readers for examples.
 
 
-3. In colloc_config, define configuration variables describing the location of
+5. In colloc_config, define configuration variables describing the location of
 where the collocations should be stored. For example, to add POES/POES, I added:
 
 A.collocation_poes_poes_basedir = '~/data/collocations_poes_poes';
@@ -252,7 +252,7 @@ A.collocation_poes_poes_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 Those can be redefined at a later stage, and the function calculating the
 filename (see step3) should thus use those rather than hardcoded paths.
 
-4. In colloc_config, define configuration variables describing what m-file
+6. In colloc_config, define configuration variables describing what m-file
 should be used to calculate the filename from year/month/day/sat1/sat2. For
 example, for POES/POES, I added:
 
@@ -260,7 +260,7 @@ A.filename_poes_poes = @colloc_get_path_poes_poes;
 
 Note that 'mhs' and 'amsub' are aliases for 'poes'.
 
-5. Create the m-files just linked to. The existing colloc_get_path_* can serve
+7. Create the m-files just linked to. The existing colloc_get_path_* can serve
 as an example, It should take 5 input arguments (year, month, day, sat1, sat2)
 and give up to 3 output arguments (path for collocations, path for
 collocation data and path for mean collocation data). Here, you should use the
@@ -268,7 +268,7 @@ variables stored in step 1 and replace strings like $SAT1 and $SAT2 with
 appropiate names using a function like strrep. Because colloc_config is
 configurable, the user can deviate from default paths and naming patterns.
 
-6. In colloc_config, define configuration variables describing what m-file
+8. In colloc_config, define configuration variables describing what m-file
 should be used to process the collocations. After collocating, one probably
 wants to store some more data along with the collocations, like brightness
 temperatures, so that one doesn't need to return to the original files all the
@@ -283,7 +283,7 @@ A.no_poes_poes = 2;
 
 Note that 'mhs' and 'amsub' are aliases for 'poes'.
 
-7. In colloc_config, define the columns of the matrices one will create in
+9. In colloc_config, define the columns of the matrices one will create in
 step 8 after the processing. In processing, one wants to collect information
 such as brightness temperatures. Those are structures that should define each
 column by name, and also give the total number of columns. This has to be of
@@ -321,7 +321,7 @@ Additionally, for the .overlap, one must also add 'unicol'. This is used to
 determine what constitutes a unique collocation, so that doubles in the data
 (between subsequent granules) do not end up as doubles in the collocations.
 
-8. Create the m-files linked to in step 6. The existing colloc_process_* can serve
+10. Create the m-files linked to in step 8. The existing colloc_process_* can serve
 as examples. One can have up to three processing files for each pair of
 sensors: process_sensor1_sensor2, process_data_sensor1_sensor2 and
 process_meandata_sensor1_sensor2. They all have a predefined interface. For

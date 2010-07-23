@@ -17,8 +17,10 @@ function datafile = find_datafile_by_date(datevec, satname, sensor)
 % IN
 %
 %   datevec     vector  Date/time to find datafile for
-%   satname     string  Name of satellite
+%   satname     string* Name of satellite
 %   sensor      string  Name of sensor
+%
+%   * may be cell array of strings if sensor is collocation_...
 %
 % OUT
 %
@@ -32,7 +34,12 @@ errid = 'atmlab:find_datafile_by_date';
 basedir = colloc_config([sensor '_basedir']);
 yeardir = colloc_config([sensor '_yeardir']);
 yeardir = strrep(yeardir, '$YEAR', num2str(datevec(1)));
-yeardir = strrep(yeardir, '$SAT', satname);
+if ischar(satname) % satname may be cell array
+    yeardir = strrep(yeardir, '$SAT', satname);
+end
+datadir = fullfile(basedir, yeardir, num2str(datevec(2), '%02d'), num2str(datevec(3), '%02d'));
+
+% try with dedicated filename calculator
 if isempty(yeardir) % not per year, calculate it instead
     calculator = colloc_config([sensor '_getpath']);
     fn = calculator(datevec(1), datevec(2), datevec(3), satname);
@@ -43,13 +50,39 @@ if isempty(yeardir) % not per year, calculate it instead
     return
 end
 
+% try to get filename from sensor_filename
+hasfn = false;
+try
+    fn = colloc_config([sensor '_filename']);
+    hasfn = true;
+catch ME
+    switch ME.identifier
+        case 'atmlab:prstnt_struct:undefined'
+            % no filename
+        otherwise
+            ME.rethrow();
+    end
+end
+if hasfn
+    if iscellstr(satname)
+        for i = 1:length(satname)
+            fn = strrep(fn, ['$SAT' num2str(i)], satname{i});
+        end
+    else
+        fn = strrep(fn, '$SAT', satname);
+    end
+    datafile = fullfile(datadir, fn);
+    return
+end
+
+% if all else fails: search through all granules until satisfied
+
 granules = find_granules_by_date(datevec(1), datevec(2), datevec(3), satname, sensor, false);
 found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
 
 % find_granules_by_date returns granules in the order that their files are
 % returned by dir, so this is consistent
 
-datadir = fullfile(basedir, yeardir, num2str(datevec(2), '%02d'), num2str(datevec(3), '%02d'));
 files = dir(datadir);
 file_is_granule = arrayfun(@(x) any(regexp(x.name, colloc_config([sensor '_regexp']))), files);
 granule_files = files(file_is_granule);

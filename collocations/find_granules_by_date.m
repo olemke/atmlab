@@ -45,7 +45,18 @@ if isempty(yeardir) % assume only one (see note in README)
     M = [year month day 0 0];
     return;
 end
-matchy = colloc_config([sensor '_regexp']);
+try
+    matchy = colloc_config([sensor '_regexp']);
+catch ME
+    switch ME.identifier
+        case 'atmlab:prstnt_struct:undefined'
+            % give up without regexp
+            M = [year month day 0 0];
+            return
+        otherwise
+            ME.rethrow();
+    end
+end
 
 datadir = fullfile(basedir, yeardir, num2str(month, '%02d'), num2str(day, '%02d'));
 
