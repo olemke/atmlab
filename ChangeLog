@@ -1,3 +1,11 @@
+2010-07-26	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-24
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Fix bug introduced
+	when the "get rid of doubles" feature was added; failed when there was no
+	data in the first place.
+
 2010-07-23	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-23

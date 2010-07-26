@@ -61,7 +61,7 @@ fields = fieldnames(overlap_new); % fields that exist in NEW one will be used
 for n = 1:length(fields) % loop through all fields
     sat = fields{n};
     
-    if ~isfield(overlap_new, sat) % ignore
+    if ~isfield(overlap_new, sat) || isempty(overlap_new.(sat)) % ignore
         continue
     end
     
