@@ -28,6 +28,10 @@ function [t1, t2] = unify_time_axis(t1, t2)
 %
 % $Id$
 
+if isempty(t1) || isempty(t2)
+    return
+end
+
 S1 = t1(1);
 S2 = t2(1);
 

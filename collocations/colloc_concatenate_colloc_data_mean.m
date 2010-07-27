@@ -73,7 +73,7 @@ for n = 1:length(fields) % loop through all fields
     end
     overlap_cat.(sat) = [overlap_old.(sat); overlap_new.(sat)(rows, :)];
     
-    if any(data_new.(sat)) % that have anything this iteration
+    if ~isempty(data_new.(sat)) % that have anything this iteration
         data_cat.(sat) = [data_old.(sat); data_new.(sat)(rows, :)];
     end
     
@@ -86,8 +86,15 @@ for n = 1:length(fields) % loop through all fields
     if any(meandata_new.(sat)) % that have anything this iteration
         n_before = size(overlap_old.(sat), 1);
         if ~all(rows)
-            error('atmlab:colloc_concatenate_colloc_data_mean:NotImplemented', ...
-                'Ridding doubles with meandata is not implemented yet');
+            % from doubles, remove any rows where first or last points to a
+            % deleted line / keep any rows where this is not the case
+            nodups = meandata_new.(sat)(rows(meandata_new.(sat)(:, 1)), :);
+            % from meandata_new_no_dups, reduce first/last columns by the
+            % number of rows removed before this number
+            rem_before = cumsum(~rows);
+            nodups(:, 1) = nodups(:, 1) - rem_before(nodups(:, 1));
+            nodups(:, 2) = nodups(:, 2) - rem_before(nodups(:, 2));
+            meandata_new.(sat) = nodups;
         end
 
         meandata_new.(sat)(:, 1:2) = meandata_new.(sat)(:, 1:2) + n_before;

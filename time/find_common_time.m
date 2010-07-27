@@ -22,6 +22,12 @@ function [iv1, iv2] = find_common_time(t1, t2, interval)
 %
 % $Id$
 
+if isempty(t1) || isempty(t2)
+    iv1 = true(size(t1));
+    iv2 = true(size(t2));
+    return
+end
+
 t1f = t1(1);
 t1l = t1(end);
 t2f = t2(1);

@@ -25,5 +25,8 @@ function t = compensate_wraparound(t)
 %
 % $Id$
 
+if isempty(t)
+    return
+end
 wraparound = t < t(1);
 t(wraparound) = t(wraparound) + 86400;

@@ -1,3 +1,19 @@
+2010-07-27	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-25
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Add support for
+	meandata, so that CloudSat/MHS or collocated-data/AVHRR can be read again.
+
+	* collocations/read_collocs_data_mean.m: Check for emptiness before
+	proceeding with data and mean, because the latter crashes on emptiness.
+
+	* collocations/collocate_granule.m: try/catch around reading primary, and
+	check for emptiness
+
+	* time/unify_time_axis.m, time/compensate_wraparound.m,
+	time/find_common_time.m: Check for emptiness.
+
 2010-07-26	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-24

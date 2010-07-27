@@ -124,9 +124,24 @@ M_c = overlap; M_d = overlap; M_m = overlap; % and those
 
 %% read data for sat1/sensor1
 logtext(fid, 'Reading %s\n', datafile);
-data1 = fh1(datafile);
+try
+    data1 = fh1(datafile);
+catch ME
+    switch ME.identifier
+        case 'MATLAB:load:couldNotReadFile'
+            logtext(eid, 'Collocating failed: %s\n', ME.message);
+            return
+        otherwise
+            ME.rethrow();
+    end
+end
+
 data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
 logtext(fid, 'Read %s\n', datafile);
+if isempty(data1.time)
+    logtext(fid, 'Primary is empty, nothing to collocate\n');
+    return
+end
 logtext(fid, 'Found %d other granules to collocate with\n', size(date2_all, 1));
 
 %% loop through all the granules to collocate with
@@ -160,6 +175,10 @@ for i = 1:size(date2_all, 1)
     data2 = fh2(datafile2);
     data2.time_orig = data2.time; % store, see note at data1.time_orig
     logtext(fid, 'Read %s\n', datafile2);
+    if isempty(data2.time)
+        logtext(fid, 'Secondary is empty, skipping\n');
+        continue
+    end
     
     if date2_all(i, 3) ~= date1(1, 3)
         % make sure we're using the same time axis epoch
