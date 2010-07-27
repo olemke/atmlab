@@ -24,6 +24,9 @@ WARTS
 - When collocation poes/mhs or poes/amsub, mhs are amsub are really aliases.
   This is now accomodated by a special case if-statement in collocate_granule.
   This is ugly and needs to go.
+- In colloc_read_collocation_cpr_poes.m actually the meandata is read, just
+  because that's what I want when collocating with AVHRR; such a special case
+  is ugly and needs to go.
 
 WISHES
 - Add the following functionality from my own matlab-files:

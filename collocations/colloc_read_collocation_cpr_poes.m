@@ -8,16 +8,25 @@ function data = colloc_read_collocation_cpr_poes(file)
 %
 % out
 %
-%   data        structure   data with time, lat, lon and 5 channels
+%   data        structure   data with time, lat, lon
+%
+% This will actually read the meandata file, as MHS-pixels are of interest.
 %
 % $Id$
 
-M = load(file);
+% find corresponding meandata-file as well
+p = strfind(file, 'collocations');
+p = p(end)+12;
+meandatafile = [file(1:p) 'meandata' file(p:end)];
+
+M_c = load(file);
+M_m = load(meandatafile);
 c = colloc_config('cols_cpr_poes');
 
-data.lat = M.collocations(:, c.overlap.B_LAT);
-data.lon = M.collocations(:, c.overlap.B_LONG);
-[~, ~, ~, h, mi, s] = unixsecs2date(M.collocations(:, c.overlap.B_TIME));
+rows = M_m.data_averaged(:, c.meandata.FIRST);
+data.lat = M_c.collocations(rows, c.overlap.B_LAT);
+data.lon = M_c.collocations(rows, c.overlap.B_LONG);
+[~, ~, ~, h, mi, s] = unixsecs2date(M_c.collocations(rows, c.overlap.B_TIME));
 data.time = compensate_wraparound(3600*h + 60*mi + s);
 data.file = file;
 

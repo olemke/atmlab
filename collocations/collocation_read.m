@@ -98,7 +98,7 @@ for i = 1:size(dates, 1)
     end
 
     %% apply limitations
-    if exist('limits', 'var')
+    if exist('limits', 'var') && ~isempty(fieldnames(limits))
         lim = collocation_restrain(collocations_day, limmat);
         logtext(colloc_config('stdout'), ...
             '%d -> %d collocations\n', size(collocations_day, 1), sum(lim));

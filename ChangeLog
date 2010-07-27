@@ -2,6 +2,28 @@
 
 	* atmlab-1-0-25
 
+	* collocations/collocation_read_dual.m: Added. This function is for "dual
+	reading": for example, read collocated-data/AVHRR-collocations, and from
+	the 'pointers' in this one, read corresponding lines from
+	CPR/MHS-meandata. This function is in early development and will change
+	significantly.
+
+	* collocations/collocation_read.m: Don't crash on empty limits-struct.
+
+	* collocations/colloc_read_collocation_cpr_poes.m: Actually read the
+	meandata file, even when the collocations file is given as an argument. Or
+	actually read both, to get unique MHS pixels but only there where averages
+	were taken. Needed for application with
+	collocated-data/AVHRR-collocations, but not very pretty to have it here.
+	To be thought through later...
+
+	* collocations/TODO: Added entry to wish for a better solution to the
+	problem solved uglily as mentioned in the Changelog entry above.
+
+2010-07-27	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-25
+
 	* collocations/colloc_concatenate_colloc_data_mean.m: Add support for
 	meandata, so that CloudSat/MHS or collocated-data/AVHRR can be read again.
 
