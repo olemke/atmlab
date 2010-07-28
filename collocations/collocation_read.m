@@ -55,11 +55,7 @@ end
 %% convert limits structure to matrix as wanted by restrain_collocations
 
 if exist('limits', 'var')
-    C = cellfun(@(c) ...
-            [name_struct.(c)' ...
-             repmat(limits.(c), [size(name_struct.(c), 2) 1])], ...
-            fieldnames(limits), 'UniformOutput', false);
-    limmat = vertcat(C{:});
+    limmat = limstruct2limmat(limits, name_struct);
 end
 
 %% pre-allocate at least one row

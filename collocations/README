@@ -168,6 +168,8 @@ requested. A plan for the future is the ability to pass handles so that more
 complicated restrictions (such as C1==C2) can be addressed.
 More information in the help of 'collocation_read'.
 
+See also collocation_read_dual.
+
 HOW TO ADD A NEW SET OF SENSORS
 
 To add a new pair of sensors, the collocation system needs to know:
@@ -338,6 +340,13 @@ At this stage, we can collocate and store collocatons as follows:
 
 >> collocate_and_store_date_range([2010 1 1], [2010 1 3], 'metopa', 'mhs', 'noaa18', 'mhs')
 
+OTHER NOTES
+
+One (so far) dataset collocated *collocated* stuff with something else:
+collocation_cpr_poes with AVHRR and thus the collocations contain references
+to line numbers from cpr/poes-collocations. The latter is defined in
+colloc_config('links'). To read such "double" collocations, use
+collocation_read_dual.
 
 
 In case of problems, please send mail to gerrit.holl@ltu.se.

@@ -202,6 +202,12 @@ A.interval = 900; % seconds
 A.distance_for_average_MHS = 7.5; % km
 A.distance_for_average_HIRS = 5; % For HIRS/4
 
+%% define links
+
+A.links.collocation_cpr_poes.sat1 = 'cloudsat';
+A.links.collocation_cpr_poes.sensor1 = 'cpr';
+A.links.collocation_cpr_poes.sat2 = ''; % varies
+A.links.collocation_cpr_poes.sensor2 = 'mhs'; % or amsu/b
 
 %% column definitions
 

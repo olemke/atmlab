@@ -1,0 +1,33 @@
+function limmat = limstruct2limmat(limits, name_struct)
+
+% limstruct2limmat Convert limits-struct to limits-matrix
+%
+% This function converts a limits-structure (as input to the user to, for
+% example, collocation_read) to a limits-matrix (as wanted by, for example,
+% collocation_restrain.
+%
+% FORMAT
+%
+%   limmat = limstruct2limmat(limits, name_struct)
+%
+% IN
+%
+%   limits      structure       Each field is a string with the name of a
+%                               column. The values are 2x1-arrays
+%                               describing the range of values the user
+%                               wants to restrain the data to.
+%   name_struct structure       Describes the mapping of column names to
+%                               column numbers. See <a href="matlab:opentoline('colloc_colno2name.m', 1, 1)">colloc_colno2name</a>
+%
+% OUT
+%
+%   limmat      Nx3 matrix      First row column numbers; 2nd and 3rd row
+%                               the ranges as mentioned.
+%
+% $Id$
+
+C = cellfun(@(c) ...
+    [name_struct.(c)' ...
+    repmat(limits.(c), [size(name_struct.(c), 2) 1])], ...
+    fieldnames(limits), 'UniformOutput', false);
+limmat = vertcat(C{:});
