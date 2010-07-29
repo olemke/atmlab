@@ -12,29 +12,77 @@ function [M, c] = collocation_read_dual(...
 %
 % FORMAT
 %
-% (to be documented)
+% [M, c] = collocation_read_dual(...
+%   sat1, sensor1, sat2, sensor2, ...
+%   startdate, enddate, ...
+%   cols1, cols2, limits1, limits2)
 %
 % IN
 %
-% (to be documented)
+%       sat1        string      primary satellite
+%       sensor1     string      primary pseudosensor, such as
+%                               'collocation_cpr_poes'
+%       sat2        string      secondary satellite
+%       sensor2     string      secondary sensor
+%       startdate   3x1 array   datevec for first date
+%       enddate     3x1 array   datevec for last date (inclusive)
+%       cols1       cell array  Column names from sat1/sensor1
+%       cols2       cell array  Column names for sat2/sensor2
+%       limits1     structure   Limits to values for sat1/sensor1
+%       limits2     structure   Limits to values for sat2/sensor2
 %
 % OUT
 %
-% (to be documented)
+%       M           Nxp matrix  Matrix containing N collocations with p
+%                   columns
+%       c           structure   c1: column names for sat1/sensor1
+%                               c2: column names for sat2/sensor2
 %
-% Example:
+% Example reading the mean values, number of pixels-in-MHS and SD for AVHRR
+% 4 and 5, as well as the MHS lat, long, column and time-since-CPR (for the
+% first CPR pixel in the MHS), MHS channel 5, the number of CPR-in-MHS and
+% the mean CPR-in-MHS, limiting this to at least 10 AVHRR-in-MHS, 10
+% CPR-in-MHS, within 40 degrees of the equator, MHS columns 40–50,
+% unflagged MHS, nonzero IWP and at most 5 minutes between MHS and the
+% first CPR in MHS.
 %
-% [M, c] = collocation_read_dual(...
+% >> [M, c] = collocation_read_dual(...
 %       'noaa18', 'collocation_cpr_poes', 'noaa18', 'avhrr', ...
-%       [2008 1 10], [2008 1 15], ...
-%       {{'AVHRR_LAT', 'AVHRR_LONG'}, ...
-%       {}, ...
-%       {'NO', 'MEAN', 'SD'}}, ...
-%       {{'B_LAT', 'B_LONG', 'B_TIME'}, ...
-%       {}, ...
-%       {'NO', 'MEAN', 'CV'}}, ...
-%       struct('AVHRR_LAT', [-20 20], 'AVHRR_LONG', [-30 30]), ...
-%       struct('CV', [0 1]));
+%       [2008 1 1], [2008 1 31], ...
+%       {{}, {}, {'NO', 4:5, 'MEAN', 4:5, 'SD', 4:5}}, ...
+%       {{'B_LAT', 'B_LONG', 'B_C', 'B_INT'}, {'MHS', 5}, {'NO', 'MEAN'}}, ...
+%       struct('NO', [10 inf]), ...
+%       struct('B_LAT', [-40 40], 'B_C', [40 50], 'MHS', [0 400], ...
+%       'NO', [10 inf], 'MEAN', [eps inf], 'B_INT', [-300 300]));
+% (debugging output omitted)
+% >> whos M
+%   Name         Size             Bytes  Class     Attributes
+% 
+%   M         1164x15            139680  double              
+% 
+% >> c.c1
+% 
+% ans = 
+% 
+%      CPR_POES_START: 1
+%     CPR_POES_LINENO: 2
+%                  NO: [3 4]
+%                MEAN: [5 6]
+%                  SD: [7 8]
+% 
+% >> c.c2
+% 
+% ans = 
+% 
+%      B_LAT: 9
+%     B_LONG: 10
+%        B_C: 11
+%      B_INT: 12
+%        MHS: 13
+%         NO: 14
+%       MEAN: 15
+%
+% See also collocation_read
 %
 % $Id$
 
