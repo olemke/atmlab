@@ -44,14 +44,14 @@ chans = cat(2, names{channels});
 basename = fp{2};
 outfile = fullfile('/tmp', [basename '.nc']);
 infile = fullfile('/tmp', basename);
-logtext(1, 'Converting from l1b to netcdf\n');
+logtext(colloc_config('stdout'), 'Converting from l1b to netcdf\n');
 command = ['java -jar ' colloc_config('sat2netcdf') ' -nogui ' chanstr ' -latlon -temperature -avhrr ' infile ' -outputdir /tmp'];
 chdir(fileparts(colloc_config('sat2netcdf')));
 gunzip(file, '/tmp/');
 [status, result] = system(command);
 chdir(cwd);
 
-logtext(1, 'Reading data\n');
+logtext(colloc_config('stdout'), 'Reading data\n');
 data = loadncvar(outfile, [{'lat', 'lon', 'scanLineUTC'}, ...
     chans]);
 
@@ -60,7 +60,7 @@ delete(outfile);
 
 % convert time from milliseconds to seconds
 
-logtext(1, 'Putting data in order\n');
+logtext(colloc_config('stdout'), 'Putting data in order\n');
 data.time = double(data.scanLineUTC)/1000;
 
 % compensate time wrapping around
