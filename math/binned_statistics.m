@@ -9,7 +9,7 @@ function out = binned_statistics(data_bins, statistics, filter)
 %
 % FORMAT   out = binned_statistics(data_bins, statistics, filter)
 %
-% OUT   out          Structure where with one element for each applied
+% OUT   out          Structure containing the results for each applied
 %                    statistics function.
 % IN    data_bins    Cell of gridded vectors of data.
 %       statistics   Cell array of statistic function references.

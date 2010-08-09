@@ -1,3 +1,9 @@
+2010-08-09  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-28
+
+	* math/binned_statistics.m: Clarify docs to deconfuse native speakers.
+
 2010-07-30	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-27
