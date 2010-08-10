@@ -124,7 +124,7 @@ if isfield(se,'psbox')                                                          
     se.plot.psbox = setup_psboxpoly(se, 'psbox');
 end
 
-if isfield(se,'pspoly')                                                          % PSBOX
+if isfield(se,'pspoly')                                                         % PSBOX
     se.plot.pspoly = setup_psboxpoly(se, 'pspoly');
 end
 
@@ -208,7 +208,7 @@ if ~isfield(se,'increment')
     x = length( unique( floor(se.lat)));
     y = length( unique( floor(se.lon)));
     A = x*y;
-    delta = sqrt(numel(se.(se.field)) / A);
+    delta = sqrt(numel(se.(se.fieldname)) / A);
     inc = ceil(60/delta *2); % times 2 is to make it a bit bigger
     if inc>60, inc=60; end
     a.increment = sprintf('%dm',inc); %i.e. One degree
@@ -249,12 +249,6 @@ if ~isfield(se,'cptfile')
             [tickval,prtstr]=ownctable(se);
             a.cptfile = makehot(tickval,prtstr,'hot2cold');
         case 'mypolar'
-            if ~isfield(se.datarange,'min')
-                se.datarange.min=-1*se.datarange.max;
-            end
-            if ~isfield(se.datarange,'max')
-                se.datarange.max=abs(se.datarange.min);
-            end
             se = setup_cpt(se);
             [tickval,prtstr]=ownctable(se);
             a.cptfile = makepolar(tickval,prtstr);
@@ -407,7 +401,7 @@ if ~isfield(se,'datarange')
     se.ctable = 'mypolar';
 elseif isfield(se.datarange,'max') && ~isfield(se.datarange,'min')
     se.datarange.min = 0;
-    fprintf('setting se.datafield.min = %3.1f\n',se.datarange.min)
+    fprintf('setting se.datarange.min = %3.1f\n',se.datarange.min)
 end
 if se.datarange.max == se.datarange.min
     se.plot.nlevels=1;

@@ -17,7 +17,7 @@ function filename = gmt_plot(in,field)
 %
 % MANDITORY INPUT
 %
-% 1) in.(field) % the data
+% 1) in.(field) % the data (default is field = 'datafield', i.e. in.datafield)
 % 2) in.lat     % the corresponding latitudes
 % 3) in.lon     % the corresponding longitudes
 %
@@ -28,8 +28,10 @@ function filename = gmt_plot(in,field)
 % [length(in.lat),lenght(in.lon)] = size(in.(field));
 %  << transpose: in.(field) = in.(field)'; if this is not the case >>
 %
-% NOTE: If your data is UNGRIDDED I recommend setting:
+% NOTE: 1) If your data is UNGRIDDED I recommend setting:
 %          in.increment = arcminutes (default = 60)
+%       2) gmt_plot automatically detects if the data is gridded or not
+%
 %
 %   -----------------------------------------------------------------------
 %
@@ -181,7 +183,7 @@ filename=sort_figures(out);                                                     
 
 function se = set_GMT_plot(se,field)                                            %% SETUP %%
 
-se.field = field;
+se.fieldname = field;
 if ~isfield(se,'display')                                                       % view the figure?
     se.display=1;                                                               % 0 if you just want to create plot
 end
@@ -190,7 +192,7 @@ if ~isfield(se,'figuretype'), se.figuretype='pdf'; end                          
 
 se = makefilename(se);                                                          % generate a valid filename and title
 
-if (isfield(se,'nodata')&&se.nodata) || (isempty(field) || isempty(se.(field))) % only the coastlines?
+if (isfield(se,'nodata')&&se.nodata) || (isempty(field))                        % only the coastlines?
     se = nodata(se);
     return
 end
@@ -274,6 +276,7 @@ end
 if ~isfield(se,'filename')
     if ~isfield(se,'title') || isempty(se.title)
         se.filename = 'default';
+        se.title = '';
     else se.filename = se.title;
     end
 end
@@ -303,6 +306,10 @@ end
 
 function se = isgridded(se,field)                                               %% ISGRIDDED %%
 %% Test if the data is gridded
+
+if isempty(se.(field))
+    error('The data variable: se.%s is empty',field)
+end
 
 if ndims(se.(field))==3                                                         % test if I need to use squeeze
     se.(field) = squeeze(se.(field));

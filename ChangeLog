@@ -1,3 +1,14 @@
+2010-08-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-28
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Clarified what the default
+	variable name is in help. Now displays a descent error message if
+	the data is empty.
+
+	* geoplots/gmt/create_gmt_earth.m (create_gmt_earth): Small fixes
+	including removing redundent stuff.
+	
 2010-08-09  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-28
