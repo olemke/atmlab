@@ -1,3 +1,13 @@
+2010-08-13  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-29
+
+	* math/binned_statistics.m:
+
+	Turn off divideByZero warning. It will be shown calculating mean for
+	empty bins. We can ignore the warning because the result is still what
+	we want and in 2010a and later the warning is not displayed anyway.
+
 2010-08-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-28

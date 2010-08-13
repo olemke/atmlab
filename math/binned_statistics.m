@@ -34,6 +34,9 @@ if nargin == 3
     data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
 end
 
+w = warning('off','MATLAB:divideByZero');
 for s = statistics
     out.(func2str(s{1})) = cellfun(s{1}, data_bins);
 end
+warning(w);
+
