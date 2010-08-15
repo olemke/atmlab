@@ -319,6 +319,12 @@ provide the specified L2 data (Section \ref{sec:l2}) is ensured by initialising
 \begin{verbatim}
 O = qp2_l2( Q );
 \end{verbatim}
+Some fields of O are also set by Qpack2, and user settings are overwritten.
+These fields are:
+\begin{itemize}
+\item \verb|O.msg|
+\item \verb|O.sxnorm| 
+\end{itemize}
 For linear inversion, a single active setting is needed:
 \begin{verbatim}
 O.linear = true;

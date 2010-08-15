@@ -1,3 +1,11 @@
+2010-08-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.1
+	
+	* qpack2.tex (subsection{OEM settings}): Added some text
+	explaining that some fields of O are set by Qpack2 and any user
+	setting is overwritten.
+
 2010-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.0: Selecting this as the starting point for Qpack2.0.
