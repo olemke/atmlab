@@ -12,4 +12,8 @@ function hname = hostname
 
 [st,hname] = system( 'hostname' );
 
-hname = hname(1:end-1);
+%- Remove any newline character
+%
+if hname(end) == sprintf('\n')
+  hname = hname(1:end-1);
+end

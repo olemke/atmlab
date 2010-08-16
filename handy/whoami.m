@@ -25,3 +25,10 @@ if ispc
     user = user((i+1):end);
   end
 end
+
+
+%- Remove any newline character
+%
+if user(end) == sprintf('\n')
+  user = user(1:end-1);
+end
