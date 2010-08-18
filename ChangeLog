@@ -1,3 +1,11 @@
+2010-08-18  Marston Johnston  <marston@chalmers.se>
+
+	* atmlab-1-0-31
+
+	* h2o/thermodynamics/e_eq_water_gg.m: created 
+
+	* h2o/thermodynamics/e_eq_ice_gg.m: created 
+	
 2010-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-30
