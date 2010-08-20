@@ -51,8 +51,8 @@ if nargout > 1
   G = atmdata_regrid( G, { p, lat, 0, doy } );
 
   if length(doy) > 1
-    z = reshape( G.DATA, [size(G.DATA,1), size(G.DATA,2), size(G.DATA,4)] );
+    t = reshape( G.DATA, [size(G.DATA,1), size(G.DATA,2), size(G.DATA,4)] );
   else
-    z = G.DATA;
+    t = G.DATA;
   end
 end  
