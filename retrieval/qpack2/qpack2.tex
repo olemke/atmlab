@@ -68,7 +68,7 @@ maintained version of ARTS. This gave also an opportunity to make a more
 stringent implementation and to add some features. This should hopefully make
 it easier to maintain and extend Qpack2. Data formats are now more clearly
 defined and the ambition level around documentation is higher (but still
-modest). A main improvement compared to Qpack2 is that extraction of a priori
+modest). A main improvement compared to Qpack is that extraction of a priori
 data from climatology data is now an integrated part. On the other hand, the
 feature of classifying errors into different categories (0-3 in Qpack) and the
 associated plotting features are removed as it was hardly used.
@@ -168,7 +168,7 @@ priori data are also defined in \verb|Q|. The exceptions are settings directly
 associated with OEM, that are stored in \verb|O|. This division reflects the
 fact that the OEM operations are made by a stand-alone function. This function,
 \verb|oem|, is implemented in a general manner, to be applicable for any
-retrievaL case as long as an interface to a ``forward model'' is provided.
+retrieval case as long as an interface to a ``forward model'' is provided.
 
 The measurement data structure \verb|Y| can be an array. That is, a series of
 observations can be inverted in a single call of \verb|qpack2|, on the
@@ -283,7 +283,7 @@ Atmlab's folder \verb|demos|, such as \verb|qarts_demo|.
 Most fields of \verb|Q| can be unspecified (\verb|{}|), but Qpack2 handles some
 fields in special way:
 \begin{itemize}
-\item \verb|Q.ATMOSPHERE_DIM| must be set, to 1.
+\item \verb|Q.ATMOSPHERE_DIM| must be set to 1.
 \item \verb|Q.R_GEOID| must be set.
 \item \verb|Q.Q.USE_RAW_ATMOSPHERE| must be set to false. 
 \item \verb|Q.ABS_SPECIES.ATMDATA| must be set.
