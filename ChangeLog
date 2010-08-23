@@ -1,3 +1,9 @@
+2010-08-23  Ole Martin Christensen  <olem@chalmers.se>
+
+	* arts/qartsSensor.m (qartsSensor): *sensor_responseBackendFrequencySwitch 
+	changed to *sensor_responseBackendFrequencySwitching in the description of 
+	F_SWITCHING.
+
 2010-08-20  Ole Martin Christensen  <olem@chalmers.se>
 
 	* arts/qarts.m (qarts): qarts_set_abs_lookup in description 
