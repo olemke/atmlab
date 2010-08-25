@@ -120,9 +120,12 @@ HOW TO READ COLLOCATIONS PREVIOUSLY LOCATED
 To read previously written collocations, use 'collocation_read'. You give it a
 pair of satellite/sensor-couples, a date range and the names of the columns to
 read (overlap, data, meandata), as well as a structure defining the
-limitations to those that you want to read. for example, to read the latitude,
-longitude and distance (mhs/cpr), along with MHS-channels 3–5 and the mean
-ROIWP, but only within 20 degrees of the equator, one would write:
+limitations to those that you want to read. Finally, you can pass it some
+handles, along with the names of the columns to give as input to those
+handles, for more complicated filters (such as a land-sea-mask TBI).
+For example, to read the latitude, longitude and distance (mhs/cpr), along
+with MHS-channels 3–5 and the mean ROIWP, but only within 20 degrees of the
+equator, one would write:
 
 >> [M, cols] = collocation_read('cloudsat', 'cpr', 'noaa18', 'mhs', [2008 1 12], [2008 1 14], {{'C_LAT', 'C_LONG', 'B_DIST'}, {'MHS', 3:5}, {'MEAN'}}, struct('C_LAT', [-20 20]));
 18-Jun-2010 17:25:29.719:read_collocs_data_mean:36:Reading ~/data/collocations/2008/01/12/collocations_noaa18.mat
@@ -138,11 +141,11 @@ ROIWP, but only within 20 degrees of the equator, one would write:
 18-Jun-2010 17:25:31.351:read_collocs_data_mean:48:Reading ~/data/collocations/2008/01/14/collocations_meandata_noaa18.mat
 18-Jun-2010 17:25:31.356:collocation_read:80:1888 -> 412 collocations
 
-or, 
+or, as another example, also illustrating the passing of handles
 >> [M, cols] = collocation_read(...
     'noaa16', 'amsub', 'noaa15', 'amsub', ... % sat/sensor pairs
     [2001 1 1], [2001 1 15], ... % period
-    {{'LAT1', 'LONG1', 'C1', 'C2', 'DIST', 'INT'}, ... % geometrical info
+    {{'LAT1', 'LONG1', 'START1', 'I1', 'C1', 'C2', 'DIST', 'INT'}, ... % geometrical info
      {'AMSU_B1', 3:5, 'AMSU_B2', 3:5}}, ... % actual measurements
      struct(...
         'LAT1', [65 90], ... % latitude between 65 and 90 (inclusive) (only polar)
@@ -151,7 +154,12 @@ or,
         'DIST', [0 5], ...   % max 5 km
         'INT', [0 300], ...  % max 5 minutes
         'AMSU_B1', [0 400], ... % all requested NOAA-16 chans unflagged
-        'AMSU_B2', [0 400]);    % all requested NOAA-15 chans unflagged
+        'AMSU_B2', [0 400]), ...
+        {@colloc_select_good_lines, ... % apply function as filter
+         {'START1', 'I1'}, ... % columns to pass to function used as filter
+         @(v1, v2) v1==v2, ... % apply anonymous funciton as filter
+         {'C1', 'C2'} ... % columns to pass (only collocs with equal viewing angles)
+         });
 (output omitted)
 >> whos
   Name        Size            Bytes  Class     Attributes
@@ -163,9 +171,6 @@ or,
     M(:, cols.AMSU_B2(3)), ... % versus NOAA-15/AMSU-B channel 20. ..
     'k.')
 
-Currently, the only restrictions possible are ranges of individual values
-requested. A plan for the future is the ability to pass handles so that more
-complicated restrictions (such as C1==C2) can be addressed.
 More information in the help of 'collocation_read'.
 
 See also collocation_read_dual.

@@ -8,6 +8,10 @@ BUGS
   H_TIME-B_TIME is ~one day; error in hirs time calculation? Or artefact of
   something from a long time ago? Can't reproduce.
 - When removing doubles, also take care of averaged data
+- colloc_select_good_lines.m currently depends on functionaly in
+  my (Gerrits) own private code; fix this, and see it is fixed elsewhere too.
+  Actually, colloc_select_good_lines.m is in alpha and needs considerable
+  polishing.
 
 WARTS
 - Currently, when processing CloudSat/MHS-collocations, I read the files for
@@ -31,9 +35,6 @@ WARTS
 WISHES
 - Add the following functionality from my own matlab-files:
     - cscolmhs-collocations
-- More advanced collocation restrictions, probably by passing a handle,
-  calcuting true/false as a function of requested fields (identical viewing
-  angles, land-sea-mask, etc.).
 - Add aliases for abbreviated satellite pairs, so that noaa15/N15 are the same
   (particularly useful for hirscs).
 - Don't let CPR collocate with more than one MHS; only the closest one

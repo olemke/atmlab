@@ -1,5 +1,5 @@
 function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
-    start_date, end_date, cols_in, limits)
+    start_date, end_date, cols_in, limits, filters)
 
 % collocation_read Read collocations for indicated period
 %
@@ -11,7 +11,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %
 %   [M, cols] = collocation_read(...
 %       sat1, sensor1, sat2, sensor2, ...
-%       start_date, end_date, cols_in, limits)
+%       start_date, end_date, cols_in[, limits[, filters]])
 %
 % IN
 %
@@ -30,6 +30,11 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   limits      structure       Describes acceptable ranges for the
 %                               different columns requested. Data outside
 %                               this ranges will not be returned.
+%   filters     cell array      Cell array with even number of members. The
+%                               odd members are handles, the even members
+%                               are the columns passed to them. For
+%                               example: {@colloc_select_good_lines,
+%                               {'START1', 'I1'}}.
 %
 % OUT
 %
@@ -56,6 +61,20 @@ end
 
 if exist('limits', 'var')
     limmat = limstruct2limmat(limits, name_struct);
+end
+
+%% the same for the filters
+
+if ~exist('filters', 'var')
+    filters = {};
+end
+
+% for the filters, convert column names to column numbers, using the
+% earlier obtained name_struct
+if ~isempty(filters)
+    for i = 2:2:length(filters)
+        filters{i} = cellfun(@(s) name_struct.(s), filters{i});
+    end
 end
 
 %% pre-allocate at least one row
@@ -97,8 +116,22 @@ for i = 1:size(dates, 1)
     if exist('limits', 'var') && ~isempty(fieldnames(limits))
         lim = collocation_restrain(collocations_day, limmat);
         logtext(colloc_config('stdout'), ...
-            '%d -> %d collocations\n', size(collocations_day, 1), sum(lim));
+            'limits: %d -> %d collocations\n', size(collocations_day, 1), sum(lim));
         collocations_day = collocations_day(lim, :);
+    end
+    
+    if exist('filters', 'var') && ~isempty(filters)
+        for k = 1:2:length(filters)
+            % make a cell array of column vectors so that I can pass a
+            % variable number of arguments to the filter
+            args = collocations_day(:, filters{k+1});
+            args = mat2cell(args, size(args, 1), repmat(1, [size(args, 2) 1]));
+            lim = filters{k}(args{:});
+            logtext(colloc_config('stdout'), ...
+                'filter %s: %d -> %d collocations\n', func2str(filters{k}), ...
+                size(collocations_day, 1), sum(lim));
+            collocations_day = collocations_day(lim, :);
+        end
     end
     
     L = size(M, 1);

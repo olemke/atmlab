@@ -1,3 +1,16 @@
+2010-08-25	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* collocations/collocation_read.m: Add support for filters, handles passed
+	on the the function, for arbitrarily complicated subselections.
+
+	* collocations/colloc_select_good_lines.m: Filter to be used with
+	collocation_read, throws out lines occuring in the granule before.
+
+	* collocations/{TODO,README}: Update to reflect implemented functionality.
+
+	* handy/logtext.m: Do not print the name (code) of anonymous, inline
+	functions.
+
 2010-08-23  Ole Martin Christensen  <olem@chalmers.se>
 
 	* arts/qartsSensor.m (qartsSensor): *sensor_responseBackendFrequencySwitch 
