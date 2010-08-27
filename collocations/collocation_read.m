@@ -30,11 +30,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   limits      structure       Describes acceptable ranges for the
 %                               different columns requested. Data outside
 %                               this ranges will not be returned.
-%   filters     cell array      Cell array with even number of members. The
-%                               odd members are handles, the even members
-%                               are the columns passed to them. For
-%                               example: {@colloc_select_good_lines,
-%                               {'START1', 'I1'}}.
+%   filters     cell array      to be documented
 %
 % OUT
 %
@@ -72,8 +68,8 @@ end
 % for the filters, convert column names to column numbers, using the
 % earlier obtained name_struct
 if ~isempty(filters)
-    for i = 2:2:length(filters)
-        filters{i} = cellfun(@(s) name_struct.(s), filters{i});
+    for i = 1:length(filters)
+        filters{i}{2} = cellfun(@(s) name_struct.(s), filters{i}{2});
     end
 end
 
@@ -121,14 +117,20 @@ for i = 1:size(dates, 1)
     end
     
     if exist('filters', 'var') && ~isempty(filters)
-        for k = 1:2:length(filters)
+        for k = 1:length(filters)
             % make a cell array of column vectors so that I can pass a
             % variable number of arguments to the filter
-            args = collocations_day(:, filters{k+1});
+            filter = filters{k}{1};
+            args = collocations_day(:, filters{k}{2});
             args = mat2cell(args, size(args, 1), repmat(1, [size(args, 2) 1]));
-            lim = filters{k}(args{:});
+            if length(filters{k}) > 2
+                addargs = filters{k}{3};
+            else
+                addargs = {};
+            end
+            lim = filter(args{:}, addargs{:});
             logtext(colloc_config('stdout'), ...
-                'filter %s: %d -> %d collocations\n', func2str(filters{k}), ...
+                'filter %s: %d -> %d collocations\n', func2str(filter), ...
                 size(collocations_day, 1), sum(lim));
             collocations_day = collocations_day(lim, :);
         end

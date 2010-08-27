@@ -1,3 +1,16 @@
+2010-08-27	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* collocations/collocation_read.m: Adapt support for filters: can pass
+	additional arguments to the filter.
+
+	* collocations/find_granules_by_date.m: Sort granules upon return.
+
+	* handy/find_granules_for_period.m: Return a matrix with all granules for
+	the period for the satellite/sensor-pair.
+
+	* collocations/colloc_select_good_lines.m: Fix bug: Don't assume noaa19,
+	actually, don't assume anything, pass on the satellite in question.
+
 2010-08-25	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* collocations/collocation_read.m: Add support for filters, handles passed

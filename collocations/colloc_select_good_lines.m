@@ -1,4 +1,4 @@
-function good = colloc_select_good_lines(unisec, line)
+function good = colloc_select_good_lines(unisec, line, sat)
 
 % colloc_select_good_lines Select 'good' scanlines
 %
@@ -13,12 +13,13 @@ function good = colloc_select_good_lines(unisec, line)
 %
 % FORMAT
 %
-%   good = colloc_select_good_lines(unisec, line)
+%   good = colloc_select_good_lines(unisec, line, sat)
 %
 % IN
 %
 %   unisec  array   contains starting times for granule for each row
 %   line    array   contains row-number/scanline for each granule
+%   sat     string  satellite
 %
 % OUT
 %
@@ -31,15 +32,18 @@ function good = colloc_select_good_lines(unisec, line)
 %
 % $Id$
 
-[unisec_uni, I] = unique(unisec);
+[unisec_uni, I] = unique(unisec, 'first');
 ngrans = length(unisec_uni);
 
 good = false(size(line));
 cutoffs = zeros(size(unisec_uni));
-for i = 2:ngrans % leave first cutoff at 0, e.g. always select all points for first granule
-    % this returns 0 if it's not found, so then this filter is a noop
-    cutoffs(i) = amsu_first_scanline('noaa19', unisec_uni(i));
+for i = 1:ngrans
+    % this returns 0 if it's not found, so then the filter is a noop
+    cutoffs(i) = amsu_first_scanline(sat, unisec_uni(i));
 end
+
+% make a poor estimate for those where it's unknown (average of rest)
+cutoffs(cutoffs==-1) = round(mean(cutoffs(cutoffs~=-1)));
 
 for i = 1:ngrans
     first = I(i);

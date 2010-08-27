@@ -87,3 +87,5 @@ if with_yesterday
 end
 % remove lines with zeroes
 M(M(:, 1)==0, :) = [];
+% sort
+M = sortrows(M);
