@@ -57,6 +57,8 @@ end
 
 if exist('limits', 'var')
     limmat = limstruct2limmat(limits, name_struct);
+else
+    limmat = zeros(0, 3);
 end
 
 %% the same for the filters
@@ -69,7 +71,7 @@ end
 % earlier obtained name_struct
 if ~isempty(filters)
     for i = 1:length(filters)
-        filters{i}{2} = cellfun(@(s) name_struct.(s), filters{i}{2});
+        filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
     end
 end
 
@@ -107,35 +109,12 @@ for i = 1:size(dates, 1)
         logtext(colloc_config('stdout'), 'no collocations\n');
         continue
     end
-
+    
     %% apply limitations
-    if exist('limits', 'var') && ~isempty(fieldnames(limits))
-        lim = collocation_restrain(collocations_day, limmat);
-        logtext(colloc_config('stdout'), ...
-            'limits: %d -> %d collocations\n', size(collocations_day, 1), sum(lim));
-        collocations_day = collocations_day(lim, :);
-    end
+    lim = collocation_restrain(collocations_day, limmat, filters);
+    collocations_day = collocations_day(lim, :);
     
-    if exist('filters', 'var') && ~isempty(filters)
-        for k = 1:length(filters)
-            % make a cell array of column vectors so that I can pass a
-            % variable number of arguments to the filter
-            filter = filters{k}{1};
-            args = collocations_day(:, filters{k}{2});
-            args = mat2cell(args, size(args, 1), repmat(1, [size(args, 2) 1]));
-            if length(filters{k}) > 2
-                addargs = filters{k}{3};
-            else
-                addargs = {};
-            end
-            lim = filter(args{:}, addargs{:});
-            logtext(colloc_config('stdout'), ...
-                'filter %s: %d -> %d collocations\n', func2str(filter), ...
-                size(collocations_day, 1), sum(lim));
-            collocations_day = collocations_day(lim, :);
-        end
-    end
-    
+    %% add to total
     L = size(M, 1);
     N = size(collocations_day, 1);
     M((L+1):(L+N), :) = collocations_day;

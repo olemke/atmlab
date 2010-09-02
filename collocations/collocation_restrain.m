@@ -1,4 +1,4 @@
-function rows = collocation_restrain(data, ranges)
+function rows = collocation_restrain(data, ranges, filters)
 
 % collocation_restrain Find rows fulfilling restrictions
 %
@@ -10,23 +10,45 @@ function rows = collocation_restrain(data, ranges)
 %   ranges  Nx3 matrix  Matrix containing rows [colno min max], where data
 %                       rows from the data are selected if
 %                       min <= data(row, col) <= max
+%   filters cell array 
 %
 % OUT
 %
 %   rows    logical     Rows where limitations are met
 %
-% TODO:
-% implement more complicated restrictions such as:
-% - localtime
-% - SZA
-% - land/sea
-% - season
-%
 % $Id$
 
-rightrange = all(data(:, ranges(:, 1)) >= repmat(ranges(:, 2)', [size(data, 1) 1]), 2) & ...
-             all(data(:, ranges(:, 1)) <= repmat(ranges(:, 3)', [size(data, 1) 1]), 2);
+if isempty(ranges)
+    rows = true(size(data, 1), 1);
+else
+    rightrange = all(data(:, ranges(:, 1)) >= repmat(ranges(:, 2)', [size(data, 1) 1]), 2) & ...
+        all(data(:, ranges(:, 1)) <= repmat(ranges(:, 3)', [size(data, 1) 1]), 2);
+    
+    rows = rightrange;
+    logtext(colloc_config('stdout'), 'Selecting ranges: %d -> %d\n', ...
+        size(data, 1), sum(rows));
+end
 
-%
-
-rows = rightrange;
+if ~any(rows)
+    logtext(colloc_config('stdout'), 'No more collocations, nothing to do\n');
+    return
+end
+    
+for k = 1:length(filters)
+    % make a cell array of column vectors so that I can pass a
+    % variable number of arguments to the filter
+    filter = filters{k}{1};
+    args = cellfun(@(v) data(:, v), ...
+        filters{k}{2}, ...
+        'UniformOutput', false);
+    if length(filters{k}) > 2
+        addargs = filters{k}{3};
+    else
+        addargs = {};
+    end
+    lim = filter(args{:}, addargs{:});
+    logtext(colloc_config('stdout'), ...
+        'filter %s: %d -> %d collocations\n', func2str(filter), ...
+        sum(rows), sum(rows&lim));
+    rows = rows&lim;
+end

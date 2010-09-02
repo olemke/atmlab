@@ -1,13 +1,15 @@
 function [M, c] = collocation_read_dual(...
     sat1, sensor1, sat2, sensor2, ...
     startdate, enddate, ...
-    cols1, cols2, limits1, limits2)
+    cols1, cols2, limits1, limits2, ...
+    filter1, filter2)
 
 % collocation_read_dual Read collocations from two sources
 %
 % Note! Function is in alpha and will likely change significantly!
+% Currently hardcoded for CPR-collocations/AVHRR, this will likely change!
 %
-% Read collocation from more two source, where the first source describes
+% Read collocation from two sources, where the first source describes
 % the row numbers to be read from the second source.
 %
 % FORMAT
@@ -30,6 +32,8 @@ function [M, c] = collocation_read_dual(...
 %       cols2       cell array  Column names for sat2/sensor2
 %       limits1     structure   Limits to values for sat1/sensor1
 %       limits2     structure   Limits to values for sat2/sensor2
+%       filter1     cell array  Filters as for collocation_read
+%       filter2     cell array  Filters as for collocation_read
 %
 % OUT
 %
@@ -53,7 +57,8 @@ function [M, c] = collocation_read_dual(...
 %       {{'B_LAT', 'B_LONG', 'B_C', 'B_INT'}, {'MHS', 5}, {'NO', 'MEAN'}}, ...
 %       struct('NO', [10 inf]), ...
 %       struct('B_LAT', [-40 40], 'B_C', [40 50], 'MHS', [0 400], ...
-%       'NO', [10 inf], 'MEAN', [eps inf], 'B_INT', [-300 300]));
+%       'NO', [10 inf], 'MEAN', [eps inf], 'B_INT', [-300 300]), ...
+%       {}, {}); % no filters
 % (debugging output omitted)
 % >> whos M
 %   Name         Size             Bytes  Class     Attributes
@@ -97,11 +102,20 @@ if ~any(strcmp(cols1{1}, 'CPR_POES_LINENO'))
 end
 
 [M1, c1] = collocation_read(sat1, sensor1, sat2, sensor2, ...
-    startdate, enddate, cols1, limits1);
+    startdate, enddate, cols1, limits1, filter1);
 
 links = colloc_config('links');
 [~, name_struct] = colloc_colname2no(links.(sensor1).sensor1, links.(sensor1).sensor2, cols2);
 limmat = limstruct2limmat(limits2, name_struct);
+
+% for the filters@filter2, convert column names to column numbers, using the
+% earlier obtained name_struct
+if ~isempty(filter2)
+    for i = 1:length(filter2)
+        filter2{i}{2} = cellfun(@(s) name_struct.(s)', filter2{i}{2}, 'UniformOutput', false);
+    end
+end
+
 M1_rows = true(size(M1, 1), 1);
 
 N = 0;
@@ -119,9 +133,7 @@ for i = 1:length(starttimes)
         [year month day], [year month day], ...
         cols2);
     M2 = M2(rows, :);
-    lim = collocation_restrain(M2, limmat);
-    logtext(colloc_config('stdout'), ...
-        '%d -> %d collocations\n', length(rows), sum(lim));
+    lim = collocation_restrain(M2, limmat, filter2);
     M1_rows(first:last) = lim;
     M2 = M2(lim, :);
     

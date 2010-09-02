@@ -1,3 +1,20 @@
+2010-09-02	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* collocations/collocation_read.m: Move filters to separate file.
+
+	* collocations/colloc_config.m: Add field to describe where
+	firstline-hashtables can be found.
+
+	* collocations/collocation_read_dual.m: Add support for filters.
+
+	* collocations/colloc_select_good_lines.m: Also needs the sensor
+	(noaa18/mhs != noaa18/avhrr)
+
+	* collocations/collocation_restrain.m: Move filter support here.
+
+	* sensors/granule_first_line.m: Added: returns lowest (scan)line not
+	occuring in previous granule.
+
 2010-08-27	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* collocations/collocation_read.m: Adapt support for filters: can pass

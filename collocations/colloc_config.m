@@ -123,6 +123,7 @@ A.collocation_collocation_cpr_poes_avhrr_filename = 'collocations_$SAT1_$SAT2.ma
 A.collocation_collocation_cpr_poes_avhrr_data_filename = 'collocations_data_$SAT1_$SAT2.mat';
 A.collocation_collocation_cpr_poes_avhrr_meandata_filename = 'collocations_meandata_$SAT1_$SAT2.mat';
 
+A.firstline_data = '~gerrit/data/overig/firstline_$SAT_$SENSOR.mat';
 % define what reading function to use for what sensor
 
 A.read_cpr = @colloc_read_cpr;
