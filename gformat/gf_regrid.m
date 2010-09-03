@@ -43,9 +43,12 @@ for i = 1 : length( G )
   agrids = {};
   %
   for d = 1  : G(i).DIM
-    agrids{d} = G(i).(sprintf('GRID%d',d));
+    gname        = sprintf('GRID%d',d);
+    agrids{d}    = G(i).(gname);
+    G(i).(gname) = grids{d};
   end
   %
   G(i).DATA = regrid( agrids, G(i).DATA, grids, iopt );  
   %
 end
+

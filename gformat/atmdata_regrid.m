@@ -36,11 +36,11 @@ end                                                                         %&%
 %- Take log of pressure
 %
 if length( grids )
+  g0       = grids{1};
   grids{1} = -log( grids{1} );
 end
 for i = 1 : length(G)
   if G(i).DIM > 0
-    g0{i} = G(i).GRID1;
     G(i).GRID1 = -log( G(i).GRID1 );
   end
 end
@@ -70,6 +70,6 @@ G = gf_regrid( G, grids );
 %
 for i = 1 : length(G)
   if G(i).DIM > 0
-    G(i).GRID1 = g0{i};
+    G(i).GRID1 = g0;
   end
 end

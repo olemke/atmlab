@@ -1,3 +1,13 @@
+2010-09-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-40
+
+	* gformat/atmdata_regrid.m: And here wrong pressure grid was
+	inserted.
+
+	* gformat/gf_regrid.m: Returned structure was not updated with new
+	grids.
+
 2010-09-03	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* collocations/README: Moved documentation to satpage.
