@@ -1,3 +1,7 @@
+2010-09-03	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* collocations/README: Moved documentation to satpage.
+
 2010-09-02	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* collocations/collocation_read.m: Move filters to separate file.
