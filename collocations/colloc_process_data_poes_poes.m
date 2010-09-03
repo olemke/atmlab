@@ -45,9 +45,9 @@ i2 = sub2ind(size(data2.lat), r2, c2);
 
 % reshape so that I can use direct addressing for brightness temperatures
 
-tb1 = reshape(shiftdim(data1.tb, 1), [5 numel(data1.lat)]);
-tb2 = reshape(shiftdim(data2.tb, 1), [5 numel(data2.lat)]);
+tb1 = reshape(data1.tb, [numel(data1.lat) 5]);
+tb2 = reshape(data2.tb, [numel(data2.lat) 5]);
 
 %% store info
 
-M = [tb1(:, i1)' tb2(:, i2)'];
+M = [tb1(i1, :) tb2(i2, :)];

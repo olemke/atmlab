@@ -37,7 +37,8 @@ data.time = data.time'/1000;
 
 data.time = compensate_wraparound(data.time);
 
-% rotate lat and lon so that columns are viewing angles
+% shift dimensions so that it's [row col (channel)]
 
-data.lat = data.lat';
-data.lon = data.lon';
+data.lat = shiftdim(data.lat, 1);
+data.lon = shiftdim(data.lon, 1);
+data.tb = shiftdim(data.tb, 2);

@@ -53,9 +53,9 @@ c = c.data;
 
 % reshape so that I can use direct addressing for brightness temperatures
 
-tb2 = reshape(shiftdim(data2.tb, 1), [5 numel(data2.lat)]);
+tb2 = reshape(data2.tb, [numel(data2.lat) 5]);
 
 M(:, c.VIS) = data1.vis(i1);
 M(:, c.BT) = data1.bt(i1, :);
 M(:, c.LC) = data1.lc(i1, :);
-M(:, c.MHS) = tb2(:, i2)';
+M(:, c.MHS) = tb2(i2, :);

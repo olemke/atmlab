@@ -54,7 +54,7 @@ M(:, c.data.dIOROIWP) = data1.IO_RO_ice_water_path_uncertainty(r1);
 i2 = sub2ind(size(data2.lat), r2, c2);
 
 % reshape so that I can use direct addressing for brightness temperatures
-tb = reshape(shiftdim(data2.tb, 1), [numel(data2.lat) 5]);
+tb = reshape(data2.tb, [numel(data2.lat) 5]);
 
 M(:, c.data.MHS) = tb(i2, :);
 
@@ -72,12 +72,12 @@ hirs_data = read_hirs(hirs_file); % TODO/FIXME: to be optimised as for amsua
 
 % AMSU_A
 ai = sub2ind(size(amsua_data.lat), M_c(:, c.overlap.A_I), M_c(:, c.overlap.A_C));
-tb = reshape(shiftdim(amsua_data.tb, 1), [numel(amsua_data.lat) 15]);
+tb = reshape(amsua_data.tb, [numel(amsua_data.lat) 15]);
 M(:, c.data.AMSU_A) = tb(ai, :);
 
 % HIRS
 hi = sub2ind(size(hirs_data.lat), M_c(:, c.overlap.H_I), M_c(:, c.overlap.H_C));
-tb = reshape(shiftdim(hirs_data.tb, 1), [numel(hirs_data.lat) 20]);
+tb = reshape(hirs_data.tb, [numel(hirs_data.lat) 20]);
 M(:, c.data.HIRS) = tb(hi, :);
 
 %% MSPPS

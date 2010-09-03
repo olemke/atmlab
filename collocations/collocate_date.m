@@ -8,7 +8,7 @@ function [overlap, data, meandata] = collocate_date(year, month, day, sat1, sens
 %   'stdout' (defaults to 1)
 %   'stderr' (defaults to 2)
 %   'POES_satellite_names'
-%   
+%
 %
 % FORMAT
 %
@@ -36,7 +36,6 @@ function [overlap, data, meandata] = collocate_date(year, month, day, sat1, sens
 % $Id$
 
 fid = colloc_config('stdout');
-cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 
 grans = find_granules_by_date(year, month, day, sat1, sensor1);
 if isempty(grans)
@@ -104,8 +103,7 @@ for i = 1:ngrans
         end
     end
     [overlap, data, meandata] = colloc_concatenate_colloc_data_mean(...
-        overlap, S{1}, data, S{2}, meandata, S{3}, ...
-        cols.overlap.unicol);
+        overlap, S{1}, data, S{2}, meandata, S{3});
 end
 
 if ~anysuccess

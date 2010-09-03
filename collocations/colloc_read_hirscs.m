@@ -58,7 +58,7 @@ data.lc = data.lc.';
 
 data.time = compensate_wraparound(data.time);
 
-% get rid of doubles
+% get rid of doubles. FIXME: use scanline numbers
 
 [~, I] = unique([data.time data.lat data.lon], 'rows');
 allfields = fieldnames(data);

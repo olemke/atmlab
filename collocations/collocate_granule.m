@@ -241,8 +241,7 @@ for i = 1:size(date2_all, 1)
     end
     
     [overlap, data, meandata] = colloc_concatenate_colloc_data_mean(...
-        overlap, M_c, data, M_d, meandata, M_m, ...
-        cols.overlap.unicol);
+        overlap, M_c, data, M_d, meandata, M_m);
     
     logtext(fid, 'Info collected\n');
 end

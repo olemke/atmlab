@@ -7,11 +7,7 @@ BUGS
 - Bug-checking: sometimes H_INT and B_INT are both within 900 seconds, but
   H_TIME-B_TIME is ~one day; error in hirs time calculation? Or artefact of
   something from a long time ago? Can't reproduce.
-- When removing doubles, also take care of averaged data
-- colloc_select_good_lines.m currently depends on functionaly in
-  my (Gerrits) own private code; fix this, and see it is fixed elsewhere too.
-  Actually, colloc_select_good_lines.m is in alpha and needs considerable
-  polishing.
+- HIRSCS, use scanline numbers for double-checking
 
 WARTS
 - Currently, when processing CloudSat/MHS-collocations, I read the files for

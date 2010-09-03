@@ -1,3 +1,31 @@
+2010-09-03	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-41
+
+	* collocations/collocate_date.m,
+	collocations/colloc_concatenate_colloc_data_mean.m,
+	collocations/colloc_config.m, collocations/collocate_granule.m: Get rid of buggy 'unicol' system.
+
+	* collocations/colloc_read_poes_radiometer.m: Shift dimensions so that the
+	scanline is always in the first dimension.
+
+	* collocations/colloc_process_data_cpr_mhs.m,
+	collocations/colloc_process_data_hirscs_poes.m,
+	collocations/colloc_process_data_poes_poes.m: Adapt to shifted dimensions.
+
+	* collocations/colloc_read_hirscs.m: Added FIXME to use scanline numbers
+	for the removal of doubles.
+
+	* sensors/read_granule.m: Started high-level function intended to read
+	/any/ granule from /any/ satellite/sensor-pair. Working but not yet used
+	in production code.
+
+	* ChangeLog: documented changes, added version numbers for the past 7
+	changes but having an edit conflict as Patrick did the same.
+
+	* TODO: Removed items done, added note on scanline numbers in
+	colloc_read_hirscs.
+
 2010-09-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-40
@@ -10,9 +38,13 @@
 
 2010-09-03	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-39
+
 	* collocations/README: Moved documentation to satpage.
 
 2010-09-02	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-38
 
 	* collocations/collocation_read.m: Move filters to separate file.
 
@@ -31,6 +63,8 @@
 
 2010-08-27	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-37
+
 	* collocations/collocation_read.m: Adapt support for filters: can pass
 	additional arguments to the filter.
 
@@ -43,6 +77,8 @@
 	actually, don't assume anything, pass on the satellite in question.
 
 2010-08-25	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-36
 
 	* collocations/collocation_read.m: Add support for filters, handles passed
 	on the the function, for arbitrarily complicated subselections.
@@ -57,11 +93,15 @@
 
 2010-08-23  Ole Martin Christensen  <olem@chalmers.se>
 
+	* atmlab-1-0-35
+
 	* arts/qartsSensor.m (qartsSensor): *sensor_responseBackendFrequencySwitch 
 	changed to *sensor_responseBackendFrequencySwitching in the description of 
 	F_SWITCHING.
 
 2010-08-20  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-1-0-34
 
 	* arts/qarts.m (qarts): qarts_set_abs_lookup in description 
 	of Q.ABSORPTION changed to qarts_abstable. 
