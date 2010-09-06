@@ -1,3 +1,30 @@
+2010-09-06	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-44
+
+	* collocations/colloc_process_poes_poes.m,
+	collocations/colloc_process_data_cpr_mhs.m,
+	collocations/colloc_process_cpr_mhs.m,
+	collocations/colloc_process_cpr_avhrr.m, collocations/collocate_granule.m: Remove doubles after
+	processing, but not on reading, because the row numbers will be wrong.
+
+	* collocations/colloc_process_data_cpr_mhs.m: Do not remove doubles on
+	reading, because the row-numbers will be incorrect.
+
+	* collocations/collocation_read.m: Always get rid of doubles. The opposite
+	is temporarily impossible, it is extremely unlikely that is what you want.
+	Will add data fields required to find doubles to output.
+
+	* collocations/colloc_config.m: Add a field to indicate what columns to
+	pass on to the double-removing filter.
+
+	* collocations/collocation_restrain.m: Catch error if filter fails.
+
+	* sensors/read_granule.m: Optionally keep doubles. This is what you want
+	prior to collocations, otherwise finding the original data is tricky, as
+	row-numbers will be screwed up.
+
+
 2010-09-06  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-43

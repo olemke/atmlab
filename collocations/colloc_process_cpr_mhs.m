@@ -83,7 +83,7 @@ M(:, c.B_INT) = M(:, c.B_TIME) - M(:, c.C_TIME);
 
 %% amsua
 
-amsua = read_granule(name_mhs, 'amsua', date_mhs);
+amsua = read_granule(name_mhs, 'amsua', date_mhs, false);
 
 [aah aaw] = size(amsua.lon); % amsu-a width, amsu-a height
 M(:, c.A_I) = min(max(round(ar/3), 1), aah); % amsu-a row
@@ -100,7 +100,7 @@ M(:, c.A_INT) = M(:, c.A_TIME) - M(:, c.C_TIME);
 
 %% hirs
 
-hirs = read_granule(name_mhs, 'hirs', date_mhs);
+hirs = read_granule(name_mhs, 'hirs', date_mhs, false);
 
 % TODO: optimise this bit of code
 % find hirs scanline (row) closest in time for each mhs scanline
@@ -126,10 +126,14 @@ M(:, c.H_DIST) = sphdist(M(:, c.C_LAT), M(:, c.C_LONG), ...
     M(:, c.H_LAT), M(:, c.H_LONG), constants('EARTH_RADIUS')/1e3);
 M(:, c.H_INT) = M(:, c.H_TIME) - M(:, c.C_TIME);
 
-% sort by: MHS row, then MHS column, then CloudSat pixel
+%% sort by: MHS row, then MHS column, then CloudSat pixel
 
 M = sortrows(M, [c.B_I c.B_C c.C_I]);
 
+%% remove doubles
+
+wrongrows = M(:, c.B_I)< granule_first_line(name_mhs, amsub_or_mhs(name_mhs), date_mhs);
+M(wrongrows, :) = [];
 end
 
 function i = mini(v)

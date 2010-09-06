@@ -46,7 +46,20 @@ for k = 1:length(filters)
     else
         addargs = {};
     end
-    lim = filter(args{:}, addargs{:});
+    try
+        lim = filter(args{:}, addargs{:});
+    catch ME
+        switch ME.identifier
+            case 'atmlab:granule_first_line'
+                logtext(colloc_config('stderr'), ...
+                    'WARNING! Could not filter %s! ERROR ''%s''!\n', ...
+                    func2str(filter), ME.message);
+                continue;
+            otherwise
+                ME.rethrow();
+        end
+    end
+        
     logtext(colloc_config('stdout'), ...
         'filter %s: %d -> %d collocations\n', func2str(filter), ...
         sum(rows), sum(rows&lim));

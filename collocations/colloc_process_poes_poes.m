@@ -1,6 +1,6 @@
 function M = colloc_process_poes_poes(collocations, ...
-    ~, date1, data1, ...
-    ~, date2, data2)
+    name1, date1, data1, ...
+    name2, date2, data2)
 
 % colloc_process_poes_poes Gather collocation info to store for MHS+MHS
 %
@@ -82,3 +82,9 @@ M(:, c.C2) = c2;
 M(:, c.DIST) = sphdist(M(:, c.LAT1), M(:, c.LONG1), ...
     M(:, c.LAT2), M(:, c.LONG2), constants('EARTH_RADIUS')/1e3);
 M(:, c.INT) = M(:, c.TIME2) - M(:, c.TIME1);
+
+%% remove doubles
+
+wrongrows = (M(:, c.I1) < granule_first_line(name1, amsub_or_mhs(name1), date1)) & ...
+            (M(:, c.I2) < granule_first_line(name2, amsub_or_mhs(name2), date2));
+M(wrongrows, :) = [];

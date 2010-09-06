@@ -37,7 +37,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   M           NxM matrix  Matrix containing collected info
 %   cols        structure   Structure describing the names of the columns
 %
-% For examples, see atmlab/collocations/README
+% For examples, see http://www.sat.ltu.se/docs/datasets/collocations/collocations_atmlab.php
 %
 % $Id$
 
@@ -46,11 +46,31 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 getpath = colloc_config(['filename_' sensor1 '_' sensor2]);
 cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 
-%% convert column names to numbers
-
 if iscellstr(cols_in)
     cols_in = {cols_in};
 end
+
+if ~exist('filters', 'var')
+    filters = {};
+end
+
+%% ALWAYS get rid of doubles
+% FIXME: at some point in the future, this should be redundant
+filters = [filters ...
+    {{@colloc_select_good_lines, cols.overlap.filter_double{1}, {sat1, sensor1}}, ...
+     {@colloc_select_good_lines, cols.overlap.filter_double{2}, {sat2, sensor2}}}];
+% but only where filter_double has a value
+filters(cellfun(@(c) isempty(c{2}), filters)) = [];
+ 
+% make sure the fields are asked for
+for c = horzcat(cols.overlap.filter_double{:})
+    if ~any(strcmp(c, cols_in{1}))
+        cols_in{1}(end+1) = c;
+    end
+end
+
+%% convert column names to numbers
+
 [colno, name_struct] = colloc_colname2no(sensor1, sensor2, cols_in);
 
 %% convert limits structure to matrix as wanted by restrain_collocations
@@ -61,12 +81,7 @@ else
     limmat = zeros(0, 3);
 end
 
-%% the same for the filters
-
-if ~exist('filters', 'var')
-    filters = {};
-end
-
+    
 % for the filters, convert column names to column numbers, using the
 % earlier obtained name_struct
 if ~isempty(filters)

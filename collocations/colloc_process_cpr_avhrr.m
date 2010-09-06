@@ -81,3 +81,8 @@ M(:, c.AVHRR_COL) = ac;
 M(:, c.DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
     data_avhrr.lat(ai), data_avhrr.lon(ai), constants('EARTH_RADIUS')/1e3);
 M(:, c.INT) = M(:, c.AVHRR_TIME) - M(:, c.C_TIME);
+
+%% remove doubles
+
+wrongrows = M(:, c.AVHRR_ROW)< granule_first_line(name_avhrr, 'avhrr', date_avhrr);
+M(wrongrows, :) = [];

@@ -7,7 +7,9 @@ BUGS
 - Bug-checking: sometimes H_INT and B_INT are both within 900 seconds, but
   H_TIME-B_TIME is ~one day; error in hirs time calculation? Or artefact of
   something from a long time ago? Can't reproduce.
-- HIRSCS, use scanline numbers for double-checking
+- HIRSCS, use scanline numbers for double-checking, rather than unique(...,
+  rows), that may be incomplete. At least check whether the latter is or isn't
+  incomplete.
 - In the collocations, I often add one second to the starting time so that it
   doesn't get truncated to the wrong minute. This is stupid, I should have
   rounded in the first place, and this should be corrected *in the

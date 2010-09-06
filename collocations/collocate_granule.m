@@ -112,9 +112,13 @@ meandata = overlap; % this one as well
 M_c = overlap; M_d = overlap; M_m = overlap; % and those
 
 %% read data for sat1/sensor1
-logtext(fid, 'Reading %s\n', datafile);
+% Here, I decide to keep the doubles for now. Simple is better than
+% complex. My collocation output are rows and columns, and if I already
+% remove doubles /before/ collocation, the row-numbers will be incorrect or
+% at least need to be corrected for. This causes more problems than it
+% solves, so I will remove the doubles in the postprocessing instead.
 try
-    data1 = read_granule(sat1, sensor1, date1);
+    data1 = read_granule(sat1, sensor1, date1, false); % keep doubles for now
 catch ME
     switch ME.identifier
         case 'MATLAB:load:couldNotReadFile'
@@ -126,7 +130,6 @@ catch ME
 end
 
 data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
-logtext(fid, 'Read %s\n', datafile);
 if isempty(data1.time)
     logtext(fid, 'Primary is empty, nothing to collocate\n');
     return
@@ -149,7 +152,7 @@ for i = 1:size(date2_all, 1)
     %% Continue sensibly.
 
     try
-        data2 = read_granule(satname, sens, date2_all(i, 1:5));
+        data2 = read_granule(satname, sens, date2_all(i, 1:5), false); % keep doubles for now
     catch ME
         if strcmp(ME.identifier, 'atmlab:find_datafile_by_date')
             logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
@@ -161,7 +164,6 @@ for i = 1:size(date2_all, 1)
     end
     
     data2.time_orig = data2.time; % store, see note at data1.time_orig
-    logtext(fid, 'Read %s\n', datafile2);
     if isempty(data2.time)
         logtext(fid, 'Secondary is empty, skipping\n');
         continue

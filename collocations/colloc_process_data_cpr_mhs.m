@@ -62,8 +62,8 @@ M(:, c.data.MHS) = tb(i2, :);
 % those require reading additional files
 
 % TODO/FIXME: optimise this, I already read for the earlier processing
-amsua_data = read_granule(sat2, 'amsua', date2);
-hirs_data = read_granule(sat2, 'hirs', date2);
+amsua_data = read_granule(sat2, 'amsua', date2, false);
+hirs_data = read_granule(sat2, 'hirs', date2, false);
 
 % AMSU_A
 ai = sub2ind(size(amsua_data.lat), M_c(:, c.overlap.A_I), M_c(:, c.overlap.A_C));
