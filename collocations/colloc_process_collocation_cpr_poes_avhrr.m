@@ -57,9 +57,8 @@ date2_cell = num2cell(date2);
 %% store info
 
 % time
-% see comment in colloc_process_cpr_mhs for info on the 1-second hack
-M_c(:, c.CPR_POES_START) = date2unixsecs(date1_cell{1:3}, 0, 0, 1);
-M_c(:, c.AVHRR_START) = date2unixsecs(date2_cell{1:5}, 1);
+M_c(:, c.CPR_POES_START) = round(date2unixsecs(date1_cell{1:3}));
+M_c(:, c.AVHRR_START) = round(date2unixsecs(date2_cell{1:5}));
 
 % unify_time_axis has made that data[12].time uses the earliest of the two
 % as the epoch

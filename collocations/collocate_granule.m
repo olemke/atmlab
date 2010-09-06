@@ -89,17 +89,6 @@ catch ME
 end
 
 
-%% find path to datafile for sat1/sensor1
-%date1_cell = num2cell(date1);
-
-datafile = find_datafile_by_date(date1, sat1, sensor1);
-
-if isempty(datafile)
-    error('atmlab:collocate_granule', ...
-        'No data found for %s %s at %s', ...
-        sat1, sensor1, mat2str(date1));
-end
-
 %% set 'date2_all', 'overlap', and 'sat2_all_names'
 % find date/times for which to search for secondary granules
 % Also pass on the primary satellite, because for poes/poes, we don't want
@@ -125,7 +114,7 @@ M_c = overlap; M_d = overlap; M_m = overlap; % and those
 %% read data for sat1/sensor1
 logtext(fid, 'Reading %s\n', datafile);
 try
-    data1 = fh1(datafile);
+    data1 = read_granule(sat1, sensor1, date1);
 catch ME
     switch ME.identifier
         case 'MATLAB:load:couldNotReadFile'
@@ -160,7 +149,7 @@ for i = 1:size(date2_all, 1)
     %% Continue sensibly.
 
     try
-        datafile2 = find_datafile_by_date(date2_all(i, 1:5), satname, sens);
+        data2 = read_granule(satname, sens, date2_all(i, 1:5));
     catch ME
         if strcmp(ME.identifier, 'atmlab:find_datafile_by_date')
             logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
@@ -171,8 +160,6 @@ for i = 1:size(date2_all, 1)
         end
     end
     
-    logtext(fid, 'Reading %s\n', datafile2);
-    data2 = fh2(datafile2);
     data2.time_orig = data2.time; % store, see note at data1.time_orig
     logtext(fid, 'Read %s\n', datafile2);
     if isempty(data2.time)

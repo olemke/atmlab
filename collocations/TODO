@@ -8,6 +8,10 @@ BUGS
   H_TIME-B_TIME is ~one day; error in hirs time calculation? Or artefact of
   something from a long time ago? Can't reproduce.
 - HIRSCS, use scanline numbers for double-checking
+- In the collocations, I often add one second to the starting time so that it
+  doesn't get truncated to the wrong minute. This is stupid, I should have
+  rounded in the first place, and this should be corrected *in the
+  collocations*.
 
 WARTS
 - Currently, when processing CloudSat/MHS-collocations, I read the files for
@@ -27,11 +31,13 @@ WARTS
 - In colloc_read_collocation_cpr_poes.m actually the meandata is read, just
   because that's what I want when collocating with AVHRR; such a special case
   is ugly and needs to go.
+- In colloc_process_data_cpr_mhs, move MSPPS reading to a specialised reading
+  function (add to colloc_config and all that) and use read_granule to read.
 
 WISHES
-- Add the following functionality from my own matlab-files:
-    - cscolmhs-collocations
 - Add aliases for abbreviated satellite pairs, so that noaa15/N15 are the same
   (particularly useful for hirscs).
-- Don't let CPR collocate with more than one MHS; only the closest one
-- Don't let AVHRR collocate with more than one MHS; only the closest one
+- Don't let CPR collocate with more than one MHS; only the closest one?
+- Don't let AVHRR collocate with more than one MHS; only the closest one?
+- Add many, many sat/sensor pairs to the firstline-database and to
+  read_granule.

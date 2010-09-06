@@ -1,3 +1,33 @@
+2010-09-06	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-42
+
+	* collocations/colloc_process_poes_poes.m,
+	collocations/colloc_process_cpr_mhs.m,
+	collocations/colloc_process_collocation_cpr_poes_avhrr.m,
+	collocations/colloc_process_hirscs_poes.m,
+	collocations/colloc_process_cpr_avhrr.m:
+	Replace +1-second wart by slightly less horrifying round(...) wart.
+	
+	* collocations/colloc_process_data_cpr_mhs.m,
+	collocations/colloc_process_cpr_mhs.m,
+	collocations/collocate_granule.m: Use read_granule to read granule.
+
+	* collocations/colloc_select_good_lines.m: Correct for +1-second wart here instead of
+	in granule_first_line. Still horrid, though.
+
+	* sensors/read_granule.m: Use some fancy magic to get rid of double
+	scanlines.
+
+	* sensors/granule_first_line.m: Move compensation for ugly +1-second wart
+	from here to collocations/colloc_select_good_lines.m where it is very
+	slightly less out of place.
+
+	* TODO: Get rid of ugly +1-second wart, add sat/sensor-pairs for
+	scanline-numbers and thus for read_granule.
+
+	* ChangeLog: Document my changes.
+
 2010-09-03	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-41

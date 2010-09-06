@@ -11,6 +11,8 @@ function good = colloc_select_good_lines(unisec, line, sat, sensor)
 %
 % Assumes first row belongs to first swath.
 %
+% Throws an error if no information on good lines is available.
+%
 % FORMAT
 %
 %   good = colloc_select_good_lines(unisec, line, sat, sensor)
@@ -39,8 +41,19 @@ ngrans = length(unisec_uni);
 good = false(size(line));
 cutoffs = zeros(size(unisec_uni));
 for i = 1:ngrans
-    % this returns 0 if it's not found, so then the filter is a noop
-    cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i));
+    try
+        cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i));
+    catch ME
+        % ugly hack necessary because colloc_process_* add 1 second to
+        % unisecs. This is being phased out, but still present. FIXME when
+        % I that ugliness is gone and lost forever.
+        switch ME.identifier
+            case 'atmlab:granule_first_line'
+                cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i)-1);
+            otherwise
+                ME.rethrow();
+        end
+    end
 end
 
 % make a poor estimate for those where it's unknown (average of rest)

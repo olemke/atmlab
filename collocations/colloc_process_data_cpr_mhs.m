@@ -1,4 +1,4 @@
-function M = colloc_process_data_cpr_mhs(~, M_c, sat1, ~, data1, sat2, date2, data2)
+function M = colloc_process_data_cpr_mhs(~, M_c, ~, ~, data1, sat2, date2, data2)
 
 % colloc_process_data_cpr_mhs Gather collocation data to store for CPR+MHS
 %
@@ -61,14 +61,9 @@ M(:, c.data.MHS) = tb(i2, :);
 %% AMSUA, HIRS
 % those require reading additional files
 
-amsua_file = find_datafile_by_date(date2, sat2, 'amsua');
-read_amsua = colloc_config('read_amsua');
-% TODO/FIXME: optimise this, I already read amsua for the earlier processing
-amsua_data = read_amsua(amsua_file); 
-
-hirs_file = find_datafile_by_date(date2, sat2, 'hirs');
-read_hirs = colloc_config('read_hirs');
-hirs_data = read_hirs(hirs_file); % TODO/FIXME: to be optimised as for amsua
+% TODO/FIXME: optimise this, I already read for the earlier processing
+amsua_data = read_granule(sat2, 'amsua', date2);
+hirs_data = read_granule(sat2, 'hirs', date2);
 
 % AMSU_A
 ai = sub2ind(size(amsua_data.lat), M_c(:, c.overlap.A_I), M_c(:, c.overlap.A_C));
@@ -82,12 +77,12 @@ M(:, c.data.HIRS) = tb(hi, :);
 
 %% MSPPS
 
-
 % Apply scalefactor.
 % From
 % http://www.ncdc.noaa.gov/oa/pod-guide/ncdc/docs/klm/html/c9/sec96-3.htm
 % divide by the scalefactor to get kg/m^2
 % we want g/m^2 so we multiply by 1000/scalefactor
+% TODO: convert to specialised reading function
 try
     mspps_file = find_datafile_by_date(date2, sat2, 'mspps');
     scalefactor = 1000/double(cell2mat(hdfread(mspps_file, 'IWP_SCAL')));

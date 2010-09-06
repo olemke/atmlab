@@ -63,9 +63,8 @@ M(:, c.MHS_LAT) = data2.lat(i2);
 M(:, c.MHS_LONG) = data2.lon(i2);
 
 % time
-% see comment in colloc_process_cpr_mhs for the 1-second-hack
-M(:, c.H_START) = date2unixsecs(date1_cell{1:5}, 1);
-M(:, c.MHS_START) = date2unixsecs(date2_cell{1:5}, 1);
+M(:, c.H_START) = round(date2unixsecs(date1_cell{1:5}));
+M(:, c.MHS_START) = round(date2unixsecs(date2_cell{1:5}));
 
 % unify_time_axis has made that data[12].time uses the earliest of the two
 % as the epoch

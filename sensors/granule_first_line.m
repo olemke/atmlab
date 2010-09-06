@@ -16,7 +16,8 @@ function first = granule_first_line(sat, sensor, d, reload)
 %   sat         string      Satellite
 %   sensor      string      Sensor
 %   datevec     vector      Staring date/time for granule
-%   reload      logical     (optional) Reload scanline data (i.e. not cached)
+%   reload      logical     (optional) Reload scanline data (i.e. not
+%                           cached). Defaults to false.
 %
 % OUT
 %
@@ -36,10 +37,8 @@ if ~exist('reload', 'var')
     reload = false;
 end
 
-field = [sat '_' sensor];
-
-if isfield(S, field) && ~reload
-    ht = S.(field);
+if isfield(S, sat) && isfield(S.(sat), sensor) && ~reload
+    ht = S.(sat).(sensor);
 else
     scanfile = colloc_config('firstline_data');
     scanfile = strrep(scanfile, '$SAT', sat);
@@ -47,7 +46,7 @@ else
     
     t = load(scanfile);
     ht = t.ht;
-    S.(sat) = ht;
+    S.(sat).(sensor) = ht;
 end
 
 if isscalar(d)
@@ -59,12 +58,6 @@ end
 
 first = ht.get(unisecs);
 if isempty(first)
-    first = ht.get(unisecs-1); % ugly :(
-    % in colloc_process_cpr_mhs I explain why I might add 1 second to the
-    % stored unixsecs in the collocation files. This hack is ugly but not
-    % too expensive.
-    if isempty(first)
-        logtext(2, 'no overlap data found: %s / %s\n', sat, num2str(d));
-        first = -1;
-    end
+    error('atmlab:granule_first_line', 'no data found for %s/%s @ %d', ...
+        sat, sensor, unisecs);
 end

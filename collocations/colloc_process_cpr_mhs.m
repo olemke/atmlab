@@ -64,14 +64,8 @@ M(:, c.C_LONG) = data_cpr.lon(cr);
 M(:, c.C_LAT) = data_cpr.lat(cr);
 
 % time
-% unixsecs2date(date2unixsecs(2007, 8, 13, 15, 15, 0)) results in
-% 2007-08-13 15:14:59.999998... so if just the minute is taken (e.g.
-% as input to find_datafile_by_date to recover the original swathfile
-% on the SAT cluster) the date is wrong and the swathfile is not
-% found. As a workaround, one second (which is irrelevant in any case)
-% is added to the start time.
         
-M(:, c.C_START, :) = date2unixsecs(date_cpr_cell{1:5}, 1);
+M(:, c.C_START, :) = round(date2unixsecs(date_cpr_cell{1:5}));
 M(:, c.C_TIME, :) = date2unixsecs(date_cpr_cell{1:3}, 0, 0, 0) + data_cpr.time(cr);
 M(:, c.C_I, :) = cr;
 
@@ -79,7 +73,7 @@ M(:, c.C_I, :) = cr;
 
 M(:, c.B_LONG) = data_mhs.lon(ai);
 M(:, c.B_LAT) = data_mhs.lat(ai);
-M(:, c.B_START) = date2unixsecs(date_mhs_cell{1:5}, 1);
+M(:, c.B_START) = round(date2unixsecs(date_mhs_cell{1:5}));
 M(:, c.B_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + data_mhs.time(ar);
 M(:, c.B_I) = ar;
 M(:, c.B_C) = ac;
@@ -89,82 +83,48 @@ M(:, c.B_INT) = M(:, c.B_TIME) - M(:, c.C_TIME);
 
 %% amsua
 
-amsua_path = find_datafile_by_date(date_mhs, name_mhs, 'amsua');
+amsua = read_granule(name_mhs, 'amsua', date_mhs);
 
-if amsua_path
-    read_amsua = colloc_config('read_amsua');
-    try
-        amsua = read_amsua(amsua_path);
-    catch ME
-        if strcmp(ME.identifier, 'atmlab:atovs_get_l1c:zamsu2l1c')
-            warning('atmlab:process_cpr_mhs', ...
-                'SKIPPED: zamsu2l1c failed for %s', amsua_path);
-            amsua = {};
-        else
-            ME.rethrow();
-        end
-    end
-end
-
-if ~isempty(amsua)
-    [aah aaw] = size(amsua.lon); % amsu-a width, amsu-a height
-    M(:, c.A_I) = min(max(round(ar/3), 1), aah); % amsu-a row
-    M(:, c.A_C) = min(max(round(ac/3), 1), aaw); % amsu-a column
-    aai = sub2ind(size(amsua.lat), M(:, c.A_I), M(:, c.A_C));
-    M(:, c.A_LONG) = amsua.lon(aai);
-    M(:, c.A_LAT) = amsua.lat(aai);
-    M(:, c.A_START) = M(:, c.B_START);
-    M(:, c.A_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + ...
-        amsua.time(M(:, c.A_I));
-    M(:, c.A_DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
-        amsua.lat(aai), amsua.lon(aai), constants('EARTH_RADIUS')/1e3);
-    M(:, c.A_INT) = M(:, c.A_TIME) - M(:, c.C_TIME);
-end
+[aah aaw] = size(amsua.lon); % amsu-a width, amsu-a height
+M(:, c.A_I) = min(max(round(ar/3), 1), aah); % amsu-a row
+M(:, c.A_C) = min(max(round(ac/3), 1), aaw); % amsu-a column
+aai = sub2ind(size(amsua.lat), M(:, c.A_I), M(:, c.A_C));
+M(:, c.A_LONG) = amsua.lon(aai);
+M(:, c.A_LAT) = amsua.lat(aai);
+M(:, c.A_START) = M(:, c.B_START);
+M(:, c.A_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + ...
+    amsua.time(M(:, c.A_I));
+M(:, c.A_DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
+    amsua.lat(aai), amsua.lon(aai), constants('EARTH_RADIUS')/1e3);
+M(:, c.A_INT) = M(:, c.A_TIME) - M(:, c.C_TIME);
 
 %% hirs
 
-hirs_path = find_datafile_by_date(date_mhs, name_mhs, 'hirs');
+hirs = read_granule(name_mhs, 'hirs', date_mhs);
 
-if hirs_path
-    read_hirs = colloc_config('read_hirs');
-    try
-        hirs = read_hirs(hirs_path);
-    catch ME
-        if strcmp(ME.identifier, 'atmlab:atovs_get_l1c:zamsu2l1c')
-            warning('atmlab:process_cpr_mhs', ...
-                'SKIPPED: zamsu2l1c failed for %s', amsua_path);
-            hirs = {};
-        else
-            ME.rethrow();
-        end
-    end
-end
-
-if ~isempty(hirs)   
-    % TODO: optimise this bit of code
-    % find hirs scanline (row) closest in time for each mhs scanline
-    hr = arrayfun(...
-        @(v) mini(abs(hirs.time-v)), ...
-        data_mhs.time(M(:, c.B_I))); 
-    % find hirs pixel (col) in scanline closest in distance to CPR-point
-    hc = arrayfun(...
-        @(i) mini(...
-            (hirs.lat(hr(i), :)-M(i, c.C_LAT)).^2 + ...
-            (hirs.lon(hr(i), :)-M(i, c.C_LONG)).^2 ...
-            ), 1:n);
-    % find index from (row, column)
-    hi = sub2ind(size(hirs.lat), hr, hc');
-    % ready to add information to matrix
-    M(:, c.H_LONG) = hirs.lon(hi);
-    M(:, c.H_LAT) = hirs.lat(hi);
-    M(:, c.H_START) = M(:, c.B_START);
-    M(:, c.H_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + hirs.time(hr);
-    M(:, c.H_I) = hr;
-    M(:, c.H_C) = hc;
-    M(:, c.H_DIST) = sphdist(M(:, c.C_LAT), M(:, c.C_LONG), ...
-        M(:, c.H_LAT), M(:, c.H_LONG), constants('EARTH_RADIUS')/1e3);
-    M(:, c.H_INT) = M(:, c.H_TIME) - M(:, c.C_TIME);
-end
+% TODO: optimise this bit of code
+% find hirs scanline (row) closest in time for each mhs scanline
+hr = arrayfun(...
+    @(v) mini(abs(hirs.time-v)), ...
+    data_mhs.time(M(:, c.B_I))); 
+% find hirs pixel (col) in scanline closest in distance to CPR-point
+hc = arrayfun(...
+    @(i) mini(...
+        (hirs.lat(hr(i), :)-M(i, c.C_LAT)).^2 + ...
+        (hirs.lon(hr(i), :)-M(i, c.C_LONG)).^2 ...
+        ), 1:n);
+% find index from (row, column)
+hi = sub2ind(size(hirs.lat), hr, hc');
+% ready to add information to matrix
+M(:, c.H_LONG) = hirs.lon(hi);
+M(:, c.H_LAT) = hirs.lat(hi);
+M(:, c.H_START) = M(:, c.B_START);
+M(:, c.H_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + hirs.time(hr);
+M(:, c.H_I) = hr;
+M(:, c.H_C) = hc;
+M(:, c.H_DIST) = sphdist(M(:, c.C_LAT), M(:, c.C_LONG), ...
+    M(:, c.H_LAT), M(:, c.H_LONG), constants('EARTH_RADIUS')/1e3);
+M(:, c.H_INT) = M(:, c.H_TIME) - M(:, c.C_TIME);
 
 % sort by: MHS row, then MHS column, then CloudSat pixel
 

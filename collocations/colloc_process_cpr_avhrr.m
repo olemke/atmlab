@@ -64,14 +64,8 @@ M(:, c.C_LONG) = data_cpr.lon(cr);
 M(:, c.C_LAT) = data_cpr.lat(cr);
 
 % time
-% unixsecs2date(date2unixsecs(2007, 8, 13, 15, 15, 0)) results in
-% 2007-08-13 15:14:59.999998... so if just the minute is taken (e.g.
-% as input to find_datafile_by_date to recover the original swathfile
-% on the SAT cluster) the date is wrong and the swathfile is not
-% found. As a workaround, one second (which is irrelevant in any case)
-% is added to the start time.
         
-M(:, c.C_START, :) = date2unixsecs(date_cpr_cell{1:5}, 1);
+M(:, c.C_START, :) = round(date2unixsecs(date_cpr_cell{1:5}));
 M(:, c.C_TIME, :) = date2unixsecs(date_cpr_cell{1:3}, 0, 0, 0) + data_cpr.time(cr);
 M(:, c.C_ROW, :) = cr;
 
@@ -79,7 +73,7 @@ M(:, c.C_ROW, :) = cr;
 
 M(:, c.AVHRR_LAT) = data_avhrr.lon(ai);
 M(:, c.AVHRR_LONG) = data_avhrr.lon(ai);
-M(:, c.AVHRR_START) = date2unixsecs(date_avhrr_cell{1:5}, 1);
+M(:, c.AVHRR_START) = round(date2unixsecs(date_avhrr_cell{1:5}));
 M(:, c.AVHRR_TIME) = date2unixsecs(date_avhrr_cell{1:3}, 0, 0, 0) + ...
     data_avhrr.time(ar);
 M(:, c.AVHRR_ROW) = ar;
