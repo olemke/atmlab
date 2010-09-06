@@ -1,3 +1,15 @@
+2010-09-06  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-43
+
+	* math/taylor_diagram.m (taylor_diagram): Added script to create
+	the infamous Taylor diagram. It is used to visualize (on a
+	circular plot) the inter-comparison of datasets compared to a
+	reference data set in terms of STD, RMSD and correlation. See:
+	" K. Taylor , Summarizing multiple aspects of model performance in
+	a single diagram Journal of Geophysical % Research-Atmospheres,
+	2001, V106, D7. " for further details
+
 2010-09-06	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-42
