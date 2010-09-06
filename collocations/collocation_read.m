@@ -30,7 +30,14 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   limits      structure       Describes acceptable ranges for the
 %                               different columns requested. Data outside
 %                               this ranges will not be returned.
-%   filters     cell array      to be documented
+%   filters     cell array      Cell array of cell arrays. Each member of
+%                               the cell array is {@filter, {COL1, ...,
+%                               COLN}, {'foo', 'bar', ..., 'baz'}}.
+%                               The filter is called according to
+%                               filter(M(COL1, :), ..., M(COLN, :), 'foo',
+%                               'bar', ..., 'baz') and shall return logical
+%                               true wherever the filter is passed. See
+%                               examples on website (see below).
 %
 % OUT
 %

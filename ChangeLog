@@ -1,5 +1,11 @@
 2010-09-06	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-45
+
+	* collocations/collocation_read.m: Extend documentation.
+
+2010-09-06	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-44
 
 	* collocations/colloc_process_poes_poes.m,
