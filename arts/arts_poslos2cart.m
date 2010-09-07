@@ -34,7 +34,7 @@ deg2rad = constants( 'DEG2RAD' );
 % For lat = +- 90 the azimuth angle gives the longitude along which the
 % LOS goes
 %
-if abs( lat ) > 89.99
+if abs( lat ) > 89.9999
   %
   s = sign( lat );
   %

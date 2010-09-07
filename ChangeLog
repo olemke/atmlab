@@ -1,3 +1,11 @@
+2010-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-46
+
+	* arts/arts_poslos2cart.m: Changed 89.99 to 89.9999, to be
+	consistent with arts. (Used hours to find what I assumed was a
+	problem in arts!)
+
 2010-09-06	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-45
