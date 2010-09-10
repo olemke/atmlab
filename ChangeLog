@@ -1,3 +1,20 @@
+2010-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-47
+
+	* files/whichfiles.m: Output argumement was not set if folder just
+	contains folders. 
+
+	* atmlab/atmlab_init.m (atmlab_init): The folder V7-4 is now added
+	to the search path, if the the version is < 7.4. This is a
+	different way to handle backward compatibility than the old,
+	removed, system.
+
+	* V7-4: Created this folder.
+	
+	* V7-4/assert.m (assert): Added this function by Gerald Dalley,
+	taken from Matlab Central.
+
 2010-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-46

@@ -33,9 +33,9 @@ D = dir( fullfile( folder, rgexp ) );
 
 %= Create filenames
 %
-if isempty(D)
-  filenames = [];
-else
+filenames = [];  % If no files found
+%
+if ~isempty(D)
   j = 0;
   for i = 1:length(D)
     if ~D(i).isdir

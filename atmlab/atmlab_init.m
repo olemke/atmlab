@@ -61,6 +61,10 @@ addpath( fullfile( toppath, 'arts', 'scenegen' ) );
 addpath( fullfile( toppath, 'arts', 'xml' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
 addpath( fullfile( toppath, 'collocations' ) ); 
+%
+if nversion < 7.4
+  addpath( fullfile( toppath, 'V7-4' ) ); 
+end
 
 
 %=== Read Atmlab settings
