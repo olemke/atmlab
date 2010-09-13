@@ -1,3 +1,25 @@
+2010-09-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-48
+	
+	* time/dayofyear_inverse.m: Added function that is the opposite of
+	dayofyear, i.e. if you have the day of year and want the month
+	and day.
+
+	* geoplots/gmt/polygoninize_regions.m: Added function that outputs
+	the necessary arguments for plotting regions with GMT, e.g. used
+	in wrapper function plot_empty_regions.m. This function is
+	especially useful for plotting region outlines on top of data
+	plotted with GMT.
+
+	* geoplots/gmt/plot_empty_regions.m: Added function that display
+	the outline of regions on an empty map using GMT. The only
+	manditory argument are the coordinates for the regions. The
+	function is especially useful in that it can handle composite
+	regions, i.e. made up of many rectangular regions next to each
+	other.
+	
+
 2010-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-47
