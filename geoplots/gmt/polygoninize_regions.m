@@ -7,14 +7,14 @@ function out = polygoninize_regions(boxes)
 %          made of of several boxes. e.g. in eliasson10_assessing_acp
 %         
 %
-% IN: Array of boxes 
-% [box1; box2; box3], where box has the form [blcorner,trcorner];
+% IN: boxes: (array containing coordinates for one or several regions)
+%    e.g. boxes = [box1; box2; box3], where box1 has the form [bottom left corner, top right corner];
 %
-%
+% OUT: Structure of arguments to be used for plotting the regions on a map
+%      using GMT
 %
 %
 % 13/9-2009 Salomon Eliasson
-
 
 
 %% Make a grid of logicals

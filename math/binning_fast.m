@@ -30,7 +30,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %           lonspace = 180 for lon=-180:180
 %           lonspace = 0 do nothing (default)
 %
-%           If flag is not given, the function automatically picks a format
+%           If lonspace is not given, the function automatically picks a format
 %           which depends on if there is a longitude value larger than 180 (lon>180)
 %           or not. This may be important if your input data does not cover both
 %           hemispheres.
