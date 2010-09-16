@@ -181,7 +181,8 @@ create_gmt_earth(out);                                                          
 
 filename=sort_figures(out);                                                     % finalize
 
-function se = set_GMT_plot(se,field)                                            %% SETUP %%
+function se = set_GMT_plot(se,field)                                            
+%% SETUP %%
 
 se.fieldname = field;
 if ~isfield(se,'display')                                                       % view the figure?
@@ -197,6 +198,20 @@ if (isfield(se,'nodata')&&se.nodata) || (isempty(field))                        
     return
 end
 
+if ~isfield(se,'lat')
+    l = {'Latitude','latitude'};
+    if any(isfield(se,l))
+        se.lat = se.(l{isfield(se,l)});
+    else error('No latitudes present')
+    end
+end
+if ~isfield(se,'lon')
+    l = {'Longitude','longitude','long'};
+    if any(isfield(se,l))
+        se.lon = se.(l{isfield(se,l)});
+    else error('No longitudes present')
+    end
+end
 se = isgridded(se,field);                                                       % Check to see if the data  is gridded or not
 
 isdata(se,field)                                                                % is there useable data?

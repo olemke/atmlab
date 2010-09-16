@@ -1,3 +1,14 @@
+2010-09-16  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-50
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Took care of annoying demand
+	that fieldnames 'lat' and 'lon' must be included arguments. Now
+	excepts 'lat', 'Latitude', 'latitude','lon',' Longitude',
+	'longitude', 'long' as structure field names. This is nice so that
+	I can plot data directly from swaths using the geo-fieldnames,
+	which were used to read the geo-data.
+
 2010-09-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-49
