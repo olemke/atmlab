@@ -149,15 +149,15 @@ end
 % PTZ (last forward model fields)
 %
 if any( strcmp( Q.L2_EXTRA, 'ptz' ) )
-  L2.p_grid = Q.P_GRID;
+  L2.p_grid = qarts_get( Q.P_GRID );
   if Q.ATMOSPHERE_DIM >= 2
-    L2.lat_grid = Q.LAT_GRID;
+    L2.lat_grid = qarts_get( Q.LAT_GRID );
     if Q.ATMOSPHERE_DIM == 3
-      L2.lon_grid = Q.LON_GRID;
+      L2.lon_grid = qarts_get( Q.LON_GRID );
     end
   end
-  L2.t_field = Q.T_FIELD;
-  L2.z_field = Q.Z_FIELD;
+  L2.t_field = qarts_get( Q.T_FIELD );
+  L2.z_field = qarts_get( Q.Z_FIELD );
 end
 
 

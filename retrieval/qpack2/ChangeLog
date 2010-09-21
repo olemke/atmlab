@@ -1,3 +1,13 @@
+2010-09-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.3
+
+	* qp2_l2.m: Added qarts_get for 'ptz' part, to ensure that
+	actual data are included and not the name of a file.
+
+	* qpack2.tex: The problem fixed above could be noticed in the
+	example L2 output. Text edited.
+
 2010-08-20  Ole Martin Christensen  <olem@chalmers.se>
 
 	* qpack2.tex (Q): Fixed some minor typos
@@ -5,7 +15,7 @@
 2010-08-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.1
-	
+
 	* qpack2.tex (subsection{OEM settings}): Added some text
 	explaining that some fields of O are set by Qpack2 and any user
 	setting is overwritten.
