@@ -60,7 +60,7 @@ if ~fileexists || colloc_config('overwrite')
          end
     end
     if writethingy
-        write_collocations(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);
+        write_collocations_netcdf(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);
     end
 else
     logtext(colloc_config('stdout'), 'Already exists: %s\n', fn);

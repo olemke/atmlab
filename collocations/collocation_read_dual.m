@@ -93,6 +93,8 @@ function [M, c] = collocation_read_dual(...
 
 % make sure CPR_POES_START and CPR_POES_LINENO are in cols1
 
+error('atmlab:collocation_read_dual', 'This function is currently not working!');
+
 if ~any(strcmp(cols1{1}, 'CPR_POES_START'))
     cols1{1} = [cols1{1} 'CPR_POES_START'];
 end

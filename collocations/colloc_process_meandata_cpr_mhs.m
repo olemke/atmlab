@@ -56,7 +56,7 @@ for i = 1:length(uniques) % need to be done in loop due to mean/std/etc.
     M(j, c.meandata.NO) = sum(fine);
     M(j, c.meandata.MEAN) = mean(M_data_part(fine, c.data.ROIWP));
     M(j, c.meandata.SD) = std(M_data_part(fine, c.data.ROIWP));
-    M(j, c.meandata.CV) = M(j, c.meandata.MEAN) / M(j, c.meandata.SD);
+    M(j, c.meandata.CV) = M(j, c.meandata.SD) ./ M(j, c.meandata.MEAN);
     M(j, c.meandata.FRAC) = sum(M_data_part(fine, c.data.ROIWP)>0) / M(j, c.meandata.NO);
     M(j, c.meandata.INHIRS) = sum(fine&CS_in_HIRS);
 end

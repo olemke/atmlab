@@ -1,3 +1,31 @@
+2010-09-24	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-52
+
+	* collocations/colloc_get_path_cpr_poes_radiometer.m: Transition to
+	NetCDF: function can return either the new style (nc) or old style
+	(colloc/data/mean) collocation files.
+
+	* collocations/read_collocs_data_mean.m: Fix bug occuring in case one
+	requests data columns, but no overlap columns.
+
+	* collocations/write_collocations_netcdf.m: Transition to NetCDF: function
+	to write collocations to NetCDF. Only tested for CloudSat so far. Will be
+	merged into write_collocations at a later date.
+
+	* collocations/collocate_and_store_date.m: Use write_collocations_netcdf.
+
+	* collocations/colloc_config.m: Move firstline-granules default location
+	away from my own home-directory. Transition to NetCDF, add 'stored style'
+	field to cols_cpr_poes
+
+	* collocations/collocation_read_dual.m: Disable this function as it's
+	currently not working, due to the removal, by default, of lines by
+	collocation_read, in order to prevent doubles.
+
+	* collocations/colloc_process_meandata_cpr_mhs.m: Fix bug: CV was
+	inversely defined!
+
 2010-09-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-51

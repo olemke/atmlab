@@ -1,0 +1,158 @@
+function write_collocations_netcdf(year, month, day, S, D, M, ...
+    sat1, sensor1, ~, sensor2)
+
+% write_collocations Write collocation data to netcdf file
+%
+% Write collocation data for year/month/day in structure S to a netcdf file.
+% The filename is determined from the satellite and sensors used.
+% Needs from colloc_config:
+%   'filename_SENSOR1_SENSOR2' (replaced as passed on)
+%   'stdout'
+%
+% FORMAT
+%   
+%   write_collocations(year, month, day, S, sat1, sensor1, sat2, sensor2)
+%
+% IN
+%
+%   year    (numeric)   Year for which S contains collocations
+%   month   (numeric)   Month for which S contains collocations
+%   day     (numeric)   Day for which S contains collocations
+%   S       structure   As returned by collocate_date, structure whose
+%                       field(s) describe the collocations between the sensors
+%                       in question. (-1 means none)
+%   D       structure   As returned by collocate_date, for the data (-1=none)
+%   M       structure   As returned by collocate_date, for the mean data
+%                       (-1 means none)
+%   sat1    string      Primary satellite under consideration
+%   sensor1 string      Sensor at primary satellite
+%   sat2    string      Secondary satellite under consideration; not used,
+%                       because those should be the fieldnames in S/D/M
+%   sensor2 string      Sensor at secondary satellite.
+%
+% OUT
+%
+%   none (but writes a file)
+%
+% $Id$
+
+getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
+cols = colloc_config(['cols_' sensor1 '_' sensor2]);
+
+fields = fieldnames(S);
+for i = 1:length(fields) % for each satellite
+    satname = fields{i};
+    fn = getfn(year, month, day, sat1, satname);
+    
+    if ~exist(fileparts(fn), 'dir')
+        logtext(colloc_config('stdout'), 'Creating %s\n', fileparts(fn));
+        mkdir(fileparts(fn));
+    end
+        
+    %% create the file
+    
+    logtext(colloc_config('stdout'), 'Writing %s\n', fn);
+    ncid = netcdf.create(fn, 'NC_CLOBBER'); % overwrite existing
+    
+    %% define the dimensions
+    
+    ncollocs = size(S.(satname), 1);
+    dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
+    if isstruct(M) % also mean-data
+        dim_meancollocs = netcdf.defDim(ncid, 'Averaged_collocations', size(M.(satname), 1));
+    end
+    
+    %% put global attributes
+    
+    utc_time = java.lang.System.currentTimeMillis;
+    [utc_date{1:6}] = unixsecs2date(utc_time/1000); %#ok<AGROW>
+    utc_datestr = sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ', ...
+        [utc_date{1:5} round(utc_date{6})]);
+    addncattributes(ncid, {...
+        {'title', 'Collocations'}, ...
+        {'history', [datestr(now, 'YYYY-mm-dd') ' Collocations generated from scratch']}, ...
+        {'date', utc_datestr}, ...
+        {'institution', ['Department of Space Science, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden']}, ...
+        {'source', 'Collocation codes, part of atmlab'}, ...
+        {'references', 'Holl et al. (2010)'}, ...
+        {'software_version', atmlab_version}, ... 
+        {'maxdist_km', colloc_config('distance')}, ...
+        {'maxtime_s', colloc_config('interval')}, ...
+        {'primary_satellite', sat1}, ...
+        {'primary_sensor', sensor1}, ...
+        {'secondary_satellite', satname}, ...
+        {'secondary_sensor', sensor2}});
+
+    %% define variables, variable attributes, additional dimensions
+    
+    colloc_vars = intersect(fieldnames(cols.overlap), fieldnames(cols.stored));
+    data_vars = intersect(fieldnames(cols.data), fieldnames(cols.stored));
+    mean_vars = intersect(fieldnames(cols.meandata), fieldnames(cols.stored));
+    vars = [colloc_vars; data_vars; mean_vars];
+    vartypes = [repmat({'overlap'}, size(colloc_vars)); ...
+                repmat({'data'}, size(data_vars)); ...
+                repmat({'meandata'}, size(mean_vars))];
+    varids = zeros(size(vars));
+    dims = struct();
+    for j = 1:length(vars)
+        varname = vars{j};
+        type = cols.stored.(varname).type;
+        atts = cols.stored.(varname).atts;
+        % determine length dimension: all collocs or mean collocs?
+        switch vartypes{j}
+            case {'overlap', 'data'}
+                dim_n = dim_collocs;
+            case 'meandata'
+                dim_n = dim_meancollocs;
+            otherwise
+                error('atmlab:write_collocations_netcdf', 'Unknown vartype: %s', vartypes{j});
+        end
+        % check if we have other dimensions besides the length
+        if isfield(cols.stored.(varname), 'dims')
+            dimname = cols.stored.(varname).dims{1};
+            dimsize = cols.stored.(varname).dims{2};
+            dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
+            thisdim = [dims.(dimname) dim_n];
+        else
+            thisdim = dim_n;
+        end
+        % define variable and put attributes
+        varid = netcdf.defVar(ncid, varname, type, thisdim);
+        varids(j) = varid;
+        for k = fieldnames(atts)'
+            netcdf.putAtt(ncid, varid, k{1}, atts.(k{1}));
+        end
+    end
+    
+    %% write data
+    
+    % end define mode
+    
+    netcdf.endDef(ncid);
+    
+    % put vars
+    logtext(colloc_config('stdout'), 'Writing: ');
+    
+    for j = 1:length(vars)
+        varname = vars{j};
+        fprintf(colloc_config('stdout'), '%s ', varname);
+        
+        vartype = vartypes{j};
+        varid = varids(j);
+        switch vartype
+            case 'overlap'
+                netcdf.putVar(ncid, varid, S.(satname)(:, cols.(vartype).(varname)));
+            case 'data'
+                netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
+            case 'meandata'
+                netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+        end
+    end
+    fprintf('\n');
+    logtext(colloc_config('stdout'), 'Finalising\n');
+
+    netcdf.close(ncid);
+    
+    logtext(colloc_config('stdout'), 'Done\n');
+
+end

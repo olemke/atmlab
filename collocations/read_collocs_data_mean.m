@@ -38,11 +38,6 @@ if any(cols_overlap) || any(cols_mean)
     n = size(overlap.collocations, 1);
 end
 
-if isempty(overlap.collocations) % nothing
-    M = [];
-    return
-end
-
 if any(cols_data)
     logtext(colloc_config('stdout'), 'Reading %s\n', fn_data);
     data = load(fn_data);
@@ -79,6 +74,10 @@ if ~exist('meandata', 'var')
     meandata.data_averaged = zeros(n, 0);
 end
 
+if ~any(rows)
+    M = [];
+    return
+end
 
 % get the actual data
 M = [overlap.collocations(rows, cols_overlap) ...
