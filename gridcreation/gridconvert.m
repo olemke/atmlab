@@ -23,18 +23,12 @@
 
 function g = gridconvert( g, varargin )
 %
-[precs,mapfun,postcs] = optargs( varargin, { 0, [], 0 } );
-
-
-%- Check input
-%
-if ~( isnumeric(g) & isvector(g) )
-  error( 'Input *g* must be a numeric vector.' );
-end
-%
-if ~isempty(mapfun)  &  ~isa( mapfun, 'function_handle' )
-  error( 'Input *mapfun* must be empty or a function handle.' );
-end
+[precs,mapfun,postcs] = optargs( varargin, { false, [], false } );
+%                                                                          %&%
+rqre_datatype( g, @istensor1 );                                            %&%
+rqre_datatype( precs, @isboolean );                                        %&%
+rqre_datatype( mapfun, {@isempty,@isfunction_handle} );                    %&%
+rqre_datatype( postcs, @isboolean );                                       %&%
 
 
 if precs

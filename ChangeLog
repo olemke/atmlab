@@ -1,3 +1,11 @@
+2010-09-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-51
+
+	* gridcreation/gridconvert.m: Updated input checks. 
+
+	* gridcreation/grid_weightspaced.m: Created.
+
 2010-09-16  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-50
