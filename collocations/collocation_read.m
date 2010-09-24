@@ -115,8 +115,13 @@ for i = 1:size(dates, 1)
     
     [paths{1:length(cols_in)}] = getpath(date(1), date(2), date(3), sat1, sat2);
     try
-        collocations_day = read_collocs_data_mean(...
-            paths{1:3}, cols, colno);
+        if strcmp(paths{1}(end-1:end), 'nc') % NetCDF FIXME TEMPORARY IF
+            collocations_day = read_collocs_data_mean(...
+                paths{1:3}, cols, cols_in{1});
+        else
+            collocations_day = read_collocs_data_mean(...
+                paths{1:3}, cols, colno);
+        end
     catch ME
         switch (ME.identifier)
             case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField'}

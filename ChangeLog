@@ -1,5 +1,27 @@
 2010-09-24	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-54
+
+	* collocations/collocation_read.m: Temporary hack to check whether we're
+	doing NetCDF or not
+
+	* collocations/read_collocs_data_mean.m: Start implementing NetCDF
+	reading.
+
+	* handy/structsearch.m: Return the first if only one is found.
+
+	* ChangeLog: Add my own AND Ole's previous one, as Ole forgot to commit
+	his ChaneLog (but fortunately it was on the SVN-list :P)
+
+2010-09-24  Ole Martin Christensen  <olem@chalmers.se>
+
+    * atmlab-1-0-53
+
+    * geophysics/profile2column.m: Function for calculating the column
+      values given retrived profile(s)
+
+2010-09-24	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-52
 
 	* collocations/colloc_get_path_cpr_poes_radiometer.m: Transition to

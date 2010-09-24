@@ -27,4 +27,4 @@ has = structfun(@(v) isfield(v, name), c);
 if ~any(has)
     error('atmlab:structsearch:invalidfield', 'no such field: %s', name);
 end
-no = c.(nm{has}).(name);
+no = c.(nm{find(has, 1, 'first')}).(name);
