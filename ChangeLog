@@ -1,3 +1,13 @@
+2010-10-01	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-55
+
+	* math/combine_rows.m: Added. Returns matrix with all combinations of rows
+	from all arguments.
+
+	* handy/struct2string_compact.m: Added. Returns compact string
+	representation of scalar structure (all values must be scalar numbers).
+
 2010-09-24	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-54
