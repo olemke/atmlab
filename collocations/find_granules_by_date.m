@@ -35,9 +35,26 @@ if ~exist('with_yesterday', 'var')
     with_yesterday = true;
 end
 
-% TODO: add code to locate collocation files here
+% verify basedir is defined and exists
 
-basedir = colloc_config([sensor '_basedir']);
+try
+    basedir = colloc_config([sensor '_basedir']);
+catch ME
+    switch ME.identifier
+        case 'atmlab:prstnt_struct:undefined'
+            error('atmlab:find_granules_by_date', ...
+                'No basedir defined for %s, please define basedir_%s.', ...
+                sensor, sensor);
+        otherwise
+            ME.rethrow();
+    end
+end
+assert(exist(basedir, 'dir')~=0, 'atmlab:find_granules_by_date', ...
+        ['Configured data directory for %s is %s, ' ...
+         'but this does not exist or is not a directory. ' ...
+         'Please define basedir_%s correctly.'], ...
+         sensor, basedir, sensor);
+
 yeardir = colloc_config([sensor '_yeardir']);
 yeardir = strrep(yeardir, '$YEAR', num2str(year));
 yeardir = strrep(yeardir, '$SAT', sat);

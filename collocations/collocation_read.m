@@ -7,6 +7,10 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 % start_date and end_date, for the indicated collocations type (like
 % collocations between CloudSat and MHS or between MHS and MHS).
 %
+% FIXME: Note: This function is currently in transition from MAT-files to
+% reading NetCDF-files. The former will be phased out when the latter is
+% finished!
+%
 % FORMAT
 %
 %   [M, cols] = collocation_read(...
@@ -29,7 +33,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %                               reader function.
 %   limits      structure       Describes acceptable ranges for the
 %                               different columns requested. Data outside
-%                               this ranges will not be returned.
+%                               these ranges will not be returned. 
 %   filters     cell array      Cell array of cell arrays. Each member of
 %                               the cell array is {@filter, {COL1, ...,
 %                               COLN}, {'foo', 'bar', ..., 'baz'}}.
@@ -44,7 +48,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   M           NxM matrix  Matrix containing collected info
 %   cols        structure   Structure describing the names of the columns
 %
-% For examples, see http://www.sat.ltu.se/docs/datasets/collocations/collocations_atmlab.php
+% For examples, see <a href="http://www.sat.ltu.se/docs/datasets/collocations/collocations_atmlab.php">online help on the satpage</a>
 %
 % $Id$
 
@@ -53,7 +57,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 getpath = colloc_config(['filename_' sensor1 '_' sensor2]);
 cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 
-if iscellstr(cols_in)
+if ~iscell(cols_in{1}) % FIXME: Cleanup when conversion to NetCDF complete
     cols_in = {cols_in};
 end
 
@@ -115,7 +119,7 @@ for i = 1:size(dates, 1)
     
     [paths{1:length(cols_in)}] = getpath(date(1), date(2), date(3), sat1, sat2);
     try
-        if strcmp(paths{1}(end-1:end), 'nc') % NetCDF FIXME TEMPORARY IF
+        if strcmp(paths{1}(end-1:end), 'gz') % FIXME: Cleanup when conversion to NetCDF complete
             collocations_day = read_collocs_data_mean(...
                 paths{1:3}, cols, cols_in{1});
         else

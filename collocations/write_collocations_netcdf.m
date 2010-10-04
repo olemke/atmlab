@@ -3,6 +3,8 @@ function write_collocations_netcdf(year, month, day, S, D, M, ...
 
 % write_collocations Write collocation data to netcdf file
 %
+% (Note: name write_collocations_netcdf is TEMPORARY)
+%
 % Write collocation data for year/month/day in structure S to a netcdf file.
 % The filename is determined from the satellite and sensors used.
 % Needs from colloc_config:
@@ -59,7 +61,16 @@ for i = 1:length(fields) % for each satellite
     ncollocs = size(S.(satname), 1);
     dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
     if isstruct(M) % also mean-data
-        dim_meancollocs = netcdf.defDim(ncid, 'Averaged_collocations', size(M.(satname), 1));
+        try
+            dim_meancollocs = netcdf.defDim(ncid, 'Averaged_collocations', size(M.(satname), 1));
+        catch ME
+            switch ME.identifier
+                case 'MATLAB:netcdf:defDim:onlyOneUnlimitedDimensionAllowed'
+                    dim_meancollocs = dim_collocs;
+                otherwise
+                    ME.rethrow();
+            end
+        end
     end
     
     %% put global attributes
@@ -126,6 +137,11 @@ for i = 1:length(fields) % for each satellite
     
     %% write data
     
+    if isempty(S.(satname))
+        logtext(colloc_config('stdout'), 'Nothing to write\n');
+        continue
+    end
+    
     % end define mode
     
     netcdf.endDef(ncid);
@@ -153,6 +169,9 @@ for i = 1:length(fields) % for each satellite
 
     netcdf.close(ncid);
     
-    logtext(colloc_config('stdout'), 'Done\n');
+    logtext(colloc_config('stdout'), 'Gzipping and removing uncompressed\n');
+    gzip(fn);
+    delete(fn);
+    logtext(colloc_config('stdout'), 'Done');
 
 end

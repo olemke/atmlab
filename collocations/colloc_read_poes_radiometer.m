@@ -42,3 +42,8 @@ data.time = compensate_wraparound(data.time);
 data.lat = shiftdim(data.lat, 1);
 data.lon = shiftdim(data.lon, 1);
 data.tb = shiftdim(data.tb, 2);
+
+% add filename and version
+
+data.path = file;
+data.version = '0'; % dunno

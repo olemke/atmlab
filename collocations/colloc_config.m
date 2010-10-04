@@ -36,14 +36,14 @@ A.stderr = 2;
 
 A.overwrite = false;
 
-% all POES satellites with MHS/AMSUB
+%% all POES satellites with MHS/AMSUB
 
 A.POES_satellite_names = {'noaa15', 'noaa16', 'noaa17', 'noaa18', 'noaa19', 'metopa'};
 A.POES_satellite_numbers = [15 16 17 18 19 29499]; % for metopa, use NORAD number
 A.POES_satellites_amsub = {'noaa15', 'noaa16', 'noaa17'};
 A.POES_satellites_mhs = {'noaa18', 'noaa19', 'metopa'};
 
-% define some aliases
+%% define some aliases
 
 A.alias.mhs = 'poes';
 A.alias.amsub = 'poes';
@@ -96,7 +96,7 @@ A.hirscs_yeardir = '';
 A.hirscs_getpath = @colloc_get_filename_hirscs;
 
 % $YEAR, $SAT etc. are replaced by colloc_get_path_*
-A.collocation_cpr_poes_basedir = '/storage4/user_data/gerrit/collocations';
+A.collocation_cpr_poes_basedir = '/storage4/user_data/gerrit/collocations_cloudsat_poes';
 A.collocation_cpr_poes_yeardir = '$YEAR';
 A.collocation_cpr_poes_filename = 'collocations_$SAT.mat';
 A.collocation_cpr_poes_data_filename = 'collocations_data_$SAT.mat';
@@ -125,7 +125,8 @@ A.collocation_collocation_cpr_poes_avhrr_data_filename = 'collocations_data_$SAT
 A.collocation_collocation_cpr_poes_avhrr_meandata_filename = 'collocations_meandata_$SAT1_$SAT2.mat';
 
 A.firstline_data = '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat';
-% define what reading function to use for what sensor
+
+%% define what reading function to use for what sensor
 
 A.read_cpr = @colloc_read_cpr;
 A.read_mhs = @colloc_read_poes_radiometer;
@@ -136,7 +137,7 @@ A.read_avhrr = @colloc_read_avhrr;
 A.read_hirscs = @colloc_read_hirscs;
 A.read_collocation_cpr_poes = @colloc_read_collocation_cpr_poes;
 
-% define what processing functions to use for what sensor pair
+%% define what processing functions to use for what sensor pair
 
 A.process_cpr_poes = @colloc_process_cpr_mhs;
 A.process_data_cpr_poes = @colloc_process_data_cpr_mhs;
@@ -166,7 +167,7 @@ A.process_meandata_collocation_cpr_poes_avhrr = @colloc_process_meandata_colloca
 
 A.no_collocation_cpr_poes_avhrr = 3;
 
-% define what functions to use to find filenames
+%% define what functions to use to find filenames
 
 A.filename_cpr_poes = @colloc_get_path_cpr_poes_radiometer;
 
@@ -178,7 +179,7 @@ A.filename_hirscs_poes = @colloc_get_path_hirscs_poes_radiometer;
 
 A.filename_collocation_cpr_poes_avhrr = @colloc_get_path_collocation_cpr_poes_avhrr;
 
-% define approximate granule durations
+%% define approximate granule durations
 
 % by sensor rather than by satellite, because not all sensors are saved in
 % the same chunks; in particular, stored collocations belong to a certain
@@ -194,12 +195,12 @@ A.granule_duration_cpr = 5932; % seconds
 A.granule_duration_hirscs = 86400; % one granule per da
 A.granule_duration_collocation_cpr_poes = 86400;
 
-% maximum collocation distance and time
+%% maximum collocation distance and time
 
 A.distance = 15; % km
 A.interval = 900; % seconds
 
-% distances to be for sure to be inside the pixel
+%% distances to be for sure to be inside the pixel
 
 A.distance_for_average_MHS = 7.5; % km
 A.distance_for_average_HIRS = 5; % For HIRS/4
@@ -614,3 +615,8 @@ A.cols_cpr_poes.stored = struct(...
         'type', 'byte', ...
         'atts', struct(...
             'long_name', 'Number of CloudSat pixels in HIRS')));
+
+ A.cols_cpr_poes.aliases = struct(...
+     'MHS', {{'AMSU', 16:20}}, ... % MHS = AMSU channels 16--20
+     'AMSU_B', {{'AMSU', 16:20}}, ...
+     'AMSU_A', {{'AMSU', 1:15}}); 

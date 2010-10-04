@@ -27,14 +27,21 @@ function M = read_collocs_data_mean(fn, fn_data, fn_meandata, c, cols)
 %
 %   M           NxM matrix  Matrix containing the collected info
 %
-% ***** In transition to NetCDF! *****
+% ***** FIXME: In transition to NetCDF! *****
 %
 % $Id$
 
 %% read data
-if strcmp(fn(end-1:end), 'nc') % NetCDF FIXME
+if any(strcmp(fn(end-1:end), {'nc', 'gz'})) % NetCDF FIXME
     logtext(colloc_config('stdout')', 'Reading %s\n', fn);
-    ncid = netcdf.open(fn, 'NOWRITE');
+    compressed = strcmp(fn(end-1:end), 'gz');
+    if compressed
+        filenames = gunzip(fn, '/tmp');
+        ncid = netcdf.open(filenames{1}, 'NOWRITE');
+        delete(filenames{1});
+    else
+        ncid = netcdf.open(fn, 'NOWRITE');
+    end
     
     varids = zeros(size(cols));
     varwidth = zeros(size(cols));
@@ -42,8 +49,26 @@ if strcmp(fn(end-1:end), 'nc') % NetCDF FIXME
     % check dimensions, if any mean will need those first
     % also to know pre-alloc size
     alloc_length = 0;
+    donext = true; % sometimes we want to skip a field, e.g. if cols is
+                   % {'B_LAT', 'B_LONG', 'AMSU', 18, 'MEAN'}, 18 refers to
+                   % the column of AMSU to be read and is not a field
+                   % itself
     for i = 1:length(cols)
+        if ~donext
+            donext = true; % never skip more than one
+            continue
+        end
         col = cols{i};
+        % If col is an alias (e.g. MHS = AMSU(16:20)), replace accordingly
+        if any(strcmp(col, fieldnames(c.aliases)))
+            % if columns to read specified, replace those as well
+            if i~=length(cols) && isnumeric(cols{i+1})
+                cols{i+1} = c.aliases.(col){2}(cols{i+1});
+            end
+            cols{i} = c.aliases.(col){1};
+            col = cols{i};
+        end
+        % proceed with getting information
         varid = netcdf.inqVarID(ncid, col);
         [~, ~, dimids] = netcdf.inqVar(ncid, varid);
         % check that it has <3 dimensions
@@ -68,8 +93,16 @@ if strcmp(fn(end-1:end), 'nc') % NetCDF FIXME
                     alloc_length = dimlen;
                 otherwise
                     % not Collocations/Averaged_collocations, so additional
-                    % dimension, so width=dimlen
-                    varwidth(i) = dimlen;
+                    % dimension, so width=dimlen, unless user has specified
+                    % the additional dimension
+                    % check if additional dimension specified:
+                    if i~=length(cols) && isnumeric(cols{i+1})
+                        varwidth(i) = length(cols{i+1});
+                        donext = false;
+                    else
+                        varwidth(i) = dimlen;
+                        donext = true;
+                    end
             end
         end % for each dim
         varids(i) = varid;
@@ -77,17 +110,41 @@ if strcmp(fn(end-1:end), 'nc') % NetCDF FIXME
     M = zeros(alloc_length, sum(varwidth));
     
     if hasmean
-        error('atmlab:read_collocs_data_mean', ...
-            'Reading NetCDF with means is not implemented yet!');
+        var_mean = netcdf.inqVarID(ncid, 'FIRST');
+        rows = netcdf.getVar(ncid, var_mean);
     else
-        n = 1; % keep track of dims
-        for i = 1:length(cols)
-            M(:, n:(n+varwidth(i)-1)) = ...
-                reshape(netcdf.getvar(ncid, varids(i)), [alloc_length varwidth(i)]);
-            n = n + varwidth(i);
+        rows = true(alloc_length, 1);
+    end
+
+    n = 1; % keep track of dims
+    for i = 1:length(cols)
+        if varids(i)==0 % not a var, see comment about skipping above
+            continue;
         end
+        var = netcdf.getvar(ncid, varids(i));
+        % determine what rows to read
+        if size(var, 1) > alloc_length
+            rows_here = rows;
+        elseif size(var, 1) == alloc_length
+            rows_here = true(alloc_length, 1);
+        else
+            error('atmlab:read_collocs_data_mean', ...
+                'Incorrect number of rows in data');
+        end
+        % determine what columns to read
+        if i~=length(cols) && varids(i+1)==0 % next var is column
+            cols_here = cols{i+1};
+        else % read all columns
+            cols_here = 1:varwidth(i);
+        end
+        M(:, n:(n+varwidth(i)-1)) = ...
+            reshape(var(rows_here, cols_here), [alloc_length varwidth(i)]);
+        n = n + varwidth(i);
     end
 else
+    warning('atmlab:read_collocs_data_mean', ...
+        ['Collocations are being moved from MAT-files to NetCDF. ' ...
+         'Reading MAT-files will be phased out soon.']);
     cols_overlap = cols{1};
     cols_data = cols{2};
     cols_mean = cols{3};

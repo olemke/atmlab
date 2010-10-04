@@ -1,5 +1,27 @@
 2010-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-57
+
+	* collocations/collocation_read.m: NetCDF should be gzipped
+
+	* collocations/colloc_read_poes_radiometer.m, colloc_read_cpr: Add path
+	and version for data.
+
+	* collocations/find_granules_by_date.m: Raise error if basedir not found.
+
+	* collocations/read_collocs_data_mean.m: Add support for reading only
+	particular columns. Add warning that this is in transition. NetCDF should
+	be gzipped.
+
+	* collocations/write_collocations_netcdf.m: NetCDF should be gzipped.
+
+	* collocations/colloc_config.m: Add aliases MHS = AMSU(16:20) and more.
+
+	* collocations/colloc_read_cpr.m: Add path and version for data.
+	
+2010-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
+
+
 	* atmlab-1-0-56
 	
 	* sensors/cloudsat_read.m: Can now return global attributes. Note: IMHO

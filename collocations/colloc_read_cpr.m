@@ -29,14 +29,20 @@ function S = colloc_read_cpr(file)
 S = cloudsat_read_zipped(file, ...
     {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', ...
      'RO_ice_water_path', 'RO_ice_water_path_uncertainty', ...
-     'IO_RO_ice_water_path', 'IO_RO_ice_water_path_uncertainty'});
+     'IO_RO_ice_water_path', 'IO_RO_ice_water_path_uncertainty', ...
+     'product_version'});
 % construct time axis with same dimensions
 S.time = S.UTC_start + S.Profile_time;
 
-% rename 'Longitude' to lon and 'Latitude' to lat
+% rename some fields
 
 S.lon = S.Longitude;
 S.lat = S.Latitude;
+S.version = S.product_version;
+
+% add filename
+
+S.path = file;
 
 % remove redundant fields
-S = rmfield(S, {'Longitude', 'Latitude', 'UTC_start', 'Profile_time'});
+S = rmfield(S, {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', 'product_version'});
