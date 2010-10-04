@@ -1,5 +1,23 @@
 2010-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-58
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Include data
+	versions.
+
+	* collocations/read_collocs_data_mean.m: Always gzipped, simpler approach
+	to ignoring numbers, 
+
+	* collocations/write_collocations_netcdf.m: Always gzipped, include data
+	versions, put rows first in multi-column data.
+
+	* collocations/colloc_config.m: Always gzipped.
+
+	* collocations/collocate_granule.m: Include versions.
+
+
+2010-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-57
 
 	* collocations/collocation_read.m: NetCDF should be gzipped

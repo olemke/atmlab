@@ -136,6 +136,8 @@ if isempty(data1.time)
 end
 logtext(fid, 'Found %d other granules to collocate with\n', size(date2_all, 1));
 
+overlap.version{1} = data1.version;
+
 %% loop through all the granules to collocate with
 
 for i = 1:size(date2_all, 1)
@@ -163,6 +165,7 @@ for i = 1:size(date2_all, 1)
         end
     end
     
+    overlap.version{2} = data2.version;
     data2.time_orig = data2.time; % store, see note at data1.time_orig
     if isempty(data2.time)
         logtext(fid, 'Secondary is empty, skipping\n');
@@ -233,4 +236,5 @@ for i = 1:size(date2_all, 1)
         overlap, M_c, data, M_d, meandata, M_m);
     
     logtext(fid, 'Info collected\n');
+end
 end

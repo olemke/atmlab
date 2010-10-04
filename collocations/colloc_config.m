@@ -101,7 +101,7 @@ A.collocation_cpr_poes_yeardir = '$YEAR';
 A.collocation_cpr_poes_filename = 'collocations_$SAT.mat';
 A.collocation_cpr_poes_data_filename = 'collocations_data_$SAT.mat';
 A.collocation_cpr_poes_meandata_filename = 'collocations_meandata_$SAT.mat';
-A.collocation_cpr_poes_filename_netcdf = 'collocations_$SAT.nc';
+A.collocation_cpr_poes_filename_netcdf = 'collocations_$SAT.nc.gz';
 
 A.collocation_poes_poes_basedir = '~gerrit/data/collocations_poes_poes';
 A.collocation_poes_poes_yeardir = '$YEAR';

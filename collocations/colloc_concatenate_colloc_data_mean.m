@@ -50,6 +50,15 @@ meandata_cat = meandata_old;
 fields = fieldnames(overlap_new); % fields that exist in NEW one will be used
 for n = 1:length(fields) % loop through all fields
     sat = fields{n};
+    if strcmp(sat, 'version') % FIXME/UGLY: special case
+        if isfield(overlap_old, 'version')
+            assert(isequal(overlap_old.version, overlap_new.version), ...
+                'atmlab_colloc_concatenate_colloc_data_mean', ...
+                'Concatenating different versions, no good');
+        end
+        overlap_cat.version = overlap_new.version;
+        continue
+    end
     
     if ~isfield(overlap_new, sat) || isempty(overlap_new.(sat)) % ignore
         continue

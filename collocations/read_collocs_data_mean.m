@@ -32,16 +32,11 @@ function M = read_collocs_data_mean(fn, fn_data, fn_meandata, c, cols)
 % $Id$
 
 %% read data
-if any(strcmp(fn(end-1:end), {'nc', 'gz'})) % NetCDF FIXME
+if strcmp(fn(end-1:end), 'gz') % NetCDF FIXME
     logtext(colloc_config('stdout')', 'Reading %s\n', fn);
-    compressed = strcmp(fn(end-1:end), 'gz');
-    if compressed
-        filenames = gunzip(fn, '/tmp');
-        ncid = netcdf.open(filenames{1}, 'NOWRITE');
-        delete(filenames{1});
-    else
-        ncid = netcdf.open(fn, 'NOWRITE');
-    end
+    filenames = gunzip(fn, '/tmp');
+    ncid = netcdf.open(filenames{1}, 'NOWRITE');
+    delete(filenames{1});
     
     varids = zeros(size(cols));
     varwidth = zeros(size(cols));
@@ -49,13 +44,8 @@ if any(strcmp(fn(end-1:end), {'nc', 'gz'})) % NetCDF FIXME
     % check dimensions, if any mean will need those first
     % also to know pre-alloc size
     alloc_length = 0;
-    donext = true; % sometimes we want to skip a field, e.g. if cols is
-                   % {'B_LAT', 'B_LONG', 'AMSU', 18, 'MEAN'}, 18 refers to
-                   % the column of AMSU to be read and is not a field
-                   % itself
     for i = 1:length(cols)
-        if ~donext
-            donext = true; % never skip more than one
+        if isnumeric(cols{i}) % refers to no. in previous
             continue
         end
         col = cols{i};
@@ -98,17 +88,17 @@ if any(strcmp(fn(end-1:end), {'nc', 'gz'})) % NetCDF FIXME
                     % check if additional dimension specified:
                     if i~=length(cols) && isnumeric(cols{i+1})
                         varwidth(i) = length(cols{i+1});
-                        donext = false;
                     else
                         varwidth(i) = dimlen;
-                        donext = true;
                     end
             end
         end % for each dim
         varids(i) = varid;
     end % for each col
     M = zeros(alloc_length, sum(varwidth));
-    
+    if alloc_length==0 % nothing
+        return
+    end
     if hasmean
         var_mean = netcdf.inqVarID(ncid, 'FIRST');
         rows = netcdf.getVar(ncid, var_mean);

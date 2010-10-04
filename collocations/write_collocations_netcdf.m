@@ -44,7 +44,13 @@ cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 fields = fieldnames(S);
 for i = 1:length(fields) % for each satellite
     satname = fields{i};
+    if strcmp(satname, 'version') % but not for version
+        continue
+    end
     fn = getfn(year, month, day, sat1, satname);
+    if strcmp(fn(end-1:end), 'gz') % take off this part
+        fn(end-2:end) = '';
+    end
     
     if ~exist(fileparts(fn), 'dir')
         logtext(colloc_config('stdout'), 'Creating %s\n', fileparts(fn));
@@ -91,8 +97,10 @@ for i = 1:length(fields) % for each satellite
         {'maxtime_s', colloc_config('interval')}, ...
         {'primary_satellite', sat1}, ...
         {'primary_sensor', sensor1}, ...
+        {'primary_version', S.version{1}}, ...
         {'secondary_satellite', satname}, ...
-        {'secondary_sensor', sensor2}});
+        {'secondary_sensor', sensor2}, ...
+        {'secondary_version', S.version{2}}});
 
     %% define variables, variable attributes, additional dimensions
     
@@ -119,11 +127,11 @@ for i = 1:length(fields) % for each satellite
                 error('atmlab:write_collocations_netcdf', 'Unknown vartype: %s', vartypes{j});
         end
         % check if we have other dimensions besides the length
-        if isfield(cols.stored.(varname), 'dims')
+        if isfield(cols.stored.(varname), 'dims') && ~isempty(S.(satname))
             dimname = cols.stored.(varname).dims{1};
             dimsize = cols.stored.(varname).dims{2};
             dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
-            thisdim = [dims.(dimname) dim_n];
+            thisdim = [dim_n dims.(dimname)];
         else
             thisdim = dim_n;
         end
@@ -137,41 +145,40 @@ for i = 1:length(fields) % for each satellite
     
     %% write data
     
-    if isempty(S.(satname))
-        logtext(colloc_config('stdout'), 'Nothing to write\n');
-        continue
-    end
-    
     % end define mode
     
     netcdf.endDef(ncid);
     
-    % put vars
-    logtext(colloc_config('stdout'), 'Writing: ');
-    
-    for j = 1:length(vars)
-        varname = vars{j};
-        fprintf(colloc_config('stdout'), '%s ', varname);
+    if isempty(S.(satname))
+        logtext(colloc_config('stdout'), 'Nothing to write\n');
+    else
+        % put vars
+        logtext(colloc_config('stdout'), 'Writing: ');
         
-        vartype = vartypes{j};
-        varid = varids(j);
-        switch vartype
-            case 'overlap'
-                netcdf.putVar(ncid, varid, S.(satname)(:, cols.(vartype).(varname)));
-            case 'data'
-                netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
-            case 'meandata'
-                netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+        for j = 1:length(vars)
+            varname = vars{j};
+            fprintf(colloc_config('stdout'), '%s ', varname);
+            
+            vartype = vartypes{j};
+            varid = varids(j);
+            switch vartype
+                case 'overlap'
+                    netcdf.putVar(ncid, varid, S.(satname)(:, cols.(vartype).(varname)));
+                case 'data'
+                    netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
+                case 'meandata'
+                    netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+            end
         end
+        fprintf('\n');
     end
-    fprintf('\n');
     logtext(colloc_config('stdout'), 'Finalising\n');
-
+    
     netcdf.close(ncid);
     
     logtext(colloc_config('stdout'), 'Gzipping and removing uncompressed\n');
     gzip(fn);
     delete(fn);
-    logtext(colloc_config('stdout'), 'Done');
+    logtext(colloc_config('stdout'), 'Done\n');
 
 end
