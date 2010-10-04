@@ -1,3 +1,10 @@
+2010-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-56
+	
+	* sensors/cloudsat_read.m: Can now return global attributes. Note: IMHO
+	this function can use some improval, it's slightly messy at places.
+
 2010-10-01	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-55

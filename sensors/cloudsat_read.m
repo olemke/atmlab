@@ -267,11 +267,17 @@ try
       ih = find( strcmp( hdfnames{i}, {fileinfo.Swath.DataFields.Name} ) );
     
       if isempty( ih )
-        P = sprintf( 'Data do not contain field ''%s''.', fieldlist{i} );
-        break;
+          ih = strcmp(hdfnames{i}, {fileinfo.Swath.Attributes.Name});
+          if any(ih)
+              P.(fieldlist{i}) = fileinfo.Swath.Attributes(ih).Value';
+          else
+              P = sprintf( 'Data do not contain field ''%s''.', fieldlist{i} );
+          end
+          break
+          
       else
-        P.(fieldlist{i}) = hdfread( fileinfo.Filename, ...
-                                  fileinfo.Swath.DataFields(ih).Name );
+          P.(fieldlist{i}) = hdfread( fileinfo.Filename, ...
+              fileinfo.Swath.DataFields(ih).Name );
       end
     end
 
