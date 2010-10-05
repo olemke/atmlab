@@ -75,7 +75,7 @@ for n = 1:length(fields) % loop through all fields
     % those refer to line numbers in the overlap matrices. From
     % collocate_granule, this is per granule. When concatenating
     % granules, those numbers need to be corrected.
-    if any(meandata_new.(sat)) % that have anything this iteration
+    if any(meandata_new.(sat)(:)) % that have anything this iteration
         n_before = size(overlap_old.(sat), 1);
 
         meandata_new.(sat)(:, 1:2) = meandata_new.(sat)(:, 1:2) + n_before;

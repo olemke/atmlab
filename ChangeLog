@@ -1,3 +1,12 @@
+2010-01-05	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-61
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Fixed bug,
+	difference between any(foo) and any(foo(:), 'if any(foo)' is actually 'if
+	all(any(foo))'; this led to bugs when concatenating structures with very
+	few averaged collocations (those would be considered to be 0).
+
 2010-01-05	Gerrit Holl <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-60
