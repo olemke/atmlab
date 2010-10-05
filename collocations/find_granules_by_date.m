@@ -1,4 +1,4 @@
-function M = find_granules_by_date(year, month, day, sat, sensor, ...
+function [M, paths] = find_granules_by_date(year, month, day, sat, sensor, ...
     with_yesterday)
 
 % find_granules_by_date Find all granule start times for date/sat/sensor
@@ -6,16 +6,20 @@ function M = find_granules_by_date(year, month, day, sat, sensor, ...
 % This function finds all granule start times for granules with any coverage
 % for the the indicated for the indicated satellite/sensor pair. This
 % includes the last granule of the date before, unless this is explicitly
-% prohibited.
+% prohibited. Note that the last granule of the date before may or may not
+% actually contain information for the day requested. Also notethat there may
+% also be more than one granule on the date before containing information
+% for the day requested. This is not currently taken into account.
 %
 % FORMAT
 %
-%   M = find_granules_by_date(year, month, day, sat, sensor, with_yesterday)
+%   [M, paths] = find_granules_by_date(year, month, day, sat, sensor, with_yesterday)
 %
 % OUT
 %
 %   M     N x m matrix     where each row corresponds to one granule and is
 %                          a datevec.
+%   paths cell strings     Cell array of strings, corresponding full paths
 %
 % IN
 %
@@ -28,6 +32,18 @@ function M = find_granules_by_date(year, month, day, sat, sensor, ...
 %
 % For POES satellites (NOAA-15 – NOAA-19 and MetOp-A), AMSU, MHS, HIRS and
 % AVHRR have the same granule times.
+% 
+% The supported sensors are those that have a _basedir defined in
+% colloc_config. As of 5 October 2010, those are:
+%
+%
+% cpr amsua amsub mhs hirs mspps avhrr hirscs collocation_cpr_poes collocation_poes_poes collocation_cpr_avhrr collocation_hirscs_poes collocation_collocation_cpr_poes_avhrr
+%
+% Satellite is only required for those sensors existing on multiple
+% satellites (where _yeardir in colloc_config contains $SAT). This is
+% currently (5 October 2010) true for:
+%
+% amsua amsub mhs hirs mspps avhrr
 %
 % $Id$
 
@@ -93,16 +109,21 @@ for i = 1:nfiles
         end
     end
 end
+% all paths
+paths = cellfun(@(f) fullfile(datadir, f), {files.name}, 'UniformOutput', false);
+% remove lines with zeroes (those are not granules)
+nogran = M(:, 1)==0;
+M(nogran, :) = [];
+paths(nogran) = [];
+% sort
+M = sortrows(M);
 % add yesterday
 if with_yesterday
     yesterday = datevec(datenum([year month day])-1);
-    M_yesterday = find_granules_by_date(yesterday(1), yesterday(2), yesterday(3), ...
-        sat, sensor, false);
+    [M_yesterday, paths_yesterday] = find_granules_by_date(...
+        yesterday(1), yesterday(2), yesterday(3), sat, sensor, false);
     if ~isempty(M_yesterday) % maybe today is genesis/big bang/epoch/birth/1970-01-01
         M = [M_yesterday(end, :); M];
+        paths = [paths_yesterday(end) paths];
     end
 end
-% remove lines with zeroes
-M(M(:, 1)==0, :) = [];
-% sort
-M = sortrows(M);

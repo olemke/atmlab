@@ -1,3 +1,9 @@
+2010-01-05	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-59
+	
+	* collocations/find_granules_by_date.m: Also return filename list.
+
 2010-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-58
