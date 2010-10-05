@@ -7,6 +7,11 @@ function first = granule_first_line(sat, sensor, d, reload)
 % database (a hashtable). This hash-table is cached between subsequent
 % calls of the function.
 %
+% There should exist an entry for each satellite/sensor granule. If it's
+% not found, an error is raised, and there is probably a bug somewhere. If
+% the satellite/sensor granule exists, but there is no (unique) previous
+% granule, line -2 is returned.
+%
 % FORMAT
 %
 %   first = granule_first_line(sat, sensor, datevec[, reload])

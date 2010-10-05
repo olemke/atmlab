@@ -8,8 +8,7 @@ function [granules, names] = overlap_granule(sat1, sensor1, date1, sat2, sensor2
 %
 % Assumes granules contain data for at most one day.
 %
-% If sat2==poes, returns for all the poes satellites (except sat2==sat1),
-% and adds the 
+% If sat2==poes, returns for all the poes satellites (except sat2==sat1).
 %
 % FORMAT
 %
@@ -26,8 +25,7 @@ function [granules, names] = overlap_granule(sat1, sensor1, date1, sat2, sensor2
 %
 % OUT
 %
-%   granules Nx5/6 mat  [year month day hour minute] for each granule.
-%                       If sat2=='poes', also adds satellite number.
+%   granules Nx5 mat    [year month day hour minute] for each granule.
 %   names    string     for each granule, name of satellite
 %
 % $Id$
@@ -38,7 +36,8 @@ if strcmp(sat2, 'poes')
     allsatnames = colloc_config('POES_satellite_names');
     allsatnos = colloc_config('POES_satellite_numbers');
     nsats = length(allsatnames);
-    granules = zeros(3*nsats, 6); % pre-allocate
+    granules = zeros(3*nsats, 5); % pre-allocate
+    
     names = cell(3*nsats, 1);
     n = 0;
     for i = 1:nsats
@@ -46,11 +45,9 @@ if strcmp(sat2, 'poes')
         if strcmp(sat1, satname) % don't collocate with myself
             continue
         end
-        satno = allsatnos(i);
         [granules_i, names_i] = overlap_granule(sat1, sensor1, date1, ...
             satname, amsub_or_mhs(satname));
         granules(n+1:n+size(granules_i, 1), 1:5) = granules_i;
-        granules(n+1:n+size(granules_i, 1), 6) = satno;
         names(n+1:n+size(granules_i, 1)) = names_i;
         n = n + size(granules_i, 1);
     end

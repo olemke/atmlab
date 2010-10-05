@@ -7,7 +7,7 @@ function data = cloudsat_read_zipped(CSin, varargin)
 %
 % $Id$
 
-filenames = unzip(CSin, tempdir);
+filenames = unzip(CSin, atmlab('WORK_AREA'));
 CSout = filenames{1};
 data = cloudsat_read(CSout, varargin{:});
 delete(CSout);

@@ -34,7 +34,7 @@ function M = read_collocs_data_mean(fn, fn_data, fn_meandata, c, cols)
 %% read data
 if strcmp(fn(end-1:end), 'gz') % NetCDF FIXME
     logtext(colloc_config('stdout')', 'Reading %s\n', fn);
-    filenames = gunzip(fn, '/tmp');
+    filenames = gunzip(fn, atmlab('WORK_AREA'));
     ncid = netcdf.open(filenames{1}, 'NOWRITE');
     delete(filenames{1});
     

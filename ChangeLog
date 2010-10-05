@@ -1,3 +1,22 @@
+2010-01-05	Gerrit Holl <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-60
+
+	* collocations/collocation_read.m: Catch error if file cannot be
+	gunzipped.
+
+	* collocations/read_collocs_data_mean.m: Use atmlab('WORK_AREA') rather
+	than '/tmp/'
+
+	* collocations/overlap_granule.m: Do not add a column with satellite
+	numbers. This is bug-prone and not generic.
+
+	* sensors/cloudsat_read_zipped.m: Use atmlab('WORK_AREA') rather than
+	tempdir.
+
+	* sensors/granule_first_line.m: Add a bit more documentation on what
+	should or shouldn't happen.
+
 2010-01-05	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-59

@@ -128,7 +128,8 @@ for i = 1:size(dates, 1)
         end
     catch ME
         switch (ME.identifier)
-            case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField'}
+            case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField', ...
+                    'MATLAB:gunzip:invalidFilename'}
                 logtext(colloc_config('stderr'), 'Problem for %04d-%02d-%02d: %s\n', ...
                     date(1), date(2), date(3), ME.message);
                 continue
