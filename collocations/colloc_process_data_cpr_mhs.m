@@ -84,14 +84,20 @@ M(:, c.data.HIRS) = tb(hi, :);
 % we want g/m^2 so we multiply by 1000/scalefactor
 % TODO: convert to specialised reading function
 try
-    mspps_file = find_datafile_by_date(date2, sat2, 'mspps');
+    mspps_file = find_datafile_by_date(date2, sat2, 'mspps', 120); % 120 seconds tolerance
+    logtext(colloc_config('stdout'), ...
+        'Reading %s\n', mspps_file);
     scalefactor = 1000/double(cell2mat(hdfread(mspps_file, 'IWP_SCAL')));
     MSPPS_IWP_raw = hdfread(mspps_file, 'IWP');
     MSPPS_IWP = ((MSPPS_IWP_raw<0) + (MSPPS_IWP_raw>0)*scalefactor) .* double(MSPPS_IWP_raw);
+    assert(size(MSPPS_IWP, 1)==size(data2.tb, 1), ...
+        'atmlab:colloc_process_data_cpr_mhs', ...
+        'MSPPS has not the same number of rows as AMSU. Skipping');
     M(:, c.data.MSPPS_IWP) = MSPPS_IWP(i2);
 catch ME
     switch (ME.identifier)
-        case {'MATLAB:HDF:invalidFile', 'atmlab:find_datafile_by_date'}
+        case {'MATLAB:HDF:invalidFile', 'atmlab:find_datafile_by_date', ...
+                'atmlab:colloc_process_data_cpr_mhs'}
             logtext(colloc_config('stderr'), ...
                 'WARNING: Unable to process mspps: %s\n', ME.message);
         otherwise

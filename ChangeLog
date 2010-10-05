@@ -1,5 +1,21 @@
 2010-01-05	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-62
+	
+	* handy/find_datafile_by_date.m: Can specify a tolerance in seconds if the
+	  starting date/time is not exact. Use case: MSPPS granules may start a
+	  minute /after/ the corresponding AMSU granule. Highly annoying, but with
+	  by specifying a sufficiently large tolerance one can now still use the
+	  AMSU starting time to locate the MSPPS granule.
+
+	* collocations/colloc_process_data_cpr_mhs.m: Use the tolerance as
+	  described above. Assert that MSPPS should have the same number of rows
+	  as AMSU. If not, ignore the entire granule. I store things by
+	  row-number, so if MSPPS is larger or smaller due to one extra or missing
+	  row, I risk getting the wrong data everywhere.
+
+2010-01-05	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-61
 
 	* collocations/colloc_concatenate_colloc_data_mean.m: Fixed bug,

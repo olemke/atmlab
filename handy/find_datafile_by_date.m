@@ -1,4 +1,5 @@
-function datafile = find_datafile_by_date(datevec, satname, sensor)
+function datafile = find_datafile_by_date(datevec, satname, sensor, ...
+    tol)
 
 % find_datafile_by_date Return full path of datafile by date/time
 %
@@ -12,13 +13,15 @@ function datafile = find_datafile_by_date(datevec, satname, sensor)
 %
 % FORMAT
 %
-%   datafile = find_datafile_by_date(datevec, sat, sensor)
+%   datafile = find_datafile_by_date(datevec, sat, sensor[, tol])
 %
 % IN
 %
 %   datevec     vector  Date/time to find datafile for
 %   satname     string* Name of satellite
 %   sensor      string  Name of sensor
+%   tol         number  Optional: tolerance in seconds. Sometimes, MSPPS
+%                       doesn't start the same minute as AMSU :(.
 %
 %   * may be cell array of strings if sensor is collocation_...
 %
@@ -78,7 +81,14 @@ end
 % if all else fails: search through all granules until satisfied
 
 granules = find_granules_by_date(datevec(1), datevec(2), datevec(3), satname, sensor, false);
-found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
+if exist('tol', 'var') % use tolerance
+    g = mat2cell(granules, size(granules, 1), [1 1 1 1 1]);
+    grans_unisecs = date2unixsecs(g{:});
+    dv_unisecs = date2unixsecs(datevec(1), datevec(2), datevec(3), datevec(4), datevec(5));
+    found = abs(grans_unisecs - dv_unisecs) < 120;
+else
+    found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
+end
 
 % find_granules_by_date returns granules in the order that their files are
 % returned by dir, so this is consistent
