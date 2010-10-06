@@ -167,7 +167,11 @@ for i = 1:length(fields) % for each satellite
                 case 'data'
                     netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
                 case 'meandata'
-                    netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+                    if isempty(M.(satname))
+                        logtext(colloc_config('stderr'), 'Warning: No meandata\n');
+                    else
+                        netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+                    end
             end
         end
         fprintf('\n');

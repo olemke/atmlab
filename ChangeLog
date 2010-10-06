@@ -1,5 +1,14 @@
 2010-01-06	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-64
+
+	* collocations/write_collocations_netcdf.m: Don't crash if there is no
+	  meandata. There may actually be no meandata if all occasions with
+	  B_DIST<7.5 km have flagged values for ROIWP, as happens for collocations
+	  with NOAA-16 on 18 January 2008.
+
+2010-01-06	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-63
 
 	* collocations/colloc_process_meandata_cpr_mhs.m,
