@@ -1,3 +1,15 @@
+2010-01-06	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-63
+
+	* collocations/colloc_process_meandata_cpr_mhs.m,
+	  collocations/colloc_process_meandata_collocation_cpr_poes_avhrr.m: Fixed
+	  bug. The bug was caused by using length(foo) instead of size(foo, 1),
+	  causing a bug if the number of averaged collocations would be less than
+	  the number of fields that I was unique-ing on, in this case 2. This is
+	  rare, but happened for CloudSat-CPR 2008-01-12 04:58 with NOAA-15 AMSU-B
+	  2008-01-12 04:28.
+
 2010-01-05	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-62

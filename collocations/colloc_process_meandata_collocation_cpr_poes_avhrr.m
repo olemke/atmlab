@@ -46,7 +46,7 @@ M_m = nan*zeros(size(uniques, 1), c.meandata.NCOLS);
 
 
 j = 0; % counter increases only when there is data
-for i = 1:length(uniques) % need to be done in loop due to mean/std/etc.
+for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
     first = firsts(i);
     last = lasts(i);
     M_c_part = M_c(first:last, :);
