@@ -69,9 +69,10 @@ end
 
 %=== Read Atmlab settings
 %
-atmlab('defaults');
 if exist( 'atmlab_conf' ) == 2
   atmlab_conf;
+else
+  atmlab('defaults');  
 end
 
 

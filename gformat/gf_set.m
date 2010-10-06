@@ -23,6 +23,7 @@ function G = gf_set(G,data,grids,grid_names,grid_units,varargin)
 if nargin < 4, grid_names = []; end
 if nargin < 5, grid_units = []; end
 
+
 %- Check input                                                             %&%
 %                                                                          %&%
 rqre_nargin( 1, nargin );                                                  %&%
@@ -38,5 +39,5 @@ end                                                                        %&%
 G = gf_set_data( G, data,grids,grid_names );
 
 if ~isempty( varargin )
-  G = gf_set_fields( G, varargin );
+  G = gf_set_fields( G, varargin{:} );
 end

@@ -27,10 +27,6 @@ function B = getdims(A,dims)
 %- Check input
 %
 ndim = dimens( A );
-%  
-if ~isnumeric(A)
-  error( 'Input *A* must be a numeric variable.' );
-end
 %
 if ~isnumeric(dims) | ~isvector(dims)  |  any( iswhole(dims) ~= 1 ) 
   error( 'Input *dims* must be a numeric vector of integers.' );
