@@ -34,7 +34,7 @@ function M = colloc_process_data_cpr_avhrr(~, M_c, sat1, ~, data1, sat2, date2, 
 % $Id$
 
 % prepare
-c = colloc_config('cols_cpr_avhrr');
+c = colloc_constants('cols_cpr_avhrr');
 n = size(M_c, 1);
 M = nan*zeros(n, c.data.NCOLS);
 

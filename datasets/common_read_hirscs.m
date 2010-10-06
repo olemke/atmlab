@@ -1,15 +1,13 @@
-function data = colloc_read_hirscs(file)
+function data = common_read_hirscs(file)
 
-% colloc_read_hirscs Read HIRSCS data for collocating
+% common_read_hirscs Read HIRSCS data in the common format (see README)
 %
 % This file reads data from a HIRSCS radiometer file and rearranges the
-% fields to the format that collocate_granule and colloc_process_* use to
-% respectively collocate or acquire information. The result is a structure
-% that has at least 'time', 'lat' and 'lon'.
+% fields to the common format. See README.
 %
 % FORMAT
 %
-%   data = colloc_read_hirscs(file)
+%   data = common_read_hirscs(file)
 %
 % IN
 %

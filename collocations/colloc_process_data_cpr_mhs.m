@@ -33,7 +33,7 @@ function M = colloc_process_data_cpr_mhs(~, M_c, ~, ~, data1, sat2, date2, data2
 % $Id$
 
 % prepare
-c = colloc_config('cols_cpr_mhs');
+c = colloc_constants('cols_cpr_mhs');
 n = size(M_c, 1);
 M = nan*zeros(n, c.data.NCOLS);
 
@@ -85,7 +85,7 @@ M(:, c.data.HIRS) = tb(hi, :);
 % TODO: convert to specialised reading function
 try
     mspps_file = find_datafile_by_date(date2, sat2, 'mspps', 120); % 120 seconds tolerance
-    logtext(colloc_config('stdout'), ...
+    logtext(atmlab('OUT'), ...
         'Reading %s\n', mspps_file);
     scalefactor = 1000/double(cell2mat(hdfread(mspps_file, 'IWP_SCAL')));
     MSPPS_IWP_raw = hdfread(mspps_file, 'IWP');
@@ -98,7 +98,7 @@ catch ME
     switch (ME.identifier)
         case {'MATLAB:HDF:invalidFile', 'atmlab:find_datafile_by_date', ...
                 'atmlab:colloc_process_data_cpr_mhs'}
-            logtext(colloc_config('stderr'), ...
+            logtext(atmlab('ERR'), ...
                 'WARNING: Unable to process mspps: %s\n', ME.message);
         otherwise
             ME.rethrow();

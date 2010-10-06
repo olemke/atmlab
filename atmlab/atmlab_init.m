@@ -53,14 +53,15 @@ addpath( fullfile( toppath, 'geophysics' ) );
 addpath( fullfile( toppath, 'forwardmodel' ) );
 addpath( fullfile( toppath, 'files' ) ); 
 addpath( fullfile( toppath, 'demos' ) );
+addpath( fullfile( toppath, 'datasets' ) ); 
 addpath( fullfile( toppath, 'covmat' ) );
+addpath( fullfile( toppath, 'collocations' ) ); 
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts', 'netcdf' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
 addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts', 'xml' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
-addpath( fullfile( toppath, 'collocations' ) ); 
 %
 if nversion < 7.4
   addpath( fullfile( toppath, 'V7-4' ) ); 
@@ -99,4 +100,22 @@ else
   rand( 'state', rand_state );
   randn( 'state', rand_state );
 end
+
+% Add directory for site-specific settings, initialise subsystems
+
+if ~isnan(atmlab('SITE'))
+    sitedir = fullfile(toppath, 'site-specific', atmlab('SITE'));
+    if exist(sitedir, 'dir')
+        addpath(sitedir);
+        % execute any initialisation m-files
+        W = what(sitedir);
+        for i = 1:length(W.m)
+            m = W.m{i};
+            if strcmp(m((end-5):(end-2)), 'init')
+                run(fullfile(W.path, m));
+            end
+        end
+    end
+end
+
 

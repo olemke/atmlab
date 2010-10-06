@@ -57,23 +57,23 @@ end
 
 %% output
 
-fid = colloc_config('stdout');
-eid = colloc_config('stderr');
+fid = atmlab('OUT');
+eid = atmlab('ERR');
 
 %% need column numbers for preventing doubles
 
-cols = colloc_config(['cols_' sensor1 '_' sensor2]);
+cols = colloc_constants(['cols_' sensor1 '_' sensor2]);
 
 %% get handles for reading, processing
 
 dummy = @(varargin) (-1);
-fh1 = colloc_config(['read_' sensor1]);
-fh2 = colloc_config(['read_' sensor2]);
-fhp = colloc_config(['process_' sensor1 '_' sensor2]);
+fh1 = datasets_constants(['read_' sensor1]);
+fh2 = datasets_constants(['read_' sensor2]);
+fhp = colloc_constants(['process_' sensor1 '_' sensor2]);
 
 try
-    fhpd = colloc_config(['process_data_', sensor1 '_' sensor2]);
-    fhpm = colloc_config(['process_meandata_', sensor1 '_' sensor2]);
+    fhpd = colloc_constants(['process_data_', sensor1 '_' sensor2]);
+    fhpm = colloc_constants(['process_meandata_', sensor1 '_' sensor2]);
 catch ME
     switch (ME.identifier)
         case 'atmlab:prstnt_struct:undefined'
@@ -156,12 +156,13 @@ for i = 1:size(date2_all, 1)
     try
         data2 = read_granule(satname, sens, date2_all(i, 1:5), false); % keep doubles for now
     catch ME
-        if strcmp(ME.identifier, 'atmlab:find_datafile_by_date')
-            logtext(eid, 'Error in searching for datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
-                datecell{:}, ME.message);
-            continue
-        else
-            ME.rethrow();
+        switch ME.identifier
+            case {'atmlab:find_datafile_by_date', 'atmlab:invalid_data'}
+                logtext(eid, 'Error in reading datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
+                    datecell{:}, ME.message);
+                continue
+            otherwise
+                ME.rethrow();
         end
     end
     

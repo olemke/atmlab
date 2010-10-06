@@ -54,6 +54,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 
 %% prepare configuration things
 
+error('NEEDS REWRITE');
 getpath = colloc_config(['filename_' sensor1 '_' sensor2]);
 cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 

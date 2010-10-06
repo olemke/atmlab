@@ -21,11 +21,11 @@ function M = colloc_process_hirscs_poes(collocations, ...
 %   date1           1x5 vector  Contains [year month day hour minute] for the
 %                               start of the primary granule.
 %   data1           structure   Fields time, lat and lon should be present; as
-%                               returned by colloc_config('read_hirscs')
+%                               returned by datasets_constants('read_hirscs')
 %   name2           string      Name of secondary satellite (not used here)
 %   date2           1x5 vector  As date1, but for secondary granule.
 %   data2           structure   As data1, but for secondary granule; as
-%                               returned by colloc_config('read_mhs').
+%                               returned by dataset_constants('read_mhs').
 %
 % OUT
 %
@@ -35,7 +35,7 @@ function M = colloc_process_hirscs_poes(collocations, ...
 % $Id$
 
 % prepare
-c = colloc_config('cols_hirscs_poes');
+c = colloc_constants('cols_hirscs_poes');
 c = c.overlap;
 n = size(collocations, 1);
 M = nan*zeros(n, c.NCOLS);

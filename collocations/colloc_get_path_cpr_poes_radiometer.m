@@ -30,13 +30,14 @@ function [fn, fnd, fnm] = colloc_get_path_cpr_poes_radiometer(year, month, day, 
 %
 % $Id$
 
-basedir = colloc_config('collocation_cpr_mhs_basedir');
+error('DEPRECATED');
+basedir = datasets_config('collocation_cpr_mhs_basedir');
 
 switch nargout
     case {0, 1}
-        basefile = colloc_config('collocation_cpr_mhs_filename_netcdf');
+        basefile = datasets_config('collocation_cpr_mhs_filename_netcdf');
     case {2, 3}
-        basefile = colloc_config('collocation_cpr_mhs_filename');
+        basefile = datasets_config('collocation_cpr_mhs_filename');
     otherwise
         error('atmlab:colloc_get_path_cpr_poes_radiometer', ...
             'must have 0–3 output arguments');
@@ -53,9 +54,9 @@ if nargout==1
     return
 end
 
-basedata = colloc_config('collocation_cpr_mhs_data_filename');
+basedata = datasets_config('collocation_cpr_mhs_data_filename');
 basedata = strrep(basedata, '$SAT', sat2);
-basemean = colloc_config('collocation_cpr_mhs_meandata_filename');
+basemean = datasets_config('collocation_cpr_mhs_meandata_filename');
 basemean = strrep(basemean, '$SAT', sat2);
 
 fnd = fullfile(d, basedata);

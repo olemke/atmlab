@@ -1,17 +1,13 @@
-function S = colloc_read_cpr(file)
+function S = common_read_cpr_2BCWCRO(file)
 
-% colloc_read_cpr Read CloudSat CPR data for collocating
+% common_read_cpr_2BCWCRO Read CloudSat CPR data in the common format (see README)
 %
 % This file reads data from a CloudSat CPR file and rearranges the fields to
-% the format that collocate_granule and colloc_process_* use to respectively
-% collocate or acquire information. The result is a structure that has at
-% least 'time', 'lat' and 'lon'.
-%
-% Compare: colloc_read_poes_radiometer
+% the common format.
 %
 % FORMAT
 %
-%   data = colloc_read_cpr(file)
+%   data = common_read_cpr(file)
 %
 % IN
 %

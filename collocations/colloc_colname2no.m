@@ -24,7 +24,7 @@ function [colno, names] = colloc_colname2no(sensor1, sensor2, colnames)
 %
 % $Id$
 
-cols = colloc_config(['cols_' sensor1 '_' sensor2]);
+cols = colloc_constants(['cols_' sensor1 '_' sensor2]);
 colno = cell(size(colnames));
 
 % in the 'data' part, there might be multi-channel instruments such

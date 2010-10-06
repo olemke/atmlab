@@ -32,12 +32,12 @@ function M = colloc_process_cpr_avhrr(collocations, ...
 %
 %   M               matrix      Matrix with one row for each collocation
 %                               and columns as in
-%                               colloc_config('cols_cpr_avhrr').overlap
+%                               colloc_constants('cols_cpr_avhrr').overlap
 %
 % $Id$
 
 % prepare
-c = colloc_config('cols_cpr_avhrr');
+c = colloc_constants('cols_cpr_avhrr');
 c = c.overlap;
 n = size(collocations, 1);
 M = nan*zeros(n, c.NCOLS);

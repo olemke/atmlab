@@ -33,7 +33,7 @@ function M = read_collocs_data_mean(fn, fn_data, fn_meandata, c, cols)
 
 %% read data
 if strcmp(fn(end-1:end), 'gz') % NetCDF FIXME
-    logtext(colloc_config('stdout')', 'Reading %s\n', fn);
+    logtext(atmlab('OUT'), 'Reading %s\n', fn);
     filenames = gunzip(fn, atmlab('WORK_AREA'));
     ncid = netcdf.open(filenames{1}, 'NOWRITE');
     delete(filenames{1});
@@ -140,19 +140,19 @@ else
     cols_mean = cols{3};
     
     if any(cols_overlap) || any(cols_mean)
-        logtext(colloc_config('stdout'), 'Reading %s\n', fn);
+        logtext(atmlab('OUT'), 'Reading %s\n', fn);
         overlap = load(fn);
         n = size(overlap.collocations, 1);
     end
     
     if any(cols_data)
-        logtext(colloc_config('stdout'), 'Reading %s\n', fn_data);
+        logtext(atmlab('OUT'), 'Reading %s\n', fn_data);
         data = load(fn_data);
         n = size(data.data, 1);
     end
     
     if any(cols_mean)
-        logtext(colloc_config('stdout'), 'Reading %s\n', fn_meandata);
+        logtext(atmlab('OUT'), 'Reading %s\n', fn_meandata);
         meandata = load(fn_meandata);
     end
     

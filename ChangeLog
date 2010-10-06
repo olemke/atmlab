@@ -1,3 +1,97 @@
+2010-10-06	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-66
+
+	* datasets/: Directory added with some new content, but mostly moved from
+	  elsewhere.
+
+	* The Big Move:
+	  collocations/find_granules_by_date.m, handy/find_datafile_by_date.m,
+	  handy/find_granules_for_period.m, handy/amsub_or_mhs.m,
+	  sensors/read_granule.m, sensors/granule_first_line.m,
+	  handy/find_datafile_by_date.m, sensors/read_granule.m
+	  --> datasets/
+
+	  collocations/colloc_read_* -> datasets/common_read_*
+	  collocations/colloc_read_cpr.m -> datasets/common_read_cpr_2BCWCRO.m
+
+	* collocations/colloc_get_filename_hirscs.m: Deleted, treated by revised
+	  datasets/find_datafile_by_date.m
+
+	* collocations/colloc_config.m, collocations/colloc_constants.m,
+	  datasets/datasets_config.m, datasets/datasets_constants.m: Split
+	  collocations/colloc_config.m in 4, trying to fit all where it best
+	  belongs.
+
+	* site-specific, /kiruna, /datasets_init.m: Started a site-specific
+	  directory along with a site-specific Kiruna initialisation with
+	  constants for the datasets.
+
+	* handy/alias.m: Added. Define aliases.
+
+	* handy/strrep_multi.m: Added. Multi-string replacement.
+
+	* datasets/strrep_variables.m: Added. Replaces particular strings. Here
+	rather than in handy/ because it's so specific.
+
+	* datasets/find_datadir_by_date.m: Split off code from
+	  find_datafile_by_date, is this is also useful for find_granules_by_date.
+
+	* datasets/README: Start README for this section. To be expanded.
+
+	* datasets/TODO: Start TODO for this section. To be expanded.
+
+	* datasets/find_granules_by_date.m, datasets/find_datafile_by_date.m:
+  	  Complete rewrite, more flexible approach, no more need for get_filename_* etc.
+	  Latter can also return non-existing (to-be-written) paths.
+
+	* datasets/common_read_poes_radiometer.m: Assert monotonically increasing
+	time-axes. Was causing problems when locating meandata.
+	
+	* collocations/colloc_process_data_collocation_cpr_poes_avhrr.m,
+	collocations/colloc_process_poes_poes.m,
+	collocations/colloc_process_meandata_collocation_cpr_poes_avhrr.m,
+	collocations/colloc_colname2no.m, collocations/collocate_date.m,
+	collocations/colloc_process_data_cpr_mhs.m,
+	collocations/read_collocs_data_mean.m,
+	collocations/colloc_process_cpr_mhs.m, collocations/overlap_granule.m,
+	collocations/write_collocations_netcdf.m,
+	collocations/colloc_process_data_hirscs_poes.m,
+	collocations/collocation_read_dual.m,
+	collocations/colloc_process_data_cpr_avhrr.m,
+	collocations/colloc_process_data_hirscs_poes.m,
+	collocations/collocate_and_store_date_range.m,
+	collocations/collocation_restrain.m,
+	collocations/colloc_process_meandata_cpr_mhs.m,
+	collocations/colloc_process_cpr_avhrr.m, collocations/collocate_granule.m, 
+	  Adapt for split colloc_config.
+
+	* collocations/colloc_get_path_cpr_poes_radiometer.m,
+	collocations/colloc_get_path_cpr_avhrr.m,
+	collocations/colloc_get_path_poes_poes.m,
+	collocations/write_collocations.m,
+	collocations/colloc_get_path_collocation_cpr_poes_avhrr.m,
+	collocations/colloc_get_path_hirscs_poes_radiometer.m, 
+	  Deprecated, will be removed ASAP.
+	
+	* collocations/collocation_read.m,
+	collocations/write_collocations_netcdf.m,
+	collocations/collocate_and_store_date.m
+	  Added note: needs rewrite after todays mayhem.
+
+	* collocations/collocate_granule.m: Check for invalid data.
+
+	* atmlab/atmlab.m: Added OUT and ERR options, to redirect logging.
+
+	* atmlab/atmlab_init.m: Added directory for datasets. Resort paths
+	anti-alphabetical. Added framework for SITE: in the site-directory, any
+	_init will be executed after atmlab_init.m.
+
+	* datasets/read_granule.m: Don't flood screen with logging.
+
+	* ChangeLog: Documented my changes, including this on.
+	
+
 2010-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-65

@@ -25,7 +25,7 @@ function M = colloc_process_meandata_cpr_mhs(~, M_coll, M_data, ~, ~, ~, ~)
 %
 % $Id$
 
-c = colloc_config('cols_cpr_mhs');
+c = colloc_constants('cols_cpr_mhs');
 
 % find unique ones
 

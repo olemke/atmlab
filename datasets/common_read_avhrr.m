@@ -1,15 +1,13 @@
-function data = colloc_read_avhrr(file, channels)
+function data = common_read_avhrr(file, channels)
 
-% colloc_read_avhrr Read AVHRR l1b data for collocating
+% common_read_avhrr Read AVHRR l1b data and arrange in a common format
 %
 % This file reads data from a AVHRR l1b radiometer file and rearranges the
-% fields to the format that collocate_granule and colloc_process_* use to
-% respectively collocate or acquire information. The result is a structure
-% that has at least 'time', 'lat' and 'lon'.
+% fields to the common format, used by collocation codes.
 %
 % FORMAT
 %
-%   data = colloc_read_avhrr(file[, channels])
+%   data = common_read_avhrr(file[, channels])
 %
 % IN
 %

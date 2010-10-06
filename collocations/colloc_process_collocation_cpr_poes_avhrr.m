@@ -37,7 +37,7 @@ function M_c = colloc_process_collocation_cpr_poes_avhrr(collocations, ...
 % $Id$
 
 % prepare
-c = colloc_config('cols_collocation_cpr_poes_avhrr');
+c = colloc_constants('cols_collocation_cpr_poes_avhrr');
 c = c.overlap;
 n = size(collocations, 1);
 M_c = nan*zeros(n, c.NCOLS);

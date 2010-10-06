@@ -3,8 +3,6 @@ function collocate_and_store_date_range(date_start, date_end, ...
 
 % collocate_and_store_date_range Collocate and store for all those dates
 %
-% Needs 'stdout' to be set in colloc_config.
-%
 % FORMAT
 %
 %   collocate_and_store_date(date_start, date_end, ...
@@ -21,16 +19,16 @@ function collocate_and_store_date_range(date_start, date_end, ...
 %
 % $Id$
 
-logtext(colloc_config('stdout'), 'Starting collocations\n');
-logtext(colloc_config('stdout'), '%s %s vs. %s %s\n', sat1, sensor1, sat2, sensor2);
-logtext(colloc_config('stdout'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
+logtext(atmlab('OUT'), 'Starting collocations\n');
+logtext(atmlab('OUT'), '%s %s vs. %s %s\n', sat1, sensor1, sat2, sensor2);
+logtext(atmlab('OUT'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
 alldates = daterange(date_start, date_end);
 for i = 1:size(alldates, 1);
     year = alldates(i, 1);
     month = alldates(i, 2);
     day = alldates(i, 3);
-    logtext(colloc_config('stdout'), 'collocating %04d-%02d-%02d\n', ...
+    logtext(atmlab('OUT'), 'collocating %04d-%02d-%02d\n', ...
         year, month, day);
     collocate_and_store_date(year, month, day, sat1, sensor1, sat2, sensor2);
 end
-logtext(colloc_config('stdout'), 'Finished!\n');
+logtext(atmlab('OUT'), 'Finished!\n');

@@ -51,6 +51,10 @@
 % work folders are not removed, to make it possible to check the content
 % in these folders.
 %----------------------------------------------------------------------------
+% ERR
+%
+% Stream to log error messages to. Used by some subsystems.
+%----------------------------------------------------------------------------
 % EXTRAP
 %
 % Flag for automatic extrapolation of data at interpolation. The approach is to
@@ -67,12 +71,23 @@
 %   ARTS (both versions):
 %     A number between 0 and 3, where 3 means highest level of verbosity.
 %----------------------------------------------------------------------------
+% OUT
+%
+% Stream to log ordinary messages to. Used by some subsystems.
+%----------------------------------------------------------------------------
 % RAND_STATE
 %
 % Initialisation of random states (for rand and randn). Performed inside
 % *atmlab_init*. Either NaN or an integer. If set to NaN, a semi-random 
 % state is generated. Otherwise the specified value is used as state for 
 % both rand and randn.
+%----------------------------------------------------------------------------
+% SITE
+%
+% Location, system, e.g. Kiruna, Chalmers. If there is a directory
+% site-specific/SITE, this will be used to initialise default values for
+% the settings for some subsystems (for example, datasets will 'know' where to
+% find data).
 %----------------------------------------------------------------------------
 % SCREEN_WIDTH
 % 
@@ -128,13 +143,15 @@ A.ARTS_INCLUDES     = NaN;
 A.ARTS_PATH         = NaN;
 A.ARTS_XMLDATA_PATH = NaN;
 A.DEBUG             = false;
+A.ERR               = 2;
 A.EXTRAP            = false;
 A.FMODEL_VERBOSITY  = 0;
+A.OUT               = 1;
 A.OUTDIR            = '.';
 A.PDFVIEWER         = NaN;
 A.PSVIEWER          = NaN;
 A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
+A.SITE              = NaN;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = NaN;
-

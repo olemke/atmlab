@@ -5,12 +5,6 @@ function [fn, fnd, fnm] = colloc_get_path_collocation_cpr_poes_avhrr(year, month
 % Determine the full path of the files to which collocations between
 % CPR/POES-collocation and AVHRR should be written to, for the given date
 % and satellite pair.
-% Needs the following to be set in colloc_config:
-%   'collocation_collocation_cpr_poes_avhrr_basedir'
-%   'collocation_collocation_cpr_poes_avhrr_yeardir'
-%   'collocation_collocation_cpr_poes_avhrr_filename'
-%   'collocation_collocation_cpr_poes_avhrr_data_filename'
-%   'collocation_collocation_cpr_poes_avhrr_meandata_filename'
 %
 % FORMAT
 %
@@ -34,6 +28,7 @@ function [fn, fnd, fnm] = colloc_get_path_collocation_cpr_poes_avhrr(year, month
 %
 % $Id$
 
+error('DEPRECATED');
 basedir = colloc_config('collocation_collocation_cpr_poes_avhrr_basedir');
 basefile = colloc_config('collocation_collocation_cpr_poes_avhrr_filename');
 

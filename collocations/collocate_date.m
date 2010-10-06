@@ -4,11 +4,6 @@ function [overlap, data, meandata] = collocate_date(year, month, day, sat1, sens
 %
 % This m-file collects all collocations for the given date between the
 % indicated sensor pairs and returns the result in a structure.
-% Needs the following to be set in colloc_config:
-%   'stdout' (defaults to 1)
-%   'stderr' (defaults to 2)
-%   'POES_satellite_names'
-%
 %
 % FORMAT
 %
@@ -35,11 +30,11 @@ function [overlap, data, meandata] = collocate_date(year, month, day, sat1, sens
 %
 % $Id$
 
-fid = colloc_config('stdout');
+fid = atmlab('OUT');
 
 grans = find_granules_by_date(year, month, day, sat1, sensor1);
 if isempty(grans)
-    logtext(colloc_config('stderr'), 'no granules found %s/%s %d-%d-%d\n', ...
+    logtext(atmlab('ERR'), 'no granules found %s/%s %d-%d-%d\n', ...
         sat1, sensor1, year, month, day);
 end
 ngrans = size(grans, 1);
@@ -47,7 +42,7 @@ ngrans = size(grans, 1);
 empty = struct();
 switch lower(sat2)
     case 'poes'
-        sats = colloc_config('POES_satellite_names');
+        sats = datasets_constants('POES_satellite_names');
         for i = 1:length(sats)
             empty.(sats{i}) = []; % FIXME: get good width
         end
@@ -87,15 +82,15 @@ for i = 1:ngrans
     catch ME
         switch ME.identifier
             case 'atmlab:find_datafile_by_date'
-                logtext(colloc_config('stderr'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
+                logtext(atmlab('ERR'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     thisyear, thismonth, thisday, hour, minute, sat1, sensor1, ME.message);
                 continue
             case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:collocate_granule:noother'}
-                logtext(colloc_config('stderr'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
+                logtext(atmlab('ERR'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                     thisyear, thismonth, thisday, hour, minute, sat1, sensor1, ME.message);
                 continue
             case {'MATLAB:hdfinfo:invalidFile'}
-                logtext(colloc_config('stderr'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
+                logtext(atmlab('ERR'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                     sat1, sensor1, thisyear, thismonth, thisday, hour, minute, ME.message);
                 continue
             otherwise

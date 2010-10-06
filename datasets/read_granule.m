@@ -6,7 +6,7 @@ function M = read_granule(sat, sensor, datevec, remdouble)
 % satellite/sensor-pair, if one doesn't know what function is suitable to
 % use to read it. It also gets rid of ballast.
 %
-% Uses colloc_config('read_SENSOR') to find out what function to use to
+% Uses datasets_config('read_SENSOR') to find out what function to use to
 % read this particular data. Uses granule_first_line to find out the first
 % scanline to use (e.g. the rest are doubles).
 %
@@ -35,13 +35,13 @@ end
 
 % find datafile and function to read it
 datafile = find_datafile_by_date(datevec, sat, sensor);
-reader = colloc_config(['read_' sensor]);
+reader = datasets_constants(['read_' sensor]);
 
 % read datafile
-logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
-    func2str(reader), datafile);
+%logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
+%    func2str(reader), datafile);
 M = reader(datafile);
-logtext(colloc_config('stdout'), 'read %s\n', datafile);
+%logtext(colloc_config('stdout'), 'read %s\n', datafile);
 nlines = size(M.time, 1);
 
 if remdouble

@@ -25,12 +25,12 @@ else
         all(data(:, ranges(:, 1)) <= repmat(ranges(:, 3)', [size(data, 1) 1]), 2);
     
     rows = rightrange;
-    logtext(colloc_config('stdout'), 'Selecting ranges: %d -> %d\n', ...
+    logtext(atmlab('OUT'), 'Selecting ranges: %d -> %d\n', ...
         size(data, 1), sum(rows));
 end
 
 if ~any(rows)
-    logtext(colloc_config('stdout'), 'No more collocations, nothing to do\n');
+    logtext(atmlab('OUT'), 'No more collocations, nothing to do\n');
     return
 end
     
@@ -51,7 +51,7 @@ for k = 1:length(filters)
     catch ME
         switch ME.identifier
             case 'atmlab:granule_first_line'
-                logtext(colloc_config('stderr'), ...
+                logtext(atmlab('ERR'), ...
                     'WARNING! Could not filter %s! ERROR ''%s''!\n', ...
                     func2str(filter), ME.message);
                 continue;
@@ -60,7 +60,7 @@ for k = 1:length(filters)
         end
     end
         
-    logtext(colloc_config('stdout'), ...
+    logtext(atmlab('OUT'), ...
         'filter %s: %d -> %d collocations\n', func2str(filter), ...
         sum(rows), sum(rows&lim));
     rows = rows&lim;

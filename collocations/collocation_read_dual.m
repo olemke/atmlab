@@ -106,7 +106,7 @@ end
 [M1, c1] = collocation_read(sat1, sensor1, sat2, sensor2, ...
     startdate, enddate, cols1, limits1, filter1);
 
-links = colloc_config('links');
+links = colloc_constants('links');
 [~, name_struct] = colloc_colname2no(links.(sensor1).sensor1, links.(sensor1).sensor2, cols2);
 limmat = limstruct2limmat(limits2, name_struct);
 

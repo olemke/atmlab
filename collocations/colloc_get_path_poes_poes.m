@@ -29,6 +29,7 @@ function [fn, fnd] = colloc_get_path_poes_poes(year, month, day, sat1, sat2)
 %
 % $Id$
 
+error('DEPRECATED');
 basedir = colloc_config('collocation_poes_poes_basedir');
 basefile = colloc_config('collocation_poes_poes_filename');
 basefile = strrep(basefile, '$SAT1', sat1);

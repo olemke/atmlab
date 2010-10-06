@@ -28,6 +28,7 @@ function [fn, fnd] = colloc_get_path_hirscs_poes_radiometer(year, month, day, sa
 %
 % $Id$
 
+error('DEPRECATED');
 basedir = colloc_config('collocation_hirscs_poes_basedir');
 basefile = colloc_config('collocation_hirscs_poes_filename');
 basefile = strrep(basefile, '$SAT1', sat1);

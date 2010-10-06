@@ -33,7 +33,7 @@ function M = colloc_process_data_hirscs_poes(~, M_c, ...
 % $Id$
 
 % prepare
-c = colloc_config('cols_hirscs_poes');
+c = colloc_constants('cols_hirscs_poes');
 co = c.overlap;
 c = c.data;
 n = size(M_c, 1);
@@ -48,7 +48,7 @@ c2 = M_c(:, co.MHS_COL);
 % index for direct addressing
 i2 = sub2ind(size(data2.lat), r2, c2);
 
-c = colloc_config('cols_hirscs_poes');
+c = colloc_constants('cols_hirscs_poes');
 c = c.data;
 
 % reshape so that I can use direct addressing for brightness temperatures

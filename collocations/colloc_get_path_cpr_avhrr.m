@@ -28,6 +28,7 @@ function [fn, fnd] = colloc_get_path_cpr_avhrr(year, month, day, ~, sat2)
 %
 % $Id$
 
+error('DEPRECATED');
 basedir = colloc_config('collocation_cpr_avhrr_basedir');
 basefile = colloc_config('collocation_cpr_avhrr_filename');
 basefile = strrep(basefile, '$SAT', sat2);

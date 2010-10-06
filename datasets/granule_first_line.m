@@ -45,7 +45,7 @@ end
 if isfield(S, sat) && isfield(S.(sat), sensor) && ~reload
     ht = S.(sat).(sensor);
 else
-    scanfile = colloc_config('firstline_data');
+    scanfile = datasets_config('firstline_data');
     scanfile = strrep(scanfile, '$SAT', sat);
     scanfile = strrep(scanfile, '$SENSOR', sensor);
     

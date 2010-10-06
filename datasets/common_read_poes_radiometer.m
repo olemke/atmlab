@@ -1,18 +1,13 @@
-function data = colloc_read_poes_radiometer(file)
+function data = common_read_poes_radiometer(file)
 
-% colloc_read_poes_radiometer Read POES data for collocating
+% common_read_poes_radiometer Read POES data and arrange in the common format
 %
 % This file reads data from a POES l1b radiometer file and rearranges the
-% fields to the format that collocate_granule and colloc_process_* use to
-% respectively collocate or acquire information. The result is a structure
-% that has at least 'time', 'lat' and 'lon'.
-%
-% Note: colloc_config has several aliases for this, including read_amsua,
-% read_amsub, read_mhs and read_hirs.
+% fields to the common format. See README.
 %
 % FORMAT
 %
-%   data = colloc_read_poes_radiometer(file)
+%   data = common_read_poes_radiometer(file)
 %
 % IN
 %
@@ -36,6 +31,12 @@ data.time = data.time'/1000;
 % compensate time wrapping around
 
 data.time = compensate_wraparound(data.time);
+
+% verify data integrity
+
+assert(all(diff(data.time)>0), ...
+    'atmlab:invalid_data', ...
+    'POES time not monotonically increasing');
 
 % shift dimensions so that it's [row col (channel)]
 

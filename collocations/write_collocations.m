@@ -5,9 +5,6 @@ function write_collocations(year, month, day, S, D, M, ...
 %
 % Write collocation data for year/month/day in structure S to a filename. The
 % filename is determined from the satellite and sensors used. Needs from
-% colloc_config:
-%   'filename_SENSOR1_SENSOR2' (replaced as passed on)
-%   'stdout'
 %
 % FORMAT
 %   
@@ -35,6 +32,7 @@ function write_collocations(year, month, day, S, D, M, ...
 %
 % $Id$
 
+error('NEEDS REPLACEMENT');
 getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
 
 % number of different datasets

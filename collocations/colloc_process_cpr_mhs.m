@@ -32,12 +32,12 @@ function M = colloc_process_cpr_mhs(collocations, ...
 %
 %   M               matrix      Matrix with one row for each collocation
 %                               and columns as in
-%                               colloc_config('cols_cpr_mhs').overlap
+%                               colloc_constants('cols_cpr_mhs').overlap
 %
 % $Id$
 
 % prepare
-c = colloc_config('cols_cpr_mhs');
+c = colloc_constants('cols_cpr_mhs');
 c = c.overlap;
 n = size(collocations, 1);
 M = nan*zeros(n, c.NCOLS);
@@ -132,8 +132,20 @@ M = sortrows(M, [c.B_I c.B_C c.C_I]);
 
 %% remove doubles
 
-wrongrows = M(:, c.B_I)< granule_first_line(name_mhs, amsub_or_mhs(name_mhs), date_mhs);
-M(wrongrows, :) = [];
+try
+    wrongrows = M(:, c.B_I)< granule_first_line(name_mhs, amsub_or_mhs(name_mhs), date_mhs);
+    M(wrongrows, :) = [];
+catch ME
+    switch ME.identifier
+        case 'atmlab:granule_first_line'
+            logtext(atmlab('ERR'), ...
+                'Warning: Unable to remove doubles: %s\n', ...
+                ME.message);
+        otherwise
+            ME.rethrow();
+    end
+end
+
 end
 
 function i = mini(v)

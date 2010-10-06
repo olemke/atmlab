@@ -7,10 +7,6 @@ function collocate_and_store_date(year, month, day, ...
 % If it doesn't (or cscol('overwrite') is set), collocate the indicated
 % satellites and sensors with each other and store the result in the
 % appropiate datafile.
-% Depends on the following configurations in colloc_config:
-%   'filename_SENSOR1_SENSOR2', where SENSOR1 and SENSOR2 are as passed on
-%   'overwrite' (true or false)
-%   'stdout' (defaults to 1)
 %
 % FORMAT
 %
@@ -34,6 +30,7 @@ function collocate_and_store_date(year, month, day, ...
 
 % get filename
 
+error('NEEDS REWRITE');
 getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
 fn = getfn(year, month, day, sat1, sat2);
 if strcmp(sat2, 'poes')

@@ -7,9 +7,6 @@ function write_collocations_netcdf(year, month, day, S, D, M, ...
 %
 % Write collocation data for year/month/day in structure S to a netcdf file.
 % The filename is determined from the satellite and sensors used.
-% Needs from colloc_config:
-%   'filename_SENSOR1_SENSOR2' (replaced as passed on)
-%   'stdout'
 %
 % FORMAT
 %   
@@ -38,6 +35,7 @@ function write_collocations_netcdf(year, month, day, S, D, M, ...
 %
 % $Id$
 
+error('NEEDS REWRITE');
 getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
 cols = colloc_config(['cols_' sensor1 '_' sensor2]);
 
@@ -59,7 +57,7 @@ for i = 1:length(fields) % for each satellite
         
     %% create the file
     
-    logtext(colloc_config('stdout'), 'Writing %s\n', fn);
+    logtext(atmlab('OUT'), 'Writing %s\n', fn);
     ncid = netcdf.create(fn, 'NC_CLOBBER'); % overwrite existing
     
     %% define the dimensions
@@ -150,14 +148,14 @@ for i = 1:length(fields) % for each satellite
     netcdf.endDef(ncid);
     
     if isempty(S.(satname))
-        logtext(colloc_config('stdout'), 'Nothing to write\n');
+        logtext(atmlab('OUT'), 'Nothing to write\n');
     else
         % put vars
-        logtext(colloc_config('stdout'), 'Writing: ');
+        logtext(atmlab('OUT'), 'Writing: ');
         
         for j = 1:length(vars)
             varname = vars{j};
-            fprintf(colloc_config('stdout'), '%s ', varname);
+            fprintf(atmlab('OUT'), '%s ', varname);
             
             vartype = vartypes{j};
             varid = varids(j);
@@ -168,7 +166,7 @@ for i = 1:length(fields) % for each satellite
                     netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
                 case 'meandata'
                     if isempty(M.(satname))
-                        logtext(colloc_config('stderr'), 'Warning: No meandata\n');
+                        logtext(atmlab('ERR'), 'Warning: No meandata\n');
                     else
                         netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
                     end
@@ -176,13 +174,13 @@ for i = 1:length(fields) % for each satellite
         end
         fprintf('\n');
     end
-    logtext(colloc_config('stdout'), 'Finalising\n');
+    logtext(atmlab('OUT'), 'Finalising\n');
     
     netcdf.close(ncid);
     
-    logtext(colloc_config('stdout'), 'Gzipping and removing uncompressed\n');
+    logtext(atmlab('OUT'), 'Gzipping and removing uncompressed\n');
     gzip(fn);
     delete(fn);
-    logtext(colloc_config('stdout'), 'Done\n');
+    logtext(atmlab('OUT'), 'Done\n');
 
 end

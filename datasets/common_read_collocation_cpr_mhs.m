@@ -1,6 +1,8 @@
-function data = colloc_read_collocation_cpr_poes(file)
+function data = common_read_collocation_cpr_mhs(file)
 
-% colloc_read_collocation_cpr_poes Read CPR/MHS collocation for collocating
+% common_read_collocation_cpr_poes Read CPR/MHS collocation file
+%
+% Read a CPR/MHS collocation file and return things in the common format.
 %
 % IN
 %
