@@ -3,6 +3,11 @@
 	* atmlab-1-0-65
 
 	* handy/rqre_nargin.m: Header text described another function.
+	(Gerrit: I made this set of functions to make the input checks
+	more compact. nargchk is more advanced than this function, but as
+	it just returns an error message, you need an if statement etc. in
+	the calling function. With this function, you just need one line
+	of code.)
 
 	* gformat/gf_set.m: gf_set fields was set incorrectly.
 
