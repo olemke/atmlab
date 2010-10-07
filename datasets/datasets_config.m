@@ -8,7 +8,21 @@ function value = datasets_config(varargin)
 
 persistent A
 
-[A,value] = prstnt_struct( A, @datasets_defs, varargin );
+try
+    [A,value] = prstnt_struct( A, @datasets_defs, varargin );
+catch ME
+    switch (ME.identifier)
+        % see if any aliases can be identified
+        case 'atmlab:prstnt_struct:undefined'
+            varargin{1} = replace_aliases(varargin{1});
+            [A,value] = prstnt_struct( A, @datasets_defs, varargin);
+        otherwise
+            ME.rethrow();
+    end
+end
+
+end
+
 
 
 function A = datasets_defs
@@ -87,3 +101,5 @@ A.collocation_collocation_cpr_mhs_avhrr_basedir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_subdir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_regexp = nan;
 A.collocation_collocation_cpr_mhs_avhrr_filename = nan;
+
+end

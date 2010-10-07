@@ -35,9 +35,7 @@ function write_collocations_netcdf(year, month, day, S, D, M, ...
 %
 % $Id$
 
-error('NEEDS REWRITE');
-getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
-cols = colloc_config(['cols_' sensor1 '_' sensor2]);
+cols = colloc_constants(['cols_' sensor1 '_' sensor2]);
 
 fields = fieldnames(S);
 for i = 1:length(fields) % for each satellite
@@ -45,13 +43,22 @@ for i = 1:length(fields) % for each satellite
     if strcmp(satname, 'version') % but not for version
         continue
     end
-    fn = getfn(year, month, day, sat1, satname);
+    
+    switch number_sats_in_dataset(['collocation_' sensor1 '_' sensor2])
+        case 1
+            s = satname;
+        case 2
+            s = {sat1, satname};
+    end
+    fn = find_datafile_by_date([year month day], s, ...
+        ['collocation_' sensor1 '_' sensor2]);
+
     if strcmp(fn(end-1:end), 'gz') % take off this part
         fn(end-2:end) = '';
     end
     
     if ~exist(fileparts(fn), 'dir')
-        logtext(colloc_config('stdout'), 'Creating %s\n', fileparts(fn));
+        logtext(atmlab('OUT'), 'Creating %s\n', fileparts(fn));
         mkdir(fileparts(fn));
     end
         

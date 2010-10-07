@@ -2,16 +2,12 @@ function good = colloc_select_good_lines(unisec, line, sat, sensor)
 
 % colloc_select_good_lines Select 'good' scanlines
 %
-% WARNING! Function in alpha, subject to change!
-%
 % This collocation-selector, to be used with collocation_read
 % returns true for each row where the scanline does not occur
 % in the swath before. For the first granule in the data,
 % it returns true for every scanline.
 %
 % Assumes first row belongs to first swath.
-%
-% Throws an error if no information on good lines is available.
 %
 % FORMAT
 %
@@ -28,10 +24,8 @@ function good = colloc_select_good_lines(unisec, line, sat, sensor)
 %
 %   good    logical array  true/false
 %
-% Note: this function is normally not called directly, but by passing the
-% handle to collocation_read
-%
-% WARNING! Function in alpha, subject to change!
+% Note: this function is normally not called directly, but called by
+% collocation_read.
 %
 % $Id$
 
@@ -41,19 +35,7 @@ ngrans = length(unisec_uni);
 good = false(size(line));
 cutoffs = zeros(size(unisec_uni));
 for i = 1:ngrans
-    try
-        cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i));
-    catch ME
-        % ugly hack necessary because colloc_process_* add 1 second to
-        % unisecs. This is being phased out, but still present. FIXME when
-        % I that ugliness is gone and lost forever.
-        switch ME.identifier
-            case 'atmlab:granule_first_line'
-                cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i)-1);
-            otherwise
-                ME.rethrow();
-        end
-    end
+    cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i));
 end
 
 % make a poor estimate for those where it's unknown (average of rest)

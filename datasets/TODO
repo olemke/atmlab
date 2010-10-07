@@ -1,3 +1,4 @@
 - In find_granules_by_date, be more consistent with those datasets that are
   not sorted per day, in also returning the last one of the day before. Also,
   the new 'Salomon' feature is not yet implemented everywhere.
+- Make a function find_dataset_range

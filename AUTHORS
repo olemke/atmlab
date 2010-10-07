@@ -2,7 +2,7 @@
 
 Some of the persons who have worked on Atmlab are listed below. 
 Otherwise, look in header of each individual file.
-
+This list is not exhaustive.
 
 Patrick Eriksson <patrick.eriksson@chalmers.se>
 ---
@@ -23,7 +23,7 @@ GMT plotting interface.
 
 Gerrit Holl <gerrit.holl@ltu.se>
 ---
-Collocation code.
+Collocations, datasets, some small functions.
 
 
 Function sets have been imported made by these persons:

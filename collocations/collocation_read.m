@@ -7,10 +7,6 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 % start_date and end_date, for the indicated collocations type (like
 % collocations between CloudSat and MHS or between MHS and MHS).
 %
-% FIXME: Note: This function is currently in transition from MAT-files to
-% reading NetCDF-files. The former will be phased out when the latter is
-% finished!
-%
 % FORMAT
 %
 %   [M, cols] = collocation_read(...
@@ -29,7 +25,7 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %   sensor2     string          sensor on satellite
 %   start_date  3x1 array       Starting date for which to read collocations
 %   end_date    3x1 array       Ending date for which to read collocations
-%   cols_in     cell matrix     Column names. This is passed on to the
+%   cols_in     cell array      Column names. This is passed on to the
 %                               reader function.
 %   limits      structure       Describes acceptable ranges for the
 %                               different columns requested. Data outside
@@ -54,13 +50,9 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 
 %% prepare configuration things
 
-error('NEEDS REWRITE');
-getpath = colloc_config(['filename_' sensor1 '_' sensor2]);
-cols = colloc_config(['cols_' sensor1 '_' sensor2]);
+no = number_sats_in_dataset(['collocation_' sensor1 '_' sensor2]);
 
-if ~iscell(cols_in{1}) % FIXME: Cleanup when conversion to NetCDF complete
-    cols_in = {cols_in};
-end
+cols = colloc_constants(['cols_' sensor1 '_' sensor2]);
 
 if ~exist('filters', 'var')
     filters = {};
@@ -76,14 +68,28 @@ filters(cellfun(@(c) isempty(c{2}), filters)) = [];
  
 % make sure the fields are asked for
 for c = horzcat(cols.overlap.filter_double{:})
-    if ~any(strcmp(c, cols_in{1}))
-        cols_in{1}(end+1) = c;
+    % cannot use union here, because it wants a cellstr :(
+    if ~any(cellfun(@(d) isequal(c, d), cols_in))
+        cols_in = [cols_in c]; %#ok<AGROW>
     end
 end
 
-%% convert column names to numbers
+%% get name_struct
 
-[colno, name_struct] = colloc_colname2no(sensor1, sensor2, cols_in);
+n = 1; i = 1;
+while i <= length(cols_in)
+    if i<length(cols_in) && isnumeric(cols_in{i+1})
+        dn = length(cols_in{i+1});
+        di = 2;
+    else
+        dn = 1;
+        di = 1;
+    end
+    name_struct.(cols_in{i}) = n:(n+dn-1);
+    n = n + dn;
+    i = i + di;
+end
+ncols = n-1;
 
 %% convert limits structure to matrix as wanted by restrain_collocations
 
@@ -93,7 +99,6 @@ else
     limmat = zeros(0, 3);
 end
 
-    
 % for the filters, convert column names to column numbers, using the
 % earlier obtained name_struct
 if ~isempty(filters)
@@ -102,14 +107,9 @@ if ~isempty(filters)
     end
 end
 
-%% pre-allocate at least one row
+%% pre-allocate at least zero rows
 
-M = zeros(0, sum(cellfun(@length, colno)));
-% make sure it all has length 3 (child will know to ignore empty ones)
-paths = {[], [], []};
-for i = length(colno)+1:3
-    colno{i} = [];
-end
+M = zeros(0, ncols);
 
 %% loop through all the dates
 
@@ -117,21 +117,23 @@ dates = daterange(start_date, end_date);
 for i = 1:size(dates, 1)
     date = dates(i, :);
     %% read collocations for date
+    switch no
+        case 1
+            s = sat2;
+        case 2
+            s = {sat1, sat2};
+    end
+    path = find_datafile_by_date(date, s, ...
+        ['collocation_' sensor1 '_' sensor2]);
     
-    [paths{1:length(cols_in)}] = getpath(date(1), date(2), date(3), sat1, sat2);
     try
-        if strcmp(paths{1}(end-1:end), 'gz') % FIXME: Cleanup when conversion to NetCDF complete
-            collocations_day = read_collocs_data_mean(...
-                paths{1:3}, cols, cols_in{1});
-        else
-            collocations_day = read_collocs_data_mean(...
-                paths{1:3}, cols, colno);
-        end
+        collocations_day = read_collocs_data_mean(path, cols_in, cols);
+
     catch ME
         switch (ME.identifier)
             case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField', ...
                     'MATLAB:gunzip:invalidFilename'}
-                logtext(colloc_config('stderr'), 'Problem for %04d-%02d-%02d: %s\n', ...
+                logtext(atmlab('ERR'), 'Problem for %04d-%02d-%02d: %s\n', ...
                     date(1), date(2), date(3), ME.message);
                 continue
             otherwise
@@ -139,7 +141,7 @@ for i = 1:size(dates, 1)
         end
     end
     if isempty(collocations_day)
-        logtext(colloc_config('stdout'), 'no collocations\n');
+        logtext(atmlab('OUT'), 'no collocations\n');
         continue
     end
     

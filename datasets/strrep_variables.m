@@ -18,7 +18,8 @@ function s_out = strrep_variables(s, satname, datevec)
 % IN
 %
 %   s       string  where magic is replaced
-%   satname string* name of satellite
+%   satname string/ name of satellite/satellites
+%           cellstr
 %   datevec vector  date-vector [year month day]
 %
 % OUT
@@ -39,6 +40,11 @@ to_replace = {'$YEAR4', year, '$MONTH', month, '$DAY', day, ...
 if iscellstr(satname)
     to_replace = [to_replace {'$SAT1', satname{1}, '$SAT2', satname{2}}];
 else
+    if strfind(s, '$SAT1')
+        warning('atmlab:strrep_variables', ...
+            ['replacing $SAT, but having $SAT1; are you sure you don''t ' ...
+             'want to pass TWO satellites?']);
+    end
     to_replace = [to_replace {'$SAT', satname}];
 end
 

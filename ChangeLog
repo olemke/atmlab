@@ -1,3 +1,68 @@
+2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-68
+
+	* .cvsignore, physics/.cvsignore: Removed, not necessary anymore.
+
+	* AUTHORS: Expanded list of my own contributions and added a note that
+	  the list of authors is not exhaustive.
+
+	* CONFIGURE, README, INSTRUCTIONS: Added info on site-specific and mailinglist.
+	
+	* collocations/colloc_colname2no.m: After the transition to NetCDF, column
+	  numbers are no longer used, so nor is this function.
+ 
+	* collocations/colloc_get_path_cpr_poes_radiometer.m,
+	  collocations/colloc_get_path_cpr_avhrr.m,
+	  collocations/colloc_get_path_poes_poes.m,
+	  collocations/colloc_get_path_collocation_cpr_poes_avhrr.m,
+	  colloc_get_path_hirscs_poes_radiometer: Removed, now handled
+	  fully  by find_datafile_by_date
+	
+	* collocations/collocation_read.m, collocations/read_collocs_data_mean.m: Move fully to NetCDF, will temporarily
+	  break reading other kinds of collocations. 
+
+	* collocations/colloc_constants.m: Rename POES to MHS. Use
+	replace_aliases.
+
+	* collocations/overlap_granule.m: Adapt for split colloc_config
+
+	* collocations/write_collocations_netcdf.m: Adapt for new
+	find_datafile_by_date.
+
+	* collocations/collocate_and_store_date.m: Adapt for new
+	find_datafile_by_date and split colloc_config.
+
+	* collocations/colloc_select_good_lines.m: Remove ugly special-case hack,
+	declare out-of-alpha.
+
+	* collocations/collocate_granule.m: Changed message identifier.
+
+	* atmlab/atmlab_init.m: Use whichfiles.
+
+	* site-specific/kiruna/datasets_init.m: CPR now per day, and point direct
+	to /storage4, not to ~gerrit/... (symlink there).
+
+	* handy/replace_aliases.m: Added. Replaces aliases.
+
+	* datasets/datasets_config.m: Catch error, try again with replaced
+	aliases.
+
+	* datasets/find_datadir_by_date.m: Error in error-string...
+
+	* datasets/find_datafile_by_date.m: Elaborate documentation.
+
+	* datasets/datasets_constants.m: Move some constants from colloc_constants
+	here.
+
+	* datasets/strrep_variables.m: Issue warning if replacing $SAT when $SAT1
+	is present.
+
+	* datasets/TODO: Added function suggested by Salomon.
+
+	* datasets/number_sats_in_dataset.m: Added. Gives the number of satellites
+	needed to characterise a particular dataset fully.
+
 2010-10-07	Bengt Rydberg	<bengt.rydberg@alumn.chalmers.se>
 
 	* atmlab-1-0-67

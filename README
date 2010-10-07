@@ -106,5 +106,5 @@ tested and data checks are skipped to obtain a higher calculation
 speed. The code is stripped from lines including %&% and pure comment
 lines by the script ???? (to be implemented). 
 
-
-
+It is recommended to join the atmlab-dev mailing-list, see
+https://www.sat.ltu.se/mailman/listinfo/atmlab-dev

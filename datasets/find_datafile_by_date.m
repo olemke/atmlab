@@ -4,11 +4,17 @@ function datafile = find_datafile_by_date(datevec, satname, sensor, ...
 % find_datafile_by_date Return full path of datafile by date/time
 %
 % Returns the full path of the datafile corresponding to the input
-% arguments. It does not check whether this file actually exists. In
-% fact, it may also be used to calculate the datafile that data should be
-% written to (e.g. in the case of collocations).
+% arguments. There are two modes:
 %
-% Needs paths set in datasets_config.
+%   - If datasets_config('DATASET_filename') is defined, the path is
+%     calculated directly from datasets_config settings and the arguments
+%     passed on. The file may or may not actually exist, so in this case,
+%     you can use it to calculate the path when planning to create it.
+%
+%   - If this is not defined, then datasets_config('DATASET_regexp') has to
+%     be defined. It will search the filesystem for a file matching the
+%     regular expression and the indicated datevec/satname/dataset. In this
+%     case, one can apply a tolerance in seconds.
 %
 % FORMAT
 %
@@ -17,13 +23,13 @@ function datafile = find_datafile_by_date(datevec, satname, sensor, ...
 % IN
 %
 %   datevec     vector  Date/time to find datafile for
-%   satname     string* Name of satellite
+%   satname     string/ Name of satellite. For datasets belonging to one
+%               cellstr satellite, a simple string. For datasets belonging
+%                       to two satellites (such as collocations), a cell
+%                       array of two strings.
 %   dataset     string  Name of dataset
 %   tol         number  Optional: tolerance in seconds. Sometimes, MSPPS
 %                       doesn't start the same minute as AMSU :(.
-%
-%   * may be cell array of 2 strings if dataset is collocation_..., e.g.
-%     naturally shared by 2 sats
 %
 % OUT
 %

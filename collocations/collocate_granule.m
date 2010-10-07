@@ -76,7 +76,7 @@ try
     fhpm = colloc_constants(['process_meandata_', sensor1 '_' sensor2]);
 catch ME
     switch (ME.identifier)
-        case 'atmlab:prstnt_struct:undefined'
+        case 'MATLAB:nonExistentField'
             if any(strfind(ME.message, '_meandata_'))
                 fhpm = dummy;
             else % failed already at _data_

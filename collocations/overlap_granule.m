@@ -59,7 +59,7 @@ end
 
 %% get duration of a granule of sensor1
 
-duration = colloc_constants(['granule_duration_' sensor1]);
+duration = datasets_constants(['granule_duration_' sensor1]);
 
 %% find starting time in unixsecs
 

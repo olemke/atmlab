@@ -4,7 +4,7 @@ function collocate_and_store_date(year, month, day, ...
 % collocate_and_store_date Collect collocations and store appropiately
 %
 % For a given date, check whether a collocation datafile exists.
-% If it doesn't (or cscol('overwrite') is set), collocate the indicated
+% If it doesn't (or colloc_config('overwrite') is set), collocate the indicated
 % satellites and sensors with each other and store the result in the
 % appropiate datafile.
 %
@@ -28,27 +28,47 @@ function collocate_and_store_date(year, month, day, ...
 %
 % $Id$
 
-% get filename
+%% get filename
 
-error('NEEDS REWRITE');
-getfn = colloc_config(['filename_' sensor1 '_' sensor2]);
-fn = getfn(year, month, day, sat1, sat2);
+% check whether one or two sats should be passed. 
+
+switch number_sats_in_dataset(['collocation_' sensor1 '_' sensor2])
+    case 1
+        s = sat2;
+    case 2
+        s = {sat1, sat2};
+end
+
 if strcmp(sat2, 'poes')
-    fileexists = any(cellfun(@(v) exist(getfn(year, month, day, sat1, v), 'file'), colloc_config('POES_satellite_names')));
+    fileexists = all(cellfun(@(v) ...
+        exist(...
+            find_datafile_by_date([year month day], s, ...
+                ['collocation_' sensor1 '_' sensor2]), ...
+            'file'), ...
+        datasets_constants('POES_satellite_names')));
 else
+    fn = find_datafile_by_date([year month day], s, ...
+        ['collocation_' sensor1 '_' sensor2]);
     fileexists = exist(fn, 'file');
 end
+
+%% check if file exists and if no, collocate
+
+% no. of outputs of collocate_date is 1–3 depending on overlap, data, mean.
+% For some, mean is N/A, so check colloc_constants('no_SENSOR1_SENSOR2').
+% When writing collocations, all three are passed, but -1 is interpreted as
+% "no value".
 
 C = {-1 -1 -1};
 
 if ~fileexists || colloc_config('overwrite')
     try
-        [C{1:colloc_config(['no_' sensor1 '_' sensor2])}] = ...
+        [C{1:colloc_constants(['no_' sensor1 '_' sensor2])}] = ...
             collocate_date(year, month, day, sat1, sensor1, sat2, sensor2);
         writethingy = true;
      catch ME
          if strcmp(ME.identifier, 'atmlab:collocate_date:nosource')
-             logtext(colloc_config('stderr'), ...
+             logtext(atmlab('ERR'), ...
                  'No succesful collocations at %04d-%02d-%02d, not writing\n', ...
                  year, month, day);
              writethingy = false;
@@ -60,5 +80,5 @@ if ~fileexists || colloc_config('overwrite')
         write_collocations_netcdf(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);
     end
 else
-    logtext(colloc_config('stdout'), 'Already exists: %s\n', fn);
+    logtext(atmlab('OUT'), 'Output file(s) already exist\n');
 end

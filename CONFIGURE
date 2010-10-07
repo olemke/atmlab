@@ -54,11 +54,27 @@ You can put any Matlab stuff you like in atmlab_conf. The most natural
 choice is to include calls of atmlab, to set the existing fields to our
 preferred choices. For example:
 
-  atmlab( 'SCREEN_WIDTH', 70     );
-  atmlab( 'VERBOSITY',     2     );
-  atmlab( 'WORK_AREA',    '/tmp' );
+  atmlab( 'SCREEN_WIDTH',  70     );
+  atmlab( 'SITE',         'kiruna');
+  atmlab( 'VERBOSITY',     2      );
+  atmlab( 'WORK_AREA',    '/tmp'  );
+
+One special workspace variable is highly recommended to set in atmlab_conf.
+The workspace variable 'SITE' is used to load site-specific settings, such as
+locations for datafiles. Valid sites are the directories in
+atmlab/site-specific.
+
+If you are configuring atmlab at a site where no site-specific default
+configuration exists yet, some subsystems (such as datasets) will only work
+after you have defined the location of datasets in the way that is done in
+site-specific/kiruna/datasets_init.m.
+
+It is recommended to join the atmlab-dev mailing list. See
+https://www.sat.ltu.se/mailman/listinfo/atmlab-dev for instructions. In case
+of questions, write to atmlab-dev@www.sat.ltu.se.
 
 Good luck!
 
 Patrick Eriksson
 (patrick.eriksson@chalmers.se)
+expanded by Gerrit Holl (gerrit.holl@ltu.se)

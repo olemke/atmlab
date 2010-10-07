@@ -40,6 +40,22 @@ A.read_avhrr = @common_read_avhrr;
 A.read_hirscs = @common_read_hirscs;
 A.read_collocation_cpr_poes = @common_read_collocation_cpr_poes;
 
+%% define approximate granule durations
+
+% by sensor rather than by satellite, because not all sensors are saved in
+% the same chunks; in particular, stored collocations belong to a certain
+% satellite (pair), but are stored per day
+
+A.granule_duration_mhs = 6130; % seconds; upper estimate
+A.granule_duration_amsua = 6130;
+A.granule_duration_amsub = 6130;
+A.granule_duration_hirs = 6130;
+
+A.granule_duration_cpr = 5932; % seconds
+
+A.granule_duration_hirscs = 86400; % one granule per da
+A.granule_duration_collocation_cpr_poes = 86400;
+
 if exist('c', 'var')
     value = A.(c);
 else

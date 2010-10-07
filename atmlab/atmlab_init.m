@@ -108,14 +108,13 @@ if ~isnan(atmlab('SITE'))
     if exist(sitedir, 'dir')
         addpath(sitedir);
         % execute any initialisation m-files
-        W = what(sitedir);
-        for i = 1:length(W.m)
-            m = W.m{i};
-            if strcmp(m((end-5):(end-2)), 'init')
-                run(fullfile(W.path, m));
-            end
+        W = whichfiles('*init.m', sitedir);
+        for i = 1:length(W)
+            run(W{1});
         end
     end
 end
 
+% define some aliases
 
+alias('amsub', 'mhs');

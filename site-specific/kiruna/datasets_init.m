@@ -13,9 +13,8 @@ datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/sat2netcdf-0.4.ja
 % variables: YEAR, YEAR02, MONTH, DAY, DOY, SAT, SAT1, SAT2
 % regexp-output: year, doy, hour, minute
 
-datasets_config('cpr_basedir', '/storage3/data/cloudsat');
-%datasets_config('cpr_subdir', '$YEAR4/$DOY');
-datasets_config('cpr_subdir', '$YEAR4/$MONTH/$DAY');
+datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
+datasets_config('cpr_subdir', '$YEAR4/$DOY');
 datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_');
 
 datasets_config('amsua_basedir', '/storage3/data/amsu');
@@ -55,15 +54,15 @@ datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collo
 datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
 
-datasets_config('collocation_mhs_mhs_basedir', '~gerrit/data/collocations_mhs_mhs');
+datasets_config('collocation_mhs_mhs_basedir', '/storage4/user_data/gerrit/collocations_mhs_mhs');
 datasets_config('collocation_mhs_mhs_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_mhs_mhs_filename', 'collocations_$SAT1_$SAT2.nc.gz');
 
-datasets_config('collocation_cpr_avhrr_basedir', '~gerrit/data/collocations_cpr_avhrr');
+datasets_config('collocation_cpr_avhrr_basedir', '/storage4/user_data/gerrit/collocations_cpr_avhrr');
 datasets_config('collocation_cpr_avhrr_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_cpr_avhrr_filename', 'collocations_$SAT.nc.gz');
 
-datasets_config('collocation_hirscs_mhs_basedir', '~gerrit/data/collocations_hirscs_mhs');
+datasets_config('collocation_hirscs_mhs_basedir', '/storage4/user_data/gerrit/collocations_hirscs_mhs');
 datasets_config('collocation_hirscs_mhs_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_hirscs_mhs_filename', 'collocations_$SAT1_$SAT2.nc.gz');
 
