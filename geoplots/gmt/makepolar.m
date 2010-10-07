@@ -26,7 +26,7 @@ strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
 
 nlevels = length(tickval)-1;
 if ~isfield(in,'reference')
-    ref = (max(tickval)-min(tickval))/2;
+    ref = (max(tickval)+min(tickval))/2;
 else ref = in.reference;
 end
 
@@ -73,7 +73,7 @@ for i = 1:length(top_color_incr)
     ctable(x,:) = [255 top_color_incr(i) top_color_incr(i)];
     x = x+1;
 end
-keyboard
+
 %% Make a cptfile out of it
 
 filecpt = 'mypolar.cpt';
