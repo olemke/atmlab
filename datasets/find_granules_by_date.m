@@ -7,7 +7,7 @@ function [M, paths] = find_granules_by_date(year, month, day, sat, dataset, ...
 % for the the indicated for the indicated satellite/dataset pair. This
 % includes the last granule of the date before, unless this is explicitly
 % prohibited. Note that the last granule of the date before may or may not
-% actually contain information for the day requested. Also notethat there may
+% actually contain information for the day requested. Also note that there may
 % also be more than one granule on the date before containing information
 % for the day requested. This is not currently taken into account.
 %
@@ -45,6 +45,10 @@ datadir = find_datadir_by_date([year month day], sat, dataset);
 yearstr = num2str(year, '%04d'); % for comparing easily with 2digit years
 
 matchy = datasets_config([dataset '_regexp']);
+if isnan(matchy)
+    matchy = datasets_config([dataset '_filename']); % exact match only
+end
+matchy = strrep_variables(matchy, sat, [year month day]);
 files = dir(datadir);
 nfiles = length(files);
 M = zeros(nfiles, 5);

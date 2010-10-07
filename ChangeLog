@@ -1,5 +1,20 @@
 2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-70
+
+	* collocations/colloc_constants.m: Add POES/POES for NetCDF. Untested.
+
+	* collocations/colloc_process_data_cpr_mhs.m: Log less.
+
+	* datasets/find_granules_for_period.m: Also return paths.
+
+	* datasets/find_granules_by_date.m: If no regexp, look for exact match
+	  based on filename and string replacement.
+	
+	* (various): Set $Id$ tag.
+
+2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-69
 
 	* collocations/collocate_date.m: Less confusing logging.

@@ -7,7 +7,7 @@ function [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sens
 %
 % FORMAT
 %
-%   allgrans = find_granules_for_period(date1, date2, sat, sensor)
+%   [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sensor)
 %
 % IN
 %
@@ -19,6 +19,7 @@ function [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sens
 % OUT
 %
 %   allgrans matrix     all granules in daterange
+%   allpaths cellstr    all paths to those granules
 %
 % $Id$
 
@@ -31,11 +32,15 @@ allpaths = cell(size(allgrans));
 n = 0;
 for i = 1:ndates
     date = dates(i, :);
-    grans = find_granules_by_date(date(1), date(2), date(3), sat, sensor, false);
+    [grans, paths] = find_granules_by_date(date(1), date(2), date(3), sat, sensor, false);
     ngrans = size(grans, 1);
     allgrans(n+1:n+ngrans, :) = grans;
+    allpaths(n+1:n+ngrans) = paths;
     n = n + ngrans;
 end
 
-allgrans(isnan(allgrans(:, 1)), :) = [];
-allgrans = sortrows(allgrans);
+to_remove = isnan(allgrans(:, 1));
+allgrans(to_remove, :) = [];
+allpaths(to_remove) = [];
+[allgrans, I] = sortrows(allgrans);
+allpaths = allpaths(I);

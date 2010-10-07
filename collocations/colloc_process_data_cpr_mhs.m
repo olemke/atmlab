@@ -86,7 +86,7 @@ M(:, c.data.HIRS) = tb(hi, :);
 try
     mspps_file = find_datafile_by_date(date2, sat2, 'mspps', 120); % 120 seconds tolerance
     logtext(atmlab('OUT'), ...
-        'Reading %s\n', mspps_file);
+        'Reading mspps\n');
     scalefactor = 1000/double(cell2mat(hdfread(mspps_file, 'IWP_SCAL')));
     MSPPS_IWP_raw = hdfread(mspps_file, 'IWP');
     MSPPS_IWP = ((MSPPS_IWP_raw<0) + (MSPPS_IWP_raw>0)*scalefactor) .* double(MSPPS_IWP_raw);
