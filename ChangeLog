@@ -1,3 +1,24 @@
+2010-10-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-71
+
+	* geoplots/gmt/polygoninize_regions.m (polygoninize_regions):
+	Small changes. This function is for plotting lines (e.g. for
+	region boundaries) using GMT.
+
+	* geoplots/gmt/makepolar.m: Completely overhauled. Manually
+	generates .cpt-file where contours less than a reference value
+	(e.g. in.reference=0 for difference plots) are blue and contours
+	for values higher than reference are red. Contours around the
+	reference values are white. Smooth transition of colors even if
+	the reference value is no where near the middle.
+
+	* geoplots/gmt/create_gmt_earth.m: Cleaned up and commented.
+
+	* geoplots/gmt/equidistant_contours.m: Cleaned up and commented.
+
+	* geoplots/gmt/gmt_plot.m: Updated help section for difference plots
+
 2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-70

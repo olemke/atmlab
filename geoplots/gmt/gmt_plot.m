@@ -84,14 +84,15 @@ function filename = gmt_plot(in,field)
 % in.ticks            |'40g20/20g20'; annotations on major lines (e.g 40 xaxis,20 yaxis)
 %                     and plot minor lines (e.g 20 xaxis & yaxis)
 %
-% CONTOUR LINES:
-% in.ctable           |'rainbow'
+% CONTOURS & COLORS:
+% in.ctable           |'rainbow' | 'mypolar' (nice for difference plots)
 % in.cptfile          | path to any .cpt file generated earlier
 % in.pscontour        |'true' if you want contour lines
 % in.ctwidth          |0.5; width of contour lines
 % in.nlevels          | refers to the number of contour levels
-%
-%
+% in.reference        | Only applies when using ctable='mypolar'. Default ~=
+%                     | mean(data). Recommend in.reference = 0 for difference
+%                     | plots, but any reference works.
 %
 %
 % LEGENDS:
@@ -154,7 +155,7 @@ function filename = gmt_plot(in,field)
 % 
 % If you don't want to delete intermediate files:      se,'keep_intermediate'           
 %
-% 2010-03-04   Created by Salomon Eliasson
+% $Id$
 
 if ~exist('field','var'), field = 'datafield'; end
 

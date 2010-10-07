@@ -1,181 +1,181 @@
-function create_gmt_earth(se)
+function create_gmt_earth(in)
 %           create_gmt_earth
 %
 % See gmt_plot for input details
 %
-% 4/12-2009 Salomon Eliasson
+% $Id$
 
-se = setup_create_gmt_earth(se);                                                % Most options are assigned here
+in = setup_create_gmt_earth(in);                                                % Most options are assigned here
 
-command = sprintf('rm -f %s.{ps,eps}',se.filename);                             % Remove earlier .ps files
+command = sprintf('rm -f %s.{ps,eps}',in.filename);                             % Remove earlier .ps files
 exec_gmt_cmd(command)
 
 command = 'gmtset PAPER_MEDIA a0';                                              % Set paper sizeBASEMAP_AXES
 exec_gmt_cmd(command)
 
-if isfield(se,'headersize')                                                     % Size of title
-    command = sprintf('gmtset HEADER_FONT_SIZE %dp',se.headersize);
+if isfield(in,'headersize')                                                     % Size of title
+    command = sprintf('gmtset HEADER_FONT_SIZE %dp',in.headersize);
     exec_gmt_cmd(command)
 end
 
-if isfield(se,'basemap_axis')                                                   % Annotations of axis
-    command = sprintf('gmtset BASEMAP_AXES %s',se.basemap_axis);
+if isfield(in,'basemap_axis')                                                   % Annotations of axis
+    command = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
     exec_gmt_cmd(command)
 end
-if isfield(se,'header_offset')                                                  % Distance from axis to Annotation
-    command = sprintf('gmtset HEADER_OFFSET %c',se.header_offset);
-    exec_gmt_cmd(command)
-end
-
-if isfield(se,'nearneighbor')                                                   % Nearneighbor
-    command = se.nearneighbor;
-    exec_gmt_cmd(command)
-elseif ~se.grid && isfield(se.plot,'grid')
-    command = nearneighbor(se.plot.grid);
+if isfield(in,'header_offset')                                                  % Distance from axis to Annotation
+    command = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
     exec_gmt_cmd(command)
 end
 
-if isfield(se,'grdimage')                                                       % Image
-    command = se.grdimage;
+if isfield(in,'nearneighbor')                                                   % Nearneighbor
+    command = in.nearneighbor;
     exec_gmt_cmd(command)
-elseif ~isfield(se,'nodata') && strcmp(se.plot.plotimage.name,'grdimage')
-    command = grdimage(se.plot.plotimage);
+elseif ~in.grid && isfield(in.plot,'grid')
+    command = nearneighbor(in.plot.grid);
     exec_gmt_cmd(command)
 end
 
-if isfield(se,'pscoast')                                                        % Coastlines
-    command = se.pscoast;
+if isfield(in,'grdimage')                                                       % Image
+    command = in.grdimage;
+    exec_gmt_cmd(command)
+elseif ~isfield(in,'nodata') && strcmp(in.plot.plotimage.name,'grdimage')
+    command = grdimage(in.plot.plotimage);
+    exec_gmt_cmd(command)
+end
+
+if isfield(in,'pscoast')                                                        % Coastlines
+    command = in.pscoast;
     exec_gmt_cmd(command)
 else
-    command = pscoast(se.plot.coast);
+    command = pscoast(in.plot.coast);
     exec_gmt_cmd(command)
 end
 
-if isfield(se,'locations')                                                      % Location markers
-    command = pslocations(se);
+if isfield(in,'locations')                                                      % Location markers
+    command = pslocations(in);
     exec_gmt_cmd(command)
 end
 
-if isfield(se.plot,'pscontour') && ~isempty(se.pscontour)                       % Contourlines
-    command = pscontour(se.plot.pscontour);
+if isfield(in.plot,'pscontour') && ~isempty(in.pscontour)                       % Contourlines
+    command = pscontour(in.plot.pscontour);
     exec_gmt_cmd(command)
 end
 
-if isfield(se,'psxy')                                                           % Psbox
-    command = se.psxy;
+if isfield(in,'psxy')                                                           % Psbox
+    command = in.psxy;
     exec_gmt_cmd(command)
-elseif isfield(se.plot,'psbox')
-    psbox(se);
+elseif isfield(in.plot,'psbox')
+    psbox(in);
 end
 
-if isfield(se.plot,'pspoly')
-    pspoly(se);
+if isfield(in.plot,'pspoly')
+    pspoly(in);
 end
 
-if isfield(se.plot,'legend') && ~isempty(se.plot.legend)                        % Legends
-    command = psscale(se.plot.legend);
+if isfield(in.plot,'legend') && ~isempty(in.plot.legend)                        % Legends
+    command = psscale(in.plot.legend);
     exec_gmt_cmd(command)
 end
-if isfield(se.plot,'nanlegend') && ~isempty(se.plot.nanlegend)
+if isfield(in.plot,'nanlegend') && ~isempty(in.plot.nanlegend)
     disp('processing psscale for NaN')
-    command = psscale(se.plot.nanlegend);
+    command = psscale(in.plot.nanlegend);
     exec_gmt_cmd(command)
 end
 % an empty ps file
 command = sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps', ...
-    se.plot.region,se.plot.proj,se.filename);
+    in.plot.region,in.plot.proj,in.filename);
 exec_gmt_cmd(command)
 
 % close the ps file with
 
-function se = setup_create_gmt_earth(se)                                        %% setup_create_gmt_earth %%
+function in = setup_create_gmt_earth(in)                                        %% setup_create_gmt_earth %%
 
-se = defaults(se);
+in = defaults(in);
 
-if ~isfield(se,'region')                                                        % REGION
-    se.plot.region = sprintf('%d/%d/%d/%d',...
-        min(min(se.lon)),max(max(se.lon)),...
-        min(min(se.lat)),max(max(se.lat)));
-else se.plot.region = se.region;
+if ~isfield(in,'region')                                                        % REGION
+    in.plot.region = sprintf('%d/%d/%d/%d',...
+        min(min(in.lon)),max(max(in.lon)),...
+        min(min(in.lat)),max(max(in.lat)));
+else in.plot.region = in.region;
 end
 
-if ~isfield(se,'proj')                                                          % PROJECTION
-    se.plot.proj = setup_projection(se);
-else se.plot.proj = se.proj;
+if ~isfield(in,'proj')                                                          % PROJECTION
+    in.plot.proj = setup_projection(in);
+else in.plot.proj = in.proj;
 end
 
-if ~se.grid && ~isfield(se,'nearneighbor') && ~isfield(se,'nodata')                                      % GRIDDING
-    se.plot.grid = mkgrid(se);
+if ~in.grid && ~isfield(in,'nearneighbor') && ~isfield(in,'nodata')                                      % GRIDDING
+    in.plot.grid = mkgrid(in);
 end
 
-if ~isfield(se,'nodata')
-    se.plot.color = create_colortables(se);                                         % COLOR TABLE
+if ~isfield(in,'nodata')
+    in.plot.color = create_colortables(in);                                         % COLOR TABLE
 end
 
-if ~isfield(se,'plotimage') && ~isfield(se,'nodata')                                                    % PLOT IMAGE
-    se.plot.plotimage = mkpltimage(se);
+if ~isfield(in,'plotimage') && ~isfield(in,'nodata')                                                    % PLOT IMAGE
+    in.plot.plotimage = mkpltimage(in);
 end
 
-if ~isfield(se,'coast')                                                         % COAST
-    se.plot.coast = mkcoast(se);
+if ~isfield(in,'coast')                                                         % COAST
+    in.plot.coast = mkcoast(in);
 end
 
-if isfield(se,'psbox')                                                          % PSBOX
-    se.plot.psbox = setup_psboxpoly(se, 'psbox');
+if isfield(in,'psbox')                                                          % PSBOX
+    in.plot.psbox = setup_psboxpoly(in, 'psbox');
 end
 
-if isfield(se,'pspoly')                                                         % PSBOX
-    se.plot.pspoly = setup_psboxpoly(se, 'pspoly');
+if isfield(in,'pspoly')                                                         % PSBOX
+    in.plot.pspoly = setup_psboxpoly(in, 'pspoly');
 end
 
-if isfield(se,'pscontour')                                                      % Contour lines
-    se.plot.pscontour = mkpscontour(se);
+if isfield(in,'pscontour')                                                      % Contour lines
+    in.plot.pscontour = mkpscontour(in);
 end
 
-if ~isfield(se,'nodata') || ~se.nodata
-    [se.plot.legend,se.plot.nanlegend] = mklegend(se);                          % Legend/s
+if ~isfield(in,'nodata') || ~in.nodata
+    [in.plot.legend,in.plot.nanlegend] = mklegend(in);                          % Legend/s
 end
 
-function se = defaults(se)                                                      %% defaults %%
+function in = defaults(in)                                                      %% defaults %%
 
-if ~isfield(se,'legend_orient') || ~isempty(se.legend_orient)
-    se.legend=true;
-    if ~isfield(se,'sidebar')
-        se.sidebar = true;
+if ~isfield(in,'legend_orient') || ~isempty(in.legend_orient)
+    in.legend=true;
+    if ~isfield(in,'sidebar')
+        in.sidebar = true;
     end
 else
-    se.legend=false;
+    in.legend=false;
 end
 
-function region = region(se)                                                    %% region %%
+function region = region(in)                                                    %% region %%
 
-if isfield(se,'regionchoice')
-    se = se.regionchoice;
-elseif sum(ismember(isfield(se,{'regionchoice','regionstr'}),1))==0
-    se.blcorner = [min(min(se.lat)),min(min(se.lon))];
-    se.trcorner = [max(max(se.lat)),max(max(se.lon))];
+if isfield(in,'regionchoice')
+    in = in.regionchoice;
+elseif sum(ismember(isfield(in,{'regionchoice','regionstr'}),1))==0
+    in.blcorner = [min(min(in.lat)),min(min(in.lon))];
+    in.trcorner = [max(max(in.lat)),max(max(in.lon))];
 end
 
-if ~isfield(se,'blcorner')
-    se.blcorner = [-90,0];
+if ~isfield(in,'blcorner')
+    in.blcorner = [-90,0];
 end
-if ~isfield(se,'trcorner')
-    se.trcorner = [90,360];
+if ~isfield(in,'trcorner')
+    in.trcorner = [90,360];
 end
-lonmin = num2str(floor(se.blcorner(2))); latmin = num2str(floor(se.blcorner(1)));
-lonmax = num2str(ceil(se.trcorner(2))); latmax = num2str(ceil(se.trcorner(1)));
+lonmin = num2str(floor(in.blcorner(2))); latmin = num2str(floor(in.blcorner(1)));
+lonmax = num2str(ceil(in.trcorner(2))); latmax = num2str(ceil(in.trcorner(1)));
 region = sprintf('%s/%s/%s/%s',lonmin,lonmax,latmin,latmax);
 
-function proj = setup_projection(se)                                            %% setup_projection %%
+function proj = setup_projection(in)                                            %% setup_projection %%
 
 projection = 'Q'; %Cylindrical Equidistant Projection
 
-x = textscan(se.plot.region','%f','delimiter','/');                             % region
+x = textscan(in.plot.region','%f','delimiter','/');                             % region
 
-if ~isfield(se,'center')
+if ~isfield(in,'center')
     center = (x{1}(1)+x{1}(2))/2;
 else
-    center = se.center;
+    center = in.center;
     if center>180, center = center-360;end
     if center < x{1}(1) || center > x{1}(2)
         disp ('You have picked a projection center outside of the plot region')
@@ -184,119 +184,138 @@ else
     end
 end
 
-if ~isfield(se,'map_width')                                                     % map width
+if ~isfield(in,'map_width')                                                     % map width
     map_width = 9; %inches
-else map_width = se.map_width;
+else map_width = in.map_width;
 end
-
-
 
 proj = sprintf('%s%d/%di',projection,center,map_width);
 
-function a = mkgrid(se)                                                         %% mkgrid %%
+function a = mkgrid(in)                                                         %% mkgrid %%
 % If nothing is given the increment and search radius is loosely based on the
 % density of the data points
 
-a.region = se.plot.region;
-a.ungriddedfile = se.ungriddedfile;
-a.file = se.filename;
+a.region = in.plot.region;
+a.ungriddedfile = in.ungriddedfile;
+a.file = in.filename;
 a.name = 'nearneighbor';
 
-if ~isfield(se,'increment')
+if ~isfield(in,'increment')
     
     % find the approx density of points
-    x = length( unique( floor(se.lat)));
-    y = length( unique( floor(se.lon)));
+    x = length( unique( floor(in.lat)));
+    y = length( unique( floor(in.lon)));
     A = x*y;
-    delta = sqrt(numel(se.(se.fieldname)) / A);
+    delta = sqrt(numel(in.(in.fieldname)) / A);
     inc = ceil(60/delta *2); % times 2 is to make it a bit bigger
     if inc>60, inc=60; end
     a.increment = sprintf('%dm',inc); %i.e. One degree
-elseif isnumeric(se.increment)
-    a.increment = sprintf('%dm',se.increment);
+elseif isnumeric(in.increment)
+    a.increment = sprintf('%dm',in.increment);
 else
-    a.increment = se.increment;
+    a.increment = in.increment;
 end
 
-if ~isfield(se,'search')
+if ~isfield(in,'search')
     sc = ceil( str2double(a.increment(1:end-1)));
     a.search = sprintf('%dm',sc);
-elseif isnumeric(se.search)
-    a.search = sprintf('%dm',se.search);
+elseif isnumeric(in.search)
+    a.search = sprintf('%dm',in.search);
 else
-    a.search = se.search;
+    a.search = in.search;
 end
 
-function a = create_colortables(se)                                             %% create color tables %%
+function a = create_colortables(in)                                             %% create color tables %%
+% create color tables %
+%
+%
+%
 
-if ~isfield(se,'cptfile')
-    if ~isfield(se,'ctable')
-        fprintf('picking the "myrainbow" colortable...\n');
-        se.ctable = 'myrainbow';
-    end
+%% check if a color table file is given and use that one
+if isfield(in,'cptfile')
+    if isempty(dir(in.cptfile)), error('File: ''%s'' is missing!!',in.cptfile); end
     
-    switch lower(se.ctable)                                                     % generate cpt files
-        case 'myrainbow'
-            se = setup_cpt(se);
-            [tickval,prtstr]=ownctable(se);
-            a.cptfile = makerainbow(tickval,prtstr,se.ptype);
-        case 'cold2hot'
-            se = setup_cpt(se);
-            [tickval,prtstr]=ownctable(se);
-            a.cptfile = makehot(tickval,prtstr,'cold2hot');
-        case 'hot2cold'
-            se = setup_cpt(se);
-            [tickval,prtstr]=ownctable(se);
-            a.cptfile = makehot(tickval,prtstr,'hot2cold');
-        case 'mypolar'
-            se = setup_cpt(se);
-            [tickval,prtstr]=ownctable(se);
-            a.cptfile = makepolar(tickval,prtstr);
-        otherwise
-            disp('processing makecpt')
-            se = setup_cpt(se);
-            a.cptfile = makecpt(se);
-    end
-else
-    if isfield(se,'datarange')
+    % If you input a cptfile, then these setting are naturally ignored
+    if isfield(in,'datarange')
         fprintf('Chosen data range ignored as a preexisting cptfile will be used\n')
     end
-    if isfield(se,'ctable')
+    if isfield(in,'ctable')
         fprintf('Chosen color table ignored as a preexisting cptfile will be used\n')
     end
-    a.cptfile = se.cptfile;
+    a.cptfile = in.cptfile;
+    return
 end
 
-a.cptnan = 'color_nan.cpt';                                                     % extra legend box for missing values
-z = dir (a.cptnan);
-if isempty(z)
-    xtra_nan_legend();
+%% Or else generate it
+
+% pick default color table is none is given
+if ~isfield(in,'ctable')
+    in.ctable = 'myrainbow';
+    fprintf('picking the ''%s'' colortable...\n',in.ctable);
 end
 
-function a = mkpltimage(se)                                                     %% mkpltimage %%
+% generate cpt files
+switch in.ctable                                                            
+    case 'myrainbow'
+        in = setup_cpt(in);
+        [tickval,prtstr]=ownctable(in);
+        a.cptfile = makerainbow(tickval,prtstr,in.ptype);
+    case 'mypolar'
+        in = setup_cpt(in);
+        [tickval,prtstr]=ownctable(in);
+        a.cptfile = makepolar(tickval,prtstr,in);        
+    case 'cold2hot'
+        in = setup_cpt(in);
+        [tickval,prtstr]=ownctable(in);
+        a.cptfile = makehot(tickval,prtstr,'cold2hot');
+    case 'hot2cold'
+        in = setup_cpt(in);
+        [tickval,prtstr]=ownctable(in);
+        a.cptfile = makehot(tickval,prtstr,'hot2cold');
+    otherwise
+        disp('processing makecpt')
+        in = setup_cpt(in);
+        a.cptfile = makecpt(in);
+end
 
+% extra legend box for missing values
+if isempty(dir('color_nan.cpt')), xtra_nan_legend; end %if it's not there, make it
+a.cptnan = 'color_nan.cpt';
+
+function a = mkpltimage(in)                                                     %% mkpltimage %%
+% mkpltimage %%
+
+% setup grdimage
 a.name = 'grdimage';
-a.region = se.plot.region;
-a.proj = se.plot.proj;
-a.cptfile = se.plot.color.cptfile;
-a.file = se.filename;
-a.title = se.title;
+a.region = in.plot.region;
+a.proj = in.plot.proj;
+a.cptfile = in.plot.color.cptfile;
+a.file = in.filename;
+a.title = in.title;
 
-function a = mkcoast(se)                                                        %% mkcoast %%
+function a = mkcoast(in)                                                        %% mkcoast %%
+%mkcoast
+%
+% Does some default behaviour for plotting coastlines based on the size of the
+% region. Can be overridden by arguments: in.resolution and in.rivers
 
+
+% set
 a.name = 'pscoast';
-a.region = se.plot.region;
-a.proj = se.plot.proj;
-a.file = se.filename;
+a.region = in.plot.region;
+a.proj = in.plot.proj;
+a.file = in.filename;
+
+% Set resolution of coastal features
 rg = textscan(a.region','%f','delimiter','/');
 ln=rg{1}(2)-rg{1}(1);
 lt=rg{1}(4)-rg{1}(3);
-if ~isfield(se,'features')
+if ~isfield(in,'features')
     const = 65;%constant => features ~1000km for full map
     a.features = ln*lt/const;
-else a.features = se.features;
+else a.features = in.features;
 end
-if ~isfield(se,'resolution')
+if ~isfield(in,'resolution')
     if ln < 20
         a.resolution = 'h';
     elseif ln < 45
@@ -305,134 +324,156 @@ if ~isfield(se,'resolution')
         a.resolution = 'l';
     else a.resolution = 'c';
     end
-else a.resolution = se.resolution;
+else a.resolution = in.resolution;
 end
-if ~isfield(se,'rivers')
+
+% default = Large rivers
+if ~isfield(in,'rivers')
     a.rivers = '1';
-else a.rivers = se.rivers;
+else a.rivers = in.rivers;
 end
-if ~isfield(se,'cwidth')
+
+% Width of lines drawing coasts and rivers
+if ~isfield(in,'cwidth')
     a.width = 0.3;
-else a.width = se.cwidth;
+else a.width = in.cwidth;
 end
-if ~isfield(se,'ticks')
+if ~isfield(in,'ticks')
     x1=ln/9; x2=x1/(1+(round(ln/lt)>=2));
     x3=lt/9; x4=x3/(1+(round(lt/ln)>=2));
     fac=10^(floor(log10(x1)));
     a.ticks = sprintf('%3.1fg%3.1f/%3.1fg%3.1f',...
         round(x1/fac)*fac,round(x2/fac)*fac,round(x3/fac)*fac,round(x4/fac)*fac);
-else a.ticks = se.ticks;
+else a.ticks = in.ticks;
 end
 
-function a = mkpscontour(se)                                                    %% mkpscontour %%
-
-a.file = se.filename;
-a.region = se.plot.region;
-a.proj = se.plot.proj;
-a.cptfile = se.plot.color.cptfile;
-if ~isfield(se,'ctwidth')
+function a = mkpscontour(in)                                                    %% mkpscontour %%
+% mkpscontour
+% just a little setup
+a.file = in.filename;
+a.region = in.plot.region;
+a.proj = in.plot.proj;
+a.cptfile = in.plot.color.cptfile;
+if ~isfield(in,'ctwidth')
     a.width = 0.5;
-else a.width = se.ctwidth;
+else a.width = in.ctwidth;
 end
 
-function [a,b] = mklegend(se)                                                   %% mklegend %%
+function [a,b] = mklegend(in)                                                   %% mklegend %%
+% mklegend
 
-% automatically orient legend if a vertical legend no longer makes sense
-if se.legend
-    if ~isfield(se,'unit')
+if in.legend
+    % append unit
+    if ~isfield(in,'unit')
         a.unit = '-?-';
-    else a.unit = char(se.unit);
+    else a.unit = char(in.unit);
     end
-    x = textscan(se.plot.region','%f','delimiter','/');
-    if ~isfield(se,'sizelegend') && ~isfield(se,'legend_orient')
+    
+    x = textscan(in.plot.region','%f','delimiter','/');
+    if ~isfield(in,'sizelegend') && ~isfield(in,'legend_orient')
+        % automatically re-orient legend if a vertical legend no longer makes sense
+        %(can be overridden by in.legend_orient='h','v')
+        
         if ( x{1}(2)-x{1}(1) ) / ( x{1}(4)-x{1}(3) ) > 3
-            se.legend_orient='h';
-        else se.legend_orient='v';
+            in.legend_orient='h';
+        else in.legend_orient='v';
         end
     end
-    if strcmp(se.legend_orient,'v')
-        %i = inch , c = cm (9.7i/2.3i/4i/0.3i = orig)
+    
+     if strcmp(in.legend_orient,'v')
+        %i = inch , c = cm (9.7i/2.3i/4i/0.3i = GMT's default)
         a.legendsize = '25c/5.9c/10c/0.5c';
     end
-    if strcmp(se.legend_orient,'h')
+    if strcmp(in.legend_orient,'h')
         a.legendsize = '12c/0/18c/0.5ch -Ya-1'; %xpos/ypos/length/width
     end
-    if ~isfield(se,'nanlegend') || ~isempty(se.nanlegend)
+    
+    % A little extra legend showig colors of NaNs
+    if ~isfield(in,'nanlegend') || ~isempty(in.nanlegend)
         b.sidebar=false;
         b.unit = '';
-        b.cptfile = se.plot.color.cptnan;
+        b.cptfile = in.plot.color.cptnan;
         b.equalboxsize = '';
-        b.file = se.filename;
-        if strcmp(se.legend_orient,'v')
+        b.file = in.filename;
+        if strcmp(in.legend_orient,'v')
             b.legendsize = '25c/-1.3c/0.5c/0.5c';
         end
-        if strcmp(se.legend_orient,'h')
+        if strcmp(in.legend_orient,'h')
             %i = inch , c = cm  (9.7i/-0.5i/0.3i/0.3i = orig)
             b.legendsize = '1c/0/0.5c/0.5ch';
         end
     else b = '';
-    end
+    end  
+    
+    % finalize
     if ~exist('a','var'), a='';return, end
-    a.cptfile = se.plot.color.cptfile;
-    a.sidebar=se.sidebar;
+    a.cptfile = in.plot.color.cptfile;
+    a.sidebar=in.sidebar;
     a.equalboxsize = '';
-    a.file = se.filename;
+    a.file = in.filename;
 else a = ''; b = '';
 end
 
-function [tickval,prtstr] = ownctable(se)                                       %% ownctable %%
-
-switch lower(se.ptype)
+function [tickval,prtstr] = ownctable(in)                                       %% ownctable %%
+% ownctable %%
+switch in.ptype
     case 'equal'
         [tickval,prtstr] = ...
-            equidistant_contours(se.datarange.min,se.datarange.max,se.plot.nlevels);
+            equidistant_contours(in.datarange.min,in.datarange.max,in.plot.nlevels);
     otherwise
         error 'Currently the only available ptype is "equidistant"'
 end
 
-function se = setup_cpt(se)                                                     %% Setup color table %%
+function in = setup_cpt(in)                                                     %% Setup color table %%
+%% setup_cpt
 
-if ~isfield(se,'datarange')
+% I need some sort datarange (min & max)
+if ~isfield(in,'datarange')
     fprintf(strcat('No maximum or min values directly .',...
         ' Using default colortable (polar)...\n'));
     fprintf('setting the datarange  to -200:200 as no range is given...')
-    se.datarange.min = -200;
-    se.datarange.max = 200;
-    se.ctable = 'mypolar';
-elseif isfield(se.datarange,'max') && ~isfield(se.datarange,'min')
-    se.datarange.min = 0;
-    fprintf('setting se.datarange.min = %3.1f\n',se.datarange.min)
-end
-if se.datarange.max == se.datarange.min
-    se.plot.nlevels=1;
-elseif ~isfield(se,'nlevels')
-    se.plot.nlevels=15;
-else se.plot.nlevels = se.nlevels;
+    in.datarange.min = -200;
+    in.datarange.max = 200;
+    in.ctable = 'mypolar';
+elseif isfield(in.datarange,'max') && ~isfield(in.datarange,'min')
+    in.datarange.min = 0;
+    fprintf('setting in.datarange.min = %3.1f\n',in.datarange.min)
 end
 
-if ~isfield(se,'ptype')
-    se.ptype = 'equal'; %contour spacing
+% Set the number of contour levels to use
+if in.datarange.max == in.datarange.min %special is so that it works for no data
+    in.plot.nlevels=1;
+elseif ~isfield(in,'nlevels')
+    in.plot.nlevels=15;
+else in.plot.nlevels = in.nlevels;
 end
 
-function out = setup_psboxpoly(se, field)                                                  %% ps box %%
+% The contour spacing
+if ~isfield(in,'ptype')
+    in.ptype = 'equal'; %contour spacing (currently the only possibility)
+end
 
-l = size(se.(field),1);
-if isfield(se,[field 'color'])
-    if length(se.([field 'color']))~=l
+function out = setup_psboxpoly(in, field)                                       %% ps box %%
+% ps box %%
+
+l = size(in.(field),1);
+if isfield(in,[field 'color'])
+    if length(in.([field 'color']))~=l
         error('Need same number of colors as boxes')
     end
-else se.([field 'color'])(1:l) = {'k'}; %default is black
+else in.([field 'color'])(1:l) = {'k'}; %default is black
 end
 
-if isfield(se,([field 'thick']))
-    if length(se.([field 'thick']))~=l
+if isfield(in,([field 'thick']))
+    if length(in.([field 'thick']))~=l
         error('Need same number of sizes as boxes')
     end
 else out.thick(1:l)={10}; %default size=10
 end
-c = list_colors('colors',se.([field 'color']));
+c = list_colors('colors',in.([field 'color']));
+colors = cell(length(c),1);
 for i=1:length(c)
     colors{i}=c{i}.*255; % instead of from 0:1
 end
 out.colors=colors;
-out.(field)=se.(field);
+out.(field)=in.(field);

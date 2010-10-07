@@ -1,4 +1,4 @@
-function out = polygoninize_regions(boxes)
+function pspoly = polygoninize_regions(boxes)
 %% POLYGONINIZE_REGIONS
 %
 % Purpose: To set up for plotting many regions defined as box coordinates. This
@@ -14,7 +14,7 @@ function out = polygoninize_regions(boxes)
 %      using GMT
 %
 %
-% 13/9-2009 Salomon Eliasson
+% $Id$
 
 
 %% Make a grid of logicals
@@ -104,7 +104,7 @@ while 1
     j = j+1;
 end
 
-out.psxy = psxy(1:j-1);
+pspoly = psxy(1:j-1); %pspoly is the name used in gmt_plot
 
 %% SUBFUNCTIONS
 %     |||||||

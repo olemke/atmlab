@@ -6,36 +6,38 @@ function[tickval,prtstr] = equidistant_contours(minn,maxx,nlevels)
 %          of equidistant color values and a format string
 %  In/outdata:
 %          IN:
-%          minn = minimum field value
-%          maxx = maximum field value
+%          minn = minimum data value
+%          maxx = maximum data value
 %          nlevels = number of contour levels
 %
 %          OUT:
 %          array of contour levels and the format string to use (depends on
-%          the size of the steps)
+%          the size of data values)
 %
-%  Author: Salomon Eliasson
+%  $Id$
 
+%necessity
 if minn==maxx,maxx=maxx+1;end
-inc = (maxx - minn) /nlevels; %step sizes
-smalltest = 0;
-while smalltest >= 0 % the whileloop is for determining the format
-    x = minn;
-    brk = 0;
-    for ii = 1:nlevels +1
-        tickval(ii) = x;
-        x = x + inc;
-        if ii > 1
-            if round(tickval(ii)*10^smalltest ) - round(tickval(ii-1)*10^smalltest) < 1
-                smalltest = smalltest + 1;
-                brk = 1;
-                break
-            end
-        end
-    end
-    if brk == 0
-        % the final format
-        prtstr = strcat('%3.',num2str(smalltest),'f');
-        smalltest = -1; %if it makes it here
-    end
-end %while
+
+%step sizes
+inc = (maxx - minn) /nlevels; 
+
+% determine tickvalues
+tickval = minn:inc:maxx;
+
+% determine formatstring
+prtstr = sprintf('%s',sprintf('%%3.%1.0ff',testsize(maxx))); % currently just using the maximum
+
+function out  = testsize(val)
+% crude test the size of the value to determine string
+% 
+
+if val >10^2
+    out = 0;
+elseif val >10^1
+    out = 1;
+elseif val >10^0
+    out = 2;
+else
+    out = 3;
+end
