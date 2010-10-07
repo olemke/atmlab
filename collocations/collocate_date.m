@@ -64,8 +64,8 @@ for i = 1:ngrans
     hour = grans(i, 4);
     minute = grans(i, 5);
     
-    logtext(fid, 'Collocating %s %s with %s %s %04d-%02d-%02d %02d:%02d\n', ...
-        sat1, sensor1, sat2, sensor2, thisyear, thismonth, thisday, hour, minute);
+    logtext(fid, 'Collocating %s %s %04d-%02d-%02d %02d:%02d with %s %s \n', ...
+        sat1, sensor1, thisyear, thismonth, thisday, hour, minute, sat2, sensor2);
     
     if ~isequal([thisyear thismonth thisday], [year month day]);
         % only take collocations happening in part of granule occuring on

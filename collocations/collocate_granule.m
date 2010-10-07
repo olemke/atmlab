@@ -152,6 +152,9 @@ for i = 1:size(date2_all, 1)
     end
     %% END OF UGLY SPECIAL CASE HACK!
     %% Continue sensibly.
+    
+    logtext(atmlab('OUT'), 'Collocating with %s %s %04d-%02d-%02d %02d:%02d\n', ...
+        satname, sens, datecell{1:5});
 
     try
         data2 = read_granule(satname, sens, date2_all(i, 1:5), false); % keep doubles for now
@@ -203,11 +206,9 @@ for i = 1:size(date2_all, 1)
     end
     
     % perform collocations
-    logtext(fid, 'Collocating\n');
     collocations = collocate(data1.time(iv1), data1.lat(iv1, :), data1.lon(iv1, :), ...
         data2.time(iv2, :), data2.lat(iv2, :), data2.lon(iv2, :), ...
         colloc_config('distance'), colloc_config('interval'));
-    logtext(fid, 'Finished collocating\n');
     if any(collocations)
         % compensate for the fact that we passed only a subset to collocate
         collocations(:, 1) = collocations(:, 1) + find(iv1, 1, 'first') - 1;

@@ -1,4 +1,4 @@
-function allgrans = find_granules_for_period(date1, date2, sat, sensor)
+function [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sensor)
 
 % find_granules_for_period List all granules for sat/sensor for period
 %
@@ -26,6 +26,8 @@ dates = daterange(date1, date2);
 ndates = size(dates, 1);
 
 allgrans = nan*zeros(ndates*15, 5);
+allpaths = cell(size(allgrans));
+
 n = 0;
 for i = 1:ndates
     date = dates(i, :);

@@ -33,8 +33,8 @@ function [granules, names] = overlap_granule(sat1, sensor1, date1, sat2, sensor2
 %% special case sat1==poes: do all POES sats
 
 if strcmp(sat2, 'poes')
-    allsatnames = dataset_constants('POES_satellite_names');
-    allsatnos = dataset_constants('POES_satellite_numbers');
+    allsatnames = datasets_constants('POES_satellite_names');
+    allsatnos = datasets_constants('POES_satellite_numbers');
     nsats = length(allsatnames);
     granules = zeros(3*nsats, 5); % pre-allocate
     

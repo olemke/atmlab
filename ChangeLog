@@ -1,5 +1,21 @@
 2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-69
+
+	* collocations/collocate_date.m: Less confusing logging.
+
+	* collocations/overlap_granule.m: Fix typo: dataset -> datasets
+
+	* collocations/collocate_and_store_date.m: Correctly check for existance,
+	  even with poes/poes
+
+	* collocations/collocate_granule.m: Less logging but more information.
+
+	* datasets/find_granules_for_period.m: Work in progress to also return
+	paths.
+
+2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-68
 
 	* .cvsignore, physics/.cvsignore: Removed, not necessary anymore.
