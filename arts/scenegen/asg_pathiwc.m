@@ -14,7 +14,7 @@
 %     P.iwp vertical ice water path above the tangent point
 %     P.rhi relative humidity w.r.t. ice
 %    
-%IN   D     Gformat definition structure.
+%IN   
 %     G     ASG data.
 %     Q     Qarts setting structure
 %           Only Q.SENSOR_LOS and Q.SENSOR_POS are considered
@@ -23,15 +23,15 @@
 
 % 2007-12-06   Created by Bengt Rydberg
 
-function P=asg_pathiwc(D,G,Q,z_max)
+function P=asg_pathiwc(G,Q,z_max)
 
 
 %find the data of interest
 iwc_ind=find(strncmp(lower({G.NAME}),'iwc',3));
 alt_ind=find(strncmp(lower({G.NAME}),'altitude',8));
-hum_ind=min(find(strcmp(lower({G.NAME}),'water vapour')));
+hum_ind=min(find(strcmp(lower({G.NAME}),'h2o')));
 tem_ind=find(strncmp(lower({G.NAME}),'temperature',11));
-lwc_ind=find(strncmp(lower({G.NAME}),'lwc',3));
+lwc_ind=find(strncmp(lower({G.NAME}),'iwc',3));
 
 
 if isempty( iwc_ind )
@@ -67,9 +67,11 @@ Q2 = asg_atmgrids( D, G, Q );
 Q2.P_GRID=Q2.P_GRID(2:end-1);
 
 if ~isempty(iwc_ind)
-    H=asg_regrid(D,G([alt_ind,hum_ind,tem_ind,iwc_ind,lwc_ind]),Q2);
+    %H=asg_regrid(G([alt_ind,hum_ind,tem_ind,iwc_ind,lwc_ind]),Q2);
+    H=G([alt_ind,hum_ind,tem_ind,iwc_ind,lwc_ind]);
 else
-    H=asg_regrid(D,G([alt_ind,hum_ind,tem_ind]),Q2);
+    %H=asg_regrid(G([alt_ind,hum_ind,tem_ind]),Q2);
+    G([alt_ind,hum_ind,tem_ind]);
 end
 
 %create a pressure matrix
@@ -125,7 +127,6 @@ for pp=1:size(Q.SENSOR_POS,1)
     lat=lat(ind);
     lon=lon(ind);
    
-     
     if ~isempty(iwc_ind)
        IWC=interp3(X,Y,Z,H(4).DATA,lat,z_grid,lon);
     end
@@ -157,6 +158,5 @@ for pp=1:size(Q.SENSOR_POS,1)
     end
     P(pp).rhi=RH;
     P(pp).t=TEM;
-
 
 end

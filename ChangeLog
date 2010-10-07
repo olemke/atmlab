@@ -1,3 +1,32 @@
+2010-10-07	Bengt Rydberg	<bengt.rydberg@alumn.chalmers.se>
+
+	* atmlab-1-0-67
+
+	* arts/scenegen/: updated asg (atmospheric state generator)
+	functions to work with the current gformat structure
+	asg_2d23d.m
+	asg2q.m
+	asg_create_gfs.m
+	asg_dbz2pnd.m
+	asg_dimadd.m
+	asg_hydrostat.m
+	asg_iwc_relhumid.m
+	asg_pathiwc.m
+	asg_regrid.m
+	asg_rndmz.m
+	asg_zeropad.m
+
+	* arts/scenegen/asg_bin.m: added 
+	bin data on gformat structure
+	
+	* arts/scenegen/asg_crop.m: added
+	picks out data inside specified regions
+	on gformat structure
+	
+	* arts/scenegen/asg_cloudsat_dBZe.m: added
+	reads in relevant (for asg) data fields from cloudsat data
+	
+	
 2010-10-06	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-66

@@ -24,16 +24,16 @@
 %    That is, the covariance matrix for selected variability is described
 %    in a parametrised way.
 %
-% FORMAT   G = asg_rndmz( D, G )
+% FORMAT   G = asg_rndmz( G )
 %        
 % OUT   G   Modified ASG data. 
-% IN    D            Gformat definition structure.
+% IN    
 %       G            ASG data.
 
 % 2007-10-22   Created by Patrick Eriksson.
 
 
-function G = asg_rndmz( D, G )
+function G = asg_rndmz( G )
 
   
 
@@ -89,16 +89,16 @@ function G = do_param( G, ig )
 
   %- Check G.DIM and determine dimensionality
   %
-  dim = G.DIMS( find( G.DIMS <= 3 ) );
+  dim = G.DIM;
   %
   if isempty(dim)
     error( sprintf('0D data not handled (found in G(%d)).', ig ) );
   end
-  if length(dim) ~= dim(end)
-    error( sprintf('Pressure or latitude is missing in G(%d).DIMS', ig ) );
-  end 
+  %if length(dim) ~= dim(end)
+  %  error( sprintf('Pressure or latitude is missing in G(%d).DIMS', ig ) );
+  %end 
   %
-  dim = dim(end);
+  %dim = dim(end);
   
   %- Create covariance matrix for disturbance
   %

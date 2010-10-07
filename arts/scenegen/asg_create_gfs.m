@@ -11,10 +11,10 @@
 %    where realisations of atmospheric states are performed,
 %    which can either be 1 or 3-d.
 %
-%    FORMAT [H,lon_data] = asg_create_gfs(Gcs,grids_cs,C,workfolder)
+%    FORMAT [H,C] = asg_create_gfs(Gcs,grids_cs,C,workfolder)
 %
-% OUT   G1          Modified G format data
-%       lon_data    longitudes correspong to C.USE_LATS
+% OUT   H           Modified G format data
+%       C           Modified C data 
 % IN    Gcs         Specification of clear sky fields, in gformat.
 %       grids_cs    Initial grids for clear sky fields. These grids are used
 %                   as put into Q before calling *asg_atmgrids*. Obtained
@@ -38,7 +38,7 @@
 %                    C.PROPS(1) corresponds to the radar frequency             
 %                    C.PROPS(2) corresponds to the instrument frequencys 
 %                    with fields                    
-%             SSP    single scattering properties data
+%             radar_back    single scattering properties data
 %             PSD    particle size distribution, only 'MH97' and 'Water' works
 %             method psd method, only 'gauss-laguerre' works
 %             x      particle sizes (see help gauss_laguerre)
@@ -53,7 +53,7 @@
 
 %  2009-05-18 created by Bengt Rydberg
 
-function [H,lon_data] = asg_create_gfs(Gcs,grids_cs,C,workfolder)
+function [H,C] = asg_create_gfs(Gcs,grids_cs,C,workfolder)
   
   
 %- Load CloudSat data
@@ -68,7 +68,7 @@ if dim==1
 end
 
 %make sure we read in also just outside lat_limits
-lat_out     = [ lat_limits(1)-0.1 lat_limits(end)+0.1 ];
+lat_out     = [ lat_limits(1)-C.LAT_RES-0.1 lat_limits(end)+C.LAT_RES+0.1 ];
 
 [PATHSTR,name1,EXT,VERSN] = fileparts(C.DATA);
 if strcmp('.zip',EXT)
@@ -76,17 +76,17 @@ if strcmp('.zip',EXT)
    C.DATA=fullfile(workfolder,name1);
 end
 
-[Gdbz,Ddbz] = gfin_cloudsat_dBZe([],[],C.DATA,C.AUX,[],C.LEG,lat_out,[]);
+[Gdbz] = asg_cloudsat_dBZe([],C.DATA,C.LEG,lat_out,[],C.AUX,[]);
 
-
-
-%find out what longitudes USE_LATS correspond to
+%find out what longitudes and doys USE_LATS correspond to
 for li=1:length(C.USE_LATS)
- [lat_m,lat_ind(li)]=min( abs(Gdbz(2).GRID2-C.USE_LATS(li)));
+ [lat_m,lat_ind(li)]=min( abs(Gdbz(2).GRID1-C.USE_LATS(li)));
 end
 lon_ind=find(strcmp({Gdbz.NAME},'Longitude'));
-lon_data=Gdbz(3).DATA(lat_ind);
-
+C.USE_LONS=Gdbz(lon_ind).DATA(lat_ind);
+mjd_ind=find(strcmp({Gdbz.NAME},'mjd'));
+doy=mjd2doy(Gdbz(mjd_ind).DATA(lat_ind));
+C.MJD=Gdbz(mjd_ind).DATA(lat_ind);
 
 %- reduce the latitude resolution
 %  bin the data on a desired grid
@@ -101,72 +101,60 @@ else
 end
 
 Gdbz(1).DATA=10.^(Gdbz(1).DATA/10);
-[Gdbz,Ddbz]=gf_bin(Ddbz,Gdbz,grids,[1 2]);
+[Gdbz]=asg_bin(Gdbz(1),grids,[1 2]);
+
+
 
 if dim==1
  for i=1:length(C.USE_LATS)
-   l_ind(i)=find(Gdbz(1).GRID2==C.USE_LATS(i));
+   l_ind(i)=find(Gdbz.GRID2==C.USE_LATS(i));
  end
- for i=[1 2 3 5]
-   if i==1
-    Gdbz(i).DATA=Gdbz(i).DATA(:,l_ind);
-   else
-    Gdbz(i).DATA=Gdbz(i).DATA(l_ind);
-   end
-   Gdbz(i).GRID2=Gdbz(i).GRID2(l_ind);
- end
+ Gdbz.DATA=Gdbz.DATA(:,l_ind);
+ Gdbz.GRID2=Gdbz.GRID2(l_ind);
 end
 
+%switch back to dBZ
+Gdbz.DATA=10*log10(Gdbz.DATA);
+Gdbz.DATA(find(Gdbz.DATA<=-50))=-50;
 
-Gdbz(1).DATA=10*log10(Gdbz(1).DATA);
-Gdbz(1).DATA(find(Gdbz(1).DATA<=-50))=-50;
+% Switch to pressure grid. 
+Gdbz.GRID1= z2p_cira86(Gdbz.GRID1,mean(lat_limits),doy(1) );
+Gdbz.GRID1_NAME='Pressure';
+Gdbz.GRID1_UNIT='Pa';
 
-% Switch to pressure grid. Sort data in order to get decreasing pressures and
-% increasing latitudes.
-%
-tai_ind=find(strcmp({Gdbz.NAME},'TAI_start'));
-pt_ind=find(strcmp({Gdbz.NAME},'Profile_time'));
-dbz_ind=find(strcmp({Gdbz.NAME},'Radar_Reflectivity'));
-mjd1=date2mjd(1993,1,1,0,0,0);
-sec_of_day=60*60*24;
-mjd=mjd1+(Gdbz(tai_ind).DATA+mean(Gdbz(pt_ind).DATA))/sec_of_day;
-DOY = mjd2doy(mjd);
-Gdbz(dbz_ind).GRID1= z2p_cira86(Gdbz(dbz_ind).GRID1,mean(lat_limits),DOY );
-Ddbz.GRID1_NAME='Pressure';
-Ddbz.GRID1_UNIT='Pa';
-%
 
-% Set DIMADD or similar fields based on fields of C.
-%
-if dim==3
- grids_dbz{3} = C.LON_GRID;
- Gdbz(dbz_ind).DIMADD=C.DIMADD;
-end
-%
 
 %- Set Gdbz.GRID1
 %
 % Get out part of Gdbz that is inside the selected 
 %C.P_LIMS and latitude limits .
 %
-grids_dbz{1} = Gdbz(dbz_ind).GRID1;
+grids_dbz{1} = Gdbz.GRID1;
 if dim==3
 
  limits=[fliplr(C.P_LIMS);lat_limits];
- [Gdbz(dbz_ind),Ddbz]=gf_crop(Ddbz,Gdbz(dbz_ind),limits,[1 2]);
+ [Gdbz]=asg_crop(Gdbz,limits,[1 2]);
 
 else
  
  limits=[fliplr(C.P_LIMS)];
- [Gdbz(dbz_ind),Ddbz]=gf_crop(Ddbz,Gdbz(dbz_ind),limits,[1]);
+ [Gdbz]=asg_crop(Gdbz,limits,[1]);
 
 end
  
 %
 
-%add the psd and ssp properties of the assumed particles
+%add the psd and radar backscatter properties of the assumed particles
 % 
-Gdbz(dbz_ind).PROPS=C.PROPS;
+Gdbz.PROPS=C.PROPS;
+
+% Set DIMADD based on fields of C.
+%
+if dim==3
+ grids_dbz{3} = C.LON_GRID;
+ Gdbz.DIMADD=C.DIMADD;
+end
+%
 
 %- Prepare data for each selected latitude
 %
@@ -179,27 +167,18 @@ for ip = 1 : length(C.USE_LATS)
 
    lat  = [C.USE_LATS(ip)-C.DLAT/2 C.USE_LATS(ip)+C.DLAT/2];
    limits=[fliplr(C.P_LIMS);lat];
-   [G(ip),Ddbz]=gf_crop(Ddbz,Gdbz(dbz_ind),limits,[1 2]);
-   %place the grid on 0 degree latitude/ not for this case
-   %G(ip).GRID2= round( [G(ip).GRID2-mean(G(ip).GRID2)]*1000)/1000;
+   [G(ip)]=asg_crop(Gdbz,limits,[1 2]);
    grids_dbz{2} = G(ip).GRID2;
 
   else
 
-   G(ip)=Gdbz(1);
-   G(ip).DATA=Gdbz(1).DATA(:,ip);
-   G(ip).GRID2= Gdbz(1).GRID2(ip);
+   G(ip)=Gdbz;
+   G(ip).DATA=Gdbz.DATA(:,ip);
+   G(ip).GRID2= Gdbz.GRID2(ip);
 
   end 
 
   
-  %- Temperature, water vapor, and ozone possibly from ECMWF
-  %  just use as little data as necessary
-  % 
-  t_ind=find(strncmp(lower({Gcs1.NAME}),'temperature',11)); 
-  h_ind=find(strncmp(lower({Gcs1.NAME}),'water',5));
-  o_ind=find(strncmp(lower({Gcs1.NAME}),'o3',2));
-  s_ind=find(strncmp(lower({Gcs1.NAME}),'surface',7));
   Q = qarts;
   Q.P_GRID=grids_cs{1};
 
@@ -215,27 +194,14 @@ for ip = 1 : length(C.USE_LATS)
                  C.USE_LATS(ip)-1 C.USE_LATS(ip) C.USE_LATS(ip)+1 ...
                  lim2 lim2+0.01 lim2+1 lim2+3];
    grids_cs{2}=unique(sort([lat_grid,add_lat_grid])); 
+
    Q.LAT_GRID=grids_cs{2};
    Q.LON_GRID=grids_cs{3}; 
    Q.ATMOSPHERE_DIM = 3;
-   Q = asg_atmgrids( asgD, Gcs1, Q );
-
-  else
    
-    Q.ATMOSPHERE_DIM = 2;
-    Q.LAT_GRID=C.USE_LATS(ip);
-  
   end
-
-  
-  if Q.P_GRID(end)==Q.P_GRID(end-1)
-     Q.P_GRID=Q.P_GRID(1:end-1);
-  end
+   
  
-  Gcs1([t_ind,s_ind,h_ind,o_ind])= asg_regrid( asgD,...
-                                Gcs1([t_ind,s_ind,h_ind,o_ind]) , Q ); 
-  
-
   %- Generate a single scene
   %
   %see sub-function
@@ -245,6 +211,7 @@ for ip = 1 : length(C.USE_LATS)
   
   
 end
+
 clear G
 G=H;
 
@@ -252,18 +219,19 @@ G=H;
 function [G] = ...
         asg_gen_state(Gcs,grids_cs,Gdbz,grids_dbz,Q,dim)
 
- D = asgD;
+
 
  %- Create clear sky fields
  %
  if dim==3
-    Gcs = asg_dimadd( D, Gcs, Q );
+    Gcs = asg_dimadd( Gcs, Q );
  end
 
- Gcs = asg_regrid( D, Gcs, Q );
- Gcs = asg_fixed_relhumid( D, Gcs );
- Gcs = asg_rndmz( D, Gcs );
- Gcs = asg_hydrostat( D, Gcs, Q );
+ %regrid data
+
+ Gcs = asg_regrid( Gcs, Q );
+ Gcs = asg_rndmz( Gcs );
+ Gcs = asg_hydrostat( Gcs, Q );
 
 
  %- Determine grids for dbz field
@@ -278,19 +246,24 @@ function [G] = ...
  
  %- Create final dbz field(s)
  %
+ 
+
  if dim==3
-  Q = asg_atmgrids( D, Gdbz, Q );
   Gdbz.DATA=10.^(Gdbz.DATA/10);
-  Gdbz = asg_dimadd( D, Gdbz, Q );
+  Gdbz = asg_dimadd( Gdbz, Q );
+  Gdbz = asg_regrid( Gdbz, Q );
   Gdbz.DATA=10*log10(Gdbz.DATA);
-  Gdbz = asg_regrid( D, Gdbz, Q );
+  %pad the data with "zeros" around the dbz field, to make sure interpolation
+  %will cause no cloud "enlarging" 
+  Gdbz = asg_zeropad( Gdbz, Q);
+  Gdbz.DATA([1:2 end-1:end],:,:)=-50;
+  Gdbz.DATA(:,[1:2 end-1:end],:)=-50;
+  Gdbz.DATA(:,:,[1:2 end-1:end])=-50;
  end
 
-
  
- %- Make re-gridding of clear sky fields
+ %- Make re-gridding of fields so cloud and atmospheric variables match
  %
- % Hydrostatic eq. does not necesserily apply at "new" points
  %
  
  if dim==1
@@ -299,62 +272,60 @@ function [G] = ...
 
  Q.P_GRID=250/16e3;
  if dim==3
-  Q.LAT_GRID=0.001;
-  Q.LON_GRID=0.001;
+   Q.LAT_GRID=0.001;
+   Q.LON_GRID=0.001;
  end
- Q = asg_atmgrids( D, [Gcs Gdbz], Q );
- Gcs = asg_regrid( D, Gcs, Q );
- Gcs = asg_hydrostat( D, Gcs, Q );  
 
+ %dummy fields
+ Gdbz.RNDMZ=[];
+ Gdbz.SPCFC=[];
+ Gdbz.SURFACE=[];
+ len=length(Gcs);
+ Gcs(len+1)=Gdbz;
+  
 
- %- Pad dbz fields with zeros
- %
- % These fields do not need to match grids in Q. A reinterpolation is anyhow 
- % done in ARTS
- %
- if dim==1
-    Gdbz.DIMS=[1];
- end
  
- Gdbz = asg_zeropad( D, Gdbz, Q);
+ [grid1a] = gf_get_grid( Gcs(1), 1 );
+ [grid1b] = gf_get_grid( Gdbz, 1 );
+ grid1=flipud(vec2col(sort(union(grid1a,grid1b))));
+ grid1 = gridconvert( grid1, false, @log10, true );
+ grid1 = gridthinning( grid1, Q.P_GRID );
+ Q.P_GRID = gridconvert( grid1, true, @pow10 );
  
- 
- 
-
- %As we fill data field with zeros, but the unit is in dBZe
- % we give all zero valued data the minimum value (-50 )
- Gdbz.DATA(find(Gdbz.DATA==0))=min(Gdbz.DATA(:));  
-
- %- Convert dbz field(s) to pnd fields but first regrid atmospheric fields
- %  to the dbz grid
- %
- Q1          = Q;
- Q1.P_GRID   = Gdbz.GRID1;
  if dim==3
-    Q1.LAT_GRID = Gdbz.GRID2;
-    Q1.LON_GRID = Gdbz.GRID3;
- end
- Gcs1        = asg_regrid( D, Gcs, Q1 );
- %
+  [grid1a] = gf_get_grid( Gcs(1), 2 );
+  [grid1b] = gf_get_grid( Gdbz, 2 );
+  grid1=vec2col(sort(union(grid1a,grid1b)));
+  grid1 = gridthinning( grid1, Q.LAT_GRID );
+  Q.LAT_GRID=grid1;
 
- Gdbz = asg_dbz2pnd( D, [Gcs1 Gdbz], Q ,Gdbz.PROPS);
- Gdbz = Gdbz(length(Gcs1)+1:end);
+  [grid1a] = gf_get_grid( Gcs(1), 3 );
+  [grid1b] = gf_get_grid( Gdbz, 3 );
+  grid1=vec2col(sort(union(grid1a,grid1b)));
+  grid1 = gridthinning( grid1, Q.LON_GRID );
+  Q.LON_GRID=grid1;
+ end
+
+ ind=strcmp(lower({Gcs.NAME}),'radar_reflectivity');
+ Gcs(ind).DATA=10.^(Gcs(ind).DATA/10);
+ Gcs = asg_regrid( Gcs, Q );
+ Gcs(ind).DATA=10*log10(Gcs(ind).DATA);
+ Gcs = asg_hydrostat( Gcs, Q );  
+
+ %extract iwc and particle number fields(pnd) fields 
+ Gcs = asg_dbz2pnd( Gcs, Q ,Gcs(end).PROPS);
 
  %- Modify water vapour to match cloud distribution
  %
- ind1=find(strcmp('Water vapour',{Gcs.NAME}));
- if  Gcs(ind1).SPCFC.MOD_RH 
+ ind1=find(strcmp('h2o',lower({Gcs.NAME})));
+ if  0 %Gcs(ind1).SPCFC.MOD_RH 
 
-   if dim==1
-      ind1=find(strcmp('IWC field',{Gdbz.NAME}));
-      Gdbz(ind1).DIMS=[1 2]; 
-      %this is just to make it work (dimensionality is 1)
-   end
-   Gcs=asg_iwc_relhumid_lv(D,Gcs,Gdbz,Q);
-   Gcs = asg_hydrostat( D, Gcs, Q );
+   Gcs=asg_iwc_relhumid(Gcs,Q);
+
+   Gcs = asg_hydrostat( Gcs, Q );
 
  end
 
- G = [Gcs Gdbz];
+G=Gcs;
 
 return

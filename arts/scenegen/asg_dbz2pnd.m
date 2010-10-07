@@ -1,10 +1,10 @@
 %asg_dbz2pnd calculates iwc and pnd fields
 %
-% FORMAT   G=asg_dbz2pnd( D, G, Q, P)
+% FORMAT   G=asg_dbz2pnd( G, Q, P)
 % 
 % OUT      G        Modified gformat data,now including
 %                   IWC and PND data
-% IN       D        G format definition structure 
+% IN     
 %          G        original gformat data 
 %          Q        Qarts setting structure.            
 %          P        conversion structure of length 2
@@ -26,20 +26,17 @@
 %
 %  2007-11-13 created by Bengt Rydberg
 
-function [G,D]= asg_dbz2pnd_amsu( D, G, Q ,P);
+function [G]= asg_dbz2pnd(  G, Q ,P);
+
+r_ind=find(strncmp(lower({G(:).NAME}),'radar',5));
+t_ind=find(strncmp(lower({G(:).NAME}),'temperature',11));
+z_ind=find(strncmp(lower({G(:).NAME}),'altitude',8));
+
+dBZ=G(r_ind).DATA;
+T=G(t_ind).DATA;
+ALT=G(z_ind).DATA;
 
 warning off
-for i=1:length(G)
-    if strcmp(G(i).DATA_NAME,'Radar_Reflectivity')
-       dBZ=G(i).DATA;
-    end
-    if strcmp(G(i).DATA_NAME,'Temperature')
-       T=G(i).DATA;
-    end
-    if strcmp(G(i).DATA_NAME,'Altitude')
-       ALT=G(i).DATA;
-    end
-end
 
 if length(P)~=2
    error('P structure must be of length 2')
@@ -49,33 +46,26 @@ if ~exist('T','var') & ~exist('dBZ','var')
    error('G must hold Temperature and Radar_Reflectivity data')
 end
 
-%if isempty(Q.F_GRID)
-%   error('Q.F_GRID must be specified')
-%end
 
 if strcmp(P(1).method,'gauss-laguerre')
-   len=length(P(1).SSP);
+   len=size(P(1).radar_back,1);
    if length(P(1).x)~=len & length(P(1).w)~=len
-      error('mismatch in size between P(1).SSP,P(1).x, and P(1).w')
+      error('mismatch in size between P(1).radar_back,P(1).x, and P(1).w')
    end
-   for i=1:len
-       %radar backscattering per particle
-       Q_b1(:,i)=4*pi*squeeze(P(1).SSP(i).pha_mat_data(1,:,end,1,1,1,1))';
-       %extinction per particle
-       Q_b2(:,i)=P(1).SSP(i).ext_mat_data;
-   end
+   Q_b1=P(1).radar_back';
    %create the look-up-table for iwc
-   lambda=3e8/P(1).SSP(1).f_grid;
-   nwater=sqrt(eps_water_liebe93(P(1).SSP(1).f_grid,273.15));
+   c=constants('SPEED_OF_LIGHT');
+   f=P(1).F_GRID;
+   lambda=c/f;
+   nwater=sqrt(eps_water_liebe93(f,273.15));
    Kwater=( abs( (nwater.^2-1)./ (nwater.^2+2) ) ).^2;
    IWCv=logspace(-3.65,0.5,100);
-   %IWCv=logspace(-4,6,100);
    Tvi=180:2:273;
-   T_grid=P(1).SSP(1).T_grid;
+   T_grid=P(1).T_grid;
    %loop over Tv and IWCv to find dBZ(T,IWC)
    for j=1:length(Tvi)
        sigma_b=interp1(T_grid,Q_b1,Tvi(j));
-       sigma_c=interp1(T_grid,Q_b2,Tvi(j));
+       %sigma_c=interp1(T_grid,Q_b2,Tvi(j));
        for i=1:length(IWCv)
            if strcmp(P(1).PSD,'MH97')
               y(i,:) = ice_psd_Mcfar_97(Tvi(j),IWCv(i),P(1).x,1);
@@ -90,34 +80,28 @@ if strcmp(P(1).method,'gauss-laguerre')
        end
        Z(j,:)=lambda^4 /(pi^5)/Kwater*...
                            sum([Y.*[ones(length(IWCv),1)*sigma_b]]');
-       ext(j,:)=sum([Y.*[ones(length(IWCv),1)*sigma_c]]');
+       %ext(j,:)=sum([Y.*[ones(length(IWCv),1)*sigma_c]]');
    end
    dBZm=10*log10(Z*1e18);
    
-   len=length(P(2).SSP);
+   len=size(P(2).radar_back,1);
    if length(P(2).x)~=len & length(P(2).w)~=len
       error('mismatch in size between P(2).SSP,P(2).x, and P(2).w')
    end
    clear Q_b1 Q_b2 y Y
-   for i=1:len
-       %radar backscattering per particle
-       Q_b1(:,i)=4*pi*squeeze(P(2).SSP(i).pha_mat_data(1,:,end,1,1,1,1))';
-       %extinction per particle
-       Q_b2(:,i)=P(2).SSP(i).ext_mat_data;
-   end
-
+   Q_b1=P(2).radar_back';
+  
    %create the look-up-table for lwc
    LWCv=logspace(-3.65,2,100);
    %IWCv=logspace(-4,6,100);
    Tvw=273:2:313;
-   T_grid=P(2).SSP(3).T_grid;
+   T_grid=P(2).T_grid;
    %loop over Tv and IWCv to find dBZ(T,IWC)
    for j=1:length(Tvw)
        sigma_b=interp1(T_grid,Q_b1,Tvw(j));
-       sigma_c=interp1(T_grid,Q_b2,Tvw(j));
+       %sigma_c=interp1(T_grid,Q_b2,Tvw(j));
        for i=1:length(IWCv)
            if strcmp(P(2).PSD,'Water')
-              %y(i,:) = ice_psd_Mcfar_97(Tv(j),IWCv(i),P(1).x,1);
               c1=6;c2=1;rc=10;
               y(i,:)=water_psd(LWCv(i),P(2).x,rc,c1,c2)';
               %rho=0.91e6;
@@ -131,12 +115,13 @@ if strcmp(P(1).method,'gauss-laguerre')
        end
        Zw(j,:)=lambda^4 /(pi^5)/Kwater*...
                            sum([Y.*[ones(length(IWCv),1)*sigma_b]]');
-       extw(j,:)=sum([Y.*[ones(length(IWCv),1)*sigma_c]]');
+       %extw(j,:)=sum([Y.*[ones(length(IWCv),1)*sigma_c]]');
    end
    dBZmw=10*log10(Zw*1e18);
 
 
    %estimate the unattenuated dBZ field
+   if 0
 
    dBZp=zeros(size(dBZ));
    for i=1:size(dBZ,2) 
@@ -202,11 +187,15 @@ if strcmp(P(1).method,'gauss-laguerre')
      end
     end
    end
+      
    
+
    %set all modified dBZp to min(dBZ) for these original dBZ==min(dBZ)
    %since otherwise we may strecth out the clouds 
    mindBZ=min(min(min(dBZ)));
    dBZp(find(dBZ==mindBZ))=mindBZ;
+
+   end
 
    %re-arrange the look-up-table [IWC(T,dBZ)]
    dBZv=[-49:1:30];
@@ -214,7 +203,8 @@ if strcmp(P(1).method,'gauss-laguerre')
    for i=1:size(dBZm,1)
        IWCC(i,:)=interp1(dBZm(i,:),IWCv,dBZv);
    end
-   IWC=interp2(dBZv,Tvi,IWCC,dBZp,T);
+   %IWC=interp2(dBZv,Tvi,IWCC,dBZp,T);
+   IWC=interp2(dBZv,Tvi,IWCC,dBZ,T);
    IWC(isnan(IWC))=0;
    IWC(find(T>273))=0;
    
@@ -224,7 +214,8 @@ if strcmp(P(1).method,'gauss-laguerre')
    for i=1:size(dBZmw,1)
        LWCC(i,:)=interp1(dBZmw(i,:),LWCv,dBZv);
    end
-   LWC=interp2(dBZv,Tvw,LWCC,dBZp,T);
+   %LWC=interp2(dBZv,Tvw,LWCC,dBZp,T);
+   LWC=interp2(dBZv,Tvw,LWCC,dBZ,T);
    LWC(find(T<=273))=0;
    LWC(isnan(LWC))=0;
   

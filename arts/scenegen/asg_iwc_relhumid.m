@@ -23,18 +23,18 @@
 %
 % IN  D    gformat definition structure
 %     Gcs  gformat atmospheric data
-%     Gdbz gformat cloud data
 %     Q    Qarts setting structure   
 
 % 2007-12-12 created by Bengt Rydberg
 
-function Gcs=asg_iwc_relhumid(D,Gcs,Gdbz,Q)
+function Gcs=asg_iwc_relhumid(Gcs,Q)
 
+Q1=Q;
 
 %find indices
-water_ind=min(find(strncmp(lower({Gcs.NAME}),'water',5)));
-tem_ind=min(find(strncmp(lower({Gcs.NAME}),'temperature',11)));
-iwc_ind=min(find(strncmp(lower({Gdbz.NAME}),'iwc',3)));
+water_ind=min(find(strncmp(lower({Gcs.DATA_NAME}),'h2o',3)));
+tem_ind=min(find(strncmp(lower({Gcs.DATA_NAME}),'temperature',11)));
+iwc_ind=min(find(strncmp(lower({Gcs.DATA_NAME}),'iwc',3)));
 
 if isempty(water_ind)
    error('water vapour must be included in Gcs')
@@ -48,40 +48,56 @@ if isempty(iwc_ind)
    error('iwc must be included in Gdbz')
 end
 
-if ~any([ length( find( ( [length(Gcs(water_ind).DIMS)==3,...
-                      length(Gcs(tem_ind).DIMS)==3,...
-                      length(Gdbz(iwc_ind).DIMS)==3 ] ) ) )==3,...
-     
-          length( find( ( [length(Gcs(water_ind).DIMS)==2,...
-                      length(Gcs(tem_ind).DIMS)==2,...
-                      length(Gdbz(iwc_ind).DIMS)==2 ] ) ) )==3,...
-  
-          length( find( ( [length(Gcs(water_ind).DIMS)==1,...
-                      length(Gcs(tem_ind).DIMS)==1,...
-                      length(Gdbz(iwc_ind).DIMS)==1 ] ) ) )==3])
+dim1=Gcs(water_ind).DIM;
+dim2=Gcs(tem_ind).DIM;
+dim3=Gcs(iwc_ind).DIM;
+
+%check dimensionality
+if ~any(dim1==dim2 & dim1==dim3)
 
    error('all data has not the same dimensions')
 
 end
 
-dim=length(Gcs(water_ind).DIMS);
-
-
 %reduce the resolution of Gcs in order to be able
 %to make perturbation while calling asg_rndmz
 %without memory problem
+dim=dim1;
 
-Q1          = Q;
-Q1.P_GRID         = 1000/16e3;
-Q1.LAT_GRID = Gdbz(iwc_ind).GRID2;
-Q1.LON_GRID = Gdbz(iwc_ind).GRID3;
-Q2 = asg_atmgrids( D, Gdbz(iwc_ind), Q1 );
-Gcs1        = asg_regrid( D, Gcs([water_ind,tem_ind]), Q2 );
+Q.P_GRID         = 1000/16e3;
+Q.LAT_GRID       =1;
+Q.LON_GRID       =1;
+Q.LAT_GRID = Gcs(iwc_ind).GRID2;
+Q.LON_GRID = Gcs(iwc_ind).GRID3;
+
+[grid1a] = gf_get_grid( Gcs(water_ind), 1 );
+[grid1b] = gf_get_grid( Gcs(iwc_ind), 1 );
+grid1=flipud(vec2col(sort(union(grid1a,grid1b))));
+grid1 = gridconvert( grid1, false, @log10, true );
+grid1 = gridthinning( grid1, Q.P_GRID );
+Q.P_GRID = gridconvert( grid1, true, @pow10 );
+ 
+if dim==3
+  [grid1a] = gf_get_grid( Gcs(water_ind), 2 );
+  [grid1b] = gf_get_grid( Gcs(iwc_ind), 2 );
+  grid1=vec2col(sort(union(grid1a,grid1b)));
+  grid1 = gridthinning( grid1, Q.LAT_GRID );
+  Q.LAT_GRID=grid1;
+
+  [grid1a] = gf_get_grid( Gcs(water_ind), 3 );
+  [grid1b] = gf_get_grid( Gcs(iwc_ind), 3 );
+  grid1=vec2col(sort(union(grid1a,grid1b)));
+  grid1 = gridthinning( grid1, Q.LON_GRID );
+  Q.LON_GRID=grid1;
+end
+
+
+Gcs1 = asg_regrid( Gcs([water_ind,tem_ind,iwc_ind]), Q );
+
 
 %create a random relative humidity field
 %
 Grhi=Gcs1(1);
-
 %set randomize parameters
 if dim<4
    RND.FORMAT    = 'param'; 
@@ -100,13 +116,13 @@ end
 if dim>1    
    %
    RND.CFUN2     = 'lin';            % Linear correlation function for lat-dim.
-   RND.CL2       = 1.5;              % Corr. length 1.5 deg everywhere
+   RND.CL2       = 0.5;              % Corr. length 0.5 deg everywhere
    %
 end
 
 if dim>2
    RND.CFUN3     = 'lin';            % Linear correlation function for lat-dim.
-   RND.CL3       = 1.5;              % Corr. length 1.5 deg everywhere
+   RND.CL3       = 0.5;              % Corr. length 0.5 deg everywhere
 end
 
 Grhi.RNDMZ=RND;
@@ -115,46 +131,45 @@ Grhi.RNDMZ=RND;
 Grhi.DATA=ones(size(Grhi.DATA));
 
 %perturb the field
-Grhi = asg_rndmz( D, Grhi );
+Grhi = asg_rndmz( Grhi );
 
 
-G2        = asg_regrid( D, [Gdbz(iwc_ind),Gcs([water_ind,tem_ind]),...
-                        Grhi], Q );
 
 %Equilibrium water vapor pressure over ice
-ei = e_eq_ice(G2(3).DATA);
+ei = e_eq_ice(Gcs1(2).DATA);
 
 %create a pressure matrix
-P=zeros(size(G2(3).DATA));
+P=zeros(size(Gcs1(3).DATA));
 if dim==1
-   P=G2(3).GRID1;
+   P=Gcs1(3).GRID1;
 end
 
 if dim>1
-   p=vec2col(G2(3).GRID1)*ones(1,length(G2(3).GRID2));
+   p=vec2col(Gcs1(3).GRID1)*ones(1,length(Gcs1(3).GRID2));
    if dim==2
       P=p;
    else
-      for i=1:length(G2(3).GRID3)
+      for i=1:length(Gcs1(3).GRID3)
           P(:,:,i)=p;
       end
    end
 end
 
 %relative humdity 
-rhi=G2(2).DATA.*P./ei;
+rhi=Gcs1(1).DATA.*P./ei;
 
 %weights
 %an iwc of 0.1 will give 100% weight to the stochastic value
 %0.01 63%
 %0.001 10%
 %0.0001 1%
-w=1-exp(-100*G2(1).DATA);
+w=1-exp(-100*Gcs1(3).DATA);
 
 %apply the weights
-rhi=w.*G2(4).DATA+(1-w).*rhi;
+rhi=w.*Grhi.DATA+(1-w).*rhi;
 
 %transform back to vmr
-Gcs(water_ind).DATA=rhi.*ei./P;
+Gcs1(1).DATA=rhi.*ei./P;
 
-
+%regrid back to input grids
+Gcs(water_ind)=asg_regrid(Gcs1(1),Q1);

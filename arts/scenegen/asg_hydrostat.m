@@ -22,17 +22,17 @@
 %       G(i).SPCFC.Z0        = gf_set( D, asgG, [], 0, [], ...
 %                                     'Altitude at P0', 'Altitude', 'm' );
 %
-% FORMAT   G = asg_hydrostat( D, G, Q )
+% FORMAT   G = asg_hydrostat( G, Q )
 %        
 % OUT   G   Expanded gformat array, appended with an item holding
 %           altitudes. Name set to 'Altitude'.
-% IN    A   Settings for arts scene generator.
+% IN   
 %       G   Data (in gformat).
 %       Q   Qarts setting structure.
 
 % 2007-10-09   Created by Patrick Eriksson
 
-function G = asg_hydrostat( D, G, Q )
+function G = asg_hydrostat( G, Q )
 
 
 %- Locate position of 'Altitude field'
@@ -45,9 +45,9 @@ if isempty( iz )
   error( 'Could not locate any altitude data in G.' );
 end
 %
-rqre_field( G(iz).SPCFC, 'P0', false, 'G.SPCFC' );
-rqre_field( G(iz).SPCFC, 'Z0', false, 'G.SPCFC' );
-qcheck( @asgG, G(iz).SPCFC.Z0 );
+%rqre_field( G(iz).SPCFC, 'P0', false, 'G.SPCFC' );
+%rqre_field( G(iz).SPCFC, 'Z0', false, 'G.SPCFC' );
+%qcheck( @asgG, G(iz).SPCFC.Z0 );
 
 
 %- Locate also position of temperature and water vapour
@@ -57,7 +57,7 @@ if isempty( it )
   error( 'Could not locate temperature in G.' );
 end
 %
-iw = min( find( strcmp( lower({G(:).NAME}), 'water vapour' ) ) );
+iw = min( find( strcmp( lower({G(:).NAME}), 'h2o' ) ) );
 if isempty( iw )
   error( 'Could not locate water vapour in G.' );
 end
@@ -73,7 +73,7 @@ G(iz).DATA_UNIT = 'm';
 
 %- Latitudes
 %
-if any( G(it).DIMS == 2 )
+if G(it).DIM>=2
   lats = G(it).GRID2;
 else
   lats = 45;
@@ -82,13 +82,13 @@ end
 
 %- Re-grid SPCFC.ZO
 %
-Z0 = asg_dimadd( D, G(iz).SPCFC.Z0, Q );
-Z0 = asg_regrid( D, Z0, Q );
+Z0 = asg_dimadd( G(iz).SPCFC.Z0, Q );
+Z0 = asg_regrid( Z0, Q );
 
 
 %- Run HSE
 %
-G(iz).DIMS = G(it).DIMS;
+G(iz).DIM = G(it).DIM;
 %
 G(iz).GRID1 = G(it).GRID1; 
 G(iz).GRID2 = G(it).GRID2; 

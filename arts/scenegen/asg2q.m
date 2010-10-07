@@ -63,7 +63,8 @@ if dim >= 2
   if ~qarts_isset( Q.LAT_GRID )                                             %&%
     error( 'Q.LAT_GRID must be set.' );                                     %&%
   end                                                                       %&%
-  lat_grid = qarts_grid( Q.LAT_GRID );
+  %lat_grid = qarts_grid( Q.LAT_GRID );
+  lat_grid = Q.LAT_GRID;
   nlat     = length( lat_grid );  
   if ~istensor1(lat_grid)  |  nlat < 2                                      %&%
     error( 'Q.LAT_GRID must be a tensor1 with length > 1.' );               %&%
@@ -72,10 +73,11 @@ if dim >= 2
     if ~qarts_isset( Q.LON_GRID )                                           %&%
       error( 'Q.LON_GRID must be set.' );                                   %&%
     end                                                                     %&%
-    lon_grid = qarts_grid( Q.LON_GRID );
+    %lon_grid = qarts_grid( Q.LON_GRID );
+    lon_grid = Q.LON_GRID;
     nlon     = length( lon_grid );  
     if ~istensor1(lon_grid)  |  nlon < 2                                    %&%
-      error( 'Q.LAT_GRID must be a tensor1 with length > 1.' );             %&%
+      error( 'Q.LON_GRID must be a tensor1 with length > 1.' );             %&%
     end                                                                     %&%
   end
 end
@@ -136,7 +138,7 @@ if ~isempty(i)
     error( sprintf('Wrong size of G(%d).DATA',i) );                         %&%
   end                                                                       %&%
   %                                                                         %&%
-  Q.T_FIELD = fullfile( workfolder, 'z_field.xml' );
+  Q.Z_FIELD = fullfile( workfolder, 'z_field.xml' );
   xmlStore( Q.Z_FIELD, G(i).DATA, 'Tensor3' );
   %
 end
@@ -145,13 +147,14 @@ end
 
 %- vmr_field
 %
-ind = find( strcmp( lower({G.DATA_NAME}), {'vmr' 'volume mixing ratio'} ) );
+%ind = find( strcmp( lower({G.DATA_NAME}), {'vmr' 'volume mixing ratio'} ) );
+ind = find( strcmp( lower({G.DATA_NAME}), {'volume mixing ratio'} ) );
 %
 if ~isempty(ind)
   %
   vmr_field = zeros( [ length(ind) sfield ] );
   %
-  for i = 1 : ind
+  for i = 1 : length(ind)
     if G(ind(i)).DIM ~= dim                                                 %&%
       error( sprintf('Wrong dimension of G(%d).',ind(i)) );                 %&%
     end                                                                     %&%
@@ -161,7 +164,10 @@ if ~isempty(ind)
     end                                                                     %&%
     %                                                                       %&%
     vmr_field(i,:,:,:)        = G(ind(i)).DATA;
-    Q.ABS_SPECIES(i).TAG      = G(ind(i)).TAG;
+    if i==1
+       Q.ABS_SPECIES=[];
+    end
+    Q.ABS_SPECIES(i).TAG      = G(ind(i)).PROPS;
     Q.ABS_SPECIES(i).RETRIEVE = false;
   end
   %
@@ -219,3 +225,48 @@ if ~isempty(i)
   xmlStore( Q.Z_SURFACE, G(i).DATA, 'Matrix' );
   %
 end
+
+
+%--- Cloud box variables -----------------------------------------------------
+
+ind = find( strncmp( lower({G.DATA_NAME}), 'particle', 8 ) );
+%
+
+if ~isempty(ind)
+  Q.CLOUDBOX_DO        = true;
+  Q.CLOUDBOX.PND_FIELD = [];
+  Q.CLOUDBOX.SCAT_DATA = [];
+  %
+  for i = 1 : length(ind)
+    if G(ind(i)).DIM ~= dim                                                 %&%
+      error( sprintf('Wrong dimension of G(%d).',ind(i)) );                 %&%
+    end                                                                     %&%
+    s = [ size(G(ind(i)).DATA) 1 1 ];                                       %&%
+    if any( s(1:4) ~= sfield )                                              %&%
+      error( sprintf('Wrong size of G(%d).DATA',ind(i)) );                  %&%
+    end                                                                     %&%
+    %  
+    Q.CLOUDBOX.SCAT_DATA{i} = ...
+                         fullfile( workfolder, sprintf('scat_data%d.xml',i) );
+    xmlStore( Q.CLOUDBOX.SCAT_DATA{i}, G(ind(i)).PROPS, ...
+                                                     'SingleScatteringData' );
+    Q.CLOUDBOX.PND_FIELD{i} = ...
+                     fullfile( workfolder, sprintf('pnd_field_raw%d.xml',i) );
+    A.data= G(ind(i)).DATA;
+    A.grids{1}= G(ind(i)).GRID1;
+    A.grids{2}= G(ind(i)).GRID2;
+    A.grids{3}= G(ind(i)).GRID3;
+    A.gridnames{1}='pressure';
+    A.gridnames{2}='latitude';
+    A.gridnames{3}='longitude';
+    xmlStore(Q.CLOUDBOX.PND_FIELD{i},A,'GriddedField3');  
+ end
+
+else
+ Q.CLOUDBOX_DO        = false;
+end
+
+
+
+
+

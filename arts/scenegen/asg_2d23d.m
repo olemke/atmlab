@@ -6,7 +6,7 @@
 %
 %OUT  G   Modified Gformat data
 %    
-%IN   D   Gformat definition structure.
+%IN  
 %     G   ASG data.
 %     Q   Qarts setting structure
 %         Only Q.SENSOR_LOS and Q.SENSOR_POS are considered
@@ -14,7 +14,7 @@
 
 % 2007-12-04   Created by Bengt Rydberg
 
-function G = asg_2d23d( D, G, Q );
+function G = asg_2d23d( G, Q );
 
 X.p_grid=G.GRID1;
 X.lat_grid=G.GRID2;
@@ -93,7 +93,7 @@ end
 %we want to have it on Q.LON_GRID, so we bin it on this grid
 G.DATA=Y.data;
 G.GRID3=G.GRID2-mean(G.GRID2);
-G.DIMS=[1 2 3];
+G.DIM=3;
 m1=mean(Q.LON_GRID);
 GRIDS{1}=Q.LON_GRID-m1;
 DIMS=3;
@@ -101,6 +101,5 @@ DIMS=3;
 %round off the grids not to have any problems 
 G.GRID3=round(G.GRID3*1e6)/1e6;
 GRIDS{1}=round(GRIDS{1}*1e6)/1e6;
-
-G=gf_bin( D, G, GRIDS , DIMS);
+G=asg_bin( G, GRIDS , DIMS);
 G.GRID3=G.GRID3+m1;
