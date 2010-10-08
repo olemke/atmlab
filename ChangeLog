@@ -1,5 +1,12 @@
 2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-78
+
+	* collocations/colloc_select_good_lines.m: Put back ugly special-case
+	hack, I was too optimistic "don't need it any longer" when I removed it.
+
+2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-77
 
 	* collocations/colloc_constants.m: For POES/POES-data, I'm storing

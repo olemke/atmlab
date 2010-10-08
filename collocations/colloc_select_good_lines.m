@@ -35,7 +35,19 @@ ngrans = length(unisec_uni);
 good = false(size(line));
 cutoffs = zeros(size(unisec_uni));
 for i = 1:ngrans
-    cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i));
+    try	        
+        cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i));
+    catch ME
+        % ugly hack necessary because colloc_process_* add 1 second to
+        % unisecs. This is being phased out, but still present. FIXME when
+        % I that ugliness is gone and lost forever.
+        switch ME.identifier
+            case 'atmlab:granule_first_line'
+                cutoffs(i) = granule_first_line(sat, sensor, unisec_uni(i)-1);
+            otherwise
+                ME.rethrow();
+        end
+    end
 end
 
 % make a poor estimate for those where it's unknown (average of rest)
