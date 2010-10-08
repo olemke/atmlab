@@ -112,6 +112,8 @@ if ~isnan(atmlab('SITE'))
         for i = 1:length(W)
             run(W{1});
         end
+    else
+        warning('ATMLAB:unkownsite','Unknown site: %s',atmlab('SITE'))
     end
 end
 

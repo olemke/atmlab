@@ -1,3 +1,11 @@
+2010-10-08  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-73
+
+	* atmlab/atmlab_init.m: Throws a warning message if there are no
+	directories for specified site (from atmlab('SITE') in atmlab_conf
+	if configured). e.g. 'Kiruna' instead of 'kiruna'
+
 2010-10-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-72
@@ -29,7 +37,7 @@
 2010-07-07	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-70
-
+	
 	* collocations/colloc_constants.m: Add POES/POES for NetCDF. Untested.
 
 	* collocations/colloc_process_data_cpr_mhs.m: Log less.
