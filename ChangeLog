@@ -1,4 +1,17 @@
-2010-10-09	Gerrit Holl	<gerrit.holl@ltu.se>
+2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-75
+
+	* site-specific/kiruna/datasets_init.m: Match either full path or just
+	basename.
+
+	* datasets/find_info_from_granule.m: Update documentation according to
+	change in datasets_init
+
+	* datasets/find_granules_by_date.m: Update call according to changed
+	regexp in datasets_init.
+
+2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-74
 
