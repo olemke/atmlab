@@ -7,8 +7,6 @@
 
 2010-10-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
-	* geoplots/gmt/makepolar.m (makepolar): 
-
 	* atmlab-1-0-71
 
 	* geoplots/gmt/polygoninize_regions.m (polygoninize_regions):
