@@ -22,7 +22,7 @@
 %       map = cmap('map'); 
 %    we get the present setting for the color map. A new color map is set as 
 %       cmap('map','jet');"
-%    The existing fields and thier values are displayed by
+%    The existing fields and their values are returned by
 %       cmap;
 %    The default settings are re-created by:
 %       cmap('defaults');
@@ -77,7 +77,7 @@ switch length( varg )
 
   case 0
     %
-    disp( A );
+    value = A;
 
   case 1
     %

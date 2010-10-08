@@ -6,6 +6,8 @@ function fulldir = find_datadir_by_date(datevec, satname, dataset)
 % the path to the directory that contains the granules for this particular
 % datevec.
 %
+% Valid datasets are returned by <a href="matlab:help list_datasets">list_datasets</a>.
+%
 % FORMAT
 %
 %   fulldir = find_datadir_by_date(datevec, satname, dataset)

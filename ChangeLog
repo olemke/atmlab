@@ -1,3 +1,37 @@
+2010-10-09	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-74
+
+	* datasets/find_info_from_granule.m: Added: returns information about a
+	granule based on its filename. E.g. the hour and the minute for a MHS
+	granule, the year, day of your, hour and minute for a CloudSat CPR
+	granule, etc. For more information, please read the help-text.
+
+	* datasets/list_datasets.m: Added: return a list of all datasets that can
+	be used in functions like find_info_from_granule, find_granules_by_date,
+	etc.
+
+	* handy/prstnt_struct.m: CHANGED BEHAVIOUR in case no arguments are
+	passed. Instead of printing the structure to the screen, return its value.
+	In theory, this can break existing code, but also in theory, any
+	programmer eval-ing stuff written to the screen deserves crushing by
+	elephant. In the new behaviour, the caller can actually find out fields
+	that are valid. If this changed behaviour causes problems in well-designed
+	code, please write to atmlab-dev@www.sat.ltu.se.
+
+	* datasets/read_granule.m: Add a 'force' option: instead of raising an
+	error, a failure in reading will give "just" a warning and return an empty
+	array.
+
+	* collocations/colloc_process_cpr_mhs.m,
+	collocations/colloc_process_data_cpr_mhs.m: Don't crash if HIRS or AMSU-A
+	missing or broken.
+
+	* datasets/find_granules_by_date.m, datasets/find_granules_for_period.m,
+	datasets/find_datafile_by_date.m, datasets/find_datadir_by_date.m,
+	datasets/read_granule.m, datasets/find_info_from_granule.m: Advertise
+	list_datasets here.
+
 2010-10-08  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-73

@@ -11,6 +11,8 @@ function [M, paths] = find_granules_by_date(year, month, day, sat, dataset, ...
 % also be more than one granule on the date before containing information
 % for the day requested. This is not currently taken into account.
 %
+% Valid datasets are shown by <a href="matlab:help list_datasets">list_datasets</a>
+%
 % FORMAT
 %
 %   [M, paths] = find_granules_by_date(year, month, day, sat, dataset, with_yesterday)

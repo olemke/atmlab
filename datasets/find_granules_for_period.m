@@ -1,20 +1,22 @@
 function [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sensor)
 
-% find_granules_for_period List all granules for sat/sensor for period
+% find_granules_for_period List all granules for sat/dataset for period
 %
 % For the period between date1 and date2, list all granules (as vectors
 % indicating the starting date/time) available.
 %
+% Valid datasets are returned by <a href="matlab:help list_datasets">list_datasets</a>.
+%
 % FORMAT
 %
-%   [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sensor)
+%   [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, dataset)
 %
 % IN
 %
 %   date1   datevec     starting date
 %   date2   datevec     ending date
 %   sat     string      satellite
-%   sensor  string      sensor
+%   dataset  string      sensor
 %
 % OUT
 %

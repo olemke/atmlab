@@ -100,31 +100,35 @@ M(:, c.A_INT) = M(:, c.A_TIME) - M(:, c.C_TIME);
 
 %% hirs
 
-hirs = read_granule(name_mhs, 'hirs', date_mhs, false);
 
-% TODO: optimise this bit of code
-% find hirs scanline (row) closest in time for each mhs scanline
-hr = arrayfun(...
-    @(v) mini(abs(hirs.time-v)), ...
-    data_mhs.time(M(:, c.B_I))); 
-% find hirs pixel (col) in scanline closest in distance to CPR-point
-hc = arrayfun(...
-    @(i) mini(...
+hirs = read_granule(name_mhs, 'hirs', date_mhs, false, true);
+
+
+if ~isempty(hirs)
+    % TODO: optimise this bit of code
+    % find hirs scanline (row) closest in time for each mhs scanline
+    hr = arrayfun(...
+        @(v) mini(abs(hirs.time-v)), ...
+        data_mhs.time(M(:, c.B_I)));
+    % find hirs pixel (col) in scanline closest in distance to CPR-point
+    hc = arrayfun(...
+        @(i) mini(...
         (hirs.lat(hr(i), :)-M(i, c.C_LAT)).^2 + ...
         (hirs.lon(hr(i), :)-M(i, c.C_LONG)).^2 ...
         ), 1:n);
-% find index from (row, column)
-hi = sub2ind(size(hirs.lat), hr, hc');
-% ready to add information to matrix
-M(:, c.H_LONG) = hirs.lon(hi);
-M(:, c.H_LAT) = hirs.lat(hi);
-M(:, c.H_START) = M(:, c.B_START);
-M(:, c.H_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + hirs.time(hr);
-M(:, c.H_I) = hr;
-M(:, c.H_C) = hc;
-M(:, c.H_DIST) = sphdist(M(:, c.C_LAT), M(:, c.C_LONG), ...
-    M(:, c.H_LAT), M(:, c.H_LONG), constants('EARTH_RADIUS')/1e3);
-M(:, c.H_INT) = M(:, c.H_TIME) - M(:, c.C_TIME);
+    % find index from (row, column)
+    hi = sub2ind(size(hirs.lat), hr, hc');
+    % ready to add information to matrix
+    M(:, c.H_LONG) = hirs.lon(hi);
+    M(:, c.H_LAT) = hirs.lat(hi);
+    M(:, c.H_START) = M(:, c.B_START);
+    M(:, c.H_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + hirs.time(hr);
+    M(:, c.H_I) = hr;
+    M(:, c.H_C) = hc;
+    M(:, c.H_DIST) = sphdist(M(:, c.C_LAT), M(:, c.C_LONG), ...
+        M(:, c.H_LAT), M(:, c.H_LONG), constants('EARTH_RADIUS')/1e3);
+    M(:, c.H_INT) = M(:, c.H_TIME) - M(:, c.C_TIME);
+end
 
 %% sort by: MHS row, then MHS column, then CloudSat pixel
 

@@ -62,18 +62,22 @@ M(:, c.data.MHS) = tb(i2, :);
 % those require reading additional files
 
 % TODO/FIXME: optimise this, I already read for the earlier processing
-amsua_data = read_granule(sat2, 'amsua', date2, false);
-hirs_data = read_granule(sat2, 'hirs', date2, false);
+amsua_data = read_granule(sat2, 'amsua', date2, false, true);
+hirs_data = read_granule(sat2, 'hirs', date2, false, true);
 
-% AMSU_A
-ai = sub2ind(size(amsua_data.lat), M_c(:, c.overlap.A_I), M_c(:, c.overlap.A_C));
-tb = reshape(amsua_data.tb, [numel(amsua_data.lat) 15]);
-M(:, c.data.AMSU_A) = tb(ai, :);
+if ~isempty(amsua_data)
+    % AMSU_A
+    ai = sub2ind(size(amsua_data.lat), M_c(:, c.overlap.A_I), M_c(:, c.overlap.A_C));
+    tb = reshape(amsua_data.tb, [numel(amsua_data.lat) 15]);
+    M(:, c.data.AMSU_A) = tb(ai, :);
+end
 
-% HIRS
-hi = sub2ind(size(hirs_data.lat), M_c(:, c.overlap.H_I), M_c(:, c.overlap.H_C));
-tb = reshape(hirs_data.tb, [numel(hirs_data.lat) 20]);
-M(:, c.data.HIRS) = tb(hi, :);
+if ~isempty(hirs_data)
+    % HIRS
+    hi = sub2ind(size(hirs_data.lat), M_c(:, c.overlap.H_I), M_c(:, c.overlap.H_C));
+    tb = reshape(hirs_data.tb, [numel(hirs_data.lat) 20]);
+    M(:, c.data.HIRS) = tb(hi, :);
+end
 
 %% MSPPS
 

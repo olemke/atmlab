@@ -16,6 +16,8 @@ function datafile = find_datafile_by_date(datevec, satname, sensor, ...
 %     regular expression and the indicated datevec/satname/dataset. In this
 %     case, one can apply a tolerance in seconds.
 %
+% Valid datasets are returned by <a href="matlab:help list_datasets">list_datasets</a>.
+%
 % FORMAT
 %
 %   datafile = find_datafile_by_date(datevec, sat, dataset[, tol])
