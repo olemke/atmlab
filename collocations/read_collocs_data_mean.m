@@ -29,7 +29,7 @@ filenames = gunzip(fn, atmlab('WORK_AREA'));
 ncid = netcdf.open(filenames{1}, 'NOWRITE');
 delete(filenames{1});
 
-varids = zeros(size(cols));
+varids = nan(size(cols));
 varwidth = zeros(size(cols));
 hasmean = false;
 % check dimensions, if any mean will need those first
@@ -37,6 +37,7 @@ hasmean = false;
 alloc_length = 0;
 for i = 1:length(cols)
     if isnumeric(cols{i}) % refers to no. in previous
+        varids(i) = -1;
         continue
     end
     col = cols{i};
@@ -99,7 +100,7 @@ end
 
 n = 1; % keep track of dims
 for i = 1:length(cols)
-    if varids(i)==0 % not a var, see comment about skipping above
+    if varids(i)==-1 % not a var, see comment about skipping above
         continue;
     end
     var = netcdf.getvar(ncid, varids(i));

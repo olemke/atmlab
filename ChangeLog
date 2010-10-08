@@ -1,4 +1,28 @@
-2010-10-08	Gerrit Holl	<gerrit.holL@ltu.se>
+2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-77
+
+	* collocations/colloc_constants.m: For POES/POES-data, I'm storing
+	AMSU-B/MHS, not all of AMSU. Also fix dimensions.
+
+	* collocations/read_collocs_data_mean.m: Bugfix: 0 is a valid varid, so
+	cannot be used as a flag. Use -1 as a flag instead.
+
+	* collocations/write_collocations_netcdf.m: Don't define a dimension
+	already defined before, rather just reuse it. Optionally define extra
+	attributes to be stored.
+
+	* math/combine_rows.m: Fix typo in helpstring.
+
+	* datasets/datasets_config.m, site-specific/kiruna/datasets_init.m: Add
+	'legacy' datasets (old-style collocations).  
+
+	* datasets/common_read_avhrr.m: Update to split colloc_config.
+
+	* ChangeLog: Document my changes
+
+
+2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-76
 

@@ -2,7 +2,7 @@ function M = combine_rows(A, B, varargin)
 
 % combine_rows Return combinations of rows
 %
-% Returns every combination of of for all arguments (matrices)
+% Returns every combination of rows for all arguments (matrices)
 %
 % FORMAT
 %
