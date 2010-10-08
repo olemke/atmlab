@@ -111,7 +111,11 @@ for i = 1:length(fields) % for each satellite
     
     colloc_vars = intersect(fieldnames(cols.overlap), fieldnames(cols.stored));
     data_vars = intersect(fieldnames(cols.data), fieldnames(cols.stored));
-    mean_vars = intersect(fieldnames(cols.meandata), fieldnames(cols.stored));
+    if isfield(cols, 'meandata')
+        mean_vars = intersect(fieldnames(cols.meandata), fieldnames(cols.stored));
+    else
+        mean_vars = {};
+    end
     vars = [colloc_vars; data_vars; mean_vars];
     vartypes = [repmat({'overlap'}, size(colloc_vars)); ...
                 repmat({'data'}, size(data_vars)); ...

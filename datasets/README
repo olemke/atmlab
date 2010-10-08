@@ -13,3 +13,5 @@ columns in time should be 1. This convention was initially designed for the
 portable use of collocation codes. E.g. if one wants to add a new dataset to
 be collocated with others, one needs to add a reader function in the same
 format and add the appropiate setting to datasets_constants.
+
+For instructions on adding new datasets, see the help of datasets_config.

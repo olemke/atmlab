@@ -2,7 +2,26 @@ function value = datasets_config(varargin)
 
 % datasets_config Defines locations of datasets
 %
-% Similar to 'atmlab'.
+% This m-file interacts with a <a href="matlab:help prstnt_struct">persistent structure</a>
+% and stores information about the structure in which the datasets are
+% stored on the filesystem. Inside those, one can use variable
+% substitution. A list of substituted variables is available in
+% <a href="matlab:help strrep_variables">strrep_variables</a>.
+% 
+% For each dataset, datasets_config shall initialise to nan the following
+% four configuration variables:
+%
+% DATASET_basedir   the root directory for this dataset
+% DATASET_subdir    directory in which files are stored
+% DATASET_regexp    regular expression matching filename; should have some
+%                   named matches to get year, month, day, etc.
+% DATASET_filename  if possible, set to calculate the filename directly
+%                   from year, month, day, etc.
+%
+% For example settings, see site-specific/kiruna/datasets_init.m. If adding
+% a new dataset, it is recommended to also set defaults in the
+% site-specific initialisation, so that others can use it directly and that
+% it can serve as an example to people at other sites.
 %
 % $Id$
 
@@ -39,6 +58,31 @@ A.cpr_basedir = nan;
 A.cpr_subdir = nan;
 A.cpr_regexp = nan;
 A.cpr_filename = nan;
+
+A.cloudsat_2B_CWC_RO_basedir = nan;
+A.cloudsat_2B_CWC_RO_subdir = nan;
+A.cloudsat_2B_CWC_RO_regexp = nan;
+A.cloudsat_2B_CWC_RO_filename = nan;
+
+A.cloudsat_1B_CPR_basedir = nan;
+A.cloudsat_1B_CPR_subdir = nan;
+A.cloudsat_1B_CPR_regexp = nan;
+A.cloudsat_1B_CPR_filename = nan;
+
+A.cloudsat_2B_GEOPROF_basedir = nan;
+A.cloudsat_2B_GEOPROF_subdir = nan;
+A.cloudsat_2B_GEOPROF_regexp = nan;
+A.cloudsat_2B_GEOPROF_filename = nan;
+
+A.cloudsat_2C_PRECIP_COLUMN_basedir = nan;
+A.cloudsat_2C_PRECIP_COLUMN_subdir = nan;
+A.cloudsat_2C_PRECIP_COLUMN_regexp = nan;
+A.cloudsat_2C_PRECIP_COLUMN_filename = nan;
+
+A.cloudsat_ECMWF_AUX_basedir = nan;
+A.cloudsat_ECMWF_AUX_subdir = nan;
+A.cloudsat_ECMWF_AUX_regexp = nan;
+A.cloudsat_ECMWF_AUX_filename = nan;
 
 A.amsua_basedir = nan;
 A.amsua_subdir = nan;

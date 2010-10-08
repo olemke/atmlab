@@ -17,6 +17,27 @@ datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
 datasets_config('cpr_subdir', '$YEAR4/$DOY');
 datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_');
 
+datasets_config('cloudsat_2B_CWC_RO_basedir', datasets_config('cpr_basedir'));
+datasets_config('cloudsat_2B_CWC_RO_subdir', datasets_config('cpr_subdir'));
+datasets_config('cloudsat_2B_CWC_RO_regexp', datasets_config('cpr_regexp'));
+
+datasets_config('cloudsat_1B_CPR_basedir', '/storage3/data/cloudsat/1B-CPR.R04/');
+datasets_config('cloudsat_1B_CPR_subdir', datasets_config('cpr_subdir'));
+datasets_config('cloudsat_1B_CPR_regexp', datasets_config('cpr_regexp'));
+
+datasets_config('cloudsat_2B_GEOPROF_basedir', '/storage3/data/cloudsat/2B-GEOPROF.R04/' );
+datasets_config('cloudsat_2B_GEOPROF_subdir', datasets_config('cpr_subdir'));
+datasets_config('cloudsat_2B_GEOPROF_regexp', datasets_config('cpr_regexp'));
+
+datasets_config('cloudsat_2C_PRECIP_COLUMN_basedir', '/storage3/data/cloudsat/2C-PRECIP-COLUMN.R04/');
+datasets_config('cloudsat_2C_PRECIP_COLUMN_subdir', datasets_config('cpr_subdir'));
+datasets_config('cloudsat_2C_PRECIP_COLUMN_regexp', datasets_config('cpr_regexp'));
+
+datasets_config('cloudsat_ECMWF_AUX_basedir', '/storage3/data/cloudsat/ECMWF-AUX.R04');
+datasets_config('cloudsat_ECMWF_AUX_subdir', datasets_config('cpr_subdir'));
+datasets_config('cloudsat_ECMWF_AUX_regexp', datasets_config('cpr_regexp'));
+
+
 datasets_config('amsua_basedir', '/storage3/data/amsu');
 datasets_config('amsua_subdir', '$SAT_amsua_$YEAR4/$MONTH/$DAY');
 % Matlab doesn't seem to support nested groups, so have to stick with

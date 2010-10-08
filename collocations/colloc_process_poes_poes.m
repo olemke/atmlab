@@ -34,7 +34,7 @@ function M = colloc_process_poes_poes(collocations, ...
 % $Id$
 
 % prepare
-c = colloc_constants('cols_poes_poes');
+c = colloc_constants('cols_mhs_mhs');
 c = c.overlap;
 n = size(collocations, 1);
 M = nan*zeros(n, c.NCOLS);

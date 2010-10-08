@@ -1,3 +1,20 @@
+2010-10-08	Gerrit Holl	<gerrit.holL@ltu.se>
+
+	* atmlab-1-0-76
+
+	* datasets/datasets_config.m, site-specific/kiruna/datasets_init.m: Add 4
+	more CloudSat CPR datasets and alias the old one to cloudsat_2B_CWC_RO.
+	Also add docs on how to add new datasets.
+
+	* collocations/colloc_process_poes_poes.m: Fix bug, called _mhs_mhs, not
+	_poes_poes.
+
+	* collocations/write_collocations_netcdf.m: Fix bug, POES has no meandata.
+
+	* datasets/README: Add note on where to find help for adding new datasets.
+
+	* datasets/TODO: cleared two items that are DONE.
+
 2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-75
