@@ -60,15 +60,10 @@ end
 fid = atmlab('OUT');
 eid = atmlab('ERR');
 
-%% need column numbers for preventing doubles
-
-cols = colloc_constants(['cols_' sensor1 '_' sensor2]);
 
 %% get handles for reading, processing
 
 dummy = @(varargin) (-1);
-fh1 = datasets_constants(['read_' sensor1]);
-fh2 = datasets_constants(['read_' sensor2]);
 fhp = colloc_constants(['process_' sensor1 '_' sensor2]);
 
 try
@@ -94,6 +89,7 @@ end
 % Also pass on the primary satellite, because for poes/poes, we don't want
 % overlaps where sat1==sat2
 
+% overlap check 1: primary filename, secondary filename
 [date2_all, sat2_all_names] = overlap_granule(sat1, sensor1, ...
     date1, sat2, sensor2);
 if size(date2_all, 1)==0
@@ -129,7 +125,16 @@ catch ME
     end
 end
 
+% keep effective range, check time overlap before actually reading the
+% secondary data, because the primary might be sparse. E.g. when judging
+% from the filenames the granules contain overlapping periods, but if the
+% primary in reality only contains data for a certain part of this period
+% (e.g. in the case of collocations), should check the primary data with
+% the secondary filename in order not to read files one knows will not
+% contain overlap anyway.
 data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
+data1.eff_range = double(data1.epoch) + [min(data1.time)-colloc_config('interval'), max(data1.time)+colloc_config('interval')];
+
 if isempty(data1.time)
     logtext(fid, 'Primary is empty, nothing to collocate\n');
     return
@@ -155,6 +160,17 @@ for i = 1:size(date2_all, 1)
     
     logtext(atmlab('OUT'), 'Collocating with %s %s %04d-%02d-%02d %02d:%02d\n', ...
         satname, sens, datecell{1:5});
+    
+    % Overlap check 2; primary data with secondary filename
+    data2_start = date2unixsecs(datecell{1:5});
+    data2_end = data2_start + datasets_constants(['granule_duration_' sensor2]);
+    
+    if (data2_start > data1.eff_range(2)) || (data2_end < data1.eff_range(1))
+        % no possible time overlap; data1 range already compensated for
+        % colloc_config('interval'); no use even reading granule2
+        logtext(atmlab('OUT'), 'Not reading, no overlap with primary\n');
+        continue
+    end
 
     try
         data2 = read_granule(satname, sens, date2_all(i, 1:5), false); % keep doubles for now
@@ -176,14 +192,19 @@ for i = 1:size(date2_all, 1)
         continue
     end
     
-    if date2_all(i, 3) ~= date1(1, 3)
-        % make sure we're using the same time axis epoch
-        [data1.time, data2.time] = unify_time_axis(data1.time_orig, data2.time_orig);
-    else
-        data1.time = data1.time_orig;
-        data2.time = data2.time_orig;
+    switch sign(data1.epoch - data2.epoch)
+        case -1 % data1 epoch is earliest
+            data2.time = data2.time + double(data2.epoch - data1.epoch);
+            data2.epoch = data1.epoch;
+        case 0 % do nothing
+        case 1 % data2 epoch is earliest
+            data1.time = data1.time + double(data1.epoch - data2.epoch);
+            data1.epoch = data2.epoch;
+        otherwise
+            error('atmlab:collocate_granule', 'Reached impossible place. Bug.');
     end
-    % find the intervals for which both are active
+
+    % overlap check 3: primary data, secondary data
     [iv1, iv2] = find_common_time(data1.time, data2.time, colloc_config('interval'));
     % limit to one day (if needed)
     switch oneday

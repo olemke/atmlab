@@ -14,23 +14,16 @@ function out = dayofyear_inverse(year,doy)
 %    dayofyear: 300
 %
 % 27/8-2010 Salomon Eliasson
+% 2010-10-11 Improved by Gerrit
+%
+% $Id$
+
 if doy > daysinyear(year)
-    error('too many days')
+    error('atmlab:dayofyear_inverse', 'too many days')
 end
 
-mn=1;
-day=1;
-k=1;
-while k < doy
-    if eomday(year,mn)==day
-        mn=mn+1;
-        day = 1;
-    else day = day+1; 
-    end
-    k = k+1;
-end
-
-out.yr = year;
+[yr mn day] = jd2date(date2jd(double(year), 1, 0) + double(doy));
+out.yr = yr;
 out.mn = mn;
 out.day = day;
-out.dayofyear = k;
+out.dayofyear = doy;

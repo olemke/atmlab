@@ -35,7 +35,7 @@ function M_m = colloc_process_meandata_collocation_cpr_poes_avhrr(collocations, 
 %
 % $Id$
 
-c = colloc_constants('cols_collocation_cpr_poes_avhrr');
+c = colloc_constants('cols_collocation_cpr_mhs_avhrr');
 
 % find unique ones
 

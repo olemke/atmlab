@@ -26,8 +26,8 @@ function value = datasets_constants(c)
 
 A.POES_satellite_names = {'noaa15', 'noaa16', 'noaa17', 'noaa18', 'noaa19', 'metopa'};
 A.POES_satellite_numbers = [15 16 17 18 19 29499]; % for metopa, use NORAD number
-A.POES_satellites_amsub = {'noaa15', 'noaa16', 'noaa17'};
-A.POES_satellites_mhs = {'noaa18', 'noaa19', 'metopa'};
+A.POES_satellites_amsub = {'noaa15', 'noaa16', 'noaa17', 'N15', 'N16', 'N17'};
+A.POES_satellites_mhs = {'noaa18', 'noaa19', 'metopa', 'N18', 'N19', 'MA'};
 
 %% define what reading function to use for what sensor
 
@@ -38,7 +38,8 @@ A.read_amsub = @common_read_poes_radiometer;
 A.read_hirs = @common_read_poes_radiometer;
 A.read_avhrr = @common_read_avhrr;
 A.read_hirscs = @common_read_hirscs;
-A.read_collocation_cpr_poes = @common_read_collocation_cpr_poes;
+A.read_collocation_cpr_poes = @common_read_collocation_cpr_mhs;
+A.read_collocation_cpr_mhs = @common_read_collocation_cpr_mhs;
 
 %% define approximate granule durations
 
@@ -50,11 +51,13 @@ A.granule_duration_mhs = 6130; % seconds; upper estimate
 A.granule_duration_amsua = 6130;
 A.granule_duration_amsub = 6130;
 A.granule_duration_hirs = 6130;
+A.granule_duration_avhrr = 6130; 
 
 A.granule_duration_cpr = 5932; % seconds
 
 A.granule_duration_hirscs = 86400; % one granule per da
 A.granule_duration_collocation_cpr_poes = 86400;
+A.granule_duration_collocation_cpr_mhs = 86400;
 
 if exist('c', 'var')
     value = A.(c);

@@ -1,5 +1,51 @@
 2010-10-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-80
+
+	* collocations/colloc_process_data_collocation_cpr_poes_avhrr.m,
+	collocations/colloc_process_meandata_collocation_cpr_poes_avhrr.m,
+	collocations/colloc_process_collocation_cpr_poes_avhrr.m: Adapt
+	to changed nomenclature in colloc_constants (still from the move from
+	colloc_config).
+
+	* collocations/collocate_date.m: If a granule takes exactly one day,
+	assume it doesn't contain data for more than one day, and don't take the
+	previous day in find_granules_by_date.
+
+	* collocations/colloc_constants.m: Add HIRSCS/MHS and
+	collocation_cpr_mhs_avhrr. 
+
+	* collocations/collocate_granule.m: Increase number of overlap checks from
+	2 to 3: one overlap check when I have the primary data, but not the
+	secondary. If only a small fraction of the primary granule actually
+	contains data (as is often the case with collocations), we can refrain
+	from reading many of the secondary granules. Use epoch field instead of
+	buggy unify_time_axis.
+
+	* time/unify_time_axis.m: Get rid of buggy function. Use epoch field
+	instead.
+
+	* time/dayofyear_inverse.m: Use simpler and faster approach. Convert to
+	double to prevent rounding errors.
+
+	* files/loadncvar.m: Rather than using a readattr argument, simply look at
+	nargout te determine if the second output argument should be assigned.
+
+	* datasets/common_read_collocation_cpr_mhs.m: Adapt to collocations that
+	are now in NetCDF. Add version string and epoch field.
+
+	* datasets/common_read_avhrr.m: Add version string and epoch field. Adapt
+	to modernity. Use atmlab('WORK_AREA') rather than /tmp/.
+
+	* datasets/datasets_constants.m: Include abbreviated satellite names so
+	that amsub_or_mhs also works for N15, N16, etc.
+
+	* datasets/TODO: TODO: add epoch fields to all reader functions.
+
+	* ChangeLog: Document my changes.
+
+2010-10-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-79
 
 	* collocations/collocation_read.m: Check for legacy calling signature.

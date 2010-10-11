@@ -34,7 +34,7 @@ function M_d = colloc_process_data_collocation_cpr_poes_avhrr(collocations, M_c,
 % $Id$
 
 
-c = colloc_constants('cols_collocation_cpr_poes_avhrr');
+c = colloc_constants('cols_collocation_cpr_mhs_avhrr');
 
 % row and column numbers; use M_c, not collocations, because the latter are
 % sorted and the former aren't, and this has to be in the same order

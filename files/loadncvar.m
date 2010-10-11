@@ -19,14 +19,13 @@
 %       varname    Name of variable.
 
 % 2010-02-02   Created by Oliver Lemke.
+% 2010-10-11   Modified by Gerrit Holl.
 
 function [ret, attr] = loadncvar( filename, varname, varargin )
   
-readattr = optargs( varargin, { false } );
-
 ncid = netcdf.open (filename, 'NOWRITE');
 
-if (readattr)
+if (nargout>1)
   attr = getncattributes (ncid);
 else
   attr = [];

@@ -40,21 +40,27 @@ chans = cat(2, names{channels});
 
 [fp{1:4}] = fileparts(file);
 basename = fp{2};
-outfile = fullfile('/tmp', [basename '.nc']);
-infile = fullfile('/tmp', basename);
-logtext(colloc_config('stdout'), 'Converting from l1b to netcdf\n');
-command = ['java -jar ' datasets_config('sat2netcdf') ' -nogui ' chanstr ' -latlon -temperature -avhrr ' infile ' -outputdir /tmp'];
-chdir(fileparts(colloc_config('sat2netcdf')));
-gunzip(file, '/tmp/');
+outfile = fullfile(atmlab('WORK_AREA'), [basename '.nc']);
+infile = fullfile(atmlab('WORK_AREA'), basename);
+logtext(atmlab('OUT'), 'Converting from l1b to netcdf\n');
+command = ['java -jar ' datasets_config('sat2netcdf') ' -nogui ' chanstr ' -latlon -temperature -avhrr ' infile ' -outputdir ' atmlab('WORK_AREA')];
+chdir(fileparts(datasets_config('sat2netcdf')));
+gunzip(file, atmlab('WORK_AREA'));
 [~, ~] = system(command);
 chdir(cwd);
 
 logtext(atmlab('OUT'), 'Reading data\n');
-data = loadncvar(outfile, [{'lat', 'lon', 'scanLineUTC'}, ...
+data = loadncvar(outfile, [{'lat', 'lon', 'scanLineUTC', 'formatVersion', ...
+    'formatVersionYear', 'formatVersionDayOfYear', 'startYear', 'startDayOfYear'}, ...
     chans]);
+data.version = sprintf('year-doy:version = %d-%d:%d', data.formatVersionYear, data.formatVersionDayOfYear, data.formatVersion);
 
 delete(infile);
 delete(outfile);
+
+% calculate epoch
+datestruct = dayofyear_inverse(data.startYear, data.startDayOfYear);
+data.epoch = uint32(date2unixsecs(double(datestruct.yr), double(datestruct.mn), double(datestruct.day)));
 
 % convert time from milliseconds to seconds
 
@@ -68,6 +74,8 @@ data.time = compensate_wraparound(data.time);
 % add file/version
 
 data.file = file;
-data.version = '0'; % don't know
 
 cd(cwd);
+
+% remove redundant fields
+data = rmfield(data, {'formatVersion', 'formatVersionYear', 'formatVersionDayOfYear'});

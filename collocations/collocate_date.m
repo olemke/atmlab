@@ -32,7 +32,10 @@ function [overlap, data, meandata] = collocate_date(year, month, day, sat1, sens
 
 fid = atmlab('OUT');
 
-grans = find_granules_by_date(year, month, day, sat1, sensor1);
+% find granules for primary dataset; if the length equals one day, do not
+% take the day before as it's already sorted per day
+grans = find_granules_by_date(year, month, day, sat1, sensor1, ...
+    datasets_constants(['granule_duration_' sensor1])~=86400);
 if isempty(grans)
     logtext(atmlab('ERR'), 'no granules found %s/%s %d-%d-%d\n', ...
         sat1, sensor1, year, month, day);

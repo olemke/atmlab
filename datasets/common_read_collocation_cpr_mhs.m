@@ -12,37 +12,31 @@ function data = common_read_collocation_cpr_mhs(file)
 %
 %   data        structure   data with time, lat, lon
 %
-% This will actually read the meandata file, as MHS-pixels are of interest.
 %
 % $Id$
 
-% find corresponding meandata-file as well
-p = strfind(file, 'collocations');
-p = p(end)+12;
-meandatafile = [file(1:p) 'meandata' file(p:end)];
 
-M_c = load(file);
-M_m = load(meandatafile);
-c = colloc_config('cols_cpr_poes');
+gunzipped = gunzip(file, atmlab('WORK_AREA'));
+[data, attr] = loadncvar(gunzipped{1}, {'FIRST', 'B_LAT', 'B_LONG', 'B_TIME'});
+delete(gunzipped{1});
+data.info = cell2struct(...
+    cellfun(@(v) v{2}, attr, 'UniformOutput', false), ...
+    cellfun(@(v) v{1}, attr, 'UniformOutput', false), ...
+    2);
+data.version = ['colloc:' data.info.software_version ':' ...
+    data.info.primary_version ':' data.info.secondary_version ':' ...
+    data.info.date];
 
-rows = M_m.data_averaged(:, c.meandata.FIRST);
-data.lat = M_c.collocations(rows, c.overlap.B_LAT);
-data.lon = M_c.collocations(rows, c.overlap.B_LONG);
-[~, ~, ~, h, mi, s] = unixsecs2date(M_c.collocations(rows, c.overlap.B_TIME));
+rows = data.FIRST;
+data.lat = data.B_LAT(rows);
+data.lon = data.B_LONG(rows);
+
+[y, mo, d, h, mi, s] = unixsecs2date(double(data.B_TIME(rows)));
+data.epoch = uint32(unique(date2unixsecs(y, mo, d)));
+assert(isscalar(data.epoch), 'atmlab:common_read_collocation_cpr_mhs', ...
+    'Data in %s appears to contain measurement from more than one day', ...
+    file);
 data.time = compensate_wraparound(3600*h + 60*mi + s);
 data.file = file;
 
-% (old implementation)
-% % store rows of unique MHS pixels so that I can later if I know AVHRR pixel
-% % i collocates with unique-MHS pixel j, what row this corresponds with in
-% % the original collocation  data. This means that the values for
-% % 'collocations' are in itself not useful, but need to be fed into
-% % data.rows in order to get the rows in the cloudsat collocation file
-% % WARNING: unique returns the index to the /last/ one and should, because
-% % find_avhrrmean_for_cscolmean depends on this!
-% [M.collocations, data.rows] = unique(M.collocations(:, [c.overlap.B_TIME c.overlap.B_I c.overlap.B_C c.overlap.B_LAT c.overlap.B_LONG]), 'rows');
-% [~, ~, ~, h, mi, s] = unixsecs2date(M.collocations(:, 1));
-% data.lat = M.collocations(:, 4);
-% data.lon = M.collocations(:, 5);
-% data.time = compensate_wraparound(3600*h + 60*mi + s);
-% data.file = file;
+data = rmfield(data, {'FIRST', 'B_LAT', 'B_LONG', 'B_TIME'});
