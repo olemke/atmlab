@@ -1,5 +1,35 @@
 2010-10-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-81
+
+	* collocations/colloc_process_data_collocation_cpr_poes_avhrr.m:
+	Pre-allocate based on M_c rather than on collocs, as doubles were removed
+	from the former. Replace unused input arguments by ~.
+
+	* collocations/collocation_read.m: When a multi-channel field is requested
+	without specifying the channels, return all channels rather than just one
+	or crash.
+
+	* collocations/colloc_constants.m: FIRST and LAST don't fit in short, make
+	it int instead. Also add mandatory aliases field.
+
+	* collocations/read_collocs_data_mean.m: Fix bug, flag for
+	var-is-column is actually -1, not 0.
+
+	* collocations/colloc_process_collocation_cpr_poes_avhrr.m: Remove doubles
+	after collocating.
+
+	* collocations/collocate_granule.m: Check for emptiness /before/ rather
+	than after fixing time.
+
+	* datasets/common_read_collocation_cpr_mhs.m: Use C_TIME rather than
+	B_TIME, as this has a better 'resolution' and as this one is used to sort
+	per day.
+
+	* ChangeLog: Document my changes.
+
+2010-10-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-80
 
 	* collocations/colloc_process_data_collocation_cpr_poes_avhrr.m,

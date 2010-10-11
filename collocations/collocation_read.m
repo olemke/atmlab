@@ -29,7 +29,8 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %                               reader function.
 %   limits      structure       Describes acceptable ranges for the
 %                               different columns requested. Data outside
-%                               these ranges will not be returned. 
+%                               these ranges will not be returned. Note:
+%                               [-inf, inf] will still get rid of nans.
 %   filters     cell array      Cell array of cell arrays. Each member of
 %                               the cell array is {@filter, {COL1, ...,
 %                               COLN}, {'foo', 'bar', ..., 'baz'}}.
@@ -90,7 +91,7 @@ while i <= length(cols_in)
         dn = length(cols_in{i+1});
         di = 2;
     else
-        dn = 1;
+        dn = length(structsearch(cols, cols_in{i}));
         di = 1;
     end
     name_struct.(cols_in{i}) = n:(n+dn-1);

@@ -125,6 +125,12 @@ catch ME
     end
 end
 
+
+if isempty(data1.time)
+    logtext(fid, 'Primary is empty, nothing to collocate\n');
+    return
+end
+
 % keep effective range, check time overlap before actually reading the
 % secondary data, because the primary might be sparse. E.g. when judging
 % from the filenames the granules contain overlapping periods, but if the
@@ -135,10 +141,6 @@ end
 data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
 data1.eff_range = double(data1.epoch) + [min(data1.time)-colloc_config('interval'), max(data1.time)+colloc_config('interval')];
 
-if isempty(data1.time)
-    logtext(fid, 'Primary is empty, nothing to collocate\n');
-    return
-end
 logtext(fid, 'Found %d other granules to collocate with\n', size(date2_all, 1));
 
 overlap.version{1} = data1.version;

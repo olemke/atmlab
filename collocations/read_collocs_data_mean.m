@@ -114,7 +114,7 @@ for i = 1:length(cols)
             'Incorrect number of rows in data');
     end
     % determine what columns to read
-    if i~=length(cols) && varids(i+1)==0 % next var is column
+    if i~=length(cols) && varids(i+1)==-1 % next var is column
         cols_here = cols{i+1};
     else % read all columns
         cols_here = 1:varwidth(i);

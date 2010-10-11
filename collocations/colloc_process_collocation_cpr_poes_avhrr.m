@@ -84,3 +84,18 @@ M_c(:, c.DIST_MHS_AVHRR) = sphdist(data1.lat(r1), data1.lon(r1), ...
 M_c(:, c.INT_MHS_AVHRR) = M_c(:, c.AVHRR_TIME) - time1;
 
 M_c = sortrows(M_c, [c.CPR_POES_START c.CPR_POES_LINENO c.AVHRR_START c.AVHRR_TIME c.AVHRR_ROW c.AVHRR_COL]);
+
+%% remove doubles
+try
+    wrongrows = M_c(:, c.AVHRR_ROW)< granule_first_line(name2, 'avhrr', date2);
+    M_c(wrongrows, :) = [];
+catch ME
+    switch ME.identifier
+        case 'atmlab:granule_first_line'
+            logtext(atmlab('ERR'), ...
+                'Warning: Unable to remove doubles: %s\n', ...
+                ME.message);
+        otherwise
+            ME.rethrow();
+    end
+end
