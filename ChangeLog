@@ -1,3 +1,13 @@
+2010-10-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-79
+
+	* collocations/collocation_read.m: Check for legacy calling signature.
+	Issue a warning but proceed if this is the case.
+
+	* collocations/write_collocations_netcdf.m: Write trailing newline to
+	atmlab('OUT') rather than always to stdout (fid 1).
+
 2010-10-08	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-78

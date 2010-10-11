@@ -204,7 +204,7 @@ for i = 1:length(fields) % for each satellite
                     end
             end
         end
-        fprintf('\n');
+        fprintf(atmlab('OUT'), '\n');
     end
     logtext(atmlab('OUT'), 'Finalising\n');
     

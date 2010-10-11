@@ -58,6 +58,14 @@ if ~exist('filters', 'var')
     filters = {};
 end
 
+%% check legacy format
+if iscell(cols_in{1})
+    warning('atmlab:collocation_read', ...
+        ['fields should be {''a'', ''b'', ''c'', ''d'', ...}, ' ...
+         'not {{''a'', ''b'', ...}, {''c'', ''d'', ...}}']);
+     cols_in = [cols_in{:}];
+end
+
 %% ALWAYS get rid of doubles
 % FIXME: at some point in the future, this should be redundant
 filters = [filters ...
