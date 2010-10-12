@@ -65,12 +65,8 @@ M(:, c.LONG2) = data2.lon(i2);
 M(:, c.START1) = round(date2unixsecs(date1_cell{1:5}));
 M(:, c.START2) = round(date2unixsecs(date2_cell{1:5}));
 
-% unify_time_axis has made that data[12].time uses the earliest of the two
-% as the epoch
-time_epoch = min([date2unixsecs(date1_cell{1:3}, 0, 0, 0), ...
-                  date2unixsecs(date2_cell{1:3}, 0, 0, 0)]);
-M(:, c.TIME1) = time_epoch + data1.time(r1);
-M(:, c.TIME2) = time_epoch + data2.time(r2);
+M(:, c.TIME1) = data1.epoch + data1.time(r1);
+M(:, c.TIME2) = data2.epoch + data2.time(r2);
 
 % index/column
 M(:, c.I1) = r1;

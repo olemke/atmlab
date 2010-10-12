@@ -11,7 +11,7 @@ function data = common_read_poes_radiometer(file)
 %
 % IN
 %
-%   file    string  Path to l1b file
+%   file    string  Path to l1b file. Must be FULL PATH!
 %
 % OUT
 %
@@ -48,3 +48,9 @@ data.tb = shiftdim(data.tb, 2);
 
 data.path = file;
 data.version = '0'; % dunno
+
+% add epoch
+
+info = find_info_from_granule('amsub', file); % amsua/amsub/mhs etc. all the same
+data.epoch = round(date2unixsecs(str2double(info.year), str2double(info.month), ...
+    str2double(info.day)));

@@ -66,7 +66,7 @@ M(:, c.C_LAT) = data_cpr.lat(cr);
 % time
         
 M(:, c.C_START, :) = round(date2unixsecs(date_cpr_cell{1:5}));
-M(:, c.C_TIME, :) = date2unixsecs(date_cpr_cell{1:3}, 0, 0, 0) + data_cpr.time(cr);
+M(:, c.C_TIME, :) = data_cpr.epoch + data_cpr.time(cr);
 M(:, c.C_ROW, :) = cr;
 
 %% avhrr
@@ -74,8 +74,7 @@ M(:, c.C_ROW, :) = cr;
 M(:, c.AVHRR_LAT) = data_avhrr.lon(ai);
 M(:, c.AVHRR_LONG) = data_avhrr.lon(ai);
 M(:, c.AVHRR_START) = round(date2unixsecs(date_avhrr_cell{1:5}));
-M(:, c.AVHRR_TIME) = date2unixsecs(date_avhrr_cell{1:3}, 0, 0, 0) + ...
-    data_avhrr.time(ar);
+M(:, c.AVHRR_TIME) = data_avhrr.epoch + data_avhrr.time(ar);
 M(:, c.AVHRR_ROW) = ar;
 M(:, c.AVHRR_COL) = ac;
 M(:, c.DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...

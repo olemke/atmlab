@@ -125,9 +125,11 @@ catch ME
     end
 end
 
+overlap.version{1} = data1.version;
 
 if isempty(data1.time)
     logtext(fid, 'Primary is empty, nothing to collocate\n');
+    overlap.version{2} = 'N/A';
     return
 end
 
@@ -143,7 +145,6 @@ data1.eff_range = double(data1.epoch) + [min(data1.time)-colloc_config('interval
 
 logtext(fid, 'Found %d other granules to collocate with\n', size(date2_all, 1));
 
-overlap.version{1} = data1.version;
 
 %% loop through all the granules to collocate with
 

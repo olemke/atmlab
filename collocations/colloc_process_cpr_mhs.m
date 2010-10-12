@@ -66,7 +66,7 @@ M(:, c.C_LAT) = data_cpr.lat(cr);
 % time
         
 M(:, c.C_START, :) = round(date2unixsecs(date_cpr_cell{1:5}));
-M(:, c.C_TIME, :) = date2unixsecs(date_cpr_cell{1:3}, 0, 0, 0) + data_cpr.time(cr);
+M(:, c.C_TIME, :) = data_cpr.epoch + data_cpr.time(cr);
 M(:, c.C_I, :) = cr;
 
 %% amsub/mhs
@@ -74,7 +74,7 @@ M(:, c.C_I, :) = cr;
 M(:, c.B_LONG) = data_mhs.lon(ai);
 M(:, c.B_LAT) = data_mhs.lat(ai);
 M(:, c.B_START) = round(date2unixsecs(date_mhs_cell{1:5}));
-M(:, c.B_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + data_mhs.time(ar);
+M(:, c.B_TIME) = data_mhs.epoch + data_mhs.time(ar);
 M(:, c.B_I) = ar;
 M(:, c.B_C) = ac;
 M(:, c.B_DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
@@ -92,7 +92,7 @@ aai = sub2ind(size(amsua.lat), M(:, c.A_I), M(:, c.A_C));
 M(:, c.A_LONG) = amsua.lon(aai);
 M(:, c.A_LAT) = amsua.lat(aai);
 M(:, c.A_START) = M(:, c.B_START);
-M(:, c.A_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + ...
+M(:, c.A_TIME) = data_mhs.epoch + ...
     amsua.time(M(:, c.A_I));
 M(:, c.A_DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
     amsua.lat(aai), amsua.lon(aai), constants('EARTH_RADIUS')/1e3);
@@ -122,7 +122,7 @@ if ~isempty(hirs)
     M(:, c.H_LONG) = hirs.lon(hi);
     M(:, c.H_LAT) = hirs.lat(hi);
     M(:, c.H_START) = M(:, c.B_START);
-    M(:, c.H_TIME) = date2unixsecs(date_mhs_cell{1:3}, 0, 0, 0) + hirs.time(hr);
+    M(:, c.H_TIME) = data_mhs.epoch + hirs.time(hr);
     M(:, c.H_I) = hr;
     M(:, c.H_C) = hc;
     M(:, c.H_DIST) = sphdist(M(:, c.C_LAT), M(:, c.C_LONG), ...

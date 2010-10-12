@@ -60,12 +60,9 @@ date2_cell = num2cell(date2);
 M_c(:, c.CPR_POES_START) = round(date2unixsecs(date1_cell{1:3}));
 M_c(:, c.AVHRR_START) = round(date2unixsecs(date2_cell{1:5}));
 
-% unify_time_axis has made that data[12].time uses the earliest of the two
-% as the epoch
-time_epoch = min([date2unixsecs(date1_cell{1:3}, 0, 0, 0), ...
-                  date2unixsecs(date2_cell{1:3}, 0, 0, 0)]);
-time1 = time_epoch + data1.time(r1);              
-M_c(:, c.AVHRR_TIME) = time_epoch + data2.time(r2);
+
+time1 = data1.epoch + data1.time(r1);              
+M_c(:, c.AVHRR_TIME) = data2.epoch + data2.time(r2);
 
 % row/column
 M_c(:, c.CPR_POES_LINENO) = r1;

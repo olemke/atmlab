@@ -16,6 +16,7 @@ datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/sat2netcdf-0.4.ja
 datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
 datasets_config('cpr_subdir', '$YEAR4/$DOY');
 datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_');
+% same regexp works for all CPR's
 
 datasets_config('cloudsat_2B_CWC_RO_basedir', datasets_config('cpr_basedir'));
 datasets_config('cloudsat_2B_CWC_RO_subdir', datasets_config('cpr_subdir'));
@@ -41,30 +42,28 @@ datasets_config('cloudsat_ECMWF_AUX_regexp', datasets_config('cpr_regexp'));
 datasets_config('amsua_basedir', '/storage3/data/amsu');
 datasets_config('amsua_subdir', '$SAT_amsua_$YEAR4/$MONTH/$DAY');
 % Matlab doesn't seem to support nested groups, so have to stick with
-% |-approach instead.
-datasets_config('amsua_regexp', '/(?<satname>[a-z0-9]{6})_amsua_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
+% |-approach instead. Same regexp works for all POES.
+datasets_config('amsua_regexp', '/(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]*)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
 
 datasets_config('amsub_basedir', '/storage3/data/amsu');
 datasets_config('amsub_subdir', '$SAT_amsub_$YEAR4/$MONTH/$DAY');
-datasets_config('amsub_regexp', '/(?<satname>[a-z0-9]{6})_amsub_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
+datasets_config('amsub_regexp', datasets_config('amsua_regexp'));
 
 datasets_config('mhs_basedir', '/storage3/data/mhs');
 datasets_config('mhs_subdir', '$SAT_mhs_$YEAR4/$MONTH/$DAY');
-datasets_config('mhs_regexp', '/(?<satname>[a-z0-9]{6})_mhs_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
-
+datasets_config('mhs_regexp', datasets_config('amsua_regexp'));
 
 datasets_config('hirs_basedir', '/storage3/data/hirs');
 datasets_config('hirs_subdir', '$SAT_hirs_$YEAR4/$MONTH/$DAY');
-datasets_config('hirs_regexp', '/(?<satname>[a-z0-9]{6})_hirs_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
-
+datasets_config('hirs_regexp', datasets_config('amsua_regexp'));
 
 datasets_config('mspps_basedir', '/storage3/data/mspps');
 datasets_config('mspps_subdir', '$SAT_orbital_$YEAR4/$MONTH/$DAY');
-datasets_config('mspps_regexp', '/(?<satname>[a-z0-9]{6})_orbital_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
+datasets_config('mspps_regexp', datasets_config('amsua_regexp'));
 
 datasets_config('avhrr_basedir', '/storage3/data/avhrr');
 datasets_config('avhrr_subdir', '$SAT_gac_$YEAR4/$MONTH/$DAY');
-datasets_config('avhrr_regexp', '/(?<satname>[a-z0-9]{6})_gac_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9\.]*\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})');
+datasets_config('avhrr_regexp', datasets_config('amsua_regexp'));
 
 datasets_config('hirscs_basedir', '/storage3/data/hirscs');
 datasets_config('hirscs_subdir', 'LC_$SAT');

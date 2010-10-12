@@ -32,7 +32,7 @@ data.lat = data.C_LAT(rows);
 data.lon = data.C_LONG(rows);
 
 [y, mo, d, h, mi, s] = unixsecs2date(double(data.C_TIME(rows)));
-data.epoch = uint32(unique(date2unixsecs(y, mo, d)));
+data.epoch = round(unique(date2unixsecs(y, mo, d)));
 assert(isempty(data.epoch)||isscalar(data.epoch), 'atmlab:common_read_collocation_cpr_mhs', ...
     'Data in %s appears to contain measurement from more than one day', ...
     file);

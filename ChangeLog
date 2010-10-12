@@ -1,3 +1,27 @@
+2010-10-12	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-82
+
+	* collocations/colloc_process_*: Fix bug in time calculation. This bug
+	affects the most recent collocation run.
+
+	* collocations/write_collocations_netcdf.m: Add global attribute
+	'Conventions'.
+
+	* collocations/collocate_granule.m: Determine version before giving up on
+	collocations, making secondary version 'N/A' if primary is empty; thus
+	guaranteeing a version is always indicated.
+
+	* site-specific/kiruna/datasets_init.m: Have one regexp for all POES,
+	returning also the type.
+
+	* datasets/common_read_collocation_cpr_mhs.m: Don't be silly, don't use
+	uint32, that's asking for bugs.
+
+	* datasets/common_read_poes_radiometer.m,
+	datasets/common_read_cpr_2BCWCRO.m: Include the epoch. But not in uint32
+	please.
+
 2010-10-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-81
