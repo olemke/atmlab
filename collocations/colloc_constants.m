@@ -53,12 +53,6 @@ A.process_meandata_collocation_cpr_mhs_avhrr = @colloc_process_meandata_collocat
 A.no_collocation_cpr_mhs_avhrr = 3;
 
 
-%% define links
-
-A.links.collocation_cpr_mhs.sat1 = 'cloudsat';
-A.links.collocation_cpr_mhs.sensor1 = 'cpr';
-A.links.collocation_cpr_mhs.sat2 = ''; % varies
-A.links.collocation_cpr_mhs.sensor2 = 'mhs'; % or amsu/b
 
 %% column definitions
 
@@ -232,6 +226,13 @@ A.cols_collocation_cpr_mhs_avhrr.meandata = struct(...
     'MEAN', 8:12, ...
     'SD', 13:17, ...
     'NCOLS', 17);
+
+A.cols_collocation_cpr_mhs_avhrr.links = struct(...
+    'start', 'CPR_POES_START', ...
+    'lineno', 'CPR_POES_LINENO', ...
+    'sat1', 'cloudsat', ...
+    'sensor1', 'cpr', ...
+    'sensor2', 'mhs');
 
 %% stored style, from 2010-09-22
 

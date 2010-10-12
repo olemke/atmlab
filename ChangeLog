@@ -1,5 +1,16 @@
 2010-10-12	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-83
+
+	* collocations/colloc_constants.m: Define links differently.
+
+	* datasets/common_read_collocation_cpr_mhs.m: Add comment about what is
+	read.
+
+	* datasets/common_read_avhrr.m: Don't cast epoch to uint32.
+
+2010-10-12	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-82
 
 	* collocations/colloc_process_*: Fix bug in time calculation. This bug

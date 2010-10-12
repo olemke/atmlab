@@ -60,7 +60,7 @@ delete(outfile);
 
 % calculate epoch
 datestruct = dayofyear_inverse(data.startYear, data.startDayOfYear);
-data.epoch = uint32(date2unixsecs(double(datestruct.yr), double(datestruct.mn), double(datestruct.day)));
+data.epoch = round(date2unixsecs(double(datestruct.yr), double(datestruct.mn), double(datestruct.day)));
 
 % convert time from milliseconds to seconds
 

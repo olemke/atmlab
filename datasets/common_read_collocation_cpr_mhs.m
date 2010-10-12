@@ -3,6 +3,7 @@ function data = common_read_collocation_cpr_mhs(file)
 % common_read_collocation_cpr_mhs Read CPR/MHS collocation file
 %
 % Read a CPR/MHS collocation file and return things in the common format.
+% Will read the MHS measurements, i.e. the mean collocations.
 %
 % IN
 %
