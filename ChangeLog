@@ -1,5 +1,12 @@
 2010-10-13  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-85
+	
+	* math/get_ascend_decend_node.m: Fixed help section. ascend=NaN if
+	latitude is empty or has only one element.
+
+2010-10-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-84
 	
 	* math/get_ascend_decend_node.m : Added function the outputs a
