@@ -35,9 +35,11 @@ hasmean = false;
 % check dimensions, if any mean will need those first
 % also to know pre-alloc size
 alloc_length = 0;
-for i = 1:length(cols)
+i = 1;
+while i <= length(cols)
     if isnumeric(cols{i}) % refers to no. in previous
         varids(i) = -1;
+        i = i + 1;
         continue
     end
     col = cols{i};
@@ -46,6 +48,9 @@ for i = 1:length(cols)
         % if columns to read specified, replace those as well
         if i~=length(cols) && isnumeric(cols{i+1})
             cols{i+1} = c.aliases.(col){2}(cols{i+1});
+        elseif length(c.aliases.(col)) > 1
+            % insert channels to read
+            cols = [cols(1:i) c.aliases.(col){2} cols((i+1):end)];
         end
         cols{i} = c.aliases.(col){1};
         col = cols{i};
@@ -86,6 +91,7 @@ for i = 1:length(cols)
         end
     end % for each dim
     varids(i) = varid;
+    i = i + 1;
 end % for each col
 M = zeros(alloc_length, sum(varwidth));
 if alloc_length==0 % nothing

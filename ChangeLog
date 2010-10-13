@@ -1,5 +1,14 @@
 2010-10-13	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-88
+
+	* collocations/read_collocs_data_mean.m:
+		- Fix bug occuring when requesting an aliased field for which channels could
+		be, but weren't. Now correct for this by inserting the corresponding
+		channels.
+
+2010-10-13	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-87
 
 	* collocations/collocation_read.m:
