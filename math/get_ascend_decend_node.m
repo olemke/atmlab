@@ -6,14 +6,15 @@ function ascend = get_ascend_decend_node(latitude)
 %
 % FORMAT:  ascend = get_ascend_decend_node(latitude)
 %
-% IN: Latitude (ungridded (size = [scanposition, scanline]))
+% IN: Latitude (ungridded (size = [scanline,scanposition]))
 %
 % OUT: ascend (logical). true for ascend, false for descend.
 % 
-% Note: 1) This is for ungridded data. I.e. the latitude-matrix is a matrix (or
+% Note: 1) Latitude must have the dimensions size = [scanline,scanposition]
+%       2) This is for ungridded data. I.e. the latitude-matrix is a matrix (or
 %          vector) read straight from a satellite data file (therfore ungridded)
-%       2) If there is only one latitude scanline or if it's empty, ascend = NaN
-%       3) The node is based on the centre scanposition, i.e for amsub column
+%       3) If there is only one latitude scanline or if it's empty, ascend = NaN
+%       4) The node is based on the centre scanposition, i.e for amsub column
 %          45, for CloudSat column 1. That means that the entire scanline will
 %          always have the same node
 %
@@ -22,13 +23,14 @@ function ascend = get_ascend_decend_node(latitude)
 lat=latitude(:,round(end/2)); %always a vector
 ascend=false(size(latitude));
 
-if size(lat,2)<=1
+if size(latitude,1)<=1
     ascend = NaN;
+    return
 end
 
 % this line checks if the next latitude is higher or not (using indexing).
 % the second last and last scanlines are set to be equally ascending or
 % descending to their neighbouring point
 i = 1:length(lat)-1;
-ascend(i,:)=repmat(lat(i) >= lat(i+1),1,size(ascend,2));
+ascend(i,:)=repmat(lat(i+1) > lat(i),1,size(ascend,2));
 ascend(end,:) = ascend(end-1,:);

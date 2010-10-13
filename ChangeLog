@@ -1,3 +1,10 @@
+2010-10-13  Ajil Kottayil  <ajil@ubuntu4>
+
+	* atmlab-1-0-86
+
+	* math/get_ascend_decend_node.m: 
+	Fixed bug when ascend = NaN and clarified help section. 
+
 2010-10-13  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-85
