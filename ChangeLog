@@ -1,3 +1,28 @@
+2010-10-13	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-87
+
+	* collocations/collocation_read.m:
+		- Return actual limmat and filters applied.
+		- Add option to NOT apply those (but still return them).
+		- Use new function cols_cell_to_cols_struct to get name_struct.
+
+	* collocations/write_collocations_netcdf.m:
+		- First write collocations to atmlab('WORK_SPACE'), only copy them to
+		the final storage location when compressing (thus reducing the
+		bandwidth used significantly).
+
+	* collocations/cols_cell_to_cols_struct.m: ADDED
+		- Mostly internal use, converts a cell array of column names (with
+		possibly channel numbers in it as well) to a structure describing the
+		same thing.
+
+	* collocations/collocation_read_dual.m:
+		- Adapt to modernity
+		- Make sure at least one mean-field is requested
+		- Correctly apply limits and filters
+		- Improve documentation
+
 2010-10-13  Ajil Kottayil  <ajil@ubuntu4>
 
 	* atmlab-1-0-86

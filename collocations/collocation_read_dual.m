@@ -1,143 +1,125 @@
 function [M, c] = collocation_read_dual(...
     sat1, sensor1, sat2, sensor2, ...
-    startdate, enddate, ...
-    cols1, cols2, limits1, limits2, ...
-    filter1, filter2)
+    startdate, enddate, varargin)
 
-% collocation_read_dual Read collocations from two sources
+
+% collocation_read_dual Read collocations from two linked sources
 %
-% Note! Function is in alpha and will likely change significantly!
-% Currently hardcoded for CPR-collocations/AVHRR, this will likely change!
+% Read collocation from two sources, where the first dataset links to the
+% second dataset. For example, the collocated dataset
+% collocation_cpr_mhs/avhrr consists of collocations where the primary is
+% collocation_cpr_mhs and the secondary is avhrr. Thus, the collocated
+% dataset contains row numbers referring to the (averaged)
+% CPR/MHS-collocations. This function reads the 'primary' collocations',
+% gets the row-numbers, and then reads the associated information from the
+% secondary, linked-to collocated dataset. Hence, whereas <a href="matlab:help collocation_read">collocation_read</a>
+% needs one cols, limits and filter argument, this function needs two of
+% each: one applying to the primary, one applying to the secondary.
 %
-% Read collocation from two sources, where the first source describes
-% the row numbers to be read from the second source.
+% At the time of writing (13 October 2010) the only valid primary
+% collocated dataset is collocation_collocation_cpr_mhs_avhrr, so dataset1
+% MUST be 'collocation_cpr_mhs' and dataset2 MUST be 'avhrr', or it won't
+% work. However, this may change in the future. As the collocations are
+% with the averaged dataset (one-per-mhs rather than one-per-cpr), one also
+% MUST request at least one mean-datafield.
 %
 % FORMAT
 %
 % [M, c] = collocation_read_dual(...
-%   sat1, sensor1, sat2, sensor2, ...
-%   startdate, enddate, ...
-%   cols1, cols2, limits1, limits2)
+%   sat1, dataset1, sat2, dataset2, ...
+%   startdate, enddate[, ...
+%   cols1[, cols2[, limits1[, limits2[, ...
+%   filters1[, filters2]]]]]])
 %
 % IN
 %
 %       sat1        string      primary satellite
-%       sensor1     string      primary pseudosensor, such as
-%                               'collocation_cpr_poes'
+%       dataset1    string      primary dataset, such as
+%                               'collocation_cpr_mhs'
 %       sat2        string      secondary satellite
-%       sensor2     string      secondary sensor
+%       dataset2    string      secondary dataset, such as 'avhrr'
 %       startdate   3x1 array   datevec for first date
 %       enddate     3x1 array   datevec for last date (inclusive)
-%       cols1       cell array  Column names from sat1/sensor1
-%       cols2       cell array  Column names for sat2/sensor2
-%       limits1     structure   Limits to values for sat1/sensor1
-%       limits2     structure   Limits to values for sat2/sensor2
-%       filter1     cell array  Filters as for collocation_read
-%       filter2     cell array  Filters as for collocation_read
+%       cols1       cell array  Column names from sat1/dataset1
+%       cols2       cell array  Column names for sat2/dataset2; must
+%                               include a mean-datafield.
+%       limits1     structure   Limits to values for sat1/dataset1
+%       limits2     structure   Limits to values for sat2/dataset2
+%       filter1     cell array  Filters as for <a href="matlab:help collocation_read">collocation_read</a>
+%       filter2     cell array  Filters as for <a href="matlab:help collocation_read">collocation_read</a>
 %
 % OUT
 %
 %       M           Nxp matrix  Matrix containing N collocations with p
-%                   columns
-%       c           structure   c1: column names for sat1/sensor1
-%                               c2: column names for sat2/sensor2
+%                               columns
+%       c           structure   c1: column names for sat1/dataset1
+%                               c2: column names for sat2/dataset2
 %
-% Example reading the mean values, number of pixels-in-MHS and SD for AVHRR
-% 4 and 5, as well as the MHS lat, long, column and time-since-CPR (for the
-% first CPR pixel in the MHS), MHS channel 5, the number of CPR-in-MHS and
-% the mean CPR-in-MHS, limiting this to at least 10 AVHRR-in-MHS, 10
-% CPR-in-MHS, within 40 degrees of the equator, MHS columns 40–50,
-% unflagged MHS, nonzero IWP and at most 5 minutes between MHS and the
-% first CPR in MHS.
+% EXAMPLE
 %
 % >> [M, c] = collocation_read_dual(...
-%       'noaa18', 'collocation_cpr_poes', 'noaa18', 'avhrr', ...
-%       [2008 1 1], [2008 1 31], ...
-%       {{}, {}, {'NO', 4:5, 'MEAN', 4:5, 'SD', 4:5}}, ...
-%       {{'B_LAT', 'B_LONG', 'B_C', 'B_INT'}, {'MHS', 5}, {'NO', 'MEAN'}}, ...
-%       struct('NO', [10 inf]), ...
-%       struct('B_LAT', [-40 40], 'B_C', [40 50], 'MHS', [0 400], ...
-%       'NO', [10 inf], 'MEAN', [eps inf], 'B_INT', [-300 300]), ...
-%       {}, {}); % no filters
-% (debugging output omitted)
-% >> whos M
-%   Name         Size             Bytes  Class     Attributes
-% 
-%   M         1164x15            139680  double              
-% 
-% >> c.c1
-% 
-% ans = 
-% 
-%      CPR_POES_START: 1
-%     CPR_POES_LINENO: 2
-%                  NO: [3 4]
-%                MEAN: [5 6]
-%                  SD: [7 8]
-% 
-% >> c.c2
-% 
-% ans = 
-% 
-%      B_LAT: 9
-%     B_LONG: 10
-%        B_C: 11
-%      B_INT: 12
-%        MHS: 13
-%         NO: 14
-%       MEAN: 15
+%               'noaa18', 'collocation_cpr_mhs', 'noaa18', 'avhrr', ...
+%               [2006 7 1], [2006 7 5], ...
+%               {'AVHRR_LAT', 'AVHRR_LONG', 'AVHRR', 3:5}, ...
+%               {'B_LAT', 'B_LONG', 'MEAN'});
 %
-% See also collocation_read
+% See also <a href="matlab:help collocation_read">collocation_read</a>.
 %
 % $Id$
 
-% make sure CPR_POES_START and CPR_POES_LINENO are in cols1
+cols1 = colloc_constants(['cols_' sensor1 '_' sensor2]);
+cols2 = colloc_constants(['cols_' cols1.links.sensor1 '_' cols1.links.sensor2]);
 
-error('atmlab:collocation_read_dual', 'This function is currently not working!');
+[cols_in1, cols_in2, limits1, limits2, filter1, filter2] = ...
+    optargs(varargin, ...
+    {{cols1.links.start, cols1.links.lineno}, {}, ...
+    struct, struct, {}, {}});
 
-if ~any(strcmp(cols1{1}, 'CPR_POES_START'))
-    cols1{1} = [cols1{1} 'CPR_POES_START'];
-end
-
-if ~any(strcmp(cols1{1}, 'CPR_POES_LINENO'))
-    cols1{1} = [cols1{1} 'CPR_POES_LINENO'];
-end
-
-[M1, c1] = collocation_read(sat1, sensor1, sat2, sensor2, ...
-    startdate, enddate, cols1, limits1, filter1);
-
-links = colloc_constants('links');
-[~, name_struct] = colloc_colname2no(links.(sensor1).sensor1, links.(sensor1).sensor2, cols2);
-limmat = limstruct2limmat(limits2, name_struct);
-
-% for the filters@filter2, convert column names to column numbers, using the
-% earlier obtained name_struct
-if ~isempty(filter2)
-    for i = 1:length(filter2)
-        filter2{i}{2} = cellfun(@(s) name_struct.(s)', filter2{i}{2}, 'UniformOutput', false);
+% make sure cols1.links.start and cols1.links.lineno are asked for
+for f = {cols1.links.start, cols1.links.lineno}
+    if ~any(strcmp(f{1}, cols_in1))
+        cols_in1 = [cols_in1 f{1}]; %#ok<AGROW>
     end
 end
 
+% verify at least some mean-data-fields in M2 are asked for
+if isempty(intersect(...
+        fieldnames(cols2.meandata), ...
+        cols_in2(cellfun(@isstr, cols_in2))))
+    error('atmlab:collocation_read_dual', ...
+        'When reading dual collocations, you MUST request meandata for the secondary!');
+end
+
+[M1, c1] = collocation_read(sat1, sensor1, sat2, sensor2, ...
+    startdate, enddate, cols_in1, limits1, filter1);
+
+% convert limits-structure to limits-matrix for M2
+name_struct = cols_cell_to_cols_struct(cols2, cols_in2);
+limmat = limstruct2limmat(limits2, name_struct);
+
+% when filtering the secondary, we want to filter out the corresponding
+% rows in M1 as well; keep track of the rows we want to keep
 M1_rows = true(size(M1, 1), 1);
 
 N = 0;
-[starttimes, firsts] = unique(M1(:, c1.CPR_POES_START), 'first');
-[~, lasts] = unique(M1(:, c1.CPR_POES_START), 'last');
-for i = 1:length(starttimes)
+[starttimes, firsts] = unique(M1(:, c1.(cols1.links.start)), 'first');
+[~, lasts] = unique(M1(:, c1.(cols1.links.start)), 'last');
+for i = 1:length(starttimes) % loop through secondary granules with any data
     starttime = starttimes(i);
     first = firsts(i);
     last = lasts(i);
-    rows = M1(first:last, c1.CPR_POES_LINENO);
+    rows = M1(first:last, c1.(cols1.links.lineno));
     [year month day] = unixsecs2date(starttime);
-    [M2, c2] = collocation_read(...
-        links.(sensor1).sat1, links.(sensor1).sensor1, ...
-        sat1, links.(sensor1).sensor2, ...
+    [M2, c2, ~, f2] = collocation_read(...
+        cols1.links.sat1, cols1.links.sensor1, ...
+        sat1, cols1.links.sensor2, ...
         [year month day], [year month day], ...
-        cols2);
-    M2 = M2(rows, :);
-    lim = collocation_restrain(M2, limmat, filter2);
-    M1_rows(first:last) = lim;
-    M2 = M2(lim, :);
+        cols_in2, nan, filter2);                    % don't filter anything;
+                                                    % just 'calculate' f2
+    M2 = M2(rows, :);                               % make it same size as M1-part
+    lim = collocation_restrain(M2, limmat, f2);     % NOW filter
+    M1_rows(first:last) = lim;                      % in both M1 
+    M2 = M2(lim, :);                                % and M2
     
     % pre-allocate only here, so that we know the width
     if i==1

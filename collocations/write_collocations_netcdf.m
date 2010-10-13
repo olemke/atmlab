@@ -62,15 +62,18 @@ for i = 1:length(fields) % for each satellite
         fn(end-2:end) = '';
     end
     
-    if ~exist(fileparts(fn), 'dir')
-        logtext(atmlab('OUT'), 'Creating %s\n', fileparts(fn));
-        mkdir(fileparts(fn));
+    [outdir, name, ext] = fileparts(fn);
+    basename = [name ext];
+    temp_out = fullfile(atmlab('WORK_AREA'), basename);
+    if ~exist(outdir, 'dir')
+        logtext(atmlab('OUT'), 'Creating %s\n', outdir);
+        mkdir(outdir);
     end
         
     %% create the file
     
-    logtext(atmlab('OUT'), 'Writing %s\n', fn);
-    ncid = netcdf.create(fn, 'NC_CLOBBER'); % overwrite existing
+    logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
+    ncid = netcdf.create(temp_out, 'NC_CLOBBER'); % overwrite existing
     
     %% define the dimensions
     
@@ -211,9 +214,9 @@ for i = 1:length(fields) % for each satellite
     
     netcdf.close(ncid);
     
-    logtext(atmlab('OUT'), 'Gzipping and removing uncompressed\n');
-    gzip(fn);
-    delete(fn);
+    logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', outdir);
+    gzip(temp_out, outdir);
+    delete(temp_out);
     logtext(atmlab('OUT'), 'Done\n');
 
 end

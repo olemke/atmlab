@@ -1,4 +1,4 @@
-function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
+function [M, cols_out, limmat, filters] = collocation_read(sat1, sensor1, sat2, sensor2, ...
     start_date, end_date, cols_in, limits, filters)
 
 % collocation_read Read collocations for indicated period
@@ -31,6 +31,8 @@ function [M, cols_out] = collocation_read(sat1, sensor1, sat2, sensor2, ...
 %                               different columns requested. Data outside
 %                               these ranges will not be returned. Note:
 %                               [-inf, inf] will still get rid of nans.
+%                               Note2: if limits=nan, no filtering is done
+%                               AT ALL.
 %   filters     cell array      Cell array of cell arrays. Each member of
 %                               the cell array is {@filter, {COL1, ...,
 %                               COLN}, {'foo', 'bar', ..., 'baz'}}.
@@ -85,25 +87,21 @@ end
 
 %% get name_struct
 
-n = 1; i = 1;
-while i <= length(cols_in)
-    if i<length(cols_in) && isnumeric(cols_in{i+1})
-        dn = length(cols_in{i+1});
-        di = 2;
-    else
-        dn = length(structsearch(cols, cols_in{i}));
-        di = 1;
-    end
-    name_struct.(cols_in{i}) = n:(n+dn-1);
-    n = n + dn;
-    i = i + di;
-end
-ncols = n-1;
+name_struct = cols_cell_to_cols_struct(cols, cols_in);
+% ncols: highest value
+C = struct2cell(name_struct);
+ncols = max(horzcat(C{:}));
 
 %% convert limits structure to matrix as wanted by restrain_collocations
 
-if exist('limits', 'var')
-    limmat = limstruct2limmat(limits, name_struct);
+dolimits = true;
+if exist('limits', 'var') 
+    if isequalwithequalnans(limits, nan)
+        dolimits = false;
+        limmat = zeros(0, 3);
+    else
+        limmat = limstruct2limmat(limits, name_struct);
+    end
 else
     limmat = zeros(0, 3);
 end
@@ -155,8 +153,10 @@ for i = 1:size(dates, 1)
     end
     
     %% apply limitations
-    lim = collocation_restrain(collocations_day, limmat, filters);
-    collocations_day = collocations_day(lim, :);
+    if dolimits
+        lim = collocation_restrain(collocations_day, limmat, filters);
+        collocations_day = collocations_day(lim, :);
+    end
     
     %% add to total
     L = size(M, 1);
