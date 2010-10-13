@@ -1,3 +1,13 @@
+2010-10-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-84
+	
+	* math/get_ascend_decend_node.m : Added function the outputs a
+	logical if a pixel belongs to the ascend or descending node
+
+	* geoplots/gmt/create_gmt_earth.m: in.rivers is flagged with a
+	numeric and not a string from now on.
+
 2010-10-12	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-83

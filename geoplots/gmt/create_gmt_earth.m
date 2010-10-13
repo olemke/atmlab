@@ -330,7 +330,7 @@ end
 % default = Large rivers
 if ~isfield(in,'rivers')
     a.rivers = '1';
-else a.rivers = in.rivers;
+else a.rivers = sprintf('%i',in.rivers);
 end
 
 % Width of lines drawing coasts and rivers
