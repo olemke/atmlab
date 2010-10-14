@@ -1,5 +1,17 @@
 2010-10-14	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-90
+
+	* handy/struct2string_compact.m: Adapted.
+		- Now also handles values that are not scalar numbers, but vectors or
+		cells containing those.
+
+	* collocations/limstruct2limmat.m: Adapted.
+		- Now also handles cases where the limits only apply to a subset of
+		channels.
+
+2010-10-14	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-89
 
 	* handy/optargs_struct.m: Added.

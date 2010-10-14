@@ -17,7 +17,7 @@ function limmat = limstruct2limmat(limits, name_struct)
 %                               describing the range of values the user
 %                               wants to restrain the data to.
 %   name_struct structure       Describes the mapping of column names to
-%                               column numbers. See <a href="matlab:opentoline('colloc_colno2name.m', 1, 1)">colloc_colno2name</a>
+%                               column numbers.
 %
 % OUT
 %
@@ -26,8 +26,18 @@ function limmat = limstruct2limmat(limits, name_struct)
 %
 % $Id$
 
-C = cellfun(@(c) ...
-    [name_struct.(c)' ...
-    repmat(limits.(c), [size(name_struct.(c), 2) 1])], ...
-    fieldnames(limits), 'UniformOutput', false);
+fields = fieldnames(limits);
+C = cell(1, length(fields));
+for i = 1:length(fields)
+    c = fields{i};
+    if iscell(limits.(c))
+        C{i} = [name_struct.(c)(limits.(c){1})' repmat(limits.(c){2}, [length(limits.(c){1}) 1])];
+    else
+        C{i} = [name_struct.(c)' repmat(limits.(c), [size(name_struct.(c), 2) 1])];
+    end
+end
+% C = cellfun(@(c) ...
+%     [name_struct.(c)' ...
+%     repmat(limits.(c), [size(name_struct.(c), 2) 1])], ...
+%     fieldnames(limits), 'UniformOutput', false);
 limmat = vertcat(C{:});

@@ -1,11 +1,10 @@
-function descr = struct2string_compact(S, n)
+function descr = struct2string_compact(S, varargin)
 
 % struct2string_compact
 %
-% Return a compact representation of a string. All members should be scalar
-% numbers. Whole numbers are represented as such, any others are given N
-% digits of precision. This can be useful to add to a filename for storing
-% a figure or to use in a plot title or legend.
+% Return a compact representation of a struct. Whole numbers are represented
+% as such, any others are given N digits of precision. This can be useful
+% to add to a filename for storing a figure or to use in a plot title or legend.
 %
 % EXAMPLE
 %
@@ -27,10 +26,31 @@ function descr = struct2string_compact(S, n)
 %
 % $Id$
 
-if ~exist('n', 'var')
-    n = 3;
-end
+n = optargs(varargin, {3});
 
-descr = cellfun(@(v) sprintf('%s=%.*f,', v, n*~iswhole(S.(v)), S.(v)), fieldnames(S), 'UniformOutput', false);
-descr = horzcat(descr{:});
+%descr = cellfun(@(v) sprintf('%s=%.*f,', v, n*~iswhole(S.(v)), S.(v)), fieldnames(S), 'UniformOutput', false);
+descr = cellfun(@(v) sprintf('%s=%s;', v, elem2str(S.(v), n)), fieldnames(S), 'UniformOutput', false);
+descr = strcat(descr{:});
 descr = descr(1:end-1); % take off final comma
+end
+function s = elem2str(v, n)
+% elem2str Convert single element to string compactly
+if isempty(v)
+    s = '';
+    return
+elseif isboolean(v) || istensor0(v) % isscalar is true for cell array with 1 elem
+    s = sprintf('%.*f', n*~(iswhole(v)||isboolean(v)), v);
+elseif iscell(v)
+    s = cellfun(@(u) [elem2str(u, n) ','], v, 'UniformOutput', false);
+elseif isvector(v)
+    s = arrayfun(@(u) [elem2str(u, n) '-'], v, 'UniformOutput', false);
+else
+    error('atmlab:struct2string_compact:elem2str', ...
+        'Unable to provide compact string representation of %s', ...
+        evalc('disp(v)'));
+end
+if ~isscalar(v)
+    s = strcat(s{:});
+    s = s(1:end-1);
+end
+end
