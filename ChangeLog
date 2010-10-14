@@ -1,3 +1,14 @@
+2010-10-14	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-89
+
+	* handy/optargs_struct.m: Added.
+		This function provides a simply way to define default values for
+		function inputs where this input consists of a structure. It takes two
+		structures, one consisting of default values and one of user-provided
+		values. It returns a structure containing the user values where
+		provided and the default values otherwise.
+
 2010-10-13	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-88
