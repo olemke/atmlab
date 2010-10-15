@@ -1,3 +1,9 @@
+2010-10-15  Claudia Emde  <claudia.emde@lmu.de>
+
+	* atmlab-1-0-95
+
+	* scattering/box_pnd_mono_size_1d.m: Corrected documentation.
+
 2010-10-15	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-94

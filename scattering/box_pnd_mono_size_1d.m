@@ -2,9 +2,9 @@
 %  PND_MONO_SIZE_1D  Generates simple particle number density field
 % 
 %  This function generates the particle number density field for a 
-%  very simple 1D cirrus cloud layer. It assumes a monochromatic
-%  size distribution. As input it requires the altitude of the cloud
-%  layer, the ice mass content and the effective radius of the
+%  very simple 1D cirrus cloud layer. It assumes that all particles are of 
+%  the same size.  As input it requires the altitude of the cloud
+%  layer, the ice mass content and the radius of the
 %  particles.
 % 
 %  FORMAT pnd_field = box_pnd_mono_size_1d(z_limits, imc, r)
