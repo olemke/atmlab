@@ -1,3 +1,20 @@
+2010-10-15	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-96
+
+	* collocations/collocation_read.m: Adapted
+		- @#$%$#@ Matlab changes error identifiers between versions!
+
+	* collocations/write_collocations_netcdf.m: Adapted
+		- @#$%$#@ Matlab changes behaviour between versions; redefining
+		dimension no longer permitted
+		- use try/catch to close file no matter what
+
+	* collocations/collocate_granule.m: Adapted
+		- Make sure secondary version is defined even if no secondary file is
+		read; set to '?' in that case.
+
+
 2010-10-15  Claudia Emde  <claudia.emde@lmu.de>
 
 	* atmlab-1-0-95

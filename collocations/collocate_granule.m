@@ -126,6 +126,7 @@ catch ME
 end
 
 overlap.version{1} = data1.version;
+overlap.version{2} = '?';
 
 if isempty(data1.time)
     logtext(fid, 'Primary is empty, nothing to collocate\n');

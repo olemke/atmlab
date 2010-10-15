@@ -57,7 +57,7 @@ for i = 1:length(fields) % for each satellite
     end
     fn = find_datafile_by_date([year month day], s, ...
         ['collocation_' sensor1 '_' sensor2]);
-
+    
     if strcmp(fn(end-1:end), 'gz') % take off this part
         fn(end-2:end) = '';
     end
@@ -68,153 +68,158 @@ for i = 1:length(fields) % for each satellite
         logtext(atmlab('OUT'), 'Creating %s\n', outdir);
         mkdir(outdir);
     end
-        
+    
     %% create the file
     
     logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
     ncid = netcdf.create(temp_out, 'NC_CLOBBER'); % overwrite existing
     
-    %% define the dimensions
-    
-    ncollocs = size(S.(satname), 1);
-    dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
-    if isstruct(M) % also mean-data
-        try
-            dim_meancollocs = netcdf.defDim(ncid, 'Averaged_collocations', size(M.(satname), 1));
-        catch ME
-            switch ME.identifier
-                case 'MATLAB:netcdf:defDim:onlyOneUnlimitedDimensionAllowed'
-                    dim_meancollocs = dim_collocs;
-                otherwise
-                    ME.rethrow();
-            end
-        end
-    end
-    
-    %% put global attributes
-    
-    utc_time = java.lang.System.currentTimeMillis;
-    [utc_date{1:6}] = unixsecs2date(utc_time/1000); %#ok<AGROW>
-    utc_datestr = sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ', ...
-        [utc_date{1:5} round(utc_date{6})]);
-    global_atts = struct(...
-        'Conventions', 'CF-1.4', ...
-        'title', 'Collocations', ...
-        'history', [datestr(now, 'YYYY-mm-dd') ' Collocations generated from scratch'], ...
-        'date', utc_datestr, ...
-        'institution', ['Department of Space Science, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden'], ...
-        'source', 'Collocation codes, part of atmlab', ...
-        'references', 'Holl et al. (2010)', ...
-        'software_version', atmlab_version, ... 
-        'maxdist_km', colloc_config('distance'), ...
-        'maxtime_s', colloc_config('interval'), ...
-        'primary_satellite', sat1, ...
-        'primary_sensor', sensor1, ...
-        'primary_version', S.version{1}, ...
-        'secondary_satellite', satname, ...
-        'secondary_sensor', sensor2, ...
-        'secondary_version', S.version{2});
-    % add caller-contributed ones
-    warning('off', 'catstruct:DuplicatesFound')
-    global_atts = catstruct(global_atts, info);
-    % convert to cell-array
-    global_atts = mat2cell([fieldnames(global_atts) struct2cell(global_atts)], ...
-        ones(1, length(fieldnames(global_atts))), 2).';
-    addncattributes(ncid, global_atts);
-
-    %% define variables, variable attributes, additional dimensions
-    
-    colloc_vars = intersect(fieldnames(cols.overlap), fieldnames(cols.stored));
-    data_vars = intersect(fieldnames(cols.data), fieldnames(cols.stored));
-    if isfield(cols, 'meandata')
-        mean_vars = intersect(fieldnames(cols.meandata), fieldnames(cols.stored));
-    else
-        mean_vars = {};
-    end
-    vars = [colloc_vars; data_vars; mean_vars];
-    vartypes = [repmat({'overlap'}, size(colloc_vars)); ...
-                repmat({'data'}, size(data_vars)); ...
-                repmat({'meandata'}, size(mean_vars))];
-    varids = zeros(size(vars));
-    dims = struct();
-    for j = 1:length(vars)
-        varname = vars{j};
-        type = cols.stored.(varname).type;
-        atts = cols.stored.(varname).atts;
-        % determine length dimension: all collocs or mean collocs?
-        switch vartypes{j}
-            case {'overlap', 'data'}
-                dim_n = dim_collocs;
-            case 'meandata'
-                dim_n = dim_meancollocs;
-            otherwise
-                error('atmlab:write_collocations_netcdf', 'Unknown vartype: %s', vartypes{j});
-        end
-        % check if we have other dimensions besides the length
-        if isfield(cols.stored.(varname), 'dims') && ~isempty(S.(satname))
-            dimname = cols.stored.(varname).dims{1};
-            dimsize = cols.stored.(varname).dims{2};
+    try % in try/catch to close in any case
+        %% define the dimensions
+        
+        ncollocs = size(S.(satname), 1);
+        dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
+        if isstruct(M) % also mean-data
             try
-                if ~isfield(dims, dimname)
-                    dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
-                end
+                dim_meancollocs = netcdf.defDim(ncid, 'Averaged_collocations', size(M.(satname), 1));
             catch ME
                 switch ME.identifier
-                    case 'MATLAB:netcdf:defDim:nameIsAlreadyInUse'
-                        % no problem
+                    case {'MATLAB:netcdf:defDim:onlyOneUnlimitedDimensionAllowed', ...
+                            'MATLAB:netcdf:defDim:eunlimit:onlyOneUnlimitedDimensionAllowed'}
+                        dim_meancollocs = dim_collocs;
                     otherwise
                         ME.rethrow();
                 end
             end
-            thisdim = [dim_n dims.(dimname)];
-        else
-            thisdim = dim_n;
         end
-        % define variable and put attributes
-        varid = netcdf.defVar(ncid, varname, type, thisdim);
-        varids(j) = varid;
-        for k = fieldnames(atts)'
-            netcdf.putAtt(ncid, varid, k{1}, atts.(k{1}));
-        end
-    end
-    
-    %% write data
-    
-    % end define mode
-    
-    netcdf.endDef(ncid);
-    
-    if isempty(S.(satname))
-        logtext(atmlab('OUT'), 'Nothing to write\n');
-    else
-        % put vars
-        logtext(atmlab('OUT'), 'Writing: ');
         
+        %% put global attributes
+        
+        utc_time = java.lang.System.currentTimeMillis;
+        [utc_date{1:6}] = unixsecs2date(utc_time/1000); %#ok<AGROW>
+        utc_datestr = sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ', ...
+            [utc_date{1:5} round(utc_date{6})]);
+        global_atts = struct(...
+            'Conventions', 'CF-1.4', ...
+            'title', 'Collocations', ...
+            'history', [datestr(now, 'YYYY-mm-dd') ' Collocations generated from scratch'], ...
+            'date', utc_datestr, ...
+            'institution', ['Department of Space Science, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden'], ...
+            'source', 'Collocation codes, part of atmlab', ...
+            'references', 'Holl et al. (2010)', ...
+            'software_version', atmlab_version, ...
+            'maxdist_km', colloc_config('distance'), ...
+            'maxtime_s', colloc_config('interval'), ...
+            'primary_satellite', sat1, ...
+            'primary_sensor', sensor1, ...
+            'primary_version', S.version{1}, ...
+            'secondary_satellite', satname, ...
+            'secondary_sensor', sensor2, ...
+            'secondary_version', S.version{2});
+        % add caller-contributed ones
+        warning('off', 'catstruct:DuplicatesFound')
+        global_atts = catstruct(global_atts, info);
+        % convert to cell-array
+        global_atts = mat2cell([fieldnames(global_atts) struct2cell(global_atts)], ...
+            ones(1, length(fieldnames(global_atts))), 2).';
+        addncattributes(ncid, global_atts);
+        
+        %% define variables, variable attributes, additional dimensions
+        
+        colloc_vars = intersect(fieldnames(cols.overlap), fieldnames(cols.stored));
+        data_vars = intersect(fieldnames(cols.data), fieldnames(cols.stored));
+        if isfield(cols, 'meandata')
+            mean_vars = intersect(fieldnames(cols.meandata), fieldnames(cols.stored));
+        else
+            mean_vars = {};
+        end
+        vars = [colloc_vars; data_vars; mean_vars];
+        vartypes = [repmat({'overlap'}, size(colloc_vars)); ...
+            repmat({'data'}, size(data_vars)); ...
+            repmat({'meandata'}, size(mean_vars))];
+        varids = zeros(size(vars));
+        dims = struct();
         for j = 1:length(vars)
             varname = vars{j};
-            fprintf(atmlab('OUT'), '%s ', varname);
-            
-            vartype = vartypes{j};
-            varid = varids(j);
-            switch vartype
-                case 'overlap'
-                    netcdf.putVar(ncid, varid, S.(satname)(:, cols.(vartype).(varname)));
-                case 'data'
-                    netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
+            type = cols.stored.(varname).type;
+            atts = cols.stored.(varname).atts;
+            % determine length dimension: all collocs or mean collocs?
+            switch vartypes{j}
+                case {'overlap', 'data'}
+                    dim_n = dim_collocs;
                 case 'meandata'
-                    if isempty(M.(satname))
-                        logtext(atmlab('ERR'), 'Warning: No meandata\n');
-                    else
-                        netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+                    dim_n = dim_meancollocs;
+                otherwise
+                    error('atmlab:write_collocations_netcdf', 'Unknown vartype: %s', vartypes{j});
+            end
+            % check if we have other dimensions besides the length
+            if isfield(cols.stored.(varname), 'dims') && ~isempty(S.(satname))
+                dimname = cols.stored.(varname).dims{1};
+                dimsize = cols.stored.(varname).dims{2};
+                try
+                    if ~isfield(dims, dimname)
+                        dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
                     end
+                catch ME
+                    switch ME.identifier
+                        case 'MATLAB:netcdf:defDim:nameIsAlreadyInUse'
+                            % no problem
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
+                thisdim = [dim_n dims.(dimname)];
+            else
+                thisdim = dim_n;
+            end
+            % define variable and put attributes
+            varid = netcdf.defVar(ncid, varname, type, thisdim);
+            varids(j) = varid;
+            for k = fieldnames(atts)'
+                netcdf.putAtt(ncid, varid, k{1}, atts.(k{1}));
             end
         end
-        fprintf(atmlab('OUT'), '\n');
+        
+        %% write data
+        
+        % end define mode
+        
+        netcdf.endDef(ncid);
+        
+        if isempty(S.(satname))
+            logtext(atmlab('OUT'), 'Nothing to write\n');
+        else
+            % put vars
+            logtext(atmlab('OUT'), 'Writing: ');
+            
+            for j = 1:length(vars)
+                varname = vars{j};
+                fprintf(atmlab('OUT'), '%s ', varname);
+                
+                vartype = vartypes{j};
+                varid = varids(j);
+                switch vartype
+                    case 'overlap'
+                        netcdf.putVar(ncid, varid, S.(satname)(:, cols.(vartype).(varname)));
+                    case 'data'
+                        netcdf.putVar(ncid, varid, D.(satname)(:, cols.(vartype).(varname)));
+                    case 'meandata'
+                        if isempty(M.(satname))
+                            logtext(atmlab('ERR'), 'Warning: No meandata\n');
+                        else
+                            netcdf.putVar(ncid, varid, M.(satname)(:, cols.(vartype).(varname)));
+                        end
+                end
+            end
+            fprintf(atmlab('OUT'), '\n');
+        end
+        logtext(atmlab('OUT'), 'Finalising\n');
+    catch ME
+        logtext(atmlab('ERR'), 'Something went wrong; finalising\n');
+        netcdf.close(ncid);
+        delete(temp_out);
+        ME.rethrow();
     end
-    logtext(atmlab('OUT'), 'Finalising\n');
-    
-    netcdf.close(ncid);
-    
     logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', outdir);
     gzipped_filename = gzip(temp_out, outdir);
     delete(temp_out);
