@@ -9,4 +9,9 @@ function out = isditto(arg1,arg2)
 %
 % $Id$
 
+if ~isequal(size(arg1),size(arg1))
+    out = false;
+    return
+end
+
 out = all(arg1(:) == arg2(:));

@@ -1,5 +1,13 @@
 2010-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-92
+	
+	* math/isditto.m: Make sure the arguments have the same size. This
+	function may be pointless as there is an isequal built in
+	function, but I don't know what that is doing do I'll keep this one
+
+2010-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-91
 
 	* math/isditto.m: Made a replacement function for obsolete
