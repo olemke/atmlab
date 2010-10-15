@@ -62,9 +62,8 @@ for i = 1:length(fields) % for each satellite
         fn(end-2:end) = '';
     end
     
-    [outdir, name, ext] = fileparts(fn);
-    basename = [name ext];
-    temp_out = fullfile(atmlab('WORK_AREA'), basename);
+    outdir = fileparts(fn);
+    temp_out = tempname(atmlab('WORK_AREA'));
     if ~exist(outdir, 'dir')
         logtext(atmlab('OUT'), 'Creating %s\n', outdir);
         mkdir(outdir);
@@ -156,7 +155,9 @@ for i = 1:length(fields) % for each satellite
             dimname = cols.stored.(varname).dims{1};
             dimsize = cols.stored.(varname).dims{2};
             try
-                dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
+                if ~isfield(dims, dimname)
+                    dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
+                end
             catch ME
                 switch ME.identifier
                     case 'MATLAB:netcdf:defDim:nameIsAlreadyInUse'
@@ -215,8 +216,9 @@ for i = 1:length(fields) % for each satellite
     netcdf.close(ncid);
     
     logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', outdir);
-    gzip(temp_out, outdir);
+    gzipped_filename = gzip(temp_out, outdir);
     delete(temp_out);
+    movefile(gzipped_filename{1}, [fn '.gz']);
     logtext(atmlab('OUT'), 'Done\n');
 
 end

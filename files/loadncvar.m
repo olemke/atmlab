@@ -32,11 +32,11 @@ else
 end
 
 if ischar(varname)
-    varid = netcdf.inqVarId (ncid, varname);
+    varid = netcdf.inqVarID (ncid, varname);
     ret = netcdf.getVar (ncid, varid);
 elseif iscell(varname)
     for v = varname
-        varid = netcdf.inqVarId (ncid, char(v));
+        varid = netcdf.inqVarID (ncid, char(v));
         ret.(genvarname(char(v))) = netcdf.getVar (ncid, varid);
     end
 else

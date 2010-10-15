@@ -1,3 +1,19 @@
+2010-10-15	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-94
+
+	* files/loadncvar.m: Adapted
+		- Fix matlab2010b warning by replacing inqVarId with inqVarID.
+
+	* datasets/common_read_avhrr.m: Adapted
+		- Fix matlab2010b warning by requesting 3 rather than 4 output
+		arguments from fileparts.
+
+	* collocations/write_collocations_netcdf.m: Adapted
+		- Use random temporary filename
+		- Check for existance of dimension before creating a new one; this
+		caused an error in matlab2010b.
+
 2010-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-93

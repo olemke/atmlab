@@ -38,7 +38,7 @@ chans = cat(2, names{channels});
 
 % convert from l1b to netcdf
 
-[fp{1:4}] = fileparts(file);
+[fp{1:3}] = fileparts(file);
 basename = fp{2};
 outfile = fullfile(atmlab('WORK_AREA'), [basename '.nc']);
 infile = fullfile(atmlab('WORK_AREA'), basename);
