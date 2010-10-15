@@ -1,3 +1,10 @@
+2010-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-91
+
+	* math/isditto.m: Made a replacement function for obsolete
+	"issame" function
+
 2010-10-14	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-90
