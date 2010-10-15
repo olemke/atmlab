@@ -1,5 +1,11 @@
 2010-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-93
+	
+	* math/isditto.m: Removed
+	
+2010-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-92
 	
 	* math/isditto.m: Make sure the arguments have the same size. This
