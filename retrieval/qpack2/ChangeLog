@@ -1,3 +1,11 @@
+2010-10-19  Ole Martin Christensen  <olem@chalmers.se>
+
+	* qpack2.m: (qp2_y2Q): Added the possibility to use Z_ATMDATA
+	to define the geometric height.
+
+	* qpack2.tex: Changed the T_ATMDATA and Z_ATMDATA for the Qpack2
+	specific chapter to reflect changes in qpack2.m
+
 2010-09-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.3

@@ -247,7 +247,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   rqre_datatype( Y(m).ZA, @istensor0, sprintf('Y(%d).ZA',m) );              %&%
 
 
-  %- Map ATMDATA to VMR_FIELD and T_FIELD
+  %- Map ATMDATA to VMR_FIELD, Z_FIELD and T_FIELD 
   %
   Q.LAT_GRID  = Y(m).LATITUDE;
   Q.LON_GRID  = Y(m).LONGITUDE;
@@ -275,7 +275,11 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   %
   Q.VMR_FIELD = qarts_vmr_field( Q, mjd, ho );
   Q.T_FIELD   = qarts_t_or_z_field( Q, 't', mjd, ho );
-  Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
+  if  qarts_isset(Q.Z_ATMDATA)
+      Q.Z_FIELD   = qarts_t_or_z_field( Q, 'z', mjd, ho );
+  else
+      Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
+  end
 
   
   %- Prepare absorption table, if ABSORPTION = 'CalcTable'

@@ -287,9 +287,9 @@ fields in special way:
 \item \verb|Q.R_GEOID| must be set.
 \item \verb|Q.Q.USE_RAW_ATMOSPHERE| must be set to false. 
 \item \verb|Q.ABS_SPECIES.ATMDATA| must be set.
-\item \verb|Q.T_ATMDATA| must be set. Geometrical altitudes of the pressure
-  levels (the WSV \verb|z_field|) are found by applying hydrostatic
-  equilibrium.
+\item \verb|Q.T_ATMDATA| must be set. 
+\item \verb|Q.Z_ATMDATA| is optional, if not set geometrical altitudes of the pressure
+  levels (the WSV \verb|z_field|) are found by applying hydrostatic equilibrium.
 \item \verb|Q.ABSORPTION| must be set. If this field is set to 'CalcTable' and
   \verb|Q.ABS_P| is unspecified, the function \verb|qarts_abstable| is called
   (with default arguments) for each retrieval case (using the a priori state as
