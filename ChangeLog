@@ -1,3 +1,11 @@
+2010-10-19	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-97
+
+	* handy/homedir.m: Adapted
+		- Smarter implementation (don't do a system call, just use getenv
+		directly). Also add error identifier.
+
 2010-10-15	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-96

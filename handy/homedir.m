@@ -10,14 +10,8 @@
 function d = homedir
 
 
-[s,d] = system( 'echo $HOME' );
+d = getenv('HOME');
 
-if s
-  error( 'System call to establish home directory failed.' );
-end
-
-%- Remove any newline character
-%
-if d(end) == sprintf('\n')
-  d = d(1:end-1);
+if isempty(d)
+  error('atmlab:homedir', 'No home-directory defined');
 end
