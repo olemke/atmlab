@@ -1,3 +1,11 @@
+2010-10-22     Marston Johnston <marston@chalmers.se>
+	* atmlab-1-0-98
+
+	* gridcreation/p_merge.m: added
+		 - function to merge two vertical profiles (eg., AIRS and MLS) using
+		   the uncertainties of each profile to create a weighted mean.
+
+
 2010-10-19	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-97
