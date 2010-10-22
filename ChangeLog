@@ -1,4 +1,10 @@
-2010-10-22     Marston Johnston <marston@chalmers.se>
+2010-10-22	Marston Johnston     <marston@chalmers.se>
+	* atmlab-1-0-99
+
+	* h2o/thermodynamics/e2spechum.m
+	  - function to convert partial pressure to specific humidity 
+
+2010-10-22	Marston Johnston    <marston@chalmers.se>
 	* atmlab-1-0-98
 
 	* gridcreation/p_merge.m: added
