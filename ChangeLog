@@ -1,3 +1,9 @@
+2010-10-26      Marston Johnston    <marston@chalmers.se> 
+	        * atmlab-1-0-100 
+	 
+	        * gridcreation/p_merge.m: change 
+	                 - Added some comments when using variable "debug" 
+
 2010-10-22	Marston Johnston     <marston@chalmers.se>
 	* atmlab-1-0-99
 

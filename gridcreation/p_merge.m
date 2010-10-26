@@ -139,7 +139,7 @@ if verbose || debug
     for p = 1:numel(si), fprintf('si(%d) = %f\n',p,si(p)); end
 end
 
-if debug, keyboard; end
+if debug, disp('Stopping in debug mode. Type return to continue!'), keyboard; end
 
 % Some error checks!
 if any(isnan(vprofile))
