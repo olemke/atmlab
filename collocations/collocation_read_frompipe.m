@@ -92,7 +92,7 @@ while true
         end
     end
 end
-
+fwrite(1, fread(logfile, inf, '*char'));
 %% finalise
 
 M = data_total(~isnan(data_total(:, 1)), :);

@@ -172,7 +172,7 @@ if any(cellfun(@length, paths_hdf5))
         limstr = [baselimstr sprintf(' (B_TIME > %d) & (B_TIME < %d)', ...
             this_start, this_end)];
         M = collocation_read_frompipe(hdf5file, cols_in, limstr);
-        cols_out = namestruct;
+        cols_out = name_struct;
         return
     end
 end

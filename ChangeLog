@@ -1,7 +1,17 @@
 2010-10-27	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-102
+
+	* collocations/collocation_read.m: Typo.
+
+	* collocations/collocation_read_frompipe.m: Adapted
+		- Also print the remaining contents of the logfile.
+
+2010-10-27	Gerrit Holl	<gerrit.holl@ltu.se>
 	* atmlab-1-0-101
 
-	* handy/wait_for_existence.m: Sleep until a file jumps into existance.
+	* handy/wait_for_existence.m: Added
+		- Sleep until a file jumps into existance.
 
 	* collocations/collocation_read_frompipe.m: Added
 		- Read collocations from Pytables collocation server
