@@ -59,6 +59,16 @@ A.granule_duration_hirscs = 86400; % one granule per da
 A.granule_duration_collocation_cpr_poes = 86400;
 A.granule_duration_collocation_cpr_mhs = 86400;
 
+%% define viewing angles
+
+% source:
+% NOAA KLM User's Guide, Appendix J
+% http://www.ncdc.noaa.gov/oa/pod-guide/ncdc/docs/klm/html/j/app-j.htm
+
+A.angles_avhrr_gac = linspace(-55.37, 55.37, 409);
+A.angles_mhs = linspace(-49.4444, 49.4444, 90);
+A.angles_amsub = linspace(-48.95, 48.95, 90);
+
 if exist('c', 'var')
     value = A.(c);
 else

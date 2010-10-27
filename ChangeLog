@@ -1,3 +1,29 @@
+2010-10-27	Gerrit Holl	<gerrit.holl@ltu.se>
+	* atmlab-1-0-101
+
+	* handy/wait_for_existence.m: Sleep until a file jumps into existance.
+
+	* collocations/collocation_read_frompipe.m: Added
+		- Read collocations from Pytables collocation server
+
+	* collocations/collocation_read.m: Adapted
+		- Use Pytables collocation server when available
+	
+	* datasets/datasets_config.m,
+	site-specific/kiruna/datasets_init.m: Adapted
+		- Add paths for HDF5-collocations.
+
+	* collocations/read_collocs_data_mean.m,
+	collocations/write_collocations_netcdf.m: Adapted
+		- Register cleanup-object for closing the NetCDF file
+
+	* datasets/datasets_constants.m: Adapted
+		- Add angles for different instruments.
+
+	* datasets/find_granules_by_date.m: Adapted
+		- Turn into ASCII (experimenting with mlabwrap)
+
+
 2010-10-26      Marston Johnston    <marston@chalmers.se> 
 	        * atmlab-1-0-100 
 	 

@@ -27,8 +27,8 @@ function M = read_collocs_data_mean(fn, cols, c)
 logtext(atmlab('OUT'), 'Reading %s\n', fn);
 filenames = gunzip(fn, atmlab('WORK_AREA'));
 ncid = netcdf.open(filenames{1}, 'NOWRITE');
-delete(filenames{1});
-
+%delete(filenames{1});
+cleanupObj = onCleanup(@()netcdf.close(ncid));
 varids = nan(size(cols));
 varwidth = zeros(size(cols));
 hasmean = false;

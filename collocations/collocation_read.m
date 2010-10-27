@@ -61,6 +61,13 @@ if ~exist('filters', 'var')
     filters = {};
 end
 
+switch no
+    case 1
+        s = sat2;
+    case 2
+        s = {sat1, sat2};
+end
+
 %% check legacy format
 if iscell(cols_in{1})
     warning('atmlab:collocation_read', ...
@@ -114,6 +121,62 @@ if ~isempty(filters)
     end
 end
 
+%% check if this can be done via hdf5 (much faster!)
+
+years = start_date(1):end_date(1);
+paths_hdf5 = cell(size(years));
+for i = 1:length(years)
+    year = years(i);
+    try
+        paths_hdf5{i} = find_datafile_by_date([year 1 1], s, ['collocation_' sensor1 '_' sensor2 '_hdf5']);
+        assert(~~exist(paths_hdf5{i}, 'file'), ...
+            'atmlab:collocation_read', 'HDF5-file does not exist: %s', ...
+            paths_hdf5{i});
+    catch ME
+        switch (ME.identifier)
+            case {'atmlab:find_datadir_by_date', 'atmlab:collocation_read'}
+                logtext(atmlab('OUT'), ...
+                    'Note: no HDF5 @ %s %s %s %s', ...
+                    year, s, sensor1, sensor2)
+                continue
+            otherwise
+                ME.rethrow()
+        end
+    end
+end
+
+if any(cellfun(@length, paths_hdf5))
+    %% do this stuff via HDF5
+    if ~all(cellfun(@length, C))
+        error('atmlab:collocation_read', ...
+            'Period PARTIALLY covered by HDF-5, this is not supported yet');
+    end
+    logtext(atmlab('OUT'), 'Found HDF5\n');
+    % Convert limits-matrix to limits-string
+    limcellstr = cellfun(@(v) ...
+        ['(' v ' > ' num2str(limits.(v)(1)) ') & (' ...
+        v ' < ' num2str(limits.(v)(2)) ') & '], ...
+        fieldnames(limits), 'UniformOutput', false);
+    baselimstr = horzcat(limcellstr{:});
+    for i = 1:length(years)
+        year = years(i);
+        hdf5file = paths_hdf5{i};
+        % and limit dates
+        global_start = date2unixsecs(start_date(1), start_date(2), start_date(3));
+        this_year_start = date2unixsecs(year, 1, 1);
+        this_start = max(global_start, this_year_start);
+        global_end = date2unixsecs(end_date(1), end_date(2), end_date(3));
+        this_year_end = date2unixsecs(year, 12, 31, 24);
+        this_end = min(global_end, this_year_end);
+        % add datelimits to limstr
+        limstr = [baselimstr sprintf(' (B_TIME > %d) & (B_TIME < %d)', ...
+            this_start, this_end)];
+        M = collocation_read_frompipe(hdf5file, cols_in, limstr);
+        cols_out = namestruct;
+        return
+    end
+end
+
 %% pre-allocate at least zero rows
 
 M = zeros(0, ncols);
@@ -124,12 +187,7 @@ dates = daterange(start_date, end_date);
 for i = 1:size(dates, 1)
     date = dates(i, :);
     %% read collocations for date
-    switch no
-        case 1
-            s = sat2;
-        case 2
-            s = {sat1, sat2};
-    end
+
     path = find_datafile_by_date(date, s, ...
         ['collocation_' sensor1 '_' sensor2]);
     

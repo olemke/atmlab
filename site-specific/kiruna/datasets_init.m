@@ -76,6 +76,10 @@ datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collo
 datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
 
+datasets_config('collocation_cpr_mhs_hdf5_basedir', '/local/gerrit/data/collocations_hdf5/collocations_cloudsat_mhs');
+datasets_config('collocation_cpr_mhs_hdf5_subdir', '');
+datasets_config('collocation_cpr_mhs_hdf5_filename', '$SAT_$YEAR4.h5');
+
 datasets_config('collocation_cpr_mhs_legacy_basedir', '/storage4/user_data/gerrit/archived/20100308_collocations_cloudsat_poes/');
 datasets_config('collocation_cpr_mhs_legacy_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_cpr_mhs_legacy_filename', 'collocations_$SAT.mat');

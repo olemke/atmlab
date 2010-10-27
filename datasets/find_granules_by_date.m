@@ -32,7 +32,7 @@ function [M, paths] = find_granules_by_date(year, month, day, sat, dataset, ...
 %  dataset          string     Describing the dataset.
 %  with_yesterday   bool       Include last of yesterday (defaults to true)
 %
-% For POES satellites (NOAA-15 – NOAA-19 and MetOp-A), AMSU, MHS, HIRS and
+% For POES satellites (NOAA-15 -- NOAA-19 and MetOp-A), AMSU, MHS, HIRS and
 % AVHRR have the same granule times.
 %
 % $Id$

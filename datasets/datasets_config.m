@@ -126,6 +126,11 @@ A.collocation_cpr_mhs_subdir = nan;
 A.collocation_cpr_mhs_regexp = nan;
 A.collocation_cpr_mhs_filename = nan;
 
+A.collocation_cpr_mhs_hdf5_basedir = nan;
+A.collocation_cpr_mhs_hdf5_subdir = nan;
+A.collocation_cpr_mhs_hdf5_regexp = nan;
+A.collocation_cpr_mhs_hdf5_filename = nan;
+
 A.collocation_cpr_mhs_legacy_basedir = nan;
 A.collocation_cpr_mhs_legacy_subdir = nan;
 A.collocation_cpr_mhs_legacy_regexp = nan;
@@ -147,6 +152,11 @@ A.collocation_mhs_mhs_subdir = nan;
 A.collocation_mhs_mhs_regexp = nan;
 A.collocation_mhs_mhs_filename = nan;
 
+A.collocation_mhs_mhs_hdf5_basedir = nan;
+A.collocation_mhs_mhs_hdf5_subdir = nan;
+A.collocation_mhs_mhs_hdf5_regexp = nan;
+A.collocation_mhs_mhs_hdf5_filename = nan;
+
 A.collocation_mhs_mhs_legacy_basedir = nan;
 A.collocation_mhs_mhs_legacy_subdir = nan;
 A.collocation_mhs_mhs_legacy_regexp = nan;
@@ -162,6 +172,12 @@ A.collocation_cpr_avhrr_subdir = nan;
 A.collocation_cpr_avhrr_regexp = nan;
 A.collocation_cpr_avhrr_filename = nan;
 
+A.collocation_cpr_avhrr_hdf5_basedir = nan;
+A.collocation_cpr_avhrr_hdf5_subdir = nan;
+A.collocation_cpr_avhrr_hdf5_regexp = nan;
+A.collocation_cpr_avhrr_hdf5_filename = nan;
+
+
 A.collocation_cpr_avhrr_legacy_basedir = nan;
 A.collocation_cpr_avhrr_legacy_subdir = nan;
 A.collocation_cpr_avhrr_legacy_regexp = nan;
@@ -171,6 +187,11 @@ A.collocation_hirscs_mhs_basedir = nan;
 A.collocation_hirscs_mhs_subdir = nan;
 A.collocation_hirscs_mhs_regexp = nan;
 A.collocation_hirscs_mhs_filename = nan;
+
+A.collocation_hirscs_mhs_hdf5_basedir = nan;
+A.collocation_hirscs_mhs_hdf5_subdir = nan;
+A.collocation_hirscs_mhs_hdf5_regexp = nan;
+A.collocation_hirscs_mhs_hdf5_filename = nan;
 
 A.collocation_hirscs_mhs_legacy_basedir = nan;
 A.collocation_hirscs_mhs_legacy_subdir = nan;
@@ -186,6 +207,11 @@ A.collocation_collocation_cpr_mhs_avhrr_basedir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_subdir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_regexp = nan;
 A.collocation_collocation_cpr_mhs_avhrr_filename = nan;
+
+A.collocation_collocation_cpr_mhs_avhrr_hdf5_basedir = nan;
+A.collocation_collocation_cpr_mhs_avhrr_hdf5_subdir = nan;
+A.collocation_collocation_cpr_mhs_avhrr_hdf5_regexp = nan;
+A.collocation_collocation_cpr_mhs_avhrr_hdf5_filename = nan;
 
 A.collocation_collocation_cpr_mhs_avhrr_legacy_basedir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_legacy_subdir = nan;
