@@ -1,3 +1,13 @@
+2010-10-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-104
+
+	* time/dayofyear_inverse.m: 
+	Changed the output structure fields back to year,month instead of
+	yr,mn. This is for consistency with the output name conventions of
+	find_info_from_granule, which output year,month, etc of a file
+		
+
 2010-10-28	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-103

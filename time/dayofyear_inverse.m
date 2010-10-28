@@ -23,7 +23,7 @@ if doy > daysinyear(year)
 end
 
 [yr mn day] = jd2date(date2jd(double(year), 1, 0) + double(doy));
-out.yr = yr;
-out.mn = mn;
+out.year = yr;
+out.month = mn;
 out.day = day;
 out.dayofyear = doy;
