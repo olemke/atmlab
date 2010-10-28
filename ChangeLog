@@ -1,3 +1,10 @@
+2010-10-28	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-103
+
+	* collocations/collocation_read.m: Adapted
+		- Implemented support for reading meandata via server.
+
 2010-10-27	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-102
