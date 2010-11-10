@@ -58,7 +58,7 @@ ny = size( Y, 2 );
 %interpolate data onto the combined grid
 Y1=zeros(length(x_new3),ny);
 for i=1:ny
-    Y1(:,i)=interpd( x_new3,Y(:,i), x);
+    Y1(:,i)=interp1( x ,Y(:,i), x_new3,'linear','extrap');
 end
 
 xlen=length(x_new);

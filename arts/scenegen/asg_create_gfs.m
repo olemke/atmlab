@@ -100,6 +100,7 @@ else
    grids{2}= sort([C.USE_LATS C.USE_LATS+C.LAT_RES C.USE_LATS-C.LAT_RES]);
 end
 
+
 Gdbz(1).DATA=10.^(Gdbz(1).DATA/10);
 [Gdbz]=asg_bin(Gdbz(1),grids,[1 2]);
 
@@ -117,11 +118,11 @@ end
 Gdbz.DATA=10*log10(Gdbz.DATA);
 Gdbz.DATA(find(Gdbz.DATA<=-50))=-50;
 
+
 % Switch to pressure grid. 
 Gdbz.GRID1= z2p_cira86(Gdbz.GRID1,mean(lat_limits),doy(1) );
 Gdbz.GRID1_NAME='Pressure';
 Gdbz.GRID1_UNIT='Pa';
-
 
 
 %- Set Gdbz.GRID1
@@ -139,6 +140,9 @@ else
  
  limits=[fliplr(C.P_LIMS)];
  [Gdbz]=asg_crop(Gdbz,limits,[1]);
+ if length(Gdbz.GRID2)<2
+   Gdbz.DATA=Gdbz.DATA';
+ end
 
 end
  
@@ -153,6 +157,8 @@ Gdbz.PROPS=C.PROPS;
 if dim==3
  grids_dbz{3} = C.LON_GRID;
  Gdbz.DIMADD=C.DIMADD;
+else
+ Gdbz.DIMADD=[];
 end
 %
 
@@ -199,8 +205,12 @@ for ip = 1 : length(C.USE_LATS)
    Q.LON_GRID=grids_cs{3}; 
    Q.ATMOSPHERE_DIM = 3;
    
-  end
+  else
+
+   Q.ATMOSPHERE_DIM = 1;
+   Q.LAT_GRID=C.USE_LATS(ip);
    
+  end 
  
   %- Generate a single scene
   %

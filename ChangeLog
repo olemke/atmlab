@@ -1,3 +1,18 @@
+2010-11-10  Bengt Rydberg  <bengt.rydbergn@chalmers.se>
+
+	* atmlab-1-0-105
+
+	* demos/asg_demo.m: updated, this demo generates atmospheric states 
+
+	* arts/scenegen/asg_create_gfs.m: updated, the function can now
+	generate both 1 and 3 dimensional atmospheric states 
+
+	* arts/scenegen/asg_cloudsat_ecmwf.m: updated.
+
+	* math/binning.m: updated, removed an errorcheck
+
+	* handy/fun2dwrapper.m: updated, removed an errorcheck 
+	
 2010-10-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-104

@@ -19,7 +19,7 @@
 
 function [y]=water_psd(LWC,r,rc,c1,c2)
 
-min_nargin( 5, nargin );       
+%min_nargin( 5, nargin );       
 
 B=c1/c2/rc^c2;
 A=3*LWC*c2*B^((c1+4)/c2)*1e12/4/pi/gamma((c1+4)/c2);

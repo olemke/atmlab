@@ -370,17 +370,20 @@ function [y,dy,ydata]=asg_gfs2i(G,Q,FS,sensor,workfolder)
  if strcmp(sensor,'odin')
 
   for i= 1:length(Q.F_GRID)
-    
-    if i==1
+    if 0
+     if i==1
        cind=find(strncmp(lower({G.NAME}),'hno3',4));
        ind=setdiff(1:length(G),cind);
        G1=G(ind);
-    else
+     else
        cind=find(strncmp(lower({G.NAME}),'clo',3));
        ind=setdiff(1:length(G),cind);
        G1=G(ind);
-    end
-
+     end
+   else
+    G1=G;
+   end
+    
     Q1           = asg2q( asgD, G1, Q, workfolder );
     Q1.ABS_NLS    =[];
     Q1           = qarts_abstable( Q1,9,100,[],[] );

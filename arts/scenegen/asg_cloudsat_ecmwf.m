@@ -16,9 +16,9 @@
 %  datadir='/home/bengt/CIWSIR/Dataset_gen/CloudSAT_data/Data/';
 %  data=[datadir,'2006166131201_00702_CS_ECMWF-AUX_GRANULE_P_R03_E00.hdf'];
 %  latitude=[-90 90];
-%  [G,D]=asg_cloudsat_ecmwf(data,leg,latitude,aux)
+%  [G]=asg_cloudsat_ecmwf(data,leg,latitude,aux)
 
-function [G,D]=asg_cloudsat_ecmwf(data,leg,grids_cs,aux)
+function [G]=asg_cloudsat_ecmwf(data,leg,grids_cs,aux)
 
 
 
@@ -143,6 +143,62 @@ G(3).DATA_NAME='Volume mixing ratio';
 D.GRID1_NAME='Pressure';
 D.GRID1_UNIT='Pascal';
 
+
+
+G0 = gf_empty( 3 );
+field={G(:).NAME};
+ind=find(strcmp(field,{'Temperature field'}));
+H1=G0;
+H1=gf_set_fields(H1,'TYPE','atm_data','NAME',G(ind).NAME,...
+               'SOURCE',G(ind).SOURCE,'DATA_NAME',G(ind).DATA_NAME,...
+               'DATA_UNIT',G(ind).DATA_UNIT);
+H1=gf_set(H1,G(ind).DATA,[{G(ind).GRID1},{G(ind).GRID2'},{}]);     
+H1=gf_set_fields(H1,'GRID1_NAME','pressure',...
+               'GRID1_UNIT','Pa','GRID2_NAME','latitude',...
+               'GRID2_UNIT','degree');
+
+H1(2)=G0;
+ind=find(strcmp(field,{'Water vapour'}));
+H1(2)=G0;
+H1(2)=gf_set_fields(H1(2),'TYPE','atm_data','NAME','H2O',...
+               'SOURCE',G(ind).SOURCE,'DATA_NAME','vmr',...
+               'DATA_UNIT','1');
+H1(2)=gf_set(H1(2),G(ind).DATA,[{G(ind).GRID1},{G(ind).GRID2'},{}]);     
+H1(2)=gf_set_fields(H1(2),'GRID1_NAME','pressure',...
+               'GRID1_UNIT','Pa','GRID2_NAME','latitude',...
+               'GRID2_UNIT','degree');
+
+H1(3)=G0;
+ind=find(strcmp(field,{'Ozone'}));
+H1(3)=G0;
+H1(3)=gf_set_fields(H1(3),'TYPE','atm_data','NAME','O3',...
+               'SOURCE',G(ind).SOURCE,'DATA_NAME','vmr',...
+               'DATA_UNIT','1');
+H1(3)=gf_set(H1(3),G(ind).DATA,[{G(ind).GRID1},{G(ind).GRID2'},{}]);     
+H1(3)=gf_set_fields(H1(3),'GRID1_NAME','pressure',...
+               'GRID1_UNIT','Pa','GRID2_NAME','latitude',...
+               'GRID2_UNIT','degree');
+        
+if length(field)>3
+ for i=4:length(field)
+   H1(i)=G0;
+   if strcmp(field(i),'DEM_elevation')
+      H1(i)=gf_set_fields(H1(i),'TYPE','atm_data','NAME',...
+               'surface altitude','SOURCE',G(i).SOURCE,...
+               'DATA_NAME',G(i).DATA_NAME,'DATA_UNIT','m');
+      H1(i)=gf_set(H1(i),G(i).DATA',[{} {G(i).GRID2'} {} ]) ;
+      H1(i)=gf_set_fields(H1(i),'GRID1_NAME','latitude',...
+               'GRID1_UNIT','degree');
+   else
+      H1(i)=gf_set_fields(H1(i),'TYPE','atm_data','NAME',...
+               G(i).NAME,'SOURCE',G(i).SOURCE,...
+               'DATA_NAME',G(i).DATA_NAME,'DATA_UNIT',G(i).DATA_UNIT);
+      H1(i)=gf_set(H1(i),G(i).DATA,[{G(i).GRID1} {G(i).GRID2} {G(i).GRID3} ]); 
+   end
+ end
+end 
+
+G=H1;
 
 % GFIN_CLOUDSAT_ECMWF reads in cloudsat data on gformat
 %

@@ -42,7 +42,7 @@ if dim > dimens(X)                                                        %&%
   error( 'The selected dimension (*dim*) must be <= dimens(X).' );        %&%
 end                                                                       %&%
 %                                                                         %&%
-rqre_datatype( X, @isfunction_handle );                                   %&%
+%rqre_datatype( X, @isfunction_handle );                                   %&%
 %                                                                         %&%
 if isempty(ix)                                                            %&%
   error( 'One of the varargin arguments must be the string ''X''.' );     %&%
