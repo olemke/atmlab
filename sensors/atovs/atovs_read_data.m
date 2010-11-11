@@ -7,23 +7,30 @@
 % IN    file_name   File name.
 % OUT   data        Data structure with the following fields:
 %                   time   Vector of scanline time stamps in UTC [msec].
-%	            lon    2D matrix (fov,scanline) of longitudes in [degrees].
-%		    lat    2D matrix (fov,scanline) of latitudes in [degrees].
-%		    tb     3D matrix (fov,channel,scanline) of brightness
-%                          temperatures in [K].
+%       lon         2D matrix (fov,scanline) of longitudes in [degrees].
+%       lat         2D matrix (fov,scanline) of latitudes in [degrees].
+%       lza         2D matrix (fov,scanline) of local zenith angle in
+%                   [degrees].
+%       laa         2D matrix (fov,scanline) of local azimuth angle in
+%                   [degrees].
+%       sza         2D matrix (fov,scanline) of solar zenith angle in
+%                   [degrees].
+%       saa         2D matrix (fov,scanline) of solar azimuth angle in
+%                   [degrees].
+%       tb          3D matrix (fov,channel,scanline) of brightness
+%                   temperatures in [K].
+%           
 %       err         Error flag. 0 - no error, 1 - error.
 
 % 2004-06-29   Created by Mashrab Kuvatov.
-
+% 2010-11-11   Adapted by Gerrit Holl (also return angles)
 
 function [data, err] = atovs_read_data( file_name )
 
-% no error
-err = 0;
 
 % determine satellite and instrument IDs, data level,
 % and number of scan lines
-[sat_id, inst_id, level, nlines, err] = atovs_read_header( file_name );
+[sat_id, inst_id, level, nlines, err] = atovs_read_header( file_name ); %#ok<ASGLU>
 
 if err ~= 0
   % error
@@ -36,7 +43,7 @@ end
 % make sure it is level 1c data
 if ~strcmp( level, 'l1c')
   % error
-  disp( 'Error. Input file must be of level 1c.' );
+  disp('atmlab:atovs_read_data', 'Error. Input file must be of level 1c.' );
   data = [];
   err = 1;
   return
@@ -51,7 +58,7 @@ switch inst_id
  case 'HIRS'
   [rec_format, rec_len, nchan, nfovs] = atovs_define_hirsl1c;
  otherwise
-  error('No known instrument.')
+  error('atmlab:atovs_read_data','No known instrument: %s', inst_id)
 end
 
 % open a file
@@ -93,6 +100,10 @@ record = reshape( record, rec_len, nlines_read );
 data.lon = record( rec_format.lon, : ) * .0001;
 data.lat = record(  rec_format.lat, : ) * .0001;
 data.time = record( rec_format.time, : );
+data.lza = record(rec_format.lza, :) * .01;
+data.laa = record(rec_format.laa, :) * .01;
+data.sza = record(rec_format.sza, :) * .01;
+data.saa = record(rec_format.saa, :) * .01;
 data.tb = reshape( record( rec_format.tb', : ) * .01, nfovs, nchan, nlines_read );
 
 return

@@ -5,12 +5,13 @@
 % FORMAT   [rec_format, rec_len, nchan, nfovs] = atovs_define_hirsl1c;
 %
 % OUT   rec_format   Format of a record. A structure with fields:
-%                    time, lat, lon, and tb.
+%                    time, lat, lon, lza, laa, sza, saa, and tb.
 %       rec_len      Length of a record.
 %       nchan        Number of channels.
 %       nfovs        Number of instrument field of views.
 
 % 2004-06-29   Created by Mashrab Kuvatov.
+% 2010-11-11   Adapted by Gerrit Holl (also return angles).
 
 
 function [rec_format, rec_len, nchan, nfovs] = atovs_define_hirsl1c;
@@ -28,6 +29,10 @@ rec_len = 1664;
 rec_format.time     = 4;
 rec_format.lat = 29 + 2 * [1:nfovs];
 rec_format.lon = 30 + 2 * [1:nfovs];
+rec_format.lza = 143 + 4 * (1:nfovs);
+rec_format.laa = 144 + 4 * (1:nfovs);
+rec_format.sza = 145 + 4 * (1:nfovs);
+rec_format.saa = 146 + 4 * (1:nfovs);
 
 for ichan = 1 : nchan
   rec_format.tb( ichan, : ) = 349 + ichan + nchan * [1:nfovs];

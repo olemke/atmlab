@@ -1,3 +1,14 @@
+2010-11-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-106
+	
+	* sensors/atovs/atovs_define_hirsl1c.m,
+	sensors/atovs/atovs_define_amsual1c.m,
+	sensors/atovs/atovs_define_amsubl1c.m,
+	sensors/atovs/atovs_read_data.m: Adapted
+	- Also return angles (lza, laa, sza, saa). This makes amsu_fov2za
+	redundant for most purposes.
+
 2010-11-10  Bengt Rydberg  <bengt.rydbergn@chalmers.se>
 
 	* atmlab-1-0-105
