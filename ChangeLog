@@ -1,5 +1,14 @@
 2010-11-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-108
+
+	* sensors/atovs/avhrr_gac_read_data.m: Added
+	- Read SOME data from AVHRR GAC. Actually no brightness temperatures as
+	those are uncalibrated. So far reads just some pretty angles. In the
+	future, it would be nice to calibrate this stuff natively.
+
+2010-11-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-107
 
 	* sensors/atovs/atovs_define_hirsl1c.m,
