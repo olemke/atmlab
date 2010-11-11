@@ -28,10 +28,10 @@ rec_len = 1152;
 rec_format.time     = 4;
 rec_format.lat = 13 + 2 * (1:nfovs);
 rec_format.lon = 14 + 2 * (1:nfovs);
-rec_format.lza = 195 + 4 * (1:nfovs);
-rec_format.laa = 196 + 4 * (1:nfovs);
-rec_format.sza = 197 + 4 * (1:nfovs);
-rec_format.saa = 198 + 4 * (1:nfovs);
+rec_format.lza = 195 + 4 * (0:(nfovs-1));
+rec_format.laa = 196 + 4 * (0:(nfovs-1));
+rec_format.sza = 197 + 4 * (0:(nfovs-1));
+rec_format.saa = 198 + 4 * (0:(nfovs-1));
 
 for ichan = 1 : nchan
   rec_format.tb( ichan, : ) = 552 + ichan + nchan * (1:nfovs);

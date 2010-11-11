@@ -1,5 +1,14 @@
 2010-11-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-107
+
+	* sensors/atovs/atovs_define_hirsl1c.m,
+	sensors/atovs/atovs_define_amsual1c.m,
+	sensors/atovs/atovs_define_amsubl1c.m: Adapted
+	- Fix off-by-one error in angles.
+
+2010-11-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-106
 	
 	* sensors/atovs/atovs_define_hirsl1c.m,

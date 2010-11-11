@@ -27,12 +27,12 @@ rec_len = 1664;
 
 % define where each of these appear in the data records
 rec_format.time     = 4;
-rec_format.lat = 29 + 2 * [1:nfovs];
-rec_format.lon = 30 + 2 * [1:nfovs];
-rec_format.lza = 143 + 4 * (1:nfovs);
-rec_format.laa = 144 + 4 * (1:nfovs);
-rec_format.sza = 145 + 4 * (1:nfovs);
-rec_format.saa = 146 + 4 * (1:nfovs);
+rec_format.lat = 29 + 2 * (1:nfovs);
+rec_format.lon = 30 + 2 * (1:nfovs);
+rec_format.lza = 143 + 4 * (0:nfovs-1);
+rec_format.laa = 144 + 4 * (0:nfovs-1);
+rec_format.sza = 145 + 4 * (0:nfovs-1);
+rec_format.saa = 146 + 4 * (0:nfovs-1);
 
 for ichan = 1 : nchan
   rec_format.tb( ichan, : ) = 349 + ichan + nchan * [1:nfovs];
