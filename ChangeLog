@@ -1,3 +1,10 @@
+2010-11-12	Gerrit Holl <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-110
+
+	* math/angular2D.m: Removed
+	- This really is too incorrect to be of any use.
+
 2010-11-12	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-109
