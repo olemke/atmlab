@@ -54,6 +54,7 @@ addpath( fullfile( toppath, 'forwardmodel' ) );
 addpath( fullfile( toppath, 'files' ) ); 
 addpath( fullfile( toppath, 'demos' ) );
 addpath( fullfile( toppath, 'datasets' ) ); 
+addpath( fullfile( toppath, 'circular' ) ); 
 addpath( fullfile( toppath, 'covmat' ) );
 addpath( fullfile( toppath, 'collocations' ) ); 
 addpath( fullfile( toppath, 'atmlab' ) ); 

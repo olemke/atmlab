@@ -36,7 +36,7 @@ function M = colloc_process_cpr_avhrr(collocations, ...
 %
 % $Id$
 
-% prepare
+%% prepare
 c = colloc_constants('cols_cpr_avhrr');
 c = c.overlap;
 n = size(collocations, 1);
@@ -71,12 +71,15 @@ M(:, c.C_ROW, :) = cr;
 
 %% avhrr
 
-M(:, c.AVHRR_LAT) = data_avhrr.lon(ai);
+M(:, c.AVHRR_LAT) = data_avhrr.lat(ai);
 M(:, c.AVHRR_LONG) = data_avhrr.lon(ai);
 M(:, c.AVHRR_START) = round(date2unixsecs(date_avhrr_cell{1:5}));
 M(:, c.AVHRR_TIME) = data_avhrr.epoch + data_avhrr.time(ar);
 M(:, c.AVHRR_ROW) = ar;
 M(:, c.AVHRR_COL) = ac;
+M(:, c.AVHRR_RAA) = data_avhrr.raa(ai);
+M(:, c.SZA) = data_avhrr.sza(ai);
+M(:, c.AVHRR_LZA) = data_avhrr.lza(ai);
 M(:, c.DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
     data_avhrr.lat(ai), data_avhrr.lon(ai), constants('EARTH_RADIUS')/1e3);
 M(:, c.INT) = M(:, c.AVHRR_TIME) - M(:, c.C_TIME);
@@ -85,3 +88,9 @@ M(:, c.INT) = M(:, c.AVHRR_TIME) - M(:, c.C_TIME);
 
 wrongrows = M(:, c.AVHRR_ROW)< granule_first_line(name_avhrr, 'avhrr', date_avhrr);
 M(wrongrows, :) = [];
+
+% %% select only the nearest one
+% 
+% M = sortrows(M, [c.C_ROW c.DIST]);
+% [~, I_first] = unique(M(:, c.C_ROW), 'first');
+% M = M(I_first, :);

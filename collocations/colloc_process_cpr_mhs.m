@@ -1,5 +1,5 @@
 function M = colloc_process_cpr_mhs(collocations, ...
-    name_cpr, date_cpr, data_cpr, name_mhs, date_mhs, data_mhs)
+    ~, date_cpr, data_cpr, name_mhs, date_mhs, data_mhs)
 
 % colloc_process_cpr_mhs Gather collocation info to store for CloudSat+MHS
 %
@@ -80,6 +80,8 @@ M(:, c.B_C) = ac;
 M(:, c.B_DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
     data_mhs.lat(ai), data_mhs.lon(ai), constants('EARTH_RADIUS')/1e3);
 M(:, c.B_INT) = M(:, c.B_TIME) - M(:, c.C_TIME);
+M(:, c.B_LZA) = data_mhs.lza(ai);
+M(:, c.B_LAA) = data_mhs.laa(ai);
 
 %% amsua
 
@@ -99,7 +101,6 @@ M(:, c.A_DIST) = sphdist(data_cpr.lat(cr), data_cpr.lon(cr), ...
 M(:, c.A_INT) = M(:, c.A_TIME) - M(:, c.C_TIME);
 
 %% hirs
-
 
 hirs = read_granule(name_mhs, 'hirs', date_mhs, false, true);
 
@@ -129,6 +130,16 @@ if ~isempty(hirs)
         M(:, c.H_LAT), M(:, c.H_LONG), constants('EARTH_RADIUS')/1e3);
     M(:, c.H_INT) = M(:, c.H_TIME) - M(:, c.C_TIME);
 end
+
+%% others
+
+M(:, c.SZA) = circ_rad2ang(ignoreNaN([data_mhs.sza(ai) amsua.sza(aai) hirs.sza(hi)], ...
+    @circ_meand, 2));
+M(:, c.SAA) = circ_rad2ang(ignoreNaN([data_mhs.saa(ai) amsua.saa(aai) hirs.saa(hi)], ...
+    @circ_meand, 2));
+assert(all(circ_distd(data_mhs.sza(ai), amsua.sza(aai))<0.5), ...
+    'atmlab:colloc_process_cpr_mhs', ...
+    'solar zenith angles MHS/AMSUA do not match. Bug?');
 
 %% sort by: MHS row, then MHS column, then CloudSat pixel
 

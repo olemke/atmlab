@@ -39,7 +39,7 @@ c = colloc_constants('cols_collocation_cpr_mhs_avhrr');
 
 % find unique ones
 
-[uniques, firsts] = unique(M_c(:, c.overlap.CPR_POES_LINENO), 'rows', 'first');
+[uniques, firsts] = unique(M_c(:, c.overlap.CPR_MHS_MEAN_ROW), 'rows', 'first');
 lasts = [firsts(2:end)-1; size(M_c, 1)];
 
 M_m = nan*zeros(size(uniques, 1), c.meandata.NCOLS);
@@ -54,7 +54,7 @@ for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
     AVHRR_in_MHS = M_c_part(:, c.overlap.DIST_MHS_AVHRR) < colloc_config('distance_for_average_MHS');
     % put flags to nan
     temps = M_d_part(:, c.data.AVHRR);
-    flagged = temps < 0;
+    flagged = temps < 0 | isnan(temps);
     flagged_measurement = all(flagged, 2); % all channels flagged
     if all(flagged_measurement | ~AVHRR_in_MHS) % don't bother, all are flagged
         continue
@@ -64,7 +64,7 @@ for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
     temps(flagged) = nan;
     M_d_part(:, c.data.AVHRR) = temps;
     
-    fine = repmat(AVHRR_in_MHS, [1 5]) & ~flagged;
+    fine = repmat(AVHRR_in_MHS, [1 6]) & ~flagged;
     
     j = j + 1;
     M_m(j, c.meandata.FIRST) = first;

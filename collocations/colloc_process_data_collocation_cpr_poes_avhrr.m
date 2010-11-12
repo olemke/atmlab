@@ -46,19 +46,22 @@ c2 = M_c(:, c.overlap.AVHRR_COL);
 i2 = sub2ind(size(data2.lat), r2, c2);
 
 M_d = nan*zeros(size(M_c, 1), c.data.NCOLS);
-M_d(:, c.data.AVHRR([1 2 4 5])) = [...
-    data2.albedoCh1(i2), ...
-    data2.albedoCh2(i2), ...
-    data2.brightnessTempCh4(i2), ...
-    data2.brightnessTempCh5(i2)];
+M_d(:, c.data.AVHRR(1)) = data2.albedoCh1(i2);
+M_d(:, c.data.AVHRR(2)) = data2.albedoCh2(i2);
+M_d(:, c.data.AVHRR(3)) = data2.albedoCh3A(i2);
+M_d(:, c.data.AVHRR(4)) = data2.brightnessTempCh3B(i2);
+M_d(:, c.data.AVHRR(5)) = data2.brightnessTempCh4(i2);
+M_d(:, c.data.AVHRR(6)) = data2.brightnessTempCh5(i2);
+M_d(:, c.data.CLOUDFLAG) = data2.cloudFlag(i2);
 
 % there is some confusion about channel 3: even if albedoCh3A is fully
 % flagged and brightnessTempCh3B contains values, those values are
 % (sometimes? consistently? not sure yet) in the range [0, 100] and thus
 % actually albedo's.
 
-if max(max(data2.albedoCh3A)) > 0 % not all flagged
-    M_d(:, c.data.AVHRR(3)) = data2.albedoCh3A(i2);
-else
-    M_d(:, c.data.AVHRR(3)) = data2.brightnessTempCh3B(i2);
-end
+% but see http://www2.ncdc.noaa.gov/docs/klm/html/c8/s83133-1.htm
+% for if chan3A3B is true, then it's 3A
+is_3A = logical(data2.chan3A3B);
+M_d(is_3A(r2), c.data.AVHRR(4)) = nan; % set 3B to 0 if 3A on
+M_d(~is_3A(r2), c.data.AVHRR(3)) = nan; % set 3A to 0 if 3B on
+

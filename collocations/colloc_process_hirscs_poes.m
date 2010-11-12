@@ -34,7 +34,7 @@ function M = colloc_process_hirscs_poes(collocations, ...
 %
 % $Id$
 
-% prepare
+%% prepare
 c = colloc_constants('cols_hirscs_poes');
 c = c.overlap;
 n = size(collocations, 1);
@@ -69,6 +69,12 @@ M(:, c.MHS_START) = round(date2unixsecs(date2_cell{1:5}));
 
 M(:, c.H_TIME) = data1.epoch + data1.time(i1);
 M(:, c.MHS_TIME) = data2.epoch + data2.time(r2);
+
+% angles
+M(:, c.MHS_LZA) = data2.lza;
+M(:, c.MHS_LAA) = data2.laa;
+M(:, c.SZA) = data2.sza;
+M(:, c.SAA) = data2.saa;
 
 % index/column
 M(:, c.H_I) = i1;

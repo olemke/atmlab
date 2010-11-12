@@ -1,3 +1,85 @@
+2010-11-12	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-111
+
+	* circular/*: Added
+	- Added Circular statistics toolbox by Philipp Berens (BSD license).
+
+	* circular/circ_meand.m, circular/circ_distd.m: Added
+	- Those two written by me, counterparts to circ_mean and circ_dist that
+	take angles in degrees, not radians.
+
+	* AUTHORS: Adapted
+	- Added Philipp Berens
+
+	* atmlab/atmlab_init.m: Adapted
+	- Add circular/ to path
+
+	* datasets/common_read_poes_radiometer.m: Adapted
+	- Read angles
+
+	* datasets/common_read_collocation_cpr_mhs.m: Adapted
+	- Read all data from collocation file.
+	
+	* datasets/common_read_avhrr.m: Adapted
+	- Read angles and interpolate (and extrapolate) to entire scanline.
+	- Read cloudflag and 3A3B fields.
+	- Move sat2netcdf to datasets_constants
+
+	* datasets/common_read_cpr_2BCWCRO.m: Adapted
+	- Adapt to changed format in dayofyear_inverse
+
+	* datasets/datasets_constants.m: Adapted
+	- Move sat2netcdf here, and add flags to also read cloudflag.
+
+	* collocations/colloc_process_cpr_mhs.m: Adapted
+	- Add angles
+
+	* collocations/colloc_process_data_cpr_avhrr.m: Adapted
+	- Add cloudflag
+
+	* collocations/colloc_process_cpr_avhrr.m: Adapted
+	- Add angles
+	- Thought about selecting only the nearest one, but commented out this
+	code on second thought.
+
+	* collocations/colloc_process_data_poes_poes.m: Adapted
+	- Fix bug: only find data where originals were selected (i.e. no doubles)
+
+	* collocations/colloc_process_hirscs_poes.m: Adapted
+	- Add angles
+
+	* collocations/colloc_process_collocation_cpr_poes_avhrr.m: Adapted
+	- Renamed fields
+	- Add angles
+	- Find closest CPR inside MHS to AVHRR 
+
+	* collocations/colloc_process_data_collocation_cpr_poes_avhrr.m: Adapted
+	- Added cloud flag
+	- Don't mix 3A and 3B, rather have it in 3rd and 4th column, as with
+	CPR/AVHRR, and set the 'wrong ones' to nan.
+
+	* collocations/colloc_process_meandata_collocation_cpr_poes_avhrr.m: Adapted
+	- Takes into account that nans are not valid, and that AVHRR has in one
+	way six channels.
+	- Renamed fields in collocation cpr/poes/avhrr
+
+	* collocations/colloc_process_poes_poes.m: Adapted
+	- Add angles (LAA, LZA, SAA, SZA)
+
+	* collocations/collocation_read.m: Adapted
+	- Fix bug in string formatting in error message.
+
+	* collocations/colloc_constants.m: Adapted
+	- Add angles (SZA, SAA, LZA, LAA, RAA) where applicable.
+	- Add cloudflag where AVHRR.
+	- Renamed fields in collocation cpr/poes/avhrr
+	- Add cpr/avhrr to netcdf stored formats
+
+	* collocations/write_collocations_netcdf.m: Adapted
+	- Add new error identifier (for closing NetCDF already closed)
+
+
 2010-11-12	Gerrit Holl <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-110

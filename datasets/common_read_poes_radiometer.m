@@ -40,8 +40,9 @@ assert(all(diff(data.time)>0), ...
 
 % shift dimensions so that it's [row col (channel)]
 
-data.lat = shiftdim(data.lat, 1);
-data.lon = shiftdim(data.lon, 1);
+for field = {'lat', 'lon', 'lza', 'laa', 'sza', 'saa'}
+    data.(field{1}) = shiftdim(data.(field{1}), 1);
+end
 data.tb = shiftdim(data.tb, 2);
 
 % add filename and version

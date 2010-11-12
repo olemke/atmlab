@@ -3,7 +3,7 @@ function data = common_read_collocation_cpr_mhs(file)
 % common_read_collocation_cpr_mhs Read CPR/MHS collocation file
 %
 % Read a CPR/MHS collocation file and return things in the common format.
-% Will read the MHS measurements, i.e. the mean collocations.
+% Additionally, all data from the collocation file are included.
 %
 % IN
 %
@@ -18,26 +18,22 @@ function data = common_read_collocation_cpr_mhs(file)
 
 
 gunzipped = gunzip(file, atmlab('WORK_AREA'));
-[data, attr] = loadncvar(gunzipped{1}, {'FIRST', 'C_LAT', 'C_LONG', 'C_TIME'});
+data = loadncfile(gunzipped{1});
 delete(gunzipped{1});
-data.info = cell2struct(...
-    cellfun(@(v) v{2}, attr, 'UniformOutput', false), ...
-    cellfun(@(v) v{1}, attr, 'UniformOutput', false), ...
-    2);
+data.info = data.global_attributes;
+
 data.version = ['colloc:' data.info.software_version ':' ...
     data.info.primary_version ':' data.info.secondary_version ':' ...
     data.info.date];
 
 rows = data.FIRST;
-data.lat = data.C_LAT(rows);
-data.lon = data.C_LONG(rows);
+data.lat = data.B_LAT(rows);
+data.lon = data.B_LONG(rows);
 
-[y, mo, d, h, mi, s] = unixsecs2date(double(data.C_TIME(rows)));
+[y, mo, d, h, mi, s] = unixsecs2date(double(data.B_TIME(rows)));
 data.epoch = round(unique(date2unixsecs(y, mo, d)));
 assert(isempty(data.epoch)||isscalar(data.epoch), 'atmlab:common_read_collocation_cpr_mhs', ...
     'Data in %s appears to contain measurement from more than one day', ...
     file);
 data.time = compensate_wraparound(3600*h + 60*mi + s);
 data.file = file;
-
-data = rmfield(data, {'FIRST', 'C_LAT', 'C_LONG', 'C_TIME'});

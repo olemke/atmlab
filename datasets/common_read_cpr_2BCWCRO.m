@@ -44,7 +44,7 @@ S.path = file;
 
 info = find_info_from_granule('cpr', file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
-S.epoch = round(date2unixsecs(date.yr, date.mn, date.day));
+S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 % remove redundant fields
 S = rmfield(S, {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', 'product_version'});

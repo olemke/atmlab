@@ -57,7 +57,7 @@ date2_cell = num2cell(date2);
 %% store info
 
 % time
-M_c(:, c.CPR_POES_START) = round(date2unixsecs(date1_cell{1:3}));
+M_c(:, c.CPR_MHS_START) = round(date2unixsecs(date1_cell{1:3}));
 M_c(:, c.AVHRR_START) = round(date2unixsecs(date2_cell{1:5}));
 
 
@@ -65,7 +65,7 @@ time1 = data1.epoch + data1.time(r1);
 M_c(:, c.AVHRR_TIME) = data2.epoch + data2.time(r2);
 
 % row/column
-M_c(:, c.CPR_POES_LINENO) = r1;
+M_c(:, c.CPR_MHS_MEAN_ROW) = r1;
 M_c(:, c.AVHRR_ROW) = r2;
 M_c(:, c.AVHRR_COL) = c2;
 
@@ -75,12 +75,33 @@ M_c(:, c.AVHRR_LAT) = data2.lat(i2);
 M_c(:, c.AVHRR_LONG) = data2.lon(i2);
 %M_c(:, c.CPR_POES_LONG) = data1.lon(r1);
 
+% angles
+
+M_c(:, c.AVHRR_RAA) = data2.raa;
+M_c(:, c.SZA) = data2.sza;
+M_c(:, c.AVHRR_LZA) = data2.lza;
+
 % dist/int
 M_c(:, c.DIST_MHS_AVHRR) = sphdist(data1.lat(r1), data1.lon(r1), ...
     M_c(:, c.AVHRR_LAT), M_c(:, c.AVHRR_LONG), constants('EARTH_RADIUS')/1e3);
 M_c(:, c.INT_MHS_AVHRR) = M_c(:, c.AVHRR_TIME) - time1;
 
-M_c = sortrows(M_c, [c.CPR_POES_START c.CPR_POES_LINENO c.AVHRR_START c.AVHRR_TIME c.AVHRR_ROW c.AVHRR_COL]);
+Earth_radius = almanac('Earth', 'radius');
+%% Find closest CPR (inside MHS) for each AVHRR
+for i = 1:size(M_c, 1)
+    range = data1.FIRST(r1(i)):data1.LAST(r1(i));
+    % linearise for argmin calculation, 
+    [~, argmin] = min(abs(...
+         M_c(i, c.AVHRR_LAT)-data1.C_LAT(range)) ...
+        +abs(M_c(i,c.AVHRR_LONG)-data1.C_LONG(range)));
+    cpr_mhs_row = range(argmin);
+    dist_cpr_avhrr = sphdist(data1.C_LAT(cpr_mhs_row), data1.C_LONG(cpr_mhs_row), ...
+        M_c(i, c.AVHRR_LAT), M_c(i, c.AVHRR_LONG), Earth_radius);
+    M_c(i, c.CPR_MHS_ROW) = cpr_mhs_row;
+    M_c(i, c.DIST_CPR_AVHRR) = dist_cpr_avhrr;
+end
+
+M_c = sortrows(M_c, [c.CPR_MHS_START c.CPR_MHS_ROW c.AVHRR_START c.AVHRR_TIME c.AVHRR_ROW c.AVHRR_COL]);
 
 %% remove doubles
 try

@@ -1,4 +1,4 @@
-function M = colloc_process_data_poes_poes(collocations, ~, ...
+function M = colloc_process_data_poes_poes(~, M_c, ...
     ~, ~, data1, ~, ~, data2)
 
 % colloc_process_data_poes_poes Gather collocation data to store for MHS+MHS
@@ -33,11 +33,14 @@ function M = colloc_process_data_poes_poes(collocations, ~, ...
 %
 % $Id$
 
+% prepare
+c = colloc_constants('cols_mhs_mhs');
+
 % row and column numbers
-r1 = collocations(:, 1);
-c1 = collocations(:, 2);
-r2 = collocations(:, 3);
-c2 = collocations(:, 4);
+r1 = M_c(:, c.overlap.I1);
+r2 = M_c(:, c.overlap.I2);
+c1 = M_c(:, c.overlap.C1);
+c2 = M_c(:, c.overlap.C2);
 
 % index for direct addressing
 i1 = sub2ind(size(data1.lat), r1, c1);

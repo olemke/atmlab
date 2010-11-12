@@ -1,4 +1,4 @@
-function M = colloc_process_data_cpr_avhrr(~, M_c, sat1, ~, data1, sat2, date2, data2)
+function M = colloc_process_data_cpr_avhrr(~, M_c, ~, ~, data1, ~, ~, data2)
 
 % colloc_process_data_cpr_avhrr Gather collocation data to store for CPR+AVHRR
 %
@@ -61,4 +61,8 @@ M(:, c.data.AVHRR(3)) = data2.albedoCh3A(i2);
 M(:, c.data.AVHRR(4)) = data2.brightnessTempCh3B(i2);
 M(:, c.data.AVHRR(5)) = data2.brightnessTempCh4(i2);
 M(:, c.data.AVHRR(6)) = data2.brightnessTempCh5(i2);
+M(:, c.data.CLOUDFLAG) = data2.cloudFlag(i2);
 
+is_3A = logical(data2.chan3A3B);
+M(is_3A(r2), c.data.AVHRR(4)) = nan; % set 3B to 0 if 3A on
+M(~is_3A(r2), c.data.AVHRR(3)) = nan; % set 3A to 0 if 3B on

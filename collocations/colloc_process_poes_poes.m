@@ -74,6 +74,16 @@ M(:, c.I2) = r2;
 M(:, c.C1) = c1;
 M(:, c.C2) = c2;
 
+% angles
+M(:, c.LAA1) = data1.laa(i1);
+M(:, c.LZA1) = data1.lza(i1);
+M(:, c.LAA2) = data2.laa(i2);
+M(:, c.LZA2) = data2.lza(i2);
+M(:, c.SZA1) = data1.sza(i1);
+M(:, c.SZA2) = data2.sza(i2);
+M(:, c.SAA1) = data1.saa(i1);
+M(:, c.SAA2) = data2.saa(i2);
+
 % distance and interval
 M(:, c.DIST) = sphdist(M(:, c.LAT1), M(:, c.LONG1), ...
     M(:, c.LAT2), M(:, c.LONG2), constants('EARTH_RADIUS')/1e3);

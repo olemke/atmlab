@@ -229,7 +229,8 @@ try
     netcdf.close(ncid);
 catch ME
     switch ME.identifier
-        case {'MATLAB:netcdf:inq:notNetcdfID', 'MATLAB:netcdf:close:notNetcdfID'} % already closed
+        case {'MATLAB:netcdf:inq:notNetcdfID', 'MATLAB:netcdf:close:notNetcdfID', ...
+                'MATLAB:netcdf:close:ebadid:notNetcdfID'} % already closed
         otherwise
             ME.rethrow();
     end
