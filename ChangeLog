@@ -1,3 +1,78 @@
+2010-11-15	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* graphs/satboxplot.m: Added (helptext repeated here)
+	Alternative boxplot. Bins the data (in y) according to bins (in xbin).
+	For each bin, plots the median (by default a horizontal red line),
+	a box connecting to the 25th and 75th percentile, and whiskers extending
+	to the 1st and 99th percentile. All other data are considered outliers
+	and plotted individually. To change what the result looks like, add
+	additional arguments that will be passed on to <a href="matlab:help boxplot">boxplot</a>
+
+	FORMAT
+
+	  satboxplot(x, y, xbin, outlierstyle, ...)
+
+	IN
+
+	  x               numeric array
+					  Data according to which y is binned.
+	  y               numeric array
+					  Data for which statistics are carried out, binned
+					  according to the values of x, etc.
+	  bincentres      Bin centres for x 
+	  outlierstyle    Style for outliers, e.g. 'kx'
+	  ...     all additional arguments passed on to <a href="matlab:help boxplot">boxplot</a>
+
+	* math/bin.m: Added (helptext repeated here)
+	Bin the contents of y in the bins x according to the values in x.
+	E.g. y(i) is binned according to the value of x(i). Binning rules
+	as for <a href="matlab:help histc">histc</a>.
+
+	FORMAT
+
+	  values = bin(x, y, xbin)
+
+	IN
+
+	  x       numeric array
+				  values determine how y is binned
+	  y       numeric array
+				  values to bin. Must be the same size as x.
+	  xbin    numeric array, monotonously increasing
+				  bin edges (as for histc)
+
+	OUT
+
+	  values  cell array
+				  Binned values.
+
+	* collocations/colloc_constants.m: Expanded
+	- Add CLOUDFLAG to CPR/AVHRR, also when stored in NetCDF
+
+	* collocations/read_collocs_data_mean.m: Bugfix
+	- Wrong case when calling netcdf.getVar
+
+	* collocations/colloc_process_cpr_mhs.m: Bug-introduction
+	- Comment out annoying assertion...
+
+	* collocations/colloc_process_collocation_cpr_poes_avhrr.m: Bugfix
+	- Fix bug in collection of raa, sza, lza.
+
+	* collocations/collocate_granule.m: Expanded, wartfix
+	- Add some logtext if not all collocations are selected, due to date
+	boundaries
+	- Remove redundant (error-prone?) second dimension slicing for time
+	variables.
+
+	* circular/circ_mean.m: Bugfix
+	- Fix bug (not in my code) when getting confidence intervals on
+	non-standard dimension.
+
+	* datasets/common_read_collocation_cpr_mhs.m: Bugfix
+	- Use cloudsat time to determine if we're on one day. That doesn't have to
+	be the case for amsub-time (that is output) but must be for cloudsat time.
+
+
 2010-11-12	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-111

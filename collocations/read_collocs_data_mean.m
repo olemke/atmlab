@@ -109,7 +109,7 @@ for i = 1:length(cols)
     if varids(i)==-1 % not a var, see comment about skipping above
         continue;
     end
-    var = netcdf.getvar(ncid, varids(i));
+    var = netcdf.getVar(ncid, varids(i));
     % determine what rows to read
     if size(var, 1) > alloc_length
         rows_here = rows;

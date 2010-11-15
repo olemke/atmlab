@@ -30,10 +30,14 @@ rows = data.FIRST;
 data.lat = data.B_LAT(rows);
 data.lon = data.B_LONG(rows);
 
-[y, mo, d, h, mi, s] = unixsecs2date(double(data.B_TIME(rows)));
+% use C_TIME to calculate the epoch, but return B_TIME as we're working
+% with meandata here
+[y, mo, d, ~, ~, ~] = unixsecs2date(double(data.C_TIME(rows)));
 data.epoch = round(unique(date2unixsecs(y, mo, d)));
 assert(isempty(data.epoch)||isscalar(data.epoch), 'atmlab:common_read_collocation_cpr_mhs', ...
-    'Data in %s appears to contain measurement from more than one day', ...
-    file);
+     'Data in %s appears to contain measurement from more than one day', ...
+     file);
+[~, ~, ~, h, mi, s] = unixsecs2date(double(data.B_TIME(rows)));
+
 data.time = compensate_wraparound(3600*h + 60*mi + s);
 data.file = file;

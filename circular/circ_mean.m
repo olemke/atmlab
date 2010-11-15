@@ -50,7 +50,7 @@ mu = angle(r);
 
 % confidence limits if desired
 if nargout > 1
-  t = circ_confmean(alpha,0.05,w);
+  t = circ_confmean(alpha,0.05,w, [], dim);
   ul = mu + t;
   ll = mu - t;
 end

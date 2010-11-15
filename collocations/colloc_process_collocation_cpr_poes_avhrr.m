@@ -77,9 +77,9 @@ M_c(:, c.AVHRR_LONG) = data2.lon(i2);
 
 % angles
 
-M_c(:, c.AVHRR_RAA) = data2.raa;
-M_c(:, c.SZA) = data2.sza;
-M_c(:, c.AVHRR_LZA) = data2.lza;
+M_c(:, c.AVHRR_RAA) = data2.raa(i2);
+M_c(:, c.SZA) = data2.sza(i2);
+M_c(:, c.AVHRR_LZA) = data2.lza(i2);
 
 % dist/int
 M_c(:, c.DIST_MHS_AVHRR) = sphdist(data1.lat(r1), data1.lon(r1), ...

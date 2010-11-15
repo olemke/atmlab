@@ -219,11 +219,19 @@ for i = 1:size(date2_all, 1)
             else
                 sameday = data1.time < 2*86400;
             end
+            if ~all(sameday)
+                logtext(fid, 'taking only %d/%d that are on the same day\n', ...
+                    sum(sameday), length(data1.time));
+            end
             iv1 = iv1 & sameday;
         case 2
             % only consider data on date after the start date for data1
             sameday = data1.time > 86400;
-            iv1 = iv1 & sameday;
+            iv1 = iv1 & sameday;            
+            if ~all(sameday)
+                logtext(fid, 'taking only %d/%d that are on the next day\n', ...
+                    sum(sameday), length(data1.time));
+            end
     end
     if ~(any(iv1) && any(iv2)) % no overlap
         logtext(fid, 'no time overlap, so nothing to collocate\n');
@@ -232,7 +240,7 @@ for i = 1:size(date2_all, 1)
     
     % perform collocations
     collocations = collocate(data1.time(iv1), data1.lat(iv1, :), data1.lon(iv1, :), ...
-        data2.time(iv2, :), data2.lat(iv2, :), data2.lon(iv2, :), ...
+        data2.time(iv2), data2.lat(iv2, :), data2.lon(iv2, :), ...
         colloc_config('distance'), colloc_config('interval'));
     if any(collocations)
         % compensate for the fact that we passed only a subset to collocate
