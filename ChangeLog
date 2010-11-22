@@ -1,3 +1,10 @@
+2010-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-114
+
+	* files/loadncvar.m: Added note about loadncfile in help section,
+	removed frivolous in argument and use v{1} instead of char(v)
+
 2010-11-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-113

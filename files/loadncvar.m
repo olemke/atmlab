@@ -10,6 +10,8 @@
 %    lat = loadncvar( 'mydata.nc', 'lat');
 %    grid = loadncvar( 'mydata.nc', { 'lat', 'lon' } );
 %    
+%    Note: If you wish to load the whole netcdf file into a structure use
+%          struct = loadncfile (filename), instead.
 %
 % FORMAT   [ret, attr] = loadncvar( filename, varname )
 %        
@@ -20,8 +22,9 @@
 
 % 2010-02-02   Created by Oliver Lemke.
 % 2010-10-11   Modified by Gerrit Holl.
+% 2010-11-22   Modified by Salomon Eliasson
 
-function [ret, attr] = loadncvar( filename, varname, varargin )
+function [ret, attr] = loadncvar( filename, varname )
   
 ncid = netcdf.open (filename, 'NOWRITE');
 
@@ -36,8 +39,8 @@ if ischar(varname)
     ret = netcdf.getVar (ncid, varid);
 elseif iscell(varname)
     for v = varname
-        varid = netcdf.inqVarID (ncid, char(v));
-        ret.(genvarname(char(v))) = netcdf.getVar (ncid, varid);
+        varid = netcdf.inqVarID (ncid, v{1});
+        ret.(genvarname(v{1})) = netcdf.getVar (ncid, varid);
     end
 else
     error 'varname must be either of type char or cell';
