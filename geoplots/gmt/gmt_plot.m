@@ -57,7 +57,8 @@ function filename = gmt_plot(in,field)
 % .... and many more: | Just add other options you need from the list of gmtdefaults
 %
 %
-% For gridding:
+% FOR GRIDDING:
+%
 % in.search           |'30m' ; %search for data within 30arcmin
 % in.increment        |'60m' ; %increment the grid by 60arcmin (1deg)
 %                     | If nothing is given the increment and search radius is 
@@ -68,13 +69,13 @@ function filename = gmt_plot(in,field)
 % in.grdimage         | to explicitly set the grdimage command line
 % in.nearneighbor     | to explicitly set the nearneighbor command line
 % in.projection       |'Q'; Cylindrical Equidistant Projection
-% in.center           |0; (longitude)
+% in.center           | not working right now....
 % in.map_width        |9; nine inches
 % in.proj             |'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
 % in.region           e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
 % in.plotimage        |grdimage;
 %
-% Coastlines:
+% COASTLINES:
 % in.pscoast          | to explicitly set the pscoast command line
 % in.pscoast          |pscoast;
 % in.features         |10; km^2; (do not plot features < in.features)
@@ -104,20 +105,15 @@ function filename = gmt_plot(in,field)
 %
 % VALUE RANGE
 %                      GMT picks an appropriate default is field is not given
-% in.datarange.max    |default = max(data); specify otherwise
-% in.datarange.min    |default = min(data);
+% in.datarange.max    |[min, max];  default = [min(data) max(data)];
 %
+% EXTRAS:
+% in.psbox (%double)  | [lon11 lat11 lon12 lat12; lon21 lat21 lon22 lat22; ect]
+%                        [Bottom left corner , Top right corner; ...]
 %
-% Extras:
-%
-%
-% in.psbox (%double)  | [lat1 lon1 lat2 lon2] % [Bottom left corner; Top right corner]
-%                     to add further boxes append an extra row.
 % in.psboxes          | The index of the last row of the regions. e.g 3 7, if
 %                       you have 2 regions defined by 3 resp 4 boxes. This is
 %                       useful for defining psboxcolor.
-%
-%
 %
 % in.psboxcolor       | Default is black for every region ( 'k'={[0 0 0]}). otherwise RGB*255.
 %                     append color vector in a cell for every boxregion.
@@ -133,14 +129,14 @@ function filename = gmt_plot(in,field)
 % in.pspolycolor       | See in.psboxcolor
 %
 % in.pspolythick       | See in.psboxthick
-%%
-% Location markers:
+%
+% LOCATION MARKERS:
 %
 % in.locations(x).lat       | Latitude of location marker x
 % in.locations(x).lon       | Longitude of location marker x
 % in.locations(x).name      | Name of location marker x (optional)
 % in.locations(x).shape     | Shape of location marker x (default: c0.08i)
-% in.locations(x).color     | Color of location marker x (default: white)
+% in.locations(x).color     | Color of location marker x (default: white) (and text if textcolor if not given)
 % in.locations(x).textsize  | Size of location text x (default: 15)
 % in.locations(x).textcolor | Color of location text x (default: marker color)
 % in.locations(x).textalign | Position of marker relative to the text
@@ -148,93 +144,116 @@ function filename = gmt_plot(in,field)
 %                             second letter for vertical position: T, M, B
 %                             (default: LT)
 %
-%
+% EXTRA EXTRAS
 % If you don't want to plot data and only want a map (compatible with all options)
 % in.nodata                 | tells gmt that there is no data.
-% in.(field)=[];            | gives the same effect as in.nodata.
 % 
-% If you don't want to delete intermediate files:      se,'keep_intermediate'           
+% If you don't want to delete intermediate files:
+% in.keep_files             | true
 %
-% $Id$
+% If you want to have a separate pdf for the legend:
+% in.savelegend             | true
+%
+% $Author$
+% $Date$
 
 if ~exist('field','var'), field = 'datafield'; end
-
 out = set_GMT_plot(in,field);                                                   % setup
 
 if out.grid
     out.grdfile = [out.filename '.grd'];
-    try
-        write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                 % writegmt (gridded)
-        fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
-    catch me
-        if strcmp(me.identifier,'MATLAB:netcdf:putVar:dataSizeMismatch')
-            error('Dimension mismatch: data,lat,lon')
-        else
-            m=me.stack(1);
-            error('%s line %d: %s',m.name,m.line,me.message)
-        end
-    end
+    write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                     % writegmt (gridded)
+    fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
 else
     out = save_ungridded4GMTplot(out,field);                                    % create ascii (not gridded)
 end
 
-create_gmt_earth(out);                                                          % main function
+commands = create_gmt_earth(out);                                               % main function
 
-filename=sort_figures(out);                                                     % finalize
+filename=sort_figures(out,commands);                                            % finalize
 
-function se = set_GMT_plot(se,field)                                            
+%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTIONS
+%     ||||
+%     vvvv
+function in = set_GMT_plot(in,field)                                            
 %% SETUP %%
 
-se.fieldname = field;
-if ~isfield(se,'display')                                                       % view the figure?
-    se.display=1;                                                               % 0 if you just want to create plot
+in.fieldname  = field;
+
+default.display           = true;               % Display figure to screen
+default.figuretype        = 'pdf';              % default figure
+default.outdir            = atmlab('OUTDIR');   % where to put the figure
+default.title             = '';                 % no title by default
+default.nodata            = false;              % true if you only want the map
+default.savelegend        = false;              % make an additional pdf-file only containing the legend
+default.keep_files        = false;              % keep intermediate files (debugging)
+%default.center            = 180;               % The center longitude of the
+                                                %map. The region has to be
+                                                %-180:180 or 0:360. but that
+                                                %currently the region is
+                                                %specified directly from lat/lon
+                                                
+
+in = optargs_struct(in,default);
+
+if ~isempty(in.title)
+    default.filename = in.title;
+else default.filename = 'default';
 end
 
-if ~isfield(se,'figuretype'), se.figuretype='pdf'; end                          % default figure type = .eps
+in = optargs_struct(in,default);
 
-se = makefilename(se);                                                          % generate a valid filename and title
+% replace bad symbols for filename and mask them for the title
+in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
+in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
+in.title = regexprep(in.title,':',' ');
 
-if (isfield(se,'nodata')&&se.nodata) || (isempty(field))                        % only the coastlines?
-    se = nodata(se);
+if in.nodata
+    in = nodata(in);
     return
 end
 
-if ~isfield(se,'lat')
+% check for lat and lons
+if ~isfield(in,'lat')
     l = {'Latitude','latitude'};
-    if any(isfield(se,l))
-        se.lat = se.(l{isfield(se,l)});
-    else error('No latitudes present')
+    if any(isfield(in,l))
+        in.lat = in.(l{isfield(in,l)});
+    else error('atmlab:input','No latitudes present')
     end
 end
-if ~isfield(se,'lon')
+if ~isfield(in,'lon')
     l = {'Longitude','longitude','long'};
-    if any(isfield(se,l))
-        se.lon = se.(l{isfield(se,l)});
-    else error('No longitudes present')
+    if any(isfield(in,l))
+        in.lon = in.(l{isfield(in,l)});
+    else error('atmlab:input','No longitudes present')
     end
 end
-se = isgridded(se,field);                                                       % Check to see if the data  is gridded or not
 
-isdata(se,field)                                                                % is there useable data?
+% Check to see if the data  is gridded or not
+in = isgridded(in,field);                                                       
 
-if ~isfield(se,'datarange')                                                     % contour range
-    se.datarange.max = max(se.(field)(:));
-    se.datarange.min = min(se.(field)(:));
-elseif ~isfield(se.datarange,'min')
-    se.datarange.min = min(se.(field)(:));
-elseif ~isfield(se.datarange,'max')
-    se.datarange.max = max(se.(field)(:));
+% is there useable data?
+isdata(in,field)
+
+if ~isfield(in,'datarange')                                                     % contour range
+    in.datarange = [min(in.(field)(:)) max(in.(field)(:))];
 end
 
-se = regionspecial(se,field);                                                   % if region: check latlon format
+in = regionspecial(in,field);                                                   % if region: check latlon format
 
-se = ifcenter(se,field);                                                        % if map center is given
+in = ifcenter(in,field);                                                        % if map center is given
 
-function filename = sort_figures(se)                                            %% SORT FIGURES %%
+function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
+%% SORT FIGURES 
 
-command{1} = [];
+if se.savelegend
+    % MAKE a separate file for the legend
+    legend = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),se.outdir);
+    fprintf('FILE CONTAINING LEGEND IS LOCATED AT: %s\n',legend)
+end
+
 if strcmp(se.figuretype,'ps')
-    command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
     filename=[se.filename '.ps'];
 else
     command{end+1} = sprintf('ps2eps -f -B --loose %s.ps ',se.filename);
@@ -247,9 +266,10 @@ else
     end
     filename = [se.filename '.' se.figuretype];
 end
+
 command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
 
-if ~isfield(se,'keep_intermediate') || ~se.keep_intermediate
+if ~se.keep_files
     command{end+1} = sprintf('rm -f %s.{grd,asc} ',se.filename);
     command{end+1} = sprintf('rm -f *.cpt');
 end
@@ -277,40 +297,50 @@ if se.display
     command{end+1} = sprintf('%s %s/%s &',openwith,se.outdir,filename);
 end
 
-exec_gmt_cmd(command(2:end)) % execute commands
+exec_gmt_cmd(command) % execute commands
 
 filename = sprintf('%s/%s',se.outdir,filename);
 fprintf('GMT plot stored at:  %s\n',filename)
 
-%% SUBFUNCTIONS FOR SETUP
-%
-function se = makefilename(se)                                                  %% MAKE FILE NAME %%
+function legend = makelegendpdf(command,outdir)
+%% Make a separate pdf for the legend
 
-if ~isfield(se,'outdir')
-    se.outdir = atmlab('OUTDIR');                                               % output dir
-end
-if ~isfield(se,'filename')
-    if ~isfield(se,'title') || isempty(se.title)
-        se.filename = 'default';
-        se.title = '';
-    else se.filename = se.title;
+file = 'legend.ps';
+
+%make sure it's not here
+exec_gmt_cmd(sprintf('rm -f %s.{ps,eps,pdf}',file(1:end-3)))
+
+%Remove trailing .ps entry 
+crop=regexp(command,'>>');
+
+for i = 1:length(command)
+    command{i} = sprintf('%s -P >> %s', command{i}(1:crop{i}-1), file );
+    if i == 1
+        command{i} = regexprep(command{i},'-O','');
+    end
+    if i == length(command)
+        command{i} = regexprep(command{i},'-K','');
     end
 end
-if ~isfield(se,'title')
-    se.title = se.filename;
-end
 
-% replace bad symbols for filename and mask them for the title
-se.filename = regexprep(se.filename,'[:=, ()*/<>!?]','_');
-se.title = regexprep(se.title,'([=,()+*<>!?])','\\$1');
-se.title = regexprep(se.title,'[:]',' ');
+command{end+1} = sprintf(' ps2eps -f -B --loose legend.ps ');
+command{end+1} = sprintf(' epstool --copy -b legend.eps legend2.eps ');
+command{end+1} = sprintf(' mv legend2.eps legend.eps ');
+command{end+1} = sprintf(' epstopdf legend.eps ');
+command{end+1} = sprintf(' mv legend.pdf %s/',outdir);
 
+exec_gmt_cmd(command)
+legend = sprintf('%s/legend.pdf',outdir);
+
+
+%% SUBFUNCTIONS FOR SETUP
+%
 function se = nodata(se)                                                        %% NODATA %%
 % if you want to only plot coastlines
 
 se.sidebar=0;
 se.legend=0;
-se.grid=0;
+se.grid=false;
 if ~isfield(se,'region')                                                    
     se.region='-180/180/-90/90';
 elseif all(isfield(se,{'lat','lon'}))
@@ -345,11 +375,11 @@ if ~ig
     se.(field) = se.(field)(:);
     se.lat = se.lat(:);
     se.lon = se.lon(:);
-    se.grid = false;
+    if ~isfield(se,'grid'), se.grid = false; end
     txt1 = 'is NOT';txt2='1';txt3='is';
 else
     if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
-    se.grid = true;
+    if ~isfield(se,'grid'), se.grid = true; end    
     txt1 = 'is';txt2='0';txt3='isn''t';
 end
 
@@ -359,29 +389,24 @@ fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
 fprintf('max data value: %2.1f\nmin data value: %2.1f\n',...
 max(max((se.(field)))),min(min(se.(field))))
 
-if ~strcmp(class(se.(field)),'double')                                          %the data has to be double
-    se.(field) = double(se.(field));
-end
-
-
 function isdata(se,field)                                                       %% ISDATA %%
 %% is there useable data?
 
 if ~isempty(field)                                                              % is there data?
-    if ~isfield(se,field)
-        error('The field: "%s" is not in the structure',field)
-    end
+  if ~isfield(se,field)
+    error('atmlab:input','The field: "%s" is not in the structure',field)
+  end
 
-    if se.grid
-        [a,b]=size(se.(field));                                                 % does the gridded data have dims (lat,lon)?
-        if a>b
-            error('in.%s must have the dimensions %dx%d (lat,lon)',field,b,a)
-        end
+  if se.grid
+    if ~ ( size(se.(field),1) == length(se.lat) && size(se.(field),2) == ...
+           length(se.lon) )
+      error('atmlab:input','in.%s must have the dimensions (lat,lon)',field)
     end
+  end
 end
 
-if ~sum(~isnan(se.(field)))                                                     % data?
-    error('%s%s','Data does not contain any valid',...
+if ~any(~isnan(se.(field)))                                                     % data?
+    error('atmlab:nodata','%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
 end
 
@@ -401,15 +426,8 @@ end
 
 function se = ifcenter(se,field)                                                %% IFCENTER %%
 %% if map center is given
+% Picking a center just doesn't work right now....
 
-if isfield(se,'center') && se.center~=0
-    x = (se.(field)(:,1)+se.(field)(:,end))/2;
-    if min(se.lon)>-180
-        se.lon = [-180,se.lon];
-        se.(field) = [x,se.(field)];
-    end
-    if max(se.lon)<180
-        se.lon = [se.lon,180];
-        se.(field) = [se.(field),x];
-    end
-end
+se.(field) = [se.(field)(:,se.lon >= 180), se.(field)(:,se.lon < 180)];
+se.lon = [se.lon(se.lon >= 180); se.lon(se.lon < 180)];
+se.lon(se.lon >= 180) = se.lon(se.lon >= 180) - 360;

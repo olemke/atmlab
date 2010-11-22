@@ -1,11 +1,10 @@
-function pspoly(in)
+function commands = pspoly(file,in,commands)
 %% my_psbox
 % purpose:
 %         Makes boxes
 %
-%
-% Author:Salomon Eliasson
-%%
+% $Author$
+% $Date$
 
 colors = in.plot.pspoly.colors;
 thick = in.plot.pspoly.thick;
@@ -32,16 +31,10 @@ for i = 1:size(pp,1)
     command = sprintf('echo -e "%s" |',stdin);
     command = sprintf('%s psxy -R%s -J%s -A',command,region,proj);
     
-    if ~isempty(dir(sprintf('%s.ps',in.filename)))
-        command = sprintf('%s -O',command);
-    end
-    
     % color and size of box
     
     c = colors{i};
     s = thick{i};
     command = sprintf('%s -W%d/%d/%d/%d',command,s,c(1),c(2),c(3));
-    command = sprintf('%s -K>> %s.ps',command,in.filename);
-
-    exec_gmt_cmd(command)
+    commands{end+1} = sprintf('%s -K -O >> %s.ps',command,file);
 end

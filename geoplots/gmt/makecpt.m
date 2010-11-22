@@ -1,14 +1,14 @@
 function cptfile = makecpt(se)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% makecpt
+%
 % purpose:  
 %       Appends options to a short script and calls the GMT
 %       command makecpt.
 %
 % list of colortables found at /usr/lib/gmt/share/cpt/
 %
-% Author:Salomon Eliasson
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Author$
+% $Date$
 
 makecpt = sprintf('makecpt');
 if isfield(se,'ctable')
@@ -20,8 +20,8 @@ if ~isfield(se,'nlevels')
   se.nlevels = 15;
 end
 if isfield(se,'datarange')
-  mi = se.datarange.min;
-  mx = se.datarange.max;
+  mi = se.datarange(1);
+  mx = se.datarange(2);
   step = (mx-mi)/se.nlevels;
   makecpt = sprintf('%s -T%d/%d/%d',makecpt,mi,mx,step);
  else
@@ -32,4 +32,3 @@ cptfile = 'ctable.cpt';
 command = sprintf('%s > %s',makecpt,cptfile);
 
 exec_gmt_cmd(command)
-

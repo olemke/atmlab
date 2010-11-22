@@ -1,13 +1,12 @@
-function command = pslocations(in)
-
+function command = pslocations(file,in,command)
+%% pslocations
+%
 % purpose:
 %       Adds location markers to a GMT plot.
 %
-
+%
 % 10/12-2009 Oliver Lemke & Salomon Eliasson
 
-k = 1;
-command = cell(2*length(in.locations),1);
 for loc = in.locations
     psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);
     
@@ -37,16 +36,10 @@ for loc = in.locations
     end
     psloc = sprintf('%s -G%s -Wthinner',psloc,color);
     
-    % selects Overlay plot mode
-    if ~isempty(dir(sprintf('%s.ps',in.filename)))
-        psloc = sprintf('%s -O',psloc);
-    end
+    % selects Overlay plot mode and assume more pscode will be appended later
+    psloc = sprintf('%s -O -K',psloc);
     
-    % assuming more pscode will be appended later
-    psloc = sprintf('%s -K',psloc);
-    
-    ut = sprintf('%s.ps',in.filename);
-    command(k) = {sprintf('%s >> %s',psloc,ut)}; k=k+1;
+    command{end+1} = sprintf('%s >> %s.ps',psloc,file);
     
     if isfield(loc,'name') && ~isempty(loc.name)
         tsize=15;
@@ -71,15 +64,9 @@ for loc = in.locations
         end
         pstxt = sprintf('%s -Sthin -G%s',pstxt,color);
         
-        % selects Overlay plot mode
-        if ~isempty(dir(sprintf('%s.ps',in.filename)))
-            pstxt = sprintf('%s -O',pstxt);
-        end
-        % assuming more pscode will be appended later
-        pstxt = sprintf('%s -K',pstxt);
+        % selects Overlay plot mode and assume more pscode will be appended later
+        pstxt = sprintf('%s -O -K',pstxt);
         
-        ut = sprintf('%s.ps',in.filename);
-        command(k) = {sprintf('%s >> %s',pstxt,ut)}; k = k+1;
+        command{end+1} = sprintf('%s >> %s.ps',pstxt,file);
     end
 end
-command = command(1:k-1);

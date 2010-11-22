@@ -1,22 +1,16 @@
-function command = grdimage(in)
-%%
+function command = grdimage(file,in)
+%% grdimage
 % purpose:
 %       Makecpt creates a short script and calls the GMT
 %       command grdimage.
 %
-%
-% Author:Salomon Eliasson
+% $Author$
+% $Date$
 
 grdimage = sprintf('grdimage');
 
 %location of file
-if isfield(in,'file')
-    grdimage = sprintf('%s %s.grd',grdimage,in.file);
-else error('needs in.file')
-end
-
-% selects portrait
-grdimage=sprintf('%s -P',grdimage);
+grdimage = sprintf('%s %s.grd',grdimage,file);
 
 %lat lon bounds
 if isfield(in,'region')
@@ -35,20 +29,19 @@ if isfield(in,'title')
     grdimage = sprintf('%s -B0g0/0g0:."%s":',grdimage,in.title);
 end
 
-grdimage = sprintf('%s -Ya5',grdimage);
-
 %colortable
 if isfield(in,'cptfile')
     grdimage = sprintf('%s -C%s',grdimage,in.cptfile);
 else error('needs colortable (in.cptfile)')
 end
 
-% assuming more pscode will be appended later
-grdimage = sprintf('%s -K',grdimage);
+grdimage = sprintf('%s -Ya5',grdimage);
 
 %Use nearestneigbour interpolation, only use the nearest grid point
 %Otherwise the default bicubic interpolation introduces artifacts.
 grdimage = sprintf('%s -S-n/0',grdimage);
 
-ut = sprintf('%s.ps',in.file);
-command = sprintf('%s >> %s',grdimage,ut);
+% selects Overlay plot mode and assuming more pscode will be appended
+grdimage = sprintf('%s -O -K',grdimage);
+
+command = sprintf('%s >> %s.ps',grdimage,file);

@@ -1,13 +1,12 @@
-function command = nearneighbor(in)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function command = nearneighbor(file,in)
+%% nearneighbor
+%
 % purpose:
 %       Appends options to a short script and calls the GMT
 %       command nearneighbor.
 %
-%
-% Author:Salomon Eliasson
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Author$
+% $Date$
 
 nearneighbor = sprintf('nearneighbor');
 
@@ -16,7 +15,7 @@ nearneighbor = sprintf('%s -bic',nearneighbor); %for binary input
 %location of file
 if isfield(in,'ungriddedfile')
     nearneighbor = sprintf('%s %s',nearneighbor,in.ungriddedfile);
-    nearneighbor = sprintf('%s -F -G%s.grd',nearneighbor,in.file);
+    nearneighbor = sprintf('%s -F -G%s.grd',nearneighbor,file);
 else
     error 'needs in.ungriddedfile '
 end
@@ -43,4 +42,7 @@ else
     error 'needs in.search'
 end
 
-command = nearneighbor;
+% selects Overlay plot mode and assuming more pscode will be appended
+nearneighbor = sprintf('%s -O -K',nearneighbor);
+
+command = sprintf('%s >> %s.ps',nearneighbor,file);

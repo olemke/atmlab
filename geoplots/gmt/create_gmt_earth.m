@@ -1,94 +1,90 @@
-function create_gmt_earth(in)
-%           create_gmt_earth
+function commands = create_gmt_earth(in)
+%%           create_gmt_earth
 %
 % See gmt_plot for input details
 %
-% $Id$
+% PURPOSE: Create cell strings that will be used in a system call.
+%
+% $Author$
+% $Date$
 
 in = setup_create_gmt_earth(in);                                                % Most options are assigned here
 
-command = sprintf('rm -f %s.{ps,eps}',in.filename);                             % Remove earlier .ps files
-exec_gmt_cmd(command)
+file = in.filename;
 
-command = 'gmtset PAPER_MEDIA a0';                                              % Set paper sizeBASEMAP_AXES
-exec_gmt_cmd(command)
+commands{1} = sprintf('rm -f %s.{ps,eps}',file);                                % Remove earlier .ps files
+commands{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
+commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      % Set paper sizeBASEMAP_AXES
 
 if isfield(in,'headersize')                                                     % Size of title
-    command = sprintf('gmtset HEADER_FONT_SIZE %dp',in.headersize);
-    exec_gmt_cmd(command)
+    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %dp',in.headersize);
 end
 
 if isfield(in,'basemap_axis')                                                   % Annotations of axis
-    command = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
-    exec_gmt_cmd(command)
+    commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
 end
 if isfield(in,'header_offset')                                                  % Distance from axis to Annotation
-    command = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
-    exec_gmt_cmd(command)
+    commands{end+1} = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
 end
 
+% APPEND START with empty ps command (P = portrait, K = keep open)
+commands{end+1} = sprintf('psxy --HISTORY=FALSE -Rg -JQ1 -T -P -K >> %s.ps',file);
+
 if isfield(in,'nearneighbor')                                                   % Nearneighbor
-    command = in.nearneighbor;
-    exec_gmt_cmd(command)
+    commands{end+1} = in.nearneighbor;
 elseif ~in.grid && isfield(in.plot,'grid')
-    command = nearneighbor(in.plot.grid);
-    exec_gmt_cmd(command)
+    commands{end+1} = nearneighbor(file,in.plot.grid);
 end
 
 if isfield(in,'grdimage')                                                       % Image
-    command = in.grdimage;
-    exec_gmt_cmd(command)
-elseif ~isfield(in,'nodata') && strcmp(in.plot.plotimage.name,'grdimage')
-    command = grdimage(in.plot.plotimage);
-    exec_gmt_cmd(command)
+    commands{end+1} = in.grdimage;
+elseif ~in.nodata && strcmp(in.plot.plotimage.name,'grdimage')
+    commands{end+1} = grdimage(file,in.plot.plotimage);
 end
 
 if isfield(in,'pscoast')                                                        % Coastlines
-    command = in.pscoast;
-    exec_gmt_cmd(command)
+    commands{end+1} = in.pscoast;
 else
-    command = pscoast(in.plot.coast);
-    exec_gmt_cmd(command)
+    commands{end+1} = pscoast(file,in.plot.coast);
 end
 
 if isfield(in,'locations')                                                      % Location markers
-    command = pslocations(in);
-    exec_gmt_cmd(command)
+    commands = pslocations(file,in,commands); %internally adds several commands
 end
 
 if isfield(in.plot,'pscontour') && ~isempty(in.pscontour)                       % Contourlines
-    command = pscontour(in.plot.pscontour);
-    exec_gmt_cmd(command)
+    % currently out of order.....
+    commands{end+1} = pscontour(file,in.plot.pscontour);
 end
 
 if isfield(in,'psxy')                                                           % Psbox
-    command = in.psxy;
-    exec_gmt_cmd(command)
-elseif isfield(in.plot,'psbox')
-    psbox(in);
+    commands{end+1} = in.psxy;
+end
+if isfield(in,'psbox') || isfield(in.plot,'psbox')
+    commands = psbox(file,in,commands); %internally adds several commands
 end
 
 if isfield(in.plot,'pspoly')
-    pspoly(in);
+    commands = pspoly(file,in,commands); %internally adds several commands
 end
 
 if isfield(in.plot,'legend') && ~isempty(in.plot.legend)                        % Legends
-    command = psscale(in.plot.legend);
-    exec_gmt_cmd(command)
+    commands{end+1} = psscale(file,in.plot.legend);
 end
 if isfield(in.plot,'nanlegend') && ~isempty(in.plot.nanlegend)
-    disp('processing psscale for NaN')
-    command = psscale(in.plot.nanlegend);
-    exec_gmt_cmd(command)
+    disp('processing psscale for NaN-legend')
+    commands{end+1} = psscale(file,in.plot.nanlegend);
 end
-% an empty ps file
-command = sprintf('echo -e " " | psxy -R%s -J%s -O >> %s.ps', ...
-    in.plot.region,in.plot.proj,in.filename);
-exec_gmt_cmd(command)
 
-% close the ps file with
+% APPEND EOF with empty ps command (O = overlay (don't write header))
+commands{end+1} = sprintf('psxy --HISTORY=FALSE -Rg -JQ1 -T -O >> %s.ps',file);
 
-function in = setup_create_gmt_earth(in)                                        %% setup_create_gmt_earth %%
+%%%%%%%%%%%%%%%%%
+%  SUBFUNCTIONS
+%      |||||
+%      vvvvv
+function in = setup_create_gmt_earth(in)                                        
+%% setup_create_gmt_earth %%
 
 in = defaults(in);
 
@@ -104,15 +100,15 @@ if ~isfield(in,'proj')                                                          
 else in.plot.proj = in.proj;
 end
 
-if ~in.grid && ~isfield(in,'nearneighbor') && ~isfield(in,'nodata')                                      % GRIDDING
+if ~in.grid && ~isfield(in,'nearneighbor') && ~in.nodata                        % GRIDDING
     in.plot.grid = mkgrid(in);
 end
 
-if ~isfield(in,'nodata')
-    in.plot.color = create_colortables(in);                                         % COLOR TABLE
+if ~in.nodata
+    in.plot.color = create_colortables(in);                                     % COLOR TABLE
 end
 
-if ~isfield(in,'plotimage') && ~isfield(in,'nodata')                                                    % PLOT IMAGE
+if ~isfield(in,'plotimage') && ~in.nodata                                       % PLOT IMAGE
     in.plot.plotimage = mkpltimage(in);
 end
 
@@ -132,7 +128,7 @@ if isfield(in,'pscontour')                                                      
     in.plot.pscontour = mkpscontour(in);
 end
 
-if ~isfield(in,'nodata') || ~in.nodata
+if ~in.nodata
     [in.plot.legend,in.plot.nanlegend] = mklegend(in);                          % Legend/s
 end
 
@@ -192,12 +188,12 @@ end
 proj = sprintf('%s%d/%di',projection,center,map_width);
 
 function a = mkgrid(in)                                                         %% mkgrid %%
+%% mkgrid %%
 % If nothing is given the increment and search radius is loosely based on the
 % density of the data points
 
 a.region = in.plot.region;
 a.ungriddedfile = in.ungriddedfile;
-a.file = in.filename;
 a.name = 'nearneighbor';
 
 if ~isfield(in,'increment')
@@ -226,9 +222,7 @@ else
 end
 
 function a = create_colortables(in)                                             %% create color tables %%
-% create color tables %
-%
-%
+%% create color tables %%
 %
 
 %% check if a color table file is given and use that one
@@ -283,28 +277,25 @@ if isempty(dir('color_nan.cpt')), xtra_nan_legend; end %if it's not there, make 
 a.cptnan = 'color_nan.cpt';
 
 function a = mkpltimage(in)                                                     %% mkpltimage %%
-% mkpltimage %%
+%% mkpltimage %%
 
 % setup grdimage
 a.name = 'grdimage';
 a.region = in.plot.region;
 a.proj = in.plot.proj;
 a.cptfile = in.plot.color.cptfile;
-a.file = in.filename;
 a.title = in.title;
 
 function a = mkcoast(in)                                                        %% mkcoast %%
-%mkcoast
+%% mkcoast
 %
 % Does some default behaviour for plotting coastlines based on the size of the
 % region. Can be overridden by arguments: in.resolution and in.rivers
-
 
 % set
 a.name = 'pscoast';
 a.region = in.plot.region;
 a.proj = in.plot.proj;
-a.file = in.filename;
 
 % Set resolution of coastal features
 rg = textscan(a.region','%f','delimiter','/');
@@ -348,9 +339,8 @@ else a.ticks = in.ticks;
 end
 
 function a = mkpscontour(in)                                                    %% mkpscontour %%
-% mkpscontour
-% just a little setup
-a.file = in.filename;
+%% mkpscontour
+
 a.region = in.plot.region;
 a.proj = in.plot.proj;
 a.cptfile = in.plot.color.cptfile;
@@ -394,7 +384,6 @@ if in.legend
         b.unit = '';
         b.cptfile = in.plot.color.cptnan;
         b.equalboxsize = '';
-        b.file = in.filename;
         if strcmp(in.legend_orient,'v')
             b.legendsize = '25c/-1.3c/0.5c/0.5c';
         end
@@ -410,7 +399,6 @@ if in.legend
     a.cptfile = in.plot.color.cptfile;
     a.sidebar=in.sidebar;
     a.equalboxsize = '';
-    a.file = in.filename;
 else a = ''; b = '';
 end
 
@@ -419,7 +407,7 @@ function [tickval,prtstr] = ownctable(in)                                       
 switch in.ptype
     case 'equal'
         [tickval,prtstr] = ...
-            equidistant_contours(in.datarange.min,in.datarange.max,in.plot.nlevels);
+            equidistant_contours(in.datarange,in.plot.nlevels);
     otherwise
         error 'Currently the only available ptype is "equidistant"'
 end
@@ -427,21 +415,8 @@ end
 function in = setup_cpt(in)                                                     %% Setup color table %%
 %% setup_cpt
 
-% I need some sort datarange (min & max)
-if ~isfield(in,'datarange')
-    fprintf(strcat('No maximum or min values directly .',...
-        ' Using default colortable (polar)...\n'));
-    fprintf('setting the datarange  to -200:200 as no range is given...')
-    in.datarange.min = -200;
-    in.datarange.max = 200;
-    in.ctable = 'mypolar';
-elseif isfield(in.datarange,'max') && ~isfield(in.datarange,'min')
-    in.datarange.min = 0;
-    fprintf('setting in.datarange.min = %3.1f\n',in.datarange.min)
-end
-
 % Set the number of contour levels to use
-if in.datarange.max == in.datarange.min %special is so that it works for no data
+if in.datarange(1) == in.datarange(2) %special is so that it works for no data
     in.plot.nlevels=1;
 elseif ~isfield(in,'nlevels')
     in.plot.nlevels=15;

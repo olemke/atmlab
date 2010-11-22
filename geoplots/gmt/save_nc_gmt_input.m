@@ -8,9 +8,13 @@ function save_nc_gmt_input (filename, data, lat, lon)
 % IN    filename Name of NetCDF file.
 % IN    data          vector variable.
 % IN    lat           vector variable.
+% IN    lon           vector variable.
 %
-%
-% 2010-03-04   Created by Salomon Eliasson.
+% 2010-03-04   Created by Oliver Lemke
+
+if ~isequal(numel(data),numel(lon),numel(lat))
+    error('atmlab:input','This data is not ungridded')
+end
 
 ncid = netcdf.create (strrep(filename,'~',getenv('HOME')), 'NC_CLOBBER');
 

@@ -1,4 +1,44 @@
+2010-11-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-113
+
+	* geoplots/gmt/save_nc_gmt_input.m (save_nc_gmt_input): As this
+	requires ungridded data, immediately through an error if it is not.
+
+	* geoplots/gmt/grdimage.m (grdimage), 
+	geoplots/gmt/pscoast.m (pscoast), 
+	geoplots/gmt/nearneighbor.m (nearneighbor), 
+	geoplots/gmt/pslocations.m (pslocations), 
+	geoplots/gmt/pscontour.m (pscontour), 
+	geoplots/gmt/create_gmt_earth.m (create_gmt_earth), 
+	geoplots/gmt/psscale.m (psscale), 
+	geoplots/gmt/pspoly.m (pspoly): 
+
+	Execute all gmt commands at the end of gmt_plot wrapper. No longer
+	locally. All gmt commands have the -O and -K set as there is now
+	dummy opening .ps and a closing .ps files in create_gmt_earth.m
+
+	* geoplots/gmt/psbox.m (psbox): change from lat,lon to lon, lat
+	to match x,y conventions.
+	
+	* geoplots/gmt/equidistant_contours.m (equidistant_contours):
+	Adapted to new datarange
+
+	* geoplots/gmt/makecpt.m (makecpt): Adapted to new datarange
+
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): 
+	- Now datarange in defined as a 2 element vector [dmin,dmax] (as
+	xlim, etc.)  - Added subfunction to created a separate legend.pdf
+	file if requested. - Disabled option in.center as it doesn't work
+	with the way I define the plot region. I'll fix it at some later
+	date.  - Now always quietly put data in -180:180 format to
+	simplify things.
+	
+
 2010-11-15	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-112
 
 	* graphs/satboxplot.m: Added (helptext repeated here)
 	Alternative boxplot. Bins the data (in y) according to bins (in xbin).

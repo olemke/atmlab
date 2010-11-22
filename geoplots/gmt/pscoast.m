@@ -1,13 +1,14 @@
-function command = pscoast(in)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function command = pscoast(file,in)
+%% pscoast
+%
 % purpose:
 %       appends options to a  short script and calls the GMT
 %       command pscoast appending options.
 %
 %
-% Author:Salomon Eliasson
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Author$
+% $Date$
 
 pscoast = sprintf('pscoast');
 
@@ -39,22 +40,13 @@ if isfield(in,'rivers')
     pscoast = sprintf('%s -I%s',pscoast,in.rivers);
 end
 
-% selects Overlay plot mode
-if ~isempty(dir(sprintf('%s.ps',in.file)))
-    pscoast = sprintf('%s -O',pscoast);
-end
-
-% set portrait
-pscoast=sprintf('%s -P',pscoast);
-
 %Draw coastlines. Append attributes [Defaults: width = 1, color = black, texture = solid].
 if isfield(in,'width')
     pscoast = sprintf('%s -W%dp',pscoast,in.width);
 else pscoast = sprintf('%s -W',pscoast);
 end
 
-% assuming more pscode will be appended later
-pscoast = sprintf('%s -K',pscoast);
+% selects Overlay plot mode and assuming more pscode will be appended
+pscoast = sprintf('%s -O -K',pscoast);
 
-ut = sprintf('%s.ps',in.file);
-command = sprintf('%s >> %s',pscoast,ut);
+command = sprintf('%s >> %s.ps',pscoast,file);

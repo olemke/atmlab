@@ -1,13 +1,13 @@
-function command = psscale(in)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function command = psscale(file,in)
+%% psscale
+%
 % purpose:
 %       appends options to a  short script and calls the GMT
 %       command psscale appending options.
 %
 %
-% Author:Salomon Eliasson
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Author$
+% $Date$
 
 psscale = sprintf('psscale');
 
@@ -29,18 +29,12 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
     psscale = sprintf('%s -E',psscale);
 end
 
-% assuming more pscode will be appended later
-psscale = sprintf('%s -K',psscale);
-
 % Gives equal-sized color rectangles
 if isfield(in,'equalboxsize')
     psscale = sprintf('%s -L',psscale);
 end
 
-% selects Overlay plot mode
-if ~isempty(dir(sprintf('%s.ps',in.file)))
-    psscale = sprintf('%s -O',psscale);
-end
+% selects Overlay plot mode and assume more pscode will be appended later
+psscale = sprintf('%s -O -K',psscale);
 
-ut = sprintf('%s.ps',in.file);
-command = sprintf('%s >> %s',psscale,ut);
+command = sprintf('%s >> %s.ps',psscale,file);

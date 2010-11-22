@@ -1,4 +1,4 @@
-function[tickval,prtstr] = equidistant_contours(minn,maxx,nlevels)
+function[tickval,prtstr] = equidistant_contours(range,nlevels)
 %%  equidistant_contours
 % 
 % Purpose: 
@@ -14,9 +14,11 @@ function[tickval,prtstr] = equidistant_contours(minn,maxx,nlevels)
 %          array of contour levels and the format string to use (depends on
 %          the size of data values)
 %
-%  $Id$
+% $Author$
+% $Date$ 
 
 %necessity
+minn = range(1);maxx = range(2);
 if minn==maxx,maxx=maxx+1;end
 
 %step sizes
