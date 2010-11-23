@@ -1,6 +1,6 @@
 2010-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
-	* atmlab-1-0-115
+	* atmlab-1-0-116
 
 	* handy/catstruct.m (catstruct):
 	A very useful function for merging structures:
@@ -18,6 +18,12 @@
 	CATSTRUCT(A,'sorted') ;
 
 	http://www.mathworks.com/matlabcentral/fileexchange/7842
+
+2010-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-115
+
+	* gmt/gmt_plot.m: something small.
 
 2010-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
