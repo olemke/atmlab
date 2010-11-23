@@ -214,6 +214,9 @@ if in.nodata
     return
 end
 
+if ndims(in.(field))>2
+    error('atmlab:input','Too many dimensions in in.%s',field)
+end
 % check for lat and lons
 if ~isfield(in,'lat')
     l = {'Latitude','latitude'};

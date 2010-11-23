@@ -1,3 +1,24 @@
+2010-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-115
+
+	* handy/catstruct.m (catstruct):
+	A very useful function for merging structures:
+	
+	X = CATSTRUCT(S1,S2,S3,...) concates the structures S1, S2,
+	... into one structure X.
+
+	CATSTRUCT(S1,S2,'sorted') will sort the fieldnames alphabetically.
+
+	If a fieldname occurs more than once in the argument list, only
+	the last occurence is used, and the fields are alphabetically
+	sorted.
+
+	To sort the fieldnames of a structure A use: A =
+	CATSTRUCT(A,'sorted') ;
+
+	http://www.mathworks.com/matlabcentral/fileexchange/7842
+
 2010-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-114
