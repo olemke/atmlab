@@ -1,5 +1,42 @@
 2010-11-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-119
+	
+	* geoplots/gmt/makerainbow.m (makerainbow): rm bug
+
+	* geoplots/gmt/psscale.m (psscale): 
+	Removed equalboxsize option (-L) and adapted to tickspacing
+	option.
+
+	* geoplots/gmt/create_gmt_earth.m (create_gmt_earth): 
+	Updated legend section for tickspacing. Fixed NaN legend. If data
+	can be determined to be global fix lon-region to -180/180.
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): 
+	
+	Added option to manually decide how the ticks in the legend should
+	be spread. in.tickspacing: x=> every xth data value, 1=>same
+	number of ticks as datarange, []= one tick per contour level
+	(default behaviour)
+
+	Fixed option in.center, so that the user can define at which
+	longitude to center the map (only for global data).
+
+	Using homogenize_datalatlon, internally ensure that lat & lons are
+	ascending, lons are in the -180:180 regime, and make sure that
+	data has the dimensions data(lat,lon)
+
+	Removed subfunctions unnecessary now that I use
+	homogenize_datalatlon.
+
+	Added more defaults to the setup section for better overview on
+	gmt defaults. 
+
+	Updated Help.
+	
+
+2010-11-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-118
 
 	* geoplots/homogenize_datalatlon.m: Added geo-function For

@@ -23,7 +23,7 @@ function filename = gmt_plot(in,field)
 %
 % If your data is ungridded the dimensions must be:
 % length(in.lon) = length(in.lat) = length(in.(field))
-% 
+%
 % If your data is gridded the data MUST have the dimensions:
 % [length(in.lat),lenght(in.lon)] = size(in.(field));
 %  << transpose: in.(field) = in.(field)'; if this is not the case >>
@@ -61,19 +61,19 @@ function filename = gmt_plot(in,field)
 %
 % in.search           |'30m' ; %search for data within 30arcmin
 % in.increment        |'60m' ; %increment the grid by 60arcmin (1deg)
-%                     | If nothing is given the increment and search radius is 
+%                     | If nothing is given the increment and search radius is
 %                     | loosely based on the density of the data points
 %
 %
 % Projection & grid:
 % in.grdimage         | to explicitly set the grdimage command line
 % in.nearneighbor     | to explicitly set the nearneighbor command line
-% in.projection       |'Q'; Cylindrical Equidistant Projection
-% in.center           | not working right now....
-% in.map_width        |9; nine inches
-% in.proj             |'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
-% in.region           e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
-% in.plotimage        |grdimage;
+% in.projection       |
+% in.center           | Center longitudes to given center
+% in.map_width        | inches
+% in.proj             | e.g. 'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
+% in.region           | e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
+% in.plotimage        | e.g. 'grdimage'
 %
 % COASTLINES:
 % in.pscoast          | to explicitly set the pscoast command line
@@ -97,15 +97,24 @@ function filename = gmt_plot(in,field)
 %
 %
 % LEGENDS:
+%
+% in.legend           | false; if you don't want a legend
+% in.nanlegend        | false; if you don't want an extra NaN legend
+% in.psscale          | to explicitly set the pscale on the command line
+% in.psscale_nan      | to explicitly set the pscale for NaN legend on the command line
+% in.tickspacing      | if you want to manually decide how the ticks in the
+%                       legend should be spread. x=> every xth data value,
+%                       1=>same number of ticks as datarange, []= one tick per
+%                       contour level (default behaviour)
 % in.legend_orient    |if you want a horisontal/vertical/no legend: 'h'/'v'/''.
-% in.sizelegend       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
+% in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
+% 
 % in.sidebar          |true; gives triangles for lower and higher values
-% in.nanlegend =      |''; if you don't want a legend
 % in.sizenanlegend    |''; %i = inch , c = cm
 %
 % VALUE RANGE
 %                      GMT picks an appropriate default is field is not given
-% in.datarange.max    |[min, max];  default = [min(data) max(data)];
+% in.datarange        |[min, max];  default = [min(data) max(data)];
 %
 % EXTRAS:
 % in.psbox (%double)  | [lon11 lat11 lon12 lat12; lon21 lat21 lon22 lat22; ect]
@@ -147,7 +156,7 @@ function filename = gmt_plot(in,field)
 % EXTRA EXTRAS
 % If you don't want to plot data and only want a map (compatible with all options)
 % in.nodata                 | tells gmt that there is no data.
-% 
+%
 % If you don't want to delete intermediate files:
 % in.keep_files             | true
 %
@@ -176,24 +185,39 @@ filename=sort_figures(out,commands);                                            
 % SUBFUNCTIONS
 %     ||||
 %     vvvv
-function in = set_GMT_plot(in,field)                                            
+function in = set_GMT_plot(in,field)
 %% SETUP %%
+
+if ~ismember(field,fieldnames(in))
+    error('atmlab:input','no field by the name of "%s" in struct',field)
+end
 
 in.fieldname  = field;
 
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
 default.outdir            = atmlab('OUTDIR');   % where to put the figure
+default.map_width         = 9;                  % inches
+default.projection        = 'Q';                % Cylindrical Equidistant Projection. Projection Will only work with format: 'Q0/9i' ('%s%3.0f/%ii'in.projection,in.center,in.map_width))
+                                                % otherwise specify in.proj explicitly with the full projection command
+
 default.title             = '';                 % no title by default
 default.nodata            = false;              % true if you only want the map
 default.savelegend        = false;              % make an additional pdf-file only containing the legend
 default.keep_files        = false;              % keep intermediate files (debugging)
-%default.center            = 180;               % The center longitude of the
-                                                %map. The region has to be
-                                                %-180:180 or 0:360. but that
-                                                %currently the region is
-                                                %specified directly from lat/lon
-                                                
+default.ctable            = 'myrainbow';        % color palette (myrainbow is done in MATLAB)
+default.ptype             = 'equal';            % type of contour spacing (Currently the only one)
+
+default.legend            = true;               % show a legend
+default.legend_orient     = 'v';                % orientation of the legend (h = horisontal, v = vertical)
+default.sidebar           = true;               % coloroured triangles for data outside max/min legend
+default.unit              = '-?-';              % unit displayed with legend
+default.nanlegend         = true;               % include NaNs in the legend
+default.nlevels           = 15;                 % number of contour levels
+default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
+default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
+
+default.datarange         = [min(in.(field)(:)) max(in.(field)(:))];            % contour intervals
 
 in = optargs_struct(in,default);
 
@@ -210,6 +234,7 @@ in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
 
 if in.nodata
+    % If I only want an empty map, get the essentials and leave here.
     in = nodata(in);
     return
 end
@@ -234,21 +259,16 @@ if ~isfield(in,'lon')
 end
 
 % Check to see if the data  is gridded or not
-in = isgridded(in,field);                                                       
+in = isgridded(in,field);
 
-% is there useable data?
+% is the data plotable?
 isdata(in,field)
 
-if ~isfield(in,'datarange')                                                     % contour range
-    in.datarange = [min(in.(field)(:)) max(in.(field)(:))];
-end
-
-in = regionspecial(in,field);                                                   % if region: check latlon format
-
-in = ifcenter(in,field);                                                        % if map center is given
+% make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
+[in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
 
 function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
-%% SORT FIGURES 
+%% SORT FIGURES
 
 if se.savelegend
     % MAKE a separate file for the legend
@@ -264,8 +284,8 @@ else
     command{end+1} = sprintf('mv %s2.eps %s.eps ',se.filename,se.filename);
     command{end+1} = sprintf('rm -f %s.ps ',se.filename);
     if strcmp(se.figuretype,'pdf')
-            command{end+1} = sprintf('epstopdf %s.eps ',se.filename);
-            command{end+1} = sprintf('rm -f %s.eps ',se.filename);
+        command{end+1} = sprintf('epstopdf %s.eps ',se.filename);
+        command{end+1} = sprintf('rm -f %s.eps ',se.filename);
     end
     filename = [se.filename '.' se.figuretype];
 end
@@ -313,7 +333,7 @@ file = 'legend.ps';
 %make sure it's not here
 exec_gmt_cmd(sprintf('rm -f %s.{ps,eps,pdf}',file(1:end-3)))
 
-%Remove trailing .ps entry 
+%Remove trailing .ps entry
 crop=regexp(command,'>>');
 
 for i = 1:length(command)
@@ -339,18 +359,20 @@ legend = sprintf('%s/legend.pdf',outdir);
 %% SUBFUNCTIONS FOR SETUP
 %
 function se = nodata(se)                                                        %% NODATA %%
+%% NODATA
 % if you want to only plot coastlines
 
-se.sidebar=0;
-se.legend=0;
-se.grid=false;
-if ~isfield(se,'region')                                                    
+se.sidebar = false;
+se.legend  = false;
+se.grid    = false;
+se.nlevels = 1;
+if ~isfield(se,'region')
     se.region='-180/180/-90/90';
 elseif all(isfield(se,{'lat','lon'}))
     se.region = sprintf('%d/%d/%d/%d',...
         min(min(se.lon)),max(max(se.lon)),...
         min(min(se.lat)),max(max(se.lat)));
-    se.nodata=1;
+    se.nodata=true;
 end
 
 function se = isgridded(se,field)                                               %% ISGRIDDED %%
@@ -382,7 +404,7 @@ if ~ig
     txt1 = 'is NOT';txt2='1';txt3='is';
 else
     if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
-    if ~isfield(se,'grid'), se.grid = true; end    
+    if ~isfield(se,'grid'), se.grid = true; end
     txt1 = 'is';txt2='0';txt3='isn''t';
 end
 
@@ -390,47 +412,25 @@ fprintf('Assuming the data %s gridded...\n',txt1)
 fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
 
 fprintf('max data value: %2.1f\nmin data value: %2.1f\n',...
-max(max((se.(field)))),min(min(se.(field))))
+    max(max((se.(field)))),min(min(se.(field))))
 
 function isdata(se,field)                                                       %% ISDATA %%
 %% is there useable data?
 
 if ~isempty(field)                                                              % is there data?
-  if ~isfield(se,field)
-    error('atmlab:input','The field: "%s" is not in the structure',field)
-  end
-
-  if se.grid
-    if ~ ( size(se.(field),1) == length(se.lat) && size(se.(field),2) == ...
-           length(se.lon) )
-      error('atmlab:input','in.%s must have the dimensions (lat,lon)',field)
+    if ~isfield(se,field)
+        error('atmlab:input','The field: "%s" is not in the structure',field)
     end
-  end
+    
+    if se.grid
+        if ~ ( size(se.(field),1) == length(se.lat) && ...
+                size(se.(field),2) == length(se.lon) )
+            error('atmlab:input','in.%s must have the dimensions (lat,lon)',field)
+        end
+    end
 end
 
 if ~any(~isnan(se.(field)))                                                     % data?
     error('atmlab:nodata','%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
 end
-
-function se = regionspecial(se,field)                                           %% REGIONSPECIAL %%
-%% if region: check latlon format
-if isfield(se,'region')                           
-    if ~ischar(se.region)
-        %[blcorner,trcorner]
-        r = se.region;
-        se.region = sprintf('%d/%d/%d/%d',min(r(:,2)),max(r(:,4)),min(r(:,1)),max(r(:,3)));
-    end
-    x = textscan(se.region','%f','delimiter','/');
-    if x{1}(2) > 180
-        [se.(field),se.lat,se.lon] = flipdata(se.(field),se.lat,se.lon);
-    end
-end
-
-function se = ifcenter(se,field)                                                %% IFCENTER %%
-%% if map center is given
-% Picking a center just doesn't work right now....
-
-se.(field) = [se.(field)(:,se.lon >= 180), se.(field)(:,se.lon < 180)];
-se.lon = [se.lon(se.lon >= 180); se.lon(se.lon < 180)];
-se.lon(se.lon >= 180) = se.lon(se.lon >= 180) - 360;

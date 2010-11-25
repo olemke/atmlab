@@ -11,8 +11,10 @@ function command = psscale(file,in)
 
 psscale = sprintf('psscale');
 
-if isfield(in,'unit')
+% tickspacing (annotation every xth contour), unit (dispay with legend)
+if isempty(in.tickspacing)
     psscale = sprintf('%s -B::/:%s:',psscale,in.unit);
+else psscale = sprintf('%s -B%i::/:%s:',psscale,in.tickspacing,in.unit);
 end
 
 if isfield(in,'cptfile')
@@ -27,11 +29,6 @@ end
 
 if in.sidebar %i.e the triangles bellow the min and above the max values
     psscale = sprintf('%s -E',psscale);
-end
-
-% Gives equal-sized color rectangles
-if isfield(in,'equalboxsize')
-    psscale = sprintf('%s -L',psscale);
 end
 
 % selects Overlay plot mode and assume more pscode will be appended later

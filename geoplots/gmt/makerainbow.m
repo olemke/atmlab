@@ -35,7 +35,7 @@ strtot = strcat(prtstr,'\t','%d','\t','%d','\t','%d','\t',...
     prtstr,'\t','%d','\t','%d','\t','%d','\n');
 
 nlevels = length(tickval);
-ctable = 300: -ceil(300/nlevels): 0;
+ctable = 300:-300/nlevels: 0;
 
 for ii = 1:nlevels-1
     fprintf(fid,strtot,tickval(ii),round(ctable(ii)),1,1,...

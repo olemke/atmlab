@@ -68,12 +68,16 @@ if isfield(in.plot,'pspoly')
     commands = pspoly(file,in,commands); %internally adds several commands
 end
 
-if isfield(in.plot,'legend') && ~isempty(in.plot.legend)                        % Legends
+if isfield(in,'psscale')                                                        
+    commands{end+1} = in.psscale;
+elseif ~isempty(in.plot.legend)                                                 % Legend
     commands{end+1} = psscale(file,in.plot.legend);
 end
-if isfield(in.plot,'nanlegend') && ~isempty(in.plot.nanlegend)
-    disp('processing psscale for NaN-legend')
-    commands{end+1} = psscale(file,in.plot.nanlegend);
+
+if isfield(in,'psscale_nan')                                                    
+    commands{end+1} = in.psscale_nan;
+elseif ~isempty(in.plot.nanlegend)
+    commands{end+1} = in.plot.nanlegend;                                        % NaN Legend
 end
 
 % APPEND EOF with empty ps command (O = overlay (don't write header))
@@ -86,12 +90,14 @@ commands{end+1} = sprintf('psxy --HISTORY=FALSE -Rg -JQ1 -T -O >> %s.ps',file);
 function in = setup_create_gmt_earth(in)                                        
 %% setup_create_gmt_earth %%
 
-in = defaults(in);
-
 if ~isfield(in,'region')                                                        % REGION
-    in.plot.region = sprintf('%d/%d/%d/%d',...
-        min(min(in.lon)),max(max(in.lon)),...
-        min(min(in.lat)),max(max(in.lat)));
+    if in.grid && in.lon(end)+in.lon(end)-in.lon(end-1) == in.lon(1)+360
+        in.plot.region = sprintf('-180/180/%d/%d',in.lat(1),in.lat(end));
+    else
+        in.plot.region = sprintf('%d/%d/%d/%d',...
+            min(min(in.lon)),max(max(in.lon)),...
+            min(min(in.lat)),max(max(in.lat)));
+    end
 else in.plot.region = in.region;
 end
 
@@ -132,60 +138,17 @@ if ~in.nodata
     [in.plot.legend,in.plot.nanlegend] = mklegend(in);                          % Legend/s
 end
 
-function in = defaults(in)                                                      %% defaults %%
-
-if ~isfield(in,'legend_orient') || ~isempty(in.legend_orient)
-    in.legend=true;
-    if ~isfield(in,'sidebar')
-        in.sidebar = true;
-    end
-else
-    in.legend=false;
-end
-
-function region = region(in)                                                    %% region %%
-
-if isfield(in,'regionchoice')
-    in = in.regionchoice;
-elseif sum(ismember(isfield(in,{'regionchoice','regionstr'}),1))==0
-    in.blcorner = [min(min(in.lat)),min(min(in.lon))];
-    in.trcorner = [max(max(in.lat)),max(max(in.lon))];
-end
-
-if ~isfield(in,'blcorner')
-    in.blcorner = [-90,0];
-end
-if ~isfield(in,'trcorner')
-    in.trcorner = [90,360];
-end
-lonmin = num2str(floor(in.blcorner(2))); latmin = num2str(floor(in.blcorner(1)));
-lonmax = num2str(ceil(in.trcorner(2))); latmax = num2str(ceil(in.trcorner(1)));
-region = sprintf('%s/%s/%s/%s',lonmin,lonmax,latmin,latmax);
-
 function proj = setup_projection(in)                                            %% setup_projection %%
+%% setup_projection %%
 
-projection = 'Q'; %Cylindrical Equidistant Projection
-
-x = textscan(in.plot.region','%f','delimiter','/');                             % region
-
-if ~isfield(in,'center')
-    center = (x{1}(1)+x{1}(2))/2;
-else
-    center = in.center;
-    if center>180, center = center-360;end
-    if center < x{1}(1) || center > x{1}(2)
-        disp ('You have picked a projection center outside of the plot region')
-        disp('Choosing the middle of the region instead')
-        center = (x{1}(1)+x{1}(2))/2;
-    end
+if isempty(in.center) || ~strcmp(in.plot.region(1:9),'-180/180/')
+    disp('Data is not cyclic, choosing in.centre for projection from center longitude...')
+    x = textscan(in.plot.region','%f','delimiter','/');                         % region
+    C = (x{1}(1)+x{1}(2))/2;
+else C = in.center;
 end
 
-if ~isfield(in,'map_width')                                                     % map width
-    map_width = 9; %inches
-else map_width = in.map_width;
-end
-
-proj = sprintf('%s%d/%di',projection,center,map_width);
+proj = sprintf('%s%d/%di',in.projection,C,in.map_width);
 
 function a = mkgrid(in)                                                         %% mkgrid %%
 %% mkgrid %%
@@ -224,6 +187,10 @@ end
 function a = create_colortables(in)                                             %% create color tables %%
 %% create color tables %%
 %
+% What I need from here:
+% cptfile, cptnan, nlevels
+
+
 
 %% check if a color table file is given and use that one
 if isfield(in,'cptfile')
@@ -242,39 +209,29 @@ end
 
 %% Or else generate it
 
-% pick default color table is none is given
-if ~isfield(in,'ctable')
-    in.ctable = 'myrainbow';
-    fprintf('picking the ''%s'' colortable...\n',in.ctable);
-end
-
 % generate cpt files
 switch in.ctable                                                            
     case 'myrainbow'
-        in = setup_cpt(in);
         [tickval,prtstr]=ownctable(in);
         a.cptfile = makerainbow(tickval,prtstr,in.ptype);
     case 'mypolar'
-        in = setup_cpt(in);
         [tickval,prtstr]=ownctable(in);
         a.cptfile = makepolar(tickval,prtstr,in);        
     case 'cold2hot'
-        in = setup_cpt(in);
         [tickval,prtstr]=ownctable(in);
         a.cptfile = makehot(tickval,prtstr,'cold2hot');
     case 'hot2cold'
-        in = setup_cpt(in);
         [tickval,prtstr]=ownctable(in);
         a.cptfile = makehot(tickval,prtstr,'hot2cold');
     otherwise
         disp('processing makecpt')
-        in = setup_cpt(in);
         a.cptfile = makecpt(in);
 end
 
 % extra legend box for missing values
 if isempty(dir('color_nan.cpt')), xtra_nan_legend; end %if it's not there, make it
 a.cptnan = 'color_nan.cpt';
+a.nlevels = in.nlevels;
 
 function a = mkpltimage(in)                                                     %% mkpltimage %%
 %% mkpltimage %%
@@ -350,86 +307,63 @@ else a.width = in.ctwidth;
 end
 
 function [a,b] = mklegend(in)                                                   %% mklegend %%
-% mklegend
+%% mklegend
+%
+% What I need:
+% unit, nticks, legend_orient, legendsize, sidebar, cptfile
 
 if in.legend
-    % append unit
-    if ~isfield(in,'unit')
-        a.unit = '-?-';
-    else a.unit = char(in.unit);
+    % get what is already in the in-structure
+    F = {'unit','nticks','legend_orient','legendsize','sidebar','cptfile'};
+    for f = F(ismember(F,fieldnames(in)))
+        a.(f{1}) = in.(f{1});
     end
     
+    % used to determine defaults
     x = textscan(in.plot.region','%f','delimiter','/');
-    if ~isfield(in,'sizelegend') && ~isfield(in,'legend_orient')
-        % automatically re-orient legend if a vertical legend no longer makes sense
-        %(can be overridden by in.legend_orient='h','v')
-        
-        if ( x{1}(2)-x{1}(1) ) / ( x{1}(4)-x{1}(3) ) > 3
-            in.legend_orient='h';
-        else in.legend_orient='v';
-        end
-    end
+    test  = ( x{1}(2)-x{1}(1) ) / ( x{1}(4)-x{1}(3) ) > 3;
+    orient = ['v','h'];
+    default.legend_orient = orient(test+1);
     
-     if strcmp(in.legend_orient,'v')
-        %i = inch , c = cm (9.7i/2.3i/4i/0.3i = GMT's default)
-        a.legendsize = '25c/5.9c/10c/0.5c';
-    end
-    if strcmp(in.legend_orient,'h')
-        a.legendsize = '12c/0/18c/0.5ch -Ya-1'; %xpos/ypos/length/width
-    end
+    % get part of in...
+    if ~exist('a','var'), a = struct([]); end
+    a = optargs_struct(a,default);
+    
+    sz = {'25c/5.9c/10c/0.5c','12c/0/18c/0.5ch -Ya-1'};
+    default.legendsize = sz{ strcmp(a.legend_orient,'h') +1 };
+    a = optargs_struct(a,default);
     
     % A little extra legend showig colors of NaNs
-    if ~isfield(in,'nanlegend') || ~isempty(in.nanlegend)
-        b.sidebar=false;
-        b.unit = '';
-        b.cptfile = in.plot.color.cptnan;
-        b.equalboxsize = '';
-        if strcmp(in.legend_orient,'v')
-            b.legendsize = '25c/-1.3c/0.5c/0.5c';
+    if in.nanlegend
+        if strcmp(a.legend_orient,'v')
+            lsize = '25c/-1.3c/0.5c/0.5c';
+        elseif strcmp(a.legend_orient,'h')
+            lsize = '1c/0/0.5c/0.5ch';
         end
-        if strcmp(in.legend_orient,'h')
-            %i = inch , c = cm  (9.7i/-0.5i/0.3i/0.3i = orig)
-            b.legendsize = '1c/0/0.5c/0.5ch';
-        end
-    else b = '';
-    end  
+        b = sprintf('psscale -Bs/:NaN: -Ccolor_nan.cpt -D%s -O -K >> %s.ps',lsize,in.filename);
+    end
     
-    % finalize
-    if ~exist('a','var'), a='';return, end
+    % fixed vaules
     a.cptfile = in.plot.color.cptfile;
-    a.sidebar=in.sidebar;
-    a.equalboxsize = '';
-else a = ''; b = '';
+    a.sidebar = in.sidebar;
+    a.tickspacing = in.tickspacing;
+    
 end
+if ~exist('b','var'), b = struct([]);end
 
 function [tickval,prtstr] = ownctable(in)                                       %% ownctable %%
-% ownctable %%
+%% ownctable %%
+
 switch in.ptype
     case 'equal'
         [tickval,prtstr] = ...
-            equidistant_contours(in.datarange,in.plot.nlevels);
+            equidistant_contours(in.datarange,in.nlevels);
     otherwise
-        error 'Currently the only available ptype is "equidistant"'
-end
-
-function in = setup_cpt(in)                                                     %% Setup color table %%
-%% setup_cpt
-
-% Set the number of contour levels to use
-if in.datarange(1) == in.datarange(2) %special is so that it works for no data
-    in.plot.nlevels=1;
-elseif ~isfield(in,'nlevels')
-    in.plot.nlevels=15;
-else in.plot.nlevels = in.nlevels;
-end
-
-% The contour spacing
-if ~isfield(in,'ptype')
-    in.ptype = 'equal'; %contour spacing (currently the only possibility)
+        error ('atmlab:input','Currently the only available ptype is "equidistant"')
 end
 
 function out = setup_psboxpoly(in, field)                                       %% ps box %%
-% ps box %%
+%% ps box 
 
 l = size(in.(field),1);
 if isfield(in,[field 'color'])
