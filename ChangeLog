@@ -1,3 +1,18 @@
+2010-11-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-118
+
+	* geoplots/homogenize_datalatlon.m: Added geo-function For
+	gridded data. Makes sure lat lons are ascending, lons are in
+	-180:180 regime, and makes sure that data has the dimensions
+	data(lat,lon).
+
+2010-11-FIXME  FIXME  <FIXME@FIXME.FIXME>
+
+	* atmlab-1-0-117
+
+	* geophysics/profile2column.m: FIXME
+	
 2010-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-116
