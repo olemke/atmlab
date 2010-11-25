@@ -1,3 +1,9 @@
+2010-11-25 Ole Martin Christensen <olem@chalmers.se>
+
+	* atmlab-1-0-120
+
+	* fixed lacking ChangeLog entry
+
 2010-11-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-119
@@ -44,12 +50,12 @@
 	-180:180 regime, and makes sure that data has the dimensions
 	data(lat,lon).
 
-2010-11-FIXME  FIXME  <FIXME@FIXME.FIXME>
+2010-11-24  Ole Martin Christensen  <olem@chalmers.se>
 
-	* atmlab-1-0-117
+        * atmlab-1-0-117
 
-	* geophysics/profile2column.m: FIXME
-	
+        * geophysics/profile2column.m: changed bug and info
+
 2010-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-116
