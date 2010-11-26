@@ -34,4 +34,11 @@ end
 % selects Overlay plot mode and assume more pscode will be appended later
 psscale = sprintf('%s -O -K',psscale);
 
+if isfield(in,'shift_tick')
+    psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%di',psscale,in.shift_tick);
+end
+if isfield(in,'tick_format')
+    psscale = sprintf('%s --D_FORMAT=%s',psscale,in.tick_format);
+end
+
 command = sprintf('%s >> %s.ps',psscale,file);

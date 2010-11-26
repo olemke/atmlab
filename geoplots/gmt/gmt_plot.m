@@ -53,7 +53,8 @@ function filename = gmt_plot(in,field)
 % in.basemap_axis     |e.g 'WSne': prompts which axis need annotations.
 %                      (GMT default = 'WSNE')
 % in.header_offset    |e.g -0.5: puts title right on the axis. (GMT default = 0.5cm)
-%
+% in.gmtset           | cell with one or more gmtset commands. e.g. in.gmtset={'gmtset D_FORMAT %3.1e','ect'}
+
 % .... and many more: | Just add other options you need from the list of gmtdefaults
 %
 %
@@ -108,7 +109,11 @@ function filename = gmt_plot(in,field)
 %                       contour level (default behaviour)
 % in.legend_orient    |if you want a horisontal/vertical/no legend: 'h'/'v'/''.
 % in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
-% 
+% in.tick_annotation_format
+%                     | e.g. '%3.1e'
+% in.shift_tick_annotations
+%                     | move tick annotions to the right by x inches (e.g 0.5)
+%
 % in.sidebar          |true; gives triangles for lower and higher values
 % in.sizenanlegend    |''; %i = inch , c = cm
 %
@@ -369,7 +374,7 @@ se.nlevels = 1;
 if ~isfield(se,'region')
     se.region='-180/180/-90/90';
 elseif all(isfield(se,{'lat','lon'}))
-    se.region = sprintf('%d/%d/%d/%d',...
+    se.region = sprintf('%3.1f/%3.1f/%3.1f/%3.1f/%3.1f',...
         min(min(se.lon)),max(max(se.lon)),...
         min(min(se.lat)),max(max(se.lat)));
     se.nodata=true;
@@ -410,9 +415,7 @@ end
 
 fprintf('Assuming the data %s gridded...\n',txt1)
 fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
-
-fprintf('max data value: %2.1f\nmin data value: %2.1f\n',...
-    max(max((se.(field)))),min(min(se.(field))))
+fprintf('max data value: %3.1d\nmin data value: %3.1d\n',max(se.(field)(:)),min(se.(field)(:)))
 
 function isdata(se,field)                                                       %% ISDATA %%
 %% is there useable data?

@@ -1,3 +1,28 @@
+2010-11-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-121
+	
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Included new options:
+	1) in.gmtset: a cell of one or more gmtset commands to be called
+	additionally. 
+	e.g. 
+	in. gmtset={'gmtset HEADER_FONT_SIZE 15p','gmtset BASEMAP_AXES 	NsWE'}
+	
+	2) in.tick_annotation_format: Directly specify the format for
+	legend annotations (e.g. in.tick_annotation_format='%3.1e')
+
+	3) in.shift_tick_annotations: Move the tick annotations in
+	reference to the legend in inches (e.g in.shift_tick_annotations=0.5)
+	
+	* geoplots/gmt/create_gmt_earth.m (create_gmt_earth): Included
+	possibility to pass additional gmtset commands.
+
+	* geoplots/gmt/psscale.m (psscale): Included options
+	in.tick_annotation_format, and in.shift_tick_annotations
+
+	* geoplots/gmt/equidistant_contours.m: didn't support very small
+	numbers. Now uses format %d.
+
 2010-11-25 Ole Martin Christensen <olem@chalmers.se>
 
 	* atmlab-1-0-120

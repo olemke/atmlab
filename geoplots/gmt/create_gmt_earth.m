@@ -19,12 +19,17 @@ commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      
 if isfield(in,'headersize')                                                     % Size of title
     commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %dp',in.headersize);
 end
-
 if isfield(in,'basemap_axis')                                                   % Annotations of axis
     commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
 end
 if isfield(in,'header_offset')                                                  % Distance from axis to Annotation
     commands{end+1} = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
+end
+if isfield(in,'gmtset')
+    for i = length(in.gmtset)
+        commands{end+1} = in.gmtset{i};
+    end
+%commands{end+1} = 'gmtset D_FORMAT %3.1e';
 end
 
 % APPEND START with empty ps command (P = portrait, K = keep open)
@@ -341,6 +346,13 @@ if in.legend
             lsize = '1c/0/0.5c/0.5ch';
         end
         b = sprintf('psscale -Bs/:NaN: -Ccolor_nan.cpt -D%s -O -K >> %s.ps',lsize,in.filename);
+    end
+    
+    if isfield(in,'shift_tick_annotations')
+        a.shift_tick = in.shift_tick_annotations;
+    end
+    if isfield(in,'tick_annotation_format')
+        a.tick_format = in.tick_annotation_format;
     end
     
     % fixed vaules
