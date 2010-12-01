@@ -1,8 +1,14 @@
 2010-12-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-123
+
+	* demos/qarts_scattering_demo.m: A test setting was left.
+
+2010-12-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-122
 
-	* arts/qarts2cfile.m: Basic support for Beer-Lambert calculations. 
+	* arts/qarts2cfile.m: Basic support for Beer-Lambert calculations.
 
 	* demos/qarts_scattering_demo.m: Now also handling transmission
 	calculations.

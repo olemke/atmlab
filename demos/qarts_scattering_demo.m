@@ -63,8 +63,7 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 %= General part
 %
 f                   = linspace( 501.18e9, 501.58e9, 3 )';
-%f                   = linspace( 501.580e9, 501.581e9, 2 )';  
-f                   = linspace( 299e9, 301e9, 2 )';
+%f                   = linspace( 299e9, 301e9, 2 )';
 Q.F_GRID            = f;
 Q.STOKES_DIM        = 2;
 %
