@@ -4,7 +4,9 @@
 %   and MC. The DOIT method is implemented for both 1D and 3D, but is only
 %   recommended for 1D. MC is only implemented for 3D. FOS is defined for all
 %   atmospheric dimensionalities. This function runs a simple scenario with
-%   DOIT-1D, MC (3D) or FOS (1/2/3D).
+%   DOIT-1D, MC (3D) or FOS (1/2/3D). In addition, the transmission through
+%   the atmosphere can be calculated, including the total attenuation of
+%   clouds. This "method" is denoted as BL (Beer-Lambert)
 %
 %   The 1D scenario used for DOIT is expanded to 3D for MC. The cloud is then
 %   given a rectangular shape (in lat and lon). The 1D cloud values are applied
@@ -13,7 +15,8 @@
 %   degrees. That is, a perfect match between DOIT and MC can not be
 %   expected as the "3D cloud" has a smaller extension than the 1D one.
 %
-%   The cloud is expanded in same way for FOS, when 2D or 3D is selected.
+%   The cloud is expanded in same way for FOS and BL, when 2D or 3D is 
+%   selected.
 %
 % FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, method, m_arg )
 %
@@ -25,12 +28,13 @@
 %        dy         Error estimate. Only valid for MC.
 % OPT    ztan       Tangent altitudes. Default is [7 10 13] km.
 %        method     Scattering method to use. Default is 'mc'. Other options
-%                   are 'doit' and 'fos'. (Upper or lower case letters do not 
-%                   matter).
+%                   are 'doit', 'fos' and 'bl'. (Upper or lower case letters 
+%                   do not matter).
 %        m_arg      Method argument. Not used for DOIT. For MC it is the
 %                   Target calculation accuracy for MC, in K. Default is 5K.
-%                   For FOS this is atmospheric dimensionality to use.
+%                   For FOS and BL this is atmospheric dimensionality to use.
 
+% 2010-12-01  Extended to also handle BL by Patrick Eriksson.
 % 2010-02-12  Extended to also handle FOS by Patrick Eriksson.
 % 2007-07-27  Extended to also handle MC by Patrick Eriksson.
 % 2005-06-13  Created by Claudia Emde
@@ -60,6 +64,7 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 %
 f                   = linspace( 501.18e9, 501.58e9, 3 )';
 %f                   = linspace( 501.580e9, 501.581e9, 2 )';  
+f                   = linspace( 299e9, 301e9, 2 )';
 Q.F_GRID            = f;
 Q.STOKES_DIM        = 2;
 %
@@ -107,13 +112,21 @@ Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 5e3;
 Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
-Q.Y_UNIT              = 'RJBT';
 %
 zplat                 = 600e3;
 sensor_pos            = Q.R_GEOID + zplat;
 Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.R_GEOID, zplat, ztan )';
-
+%
+if strcmp( lower(method), 'bl' )
+  Q.IY_CLEARSKY_AGENDA = { 'iyEmissionStandardClearsky' };
+  Q.IY_SPACE_AGENDA    = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
+                           'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
+  Q.Y_UNIT             = '1';
+else
+  Q.Y_UNIT            = 'RJBT';
+end
+  
 
 
 % Calculate clearsky
@@ -230,11 +243,24 @@ elseif strcmp( lower(method), 'fos' )
   end
   
   fos(:,3) = 4*pi / size(fos,1);
-  
+  %  
   xmlStore( fos_file, fos, 'Matrix' );
+
+elseif strcmp( lower(method), 'bl' )
   %
+  C.METHOD                        = 'BL';
+  %
+  Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(ppath)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lat)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lon)';
+  Q.WSMS_BEFORE_RTE{end+1}        = '   iyBeerLambertStandardCloudbox';
+  Q.WSMS_BEFORE_RTE{end+1}        = '}';
+  
 else
-  error( 'Allowed options for *method* are ''doit'', ''mc'' and ''fos''.' );
+  error( ...
+    'Allowed options for *method* are ''doit'', ''mc'', ''fos'' and ''bl''.' );
 end
 
 
@@ -243,7 +269,7 @@ end
 latlon_grid = [-15:0.5:15]';
 csize       = 1;
 %
-if strcmp( lower(method), 'fos' )  &  m_arg == 2
+if any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 2
   %
   Q.ATMOSPHERE_DIM                = 2;
   Q.RAW_ATM_EXPAND_1D             = true;
@@ -260,7 +286,7 @@ if strcmp( lower(method), 'fos' )  &  m_arg == 2
   C.PND_FIELD{1}.data(:,3:4)      = repmat(p,[1 2]);
   %  
 elseif strcmp( lower(method), 'mc' )  |  ...
-     ( strcmp( lower(method), 'fos' )  &  m_arg == 3 )  
+     ( any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 3 )  
   %
   Q.ATMOSPHERE_DIM                = 3;
   Q.RAW_ATM_EXPAND_1D             = true;
