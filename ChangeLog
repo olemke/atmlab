@@ -1,3 +1,21 @@
+2010-12-08  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-124
+	
+	* geoplots/gmt/gmt_unicode_converter.m: Converts strings so that
+	many special characters can be given in title and legend. (oneliner)
+
+	* geoplots/gmt/makepolar.m: Smarter options and handling of this
+	color table
+
+	* geoplots/gmt/equidistant_contours.m: Better default format string
+
+	* geoplots/gmt/psscale.m:
+	* geoplots/gmt/gmt_plot.m: 
+	* geoplots/gmt/create_gmt_earth.m: 
+	Added a multitude of more options from gmtdefaults, mostly related
+	to the contour levels and plot lables
+
 2010-12-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-123

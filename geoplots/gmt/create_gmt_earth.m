@@ -25,11 +25,11 @@ end
 if isfield(in,'header_offset')                                                  % Distance from axis to Annotation
     commands{end+1} = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
 end
+
 if isfield(in,'gmtset')
     for i = length(in.gmtset)
         commands{end+1} = in.gmtset{i};
     end
-%commands{end+1} = 'gmtset D_FORMAT %3.1e';
 end
 
 % APPEND START with empty ps command (P = portrait, K = keep open)
@@ -213,20 +213,31 @@ if isfield(in,'cptfile')
 end
 
 %% Or else generate it
+prtstr = '%.12f';
+
+% MAKE a custom colour table based on manually input color values
+if isfield(in,'ctable_colors')
+    in.ctable = 'hardcoded';
+end
+
+% OR use some of the other definded color tables
+if ~isfield(in,'ctable_clevels')
+    tickval=ownctable(in);
+else
+    tickval = in.ctable_clevels;
+end
 
 % generate cpt files
-switch in.ctable                                                            
+switch in.ctable    
+    case 'hardcoded'
+        a.cptfile = hardcoded_colors(tickval,prtstr,in.ctable_colors);
     case 'myrainbow'
-        [tickval,prtstr]=ownctable(in);
         a.cptfile = makerainbow(tickval,prtstr,in.ptype);
     case 'mypolar'
-        [tickval,prtstr]=ownctable(in);
         a.cptfile = makepolar(tickval,prtstr,in);        
     case 'cold2hot'
-        [tickval,prtstr]=ownctable(in);
         a.cptfile = makehot(tickval,prtstr,'cold2hot');
     case 'hot2cold'
-        [tickval,prtstr]=ownctable(in);
         a.cptfile = makehot(tickval,prtstr,'hot2cold');
     otherwise
         disp('processing makecpt')
@@ -246,7 +257,7 @@ a.name = 'grdimage';
 a.region = in.plot.region;
 a.proj = in.plot.proj;
 a.cptfile = in.plot.color.cptfile;
-a.title = in.title;
+a.title = gmt_unicode_converter(in.title);
 
 function a = mkcoast(in)                                                        %% mkcoast %%
 %% mkcoast
@@ -317,11 +328,15 @@ function [a,b] = mklegend(in)                                                   
 % What I need:
 % unit, nticks, legend_orient, legendsize, sidebar, cptfile
 
-if in.legend
+if in.legend || in.savelegend
     % get what is already in the in-structure
     F = {'unit','nticks','legend_orient','legendsize','sidebar','cptfile'};
     for f = F(ismember(F,fieldnames(in)))
-        a.(f{1}) = in.(f{1});
+        if strcmp(f{1},'unit')
+            a.unit = gmt_unicode_converter(in.unit);
+        else
+            a.(f{1}) = in.(f{1});
+        end
     end
     
     % used to determine defaults
@@ -348,11 +363,14 @@ if in.legend
         b = sprintf('psscale -Bs/:NaN: -Ccolor_nan.cpt -D%s -O -K >> %s.ps',lsize,in.filename);
     end
     
-    if isfield(in,'shift_tick_annotations')
-        a.shift_tick = in.shift_tick_annotations;
-    end
-    if isfield(in,'tick_annotation_format')
-        a.tick_format = in.tick_annotation_format;
+    % get xtra options
+    xtra ={'tick_annotations','shift_tick_annotations','tick_annotation_format',...
+        'annot_font_size_primary','tick_length'};
+    
+    for F = xtra
+        if isfield(in,F{1})
+            a.(F{1}) = in.(F{1});
+        end
     end
     
     % fixed vaules
@@ -362,14 +380,23 @@ if in.legend
     
 end
 if ~exist('b','var'), b = struct([]);end
+if ~exist('a','var'), a = struct([]);end
 
-function [tickval,prtstr] = ownctable(in)                                       %% ownctable %%
+
+function tickval = ownctable(in)                                       %% ownctable %%
 %% ownctable %%
 
 switch in.ptype
     case 'equal'
-        [tickval,prtstr] = ...
-            equidistant_contours(in.datarange,in.nlevels);
+        minn = in.datarange(1);maxx = in.datarange(2);
+        if minn==maxx,maxx=maxx+1;end
+        if isfield(in,'ctable_cspacing')
+            tickval = minn:in.ctable_cspacing:maxx;
+        else
+        %step sizes
+        inc = (maxx - minn) /in.nlevels;
+        tickval = minn:inc:maxx;
+        end 
     otherwise
         error ('atmlab:input','Currently the only available ptype is "equidistant"')
 end

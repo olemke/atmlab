@@ -28,4 +28,4 @@ inc = (maxx - minn) /nlevels;
 tickval = minn:inc:maxx;
 
 % determine formatstring
-prtstr = '%d';
+prtstr = '%.12d';

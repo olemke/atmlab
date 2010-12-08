@@ -18,43 +18,77 @@ function filecpt = makepolar(tickval,prtstr,in)
 %             odd depending on the number of nlevels. If the number of contour 
 %             lines is even the reference 0, 2 boxes will be white.
 %
-% $Id$
+% $Author$
+% $Date$
 
 % string format to file 
+
+BG = [0,0,139]; % background colour (low extreme)
+FG = [128,0,0]; % foreground colour (high extreme)
+
+strannot = isfield(in,'tick_annotations') && ~isempty(in.tick_annotations);
+if strannot
+strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
+    prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f',' ;%s','\n');
+else
 strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
     prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
+end
 
+if ~in.sidebar
+   sidebars = [tickval(1) tickval(end)];
+   tickval = tickval(2:end-1);
+end
 nlevels = length(tickval)-1;
 if ~isfield(in,'reference')
     ref = (max(tickval)+min(tickval))/2;
 else ref = in.reference;
 end
+% tick closest to reference
+reftick = tickval(abs(tickval-ref) == min(abs(tickval-ref))); reftick = reftick(1);
+
+% Get white boxes
+if ~isfield(in,'whiteboxes')
+   whites = set_white_bars(length(tickval));
+else whites = in.whiteboxes;
+end
+
+if ref == reftick
+    whites = whites+1;
+end
+
+if mod(whites,2) %odd
+    R = ref;
+else R = reftick;
+end
 
 % find closest surrounding tickval to the chosen reference
-bf = tickval(tickval < ref);
-af = tickval(tickval > ref);
-tickvalref = [bf(end) af(1)];
+bf = tickval(tickval < R);
+af = tickval(tickval > R);
+n_colored_steps = [length(bf) - mod(whites,2) - floor(whites/2), ...
+    length(af) - mod(whites,2) - floor(whites/2)];
 
-% Set #boxes above and bellow reference value and get # white boxes
-[n_colored_steps,whitebars] = get_nboxes(tickval,tickvalref,nlevels);
+% BELLOW ref
+inc = 255/(n_colored_steps(1));
+bottom_color_incr = 0:inc:255-inc;
 
-% Make the array of colors for the 'side' with the largest number of boxes
-% base the shade of 'blue' or 'red' based on the color shade from the side that
-% is longest for an even 'color-slope'
-
-longest = n_colored_steps == max(n_colored_steps);
-if longest(1)
-    bottom_color_incr = [0:n_colored_steps(1)-1]*255/n_colored_steps(1);
-    top_color_incr = bottom_color_incr(n_colored_steps(2):-1:1); 
-else
-    top_color_incr = [n_colored_steps(2)-1: -1: 0]*255/n_colored_steps(2);
-    bottom_color_incr = top_color_incr(n_colored_steps(1):-1:1);
-end
+% ABOVE ref
+inc = 255/(n_colored_steps(2));
+top_color_incr = 255-inc:-inc:0;
 
 %% Make the array of colors
 
-x = 1;
-ctable = zeros(nlevels, 3);
+
+if ~in.sidebar
+    ctable = zeros(nlevels+2, 3);
+    ctable(1,:,:) = BG;
+    ctable(end,:,:) = FG;
+    tickval = [sidebars(1) tickval sidebars(2)];
+    x = 2;
+else
+    ctable = zeros(nlevels, 3);
+    x = 1;
+end
 
 %blue
 for i = 1:length(bottom_color_incr)
@@ -62,8 +96,8 @@ for i = 1:length(bottom_color_incr)
     x = x+1;
 end
 
-%white
-for i = 1:whitebars
+%white (refers to number of white boxes)
+for i = 1:whites
     ctable(x,:) = [255 255 255];
     x = x+1;
 end
@@ -83,14 +117,20 @@ fprintf(fid,'%s\t%s\n','#cpt file created by:','makepolar.m');
 fprintf(fid,'%s\n%s\n','#COLOR_MODEL = RGB','#');
 %############################################################
 
-for ii = 1:nlevels
+for ii = 1:nlevels+2*~in.sidebar
+    if strannot
+    fprintf(fid,strtot,tickval(ii),ctable(ii,1),ctable(ii,2),ctable(ii,3),...
+        tickval(ii+1),ctable(ii,1),ctable(ii,2),ctable(ii,3),in.tick_annotations{ii});
+        
+    else
     fprintf(fid,strtot,tickval(ii),ctable(ii,1),ctable(ii,2),ctable(ii,3),...
         tickval(ii+1),ctable(ii,1),ctable(ii,2),ctable(ii,3));
+    end
 end
 
 %prefined bachground and foreground colors
-fprintf(fid,'%s\t%i\t%i\t%i\n','B',0,0,139); %Navy
-fprintf(fid,'%s\t%i\t%i\t%i\n','F',139,28,98); %Maroon4
+fprintf(fid,'%s\t%i\t%i\t%i\n','B',BG); %Navy
+fprintf(fid,'%s\t%i\t%i\t%i\n','F',FG); %Maroon
 fprintf(fid,'%s\t%i\t%i\t%i\n','N',128,128,128); %grey
 
 fclose(fid);
@@ -99,25 +139,6 @@ fclose(fid);
 % SUBFUNCTIONS
 %   ||||||
 %   vvvvvv
-
-function [n_colored_steps,whitebars] = get_nboxes(tickval,tickvalref,nlevels)
-%% Set #boxes above and bellow white boxes and get # white boxes
-
-% middle: mostly redundent but sometimes tickvalref consists of 2 values
-middle = (tickvalref(end)+tickvalref(1))/2;  
-
-% # boxes on both sides of the ref
-bboxes = sum( tickval < middle);
-tboxes = sum( tickval > middle);
-
-% number of white boxes in legend
-whitebars = min([set_white_bars(bboxes-1), set_white_bars(tboxes-1)]);
-
-% find the number of colored steps on both sides of the reference
-n_colored_steps = [bboxes tboxes]-whitebars;
-
-% for mod(nlevels,2)==0 we need more whitebars
-whitebars = nlevels - sum(n_colored_steps); 
 
 function whitebars = set_white_bars(mxwbs)
 %% set the number of white boxes in the legend

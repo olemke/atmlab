@@ -33,7 +33,6 @@ function filename = gmt_plot(in,field)
 %       2) gmt_plot automatically detects if the data is gridded or not
 %
 %
-%   -----------------------------------------------------------------------
 %
 % OPTIONAL INPUT      |DEFAULTS
 %                     |
@@ -54,7 +53,7 @@ function filename = gmt_plot(in,field)
 %                      (GMT default = 'WSNE')
 % in.header_offset    |e.g -0.5: puts title right on the axis. (GMT default = 0.5cm)
 % in.gmtset           | cell with one or more gmtset commands. e.g. in.gmtset={'gmtset D_FORMAT %3.1e','ect'}
-
+%
 % .... and many more: | Just add other options you need from the list of gmtdefaults
 %
 %
@@ -86,19 +85,31 @@ function filename = gmt_plot(in,field)
 % in.ticks            |'40g20/20g20'; annotations on major lines (e.g 40 xaxis,20 yaxis)
 %                     and plot minor lines (e.g 20 xaxis & yaxis)
 %
-% CONTOURS & COLORS:
-% in.ctable           |'rainbow' | 'mypolar' (nice for difference plots)
+% COLORS:
 % in.cptfile          | path to any .cpt file generated earlier
-% in.pscontour        |'true' if you want contour lines
-% in.ctwidth          |0.5; width of contour lines
 % in.nlevels          | refers to the number of contour levels
-% in.reference        | Only applies when using ctable='mypolar'. Default ~=
-%                     | mean(data). Recommend in.reference = 0 for difference
-%                     | plots, but any reference works.
+% in.ctable_cspacing  | The spacein between contour levels starting from
+%                       datarange(1) (e.g. 5). This overrides in.nlevels
+% For your own color table. Specify the contour levels and colors directly (need both) 
+% in.ctable_clevels   | e.g. [1000 1002 1015 1030]
+% in.ctable_colors    | e.g. {[0 0 0],[155 0 0],[255 0 0],[0 0 0],[255 255 255]}
+%                         has to be in vector RGB format and the last 2 elements
+%                         are background and foreground colors
+%
+% in.ctable           |See GMT color paletts. There are two additional color tables,
+%                     | 'myrainbow' and 'mypolar' (nice for difference plots)
+%     if strcmp(in.ctable,'mypolar')
+%               in.reference  | Default == mean(data). Recommend in.reference = 0 for difference
+%                             | plots, but any reference works.
+%
+%               in.whiteboxes | Choose the number of white contours around
+%                             | a reference value
+%     end
 %
 %
 % LEGENDS:
 %
+% in.savelegend       | true: if you want to have a separate pdf for the legend
 % in.legend           | false; if you don't want a legend
 % in.nanlegend        | false; if you don't want an extra NaN legend
 % in.psscale          | to explicitly set the pscale on the command line
@@ -106,11 +117,16 @@ function filename = gmt_plot(in,field)
 % in.tickspacing      | if you want to manually decide how the ticks in the
 %                       legend should be spread. x=> every xth data value,
 %                       1=>same number of ticks as datarange, []= one tick per
-%                       contour level (default behaviour)
+%                       contour level (default behaviour). desirable if you have
+%                       many contour levels.
 % in.legend_orient    |if you want a horisontal/vertical/no legend: 'h'/'v'/''.
 % in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
 % in.tick_annotation_format
 %                     | e.g. '%3.1e'
+% in.tick_length      | length of the ticks
+% in.annot_font_size_primary
+%                     | size of annotations in legend
+% in.tick_annotations | e.g {'','','middle','',''} if you have 5 ticks in legend
 % in.shift_tick_annotations
 %                     | move tick annotions to the right by x inches (e.g 0.5)
 %
@@ -165,8 +181,6 @@ function filename = gmt_plot(in,field)
 % If you don't want to delete intermediate files:
 % in.keep_files             | true
 %
-% If you want to have a separate pdf for the legend:
-% in.savelegend             | true
 %
 % $Author$
 % $Date$
@@ -193,16 +207,11 @@ filename=sort_figures(out,commands);                                            
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-if ~ismember(field,fieldnames(in))
-    error('atmlab:input','no field by the name of "%s" in struct',field)
-end
-
-in.fieldname  = field;
-
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
 default.outdir            = atmlab('OUTDIR');   % where to put the figure
 default.map_width         = 9;                  % inches
+default.ticks             = '60g60/30g30';      % grid majorx'deg'minorx/majory'deg'minory
 default.projection        = 'Q';                % Cylindrical Equidistant Projection. Projection Will only work with format: 'Q0/9i' ('%s%3.0f/%ii'in.projection,in.center,in.map_width))
                                                 % otherwise specify in.proj explicitly with the full projection command
 
@@ -222,7 +231,6 @@ default.nlevels           = 15;                 % number of contour levels
 default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
 default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 
-default.datarange         = [min(in.(field)(:)) max(in.(field)(:))];            % contour intervals
 
 in = optargs_struct(in,default);
 
@@ -243,6 +251,15 @@ if in.nodata
     in = nodata(in);
     return
 end
+
+default.datarange         = [min(in.(field)(:)) max(in.(field)(:))];            % contour intervals
+in = optargs_struct(in,default);
+
+if ~ismember(field,fieldnames(in))
+     error('atmlab:input','no field by the name of "%s" in struct',field)
+end
+
+in.fieldname  = field;
 
 if ndims(in.(field))>2
     error('atmlab:input','Too many dimensions in in.%s',field)
@@ -278,7 +295,9 @@ function filename = sort_figures(se,command)                                    
 if se.savelegend
     % MAKE a separate file for the legend
     legend = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),se.outdir);
-    fprintf('FILE CONTAINING LEGEND IS LOCATED AT: %s\n',legend)
+    if ~se.legend
+        command = command(cellfun('isempty',regexp(command,'psscale')));
+    end
 end
 
 if strcmp(se.figuretype,'ps')
@@ -330,6 +349,10 @@ exec_gmt_cmd(command) % execute commands
 filename = sprintf('%s/%s',se.outdir,filename);
 fprintf('GMT plot stored at:  %s\n',filename)
 
+if se.savelegend
+    fprintf('File containing legend is located at: %s\n',legend)
+end
+
 function legend = makelegendpdf(command,outdir)
 %% Make a separate pdf for the legend
 
@@ -371,13 +394,13 @@ se.sidebar = false;
 se.legend  = false;
 se.grid    = false;
 se.nlevels = 1;
-if ~isfield(se,'region')
-    se.region='-180/180/-90/90';
-elseif all(isfield(se,{'lat','lon'}))
-    se.region = sprintf('%3.1f/%3.1f/%3.1f/%3.1f/%3.1f',...
+if isfield(se,'region')
+elseif ~isfield(se,'region') && all(isfield(se,{'lat','lon'}))
+        se.region = sprintf('%3.1f/%3.1f/%3.1f/%3.1f/%3.1f',...
         min(min(se.lon)),max(max(se.lon)),...
         min(min(se.lat)),max(max(se.lat)));
-    se.nodata=true;
+else
+    se.region='-180/180/-90/90';
 end
 
 function se = isgridded(se,field)                                               %% ISGRIDDED %%
