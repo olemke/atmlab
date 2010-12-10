@@ -1,3 +1,12 @@
+2010-12-10	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-125
+	
+	* sensors/calculate_footprint_size_amsu.m: Added
+	- Calculates the size of an AMSU/MHS footprint as a function of
+	viewing position. Can do AMSU-A and -B. Uses an elliptical
+	approximation for the half-power-bandwidth based on Bennartz (2000).
+
 2010-12-08  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-124
