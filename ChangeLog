@@ -1,3 +1,11 @@
+2010-12-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-126
+
+	* geoplots/gmt/hardcoded_colors.m (hardcoded_colors): added color
+	table creator, based on a manually input colors. ncolors has to be
+	equal to nlevels.
+
 2010-12-10	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-125
