@@ -6,4 +6,4 @@ function out = gmt_unicode_converter(string)
 % $Author$
 % $Date$ 
 
-out = sprintf('"$(echo "%s" |iconv -f utf-8 -t iso-8859-1)"',string) ;
+out = sprintf('$(echo "%s" |iconv -f utf-8 -t iso-8859-1)',string) ;

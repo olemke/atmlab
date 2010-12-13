@@ -185,7 +185,12 @@ function filename = gmt_plot(in,field)
 % $Author$
 % $Date$
 
-if ~exist('field','var'), field = 'datafield'; end
+if ~exist('field','var') && ~isfield(in,'datafield')
+    error('atmlab:input',...
+        'Need name of structure field to plot. input field = ''str'' or name the field ''datafield''')
+elseif ~exist('field','var')
+    field = 'datafield';
+end
 out = set_GMT_plot(in,field);                                                   % setup
 
 if out.grid
