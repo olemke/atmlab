@@ -1,3 +1,14 @@
+2010-12-14	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-128
+
+	* sensors/avhrr_define_gac_l1b.m: Added
+	- Define structure of AVHRR GAC L1B header and line
+
+	* atmlab/atmlab.m: Adapted
+	- Added field ATMLAB_DATA_PATH
+
+
 2010-12-13  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-127

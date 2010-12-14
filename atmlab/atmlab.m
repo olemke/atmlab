@@ -126,6 +126,12 @@
 %
 % Command to view PostScript files.
 %----------------------------------------------------------------------------
+% ATMLAB_DATA_PATH
+%
+% Path to main directory of atmlab-data
+% atmlab-data is a compilation of useful data for various atmlab tasks.
+% It is available in the atmlab-data/trunk directory of the rt svn repo.
+
 
 % 2003-07-06   Created by Patrick Eriksson.
 
@@ -142,6 +148,7 @@ function A = atmlab_defs
 A.ARTS_INCLUDES     = NaN;
 A.ARTS_PATH         = NaN;
 A.ARTS_XMLDATA_PATH = NaN;
+A.ATMLAB_DATA_PATH  = NaN;
 A.DEBUG             = false;
 A.ERR               = 2;
 A.EXTRAP            = false;
