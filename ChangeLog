@@ -1,5 +1,17 @@
 2010-12-14	Gerrit Holl	<gerrit.holl@ltu.se>
 
+	* atmlab-1-0-129
+
+	* sensors/atovs/avhrr_gac_read_raw.m: Added
+	- Initial version. Appears to read headers correctly. Did not start on
+	actual scanlines yet.
+
+	* sensors/avhrr_define_gac_l1b.m ->
+	sensors/atovs/avhrr_define_gac_l1b.m: Moved
+	- Fits better with AMSU.
+
+2010-12-14	Gerrit Holl	<gerrit.holl@ltu.se>
+
 	* atmlab-1-0-128
 
 	* sensors/avhrr_define_gac_l1b.m: Added
