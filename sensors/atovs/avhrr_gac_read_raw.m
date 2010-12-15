@@ -39,38 +39,67 @@ function varargout = avhrr_gac_read_raw(fn, varargin)
 % $Id$
 
 [fields_head, fields_line, lines] = optargs(varargin, {struct, struct, 0});
+record_size = 4608;
 
 [def_head, def_line] = avhrr_define_gac_l1b;
-data_head = struct;
-data_line = struct;
 
-fp = fopen(fn, 'r', 'b'); % big-endian
+fp = fopen(fn, 'r', 'b'); % b=big-endian
 c = onCleanup(@()fclose(fp));
 
 %% read header fields
 
-for field = fields_head
-    f = field{1};
-    fseek(fp, def_head.(f).Start_Octet-1, 'bof');
-    ws = def_head.(f).Word_Size;
-    nw = def_head.(f).Number_of_Words;
-    switch def_head.(f).Data_Type
-        case 'i'
-            type = ['int' num2str(ws*8)];
-            sz = nw;
-        case 'u'
-            type = ['uint' num2str(ws*8)];
-            sz = nw;
-        case 'c'
-            type = 'uint8=>char';
-            sz = ws*nw;
-        otherwise
-            error('atmlab:avhrr_gac_read_raw', ...
-            'Field %s has unknown data type: %s', ...
-            f, def_head.(f).Data_Type);
-    end
+data_head = cell2struct(cellfun(@(v) readfield(fp, v, def_head), fields_head, 'UniformOutput', false), fields_head, 2);
 
-    data_head.(f) = fread(fp, sz, type);
+%% read data fields
+
+if isscalar(lines) % interpret as 1,...,lines
+    lines = 1:lines;
+end
+% pre-allocate
+if ~isempty(lines)
+    data_line(lines(end)) = cell2struct(cell(1, length(fields_line)), fields_line, 2);
+end
+i = 0;
+for lineno = lines
+    i = i + 1;
+    data_line(i) = cell2struct(cellfun(@(v) readfield(fp, v, def_line, record_size*lineno), fields_line, 'UniformOutput', false), fields_line, 2);
 end
 
-varargout = {data_head};
+varargout = {data_head, data_line};
+
+end
+function val = readfield(fp, f, def, varargin)
+% readfield Reads field from AVHRR GAC
+%
+% 
+offset = optargs(varargin, {0});
+fseek(fp, offset+def.(f).Start_Octet-1, 'bof');
+ws = def.(f).Word_Size;
+nw = def.(f).Number_of_Words;
+skip = 0;
+switch def.(f).Data_Type
+    case 'i'
+        type = ['int' num2str(ws*8)];
+        sz = nw;
+    case 'u'
+        type = ['uint' num2str(ws*8)];
+        sz = nw;
+        if isbitpacked(def.(f).Id)
+            type = '3*ubit10';
+            skip = 2;
+            sz = 3*nw;
+        end
+    case 'c'
+        type = 'uint8=>char';
+        sz = uint16(ws)*nw;
+    otherwise
+        error('atmlab:avhrr_gac_read_raw', ...
+            'Field %s has unknown data type: %s', ...
+            f, def.(f).Data_Type);
+end
+val = fread(fp, sz, type, skip);
+end
+
+function n = isbitpacked(s)
+n = strcmp(s, 'avh_video'); 
+end

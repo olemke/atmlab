@@ -1,3 +1,11 @@
+2010-12-15	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-130
+
+	* sensors/atovs/avhrr_gac_read_raw.m: Adapted
+	- Also read scans. Still raw data. Actual measurements still
+	incorrect.
+
 2010-12-14	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-129
