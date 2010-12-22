@@ -9,7 +9,7 @@ function command = pslocations(file,in,command)
 
 for loc = in.locations
     psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);
-    psloc = sprintf('%s -R -J');
+    psloc = sprintf('%s -R -J',psloc);
     
     shape = 'c0.08i';
     if isfield(loc,'shape')
@@ -44,8 +44,7 @@ for loc = in.locations
         % Offset text from data point
         pstxt = sprintf('%s -Dj0.05i/0.05i',pstxt);
         
-        pstxt = sprintf('%s -R%s',pstxt,in.plot.region);
-        pstxt = sprintf('%s -J%s',pstxt,in.plot.proj);
+        pstxt = sprintf('%s -R -J',pstxt);
         
         if isfield(loc,'textcolor') && ~isempty(loc.textcolor)
             color = loc.textcolor;

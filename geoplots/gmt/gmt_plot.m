@@ -59,6 +59,8 @@ function filename = gmt_plot(in,field)
 %
 % gmtdefaults:        type 'man gmtdefaults' for behaviour of following options:
 %
+% in.ticks            |'40g20/20g20'; annotations on major lines (e.g 40 xaxis,20 yaxis)
+%                     and plot minor lines (e.g 20 xaxis & yaxis)
 % in.header_size      |e.g: 20  (GMT default = 36p)
 % in.basemap_axis     |e.g 'WSne': prompts which axis need annotations.
 %                      (GMT default = 'WSNE')
@@ -84,7 +86,6 @@ function filename = gmt_plot(in,field)
 % in.map_width        | inches
 % in.proj             | e.g. 'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
 % in.region           | e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
-% in.plotimage        | e.g. 'grdimage'
 %
 % COASTLINES:
 % in.pscoast          | to explicitly set the pscoast command line
@@ -93,8 +94,6 @@ function filename = gmt_plot(in,field)
 % in.resolution       |l; available: (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude
 % in.rivers           |'1'; (major rivers), see GMT doc on pscoast for other options
 % in.cwidth           |1; width of coastlines
-% in.ticks            |'40g20/20g20'; annotations on major lines (e.g 40 xaxis,20 yaxis)
-%                     and plot minor lines (e.g 20 xaxis & yaxis)
 %
 % COLORS:
 % in.cptfile          | path to any .cpt file generated earlier
@@ -178,18 +177,30 @@ function filename = gmt_plot(in,field)
 %
 % LOCATION MARKERS:
 %
-% in.locations(x).lat       | Latitude of location marker x
-% in.locations(x).lon       | Longitude of location marker x
-% in.locations(x).name      | Name of location marker x (optional)
-% in.locations(x).shape     | Shape of location marker x (default: c0.08i)
+% in.locations.lat          | Latitude of location marker x
+% in.locations.lon          | Longitude of location marker x
+% in.locations.name         | Name of location marker x (optional)
+% in.locations.shape        | Shape of location marker x (default: c0.08i)
 %                             if empty => don't draw dot
-% in.locations(x).color     | Color of location marker x (default: white) (and text if textcolor if not given)
-% in.locations(x).textsize  | Size of location text x (default: 15)
-% in.locations(x).textcolor | Color of location text x (default: marker color)
-% in.locations(x).textalign | Position of marker relative to the text
+% in.locations.color        | Color of location marker x (default: white) (and text if textcolor if not given)
+% in.locations.textsize     | Size of location text x (default: 15)
+% in.locations.textcolor    | Color of location text x (default: marker color)
+% in.locations.textalign    | Position of marker relative to the text
 %                             first letter for horizontal position: L, C, R
 %                             second letter for vertical position: T, M, B
 %                             (default: LT)
+%  for muliple locations define all fields according to : 
+%  in.locations(1).name = 'x',
+%  in.locations(2).name = 'y', etc...
+%
+%
+% CONTOUR LINES
+% in.grdcontour.spacing     | scalar
+% in.grdcontour.range       | [min max]
+% in.grdcontour.linethick   | scalar
+%  if several contour plots should overlap define all fields according to: 
+%  in.grdcontour(1).spacing = x,
+%  in.grdcontour(2).spacing = y, etc...
 %
 % EXTRA EXTRAS
 % If you don't want to plot data and only want a map (compatible with all options)

@@ -1,5 +1,17 @@
 2010-12-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-132
+
+	* geoplots/gmt/create_gmt_earth.m: Suppressed mlint warning
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Updated help
+
+	* atmlab/atmlab.m: Forgot to add OPEN_COMMAND to help
+
+	* geoplots/gmt/pslocations.m: Fixed bug
+
+2010-12-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-131
 
 	* geoplots/gmt/create_gmt_earth.m:

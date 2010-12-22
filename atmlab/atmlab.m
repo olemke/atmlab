@@ -118,6 +118,11 @@
 %    The work area is primarily used for forward model calculations, but
 % there could be other applications.
 %----------------------------------------------------------------------------
+% OPEN_COMMAND  
+%
+% General command to open files with. e.g. atmlab('OPEN_COMMAND','gnome-open') 
+% ---------------------------------------------------------------------------
+%
 % PDFVIEWER
 %
 % Command to view PDF files.

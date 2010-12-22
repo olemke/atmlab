@@ -28,7 +28,7 @@ end
 
 if isfield(in,'gmtset')
     for i = length(in.gmtset)
-        commands{end+1} = in.gmtset{i};
+        commands{end+1} = in.gmtset{i}; %#ok<*AGROW>
     end
 end
 
