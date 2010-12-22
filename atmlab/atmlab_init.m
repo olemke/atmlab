@@ -64,7 +64,7 @@ addpath( fullfile( toppath, 'arts', 'scenegen' ) );
 addpath( fullfile( toppath, 'arts', 'xml' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
 %
-if nversion < 7.4
+if nversion < 7.04
   addpath( fullfile( toppath, 'V7-4' ) ); 
 end
 

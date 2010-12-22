@@ -1,3 +1,15 @@
+2010-12-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-133
+
+	* atmlab/atmlab_init.m: Changed threshold value for including V7-4
+	folder, due to change below. 
+
+	* handy/nversion.m: The function mixed up 7.10 and 8.0. To fix
+	this, e.g. 7.5 and 7.10 are now returned as 7.05 and 7.10,
+	respectively. That is, the function shoulds be OK for sub-version
+	numbers up to 99.
+
 2010-12-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-132
