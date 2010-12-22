@@ -16,8 +16,8 @@ commands{1} = sprintf('rm -f %s.{ps,eps}',file);                                
 commands{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
 commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      % Set paper sizeBASEMAP_AXES
 
-if isfield(in,'headersize')                                                     % Size of title
-    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %dp',in.headersize);
+if isfield(in,'header_size')                                                    % Size of title
+    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %dp',in.header_size);
 end
 if isfield(in,'basemap_axis')                                                   % Annotations of axis
     commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
@@ -32,8 +32,8 @@ if isfield(in,'gmtset')
     end
 end
 
-% APPEND START with empty ps command (P = portrait, K = keep open)
-commands{end+1} = sprintf('psxy --HISTORY=FALSE -Rg -JQ1 -T -P -K >> %s.ps',file);
+% PSBASEMAP
+commands{end+1} = in.plot.basemap;
 
 if isfield(in,'nearneighbor')                                                   % Nearneighbor
     commands{end+1} = in.nearneighbor;
@@ -41,8 +41,11 @@ elseif ~in.grid && isfield(in.plot,'grid')
     commands{end+1} = nearneighbor(file,in.plot.grid);
 end
 
-if isfield(in,'grdimage')                                                       % Image
-    commands{end+1} = in.grdimage;
+
+if isfield(in,'grdimage')                                                  % Image
+    if ~isempty(in.grdimage)
+        commands{end+1} = in.grdimage;
+    end
 elseif ~in.nodata && strcmp(in.plot.plotimage.name,'grdimage')
     commands{end+1} = grdimage(file,in.plot.plotimage);
 end
@@ -57,9 +60,11 @@ if isfield(in,'locations')                                                      
     commands = pslocations(file,in,commands); %internally adds several commands
 end
 
-if isfield(in.plot,'pscontour') && ~isempty(in.pscontour)                       % Contourlines
+if isfield(in.plot,'grdcontour') && ~isempty(in.grdcontour)                       % Contourlines
     % currently out of order.....
-    commands{end+1} = pscontour(file,in.plot.pscontour);
+    for i = 1:length(in.plot.grdcontour)
+        commands{end+1} = grdcontour(file,in.plot.grdcontour(i));
+    end
 end
 
 if isfield(in,'psxy')                                                           % Psbox
@@ -85,8 +90,7 @@ elseif ~isempty(in.plot.nanlegend)
     commands{end+1} = in.plot.nanlegend;                                        % NaN Legend
 end
 
-% APPEND EOF with empty ps command (O = overlay (don't write header))
-commands{end+1} = sprintf('psxy --HISTORY=FALSE -Rg -JQ1 -T -O >> %s.ps',file);
+commands{end+1} = in.plot.lastbasemap;                                           % close it + grid
 
 %%%%%%%%%%%%%%%%%
 %  SUBFUNCTIONS
@@ -110,6 +114,8 @@ if ~isfield(in,'proj')                                                          
     in.plot.proj = setup_projection(in);
 else in.plot.proj = in.proj;
 end
+
+in.plot.basemap = setupbasemap(in);
 
 if ~in.grid && ~isfield(in,'nearneighbor') && ~in.nodata                        % GRIDDING
     in.plot.grid = mkgrid(in);
@@ -135,13 +141,15 @@ if isfield(in,'pspoly')                                                         
     in.plot.pspoly = setup_psboxpoly(in, 'pspoly');
 end
 
-if isfield(in,'pscontour')                                                      % Contour lines
-    in.plot.pscontour = mkpscontour(in);
+if isfield(in,'grdcontour')                                                      % Contour lines
+    in.plot.grdcontour = mkgrdcontour(in);
 end
 
 if ~in.nodata
     [in.plot.legend,in.plot.nanlegend] = mklegend(in);                          % Legend/s
 end
+
+in.plot.lastbasemap = last_psbasemap(in);                                       % Close file with this
 
 function proj = setup_projection(in)                                            %% setup_projection %%
 %% setup_projection %%
@@ -155,12 +163,21 @@ end
 
 proj = sprintf('%s%d/%di',in.projection,C,in.map_width);
 
+function basemap = setupbasemap(in)
+
+if ~isempty(in.title)
+    basemap = sprintf('psbasemap -B:."%s": -R%s -J%s -Ya5 -G -P -K > %s.ps',...
+        gmt_unicode_converter(in.title),in.plot.region,in.plot.proj,in.filename);
+else
+    basemap = sprintf('psbasemap -R%s -J%s -Ya5 -G -P -K > %s.ps',...
+        in.plot.region,in.plot.proj,in.filename);
+end
+
 function a = mkgrid(in)                                                         %% mkgrid %%
 %% mkgrid %%
 % If nothing is given the increment and search radius is loosely based on the
 % density of the data points
 
-a.region = in.plot.region;
 a.ungriddedfile = in.ungriddedfile;
 a.name = 'nearneighbor';
 
@@ -230,7 +247,7 @@ end
 % generate cpt files
 switch in.ctable    
     case 'hardcoded'
-        a.cptfile = hardcoded_colors(tickval,prtstr,in.ctable_colors);
+        a.cptfile = hardcoded_colors(tickval,prtstr,in);
     case 'myrainbow'
         a.cptfile = makerainbow(tickval,prtstr,in.ptype);
     case 'mypolar'
@@ -254,10 +271,7 @@ function a = mkpltimage(in)                                                     
 
 % setup grdimage
 a.name = 'grdimage';
-a.region = in.plot.region;
-a.proj = in.plot.proj;
 a.cptfile = in.plot.color.cptfile;
-a.title = gmt_unicode_converter(in.title);
 
 function a = mkcoast(in)                                                        %% mkcoast %%
 %% mkcoast
@@ -267,11 +281,9 @@ function a = mkcoast(in)                                                        
 
 % set
 a.name = 'pscoast';
-a.region = in.plot.region;
-a.proj = in.plot.proj;
 
 % Set resolution of coastal features
-rg = textscan(a.region','%f','delimiter','/');
+rg = textscan(in.plot.region','%f','delimiter','/');
 ln=rg{1}(2)-rg{1}(1);
 lt=rg{1}(4)-rg{1}(3);
 if ~isfield(in,'features')
@@ -302,25 +314,17 @@ if ~isfield(in,'cwidth')
     a.width = 0.3;
 else a.width = in.cwidth;
 end
-if ~isfield(in,'ticks')
-    x1=ln/9; x2=x1/(1+(round(ln/lt)>=2));
-    x3=lt/9; x4=x3/(1+(round(lt/ln)>=2));
-    fac=10^(floor(log10(x1)));
-    a.ticks = sprintf('%3.1fg%3.1f/%3.1fg%3.1f',...
-        round(x1/fac)*fac,round(x2/fac)*fac,round(x3/fac)*fac,round(x4/fac)*fac);
-else a.ticks = in.ticks;
+
+function a = mkgrdcontour(in)                                                    %% mkpscontour %%
+%% mkgrdcontour
+
+default.cptfile = in.plot.color.cptfile;
+default.grdfile = in.grdfile;
+
+for i = 1:length(in.grdcontour)
+    a(i) = catstruct(default,in.grdcontour(i));
 end
 
-function a = mkpscontour(in)                                                    %% mkpscontour %%
-%% mkpscontour
-
-a.region = in.plot.region;
-a.proj = in.plot.proj;
-a.cptfile = in.plot.color.cptfile;
-if ~isfield(in,'ctwidth')
-    a.width = 0.5;
-else a.width = in.ctwidth;
-end
 
 function [a,b] = mklegend(in)                                                   %% mklegend %%
 %% mklegend
@@ -330,10 +334,10 @@ function [a,b] = mklegend(in)                                                   
 
 if in.legend || in.savelegend
     % get what is already in the in-structure
-    F = {'unit','nticks','legend_orient','legendsize','sidebar','cptfile'};
+    F = {'xunit','unit','nticks','legend_orient','legendsize','sidebar','cptfile'};
     for f = F(ismember(F,fieldnames(in)))
-        if strcmp(f{1},'unit')
-            a.unit = gmt_unicode_converter(in.unit);
+        if any(strcmp(f{1},{'unit','xunit'}))
+            a.(f{1}) = gmt_unicode_converter(in.(f{1}));
         else
             a.(f{1}) = in.(f{1});
         end
@@ -364,8 +368,8 @@ if in.legend || in.savelegend
     end
     
     % get xtra options
-    xtra ={'tick_annotations','shift_tick_annotations','tick_annotation_format',...
-        'annot_font_size_primary','tick_length'};
+    xtra ={'tickspacing','tick_annotations','shift_tick_annotations','tick_annotation_format',...
+        'annot_font_size_primary','tick_length','legendbox_spacing','tickcentering','equalboxwidth'};
     
     for F = xtra
         if isfield(in,F{1})
@@ -425,3 +429,21 @@ for i=1:length(c)
 end
 out.colors=colors;
 out.(field)=in.(field);
+
+function basemap = last_psbasemap(in)
+%% last_psbasemap
+
+rg = textscan(in.plot.region','%f','delimiter','/');
+ln=rg{1}(2)-rg{1}(1);
+lt=rg{1}(4)-rg{1}(3);
+
+if ~isfield(in,'ticks')
+    x1=ln/9; x2=x1/(1+(round(ln/lt)>=2));
+    x3=lt/9; x4=x3/(1+(round(lt/ln)>=2));
+    fac=10^(floor(log10(x1)));
+    ticks = sprintf('%3.1fg%3.1f/%3.1fg%3.1f',...
+        round(x1/fac)*fac,round(x2/fac)*fac,round(x3/fac)*fac,round(x4/fac)*fac);
+else ticks = in.ticks;
+end
+
+basemap = sprintf('psbasemap -B%s -R -J -O >> %s.ps',ticks,in.filename);

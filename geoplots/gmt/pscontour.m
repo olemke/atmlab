@@ -11,7 +11,6 @@ function command = pscontour(file,in)
 
 %location of file
 
-error('Doesn''t work yet')
 if isfield(in,'file')
     pscontour = sprintf('pscontour %s.grd',file);
 else

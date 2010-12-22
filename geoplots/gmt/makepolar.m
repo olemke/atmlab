@@ -21,18 +21,18 @@ function filecpt = makepolar(tickval,prtstr,in)
 % $Author$
 % $Date$
 
-% string format to file 
 
 BG = [0,0,139]; % background colour (low extreme)
 FG = [128,0,0]; % foreground colour (high extreme)
 
+% string format to file 
 strannot = isfield(in,'tick_annotations') && ~isempty(in.tick_annotations);
 if strannot
-strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
-    prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f',' ;%s','\n');
+    strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
+        prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f',' ;%s','\n');
 else
-strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
-    prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
+    strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
+        prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 end
 
 if ~in.sidebar
@@ -53,7 +53,7 @@ if ~isfield(in,'whiteboxes')
 else whites = in.whiteboxes;
 end
 
-if ref == reftick
+if ref == reftick && mod(nlevels,2)
     whites = whites+1;
 end
 
@@ -68,17 +68,16 @@ af = tickval(tickval > R);
 n_colored_steps = [length(bf) - mod(whites,2) - floor(whites/2), ...
     length(af) - mod(whites,2) - floor(whites/2)];
 
-% BELLOW ref
-inc = 255/(n_colored_steps(1));
-bottom_color_incr = 0:inc:255-inc;
 
+inc = 255/(max(n_colored_steps));
+% BELLOW ref
+bottom_color_incr = 0:inc:255-inc;
+bottom_color_incr = bottom_color_incr(end-n_colored_steps(1)+1:end);
 % ABOVE ref
-inc = 255/(n_colored_steps(2));
 top_color_incr = 255-inc:-inc:0;
+top_color_incr = top_color_incr(1:n_colored_steps(2));
 
 %% Make the array of colors
-
-
 if ~in.sidebar
     ctable = zeros(nlevels+2, 3);
     ctable(1,:,:) = BG;
@@ -128,10 +127,19 @@ for ii = 1:nlevels+2*~in.sidebar
     end
 end
 
-%prefined bachground and foreground colors
-fprintf(fid,'%s\t%i\t%i\t%i\n','B',BG); %Navy
-fprintf(fid,'%s\t%i\t%i\t%i\n','F',FG); %Maroon
-fprintf(fid,'%s\t%i\t%i\t%i\n','N',128,128,128); %grey
+% incase the reference is far from the middle of the range, don't use the
+% predefined BG or FG
+if length(top_color_incr) - length(bottom_color_incr) > 2
+    col = top_color_incr(length(bottom_color_incr)+2);
+    BG = [col col 255]; 
+elseif length(bottom_color_incr) - length(top_color_incr) > 2
+    col = bottom_color_incr(end-(length(top_color_incr)+1));
+    FG = [255 col col]; 
+end
+
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','B',BG); %Navy
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','F',FG); %Maroon
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',128,128,128); %grey
 
 fclose(fid);
 
@@ -142,10 +150,13 @@ fclose(fid);
 
 function whitebars = set_white_bars(mxwbs)
 %% set the number of white boxes in the legend
-if mxwbs >= 11
-    whitebars =2;
-elseif mxwbs >=1
-    whitebars = 1;
+
+if mxwbs >= 20
+    whitebars =3+mod(mxwbs,2);
+elseif mxwbs >= 10
+    whitebars =2+~mod(mxwbs,2);
+elseif mxwbs >= 6
+    whitebars = 1+mod(mxwbs,2);
 else
-    whitebars = 0;
+    whitebars = ~mod(mxwbs,2);
 end

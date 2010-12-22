@@ -10,27 +10,12 @@ function command = pscoast(file,in)
 % $Author$
 % $Date$
 
-pscoast = sprintf('pscoast');
-
-%lat lon bounds
-if isfield(in,'region')
-    pscoast = sprintf('%s -R%s',pscoast,in.region);
-else error('needs in.region')
-end
-
-%projection type
-if isfield(in,'proj')
-    pscoast = sprintf('%s -J%s',pscoast,in.proj);
-else error('needs in.proj')
-end
+pscoast = sprintf('pscoast -R -J');
 
 % set the minimal area of features to plot
 if isfield(in,'features')
     pscoast = sprintf('%s -A%d',pscoast,in.features);
 end
-
-% Sets map boundary annotation and tickmark intervals;
-pscoast = sprintf('%s -B%s',pscoast,in.ticks);
 
 if isfield(in,'resolution')
     pscoast = sprintf('%s -D%s',pscoast,in.resolution);

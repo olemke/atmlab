@@ -8,7 +8,7 @@ function command = nearneighbor(file,in)
 % $Author$
 % $Date$
 
-nearneighbor = sprintf('nearneighbor');
+nearneighbor = sprintf('nearneighbor -R');
 
 nearneighbor = sprintf('%s -bic',nearneighbor); %for binary input
 
@@ -18,13 +18,6 @@ if isfield(in,'ungriddedfile')
     nearneighbor = sprintf('%s -F -G%s.grd',nearneighbor,file);
 else
     error 'needs in.ungriddedfile '
-end
-
-%lat lon bounds
-if isfield(in,'region')
-    nearneighbor = sprintf('%s -R%s',nearneighbor,in.region);
-else
-    error 'needs se.plotregion'
 end
 
 %increment grid

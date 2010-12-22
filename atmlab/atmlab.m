@@ -153,6 +153,7 @@ A.DEBUG             = false;
 A.ERR               = 2;
 A.EXTRAP            = false;
 A.FMODEL_VERBOSITY  = 0;
+A.OPEN_COMMAND      = NaN;
 A.OUT               = 1;
 A.OUTDIR            = '.';
 A.PDFVIEWER         = NaN;

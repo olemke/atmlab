@@ -1,3 +1,44 @@
+2010-12-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-131
+
+	* geoplots/gmt/create_gmt_earth.m:
+	Made some configure changes.
+
+	* atmlab/atmlab.m:
+	Added persistent variable: OPEN_COMMAND. As there are many file
+	types available for the output figure it makes sense to open the
+	figure using something like 'gnome-open'. e.g. set
+	atmlab('OPEN_COMMAND','gnome-open') in startup.m
+
+	* geoplots/gmt/exec_gmt_cmd.m:
+	Updated in order to keep track of GMT output messages
+
+	* geoplots/gmt/hardcoded_colors.m:
+	* geoplots/gmt/makepolar.m:
+	Smarter color tables. More desirable behaviour.
+
+	* geoplots/gmt/grdimage.m:
+	* geoplots/gmt/pscoast.m:
+	* geoplots/gmt/nearneighbor.m:
+	* geoplots/gmt/psscale.m:
+	* geoplots/gmt/pscontour.m:
+	Use psbasemap to open and close the ps-file and to define the
+	region and projection. Commands that follow the psbasemap call
+	now only need to specify -R -J
+
+	* geoplots/gmt/pslocations.m:
+	Enabled geo-located text without markers
+
+	* geoplots/gmt/grdcontour.m:
+	Fixed so that you can easily plot named contour levels.
+
+	* geoplots/gmt/gmt_plot.m:
+	1) Added short example in help section on how to create a figure
+	2) Added more options to fine tune the appearance of the figure.
+	3) More output figure types: in.figuretype supports pdf,ps,eps,tif, and png
+	4) Catches errors in GMT script call
+
 2010-12-15	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-130

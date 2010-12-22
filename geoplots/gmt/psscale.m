@@ -11,16 +11,25 @@ function command = psscale(file,in)
 
 psscale = sprintf('psscale');
 
-if isfield(in,'tick_annotations') && isempty(in.tick_annotations) 
-    %need equal size boxes for custom annotations
-    psscale = sprintf('%s -Bs::/:%s:',psscale,in.unit);
-elseif isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) 
-    psscale = sprintf('%s -L -B::/:%s:',psscale,in.unit);
-elseif ~isempty(in.tickspacing)
-    % tickspacing (annotation every xth contour), unit (dispay with legend)
-    psscale = sprintf('%s -B%i::/:%s:',psscale,in.tickspacing,in.unit);
-else 
-    psscale = sprintf('%s -B::/:%s:',psscale,in.unit);
+if isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) || ...
+        isfield(in,'equalboxwidth') && in.equalboxwidth || ...
+        any(isfield(in,{'legendbox_spacing','tickcentering'}))
+    
+    psscale = sprintf('%s -L',psscale);
+    
+    if isfield(in,'legendbox_spacing')
+        % tickspacing (annotation every xth contour), unit (dispay with legend)
+        psscale = sprintf('%s%.2f',psscale,in.legendbox_spacing);
+    end
+    if isfield(in,'tickcentering')
+        psscale = sprintf('%si',psscale);
+    end
+end
+    
+if isfield(in,'tickspacing')
+    psscale = sprintf('%s -B%.0f:"%s":/:"%s":',psscale,in.tickspacing,in.xunit,in.unit);
+else
+    psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
 end
 
 if isfield(in,'cptfile')

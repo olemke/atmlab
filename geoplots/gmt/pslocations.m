@@ -9,25 +9,13 @@ function command = pslocations(file,in,command)
 
 for loc = in.locations
     psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);
-    
-    %lat lon bounds
-    if isfield(in.plot,'region')
-        psloc = sprintf('%s -R%s',psloc,in.plot.region);
-    else
-        error 'needs in.region'
-    end
-    
-    %projection type
-    if isfield(in.plot,'proj')
-        psloc = sprintf('%s -J%s',psloc,in.plot.proj);
-    else
-        error 'needs in.proj'
-    end
+    psloc = sprintf('%s -R -J');
     
     shape = 'c0.08i';
-    if isfield(loc,'shape') && ~isempty(loc.shape)
+    if isfield(loc,'shape')
         shape = loc.shape;
     end
+    
     psloc = sprintf('%s -S%s',psloc,shape);
     
     color = 'white';
@@ -38,9 +26,9 @@ for loc = in.locations
     
     % selects Overlay plot mode and assume more pscode will be appended later
     psloc = sprintf('%s -O -K',psloc);
-    
-    command{end+1} = sprintf('%s >> %s.ps',psloc,file);
-    
+    if ~isempty(shape)
+        command{end+1} = sprintf('%s >> %s.ps',psloc,file);
+    end
     if isfield(loc,'name') && ~isempty(loc.name)
         tsize=15;
         if isfield(loc,'textsize') && ~isempty(loc.textsize)

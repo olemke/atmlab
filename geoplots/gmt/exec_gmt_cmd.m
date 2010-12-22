@@ -1,4 +1,4 @@
-function exec_gmt_cmd(cmd, silent)
+function out = exec_gmt_cmd(cmd, verbose)
 %
 % EXEC_GMT_CMD Executes a system command.
 %
@@ -6,24 +6,34 @@ function exec_gmt_cmd(cmd, silent)
 %
 % IN    cmd      Command string
 %
-% OPT   silent   Set to true to not echo the command.
+% OUT   out      A cell containing all stdouts
 %
-% Author: Oliver Lemke
+%
+% OPT   verbose   Set to true to echo the command.
+%
+% Author: Oliver Lemke & Salomon Eliasson
 
 if ~iscell(cmd), cmd = {cmd}; end
 
 cmd = cmd(:);
 
-if ~exist('silent', 'var'), silent=false; end
+if ~exist('verbose', 'var'), verbose=1; end
 
+out = cell(1,length(cmd)); i = 1; % keep track of output messages
 for x = cmd'
     fullcmd = char(x);
 
-    if ~silent, fprintf('%s\n',fullcmd); end
+    if verbose>0, fprintf('%s\n',fullcmd); end
 
-    ret = system(fullcmd);
+    [ret,out{i}] = system(fullcmd);
+    
+    if verbose>0 && ~isempty(out{i})
+        fprintf('%s\n',out{i}(1:end-1))
+    end
+    
     if (ret == 127)
         error('Command not found: "%s"', fullcmd)
     end
+    i = i+1;
 end
 

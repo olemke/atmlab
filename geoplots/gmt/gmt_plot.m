@@ -3,6 +3,7 @@ function filename = gmt_plot(in,field)
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
 % It is assumed that the data is CENTERED at the corresponding lat/lon points.
+% 
 %
 % OUT   filename    The filename of the figure.
 %
@@ -13,7 +14,16 @@ function filename = gmt_plot(in,field)
 %                 data to be plotted. If no field is given, 'datafield' is
 %                 assumed.
 %
-% Structure contents:
+% Easy example: If you just want to plot some data..
+%                 in.somefield = data2plot
+%                 in.lon  = longitudes 
+%                 in.lat  = latitudes
+%
+%                 file = gmt_plot(in,'somefield');
+%
+% SEE BELOW for the rest of the available arguments
+%    
+% Structure contents: 
 %
 % MANDITORY INPUT
 %
@@ -43,12 +53,13 @@ function filename = gmt_plot(in,field)
 % in.figuretype       |'pdf', you can pick 'eps' or 'ps' instead.
 %
 % in.display          | true (if 0, make pdf without displaying figure.
-% in.unit             |e.g: 'g/m^2' displayed over legend
+% in.unit             |e.g: 'g/m^2' displayed on the y-axis of the legend (default axis)
+% in.xunit            | as in.unit except for the x-axis
 % in.varname          |e.g: 'IWP'
 %
 % gmtdefaults:        type 'man gmtdefaults' for behaviour of following options:
 %
-% in.headersize       |e.g: 20  (GMT default = 36p)
+% in.header_size      |e.g: 20  (GMT default = 36p)
 % in.basemap_axis     |e.g 'WSne': prompts which axis need annotations.
 %                      (GMT default = 'WSNE')
 % in.header_offset    |e.g -0.5: puts title right on the axis. (GMT default = 0.5cm)
@@ -114,13 +125,12 @@ function filename = gmt_plot(in,field)
 % in.nanlegend        | false; if you don't want an extra NaN legend
 % in.psscale          | to explicitly set the pscale on the command line
 % in.psscale_nan      | to explicitly set the pscale for NaN legend on the command line
+% in.tickcentering    | Have ticks at the center of the boxes (default=edges)
 % in.tickspacing      | if you want to manually decide how the ticks in the
 %                       legend should be spread. x=> every xth data value,
 %                       1=>same number of ticks as datarange, []= one tick per
 %                       contour level (default behaviour). desirable if you have
 %                       many contour levels.
-% in.legend_orient    |if you want a horisontal/vertical/no legend: 'h'/'v'/''.
-% in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
 % in.tick_annotation_format
 %                     | e.g. '%3.1e'
 % in.tick_length      | length of the ticks
@@ -128,7 +138,13 @@ function filename = gmt_plot(in,field)
 %                     | size of annotations in legend
 % in.tick_annotations | e.g {'','','middle','',''} if you have 5 ticks in legend
 % in.shift_tick_annotations
-%                     | move tick annotions to the right by x inches (e.g 0.5)
+%                     | move tick annotions to the right by x inches (e.g
+%                     0.5)
+% in.equalboxwidth
+%                     | false (-L option)
+% in.legend_orient    |if you want a horisontal/vertical/no legend: 'h'/'v'/''.
+% in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
+% in.legendbox_spacing| space between legend boxes (%d)
 %
 % in.sidebar          |true; gives triangles for lower and higher values
 % in.sizenanlegend    |''; %i = inch , c = cm
@@ -166,6 +182,7 @@ function filename = gmt_plot(in,field)
 % in.locations(x).lon       | Longitude of location marker x
 % in.locations(x).name      | Name of location marker x (optional)
 % in.locations(x).shape     | Shape of location marker x (default: c0.08i)
+%                             if empty => don't draw dot
 % in.locations(x).color     | Color of location marker x (default: white) (and text if textcolor if not given)
 % in.locations(x).textsize  | Size of location text x (default: 15)
 % in.locations(x).textcolor | Color of location text x (default: marker color)
@@ -230,7 +247,8 @@ default.ptype             = 'equal';            % type of contour spacing (Curre
 default.legend            = true;               % show a legend
 default.legend_orient     = 'v';                % orientation of the legend (h = horisontal, v = vertical)
 default.sidebar           = true;               % coloroured triangles for data outside max/min legend
-default.unit              = '-?-';              % unit displayed with legend
+default.unit              = '';                 % unit displayed with legend
+default.xunit             = '';                 % xlabel for the legend
 default.nanlegend         = true;               % include NaNs in the legend
 default.nlevels           = 15;                 % number of contour levels
 default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
@@ -305,39 +323,43 @@ if se.savelegend
     end
 end
 
-if strcmp(se.figuretype,'ps')
-    filename=[se.filename '.ps'];
-else
-    command{end+1} = sprintf('ps2eps -f -B --loose %s.ps ',se.filename);
-    command{end+1} = sprintf('epstool --copy -b %s.eps %s2.eps ',se.filename,se.filename);
-    command{end+1} = sprintf('mv %s2.eps %s.eps ',se.filename,se.filename);
-    command{end+1} = sprintf('rm -f %s.ps ',se.filename);
-    if strcmp(se.figuretype,'pdf')
-        command{end+1} = sprintf('epstopdf %s.eps ',se.filename);
-        command{end+1} = sprintf('rm -f %s.eps ',se.filename);
-    end
-    filename = [se.filename '.' se.figuretype];
+% for figuretypes
+switch se.figuretype
+    case 'pdf'
+        T = '-Tf';
+    case 'eps'
+        T = '-Te';
+    case 'png'
+        T = '-Tg -Qg -Qt';
+    case 'tif'
+        T = '-Tt -Qg -Qt';
+    otherwise
+        error('Atmlab:figuretype','%s: not supported',se.figuretype)
 end
+
+command{end+1} = sprintf('ps2raster %s.ps -A -P %s',se.filename,T);
 
 command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
 
 if ~se.keep_files
-    command{end+1} = sprintf('rm -f %s.{grd,asc} ',se.filename);
-    command{end+1} = sprintf('rm -f *.cpt');
+    command{end+1} = sprintf('rm -f %s.{grd,asc,ps} *.cpt',se.filename);
 end
 
 if isdir(se.outdir)
-    command{end+1} = sprintf('mv %s %s/  ',filename,se.outdir);
+     command{end+1} = sprintf('mv %s.%s %s/  ',se.filename,se.figuretype,se.outdir);
 else
     se.outdir=pwd;
 end
 
-if strcmp(filename(end-2:end),'pdf')
+openwith = NaN;
+if strcmp(se.figuretype,'pdf')
     openwith = atmlab('PDFVIEWER');
-else
+elseif strcmp(se.figuretype,'eps')
     openwith = atmlab('PSVIEWER');
 end
-
+if isnan(openwith)
+    openwith = atmlab('OPEN_COMMAND');
+end
 if isnan(openwith)
     disp('No viewer program defined. ')
     disp('Add something like the following to your startup file')
@@ -346,13 +368,15 @@ if isnan(openwith)
 end
 
 if se.display
-    command{end+1} = sprintf('%s %s/%s &',openwith,se.outdir,filename);
+    command{end+1} = sprintf('%s %s/%s.%s &',openwith,se.outdir,se.filename,se.figuretype);
 end
 
-exec_gmt_cmd(command) % execute commands
+out = exec_gmt_cmd(command,atmlab('VERBOSITY')); % execute commands
 
-filename = sprintf('%s/%s',se.outdir,filename);
-fprintf('GMT plot stored at:  %s\n',filename)
+hunt_down_errors(command,out)
+
+filename = sprintf('%s/%s.%s',se.outdir,se.filename,se.figuretype);
+fprintf('GMT plot stored at:  %s/%s.%s\n',se.outdir,se.filename,se.figuretype)
 
 if se.savelegend
     fprintf('File containing legend is located at: %s\n',legend)
@@ -464,4 +488,36 @@ end
 if ~any(~isnan(se.(field)))                                                     % data?
     error('atmlab:nodata','%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
+end
+
+function hunt_down_errors(command,errors)
+%% Hunt down any errors encounted using GMT
+
+% messages containing any of these are exempted
+error_exeptions = {'warning'}; 
+definite_errors = {'illegal','error'};
+
+% this gives cell{1:nerrors}{1:nerr_exp}
+found_err_exp = cellfun(@(x)(regexp(x,error_exeptions,'ignorecase','once')),errors,'uniformoutput',0);
+found_def_err = cellfun(@(x)(regexp(x,definite_errors,'ignorecase','once')),errors,'uniformoutput',0);
+
+windex = cellfun(@(x)(any(cell2mat(x))),found_err_exp);
+eindex = cellfun(@(x)(any(cell2mat(x))),found_def_err);
+
+Warnings             = errors(windex);
+associated_w_warning = command(windex);
+Errors               = errors(eindex);
+associated_w_errors  = command(eindex);
+
+% display GMT calls containing warning
+if ~isempty(Warnings)
+    fprintf('\nGMT completed with the following warning messages:\n')
+    tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_warning,Warnings,'UniformOutput',0);
+    fprintf('%s\n',[tmp{:}])
+end
+
+% error on GMT errors
+if ~isempty(Errors)
+    tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_errors,Errors,'UniformOutput',0);
+    error('atmlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
 end
