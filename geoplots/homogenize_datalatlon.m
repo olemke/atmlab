@@ -32,3 +32,17 @@ end
 lon = lon-(lon > 180)*360;
 [lon,lnindex] = sort(lon);
 data = data(:,lnindex,:,:);
+
+% Need to remove duplicate data at zeros and instead introduce duplicate
+% data for -180 and 180
+[sv,index] = unique(lon);
+lon = lon(index);
+data = data(:,index,:,:);
+
+if lon(1)==-180 && ~lon(end)==180
+    lon = [lon 180];
+    data = [data data(:,1,:,:)];
+elseif lon(end)==180 && ~lon(1)==-180
+    lon = [-180 lon];
+    data = [data(:,end,:,:) data];
+end

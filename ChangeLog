@@ -1,3 +1,11 @@
+2010-12-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-134
+
+	* geoplots/homogenize_datalatlon.m: 
+	Need to remove duplicate data at zeros and instead introduce
+	duplicate data for -180 and 180, if converting 0:360 lon to -180:180
+
 2010-12-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-133
