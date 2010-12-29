@@ -71,7 +71,7 @@ function filename = gmt_plot(in,field)
 %
 %
 % FOR GRIDDING:
-%
+%       Using nearneighbor
 % in.search           |'30m' ; %search for data within 30arcmin
 % in.increment        |'60m' ; %increment the grid by 60arcmin (1deg)
 %                     | If nothing is given the increment and search radius is
@@ -81,7 +81,8 @@ function filename = gmt_plot(in,field)
 % Projection & grid:
 % in.grdimage         | to explicitly set the grdimage command line
 % in.nearneighbor     | to explicitly set the nearneighbor command line
-% in.projection       |
+%
+% in.projection       | e.g. 'Q'
 % in.center           | Center longitudes to given center
 % in.map_width        | inches
 % in.proj             | e.g. 'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
@@ -89,11 +90,11 @@ function filename = gmt_plot(in,field)
 %
 % COASTLINES:
 % in.pscoast          | to explicitly set the pscoast command line
-% in.pscoast          |pscoast;
-% in.features         |10; km^2; (do not plot features < in.features)
-% in.resolution       |l; available: (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude
-% in.rivers           |'1'; (major rivers), see GMT doc on pscoast for other options
-% in.cwidth           |1; width of coastlines
+%
+% in.features         |10 (do not plot features < in.features) [km^2]
+% in.resolution       |l (available: (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude )
+% in.rivers           |1 (major rivers), see GMT doc on pscoast for other options
+% in.cwidth           |1 width of coastlines
 %
 % COLORS:
 % in.cptfile          | path to any .cpt file generated earlier
@@ -118,13 +119,13 @@ function filename = gmt_plot(in,field)
 %
 %
 % LEGENDS:
+% in.psscale          | to explicitly set the pscale on the command line
+% in.psscale_nan      | to explicitly set the pscale for NaN legend on the command line
 %
 % in.savelegend       | true: if you want to have a separate pdf for the legend
 % in.legend           | false; if you don't want a legend
 % in.nanlegend        | false; if you don't want an extra NaN legend
-% in.psscale          | to explicitly set the pscale on the command line
-% in.psscale_nan      | to explicitly set the pscale for NaN legend on the command line
-% in.tickcentering    | Have ticks at the center of the boxes (default=edges)
+% in.tickcentering    | true; Have ticks at the center of the boxes (default=edges)
 % in.tickspacing      | if you want to manually decide how the ticks in the
 %                       legend should be spread. x=> every xth data value,
 %                       1=>same number of ticks as datarange, []= one tick per
@@ -210,8 +211,7 @@ function filename = gmt_plot(in,field)
 % in.keep_files             | true
 %
 %
-% $Author$
-% $Date$
+% $Id$
 
 if ~exist('field','var') && ~isfield(in,'datafield')
     error('atmlab:input',...
@@ -240,6 +240,10 @@ filename=sort_figures(out,commands);                                            
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
+% CHECK input type
+check_optional_input(in);
+
+% SET DEFAULTS
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
 default.outdir            = atmlab('OUTDIR');   % where to put the figure
@@ -425,7 +429,54 @@ legend = sprintf('%s/legend.pdf',outdir);
 
 
 %% SUBFUNCTIONS FOR SETUP
-%
+%      ||||||
+%      VVVVVV
+function check_optional_input(in)
+%% check_optional_input
+% Note: I want to put all legend things in a structure and all psbox things in a
+% structure
+
+fields = fieldnames(in);
+
+% STRINGS
+checkinput(1,:) = {@ischar,'string'...
+    {'title','outdir','filename','figuretype','unit','xunit',...
+    'varname','ticks','basemap_axis','search','increment','grdimage',...
+    'nearneighbor','projection','proj','region','resolution','cptfile',...
+    'ctable','psscale','psscale_nan','tick_annotation_format',...
+    'legend_orient','legendsize','sizenanlegend','pscoast'}};
+
+% SCALARS/VECTORS
+checkinput(2,:) = {@isnumeric,'scalar/array',...
+{'display','header_size','header_offset','center',...
+    'map_width','features','rivers','cwidth','nlevels','ctable_cspacing',...
+    'ctable_clevels','reference','whiteboxes','savelegend','legend',...
+    'nanlegend','tickcentering','tickspacing','tick_length',...
+    'annot_font_size_primary','shift_tick_annotations','equalboxwidth',...
+    'legendbox_spacing','sidebar','datarange','psbox','psboxes',...
+    'nodata','keep_files'}};
+
+% CELLS
+checkinput(3,:) = {@iscell,'cell',...
+{'gmtset','ctable_colors','tick_annotations','psboxcolor',...
+    'psboxthick','pspoly','pspolycolor','pspolythick'}};
+
+% STRUCTURES
+checkinput(4,:) = {@isstruct,'structure',{'locations','grdcontour'}};
+
+for i = 1:4
+    % test structure arguments: 
+    % e.g. cellfun(@(x)(ischar(in.(x))),{'unit','title'}), 
+    %       where in.title='str'; in.unit='str2';
+    F = fields(ismember(fields,checkinput{i,3}));
+    test = ~cellfun(@(x)(checkinput{i,1}(in.(x))),F);
+    if any(test)
+        err=cellfun(@(x,y)(sprintf('in.%s must be of type: %s',x,y)),...
+            F(test),repmat(checkinput(i,2),length(F(test)),1),'uniformoutput',0);
+        error('atmlab:input','\n%s',err{:})
+    end
+end
+
 function se = nodata(se)                                                        %% NODATA %%
 %% NODATA
 % if you want to only plot coastlines

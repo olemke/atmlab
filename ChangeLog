@@ -1,3 +1,18 @@
+2010-12-29  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-135
+
+	* geoplots/gmt/test_gmt.m:
+	Added function to test gmt_plot. To make sure it is still working
+	if changes have been made to it. It is supposed to test
+	everything, but I've only just started this one.
+
+	* geoplots/gmt/gmt_plot.m (check_optional_input):
+	Introduced input error checks to minimize weird behavior if the
+	input type is incorrect.
+	(hunt_down_errors): 
+	Now keep track of errors and warnings invoked when calling GMT.
+
 2010-12-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-134
