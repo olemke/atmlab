@@ -360,7 +360,7 @@ if in.legend || in.savelegend
     % A little extra legend showig colors of NaNs
     if in.nanlegend
         if strcmp(a.legend_orient,'v')
-            lsize = '25c/-1.3c/0.5c/0.5c';
+            lsize = '25c/-0.5c/0.5c/0.5c';
         elseif strcmp(a.legend_orient,'h')
             lsize = '1c/-1c/0.5c/0.5ch';
         end

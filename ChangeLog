@@ -1,5 +1,14 @@
 2010-12-30  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-137
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Cosmetic fix: Change the vertical offset of the NaN legend for vertical
+	colorbars from -1.3 to -0.5 cm to align it with the bottom of the plot.
+
+2010-12-30  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-136
 
 	* geoplots/gmt/create_gmt_earth.m:
