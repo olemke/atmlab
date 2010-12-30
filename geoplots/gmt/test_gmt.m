@@ -1,6 +1,6 @@
 function test_gmt
 %% TEST_GMT
-% purpose: check that all the elements/options of plot_gmt are still working
+%
 %
 %
 % $ID$
@@ -13,4 +13,4 @@ for j=0:180
     end
 end
 
-gmt_plot(catstruct(test,struct('title','test₂ title²','unit','kg/m²')),'data');
+gmt_plot(catstruct(test,struct('title','test title²','unit','kg/m²')),'data');

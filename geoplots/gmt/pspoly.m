@@ -9,8 +9,6 @@ function commands = pspoly(file,in,commands)
 colors = in.plot.pspoly.colors;
 thick = in.plot.pspoly.thick;
 pp = in.plot.pspoly.pspoly;
-region = in.plot.region;
-proj = in.plot.coast.proj;
 
 for i = 1:size(pp,1)    
     %stdin
@@ -29,7 +27,7 @@ for i = 1:size(pp,1)
     stdin = [stdin,a{size(ppcur,1)+1},' D'];
     
     command = sprintf('echo -e "%s" |',stdin);
-    command = sprintf('%s psxy -R%s -J%s -A',command,region,proj);
+    command = sprintf('%s psxy -R -J -A',command);
     
     % color and size of box
     

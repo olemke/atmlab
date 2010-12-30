@@ -145,9 +145,7 @@ if isfield(in,'grdcontour')                                                     
     in.plot.grdcontour = mkgrdcontour(in);
 end
 
-if ~in.nodata
-    [in.plot.legend,in.plot.nanlegend] = mklegend(in);                          % Legend/s
-end
+[in.plot.legend,in.plot.nanlegend] = mklegend(in);                          % Legend/s
 
 in.plot.lastbasemap = last_psbasemap(in);                                       % Close file with this
 
@@ -332,7 +330,7 @@ function [a,b] = mklegend(in)                                                   
 % What I need:
 % unit, nticks, legend_orient, legendsize, sidebar, cptfile
 
-if in.legend || in.savelegend
+if isfield(in,'field') && (in.legend || in.savelegend) %if not field then nodata
     % get what is already in the in-structure
     F = {'xunit','unit','nticks','legend_orient','legendsize','sidebar','cptfile'};
     for f = F(ismember(F,fieldnames(in)))

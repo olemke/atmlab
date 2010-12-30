@@ -1,3 +1,16 @@
+2010-12-30  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-138
+
+	* geoplots/gmt/test_gmt.m: A bit more
+
+	* geoplots/gmt/gmt_plot.m: Fixed check input for scalars or logicals
+
+	* geoplots/gmt/pspoly.m: Use -R and -J from psbasemap instead
+
+	* geoplots/gmt/create_gmt_earth.m: fixed small bug related to
+	plotting only coastlines.
+
 2010-12-30  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-137
