@@ -1,3 +1,11 @@
+2010-12-30  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-136
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Fix plot alignment and position of NaN legend for horizontal colorbars.
+
 2010-12-29  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-135

@@ -353,7 +353,7 @@ if in.legend || in.savelegend
     if ~exist('a','var'), a = struct([]); end
     a = optargs_struct(a,default);
     
-    sz = {'25c/5.9c/10c/0.5c','12c/0/18c/0.5ch -Ya-1'};
+    sz = {'25c/5.9c/10c/0.5c','12c/-1c/18c/0.5ch'};
     default.legendsize = sz{ strcmp(a.legend_orient,'h') +1 };
     a = optargs_struct(a,default);
     
@@ -362,7 +362,7 @@ if in.legend || in.savelegend
         if strcmp(a.legend_orient,'v')
             lsize = '25c/-1.3c/0.5c/0.5c';
         elseif strcmp(a.legend_orient,'h')
-            lsize = '1c/0/0.5c/0.5ch';
+            lsize = '1c/-1c/0.5c/0.5ch';
         end
         b = sprintf('psscale -Bs/:NaN: -Ccolor_nan.cpt -D%s -O -K >> %s.ps',lsize,in.filename);
     end
