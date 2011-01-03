@@ -6,7 +6,7 @@ function theta = potential_temperature(rh, T, p)
 %   standard pressure, p0, typically 100 kPa 
 %   (REF: http://amsglossary.allenpress.com/glossary/)
 %
-% FORMAT    theta = potential_temperature(T, es, p, rh)
+% FORMAT    theta = potential_temperature(rh, T, p)
 %        
 % OUT   theta   potential temperature [K]
 % IN    rh  relative humidity [%, rh > 0], it can be a scalar or a tensor

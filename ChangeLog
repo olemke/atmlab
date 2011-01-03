@@ -1,3 +1,10 @@
+2010-01-03	Isaac Moradi	<isaac.moradi@ltu.se>
+
+	* atmlab-1-0-109
+
+	* h2o/thermodynamics/potential_temperature.m:
+	- Amended the documentation
+
 2010-12-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-138
@@ -537,6 +544,7 @@
 	correct at least for mean and interpolation. Not sure if a generic
 	approach to this (by converting to "linear space") is actually possible.
 
+>>>>>>> .r6699
 2010-11-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-108
