@@ -1,3 +1,18 @@
+2011-01-04	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-111
+
+	* geoplots/land_sea_mask.m -> math/land_sea_mask.m: Moved
+	- I really don't think land_sea_mask belongs in geoplots. Math is not
+	ideal either but already better, as it's quite generic (e.g. shouldn't
+	be in 'sensors' or so either).
+
+	* math/land_sea_mask: Adapted
+	- Added functionality to read new land-water-masks from atmlab-data,
+	as well as functionality to list all of those. Retains backward
+	compatibility. I chose to add it here rather than to create a new
+	function to prevent balkanisation.
+
 2011-01-03  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-110
