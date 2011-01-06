@@ -65,7 +65,11 @@ for lineno = lines
     data_line(i) = cell2struct(cellfun(@(v) readfield(fp, v, def_line, record_size*lineno), fields_line, 'UniformOutput', false), fields_line, 2);
 end
 
-varargout = {data_head, data_line};
+if exist('data_line', 'var')
+    varargout = {data_head, data_line};
+else
+    varargout = {data_head};
+end
 
 end
 function val = readfield(fp, f, def, varargin)
@@ -77,18 +81,14 @@ fseek(fp, offset+def.(f).Start_Octet-1, 'bof');
 ws = def.(f).Word_Size;
 nw = def.(f).Number_of_Words;
 skip = 0;
+nbits = num2str(ws*8);
 switch def.(f).Data_Type
     case 'i'
-        type = ['int' num2str(ws*8)];
+        type = ['int' nbits '=>int' nbits];
         sz = nw;
     case 'u'
-        type = ['uint' num2str(ws*8)];
+        type = ['uint' nbits '=>uint' nbits];
         sz = nw;
-        if isbitpacked(def.(f).Id)
-            type = '3*ubit10';
-            skip = 2;
-            sz = 3*nw;
-        end
     case 'c'
         type = 'uint8=>char';
         sz = uint16(ws)*nw;
@@ -98,8 +98,4 @@ switch def.(f).Data_Type
             f, def.(f).Data_Type);
 end
 val = fread(fp, sz, type, skip);
-end
-
-function n = isbitpacked(s)
-n = strcmp(s, 'avh_video'); 
 end
