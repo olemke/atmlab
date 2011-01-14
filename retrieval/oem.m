@@ -821,7 +821,7 @@ end
 
   if O.J
     if O.sxnorm
-      X.J = J ./ repmat( xnorm', size(X.J,1) , 1 );
+      X.J = J ./ repmat( xnorm', size(J,1) , 1 );
     else
       X.J = J;
     end
@@ -829,7 +829,7 @@ end
 
   if O.G
     if O.sxnorm
-      X.G = G .* repmat( xnorm, 1, size(X.G,2) );
+      X.G = G .* repmat( xnorm, 1, size(G,2) );
     else
       X.G = G;
     end
