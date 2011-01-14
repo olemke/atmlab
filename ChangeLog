@@ -1,3 +1,8 @@
+2011-01-14    Ajil Kottyil    <ajil.kottyil@ltu.se>
+        * atmlab-1-0-114
+
+         * geoplots/gmt/create_gmt_earth.m: fixed small bug.
+ 
 2011-01-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-113

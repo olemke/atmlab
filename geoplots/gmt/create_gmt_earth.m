@@ -330,7 +330,7 @@ function [a,b] = mklegend(in)                                                   
 % What I need:
 % unit, nticks, legend_orient, legendsize, sidebar, cptfile
 
-if isfield(in,'field') && (in.legend || in.savelegend) %if not field then nodata
+if isfield(in,'fieldname') && (in.legend || in.savelegend) %if not field then nodata
     % get what is already in the in-structure
     F = {'xunit','unit','nticks','legend_orient','legendsize','sidebar','cptfile'};
     for f = F(ismember(F,fieldnames(in)))
