@@ -1,3 +1,9 @@
+2011-01-18  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-117
+
+	* geoplots/gmt/test_gmt.m: Add another test case.
+
 2011-01-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-116

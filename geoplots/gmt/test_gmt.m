@@ -43,3 +43,32 @@ tmp{15} = 'black';
 tmp{20} = 'red';
 a.tick_annotations = tmp; clear tmp
 gmt_plot(catstruct(in,test,a,struct('ticks','30g30/15g15','head_size',20,'map_width',15,'basemap_axis','NeSW','region','-90/90/-30/90')),'data');
+
+clear test;
+% TEST CUSTOM CONTOURS
+test.lat = -90:90;
+test.lon = -180:180;
+for j = test.lat
+    for i = test.lon
+        test.data(j+91,i+181) = ((0.1*sin((j+91)/18*pi))+sin((j+91)/180*pi))*(0.1*cos(i/36*pi)+cos(i/360*pi));
+    end
+end
+
+test.title = 'contours, -HSV colours, horiz. legend';
+test.unit = 'No unit';
+test.xunit = 'No unit either';
+test.projection = 'H';
+test.nlevels = 10;
+test.tick_annotation_format = '%.1lf';
+test.legend_orient = 'h';
+test.grdcontour.spacing=0.1;
+test.grdcontour.range=[0 1];
+test.grdcontour.linethick=1;
+test.grdcontour.more='-T1c/0.001c:LH';
+test.datarange = [0, 1];
+test.color_background = '255/0/0';
+test.color_foreground = '255/255/0';
+test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
+test.colorrange.color_model = '-HSV';
+
+gmt_plot (test, 'data');
