@@ -1,4 +1,4 @@
-function test_gmt(in)
+function files = test_gmt(in)
 %% TEST_GMT
 %
 % Purpose: To test variuos aspecs of gmt_plot. Especially before commiting
@@ -20,15 +20,16 @@ for j=0:180
     end
 end
 
+files = {};
 % TEST TITLE
 test.title = 'title² and unit';
 test.data = data;
-gmt_plot(catstruct(in,test,struct('unit','kg/m²')),'data');
+files{end+1} = gmt_plot(catstruct(in,test,struct('unit','kg/m²')),'data');
 % 
 % % TEST SIDEBAR, NAN, PROJECTION, CENTER
 test.data(20:30,20:30) = NaN;
 test.title = 'upper sidebar, nan, Hammer projection, center';
-gmt_plot(catstruct(in,test,struct('projection','H','center',180,'datarange',[160,250])),'data');
+files{end+1} = gmt_plot(catstruct(in,test,struct('projection','H','center',180,'datarange',[160,250])),'data');
 
 % TEST custom color table, header_size, map_width, grid lines, NeSW
 test.title = 'custom color, annotations,header_size, map_width, tight grid, NeSW, region';
@@ -36,13 +37,9 @@ test.data = data;
 a.colorrange.colors      = {{0,'0/0/255'},{0.3,'255/255/255'},{0.5,'0/255/0'},{.7,'0/0/0'},{1,'255/0/0'}};
 a.colorrange.color_model = 'RGB';
 tmp = cell(1,20);
-tmp{1} = 'blue';
-tmp{6} = 'white';
-tmp{10} = 'green';
-tmp{15} = 'black';
-tmp{20} = 'red';
+tmp{1} = 'blue'; tmp{6} = 'white'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
 a.tick_annotations = tmp; clear tmp
-gmt_plot(catstruct(in,test,a,struct('ticks','30g30/15g15','head_size',20,'map_width',15,'basemap_axis','NeSW','region','-90/90/-30/90')),'data');
+files{end+1} = gmt_plot(catstruct(in,test,a,struct('ticks','30g30/15g15','head_size',20,'map_width',15,'basemap_axis','NeSW','region','-90/90/-30/90')),'data');
 
 clear test;
 % TEST CUSTOM CONTOURS
@@ -72,4 +69,30 @@ test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
 
-gmt_plot (test, 'data');
+files{end+1} = gmt_plot (test, 'data');
+
+clear test
+% TEST LOCATIONS
+names = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki','Oberstdorf','Tehran','Amsterdam','Lauchhammer','Freiburg'};
+lats = [67.85 -27.48 48.83 53.1 9.9 47.3 35.7 52.4 51.5 48];
+lons = [20.216 153 9.2 8 77 10.22 51.5 4.77 13.77 7.85];
+textcolor = repmat({'black'},1,length(names)); textcolor{1} = 'red';
+color = repmat({'green'},1,length(names)); color{3} = 'yellow';
+textalign = {'M','R','LM','LB','CL','LT','LT','RM','LM','RM'};
+textsize = [15,15,7,7,15,7,15,7,7,7];
+shape = repmat({'c0.08i'},1,length(names));shape{3} = 'd0.1i';
+for i = 1:length(names)
+    test.locations(i).lat = lats(i);
+    test.locations(i).lon = lons(i);
+    test.locations(i).name = names{i};
+    test.locations(i).shape = shape{i};
+    %
+    test.locations(i).color = color{i};
+    test.locations(i).textsize = textsize(i);
+    test.locations(i).textcolor= textcolor{i};
+    test.locations(i).textalign = textalign{i};
+end
+test.title = 'SatGroup locations';
+test.nodata = true;
+test.region = '-20/160/-30/70';
+files{end+1} = gmt_plot(test);

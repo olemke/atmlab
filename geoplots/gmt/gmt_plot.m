@@ -277,13 +277,9 @@ default.legend            = true;               % show a legend
 default.legend_orient     = 'v';                % orientation of the legend (h = horisontal, v = vertical)
 default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
-default.nanlegend         = any(isnan(in.(field)(:))); % include NaNs in the legend
 default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
 default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 
-in = optargs_struct(in,default);
-
-default.datarange         = getdatarange(in,field);
 if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
 
 in = optargs_struct(in,default);
@@ -304,7 +300,9 @@ if ~ismember(field,fieldnames(in))
 end
 
 in.fieldname  = field;
-
+default.nanlegend=any(isnan(in.(field)(:))); % include NaNs in the legend
+default.datarange         = getdatarange(in,field);
+in = optargs_struct(in,default);
 default.stepsize          = getstepsize(in); % color level datastep interval
 default.sidebar           = getsidebar(in); % coloroured triangles for data outside max/min legend
 in = optargs_struct(in,default);

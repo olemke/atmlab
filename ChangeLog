@@ -1,3 +1,14 @@
+2011-01-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-119
+
+	* geoplots/gmt/test_gmt.m: Added another test (locations), and
+	output the location of all files produced.
+
+	* geoplots/gmt/gmt_plot.m: Fixed bug if in.nodata=1
+
+	* geoplots/gmt/pslocations.m: removed contour around text
+
 2011-01-18  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-118

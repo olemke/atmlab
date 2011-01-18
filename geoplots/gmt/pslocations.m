@@ -49,7 +49,7 @@ for loc = in.locations
         if isfield(loc,'textcolor') && ~isempty(loc.textcolor)
             color = loc.textcolor;
         end
-        pstxt = sprintf('%s -Sthin -G%s',pstxt,color);
+        pstxt = sprintf('%s -G%s',pstxt,color);
         
         % selects Overlay plot mode and assume more pscode will be appended later
         pstxt = sprintf('%s -O -K',pstxt);
