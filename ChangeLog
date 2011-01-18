@@ -1,5 +1,13 @@
 2011-01-18  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-118
+
+	* geoplots/gmt/test_gmt.m: Change -HSV to HSV.
+
+	* geoplots/gmt/gmt_plot.m: Update color_model docs.
+
+2011-01-18  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-117
 
 	* geoplots/gmt/test_gmt.m: Add another test case.

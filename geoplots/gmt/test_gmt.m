@@ -54,7 +54,7 @@ for j = test.lat
     end
 end
 
-test.title = 'contours, -HSV colours, horiz. legend';
+test.title = 'contours, HSV colours, horiz. legend';
 test.unit = 'No unit';
 test.xunit = 'No unit either';
 test.projection = 'H';
@@ -69,6 +69,7 @@ test.datarange = [0, 1];
 test.color_background = '255/0/0';
 test.color_foreground = '255/255/0';
 test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
-test.colorrange.color_model = '-HSV';
+test.colorrange.color_model = 'HSV';
+test.nlevels = 5;
 
 gmt_plot (test, 'data');

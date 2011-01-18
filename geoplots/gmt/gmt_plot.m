@@ -129,7 +129,7 @@ function filename = gmt_plot(in,field)
 % 
 % in.colorrange.colors      | {{%d,'color'},{%d,'color2'},etc.} 
 %              color can be give as e.g. '255/0/0' (red in RGB)
-% in.colorrange.color_model |  'RGB', '+HSV', or '-HSV'
+% in.colorrange.color_model |  'RGB', 'HSV, or '+HSV'
 %
 %
 % LEGENDS:
