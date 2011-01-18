@@ -8,12 +8,14 @@ function commands = create_gmt_earth(in)
 % $Author$
 % $Date$
 
-in = setup_create_gmt_earth(in);                                                % Most options are assigned here
+in = setup_create_gmt_earth(in);                                           
 
-file = in.filename;
+F = in.filename;
 
-commands{1} = sprintf('rm -f %s.{ps,eps}',file);                                % Remove earlier .ps files
+% Remove earlier .ps and gmt residules
+commands{1} = sprintf('rm -f %s.{ps,eps}',F);                                
 commands{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
+
 commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      % Set paper sizeBASEMAP_AXES
 
 if isfield(in,'header_size')                                                    % Size of title
@@ -38,7 +40,7 @@ commands{end+1} = in.plot.basemap;
 if isfield(in,'nearneighbor')                                                   % Nearneighbor
     commands{end+1} = in.nearneighbor;
 elseif ~in.grid && isfield(in.plot,'grid')
-    commands{end+1} = nearneighbor(file,in.plot.grid);
+    commands{end+1} = nearneighbor(F,in.plot.grid);
 end
 
 
@@ -47,23 +49,23 @@ if isfield(in,'grdimage')                                                  % Ima
         commands{end+1} = in.grdimage;
     end
 elseif ~in.nodata && strcmp(in.plot.plotimage.name,'grdimage')
-    commands{end+1} = grdimage(file,in.plot.plotimage);
+    commands{end+1} = grdimage(F,in.plot.plotimage);
 end
 
 if isfield(in,'pscoast')                                                        % Coastlines
     commands{end+1} = in.pscoast;
 else
-    commands{end+1} = pscoast(file,in.plot.coast);
+    commands{end+1} = pscoast(F,in.plot.coast);
 end
 
 if isfield(in,'locations')                                                      % Location markers
-    commands = pslocations(file,in,commands); %internally adds several commands
+    commands = pslocations(F,in,commands); %internally adds several commands
 end
 
 if isfield(in.plot,'grdcontour') && ~isempty(in.grdcontour)                       % Contourlines
     % currently out of order.....
     for i = 1:length(in.plot.grdcontour)
-        commands{end+1} = grdcontour(file,in.plot.grdcontour(i));
+        commands{end+1} = grdcontour(F,in.plot.grdcontour(i));
     end
 end
 
@@ -71,17 +73,17 @@ if isfield(in,'psxy')                                                           
     commands{end+1} = in.psxy;
 end
 if isfield(in,'psbox') || isfield(in.plot,'psbox')
-    commands = psbox(file,in,commands); %internally adds several commands
+    commands = psbox(F,in,commands); %internally adds several commands
 end
 
 if isfield(in.plot,'pspoly')
-    commands = pspoly(file,in,commands); %internally adds several commands
+    commands = pspoly(F,in,commands); %internally adds several commands
 end
 
 if isfield(in,'psscale')                                                        
     commands{end+1} = in.psscale;
 elseif ~isempty(in.plot.legend)                                                 % Legend
-    commands{end+1} = psscale(file,in.plot.legend);
+    commands{end+1} = psscale(F,in.plot.legend);
 end
 
 if isfield(in,'psscale_nan')                                                    
@@ -233,12 +235,14 @@ prtstr = '%.12f';
 % MAKE a custom colour table based on manually input color values
 if isfield(in,'ctable_colors')
     in.ctable = 'hardcoded';
+elseif isfield(in,'colorrange')
+    in.ctable = 'colorrange';
 end
 
 % OR use some of the other definded color tables
-if ~isfield(in,'ctable_clevels')
+if any(strcmp(in.ctable,{'hardcoded','mypolar'}))
     tickval=ownctable(in);
-else
+elseif isfield(in,'ctable_clevels')
     tickval = in.ctable_clevels;
 end
 
@@ -246,23 +250,29 @@ end
 switch in.ctable    
     case 'hardcoded'
         a.cptfile = hardcoded_colors(tickval,prtstr,in);
-    case 'myrainbow'
-        a.cptfile = makerainbow(tickval,prtstr,in.ptype);
     case 'mypolar'
         a.cptfile = makepolar(tickval,prtstr,in);        
-    case 'cold2hot'
-        a.cptfile = makehot(tickval,prtstr,'cold2hot');
-    case 'hot2cold'
-        a.cptfile = makehot(tickval,prtstr,'hot2cold');
+    case 'colorrange'
+        cpt_from_colorrange(in.colorrange);
+        a.cptfile = makecpt(in);
     otherwise
         disp('processing makecpt')
-        a.cptfile = makecpt(in);
+        if ~isfield(in,'makecpt')
+            a.cptfile = makecpt(in);
+        else
+            exec_gmt_cmd(in.makecpt);
+            tmp = regexp(in.makecpt,'> ','split');
+            a.cptfile = tmp{2};
+        end
 end
 
+if isfield(in,'tick_annotations')
+    append_tickannotations(a.cptfile,in.tick_annotations);
+end
 % extra legend box for missing values
-if isempty(dir('color_nan.cpt')), xtra_nan_legend; end %if it's not there, make it
-a.cptnan = 'color_nan.cpt';
-a.nlevels = in.nlevels;
+if in.nanlegend
+    a.cptnan = xtra_nan_legend(in);
+end
 
 function a = mkpltimage(in)                                                     %% mkpltimage %%
 %% mkpltimage %%
@@ -351,17 +361,22 @@ if isfield(in,'fieldname') && (in.legend || in.savelegend) %if not field then no
     if ~exist('a','var'), a = struct([]); end
     a = optargs_struct(a,default);
     
-    sz = {'25c/5.9c/10c/0.5c','12c/-1c/18c/0.5ch'};
+    %sz = {'25c/5.9c/10c/0.5c','12c/-1c/18c/0.5ch'};
+    szdef = {[9.8 2.3 3.9 .2],[4.7 -0.4 7.1 .2]}; %inches matching map_width = 9i
+    
+    tmp = sprintf('%.2fi/',szdef{1}*in.map_width/9); sz{1} = tmp(1:end-1);
+    tmp = sprintf('%.2fi/',szdef{2}*in.map_width/9); sz{2} = [tmp(1:end-1) 'h'];
+
+    
     default.legendsize = sz{ strcmp(a.legend_orient,'h') +1 };
     a = optargs_struct(a,default);
     
     % A little extra legend showig colors of NaNs
     if in.nanlegend
-        if strcmp(a.legend_orient,'v')
-            lsize = '25c/-0.5c/0.5c/0.5c';
-        elseif strcmp(a.legend_orient,'h')
-            lsize = '1c/-1c/0.5c/0.5ch';
-        end
+        nandef = {[9.84 -.2 .2 .2],[.4 -.4 .2 2]};
+        tmp = sprintf('%.2fi/',nandef{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
+        tmp = sprintf('%.2fi/',nandef{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
+        lsize = nsz{ strcmp(a.legend_orient,'h') +1 };
         b = sprintf('psscale -Bs/:NaN: -Ccolor_nan.cpt -D%s -O -K >> %s.ps',lsize,in.filename);
     end
     
@@ -388,20 +403,11 @@ if ~exist('a','var'), a = struct([]);end
 function tickval = ownctable(in)                                       %% ownctable %%
 %% ownctable %%
 
-switch in.ptype
-    case 'equal'
-        minn = in.datarange(1);maxx = in.datarange(2);
-        if minn==maxx,maxx=maxx+1;end
-        if isfield(in,'ctable_cspacing')
-            tickval = minn:in.ctable_cspacing:maxx;
-        else
-        %step sizes
-        inc = (maxx - minn) /in.nlevels;
-        tickval = minn:inc:maxx;
-        end 
-    otherwise
-        error ('atmlab:input','Currently the only available ptype is "equidistant"')
+minn = in.datarange(1);maxx = in.datarange(2);
+if minn==maxx
+    maxx=maxx+1;
 end
+tickval = minn:in.stepsize:maxx;
 
 function out = setup_psboxpoly(in, field)                                       %% ps box %%
 %% ps box 

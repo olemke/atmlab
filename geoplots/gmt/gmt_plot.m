@@ -1,4 +1,5 @@
 function filename = gmt_plot(in,field)
+%% gmt_plot
 %
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
@@ -59,7 +60,7 @@ function filename = gmt_plot(in,field)
 %
 % gmtdefaults:        type 'man gmtdefaults' for behaviour of following options:
 %
-% in.ticks            |'40g20/20g20'; annotations on major lines (e.g 40 xaxis,20 yaxis)
+% in.ticks            |'60g60/30g30'; annotations on major lines (e.g 40 xaxis,20 yaxis)
 %                     and plot minor lines (e.g 20 xaxis & yaxis)
 % in.header_size      |e.g: 20  (GMT default = 36p)
 % in.basemap_axis     |e.g 'WSne': prompts which axis need annotations.
@@ -97,25 +98,38 @@ function filename = gmt_plot(in,field)
 % in.cwidth           |1 width of coastlines
 %
 % COLORS:
+%
+% in.color_background | set the background color (values less than range)
+% in.color_foreground | set the foreground color (values greater tham range)
+% in.color_nan        | set the color of NaNs
 % in.cptfile          | path to any .cpt file generated earlier
-% in.nlevels          | refers to the number of contour levels
-% in.ctable_cspacing  | The spacein between contour levels starting from
-%                       datarange(1) (e.g. 5). This overrides in.nlevels
+% in.nlevels          | refers to the number of contour levels (converted to stepsize using datarange)
+% in.stepsize         | The stepsize between data values. This overrides nlevels (-T/min/max/stepsize in makecpt)
+%
 % For your own color table. Specify the contour levels and colors directly (need both) 
 % in.ctable_clevels   | e.g. [1000 1002 1015 1030]
 % in.ctable_colors    | e.g. {[0 0 0],[155 0 0],[255 0 0],[0 0 0],[255 255 255]}
 %                         has to be in vector RGB format and the last 2 elements
 %                         are background and foreground colors
 %
-% in.ctable           |See GMT color paletts. There are two additional color tables,
-%                     | 'myrainbow' and 'mypolar' (nice for difference plots)
-%     if strcmp(in.ctable,'mypolar')
-%               in.reference  | Default == mean(data). Recommend in.reference = 0 for difference
-%                             | plots, but any reference works.
+% in.ctable           |See GMT color paletts. 'mypolar' is a nice colortable for difference plots.
+%                     if strcmp(in.ctable,'mypolar')
+%                       in.reference == mean(data(:)). (default)
+%                       % Recommend set in.reference = 0 for difference plots,
+%                       % but any reference works.
+%                     
+%                       in.whiteboxes | The number of white contours around a reference value
+%                     end
 %
-%               in.whiteboxes | Choose the number of white contours around
-%                             | a reference value
-%     end
+% For your own custom colortable use in.colorrange.colors (see below). Assign a
+% color to a relative value, e.g between 0-1, where 0 is for the minimum of the
+% datarange and 1 is for the color of the maximum datarange. For example,
+% in.colorrange.colors = {{0,'red'},{.3,'black'},{0.5,'green'},{1,'blue'}},
+% makes a colortable that goes from red to black to green to blue.
+% 
+% in.colorrange.colors      | {{%d,'color'},{%d,'color2'},etc.} 
+%              color can be give as e.g. '255/0/0' (red in RGB)
+% in.colorrange.color_model |  'RGB', '+HSV', or '-HSV'
 %
 %
 % LEGENDS:
@@ -146,7 +160,7 @@ function filename = gmt_plot(in,field)
 % in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
 % in.legendbox_spacing| space between legend boxes (%d)
 %
-% in.sidebar          |true; gives triangles for lower and higher values
+% in.sidebar          |0,1,2,or 3. Indicates none, bellow range only, above -||-, or both
 % in.sizenanlegend    |''; %i = inch , c = cm
 %
 % VALUE RANGE
@@ -211,7 +225,8 @@ function filename = gmt_plot(in,field)
 % in.keep_files             | true
 %
 %
-% $Id$
+% $Author$
+% $Date$
 
 if ~exist('field','var') && ~isfield(in,'datafield') && ...
         isfield(in,'nodata') && ~in.nodata
@@ -257,26 +272,19 @@ default.title             = '';                 % no title by default
 default.nodata            = false;              % true if you only want the map
 default.savelegend        = false;              % make an additional pdf-file only containing the legend
 default.keep_files        = false;              % keep intermediate files (debugging)
-default.ctable            = 'myrainbow';        % color palette (myrainbow is done in MATLAB)
-default.ptype             = 'equal';            % type of contour spacing (Currently the only one)
-
+default.ctable            = 'rainbow';          % color palette
 default.legend            = true;               % show a legend
 default.legend_orient     = 'v';                % orientation of the legend (h = horisontal, v = vertical)
-default.sidebar           = true;               % coloroured triangles for data outside max/min legend
 default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
-default.nanlegend         = true;               % include NaNs in the legend
-default.nlevels           = 15;                 % number of contour levels
+default.nanlegend         = any(isnan(in.(field)(:))); % include NaNs in the legend
 default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
 default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 
-
 in = optargs_struct(in,default);
 
-if ~isempty(in.title)
-    default.filename = in.title;
-else default.filename = 'default';
-end
+default.datarange         = getdatarange(in,field);
+if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
 
 in = optargs_struct(in,default);
 
@@ -291,14 +299,15 @@ if in.nodata
     return
 end
 
-default.datarange         = [min(in.(field)(:)) max(in.(field)(:))];            % contour intervals
-in = optargs_struct(in,default);
-
 if ~ismember(field,fieldnames(in))
      error('atmlab:input','no field by the name of "%s" in struct',field)
 end
 
 in.fieldname  = field;
+
+default.stepsize          = getstepsize(in); % color level datastep interval
+default.sidebar           = getsidebar(in); % coloroured triangles for data outside max/min legend
+in = optargs_struct(in,default);
 
 if ndims(in.(field))>2
     error('atmlab:input','Too many dimensions in in.%s',field)
@@ -327,6 +336,7 @@ isdata(in,field)
 
 % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
 [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
+
 
 function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
@@ -441,29 +451,28 @@ fields = fieldnames(in);
 
 % STRINGS
 checkinput(1,:) = {@ischar,'string'...
-    {'title','outdir','filename','figuretype','unit','xunit',...
-    'varname','ticks','basemap_axis','search','increment','grdimage',...
-    'nearneighbor','projection','proj','region','resolution','cptfile',...
-    'ctable','psscale','psscale_nan','tick_annotation_format',...
-    'legend_orient','legendsize','sizenanlegend','pscoast'}};
+     {'basemap_axis','cptfile','ctable','figuretype','filename','grdimage',...
+     'increment','legend_orient','legendsize','nearneighbor','outdir','proj',...
+     'projection','pscoast','psscale','psscale_nan','region','resolution',...
+     'search','sizenanlegend','tick_annotation_format','ticks','title','unit',...
+     'varname','xunit'}};
 
 % SCALARS/VECTORS
 checkinput(2,:) = {@(x)(isnumeric(x) | islogical(x)),'scalar/array',...
-{'display','header_size','header_offset','center',...
-    'map_width','features','rivers','cwidth','nlevels','ctable_cspacing',...
-    'ctable_clevels','reference','whiteboxes','savelegend','legend',...
-    'nanlegend','tickcentering','tickspacing','tick_length',...
-    'annot_font_size_primary','shift_tick_annotations','equalboxwidth',...
-    'legendbox_spacing','sidebar','datarange','psbox','psboxes',...
-    'nodata','keep_files'}};
+    {'annot_font_size_primary','center','ctable_clevels','cwidth','datarange',...
+    'display','equalboxwidth','features','header_offset','header_size',...
+    'keep_files','legend','legendbox_spacing','map_width','nanlegend','nlevels',...
+    'nodata','psbox','psboxes','reference','rivers','savelegend',...
+    'shift_tick_annotations','sidebar','stepsize','tick_length',...
+    'tickcentering','tickspacing','whiteboxes'}};
 
 % CELLS
 checkinput(3,:) = {@iscell,'cell',...
-{'gmtset','ctable_colors','tick_annotations','psboxcolor',...
-    'psboxthick','pspoly','pspolycolor','pspolythick'}};
+    {'ctable_colors','gmtset','psboxcolor','psboxthick','pspoly',...
+    'pspolycolor','pspolythick','tick_annotations'}};
 
 % STRUCTURES
-checkinput(4,:) = {@isstruct,'structure',{'locations','grdcontour'}};
+checkinput(4,:) = {@isstruct,'structure',{'colorrange','grdcontour','locations'}};
 
 for i = 1:4
     % test structure arguments: 
@@ -477,6 +486,42 @@ for i = 1:4
         error('atmlab:input','\n%s',err{:})
     end
 end
+
+function datarange = getdatarange(in,field)
+%% getdatarange
+
+
+d = [min(in.(field)(:)) max(in.(field)(:))];
+if d(2)-(1)>10
+    datarange = [floor(d(1)) ceil(d(2))];
+else
+    datarange = d;
+end
+
+
+function stepsize = getstepsize(in)
+%% getstepsize
+
+% default-ish number of levels
+x = 20;
+diff = in.datarange(2)-in.datarange(1);
+
+if all(isfield(in,{'stepsize','nlevels'}))
+    warning('atmlab:input','in.stepsize overrides in.nlevels')
+elseif ~isfield(in,'stepsize') && isfield(in,'nlevels')
+    stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
+elseif diff >= x
+    stepsize = floor((diff-1)/x)+1;
+else stepsize = diff/x;
+end
+
+function sidebar = getsidebar(in)
+%% color level datastep interval
+% sidebar can have the values 0,1,2,3 (none, bellow only, above only, both). 
+
+sidebar =  ( min(in.(in.fieldname)(:))<in.datarange(1) ) + ...
+    2* ( max(in.(in.fieldname)(:))>in.datarange(2) );
+
 
 function se = nodata(se)                                                        %% NODATA %%
 %% NODATA

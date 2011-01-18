@@ -14,18 +14,10 @@ function filecpt = hardcoded_colors(tickval,prtstr,in)
 % Salomon Eliasson
 
 colors = in.ctable_colors;
-BG = colors{1};   % background colour (low extreme)
-FG = colors{end}; % foreground colour (high extreme)
 
 % string format to file 
-strannot = isfield(in,'tick_annotations') && ~isempty(in.tick_annotations);
-if strannot
-    strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
-        prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f',' ;%s','\n');
-else
-    strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
-        prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
-end
+strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
+    prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
 filecpt = 'own_colortable.cpt';
 fid = fopen(filecpt,'w');

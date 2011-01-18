@@ -1,0 +1,43 @@
+function filecpt = cpt_from_colorrange(colorrange)
+%% cpt_from_colorrange
+%
+% Purpose: Make a colortable file with desired color values and ranges, that
+% will be passed in the makecpt function that uses this input to make a color
+% that can be used by GMT.
+%
+% USAGE: e.g. file = cpt_from_colorrange(struct('colors',{{{0.25,'255/255/255'},{0.75,'0/0/0'}}},'color_model','RGB'))
+%
+% IN: structure.
+%    colors = {{value,'color'},{value2,'color2'},etc.}; (manditory)
+%    color_model = 'RGB', '+HSV', or '-HSV'
+%
+%
+% OUT: filename
+%
+% $Author$
+% $Date$
+
+% MODEL
+if ~isfield(colorrange,'color_model')
+    model = 'RGB';
+else
+    model = colorrange.color_model;
+end
+C = colorrange.colors;
+strtot = strcat('%.2f\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\n');
+    
+%print COLORBAR to file
+filecpt = sprintf('colorrange.cpt');
+fid = fopen(filecpt,'w');
+
+fprintf(fid,'%s\n','#cpt file created by: cpt_from_colorrange.m');
+fprintf(fid,'%s\n',sprintf('#COLOR_MODEL = %s',model));
+
+for ii = 1:length(C)-1
+    val   = C{ii}{1}; val2 = C{ii+1}{1};
+    color = regexp(C{ii}{2},'/','split'); color2 = regexp(C{ii+1}{2},'/','split'); 
+    fprintf(fid,strtot,val,color{1},color{2},color{3},...
+        val2,color2{1},color2{2},color2{3});
+end
+
+fclose(fid);

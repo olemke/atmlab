@@ -4,31 +4,31 @@ function cptfile = makecpt(se)
 % purpose:  
 %       Appends options to a short script and calls the GMT
 %       command makecpt.
+% 
+% se: structure: fields = 'datarange', 'ctable'
 %
 % list of colortables found at /usr/lib/gmt/share/cpt/
 %
 % $Author$
 % $Date$
 
-makecpt = sprintf('makecpt');
-if isfield(se,'ctable')
-  makecpt = sprintf('%s -C%s',makecpt,se.ctable);
-else
-  makecpt = sprintf('%s -Crainbow',makecpt);
-end
-if ~isfield(se,'nlevels')
-  se.nlevels = 15;
-end
-if isfield(se,'datarange')
-  mi = se.datarange(1);
-  mx = se.datarange(2);
-  step = (mx-mi)/se.nlevels;
-  makecpt = sprintf('%s -T%d/%d/%d',makecpt,mi,mx,step);
- else
-   error 'need the the min & max values of the data'
-end
+mkcpt = sprintf('makecpt -C%s',se.ctable);
 
+mi = se.datarange(1);
+mx = se.datarange(2);
+step = se.stepsize;
+mkcpt = sprintf('%s -T%d/%d/%d',mkcpt,mi,mx,step);
+
+if isfield(se,'color_nan')
+    mkcpt = sprintf('%s --COLOR_NAN=%s',mkcpt,se.color_nan);
+end
+if isfield(se,'color_background')
+    mkcpt = sprintf('%s --COLOR_BACKGROUND=%s',mkcpt,se.color_background);
+end
+if isfield(se,'color_foreground')
+    mkcpt = sprintf('%s --COLOR_FOREGROUND=%s',mkcpt,se.color_foreground);
+end
 cptfile = 'ctable.cpt';
-command = sprintf('%s > %s',makecpt,cptfile);
+command = sprintf('%s > %s',mkcpt,cptfile);
 
-exec_gmt_cmd(command)
+exec_gmt_cmd(command);

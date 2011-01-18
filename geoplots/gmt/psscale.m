@@ -2,9 +2,7 @@ function command = psscale(file,in)
 %% psscale
 %
 % purpose:
-%       appends options to a  short script and calls the GMT
-%       command psscale appending options.
-%
+%       Appends options to a short script to be later called with all GMT scripts
 %
 % $Author$
 % $Date$
@@ -43,7 +41,17 @@ if isfield(in,'legendsize')
 end
 
 if in.sidebar %i.e the triangles bellow the min and above the max values
-    psscale = sprintf('%s -E',psscale);
+    switch in.sidebar
+        case 1
+            str = '-Eb';
+        case 2
+            str = '-Ef';
+        case 3
+            str = '-E';
+        otherwise
+            error('atmlab:input','error in determining sidebar')
+    end
+    psscale = sprintf('%s %s',psscale,str);
 end
 
 % selects Overlay plot mode and assume more pscode will be appended later

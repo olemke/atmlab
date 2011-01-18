@@ -1,3 +1,59 @@
+2011-01-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-116
+
+	* geoplots/gmt/append_tickannotations.m: Added function that makes
+	it easy to change the legend annotations to whatever you want.
+
+	* geoplots/gmt/cpt_from_colorrange.m: Added function to create
+	your own color table (see help gmt_plot))
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- in.colorrange.colors: Included shiny new option to easy create
+	    your own color table. Basically, if you want a color table that
+	    goes from e.g. blue-red-black, define where these colors should be
+	    between 0-1, where 0 refers to min(datarange) and 1 to
+	    max(datarange).
+	    Usage: e.g. {{0,'0/0/255'}{.5,'255/0/0'}{1,'0/0/0'}}.
+	    in.colorrange.color_model is used to specify '+HSV','-HSV',or
+	    'RGB' (default='RGB')
+	- in.ctable: Removed my own colortable except for mypolar, which
+	             is a well suited color table for difference plots.
+	- in.stepsize: Replaces in.ctable_cspaceing. in.stepsize is for
+ 	               the data-color levels.
+	- in.sidebar: For triangles indicating data outside datarange in
+	              legend. 0 (none), 1 (below), 2 (above), 3 (bellow and
+	              above). This is determined automatically by default.
+	-in.ctable:    default has changed to GMT's 'rainbow' palette.
+	-in.nanlegend: default is true only if there are NaNs in the data.
+	-in.datarange: For data range > 10, use floor and ceil for cleaner
+	               data intervals.
+
+	See help section for more details.
+
+	* geoplots/gmt/makecpt.m: Added user options: COLOR_NAN (for NaN
+	values), COLOR_FOREGROUND (for data > max(datarange)), and
+	COLOR_BACKGROUND ((for data < max(datarange))).
+
+	* geoplots/gmt/create_gmt_earth.m: Automatically scale the legend
+	according to the map size.
+
+	* geoplots/gmt/xtra_nan_legend.m: Always call this function,
+	unless userspec in.nanlegend = 0 or there are no NaNs in the data
+
+	* geoplots/gmt/psscale.m: Only display sidebars to legend if there
+	is data outside the given data range.
+
+	* geoplots/gmt/hardcoded_colors.m: rm frivolous stuff. Basically
+	this whole function is frivolous now due to the introduction of
+	geoplots/gmt/cpt_from_colorrange.m, and I'll probably remove it
+	later on.
+
+	* geoplots/gmt/test_gmt.m: Added more test runs.
+
+	* geoplots/gmt/*.m: svn:keywords "Date Author Id"
+
 2011-01-14  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-1-0-115
