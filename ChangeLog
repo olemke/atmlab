@@ -1,5 +1,12 @@
 2011-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-121
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot):Fixed small bug that I just
+	introduced in the last commit.
+
+2011-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-120
 
 	* geoplots/gmt/test_gmt.m: Cleaned up a bit, especially making

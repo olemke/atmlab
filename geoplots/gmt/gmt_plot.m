@@ -278,11 +278,12 @@ default.xunit             = '';                 % xlabel for the legend
 default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
 default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 
-if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
-
 in = optargs_struct(in,default);
 
 % replace bad symbols for filename and mask them for the title
+if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
+in = optargs_struct(in,default);
+
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
