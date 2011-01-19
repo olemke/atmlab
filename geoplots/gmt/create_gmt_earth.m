@@ -16,35 +16,43 @@ F = in.filename;
 commands{1} = sprintf('rm -f %s.{ps,eps}',F);                                
 commands{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
 
-commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      % Set paper sizeBASEMAP_AXES
+% Set paper size
+commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      
 
-if isfield(in,'header_size')                                                    % Size of title
+% Size of title
+if isfield(in,'header_size')                                                    
     commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %dp',in.header_size);
 end
-if isfield(in,'basemap_axis')                                                   % Annotations of axis
+
+% Annotations of axis
+if isfield(in,'basemap_axis')                                                   
     commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
 end
-if isfield(in,'header_offset')                                                  % Distance from axis to Annotation
+
+% Verticle distance from plot to title
+if isfield(in,'header_offset')                                                  
     commands{end+1} = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
 end
 
+% other gmtset-commands you might have
 if isfield(in,'gmtset')
     for i = length(in.gmtset)
         commands{end+1} = in.gmtset{i}; %#ok<*AGROW>
     end
 end
 
-% PSBASEMAP
+% PSBASEMAP (open PS-file)
 commands{end+1} = in.plot.basemap;
 
-if isfield(in,'nearneighbor')                                                   % Nearneighbor
+% NEARNEIGHBOR
+if isfield(in,'nearneighbor')                                                   
     commands{end+1} = in.nearneighbor;
-elseif ~in.grid && isfield(in.plot,'grid')
+elseif ~in.gridded && isfield(in.plot,'grid')
     commands{end+1} = nearneighbor(F,in.plot.grid);
 end
 
-
-if isfield(in,'grdimage')                                                  % Image
+% IMAGE
+if isfield(in,'grdimage')                                                  
     if ~isempty(in.grdimage)
         commands{end+1} = in.grdimage;
     end
@@ -52,47 +60,50 @@ elseif ~in.nodata && strcmp(in.plot.plotimage.name,'grdimage')
     commands{end+1} = grdimage(F,in.plot.plotimage);
 end
 
-if isfield(in,'pscoast')                                                        % Coastlines
+% COASTLINES
+if isfield(in,'pscoast')                                                        
     commands{end+1} = in.pscoast;
 else
     commands{end+1} = pscoast(F,in.plot.coast);
 end
 
-if isfield(in,'locations')                                                      % Location markers
-    commands = pslocations(F,in,commands); %internally adds several commands
+% LOCATION MARKERS
+if isfield(in,'locations')                                                      
+    commands = pslocations(F,in,commands);
 end
 
-if isfield(in.plot,'grdcontour') && ~isempty(in.grdcontour)                       % Contourlines
-    % currently out of order.....
+% CONTOURLINES
+if isfield(in.plot,'grdcontour') && ~isempty(in.grdcontour)                       
     for i = 1:length(in.plot.grdcontour)
         commands{end+1} = grdcontour(F,in.plot.grdcontour(i));
     end
 end
 
-if isfield(in,'psxy')                                                           % Psbox
+% PSBOX (draw boxes or shapes on map)
+if isfield(in,'psxy')                                                           
     commands{end+1} = in.psxy;
-end
-if isfield(in,'psbox') || isfield(in.plot,'psbox')
-    commands = psbox(F,in,commands); %internally adds several commands
-end
-
-if isfield(in.plot,'pspoly')
-    commands = pspoly(F,in,commands); %internally adds several commands
+elseif isfield(in,'psbox') || isfield(in.plot,'psbox')
+    commands = psbox(F,in,commands);
+elseif isfield(in.plot,'pspoly')
+    commands = pspoly(F,in,commands);
 end
 
+% LEGEND
 if isfield(in,'psscale')                                                        
     commands{end+1} = in.psscale;
-elseif ~isempty(in.plot.legend)                                                 % Legend
+elseif ~isempty(in.plot.legend)
     commands{end+1} = psscale(F,in.plot.legend);
 end
 
+% NaN legend
 if isfield(in,'psscale_nan')                                                    
     commands{end+1} = in.psscale_nan;
 elseif ~isempty(in.plot.nanlegend)
-    commands{end+1} = in.plot.nanlegend;                                        % NaN Legend
+    commands{end+1} = in.plot.nanlegend;
 end
 
-commands{end+1} = in.plot.lastbasemap;                                           % close it + grid
+% CLOSE PS + GRID
+commands{end+1} = in.plot.lastbasemap;
 
 %%%%%%%%%%%%%%%%%
 %  SUBFUNCTIONS
@@ -102,7 +113,7 @@ function in = setup_create_gmt_earth(in)
 %% setup_create_gmt_earth %%
 
 if ~isfield(in,'region')                                                        % REGION
-    if in.grid && in.lon(end)+in.lon(end)-in.lon(end-1) == in.lon(1)+360
+    if in.gridded && in.lon(end)+in.lon(end)-in.lon(end-1) == in.lon(1)+360
         in.plot.region = sprintf('-180/180/%d/%d',in.lat(1),in.lat(end));
     else
         in.plot.region = sprintf('%d/%d/%d/%d',...
@@ -119,7 +130,7 @@ end
 
 in.plot.basemap = setupbasemap(in);
 
-if ~in.grid && ~isfield(in,'nearneighbor') && ~in.nodata                        % GRIDDING
+if ~in.gridded && ~isfield(in,'nearneighbor') && ~in.nodata                        % GRIDDING
     in.plot.grid = mkgrid(in);
 end
 
@@ -437,17 +448,27 @@ out.(field)=in.(field);
 function basemap = last_psbasemap(in)
 %% last_psbasemap
 
-rg = textscan(in.plot.region','%f','delimiter','/');
-ln=rg{1}(2)-rg{1}(1);
-lt=rg{1}(4)-rg{1}(3);
+% default.ticks = '60g60/30g30' (global)
+% in.plot.region has this format: 'lon1/lon2/lat1/lat2'
+x = cellfun(@(x)(str2double(x)),regexp(in.plot.region,'/','split'));
+lon=x(2)-x(1);
+lat=x(4)-x(3);
 
-if ~isfield(in,'ticks')
-    x1=ln/9; x2=x1/(1+(round(ln/lt)>=2));
-    x3=lt/9; x4=x3/(1+(round(lt/ln)>=2));
-    fac=10^(floor(log10(x1)));
-    ticks = sprintf('%3.1fg%3.1f/%3.1fg%3.1f',...
-        round(x1/fac)*fac,round(x2/fac)*fac,round(x3/fac)*fac,round(x4/fac)*fac);
-else ticks = in.ticks;
-end
+% for nice step lengths
 
-basemap = sprintf('psbasemap -B%s -R -J -O >> %s.ps',ticks,in.filename);
+% lons
+as   = [240 180 120 90 60 30 15];
+step = [60 40 30 20 15 10 5];
+a = step(~(as>lon));
+if isempty(a), a = lon/6; end
+
+%lats
+bs   = [120 60 90 40 30 20 15];
+step = [60 40 30 20 10 5 2.5];
+b = step(~(bs>lat));
+if isempty(b), b = lat/3; end
+
+default.ticks = sprintf('%.2fg%.2f/%.2fg%.2f',a(1),b(1),a(1)/2,b(1)/2);
+in = optargs_struct(in,default);
+
+basemap = sprintf('psbasemap -B%s -R -J -O >> %s.ps',in.ticks,in.filename);

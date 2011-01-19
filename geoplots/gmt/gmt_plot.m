@@ -51,13 +51,11 @@ function filename = gmt_plot(in,field)
 % in.title            |'string';
 % in.outdir           |'name/a/directory'
 % in.filename         |'yourfilename', default generated from title
-% in.figuretype       |'pdf', you can pick 'eps' or 'ps' instead.
+% in.figuretype       |'pdf','eps','png', or 'tif'. (pdf is default)
 %
 % in.display          | true (if 0, make pdf without displaying figure.
 % in.unit             |e.g: 'g/m^2' displayed on the y-axis of the legend (default axis)
 % in.xunit            | as in.unit except for the x-axis
-% in.varname          |e.g: 'IWP'
-%
 % gmtdefaults:        type 'man gmtdefaults' for behaviour of following options:
 %
 % in.ticks            |'60g60/30g30'; annotations on major lines (e.g 40 xaxis,20 yaxis)
@@ -84,7 +82,7 @@ function filename = gmt_plot(in,field)
 % in.nearneighbor     | to explicitly set the nearneighbor command line
 %
 % in.projection       | e.g. 'Q'
-% in.center           | Center longitudes to given center
+% in.center           | Center map at given center longitude
 % in.map_width        | inches
 % in.proj             | e.g. 'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
 % in.region           | e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
@@ -237,7 +235,7 @@ elseif ~exist('field','var')
 end
 out = set_GMT_plot(in,field);                                                   % setup
 
-if out.grid
+if out.gridded
     out.grdfile = [out.filename '.grd'];
     write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                     % writegmt (gridded)
     fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
@@ -264,7 +262,7 @@ default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
 default.outdir            = atmlab('OUTDIR');   % where to put the figure
 default.map_width         = 9;                  % inches
-default.ticks             = '60g60/30g30';      % grid majorx'deg'minorx/majory'deg'minory
+%default.ticks             = '60g60/30g30';      % grid majorx'deg'minorx/majory'deg'minory (this is set in create_gmt_earth instead)
 default.projection        = 'Q';                % Cylindrical Equidistant Projection. Projection Will only work with format: 'Q0/9i' ('%s%3.0f/%ii'in.projection,in.center,in.map_width))
                                                 % otherwise specify in.proj explicitly with the full projection command
 
@@ -333,8 +331,9 @@ in = isgridded(in,field);
 isdata(in,field)
 
 % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
-[in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
-
+if in.gridded
+    [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
+end
 
 function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
@@ -347,7 +346,7 @@ if se.savelegend
     end
 end
 
-% for figuretypes
+% for figuretypes (pdf,eps,png, or tif)
 switch se.figuretype
     case 'pdf'
         T = '-Tf';
@@ -384,18 +383,21 @@ end
 if isnan(openwith)
     openwith = atmlab('OPEN_COMMAND');
 end
-if isnan(openwith)
-    disp('No viewer program defined. ')
-    disp('Add something like the following to your startup file')
-    disp('To view PS files with ghost view: atmlab( ''PSVIEWER'',''gv'');')
-    disp('To view PDF files with ex pee dee eff: atmlab( ''PDFVIEWER'',''xpdf -z width'');')
-end
-
-if se.display
+if se.display && ~any(isnan(openwith))
     command{end+1} = sprintf('%s %s/%s.%s &',openwith,se.outdir,se.filename,se.figuretype);
 end
 
 out = exec_gmt_cmd(command,atmlab('VERBOSITY')); % execute commands
+
+if any(isnan(openwith))
+    disp(' ')
+    disp('>> No viewer program defined. ')
+    disp('>> Add something like the following to your startup file')
+    disp('>> atmlab( ''PSVIEWER'',''gv'');             %% view PS files with ghost view: ')
+    disp('>> atmlab( ''PDFVIEWER'',''xpdf -z width''); %% view PDF files with xpdf')
+    disp('>> atmlab(''OPEN_COMMAND'',''gnome-open'');  %% Or use the default viewer for the computer for any filetypes')
+    disp(' ')
+end
 
 hunt_down_errors(command,out)
 
@@ -453,7 +455,7 @@ checkinput(1,:) = {@ischar,'string'...
      'increment','legend_orient','legendsize','nearneighbor','outdir','proj',...
      'projection','pscoast','psscale','psscale_nan','region','resolution',...
      'search','sizenanlegend','tick_annotation_format','ticks','title','unit',...
-     'varname','xunit'}};
+     'xunit'}};
 
 % SCALARS/VECTORS
 checkinput(2,:) = {@(x)(isnumeric(x) | islogical(x)),'scalar/array',...
@@ -527,7 +529,7 @@ function se = nodata(se)                                                        
 
 se.sidebar = false;
 se.legend  = false;
-se.grid    = false;
+se.gridded    = false;
 se.nlevels = 1;
 if isfield(se,'region')
 elseif ~isfield(se,'region') && all(isfield(se,{'lat','lon'}))
@@ -563,16 +565,18 @@ if ~ig
     se.(field) = se.(field)(:);
     se.lat = se.lat(:);
     se.lon = se.lon(:);
-    if ~isfield(se,'grid'), se.grid = false; end
+    if ~isfield(se,'gridded'), se.gridded = false; end
     txt1 = 'is NOT';txt2='1';txt3='is';
 else
     if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
-    if ~isfield(se,'grid'), se.grid = true; end
+    if ~isfield(se,'gridded')
+        se.gridded = true;
+    end
     txt1 = 'is';txt2='0';txt3='isn''t';
 end
 
 fprintf('Assuming the data %s gridded...\n',txt1)
-fprintf('Include structure argument se.grid=%s if it %s.\n',txt2,txt3)
+fprintf('Include structure argument se.gridded=%s if it %s.\n',txt2,txt3)
 fprintf('max data value: %3.1d\nmin data value: %3.1d\n',max(se.(field)(:)),min(se.(field)(:)))
 
 function isdata(se,field)                                                       %% ISDATA %%
@@ -583,7 +587,7 @@ if ~isempty(field)                                                              
         error('atmlab:input','The field: "%s" is not in the structure',field)
     end
     
-    if se.grid
+    if se.gridded
         if ~ ( size(se.(field),1) == length(se.lat) && ...
                 size(se.(field),2) == length(se.lon) )
             error('atmlab:input','in.%s must have the dimensions (lat,lon)',field)

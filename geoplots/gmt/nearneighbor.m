@@ -35,7 +35,4 @@ else
     error 'needs in.search'
 end
 
-% selects Overlay plot mode and assuming more pscode will be appended
-nearneighbor = sprintf('%s -O -K',nearneighbor);
-
 command = sprintf('%s >> %s.ps',nearneighbor,file);

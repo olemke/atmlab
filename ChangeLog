@@ -1,3 +1,23 @@
+2011-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-120
+
+	* geoplots/gmt/test_gmt.m: Cleaned up a bit, especially making
+	each test a subfunction and included the option to run a subset of
+	tests if you want. e.g. in.tests = [1 2 4]. Default is to run all
+	tests. Also included some additional tests.
+
+	* geoplots/homogenize_datalatlon.m: Catch error if the function is
+	called with ungridded data as input.
+
+	* geoplots/gmt/gmt_plot.m: in.grid is now in.gridded and option
+	in.varname is removed
+
+	* geoplots/gmt/create_gmt_earth.m: Automatically pick a suitable
+	map tick interval, if in.ticks is not given.
+
+	* geoplots/gmt/nearneighbor.m: removed -O -K
+
 2011-01-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-119

@@ -11,6 +11,10 @@ function [data,lat,lon] = homogenize_datalatlon(data,lat,lon)
 % $Author$
 % $Date$
 
+if isequal(size(data),size(lat),size(lon))
+    error('atmlab:input','data does not appear to be gridded')
+end
+
 %flip so that dimensions are data(lat,lon)
 x = 1:ndims(data);
 if length(lon)==size(data,1) && length(lat)==size(data,2)
