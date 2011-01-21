@@ -1,3 +1,11 @@
+2011-01-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-122
+
+	* arts/qarts.m: Added field ABS_WSMS.
+
+	* arts/qarts2cfile.m: Added handling of field ABS_WSMS.
+
 2011-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-121

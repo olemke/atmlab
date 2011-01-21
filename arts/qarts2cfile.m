@@ -497,6 +497,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       %
       T = add_includes( T, 'Q.ABS_MODELS', Q.ABS_MODELS );
       %
+      if qarts_isset( Q.ABS_WSMS )
+        T = add_wsms( T, 'ABS_WSMS', Q.ABS_WSMS );
+      end
     end
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
