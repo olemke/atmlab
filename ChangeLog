@@ -1,3 +1,9 @@
+2011-01-24  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-124
+
+	* geoplots/gmt/gmt_plot.m: Reviewed docs.
+
 2011-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-123

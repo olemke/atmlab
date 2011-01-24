@@ -1,13 +1,11 @@
 function filename = gmt_plot(in,field)
-%% gmt_plot
-%
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
 % It is assumed that the data is CENTERED at the corresponding 
 % lat/lon points.
 % 
 %
-% OUT   filename    The filename of the figure.
+% OUT   filename  The filename of the figure.
 %
 % IN    in        A structure with input data and options. See below for
 %                 a detailed description of the structure.
@@ -27,17 +25,17 @@ function filename = gmt_plot(in,field)
 %    
 % Structure contents: 
 %
-% MANDITORY INPUT
+% MANDATORY INPUT
 %
 % 1) in.(field) % the data (default is field='datafield' i.e. in.datafield)
 % 2) in.lat     % the corresponding latitudes
 % 3) in.lon     % the corresponding longitudes
 %
 % If your data is ungridded the dimensions must be:
-% length(in.lon) = length(in.lat) = length(in.(field))
+% length(in.lon) == length(in.lat) == length(in.(field))
 %
 % If your data is gridded the data MUST have the dimensions:
-% [length(in.lat),lenght(in.lon)] = size(in.(field));
+% [length(in.lat),length(in.lon)] == size(in.(field));
 %  << transpose: in.(field) = in.(field)'; if this is not the case >>
 %
 % NOTE: 1) If your data is UNGRIDDED I recommend setting:
@@ -47,12 +45,12 @@ function filename = gmt_plot(in,field)
 %
 % HOW TO READ VARIABLE DESCRIPTION OF OPTIONAL VARIABLES: 
 %
-%% KEY: in.variable   |Type| Explaination/Example |Default value/behaviour| 
+%% KEY: in.variable   |Type| Explanation/Example |Default value/behavior| 
 %
 %                  types: %s=character or string
 %                         %f=numeric/logical
 %                         {}=cell
-%                  defualt: []=means there is no default value/behaviour.
+%                  default: []=means there is no default value/behaviour.
 %--------------------------------------------------------------------------
 %
 % GENERAL:
@@ -75,7 +73,7 @@ function filename = gmt_plot(in,field)
 %                     E.g '60g50/30g20'. Adds annotations to  major lines
 %                     (e.g 60 xaxis (lon),50 yaxis (lat)) and displays
 %                     minor lines at (e.g 30 xaxis,20 yaxis)
-%                     | determinded by input lat/lon range. |
+%                     | determined by input lat/lon range. |
 %                     ------------
 % in.header_size      |%f| Title size | 36 [p] |
 %                     ------------
@@ -83,15 +81,16 @@ function filename = gmt_plot(in,field)
 %                     E.g. 'WSne', annotates West and South of the map.
 %                     | 'WSNE' |
 %                     ------------
-% in.header_offset    |%f| Moves the title i y-dir on the page | 0.5 [cm] |
+% in.header_offset    |%f| Moves the title in y-dir on the page | 0.5 [cm] |
 %                     ------------
 % in.gmtset           |{%s,%s,...}|
 %                     Cell with one or more gmtset commands. 
-%                     E.g. in.gmtset={'gmtset D_FORMAT %3.1e','ect'} | []|
+%                     E.g. in.gmtset={'gmtset D_FORMAT %3.1e','gmtset ...'}
+%                     | [] |
 %                     ------------
 % in.nodata           |%f| 
 %                     If you only want a map (compatible with all options)
-%                     |[]|
+%                     | [] |
 %                     ------------
 % in.keep_files       |%f| 
 %                     If you don't want to delete intermediate files
@@ -102,16 +101,16 @@ function filename = gmt_plot(in,field)
 % PROJECTION, GRID, COASTLINES:
 % 
 % in.region           |%s|
-%                     E.g '-180/180/-90/90'=global range, defined from 
+%                     E.g. '-180/180/-90/90'=global range, defined from 
 %                      sprintf('%d/%d/%d/%d',lon1,lon2,lat1,lat2)
-%                     | determinded by input lat/lon range. |
+%                     | determined by input lat/lon range. |
 %                     ------------
 % in.nearneighbor     |%s|
-%                     E.G 'nearneighbor OPT > filename.ps', explicitly sets
+%                     E.g. 'nearneighbor OPT > filename.ps', explicitly sets
 %                     the nearneighbor GMT command directly. If 
 %                     in.nearneighbor is a structure, it'll use the
-%                     strcture arguments to generate the command.
-%                     |[]|
+%                     structure arguments to generate the command.
+%                     | [] |
 %                     ----------------------
 %
 % in.nearneighhbor.   | STRUCTURE with one or more of the following fields:  
@@ -145,7 +144,7 @@ function filename = gmt_plot(in,field)
 %                     ----------------------
 % in.coast            |%s|
 %                     If you don't want coastlines, set to false. If
-%                     in.coast is a structure, it'll use the strcture
+%                     in.coast is a structure, it'll use the structure
 %                     arguments to generate the pscoast command.
 %                     | create coastlines |
 %                     ----------------------
@@ -163,7 +162,7 @@ function filename = gmt_plot(in,field)
 %                     Display rivers. pscoast -Ioption (1-10, a,r,i,c)
 %                     | '1' (major rivers) |
 %                     ------------
-%  width              |%i| Width of coastlines |.3|
+%  width              |%i| Width of coastlines | .3 |
 %                     ----------------------
 %
 %--------------------------------------------------------------------------
@@ -175,18 +174,19 @@ function filename = gmt_plot(in,field)
 %                     | [min(data) max(data)] |
 %                     ------------
 % in.grdimage         |%s|
-%                     E.G 'grdimage OPT > filename.ps', explicitly sets
+%                     E.g. 'grdimage OPT > filename.ps', explicitly sets
 %                     the grdimage GMT command directly.
-%                     |[]|
+%                     | [] |
 %                     ------------
 % in.makecpt          |%s|
-%                     E.G 'makecpt OPT > filename.ps', explicitly sets the 
+%                     E.g. 'makecpt OPT > filename.ps', explicitly sets the 
 %                     makecpt GMT command directly.
-%                     |[]|
+%                     | [] |
 %                     ------------
-% in.cptfile          |%s| Path to any .cpt file generatedpreviously| [] |
+% in.cptfile          |%s| Path to any .cpt file generated previously
+%                     | [] |
 %                     ------------
-% in.ctable           |%s| See GMT color paletts | 'rainbow' |
+% in.ctable           |%s| See GMT color palettes | 'rainbow' |
 %
 %                     NOTE: 'mypolar' is a nice colortable for difference
 %                     plots, and there are two additional optional 
@@ -209,14 +209,15 @@ function filename = gmt_plot(in,field)
 %                     ------------
 % in.color_foreground |%s|
 %                     Set the foreground color (values greater than range)
-%                     |'255/255/255' ('white') |
+%                     | '255/255/255' ('white') |
 %                     ------------
-% in.color_nan        |%s| Set the color of NaNs  |'125/125/125' ('grey')|
+% in.color_nan        |%s| Set the color of NaNs
+%                     | '125/125/125' ('grey') |
 %                     ------------
 % in.nlevels          |%d| 
 %                     Refers to the number of contour levels (converted to
 %                     stepsize using datarange)
-%                     |20|
+%                     | 20 |
 %                     ------------
 % in.stepsize         |%d| 
 %                     The stepsize between data values. This overrides
@@ -231,7 +232,7 @@ function filename = gmt_plot(in,field)
 % in.colorrange.colors = {{0,'red'},{.3,'black'},{0.5,'green'},{1,'blue'}},
 % makes a colortable that goes from red to black to green to blue. 
 % Naturally you can also use the 'contour values' directly as long as you
-% give assign all levels a color.
+% assign all levels a color.
 % 
 %                     ----------------------
 % in.colorrange.      | STRUCTURE with one or more of the following fields:
@@ -239,46 +240,46 @@ function filename = gmt_plot(in,field)
 %  colors             | {{%d,%s},{%d,%s},etc.}
 %                     %d is the data value, %s is the color 
 %                     (e.g. {20,'255/0/0'} (red in RGB))
-%                     |[]|
+%                     | [] |
 %                     ------------
 %  color_model        |%s|
 %                     'RGB', 'HSV, or '+HSV'
-%                     |'RGB'|
+%                     | 'RGB' |
 %                     ----------------------
 %
 %------------------------------------------------------------------------------------
 % LEGENDS:
 %
 % in.pscale           |%s|
-%                     E.G 'psscale OPT > filename.ps', explicitly sets the 
+%                     E.g. 'psscale OPT > filename.ps', explicitly sets the 
 %                     psscale GMT command for the legend directly.
-%                     |[]|
+%                     | [] |
 %                     ------------
 % in.pscale_nan       |%s|
-%                     E.G 'psscale OPT > filename.ps', explicitly sets the 
+%                     E.g. 'psscale OPT > filename.ps', explicitly sets the 
 %                     psscale GMT command for the NaN legend directly.
-%                     |[]|
+%                     | [] |
 %                     ------------
 % in.savelegend       |%f|
 %                     if you want to have a separate pdf for the legend
-%                     |[]|
+%                     | [] |
 %                     ------------
 % in.nanlegend        |%f| 
 %                     Set to false if you don't want an extra NaN legend
-%                     | true is there are NaN values in the data | 
+%                     | true if there are NaN values in the data | 
 %                     ------------
 % in.legend           |%f|
 %                     Set to false if you don't want a legend. if in.legend
 %                     is a structure, it's equivalent to in.legend = true
-%                     |true|
+%                     | true |
 %                     ----------------------
 %
 % in.legend.          | STRUCTURE with one or more of the following fields:  
 %
 %  annot_font_size_primary
-%                     |%f| Size of annotations in legend  |[]|
+%                     |%f| Size of annotations in legend  | [] |
 %                     ------------
-%  box_spacing        |%f| Space between legend boxes | 0 (side by side)|
+%  box_spacing        |%f| Space between legend boxes | 0 (side by side) |
 %                     ------------
 %  dimensions         |%s| 
 %                     e.g '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
@@ -292,37 +293,37 @@ function filename = gmt_plot(in,field)
 %                     If the legend color boxes have to be the same size, 1
 %                     | false (-L option) |
 %                     ------------                        
-%  orientatation      |%s|
-%                     if you want a horist./vert. legend input 'h'/'v.
-%                     |determined by map dimensions|
+%  orientation        |%s|
+%                     if you want a horizontal/vertical legend input 'h'/'v.
+%                     | determined by map dimensions |
 %                     ------------
 %  shift_tick_annotations
 %                     |%f| 
-%                     Move tick annotions to the right by x inches
-%                     |[]|
+%                     Move tick annotations to the right by x inches
+%                     | [] |
 %                     ------------
 %  sidebar            |%f|
-%                     Input scalar 0,1,2,or 3. Indicates none,
+%                     Input scalar 0, 1, 2, or 3. Indicates none,
 %                     below range only, above range, or both
 %                     | determined from data |
 %                     ------------
 %  tick_annotations   |{%s,%s,...}|
-%                     E.g {'','','middle','',''}.
+%                     E.g. {'','','middle','',''}.
 %                     Number of annotations must be = nlevels.
-%                     |[]|
+%                     | [] |
 %                     ------------
 %  tick_annotation_format
-%                     |%s
+%                     |%s|
 %                     E.g. '%3.1e'
-%                     |[]|
+%                     | [] |
 %                     ------------
 %  tick_centering     |%f|
 %                     Have ticks at the center of the boxes
-%                     |false (edges)|
+%                     | false (edges) |
 %                     ------------
 %  tick_length        |%f|
 %                     The length of the ticks
-%                     |[]|
+%                     | [] |
 %                     ------------
 %  tick_spacing       |%f| 
 %                     If you want to manually decide how the ticks in the
@@ -337,7 +338,7 @@ function filename = gmt_plot(in,field)
 %------------------------------------------------------------------------------------                   
 % PLOT LOCATION MARKERS:
 %
-%  for muliple locations define all fields according to : 
+%  for multiple locations define all fields according to : 
 %  in.locations(1).name = 'x',
 %  in.locations(2).name = 'y', etc...
 %
@@ -345,27 +346,27 @@ function filename = gmt_plot(in,field)
 %
 % in.locations.       | Structure with one or more of the following fields:  
 %
-%  lat (manditory)    |%f| Latitude of marker |[]|
+%  lat (mandatory)    |%f| Latitude of marker | [] |
 %                     ------------
-%  lon (manditory)    |%f| Longitude of marker |[]|
+%  lon (mandatory)    |%f| Longitude of marker | [] |
 %                     ------------
-%  name               |%s| Name of marker |[]|
+%  name               |%s| Name of marker | [] |
 %                     ------------
 %  shape              |%s| Shape of marker
-%                     |'c0.08i' (filled circle,diameter=.08)|
+%                     | 'c0.08i' (filled circle,diameter=.08) |
 %                     ------------
-%  color              |%s| Color of marker |'white'|
+%  color              |%s| Color of marker | 'white' |
 %                     ------------
-%  textsize           |%f| Size of name |15|
+%  textsize           |%f| Size of name | 15 |
 %                     ------------
-%  textcolor          |%s| Color of name |in.location.color|
+%  textcolor          |%s| Color of name | in.location.color |
 %                     ------------
 %  textalign          |%s| 
 %                     Two letters for the position of marker relative
 %                     to the text. 1st letter for horizontal 
 %                     position: L, C, R. 2nd letter for vertical
 %                     position: T, M, B 
-%                     |'LT'|
+%                     | 'LT' |
 %                     ----------------------
 %
 %--------------------------------------------------------------------------                
@@ -373,9 +374,9 @@ function filename = gmt_plot(in,field)
 % PLOT CONTOURS:
 %
 % in.grdcontour       |%s|
-%                     E.G 'grdcontour OPT > filename.ps', explicitly sets 
+%                     E.g. 'grdcontour OPT > filename.ps', explicitly sets 
 %                     the grdcontour GMT command directly.
-%                     |[]|
+%                     | [] |
 %                     ------------
 % in.grdcontour       | to explicitly set pscale GMT command
 %
@@ -383,16 +384,16 @@ function filename = gmt_plot(in,field)
 %
 % in.contourline.     | Structure with one or more of the following fields:  
 %
-% spacing             |%f| data interaval between contours|
+% spacing             |%f| data interval between contours|
 %                     ------------
 % range               |[%f %f]| [min max]| default= same as in.datarange
 %                     ------------
 % linethick           |%f| -||-|
 %                     ------------
 % more                |%s| 
-%                     Additional commands for GMT's grcontour.
+%                     Additional commands for GMT's grdcontour.
 %                     E.g. '-T1c/0.001c:LH'
-%                     |[]|
+%                     | [] |
 %
 %                     ----------------------
 %
@@ -424,10 +425,10 @@ function filename = gmt_plot(in,field)
 %                     ------------
 % boxthick            |{%f}|
 %                     Thickness of lines
-%                     | 20 for every region boundary|
+%                     | 20 for every region boundary |
 %                     ------------
 %
-% in.pspoly (%double) |{[%f %f;%f %f;...][%f %f;...]}|
+% in.pspoly (%double) |{[%f %f;%f %f;...] [%f %f;...]}|
 %                      Draws a polygon. Use one cell row per polygon: 
 %                      {[p1lon1 p1lat1; p1lon2 p1lat2| ...];...}
 %                     ------------
