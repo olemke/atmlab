@@ -1,4 +1,4 @@
-function command = grdimage(file,in)
+function command = grdimage(file,cptfile)
 %% grdimage
 % purpose:
 %       Makecpt creates a short script and calls the GMT
@@ -13,10 +13,7 @@ grdimage = sprintf('grdimage');
 grdimage = sprintf('%s %s.grd -R -J',grdimage,file);
 
 %colortable
-if isfield(in,'cptfile')
-    grdimage = sprintf('%s -C%s',grdimage,in.cptfile);
-else error('needs colortable (in.cptfile)')
-end
+grdimage = sprintf('%s -C%s',grdimage,cptfile);
 
 %Use nearestneigbour interpolation, only use the nearest grid point
 %Otherwise the default bicubic interpolation introduces artifacts.

@@ -3,7 +3,8 @@ function filename = gmt_plot(in,field)
 %
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
-% It is assumed that the data is CENTERED at the corresponding lat/lon points.
+% It is assumed that the data is CENTERED at the corresponding 
+% lat/lon points.
 % 
 %
 % OUT   filename    The filename of the figure.
@@ -11,9 +12,9 @@ function filename = gmt_plot(in,field)
 % IN    in        A structure with input data and options. See below for
 %                 a detailed description of the structure.
 %
-% OPT   field     The string name of the structure element that contains the
-%                 data to be plotted. If no field is given, 'datafield' is
-%                 assumed.
+% OPT   field     The string name of the structure element that contains 
+%                 the data to be plotted. If no field is given, 'datafield'
+%                 is assumed.
 %
 % Easy example: If you just want to plot some data..
 %                 in.somefield = data2plot
@@ -28,7 +29,7 @@ function filename = gmt_plot(in,field)
 %
 % MANDITORY INPUT
 %
-% 1) in.(field) % the data (default is field = 'datafield', i.e. in.datafield)
+% 1) in.(field) % the data (default is field='datafield' i.e. in.datafield)
 % 2) in.lat     % the corresponding latitudes
 % 3) in.lon     % the corresponding longitudes
 %
@@ -44,184 +45,398 @@ function filename = gmt_plot(in,field)
 %       2) gmt_plot automatically detects if the data is gridded or not
 %
 %
+% HOW TO READ VARIABLE DESCRIPTION OF OPTIONAL VARIABLES: 
 %
-% OPTIONAL INPUT      |DEFAULTS
-%                     |
-% Filename, title etc.
-% in.title            |'string';
-% in.outdir           |'name/a/directory'
-% in.filename         |'yourfilename', default generated from title
-% in.figuretype       |'pdf','eps','png', or 'tif'. (pdf is default)
+%% KEY: in.variable   |Type| Explaination/Example |Default value/behaviour| 
 %
-% in.display          | true (if 0, make pdf without displaying figure.
-% in.unit             |e.g: 'g/m^2' displayed on the y-axis of the legend (default axis)
-% in.xunit            | as in.unit except for the x-axis
-% gmtdefaults:        type 'man gmtdefaults' for behaviour of following options:
+%                  types: %s=character or string
+%                         %f=numeric/logical
+%                         {}=cell
+%                  defualt: []=means there is no default value/behaviour.
+%--------------------------------------------------------------------------
 %
-% in.ticks            |'60g60/30g30'; annotations on major lines (e.g 40 xaxis,20 yaxis)
-%                     and plot minor lines (e.g 20 xaxis & yaxis)
-% in.header_size      |e.g: 20  (GMT default = 36p)
-% in.basemap_axis     |e.g 'WSne': prompts which axis need annotations.
-%                      (GMT default = 'WSNE')
-% in.header_offset    |e.g -0.5: puts title right on the axis. (GMT default = 0.5cm)
-% in.gmtset           | cell with one or more gmtset commands. e.g. in.gmtset={'gmtset D_FORMAT %3.1e','ect'}
+% GENERAL:
 %
-% .... and many more: | Just add other options you need from the list of gmtdefaults
+% in.title            |%s| Title of plot | '' |
+%                     ------------                     
+% in.outdir           |%s| E.g. 'name/a/directory' |'.'|
+%                     ------------
+% in.filename         |%s| E.g. 'yourfilename' | generated from title |
+%                     ------------
+% in.figuretype       |%s| 'pdf','eps','png', or 'tif' | 'pdf' |
+%                     ------------
+% in.display          |%i| If false, file created but not displayed |true |
+%                     ------------
+% in.unit             |%s| String displayed on the y-axis of legend | '' |
+%                     ------------
+% in.xunit            |%s| String displayed on the x-axis of legend | '' |
+%                     ------------
+% in.ticks            |%s| 
+%                     E.g '60g50/30g20'. Adds annotations to  major lines
+%                     (e.g 60 xaxis (lon),50 yaxis (lat)) and displays
+%                     minor lines at (e.g 30 xaxis,20 yaxis)
+%                     | determinded by input lat/lon range. |
+%                     ------------
+% in.header_size      |%f| Title size | 36 [p] |
+%                     ------------
+% in.basemap_axis     |%s| 
+%                     E.g. 'WSne', annotates West and South of the map.
+%                     | 'WSNE' |
+%                     ------------
+% in.header_offset    |%f| Moves the title i y-dir on the page | 0.5 [cm] |
+%                     ------------
+% in.gmtset           |{%s,%s,...}|
+%                     Cell with one or more gmtset commands. 
+%                     E.g. in.gmtset={'gmtset D_FORMAT %3.1e','ect'} | []|
+%                     ------------
+% in.nodata           |%f| 
+%                     If you only want a map (compatible with all options)
+%                     |[]|
+%                     ------------
+% in.keep_files       |%f| 
+%                     If you don't want to delete intermediate files
+%                     | false |
 %
+%--------------------------------------------------------------------------
 %
-% FOR GRIDDING:
-%       Using nearneighbor
-% in.search           |'30m' ; %search for data within 30arcmin
-% in.increment        |'60m' ; %increment the grid by 60arcmin (1deg)
-%                     | If nothing is given the increment and search radius is
-%                     | loosely based on the density of the data points
-%
-%
-% Projection & grid:
-% in.grdimage         | to explicitly set the grdimage command line
-% in.nearneighbor     | to explicitly set the nearneighbor command line
-%
-% in.projection       | e.g. 'Q'
-% in.center           | Center map at given center longitude
-% in.map_width        | inches
-% in.proj             | e.g. 'Q0/9i' ( sprintf('%s%d/%di',in.projection,in.center,in.map_width))
-% in.region           | e.g sprintf('%d/%d/%d/%d',lonmin,lonmax,latmin,latmax);
-%
-% COASTLINES:
-% in.pscoast          | to explicitly set the pscoast command line
-%
-% in.features         |10 (do not plot features < in.features) [km^2]
-% in.resolution       |l (available: (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude )
-% in.rivers           |1 (major rivers), see GMT doc on pscoast for other options
-% in.cwidth           |1 width of coastlines
-%
-% COLORS:
-%
-% in.color_background | set the background color (values less than range)
-% in.color_foreground | set the foreground color (values greater tham range)
-% in.color_nan        | set the color of NaNs
-% in.cptfile          | path to any .cpt file generated earlier
-% in.nlevels          | refers to the number of contour levels (converted to stepsize using datarange)
-% in.stepsize         | The stepsize between data values. This overrides nlevels (-T/min/max/stepsize in makecpt)
-%
-% For your own color table. Specify the contour levels and colors directly (need both) 
-% in.ctable_clevels   | e.g. [1000 1002 1015 1030]
-% in.ctable_colors    | e.g. {[0 0 0],[155 0 0],[255 0 0],[0 0 0],[255 255 255]}
-%                         has to be in vector RGB format and the last 2 elements
-%                         are background and foreground colors
-%
-% in.ctable           |See GMT color paletts. 'mypolar' is a nice colortable for difference plots.
-%                     if strcmp(in.ctable,'mypolar')
-%                       in.reference == mean(data(:)). (default)
-%                       % Recommend set in.reference = 0 for difference plots,
-%                       % but any reference works.
-%                     
-%                       in.whiteboxes | The number of white contours around a reference value
-%                     end
-%
-% For your own custom colortable use in.colorrange.colors (see below). Assign a
-% color to a relative value, e.g between 0-1, where 0 is for the minimum of the
-% datarange and 1 is for the color of the maximum datarange. For example,
-% in.colorrange.colors = {{0,'red'},{.3,'black'},{0.5,'green'},{1,'blue'}},
-% makes a colortable that goes from red to black to green to blue.
+% PROJECTION, GRID, COASTLINES:
 % 
-% in.colorrange.colors      | {{%d,'color'},{%d,'color2'},etc.} 
-%              color can be give as e.g. '255/0/0' (red in RGB)
-% in.colorrange.color_model |  'RGB', 'HSV, or '+HSV'
+% in.region           |%s|
+%                     E.g '-180/180/-90/90'=global range, defined from 
+%                      sprintf('%d/%d/%d/%d',lon1,lon2,lat1,lat2)
+%                     | determinded by input lat/lon range. |
+%                     ------------
+% in.nearneighbor     |%s|
+%                     E.G 'nearneighbor OPT > filename.ps', explicitly sets
+%                     the nearneighbor GMT command directly. If 
+%                     in.nearneighbor is a structure, it'll use the
+%                     strcture arguments to generate the command.
+%                     |[]|
+%                     ----------------------
 %
+% in.nearneighhbor.   | STRUCTURE with one or more of the following fields:  
 %
+%  search             |%s| 
+%                     E.g. 30m' Search for data within 30 [arcmin]
+%                     | Loosely based on the density of the data points |
+%                     ------------
+%  increment          |%s| 
+%                     E.g. '60m' Increment the grid by 60 [arcmin] = 1deg
+%                     | Loosely based on the density of the data points |
+%
+%                     ----------------------
+%
+% in.projection       |%s|
+%                     See available projections in GMT manual.
+%                     |'Q' (cylindric equidistant) |
+%                     ------------
+% in.center           |%f| Center map at given longitude | 0 [deg] |
+%                     ------------
+% in.map_width        |%f| Set width of map | 9 [inches] |
+%                     ------------
+% in.proj             |%s| 
+%                     Describes the projection, center, and map_width
+%                     | 'Q0/9i' (see above) |
+%                     ------------
+% in.pscoast          |%s|
+%                     E.G 'pscoast OPT > filename.ps', explicitly sets the
+%                     pscoast GMT command.
+%                     |[]|
+%                     ----------------------
+% in.coast            |%s|
+%                     If you don't want coastlines, set to false. If
+%                     in.coast is a structure, it'll use the strcture
+%                     arguments to generate the pscoast command.
+%                     | create coastlines |
+%                     ----------------------
+%
+% in.coast.           | STRUCTURE with one or more of the following fields:
+% 
+%  features           |%f| Don't plot features < in.features [km^2] 
+%                     | determined by lon/lat range |
+%                     ------------
+%  resolution         |%s|
+%                     (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude
+%                     | determined by lon/lat range |
+%                     ------------
+%  rivers             |%s| 
+%                     Display rivers. pscoast -Ioption (1-10, a,r,i,c)
+%                     | '1' (major rivers) |
+%                     ------------
+%  width              |%i| Width of coastlines |.3|
+%                     ----------------------
+%
+%--------------------------------------------------------------------------
+%
+% COLORS & DATA REPRESENTATION:
+%
+% in.datarange        |[%f, %f]| 
+%                     Range of data values to display
+%                     | [min(data) max(data)] |
+%                     ------------
+% in.grdimage         |%s|
+%                     E.G 'grdimage OPT > filename.ps', explicitly sets
+%                     the grdimage GMT command directly.
+%                     |[]|
+%                     ------------
+% in.makecpt          |%s|
+%                     E.G 'makecpt OPT > filename.ps', explicitly sets the 
+%                     makecpt GMT command directly.
+%                     |[]|
+%                     ------------
+% in.cptfile          |%s| Path to any .cpt file generatedpreviously| [] |
+%                     ------------
+% in.ctable           |%s| See GMT color paletts | 'rainbow' |
+%
+%                     NOTE: 'mypolar' is a nice colortable for difference
+%                     plots, and there are two additional optional 
+%                     arguments for this color table:
+%                       in.reference: |%d| 
+%                                     where to center the white color
+%                                     | mean(data(:)) |
+%                           Note:     Recommend set in.reference = 0 for 
+%                                     difference plots, but any reference
+%                                     will work.
+%                     
+%                       in.whiteboxes: |%d|
+%                                      The number of white contours around
+%                                      a reference value
+%                                      | determined by number of levels |
+%
+% in.color_background |%s| 
+%                     Set the background color (values less than range)
+%                     | '0/0/0' ('black') |
+%                     ------------
+% in.color_foreground |%s|
+%                     Set the foreground color (values greater than range)
+%                     |'255/255/255' ('white') |
+%                     ------------
+% in.color_nan        |%s| Set the color of NaNs  |'125/125/125' ('grey')|
+%                     ------------
+% in.nlevels          |%d| 
+%                     Refers to the number of contour levels (converted to
+%                     stepsize using datarange)
+%                     |20|
+%                     ------------
+% in.stepsize         |%d| 
+%                     The stepsize between data values. This overrides
+%                     nlevels (-T/min/max/stepsize in makecpt)
+%                     | determined by nlevels |
+%                     ------------
+%
+% NOTE: For your own CUSTOM COLORTABLE use in.colorrange.colors 
+% (see below). Assign a color to a relative value, e.g between 0-1, where
+% 0 is for the minimum of the datarange and 1 is for the color of the 
+% maximum datarange. For example, 
+% in.colorrange.colors = {{0,'red'},{.3,'black'},{0.5,'green'},{1,'blue'}},
+% makes a colortable that goes from red to black to green to blue. 
+% Naturally you can also use the 'contour values' directly as long as you
+% give assign all levels a color.
+% 
+%                     ----------------------
+% in.colorrange.      | STRUCTURE with one or more of the following fields:
+%
+%  colors             | {{%d,%s},{%d,%s},etc.}
+%                     %d is the data value, %s is the color 
+%                     (e.g. {20,'255/0/0'} (red in RGB))
+%                     |[]|
+%                     ------------
+%  color_model        |%s|
+%                     'RGB', 'HSV, or '+HSV'
+%                     |'RGB'|
+%                     ----------------------
+%
+%------------------------------------------------------------------------------------
 % LEGENDS:
-% in.psscale          | to explicitly set the pscale on the command line
-% in.psscale_nan      | to explicitly set the pscale for NaN legend on the command line
 %
-% in.savelegend       | true: if you want to have a separate pdf for the legend
-% in.legend           | false; if you don't want a legend
-% in.nanlegend        | false; if you don't want an extra NaN legend
-% in.tickcentering    | true; Have ticks at the center of the boxes (default=edges)
-% in.tickspacing      | if you want to manually decide how the ticks in the
-%                       legend should be spread. x=> every xth data value,
-%                       1=>same number of ticks as datarange, []= one tick per
-%                       contour level (default behaviour). desirable if you have
-%                       many contour levels.
-% in.tick_annotation_format
-%                     | e.g. '%3.1e'
-% in.tick_length      | length of the ticks
-% in.annot_font_size_primary
-%                     | size of annotations in legend
-% in.tick_annotations | e.g {'','','middle','',''} if you have 5 ticks in legend
-% in.shift_tick_annotations
-%                     | move tick annotions to the right by x inches (e.g
-%                     0.5)
-% in.equalboxwidth
-%                     | false (-L option)
-% in.legend_orient    |if you want a horisontal/vertical/no legend: 'h'/'v'/''.
-% in.legendsize       |'9.7i/2.3i/10c/0.8c'; %i = inch , c = cm
-% in.legendbox_spacing| space between legend boxes (%d)
+% in.pscale           |%s|
+%                     E.G 'psscale OPT > filename.ps', explicitly sets the 
+%                     psscale GMT command for the legend directly.
+%                     |[]|
+%                     ------------
+% in.pscale_nan       |%s|
+%                     E.G 'psscale OPT > filename.ps', explicitly sets the 
+%                     psscale GMT command for the NaN legend directly.
+%                     |[]|
+%                     ------------
+% in.savelegend       |%f|
+%                     if you want to have a separate pdf for the legend
+%                     |[]|
+%                     ------------
+% in.nanlegend        |%f| 
+%                     Set to false if you don't want an extra NaN legend
+%                     | true is there are NaN values in the data | 
+%                     ------------
+% in.legend           |%f|
+%                     Set to false if you don't want a legend. if in.legend
+%                     is a structure, it's equivalent to in.legend = true
+%                     |true|
+%                     ----------------------
 %
-% in.sidebar          |0,1,2,or 3. Indicates none, bellow range only, above -||-, or both
-% in.sizenanlegend    |''; %i = inch , c = cm
+% in.legend.          | STRUCTURE with one or more of the following fields:  
 %
-% VALUE RANGE
-%                      GMT picks an appropriate default is field is not given
-% in.datarange        |[min, max];  default = [min(data) max(data)];
+%  annot_font_size_primary
+%                     |%f| Size of annotations in legend  |[]|
+%                     ------------
+%  box_spacing        |%f| Space between legend boxes | 0 (side by side)|
+%                     ------------
+%  dimensions         |%s| 
+%                     e.g '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
+%                     ('x-displacement/y-displacement/height/width')
+%                     | size determined by map dimensions |
+%                     ------------
+%  dimensions_nan     |%s| 
+%                     As for dimensions, but for the NaN legend
+%                     ------------
+%  equalboxwidth      |%f| 
+%                     If the legend color boxes have to be the same size, 1
+%                     | false (-L option) |
+%                     ------------                        
+%  orientatation      |%s|
+%                     if you want a horist./vert. legend input 'h'/'v.
+%                     |determined by map dimensions|
+%                     ------------
+%  shift_tick_annotations
+%                     |%f| 
+%                     Move tick annotions to the right by x inches
+%                     |[]|
+%                     ------------
+%  sidebar            |%f|
+%                     Input scalar 0,1,2,or 3. Indicates none,
+%                     below range only, above range, or both
+%                     | determined from data |
+%                     ------------
+%  tick_annotations   |{%s,%s,...}|
+%                     E.g {'','','middle','',''}.
+%                     Number of annotations must be = nlevels.
+%                     |[]|
+%                     ------------
+%  tick_annotation_format
+%                     |%s
+%                     E.g. '%3.1e'
+%                     |[]|
+%                     ------------
+%  tick_centering     |%f|
+%                     Have ticks at the center of the boxes
+%                     |false (edges)|
+%                     ------------
+%  tick_length        |%f|
+%                     The length of the ticks
+%                     |[]|
+%                     ------------
+%  tick_spacing       |%f| 
+%                     If you want to manually decide how the ticks in the
+%                     legend should be spread. x=> every xth data value,
+%                     1=>same number of ticks as datarange
+%                     | one tick per data level |
+%                     NOTE: This options is desirable if you have many 
+%                     data levels.
 %
-% EXTRAS:
-% in.psbox (%double)  | [lon11 lat11 lon12 lat12; lon21 lat21 lon22 lat22; ect]
-%                        [Bottom left corner , Top right corner; ...]
+%                     ----------------------
 %
-% in.psboxes          | The index of the last row of the regions. e.g 3 7, if
-%                       you have 2 regions defined by 3 resp 4 boxes. This is
-%                       useful for defining psboxcolor.
+%------------------------------------------------------------------------------------                   
+% PLOT LOCATION MARKERS:
 %
-% in.psboxcolor       | Default is black for every region ( 'k'={[0 0 0]}). otherwise RGB*255.
-%                     append color vector in a cell for every boxregion.
-% in.psboxthick       | Default is 20 for every region boundary {20}.
-%                     append thick value in a cell for every boxregion boundary.
-%
-% in.pspoly (%double) | {[lon1 lat1; lon2 lat2; ...]}
-%                       Draws a polygon. Use one cell row per polygon:
-%                       {[p1lon1 p1lat1; p1lon2 p1lat2; ...];
-%                        [p2lon1 p2lat1; p2lon2 p2lat2; ...];
-%                        ...}
-%
-% in.pspolycolor       | See in.psboxcolor
-%
-% in.pspolythick       | See in.psboxthick
-%
-% LOCATION MARKERS:
-%
-% in.locations.lat          | Latitude of location marker x
-% in.locations.lon          | Longitude of location marker x
-% in.locations.name         | Name of location marker x (optional)
-% in.locations.shape        | Shape of location marker x (default: c0.08i)
-%                             if empty => don't draw dot
-% in.locations.color        | Color of location marker x (default: white) (and text if textcolor if not given)
-% in.locations.textsize     | Size of location text x (default: 15)
-% in.locations.textcolor    | Color of location text x (default: marker color)
-% in.locations.textalign    | Position of marker relative to the text
-%                             first letter for horizontal position: L, C, R
-%                             second letter for vertical position: T, M, B
-%                             (default: LT)
 %  for muliple locations define all fields according to : 
 %  in.locations(1).name = 'x',
 %  in.locations(2).name = 'y', etc...
 %
+%                     ----------------------
 %
-% CONTOUR LINES
-% in.grdcontour.spacing     | scalar
-% in.grdcontour.range       | [min max]
-% in.grdcontour.linethick   | scalar
-%  if several contour plots should overlap define all fields according to: 
+% in.locations.       | Structure with one or more of the following fields:  
+%
+%  lat (manditory)    |%f| Latitude of marker |[]|
+%                     ------------
+%  lon (manditory)    |%f| Longitude of marker |[]|
+%                     ------------
+%  name               |%s| Name of marker |[]|
+%                     ------------
+%  shape              |%s| Shape of marker
+%                     |'c0.08i' (filled circle,diameter=.08)|
+%                     ------------
+%  color              |%s| Color of marker |'white'|
+%                     ------------
+%  textsize           |%f| Size of name |15|
+%                     ------------
+%  textcolor          |%s| Color of name |in.location.color|
+%                     ------------
+%  textalign          |%s| 
+%                     Two letters for the position of marker relative
+%                     to the text. 1st letter for horizontal 
+%                     position: L, C, R. 2nd letter for vertical
+%                     position: T, M, B 
+%                     |'LT'|
+%                     ----------------------
+%
+%--------------------------------------------------------------------------                
+%
+% PLOT CONTOURS:
+%
+% in.grdcontour       |%s|
+%                     E.G 'grdcontour OPT > filename.ps', explicitly sets 
+%                     the grdcontour GMT command directly.
+%                     |[]|
+%                     ------------
+% in.grdcontour       | to explicitly set pscale GMT command
+%
+%                     ----------------------
+%
+% in.contourline.     | Structure with one or more of the following fields:  
+%
+% spacing             |%f| data interaval between contours|
+%                     ------------
+% range               |[%f %f]| [min max]| default= same as in.datarange
+%                     ------------
+% linethick           |%f| -||-|
+%                     ------------
+% more                |%s| 
+%                     Additional commands for GMT's grcontour.
+%                     E.g. '-T1c/0.001c:LH'
+%                     |[]|
+%
+%                     ----------------------
+%
+% If several contour plots should overlap define all fields according to: 
 %  in.grdcontour(1).spacing = x,
 %  in.grdcontour(2).spacing = y, etc...
+%--------------------------------------------------------------------------
 %
-% EXTRA EXTRAS
-% If you don't want to plot data and only want a map (compatible with all options)
-% in.nodata                 | tells gmt that there is no data.
+% DRAW SHAPES ON MAP: FIXME are both necessary?
+% 
+% in.psbox.           | Structure with one or more of the following fields:  
 %
-% If you don't want to delete intermediate files:
-% in.keep_files             | true
+%                     ----------------------
+%  box                |[%f %f %f %f]|
+%                     E.g. for box regions: 
+%                     [lon11 lat11 lon12 lat12;lon21 lat21 lon22 lat22]=
+%                     [Bottom left corner1, Top right corner1;
+%                     Bottom left corner2, Top right corner2]|
+%                     ------------
+%  boxes              |[%f %f ...]| 
+%                     The index of the last row of the regions. e.g 3 7, if
+%                     you have 2 regions defined by 3 resp 4 boxes. This is
+%                     useful for defining psboxcolor. Each index is defines
+%                     the last corner of a region, where a region is
+%                     essentially made up of many smaller boxes regions.
+%                     ------------
+% boxcolor            |{[%f %f %f]}| RGB color or every region
+%                     | [{[0 0 0]})] for every region |
+%                     ------------
+% boxthick            |{%f}|
+%                     Thickness of lines
+%                     | 20 for every region boundary|
+%                     ------------
 %
+% in.pspoly (%double) |{[%f %f;%f %f;...][%f %f;...]}|
+%                      Draws a polygon. Use one cell row per polygon: 
+%                      {[p1lon1 p1lat1; p1lon2 p1lat2| ...];...}
+%                     ------------
+% in.pspolycolor      | See in.psboxcolor
+%                     ------------
+% in.pspolythick      | See in.psboxthick
+%                     ------------
+%
+%--------------------------------------------------------------------------
 %
 % $Author$
 % $Date$
@@ -254,39 +469,50 @@ filename=sort_figures(out,commands);                                            
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-% CHECK input type
-check_optional_input(in);
-
 % SET DEFAULTS
+% general
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
 default.outdir            = atmlab('OUTDIR');   % where to put the figure
-default.map_width         = 9;                  % inches
-%default.ticks             = '60g60/30g30';      % grid majorx'deg'minorx/majory'deg'minory (this is set in create_gmt_earth instead)
-default.projection        = 'Q';                % Cylindrical Equidistant Projection. Projection Will only work with format: 'Q0/9i' ('%s%3.0f/%ii'in.projection,in.center,in.map_width))
-                                                % otherwise specify in.proj explicitly with the full projection command
+default.projection        = 'Q';                % Cylindrical Equidistant Projection.
+default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
+default.map_width         = 9;                  % in inches
+% i.e. default.proj = 'Q0/9i'
 
 default.title             = '';                 % no title by default
 default.nodata            = false;              % true if you only want the map
 default.savelegend        = false;              % make an additional pdf-file only containing the legend
 default.keep_files        = false;              % keep intermediate files (debugging)
-default.ctable            = 'rainbow';          % color palette
-default.legend            = true;               % show a legend
-default.legend_orient     = 'v';                % orientation of the legend (h = horisontal, v = vertical)
 default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
-default.tickspacing       = [];                 % [] Show values every xth contour level. Otherwise tickspacing based on datarange
-default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 
+if isfield(in,field)
+    default.datarange         = getdatarange(in,field); %
+    default.nanlegend  = any(isnan(in.(field)(:))); % include NaNs in the legend
+end
 in = optargs_struct(in,default);
 
 % replace bad symbols for filename and mask them for the title
 if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
-in = optargs_struct(in,default);
+
+% colors & data representation:
+default.ctable      = 'rainbow';          % color palette
+default.stepsize    = getstepsize(in);    % color level datastep interval
+in = optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
+
+%coast
+if ~isfield(in,'coast') || isstruct(in.coast) || in.coast
+    if ~isfield(in,'coast'), in.coast=struct([]);end
+    default.rivers      = '1';  % '1' displays major rivers only. 'a' displays all.
+    default.width       = .3;   % width of the coast
+    
+    in.coast            = optargs_struct(in.coast,default); clear default
+end
+
 
 if in.nodata
     % If I only want an empty map, get the essentials and leave here.
@@ -295,41 +521,33 @@ if in.nodata
 end
 
 if ~ismember(field,fieldnames(in))
-     error('atmlab:input','no field by the name of "%s" in struct',field)
+    error('atmlab:input','no field by the name of "%s" in struct',field)
+else
+    in.fieldname  = field;
 end
 
-in.fieldname  = field;
-default.nanlegend=any(isnan(in.(field)(:))); % include NaNs in the legend
-default.datarange         = getdatarange(in,field);
-in = optargs_struct(in,default);
-default.stepsize          = getstepsize(in); % color level datastep interval
-default.sidebar           = getsidebar(in); % coloroured triangles for data outside max/min legend
-in = optargs_struct(in,default);
+%legend
+if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
+    if ~isfield(in,'legend'), in.legend=struct([]);end
+    szdef = {[9.8 2.3 3.9 .2],[4.7 -0.4 7.1 .2]}; %inches matching map_width = 9i
+    tmp = ['v','h']; %vertical,horisontal
+    tmp2 = sprintf('%.2fi/',szdef{1}*in.map_width/9); sz{1} = tmp2(1:end-1);
+    tmp2 = sprintf('%.2fi/',szdef{2}*in.map_width/9); sz{2} = [tmp2(1:end-1) 'h'];
 
-if ndims(in.(field))>2
-    error('atmlab:input','Too many dimensions in in.%s',field)
+    mycondition = ( in.lon(end)-in.lon(1) )/( in.lat(end)-in.lat(1) ) < 2*.85;
+
+    default.orientation = tmp(mycondition+1);     
+    default.dimensions  = sz{mycondition+1};
+    default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
+    
+    in.legend           = optargs_struct(in.legend,default);
 end
-% check for lat and lons
-if ~isfield(in,'lat')
-    l = {'Latitude','latitude'};
-    if any(isfield(in,l))
-        in.lat = in.(l{isfield(in,l)});
-    else error('atmlab:input','No latitudes present')
-    end
-end
-if ~isfield(in,'lon')
-    l = {'Longitude','longitude','long'};
-    if any(isfield(in,l))
-        in.lon = in.(l{isfield(in,l)});
-    else error('atmlab:input','No longitudes present')
-    end
-end
+
+% is the data plotable?
+in = isdata(in,field);
 
 % Check to see if the data  is gridded or not
 in = isgridded(in,field);
-
-% is the data plotable?
-isdata(in,field)
 
 % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
 if in.gridded
@@ -443,54 +661,9 @@ legend = sprintf('%s/legend.pdf',outdir);
 %% SUBFUNCTIONS FOR SETUP
 %      ||||||
 %      VVVVVV
-function check_optional_input(in)
-%% check_optional_input
-% Note: I want to put all legend things in a structure and all psbox things in a
-% structure
-
-fields = fieldnames(in);
-
-% STRINGS
-checkinput(1,:) = {@ischar,'string'...
-     {'basemap_axis','cptfile','ctable','figuretype','filename','grdimage',...
-     'increment','legend_orient','legendsize','nearneighbor','outdir','proj',...
-     'projection','pscoast','psscale','psscale_nan','region','resolution',...
-     'search','sizenanlegend','tick_annotation_format','ticks','title','unit',...
-     'xunit'}};
-
-% SCALARS/VECTORS
-checkinput(2,:) = {@(x)(isnumeric(x) | islogical(x)),'scalar/array',...
-    {'annot_font_size_primary','center','ctable_clevels','cwidth','datarange',...
-    'display','equalboxwidth','features','header_offset','header_size',...
-    'keep_files','legend','legendbox_spacing','map_width','nanlegend','nlevels',...
-    'nodata','psbox','psboxes','reference','rivers','savelegend',...
-    'shift_tick_annotations','sidebar','stepsize','tick_length',...
-    'tickcentering','tickspacing','whiteboxes'}};
-
-% CELLS
-checkinput(3,:) = {@iscell,'cell',...
-    {'ctable_colors','gmtset','psboxcolor','psboxthick','pspoly',...
-    'pspolycolor','pspolythick','tick_annotations'}};
-
-% STRUCTURES
-checkinput(4,:) = {@isstruct,'structure',{'colorrange','grdcontour','locations'}};
-
-for i = 1:4
-    % test structure arguments: 
-    % e.g. cellfun(@(x)(ischar(in.(x))),{'unit','title'}), 
-    %       where in.title='str'; in.unit='str2';
-    F = fields(ismember(fields,checkinput{i,3}));
-    test = ~cellfun(@(x)(checkinput{i,1}(in.(x))),F);
-    if any(test)
-        err=cellfun(@(x,y)(sprintf('in.%s must be of type: %s',x,y)),...
-            F(test),repmat(checkinput(i,2),length(F(test)),1),'uniformoutput',0);
-        error('atmlab:input','\n%s',err{:})
-    end
-end
 
 function datarange = getdatarange(in,field)
 %% getdatarange
-
 
 d = [min(in.(field)(:)) max(in.(field)(:))];
 if d(2)-(1)>10
@@ -502,6 +675,11 @@ end
 
 function stepsize = getstepsize(in)
 %% getstepsize
+
+if ~isfield(in,'datarange')
+    stepsize = 0;
+    return
+end
 
 % default-ish number of levels
 x = 20;
@@ -541,71 +719,76 @@ else
     se.region='-180/180/-90/90';
 end
 
-function se = isgridded(se,field)                                               %% ISGRIDDED %%
-%% Test if the data is gridded
+function se = isgridded(se,field)                                               
+%% ISGRIDDED: Test if the data is gridded
 
 if isempty(se.(field))
     error('The data variable: se.%s is empty',field)
 end
 
-if ndims(se.(field))==3                                                         % test if I need to use squeeze
+if ndims(se.(field))==3                                                         
     se.(field) = squeeze(se.(field));
 end
 
-%% Check to see if the data is gridded or not.
 [a,b]=size(se.(field));
-
 pos1 = a==length(se.lat)&b==length(se.lon); %(lat,lon)
 pos2 = b==length(se.lat)&a==length(se.lon); %(lon,lat)
 
 % if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
 % assume it's not.
-ig = ~(pos1 && pos2) && (pos1 || pos2);
-
-if ~ig
-    se.(field) = se.(field)(:);
-    se.lat = se.lat(:);
-    se.lon = se.lon(:);
-    if ~isfield(se,'gridded'), se.gridded = false; end
-    txt1 = 'is NOT';txt2='1';txt3='is';
-else
-    if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
-    if ~isfield(se,'gridded')
+if ~isfield(se,'gridded')
+    ig = ~(pos1 && pos2) && (pos1 || pos2);
+    if ~ig
+        se.(field) = se.(field)(:);
+        se.lat = se.lat(:);
+        se.lon = se.lon(:);
+        se.gridded = false;
+        txt1 = 'is NOT';txt2='1';txt3='is';
+    else
+        if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
         se.gridded = true;
-    end
-    txt1 = 'is';txt2='0';txt3='isn''t';
-end
-
-fprintf('Assuming the data %s gridded...\n',txt1)
-fprintf('Include structure argument se.gridded=%s if it %s.\n',txt2,txt3)
-fprintf('max data value: %3.1d\nmin data value: %3.1d\n',max(se.(field)(:)),min(se.(field)(:)))
-
-function isdata(se,field)                                                       %% ISDATA %%
-%% is there useable data?
-
-if ~isempty(field)                                                              % is there data?
-    if ~isfield(se,field)
-        error('atmlab:input','The field: "%s" is not in the structure',field)
+        txt1 = 'is';txt2='0';txt3='isn''t';
     end
     
-    if se.gridded
-        if ~ ( size(se.(field),1) == length(se.lat) && ...
-                size(se.(field),2) == length(se.lon) )
-            error('atmlab:input','in.%s must have the dimensions (lat,lon)',field)
-        end
-    end
+    fprintf('Assuming the data %s gridded...\n',txt1)
+    fprintf('Include structure argument se.gridded=%s if it %s.\n',txt2,txt3)
+    fprintf('max data value: %3.1d\nmin data value: %3.1d\n',max(se.(field)(:)),min(se.(field)(:)))
 end
 
-if ~any(~isnan(se.(field)))                                                     % data?
+function se = isdata(se,field)
+%% is there any useable data?
+
+if ~isfield(se,field)
+    error('atmlab:input','The field: "%s" is not in the structure',field)
+end
+if ~any(~isnan(se.(field)))
     error('atmlab:nodata','%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
+end
+if ndims(se.(field))>2
+    error('atmlab:input','Too many dimensions in in.%s',field)
+end
+% check for lat and lons
+if ~isfield(se,'lat')
+    l = {'Latitude','latitude'};
+    if any(isfield(se,l))
+        se.lat = se.(l{isfield(se,l)});
+    else error('atmlab:input','No latitudes present')
+    end
+end
+if ~isfield(se,'lon')
+    l = {'Longitude','longitude','long'};
+    if any(isfield(se,l))
+        se.lon = se.(l{isfield(se,l)});
+    else error('atmlab:input','No longitudes present')
+    end
 end
 
 function hunt_down_errors(command,errors)
 %% Hunt down any errors encounted using GMT
 
 % messages containing any of these are exempted
-error_exeptions = {'warning'}; 
+error_exeptions = {'warning','not set'}; 
 definite_errors = {'illegal','error'};
 
 % this gives cell{1:nerrors}{1:nerr_exp}

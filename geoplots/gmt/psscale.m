@@ -8,24 +8,25 @@ function command = psscale(file,in)
 % $Date$
 
 psscale = sprintf('psscale');
+psscale = sprintf('%s -D%s%s',psscale,in.dimensions);
 
 if isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) || ...
         isfield(in,'equalboxwidth') && in.equalboxwidth || ...
-        any(isfield(in,{'legendbox_spacing','tickcentering'}))
+        any(isfield(in,{'box_spacing','tick_centering'}))
     
     psscale = sprintf('%s -L',psscale);
     
-    if isfield(in,'legendbox_spacing')
+    if isfield(in,'box_spacing')
         % tickspacing (annotation every xth contour), unit (dispay with legend)
-        psscale = sprintf('%s%.2f',psscale,in.legendbox_spacing);
+        psscale = sprintf('%s%.2f',psscale,in.box_spacing);
     end
-    if isfield(in,'tickcentering')
+    if isfield(in,'tick_centering')
         psscale = sprintf('%si',psscale);
     end
 end
     
-if isfield(in,'tickspacing')
-    psscale = sprintf('%s -B%.0f:"%s":/:"%s":',psscale,in.tickspacing,in.xunit,in.unit);
+if isfield(in,'tick_spacing')
+    psscale = sprintf('%s -B%.0f:"%s":/:"%s":',psscale,in.tick_spacing,in.xunit,in.unit);
 else
     psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
 end
@@ -34,10 +35,6 @@ if isfield(in,'cptfile')
     psscale = sprintf('%s -C%s',psscale,in.cptfile);
 else
     error 'needs in.cptfile'
-end
-
-if isfield(in,'legendsize')
-    psscale = sprintf('%s -D%s',psscale,in.legendsize);
 end
 
 if in.sidebar %i.e the triangles bellow the min and above the max values
@@ -70,8 +67,6 @@ if isfield(in,'tick_length')
 end
 if isfield(in,'tick_annotation_format')
     psscale = sprintf('%s --D_FORMAT=%s',psscale,in.tick_annotation_format);
-else
-    psscale = sprintf('%s --D_FORMAT=%%.0lf',psscale);
 end
 
 command = sprintf('%s >> %s.ps',psscale,file);

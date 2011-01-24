@@ -2,19 +2,21 @@ function pspoly = polygoninize_regions(boxes)
 %% POLYGONINIZE_REGIONS
 %
 % Purpose: To set up for plotting many regions defined as box coordinates. This
-%          function make sure that extra lines aren't drawn for regions right
-%          next to each other. This is usefull if you have a complicated region
-%          made of of several boxes. e.g. in eliasson10_assessing_acp
+%          function make sure that extra lines aren't drawn right next to each
+%          other for essentially the same region. This is usefull if you have a
+%          complicated region made of of several boxes.
+%          e.g. in eliasson11_assessing_acp
 %         
 %
 % IN: boxes: (array containing coordinates for one or several regions)
-%    e.g. boxes = [box1; box2; box3], where box1 has the form [bottom left corner, top right corner];
+%     e.g. boxes = [box1; box2; box3], where box1 has the form 
+%     [bottom left corner, top right corner];
 %
 % OUT: Structure of arguments to be used for plotting the regions on a map
 %      using GMT
 %
-%
-% $Id$
+% $Author$
+% $Date$
 
 
 %% Make a grid of logicals
@@ -66,15 +68,6 @@ itr = xor(cond3,cond5 & cond2) & ~tmpgrid(j-1,i+1); % ibr
 ibl = xor(cond6,cond4 & cond7) & ~tmpgrid(j+1,i-1); % itl
 ibr = xor(cond8,cond5 & cond7) & ~tmpgrid(j+1,i+1); % itr
 
-%% reference plot
-% y.lat = tmplat(2:end-1);
-% y.lon = tmplon(2:end-1);
-% y.d = double(tmpgrid(2:end-1,2:end-1))+double(tl | tr | bl | br)*2 + double(itl | itr | ibl | ibr)*4;
-% y.d(~y.d)=NaN;
-% y.title='reference plot';
-% y.region = '7/14/-7/-4';
-% gmt_plot(y,'d')
-
 %% TRACING
 corners = tl | tr | bl | br | itl | itr | ibl | ibr;
 [rows,cols]=find(corners);
@@ -87,7 +80,9 @@ j = 1;
 curpoints = [points,false(size(cols))];
 psxy = cell(10,1);
 while 1
-    if isempty(curpoints), break, end
+    if isempty(curpoints)
+        break
+    end
     i = 1;
     psxy{j} = [curpoints(i,2),curpoints(i,1)];
     curpoints(i,5)=true;
@@ -111,12 +106,10 @@ pspoly = psxy(1:j-1); %pspoly is the name used in gmt_plot
 %     vvvvvvv
 
 function d = finddirection(tmpgrid,points,i,dir)
-try
+%% finddirection
+
 [d,f] = specialcase(tmpgrid,points,i,dir);
-catch me
-    disp(me)
-    keyboard
-end
+
 if f, return, end
 
 for j=1:4
@@ -155,6 +148,7 @@ end
 
 
 function a = nextcoord(di,points,i)
+%% nextcoord
 
 ref = points(i,3:4);
 
@@ -173,9 +167,12 @@ end
 k = k(index);
 test = sum(repmat(ref,sum(index),1)-points(index,3:4),2);
 a = k(abs(test)==min(abs(test)));
-if isempty(a),error('@#$%^&'),end
+if isempty(a)
+    error('atmlab:error','isempty(a)')
+end
 
-function [dir,f] = specialcase(tmpgrid,points,i,dir)                            %% SPECIAL CASE
+function [dir,f] = specialcase(tmpgrid,points,i,dir)                            
+%% SPECIAL CASE
 
 a = points(i,4) == 1;              % you are on the western edge of the map
 b = points(i,4) == size(tmpgrid,2);% you are on the eastern edge of the map
@@ -215,7 +212,8 @@ if a || b || c || d
 end
 
 
-function out = checknorth(tmpgrid,points,i)                                     %% CHECK NORTH
+function out = checknorth(tmpgrid,points,i)                                     
+%% CHECK NORTH
 
 out = false;
 ref = points(i,3:4);
@@ -234,7 +232,8 @@ a = k(abs(test)==min(abs(test)));
 vect = tmpgrid(ref(1,1):points(a,3),1);
 out = sum(vect,1)==length(vect);
 
-function out = checksouth(tmpgrid,points,i)                                     %% CHECK SOUTH
+function out = checksouth(tmpgrid,points,i)                                     
+%% CHECK SOUTH
 
 out=false;
 ref = points(i,3:4);
@@ -253,10 +252,9 @@ a = k(abs(test)==min(abs(test)));
 vect = tmpgrid(ref(1,1):points(a,3),end);
 out = sum(vect,1)==length(vect);
 
-function out = checkwest(tmpgrid,points,i)                                      %% CHECK WEST
+function out = checkwest(tmpgrid,points,i)                                      
+%% CHECK WEST
 
-'check this'
-keyboard
 out=false;
 ref = points(i,3:4);
 k = 1:length(points);
@@ -273,10 +271,9 @@ a = k(abs(test)==min(abs(test)));
 vect = tmpgrid(1,ref(1,2):points(a,4));
 out = sum(vect,1)==length(vect);
 
-function out = checkeast(tmpgrid,points,i)                                      %% CHECK EAST
+function out = checkeast(tmpgrid,points,i)                                      
+%% CHECK EAST
 
-'check this'
-keyboard
 out=false;
 ref = points(i,3:4);
 k = 1:length(points);

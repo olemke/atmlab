@@ -1,3 +1,29 @@
+2011-01-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-122
+
+	* geoplots/gmt/gmt_plot.m: Substantionally updated the help
+	section to make it easier to understand for new users. Also group
+	some input arguments together for clarity. Removed the test_input
+	section as it needed to be changed. The correct input is given in
+	the help section.
+
+	* geoplots/gmt/test_gmt.m: Added extra test, where I test drawing
+	polygons on the map. Also  did some small adaptations
+
+	* geoplots/gmt/psscale.m: Adapted to changed variable names
+
+	* geoplots/gmt/create_gmt_earth.m: Cleaned up a bit and removed
+	some frivolous sub functions.
+
+	* geoplots/gmt/polygoninize_regions.m: Cleaned up a bit. updated help
+
+	* geoplots/gmt/grdimage.m: Demands input cpt-file as second
+	argument
+
+	* geoplots/gmt/hardcoded_colors.m: This function and colortable is
+	unnecessary as in.colorrange allows you make your own custom colortable
+
 2011-01-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-122
