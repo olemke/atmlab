@@ -1,3 +1,12 @@
+2011-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-123
+
+	* physics/fresnel.m: Output arguments were in wrong order in the
+	FORMAT text string.
+
+	* handy/optargs.m: Last user example had wrong name for function.
+
 2011-01-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-122

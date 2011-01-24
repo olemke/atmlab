@@ -12,7 +12,7 @@
 %       [a,b] = optargs( {1,[]}, {0,'a'} )
 %    gives a=1 and b='a'. However, the normal usage of the function should
 %    be to set *userin* to *varargin*:
-%       [a,b] = funcinput( varargin, {0,'a'} )
+%       [a,b] = optargs( varargin, {0,'a'} )
 %
 % FORMAT   varargout = optargs( userin, defaults )
 %        

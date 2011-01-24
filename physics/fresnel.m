@@ -23,7 +23,7 @@
 %    when n1 > n2, and corresponds to a total reflection and there is no
 %    transmitted part. Rv and Rh are here set to 1.
 %
-% FORMAT   [theta2,Rv,Rh] = fresnel(n1,n2,theta1)
+% FORMAT   [Rv,Rh,theta2] = fresnel(n1,n2,theta1)
 %        
 % OUT   Rv       Reflection coefficient for vertical polarisation.
 %       Rh       Reflection coefficient for horisontal polarisation.
@@ -45,7 +45,7 @@ if imag(n1)<0 | imag(n2)<0                                                  %&%
 end                                                                         %&%
 
 
-theta2    = snell( n1, n2, theta1);
+theta2    = snell( n1, n2, theta1 );
 
 DEG2RAD   = constants('DEG2RAD');
 
