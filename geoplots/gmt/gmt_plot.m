@@ -527,6 +527,17 @@ else
     in.fieldname  = field;
 end
 
+% is the data plotable?
+in = isdata(in,field);
+
+% Check to see if the data  is gridded or not
+in = isgridded(in,field);
+
+% make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
+if in.gridded
+    [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
+end
+
 %legend
 if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
     if ~isfield(in,'legend'), in.legend=struct([]);end
@@ -542,17 +553,6 @@ if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
     default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
     
     in.legend           = optargs_struct(in.legend,default);
-end
-
-% is the data plotable?
-in = isdata(in,field);
-
-% Check to see if the data  is gridded or not
-in = isgridded(in,field);
-
-% make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
-if in.gridded
-    [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
 end
 
 function filename = sort_figures(se,command)                                    %% SORT FIGURES %%

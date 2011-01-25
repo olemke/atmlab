@@ -1,5 +1,16 @@
 2011-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-127
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Change the order of
+	commands to facilitate for data with lons between 0:360
+
+2011-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-126
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): 
+
 	* geoplots/gmt/test_gmt.m: Added difference plot test (new test1)
 
 	* geoplots/gmt/gmt_plot.m: Changed name of field: in.white_boxes
