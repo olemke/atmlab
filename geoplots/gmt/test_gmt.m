@@ -21,23 +21,26 @@ in = optargs_struct(in,default);
 
 [gridded,ungridded] = dummy_data;
 
- %TEST: title, unit (gridded and ungridded)
-files        = TEST1(in,gridded,ungridded,files);
+%TEST: polar, reference, nlevels, sidebar
+files        = TEST1(in,gridded,files);
+
+%TEST: title, unit (gridded and ungridded)
+files        = TEST2(in,gridded,ungridded,files);
 
 %TEST: sidebar, nan, projection, center
-files{end+1} = TEST2(in,gridded); 
-
-%TEST: custom color table, header_size, map_width, grid lines
 files{end+1} = TEST3(in,gridded); 
 
+%TEST: custom color table, header_size, map_width, grid lines
+files{end+1} = TEST4(in,gridded); 
+
 %TEST: contours, nlevels, annotation format, xunit
-files{end+1} = TEST4(in);         
+files{end+1} = TEST5(in);         
 
 %TEST: locations, nodata, regions, map details
-files        = TEST5(in,files);          
+files        = TEST6(in,files);          
 
 %TEST: pspolygon, basemap_axis
-files{end+1} = TEST6(in);
+files{end+1} = TEST7(in);
 
 %%%%%%%%%%%%%%%%%
 % SUB FUNCTIONS
@@ -66,10 +69,31 @@ for j=0:180
     end
 end
 
-function files = TEST1(in,gridded,ungridded,files)
-%% TEST 1: title, unit (gridded and ungridded)
+
+function files        = TEST1(in,gridded,files)
+%% TEST: Difference plot, reference=0, nlevels, sidebar
 
 if ~ismember(1,in.test), return, end %then don't do this test
+
+gridded.data = gridded.data-200;  % for difference 
+test.ctable = 'mypolar';
+test.reference = 0;
+test.legend.sidebar = 3; % both above and below
+test.basemap_axis = 'nesw';
+test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+test.legend.sidebar = 2; % above only
+test.nlevels = 15; 
+test.nwhite = 6;
+test.header_size = 20;
+test.title = 'Diff plot,nlevels=15,ref=0,nwhite=6,sidebar=2 (above)';
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+function files = TEST2(in,gridded,ungridded,files)
+%% TEST: title, unit (gridded and ungridded)
+
+if ~ismember(2,in.test), return, end %then don't do this test
 
 test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
@@ -79,10 +103,10 @@ files{end+1} = gmt_plot(catstruct(in,gridded,test),'data');
 test.title        = 'ungridded: title², unit';
 files{end+1} = gmt_plot(catstruct(in,ungridded,test),'data');
 
-function file = TEST2(in,gridded)
-%% TEST2: sidebar, nan, projection, center
+function file = TEST3(in,gridded)
+%% TEST: sidebar, nan, projection, center
 
-if ~ismember(2,in.test), file='';return, end %then don't do this test
+if ~ismember(3,in.test), file='';return, end %then don't do this test
 
 gridded.data(20:40,20:80) = NaN;
 test.title      = 'upper sidebar, NaN, Hammer projection, center';
@@ -92,10 +116,10 @@ test.datarange  = [160,250];% displayed value range. Sidebar triangles shown for
 
 file = gmt_plot(catstruct(in,gridded,test),'data');
 
-function file = TEST3(in,gridded) 
-%% TEST3: custom color table, header_size, map_width, grid lines, region
+function file = TEST4(in,gridded) 
+%% TEST: custom color table, header_size, map_width, grid lines, region
 
-if ~ismember(3,in.test), file=''; return, end %then don't do this test
+if ~ismember(4,in.test), file=''; return, end %then don't do this test
 
 if ~isfield(in,{'stepsize','nlevels'})
     tmp = cell(1,20);
@@ -122,10 +146,10 @@ test.colorrange.color_model = 'RGB';
 
 file = gmt_plot(catstruct(in,gridded,test),'data');
 
-function file = TEST4(in)
+function file = TEST5(in)
 %% TEST: contours, nlevels, annotation format, xunit
 
-if ~ismember(4,in.test), file=''; return, end %then don't do this test
+if ~ismember(5,in.test), file=''; return, end %then don't do this test
 
 test.lat = -90:90;
 test.lon = -180:180;
@@ -155,10 +179,10 @@ test.nlevels = 5;
 
 file = gmt_plot (catstruct(in,test), 'data');
 
-function files = TEST5(in,files)
+function files = TEST6(in,files)
 %% TEST: locations, nodata 
 
-if ~ismember(5,in.test), return, end %then don't do this test
+if ~ismember(6,in.test), return, end %then don't do this test
 
 names = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki','Oberstdorf','Tehran','Amsterdam','Lauchhammer','Freiburg'};
 lats = [67.85 -27.48 48.83 53.1 9.9 47.3 35.7 52.4 51.5 48];
@@ -201,10 +225,10 @@ test.region = '12/22/65/70';
 test.coast.rivers = 'a';
 files{end+1} = gmt_plot(test);
 
-function file = TEST6(in)
-%TEST: pspolygon
+function file = TEST7(in)
+%% TEST: pspolygon
 
-if ~ismember(6,in.test), return, end %then don't do this test
+if ~ismember(7,in.test), file=''; return, end %then don't do this test
 
 % REGIONS FROM eliasson11:assessing_acp
 a = [-12    80    16   100;...

@@ -198,7 +198,7 @@ function filename = gmt_plot(in,field)
 %                                     difference plots, but any reference
 %                                     will work.
 %                     
-%                       in.whiteboxes: |%d|
+%                       in.nwhite:     |%d|
 %                                      The number of white contours around
 %                                      a reference value
 %                                      | determined by number of levels |

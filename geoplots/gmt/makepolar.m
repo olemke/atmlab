@@ -1,8 +1,9 @@
-function filecpt = makepolar(tickval,prtstr,in)
+function filecpt = makepolar(tickval,in)
 %%                     makepolar
 %
 % Puropose: To create a .cpt file based on the 'polar'
-%           colourtable that garantess white color around a reference value (e.g. in.reference = 0)
+%           colourtable that garantees white color around a reference value 
+%           (e.g. in.reference = 0)
 %
 %         
 % In:     1) The data contour values
@@ -12,99 +13,57 @@ function filecpt = makepolar(tickval,prtstr,in)
 % Out:    file location
 %
 % What it does:
-%             In the same mannner as makecpt -Cpolar,
-%             except that here the reference 1 or 3 contour levels
-%             colored white if the number of contours is
-%             odd depending on the number of nlevels. If the number of contour 
-%             lines is even the reference 0, 2 boxes will be white.
+%             Similar to makecpt -Cpolar, but more fancy. Uses a gradient in
+%             the color depending on the number of contours, where the
+%             reference is relative to max/min data and the number of boxes
+%             that should be white. Gradient is from blue to white to red,
+%             and the grandient is equal on both sides of the reference. 
 %
 % $Author$
 % $Date$
 
-
-BG = [0,0,139]; % background colour (low extreme)
-FG = [128,0,0]; % foreground colour (high extreme)
-
 % string format to file 
-strannot = isfield(in,'tick_annotations') && ~isempty(in.tick_annotations);
-if strannot
-    strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
-        prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f',' ;%s','\n');
-else
-    strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
-        prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
+diff = tickval(2)-tickval(1);
+b=~isequal(floor(diff),diff);
+x=diff;
+while x < 0
+    b = b+1;
+    x = x*10^b;
 end
+prtstr=sprintf('%%.%df',b);
+strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
+    prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
-if ~in.sidebar
-   sidebars = [tickval(1) tickval(end)];
-   tickval = tickval(2:end-1);
+% WHITEBOXES
+if ~isfield(in,'nwhite')
+    nw = ceil((length(tickval)-1)/10);
+else
+    nw = in.nwhite;
 end
-nlevels = length(tickval)-1;
+% REFERENCE
 if ~isfield(in,'reference')
     ref = (max(tickval)+min(tickval))/2;
 else ref = in.reference;
 end
-% tick closest to reference
-reftick = tickval(abs(tickval-ref) == min(abs(tickval-ref))); reftick = reftick(1);
 
-% Get white boxes
-if ~isfield(in,'whiteboxes')
-   whites = set_white_bars(length(tickval));
-else whites = in.whiteboxes;
+[BT,TT,nw] = get_white_boxes(tickval,ref,nw);
+
+n_colored_steps = [ length(tickval(1:BT-1)) length(tickval(TT+1:end))];
+
+inc = 255/max(n_colored_steps); % step gradient
+
+ctable = zeros(length(tickval)-1,3);
+% BLUE 
+for i = 1:BT-1
+    ctable(BT-i,:) = [255-i*inc,255-i*inc,255];
 end
-
-if ref == reftick && mod(nlevels,2)
-    whites = whites+1;
+% WHITE
+if ~isempty(BT:TT-1) %empty=nowhite
+    ctable(BT:TT-1,:) = repmat(255,nw,3);
 end
-
-if mod(whites,2) %odd
-    R = ref;
-else R = reftick;
-end
-
-% find closest surrounding tickval to the chosen reference
-bf = tickval(tickval < R);
-af = tickval(tickval > R);
-n_colored_steps = [length(bf) - mod(whites,2) - floor(whites/2), ...
-    length(af) - mod(whites,2) - floor(whites/2)];
-
-
-inc = 255/(max(n_colored_steps));
-% BELLOW ref
-bottom_color_incr = 0:inc:255-inc;
-bottom_color_incr = bottom_color_incr(end-n_colored_steps(1)+1:end);
-% ABOVE ref
-top_color_incr = 255-inc:-inc:0;
-top_color_incr = top_color_incr(1:n_colored_steps(2));
-
-%% Make the array of colors
-if ~in.sidebar
-    ctable = zeros(nlevels+2, 3);
-    ctable(1,:,:) = BG;
-    ctable(end,:,:) = FG;
-    tickval = [sidebars(1) tickval sidebars(2)];
-    x = 2;
-else
-    ctable = zeros(nlevels, 3);
-    x = 1;
-end
-
-%blue
-for i = 1:length(bottom_color_incr)
-    ctable(x,:) = [bottom_color_incr(i) bottom_color_incr(i) 255];
-    x = x+1;
-end
-
-%white (refers to number of white boxes)
-for i = 1:whites
-    ctable(x,:) = [255 255 255];
-    x = x+1;
-end
-
-%red
-for i = 1:length(top_color_incr)
-    ctable(x,:) = [255 top_color_incr(i) top_color_incr(i)];
-    x = x+1;
+% RED
+for i = 1:length(tickval)-TT
+    ctable(TT-1+i,:) = [255 255-i*inc,255-i*inc];
 end
 
 %% Make a cptfile out of it
@@ -116,30 +75,42 @@ fprintf(fid,'%s\t%s\n','#cpt file created by:','makepolar.m');
 fprintf(fid,'%s\n%s\n','#COLOR_MODEL = RGB','#');
 %############################################################
 
-for ii = 1:nlevels+2*~in.sidebar
-    if strannot
-    fprintf(fid,strtot,tickval(ii),ctable(ii,1),ctable(ii,2),ctable(ii,3),...
-        tickval(ii+1),ctable(ii,1),ctable(ii,2),ctable(ii,3),in.tick_annotations{ii});
-        
-    else
+for ii = 1:length(tickval)-1
     fprintf(fid,strtot,tickval(ii),ctable(ii,1),ctable(ii,2),ctable(ii,3),...
         tickval(ii+1),ctable(ii,1),ctable(ii,2),ctable(ii,3));
+end
+
+% Set Background and forground colors base on the last color minus 2 times
+% the gradient of color change used in ctable
+if isfield(in,'color_background')
+    BG = in.color_background;
+else
+    tmp = ctable(1,1);
+    if (tmp-2*inc)>0
+        BG = [tmp-2*inc tmp-2*inc 255];
+    else
+        BG = [tmp tmp 255-2*inc];
     end
 end
-
-% incase the reference is far from the middle of the range, don't use the
-% predefined BG or FG
-if length(top_color_incr) - length(bottom_color_incr) > 2
-    col = top_color_incr(length(bottom_color_incr)+2);
-    BG = [col col 255]; 
-elseif length(bottom_color_incr) - length(top_color_incr) > 2
-    col = bottom_color_incr(end-(length(top_color_incr)+1));
-    FG = [255 col col]; 
+if isfield(in,'color_foreground')
+    FG = in.color_foreground;
+else
+    tmp = ctable(end,end);
+    if (tmp-2*inc)>0
+        FG = [255 tmp-2*inc tmp-2*inc];
+    else
+        FG = [255-2*inc tmp tmp];
+    end
 end
-
-fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','B',BG); %Navy
-fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','F',FG); %Maroon
-fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',128,128,128); %grey
+if isfield(in,'color_nan')
+    N = in.color_nan;
+else
+    N = [128 128 128]; %Grey
+end
+% Background, Foreground, and NaN color
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','B',BG);
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','F',FG);
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',N);
 
 fclose(fid);
 
@@ -148,15 +119,44 @@ fclose(fid);
 %   ||||||
 %   vvvvvv
 
-function whitebars = set_white_bars(mxwbs)
-%% set the number of white boxes in the legend
+function [BT,TT,nw] = get_white_boxes(tickval,ref,nw)
+%% get_white_boxes
 
-if mxwbs >= 20
-    whitebars =3+mod(mxwbs,2);
-elseif mxwbs >= 10
-    whitebars =2+~mod(mxwbs,2);
-elseif mxwbs >= 6
-    whitebars = 1+mod(mxwbs,2);
-else
-    whitebars = ~mod(mxwbs,2);
+% FIND WHITE TICKS
+len = 1:length(tickval);
+if ~mod(nw,2) %even nwhites
+    reftick = len(abs(tickval-ref) == min(abs(tickval-ref)));
+    if ~ ( length(reftick)==2 )
+        BT = len(reftick)-nw/2;
+        TT = len(reftick)+nw/2;
+        if BT <= 0, BT = [];end
+        if ref > tickval(end), BT = len(end);end
+        if TT >= len(end), TT = [];end
+        if ref < tickval(1), TT = 1;end
+    else
+        % right in between 2 ticks
+        nw=nw+1;
+        disp('Reference is exactly between two ticks. Increasing number of white boxes so that the number is odd instead')
+        [BT,TT] = get_white_boxes(tickval,ref,nw);
+        return
+    end
+else % odd nwhites
+    if ~ismember(ref,tickval)
+        tmp = len(tickval<=ref);
+        if ~isempty(tmp)
+            BT =  tmp(end);
+        else BT = [];
+        end
+        tmp = len(tickval>=ref);
+        if ~isempty(tmp)
+            TT = tmp(1);
+        else TT = [];
+        end
+    else
+        % right in between 2 ticks
+        nw=nw+1;
+        disp('Reference is exactly on a tick. Increasing the number of white boxes so that the number is even instead')
+        [BT,TT] = get_white_boxes(tickval,ref,nw);
+        return
+    end
 end

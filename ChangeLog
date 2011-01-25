@@ -1,3 +1,16 @@
+2011-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geoplots/gmt/test_gmt.m: Added difference plot test (new test1)
+
+	* geoplots/gmt/gmt_plot.m: Changed name of field: in.white_boxes
+	to in.nwhite
+
+	* geoplots/gmt/create_gmt_earth.m: Now automatically decide the
+	annotation for the legend from the tick values if none is
+	in.legend.annotation_format is not given.
+
+	* geoplots/gmt/makepolar.m: Updated function for difference plots.
+
 2011-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-125

@@ -237,9 +237,6 @@ if isfield(in,'cptfile')
     return
 end
 
-% Generate cptfile
-prtstr = '%.12f';
-
 % MAKE a custom colour table based on manually input color values
 if isfield(in,'colorrange')
     in.ctable = 'colorrange';
@@ -253,7 +250,7 @@ end
 % generate cpt files
 switch in.ctable    
     case 'mypolar'
-        a.cptfile = makepolar(tickval,prtstr,in);        
+        a.cptfile = makepolar(tickval,in);        
     case 'colorrange'
         cpt_from_colorrange(in.colorrange);
         a.cptfile = makecpt(in);
