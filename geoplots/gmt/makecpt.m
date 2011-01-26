@@ -17,7 +17,7 @@ mkcpt = sprintf('makecpt -C%s',se.ctable);
 mi = se.datarange(1);
 mx = se.datarange(2);
 step = se.stepsize;
-mkcpt = sprintf('%s -T%d/%d/%d',mkcpt,mi,mx,step);
+mkcpt = sprintf('%s -T%f/%f/%f',mkcpt,mi,mx,step);
 
 if isfield(se,'color_nan')
     mkcpt = sprintf('%s --COLOR_NAN=%s',mkcpt,se.color_nan);

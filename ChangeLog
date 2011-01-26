@@ -1,5 +1,18 @@
 2011-01-26  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-130
+
+	* geoplots/gmt/makecpt.m:
+
+	Use floats not integers for makecpt's -T option.
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Use sscanf to parse the region string instead of textscan or
+	cellfunned regexps.
+
+2011-01-26  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-129
 
 	* geoplots/gmt/write_gmtgrid.m:

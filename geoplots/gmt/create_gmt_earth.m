@@ -278,9 +278,9 @@ if ~isstruct(in.coast)
     return
 end
 % Set resolution of coastal features
-rg = textscan(in.plot.region','%f','delimiter','/');
-ln=rg{1}(2)-rg{1}(1);
-lt=rg{1}(4)-rg{1}(3);
+rg=sscanf(in.plot.region,'%f/%f/%f/%f');
+ln=rg(2)-rg(1);
+lt=rg(4)-rg(3);
 if ~isfield(in.coast,'features')
     const = 65;%constant => features ~1000km for full map
     a.features = ln*lt/const;
@@ -400,9 +400,9 @@ function basemap = last_psbasemap(in)
 
 % default.ticks = '60g60/30g30' (global)
 % in.plot.region has this format: 'lon1/lon2/lat1/lat2'
-x = cellfun(@(x)(str2double(x)),regexp(in.plot.region,'/','split'));
-lon=x(2)-x(1);
-lat=x(4)-x(3);
+rg=sscanf(in.plot.region,'%f/%f/%f/%f');
+lon=rg(2)-rg(1);
+lat=rg(4)-rg(3);
 
 % for nice step lengths
 
