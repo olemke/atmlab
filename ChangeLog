@@ -1,3 +1,10 @@
+2011-01-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-131
+
+	* demos/qarts_scattering_demo.m: Extended range of lat and lon
+	grids, to pass new check in arts. 
+
 2011-01-26  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-130

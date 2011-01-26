@@ -265,7 +265,7 @@ end
 
 %- Map to 2D or 3D?
 %
-latlon_grid = [-15:0.5:15]';
+latlon_grid = [-25:0.5:25]';
 csize       = 1;
 %
 if any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 2
