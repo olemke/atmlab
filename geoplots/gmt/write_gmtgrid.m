@@ -21,6 +21,11 @@
 
 function write_gmtgrid (x, y, z, cdf)
 
+if exist('OCTAVE_VERSION')
+  write_gmtgrid_octave( x, y, z, cdf);
+  return;
+end;
+
 [ny,nx] = size(z);
 
 % Create the file  
@@ -46,8 +51,6 @@ dimids = [ lon_dimid lat_dimid ];
 % Define the netCDF data variable.
 mean_varid = netcdf.defVar (ncid, 'z', 'float', dimids);
 
-%
-% Assign units attributes to coordinate variables.
 netcdf.putAtt ( ncid, lon_varid, 'long_name', 'x' );
 netcdf.putAtt ( ncid, lat_varid, 'long_name', 'y' );
 netcdf.putAtt ( ncid, mean_varid, 'long_name', 'z' );
@@ -60,4 +63,39 @@ netcdf.putVar ( ncid, lat_varid, y );
 netcdf.putVar ( ncid, mean_varid, z' );
 
 netcdf.close (ncid);
+
+
+%% WRITE_GMTGRID_OCTAVE
+
+function write_gmtgrid_octave (x, y, z, cdf)
+
+[ny,nx] = size(z);
+
+nc = netcdf ( cdf, 'c' );
+
+%
+% Define the dimensions.
+nc('x') = nx;
+nc('y') = ny;
+
+%
+% Write the variable dimensions.
+nc{'x'} = ncdouble ( 'x' );
+nc{'x'}.long_name = 'x';
+
+nc{'y'} = ncdouble ( 'y' );
+nc{'y'}.long_name = 'y';
+
+nc{'z'} = ncdouble ( 'y', 'x' );
+nc{'z'}.long_name = 'z';
+
+%
+% Write the variables.
+nc{'x'}(:) = x;
+nc{'y'}(:) = y;
+nc{'z'}(:) = z;
+
+nc.node_offset = '1';
+
+close (nc);
 
