@@ -1,3 +1,13 @@
+2011-01-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-128
+
+	* geoplots/gmt/save_nc_gmt_input.m: Rephrased error message a bit.
+
+	* geoplots/gmt/gmt_plot.m: Throw an error if min(data)==max(data).
+	Changed the isgridded test to not be duped by data where
+	length(in.lat)==length(in.lon)
+
 2011-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-127
@@ -8,8 +18,6 @@
 2011-01-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-126
-
-	* geoplots/gmt/gmt_plot.m (gmt_plot): 
 
 	* geoplots/gmt/test_gmt.m: Added difference plot test (new test1)
 

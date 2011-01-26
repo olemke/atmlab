@@ -738,7 +738,7 @@ pos2 = b==length(se.lat)&a==length(se.lon); %(lon,lat)
 % if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
 % assume it's not.
 if ~isfield(se,'gridded')
-    ig = ~(pos1 && pos2) && (pos1 || pos2);
+    ig = ~ (isequal(size(se.(field)),size(se.lat),size(se.lon))) ;
     if ~ig
         se.(field) = se.(field)(:);
         se.lat = se.lat(:);
@@ -746,7 +746,10 @@ if ~isfield(se,'gridded')
         se.gridded = false;
         txt1 = 'is NOT';txt2='1';txt3='is';
     else
-        if pos2, se.(field)=se.(field)';end % want it in (lat,lon)
+        if pos2 && (pos2 ~= pos1)
+            % want it in (lat,lon)
+            se.(field)=se.(field)';
+        end 
         se.gridded = true;
         txt1 = 'is';txt2='0';txt3='isn''t';
     end
@@ -783,6 +786,9 @@ if ~isfield(se,'lon')
         se.lon = se.(l{isfield(se,l)});
     else error('atmlab:input','No longitudes present')
     end
+end
+if se.datarange(1)==se.datarange(2)
+    error('atmlab:input','min(data) must not be equal to max(data)')
 end
 
 function hunt_down_errors(command,errors)
