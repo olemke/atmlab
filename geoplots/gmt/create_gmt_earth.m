@@ -21,7 +21,7 @@ commands{end+1} = 'gmtset PAPER_MEDIA a0';
 
 % Size of title
 if isfield(in,'header_size')                                                    
-    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %dp',in.header_size);
+    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %fp',in.header_size);
 end
 
 % Annotations of axis
@@ -116,9 +116,9 @@ function in = setup_create_gmt_earth(in)
 % REGION
 if ~isfield(in,'region')                                                        
     if in.gridded && in.lon(end)+in.lon(end)-in.lon(end-1) == in.lon(1)+360
-        in.plot.region = sprintf('-180/180/%d/%d',in.lat(1),in.lat(end));
+        in.plot.region = sprintf('-180/180/%f/%f',in.lat(1),in.lat(end));
     else
-        in.plot.region = sprintf('%d/%d/%d/%d',...
+        in.plot.region = sprintf('%f/%f/%f/%f',...
             min(min(in.lon)),max(max(in.lon)),...
             min(min(in.lat)),max(max(in.lat)));
     end
@@ -173,12 +173,12 @@ function proj = setup_projection(in)
 
 if isempty(in.center) || ~strcmp(in.plot.region(1:9),'-180/180/')
     disp('Data is not cyclic, choosing in.centre for projection from center longitude...')
-    x = textscan(in.plot.region','%f','delimiter','/');
-    C = (x{1}(1)+x{1}(2))/2;
+    x = sscanf(in.plot.region,'%f/%f/%f/%f');
+    C = (x(1)+x(2))/2;
 else C = in.center;
 end
 
-proj = sprintf('%s%d/%di',in.projection,C,in.map_width);
+proj = sprintf('%s%f/%fi',in.projection,C,in.map_width);
 
 function basemap = setupbasemap(in)
 %% setupbasemap
@@ -210,14 +210,14 @@ if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
     delta = sqrt(numel(in.(in.fieldname)) / A);
     inc = ceil(60/delta *2); % times 2 is to make it a bit bigger
     if inc>60, inc=60; end
-    a.increment = sprintf('%dm',inc); %i.e. One degree
+    a.increment = sprintf('%fm',inc); %i.e. One degree
 else
     a.increment = in.nearneighbor.increment;
 end
 
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'search')
     sc = ceil( str2double(a.increment(1:end-1)));
-    a.search = sprintf('%dm',sc);
+    a.search = sprintf('%fm',sc);
 else
     a.search = in.nearneighbor.search;
 end
@@ -260,7 +260,7 @@ switch in.ctable
             a.cptfile = makecpt(in);
         else
             exec_gmt_cmd(in.makecpt);
-            tmp = regexp(in.makecpt,'> ','split');
+            tmp = splitstring(in.makecpt,'> ');
             a.cptfile = tmp{2};
         end
 end

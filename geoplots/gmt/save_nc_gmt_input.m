@@ -16,6 +16,11 @@ if ~isequal(numel(data),numel(lon),numel(lat))
     error('atmlab:input','This data is expected to be ungridded')
 end
 
+if exist('OCTAVE_VERSION')
+  save_nc_gmt_input_octave (filename, data, lat, lon);
+  return;
+end;
+
 ncid = netcdf.create (strrep(filename,'~',getenv('HOME')), 'NC_CLOBBER');
 
 len = netcdf.defDim (ncid, 'numel', length(data));
@@ -31,3 +36,21 @@ netcdf.putVar (ncid, varid2, lat);
 netcdf.putVar (ncid, varid3, data);
 
 netcdf.close (ncid);
+
+
+function save_nc_gmt_input_octave (filename, data, lat, lon)
+
+nc = netcdf (strrep(filename,'~',getenv('HOME')), 'c');
+
+nc('numel') = length(data);
+
+nc{'x'} = ncdouble ('numel');
+nc{'y'} = ncdouble ('numel');
+nc{'z'} = ncdouble ('numel');
+
+nc{'x'}(:) = lon;
+nc{'y'}(:) = lat;
+nc{'z'}(:) = data;
+
+close (nc);
+

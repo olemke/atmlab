@@ -1,3 +1,46 @@
+2011-01-27  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-132
+
+	* test_gmt now also works in Octave. Only one issue remaining where
+	the font size of some titles is different in plots generated from
+	Octave compared to the plots generated from Matlab.
+
+	* handy/catstruct.m:
+
+	Pass 1 (dim) as third argument to cell2struct to make Octave happy.
+
+	* handy/splitstring.m:
+
+	Added function to split a string into tokens at the given separator
+	which works in Matlab and Octave. In Matlab the function uses
+	regexp(...,...,'split'), in Octave it uses strsplit().
+
+	This is necessary because Octave doesn't support the 'split' option in
+	regexp, but Matlab doesn't have Octave's strsplit function.
+
+	* geoplots/gmt/cpt_from_colorrange.m, geoplots/gmt/xtra_nan_legend.m,
+	geoplots/gmt/create_gmt_earth.m:
+
+	Use splitstring instead of regexp directly.
+
+	* geoplots/gmt/save_nc_gmt_input.m: Modified to also work in Octave.
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Replace another textscan with sscanf.
+
+	* geoplots/gmt/pscoast.m, geoplots/gmt/create_gmt_earth.m,
+	geoplots/gmt/gmt_plot.m:
+
+	Replace %d with %f where applicable. Matlab outputs %d values as
+	floats although the documentation says it should output them as
+	integers which would also be consistent with the sprintf function in
+	the C library.
+
+	Matlab: sprintf('%d', 1.5') -> ans = 1.500000e+00
+	Octave: sprintf('%d', 1.5') -> ans = 1;
+
 2011-01-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-131

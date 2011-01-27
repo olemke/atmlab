@@ -93,7 +93,7 @@ end
 
 if ~isempty(FN),
     % This deals correctly with cell arrays
-    A = cell2struct(VAL, FN);
+    A = cell2struct(VAL, FN, 1);
 else
     A = struct([]) ;
 end

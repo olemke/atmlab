@@ -102,7 +102,7 @@ function filename = gmt_plot(in,field)
 % 
 % in.region           |%s|
 %                     E.g. '-180/180/-90/90'=global range, defined from 
-%                      sprintf('%d/%d/%d/%d',lon1,lon2,lat1,lat2)
+%                      sprintf('%f/%f/%f/%f',lon1,lon2,lat1,lat2)
 %                     | determined by input lat/lon range. |
 %                     ------------
 % in.nearneighbor     |%s|
@@ -219,7 +219,7 @@ function filename = gmt_plot(in,field)
 %                     stepsize using datarange)
 %                     | 20 |
 %                     ------------
-% in.stepsize         |%d| 
+% in.stepsize         |%f| 
 %                     The stepsize between data values. This overrides
 %                     nlevels (-T/min/max/stepsize in makecpt)
 %                     | determined by nlevels |
