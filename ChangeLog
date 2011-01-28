@@ -1,3 +1,10 @@
+2011-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-133
+
+	* gridcreation/grid_weightspaced.m: Created. (In Sep., missed to
+	add it!)
+
 2011-01-27  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-132
