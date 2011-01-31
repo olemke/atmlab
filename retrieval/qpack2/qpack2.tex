@@ -192,7 +192,7 @@ This option is triggered by setting the spectrum field to be empty (if \verb|Y|
 is an array, this must be done for elements):
 \begin{verbatim}
 ...
-Yempty.Y = []; 
+Ye.Y = []; 
 Ysim = qpack2( Q, O, Ye );
 \end{verbatim}
 The output is a copy of \verb|Ye|, with the field \verb|Ysim.Y| set to the
@@ -512,7 +512,11 @@ The retrieved species are indexed after the order they are specified in
 \verb|Q| and named as \verb|species1|, \verb|species2| \dots A number of fields
 is returned for each species. The field names below are valid for species 1. If
 two species are retrieved there is also a field named as \verb|species2_name|
-etc. This set of fields are available:
+etc. For fields where unit depends on \verb|Q.SPECIES(i).UNIT|, the unit of the 
+returned field is \verb|vmr| for all settings of \verb|Q.SPECIES(i).UNIT| except 
+for \verb|nd|, where the returned fields are given in number density. 
+
+These set of fields are available:
 
 \newfield 
 \verb|species1_name|:\\
@@ -528,19 +532,19 @@ Retrieved profile. Unit depends on \verb|Q.SPECIES(i).UNIT|.
 
 \newfield 
 \verb|species1_xa|:\\
-A priori state for the species.
+A priori state for the species. Unit depends on \verb|Q.SPECIES(i).UNIT|.
 
 \newfield 
 \verb|species1_e|:\\
-Total retrieval (observation + smoothing) error for the species.
+Total retrieval (observation + smoothing) error for the species. Unit depends on \verb|Q.SPECIES(i).UNIT|.
 
 \newfield 
 \verb|species1_eo|:\\
-Observation error for the species.
+Observation error for the species. Unit depends on \verb|Q.SPECIES(i).UNIT|.
 
 \newfield 
 \verb|species1_es|:\\
-Smoothing error for the species.
+Smoothing error for the species. Unit depends on \verb|Q.SPECIES(i).UNIT|.
 
 \newfield
 \verb|species1_mr|:\\

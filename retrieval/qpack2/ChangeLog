@@ -1,3 +1,7 @@
+2011-01-31  Ole Martin Christensen  <olem@chalmers.se>
+
+	* qpack2.tex: Added comments about the units of the returned fields
+
 2010-10-19  Ole Martin Christensen  <olem@chalmers.se>
 
 	* qpack2.m: (qp2_y2Q): Added the possibility to use Z_ATMDATA
