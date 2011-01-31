@@ -1,3 +1,11 @@
+2011-01-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-134
+
+	* arts/qarts2cfile.m (add_rtecalcstart): Removed code around J_UNIT.
+
+	* arts/qarts.m (qarts): Removed Q.J_UNIT (as now removed from arts).
+
 2011-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-133

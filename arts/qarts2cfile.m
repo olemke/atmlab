@@ -1606,13 +1606,6 @@ function T = add_rtecalcstart( Q )
     T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
   end
 
-  if qarts_isset( Q.J_DO )  &  Q.J_DO
-    if qarts_isset( Q.J_UNIT )
-      rqre_datatype( Q.J_UNIT, @ischar, 'Q.J_UNIT' );                       %&%
-      T{end+1} = sprintf( 'StringSet(jacobian_unit,"%s")', Q.J_UNIT );
-    end
-  end
-
   if qarts_isset( Q.WSMS_BEFORE_RTE )
     T = add_wsms( T, 'WSMS_BEFORE_RTE', Q.WSMS_BEFORE_RTE );
   end
