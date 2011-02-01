@@ -1,5 +1,14 @@
 2011-02-01  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-136
+
+	* geoplots/gmt/gmt_plot.m:
+
+	Redirect output of viewer command to /dev/null to avoid blocking issue
+	in Octave.
+
+2011-02-01  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-135
 
 	* geoplots/gmt/gmt_plot.m, geoplots/gmt/create_gmt_earth.m:

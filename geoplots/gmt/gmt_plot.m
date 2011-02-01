@@ -604,7 +604,7 @@ if isnan(openwith)
     openwith = atmlab('OPEN_COMMAND');
 end
 if se.display && ~any(isnan(openwith))
-    command{end+1} = sprintf('%s %s/%s.%s &',openwith,se.outdir,se.filename,se.figuretype);
+    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',openwith,se.outdir,se.filename,se.figuretype);
 end
 
 out = exec_gmt_cmd(command,atmlab('VERBOSITY')); % execute commands
