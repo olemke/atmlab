@@ -13,8 +13,8 @@ in = setup_create_gmt_earth(in);
 F = in.filename;
 
 % Remove earlier .ps and gmt residules
-commands{1} = sprintf('rm -f %s.{ps,eps}',F);                                
-commands{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
+commands{1} = sprintf('rm -f %s.ps %s.eps',F,F);                                
+commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
 
 % Set paper size
 commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      

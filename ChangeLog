@@ -1,3 +1,12 @@
+2011-02-01  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-135
+
+	* geoplots/gmt/gmt_plot.m, geoplots/gmt/create_gmt_earth.m:
+
+	Don't use curly brace expansion in system commands for more octave
+	compatibility.
+
 2011-01-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-134

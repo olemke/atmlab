@@ -582,10 +582,10 @@ end
 
 command{end+1} = sprintf('ps2raster %s.ps -A -P %s',se.filename,T);
 
-command{end+1} = sprintf('rm -f .gmt{commands4,defaults4} ');
+command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 
 if ~se.keep_files
-    command{end+1} = sprintf('rm -f %s.{grd,asc,ps} *.cpt',se.filename);
+    command{end+1} = sprintf('rm -f %s.grd %s.asc %s.ps *.cpt',se.filename,se.filename,se.filename);
 end
 
 if isdir(se.outdir)
@@ -634,7 +634,8 @@ function legend = makelegendpdf(command,outdir)
 file = 'legend.ps';
 
 %make sure it's not here
-exec_gmt_cmd(sprintf('rm -f %s.{ps,eps,pdf}',file(1:end-3)))
+basename=file(1:end-3);
+exec_gmt_cmd(sprintf('rm -f %s.ps %s.eps %s.pdf',basename,basename,basename))
 
 %Remove trailing .ps entry
 crop=regexp(command,'>>');
