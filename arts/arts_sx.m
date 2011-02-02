@@ -54,6 +54,16 @@ for i = 1 : nq
     %
     Sx(ind,ind) = Q.ABS_SPECIES(ig).SX;
    
+   case 'Atmospheric temperatures'   %-----------------------------------------
+    %
+    rqre_field( Q.T, 'SX', 'Q.T' );                                         %&%
+    rqre_datatype( Q.T.SX, @istensor2, 'Q.T.SX' );                          %&%
+    if any( size(Q.T.SX) ~= length(ind) )                                   %&%
+      error( sprintf('Wrong size of Q.T.SX.') );                            %&%
+    end                                                                     %&%
+    %
+    Sx(ind,ind) = Q.T.SX;
+   
    case 'Frequency'   %--------------------------------------------------------
     %
     rqre_field( Q.FFIT, 'SX', 'Q.FFIT' );                                   %&%

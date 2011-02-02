@@ -1015,7 +1015,47 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     end % for
   end % if
 
+  
+  %- Atmospheric temperatures
+  %                                                                         %&%
+  rqre_field( Q.T, 'RETRIEVE', 'Q.T' );                                     %&%
+  %
+  if Q.T.RETRIEVE
+    %                                                                       %&%
+    if ~isfield( Q.T, {'GRIDS'} )                                           %&%
+      error( 'With Q.T.RETRIEVED true the field ''GRIDS'' must exist.' );   %&%
+    end                                                                     %&%
+    rqre_datatype( Q.T.RETRIEVE, @isboolean, 'Q.T.RETRIEVE' );              %&%
+    rqre_datatype( Q.T.GRIDS, @iscell, 'Q.T.GRIDS' );                       %&%
+    if length(Q.T.GRIDS) ~= 3                                               %&%
+      error( 'Q.T.GRIDS has not length 3.' );                               %&%
+    end                                                                     %&%
+    %
+    name1    = 'temperature_jac_p_grid';
+    T{end+1} = create_var( name1, 'Vector' );
+    T{end+1} = file_or_data( name1, 'Vector', Q.T.GRIDS{1}, ...
+                              workfolder, Q.INPUT_FILE_FORMAT, name1 );
+    name2    = 'temperature_jac_lat_grid';
+    T{end+1} = create_var( name2, 'Vector' );
+    T{end+1} = file_or_data( name2, 'Vector', Q.T.GRIDS{2}, ...
+                              workfolder, Q.INPUT_FILE_FORMAT, name2 );
+    name3    = 'temperature_jac_lon_grid';
+    T{end+1} = create_var( name3, 'Vector' );
+    T{end+1} = file_or_data( name3, 'Vector', Q.T.GRIDS{3},...
+                                  workfolder, Q.INPUT_FILE_FORMAT, name3 );
+    hse = 'on'; method = 'analytical'; dt = 1;
+    if isfield( Q.T, 'HSE' ) & qarts_isset( Q.T.HSE ), hse = Q.T.HSE; end
+    if isfield( Q.T, 'METHOD' ) & qarts_isset( Q.T.METHOD ), 
+      method = Q.T.METHOD; 
+    end
+    if isfield( Q.T, 'DT' ) & qarts_isset( Q.T.DT ), dt = Q.T.DT; end      
+    T{end+1} ='jacobianAddTemperature(jacobian_quantities,jacobian_agenda,';
+    T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+    T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
+    T{end+1} = sprintf( '  "%s","%s",%.3f)', hse, method, dt );
+  end
 
+  
   %- Frequency
   %
   if qarts_isset(Q.FFIT) 

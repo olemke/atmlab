@@ -157,6 +157,15 @@ for i = 1 : nq
                                                          R.jq{i}.mode ) ); %&%
     end
     
+  case 'Atmospheric temperatures'   %-----------------------------------------
+    %
+    %- Get p and t for each retrieval point
+    grid1         = R.jq{i}.grids{1};
+    R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
+    R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
+                                                             R.jq{i}.grids ) );
+    xa(ind)       = R.x_t(ind);
+   
   case { 'Frequency', 'Polynomial baseline fit', 'Sensor pointing' }
     %
     xa(ind) = 0;    

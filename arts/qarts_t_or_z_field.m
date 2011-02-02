@@ -53,11 +53,11 @@ end
 %- Get data to interpolate
 %
 if strcmp( t_or_z, 't' )
-  if ~qarts_isset( Q.T_ATMDATA )                                            %&%
-    error( 'Q.T_ATMDATA must be set when using this function' );            %&%
+  if ~isfield( Q.T, 'ATMDATA' ) | ~qarts_isset( Q.T.ATMDATA )               %&%
+    error( 'Q.T.ATMDATA must be set when using this function' );            %&%
   end                                                                       %&%
-  G = qarts_get_gformat( Q.T_ATMDATA );
-  rqre_datatype( G, @isatmdata, 'Q.T_ATMDATA' );                            %&%
+  G = qarts_get_gformat( Q.T.ATMDATA );
+  rqre_datatype( G, @isatmdata, 'Q.T.ATMDATA' );                            %&%
 elseif strcmp( t_or_z, 'z' )
   if ~qarts_isset( Q.Z_ATMDATA )                                            %&%
     error( 'Q.Z_ATMDATA must be set when using this function' );            %&%

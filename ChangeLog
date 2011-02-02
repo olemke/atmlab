@@ -1,3 +1,21 @@
+2011-02-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-138
+
+	* Some work to add temperature as retrieval quantity. HSE part is
+	lacking. 
+
+	* arts/qarts2cfile.m (cfile_Jacobi): Added handling of new T
+	jacobian fields.
+
+	* arts/arts_oem_init.m (arts_oem_init): 
+	* arts/arts_x2QR.m (arts_x2QR): 
+	* arts/arts_sx.m (arts_sx): Added handling of temperature as
+	retrieval quantity.
+
+	* arts/qarts.m (qarts): Q.T introduced. Q.T_ATMDATA removed, now
+	handled by Q.T.
+
 2011-02-02  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-137
