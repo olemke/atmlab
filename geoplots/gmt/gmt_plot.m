@@ -545,15 +545,20 @@ if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
     tmp = ['v','h']; %vertical,horisontal
     tmp2 = sprintf('%.2fi/',szdef{1}*in.map_width/9); sz{1} = tmp2(1:end-1);
     tmp2 = sprintf('%.2fi/',szdef{2}*in.map_width/9); sz{2} = [tmp2(1:end-1) 'h'];
-
-    mycondition = ( in.lon(end)-in.lon(1) )/( in.lat(end)-in.lat(1) ) < 2*.85;
-
-    default.orientation = tmp(mycondition+1);     
-    default.dimensions  = sz{mycondition+1};
-    default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
     
+    mycondition = ( in.lon(end)-in.lon(1) )/( in.lat(end)-in.lat(1) ) < 2*.85;
+    
+    default.orientation = tmp(mycondition+1);
+    if isfield(in,'legend') && isfield(in.legend,'orientation')
+        default.dimensions = sz{strcmp(in.legend.orientation,'h')+1};
+    else
+        default.dimensions  = sz{mycondition+1};
+    end
+    default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
     in.legend           = optargs_struct(in.legend,default);
 end
+
+
 
 function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES

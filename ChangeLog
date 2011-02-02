@@ -1,3 +1,10 @@
+2011-02-02  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-137
+
+	* geoplots/gmt/gmt_plot.m: Fixed bug where input
+	in.legend.orientation was being ignored.
+
 2011-02-01  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-136
