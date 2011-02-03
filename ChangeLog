@@ -1,3 +1,18 @@
+2011-02-03  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-139
+
+	* arts/xml/xmlReadArray.m:
+
+	Make sure the elements inside the array match the array's type
+	attribute.
+
+	* arts/xml/xmlReadTag.m: Add optional argument expected_tag.
+
+	* arts/xml/xmlLoad.m:
+
+	Use && instead of &, remove unnecessary sprintf from error calls.
+
 2011-02-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-138

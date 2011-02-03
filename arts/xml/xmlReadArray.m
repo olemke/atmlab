@@ -20,12 +20,12 @@
 
 function result = xmlReadArray(fid, attrlist, itype, ftype, binary, fid2)
 
-ne = str2num (xmlGetAttrValue (attrlist, 'nelem'));
-
+ne = str2double (xmlGetAttrValue (attrlist, 'nelem'));
+atype = xmlGetAttrValue (attrlist, 'type');
+if length(atype) >= 5 && strcmp(atype(1:5), 'Array'), atype = 'Array'; end
 result = {};
 e = 0;
 while e ~= ne
   e = e + 1;
-  result{e} = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result{e} = xmlReadTag(fid, '', itype, ftype, binary, fid2, atype);
 end
-

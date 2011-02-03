@@ -33,13 +33,13 @@ if fid == -1
   if ~strcmp (uncompressed_filename, '')
     delete (uncompressed_filename);
   end
-  error (sprintf ('Cannot open file %s', filename));
+  error ('Cannot open file %s', filename);
 end
 
 %=== Validate XML file header
 c = fgets (fid, 1);
 s = c;
-while ~feof (fid) & c ~= '>'
+while ~feof (fid) && c ~= '>'
   c = fgets (fid, 1);
   s = strcat (s, c);
 end

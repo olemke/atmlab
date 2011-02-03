@@ -15,7 +15,7 @@
 
 % 2002-11-28   Created by Oliver Lemke.
 
-function [result,attrlist] = xmlReadTag(fid, filename, itype, ftype, binary, fid2)
+function [result,attrlist] = xmlReadTag(fid, filename, itype, ftype, binary, fid2, expected_tag)
 
 toplevel = 0;
 exit_loop = 0;
@@ -89,21 +89,25 @@ while ~feof (fid) & ~exit_loop
          if valid == 0
            error ('Cannot find closing tag for comment');
          end
-       otherwise
+        otherwise
+           if exist('expected_tag', 'var') && ~isempty(expected_tag) && ~strcmp(expected_tag, tag)
+               error ('Wrong tag, expected "%s", but got "%s"', ...
+                      expected_tag, tag);
+           end
          func = str2func (strcat ('xmlRead', tag));
          result = feval (func, fid, attrlist, itype, ftype, binary, fid2);
       end
     else %=== or is it a closing tag
       c = fgets (fid, 1);
       s = c;
-      while ~feof (fid) & c ~= '>'
+      while ~feof (fid) && c ~= '>'
         c = fgets (fid, 1);
         s = strcat (s, c);
       end
       if (~toplevel)
         exit_loop = 1;
       else
-        if (strcmp (s, 'arts>') & (fid2))
+        if (strcmp (s, 'arts>') && (fid2))
           fclose (fid2);
         end
       end
