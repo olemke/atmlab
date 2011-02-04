@@ -9,10 +9,9 @@
 %       VMR_FIELD
 %       ABS_SPECIES, that must contain data for H2O. 
 %
-%    In addition, LAT_GRID and LON_GRID must be set with sizes matching
-%    Q.T_FIELD. For example, LAT_GRID shall be a scalar when 
-%    ATMOSPHERE_DIM = 1. This latitude is given to *pt2z*, used for 
-%    determining the gravitational constant.
+%    In addition, LAT_GRID must be set with a size matching Q.T_FIELD. For
+%    example, LAT_GRID shall be a scalar when ATMOSPHERE_DIM = 1. This latitude
+%    is given to *pt2z*, used for determining the gravitational constant.
 %
 % FORMAT   Z = qarts_hse( Q, hse_p, hse_z )
 %        
@@ -33,9 +32,6 @@ if ~qarts_isset( Q.P_GRID )                                                 %&%
 end                                                                         %&%
 if ~qarts_isset( Q.LAT_GRID )                                               %&%
   error( 'Q.LAT_GRID must be set when using this function' );               %&%
-end                                                                         %&%
-if ~qarts_isset( Q.LON_GRID )                                               %&%
-  error( 'Q.LON_GRID must be set when using this function' );               %&%
 end                                                                         %&%
 if ~qarts_isset( Q.T_FIELD     )                                            %&%
   error( 'Q.T_FIELD must be set when using this function' );                %&%
@@ -65,15 +61,12 @@ T        = qarts_get( Q.T_FIELD );
 VMR      = qarts_get( Q.VMR_FIELD );
 p_grid   = qarts_get( Q.P_GRID );
 lat_grid = qarts_get( Q.LAT_GRID );
-lon_grid = qarts_get( Q.LON_GRID );
   
 
 rqre_gridmatch( T, 1, p_grid );                                             %&%
 rqre_gridmatch( T, 2, lat_grid );                                           %&%
-rqre_gridmatch( T, 3, lon_grid );                                           %&%
 rqre_gridmatch( VMR, 2, p_grid );                                           %&%
 rqre_gridmatch( VMR, 3, lat_grid );                                         %&%
-rqre_gridmatch( VMR, 4, lon_grid );                                         %&%
 
 
 Z = zeros( size( T ) );
@@ -82,7 +75,7 @@ for ilon = 1 : size( T, 3 )
   for ilat = 1 : size( T, 2 )
 
     Z = pt2z( p_grid, T(:,ilat,ilon), getdims(VMR(ih2o,:,ilat,ilon),2), ...
-                                             hse_p, hse_z, lat_grid(ilat) );
+                                                hse_p, hse_z, lat_grid(ilat) );
   
   end
 end

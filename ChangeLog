@@ -1,5 +1,14 @@
 2011-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-142
+
+	* geophysics/pt2z.m: Added z_acc, and some polishing.
+
+	* arts/qarts_hse.m (qarts_hse): Removed demand and checks
+	associated with lon_grid, as not used.
+
+2011-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-141
 
 	* geophysics/pt2z.m (z2g): Added information about source of

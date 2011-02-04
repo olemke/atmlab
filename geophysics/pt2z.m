@@ -5,7 +5,13 @@
 %    and altitude of a reference point must be specified.
 %
 %    Molecular weights and gravitational constants are hard coded and 
-%    function is only valid for Earth.
+%    function is only valid for the Earth.
+%
+%    As the gravitation changes with altitude, an iterative process is
+%    needed. The accyuracy can be controlled by *z_acc*. The calculations
+%    are repeated until the max change of the altitudes is below *z_acc*. If
+%    z_acc<0, the calculations are run twice, which should give an accuracy
+%    better than 1 m.
 %
 % FORMAT   z = pt2z( p, t, h2o, p0, z0 [,lat] )
 %        
@@ -16,13 +22,14 @@
 %       p0    Pressure of reference point [Pa].
 %       z0    Altitude of reference point [m].
 %       lat   Latitude. Default is 45.
+%       z_acc Accuracy for z. Default is -1.
 
 % 2005-05-11   Created by Patrick Eriksson.
 
 
-function z = pt2z(p,t,h2o,p0,z0,lat)
+function z = pt2z(p,t,h2o,p0,z0,varargin)
 %
-if nargin < 6, lat = 45; end
+[lat,z_acc] = optargs( varargin, { 45, -1 } );
                                                                             %&%
 rqre_nargin( 5, nargin );                                                   %&%
 rqre_datatype( p, @istensor1 );                                             %&%
@@ -62,8 +69,18 @@ re = wgs84( 2, lat );
 g0 = lat2g0( lat );
 
 
-for iter = 1:2
+%= How to end iterations
+%
+if z_acc < 0
+  niter = 2;
+else
+  niter = 99;
+end  
 
+for iter = 1:niter
+
+  zold = z;
+  
   g = z2g( re, g0, z );
 
   for i = 1 : (np-1)
@@ -86,6 +103,10 @@ for iter = 1:2
   %-- Match the altitude of the reference point
   z = shift2refpoint( p, z, p0, z0 );
 
+  if z_acc >= 0 & max(abs(z-zold)) < z_acc
+    break;
+  end
+  
 end
 
 

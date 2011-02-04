@@ -276,9 +276,9 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   Q.VMR_FIELD = qarts_vmr_field( Q, mjd, ho );
   Q.T_FIELD   = qarts_t_or_z_field( Q, 't', mjd, ho );
   if  qarts_isset(Q.Z_ATMDATA)
-      Q.Z_FIELD   = qarts_t_or_z_field( Q, 'z', mjd, ho );
+    Q.Z_FIELD   = qarts_t_or_z_field( Q, 'z', mjd, ho );
   else
-      Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
+    Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
   end
 
   
