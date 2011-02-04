@@ -245,8 +245,30 @@ for q = 1 : length(R.jq)
                   length( Q.ABS_SPECIES(ispecies).GRIDS{2} ) ];
         end
       end
-    end  
-  
+    end
+    
+  elseif strcmp( R.jq{q}.maintag, 'Atmospheric temperatures' )
+    %--------------------------------------------------------------------------
+      
+      s       = 'temperature';
+      include  = 1;
+      %
+      %
+      L2.([s,'_p']) = Q.T.GRIDS{1};
+      if Q.ATMOSPHERE_DIM >= 2
+        L2.([s,'_lat']) = Q.T.GRIDS{2};
+        if Q.ATMOSPHERE_DIM == 3
+          L2.([s,'_lon']) = Q.T.GRIDS{3};
+          siz = [ length( Q.T.GRIDS{1} );
+                  length( Q.T.GRIDS{2} );
+                  length( Q.T.GRIDS{3} ) ];
+        else
+          siz = [ length( Q.T.GRIDS{1} );
+                  length( Q.T.GRIDS{2} ) ];
+        end
+      end
+    
+    
   elseif strcmp( R.jq{q}.maintag, 'Frequency' )
     %--------------------------------------------------------------------------
     rqre_field( Q.FFIT, 'L2', 'Q.FFIT' );                                   %&%

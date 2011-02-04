@@ -1,3 +1,7 @@
+2011-02-04  Ole Martin Christensen  <olem@chalmers.se>
+
+	* qp2_l2.m: Added output info from temperature retrievals
+
 2011-01-31  Ole Martin Christensen  <olem@chalmers.se>
 
 	* qpack2.tex: Added comments about the units of the returned fields

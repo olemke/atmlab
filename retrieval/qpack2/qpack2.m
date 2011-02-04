@@ -200,8 +200,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    %&%
       error( 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;%&%
     end                                                                     %&%
-    if ~qarts_isset(Q.T_ATMDATA)                                            %&%
-      error( 'Qpack2 requires that Q.T_ATMDATA is set.' );                  %&%
+    if ~qarts_isset(Q.T.ATMDATA)                                            %&%
+      error( 'Qpack2 requires that Q.T.ATMDATA is set.' );                  %&%
     end                                                                     %&%
     % The details of the ATMDATA fields are checked in qarts_vmr_field etc  %&%
     if ~qarts_isset(Q.ABSORPTION)                                           %&%
