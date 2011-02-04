@@ -1,5 +1,12 @@
 2011-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-141
+
+	* geophysics/pt2z.m (z2g): Added information about source of
+	expression.
+
+2011-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-140
 
 	* geophysics/pt2z.m (lat2g0): Replaced table+interpolation, with

@@ -105,7 +105,9 @@ function g = z2g(r_geoid,g0,z)
   %
 return
 
-
+% Expression below taken from Wikipedia page "Gravity of Earth", that is stated
+% to be: International Gravity Formula 1967, the 1967 Geodetic Reference System
+% Formula, Helmert's equation or Clairault's formula.
 function g0 = lat2g0(lat)
   %
   x  = abs( lat );
