@@ -25,11 +25,11 @@
 %    
 %   And so on up to the dimension specified by *DIM*.
 %
-%   It is further allowed to add other fields, to both D and G. These fields
-%   can be used for input to specific functions using gformat arrays as input.
-%   A consequency is that data with different DIM can be mixed in an array
-%   of G. Some gformat functions are vectorised, allowing G to be a vector
-%   (but not a matrix), and should handle the case of a varying DIM.
+%   It is further allowed to add other fields. These fields can be used for
+%   input to specific functions using gformat arrays as input. A consequency is
+%   that data with different DIM can be mixed in an array of G. Some gformat
+%   functions are vectorised, allowing G to be a vector (but not a matrix), and
+%   should handle the case of a varying DIM.
 %  
 %   Interpolation functions considers the atmlab setting 'EXTRAP'. With EXTRAP
 %   set to false, the data are undefined outside the grid ranges. With EXTRAP
