@@ -1,3 +1,9 @@
+2011-02-08  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-1-0-143
+
+	* gformat/gf2griddedfield.m: Created
+
 2011-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-142
