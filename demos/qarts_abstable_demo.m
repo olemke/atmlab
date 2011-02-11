@@ -52,7 +52,6 @@ Q.P_GRID                 = z2p_simple( [-750:250:40e3]' );
 
 %= Reference atmosphere
 %
-Q.USE_RAW_ATMOSPHERE     = true;
 Q.RAW_ATMOSPHERE         = fullfile( fascod, 'subarctic-winter' );
 %
 % Needed, but dummy variables

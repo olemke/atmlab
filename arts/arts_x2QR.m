@@ -64,21 +64,14 @@ for i = 1 : nq
     R.vmr_field(ig,:,:,:) = ...
                           arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
 
-    
    case 'Atmospheric temperatures'   %----------------------------------------
     %
     X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, x(ind) );
     X = arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
     xmlStore( fullfile(R.workfolder,'t_field.xml'), X, 'Tensor3' );
     %
-    if strcmp( R.jq{i}.subtag, 'HSE off' )
-      %
-    elseif strcmp( R.jq{i}.subtag, 'HSE on' )
-      error( 'HSE not yet handled by this function.' );
-    else                                                                    %&%
-      assert( false );                                                      %&%
-    end
-
+    % R-x_t just used for conversion to nd, which can not be combined with
+    % t-retrievals.
     
    case 'Frequency'   %-------------------------------------------------------
     %

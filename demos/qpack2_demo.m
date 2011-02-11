@@ -102,7 +102,6 @@ Q = qarts;
 Q.INCLUDES            = { fullfile( arts_includes, 'general.arts' ), ...
                           fullfile( arts_includes, 'continua.arts' ) };
 Q.ATMOSPHERE_DIM      = 1;
-Q.USE_RAW_ATMOSPHERE  = false;
 Q.STOKES_DIM          = 1;
 Q.J_DO                = true;
 
@@ -110,7 +109,6 @@ Q.J_DO                = true;
 %- Radiative transfer
 %
 Q.Y_UNIT              = 'RJBT'; 
-Q.WSMS_BEFORE_RTE     = { 'atm_checkedCalc' };
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
@@ -191,7 +189,8 @@ Q.L2_EXTRA = { 'cost', 'dx', 'xa', 'y', 'yf', 'bl', 'ptz', 'mresp', ...
 
 %- Temperature
 %
-Q.T_ATMDATA = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
+Q.T.RETRIEVE = false;
+Q.T.ATMDATA  = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
                         'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
 
 

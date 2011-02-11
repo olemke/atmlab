@@ -328,52 +328,42 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                                      Q.INPUT_FILE_FORMAT );
   end
   %
-  if qarts_isset( Q.LAT_GRID )   % Grids of length 1 shall not be given to arts
-    grid     = qarts_get( Q.LAT_GRID );
-    if length(grid) > 1
-      T{end+1} = file_or_data( 'lat_grid', 'Vector', grid, workfolder, ...
-                                                     Q.INPUT_FILE_FORMAT );
-    end
+  if qarts_isset( Q.LAT_GRID ) 
+    T{end+1} = file_or_data( 'lat_grid', 'Vector', Q.LAT_GRID, workfolder, ...
+                                                         Q.INPUT_FILE_FORMAT );
   end
-  if qarts_isset( Q.LON_GRID )   % Grids of length 1 shall not be given to arts
-    grid = qarts_get( Q.LON_GRID );
-    if length(grid) > 1
-      T{end+1} = file_or_data( 'lon_grid', 'Vector', grid, workfolder, ...
-                                                     Q.INPUT_FILE_FORMAT );
+  if qarts_isset( Q.LON_GRID ) 
+    T{end+1} = file_or_data( 'lon_grid', 'Vector', Q.LON_GRID, workfolder, ...
+                                                         Q.INPUT_FILE_FORMAT );
+  end
+  %
+  if qarts_isset( Q.RAW_ATMOSPHERE )
+    rqre_datatype( Q.RAW_ATMOSPHERE, @ischar, 'Q.RAW_ATMOSPHERE' );         %&%
+    if qarts_isset( Q.RAW_ATM_EXPAND_1D )                                   %&%
+      rqre_datatype( Q.RAW_ATM_EXPAND_1D, @isboolean, ...                   %&%
+                                                   'Q.RAW_ATM_EXPAND_1D' ); %&%
+    end                                                                     %&%
+    T{end+1} = sprintf( ...
+       'AtmRawRead(t_field_raw,z_field_raw,vmr_field_raw,abs_species,"%s")',...
+                                                        Q.RAW_ATMOSPHERE );
+    if qarts_isset( Q.RAW_ATM_EXPAND_1D ) & Q.RAW_ATM_EXPAND_1D
+      T{end+1} = 'AtmFieldsCalcExpand1D';
+    else
+      T{end+1} = 'AtmFieldsCalc';
     end
   end
   %
-  if qarts_isset( Q.USE_RAW_ATMOSPHERE )
-    rqre_datatype( Q.USE_RAW_ATMOSPHERE, @isboolean, ...                    %&%
-                                                  'Q.USE_RAW_ATMOSPHERE' ); %&%
-    if Q.USE_RAW_ATMOSPHERE
-      rqre_datatype( Q.RAW_ATMOSPHERE, @ischar, 'Q.RAW_ATMOSPHERE' );       %&%
-      T{end+1} = sprintf( ...
-       'AtmRawRead(t_field_raw,z_field_raw,vmr_field_raw,abs_species,"%s")',...
-                                                        Q.RAW_ATMOSPHERE );
-      if qarts_isset( Q.RAW_ATM_EXPAND_1D )                                 %&%
-        rqre_datatype( Q.RAW_ATM_EXPAND_1D, @isboolean, ...                 %&%
-                                                   'Q.RAW_ATM_EXPAND_1D' ); %&%
-      end                                                                   %&%
-      if qarts_isset( Q.RAW_ATM_EXPAND_1D ) & Q.RAW_ATM_EXPAND_1D
-        T{end+1} = 'AtmFieldsCalcExpand1D';
-      else
-        T{end+1} = 'AtmFieldsCalc';
-      end
-    else
-      if qarts_isset( Q.T_FIELD )
-        T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, ...
-                                         workfolder, Q.INPUT_FILE_FORMAT );
-      end      
-      if qarts_isset( Q.VMR_FIELD )
-        T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, ...
-                                         workfolder, Q.INPUT_FILE_FORMAT );
-      end      
-      if qarts_isset( Q.Z_FIELD )
-        T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, ...
-                                         workfolder, Q.INPUT_FILE_FORMAT );
-      end
-    end
+  if qarts_isset( Q.T_FIELD )
+    T{end+1} = file_or_data( 't_field', 'Tensor3', Q.T_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end      
+  if qarts_isset( Q.VMR_FIELD )
+    T{end+1} = file_or_data( 'vmr_field', 'Tensor4', Q.VMR_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end      
+  if qarts_isset( Q.Z_FIELD )
+    T{end+1} = file_or_data( 'z_field', 'Tensor3', Q.Z_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
   if qarts_isset(Q.R_GEOID)
@@ -398,6 +388,25 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     else
       T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
+    end
+  end
+  %
+  T{end+1} = 'atm_checkedCalc';
+  %
+  if qarts_isset( Q.HSE )
+    if ~isfield( Q.HSE, 'ON' ) & ~isbool( Q.HSE.ON )                        %&%
+      error( ...                                                            %&%
+      'When Q.HSE is present, HSE.ON must be a present and be a boolean.'); %&%
+    end                                                                     %&%
+    if Q.HSE.ON
+      if ~isfield( Q.HSE, {'P','ACCURACY'} )                                %&%
+        error( 'With Q.HSE.ON true the fields P and ACCURACY must exist' ); %&%
+      end                                                                   %&%
+      rqre_datatype( Q.HSE.P, @istensor0, 'Q.HSE.P' );                      %&%
+      rqre_datatype( Q.HSE.ACCURACY, @istensor0, 'Q.HSE.ACCURACY' );        %&%
+      T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );      
+      T{end+1} = sprintf( 'NumericSet(z_hse_accuracy,%.3f)', Q.HSE.ACCURACY );
+      T{end+1} = 'z_fieldFromHSE';
     end
   end
   %
@@ -1018,41 +1027,44 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   
   %- Atmospheric temperatures
   %                                                                         %&%
-  rqre_field( Q.T, 'RETRIEVE', 'Q.T' );                                     %&%
-  %
-  if Q.T.RETRIEVE
-    %                                                                       %&%
-    if ~isfield( Q.T, {'GRIDS'} )                                           %&%
-      error( 'With Q.T.RETRIEVED true the field ''GRIDS'' must exist.' );   %&%
+  if qarts_isset( Q.T )
+    if ~isfield( Q.T, 'RETRIEVE' )                                          %&%
+       error( 'When Q.T exists, the field RETRIEVE must be set.' );         %&%
     end                                                                     %&%
     rqre_datatype( Q.T.RETRIEVE, @isboolean, 'Q.T.RETRIEVE' );              %&%
-    rqre_datatype( Q.T.GRIDS, @iscell, 'Q.T.GRIDS' );                       %&%
-    if length(Q.T.GRIDS) ~= 3                                               %&%
-      error( 'Q.T.GRIDS has not length 3.' );                               %&%
-    end                                                                     %&%
-    %
-    name1    = 'temperature_jac_p_grid';
-    T{end+1} = create_var( name1, 'Vector' );
-    T{end+1} = file_or_data( name1, 'Vector', Q.T.GRIDS{1}, ...
-                              workfolder, Q.INPUT_FILE_FORMAT, name1 );
-    name2    = 'temperature_jac_lat_grid';
-    T{end+1} = create_var( name2, 'Vector' );
-    T{end+1} = file_or_data( name2, 'Vector', Q.T.GRIDS{2}, ...
-                              workfolder, Q.INPUT_FILE_FORMAT, name2 );
-    name3    = 'temperature_jac_lon_grid';
-    T{end+1} = create_var( name3, 'Vector' );
-    T{end+1} = file_or_data( name3, 'Vector', Q.T.GRIDS{3},...
-                                  workfolder, Q.INPUT_FILE_FORMAT, name3 );
-    hse = 'on'; method = 'analytical'; dt = 1;
-    if isfield( Q.T, 'HSE' ) & qarts_isset( Q.T.HSE ), hse = Q.T.HSE; end
-    if isfield( Q.T, 'METHOD' ) & qarts_isset( Q.T.METHOD ), 
-      method = Q.T.METHOD; 
-    end
-    if isfield( Q.T, 'DT' ) & qarts_isset( Q.T.DT ), dt = Q.T.DT; end      
-    T{end+1} ='jacobianAddTemperature(jacobian_quantities,jacobian_agenda,';
-    T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
-    T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
-    T{end+1} = sprintf( '  "%s","%s",%.3f)', hse, method, dt );
+    if Q.T.RETRIEVE
+      %                                                                     %&%
+      if ~isfield( Q.T, {'GRIDS'} )                                         %&%
+        error( 'With Q.T.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
+      end                                                                   %&%
+      rqre_datatype( Q.T.GRIDS, @iscell, 'Q.T.GRIDS' );                     %&%
+      if length(Q.T.GRIDS) ~= 3                                             %&%
+        error( 'Q.T.GRIDS has not length 3.' );                             %&%
+      end                                                                   %&%
+      %
+      name1    = 'temperature_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T{end+1} = file_or_data( name1, 'Vector', Q.T.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'temperature_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T{end+1} = file_or_data( name2, 'Vector', Q.T.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'temperature_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T{end+1} = file_or_data( name3, 'Vector', Q.T.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      hse = 'on'; method = 'analytical'; dt = 1;
+      if isfield( Q.T, 'HSE' ) & qarts_isset( Q.T.HSE ), hse = Q.T.HSE; end
+      if isfield( Q.T, 'METHOD' ) & qarts_isset( Q.T.METHOD ), 
+        method = Q.T.METHOD; 
+      end
+      if isfield( Q.T, 'DT' ) & qarts_isset( Q.T.DT ), dt = Q.T.DT; end      
+      T{end+1} ='jacobianAddTemperature(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
+      T{end+1} = sprintf( '  "%s","%s",%.3f)', hse, method, dt );
+    end  
   end
 
   
@@ -1071,7 +1083,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
                                                      'Q.FFIT.ORDER' );      %&%
       rqre_in_range( Q.FFIT.ORDER, 0, 1, 'Q.FFIT.ORDER' );                  %&%
       T{end+1} = 'jacobianAddFreqShiftAndStretch(jacobian_quantities,';
-      T{end+1} =  sprintf('   jacobian_agenda, "iybinterp", %.3e, %d )', ...
+      T{end+1} = sprintf('   jacobian_agenda, "iybinterp", %.3e, %d )', ...
                                                Q.FFIT.DF, Q.FFIT.ORDER >0 );
     end
   end

@@ -1,3 +1,13 @@
+2011-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.7
+
+	* qpack2.m (qp2_y2Q): Setting of Z_FIELD through HSE requires now
+	that Q.HSE.ON is true. Added handling of Q.HSE.
+
+	* qpack2.tex: Added text explaining that t_field etc. are ignored.
+	Added text explaining the HSE part (see 6.1.2).
+
 2011-02-04  Ole Martin Christensen  <olem@chalmers.se>
 
 	* qp2_l2.m: Added output info from temperature retrievals

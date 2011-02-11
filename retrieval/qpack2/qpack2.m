@@ -193,9 +193,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     if Q.ATMOSPHERE_DIM ~= 1                                                %&%
       error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' );        %&%
     end                                                                     %&%
-    if ~qarts_isset(Q.USE_RAW_ATMOSPHERE) | ...                             %&%
-        qarts_get(Q.USE_RAW_ATMOSPHERE) ~= false                            %&%
-      error( 'Qpack2 requires that Q.USE_RAW_ATMOSPHERE == false' );        %&%
+    if qarts_isset(Q.RAW_ATMOSPHERE)                                        %&%
+      error( 'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' );           %&%
     end                                                                     %&%
     if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    %&%
       error( 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;%&%
@@ -213,7 +212,11 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     end                                                                     %&%
     Q.R_GEOID = qarts_get( Q.R_GEOID ); 
     rqre_datatype( Q.R_GEOID, @istensor0, Q.R_GEOID );                      %&%
-  
+    if ~qarts_isset(Q.HSE)                                                  %&%
+      error( 'Qpack2 requires that Q.HSE is set.' );                        %&%
+    end                                                                     %&%
+    rqre_datatype( Q.HSE.ON, @isboolean, Q.HSE.ON );                        %&%
+    
     if nargout < 2
       Q.J_DO = 0;
     else
@@ -278,8 +281,13 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   if  qarts_isset(Q.Z_ATMDATA)
     Q.Z_FIELD   = qarts_t_or_z_field( Q, 'z', mjd, ho );
   else
+    if ~Q.HSE.ON
+      error( 'If Q.Z_FILED* shall be set by HSE, Q.HSE.ON must be true.' );
+    end
     Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
   end
+  %
+  Q.HSE.P = Y(m).HSE_P;
 
   
   %- Prepare absorption table, if ABSORPTION = 'CalcTable'

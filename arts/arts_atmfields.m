@@ -1,8 +1,7 @@
 % ARTS_ATMFIELDS   Interpolates a raw atmosphere through ARTS
 %
-%    The function extracts the atmospheric fields that would be used
-%    by ARTS for given settings if Q.USE_RAW_ATMOSPHERE = 1. That is,
-%    the field USE_RAW_ATMOSPHERE is locally set to 1 before calling ARTS.
+%    The function extracts the atmospheric fields corresponding to 
+%    RAW_ATMOSPHERE.
 %
 %    Geoid and surface altitude variables are also returned.
 %
@@ -48,6 +47,8 @@ rqre_nargin(1,nargin);                                           %&%
 %                                                                %&%
 rqre_datatype( Q, @isstruct );                                   %&%
 % p,lat and lon checked inside qarts2cfile                       %&%
+rqre_datatype( Q.RAW_ATMOSPHERE, @ischar, 'Q.RAW_ATMOSPHERE' );  %&%
+
 
 if nargin >= 2
   Q.P_GRID = p;
@@ -59,7 +60,7 @@ if nargin >= 4
   Q.LON_GRID = lon;
 end
 
-Q.USE_RAW_ATMOSPHERE = true;
+
 
 tmpfolder   = create_tmpfolder;
 

@@ -86,10 +86,9 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-Q.USE_RAW_ATMOSPHERE  = true;
-Q.RAW_ATM_EXPAND_1D   = false;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
+Q.RAW_ATM_EXPAND_1D   = false;
 %
 Q.R_GEOID             = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE           = 500;
@@ -106,7 +105,6 @@ Q                     = qarts_abstable( Q );
 
 %= Set RTE variables
 %
-Q.WSMS_BEFORE_RTE     = { 'atm_checkedCalc' };
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 5e3;

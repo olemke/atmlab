@@ -485,9 +485,9 @@ end
   else
     
     % The different cases are handled separately to avoid a lot of flags, if
-    % statements and control variables. Helps also to save memory and to make the
-    % calculations in most efficient way. The drawback is that more or less the
-    % same code is found at several places.
+    % statements and control variables. Helps also to save memory and to make
+    % the calculations in most efficient way. The drawback is that more or less
+    % the same code is found at several places.
     
 
     

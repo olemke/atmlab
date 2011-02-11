@@ -95,6 +95,7 @@ end
 nq = length( R.jq );
 nx = R.ji{nq}{2};
 %
+% Fields to handle species unit conversions
 R.x_p    = repmat( NaN, nx, 1 );
 R.x_t    = R.x_p;
 R.x_vmr0 = R.x_p;
@@ -159,7 +160,7 @@ for i = 1 : nq
     
   case 'Atmospheric temperatures'   %-----------------------------------------
     %
-    %- Get p and t for each retrieval point
+    %- Get p and t for each retrieval point 
     grid1         = R.jq{i}.grids{1};
     R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
     R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
@@ -263,12 +264,12 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
   %- Atmospheric fields
   %
-  % We do not want the option USE_RAW_ATMOSPHERE here
+  % We do not want the option RAW_ATMOSPHERE here
   %
-  if Q.USE_RAW_ATMOSPHERE 
+  if qarts_isset( Q.RAW_ATMOSPHERE )
     [t_field,z_field,vmr_field]       = arts_atmfields( Q );
     [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD] = deal( t_field, z_field, vmr_field );   
-    Q.USE_RAW_ATMOSPHERE              = false;
+    Q.RAW_ATMOSPHERE                  = {};
   else
     t_field   = qarts_get( Q.T_FIELD );
     z_field   = qarts_get( Q.Z_FIELD );

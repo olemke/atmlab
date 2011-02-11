@@ -51,13 +51,23 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-Q.USE_RAW_ATMOSPHERE    = true;
-Q.RAW_ATM_EXPAND_1D     = false;
 Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
+Q.RAW_ATM_EXPAND_1D     = false;
 %
 Q.R_GEOID               = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE             = 500;
+
+
+%= To enforce detailed hydrostatic equilibrium 
+%
+% This demands that a latitude is specified, through LAT_GRID.
+%
+Q.HSE.ON                = true;
+Q.HSE.P                 = Q.P_GRID(1);
+Q.HSE.ACCURACY          = 1;
+%
+Q.LAT_GRID              = 15;
 
 
 %= Absorption
@@ -93,8 +103,7 @@ Q.SURFACE_PROP_AGENDA   = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                             'surfaceBlackbody' };
 %
 Q.WSMS_BEFORE_RTE       = { 'VectorSet(abs_n2,[0.7808])', ...
-                            'FlagOff(iy_aux_do)',...
-                            'atm_checkedCalc' };
+                            'FlagOff(iy_aux_do)' };
 Q.YCALC_WSMS            = { 'yCalc' };
 %
 Q.PPATH_LMAX            = 20e3;

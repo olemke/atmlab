@@ -1,3 +1,36 @@
+2011-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-144
+
+	* This commit can brake some old q-files. But it should just be to
+	remove USE_RAW_ATMOSPHERE. You should also remove calls of
+	atm_checkedCalc.
+	Note also changes qpack2.
+
+	* demos/qarts_demo.m: Added demonstration on how to use HSE.
+
+	* arts/qarts.m (qarts): Added field HSE.
+
+	Modification of existing features:
+	---
+	* arts/qarts2cfile.m (cfile_AtmSrf): A call of atm_checkedCalc is
+	now always included. No need anymore to include this by
+	WSMS_BEFORE_RTE!
+
+	* arts/arts_get_atmfields.m: Removed. The same function as
+	arts_atmfields.m!
+
+	* demos/qarts_demo.m: Adopted several demos to change below. And
+	removed calls of atm_checkedCalc.
+
+	* arts: Adopted several functions to change below.
+
+	* arts/qarts.m (qarts): Removed USE_RAW_ATMOSPHERE. A "raw"
+	atmosphere is now included if RAW_ATMOSPHERE is set. And in
+	contrast to before, this does not override settings of T_FIELD
+	etc. Any data in T_FIELD, Z_FIELD or VMR_FIELD are put in after a
+	raw atmosphere has been read. Thus, more flexible now.
+
 2011-02-08  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-1-0-143

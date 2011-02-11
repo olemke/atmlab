@@ -72,13 +72,11 @@ Q.R_GEOID             = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE           = 0;
 Q.P_GRID              = z2p_simple( -250:250:90e3 )';
 %
-Q.USE_RAW_ATMOSPHERE  = true;
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                               'fascod', 'midlatitude-winter' );
 
 %- RTE
 %
-Q.WSMS_BEFORE_RTE     = { 'atm_checkedCalc' };
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;

@@ -64,16 +64,15 @@ despite all code is written from scratch. However, for both Qpack versions the
 computations are controlled by a set of settings fields packed into a structure
 denoted as Q (though Qpack2 has also a structure O). Qpack was built around
 ARTS-1, this new Qpack version is mainly a consequence of that ARTS-2 is the
-maintained version of ARTS. This gave also an opportunity to make a more
-stringent implementation and to add some features. This should hopefully make
-it easier to maintain and extend Qpack2. Data formats are now more clearly
-defined and the ambition level around documentation is higher (but still
-modest). A main improvement compared to Qpack is that extraction of a priori
-data from climatology data is now an integrated part. On the other hand, the
-feature of classifying errors into different categories (0-3 in Qpack) and the
-associated plotting features are removed as it was hardly used.
-
-ARTS-2 is below just denoted as ARTS.
+maintained version of ARTS. (ARTS-2 is below just denoted as ARTS.) This gave
+also an opportunity to make a more stringent implementation and to add some
+features. This should hopefully make it easier to maintain and extend Qpack2.
+Data formats are now more clearly defined and the ambition level around
+documentation is higher (but still modest). A main improvement compared to
+Qpack is that extraction of a priori data from climatology data is now an
+integrated part. On the other hand, the feature of classifying errors into
+different categories (0-3 in Qpack) and the associated plotting features are
+removed as it was hardly used.
 
 Quality checks are not handled by Qpack2. For example, there is no default
 check that the frequencies of the measurements are as expected. This for
@@ -285,11 +284,18 @@ fields in special way:
 \begin{itemize}
 \item \verb|Q.ATMOSPHERE_DIM| must be set to 1.
 \item \verb|Q.R_GEOID| must be set.
-\item \verb|Q.Q.USE_RAW_ATMOSPHERE| must be set to false. 
+\item \verb|Q.RAW_ATMOSPHERE| must be unset (\verb|{}|).
+\item The fields \verb|T_FIELD|, \verb|VMR_FIELD| and \verb|Z_FIELD| are
+  ignored. These fields are set by Qpack2 by the corresponding
+  ``atmdata''-fields.
 \item \verb|Q.ABS_SPECIES.ATMDATA| must be set.
 \item \verb|Q.T_ATMDATA| must be set. 
-\item \verb|Q.Z_ATMDATA| is optional, if not set geometrical altitudes of the pressure
-  levels (the WSV \verb|z_field|) are found by applying hydrostatic equilibrium.
+\item \verb|Q.Z_ATMDATA| is optional. If not set, geometrical altitudes of the
+  pressure levels (the WSV \verb|z_field|) are found by applying hydrostatic
+  equilibrium using \verb|Y.HSE_P| and \verb|Y.HSE_Z| (Sec.~\ref{sec:Y}). This
+  later option demands that \verb|Q.HSE.ON| is true.
+\item \verb|Q.HSE_P| is set to \verb|Y.HSE_P|. Other fields of \verb|Q.HSE|
+  must be set by the user, thus including an active choice for \verb|Q.HSE.ON|.
 \item \verb|Q.ABSORPTION| must be set. If this field is set to 'CalcTable' and
   \verb|Q.ABS_P| is unspecified, the function \verb|qarts_abstable| is called
   (with default arguments) for each retrieval case (using the a priori state as

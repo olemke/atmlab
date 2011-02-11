@@ -71,7 +71,7 @@ Q.ABS_SPECIES(5).ATMDATA = gf_set( atmdata_empty(0), 0.781, [] );
 
 %= Temperature and geoemtrical altitudes are taken from CIRA86
 %
-Q.T_ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
+Q.T.ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
          'climatology', 'cira86', 'cira86.t.xml' ), 'Temperature', 't_field' );
 Q.Z_ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
            'climatology', 'cira86', 'cira86.z.xml' ), 'Altitudes', 'z_field' );
@@ -101,7 +101,6 @@ Q.Z_SURFACE              = 500;
 
 %= Set-up VMR_FIELD, T_FIELD and Z_FIELD
 %
-Q.USE_RAW_ATMOSPHERE     = false;
 Q.VMR_FIELD              = qarts_vmr_field( Q );
 Q.T_FIELD                = qarts_t_or_z_field( Q, 't', 45 );% Note interp.
 Q.Z_FIELD                = qarts_t_or_z_field( Q, 'z', 45 );% to DOY 45
@@ -122,7 +121,7 @@ Q.ABS_LINES_FORMAT       = 'Arts';
 Q.ABS_LINES              = fullfile( atmlab_example_data , 'lines501.4' );
 Q.ABS_NLS                = [];
 %
-Q                        = qarts_abstable( Q, 8, 10 );
+Q                        = qarts_abstable( Q, 8, 15 );
 Q.ABS_LOOKUP             = arts_abstable( Q );        
 %                                                     
 Q.ABSORPTION             = 'LoadTable';
@@ -157,7 +156,7 @@ end
 
 %= Set RTE variables (refraction is here neglected)
 %
-Q.WSMS_BEFORE_RTE        = { 'FlagOff(iy_aux_do)', 'atm_checkedCalc' };
+Q.WSMS_BEFORE_RTE        = { 'FlagOff(iy_aux_do)' };
 Q.YCALC_WSMS             = { 'yCalc' };
 %
 Q.PPATH_LMAX             = 20e3;

@@ -15,7 +15,6 @@
 %   The following fields must always be set:
 %      Q.ATMOSPHERE_DIM
 %      Q.P_GRID
-%      Q.USE_RAW_ATMOSPHERE
 %      Q.ABS_NLS
 %
 % FORMAT   Q = qarts_abstable( Q [, nt, dt, dnls ] )
@@ -58,11 +57,6 @@ rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...                %&%
 if ~qarts_isset( Q.P_GRID )                                                %&%
   error( 'Q.P_GRID must be set' );                                         %&%
 end                                                                        %&%
-if ~qarts_isset( Q.USE_RAW_ATMOSPHERE )                                    %&%
-  error( 'Q.USE_RAW_ATMOSPHERE must be set' );                             %&%
-end                                                                        %&%
-rqre_datatype( Q.USE_RAW_ATMOSPHERE, @isboolean, ...                       %&%
-                                       'Q.USE_RAW_ATMOSPHERE' );           %&%
 if ~qarts_isset( Q.ABS_NLS )                                               %&%
   error( 'Q.ABS_NLS must be set' );                                        %&%
 end                                                                        %&%
@@ -73,9 +67,9 @@ rqre_datatype( dnls, {@istensor1} );                                       %&%
 
 %- Obtain atmospheric profiles
 %
-p_grid   = qarts_get( Q.P_GRID );
+p_grid = qarts_get( Q.P_GRID );
 %
-if Q.USE_RAW_ATMOSPHERE
+if qarts_isset( Q.RAW_ATMOSPHERE )
   %
   [t_field,z_field,vmr_field] = arts_atmfields( Q ); 
 else
