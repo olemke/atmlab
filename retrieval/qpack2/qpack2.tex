@@ -296,11 +296,10 @@ fields in special way:
   later option demands that \verb|Q.HSE.ON| is true.
 \item \verb|Q.HSE_P| is set to \verb|Y.HSE_P|. Other fields of \verb|Q.HSE|
   must be set by the user, thus including an active choice for \verb|Q.HSE.ON|.
-\item \verb|Q.ABSORPTION| must be set. If this field is set to 'CalcTable' and
-  \verb|Q.ABS_P| is unspecified, the function \verb|qarts_abstable| is called
-  (with default arguments) for each retrieval case (using the a priori state as
-  the reference for the absorption table calculations). If you want to use a
-  single absorption table, this table must be generated separately.  
+\item \verb|Q.ABSORPTION| must be set. The option 'CalcTable' is not allowed
+  (as it is difficult to ensure generation of good absorption tables in a
+  general manner). You must either use 'OnTheFly' or create an absorption table
+  as a pre-calculation (the 'LoadTable' option).
 \item \verb|Q.TNOISE_C| must be set.
 \item The a priori knowledge covariance matrix (Sx) is created by
   \verb|arts_sx| and the \verb|SX| sub-fields of the retrieval quantities must

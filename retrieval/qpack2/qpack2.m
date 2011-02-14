@@ -207,6 +207,9 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
       error( 'Qpack2 requires that Q.ABSORPTION is set.' );                 %&%
     end                                                                     %&%
     rqre_datatype( Q.ABSORPTION, @ischar, Q.ABSORPTION );                   %&%
+    if strcmp( Q.ABSORPTION, 'CalcTable' )                                  %&%
+      error( 'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     %&%
+    end                                                                     %&%
     if ~qarts_isset(Q.R_GEOID)                                              %&%
       error( 'Qpack2 requires that Q.R_GEOID is set.' );                    %&%
     end                                                                     %&%
@@ -292,9 +295,9 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   
   %- Prepare absorption table, if ABSORPTION = 'CalcTable'
   %
-  if strcmp( Q.ABSORPTION, 'CalcTable' )  &  ~qarts_isset( Q.ABS_P )
-    Q = qarts_abstable( Q );
-  end
+  %if strcmp( Q.ABSORPTION, 'CalcTable' )  &  ~qarts_isset( Q.ABS_P )
+  %  Q = qarts_abstable( Q );
+  %end
   
   
   %- Sensor pos and los

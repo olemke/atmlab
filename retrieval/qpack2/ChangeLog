@@ -1,3 +1,15 @@
+2011-02-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.8
+
+	* qpack2.m: The option CalcTable is now not allowed for
+	ABSORPTION. Too difficult to handle safely in a general manner.
+	This must be handled by the user (and then using LoadTable). Use
+	set ABSORPTION to 'OnTheFly' (in fact, can be the quickest
+	option).
+
+	* qpack2.tex: Adopted to change above.
+
 2011-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.7

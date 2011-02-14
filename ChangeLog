@@ -1,3 +1,14 @@
+2011-02-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-145
+	
+	* arts/qarts2cfile.m (cfile_AtmSrf): HSE.P and HSE.ACCURACY saved,
+	if set, even if HSE.ON false. This add jacobianCalcTemperature
+	have these variables as input, even if not used. 
+	Improved error message for ABSORPTION.
+
+	* Qpack2: CalcTable is now not allowed for ABSORPTION! 
+
 2011-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-144

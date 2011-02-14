@@ -407,6 +407,14 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
       T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );      
       T{end+1} = sprintf( 'NumericSet(z_hse_accuracy,%.3f)', Q.HSE.ACCURACY );
       T{end+1} = 'z_fieldFromHSE';
+    else
+      % To allow dummy values for t retrievals without HSE
+      if isfield( Q.HSE, 'P' ) 
+        T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );      
+      end
+      if isfield( Q.HSE, 'ACCURACY' ) 
+        T{end+1} = sprintf( 'NumericSet(z_hse_accuracy,%.3f)', Q.HSE.ACCURACY );
+      end
     end
   end
   %
@@ -450,8 +458,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     if ~( strcmp(Q.ABSORPTION,'OnTheFly') | ...                             %&%
           strcmp(Q.ABSORPTION,'LoadTable') | ...                            %&%
           strcmp(Q.ABSORPTION,'CalcTable') )                                %&%
-      error( 'Only recognised choices for *ABSORPTION* are ',...            %&%
-                        '''OnTheFly'', ''LoadTable'' and ''CalcTable''.' ); %&%
+      error( ['Only recognised choices for *ABSORPTION* are ',...           %&%
+                       '''OnTheFly'', ''LoadTable'' and ''CalcTable''.'] ); %&%
     end                                                                     %&%
     %
     if strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION, 'CalcTable')
