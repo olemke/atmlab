@@ -132,19 +132,7 @@ function value = atmlab( varargin )
             
 persistent A
 
-try
-    [A,value] = prstnt_struct( A, @atmlab_defs, varargin );
-catch ME
-    if strcmp(ME.identifier,'atmlab:prstnt_struct:undefined')
-        try
-            value = gmtlab( varargin );
-        catch %#ok<*CTCH>
-            error(ME.identifier,ME.message)
-        end
-    else
-        error(ME.identifier,ME.message)
-    end
-end
+[A,value] = prstnt_struct( A, @atmlab_defs, varargin );
 
 
 function A = atmlab_defs

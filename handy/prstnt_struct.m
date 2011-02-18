@@ -101,8 +101,7 @@ switch length( varg )
     if strcmp( varg{1}, 'require' )
       for i = 1 : length(varg{2})
         if ~isfield( A, varg{2}{i} )
-          fprintf('\nThe field %s is required.\n\n', varg{2}{i} );
-          error( 'See above' ); 
+          error('atmlab:input','\nThe field %s is required.\n\n', varg{2}{i}); 
         end
         if isnan( getfield( A, varg{2}{i} ) )
           error('atmlab:input:undefined' ,...
