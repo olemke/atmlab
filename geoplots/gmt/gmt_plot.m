@@ -470,6 +470,14 @@ filename=sort_figures(out,commands);                                            
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
+[a,b] = system('gmtset');
+if a == 127
+    c  = 'Either GMT is not installed';
+    d  = 'you need to add its installation directory to your PATH';
+    e  = 'e.g. in Matlab you can add the PATH via';
+    f  = 'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])';
+    error('atmlab:shell','%s%s or %s\n%s:\n%s',b,c,d,e,f)
+end
 % SET DEFAULTS
 % general
 default.display           = true;               % Display figure to screen

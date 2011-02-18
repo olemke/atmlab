@@ -87,9 +87,7 @@ switch length( varg )
     else
 
       if ~isfield( A, varg{1} )
-%        fprintf('\nThe field %s is not defined.\n\n', varg{1} );
-        
-        error('atmlab:prstnt_struct:undefined', ...
+          error('atmlab:input:undefined', ...
             'The field %s is not defined', varg{1}); 
       end
 
@@ -107,15 +105,15 @@ switch length( varg )
           error( 'See above' ); 
         end
         if isnan( getfield( A, varg{2}{i} ) )
-          fprintf('\nThe field %s is required but is NaN.\n\n', varg{2}{i} );
-          error( 'See above' ); 
+          error('atmlab:input:undefined' ,...
+              'The field %s is required but is NaN.\n\n', varg{2}{i} ); 
         end
       end
 
     else
       if ~isfield( A, varg{1} )
-        fprintf('\nThe field %s is not defined.\n\n', varg{1} );
-        error( 'See above' ); 
+          error('atmlab:input:undefined' ,...
+              'The field %s is not defined.', varg{1} );
       end
 
       A = setfield( A, varg{1}, varg{2} );
@@ -125,9 +123,5 @@ switch length( varg )
 
   otherwise
     %
-    error('To many input arguments.');
+    error('atmlab:input','Too many input arguments.');
 end
-
-return
-
-

@@ -32,7 +32,7 @@ for x = cmd'
     end
     
     if (ret == 127)
-        error('Command not found: "%s"', fullcmd)
+        error('atmlab:shell','Command not found: "%s"', fullcmd)
     end
     i = i+1;
 end

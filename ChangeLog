@@ -1,3 +1,32 @@
+2011-02-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-146
+
+	* atmlab/atmlab.m: Removed options related to gmt from atmlab_defs
+	and put them into gmtlab.m. Added a try catch around @atmlab_defs
+	to instead call gmtlab if the desired option is missing. If option
+	is also missing in gmtlab, throw the usual error. I've done this
+	for backward compatibility, in case people have added gmt options
+	via the old atmlab('gmtoption','something')
+	
+	* geoplots/gmt/gmtlab.m: Added function based on atmlab.m, but
+	specifically for gmt options only. This is necessary if one only
+	wants the gmtlab repository and not the atmlab repository. The
+	gmtlab functions are now independent of atmlab (but still part of
+	atmlab)
+
+	* geoplots/gmt/gmt_plot.m: Added check to see if gmt is not going
+	to run, e.g. if gmt is not installed on the computer or if the
+	gmt path is not set. Suggests how to set the environment in matlab.
+
+	* geoplots/gmt/nearneighbor.m: Removed default -F option to be
+	compatible with gridded data (assume gridbox centers)
+
+	* geoplots/gmt/exec_gmt_cmd.m: Added identifier to error.
+
+	* handy/prstnt_struct.m: Fixed the error messages so that they are
+	usable (identifiers)
+
 2011-02-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-145

@@ -118,19 +118,6 @@
 %    The work area is primarily used for forward model calculations, but
 % there could be other applications.
 %----------------------------------------------------------------------------
-% OPEN_COMMAND  
-%
-% General command to open files with. e.g. atmlab('OPEN_COMMAND','gnome-open') 
-% ---------------------------------------------------------------------------
-%
-% PDFVIEWER
-%
-% Command to view PDF files.
-%----------------------------------------------------------------------------
-% PSVIEWER
-%
-% Command to view PostScript files.
-%----------------------------------------------------------------------------
 % ATMLAB_DATA_PATH
 %
 % Path to main directory of atmlab-data
@@ -144,8 +131,20 @@
 function value = atmlab( varargin )
             
 persistent A
-          
-[A,value] = prstnt_struct( A, @atmlab_defs, varargin );
+
+try
+    [A,value] = prstnt_struct( A, @atmlab_defs, varargin );
+catch ME
+    if strcmp(ME.identifier,'atmlab:prstnt_struct:undefined')
+        try
+            value = gmtlab( varargin );
+        catch %#ok<*CTCH>
+            error(ME.identifier,ME.message)
+        end
+    else
+        error(ME.identifier,ME.message)
+    end
+end
 
 
 function A = atmlab_defs
@@ -158,11 +157,7 @@ A.DEBUG             = false;
 A.ERR               = 2;
 A.EXTRAP            = false;
 A.FMODEL_VERBOSITY  = 0;
-A.OPEN_COMMAND      = NaN;
 A.OUT               = 1;
-A.OUTDIR            = '.';
-A.PDFVIEWER         = NaN;
-A.PSVIEWER          = NaN;
 A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
 A.SITE              = NaN;
