@@ -71,3 +71,52 @@ B.OPEN_COMMAND      = NaN;
 B.OUTDIR            = '.';
 B.PDFVIEWER         = NaN;
 B.VERBOSITY         = 0;
+
+function [A,value] = gmt_prstnt_struct( A, def_fun, varargin )
+%% gmt_prstnt_struct
+% More or less cloned from prstnt_struct created by Patrick Eriksson in atmlab.
+
+if isempty( A )
+  A = feval( def_fun );
+end
+
+%=== As this function is called with a varargin argument, we have to extract
+%=== varargin as given to the calling function.
+%
+varg = varargin{1};
+value = [];
+
+switch length( varg )
+  case 0
+    value = A;
+  case 1
+    if strcmp( varg{1}, 'defaults' )
+      A = feval( def_fun );
+     else
+      if ~isfield( A, varg{1} )
+          error('atmlab:input:undefined', ...
+            'The field %s is not defined', varg{1}); 
+      end
+      value = getfield( A, varg{1} );
+    end
+  case 2
+    if strcmp( varg{1}, 'require' )
+      for i = 1 : length(varg{2})
+        if ~isfield( A, varg{2}{i} )
+          fprintf('\nThe field %s is required.\n\n', varg{2}{i} );
+          error( 'See above' ); 
+        end
+        if isnan( getfield( A, varg{2}{i} ) )
+          error('atmlab:input:undefined','The field %s is required but is NaN.\n\n',varg{2}{i}); 
+        end
+      end
+    else
+      if ~isfield( A, varg{1} )
+          error('atmlab:input:undefined','The field %s is not defined.',varg{1});
+      end
+      A = setfield( A, varg{1}, varg{2} );
+      value = varg{2};
+    end
+  otherwise
+    error('atmlab:input','Too many input arguments.');
+end

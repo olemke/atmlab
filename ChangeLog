@@ -1,5 +1,11 @@
 2011-02-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-151
+
+	* geoplots/gmt/gmtlab.m: unbroke it
+	
+2011-02-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-150
 
 	* geoplots/gmt/test_gmt.m (test_gmt): Added some info output about
