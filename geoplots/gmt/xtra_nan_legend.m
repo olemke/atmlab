@@ -18,7 +18,7 @@ fprintf(fid,'%s\n','# Created for NaN colorbox');
 fprintf(fid,'%s\n%s\n','#COLOR_MODEL = RGB','#');
 
 if isfield(in,'color_nan')
-    tmp = splitstring(in.color_nan,'/');
+    tmp = gmt_splitstring(in.color_nan,'/');
     str = sprintf('%s\t%s\t%s',tmp{1},tmp{2},tmp{3});
 else
     str = '128\t128\t128';

@@ -172,7 +172,9 @@ function proj = setup_projection(in)
 %% setup_projection %%
 
 if isempty(in.center) || ~strcmp(in.plot.region(1:9),'-180/180/')
-    disp('Data is not cyclic, choosing in.centre for projection from center longitude...')
+    if in.verbosity
+        disp('Data is not cyclic, choosing in.centre for projection from center longitude...')
+    end
     x = sscanf(in.plot.region,'%f/%f/%f/%f');
     C = (x(1)+x(2))/2;
 else C = in.center;
@@ -260,7 +262,7 @@ switch in.ctable
             a.cptfile = makecpt(in);
         else
             exec_gmt_cmd(in.makecpt);
-            tmp = splitstring(in.makecpt,'> ');
+            tmp = gmt_splitstring(in.makecpt,'> ');
             a.cptfile = tmp{2};
         end
 end
@@ -307,7 +309,7 @@ default.cptfile = in.plot.color.cptfile;
 default.grdfile = in.grdfile;
 
 for i = 1:length(in.contourline)
-    a(i) = catstruct(default,in.contourline(i));
+    a(i) = gmt_catstruct(default,in.contourline(i));
 end
 
 
@@ -419,6 +421,6 @@ b = step(~(bs>lat));
 if isempty(b), b = lat/3; end
 
 default.ticks = sprintf('%.2fg%.2f/%.2fg%.2f',a(1),b(1),a(1)/2,b(1)/2);
-in = optargs_struct(in,default);
+in = gmt_optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s -R -J -O >> %s.ps',in.ticks,in.filename);

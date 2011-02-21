@@ -1,3 +1,60 @@
+2011-02-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-150
+
+	* geoplots/gmt/test_gmt.m (test_gmt): Added some info output about
+	every test.
+
+	* geoplots/gmt/create_gmt_earth.m (create_gmt_earth): Changed
+	splitstring/catstruct/optargs_struct to
+	gmt_splitstring/gmt_catstruct/gmt_optargs_struct
+	
+	* geoplots/gmt/cpt_from_colorrange.m (cpt_from_colorrange): Changed splitstring to gmt_splitstring
+
+	* geoplots/gmt/psscale.m: Fixed bad if-statement
+
+	* geoplots/gmt/xtra_nan_legend.m: Changed splitstring to gmt_splitstring
+
+	* geoplots/gmt/gmt_plot.m: Call gmtlab defaults instead of atmlab
+	defaults. Added verbosity as a default argument.
+
+	* geoplots/gmt/gmt_splitstring.m: Cloned from atmlabs splitstring
+	by Oliver Lemke. This is necessary for gmtlab to be standalone.
+	
+	* geoplots/gmt/gmt_optargs_struct.m: Cloned from optargs_struct.m
+	by Gerrit Holl in atmlab. This is necessary for gmtlab to be standalone.
+
+	* geoplots/gmt/reference_maps: Added directory with figures and
+	README showing what the figures output from test_gmt should look like.
+
+	* geoplots/gmt/gmt_catstruct.m: Added a more or less cloned
+	version of catstruct. Important difference is that this version of
+	catstruct also works recursively!
+
+2011-02-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-149
+
+	* geoplots/gmt/homogenize_datalatlon.m: Forgot this one.
+
+2011-02-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-148
+
+	* geoplots/homogenize_datalatlon.m: moved this file to the gmt
+	directory instead
+
+2011-02-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-147
+
+	* atmlab/atmlab.m: Decided to remove try catch. People using gmt
+	will have to change atmlab('gmtoption','something') to
+	gmtlab('gmtoption','something') in their startup file instead.
+
+	* handy/prstnt_struct.m: Found another error without an
+	identifier.
+
 2011-02-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-146
@@ -8,7 +65,7 @@
 	is also missing in gmtlab, throw the usual error. I've done this
 	for backward compatibility, in case people have added gmt options
 	via the old atmlab('gmtoption','something')
-	
+
 	* geoplots/gmt/gmtlab.m: Added function based on atmlab.m, but
 	specifically for gmt options only. This is necessary if one only
 	wants the gmtlab repository and not the atmlab repository. The

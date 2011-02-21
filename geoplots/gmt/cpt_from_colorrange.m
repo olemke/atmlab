@@ -35,8 +35,8 @@ fprintf(fid,'%s\n',sprintf('#COLOR_MODEL = %s',model));
 
 for ii = 1:length(C)-1
     val   = C{ii}{1}; val2 = C{ii+1}{1};
-    color = splitstring(C{ii}{2},'/');
-    color2 = splitstring(C{ii+1}{2},'/'); 
+    color = gmt_splitstring(C{ii}{2},'/');
+    color2 = gmt_splitstring(C{ii+1}{2},'/'); 
     fprintf(fid,strtot,val,color{1},color{2},color{3},...
         val2,color2{1},color2{2},color2{3});
 end

@@ -1,46 +1,69 @@
-function files = test_gmt(in)
+function [files,info] = test_gmt(in)
 %% TEST_GMT
 %
 % Purpose: To test variuos aspecs of gmt_plot. Especially before commiting
 % changes
 %
-% IN: (optional) structure of arguments to be additionally used 
-%     in the gmt_plot call/s.
-%     -----------
-%     If you only want to run a subset of tests:
+% USAGE: [files,info] = test_gmt(in)  
 %
-%     in.test = [1,3,4] is which tests to run. 
-%     The default behaviour is to run all tests ([1:6])
+% IN: (optional) structure of arguments to be additionally used 
+%     in the gmt_plot call/s. I.e. it will use each tests default values
+%     including the addional option.
 %     -----------
+%     in.test: If you only want to run a subset of tests, e.g. in.test =
+%     [1,3,4] runs tests 1,3,4. The default behaviour is to run all tests ([1:7])
+%     -----------
+%
+%
+% OUT: files = cellarray of paths to created figures
+%      info  = cellarray of information about each test. The information is
+%              also displayed at the end of the run.
+%
 % $Author$
 % $Date$
 
-files = {}; if ~exist('in','var'); in=struct([]); end
-default.test = 1:6; % which tests to do (default=all)
-in = optargs_struct(in,default); 
+files = {}; info = {}; if ~exist('in','var'); in=struct([]); end
+default.test = 1:7; % which tests to do (default=all)
+default.verbosity = false;
+warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
+
+% Offload atmlab-only paths if they are defined
+[allpaths,index] = temporarily_rmpaths;
+
+in = gmt_optargs_struct(in,default); 
 
 [gridded,ungridded] = dummy_data;
 
 %TEST: polar, reference, nlevels, sidebar
-files        = TEST1(in,gridded,files);
+[files,info]               = TEST1(in,gridded,files,info);
 
 %TEST: title, unit (gridded and ungridded)
-files        = TEST2(in,gridded,ungridded,files);
+[files,info]               = TEST2(in,gridded,ungridded,files,info);
 
 %TEST: sidebar, nan, projection, center
-files{end+1} = TEST3(in,gridded); 
+[files{end+1},info{end+1}] = TEST3(in,gridded); 
 
 %TEST: custom color table, header_size, map_width, grid lines
-files{end+1} = TEST4(in,gridded); 
+[files{end+1},info{end+1}] = TEST4(in,gridded); 
 
 %TEST: contours, nlevels, annotation format, xunit
-files{end+1} = TEST5(in);         
+[files{end+1},info{end+1}] = TEST5(in);         
 
 %TEST: locations, nodata, regions, map details
-files        = TEST6(in,files);          
+[files,info]               = TEST6(in,files,info);          
 
 %TEST: pspolygon, basemap_axis
-files{end+1} = TEST7(in);
+[files{end+1},info{end+1}] = TEST7(in);
+
+% Put paths back in place (removed in the beginning for testing)
+cellfun(@addpath,allpaths(index));
+files = files(~cellfun('isempty',files));
+
+% DISPLAY information about the tests
+disp(' ')
+disp(' ')
+cellfun(@disp,info)
+warning('on','gmtcatstruct:DuplicatesFound')
 
 %%%%%%%%%%%%%%%%%
 % SUB FUNCTIONS
@@ -70,10 +93,12 @@ for j=0:180
 end
 
 
-function files        = TEST1(in,gridded,files)
+function [files,info]        = TEST1(in,gridded,files,info)
 %% TEST: Difference plot, reference=0, nlevels, sidebar
 
 if ~ismember(1,in.test), return, end %then don't do this test
+
+%% Test 1a
 
 gridded.data = gridded.data-200;  % for difference 
 test.ctable = 'mypolar';
@@ -81,16 +106,33 @@ test.reference = 0;
 test.legend.sidebar = 3; % both above and below
 test.basemap_axis = 'nesw';
 test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
-files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+test.filename = 'Test1a';
+files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
+a = 'Test 1a demonstrates the mypolar colortable which is similar to polar.cpt';
+b = 'Using in.ctable=''mypolar'' you can define where the reference value should be.';
+c = 'The white color is then centered around the reference value (in.reference).';
+d = 'Test 1a also tests the in.basemap_axis option for map annotations';
+e = 'and the in.sidebar option (triangles above and below legend range) for ';
+f = 'indicating the color values would have if they are outside the value range';
+g = 'defined by in.datarange = [min max].';
+info{end+1} = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f,g);
+
 
 test.legend.sidebar = 2; % above only
 test.nlevels = 15; 
 test.nwhite = 6;
 test.header_size = 20;
 test.title = 'Diff plot,nlevels=15,ref=0,nwhite=6,sidebar=2 (above)';
-files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+test.filename = 'Test1b';
+files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
 
-function files = TEST2(in,gridded,ungridded,files)
+a = 'Test 1b demonstrates that you can change the number of intervals that are';
+b = 'colored white while using the mypolar colortable (in.nwhite). You can also';
+c = 'change the number of data intervals (in.nlevels), change in.headersize,';
+d = 'or decide to only have the sidebar for values above the datarange (in.sidebar=2)';
+info{end+1} = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d);
+
+function [files,info] = TEST2(in,gridded,ungridded,files,info)
 %% TEST: title, unit (gridded and ungridded)
 
 if ~ismember(2,in.test), return, end %then don't do this test
@@ -98,41 +140,65 @@ if ~ismember(2,in.test), return, end %then don't do this test
 test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
+test.filename = 'Test2a';
+files{end+1} = gmt_plot(gmt_catstruct(in,gridded,test),'data');
 
-files{end+1} = gmt_plot(catstruct(in,gridded,test),'data');
+a = 'Test 2a demonstrates that you can include some special';
+b = 'characters in in.title and in.unit and that you can toggle in.basemap_axis';
+c = 'to annotate the South and West axis only if you like. This test uses ';
+d = 'gridded data, where size(data) = [length(lat),length(lon)]';
+info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
+
 test.title        = 'ungridded: title², unit';
-files{end+1} = gmt_plot(catstruct(in,ungridded,test),'data');
+test.filename = 'Test2b';
+files{end+1} = gmt_plot(gmt_catstruct(in,ungridded,test),'data');
 
-function file = TEST3(in,gridded)
+a = 'Test2b demonstrates the same as Test2a but for ungridded data, where';
+b = 'size(data) = size(lat) = size(lon). This is e.g. good for plotting satellite';
+c = 'granule data directly.';
+info{end+1} = sprintf('%s\n%s\n%s\n',a,b,c);
+
+function [file,info] = TEST3(in,gridded)
 %% TEST: sidebar, nan, projection, center
 
-if ~ismember(3,in.test), file='';return, end %then don't do this test
+if ~ismember(3,in.test), file='';info='';return, end %then don't do this test
 
 gridded.data(20:40,20:80) = NaN;
 test.title      = 'upper sidebar, NaN, Hammer projection, center';
 test.projection = 'H';      % hammer
 test.center     = 180;      % Center map at given center longitude
 test.datarange  = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
+test.filename = 'Test3';
+file = gmt_plot(gmt_catstruct(in,gridded,test),'data');
 
-file = gmt_plot(catstruct(in,gridded,test),'data');
+a = 'Test3 demonstrates the Hammer projection (one of many available projections),';
+b = 'using in.projection = ''H''. The test also demonstrates that you can';
+c = 'easily change the center of the projection to e.g. 180E using in.center.';
+d = 'The grey region in the map indicates NaN values. The upper sidebar is ';
+e = 'automatically shown if there are data larger than in.datarange(2),';
+f = 'if given via in.datarange = [v1,v2]. The color for these values can';
+g = 'changed using in.color_foreground (default is ''255/255/255'' (white))';
+info = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f,g);
 
-function file = TEST4(in,gridded) 
+function [file,info] = TEST4(in,gridded) 
 %% TEST: custom color table, header_size, map_width, grid lines, region
 
-if ~ismember(4,in.test), file=''; return, end %then don't do this test
+if ~ismember(4,in.test), file=''; info = ''; return, end %then don't do this test
 
 if ~isfield(in,{'stepsize','nlevels'})
     tmp = cell(1,20);
-    tmp{1} = 'blue'; tmp{6} = 'white'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
+    tmp{1} = 'blue'; tmp{6} = 'light blue'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
     test.legend.tick_annotations = tmp; % place annotations at the desired intervals
 end
-test.title = 'custom color, annotations,header_size, map_width, tight grid, NeSW, region';
+test.title = 'custom legend and sub-region';
 test.ticks = '30g30/15g15'; % annotations (deg) on major lines (e.g 40 xaxis,20 yaxis)
                             % and plot minor lines (e.g 20 xaxis & yaxis)
 test.head_size = 20;              % (GMT default = 36p)
 test.map_width = 15;              % (default is 9 inches)
-test.region    = '-90/90/-30/90'; % 'lonmin/lonmax/latmin/latmax'
+test.region    = '-90/90/0/70'; % 'lonmin/lonmax/latmin/latmax'
 test.basemap_axis = 'NeSW';
+test.legend.orientation = 'h';
+test.legend.tick_centering = true;
 
 % CUSTOM COLOR TABLE ---
 % For your own custom colortable use in.colorrange.colors (see below). Assign a
@@ -143,13 +209,22 @@ test.colorrange.colors  = {{0,'0/0/255'},{0.3,'255/255/255'},...
 test.colorrange.color_model = 'RGB';
 % makes a colortable that goes from blue to white to green to black to red in RGB format.
 % ------------------------
+test.filename = 'Test4';
 
-file = gmt_plot(catstruct(in,gridded,test),'data');
+file = gmt_plot(gmt_catstruct(in,gridded,test),'data');
 
-function file = TEST5(in)
+a = 'Test4 demonstrates that you can easily make your own custom colortable.';
+b = 'You can also insert your own legend annotations to be used instead of';
+c = 'data values (see help gmt_plot). You can also change in.mapwidth,';
+d = 'in.headersize, the tick spacing for the axis using in.ticks,';
+e = 'and in this test its demonstrated how to confine the figure to certain';
+f = 'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''';
+info = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f);
+
+function [file,info] = TEST5(in)
 %% TEST: contours, nlevels, annotation format, xunit
 
-if ~ismember(5,in.test), file=''; return, end %then don't do this test
+if ~ismember(5,in.test), file=''; info = ''; return, end %then don't do this test
 
 test.lat = -90:90;
 test.lon = -180:180;
@@ -165,7 +240,7 @@ test.xunit = 'No unit either';
 test.projection = 'H';
 test.nlevels = 10;
 test.tick_annotation_format = '%.1lf';
-test.legend_orient = 'h';
+test.legend.orientation = 'h';
 test.contourline.spacing=0.1;
 test.contourline.range=[0 1];
 test.contourline.linethick=1;
@@ -176,21 +251,29 @@ test.color_foreground = '255/255/0';
 test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
+test.filename = 'Test5';
+file = gmt_plot (gmt_catstruct(in,test), 'data');
 
-file = gmt_plot (catstruct(in,test), 'data');
+a = 'Test 5 demonstrates contour maps, where you can optionally choose to show';
+b = 'High and Lows in the of the data. Test 5 also demonstrates that you can';
+c = 'have x and y-labels (in.xunit and in.unit) on the around the legend';
+d = 'Using the custom colortable (in.colorrange) you can also use';
+e = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
 
-function files = TEST6(in,files)
+info = sprintf('%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e);
+
+function [files,info] = TEST6(in,files,info)
 %% TEST: locations, nodata 
 
 if ~ismember(6,in.test), return, end %then don't do this test
 
-names = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki','Oberstdorf','Tehran','Amsterdam','Lauchhammer','Freiburg'};
-lats = [67.85 -27.48 48.83 53.1 9.9 47.3 35.7 52.4 51.5 48];
-lons = [20.216 153 9.2 8 77 10.22 51.5 4.77 13.77 7.85];
+names = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki','Oberstdorf','Amsterdam','Lauchhammer','Freiburg'};
+lats = [67.85 -27.48 48.83 53.1 9.9 47.3 52.4 51.5 48];
+lons = [20.216 153 9.2 8 77 10.22 4.77 13.77 7.85];
 textcolor = repmat({'black'},1,length(names)); textcolor{1} = 'red';
 color = repmat({'green'},1,length(names)); color{3} = 'yellow';
-textalign = {'LM','RT','LM','LB','CL','LT','LT','RM','LM','RM'};
-textsize = [15,15,7,7,15,7,15,7,7,7];
+textalign = {'LM','RB','LM','LB','CB','LT','RM','LM','RM'};
+textsize = [15,15,7,7,15,7,7,7,7];
 shape = repmat({'c0.08i'},1,length(names));shape{3} = 'd0.1i';
 
 for i = 1:length(names)
@@ -207,7 +290,8 @@ test.basemap_axis = 'neSW';
 test.title = 'SatGroup locations';
 test.nodata = true;
 test.region = '-20/160/-30/70';
-files{end+1} = gmt_plot(test);
+test.filename = 'Test6a';
+files{end+1} = gmt_plot(gmt_catstruct(in,test));
 
 % TEST: mediumregion
 for i = 1:length(names)
@@ -217,18 +301,26 @@ test.region     = '-10/40/40/70';
 test.figuretype = 'png';
 test.title      = 'Europe (medium details in a .png-file)';
 test.coast.rivers = 'r';
-files{end+1}    = gmt_plot(test);
+test.filename = 'Test6b';
+files{end+1}    = gmt_plot(gmt_catstruct(in,test));
 
 % TEST: smallregion
 test.title = 'Kiruna (high details)';
 test.region = '12/22/65/70';
 test.coast.rivers = 'a';
-files{end+1} = gmt_plot(test);
+test.filename = 'Test6c';
+files{end+1} = gmt_plot(gmt_catstruct(in,test));
 
-function file = TEST7(in)
+a = 'Test 6 demonstrates that you can plot points and text on a map, and';
+b = 'demonstrates that there are several map resolutions available.';
+c = 'It is also demonstrated that the output file need not be pdf.';
+d = 'The available file types in.figuretype are ''pdf'',''eps'',''png'', and ''tif''';
+info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
+
+function [file,info] = TEST7(in)
 %% TEST: pspolygon
 
-if ~ismember(7,in.test), file=''; return, end %then don't do this test
+if ~ismember(7,in.test), file=''; info = '';return, end %then don't do this test
 
 % REGIONS FROM eliasson11:assessing_acp
 a = [-12    80    16   100;...
@@ -264,5 +356,22 @@ test.pspoly = reg;
 test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g','g','g','g','g','g','g','g','g','g','g'};
 test.nodata=true;
 test.basemap_axis='nWeS';
-test.filename = 'TEST6_regions';
-file = gmt_plot(catstruct(test,in));
+test.filename = 'TEST7';
+file = gmt_plot(gmt_catstruct(test,in));
+
+a = 'Test 7 demonstrates that you can draw polygons on a map. E.g. useful if you';
+b = 'want to draw regions of interest on a map';
+
+info = sprintf('%s\n%s\n',a,b);
+
+function [allpaths,index] = temporarily_rmpaths
+%% temporarily_rmpaths;
+% Offload atmlab paths if they are defined
+% In order to ensure gmtlab is independent av atmlab
+
+allpaths = gmt_splitstring(path,':');
+AP = regexp(allpaths,'atmlab','match');
+GP = regexp(allpaths,'gmt','match');
+index = ~cellfun('isempty',AP) & cellfun('isempty',GP);
+
+cellfun(@rmpath,allpaths(index));

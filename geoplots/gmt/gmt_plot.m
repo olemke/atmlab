@@ -55,6 +55,8 @@ function filename = gmt_plot(in,field)
 %
 % GENERAL:
 %
+% in.verbosity        |%f| Display non essential output | gmtlab('VERBOSITY') | 
+%
 % in.title            |%s| Title of plot | '' |
 %                     ------------                     
 % in.outdir           |%s| E.g. 'name/a/directory' |'.'|
@@ -318,7 +320,7 @@ function filename = gmt_plot(in,field)
 %                     | [] |
 %                     ------------
 %  tick_centering     |%f|
-%                     Have ticks at the center of the boxes
+%                     Have tick annotation at the center of the boxes
 %                     | false (edges) |
 %                     ------------
 %  tick_length        |%f|
@@ -444,7 +446,7 @@ function filename = gmt_plot(in,field)
 
 if ~exist('field','var') && ~isfield(in,'datafield') && ...
         isfield(in,'nodata') && ~in.nodata
-    error('atmlab:input',...
+    error('gmtlab:input',...
         'Need name of structure field to plot. input field = ''str'' or name the field ''datafield''')
 elseif ~exist('field','var')
     field = 'datafield';
@@ -476,13 +478,14 @@ if a == 127
     d  = 'you need to add its installation directory to your PATH';
     e  = 'e.g. in Matlab you can add the PATH via';
     f  = 'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])';
-    error('atmlab:shell','%s%s or %s\n%s:\n%s',b,c,d,e,f)
+    error('gmtlab:shell','%s%s or %s\n%s:\n%s',b,c,d,e,f)
 end
 % SET DEFAULTS
 % general
+default.verbosity         = gmtlab('VERBOSITY');% Display non essential stdout in command window
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
-default.outdir            = atmlab('OUTDIR');   % where to put the figure
+default.outdir            = gmtlab('OUTDIR');   % where to put the figure
 default.projection        = 'Q';                % Cylindrical Equidistant Projection.
 default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 default.map_width         = 9;                  % in inches
@@ -499,7 +502,7 @@ if isfield(in,field)
     default.datarange         = getdatarange(in,field); %
     default.nanlegend  = any(isnan(in.(field)(:))); % include NaNs in the legend
 end
-in = optargs_struct(in,default);
+in = gmt_optargs_struct(in,default);
 
 % replace bad symbols for filename and mask them for the title
 if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
@@ -507,7 +510,7 @@ if ~isempty(in.title), default.filename = in.title; else default.filename = 'def
 % colors & data representation:
 default.ctable      = 'rainbow';          % color palette
 default.stepsize    = getstepsize(in);    % color level datastep interval
-in = optargs_struct(in,default); clear default
+in = gmt_optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
@@ -519,7 +522,7 @@ if ~isfield(in,'coast') || isstruct(in.coast) || in.coast
     default.rivers      = '1';  % '1' displays major rivers only. 'a' displays all.
     default.width       = .3;   % width of the coast
     
-    in.coast            = optargs_struct(in.coast,default); clear default
+    in.coast            = gmt_optargs_struct(in.coast,default); clear default
 end
 
 
@@ -530,7 +533,7 @@ if in.nodata
 end
 
 if ~ismember(field,fieldnames(in))
-    error('atmlab:input','no field by the name of "%s" in struct',field)
+    error('gmtlab:input','no field by the name of "%s" in struct',field)
 else
     in.fieldname  = field;
 end
@@ -563,10 +566,8 @@ if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
         default.dimensions  = sz{mycondition+1};
     end
     default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
-    in.legend           = optargs_struct(in.legend,default);
+    in.legend           = gmt_optargs_struct(in.legend,default);
 end
-
-
 
 function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
@@ -590,7 +591,7 @@ switch se.figuretype
     case 'tif'
         T = '-Tt -Qg -Qt';
     otherwise
-        error('Atmlab:figuretype','%s: not supported',se.figuretype)
+        error('gmtlab:figuretype','%s: not supported',se.figuretype)
 end
 
 command{end+1} = sprintf('ps2raster %s.ps -A -P %s',se.filename,T);
@@ -609,26 +610,26 @@ end
 
 openwith = NaN;
 if strcmp(se.figuretype,'pdf')
-    openwith = atmlab('PDFVIEWER');
+    openwith = gmtlab('PDFVIEWER');
 elseif strcmp(se.figuretype,'eps')
-    openwith = atmlab('PSVIEWER');
+    openwith = gmtlab('PSVIEWER');
 end
 if isnan(openwith)
-    openwith = atmlab('OPEN_COMMAND');
+    openwith = gmtlab('OPEN_COMMAND');
 end
 if se.display && ~any(isnan(openwith))
     command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',openwith,se.outdir,se.filename,se.figuretype);
 end
 
-out = exec_gmt_cmd(command,atmlab('VERBOSITY')); % execute commands
+out = exec_gmt_cmd(command,se.verbosity); % execute commands
 
 if any(isnan(openwith))
     disp(' ')
     disp('>> No viewer program defined. ')
     disp('>> Add something like the following to your startup file')
-    disp('>> atmlab( ''PSVIEWER'',''gv'');             %% view PS files with ghost view: ')
-    disp('>> atmlab( ''PDFVIEWER'',''xpdf -z width''); %% view PDF files with xpdf')
-    disp('>> atmlab(''OPEN_COMMAND'',''gnome-open'');  %% Or use the default viewer for the computer for any filetypes')
+    disp('>> gmtlab( ''PSVIEWER'',''gv'');             %% view PS files with ghost view: ')
+    disp('>> gmtlab( ''PDFVIEWER'',''xpdf -z width''); %% view PDF files with xpdf')
+    disp('>> gmtlab(''OPEN_COMMAND'',''gnome-open'');  %% Or use the default viewer for the computer for any filetypes')
     disp(' ')
 end
 
@@ -701,7 +702,7 @@ x = 20;
 diff = in.datarange(2)-in.datarange(1);
 
 if all(isfield(in,{'stepsize','nlevels'}))
-    warning('atmlab:input','in.stepsize overrides in.nlevels')
+    warning('gmtlab:input','in.stepsize overrides in.nlevels')
 elseif ~isfield(in,'stepsize') && isfield(in,'nlevels')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
 elseif diff >= x
@@ -777,32 +778,32 @@ function se = isdata(se,field)
 %% is there any useable data?
 
 if ~isfield(se,field)
-    error('atmlab:input','The field: "%s" is not in the structure',field)
+    error('gmtlab:input','The field: "%s" is not in the structure',field)
 end
 if ~any(~isnan(se.(field)))
-    error('atmlab:nodata','%s%s','Data does not contain any valid',...
+    error('gmtlab:nodata','%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
 end
 if ndims(se.(field))>2
-    error('atmlab:input','Too many dimensions in in.%s',field)
+    error('gmtlab:input','Too many dimensions in in.%s',field)
 end
 % check for lat and lons
 if ~isfield(se,'lat')
     l = {'Latitude','latitude'};
     if any(isfield(se,l))
         se.lat = se.(l{isfield(se,l)});
-    else error('atmlab:input','No latitudes present')
+    else error('gmtlab:input','No latitudes present')
     end
 end
 if ~isfield(se,'lon')
     l = {'Longitude','longitude','long'};
     if any(isfield(se,l))
         se.lon = se.(l{isfield(se,l)});
-    else error('atmlab:input','No longitudes present')
+    else error('gmtlab:input','No longitudes present')
     end
 end
 if se.datarange(1)==se.datarange(2)
-    error('atmlab:input','min(data) must not be equal to max(data)')
+    error('gmtlab:input','min(data) must not be equal to max(data)')
 end
 
 function hunt_down_errors(command,errors)
@@ -834,5 +835,5 @@ end
 % error on GMT errors
 if ~isempty(Errors)
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_errors,Errors,'UniformOutput',0);
-    error('atmlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
+    error('gmtlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
 end

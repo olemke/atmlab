@@ -32,27 +32,42 @@
 %
 % General command to open files with. e.g. gmtlab('OPEN_COMMAND','gnome-open') 
 % ---------------------------------------------------------------------------
+% OUTDIR
 %
+% Directory to output files from created by gmtlab
+% ---------------------------------------------------------------------------
 % PDFVIEWER
 %
 % Command to view PDF files.
 %----------------------------------------------------------------------------
+% VERBOSITY
+% 
+% The verbosity of Atmlab (gmtlab) functions.  
+% Functions writing to the screen set a report level for each output. If the
+% the set report level is higher than VERBOSITY, the output is ignored.
+% Output obeying this setting is most easily produced with the function *out*.
+% Functions can also use VERBOSITY to decide if figures shall be produced
+% (which is most easily checked by using *out*).
+%----------------------------------------------------------------------------
 %
 % $Date:$   Created by Salomon Eliasson based on ATMLAB by Patrick Eriksson.
-
 
 function value = gmtlab( varargin )
             
 persistent B
 
 if iscell(varargin{1})
-    [B,value] = prstnt_struct( B, @gmtlab_defs, varargin{:} );
+    [B,value] = gmt_prstnt_struct( B, @gmtlab_defs, varargin{:} );
 else
-    [B,value] = prstnt_struct( B, @gmtlab_defs, varargin );
+    [B,value] = gmt_prstnt_struct( B, @gmtlab_defs, varargin );
 end
 
+%%%%%%%%%%%%%%%%
+% SUBFUNCTIONS
+%
 function B = gmtlab_defs
-
+%% gmtlab_defs
 B.OPEN_COMMAND      = NaN;
 B.OUTDIR            = '.';
 B.PDFVIEWER         = NaN;
+B.VERBOSITY         = 0;
