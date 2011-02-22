@@ -40,6 +40,11 @@
 %
 % Command to view PDF files.
 %----------------------------------------------------------------------------
+% PSVIEWER
+%
+% Command to view PS or EPS files.
+%----------------------------------------------------------------------------
+
 % VERBOSITY
 % 
 % The verbosity of Atmlab (gmtlab) functions.  
@@ -70,6 +75,7 @@ function B = gmtlab_defs
 B.OPEN_COMMAND      = NaN;
 B.OUTDIR            = '.';
 B.PDFVIEWER         = NaN;
+B.PSVIEWER          = NaN;
 B.VERBOSITY         = 0;
 
 function [A,value] = gmt_prstnt_struct( A, def_fun, varargin )

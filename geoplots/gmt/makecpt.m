@@ -31,4 +31,4 @@ end
 cptfile = 'ctable.cpt';
 command = sprintf('%s > %s',mkcpt,cptfile);
 
-exec_gmt_cmd(command);
+exec_gmt_cmd(command,se.verbosity);

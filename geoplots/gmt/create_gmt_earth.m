@@ -257,7 +257,7 @@ switch in.ctable
         cpt_from_colorrange(in.colorrange);
         a.cptfile = makecpt(in);
     otherwise
-        disp('processing makecpt')
+        if in.verbosity, disp('processing makecpt'); end
         if ~isfield(in,'makecpt')
             a.cptfile = makecpt(in);
         else

@@ -1,8 +1,9 @@
 function filename = gmt_plot(in,field)
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
-% It is assumed that the data is CENTERED at the corresponding 
-% lat/lon points.
+% The function is basically a wrapper that calls gmt shell commands using easy
+% to use matlab arguments. Try test_gmt.m for some examples on how to use the function.
+% It is assumed that the data is CENTERED at the corresponding lat/lon points.
 % 
 %
 % OUT   filename  The filename of the figure.
@@ -21,7 +22,15 @@ function filename = gmt_plot(in,field)
 %
 %                 file = gmt_plot(in,'somefield');
 %
-% SEE BELOW for the rest of the available arguments
+% see STRUCTURE CONTENTS below for the rest of the available arguments
+%
+% VIEWING THE PLOT:
+% The easiest thing to do is to define a viewer in your startup file.
+%
+% Add something like the following to your startup file')
+% gmtlab( ''PSVIEWER'',''gv'');             %% view PS files with ghost view: ')
+% gmtlab( ''PDFVIEWER'',''xpdf -z width''); %% view PDF files with xpdf')
+% gmtlab(''OPEN_COMMAND'',''gnome-open'');  %% Or use the default viewer for the computer for any filetypes')
 %    
 % Structure contents: 
 %
@@ -456,7 +465,9 @@ out = set_GMT_plot(in,field);                                                   
 if out.gridded
     out.grdfile = [out.filename '.grd'];
     write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                     % writegmt (gridded)
-    fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
+    if in.verbosity
+        fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
+    end
 else
     out = save_ungridded4GMTplot(out,field);                                    % create ascii (not gridded)
 end
@@ -472,7 +483,8 @@ filename=sort_figures(out,commands);                                            
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-[a,b] = system('gmtset');
+[a,b] = system('gmtset 2>&1');
+
 if a == 127
     c  = 'Either GMT is not installed';
     d  = 'you need to add its installation directory to your PATH';
@@ -599,7 +611,7 @@ command{end+1} = sprintf('ps2raster %s.ps -A -P %s',se.filename,T);
 command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 
 if ~se.keep_files
-    command{end+1} = sprintf('rm -f %s.grd %s.asc %s.ps *.cpt',se.filename,se.filename,se.filename);
+    command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',se.filename);
 end
 
 if isdir(se.outdir)
@@ -622,16 +634,6 @@ if se.display && ~any(isnan(openwith))
 end
 
 out = exec_gmt_cmd(command,se.verbosity); % execute commands
-
-if any(isnan(openwith))
-    disp(' ')
-    disp('>> No viewer program defined. ')
-    disp('>> Add something like the following to your startup file')
-    disp('>> gmtlab( ''PSVIEWER'',''gv'');             %% view PS files with ghost view: ')
-    disp('>> gmtlab( ''PDFVIEWER'',''xpdf -z width''); %% view PDF files with xpdf')
-    disp('>> gmtlab(''OPEN_COMMAND'',''gnome-open'');  %% Or use the default viewer for the computer for any filetypes')
-    disp(' ')
-end
 
 hunt_down_errors(command,out)
 
@@ -759,19 +761,13 @@ if ~isfield(se,'gridded')
         se.lat = se.lat(:);
         se.lon = se.lon(:);
         se.gridded = false;
-        txt1 = 'is NOT';txt2='1';txt3='is';
     else
         if pos2 && (pos2 ~= pos1)
             % want it in (lat,lon)
             se.(field)=se.(field)';
         end 
         se.gridded = true;
-        txt1 = 'is';txt2='0';txt3='isn''t';
     end
-    
-    fprintf('Assuming the data %s gridded...\n',txt1)
-    fprintf('Include structure argument se.gridded=%s if it %s.\n',txt2,txt3)
-    fprintf('max data value: %3.1d\nmin data value: %3.1d\n',max(se.(field)(:)),min(se.(field)(:)))
 end
 
 function se = isdata(se,field)

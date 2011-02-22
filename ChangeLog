@@ -1,3 +1,21 @@
+2011-02-22  Salomon Eliasson  <s.eliasson@ltu.se>
+ 
+	* atmlab-1-0-152
+
+	* geoplots/gmt/makecpt.m): Added verbosity to system command
+
+	* geoplots/gmt/gmt_plot.m: Edited help section, fixed
+	some things for octave people
+
+	* geoplots/gmt/gmtlab.m: Added psviewer to gmtlab (for eps and ps
+	files)
+
+	* geoplots/gmt/test_gmt.m: Had to add
+	"'uniformoutput',false" to all cellfuns for octave users.
+
+	* geoplots/gmt/create_gmt_earth.m: suppressed
+	some output with verbosity
+
 2011-02-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-151

@@ -56,13 +56,14 @@ in = gmt_optargs_struct(in,default);
 [files{end+1},info{end+1}] = TEST7(in);
 
 % Put paths back in place (removed in the beginning for testing)
-cellfun(@addpath,allpaths(index));
+cellfun(@addpath,allpaths(index),'uniformoutput',false);
 files = files(~cellfun('isempty',files));
+info = info(~cellfun('isempty',info));
 
 % DISPLAY information about the tests
 disp(' ')
 disp(' ')
-cellfun(@disp,info)
+cellfun(@disp,info,'uniformoutput',false)
 warning('on','gmtcatstruct:DuplicatesFound')
 
 %%%%%%%%%%%%%%%%%
@@ -373,5 +374,4 @@ allpaths = gmt_splitstring(path,':');
 AP = regexp(allpaths,'atmlab','match');
 GP = regexp(allpaths,'gmt','match');
 index = ~cellfun('isempty',AP) & cellfun('isempty',GP);
-
-cellfun(@rmpath,allpaths(index));
+cellfun(@rmpath,allpaths(index),'uniformoutput',false);
