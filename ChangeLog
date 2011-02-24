@@ -1,5 +1,13 @@
 2011-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-155
+
+	* geoplots/gmt/gmt_optargs_struct.m: Changed header
+
+	* geoplots/gmt/gmt_plot.m: Fixed minor bugs
+
+2011-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-154
 
 	* math/get_ascend_decend_node.m: Changed header

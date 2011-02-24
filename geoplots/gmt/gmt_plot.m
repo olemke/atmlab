@@ -454,19 +454,20 @@ function filename = gmt_plot(in,field)
 %
 % 2011-02-22 created by Salomon Eliasson
 
-if ~exist('field','var') && ~isfield(in,'datafield') && ...
-        isfield(in,'nodata') && ~in.nodata
-    error('gmtlab:input',...
-        'Need name of structure field to plot. input field = ''str'' or name the field ''datafield''')
-elseif ~exist('field','var')
+if ~exist('field','var')
     field = 'datafield';
 end
+if ~isfield(in,field) && ~isfield(in,'nodata')
+    error('gmtlab:input',...
+        'Data field: "%s" not found',field)
+end
+
 out = set_GMT_plot(in,field);
 
 if out.gridded
     out.grdfile = [out.filename '.grd'];
     write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);
-    if in.verbosity
+    if out.verbosity
         fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
     end
 else
@@ -667,7 +668,7 @@ file = 'legend.ps';
 
 %make sure it's not here
 basename=file(1:end-3);
-exec_gmt_cmd(sprintf('rm -f %s.ps %s.eps %s.pdf',basename,basename,basename))
+exec_gmt_cmd(sprintf('rm -f %s.{ps,eps,pdf}',basename))
 
 %Remove trailing .ps entry
 crop=regexp(command,'>>');
@@ -682,10 +683,8 @@ for i = 1:length(command)
     end
 end
 
-command{end+1} = sprintf(' ps2eps -f -B --loose legend.ps ');
-command{end+1} = sprintf(' epstool --copy -b legend.eps legend2.eps ');
-command{end+1} = sprintf(' mv legend2.eps legend.eps ');
-command{end+1} = sprintf(' epstopdf legend.eps ');
+command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
+
 command{end+1} = sprintf(' mv legend.pdf %s/',outdir);
 
 exec_gmt_cmd(command)

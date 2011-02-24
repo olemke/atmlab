@@ -23,10 +23,8 @@ function out = gmt_optargs_struct(userin, defaults)
 %
 % See also: <a href="matlab:help optargs">optargs</a>
 % 
-% $Author$
-% Cloned from  optargs_struct.m by Gerrit Holl in atmlab
-%
-% $Date$
+% 
+% 2011-02-24 Cloned from  optargs_struct.m by Gerrit Holl in atmlab
 
 
 out = defaults;
