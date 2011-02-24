@@ -9,7 +9,7 @@
 
 function s = splitstring (p, sep)
 
-if exist('OCTAVE_VERSION')
+if exist('OCTAVE_VERSION','builtin')
   s = strsplit (p, sep, true);
 else
   s = regexp (p, sep, 'split');

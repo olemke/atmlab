@@ -1,5 +1,15 @@
 2011-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-154
+
+	* math/get_ascend_decend_node.m: Changed header
+
+	* atmlab/atmlab_init.m: Futile change.
+
+	* handy/splitstring.m: Added 'builtin' to exist for Octave.
+
+2011-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-153
 
 	* geoplots/gmt/{homogenize_datalatlon.m,create_gmt_earth.m,gmt_catstruct.m}:

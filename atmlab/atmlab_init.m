@@ -47,8 +47,8 @@ addpath( fullfile( toppath, 'gridcreation', 'annealing' ) );
 addpath( fullfile( toppath, 'gridcreation' ) ); 
 addpath( fullfile( toppath, 'graphs' ) );
 addpath( fullfile( toppath, 'gformat' ) );
+addpath( fullfile( toppath, 'geoplots', 'gmt') );
 addpath( fullfile( toppath, 'geoplots' ) );
-addpath( fullfile( toppath, 'geoplots', 'gmt' ) );
 addpath( fullfile( toppath, 'geophysics' ) );
 addpath( fullfile( toppath, 'forwardmodel' ) );
 addpath( fullfile( toppath, 'files' ) ); 
@@ -67,7 +67,6 @@ addpath( fullfile( toppath, 'arts' ) );
 if nversion < 7.04
   addpath( fullfile( toppath, 'V7-4' ) ); 
 end
-
 
 %=== Read Atmlab settings
 %

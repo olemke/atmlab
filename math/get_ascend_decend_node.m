@@ -18,7 +18,7 @@ function ascend = get_ascend_decend_node(latitude)
 %          45, for CloudSat column 1. That means that the entire scanline will
 %          always have the same node
 %
-% $Id$
+% 2010-10-13 created by Salomon Eliasson
 
 lat=latitude(:,round(end/2)); %always a vector
 ascend=false(size(latitude));
