@@ -1,5 +1,31 @@
+2011-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-153
+
+	* geoplots/gmt/{homogenize_datalatlon.m,create_gmt_earth.m,gmt_catstruct.m}:
+	Changed header.
+
+	* geoplots/gmt/save_ungridded4GMTplot.m: adapted to new
+	default.outdir convention.
+
+	* geoplots/gmt/{gmt_splitstring.m,write_gmtgrid.m,save_ungridded4GMTplot.m}:
+	Added 'builtin' to exist for Octave.
+
+	* geoplots/gmt/gmt_plot.m: Edited header, adapted to new
+	default.outdir convention.
+
+	* geoplots/gmt/test_gmt.m: Fixed bug where input was being ignored.
+
+	* geoplots/gmt/cpt_from_colorrange.m: Better help text
+
+	* geoplots/gmt/gmtlab.m: Changed default in.outdir to NaN instead of '.'
+
+	* geoplots/gmt/gmt_get_nctype.m: Added function that gets the
+	correct netcdf type for the data variable. This enables the
+	possibility of plotting logicals.
+
 2011-02-22  Salomon Eliasson  <s.eliasson@ltu.se>
- 
+
 	* atmlab-1-0-152
 
 	* geoplots/gmt/makecpt.m): Added verbosity to system command

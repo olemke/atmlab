@@ -1,12 +1,11 @@
 function commands = create_gmt_earth(in)
 %%           create_gmt_earth
 %
-% See gmt_plot for input details
+% See help gmt_plot for input details
 %
 % PURPOSE: Create cell strings that will be used in a system call.
 %
-% $Author$
-% $Date$
+% 2011-02-22 created by Salomon Eliasson
 
 in = setup_create_gmt_earth(in);                                           
 

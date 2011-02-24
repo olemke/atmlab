@@ -28,9 +28,9 @@ function filename = gmt_plot(in,field)
 % The easiest thing to do is to define a viewer in your startup file.
 %
 % Add something like the following to your startup file')
-% gmtlab( ''PSVIEWER'',''gv'');             %% view PS files with ghost view: ')
-% gmtlab( ''PDFVIEWER'',''xpdf -z width''); %% view PDF files with xpdf')
-% gmtlab(''OPEN_COMMAND'',''gnome-open'');  %% Or use the default viewer for the computer for any filetypes')
+% gmtlab( 'PSVIEWER','gv');             %% view PS files with ghost view: ')
+% gmtlab( 'PDFVIEWER','xpdf -z width'); %% view PDF files with xpdf')
+% gmtlab( 'OPEN_COMMAND','gnome-open'); %% Or use the default viewer for the computer for any filetypes')
 %    
 % Structure contents: 
 %
@@ -40,15 +40,16 @@ function filename = gmt_plot(in,field)
 % 2) in.lat     % the corresponding latitudes
 % 3) in.lon     % the corresponding longitudes
 %
-% If your data is ungridded the dimensions must be:
-% length(in.lon) == length(in.lat) == length(in.(field))
+% If your data is ungridded the dimensions of the manditory input
+% (lat,lon.data) must be the same. 
+% i.e isequal(size(in.lat),size(in.lon),size(in.data))
 %
 % If your data is gridded the data MUST have the dimensions:
 % [length(in.lat),length(in.lon)] == size(in.(field));
 %  << transpose: in.(field) = in.(field)'; if this is not the case >>
 %
-% NOTE: 1) If your data is UNGRIDDED I recommend setting:
-%          in.increment = arcminutes (default = 60)
+% NOTE: 1) If your data is UNGRIDDED I recommend setting in.increment =
+%          arcminutes (default = 60) to something suitable.
 %       2) gmt_plot automatically detects if the data is gridded or not
 %
 %
@@ -65,10 +66,11 @@ function filename = gmt_plot(in,field)
 % GENERAL:
 %
 % in.verbosity        |%f| Display non essential output | gmtlab('VERBOSITY') | 
-%
+%                     ------------                     
 % in.title            |%s| Title of plot | '' |
 %                     ------------                     
-% in.outdir           |%s| E.g. 'name/a/directory' |'.'|
+% in.outdir           |%s| E.g. 'name/a/directory' 
+%                     |gmtlab('OUTDIR')  ('.' if not set in startup) |
 %                     ------------
 % in.filename         |%s| E.g. 'yourfilename' | generated from title |
 %                     ------------
@@ -254,7 +256,7 @@ function filename = gmt_plot(in,field)
 %                     | [] |
 %                     ------------
 %  color_model        |%s|
-%                     'RGB', 'HSV, or '+HSV'
+%                     'RGB', 'HSV'
 %                     | 'RGB' |
 %                     ----------------------
 %
@@ -450,8 +452,7 @@ function filename = gmt_plot(in,field)
 %
 %--------------------------------------------------------------------------
 %
-% $Author$
-% $Date$
+% 2011-02-22 created by Salomon Eliasson
 
 if ~exist('field','var') && ~isfield(in,'datafield') && ...
         isfield(in,'nodata') && ~in.nodata
@@ -460,21 +461,23 @@ if ~exist('field','var') && ~isfield(in,'datafield') && ...
 elseif ~exist('field','var')
     field = 'datafield';
 end
-out = set_GMT_plot(in,field);                                                   % setup
+out = set_GMT_plot(in,field);
 
 if out.gridded
     out.grdfile = [out.filename '.grd'];
-    write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);                     % writegmt (gridded)
+    write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);
     if in.verbosity
         fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
     end
 else
-    out = save_ungridded4GMTplot(out,field);                                    % create ascii (not gridded)
+    out = save_ungridded4GMTplot(out,field);
 end
 
-commands = create_gmt_earth(out);                                               % main function
+% main function
+commands = create_gmt_earth(out);
 
-filename=sort_figures(out,commands);                                            % finalize
+% finalize
+filename=sort_figures(out,commands);                                            
 
 %%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTIONS
@@ -581,19 +584,24 @@ if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
     in.legend           = gmt_optargs_struct(in.legend,default);
 end
 
-function filename = sort_figures(se,command)                                    %% SORT FIGURES %%
+function filename = sort_figures(in,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
 
-if se.savelegend
+if isnan(in.outdir)
+    outdir = '.';
+else outdir = in.outdir;
+end
+
+if in.savelegend
     % MAKE a separate file for the legend
-    legend = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),se.outdir);
-    if ~se.legend
+    legend = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),outdir);
+    if ~in.legend
         command = command(cellfun('isempty',regexp(command,'psscale')));
     end
 end
 
 % for figuretypes (pdf,eps,png, or tif)
-switch se.figuretype
+switch in.figuretype
     case 'pdf'
         T = '-Tf';
     case 'eps'
@@ -603,50 +611,58 @@ switch se.figuretype
     case 'tif'
         T = '-Tt -Qg -Qt';
     otherwise
-        error('gmtlab:figuretype','%s: not supported',se.figuretype)
+        error('gmtlab:figuretype','%s: not supported',in.figuretype)
 end
 
-command{end+1} = sprintf('ps2raster %s.ps -A -P %s',se.filename,T);
+command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
 
 command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 
-if ~se.keep_files
-    command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',se.filename);
+if ~in.keep_files
+    command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',in.filename);
 end
 
-if isdir(se.outdir)
-     command{end+1} = sprintf('mv %s.%s %s/  ',se.filename,se.figuretype,se.outdir);
-else
-    se.outdir=pwd;
+if isdir(outdir)
+    command{end+1} = sprintf('mv %s.%s %s/  ',in.filename,in.figuretype,outdir);
 end
 
 openwith = NaN;
-if strcmp(se.figuretype,'pdf')
+if strcmp(in.figuretype,'pdf')
     openwith = gmtlab('PDFVIEWER');
-elseif strcmp(se.figuretype,'eps')
+elseif strcmp(in.figuretype,'eps')
     openwith = gmtlab('PSVIEWER');
 end
 if isnan(openwith)
     openwith = gmtlab('OPEN_COMMAND');
 end
-if se.display && ~any(isnan(openwith))
-    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',openwith,se.outdir,se.filename,se.figuretype);
+if in.display && ~any(isnan(openwith))
+    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',...
+        openwith,outdir,in.filename,in.figuretype);
 end
 
-out = exec_gmt_cmd(command,se.verbosity); % execute commands
+out = exec_gmt_cmd(command,in.verbosity); % execute commands
 
 hunt_down_errors(command,out)
 
-filename = sprintf('%s/%s.%s',se.outdir,se.filename,se.figuretype);
-fprintf('GMT plot stored at:  %s/%s.%s\n',se.outdir,se.filename,se.figuretype)
+filename = sprintf('%s/%s.%s',outdir,in.filename,in.figuretype);
+fprintf('GMT plot stored at:  %s/%s.%s\n',outdir,in.filename,in.figuretype)
 
-if se.savelegend
+if in.savelegend
     fprintf('File containing legend is located at: %s\n',legend)
+end
+
+if isnan(in.outdir)
+    a = 'Files are saved at ''.''';
+    b = 'It is desirable to set a directory you want the figures to be saved to.';
+    c = 'I.e this is easily done by setting gmtlab(''OUTDIR'',''<Somewhere>'') in your startup.m file';
+    d = 'Setting this, or including in.outdir as input will suppress this message.';
+    warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
 end
 
 function legend = makelegendpdf(command,outdir)
 %% Make a separate pdf for the legend
 
+if isnan(outdir), outdir = '.'; end
 file = 'legend.ps';
 
 %make sure it's not here
@@ -694,14 +710,14 @@ end
 function stepsize = getstepsize(in)
 %% getstepsize
 
-if ~isfield(in,'datarange')
+if in.nodata
     stepsize = 0;
     return
 end
 
 % default-ish number of levels
 x = 20;
-diff = in.datarange(2)-in.datarange(1);
+diff = double(in.datarange(2)-in.datarange(1));
 
 if all(isfield(in,{'stepsize','nlevels'}))
     warning('gmtlab:input','in.stepsize overrides in.nlevels')
@@ -709,7 +725,8 @@ elseif ~isfield(in,'stepsize') && isfield(in,'nlevels')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
 elseif diff >= x
     stepsize = floor((diff-1)/x)+1;
-else stepsize = diff/x;
+else
+    stepsize = diff/x;
 end
 
 function sidebar = getsidebar(in)
@@ -720,85 +737,86 @@ sidebar =  ( min(in.(in.fieldname)(:))<in.datarange(1) ) + ...
     2* ( max(in.(in.fieldname)(:))>in.datarange(2) );
 
 
-function se = nodata(se)                                                        %% NODATA %%
+function in = nodata(in)                                                        %% NODATA %%
 %% NODATA
 % if you want to only plot coastlines
 
-se.sidebar = false;
-se.legend  = false;
-se.gridded    = false;
-se.nlevels = 1;
-if isfield(se,'region')
-elseif ~isfield(se,'region') && all(isfield(se,{'lat','lon'}))
-        se.region = sprintf('%3.1f/%3.1f/%3.1f/%3.1f/%3.1f',...
-        min(min(se.lon)),max(max(se.lon)),...
-        min(min(se.lat)),max(max(se.lat)));
+in.sidebar = false;
+in.legend  = false;
+in.gridded = false;
+in.nlevels = 1;
+if isfield(in,'region')
+elseif ~isfield(in,'region') && all(isfield(in,{'lat','lon'}))
+        in.region = sprintf('%3.1f/%3.1f/%3.1f/%3.1f/%3.1f',...
+        min(in.lon(:)),max(in.lon(:)),...
+        min(in.lat(:)),max(in.lat(:)));
 else
-    se.region='-180/180/-90/90';
+    in.region='-180/180/-90/90';
 end
 
-function se = isgridded(se,field)                                               
+function in = isgridded(in,field)                                               
 %% ISGRIDDED: Test if the data is gridded
 
-if isempty(se.(field))
-    error('The data variable: se.%s is empty',field)
+if isempty(in.(field))
+    error('The data variable: in.%s is empty',field)
 end
 
-if ndims(se.(field))==3                                                         
-    se.(field) = squeeze(se.(field));
+if ndims(in.(field))==3                                                         
+    in.(field) = squeeze(in.(field));
 end
 
-[a,b]=size(se.(field));
-pos1 = a==length(se.lat)&b==length(se.lon); %(lat,lon)
-pos2 = b==length(se.lat)&a==length(se.lon); %(lon,lat)
+[a,b]=size(in.(field));
+pos1 = a==length(in.lat)&b==length(in.lon); %(lat,lon)
+pos2 = b==length(in.lat)&a==length(in.lon); %(lon,lat)
 
 % if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
 % assume it's not.
-if ~isfield(se,'gridded')
-    ig = ~ (isequal(size(se.(field)),size(se.lat),size(se.lon))) ;
+if ~isfield(in,'gridded')
+    ig = ~ (isequal(size(in.(field)),size(in.lat),size(in.lon))) ;
     if ~ig
-        se.(field) = se.(field)(:);
-        se.lat = se.lat(:);
-        se.lon = se.lon(:);
-        se.gridded = false;
+        in.(field) = in.(field)(:);
+        in.lat     = in.lat(:);
+        in.lon     = in.lon(:);
+        in.gridded = false;
     else
         if pos2 && (pos2 ~= pos1)
             % want it in (lat,lon)
-            se.(field)=se.(field)';
+            in.(field)=in.(field)';
         end 
-        se.gridded = true;
+        in.gridded = true;
     end
 end
 
-function se = isdata(se,field)
+function in = isdata(in,field)
 %% is there any useable data?
 
-if ~isfield(se,field)
+if ~isfield(in,field)
     error('gmtlab:input','The field: "%s" is not in the structure',field)
 end
-if ~any(~isnan(se.(field)))
+if ~any(~isnan(in.(field)))
     error('gmtlab:nodata','%s%s','Data does not contain any valid',...
         ' values for contour levels to be based on...')
 end
-if ndims(se.(field))>2
+if ndims(in.(field))>2
     error('gmtlab:input','Too many dimensions in in.%s',field)
 end
 % check for lat and lons
-if ~isfield(se,'lat')
+if ~isfield(in,'lat')
     l = {'Latitude','latitude'};
-    if any(isfield(se,l))
-        se.lat = se.(l{isfield(se,l)});
-    else error('gmtlab:input','No latitudes present')
+    if any(isfield(in,l))
+        in.lat = in.(l{isfield(in,l)});
+    else
+        error('gmtlab:input','No latitudes present')
     end
 end
-if ~isfield(se,'lon')
+if ~isfield(in,'lon')
     l = {'Longitude','longitude','long'};
-    if any(isfield(se,l))
-        se.lon = se.(l{isfield(se,l)});
+    if any(isfield(in,l))
+        in.lon = in.(l{isfield(in,l)});
     else error('gmtlab:input','No longitudes present')
     end
 end
-if se.datarange(1)==se.datarange(2)
+if in.datarange(1)==in.datarange(2)
     error('gmtlab:input','min(data) must not be equal to max(data)')
 end
 

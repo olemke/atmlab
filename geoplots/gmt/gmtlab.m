@@ -61,7 +61,7 @@ function value = gmtlab( varargin )
             
 persistent B
 
-if iscell(varargin{1})
+if ~isempty(varargin) && iscell(varargin{1})
     [B,value] = gmt_prstnt_struct( B, @gmtlab_defs, varargin{:} );
 else
     [B,value] = gmt_prstnt_struct( B, @gmtlab_defs, varargin );
@@ -73,7 +73,7 @@ end
 function B = gmtlab_defs
 %% gmtlab_defs
 B.OPEN_COMMAND      = NaN;
-B.OUTDIR            = '.';
+B.OUTDIR            = NaN;
 B.PDFVIEWER         = NaN;
 B.PSVIEWER          = NaN;
 B.VERBOSITY         = 0;

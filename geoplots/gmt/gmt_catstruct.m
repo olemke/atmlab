@@ -45,8 +45,8 @@ function A = gmt_catstruct(varargin)
 % Modified by Salomon Eliassson. 2011
 %       additions: Works recursively
 %                  Allows empty arguments in varargin
-% $Author$
-% $Date$
+%
+% 2011-02-23 created by Salomon Eliasson
 
 N = nargin ;
 
@@ -122,9 +122,11 @@ for i =1:size(FN,1)
     % find which structures contain structures
     a{i}= FN{i}(cellfun(@isstruct,VAL{i}));
 end
+
+if all(cellfun('isempty',a)); return; end
 % get the unique structure names
 F = unique(cat(1,a{:}));
-if isempty(F); return; end 
+
 
 for f = F'
     % find the lower level structure in the the other structures

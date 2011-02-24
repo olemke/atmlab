@@ -21,7 +21,7 @@
 
 function write_gmtgrid (x, y, z, cdf)
 
-if exist('OCTAVE_VERSION')
+if exist('OCTAVE_VERSION','builtin')
   write_gmtgrid_octave( x, y, z, cdf);
   return;
 end;

@@ -8,8 +8,7 @@ function [data,lat,lon] = homogenize_datalatlon(data,lat,lon)
 % IN:  data,lat,lon
 % OUT: data,lat,lon
 %
-% $Author$
-% $Date$
+% 2011-02-18 created by Salomon Eliasson
 
 if isequal(size(data),size(lat),size(lon))
     error('gmtlab:input','data does not appear to be gridded')

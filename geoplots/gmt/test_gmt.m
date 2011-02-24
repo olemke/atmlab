@@ -1,36 +1,42 @@
-function [files,info] = test_gmt(in)
+function [info,files] = test_gmt(in)
 %% TEST_GMT
 %
 % Purpose: To test variuos aspecs of gmt_plot. Especially before commiting
 % changes
 %
-% USAGE: [files,info] = test_gmt(in)  
+% USAGE: [info,files] = test_gmt(in)  
 %
-% IN: (optional) structure of arguments to be additionally used 
-%     in the gmt_plot call/s. I.e. it will use each tests default values
-%     including the addional option.
-%     -----------
-%     in.test: If you only want to run a subset of tests, e.g. in.test =
-%     [1,3,4] runs tests 1,3,4. The default behaviour is to run all tests ([1:7])
-%     -----------
+% OPT: structure of arguments to be additionally used 
+%      in the test_gmt call/s. I.e. it will use the default values for each
+%      test and the addional options added by the user (which have precedence).
+%      -----------
+%      in.test: If you only want to run a subset of tests, e.g. in.test =
+%      [1,3,4] runs tests 1,3,4. The default behaviour is to run all tests ([1:7])
+%
+%      -----------
 %
 %
 % OUT: files = cellarray of paths to created figures
 %      info  = cellarray of information about each test. The information is
 %              also displayed at the end of the run.
 %
-% $Author$
-% $Date$
+% 2011-02-23 created by Salomon Eliasson
 
-files = {}; info = {}; if ~exist('in','var'); in=struct([]); end
-default.test = 1:7; % which tests to do (default=all)
+files = {}; info = {};
+if ~exist('in','var'); in=struct([]); end
+od = isfield(in,'outdir');
+
+% SET some defaults
+default.test      = 1:7; % which tests to do (default=all)
 default.verbosity = false;
+default.outdir    = gmtlab('OUTDIR');
+in = gmt_optargs_struct(in,default); 
+
+if ~ischar(in.outdir), in.outdir = '.'; end
 warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 
 % Offload atmlab-only paths if they are defined
 [allpaths,index] = temporarily_rmpaths;
-
-in = gmt_optargs_struct(in,default); 
 
 [gridded,ungridded] = dummy_data;
 
@@ -64,7 +70,16 @@ info = info(~cellfun('isempty',info));
 disp(' ')
 disp(' ')
 cellfun(@disp,info,'uniformoutput',false)
+
 warning('on','gmtcatstruct:DuplicatesFound')
+
+if ~od && ~ischar(gmtlab('OUTDIR'))
+    a = 'Files are saved at ''.''';
+    b = 'It is desirable to set a default directory where to save the figures.';
+    c = 'I.e this is easily done by setting gmtlab(''OUTDIR'',''<Somewhere>'') in your startup.m file';
+    d = 'Setting this, or including in.outdir as input will suppress this message.';
+    warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
+end
 
 %%%%%%%%%%%%%%%%%
 % SUB FUNCTIONS
@@ -142,7 +157,7 @@ test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
 test.filename = 'Test2a';
-files{end+1} = gmt_plot(gmt_catstruct(in,gridded,test),'data');
+files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
 
 a = 'Test 2a demonstrates that you can include some special';
 b = 'characters in in.title and in.unit and that you can toggle in.basemap_axis';
@@ -152,7 +167,7 @@ info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
 
 test.title        = 'ungridded: title², unit';
 test.filename = 'Test2b';
-files{end+1} = gmt_plot(gmt_catstruct(in,ungridded,test),'data');
+files{end+1} = gmt_plot(gmt_catstruct(ungridded,test,in),'data');
 
 a = 'Test2b demonstrates the same as Test2a but for ungridded data, where';
 b = 'size(data) = size(lat) = size(lon). This is e.g. good for plotting satellite';
@@ -170,7 +185,7 @@ test.projection = 'H';      % hammer
 test.center     = 180;      % Center map at given center longitude
 test.datarange  = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
 test.filename = 'Test3';
-file = gmt_plot(gmt_catstruct(in,gridded,test),'data');
+file = gmt_plot(gmt_catstruct(gridded,test,in),'data');
 
 a = 'Test3 demonstrates the Hammer projection (one of many available projections),';
 b = 'using in.projection = ''H''. The test also demonstrates that you can';
@@ -186,10 +201,12 @@ function [file,info] = TEST4(in,gridded)
 
 if ~ismember(4,in.test), file=''; info = ''; return, end %then don't do this test
 
-if ~isfield(in,{'stepsize','nlevels'})
+% Add some annotations some intervals.
+if ~isfield(in,{'stepsize','nlevels'}) 
+    % assuming we have 20 levels, test the following
     tmp = cell(1,20);
     tmp{1} = 'blue'; tmp{6} = 'light blue'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
-    test.legend.tick_annotations = tmp; % place annotations at the desired intervals
+    test.legend.tick_annotations = tmp; 
 end
 test.title = 'custom legend and sub-region';
 test.ticks = '30g30/15g15'; % annotations (deg) on major lines (e.g 40 xaxis,20 yaxis)
@@ -205,14 +222,17 @@ test.legend.tick_centering = true;
 % For your own custom colortable use in.colorrange.colors (see below). Assign a
 % color to a relative value, e.g between 0-1, where 0 is for the minimum of the
 % datarange and 1 is for the color of the maximum datarange. For example,
-test.colorrange.colors  = {{0,'0/0/255'},{0.3,'255/255/255'},...
-    {0.5,'0/255/0'},{.7,'0/0/0'},{1,'255/0/0'}};
+test.colorrange.colors  = {{0,'0/0/255'},...
+    {0.3,'255/255/255'},...
+    {0.5,'0/255/0'},...
+    {.7,'0/0/0'},...
+    {1,'255/0/0'}};
 test.colorrange.color_model = 'RGB';
 % makes a colortable that goes from blue to white to green to black to red in RGB format.
 % ------------------------
 test.filename = 'Test4';
 
-file = gmt_plot(gmt_catstruct(in,gridded,test),'data');
+file = gmt_plot(gmt_catstruct(gridded,test,in),'data');
 
 a = 'Test4 demonstrates that you can easily make your own custom colortable.';
 b = 'You can also insert your own legend annotations to be used instead of';
@@ -253,7 +273,7 @@ test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
 test.filename = 'Test5';
-file = gmt_plot (gmt_catstruct(in,test), 'data');
+file = gmt_plot (gmt_catstruct(test,in), 'data');
 
 a = 'Test 5 demonstrates contour maps, where you can optionally choose to show';
 b = 'High and Lows in the of the data. Test 5 also demonstrates that you can';
@@ -292,7 +312,7 @@ test.title = 'SatGroup locations';
 test.nodata = true;
 test.region = '-20/160/-30/70';
 test.filename = 'Test6a';
-files{end+1} = gmt_plot(gmt_catstruct(in,test));
+files{end+1} = gmt_plot(gmt_catstruct(test,in));
 
 % TEST: mediumregion
 for i = 1:length(names)
@@ -303,14 +323,14 @@ test.figuretype = 'png';
 test.title      = 'Europe (medium details in a .png-file)';
 test.coast.rivers = 'r';
 test.filename = 'Test6b';
-files{end+1}    = gmt_plot(gmt_catstruct(in,test));
+files{end+1}    = gmt_plot(gmt_catstruct(test,in));
 
 % TEST: smallregion
 test.title = 'Kiruna (high details)';
 test.region = '12/22/65/70';
 test.coast.rivers = 'a';
 test.filename = 'Test6c';
-files{end+1} = gmt_plot(gmt_catstruct(in,test));
+files{end+1} = gmt_plot(gmt_catstruct(test,in));
 
 a = 'Test 6 demonstrates that you can plot points and text on a map, and';
 b = 'demonstrates that there are several map resolutions available.';
@@ -371,7 +391,7 @@ function [allpaths,index] = temporarily_rmpaths
 % In order to ensure gmtlab is independent av atmlab
 
 allpaths = gmt_splitstring(path,':');
-AP = regexp(allpaths,'atmlab','match');
-GP = regexp(allpaths,'gmt','match');
+AP = regexp(allpaths,'/atmlab','match');
+GP = regexp(allpaths,'/gmt','match');
 index = ~cellfun('isempty',AP) & cellfun('isempty',GP);
 cellfun(@rmpath,allpaths(index),'uniformoutput',false);

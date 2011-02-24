@@ -1,4 +1,4 @@
-function se = save_ungridded4GMTplot(se,field)
+function in = save_ungridded4GMTplot(in,field)
 %
 % Purpose: To create an ascii file containing (lon,lat,value)
 %          This function is called if the data is not gridded!
@@ -12,13 +12,16 @@ function se = save_ungridded4GMTplot(se,field)
 %
 % Outdata: se.ungriddedfile: the full path of the generated.ungriddedfile
 %
-% 4/12-2009 Salomon Eliasson
+% 4/12-2009 created by Salomon Eliasson
 
 % if I don't want to plot data
-if isfield(se,'nodata')&&se.nodata
+if isfield(in,'nodata')&&in.nodata
     return
 end
+if isnan(in.outdir)
+    outdir = '.';
+else outdir = in.outdir;
+end
+in.ungriddedfile = [outdir,'/',in.filename '.nc'];
 
-se.ungriddedfile = [se.outdir,'/',se.filename '.nc'];
-
-save_nc_gmt_input (se.ungriddedfile, se.(field), se.lat, se.lon);
+save_nc_gmt_input (in.ungriddedfile, in.(field), in.lat, in.lon);
