@@ -116,7 +116,7 @@ Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.R_GEOID, zplat, ztan )';
 %
 if strcmp( lower(method), 'bl' )
-  Q.IY_CLEARSKY_AGENDA = { 'iyEmissionStandardClearsky' };
+  Q.IY_CLEARSKY_AGENDA = { 'iyBeerLambertStandardClearsky' };
   Q.IY_SPACE_AGENDA    = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                            'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
   Q.Y_UNIT             = '1';

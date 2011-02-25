@@ -1,3 +1,11 @@
+2011-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-156
+
+	* demos/qarts_scattering_demo.m: The emission WSM was used for
+	IY_CLEARSKY_AGENDA even for the BL case. Works, but the dedicated
+	BL WSM is better (of course) and is used now.
+
 2011-02-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-155
