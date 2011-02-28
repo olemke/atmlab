@@ -522,7 +522,7 @@ end
 in = gmt_optargs_struct(in,default);
 
 % check outdir
-if ~isdir(in.outdir)
+if ischar(in.outdir) && ~isdir(in.outdir)
     error('gmtlab:input','outdir: %s is not a directory',in.outdir)
 end
 % replace bad symbols for filename and mask them for the title

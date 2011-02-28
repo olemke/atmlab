@@ -1,5 +1,12 @@
 2011-02-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-158
+
+	* geoplots/gmt/gmt_plot.m: Fixed bug if in.outdir = NaN (default
+	is gmtlab('OUTDIR') is not set), using isdir
+
+2011-02-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-157
 
 	* geoplots/gmt/gmt_plot.m:
