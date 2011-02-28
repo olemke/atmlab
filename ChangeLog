@@ -1,3 +1,17 @@
+2011-02-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-157
+
+	* geoplots/gmt/gmt_plot.m:
+	Added Oliver to created by, and my email for correspondence.
+	Check if outdir exists.
+	Get a default tick_annotation_format if none is given.
+	Fixed bug where someone inputting in.legend=true stops the
+	assignment of options to legend.
+
+	* geoplots/gmt/makepolar.m: Fixed bug where RGB is sometimes
+	negative (due to data precision)
+
 2011-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-156

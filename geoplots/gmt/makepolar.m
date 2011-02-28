@@ -19,8 +19,7 @@ function filecpt = makepolar(tickval,in)
 %             that should be white. Gradient is from blue to white to red,
 %             and the grandient is equal on both sides of the reference. 
 %
-% $Author$
-% $Date$
+% 2011-01-25 created by Salomon Eliasson
 
 % string format to file 
 diff = tickval(2)-tickval(1);
@@ -55,7 +54,7 @@ inc = 255/max(n_colored_steps); % step gradient
 ctable = zeros(length(tickval)-1,3);
 % BLUE 
 for i = 1:BT-1
-    ctable(BT-i,:) = [255-i*inc,255-i*inc,255];
+    ctable(BT-i,:) = abs([255-i*inc,255-i*inc,255]);
 end
 % WHITE
 if ~isempty(BT:TT-1) %empty=nowhite
@@ -63,7 +62,7 @@ if ~isempty(BT:TT-1) %empty=nowhite
 end
 % RED
 for i = 1:length(tickval)-TT
-    ctable(TT-1+i,:) = [255 255-i*inc,255-i*inc];
+    ctable(TT-1+i,:) = abs([255 255-i*inc,255-i*inc]);
 end
 
 %% Make a cptfile out of it
@@ -108,8 +107,8 @@ else
     N = [128 128 128]; %Grey
 end
 % Background, Foreground, and NaN color
-fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','B',BG);
-fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','F',FG);
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','B',abs(BG)); %added abs to garantee >0
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','F',abs(FG));
 fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',N);
 
 fclose(fid);

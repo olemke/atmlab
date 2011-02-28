@@ -452,7 +452,7 @@ function filename = gmt_plot(in,field)
 %
 %--------------------------------------------------------------------------
 %
-% 2011-02-22 created by Salomon Eliasson
+% 2011-02-22 created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
 
 if ~exist('field','var')
     field = 'datafield';
@@ -496,6 +496,7 @@ if a == 127
     f  = 'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])';
     error('gmtlab:shell','%s%s or %s\n%s:\n%s',b,c,d,e,f)
 end
+
 % SET DEFAULTS
 % general
 default.verbosity         = gmtlab('VERBOSITY');% Display non essential stdout in command window
@@ -515,17 +516,24 @@ default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
 
 if isfield(in,field)
-    default.datarange         = getdatarange(in,field); %
-    default.nanlegend  = any(isnan(in.(field)(:))); % include NaNs in the legend
+    default.datarange     = getdatarange(in,field); %
+    default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
 end
 in = gmt_optargs_struct(in,default);
 
+% check outdir
+if ~isdir(in.outdir)
+    error('gmtlab:input','outdir: %s is not a directory',in.outdir)
+end
 % replace bad symbols for filename and mask them for the title
-if ~isempty(in.title), default.filename = in.title; else default.filename = 'default'; end
+if ~isempty(in.title)
+    default.filename = in.title;
+else default.filename = 'default';
+end
 
 % colors & data representation:
 default.ctable      = 'rainbow';          % color palette
-default.stepsize    = getstepsize(in);    % color level datastep interval
+[default.stepsize,default.legend.tick_annotation_format]    = getstepsize(in);    % color level datastep interval
 in = gmt_optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
@@ -567,7 +575,9 @@ end
 
 %legend
 if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
-    if ~isfield(in,'legend'), in.legend=struct([]);end
+    if ~isfield(in,'legend') || ~isstruct(in.legend)
+        in.legend=struct([]);
+    end
     szdef = {[9.8 2.3 3.9 .2],[4.7 -0.4 7.1 .2]}; %inches matching map_width = 9i
     tmp = ['v','h']; %vertical,horisontal
     tmp2 = sprintf('%.2fi/',szdef{1}*in.map_width/9); sz{1} = tmp2(1:end-1);
@@ -706,11 +716,12 @@ else
 end
 
 
-function stepsize = getstepsize(in)
+function [stepsize,annot_format] = getstepsize(in)
 %% getstepsize
 
 if in.nodata
     stepsize = 0;
+    annot_format='';
     return
 end
 
@@ -722,10 +733,17 @@ if all(isfield(in,{'stepsize','nlevels'}))
     warning('gmtlab:input','in.stepsize overrides in.nlevels')
 elseif ~isfield(in,'stepsize') && isfield(in,'nlevels')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
-elseif diff >= x
-    stepsize = floor((diff-1)/x)+1;
 else
     stepsize = diff/x;
+end
+
+% Guess a reasonable annotation format based on stepsize.
+% in.tick_annotation_format overwrites this default value.
+i = floor(log10(stepsize));
+if i>0
+    annot_format = sprintf('%%%i.0f',i);
+else
+    annot_format = sprintf('%%.%if',abs(i));
 end
 
 function sidebar = getsidebar(in)
