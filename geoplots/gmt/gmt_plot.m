@@ -28,9 +28,10 @@ function filename = gmt_plot(in,field)
 % The easiest thing to do is to define a viewer in your startup file.
 %
 % Add something like the following to your startup file')
-% gmtlab( 'PSVIEWER','gv');             %% view PS files with ghost view: ')
-% gmtlab( 'PDFVIEWER','xpdf -z width'); %% view PDF files with xpdf')
-% gmtlab( 'OPEN_COMMAND','gnome-open'); %% Or use the default viewer for the computer for any filetypes')
+% gmtlab( 'OUTDIR', '/name/a/favorite' ) %% The default directory to put plots
+% gmtlab( 'PSVIEWER','gv');             %% set viewer for .ps files
+% gmtlab( 'PDFVIEWER','xpdf -z width'); %% set viewer for .pdf files
+% gmtlab( 'OPEN_COMMAND','gnome-open'); %% set a general open command
 %    
 % Structure contents: 
 %
@@ -466,12 +467,14 @@ out = set_GMT_plot(in,field);
 
 if out.gridded
     out.grdfile = [out.filename '.grd'];
-    write_gmtgrid(out.lon,out.lat,out.(field),out.grdfile);
+    gmt_nc_save_gridded(out.lon,out.lat,out.(field),out.grdfile);
     if out.verbosity
         fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
     end
 else
-    out = save_ungridded4GMTplot(out,field);
+    if ~out.nodata
+        gmt_nc_save_ungridded([out.filename '.nc'],out.(field),out.lat,out.lon);
+    end
 end
 
 % main function
@@ -521,10 +524,27 @@ if isfield(in,field)
 end
 in = gmt_optargs_struct(in,default);
 
-% check outdir
-if ischar(in.outdir) && ~isdir(in.outdir)
-    error('gmtlab:input','outdir: %s is not a directory',in.outdir)
+
+if isnan(in.outdir)
+    in.outdir = tempdir;
+    a = sprintf('Files are saved in your tempdir (%s)',in.outdir);
+    in.outdir = in.outdir(1:end-1);
+    b = 'It is better to set a default directory.';
+    c = 'I.e by setting gmtlab(''OUTDIR'',''<Somewhere>''), e.g. in startup.m';
+    d = 'Setting this, or inputting or inputting a valid directory: in.outdir will suppress this message.';
+    warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
 end
+
+% check outdir
+if any(ismember(in.outdir,' '))
+    error('gmtlab:input','"spaces" ar not supported for outdir (%s)',in.outdir)
+end
+if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
+    a = 'gmtlab:input'; b = 'Either %s doesn''t exist';
+    c = ', or gmtlab does not have write access to %s';
+    error(a,[b,c],in.outdir,in.outdir)
+end
+
 % replace bad symbols for filename and mask them for the title
 if ~isempty(in.title)
     default.filename = in.title;
@@ -537,6 +557,7 @@ default.ctable      = 'rainbow';          % color palette
 in = gmt_optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
+in.filename = sprintf('%s/%s',in.outdir,in.filename);
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
 
@@ -598,11 +619,6 @@ end
 function filename = sort_figures(in,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
 
-if isnan(in.outdir)
-    outdir = '.';
-else outdir = in.outdir;
-end
-
 if in.savelegend
     % MAKE a separate file for the legend
     legend = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),outdir);
@@ -633,10 +649,11 @@ if ~in.keep_files
     command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',in.filename);
 end
 
-if isdir(outdir)
-    command{end+1} = sprintf('mv %s.%s %s/  ',in.filename,in.figuretype,outdir);
+if isdir(in.outdir)
+    command{end+1} = sprintf('mv %s.%s %s/  ',in.filename,in.figuretype,in.outdir);
 end
 
+% Assemble open command
 openwith = NaN;
 if strcmp(in.figuretype,'pdf')
     openwith = gmtlab('PDFVIEWER');
@@ -647,27 +664,37 @@ if isnan(openwith)
     openwith = gmtlab('OPEN_COMMAND');
 end
 if in.display && ~any(isnan(openwith))
-    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',...
-        openwith,outdir,in.filename,in.figuretype);
+    command{end+1} = sprintf('%s %s.%s >/dev/null &',...
+        openwith,in.filename,in.figuretype);
 end
 
-out = exec_gmt_cmd(command,in.verbosity); % execute commands
+out = exec_gmt_cmd(command,in.verbosity); % execute all gathered commands
 
-hunt_down_errors(command,out)
+filename = sprintf('%s.%s',in.filename,in.figuretype);
 
-filename = sprintf('%s/%s.%s',outdir,in.filename,in.figuretype);
-fprintf('GMT plot stored at:  %s/%s.%s\n',outdir,in.filename,in.figuretype)
+% If no viewer is defined, check for xpdf, then evince, then okular
+if in.display && any(isnan(openwith)) && strcmp(in.figuretype,'pdf')
+    disp('No pdfviewer defined.')
+    disp('Set gmtlab(''PDFVIEWER'',''<e.g. xpdf>'') in your startup file')    
+    if ~system('which xpdf')
+        openwith = 'xpdf';
+    elseif ~system('which evince')
+        openwith = 'evince'; % for gnome users
+    elseif ~system('which okular')
+        openwith  = 'okular'; % for kde users
+    end
+    if ~any(isnan(openwith))
+        fprintf('Opening file with %s for now\n',openwith)
+        system(sprintf('%s %s &',openwith,filename));
+    end
+end
+
+hunt_down_errors(command,out) % look for system call errors in the gmt calls
+
+fprintf('GMT plot stored at:  %s\n',filename)
 
 if in.savelegend
     fprintf('File containing legend is located at: %s\n',legend)
-end
-
-if isnan(in.outdir)
-    a = 'Files are saved at ''.''';
-    b = 'It is desirable to set a directory you want the figures to be saved to.';
-    c = 'I.e this is easily done by setting gmtlab(''OUTDIR'',''<Somewhere>'') in your startup.m file';
-    d = 'Setting this, or including in.outdir as input will suppress this message.';
-    warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
 end
 
 function legend = makelegendpdf(command,outdir)
@@ -709,11 +736,13 @@ function datarange = getdatarange(in,field)
 %% getdatarange
 
 d = [min(in.(field)(:)) max(in.(field)(:))];
-if d(2)-(1)>10
-    datarange = [floor(d(1)) ceil(d(2))];
-else
-    datarange = d;
-end
+
+% Do some tricks to get the most useful datarange. (rounded, but preserve precision)
+x = log10(d(2)-d(1));
+
+datarange = [10^(round(x)-1) * round(d(1) * (1/10^(round(x)-1))),...
+    10^(round(x)-1) * round(d(2) * (1/10^(round(x)-1)))];
+
 
 
 function [stepsize,annot_format] = getstepsize(in)

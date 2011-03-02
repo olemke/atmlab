@@ -24,15 +24,20 @@ function [info,files] = test_gmt(in)
 
 files = {}; info = {};
 if ~exist('in','var'); in=struct([]); end
-od = isfield(in,'outdir');
+
 
 % SET some defaults
 default.test      = 1:7; % which tests to do (default=all)
-default.verbosity = false;
+default.verbosity = gmtlab('VERBOSITY');
+od = isfield(in,'outdir');
 default.outdir    = gmtlab('OUTDIR');
 in = gmt_optargs_struct(in,default); 
 
-if ~ischar(in.outdir), in.outdir = '.'; end
+if ~ischar(in.outdir)
+    in.outdir = tempdir;
+    in.outdir = in.outdir(1:end-1);
+end 
+
 warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 
 % Offload atmlab-only paths if they are defined
@@ -74,10 +79,11 @@ cellfun(@disp,info,'uniformoutput',false)
 warning('on','gmtcatstruct:DuplicatesFound')
 
 if ~od && ~ischar(gmtlab('OUTDIR'))
-    a = 'Files are saved at ''.''';
-    b = 'It is desirable to set a default directory where to save the figures.';
-    c = 'I.e this is easily done by setting gmtlab(''OUTDIR'',''<Somewhere>'') in your startup.m file';
-    d = 'Setting this, or including in.outdir as input will suppress this message.';
+    a = sprintf('Files are saved in your tempdir (%s)',in.outdir);
+    in.outdir = in.outdir(1:end-1);
+    b = 'It is better to set a default directory.';
+    c = 'I.e by setting gmtlab(''OUTDIR'',''<Somewhere>''), e.g. in startup.m';
+    d = 'Setting this, or inputting a valid directory: in.outdir will suppress this message.';
     warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
 end
 
@@ -138,13 +144,14 @@ test.legend.sidebar = 2; % above only
 test.nlevels = 15; 
 test.nwhite = 6;
 test.header_size = 20;
-test.title = 'Diff plot,nlevels=15,ref=0,nwhite=6,sidebar=2 (above)';
+test.header_offset = -.5; %move the header down a bit because of smaller header size
+test.title = 'Diff plot,nlevels=15,ref=0,nwhite=6,sidebar=2 (above),header';
 test.filename = 'Test1b';
 files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
 
 a = 'Test 1b demonstrates that you can change the number of intervals that are';
 b = 'colored white while using the mypolar colortable (in.nwhite). You can also';
-c = 'change the number of data intervals (in.nlevels), change in.headersize,';
+c = 'change the number of data intervals (in.nlevels), change in.headersize and in.header_offset,';
 d = 'or decide to only have the sidebar for values above the datarange (in.sidebar=2)';
 info{end+1} = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d);
 

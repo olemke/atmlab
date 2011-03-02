@@ -15,8 +15,7 @@ function pspoly = polygoninize_regions(boxes)
 % OUT: Structure of arguments to be used for plotting the regions on a map
 %      using GMT
 %
-% $Author$
-% $Date$
+% 2011-01-24 created by Salomon Eliasson
 
 
 %% Make a grid of logicals
@@ -168,7 +167,7 @@ k = k(index);
 test = sum(repmat(ref,sum(index),1)-points(index,3:4),2);
 a = k(abs(test)==min(abs(test)));
 if isempty(a)
-    error('atmlab:error','isempty(a)')
+    error('gmtlab:error','isempty(a)')
 end
 
 function [dir,f] = specialcase(tmpgrid,points,i,dir)                            

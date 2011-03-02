@@ -1,4 +1,5 @@
-% WRITE_GMTGRID   Write a gridded netcdf file for GMT.
+function gmt_nc_save_gridded (x, y, z, cdf)
+%% GMT_NC_SAVE_GRIDDED   write a gridded netcdf file for GMT.
 %
 % This function writes a netcdf file that can be used as input for
 % GMT plotting routines.
@@ -18,8 +19,6 @@
 % x and y can be either row or column vectors
 
 % 2010-01-20 Created by Oliver Lemke.
-
-function write_gmtgrid (x, y, z, cdf)
 
 if exist('OCTAVE_VERSION','builtin')
   write_gmtgrid_octave( x, y, z, cdf);

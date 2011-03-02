@@ -55,7 +55,7 @@
 % (which is most easily checked by using *out*).
 %----------------------------------------------------------------------------
 %
-% $Date:$   Created by Salomon Eliasson based on ATMLAB by Patrick Eriksson.
+% 2011-03-01 created by Salomon Eliasson based on ATMLAB by Patrick Eriksson.
 
 function value = gmtlab( varargin )
             
@@ -100,7 +100,7 @@ switch length( varg )
       A = feval( def_fun );
      else
       if ~isfield( A, varg{1} )
-          error('atmlab:input:undefined', ...
+          error('gmtlab:input:undefined', ...
             'The field %s is not defined', varg{1}); 
       end
       value = getfield( A, varg{1} );
@@ -109,20 +109,19 @@ switch length( varg )
     if strcmp( varg{1}, 'require' )
       for i = 1 : length(varg{2})
         if ~isfield( A, varg{2}{i} )
-          fprintf('\nThe field %s is required.\n\n', varg{2}{i} );
-          error( 'See above' ); 
+          error('gmtlab:input','The field %s is required.\n\n', varg{2}{i} ); 
         end
         if isnan( getfield( A, varg{2}{i} ) )
-          error('atmlab:input:undefined','The field %s is required but is NaN.\n\n',varg{2}{i}); 
+          error('gmtlab:input:undefined','The field %s is required but is NaN.\n\n',varg{2}{i}); 
         end
       end
     else
       if ~isfield( A, varg{1} )
-          error('atmlab:input:undefined','The field %s is not defined.',varg{1});
+          error('gmtlab:input:undefined','The field %s is not defined.',varg{1});
       end
       A = setfield( A, varg{1}, varg{2} );
       value = varg{2};
     end
   otherwise
-    error('atmlab:input','Too many input arguments.');
+    error('gmtlab:input','Too many input arguments.');
 end

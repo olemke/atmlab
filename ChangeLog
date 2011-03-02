@@ -1,3 +1,40 @@
+2011-03-02  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-159
+
+	* geoplots/gmt/makerainbow.m: removed unused function.
+
+	* geoplots/gmt/gmtlab.m: replaced all depricated getfield and
+	setfield using dynamic arguments.
+
+	* geoplots/gmt/{save_nc_gmt_input.m, psscale.m, gmtlab.m,
+	polygoninize_regions.m, exec_gmt_cmd.m, append_tickannotations.m}:
+	changed error identifiers to gmtlab from atmlab
+
+	* geoplots/gmt/create_gmt_earth.m: Puny change.
+
+	* geoplots/gmt/gmt_plot.m: Changed the default outdir to tempdir
+	(which looks for the system tmp dir). This for speed, permissions,
+	etc. Now looks for if xpdf is installed is no viewer is set and
+	the figure is pdf, but it still warns that you should define a
+	viewer. Fixed bug so the in datarange rounding in the plot also
+	work for unusual value ranges.
+
+	* geoplots/gmt/test_gmt.m: Adapted to new outdir conventions
+
+	* geoplots/gmt/gmt_nc_save_ungridded.m: Changed function name from
+	save_nc_gmt_input.
+
+	* geoplots/gmt/makepolar.m: Fixed for special case if reference
+	value is outside or on the edge of the datarange (caused crash).
+
+	* geoplots/gmt/gmt_nc_save_gridded.m: Changed function name from
+	write_gmt.
+
+	* geoplots/gmt/xtra_nan_legend.m: adapted to new outdir.
+
+	* geoplots/gmt/makecpt.m: small bug
+
 2011-02-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-158

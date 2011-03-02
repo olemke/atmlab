@@ -4,8 +4,7 @@ function command = psscale(file,in)
 % purpose:
 %       Appends options to a short script to be later called with all GMT scripts
 %
-% $Author$
-% $Date$
+% 2011-02-21 created by Salomon Eliasson
 
 psscale = sprintf('psscale');
 psscale = sprintf('%s -D%s%s',psscale,in.dimensions);
@@ -46,7 +45,7 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
         case 3
             str = '-E';
         otherwise
-            error('atmlab:input','error in determining sidebar')
+            error('gmtlab:input','error in determining sidebar')
     end
     psscale = sprintf('%s %s',psscale,str);
 end

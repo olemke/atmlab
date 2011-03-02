@@ -56,10 +56,14 @@ ctable = zeros(length(tickval)-1,3);
 for i = 1:BT-1
     ctable(BT-i,:) = abs([255-i*inc,255-i*inc,255]);
 end
+
 % WHITE
-if ~isempty(BT:TT-1) %empty=nowhite
+if ~isempty(BT:TT-1)
     ctable(BT:TT-1,:) = repmat(255,nw,3);
+elseif isempty(BT)
+    ctable(1:TT-1,:) = repmat(255,nw,3);
 end
+
 % RED
 for i = 1:length(tickval)-TT
     ctable(TT-1+i,:) = abs([255 255-i*inc,255-i*inc]);
@@ -67,7 +71,7 @@ end
 
 %% Make a cptfile out of it
 
-filecpt = 'mypolar.cpt';
+filecpt = sprintf('%s/mypolar.cpt',in.outdir);
 fid = fopen(filecpt,'w');
 %##################### HEADER ###############################
 fprintf(fid,'%s\t%s\n','#cpt file created by:','makepolar.m');
@@ -128,9 +132,15 @@ if ~mod(nw,2) %even nwhites
     if ~ ( length(reftick)==2 )
         BT = len(reftick)-nw/2;
         TT = len(reftick)+nw/2;
-        if BT <= 0, BT = [];end
+        if BT <= 0
+            BT = [];
+            nw = nw - nw/2; %need to chop away bottom half
+        end
         if ref > tickval(end), BT = len(end);end
-        if TT >= len(end), TT = [];end
+        if TT >= len(end)
+            TT = [];
+            nw = nw - nw/2; %need to chop away top half
+        end
         if ref < tickval(1), TT = 1;end
     else
         % right in between 2 ticks
@@ -144,12 +154,16 @@ else % odd nwhites
         tmp = len(tickval<=ref);
         if ~isempty(tmp)
             BT =  tmp(end);
-        else BT = [];
+        else
+            BT = [];
+             nw = nw - floor(nw/2); %need to chop away bottom half
         end
         tmp = len(tickval>=ref);
         if ~isempty(tmp)
             TT = tmp(1);
-        else TT = [];
+        else
+            TT = [];
+            nw = nw - floor(nw/2); %need to chop top bottom half
         end
     else
         % right in between 2 ticks

@@ -10,8 +10,7 @@ function file = append_tickannotations(file,annotations)
 % 
 % OUT: file '%s'
 %
-% $Author$
-% $Date$
+% 2011-01-27 created by Salomon Eliasson
 
 % READ OLD FILE
 fid = fopen(file);
@@ -25,7 +24,7 @@ fclose(fid);
 
 % CHECK INPUT
 if ~( sum(~cellfun('isempty', regexp(out,'^[0-9]'))) == length(annotations)) 
-    error('atmlab:input','Number of annotations must match number of ticks')
+    error('gmtlab:input','Number of annotations must match number of ticks')
 end
 
 fid = fopen(file,'w'); x = 1;

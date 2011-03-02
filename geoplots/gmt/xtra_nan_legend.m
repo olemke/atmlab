@@ -6,12 +6,11 @@ function file = xtra_nan_legend(in)
 %
 % Out: The output-file location
 %
-% $Author$
-% $Date$
+% 2011-02-21 created by Salomon Eliasson
 
 
 %create nan.cpt for NaN colorbox
-file = 'color_nan.cpt'; %save to local file
+file = sprintf('%s/color_nan.cpt',in.outdir); %save to local file
 fid = fopen(file,'w');
 fprintf(fid,'%s\n','#cpt file created by: xtra_nan_legend.m');
 fprintf(fid,'%s\n','# Created for NaN colorbox');

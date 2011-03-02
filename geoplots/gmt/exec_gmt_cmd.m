@@ -11,7 +11,7 @@ function out = exec_gmt_cmd(cmd, verbose)
 %
 % OPT   verbose   Set to true to echo the command.
 %
-% Author: Oliver Lemke & Salomon Eliasson
+% Author: Oliver Lemke
 
 if ~iscell(cmd), cmd = {cmd}; end
 
@@ -32,7 +32,7 @@ for x = cmd'
     end
     
     if (ret == 127)
-        error('atmlab:shell','Command not found: "%s"', fullcmd)
+        error('gmtlab:shell','Command not found: "%s"', fullcmd)
     end
     i = i+1;
 end

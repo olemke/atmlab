@@ -201,10 +201,9 @@ if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
     a='';
     return
 end
-a.ungriddedfile = in.ungriddedfile;
+a.ungriddedfile = [in.filename '.nc'];
 
-if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
-    % find the approx density of points
+if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')    % find the approx density of points
     x = length( unique( floor(in.lat)));
     y = length( unique( floor(in.lon)));
     A = x*y;
@@ -227,13 +226,6 @@ function a = create_colortables(in)
 %% create color tables %%
 
 if isfield(in,'cptfile')
-    if isempty(dir(in.cptfile)), error('File: ''%s'' is missing!!',in.cptfile); end
-    if isfield(in,'datarange')
-        fprintf('Chosen data range ignored as a preexisting cptfile will be used\n')
-    end
-    if isfield(in,'ctable')
-        fprintf('Chosen color table ignored as a preexisting cptfile will be used\n')
-    end
     a.cptfile = in.cptfile;
     return
 end
@@ -336,7 +328,8 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
         else
             lsize = in.legend.dimensions_nan;
         end
-        b = sprintf('psscale -Bs/:NaN: -Ccolor_nan.cpt -D%s -O -K >> %s.ps',lsize,in.filename);
+        b = sprintf('psscale -Bs/:NaN: -C%s/color_nan.cpt -D%s -O -K >> %s.ps',...
+            in.outdir,lsize,in.filename);
     end
     
     % get xtra options

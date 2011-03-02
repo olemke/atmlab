@@ -13,7 +13,7 @@ function save_nc_gmt_input (filename, data, lat, lon)
 % 2010-03-04   Created by Oliver Lemke
 
 if ~isequal(numel(data),numel(lon),numel(lat))
-    error('atmlab:input','This data is expected to be ungridded')
+    error('gmtlab:input','This data is expected to be ungridded')
 end
 
 if islogical(data)
