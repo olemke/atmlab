@@ -11,14 +11,25 @@ for loc = in.locations
     psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);
     psloc = sprintf('%s -R -J',psloc);
     
-    shape = 'c0.08i';
+    
     if isfield(loc,'shape')
         shape = loc.shape;
+    else
+        shape = 'c'; % default shape (circle)
     end
     
-    psloc = sprintf('%s -S%s',psloc,shape);
+    if isfield(loc,'size')
+        sze = loc.size;
+        if isnumeric(sze)
+            sze = [num2str(sze),'c']; %assume cm
+        end
+    else
+        sze   = '.08i'; %default size
+    end
     
-    color = 'white';
+    psloc = sprintf('%s -S%s%s',psloc,shape,sze);
+    
+    color = 'white'; % default color
     if isfield(loc,'color') && ~isempty(loc.color)
         color = loc.color;
     end

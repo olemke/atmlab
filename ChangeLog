@@ -1,3 +1,21 @@
+2011-03-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-160
+
+	* geoplots/gmt/{gmt_plot.m,pslocations}:
+	Changed option in.locations.shape to only handle the shape of
+	points on a map and not the size. Added option in.locations.size
+	for the size of the point on the map.
+
+	* geoplots/gmt/{create_gmt_earth.m,makecpt.m:}:
+	Now supports giving a vector of tick values to use for manual data
+	intervals. The tick values are saved temporarily in a txt-file,
+	used in the -T option in makecpt and the file is later removed
+	from outdir.
+
+	* geoplots/gmt/cpt_from_colorrange.m: Clarified a bit better in
+	the header.
+
 2011-03-02  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-159

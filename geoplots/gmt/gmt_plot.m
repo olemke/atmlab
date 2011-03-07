@@ -239,6 +239,11 @@ function filename = gmt_plot(in,field)
 %                     | determined by nlevels |
 %                     ------------
 %
+% in.tickval          |%d|
+%                     Vector of values to be used for ticks and data interval
+%                     | determined by datarange and stepsize|
+%                     ------------
+%
 % NOTE: For your own CUSTOM COLORTABLE use in.colorrange.colors 
 % (see below). Assign a color to a relative value, e.g between 0-1, where
 % 0 is for the minimum of the datarange and 1 is for the color of the 
@@ -366,8 +371,13 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  name               |%s| Name of marker | [] |
 %                     ------------
-%  shape              |%s| Shape of marker
-%                     | 'c0.08i' (filled circle,diameter=.08) |
+%  shape              |%s| Shape of marker | 'c' c=filled circle |
+%                     ------------
+%  size               |%s or %f| 
+%                      size of shape. If size = %f, cm ('c') is assumend. 
+%                      If size = %s, give the size and unit in string (see
+%                      default)
+%                     | '.08i' | 
 %                     ------------
 %  color              |%s| Color of marker | 'white' |
 %                     ------------
@@ -604,13 +614,14 @@ if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
     tmp2 = sprintf('%.2fi/',szdef{1}*in.map_width/9); sz{1} = tmp2(1:end-1);
     tmp2 = sprintf('%.2fi/',szdef{2}*in.map_width/9); sz{2} = [tmp2(1:end-1) 'h'];
     
-    mycondition = ( in.lon(end)-in.lon(1) )/( in.lat(end)-in.lat(1) ) < 2*.85;
+    % when to decide to have horisontal legend
+    myHcondition = ( in.lon(end)-in.lon(1) )/( in.lat(end)-in.lat(1) ) < 2*.85;
     
-    default.orientation = tmp(mycondition+1);
+    default.orientation = tmp(myHcondition+1);
     if isfield(in,'legend') && isfield(in.legend,'orientation')
         default.dimensions = sz{strcmp(in.legend.orientation,'h')+1};
     else
-        default.dimensions  = sz{mycondition+1};
+        default.dimensions  = sz{myHcondition+1};
     end
     default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
     in.legend           = gmt_optargs_struct(in.legend,default);

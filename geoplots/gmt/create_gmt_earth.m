@@ -235,16 +235,23 @@ if isfield(in,'colorrange')
     in.ctable = 'colorrange';
 end
 
-% OR use some of the other pre-defined color tables
-if any(strcmp(in.ctable,{'mypolar'}))
-    tickval=ownctable(in);
+if isfield(in,'tickval')
+    % make temporary tivkval file
+    fid=fopen(sprintf('%s/tickvalues.txt',gmtlab('OUTDIR')),'w');
+    fprintf(fid,'%.3f\n',in.tickval);
+    fclose(fid);
 end
 
 % generate cpt files
-switch in.ctable    
+switch in.ctable
     case 'mypolar'
-        a.cptfile = makepolar(tickval,in);        
+        if ~isfield(in,'tickval')
+            tickval = ownctable(in);
+        else tickval = in.tickval;
+        end
+        a.cptfile = makepolar(tickval,in);
     case 'colorrange'
+        % make ctable to be input to makecpt -C%s
         cpt_from_colorrange(in.colorrange);
         a.cptfile = makecpt(in);
     otherwise
@@ -256,6 +263,10 @@ switch in.ctable
             tmp = gmt_splitstring(in.makecpt,'> ');
             a.cptfile = tmp{2};
         end
+end
+
+if isfield(in,'tickval') 
+    delete(sprintf('%s/tickvalues.txt',gmtlab('OUTDIR'))) %delete temporary
 end
 
 % extra legend box for missing values
@@ -321,10 +332,10 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
     % A little extra legend showig colors of NaNs
     if in.nanlegend
         if ~isfield(in.legend,'dimensions_nan')
-        nandef = {[9.84 -.2 .2 .2],[.4 -.4 .2 2]};
-        tmp = sprintf('%.2fi/',nandef{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
-        tmp = sprintf('%.2fi/',nandef{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
-        lsize = nsz{ strcmp(in.legend.orientation,'h') +1 };
+            nandef = {[9.84 -.2 .2 .2],[.4 -.4 .2 .2]};
+            tmp = sprintf('%.2fi/',nandef{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
+            tmp = sprintf('%.2fi/',nandef{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
+            lsize = nsz{ strcmp(in.legend.orientation,'h') +1 };
         else
             lsize = in.legend.dimensions_nan;
         end

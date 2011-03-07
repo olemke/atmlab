@@ -3,7 +3,7 @@ function filecpt = cpt_from_colorrange(colorrange)
 %
 % Purpose: Make a colortable file with desired color values and ranges, that
 % will be passed in the makecpt function that uses this input to make a color
-% that can be used by GMT.
+% that can be used by GMT. i.e. makecpt -Ccolorrange.cpt etc.
 %
 % USAGE: e.g. file = cpt_from_colorrange(struct('colors',{{{0.25,'255/255/255'},{0.75,'0/0/0'}}},'color_model','RGB'))
 %

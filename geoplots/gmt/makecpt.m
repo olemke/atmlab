@@ -5,7 +5,7 @@ function cptfile = makecpt(in)
 %       Appends options to a short script and calls the GMT
 %       command makecpt.
 % 
-% se: structure: fields = 'datarange', 'ctable'
+% in: structure: fields = 'datarange', 'ctable'
 %
 % list of colortables found at /usr/lib/gmt/share/cpt/
 %
@@ -13,10 +13,14 @@ function cptfile = makecpt(in)
 
 mkcpt = sprintf('makecpt -C%s',in.ctable);
 
-mi = in.datarange(1);
-mx = in.datarange(2);
-step = in.stepsize;
-mkcpt = sprintf('%s -T%f/%f/%f',mkcpt,mi,mx,step);
+if isfield(in,'tickval')
+    mkcpt = sprintf('%s -T%s/tickvalues.txt',mkcpt,gmtlab('OUTDIR'));
+else
+    mi = in.datarange(1);
+    mx = in.datarange(2);
+    step = in.stepsize;
+    mkcpt = sprintf('%s -T%f/%f/%f',mkcpt,mi,mx,step);
+end
 
 if isfield(in,'color_nan')
     mkcpt = sprintf('%s --COLOR_NAN=%s',mkcpt,in.color_nan);
