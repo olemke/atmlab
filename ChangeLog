@@ -1,3 +1,9 @@
+2011-03-09  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-161
+
+	* files/loadncfile.m: First version to support reading groups.
+
 2011-03-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-160
