@@ -1,3 +1,9 @@
+2011-03-10	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-162
+
+	* collocations/collocation_read.m: Bugfix
+
 2011-03-09  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-161
