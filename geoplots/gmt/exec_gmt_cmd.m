@@ -33,6 +33,8 @@ for x = cmd'
     
     if (ret == 127)
         error('gmtlab:shell','Command not found: "%s"', fullcmd)
+    elseif (ret ~= 0)
+        error('gmtlab:shell','Command returned error %d: "%s"', ret, out{i})
     end
     i = i+1;
 end

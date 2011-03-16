@@ -1,3 +1,11 @@
+2011-03-16  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-163
+
+	* geoplots/gmt/exec_gmt_cmd.m: Throw error for exit code ~= 0.
+
+	* geoplots/gmt/gmt_plot.m: Fix mv command.
+
 2011-03-10	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-162

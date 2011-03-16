@@ -661,7 +661,9 @@ if ~in.keep_files
 end
 
 if isdir(in.outdir)
-    command{end+1} = sprintf('mv %s.%s %s/  ',in.filename,in.figuretype,in.outdir);
+    [figpath, figname] = fileparts(in.filename);
+    command{end+1} = sprintf('mv %s.%s %s/%s.%s', ...
+        in.filename,in.figuretype,in.outdir,figname,in.figuretype);
 end
 
 % Assemble open command
