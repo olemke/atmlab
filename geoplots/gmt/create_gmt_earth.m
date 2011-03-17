@@ -18,11 +18,6 @@ commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
 % Set paper size
 commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      
 
-% Size of title
-if isfield(in,'header_size')                                                    
-    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %fp',in.header_size);
-end
-
 % Annotations of axis
 if isfield(in,'basemap_axis')                                                   
     commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
@@ -32,6 +27,17 @@ end
 if isfield(in,'header_offset')                                                  
     commands{end+1} = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
 end
+
+% Size of title
+if isfield(in,'header_size')                                                    
+    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %fp',in.header_size);
+end
+
+% Default unit to use
+if isfield(in,'measure_unit')                                                    
+    commands{end+1} = sprintf('gmtset MEASURE_UNIT=%s',in.measure_unit);
+end
+
 
 % other gmtset-commands you might have
 if isfield(in,'gmtset')
@@ -112,17 +118,7 @@ commands{end+1} = in.plot.lastbasemap;
 function in = setup_create_gmt_earth(in)                                        
 %% setup_create_gmt_earth %%
 
-% REGION
-if ~isfield(in,'region')                                                        
-    if in.gridded && in.lon(end)+in.lon(end)-in.lon(end-1) == in.lon(1)+360
-        in.plot.region = sprintf('-180/180/%f/%f',in.lat(1),in.lat(end));
-    else
-        in.plot.region = sprintf('%f/%f/%f/%f',...
-            min(min(in.lon)),max(max(in.lon)),...
-            min(min(in.lat)),max(max(in.lat)));
-    end
-else in.plot.region = in.region;
-end
+in.plot.region = in.region;
 
 % PROJECTION
 if ~isfield(in,'proj')                                                          
@@ -331,22 +327,25 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
     
     % A little extra legend showig colors of NaNs
     if in.nanlegend
-        if ~isfield(in.legend,'dimensions_nan')
-            nandef = {[9.84 -.2 .2 .2],[.4 -.4 .2 .2]};
+        if ~isfield(in.legend,'position_nan')
+            nandef = {[str2double(in.legend.xpos(1:end-1)),...
+                -.2, .2, .2],...
+                [.4, str2double(in.legend.ypos(1:end-1)), .2, .2]};
             tmp = sprintf('%.2fi/',nandef{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
             tmp = sprintf('%.2fi/',nandef{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
             lsize = nsz{ strcmp(in.legend.orientation,'h') +1 };
         else
-            lsize = in.legend.dimensions_nan;
+            lsize = in.legend.position_nan;
         end
-        b = sprintf('psscale -Bs/:NaN: -C%s/color_nan.cpt -D%s -O -K >> %s.ps',...
+        b = sprintf('psscale -Li -C%s/color_nan.cpt -D%s -O -K >> %s.ps',...
             in.outdir,lsize,in.filename);
     end
     
     % get xtra options
-    fields ={'annot_font_size_primary','box_spacing','dimensions','equalboxwidth',...
-        'orientation','shift_tick_annotations','sidebar','tick_annotations',...
-        'tick_annotation_format','tick_centering','tick_length','tick_spacing'};
+    fields ={'annot_font_size_primary','box_spacing','equalboxwidth','length',...
+        'orientation','position','shift_tick_annotations','sidebar',...
+        'tick_annotations','tick_annotation_format','tick_centering','tick_length',...
+        'tick_spacing','width','xpos','ypos'};
     
     for F = fields
         if isfield(in.legend,F{1})

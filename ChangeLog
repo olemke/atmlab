@@ -1,3 +1,26 @@
+2011-03-17  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-164
+
+	* geoplots/gmt/gmt_plot.m: 
+	- Added input in.measure_unit to toggle the default unit all
+	functions will use if the units are not explicitly given.
+	- Changed in.legend.dimensions to in.legend.position for
+	consistency with gmtdocs.
+	- Added xpos, ypos, length, and width as arguments for legend.
+	- Replaced ~ with getenv('HOME'), because some netcdf-functions
+	don't like ~.
+	- Now use the plot region dimensions rather than lat lons to
+	decide if a legend should default to horisontal or vertical.
+	- Removed frivolous mv command.
+
+	* geoplots/gmt/create_gmt_earth.m: Adapted to changes explained
+	for gmt_plot.m
+
+	* geoplots/gmt/makepolar.m: Catch error if in.nwhite >	in.nlevels.
+
+	* geoplots/gmt/psscale.m: Adapted to new legend options.
+
 2011-03-16  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-163

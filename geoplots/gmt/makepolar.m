@@ -125,6 +125,9 @@ fclose(fid);
 function [BT,TT,nw] = get_white_boxes(tickval,ref,nw)
 %% get_white_boxes
 
+if nw>length(tickval)-1
+    error('gmtlab:input','number of white boxes (%.0f) exceedes nlevels (%.0f)',nw,length(tickval)-1)
+end
 % FIND WHITE TICKS
 len = 1:length(tickval);
 if ~mod(nw,2) %even nwhites

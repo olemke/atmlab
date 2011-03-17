@@ -7,7 +7,16 @@ function command = psscale(file,in)
 % 2011-02-21 created by Salomon Eliasson
 
 psscale = sprintf('psscale');
-psscale = sprintf('%s -D%s%s',psscale,in.dimensions);
+if isfield(in,'position')
+    psscale = sprintf('%s -D%s',psscale,in.position);
+else
+    psscale = sprintf('%s -D%s/%s/%s/%s%s',...
+        psscale,num2str(in.xpos),num2str(in.ypos),num2str(in.length),num2str(in.width),...
+        in.orientation);
+    
+    %may only append 'h'
+    if strcmp(in.orientation,'v'), psscale = psscale(1:end-1); end 
+end
 
 if ( isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) ) || ...
         ( isfield(in,'equalboxwidth') && in.equalboxwidth )|| ...

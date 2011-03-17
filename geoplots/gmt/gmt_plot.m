@@ -66,22 +66,40 @@ function filename = gmt_plot(in,field)
 %
 % GENERAL:
 %
-% in.verbosity        |%f| Display non essential output | gmtlab('VERBOSITY') | 
-%                     ------------                     
-% in.title            |%s| Title of plot | '' |
-%                     ------------                     
-% in.outdir           |%s| E.g. 'name/a/directory' 
-%                     |gmtlab('OUTDIR')  ('.' if not set in startup) |
+% in.basemap_axis     |%s| 
+%                     E.g. 'WSne', annotates West and South of the map.
+%                     | 'WSNE' |
+%                     ------------
+% in.display          |%i| If false, file created but not displayed |true |
 %                     ------------
 % in.filename         |%s| E.g. 'yourfilename' | generated from title |
 %                     ------------
 % in.figuretype       |%s| 'pdf','eps','png', or 'tif' | 'pdf' |
 %                     ------------
-% in.display          |%i| If false, file created but not displayed |true |
+% in.gmtset           |{%s,%s,...}|
+%                     Cell with one or more gmtset commands. 
+%                     E.g. in.gmtset={'gmtset D_FORMAT %3.1e','gmtset ...'}
+%                     | [] |
 %                     ------------
-% in.unit             |%s| String displayed on the y-axis of legend | '' |
+% in.header_size      |%f| Title size | 36 [p] |
 %                     ------------
-% in.xunit            |%s| String displayed on the x-axis of legend | '' |
+% in.header_offset    |%f| Moves the title in y-dir on the page | 0.5 [cm] |
+%                     ------------
+% in.keep_files       |%f| 
+%                     If you don't want to delete intermediate files
+%                     | false |
+%                     ------------
+% in.measure_unit     |%s| 
+%                     The default unit to use for all commands if none is given.
+%                     Choose between:  'point' (1/72 inch), 'cm', 'm' and 'inch'
+%                     |'cm'|
+%                     ------------
+% in.nodata           |%f| 
+%                     If you only want a map (compatible with all options)
+%                     | [] |
+%                     ------------
+% in.outdir           |%s| E.g. 'name/a/directory' 
+%                     |gmtlab('OUTDIR')  ('.' if not set in startup) |
 %                     ------------
 % in.ticks            |%s| 
 %                     E.g '60g50/30g20'. Adds annotations to  major lines
@@ -89,26 +107,14 @@ function filename = gmt_plot(in,field)
 %                     minor lines at (e.g 30 xaxis,20 yaxis)
 %                     | determined by input lat/lon range. |
 %                     ------------
-% in.header_size      |%f| Title size | 36 [p] |
+% in.title            |%s| Title of plot | '' |
+%                     ------------                     
+% in.unit             |%s| String displayed on the y-axis of legend | '' |
 %                     ------------
-% in.basemap_axis     |%s| 
-%                     E.g. 'WSne', annotates West and South of the map.
-%                     | 'WSNE' |
+% in.verbosity        |%f| Display non essential output | gmtlab('VERBOSITY') | 
+%                     ------------                     
+% in.xunit            |%s| String displayed on the x-axis of legend | '' |
 %                     ------------
-% in.header_offset    |%f| Moves the title in y-dir on the page | 0.5 [cm] |
-%                     ------------
-% in.gmtset           |{%s,%s,...}|
-%                     Cell with one or more gmtset commands. 
-%                     E.g. in.gmtset={'gmtset D_FORMAT %3.1e','gmtset ...'}
-%                     | [] |
-%                     ------------
-% in.nodata           |%f| 
-%                     If you only want a map (compatible with all options)
-%                     | [] |
-%                     ------------
-% in.keep_files       |%f| 
-%                     If you don't want to delete intermediate files
-%                     | false |
 %
 %--------------------------------------------------------------------------
 %
@@ -300,20 +306,29 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  box_spacing        |%f| Space between legend boxes | 0 (side by side) |
 %                     ------------
-%  dimensions         |%s| 
+%  position           |%s| 
 %                     e.g '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
-%                     ('x-displacement/y-displacement/height/width')
+%                     ('x-displacement/y-displacement/height/width'). Append 'h'
+%                     for horisontal legend.
 %                     | size determined by map dimensions |
 %                     ------------
-%  dimensions_nan     |%s| 
-%                     As for dimensions, but for the NaN legend
+%  position_nan       |%s| 
+%                     As for in.legend.position, but for the NaN legend
 %                     ------------
 %  equalboxwidth      |%f| 
 %                     If the legend color boxes have to be the same size, 1
 %                     | false (-L option) |
 %                     ------------                        
+%  length             |%f| or |%s|
+%                     Toggle the length of the legend bar. If input is a string,
+%                     you must append 'c' or 'i' for cm or inches, otherwise
+%                     in.MEASURE_UNIT is used. Use negative value to reverse the
+%                     legend. See also width,xpos,ypos,orientation for legend
+%                     | '3.9i' |
+%                     ------------                        
 %  orientation        |%s|
 %                     if you want a horizontal/vertical legend input 'h'/'v.
+%                     See also length,width,xpos,ypos for legend
 %                     | determined by map dimensions |
 %                     ------------
 %  shift_tick_annotations
@@ -351,6 +366,27 @@ function filename = gmt_plot(in,field)
 %                     | one tick per data level |
 %                     NOTE: This options is desirable if you have many 
 %                     data levels.
+%                     ------------                        
+%  width              |%f| or |%s|
+%                     Toggle the width of the legend bar. If input is a string,
+%                     you must append 'c' or 'i' for cm or inches, otherwise
+%                     in.MEASURE_UNIT is used. 
+%                     See also length,xpos,ypos, orientation for legend
+%                     | '.2i' |
+%                     ------------                        
+%  xpos               |%f| or |%s|
+%                     Toggle the x-position of the center of the legend bar. 
+%                     If input is a string, you must append 'c' or 'i' for cm or inches,
+%                     otherwise in.MEASURE_UNIT is used.
+%                     See also length,width,ypos, orientation for legend
+%                     | '9.8i' for verticle |
+%                     ------------                        
+%  ypos               |%f| or |%s|
+%                     Toggle the y-position of the center of the legend bar. 
+%                     If input is a string, you must append 'c' or 'i' for cm or inches,
+%                     otherwise in.MEASURE_UNIT is used. 
+%                     See also length,width,xpos, orientation for legend
+%                     | '2.3i' for verticle |
 %
 %                     ----------------------
 %
@@ -543,12 +579,13 @@ if isnan(in.outdir)
     c = 'I.e by setting gmtlab(''OUTDIR'',''<Somewhere>''), e.g. in startup.m';
     d = 'Setting this, or inputting or inputting a valid directory: in.outdir will suppress this message.';
     warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
+elseif any(ismember(in.outdir,' '))
+    error('gmtlab:input','"spaces" ar not supported for outdir (%s)',in.outdir)
+elseif strcmp(in.outdir(1),'~')
+    % netcdffunctions don't like ~ for home
+    in.outdir = [getenv('HOME') '/' in.outdir(2:end)];
 end
 
-% check outdir
-if any(ismember(in.outdir,' '))
-    error('gmtlab:input','"spaces" ar not supported for outdir (%s)',in.outdir)
-end
 if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
     a = 'gmtlab:input'; b = 'Either %s doesn''t exist';
     c = ', or gmtlab does not have write access to %s';
@@ -604,28 +641,51 @@ if in.gridded
     [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
 end
 
-%legend
-if ~isfield(in,'legend') || isstruct(in.legend) || in.legend
-    if ~isfield(in,'legend') || ~isstruct(in.legend)
-        in.legend=struct([]);
-    end
-    szdef = {[9.8 2.3 3.9 .2],[4.7 -0.4 7.1 .2]}; %inches matching map_width = 9i
-    tmp = ['v','h']; %vertical,horisontal
-    tmp2 = sprintf('%.2fi/',szdef{1}*in.map_width/9); sz{1} = tmp2(1:end-1);
-    tmp2 = sprintf('%.2fi/',szdef{2}*in.map_width/9); sz{2} = [tmp2(1:end-1) 'h'];
-    
-    % when to decide to have horisontal legend
-    myHcondition = ( in.lon(end)-in.lon(1) )/( in.lat(end)-in.lat(1) ) < 2*.85;
-    
-    default.orientation = tmp(myHcondition+1);
-    if isfield(in,'legend') && isfield(in.legend,'orientation')
-        default.dimensions = sz{strcmp(in.legend.orientation,'h')+1};
+% REGION
+if ~isfield(in,'region')
+    if in.gridded
+        % check if the data is probably global
+        d = diff(in.lon);
+        cond1 = abs(-180-in.lon(1)) <= d(1);
+        cond2 = 180-in.lon(end) <= d(end);
+        if cond1 && cond2
+            in.region = sprintf('-180/180/%f/%f',in.lat(1),in.lat(end));
+        else
+            in.region = sprintf('%f/%f/%f/%f',...
+                min(in.lon(:)),max(in.lon(:)),...
+                min(in.lat(:)),max(in.lat(:)));
+        end
     else
-        default.dimensions  = sz{myHcondition+1};
+        in.region = sprintf('%f/%f/%f/%f',...
+            min(in.lon(:)),max(in.lon(:)),...
+            min(in.lat(:)),max(in.lat(:)));
     end
-    default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
-    in.legend           = gmt_optargs_struct(in.legend,default);
 end
+
+%legend
+if ~isfield(in,'legend') || ~isstruct(in.legend)
+    in.legend=struct([]);
+end
+
+if ~isfield(in.legend,'position')
+    % ORIENTATION
+    x = sscanf(in.region,'%f/%f/%f/%f');
+    myHcondition = ( x(2)-x(1) )/( x(4)-x(3) ) < 2*.85; tmp = ['v','h']; %vertical,horisontal
+    default.orientation = tmp(myHcondition+1);
+    
+    in.legend           = gmt_optargs_struct(in.legend,default); %need orientation now
+    
+    o = strcmp(in.legend.orientation,'h'); %logical ishorizontal
+    factors = {[9.8 2.25 3.9 .2]/9 ,[4.5 -0.4 7.1 .2]/9}; %empirically good defaults for inch
+    % this is based on in.mapwidth in inches !
+    default.xpos   = sprintf('%.2fi',factors{o+1}(1)*in.map_width);
+    default.ypos   = sprintf('%.2fi',factors{o+1}(2)*in.map_width);
+    default.length = sprintf('%.2fi',factors{o+1}(3)*in.map_width);
+    default.width  = sprintf('%.2fi',factors{o+1}(4)*in.map_width);
+    
+end
+default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
+in.legend           = gmt_optargs_struct(in.legend,default);
 
 function filename = sort_figures(in,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
@@ -658,12 +718,6 @@ command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 
 if ~in.keep_files
     command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',in.filename);
-end
-
-if isdir(in.outdir)
-    [figpath, figname] = fileparts(in.filename);
-    command{end+1} = sprintf('mv %s.%s %s/%s.%s', ...
-        in.filename,in.figuretype,in.outdir,figname,in.figuretype);
 end
 
 % Assemble open command
