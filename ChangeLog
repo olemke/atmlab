@@ -1,3 +1,13 @@
+2011-03-29  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-165
+
+	* files/getfiles_matching_regexp.m:
+	Added function that collects all files in a given directory (also
+	checking its sub directories) that match a given regular
+	expression.
+	Usage files = getfiles_matching_regexp(dir,regularexp)
+
 2011-03-17  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-164
