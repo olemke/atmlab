@@ -44,7 +44,7 @@
 %
 % Command to view PS or EPS files.
 %----------------------------------------------------------------------------
-
+%
 % VERBOSITY
 % 
 % The verbosity of Atmlab (gmtlab) functions.  
@@ -99,29 +99,18 @@ switch length( varg )
     if strcmp( varg{1}, 'defaults' )
       A = feval( def_fun );
      else
-      if ~isfield( A, varg{1} )
+      if ~isfield( A,upper(varg{1}))
           error('gmtlab:input:undefined', ...
-            'The field %s is not defined', varg{1}); 
+            'The field %s is not defined',upper(varg{1})); 
       end
-      value = getfield( A, varg{1} );
+      value = A.(upper(varg{1}));
     end
   case 2
-    if strcmp( varg{1}, 'require' )
-      for i = 1 : length(varg{2})
-        if ~isfield( A, varg{2}{i} )
-          error('gmtlab:input','The field %s is required.\n\n', varg{2}{i} ); 
-        end
-        if isnan( getfield( A, varg{2}{i} ) )
-          error('gmtlab:input:undefined','The field %s is required but is NaN.\n\n',varg{2}{i}); 
-        end
+      if ~isfield( A, upper(varg{1}))
+          error('gmtlab:input:undefined','The field %s is not defined.',upper(varg{1}));
       end
-    else
-      if ~isfield( A, varg{1} )
-          error('gmtlab:input:undefined','The field %s is not defined.',varg{1});
-      end
-      A = setfield( A, varg{1}, varg{2} );
+      A.(upper(varg{1})) = varg{2};
       value = varg{2};
-    end
   otherwise
     error('gmtlab:input','Too many input arguments.');
 end

@@ -6,7 +6,7 @@ function out = exec_gmt_cmd(cmd, verbose)
 %
 % IN    cmd      Command string
 %
-% OUT   out      A cell containing all stdouts
+% OUT   out      A cell containing all stdouts (One for every system call)
 %
 %
 % OPT   verbose   Set to true to echo the command.

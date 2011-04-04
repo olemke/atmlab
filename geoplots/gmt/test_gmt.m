@@ -41,7 +41,7 @@ end
 warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 
 % Offload atmlab-only paths if they are defined
-[allpaths,index] = temporarily_rmpaths;
+%removed_paths = temporarily_rmpaths;
 
 [gridded,ungridded] = dummy_data;
 
@@ -67,7 +67,8 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 [files{end+1},info{end+1}] = TEST7(in);
 
 % Put paths back in place (removed in the beginning for testing)
-cellfun(@addpath,allpaths(index),'uniformoutput',false);
+% cellfun(@addpath,removed_paths,'uniformoutput',false);
+
 files = files(~cellfun('isempty',files));
 info = info(~cellfun('isempty',info));
 
@@ -295,20 +296,23 @@ function [files,info] = TEST6(in,files,info)
 
 if ~ismember(6,in.test), return, end %then don't do this test
 
-names = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki','Oberstdorf','Amsterdam','Lauchhammer','Freiburg'};
-lats = [67.85 -27.48 48.83 53.1 9.9 47.3 52.4 51.5 48];
-lons = [20.216 153 9.2 8 77 10.22 4.77 13.77 7.85];
-textcolor = repmat({'black'},1,length(names)); textcolor{1} = 'red';
-color = repmat({'green'},1,length(names)); color{3} = 'yellow';
-textalign = {'LM','RB','LM','LB','CB','LT','RM','LM','RM'};
+names    = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki',...
+    'Oberstdorf','Amsterdam','Lauchhammer','Freiburg'};
+lats     = [67.85 -27.48 48.83 53.1 9.9 47.3 52.4 51.5 48];
+lons     = [20.216 153 9.2 8 77 10.22 4.77 13.77 7.85];
+textcolor= repmat({'black'},1,length(names)); textcolor{1} = 'red';
+color    = repmat({'green'},1,length(names)); color{3} = 'yellow';
+textalign= {'LM','RB','LM','LB','CB','LT','RM','LM','RM'};
 textsize = [15,15,7,7,15,7,7,7,7];
-shape = repmat({'c0.08i'},1,length(names));shape{3} = 'd0.1i';
+shape    = repmat({'c'},1,length(names));shape{3} = 'd';
+sze      = repmat({.08},1,length(names)); sze{3} = .1;
 
 for i = 1:length(names)
     test.locations(i).lat = lats(i);
     test.locations(i).lon = lons(i);
     test.locations(i).name = names{i};
     test.locations(i).shape = shape{i};
+    test.locations(i).size = sze{i};
     test.locations(i).color = color{i};
     test.locations(i).textsize = textsize(i);
     test.locations(i).textcolor= textcolor{i};
@@ -392,7 +396,7 @@ b = 'want to draw regions of interest on a map';
 
 info = sprintf('%s\n%s\n',a,b);
 
-function [allpaths,index] = temporarily_rmpaths
+function allpaths = temporarily_rmpaths
 %% temporarily_rmpaths;
 % Offload atmlab paths if they are defined
 % In order to ensure gmtlab is independent av atmlab
@@ -401,4 +405,5 @@ allpaths = gmt_splitstring(path,':');
 AP = regexp(allpaths,'/atmlab','match');
 GP = regexp(allpaths,'/gmt','match');
 index = ~cellfun('isempty',AP) & cellfun('isempty',GP);
-cellfun(@rmpath,allpaths(index),'uniformoutput',false);
+allpaths = allpaths(index);
+cellfun(@rmpath,allpaths,'uniformoutput',false);

@@ -586,6 +586,10 @@ elseif strcmp(in.outdir(1),'~')
     in.outdir = [getenv('HOME') '/' in.outdir(2:end)];
 end
 
+% cd to outdir so that the temporary .gmtfiles are not saved at '.'
+in.tmpdir = create_tmpfolder;
+in.curdir = pwd; cd(in.tmpdir);
+
 if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
     a = 'gmtlab:input'; b = 'Either %s doesn''t exist';
     c = ', or gmtlab does not have write access to %s';
@@ -662,11 +666,15 @@ if ~isfield(in,'region')
     end
 end
 
-%legend
+% LEGEND 
+if isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend)
+    % If in.legend = false, do nothing
+    return
+end
 if ~isfield(in,'legend') || ~isstruct(in.legend)
     in.legend=struct([]);
 end
-
+% apply defaults to legend
 if ~isfield(in.legend,'position')
     % ORIENTATION
     x = sscanf(in.region,'%f/%f/%f/%f');
@@ -687,34 +695,34 @@ end
 default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
 in.legend           = gmt_optargs_struct(in.legend,default);
 
+
 function filename = sort_figures(in,command)                                    %% SORT FIGURES %%
 %% SORT FIGURES
 
 if in.savelegend
     % MAKE a separate file for the legend
-    legend = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),outdir);
-    if ~in.legend
-        command = command(cellfun('isempty',regexp(command,'psscale')));
+    in.filename = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),in);
+    command = {};
+else
+    
+    % for figuretypes (pdf,eps,png, or tif)
+    switch in.figuretype
+        case 'pdf'
+            T = '-Tf';
+        case 'eps'
+            T = '-Te';
+        case 'png'
+            T = '-Tg -Qg -Qt';
+        case 'tif'
+            T = '-Tt -Qg -Qt';
+        otherwise
+            error('gmtlab:figuretype','%s: not supported',in.figuretype)
     end
+    
+    command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
+    
+    command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 end
-
-% for figuretypes (pdf,eps,png, or tif)
-switch in.figuretype
-    case 'pdf'
-        T = '-Tf';
-    case 'eps'
-        T = '-Te';
-    case 'png'
-        T = '-Tg -Qg -Qt';
-    case 'tif'
-        T = '-Tt -Qg -Qt';
-    otherwise
-        error('gmtlab:figuretype','%s: not supported',in.figuretype)
-end
-
-command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
-
-command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 
 if ~in.keep_files
     command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',in.filename);
@@ -760,26 +768,32 @@ hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
 fprintf('GMT plot stored at:  %s\n',filename)
 
-if in.savelegend
-    fprintf('File containing legend is located at: %s\n',legend)
-end
+% cd back to the original directory
+cd(in.curdir);
+delete([in.tmpdir,'/*'])
+rmdir(in.tmpdir)
 
-function legend = makelegendpdf(command,outdir)
+function file = makelegendpdf(command,in)
 %% Make a separate pdf for the legend
+% Only allowed to have 1 or 2 psscale commands in the commad list. the first one
+% is the regular legend. The second is for the nan legend (if it exists)
 
-if isnan(outdir), outdir = '.'; end
-file = 'legend.ps';
+file = fullfile(in.outdir,'legend');
 
 %make sure it's not here
-basename=file(1:end-3);
-exec_gmt_cmd(sprintf('rm -f %s.{ps,eps,pdf}',basename))
+exec_gmt_cmd(sprintf('rm -f %s.ps',file),in.verbosity);
+
+% Make the page large enough to fit most legends
+cmd = {'gmtset PAPER_MEDIA a0'};
+command = [cmd, command];
 
 %Remove trailing .ps entry
 crop=regexp(command,'>>');
 
-for i = 1:length(command)
-    command{i} = sprintf('%s -P >> %s', command{i}(1:crop{i}-1), file );
-    if i == 1
+% Additional adjustments    
+for i = 2:length(command)
+    command{i} = sprintf('%s -P >> %s.ps', command{i}(1:crop{i}-1), file );
+    if i == 2
         command{i} = regexprep(command{i},'-O','');
     end
     if i == length(command)
@@ -789,11 +803,7 @@ end
 
 command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
 
-command{end+1} = sprintf(' mv legend.pdf %s/',outdir);
-
-exec_gmt_cmd(command)
-legend = sprintf('%s/legend.pdf',outdir);
-
+exec_gmt_cmd(command,in.verbosity);
 
 %% SUBFUNCTIONS FOR SETUP
 %      ||||||

@@ -337,8 +337,8 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
         else
             lsize = in.legend.position_nan;
         end
-        b = sprintf('psscale -Li -C%s/color_nan.cpt -D%s -O -K >> %s.ps',...
-            in.outdir,lsize,in.filename);
+        b = sprintf('psscale -D%s -Li -C%s/color_nan.cpt -O -K >> %s.ps',...
+            lsize,in.outdir,in.filename);
     end
     
     % get xtra options

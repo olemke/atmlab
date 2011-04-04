@@ -37,11 +37,14 @@ function vectcolors = list_colors(varargin)
 % 
 % 18/11-2009 Salomon Eliasson
 
-
 colors={'k','g','r','b','c','m','y','rp','gr','p','o','ca','pi'};
+if ~nargin
+    varargin = {'Ncolors',length(colors)};
+end
+
 
 %% LOAD CUSTOM OPTIONS:
-for iopt = 1 : 2 : nargin
+for iopt = 1 : 2 : length(varargin)
     optname  = varargin{iopt};
     optvalue = varargin{iopt+1};
     switch lower(optname)

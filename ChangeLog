@@ -1,3 +1,29 @@
+2011-04-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-167
+
+	* geoplots/gmt/gmt_plot.m:
+	- Now cd into a tmpdir to let loose the temporary files there. This
+	directory is deleted afterwards.
+	- Fixed option to make a pdf out of only the legend.
+
+	* geoplots/gmt/test_gmt.m:
+	- Updated locations section to new input rules.
+	- Dropping the idea of making gmtlab self sustained. i.e. don't
+	test temporarily removing the atmlab paths.
+
+	* geoplots/gmt/gmtlab.m:
+	No longer case sensitive
+
+	* geoplots/gmt/exec_gmt_cmd.m:
+	Edited help section
+
+	* geoplots/gmt/create_gmt_earth.m:
+	Small update
+
+	* geoplots/gmt/list_colors.m:
+	default to create 10 colors vectors if ~nargin
+
 2011-04-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-166
