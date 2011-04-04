@@ -1,3 +1,13 @@
+2011-04-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-166
+
+	* files/create_tmpfolder.m:
+
+	Use matlab's tempname function to generate foldername. Append -atmlab
+	to tmpfolder name. Add error identifiers. Avoid possible endless loop
+	by bailing out after 100 failed attempts to create a unique folder.
+
 2011-03-29  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-165
