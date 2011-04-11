@@ -1,3 +1,16 @@
+2011-04-11	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-69
+
+	* collocations/collocate.m: Bugfix
+	  - Also find collocations more than 2 longitude-cells away
+	  - Made error messages understandable for people with limited
+	    experience with civilised programming languages.
+	  - Clarified documentation on longitude-ranges
+	  - Rather than calling max(...) twice, call max and abs on flattened
+	    copy of matrix.
+	  - Adapt to Atmlab convention of having name.
+
 2011-04-11  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-168

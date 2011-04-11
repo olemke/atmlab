@@ -18,13 +18,14 @@ function collocations = collocate(t1, lat1, long1, t2, lat2, long2, maxdist, max
 % IN  t1      Array length L1 giving the times of the scanlines.
 % IN  lat1    Matrix L1xW1 with latitude for L1 scanlines with W1 scans per
 %             line. The latitude should be in degrees.
-% IN  long1   Matrix L1xW1 with longitude, L1 scans, W1 scans/line
-% IN  t2      Array of length L2 giving the times of the scanlines
-% IN  lat2    Matrix L2xW2 with latitude, L2 scans, W2 scans/line
-% IN  long2   Matrix L2xW2 with longitude, L2 scans, W2 scans/line
-% IN  maxdist Max distance (km) to consider a collocation
-% IN  maxtime Max time (s) to consider a collocation
-%
+% IN  long1   Matrix L1xW1 with longitude (-180, 180), L1 scans, W1 scans/line.
+% IN  t2      Array of length L2 giving the times of the scanlines.
+% IN  lat2    Matrix L2xW2 with latitude, L2 scans, W2 scans/line.
+% IN  long2   Matrix L2xW2 with longitude (-180, 180), L2 scans, W2 scans/line.
+% IN  maxdist Max distance (km) to consider a collocation.
+% IN  maxtime Max time (units as for t1, t2) to consider a collocation.
+
+% Originally created by Gerrit Holl.
 % $Id$
 
 %% data checks
@@ -36,19 +37,20 @@ ncols2 = size(lat2, 2);
 nel1 = numel(lat1);
 nel2 = numel(lat2);
 
+errid = 'atmlab:collocate';
 % check dimensions
-assert(size(long1, 1)==nrows1, 'atmlab:collocate', 'length long1 != length lat1');
-assert(size(long2, 1)==nrows2, 'atmlab:collocate', 'length long2 != length long1');
-assert(length(t1)==nrows1, 'atmlab:collocate', 'length t1 != length lat1');
-assert(length(t2)==nrows2, 'atmlab:collocate', 'length t2 != length long2');
-assert(size(long1, 2)==ncols1, 'atmlab:collocate', 'width long1 != width lat1');
-assert(size(long2, 2)==ncols2, 'atmlab:collocate', 'width long2 != width lat2');
+assert(size(long1, 1)==nrows1, errid, 'length long1 differs from length lat1');
+assert(size(long2, 1)==nrows2, errid, 'length long2 differs from length long1');
+assert(length(t1)==nrows1, errid, 'length t1 differs from length lat1');
+assert(length(t2)==nrows2, errid, 'length t2 differs from length long2');
+assert(size(long1, 2)==ncols1, errid, 'width long1 differs from width lat1');
+assert(size(long2, 2)==ncols2, errid, 'width long2 differs from width lat2');
 
 % check correct numbers
-assert(max(max(abs(long1)))<=180, 'atmlab:collocate', 'Invalid data in long1');
-assert(max(max(abs(lat1)))<=90, 'atmlab:collocate', 'Invalid data in lat1');
-assert(max(max(abs(long2)))<=180, 'atmlab:collocate', 'Invalid data in long2');
-assert(max(max(abs(lat2)))<=180, 'atmlab:collocate', 'Invalid data in lat2');
+assert(max(abs(long1(:)))<=180, errid, 'Invalid data in long1');
+assert(max(abs(lat1(:)))<=90, errid, 'Invalid data in lat1');
+assert(max(abs(long2(:)))<=180, errid, 'Invalid data in long2');
+assert(max(abs(lat2(:)))<=180, errid, 'Invalid data in lat2');
 
 %% make t, rows, cols at the same grid --> no need for ind2sub
 
@@ -98,14 +100,16 @@ grid2 = binning_fast(...
 
 count = 0;
 
-% the width of the cells as a function of latitude
+% the width and height of the cells as a function of latitude
 cell_width = 2 * pi * earth_radius * cosd(lat_grid1) / 360;
+cell_height = 2 * pi * earth_radius / 360;
 
 % how many cells of latitude to check for collocations
-cells_in_range = ceil(maxdist ./ cell_width);
+cells_in_lat_range = ceil(maxdist ./ cell_width);
+c_lon = ceil(maxdist ./ cell_height);
 
 for i = 1:size(grid1, 1) % latitude
-    c = cells_in_range(i);
+    c_lat = cells_in_lat_range(i);
     for j = 1:size(grid1, 2) % longitude
         if any(grid1{i, j})
             
@@ -115,13 +119,13 @@ for i = 1:size(grid1, 1) % latitude
             % which range of grid-cells to look for collocations?
             
             % for longitude (cols), depends on cells_in_range
-            cols = j-c:j+c;
+            cols = j-c_lat:j+c_lat;
             cols = mod(cols, n_grid_lons);
             cols(cols==0) = n_grid_lons;
 
-            % for latitude (rows), always j-1:j+1
+            % for latitude (rows), no dependence on lat
 
-            rows = i-1:i+1;
+            rows = i-c_lon:i+c_lon;
             % edges do not wrap: if rows < 1  
             rows(rows<1) = [];
             rows(rows>n_grid_lats) = [];
