@@ -1,3 +1,11 @@
+2011-04-11  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-168
+
+	* handy/combine_pdfs.m:
+
+	Add function to combine several PDF files on one page.
+
 2011-04-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-167
