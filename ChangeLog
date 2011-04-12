@@ -1,3 +1,40 @@
+2011-04-12	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-70
+
+	* graphs/satboxplot.m: Updated
+	  - Also return plot handle
+	  - Update documentation
+
+	* collocations/collocation_read.m: Changed behaviour
+	  - Take away functionality for HDF5-reading. This is really not
+	    working well yet.
+
+	* collocations/write_collocations_netcdf.m: Expanded
+	  - Also add the date for which the collocations are to the NetCDF.
+
+	* collocations/README: Updated
+	  - Update link to web-documentation
+
+	* collocations/collocation_read_frompipe.m: Updated
+	  - Update path to server
+	  - Added warning that this is EXPERIMENTAL
+
+	* collocations/TODO: Expanded
+	  - Added some TODO-items
+
+	* sensors/atovs/atovs_read_data.m: Whitespace changes
+	  - Fixed tabbing in doc.
+
+	* datasets/datasets_config.m: Changed behaviour
+	  - When run for the first time, try to run datasets_init first.
+	
+	* datasets/find_datadir_by_date.m: Small change
+	  - Improve error message
+	
+	* datasets/TODO: Expanded
+	  - Added one TODO-item.
+
 2011-04-11	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-69

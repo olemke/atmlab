@@ -18,14 +18,31 @@ function value = datasets_config(varargin)
 % DATASET_filename  if possible, set to calculate the filename directly
 %                   from year, month, day, etc.
 %
+% To set actual values, add datasets_init to your path. This is executed
+% when datasets_config is run for the first time.
 % For example settings, see site-specific/kiruna/datasets_init.m. If adding
 % a new dataset, it is recommended to also set defaults in the
 % site-specific initialisation, so that others can use it directly and that
 % it can serve as an example to people at other sites.
-%
+
+% Created by Gerrit
 % $Id$
 
 persistent A
+
+persistent initialised
+
+if isempty(initialised)
+    if exist('datasets_init', 'file')==2
+        logtext(atmlab('OUT'), 'datasets_config first run, initialising...');
+        initialised = true;
+        datasets_init;
+    else
+        warning('atmlab:datasets:datasets_config', ...
+                'Cannot find datasets_init, not initialising');
+    end
+        
+end
 
 try
     [A,value] = prstnt_struct( A, @datasets_defs, varargin );

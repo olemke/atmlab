@@ -6,18 +6,18 @@
 %
 % IN    file_name   File name.
 % OUT   data        Data structure with the following fields:
-%                   time   Vector of scanline time stamps in UTC [msec].
-%       lon         2D matrix (fov,scanline) of longitudes in [degrees].
-%       lat         2D matrix (fov,scanline) of latitudes in [degrees].
-%       lza         2D matrix (fov,scanline) of local zenith angle in
+%           time    Vector of scanline time stamps in UTC [msec].
+%           lon     2D matrix (fov,scanline) of longitudes in [degrees].
+%           lat     2D matrix (fov,scanline) of latitudes in [degrees].
+%           lza     2D matrix (fov,scanline) of local zenith angle in
 %                   [degrees].
-%       laa         2D matrix (fov,scanline) of local azimuth angle in
+%           laa     2D matrix (fov,scanline) of local azimuth angle in
 %                   [degrees].
-%       sza         2D matrix (fov,scanline) of solar zenith angle in
+%           sza     2D matrix (fov,scanline) of solar zenith angle in
 %                   [degrees].
-%       saa         2D matrix (fov,scanline) of solar azimuth angle in
+%           saa     2D matrix (fov,scanline) of solar azimuth angle in
 %                   [degrees].
-%       tb          3D matrix (fov,channel,scanline) of brightness
+%           tb      3D matrix (fov,channel,scanline) of brightness
 %                   temperatures in [K].
 %           
 %       err         Error flag. 0 - no error, 1 - error.

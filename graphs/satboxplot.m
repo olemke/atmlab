@@ -1,4 +1,4 @@
-function satboxplot(x, y, bincentres, outlierstyle, varargin)
+function h=satboxplot(x, y, bincentres, outlierstyle, varargin)
 
 % satboxplot Modified boxplot
 %
@@ -11,7 +11,7 @@ function satboxplot(x, y, bincentres, outlierstyle, varargin)
 %
 % FORMAT
 %
-%   satboxplot(x, y, xbin, outlierstyle, ...)
+%   h = satboxplot(x, y, xbin, outlierstyle, ...)
 %
 % IN
 %
@@ -23,6 +23,11 @@ function satboxplot(x, y, bincentres, outlierstyle, varargin)
 %   bincentres      Bin centres for x 
 %   outlierstyle    Style for outliers, e.g. 'kx'
 %   ...     all additional arguments passed on to <a href="matlab:help boxplot">boxplot</a>
+%
+% OUT
+%
+%  h                numeric scalar, plot handle
+%                   handle to outliers (for other handles, see <a href="matlab:help boxplot">boxplot</a>)
 %
 % $Id$
 
@@ -46,4 +51,8 @@ all_outliers(all_outliers==0)=nan;
 hold on;
 boxplot(q, bincentres, 'positions', bincentres, 'labelorientation', 'inline', 'whisker', inf, varargin{:});
 set(gca,'xtickmode','auto','xticklabelmode','auto');
-plot(bincentres, all_outliers, outlierstyle);
+if ~isempty(all_outliers)
+    h=plot(bincentres, all_outliers, outlierstyle);
+else
+    h = -1;
+end

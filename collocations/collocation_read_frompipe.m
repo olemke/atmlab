@@ -2,7 +2,7 @@ function M = collocation_read_frompipe(hdf5file, fields, query)
 
 % collocation_read_frompipe Low-level, read collocations as client to pytables server
 %
-% Note. Function in α/β and subject to change.
+% EXPERIMENTAL! Function in α/β and subject to change.
 %
 % FORMAT
 %
@@ -26,7 +26,7 @@ function M = collocation_read_frompipe(hdf5file, fields, query)
 % $Id$
 
 %% initialise
-path_to_server = '/storage4/home/gerrit/svn/pycodes/scripts/collocation_read.py';
+path_to_server = '/storage4/home/gerrit/svn/sources/python/scripts/collocation_read.py';
 
 % note: make sure this matches Pythons calculations
 lockfile = fullfile('/tmp', strrep(hdf5file, '/', '_'));

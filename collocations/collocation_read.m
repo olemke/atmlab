@@ -145,47 +145,47 @@ for i = 1:length(years)
     end
 end
 
-if any(cellfun(@length, paths_hdf5))
-    %% do this stuff via HDF5
-    if ~all(cellfun(@length, C))
-        error('atmlab:collocation_read', ...
-            'Period PARTIALLY covered by HDF-5, this is not supported yet');
-    end
-    logtext(atmlab('OUT'), 'Found HDF5\n');
-    % Convert limits-matrix to limits-strings
-    baselimstrs = {'', ''};
-    fieldnames_both = {union(fieldnames(cols.overlap), fieldnames(cols.data)), fieldnames(cols.meandata)};
-    for i = 1:2
-        
-        limcellstr = cellfun(@(v) ...
-            ['(' v ' >= ' num2str(limits.(v)(1)) ') & (' ...
-            v ' <= ' num2str(limits.(v)(2)) ') & '], ...
-            intersect(fieldnames_both{i}, fieldnames(limits)), ...
-            'UniformOutput', false);
-        baselimstrs{i} = horzcat(limcellstr{:});
-    end
-    for i = 1:length(years)
-        year = years(i);
-        hdf5file = paths_hdf5{i};
-        % and limit dates
-        global_start = date2unixsecs(start_date(1), start_date(2), start_date(3));
-        this_year_start = date2unixsecs(year, 1, 1);
-        this_start = max(global_start, this_year_start);
-        global_end = date2unixsecs(end_date(1), end_date(2), end_date(3));
-        this_year_end = date2unixsecs(year, 12, 31, 24);
-        this_end = min(global_end, this_year_end);
-        % add datelimits to limstr
-        limstr = [baselimstrs{1} sprintf(' (B_TIME >= %d) & (B_TIME <= %d)', ...
-            this_start, this_end) ' MEANSEP ' baselimstrs{2}];
-        limstr = deblank(limstr);
-        if strcmp(limstr(end), '&')
-            limstr = deblank(limstr(1:end-2));
-        end
-        M = collocation_read_frompipe(hdf5file, cols_in, limstr);
-        cols_out = name_struct;
-        return
-    end
-end
+% if any(cellfun(@length, paths_hdf5))
+%     %% do this stuff via HDF5
+%     if ~all(cellfun(@length, C))
+%         error('atmlab:collocation_read', ...
+%             'Period PARTIALLY covered by HDF-5, this is not supported yet');
+%     end
+%     logtext(atmlab('OUT'), 'Found HDF5\n');
+%     % Convert limits-matrix to limits-strings
+%     baselimstrs = {'', ''};
+%     fieldnames_both = {union(fieldnames(cols.overlap), fieldnames(cols.data)), fieldnames(cols.meandata)};
+%     for i = 1:2
+%         
+%         limcellstr = cellfun(@(v) ...
+%             ['(' v ' >= ' num2str(limits.(v)(1)) ') & (' ...
+%             v ' <= ' num2str(limits.(v)(2)) ') & '], ...
+%             intersect(fieldnames_both{i}, fieldnames(limits)), ...
+%             'UniformOutput', false);
+%         baselimstrs{i} = horzcat(limcellstr{:});
+%     end
+%     for i = 1:length(years)
+%         year = years(i);
+%         hdf5file = paths_hdf5{i};
+%         % and limit dates
+%         global_start = date2unixsecs(start_date(1), start_date(2), start_date(3));
+%         this_year_start = date2unixsecs(year, 1, 1);
+%         this_start = max(global_start, this_year_start);
+%         global_end = date2unixsecs(end_date(1), end_date(2), end_date(3));
+%         this_year_end = date2unixsecs(year, 12, 31, 24);
+%         this_end = min(global_end, this_year_end);
+%         % add datelimits to limstr
+%         limstr = [baselimstrs{1} sprintf(' (B_TIME >= %d) & (B_TIME <= %d)', ...
+%             this_start, this_end) ' MEANSEP ' baselimstrs{2}];
+%         limstr = deblank(limstr);
+%         if strcmp(limstr(end), '&')
+%             limstr = deblank(limstr(1:end-2));
+%         end
+%         M = collocation_read_frompipe(hdf5file, cols_in, limstr);
+%         cols_out = name_struct;
+%         return
+%     end
+% end
 
 %% pre-allocate at least zero rows
 

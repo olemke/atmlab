@@ -43,3 +43,7 @@ WISHES
 - Don't let AVHRR collocate with more than one MHS; only the closest one?
 - Add many, many sat/sensor pairs to the firstline-database and to
   read_granule.
+- Generalise the firstline-database. Add to atmlab-data?
+- (From Salomon, Ajil) When searching for collocations, permit the ability to
+  pass on fields to return on-the-fly.
+- Add an extensive testing suite.
