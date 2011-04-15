@@ -1,3 +1,11 @@
+2011-04-15	Gerrit Holl	<gerrit.holl@ltu.se>
+	
+	* atmlab-1-0-72
+
+	* handy/optargs_struct.m: Expanded
+	  - Now handles structures recursively. If both the default and the
+	    provided are a struct, they are both passed on to optargs_struct.
+
 2011-04-15  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-71
