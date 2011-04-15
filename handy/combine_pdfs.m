@@ -23,8 +23,8 @@ function outfile = combine_pdfs(pdffiles, options)
 %       outdir        |%s    directory for output        | gmtlab('outdir')
 %       vspace        |%f    space between rows          | 1 (cm)
 %       hspace        |%f    space between columns       | 1 (cm)
-%       valign        |%s    vertical alignment          | c
-%                     |      c = centered, b = bottom,   |
+%       valign        |%s    vertical alignment          | m
+%                     |      m = middle, b = bottom      |
 %
 % OUT:      outfile             string; the fullpath to the pdffile created
 %

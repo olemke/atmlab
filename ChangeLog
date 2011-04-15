@@ -1,3 +1,9 @@
+2011-04-15  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-73
+
+	* handy/combine_pdfs.m: Fix bug in doc.
+
 2011-04-15	Gerrit Holl	<gerrit.holl@ltu.se>
 	
 	* atmlab-1-0-72
