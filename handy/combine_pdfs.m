@@ -26,7 +26,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %       valign        |%s    vertical alignment          | m
 %                     |      m = middle, b = bottom      |
 %
-% OUT:      outfile             string; the fullpath to the pdffile created
+% OUT:      outfile             string; name of the pdffile created
 %
 % NOTE: The files are appended left to right and from top to bottom.
 %       Arguments may be:
@@ -44,11 +44,10 @@ default.cols   = 2;
 default.vspace = 1;
 default.hspace = 1;
 default.valign = 'm';
+default.filename = 'out';
 default.outdir = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.2;
 
-options = optargs_struct(options, default);
-default.filename = fullfile(options.outdir, 'out');
 options = optargs_struct(options, default);
 
 %% Sanity checks
