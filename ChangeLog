@@ -1,3 +1,9 @@
+2011-04-15  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-71
+
+	* handy/combine_pdfs.m: Code cleanup.
+
 2011-04-12	Gerrit Holl	<gerrit.holl@ltu.se>
 
 	* atmlab-1-0-70

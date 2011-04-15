@@ -3,156 +3,182 @@ function outfile = combine_pdfs(pdffiles, options)
 %
 % USAGE: outfile = combine_pdfs(pdffiles, options) 
 %
-%e.g.file = combine_pdfs(files,struct('cols',[2 2 2 2 1],..)
+% E.g. file = combine_pdfs(files,struct('cols',[2 2 2 2 1],..)
 %
 % PURPOSE:  Merge several pdf's (one page each) into a pdf file
 %
-% IN:       pdffiles            cell; Each element contains the path to a
-%                               file.
-%                               OR
-%                               string;  unix regular expression from which
-%                               find <regexp> will get a list of files.
-%                               e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
+% EXTERNAL DEPENDENCIES: pdfinfo, pdflatex.
 %
-%           options.            structure; contains the following options:
-%         KEY:    fieldname     |type |description                  | default
-%                 cols          |%d [] number of columns per row    | 2
-%                 vspace        |%d    space between rows           | 1 (cm)
-%                 hspace        |%d    space between columns        | 1 (cm)
-%                 filename      |%s    name of outfile              | 'out'
-%                 outdir        |%s    directory for output         | gmtlab('outdir')
-%                 valign        |%s    vertical alignment           | c
-%                               |      c = centered, b = bottom,    |
+% IN:   pdffiles            cell: Each element contains the path to a
+%                                 file.
+%                           OR
+%                           string: unix regular expression from which
+%                             'ls <regexp>' will get a list of files.
+%                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
+%
+%       options.            structure; contains the following options:
+%   KEY:fieldname     |type |description                 | default
+%       cols          |%d [] number of columns per row   | 2
+%       filename      |%s    name of output file         | 'out'
+%       outdir        |%s    directory for output        | gmtlab('outdir')
+%       vspace        |%f    space between rows          | 1 (cm)
+%       hspace        |%f    space between columns       | 1 (cm)
+%       valign        |%s    vertical alignment          | c
+%                     |      c = centered, b = bottom,   |
 %
 % OUT:      outfile             string; the fullpath to the pdffile created
 %
-% NOTE: The files are appended left to right and from top to bottom. This
-%       function assembles the PDFs using pdfinfo and pdflatex.
+% NOTE: The files are appended left to right and from top to bottom.
 %       Arguments may be:
-%            1) option.cols can alternativley be a vector
+%            1) option.cols can alternatively be a vector
 %               with the number of columns for each row. In that case, the
 %               sum of this vector must match the number of pdf files.
-%
+
 % 2011-04-11 Created by Oliver Lemke based on an idea by Salomon.
 
-if ~nargin, error('atmlab:input','Needs input. Read help section'); end
+if ~nargin, error('atmlab:combine_pdfs','Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
-default.cols          = 2;
-default.vspace        = 1;
-default.hspace        = 1;
-default.valign        = 'm';
-default.outdir        = gmtlab('outdir');
+default.cols   = 2;
+default.vspace = 1;
+default.hspace = 1;
+default.valign = 'm';
+default.outdir = gmtlab('outdir');
+default.secret_latex_spacing_tweak = 0.2;
 
-options = optargs_struct(options,default);
-default.filename      = fullfile(options.outdir,'out');
-options = optargs_struct(options,default);
+options = optargs_struct(options, default);
+default.filename = fullfile(options.outdir, 'out');
+options = optargs_struct(options, default);
 
-if ischar(pdffiles)   %then use regular expression to find files
-    files = exec_gmt_cmd(sprintf('ls -1 %s',pdffiles));
-    pdffiles = regexp(files{1},'\n','split');
+%% Sanity checks
+assert(options.vspace >= 0, 'Vertical spacing must be > 0');
+assert(options.hspace >= 0, 'Horizontal spacing must be > 0');
+assert(length(options.valign) == 1 && sum('mb' == options.valign), ...
+       'Vertical alignment must be either ''m'' or ''b''');
+
+%% If we got a regexp, use ls to get the file list
+if ischar(pdffiles)
+    files = exec_gmt_cmd(sprintf('ls -1 %s', pdffiles), gmtlab('verbosity'));
+    pdffiles = regexp(files{1}, '\n','split');
 end
 
-%make sure there are no empty cells
+%% We don't want no empty filenames
 pdffiles = pdffiles(~cellfun('isempty',pdffiles));
 
-if (length(options.cols) > 1 && sum(options.cols) ~= length(pdffiles))
-    error ('atmlab:input', 'The number of plots (%d) doesn''t match the sum of columns (%d)', ...
-        length(pdffiles), sum(options.cols));
+%% We trust that the user can count! Not really, better double check here
+if (length(options.cols) ~= 1 && sum(options.cols) ~= length(pdffiles))
+    error ('atmlab:combine_pdfs', ...
+           'Number of plots (%d) doesn''t match sum of columns (%d)', ...
+           length(pdffiles), sum(options.cols));
 end
 
-plotrows = get_plot_dimensions(pdffiles,options);
+%% If cols is only one number, replicate it to match the number files
+if (length(options.cols) == 1)
+    options.cols = repmat(options.cols, ceil(length(pdffiles)/options.cols), 1);
+end
 
-put_figs_together_with_latex(plotrows,options);
+%% Setup is complete, let's get cracking
+layout = create_layout_from_pdffiles(pdffiles, options);
 
-outfile   = compile_and_crop(options);
+create_pdf_from_layout_with_latex(layout, options);
+
+outfile = [options.filename '.pdf'];
+
+end
 
 
-function plot_sizes = get_plot_dimensions(pdffiles, options)
-%% get_plot_dimensions (in points)
 
+%% Only subfunctions allowed after this point!!!
+
+function layout = create_layout_from_pdffiles(pdffiles, options)
+
+% Create a fancy regexp that gives us width and height from pdfinfo output
 regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
-col = 1; row = 1;
-for i = 1:length(pdffiles)
-    info  = exec_gmt_cmd(sprintf('pdfinfo %s',pdffiles{i}),gmtlab('verbosity'));
-    tmp =  structfun(@str2double,regexp(info{1},regx,'names'),'uniformoutput',0);
-    plot_sizes{row}(col) = struct( ...
-        'height', tmp.height / 72 * 2.54, ...
-        'width', tmp.width / 72 * 2.54, ... %convert from pt to cm
-        'file', pdffiles{i}); %#ok<AGROW>
-    
-    if row > length(options.cols)
-        curcols = options.cols(end);
-    else
-        curcols = options.cols(row);
-    end
 
+col = 1; row = 1;
+for P = pdffiles
+    info  = exec_gmt_cmd(sprintf('pdfinfo %s', P{1}), gmtlab('verbosity'));
+
+    % Great, pdfinfo uses BigPoints as a unit. Let's throw in some fancy
+    % numbers and hope we end up with centimeters after that (DPI*INCH).
+    % This might break for some PDFs, better keep your fingers crossed.
+    psize =  structfun(@(x) str2double(x)/72*2.54, ...
+                       regexp(info{1},regx, 'names'), ...
+                       'uniformoutput', 0);
+    layout.plotsbyrow{row}(col) = struct('height', psize.height, ...
+                                         'width', psize.width, ...
+                                         'file', P{1});
+    
     col = col + 1;
-    if (col > curcols)
+    if (col > options.cols(row) ...
+            || length([layout.plotsbyrow{:}]) == length(pdffiles))
         col = 1;
+        R = layout.plotsbyrow(row);
+        layout.rowwidth(row) = sum([R{:}.width]) ...
+            + options.hspace*(length(R{:})-1) ...
+            + options.secret_latex_spacing_tweak*length(R{:});
+        layout.rowheight(row) = max([R{:}.height]);
         row = row + 1;
     end
 end
 
-function file = put_figs_together_with_latex(plotrows,options)
-%% put_figs_together_with_latex
-%
+end
 
-file = [options.filename,'.tex'];
+
+function file = create_pdf_from_layout_with_latex(layout, options)
+
+%% Hook up a cleanup callback.
+% In case we screw up the LaTeX run, we don't want to leave any
+% evidence behind.
+c = onCleanup(@() ...
+    exec_gmt_cmd(sprintf('cd %s && rm -f %s.{log,aux,tex}', ...
+                         options.outdir, options.filename), ...
+                 gmtlab('verbosity')));
+
+%% Assemble our pretty tex file
+file = [[options.outdir '/' options.filename], '.tex'];
 fid = fopen(file,'w');
 fprintf(fid,'\\documentclass[a4paper,10pt]{report}');
 
-%% determine page width
-nrows = 1;
-for P = plotrows
-    %% Fill up the row
-    rowwidth(nrows) = sum([P{:}.width]) + options.hspace * (length(P{:})-1); %#ok<AGROW>
-    rowheight(nrows) = max([P{:}.height]); %#ok<AGROW>
-    nrows = nrows+1;
-end
-
 margin=0.1;
-fprintf(fid,'\\usepackage[margin=%.2fcm, paperwidth=%.2fcm, paperheight=%.2fcm]{geometry}\n', ...
-    margin, ...
-    max(rowwidth) + 2*margin + 0.3, ...
-    sum(rowheight) + 2*margin + (options.vspace + 0.1) * (length(rowheight)-1));
-fprintf(fid,'\\pagestyle{empty}\n'); %no page numbering
+fprintf(fid,['\\usepackage[margin=%.2fcm,paperwidth=%.2fcm,' ...
+             'paperheight=%.2fcm]{geometry}\n'], ...
+        margin, ...
+        max(layout.rowwidth) + 2*margin, ...
+        sum(layout.rowheight) + 2*margin ...
+            + options.vspace*(length(layout.rowheight)-1) ...
+            + options.secret_latex_spacing_tweak*length(layout.rowheight));
+fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
-fprintf(fid,'\\setlength{\\parindent}{0in}');
+fprintf(fid,'\\setlength{\\parindent}{0in}\n');
 fprintf(fid,'\\begin{document}\n');
 fprintf(fid,'\\centering\n');
+
 row = 1;
-for P = plotrows
-    %% Fill up the row
+for R = layout.plotsbyrow
     col=1;
-    for iplot = P{:}
+    for P = R{:}
+        fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}', options.valign, P.width);
+        fprintf(fid,'\\includegraphics{%s}', P.file);
+        fprintf(fid,'\\end{minipage}\n');
         
-        fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}', options.valign, iplot.width);
-        fprintf(fid,'%s',sprintf('\\includegraphics{%s}',iplot.file));
-        fprintf(fid,'%s', sprintf('\\end{minipage}'));
-        
-        if (col ~= length(P{:}))
-            fprintf(fid,'%s',sprintf('\\hspace{%.2fcm}',options.hspace));
+        if (col ~= length(R{:}))
+            fprintf(fid,'\\hspace{%.2fcm}\n', options.hspace);
         end
         col = col+1;
     end
-    if (row ~= length(rowheight))
-        %fprintf(fid, '\\\\\n');
-        fprintf(fid, '\\vspace{%.2fcm}\\\\', options.vspace);
+    if (row ~= length(layout.rowheight))
+        fprintf(fid, '\\vspace{%.2fcm}\\\\\n', options.vspace);
     end
     row = row+1;
 end
-fprintf(fid,'%s\n','\end{document}');
+fprintf(fid,'\\end{document}\n');
 fclose(fid);
 
-function outfile   = compile_and_crop(options)
-%% compile_and_crop
-%
-command{1} = sprintf('pdflatex -interaction batchmode -output-directory %s %s.tex', ...
-                     options.outdir,options.filename);
-command{2} = sprintf('rm -f %s.{log,aux,tex}',options.filename);
+%% Hand the TeX file over to pdflatex
+exec_gmt_cmd(sprintf('pdflatex -interaction batchmode -output-directory %s %s.tex', ...
+                     options.outdir, options.filename), ...
+             gmtlab('verbosity'));
 
-exec_gmt_cmd(command,gmtlab('verbosity'));
-
-outfile = [options.filename '.pdf'];
+end
