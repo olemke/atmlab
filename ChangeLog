@@ -1,3 +1,9 @@
+2011-04-16  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-75
+
+	* handy/combine_pdfs.m: Return full path to output file.
+
 2011-04-15  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-74

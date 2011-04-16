@@ -82,7 +82,7 @@ layout = create_layout_from_pdffiles(pdffiles, options);
 
 create_pdf_from_layout_with_latex(layout, options);
 
-outfile = [options.filename '.pdf'];
+outfile = [[options.outdir '/' options.filename], '.pdf'];
 
 end
 
