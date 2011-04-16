@@ -1,5 +1,11 @@
 2011-04-16  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-76
+
+	* handy/combine_pdfs.m: Ensure that pdffiles is a non-empty row vector.
+
+2011-04-16  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-75
 
 	* handy/combine_pdfs.m: Return full path to output file.

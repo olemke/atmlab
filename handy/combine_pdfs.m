@@ -62,8 +62,10 @@ if ischar(pdffiles)
     pdffiles = regexp(files{1}, '\n','split');
 end
 
-%% We don't want no empty filenames
+%% Make sure filenames are in a row vector and non-empty
+pdffiles = pdffiles(:)';
 pdffiles = pdffiles(~cellfun('isempty',pdffiles));
+assert(length(pdffiles) > 0, 'List of input pdf files is empty');
 
 %% We trust that the user can count! Not really, better double check here
 if (length(options.cols) ~= 1 && sum(options.cols) ~= length(pdffiles))
