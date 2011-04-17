@@ -55,7 +55,8 @@
 % (which is most easily checked by using *out*).
 %----------------------------------------------------------------------------
 %
-% 2011-03-01 created by Salomon Eliasson based on ATMLAB by Patrick Eriksson.
+% Created by Salomon Eliasson based entirely on atmlab.m by Patrick Eriksson.
+% $Id$
 
 function value = gmtlab( varargin )
             

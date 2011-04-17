@@ -1,10 +1,14 @@
 function commands = pspoly(file,in,commands)
-%% my_psbox
-% purpose:
-%         Makes boxes
+% PSPOLY Make polygons to plot with GMT
 %
-% $Author$
-% $Date$
+% IN      file     %s       file to append to
+%         in       struct   options here (see help gmt_plot)
+%         command  cell     cell of string commands for systemcall
+%
+% OUT     command  cell     cell of string commands for systemcall
+%
+% Created by Oliver Lemke
+% $Id$
 
 colors = in.plot.pspoly.colors;
 thick = in.plot.pspoly.thick;

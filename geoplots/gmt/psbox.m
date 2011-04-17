@@ -1,11 +1,14 @@
 function commands = psbox(file,in,commands)
-%% my_psbox
-% purpose:
-%         Makes boxes
+% PSBOX Makes boxes in gmtplot
 %
+% IN      file     %s       file to append to
+%         in       struct   options here (see help gmt_plot)
+%         command  cell     cell of string commands for systemcall
 %
-% Author:Salomon Eliasson
-%%
+% OUT     command  cell     cell of string commands for systemcall
+%
+% Created by Salomon Eliasson
+% $Id$
 
 colors = in.plot.psbox.colors;
 thick = in.plot.psbox.thick;

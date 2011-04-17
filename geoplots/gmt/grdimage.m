@@ -1,13 +1,17 @@
 function command = grdimage(file,cptfile)
-%% grdimage
-% purpose:
-%       Makecpt creates a short script and calls the GMT
-%       command grdimage.
+% GRDIMAGE appends options to GMT grdimage
 %
-% $Author$
-% $Date$
+% purpose: Appends options to a short script and calls the GMT
+%
+% IN    file      %s              .ps-file created/appened to by command
+%       cptfile   %s              .cpt-file used for grdimage from makecpt.m
+%
+% OUT   command   %s              string command to be used in system call
+%
+% Created by Salomon Eliasson
+% $Id$
 
-grdimage = sprintf('grdimage');
+grdimage = 'grdimage';
 
 %location of file, region and projection
 grdimage = sprintf('%s %s.grd -R -J',grdimage,file);

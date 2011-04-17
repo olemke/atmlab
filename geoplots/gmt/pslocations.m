@@ -1,11 +1,14 @@
 function command = pslocations(file,in,command)
-%% pslocations
+% PSLOCATIONS Adds location markers to a GMT plot.
 %
-% purpose:
-%       Adds location markers to a GMT plot.
+% IN      file     %s       file to append to
+%         in       struct   options here (see help gmt_plot)
+%         command  cell     cell of string commands for systemcall
 %
+% OUT     command  cell     cell of string commands for systemcall
 %
-% 10/12-2009 Oliver Lemke & Salomon Eliasson
+% Created by Oliver Lemke & Salomon Eliasson
+% $Id$
 
 for loc = in.locations
     psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);

@@ -1,15 +1,15 @@
 function cptfile = makecpt(in)
-%% makecpt
+% MAKECPT appends options to GMT makecpt
 %
-% purpose:  
-%       Appends options to a short script and calls the GMT
-%       command makecpt.
+% PURPOSE: Appends options to a short script and calls the GMT
 % 
-% in: structure: fields = 'datarange', 'ctable'
+% IN      struct           options here (see help gmt_plot)
+% OUT     %s               filename of colortable/file
 %
-% list of colortables found at /usr/lib/gmt/share/cpt/
+% NOTE    list of colortables found at /usr/lib/gmt/share/cpt/
 %
-% 2011-02-22 created by Salomon Eliasson
+% Created by Salomon Eliasson
+% $Id$ 
 
 mkcpt = sprintf('makecpt -C%s',in.ctable);
 

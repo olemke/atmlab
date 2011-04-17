@@ -1,16 +1,15 @@
 function filecpt = makepolar(tickval,in)
-%%                     makepolar
+% MAKEPOLAR create a .cpt-file based on the 'polar' but with extra options
 %
-% Puropose: To create a .cpt file based on the 'polar'
+% PURPOSE: To create a .cpt file based on the 'polar'
 %           colourtable that garantees white color around a reference value 
 %           (e.g. in.reference = 0)
 %
 %         
-% In:     1) The data contour values
-%         2) The format string for a tidy representation
-%         3) in  = structure with options (optional)
+% IN      tickval     [%f,%f,etc]        The data contour values
+%         in          struct             options here (see help gmt_plot)
 %
-% Out:    file location
+% Out:    filecpt     %s                 fullpath to colortable-file
 %
 % What it does:
 %             Similar to makecpt -Cpolar, but more fancy. Uses a gradient in

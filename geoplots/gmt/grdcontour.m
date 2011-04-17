@@ -1,13 +1,15 @@
 function command = grdcontour(file,in)
-%% pscontour
+% GRDCONTOUR appends options to GMT grdcontour
 %
-% purpose:
-%       appends options to a  short script and calls the GMT
-%       command pscontour appending options.
+% PURPOSE:  Appends options to a short script and calls the GMT
+% 
+% IN    file      %s              .ps-file created/appened to by command
+%       in        struct          options here (see help gmt_plot)
 %
+% OUT   command   %s              string command to be used in system call
 %
-% Author:Salomon Eliasson
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Created by Salomon Eliasson
+% $Id$
 
 %location of file, region and projection
 grdcontour = sprintf('grdcontour %s -R -J',in.grdfile);

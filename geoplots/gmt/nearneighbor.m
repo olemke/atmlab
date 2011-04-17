@@ -1,12 +1,15 @@
 function command = nearneighbor(file,in)
-%% nearneighbor
+% NEARNEIGHBOR Appends options to GMT nearneighbor
 %
-% purpose:
-%       Appends options to a short script and calls the GMT
-%       command nearneighbor.
+% PURPOSE: Appends options to a short script and calls the GMT
 %
-% $Author$
-% $Date$
+% IN    file      %s              .ps-file created/appened to by command
+%       in        struct          options here (see help gmt_plot)
+%
+% OUT   command   %s              string command to be used in system call
+%
+% Created by Salomon Eliasson
+% $Id$
 
 nearneighbor = sprintf('nearneighbor -R');
 

@@ -1,22 +1,22 @@
 function pspoly = polygoninize_regions(boxes)
-%% POLYGONINIZE_REGIONS
+% POLYGONINIZE_REGIONS Turn adjacent regions (boxes) into polygon for plotting
 %
-% Purpose: To set up for plotting many regions defined as box coordinates. This
+% PURPOSE: To set up for plotting many regions defined as box coordinates. This
 %          function make sure that extra lines aren't drawn right next to each
 %          other for essentially the same region. This is usefull if you have a
 %          complicated region made of of several boxes.
 %          e.g. in eliasson11_assessing_acp
 %         
 %
-% IN: boxes: (array containing coordinates for one or several regions)
-%     e.g. boxes = [box1; box2; box3], where box1 has the form 
-%     [bottom left corner, top right corner];
+% IN      boxes  [%f %s]: (array containing coordinates for one or several regions)
+%         e.g. boxes = [box1; box2; box3], where box1 has the form 
+%         [bottom left corner, top right corner];
 %
-% OUT: Structure of arguments to be used for plotting the regions on a map
-%      using GMT
+% OUT     struct      Structure of arguments to be used for plotting the
+%                     regions  on a map
 %
-% 2011-01-24 created by Salomon Eliasson
-
+% Created by Salomon Eliasson
+% $Id$
 
 %% Make a grid of logicals
 res = .1;

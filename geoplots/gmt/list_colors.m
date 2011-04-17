@@ -1,22 +1,22 @@
 function vectcolors = list_colors(varargin)
+% LIST_COLORS Creates a cell of rgb vectors
 %
-% list_colors
-% Purpose:
+% PURPOSE:
 %         From a cell of string arguments create a cell of rgb vectors for the
 %         corresponding colors from the following table. Can also pass rogue rgb
 %         vectors amongst color markers. e.g
 %         strcolors = {'r',[.1 .1 .1],'k','b'}
 % 
-% Indata: 1) Either requested number of colors is given: list_colors('Ncolors',n)
+% IN      1) Either requested number of colors is given: list_colors('Ncolors',n)
 %         
 %         2) Or the colors are given in short string arguments. e.g 
 %               list_colors('Colors',{'r','b'}), but the colors most be in the
 %               colors list. see bellow for available colors
 % 
-% 
+% OUT     vector of rgb colors
 % 
 % Available colors (add more?)
-% LONGNAME  | shortname | vector
+% longname  | shortname | vector
 %           |           |
 % black     | 'k'       | [0,0,0]
 % green     | 'g'       | [0,1,0]

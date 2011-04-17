@@ -1,10 +1,15 @@
 function command = psscale(file,in)
-%% psscale
+% PSSCALE Appends options to GMT psscale
 %
-% purpose:
-%       Appends options to a short script to be later called with all GMT scripts
+% PURPOSE: Appends options to a short script and calls the GMT
 %
-% 2011-02-21 created by Salomon Eliasson
+% IN    file      %s              .ps-file created/appened to by command
+%       in        struct          options here (see help gmt_plot)
+%
+% OUT   command   %s              string command to be used in system call
+%
+% Created by Salomon Eliasson
+% $Id$
 
 psscale = sprintf('psscale');
 if isfield(in,'position')

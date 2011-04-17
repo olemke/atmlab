@@ -1,12 +1,12 @@
 function [files,info] = test_gmt(in)
-%% TEST_GMT
+% TEST_GMT To test various aspecs of gmt_plot
 %
-% Purpose: To test variuos aspecs of gmt_plot. Especially before commiting
-% changes
+% PURPOSE: To test various aspecs of gmt_plot. Especially before commiting
+%          changes
 %
 % USAGE: [info,files] = test_gmt(in)  
 %
-% OPT: structure of arguments to be additionally used 
+% IN   structure of arguments to be additionally used 
 %      in the test_gmt call/s. I.e. it will use the default values for each
 %      test and the addional options added by the user (which have precedence).
 %      -----------

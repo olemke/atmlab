@@ -1,5 +1,26 @@
 2011-04-17  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-78
+
+	* geoplots/gmt/
+	{test_gmt.m, psscale.m, pspoly.m, pslocations.m, pscoast.m,
+	psbox.m, polygoninize_regions.m, nearneighbor.m, makepolar.m,
+	list_colors.m, grdimage.m, grdcontour.m, xtra_nan_legend.m,
+	gmt_unicode_converter.m, gmtlab.m, gmt_get_nctype.m,
+	cpt_from_colorrange.m, equidistant_contours.m}
+
+	Fixed headers
+
+	* geoplots/gmt/pscontour.m: Removed deprecated
+
+	* geoplots/gmt/plot_empty_regions.m: Removed deprecated
+
+	* geoplots/gmt/gmt_splitstring.m: Removed deprecated
+
+	* geoplots/gmt/create_gmt_earth.m: Removed gmt_splitstring
+
+2011-04-17  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-77
 
 	* datasets/datasets_config.m: Added missing '\n' to logtext

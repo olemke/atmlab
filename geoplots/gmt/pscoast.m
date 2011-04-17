@@ -1,14 +1,15 @@
 function command = pscoast(file,in)
-%% pscoast
+% PSCOAST appends options to GMT pscoast
 %
-% purpose:
-%       appends options to a  short script and calls the GMT
-%       command pscoast appending options.
+% PURPOSE:  Appends options to a short script and calls the GMT
+% 
+% IN    file      %s              .ps-file created/appened to by command
+%       in        struct          options here (see help gmt_plot)
 %
+% OUT   command   %s              string command to be used in system call
 %
-%
-% $Author$
-% $Date$
+% Created by Salomon Eliasson
+% $Id$
 
 pscoast = sprintf('pscoast -R -J');
 

@@ -257,7 +257,7 @@ switch in.ctable
             a.cptfile = makecpt(in);
         else
             exec_gmt_cmd(in.makecpt);
-            tmp = gmt_splitstring(in.makecpt,'> ');
+            tmp = splitstring(in.makecpt,'> ');
             a.cptfile = tmp{2};
         end
 end

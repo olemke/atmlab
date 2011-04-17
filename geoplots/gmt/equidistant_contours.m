@@ -1,9 +1,10 @@
 function[tickval,prtstr] = equidistant_contours(range,nlevels)
-%%  equidistant_contours
+% EQUIDISTANT_CONTOURS equidistant contour levels array and a format string
 % 
 % Purpose: 
-%          Creates an equidistant contour levels array, an array
-%          of equidistant color values and a format string
+%          Creates an equidistant contour levels array and a format string to
+%          be used with makecpt
+%
 %  In/outdata:
 %          IN:
 %          minn = minimum data value
@@ -14,8 +15,9 @@ function[tickval,prtstr] = equidistant_contours(range,nlevels)
 %          array of contour levels and the format string to use (depends on
 %          the size of data values)
 %
-% $Author$
-% $Date$ 
+% Created by Salomon Eliasson
+% $Id$
+
 
 %necessity
 minn = range(1);maxx = range(2);
