@@ -12,7 +12,7 @@ function filename = gmt_plot(in,field)
 %                 a detailed description of the structure.
 %
 % OPT   field     The string name of the structure element that contains 
-%                 the data to be plotted. If no field is given, 'datafield'
+%                 the data to be plotted. If no field is given, 'data'
 %                 is assumed.
 %
 % Easy example: If you just want to plot some data..
@@ -37,7 +37,7 @@ function filename = gmt_plot(in,field)
 %
 % MANDATORY INPUT
 %
-% 1) in.(field) % the data (default is field='datafield' i.e. in.datafield)
+% 1) in.(field) % the data (default is field='data' i.e. in.data)
 % 2) in.lat     % the corresponding latitudes
 % 3) in.lon     % the corresponding longitudes
 %
@@ -499,15 +499,30 @@ function filename = gmt_plot(in,field)
 %
 %--------------------------------------------------------------------------
 %
-% 2011-02-22 created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
+% QUICK TEST
+% 
+% in.lat  = -89.5:89.5;
+% in.lon  = -179.5:179.5
+% in.data = rand(length(in.lat),length(in.lon)) 
+% file = gmt_plot(in);
+%
+%
+% Created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
+% $Id$
 
 if ~exist('field','var')
-    field = 'datafield';
+    field = 'data';
 end
 if ~isfield(in,field) && ~isfield(in,'nodata')
     error('gmtlab:input',...
         'Data field: "%s" not found',field)
 end
+
+% CD to outdir so that the temporary .gmtfiles are not saved at '.'. Make
+% sure I cleanup after I'm done
+in.tmpdir = create_tmpfolder;p = pwd();
+onCleanup(@() cleanup(in.tmpdir,p));
+cd(in.tmpdir);
 
 out = set_GMT_plot(in,field);
 
@@ -568,7 +583,7 @@ if isfield(in,field)
     default.datarange     = getdatarange(in,field); %
     default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
 end
-in = gmt_optargs_struct(in,default);
+in = optargs_struct(in,default);
 
 
 if isnan(in.outdir)
@@ -586,10 +601,6 @@ elseif strcmp(in.outdir(1),'~')
     in.outdir = [getenv('HOME') '/' in.outdir(2:end)];
 end
 
-% cd to outdir so that the temporary .gmtfiles are not saved at '.'
-in.tmpdir = create_tmpfolder;
-in.curdir = pwd; cd(in.tmpdir);
-
 if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
     a = 'gmtlab:input'; b = 'Either %s doesn''t exist';
     c = ', or gmtlab does not have write access to %s';
@@ -605,7 +616,7 @@ end
 % colors & data representation:
 default.ctable      = 'rainbow';          % color palette
 [default.stepsize,default.legend.tick_annotation_format]    = getstepsize(in);    % color level datastep interval
-in = gmt_optargs_struct(in,default); clear default
+in = optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
 in.filename = sprintf('%s/%s',in.outdir,in.filename);
@@ -618,7 +629,7 @@ if ~isfield(in,'coast') || isstruct(in.coast) || in.coast
     default.rivers      = '1';  % '1' displays major rivers only. 'a' displays all.
     default.width       = .3;   % width of the coast
     
-    in.coast            = gmt_optargs_struct(in.coast,default); clear default
+    in.coast            = optargs_struct(in.coast,default); clear default
 end
 
 
@@ -677,11 +688,12 @@ end
 % apply defaults to legend
 if ~isfield(in.legend,'position')
     % ORIENTATION
+
     x = sscanf(in.region,'%f/%f/%f/%f');
     myHcondition = ( x(2)-x(1) )/( x(4)-x(3) ) < 2*.85; tmp = ['v','h']; %vertical,horisontal
     default.orientation = tmp(myHcondition+1);
-    
-    in.legend           = gmt_optargs_struct(in.legend,default); %need orientation now
+       
+    in.legend           = optargs_struct(in.legend,default); %need orientation now
     
     o = strcmp(in.legend.orientation,'h'); %logical ishorizontal
     factors = {[9.8 2.25 3.9 .2]/9 ,[4.5 -0.4 7.1 .2]/9}; %empirically good defaults for inch
@@ -691,9 +703,11 @@ if ~isfield(in.legend,'position')
     default.length = sprintf('%.2fi',factors{o+1}(3)*in.map_width);
     default.width  = sprintf('%.2fi',factors{o+1}(4)*in.map_width);
     
+else
+    default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
 end
 default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
-in.legend           = gmt_optargs_struct(in.legend,default);
+in.legend           = optargs_struct(in.legend,default);
 
 
 function filename = sort_figures(in,command)                                    %% SORT FIGURES %%
@@ -767,11 +781,6 @@ end
 hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
 fprintf('GMT plot stored at:  %s\n',filename)
-
-% cd back to the original directory
-cd(in.curdir);
-delete([in.tmpdir,'/*'])
-rmdir(in.tmpdir)
 
 function file = makelegendpdf(command,in)
 %% Make a separate pdf for the legend
@@ -974,3 +983,10 @@ if ~isempty(Errors)
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_errors,Errors,'UniformOutput',0);
     error('gmtlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
 end
+
+function cleanup(tmpdir,curdir)
+% cd back to the original directory
+
+cd(curdir);
+delete([tmpdir,'/*'])
+rmdir(tmpdir)

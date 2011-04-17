@@ -35,7 +35,8 @@ function vectcolors = list_colors(varargin)
 % 
 % default loop of colors: colors={'k','g','r','b','c','m','y','rp','gr','p','o','ca','pi'};
 % 
-% 18/11-2009 Salomon Eliasson
+% Created by Salomon Eliasson
+% $Id$
 
 colors={'k','g','r','b','c','m','y','rp','gr','p','o','ca','pi'};
 if ~nargin

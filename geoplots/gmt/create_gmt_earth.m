@@ -1,11 +1,12 @@
 function commands = create_gmt_earth(in)
-%%           create_gmt_earth
+% CREATE_GMT_EARTH Main wrapper to gmt interface
 %
 % See help gmt_plot for input details
 %
 % PURPOSE: Create cell strings that will be used in a system call.
 %
-% 2011-02-22 created by Salomon Eliasson
+% Created by Salomon Eliasson
+% $Id$
 
 in = setup_create_gmt_earth(in);                                           
 
@@ -423,6 +424,6 @@ b = step(~(bs>lat));
 if isempty(b), b = lat/3; end
 
 default.ticks = sprintf('%.2fg%.2f/%.2fg%.2f',a(1),b(1),a(1)/2,b(1)/2);
-in = gmt_optargs_struct(in,default);
+in = optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s -R -J -O >> %s.ps',in.ticks,in.filename);

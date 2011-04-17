@@ -34,7 +34,7 @@ persistent initialised
 
 if isempty(initialised)
     if exist('datasets_init', 'file')==2
-        logtext(atmlab('OUT'), 'datasets_config first run, initialising...');
+        logtext(atmlab('OUT'), 'datasets_config first run, initialising...\n');
         initialised = true;
         datasets_init;
     else

@@ -1,4 +1,4 @@
-function [info,files] = test_gmt(in)
+function [files,info] = test_gmt(in)
 %% TEST_GMT
 %
 % Purpose: To test variuos aspecs of gmt_plot. Especially before commiting
@@ -20,18 +20,27 @@ function [info,files] = test_gmt(in)
 %      info  = cellarray of information about each test. The information is
 %              also displayed at the end of the run.
 %
-% 2011-02-23 created by Salomon Eliasson
+% created by Salomon Eliasson
+% $Id$
 
 files = {}; info = {};
 if ~exist('in','var'); in=struct([]); end
-
 
 % SET some defaults
 default.test      = 1:7; % which tests to do (default=all)
 default.verbosity = gmtlab('VERBOSITY');
 od = isfield(in,'outdir');
 default.outdir    = gmtlab('OUTDIR');
-in = gmt_optargs_struct(in,default); 
+in = optargs_struct(in,default); 
+assert(isnumeric(in.test),sprintf('atmlab:%s:bad_input',mfilename),...
+    'in.test must be numeric')
+
+% for the final pdfs
+if isequal(in.test,1:7)
+    in.cols = [2 2 2 1 3 1];
+else
+    in.cols = 2;
+end
 
 if ~ischar(in.outdir)
     in.outdir = tempdir;
@@ -39,9 +48,6 @@ if ~ischar(in.outdir)
 end 
 
 warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
-
-% Offload atmlab-only paths if they are defined
-%removed_paths = temporarily_rmpaths;
 
 [gridded,ungridded] = dummy_data;
 
@@ -54,11 +60,11 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 %TEST: sidebar, nan, projection, center
 [files{end+1},info{end+1}] = TEST3(in,gridded); 
 
-%TEST: custom color table, header_size, map_width, grid lines
-[files{end+1},info{end+1}] = TEST4(in,gridded); 
-
 %TEST: contours, nlevels, annotation format, xunit
-[files{end+1},info{end+1}] = TEST5(in);         
+[files{end+1},info{end+1}] = TEST4(in);         
+
+%TEST: custom color table, header_size, map_width, grid lines
+[files{end+1},info{end+1}] = TEST5(in,gridded); 
 
 %TEST: locations, nodata, regions, map details
 [files,info]               = TEST6(in,files,info);          
@@ -66,8 +72,12 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 %TEST: pspolygon, basemap_axis
 [files{end+1},info{end+1}] = TEST7(in);
 
-% Put paths back in place (removed in the beginning for testing)
-% cellfun(@addpath,removed_paths,'uniformoutput',false);
+% PUT all figure in one pdf
+files{end+1} = combine_pdfs(files,...
+    struct('filename','all_tests','cols',in.cols,'valign','b'));
+
+% DISPLAY combined plot
+exec_gmt_cmd(sprintf('%s %s&',gmtlab('pdfviewer'),files{end}));
 
 files = files(~cellfun('isempty',files));
 info = info(~cellfun('isempty',info));
@@ -120,7 +130,7 @@ function [files,info]        = TEST1(in,gridded,files,info)
 %% TEST: Difference plot, reference=0, nlevels, sidebar
 
 if ~ismember(1,in.test), return, end %then don't do this test
-
+test.display = false; % no just put them all in one pdf using conbine_pdfs
 %% Test 1a
 
 gridded.data = gridded.data-200;  % for difference 
@@ -160,6 +170,7 @@ function [files,info] = TEST2(in,gridded,ungridded,files,info)
 %% TEST: title, unit (gridded and ungridded)
 
 if ~ismember(2,in.test), return, end %then don't do this test
+test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
@@ -173,8 +184,11 @@ c = 'to annotate the South and West axis only if you like. This test uses ';
 d = 'gridded data, where size(data) = [length(lat),length(lon)]';
 info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
 
-test.title        = 'ungridded: title², unit';
-test.filename = 'Test2b';
+test.title           = 'ungridded: legend';
+test.filename        = 'Test2b';
+test.unit            = 'kg/m²';
+test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
+test.legend.tick_spacing = 25;
 files{end+1} = gmt_plot(gmt_catstruct(ungridded,test,in),'data');
 
 a = 'Test2b demonstrates the same as Test2a but for ungridded data, where';
@@ -186,7 +200,7 @@ function [file,info] = TEST3(in,gridded)
 %% TEST: sidebar, nan, projection, center
 
 if ~ismember(3,in.test), file='';info='';return, end %then don't do this test
-
+test.display = false; % no just put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
 test.title      = 'upper sidebar, NaN, Hammer projection, center';
 test.projection = 'H';      % hammer
@@ -204,10 +218,55 @@ f = 'if given via in.datarange = [v1,v2]. The color for these values can';
 g = 'changed using in.color_foreground (default is ''255/255/255'' (white))';
 info = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f,g);
 
-function [file,info] = TEST4(in,gridded) 
-%% TEST: custom color table, header_size, map_width, grid lines, region
+function [file,info] = TEST4(in)
+%% TEST: contours, nlevels, annotation format, xunit
 
 if ~ismember(4,in.test), file=''; info = ''; return, end %then don't do this test
+test.display = false; % no just put them all in one pdf using conbine_pdfs
+
+
+
+test.lat = -90:90;
+test.lon = -180:180;
+for j = test.lat
+    for i = test.lon
+        test.data(j+91,i+181) = ((0.1*sin((j+91)/18*pi))+sin((j+91)/180*pi))*(0.1*cos(i/36*pi)+cos(i/360*pi));
+    end
+end
+
+test.title = 'contours, HSV colours, horiz. legend';
+test.unit = 'No unit';
+test.xunit = 'No unit either';
+test.projection = 'H';
+test.nlevels = 10;
+test.tick_annotation_format = '%.1lf';
+test.legend.orientation = 'h';
+test.contourline.spacing=0.1;
+test.contourline.range=[0 1];
+test.contourline.linethick=1;
+test.contourline.more='-T1c/0.001c:LH';
+test.datarange = [0, 1];
+test.color_background = '255/0/0';
+test.color_foreground = '255/255/0';
+test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
+test.colorrange.color_model = 'HSV';
+test.nlevels = 5;
+test.filename = 'Test4';
+file = gmt_plot (gmt_catstruct(test,in), 'data');
+
+a = 'Test 5 demonstrates contour maps, where you can optionally choose to show';
+b = 'High and Lows in the of the data. Test 5 also demonstrates that you can';
+c = 'have x and y-labels (in.xunit and in.unit) on the around the legend';
+d = 'Using the custom colortable (in.colorrange) you can also use';
+e = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
+
+info = sprintf('%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e);
+
+function [file,info] = TEST5(in,gridded) 
+%% TEST: custom color table, header_size, map_width, grid lines, region
+
+if ~ismember(5,in.test), file=''; info = ''; return, end %then don't do this test
+test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 % Add some annotations some intervals.
 if ~isfield(in,{'stepsize','nlevels'}) 
@@ -238,7 +297,7 @@ test.colorrange.colors  = {{0,'0/0/255'},...
 test.colorrange.color_model = 'RGB';
 % makes a colortable that goes from blue to white to green to black to red in RGB format.
 % ------------------------
-test.filename = 'Test4';
+test.filename = 'Test5';
 
 file = gmt_plot(gmt_catstruct(gridded,test,in),'data');
 
@@ -250,51 +309,11 @@ e = 'and in this test its demonstrated how to confine the figure to certain';
 f = 'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''';
 info = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f);
 
-function [file,info] = TEST5(in)
-%% TEST: contours, nlevels, annotation format, xunit
-
-if ~ismember(5,in.test), file=''; info = ''; return, end %then don't do this test
-
-test.lat = -90:90;
-test.lon = -180:180;
-for j = test.lat
-    for i = test.lon
-        test.data(j+91,i+181) = ((0.1*sin((j+91)/18*pi))+sin((j+91)/180*pi))*(0.1*cos(i/36*pi)+cos(i/360*pi));
-    end
-end
-
-test.title = 'contours, HSV colours, horiz. legend';
-test.unit = 'No unit';
-test.xunit = 'No unit either';
-test.projection = 'H';
-test.nlevels = 10;
-test.tick_annotation_format = '%.1lf';
-test.legend.orientation = 'h';
-test.contourline.spacing=0.1;
-test.contourline.range=[0 1];
-test.contourline.linethick=1;
-test.contourline.more='-T1c/0.001c:LH';
-test.datarange = [0, 1];
-test.color_background = '255/0/0';
-test.color_foreground = '255/255/0';
-test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
-test.colorrange.color_model = 'HSV';
-test.nlevels = 5;
-test.filename = 'Test5';
-file = gmt_plot (gmt_catstruct(test,in), 'data');
-
-a = 'Test 5 demonstrates contour maps, where you can optionally choose to show';
-b = 'High and Lows in the of the data. Test 5 also demonstrates that you can';
-c = 'have x and y-labels (in.xunit and in.unit) on the around the legend';
-d = 'Using the custom colortable (in.colorrange) you can also use';
-e = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
-
-info = sprintf('%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e);
-
 function [files,info] = TEST6(in,files,info)
 %% TEST: locations, nodata 
 
 if ~ismember(6,in.test), return, end %then don't do this test
+test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 names    = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki',...
     'Oberstdorf','Amsterdam','Lauchhammer','Freiburg'};
@@ -329,16 +348,15 @@ files{end+1} = gmt_plot(gmt_catstruct(test,in));
 for i = 1:length(names)
     test.locations(i).textsize = 15;
 end
-test.region     = '-10/40/40/70';
-test.figuretype = 'png';
-test.title      = 'Europe (medium details in a .png-file)';
+test.region     = '-10/30/45/70';
+test.title      = 'Europe';
 test.coast.rivers = 'r';
 test.filename = 'Test6b';
 files{end+1}    = gmt_plot(gmt_catstruct(test,in));
 
 % TEST: smallregion
 test.title = 'Kiruna (high details)';
-test.region = '12/22/65/70';
+test.region = '16/22/66.2/70';
 test.coast.rivers = 'a';
 test.filename = 'Test6c';
 files{end+1} = gmt_plot(gmt_catstruct(test,in));
@@ -353,6 +371,7 @@ function [file,info] = TEST7(in)
 %% TEST: pspolygon
 
 if ~ismember(7,in.test), file=''; info = '';return, end %then don't do this test
+test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 % REGIONS FROM eliasson11:assessing_acp
 a = [-12    80    16   100;...
@@ -395,15 +414,3 @@ a = 'Test 7 demonstrates that you can draw polygons on a map. E.g. useful if you
 b = 'want to draw regions of interest on a map';
 
 info = sprintf('%s\n%s\n',a,b);
-
-function allpaths = temporarily_rmpaths
-%% temporarily_rmpaths;
-% Offload atmlab paths if they are defined
-% In order to ensure gmtlab is independent av atmlab
-
-allpaths = gmt_splitstring(path,':');
-AP = regexp(allpaths,'/atmlab','match');
-GP = regexp(allpaths,'/gmt','match');
-index = ~cellfun('isempty',AP) & cellfun('isempty',GP);
-allpaths = allpaths(index);
-cellfun(@rmpath,allpaths,'uniformoutput',false);

@@ -19,7 +19,8 @@ function filecpt = makepolar(tickval,in)
 %             that should be white. Gradient is from blue to white to red,
 %             and the grandient is equal on both sides of the reference. 
 %
-% 2011-01-25 created by Salomon Eliasson
+% Created by Salomon Eliasson
+% $Id$
 
 % string format to file 
 diff = tickval(2)-tickval(1);
@@ -33,41 +34,36 @@ prtstr=sprintf('%%.%df',b);
 strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
     prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
-% WHITEBOXES
-if ~isfield(in,'nwhite')
-    nw = ceil((length(tickval)-1)/10);
-else
-    nw = in.nwhite;
-end
 % REFERENCE
 if ~isfield(in,'reference')
     ref = (max(tickval)+min(tickval))/2;
 else ref = in.reference;
 end
 
-[BT,TT,nw] = get_white_boxes(tickval,ref,nw);
+[BT,TT,nw] = get_white_boxes(tickval,ref,in);
 
-n_colored_steps = [ length(tickval(1:BT-1)) length(tickval(TT+1:end))];
+n_colored_steps = [BT TT];
 
-inc = 255/max(n_colored_steps); % step gradient
+N = max(n_colored_steps);
+inc = 255/N; % step gradient
+vect = 255-[1:N]*inc;
 
 ctable = zeros(length(tickval)-1,3);
+
+
 % BLUE 
-for i = 1:BT-1
-    ctable(BT-i,:) = abs([255-i*inc,255-i*inc,255]);
-end
+tmp = abs([vect(BT:-1:1);vect(BT:-1:1);repmat(255,1,BT)])';
+len = size(tmp,1);
+ctable(1:len,:) = tmp;
 
 % WHITE
-if ~isempty(BT:TT-1)
-    ctable(BT:TT-1,:) = repmat(255,nw,3);
-elseif isempty(BT)
-    ctable(1:TT-1,:) = repmat(255,nw,3);
-end
+ctable(len+1:len+nw,:) = repmat([255,255,255],nw,1);
+len = len+nw;
 
 % RED
-for i = 1:length(tickval)-TT
-    ctable(TT-1+i,:) = abs([255 255-i*inc,255-i*inc]);
-end
+tmp = abs([repmat(255,1,TT);vect(TT:-1:1);vect(TT:-1:1)])';
+ctable(len+1:end,:) = tmp(end:-1:1,:);
+
 
 %% Make a cptfile out of it
 
@@ -122,57 +118,59 @@ fclose(fid);
 %   ||||||
 %   vvvvvv
 
-function [BT,TT,nw] = get_white_boxes(tickval,ref,nw)
+function [BT,TT,nw] = get_white_boxes(tickval,ref,in)
 %% get_white_boxes
 
-if nw>length(tickval)-1
-    error('gmtlab:input','number of white boxes (%.0f) exceedes nlevels (%.0f)',nw,length(tickval)-1)
+% WHITEBOXES
+if ~isfield(in,'nwhite')
+    nw = ceil((length(tickval)-1)/10);
+    input = false;
+else
+    nw = in.nwhite;
+    input=true;
 end
-% FIND WHITE TICKS
-len = 1:length(tickval);
-if ~mod(nw,2) %even nwhites
-    reftick = len(abs(tickval-ref) == min(abs(tickval-ref)));
-    if ~ ( length(reftick)==2 )
-        BT = len(reftick)-nw/2;
-        TT = len(reftick)+nw/2;
-        if BT <= 0
-            BT = [];
-            nw = nw - nw/2; %need to chop away bottom half
-        end
-        if ref > tickval(end), BT = len(end);end
-        if TT >= len(end)
-            TT = [];
-            nw = nw - nw/2; %need to chop away top half
-        end
-        if ref < tickval(1), TT = 1;end
-    else
-        % right in between 2 ticks
-        nw=nw+1;
-        disp('Reference is exactly between two ticks. Increasing number of white boxes so that the number is odd instead')
-        [BT,TT] = get_white_boxes(tickval,ref,nw);
-        return
-    end
-else % odd nwhites
-    if ~ismember(ref,tickval)
-        tmp = len(tickval<=ref);
-        if ~isempty(tmp)
-            BT =  tmp(end);
-        else
-            BT = [];
-             nw = nw - floor(nw/2); %need to chop away bottom half
-        end
-        tmp = len(tickval>=ref);
-        if ~isempty(tmp)
-            TT = tmp(1);
-        else
-            TT = [];
-            nw = nw - floor(nw/2); %need to chop top bottom half
-        end
-    else
-        % right in between 2 ticks
-        nw=nw+1;
-        disp('Reference is exactly on a tick. Increasing the number of white boxes so that the number is even instead')
-        [BT,TT] = get_white_boxes(tickval,ref,nw);
-        return
+
+assert(nw<length(tickval)-1,...
+    'gmtlab:input','number of white boxes (%.0f) exceedes nlevels (%.0f)',...
+    nw,length(tickval)-1)
+
+
+% ADJUST nwhite if ref is on a contour line
+if ismember(ref,tickval) && mod(nw,2) 
+    % if ref is on one of the edges and nwhite is odd, increase nwhite by 1
+    nw = nw+1;
+    if input
+        warning('atmlab:badInput',...
+            '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is exactly on a contour level,',...
+            'i.e in.nwhite must be an even number. Increasing ',in.nwhite,nw);
     end
 end
+
+% ADJUST nwhite if ref is inbetween contour lines
+if ~ismember(ref,tickval) && ~mod(nw,2) 
+    % if ref is in between the edges and nwhite is even, decrease by 1
+    nw = nw-1;
+    if input
+        warning('atmlab:badInput',...
+            '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is inbetween contour levels,',...
+            'i.e in.nwhite must be an odd number. Decreasing ',in.nwhite,nw);
+    end
+end
+
+whitedomain = (nw + mod(nw,2))/2;   
+
+% BT bottom ticks
+BT = sum(tickval < ref ) -whitedomain;
+% TT top ticks
+TT = sum(tickval > ref ) -whitedomain;
+
+% zero it if it's bellow 0
+BT = BT*(BT>=0);
+TT = TT*(TT>=0);
+
+% if reference is on the EDGE
+if ismember(ref,[tickval(1),tickval(end)])
+    nw = nw/2;
+end
+
+assert(BT+TT+nw == length(tickval)-1,'Salomon:Bug','BT+TT+nw ~= length(tickval)-1')

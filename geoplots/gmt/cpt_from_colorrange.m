@@ -1,5 +1,5 @@
 function filecpt = cpt_from_colorrange(colorrange)
-%% cpt_from_colorrange
+% CPT_FROM_COLORRANGE configure colortable to desired color values and ranges
 %
 % Purpose: Make a colortable file with desired color values and ranges, that
 % will be passed in the makecpt function that uses this input to make a color
@@ -13,7 +13,8 @@ function filecpt = cpt_from_colorrange(colorrange)
 %
 % OUT: filename
 %
-% 2011-02-21 created by Salomon Eliasson
+% Created by Salomon Eliasson
+% $Id$
 
 % COLOR MODEL
 if ~isfield(colorrange,'color_model')

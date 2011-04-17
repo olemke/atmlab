@@ -1,5 +1,5 @@
 function file = append_tickannotations(file,annotations)
-%% append_tickannotations
+%% APPEND_TICKANNOTATIONS change legend annotations to whatever you want.
 %
 % Purpose: function that makes it easy to change the legend annotations	to
 % whatever you	want.
@@ -10,7 +10,8 @@ function file = append_tickannotations(file,annotations)
 % 
 % OUT: file '%s'
 %
-% 2011-01-27 created by Salomon Eliasson
+% Created by Salomon Eliasson
+% $Id$
 
 % READ OLD FILE
 fid = fopen(file);

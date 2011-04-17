@@ -18,8 +18,8 @@ Created the XML format for data files.
 
 Salomon Eliasson <s.eliasson@ltu.se>
 ---
-GMT plotting interface.
-
+GMT plotting interface, 
+some other small functions
 
 Gerrit Holl <gerrit.holl@ltu.se>
 ---

@@ -1,3 +1,33 @@
+2011-04-17  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-77
+
+	* datasets/datasets_config.m: Added missing '\n' to logtext
+
+	* AUTHORS: Small edit
+
+	* geoplots/gmt/test_gmt.m:
+	1) Added a tick_spacing test.
+	2) Use combine_pdfs to put all the output figures in one file.
+
+	* geoplots/gmt/makepolar.m: Refined and fixed new bug.
+
+	* geoplots/gmt/gmt_plot.m:
+	1) Change the default datafield to plot from 'datafield' to 'data'
+	2) Stopped using gmt_optargs_struct
+	3) Included onCleanup function to make sure that gmt_plot is not
+	left hanging in a temporary directory.
+	4) Include a quickstart example at the end of the help section.
+
+	* geoplots/gmt/
+	{homogenize_datalatlon.m, list_colors.m, create_gmt_earth.m,
+	cpt_from_colorrange.m, append_tickannotations.m}:
+
+	Fixed headers.
+
+	* geoplots/gmt/gmt_optargs_struct.m: No longer use this. Use
+	atmlabs version instead
+
 2011-04-16  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-76
