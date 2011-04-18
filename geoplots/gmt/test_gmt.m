@@ -184,7 +184,9 @@ c = 'to annotate the South and West axis only if you like. This test uses ';
 d = 'gridded data, where size(data) = [length(lat),length(lon)]';
 info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
 
-test.title           = 'ungridded: legend';
+test.title           = 'ungridded: legend, coastlines';
+test.coast.width     = 1;
+test.coast.color     = '255/255/255';
 test.filename        = 'Test2b';
 test.unit            = 'kg/m²';
 test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')

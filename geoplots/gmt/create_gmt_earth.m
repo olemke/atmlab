@@ -298,6 +298,10 @@ if ~isfield(in.coast,'resolution')
     end
 else a.resolution = in.coast.resolution;
 end
+
+if isfield(in.coast,'color')
+    a.color = in.coast.color;
+end
 a.rivers = in.coast.rivers;
 a.width = in.coast.width;
 

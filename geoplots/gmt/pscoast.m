@@ -24,12 +24,18 @@ end
 
 if isfield(in,'rivers')
     pscoast = sprintf('%s -I%s',pscoast,in.rivers);
+    if isfield(in,'color') % for rivers
+        pscoast = sprintf('%s/%s',pscoast,in.color);
+    end
 end
 
 %Draw coastlines. Append attributes [Defaults: width = 1, color = black, texture = solid].
 if isfield(in,'width')
     pscoast = sprintf('%s -W%fp',pscoast,in.width);
 else pscoast = sprintf('%s -W',pscoast);
+end
+if isfield(in,'color') %for coast
+    pscoast = sprintf('%s/%s',pscoast,in.color);
 end
 
 % selects Overlay plot mode and assuming more pscode will be appended

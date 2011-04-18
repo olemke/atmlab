@@ -1,3 +1,12 @@
+2011-04-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-79
+
+	* geoplots/gmt/{gmt_plot.m, pscoast.m, create_gmt_earth.m}
+	Added new option to change the color of the coastline and rivers
+
+	* geoplots/gmt/test_gmt.m: Test coastlines
+
 2011-04-17  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-78

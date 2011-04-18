@@ -184,6 +184,10 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  width              |%i| Width of coastlines | .3 |
 %                     ----------------------
+%  color              |%s| color of coast and rivers in rgb 
+%                     e.g. '255/255/255' gives white coastlines
+%                     | COLOR_BAGROUND |
+%                     ----------------------
 %
 %--------------------------------------------------------------------------
 %
