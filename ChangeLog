@@ -1,12 +1,12 @@
 2011-04-18  Oliver Lemke  <olemke@core-dump.info>
 
-	* atmlab-1-0-82
+	* atmlab-1-0-83
 
 	* handy/combine_pdfs.m: Fix file ending.
 
 2011-04-18  Oliver Lemke  <olemke@core-dump.info>
 
-	* atmlab-1-0-81
+	* atmlab-1-0-82
 
 	* handy/combine_pdfs.m:
 
@@ -19,7 +19,7 @@
 
 2011-04-18	Gerrit Holl	<gerrit.holl@ltu.se>
 
-	* atmlab-1-0-80
+	* atmlab-1-0-81
 
 	* collocations/read_collocs_data_mean.m,
 	  datasets/common_read_collocation_cpr_mhs.m,
@@ -31,19 +31,29 @@
 	* atmlab/addsite.m: Added
 	  - Move this functionality to seperate function, as this too needs to
 	  be called only when needed.
-	
+
 	* atmlab/atmlab.m: Expanded
 	  - Added ATMLAB_PATH. This can be used to override the path derived
 	  from the location of atmlab_init, but is otherwise used to store the
 	  ATMLAB_PATH by atmlab_init for usage in postponed initialisation
 	  functions.
-	
+
 	* atmlab/atmlab_init.m: Expanded
 	  - Set ATMLAB_PATH for later postponed initialisation.
 
 	* datasets/datasets_config.m: Expanded
 	  - Do postponed initialisation, including calling addpath when
 	  needed.
+
+2011-04-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-80
+
+	* files/create_tmpfolder.m: Allow user to bypass the need for
+	atmlab('WORK_AREA'), by optionally providing an alternative
+	directory to use. 
+
+	* handy/combine_pdfs.m: Make sure there is a valid outdir
 
 2011-04-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
