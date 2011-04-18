@@ -26,8 +26,11 @@ function data = common_read_hirscs(file)
 isgzipped = strcmp(file(end-2:end), '.gz');
 
 if isgzipped % gunzip first
-    filenames = gunzip(file, '/tmp');
-    file = filenames{1};
+    newfile = tempname(atmlab('WORK_AREA'));
+    system(['zcat ' file '>' newfile]); % 3x faster than ML gunzip
+    file = newfile;
+%    filenames = gunzip(file, '/tmp');
+%    file = filenames{1};
 end
 
 ncid = netcdf.open(file, 'NC_NOWRITE');

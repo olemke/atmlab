@@ -1,3 +1,29 @@
+2011-04-18	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* collocations/read_collocs_data_mean.m,
+	  datasets/common_read_collocation_cpr_mhs.m,
+	  datasets/common_read_avhrr.m,
+	  datasets/common_read_hirscs.m: Changed implementation
+	  - Reluctantly realised system('zcat foo>bar') is three times faster
+	    than gunzip('foo') and changed the latter to the former
+
+	* atmlab/addsite.m: Added
+	  - Move this functionality to seperate function, as this too needs to
+	  be called only when needed.
+	
+	* atmlab/atmlab.m: Expanded
+	  - Added ATMLAB_PATH. This can be used to override the path derived
+	  from the location of atmlab_init, but is otherwise used to store the
+	  ATMLAB_PATH by atmlab_init for usage in postponed initialisation
+	  functions.
+	
+	* atmlab/atmlab_init.m: Expanded
+	  - Set ATMLAB_PATH for later postponed initialisation.
+
+	* datasets/datasets_config.m: Expanded
+	  - Do postponed initialisation, including calling addpath when
+	  needed.
+
 2011-04-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-79

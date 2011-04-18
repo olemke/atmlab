@@ -17,9 +17,12 @@ function data = common_read_collocation_cpr_mhs(file)
 % $Id$
 
 
-gunzipped = gunzip(file, atmlab('WORK_AREA'));
-data = loadncfile(gunzipped{1});
-delete(gunzipped{1});
+tmp = tempname(atmlab('WORK_AREA'));
+system(['zcat ' file '>' tmp); % 3x faster than gunzip
+%gunzipped = gunzip(file, atmlab('WORK_AREA'));
+%data = loadncfile(gunzipped{1});
+data = loadncfile(tmp);
+delete(tmp);
 data.info = data.global_attributes;
 
 data.version = ['colloc:' data.info.software_version ':' ...

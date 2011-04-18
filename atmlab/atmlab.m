@@ -123,6 +123,13 @@
 % Path to main directory of atmlab-data
 % atmlab-data is a compilation of useful data for various atmlab tasks.
 % It is available in the atmlab-data/trunk directory of the rt svn repo.
+%--------------------------------------------------------------------------
+% ATMLAB_PATH
+%
+% Path to main directory of atmlab
+% Can be used by the user to override automatic determination of this file,
+% or is otherwise set by initialisation functions for other functions to
+% use.
 
 
 % 2003-07-06   Created by Patrick Eriksson.
@@ -151,3 +158,4 @@ A.SCREEN_WIDTH      = 70;
 A.SITE              = NaN;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = NaN;
+A.ATMLAB_PATH       = NaN;

@@ -25,9 +25,13 @@ function M = read_collocs_data_mean(fn, cols, c)
 %% read data
 
 logtext(atmlab('OUT'), 'Reading %s\n', fn);
-filenames = gunzip(fn, atmlab('WORK_AREA'));
-ncid = netcdf.open(filenames{1}, 'NOWRITE');
+tmp = tempname(atmlab('WORK_AREA'));
+system(['zcat ' fn '>' tmp]); % 3x faster than ML gunzip
+%filenames = gunzip(fn, atmlab('WORK_AREA')); 
+%ncid = netcdf.open(filenames{1}, 'NOWRITE');
+ncid = netcdf.open(tmp, 'NOWRITE');
 %delete(filenames{1});
+delete(tmp);
 cleanupObj = onCleanup(@()netcdf.close(ncid));
 varids = nan(size(cols));
 varwidth = zeros(size(cols));

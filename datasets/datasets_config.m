@@ -33,6 +33,7 @@ persistent A
 persistent initialised
 
 if isempty(initialised)
+    addsite
     if exist('datasets_init', 'file')==2
         logtext(atmlab('OUT'), 'datasets_config first run, initialising...\n');
         initialised = true;

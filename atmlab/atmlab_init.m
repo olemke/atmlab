@@ -101,20 +101,10 @@ else
   randn( 'state', rand_state );
 end
 
-% Add directory for site-specific settings, initialise subsystems
+% Add directory for site-specific settings
 
-if ~isnan(atmlab('SITE'))
-    sitedir = fullfile(toppath, 'site-specific', atmlab('SITE'));
-    if exist(sitedir, 'dir')
-        addpath(sitedir);
-        % execute any initialisation m-files
-        W = whichfiles('*init.m', sitedir);
-        for i = 1:length(W)
-            run(W{1});
-        end
-    else
-        warning('ATMLAB:unkownsite','Unknown site: %s',atmlab('SITE'))
-    end
+if isnan(atmlab('ATMLAB_PATH'))
+    atmlab('ATMLAB_PATH', toppath);
 end
 
 % define some aliases
