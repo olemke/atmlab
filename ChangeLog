@@ -1,4 +1,19 @@
+2011-04-18  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-81
+
+	* handy/combine_pdfs.m:
+
+	Update docs.
+
+	Use create_tmpfolder/delete_tmpfolder to make the LaTeX run safer.
+	This way we don't have to call rm on unsanitized input.
+
+	* ChangeLog: Add missing version number for previous commit.
+
 2011-04-18	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-1-0-80
 
 	* collocations/read_collocs_data_mean.m,
 	  datasets/common_read_collocation_cpr_mhs.m,

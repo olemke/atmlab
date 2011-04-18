@@ -3,7 +3,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %
 % USAGE: outfile = combine_pdfs(pdffiles, options) 
 %
-% E.g. file = combine_pdfs(files,struct('cols',[2 2 2 2 1],..)
+% E.g. file = combine_pdfs(files,struct('cols',[2 2 2 2 1],...))
 %
 % PURPOSE:  Merge several pdf's (one page each) into a pdf file
 %
@@ -26,7 +26,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %       valign        |%s    vertical alignment          | m
 %                     |      m = middle, b = bottom      |
 %
-% OUT:      outfile             string; name of the pdffile created
+% OUT:      outfile             string; the fullpath to the pdffile created
 %
 % NOTE: The files are appended left to right and from top to bottom.
 %       Arguments may be:
@@ -71,7 +71,7 @@ end
 %% Make sure filenames are in a row vector and non-empty
 pdffiles = pdffiles(:)';
 pdffiles = pdffiles(~cellfun('isempty',pdffiles));
-assert(length(pdffiles) > 0, 'List of input pdf files is empty');
+assert(~isempty(pdffiles), 'List of input pdf files is empty');
 
 %% We trust that the user can count! Not really, better double check here
 if (length(options.cols) ~= 1 && sum(options.cols) ~= length(pdffiles))
@@ -135,16 +135,15 @@ end
 
 function file = create_pdf_from_layout_with_latex(layout, options)
 
+tmpfolder = create_tmpfolder();
+
 %% Hook up a cleanup callback.
 % In case we screw up the LaTeX run, we don't want to leave any
 % evidence behind.
-c = onCleanup(@() ...
-    exec_gmt_cmd(sprintf('cd %s && rm -f %s.{log,aux,tex}', ...
-                         options.outdir, options.filename), ...
-                 gmtlab('verbosity')));
+c = onCleanup(@() delete_tmpfolder(tmpfolder));
 
 %% Assemble our pretty tex file
-file = [[options.outdir '/' options.filename], '.tex'];
+file = [tmpfolder '/out.tex'];
 fid = fopen(file,'w');
 fprintf(fid,'\\documentclass[a4paper,10pt]{report}');
 
@@ -184,8 +183,12 @@ fprintf(fid,'\\end{document}\n');
 fclose(fid);
 
 %% Hand the TeX file over to pdflatex
-exec_gmt_cmd(sprintf('pdflatex -interaction batchmode -output-directory %s %s.tex', ...
-                     options.outdir, options.filename), ...
+exec_gmt_cmd(sprintf('pdflatex -interaction batchmode -output-directory %s out.tex', ...
+                     tmpfolder), ...
+             gmtlab('verbosity'));
+
+exec_gmt_cmd(sprintf('cd %s && mv out.pdf "%s/%s"', ...
+                     tmpfolder, options.outdir, options.filename), ...
              gmtlab('verbosity'));
 
 end
