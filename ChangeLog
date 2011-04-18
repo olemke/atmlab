@@ -1,5 +1,11 @@
 2011-04-18  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-82
+
+	* handy/combine_pdfs.m: Fix file ending.
+
+2011-04-18  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-81
 
 	* handy/combine_pdfs.m:
