@@ -50,12 +50,18 @@ default.secret_latex_spacing_tweak = 0.2;
 
 options = optargs_struct(options, default);
 
+
 %% Sanity checks
 assert(options.vspace >= 0, 'Vertical spacing must be > 0');
 assert(options.hspace >= 0, 'Horizontal spacing must be > 0');
 assert(length(options.valign) == 1 && sum('mb' == options.valign), ...
        'Vertical alignment must be either ''m'' or ''b''');
+if isnan(options.outdir)
+   options.outdir = tempdir; 
+end
+assert(isdir(options.outdir),'%s does not exist',options.outdir)
 
+   
 %% If we got a regexp, use ls to get the file list
 if ischar(pdffiles)
     files = exec_gmt_cmd(sprintf('ls -1 %s', pdffiles), gmtlab('verbosity'));
