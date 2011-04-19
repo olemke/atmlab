@@ -312,7 +312,7 @@ default.cptfile = in.plot.color.cptfile;
 default.grdfile = in.grdfile;
 
 for i = 1:length(in.contourline)
-    a(i) = gmt_catstruct(default,in.contourline(i));
+    a(i) = catstruct(default,in.contourline(i));
 end
 
 

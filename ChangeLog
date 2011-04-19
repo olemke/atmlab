@@ -1,3 +1,21 @@
+2011-04-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-84
+
+	* geoplots/gmt/gmt_plot.m: Use create_tmpfolder(tempdir) instead
+	of create_tmpfolder in case atmlab('WORK_AREA') is uninitialized
+
+	* geoplots/gmt/gmt_catstruct.m: Deleted. adapted handy/catstruct.m
+	instead.
+
+	* handy/catstruct.m: Now also works recursively properly fields in
+	a structure that are also structures.
+
+	* geoplots/gmt/{ test_gmt.m, create_gmt_earth.m}:
+	gmt_catstruct->catstruct
+
+	* geoplots/gmt/psscale.m: changed error message
+
 2011-04-18  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-83

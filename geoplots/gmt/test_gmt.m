@@ -140,7 +140,7 @@ test.legend.sidebar = 3; % both above and below
 test.basemap_axis = 'nesw';
 test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
 test.filename = 'Test1a';
-files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 a = 'Test 1a demonstrates the mypolar colortable which is similar to polar.cpt';
 b = 'Using in.ctable=''mypolar'' you can define where the reference value should be.';
 c = 'The white color is then centered around the reference value (in.reference).';
@@ -158,7 +158,7 @@ test.header_size = 20;
 test.header_offset = -.5; %move the header down a bit because of smaller header size
 test.title = 'Diff plot,nlevels=15,ref=0,nwhite=6,sidebar=2 (above),header';
 test.filename = 'Test1b';
-files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = 'Test 1b demonstrates that you can change the number of intervals that are';
 b = 'colored white while using the mypolar colortable (in.nwhite). You can also';
@@ -176,7 +176,7 @@ test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
 test.filename = 'Test2a';
-files{end+1} = gmt_plot(gmt_catstruct(gridded,test,in),'data');
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = 'Test 2a demonstrates that you can include some special';
 b = 'characters in in.title and in.unit and that you can toggle in.basemap_axis';
@@ -191,7 +191,7 @@ test.filename        = 'Test2b';
 test.unit            = 'kg/m²';
 test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
 test.legend.tick_spacing = 25;
-files{end+1} = gmt_plot(gmt_catstruct(ungridded,test,in),'data');
+files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
 a = 'Test2b demonstrates the same as Test2a but for ungridded data, where';
 b = 'size(data) = size(lat) = size(lon). This is e.g. good for plotting satellite';
@@ -209,7 +209,7 @@ test.projection = 'H';      % hammer
 test.center     = 180;      % Center map at given center longitude
 test.datarange  = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
 test.filename = 'Test3';
-file = gmt_plot(gmt_catstruct(gridded,test,in),'data');
+file = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = 'Test3 demonstrates the Hammer projection (one of many available projections),';
 b = 'using in.projection = ''H''. The test also demonstrates that you can';
@@ -254,7 +254,7 @@ test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
 test.filename = 'Test4';
-file = gmt_plot (gmt_catstruct(test,in), 'data');
+file = gmt_plot (catstruct(test,in), 'data');
 
 a = 'Test 5 demonstrates contour maps, where you can optionally choose to show';
 b = 'High and Lows in the of the data. Test 5 also demonstrates that you can';
@@ -301,7 +301,7 @@ test.colorrange.color_model = 'RGB';
 % ------------------------
 test.filename = 'Test5';
 
-file = gmt_plot(gmt_catstruct(gridded,test,in),'data');
+file = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = 'Test4 demonstrates that you can easily make your own custom colortable.';
 b = 'You can also insert your own legend annotations to be used instead of';
@@ -344,7 +344,7 @@ test.title = 'SatGroup locations';
 test.nodata = true;
 test.region = '-20/160/-30/70';
 test.filename = 'Test6a';
-files{end+1} = gmt_plot(gmt_catstruct(test,in));
+files{end+1} = gmt_plot(catstruct(test,in));
 
 % TEST: mediumregion
 for i = 1:length(names)
@@ -354,14 +354,14 @@ test.region     = '-10/30/45/70';
 test.title      = 'Europe';
 test.coast.rivers = 'r';
 test.filename = 'Test6b';
-files{end+1}    = gmt_plot(gmt_catstruct(test,in));
+files{end+1}    = gmt_plot(catstruct(test,in));
 
 % TEST: smallregion
 test.title = 'Kiruna (high details)';
 test.region = '16/22/66.2/70';
 test.coast.rivers = 'a';
 test.filename = 'Test6c';
-files{end+1} = gmt_plot(gmt_catstruct(test,in));
+files{end+1} = gmt_plot(catstruct(test,in));
 
 a = 'Test 6 demonstrates that you can plot points and text on a map, and';
 b = 'demonstrates that there are several map resolutions available.';
@@ -410,7 +410,7 @@ test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g','g','g','g','g','g','g','g',
 test.nodata=true;
 test.basemap_axis='nWeS';
 test.filename = 'TEST7';
-file = gmt_plot(gmt_catstruct(test,in));
+file = gmt_plot(catstruct(test,in));
 
 a = 'Test 7 demonstrates that you can draw polygons on a map. E.g. useful if you';
 b = 'want to draw regions of interest on a map';

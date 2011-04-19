@@ -524,7 +524,18 @@ end
 
 % CD to outdir so that the temporary .gmtfiles are not saved at '.'. Make
 % sure I cleanup after I'm done
-in.tmpdir = create_tmpfolder;p = pwd();
+try
+    in.tmpdir = create_tmpfolder;
+catch ME
+    if strcmp(ME.identifier, 'atmlab:input:undefined')
+        in.tmpdir = create_tmpfolder(tempdir);
+        if in.verbosity
+            fprintf('atmlab(''WORK_AREA'') is not initialized. Work area is set to: %s\n',in.tmpdir)
+        end
+    end
+end
+
+p = pwd();
 onCleanup(@() cleanup(in.tmpdir,p));
 cd(in.tmpdir);
 

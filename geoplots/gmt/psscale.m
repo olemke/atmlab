@@ -59,7 +59,7 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
         case 3
             str = '-E';
         otherwise
-            error('gmtlab:input','error in determining sidebar')
+            error(sprintf('gmtlab:%sinput',mfilename),'error in determining sidebar')
     end
     psscale = sprintf('%s %s',psscale,str);
 end
