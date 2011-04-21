@@ -1,3 +1,12 @@
+2011-04-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-85
+
+	* datasets/datasets_config.m: 
+	* site-specific/kiruna/datasets_init.m:
+
+	Added more datasets with paths and regexps to the list
+
 2011-04-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-84

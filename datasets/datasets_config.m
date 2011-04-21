@@ -72,15 +72,30 @@ A.sat2netcdf = nan;
 %
 % For example values and explanation, see atmlab/site-specific/kiruna/datasets_init.m
 
+A.amsua_basedir = nan;
+A.amsua_subdir = nan;
+A.amsua_regexp = nan;
+A.amsua_filename = nan;
+
+A.amsub_basedir = nan;
+A.amsub_subdir = nan;
+A.amsub_regexp = nan;
+A.amsub_filename = nan;
+
+A.avhrr_basedir = nan;
+A.avhrr_subdir = nan;
+A.avhrr_regexp = nan;
+A.avhrr_filename = nan;
+
+A.calipso_basedir = nan;
+A.calipso_subdir = nan;
+A.calipso_regexp = nan;
+A.calipso_filename = nan;
+
 A.cpr_basedir = nan;
 A.cpr_subdir = nan;
 A.cpr_regexp = nan;
 A.cpr_filename = nan;
-
-A.cloudsat_2B_CWC_RO_basedir = nan;
-A.cloudsat_2B_CWC_RO_subdir = nan;
-A.cloudsat_2B_CWC_RO_regexp = nan;
-A.cloudsat_2B_CWC_RO_filename = nan;
 
 A.cloudsat_1B_CPR_basedir = nan;
 A.cloudsat_1B_CPR_subdir = nan;
@@ -92,6 +107,16 @@ A.cloudsat_2B_GEOPROF_subdir = nan;
 A.cloudsat_2B_GEOPROF_regexp = nan;
 A.cloudsat_2B_GEOPROF_filename = nan;
 
+A.cloudsat_2B_CWC_RO_basedir = nan;
+A.cloudsat_2B_CWC_RO_subdir = nan;
+A.cloudsat_2B_CWC_RO_regexp = nan;
+A.cloudsat_2B_CWC_RO_filename = nan;
+
+A.cloudsat_2B_CWC_RVOD_basedir = nan;
+A.cloudsat_2B_CWC_RVOD_subdir = nan;
+A.cloudsat_2B_CWC_RVOD_regexp = nan;
+A.cloudsat_2B_CWC_RVOD_filename = nan;
+
 A.cloudsat_2C_PRECIP_COLUMN_basedir = nan;
 A.cloudsat_2C_PRECIP_COLUMN_subdir = nan;
 A.cloudsat_2C_PRECIP_COLUMN_regexp = nan;
@@ -102,43 +127,68 @@ A.cloudsat_ECMWF_AUX_subdir = nan;
 A.cloudsat_ECMWF_AUX_regexp = nan;
 A.cloudsat_ECMWF_AUX_filename = nan;
 
-A.amsua_basedir = nan;
-A.amsua_subdir = nan;
-A.amsua_regexp = nan;
-A.amsua_filename = nan;
-
-A.amsub_basedir = nan;
-A.amsub_subdir = nan;
-A.amsub_regexp = nan;
-A.amsub_filename = nan;
-
-A.mhs_basedir = nan;
-A.mhs_subdir = nan;
-A.mhs_regexp = nan;
-A.mhs_filename = nan;
+A.firstline_data = '';
 
 A.hirs_basedir = nan;
 A.hirs_subdir = nan;
 A.hirs_regexp = nan;
 A.hirs_filename = nan;
 
-A.mspps_basedir = nan;
-A.mspps_subdir = nan;
-A.mspps_regexp = nan;
-A.mspps_filename = nan;
-
-A.avhrr_basedir = nan;
-A.avhrr_subdir = nan;
-A.avhrr_regexp = nan;
-A.avhrr_filename = nan;
-
 A.hirscs_basedir = nan;
 A.hirscs_subdir = nan;
 A.hirscs_regexp = nan;
 A.hirscs_filename = nan;
 
-A.firstline_data = '';
+A.isccp_dx_basedir = nan;
+A.isccp_dx_subdir = nan;
+A.isccp_dx_regexp = nan;
+A.isccp_dx_filename = nan;
 
+A.isccp_d1_basedir = nan;
+A.isccp_d1_subdir = nan;
+A.isccp_d1_regexp = nan;
+A.isccp_d1_filename = nan;
+
+A.isccp_d2_basedir = nan;
+A.isccp_d2_subdir = nan;
+A.isccp_d2_regexp = nan;
+A.isccp_d2_filename = nan;
+
+A.hoaps_iwp_basedir  = nan;
+A.hoaps_iwp_subdir  = nan;
+A.hoaps_iwp_regexp = nan;
+
+A.hoaps_HTWmm_basedir  = nan;
+A.hoaps_HTWmm_subdir  = nan;
+A.hoaps_HTWmm_regexp = nan;
+
+A.hoaps_HTWdm_basedir  = nan;
+A.hoaps_HTWdm_subdir  = nan;
+A.hoaps_HTWdm_regexp = nan;
+
+A.mhs_basedir = nan;
+A.mhs_subdir = nan;
+A.mhs_regexp = nan;
+A.mhs_filename = nan;
+
+A.modis_MOD08_M3_basedir = nan;
+A.modis_MOD08_M3_subdir = nan;
+A.modis_MOD08_M3_regexp = nan;
+
+A.modis_MYD08_M3_basedir = nan;
+A.modis_MYD08_M3_subdir = nan;
+A.modis_MYD08_M3_regexp = nan;
+
+A.modis_MYD06_L2_basedir = nan;
+A.modis_MYD06_L2_subdir = nan;
+A.modis_MYD06_L2_regexp = nan;
+
+A.mspps_basedir = nan;
+A.mspps_subdir = nan;
+A.mspps_regexp = nan;
+A.mspps_filename = nan;
+
+%% COLLOCATION DATASETS
 A.collocation_cpr_mhs_basedir = nan;
 A.collocation_cpr_mhs_subdir = nan;
 A.collocation_cpr_mhs_regexp = nan;
@@ -163,7 +213,6 @@ A.collocation_cpr_mhs_meandata_legacy_basedir = nan;
 A.collocation_cpr_mhs_meandata_legacy_subdir = nan;
 A.collocation_cpr_mhs_meandata_legacy_regexp = nan;
 A.collocation_cpr_mhs_meandata_legacy_filename = nan;
-
 
 A.collocation_mhs_mhs_basedir = nan;
 A.collocation_mhs_mhs_subdir = nan;
