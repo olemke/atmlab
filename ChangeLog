@@ -1,5 +1,19 @@
 2011-04-26  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-87
+
+	* handy/combine_pdfs.m:
+
+	As LaTeX is very picky about the filenames it allows in
+	includegraphics (no spaces, no %, etc), the pdf files are now copied to
+	the tmpfolder with sensible names to avoid problems.
+
+	Use dir() instead of system call to ls to generate file list.
+
+	Fix pdfinfo call.
+
+2011-04-26  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-86
 
 	* handy/combine_pdfs.m:

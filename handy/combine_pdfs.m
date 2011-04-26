@@ -12,7 +12,7 @@ function outfile = combine_pdfs(pdffiles, options)
 % IN:   pdffiles            cell: Each element contains the path to a
 %                                 file.
 %                           OR
-%                           string: 'ls <string>' will get a list of files,
+%                           string: 'dir(<string>)' will get a list of files,
 %                                   globbing is allowed:
 %                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
 %
@@ -64,10 +64,7 @@ assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
 
    
 %% If we got a regexp, use ls to get the file list
-if ischar(pdffiles)
-    files = exec_gmt_cmd(sprintf('ls -1 %s', pdffiles), gmtlab('verbosity'));
-    pdffiles = regexp(files{1}, '\n','split');
-end
+if ischar(pdffiles), files = dir(pdffiles); pdffiles = {files.name}; end
 
 %% Make sure filenames are in a row vector and non-empty
 pdffiles = pdffiles(:)';
@@ -106,7 +103,7 @@ regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 
 col = 1; row = 1;
 for P = pdffiles
-    info  = exec_gmt_cmd(sprintf('pdfinfo %s', P{1}), gmtlab('verbosity'));
+    info  = exec_gmt_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('verbosity'));
 
     % Great, pdfinfo uses BigPoints as a unit. Let's throw in some fancy
     % numbers and hope we end up with centimeters after that (DPI*INCH).
@@ -158,17 +155,19 @@ fprintf(fid,['\\usepackage[margin=%.2fcm,paperwidth=%.2fcm,' ...
             + options.secret_latex_spacing_tweak*length(layout.rowheight));
 fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
-fprintf(fid,'\\usepackage[multidot]{grffile}\n');
 fprintf(fid,'\\setlength{\\parindent}{0in}\n');
 fprintf(fid,'\\begin{document}\n');
 fprintf(fid,'\\centering\n');
 
-row = 1;
+row = 1; filenum = 1;
 for R = layout.plotsbyrow
     col=1;
     for P = R{:}
         fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}', options.valign, P.width);
-        fprintf(fid,'\\includegraphics{%s}', P.file);
+        tmpplotname=sprintf('plot%d.pdf', filenum);
+        mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
+        filenum=filenum+1;
+        fprintf(fid,'\\includegraphics{%s}', tmpplotname);
         fprintf(fid,'\\end{minipage}');
         
         if (col ~= length(R{:}))
@@ -185,7 +184,8 @@ fprintf(fid,'\\end{document}\n');
 fclose(fid);
 
 %% Hand the TeX file over to pdflatex
-exec_gmt_cmd(sprintf('pdflatex -interaction batchmode -output-directory %s out.tex', ...
+exec_gmt_cmd(mvplotcmd, gmtlab('verbosity'));
+exec_gmt_cmd(sprintf('cd %s && pdflatex -interaction batchmode out.tex', ...
                      tmpfolder), ...
              gmtlab('verbosity'));
 
