@@ -1,3 +1,12 @@
+2011-04-26  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-86
+
+	* handy/combine_pdfs.m:
+
+	Update docs. Include error indentifiers in asserts. Use fullfile.
+	Make pdflatex behave well with dots in pdf filenames.
+
 2011-04-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-85

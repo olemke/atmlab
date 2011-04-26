@@ -12,14 +12,14 @@ function outfile = combine_pdfs(pdffiles, options)
 % IN:   pdffiles            cell: Each element contains the path to a
 %                                 file.
 %                           OR
-%                           string: unix regular expression from which
-%                             'ls <regexp>' will get a list of files.
+%                           string: 'ls <string>' will get a list of files,
+%                                   globbing is allowed:
 %                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
 %
 %       options.            structure; contains the following options:
 %   KEY:fieldname     |type |description                 | default
 %       cols          |%d [] number of columns per row   | 2
-%       filename      |%s    name of output file         | 'out'
+%       filename      |%s    name of output file         | 'out.pdf'
 %       outdir        |%s    directory for output        | gmtlab('outdir')
 %       vspace        |%f    space between rows          | 1 (cm)
 %       hspace        |%f    space between columns       | 1 (cm)
@@ -44,7 +44,7 @@ default.cols   = 2;
 default.vspace = 1;
 default.hspace = 1;
 default.valign = 'm';
-default.filename = 'out';
+default.filename = 'out.pdf';
 default.outdir = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.2;
 
@@ -52,14 +52,15 @@ options = optargs_struct(options, default);
 
 
 %% Sanity checks
-assert(options.vspace >= 0, 'Vertical spacing must be > 0');
-assert(options.hspace >= 0, 'Horizontal spacing must be > 0');
-assert(length(options.valign) == 1 && sum('mb' == options.valign), ...
-       'Vertical alignment must be either ''m'' or ''b''');
+assert(options.vspace >= 0, 'atmlab:combine_pdfs', 'Vertical spacing must be > 0');
+assert(options.hspace >= 0, 'atmlab:combine_pdfs', 'Horizontal spacing must be > 0');
+assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
+       'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
 if isnan(options.outdir)
    options.outdir = tempdir; 
 end
-assert(isdir(options.outdir),'%s does not exist',options.outdir)
+assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
+       '%s does not exist', options.outdir);
 
    
 %% If we got a regexp, use ls to get the file list
@@ -71,7 +72,7 @@ end
 %% Make sure filenames are in a row vector and non-empty
 pdffiles = pdffiles(:)';
 pdffiles = pdffiles(~cellfun('isempty',pdffiles));
-assert(~isempty(pdffiles), 'List of input pdf files is empty');
+assert(~isempty(pdffiles), 'atmlab:combine_pdfs', 'List of input pdf files is empty');
 
 %% We trust that the user can count! Not really, better double check here
 if (length(options.cols) ~= 1 && sum(options.cols) ~= length(pdffiles))
@@ -90,7 +91,7 @@ layout = create_layout_from_pdffiles(pdffiles, options);
 
 create_pdf_from_layout_with_latex(layout, options);
 
-outfile = [[options.outdir '/' options.filename], '.pdf'];
+outfile = fullfile(options.outdir, options.filename);
 
 end
 
@@ -143,7 +144,7 @@ tmpfolder = create_tmpfolder();
 c = onCleanup(@() delete_tmpfolder(tmpfolder));
 
 %% Assemble our pretty tex file
-file = [tmpfolder '/out.tex'];
+file = fullfile(tmpfolder, 'out.tex');
 fid = fopen(file,'w');
 fprintf(fid,'\\documentclass[a4paper,10pt]{report}');
 
@@ -157,6 +158,7 @@ fprintf(fid,['\\usepackage[margin=%.2fcm,paperwidth=%.2fcm,' ...
             + options.secret_latex_spacing_tweak*length(layout.rowheight));
 fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
+fprintf(fid,'\\usepackage[multidot]{grffile}\n');
 fprintf(fid,'\\setlength{\\parindent}{0in}\n');
 fprintf(fid,'\\begin{document}\n');
 fprintf(fid,'\\centering\n');
@@ -167,7 +169,7 @@ for R = layout.plotsbyrow
     for P = R{:}
         fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}', options.valign, P.width);
         fprintf(fid,'\\includegraphics{%s}', P.file);
-        fprintf(fid,'\\end{minipage}\n');
+        fprintf(fid,'\\end{minipage}');
         
         if (col ~= length(R{:}))
             fprintf(fid,'\\hspace{%.2fcm}\n', options.hspace);
@@ -187,8 +189,8 @@ exec_gmt_cmd(sprintf('pdflatex -interaction batchmode -output-directory %s out.t
                      tmpfolder), ...
              gmtlab('verbosity'));
 
-exec_gmt_cmd(sprintf('cd %s && mv out.pdf "%s/%s.pdf"', ...
-                     tmpfolder, options.outdir, options.filename), ...
+exec_gmt_cmd(sprintf('cd %s && mv out.pdf ''%s''', ...
+                     tmpfolder, fullfile(options.outdir, options.filename)), ...
              gmtlab('verbosity'));
 
 end
