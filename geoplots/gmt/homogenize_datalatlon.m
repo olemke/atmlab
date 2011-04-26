@@ -12,13 +12,14 @@ function [data,lat,lon] = homogenize_datalatlon(data,lat,lon)
 % created by Salomon Eliasson
 % $Id$
 
-if isequal(size(data),size(lat),size(lon))
-    error('gmtlab:input','data does not appear to be gridded')
-end
+assert(~isequal(size(data),size(lat),size(lon)),...
+    'gmtlab:homogenize_datalatlon:badInput',...
+    'data does not appear to be gridded')
 
 %flip so that dimensions are data(lat,lon)
 x = 1:ndims(data);
-if length(lon)==size(data,1) && length(lat)==size(data,2)
+if (length(lon)==size(data,1) && length(lat)==size(data,2)) && ... %wrong order
+        length(lat) ~= length(lon) % if square, do nothing
     x(1)=2;x(2)=1;
     data = permute(data,x);
 end

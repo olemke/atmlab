@@ -150,7 +150,7 @@ if ~ismember(ref,tickval) && ~mod(nw,2)
     % if ref is in between the edges and nwhite is even, decrease by 1
     nw = nw-1;
     if input
-        warning('atmlab:badInput',...
+        warning('atmlab:makepolar:badInput',...
             '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is inbetween contour levels,',...
             'i.e in.nwhite must be an odd number. Decreasing ',in.nwhite,nw);
     end
@@ -163,13 +163,15 @@ BT = sum(tickval < ref ) -whitedomain;
 % TT top ticks
 TT = sum(tickval > ref ) -whitedomain;
 
-% zero it if it's bellow 0
+% zero-it if it's less than 0
 BT = BT*(BT>=0);
 TT = TT*(TT>=0);
 
 % if reference is on the EDGE
-if ismember(ref,[tickval(1),tickval(end)])
-    nw = nw/2;
+if BT < whitedomain || TT < whitedomain
+    if BT < whitedomain, nw = whitedomain-BT; end
+    if TT < whitedomain, nw = whitedomain-TT; end
+    nw = nw - mod(nw,2);
 end
-
+%special 
 assert(BT+TT+nw == length(tickval)-1,'Salomon:Bug','BT+TT+nw ~= length(tickval)-1')

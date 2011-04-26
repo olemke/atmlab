@@ -430,4 +430,6 @@ if isempty(b), b = lat/3; end
 default.ticks = sprintf('%.2fg%.2f/%.2fg%.2f',a(1),b(1),a(1)/2,b(1)/2);
 in = optargs_struct(in,default);
 
-basemap = sprintf('psbasemap -B%s -R -J -O >> %s.ps',in.ticks,in.filename);
+basemap = sprintf('psbasemap -B%s',in.ticks);
+
+basemap = sprintf('%s  -R -J -O >> %s.ps',basemap,in.filename);

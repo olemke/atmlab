@@ -68,7 +68,7 @@ function filename = gmt_plot(in,field)
 %
 % in.basemap_axis     |%s| 
 %                     E.g. 'WSne', annotates West and South of the map.
-%                     | 'WSNE' |
+%                     | 'WSne' |
 %                     ------------
 % in.display          |%i| If false, file created but not displayed |true |
 %                     ------------
@@ -578,6 +578,7 @@ end
 
 % SET DEFAULTS
 % general
+default.basemap_axis      = 'nSeW';             % Annotates West and South of the map.
 default.verbosity         = gmtlab('VERBOSITY');% Display non essential stdout in command window
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
@@ -633,7 +634,7 @@ default.ctable      = 'rainbow';          % color palette
 [default.stepsize,default.legend.tick_annotation_format]    = getstepsize(in);    % color level datastep interval
 in = optargs_struct(in,default); clear default
 
-in.filename = regexprep(in.filename,'[:=, ()*/<>!?]','_');
+in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
 in.filename = sprintf('%s/%s',in.outdir,in.filename);
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
@@ -668,6 +669,8 @@ in = isgridded(in,field);
 
 % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
 if in.gridded
+    assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
+        'gmtlab:gmt_plot:badInput','numel(data) must length(lat)*length(lon)')
     [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
 end
 
@@ -675,15 +678,19 @@ end
 if ~isfield(in,'region')
     if in.gridded
         % check if the data is probably global
-        d = diff(in.lon);
-        cond1 = abs(-180-in.lon(1)) <= d(1);
-        cond2 = 180-in.lon(end) <= d(end);
+        dn = diff(in.lon);
+        dt = diff(in.lat);
+        if isempty(dt), dt = mean(dn);end %incase there's only one latitude        
+        
+        cond1 = abs(-180-in.lon(1)) <= dn(1);
+        cond2 = 180-in.lon(end) <= dn(end);
         if cond1 && cond2
-            in.region = sprintf('-180/180/%f/%f',in.lat(1),in.lat(end));
+            in.region = sprintf('-180/180/%f/%f',...
+                in.lat(1),in.lat(end));
         else
             in.region = sprintf('%f/%f/%f/%f',...
-                min(in.lon(:)),max(in.lon(:)),...
-                min(in.lat(:)),max(in.lat(:)));
+                min(in.lon(:))-dn(1)/2,max(in.lon(:))+dn(end)/2,...
+                min(in.lat(:))-dt(1)/2,max(in.lat(:))+dt(end)/2);
         end
     else
         in.region = sprintf('%f/%f/%f/%f',...
@@ -705,13 +712,22 @@ if ~isfield(in.legend,'position')
     % ORIENTATION
 
     x = sscanf(in.region,'%f/%f/%f/%f');
-    myHcondition = ( x(2)-x(1) )/( x(4)-x(3) ) < 2*.85; tmp = ['v','h']; %vertical,horisontal
+    myHcondition = ( x(2)-x(1) )/( x(4)-x(3) ) > 3; tmp = ['v','h']; %vertical,horisontal
     default.orientation = tmp(myHcondition+1);
        
     in.legend           = optargs_struct(in.legend,default); %need orientation now
     
     o = strcmp(in.legend.orientation,'h'); %logical ishorizontal
-    factors = {[9.8 2.25 3.9 .2]/9 ,[4.5 -0.4 7.1 .2]/9}; %empirically good defaults for inch
+    
+    if strcmp(in.legend.orientation,'v')
+        % vertical
+        % fullheight vertical            9.8 2.25 4.5 .2
+        % min height (good for 20 lvls)  9.8  1.5   3 .2
+        f = 2* (180/(x(4)-x(3)) -1); %something between 0->1 equivalent to 120->180 lats
+        v = [9.8 2.25-f*0.75 4.4-f*1.5 .2];
+    else v = [];
+    end
+    factors = {v/9 ,[4.5 -0.4 7.1 .2]/9}; %empirically good defaults for inch
     % this is based on in.mapwidth in inches !
     default.xpos   = sprintf('%.2fi',factors{o+1}(1)*in.map_width);
     default.ypos   = sprintf('%.2fi',factors{o+1}(2)*in.map_width);
@@ -836,7 +852,8 @@ exec_gmt_cmd(command,in.verbosity);
 function datarange = getdatarange(in,field)
 %% getdatarange
 
-d = [min(in.(field)(:)) max(in.(field)(:))];
+tmp = in.(field)(:);
+d = [min(tmp) max(tmp(~isinf(tmp)))];
 
 % Do some tricks to get the most useful datarange. (rounded, but preserve precision)
 x = log10(d(2)-d(1));
@@ -937,34 +954,27 @@ end
 function in = isdata(in,field)
 %% is there any useable data?
 
-if ~isfield(in,field)
-    error('gmtlab:input','The field: "%s" is not in the structure',field)
-end
-if ~any(~isnan(in.(field)))
-    error('gmtlab:nodata','%s%s','Data does not contain any valid',...
-        ' values for contour levels to be based on...')
-end
-if ndims(in.(field))>2
-    error('gmtlab:input','Too many dimensions in in.%s',field)
-end
+Id  = 'gmtlab:gmt_plot:badInput';
+Eps = 1e-10;
+
+assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
+assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
+    '%s%s','Data does not contain any valid',...
+    ' values for contour levels to be based on...')
+assert(~(ndims(in.(field))>2),Id,'Too many dimensions in in.%s',field)
+assert(abs(in.datarange(1)-in.datarange(2))>Eps,Id,...
+'min(data) must not be equal to max(data)')
+
 % check for lat and lons
 if ~isfield(in,'lat')
     l = {'Latitude','latitude'};
-    if any(isfield(in,l))
-        in.lat = in.(l{isfield(in,l)});
-    else
-        error('gmtlab:input','No latitudes present')
-    end
+    assert(any(isfield(in,l)),Id,'No latitudes present')
+    in.lat = in.(l{isfield(in,l)});
 end
 if ~isfield(in,'lon')
     l = {'Longitude','longitude','long'};
-    if any(isfield(in,l))
-        in.lon = in.(l{isfield(in,l)});
-    else error('gmtlab:input','No longitudes present')
-    end
-end
-if in.datarange(1)==in.datarange(2)
-    error('gmtlab:input','min(data) must not be equal to max(data)')
+    assert(any(isfield(in,l)),Id,'No longitudes present')
+    in.lon = in.(l{isfield(in,l)});
 end
 
 function hunt_down_errors(command,errors)

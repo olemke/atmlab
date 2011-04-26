@@ -1,3 +1,35 @@
+2011-04-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-88
+
+	* geoplots/gmt/gmt_plot.m:
+	- fixed bug in in.region.
+	- changed default basemap_axis to WSne.
+	- Fixed automatic legend. Better default behaviour if using
+	in.projection = 'Q' (default projection).
+	- fixed in.datarange to exclude inf when finding the maximum
+	value.
+	- change many: if bla, error('str'), end to assert(~bla, 'str')
+
+	* geoplots/gmt/homogenize_datalatlon.m:
+	Fixed bug where data was flipped if the input data is square
+	(i.e. can't determine if it's (lat,lon) or (lon,lat))
+
+	* geoplots/gmt/gmt_nc_save_gridded.m: Make sure that z is single
+	for netcdf.putVar
+
+	* geoplots/gmt/test_gmt.m:
+	- changed order of output
+	- added more explanatory and up-to-date output describing figures.
+	- testing some more gmtlab features
+
+	* handy/catstruct.m: fixed bug by typo
+
+	* geoplots/gmt/makepolar.m: Fixed bug for special case.
+
+	* geoplots/gmt/create_gmt_earth.m: Puny update
+
+
 2011-04-26  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-87

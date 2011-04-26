@@ -146,7 +146,7 @@ for f = F'
     for loop = fnd(structs_index)
         vargin{loop} = VAL{loop}{ismember(FN{loop},f)}; % this is the low level struct
     end
-    merged_lowstruct.(f{1}) = gmt_catstruct(vargin{:});
+    merged_lowstruct.(f{1}) = catstruct(vargin{:});
 end
 if ~exist('merged_lowstruct','var'), return, end % nothing was done
 

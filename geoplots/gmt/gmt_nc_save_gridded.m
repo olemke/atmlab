@@ -59,7 +59,7 @@ netcdf.endDef (ncid);
 
 netcdf.putVar ( ncid, lon_varid, x );
 netcdf.putVar ( ncid, lat_varid, y );
-netcdf.putVar ( ncid, mean_varid, z' );
+netcdf.putVar ( ncid, mean_varid, single(z)' );
 
 netcdf.close (ncid);
 

@@ -1,4 +1,4 @@
-function [files,info] = test_gmt(in)
+function [info, files] = test_gmt(in)
 % TEST_GMT To test various aspecs of gmt_plot
 %
 % PURPOSE: To test various aspecs of gmt_plot. Especially before commiting
@@ -86,6 +86,10 @@ info = info(~cellfun('isempty',info));
 disp(' ')
 disp(' ')
 cellfun(@disp,info,'uniformoutput',false)
+disp('Look at help gmt_plot for more detailed descriptions of options ')
+disp('specified here. I suggest looking at the call for each test in test_gmt')
+disp('if you want to see an example on how to create these figures.')
+disp('All the tests where merged onto one pdf using combine_pdfs.m.')
 
 warning('on','gmtcatstruct:DuplicatesFound')
 
@@ -128,105 +132,122 @@ end
 
 function [files,info]        = TEST1(in,gridded,files,info)
 %% TEST: Difference plot, reference=0, nlevels, sidebar
+t=1;
+if ~ismember(t,in.test), return, end %then don't do this test
 
-if ~ismember(1,in.test), return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 %% Test 1a
+
 
 gridded.data = gridded.data-200;  % for difference 
 test.ctable = 'mypolar';
 test.reference = 0;
 test.legend.sidebar = 3; % both above and below
-test.basemap_axis = 'nesw';
+test.header_offset = -.5; %move the header down a bit because of smaller header size
+test.basemap_axis = 'neSW';
 test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
-test.filename = 'Test1a';
+a0 = sprintf('Test%.0fa',t);
+test.filename = a0;
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
-a = 'Test 1a demonstrates the mypolar colortable which is similar to polar.cpt';
-b = 'Using in.ctable=''mypolar'' you can define where the reference value should be.';
-c = 'The white color is then centered around the reference value (in.reference).';
-d = 'Test 1a also tests the in.basemap_axis option for map annotations';
-e = 'and the in.sidebar option (triangles above and below legend range) for ';
-f = 'indicating the color values would have if they are outside the value range';
-g = 'defined by in.datarange = [min max].';
-info{end+1} = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f,g);
 
+a = ' demonstrates the mypolar-colortable which is similar to polar.cpt';
+b = 'Using in.ctable=''mypolar'' you can define where the reference value';
+c = 'should be (here in.reference = 0). The white color is centered around this value.';
+d = 'in.basemap_axis = ''nSeW'' is tested, and means that the south (S) and west(W)';
+e = 'axes are labelled. in.sidebar = 3 is tested and means that triangles';
+f = 'above and below legend-range are shown to indicate the color of data outside the datarange';
+g = 'defined by in.datarange = [min max]. The title offset is set to -0.5 here (moving it down)';
+h = 'using in.header_offset = -0.5; See help gmt_plot for more details on these options';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
 
 test.legend.sidebar = 2; % above only
+test.basemap_axis = 'NEsw';
 test.nlevels = 15; 
 test.nwhite = 6;
 test.header_size = 20;
-test.header_offset = -.5; %move the header down a bit because of smaller header size
-test.title = 'Diff plot,nlevels=15,ref=0,nwhite=6,sidebar=2 (above),header';
-test.filename = 'Test1b';
+test = rmfield(test,'header_offset');
+test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
+a0 = sprintf('Test%.0fb',t);
+test.filename = a0;
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = 'Test 1b demonstrates that you can change the number of intervals that are';
-b = 'colored white while using the mypolar colortable (in.nwhite). You can also';
-c = 'change the number of data intervals (in.nlevels), change in.headersize and in.header_offset,';
-d = 'or decide to only have the sidebar for values above the datarange (in.sidebar=2)';
-info{end+1} = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d);
+a = ' demonstrates that you can change the number of intervals that are';
+b = 'colored white around the reference value when using the mypolar-colortable,';
+c = 'here in.nwhite = 6. You can also change the number of data intervals ';
+d = '(here in.nlevels = 15), change in.headersize (here in.headersize = 20)';
+e = 'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e);
 
 function [files,info] = TEST2(in,gridded,ungridded,files,info)
 %% TEST: title, unit (gridded and ungridded)
-
-if ~ismember(2,in.test), return, end %then don't do this test
+t = 2;
+if ~ismember(t,in.test), return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
-test.filename = 'Test2a';
+test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
+test.legend.tick_spacing = 25;
+a0 = sprintf('Test%.0fa',t);
+test.filename = a0;
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = 'Test 2a demonstrates that you can include some special';
-b = 'characters in in.title and in.unit and that you can toggle in.basemap_axis';
-c = 'to annotate the South and West axis only if you like. This test uses ';
-d = 'gridded data, where size(data) = [length(lat),length(lon)]';
-info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
+a = ' demonstrates that you can include some special';
+b = 'characters in in.title and in.unit. This test uses ';
+c = 'gridded data, where size(data) = [length(lat),length(lon)]';
+d = 'You can also change the size and position of the legend';
+e = '(here in.legend.position = ''9.35i/2i/3i/.5i''; %(''x-displacement/y-displacement/height/width''))';
+f = 'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
 
+test = rmfield(test,'legend');
 test.title           = 'ungridded: legend, coastlines';
 test.coast.width     = 1;
 test.coast.color     = '255/255/255';
-test.filename        = 'Test2b';
+a0 = sprintf('Test%.0fb',t);
+test.filename        = a0;
 test.unit            = 'kg/m²';
-test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
-test.legend.tick_spacing = 25;
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
-a = 'Test2b demonstrates the same as Test2a but for ungridded data, where';
-b = 'size(data) = size(lat) = size(lon). This is e.g. good for plotting satellite';
-c = 'granule data directly.';
-info{end+1} = sprintf('%s\n%s\n%s\n',a,b,c);
+a = ' demonstrates the same data as Test2a except in an ungridded form';
+b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
+c = 'for plotting satellite granule data directly. You can also change the';
+d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
 
 function [file,info] = TEST3(in,gridded)
 %% TEST: sidebar, nan, projection, center
 
-if ~ismember(3,in.test), file='';info='';return, end %then don't do this test
+t = 3;
+if ~ismember(t,in.test), file='';info='';return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
 test.title      = 'upper sidebar, NaN, Hammer projection, center';
 test.projection = 'H';      % hammer
 test.center     = 180;      % Center map at given center longitude
 test.datarange  = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
-test.filename = 'Test3';
+a0 = sprintf('Test%.0f',t);
+test.filename = a0;
 file = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = 'Test3 demonstrates the Hammer projection (one of many available projections),';
-b = 'using in.projection = ''H''. The test also demonstrates that you can';
-c = 'easily change the center of the projection to e.g. 180E using in.center.';
-d = 'The grey region in the map indicates NaN values. The upper sidebar is ';
-e = 'automatically shown if there are data larger than in.datarange(2),';
-f = 'if given via in.datarange = [v1,v2]. The color for these values can';
-g = 'changed using in.color_foreground (default is ''255/255/255'' (white))';
-info = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f,g);
+a = ' demonstrates the Hammer projection (using in.projection = ''H''),';
+b = 'one of many available projections. The test also demonstrates that you can';
+c = 'easily change the center of the projection to e.g. 180E using in.center = 180.';
+d = 'The grey region in the map indicates NaN values, and an extra NaN color box';
+e = 'is automatically added below the vertical legend. You can suppress the extra';
+f = 'NaN-legend using in.nanlegend = false. The upper sidebar is automatically shown';
+g = 'if there are data larger than in.datarange(2), given via in.datarange = [v1,v2].';
+h = 'The color for these values can be changed using';
+i = 'in.color_foreground (default is ''255/255/255'' (white))';
+info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h,i);
 
 function [file,info] = TEST4(in)
 %% TEST: contours, nlevels, annotation format, xunit
 
-if ~ismember(4,in.test), file=''; info = ''; return, end %then don't do this test
+t = 4;
+if ~ismember(t,in.test), file=''; info = ''; return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
-
-
 
 test.lat = -90:90;
 test.lon = -180:180;
@@ -253,21 +274,24 @@ test.color_foreground = '255/255/0';
 test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
-test.filename = 'Test4';
+a0 = sprintf('Test%.0f',t);
+test.filename = a0;
 file = gmt_plot (catstruct(test,in), 'data');
 
-a = 'Test 5 demonstrates contour maps, where you can optionally choose to show';
-b = 'High and Lows in the of the data. Test 5 also demonstrates that you can';
-c = 'have x and y-labels (in.xunit and in.unit) on the around the legend';
-d = 'Using the custom colortable (in.colorrange) you can also use';
-e = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
+a = ' demonstrates contour maps (see contour options in help gmt_plot), ';
+b = 'where you can optionally choose to show highs and lows in the of the data.';
+c = 'It also demonstrated that you can have x and y-labels';
+d = '(in.xunit=''no unit either'' and in.unit=''no unit'') around the legend';
+e = 'Using the custom colortable (in.colorrange) you can also use';
+f = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
 
-info = sprintf('%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e);
+info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
 
 function [file,info] = TEST5(in,gridded) 
 %% TEST: custom color table, header_size, map_width, grid lines, region
+t = 5;
 
-if ~ismember(5,in.test), file=''; info = ''; return, end %then don't do this test
+if ~ismember(t,in.test), file=''; info = ''; return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 % Add some annotations some intervals.
@@ -281,10 +305,9 @@ test.title = 'custom legend and sub-region';
 test.ticks = '30g30/15g15'; % annotations (deg) on major lines (e.g 40 xaxis,20 yaxis)
                             % and plot minor lines (e.g 20 xaxis & yaxis)
 test.head_size = 20;              % (GMT default = 36p)
-test.map_width = 15;              % (default is 9 inches)
-test.region    = '-90/90/0/70'; % 'lonmin/lonmax/latmin/latmax'
+test.map_width = 17;              % (default is 9 inches)
+test.region    = '-130/130/-30/30'; % 'lonmin/lonmax/latmin/latmax'
 test.basemap_axis = 'NeSW';
-test.legend.orientation = 'h';
 test.legend.tick_centering = true;
 
 % CUSTOM COLOR TABLE ---
@@ -299,22 +322,26 @@ test.colorrange.colors  = {{0,'0/0/255'},...
 test.colorrange.color_model = 'RGB';
 % makes a colortable that goes from blue to white to green to black to red in RGB format.
 % ------------------------
-test.filename = 'Test5';
+a0 = sprintf('Test%.0f',t);
+test.filename = a0;
 
 file = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = 'Test4 demonstrates that you can easily make your own custom colortable.';
+a = ' demonstrates that you can easily make your own custom colortable using in.colorrange.';
 b = 'You can also insert your own legend annotations to be used instead of';
-c = 'data values (see help gmt_plot). You can also change in.mapwidth,';
+c = 'data values using in.legend.tick_annotations. You can also change in.mapwidth,';
 d = 'in.headersize, the tick spacing for the axis using in.ticks,';
 e = 'and in this test its demonstrated how to confine the figure to certain';
 f = 'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''';
-info = sprintf('%s\n%s\n%s\n%s\n%s\n%s\n',a,b,c,d,e,f);
+g = 'The legend is also automatically made horizontal if the base/height > 3';
+h = 'This can easily be overridden by setting in.orientation.orientation = ''v'' ';
+info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
 
 function [files,info] = TEST6(in,files,info)
 %% TEST: locations, nodata 
-
-if ~ismember(6,in.test), return, end %then don't do this test
+t = 6;
+a0 = sprintf('Test%.0f',t);
+if ~ismember(t,in.test), return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 names    = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki',...
@@ -343,7 +370,7 @@ test.basemap_axis = 'neSW';
 test.title = 'SatGroup locations';
 test.nodata = true;
 test.region = '-20/160/-30/70';
-test.filename = 'Test6a';
+test.filename = sprintf('Test%.0fa',t);
 files{end+1} = gmt_plot(catstruct(test,in));
 
 % TEST: mediumregion
@@ -353,26 +380,26 @@ end
 test.region     = '-10/30/45/70';
 test.title      = 'Europe';
 test.coast.rivers = 'r';
-test.filename = 'Test6b';
+test.filename = sprintf('Test%.0fb',t);
 files{end+1}    = gmt_plot(catstruct(test,in));
 
 % TEST: smallregion
 test.title = 'Kiruna (high details)';
 test.region = '16/22/66.2/70';
 test.coast.rivers = 'a';
-test.filename = 'Test6c';
+test.filename = sprintf('Test%.0fc',t);
 files{end+1} = gmt_plot(catstruct(test,in));
 
-a = 'Test 6 demonstrates that you can plot points and text on a map, and';
-b = 'demonstrates that there are several map resolutions available.';
-c = 'It is also demonstrated that the output file need not be pdf.';
+a = ' demonstrates that you can plot points and text on a map using';
+b = 'in.locations (see help gmt_plot), and demonstrates that there are';
+c = 'several map resolutions available.';
 d = 'The available file types in.figuretype are ''pdf'',''eps'',''png'', and ''tif''';
-info{end+1} = sprintf('%s\n%s\n%s\n%s\n',a,b,c,d);
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
 
 function [file,info] = TEST7(in)
 %% TEST: pspolygon
-
-if ~ismember(7,in.test), file=''; info = '';return, end %then don't do this test
+t = 7;
+if ~ismember(t,in.test), file=''; info = '';return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 % REGIONS FROM eliasson11:assessing_acp
@@ -409,10 +436,11 @@ test.pspoly = reg;
 test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g','g','g','g','g','g','g','g','g','g','g'};
 test.nodata=true;
 test.basemap_axis='nWeS';
-test.filename = 'TEST7';
+a0 = sprintf('Test%.0f',t);
+test.filename = a0;
 file = gmt_plot(catstruct(test,in));
 
-a = 'Test 7 demonstrates that you can draw polygons on a map. E.g. useful if you';
-b = 'want to draw regions of interest on a map';
+a = ' demonstrates that you can draw polygons on a map, using in.pspoly.';
+b = 'E.g. useful if you want to draw regions of interest on a map';
 
-info = sprintf('%s\n%s\n',a,b);
+info = sprintf('%s%s\n%s\n',a0,a,b);
