@@ -522,21 +522,15 @@ if ~isfield(in,field) && ~isfield(in,'nodata')
         'Data field: "%s" not found',field)
 end
 
-% CD to outdir so that the temporary .gmtfiles are not saved at '.'. Make
+% make TEMPDIR
+% cd to tmpdir so that the temporary .gmtfiles are not saved at '.'. Make
 % sure I cleanup after I'm done
-try
-    in.tmpdir = create_tmpfolder;
-catch ME
-    if strcmp(ME.identifier, 'atmlab:input:undefined')
-        in.tmpdir = create_tmpfolder(tempdir);
-        if in.verbosity
-            fprintf('atmlab(''WORK_AREA'') is not initialized. Work area is set to: %s\n',in.tmpdir)
-        end
-    end
-end
-
+wa_flag = isnan(atmlab('WORK_AREA'));
+% temporarily set this (unitialized on cleanup)
+if wa_flag, atmlab('WORK_AREA',tempdir); end
+in.tmpdir = create_tmpfolder;
 p = pwd();
-onCleanup(@() cleanup(in.tmpdir,p));
+onCleanup(@() cleanup(in.tmpdir,p,wa_flag));
 cd(in.tmpdir);
 
 out = set_GMT_plot(in,field);
@@ -1009,9 +1003,8 @@ if ~isempty(Errors)
     error('gmtlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
 end
 
-function cleanup(tmpdir,curdir)
+function cleanup(tmpdir,curdir,wa_flag)
 % cd back to the original directory
-
+if wa_flag, atmlab('WORK_AREA',NaN); end
 cd(curdir);
-delete([tmpdir,'/*'])
-rmdir(tmpdir)
+rmdir(tmpdir,'s')

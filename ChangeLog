@@ -1,3 +1,15 @@
+2011-04-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* files/create_tmpfolder.m: Removed my workaround from this. The
+	function is now as it was before my meddling.
+
+	* geoplots/gmt/gmt_plot.m: Temporarily set atmlab('work_area') to
+	/tmp if it is not initialized. I uninitialize it again in the
+	onCleanup call.
+
+	* geoplots/gmt/test_gmt.m: Use the backup viewer option
+	gmtlab('open_command') if gmtlab('pdfviewer') is not defined
+
 2011-04-27  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-89

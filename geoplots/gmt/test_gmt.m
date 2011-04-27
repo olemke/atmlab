@@ -76,9 +76,6 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 files{end+1} = combine_pdfs(files,...
     struct('filename','all_tests.pdf','cols',in.cols,'valign','b'));
 
-% DISPLAY combined plot
-exec_gmt_cmd(sprintf('%s %s&',gmtlab('pdfviewer'),files{end}));
-
 files = files(~cellfun('isempty',files));
 info = info(~cellfun('isempty',info));
 
@@ -92,6 +89,18 @@ disp('if you want to see an example on how to create these figures.')
 disp('All the tests where merged onto one pdf using combine_pdfs.m.')
 
 warning('on','gmtcatstruct:DuplicatesFound')
+
+% DISPLAY combined plot
+v = gmtlab('pdfviewer');
+if isnan(v), v = gmtlab('open_command');end
+if ~isnan(v)
+    exec_gmt_cmd(sprintf('%s %s&',v,files{end}));
+else
+    a = 'No viewer defined. ';
+    b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
+    c = 'or type ''help gmtlab'' to learn more';
+    fprintf(2,'%s\n%s\n%s\n',a,b,c)
+end
 
 if ~od && ~ischar(gmtlab('OUTDIR'))
     a = sprintf('Files are saved in your tempdir (%s)',in.outdir);

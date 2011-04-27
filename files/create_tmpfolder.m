@@ -12,27 +12,23 @@
 % OUT      tmpfolder   Full path to created folder.
 % ATMLAB   WORK_AREA   The work area is required as a personal setting.
 
-% 2011-04-18  Updated by Salomon. Allow user to bypass the need for
-%             atmlab('WORK_AREA'), by providing an alternative
 % 2011-04-04  Updated by Oliver Lemke. Use matlab's tempname to generate
 %             folder name. Append -atmlab to tmpfolder name.
 % 2002-12-20  Created by Patrick Eriksson, based on older version
 %             in AMI (part of arts-1).
 
 
-function tmpfolder = create_tmpfolder(workarea)
+function tmpfolder = create_tmpfolder
 
-if ~exist('workarea','var')
-    %=== Require that a work area is set as a personal setting
-    %
-    atmlab( 'require', {'WORK_AREA'} );
-    workarea = atmlab( 'WORK_AREA' );
-    %
-    if ~ischar( workarea )
-        error( 'atmlab:tmpfolder', 'WORKAREA must be a string' );
-    end
-    
+%=== Require that a work area is set as a personal setting
+%
+atmlab( 'require', {'WORK_AREA'} );
+workarea = atmlab( 'WORK_AREA' );
+%
+if ~ischar( workarea )
+    error( 'atmlab:tmpfolder', 'WORKAREA must be a string' );
 end
+
 if ~isdir(workarea)
     error( 'atmlab:tmpfolder', ...
         'The given work area (%s) does not exist.', workarea );

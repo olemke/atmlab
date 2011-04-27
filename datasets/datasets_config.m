@@ -188,6 +188,10 @@ A.mspps_subdir = nan;
 A.mspps_regexp = nan;
 A.mspps_filename = nan;
 
+A.patmosx_L2b_basedir = nan;
+A.patmosx_L2b_subdir = nan;
+A.patmosx_L2b_regexp = nan;
+
 %% COLLOCATION DATASETS
 A.collocation_cpr_mhs_basedir = nan;
 A.collocation_cpr_mhs_subdir = nan;
