@@ -1,5 +1,16 @@
 2011-04-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-91
+
+	* geoplots/resample_geodata.m:
+	Added useful re-gridding function for geodata.
+
+	* site-specific/kiruna/datasets_init.m: Continued adding datasets.
+
+2011-04-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-90
+
 	* files/create_tmpfolder.m: Removed my workaround from this. The
 	function is now as it was before my meddling.
 

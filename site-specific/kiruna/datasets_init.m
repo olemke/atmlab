@@ -115,6 +115,12 @@ datasets_config('modis_MYD06_L2_basedir','/storage3/data/modis/MYD06_L2/');
 datasets_config('modis_MYD06_L2_subdir' ,'$YEAR4/$MONTH/$DAY' );
 datasets_config('modis_MYD06_L2_regexp' ,'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})');
 
+datasets_config('patmosx_L2b_basedir','/storage3/data/patmosx/level2b/');
+datasets_config('patmosx_L2b_subdir' ,'$YEAR4' );
+datasets_config('patmosx_L2b_regexp' ,'patmosx_(?<satellite>)_(?<node>)_(?<year>)_(?<doy>)\.+(?<end>.{6})$');
+
+
+
 datasets_config('mspps_basedir', '/storage3/data/mspps');
 datasets_config('mspps_subdir', '$SAT_orbital_$YEAR4/$MONTH/$DAY');
 datasets_config('mspps_regexp', datasets_config('amsua_regexp'));
