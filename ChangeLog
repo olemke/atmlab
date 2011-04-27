@@ -1,3 +1,11 @@
+2011-04-27  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-89
+
+	* geoplots/gmt/test_gmt.m:
+
+	'all_tests'->'all_test.pdf', combine_pdfs requires the file suffix now.
+
 2011-04-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-88

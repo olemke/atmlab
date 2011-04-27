@@ -74,7 +74,7 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 
 % PUT all figure in one pdf
 files{end+1} = combine_pdfs(files,...
-    struct('filename','all_tests','cols',in.cols,'valign','b'));
+    struct('filename','all_tests.pdf','cols',in.cols,'valign','b'));
 
 % DISPLAY combined plot
 exec_gmt_cmd(sprintf('%s %s&',gmtlab('pdfviewer'),files{end}));
