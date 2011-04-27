@@ -29,31 +29,18 @@ rqre_datatype( Q, @isstruct );                                   %&%
 rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
 
 
-folder_created = 0;
-%
 if isempty( workfolder )
-  workfolder     = create_tmpfolder;
-  folder_created = 1;
+  workfolder = create_tmpfolder;
+  cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 end
 
 
-try
-  %
-  parts = qarts2cfile( 'Batch' );
-  S     = qarts2cfile( Q, parts, workfolder );
-  cfile = fullfile( workfolder, 'cfile.arts' );
-  strs2file( cfile, S );
-  arts( cfile );
+parts = qarts2cfile( 'Batch' );
+S     = qarts2cfile( Q, parts, workfolder );
+cfile = fullfile( workfolder, 'cfile.arts' );
+strs2file( cfile, S );
+arts( cfile );
 
-catch
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
-  rethrow(lasterror);
-end
 
 Y = xmlLoad( fullfile( workfolder, 'ybatch.xml' ) );
 
-if folder_created
-  delete_tmpfolder( workfolder );  
-end

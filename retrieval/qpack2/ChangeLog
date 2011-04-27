@@ -1,3 +1,9 @@
+2011-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.9
+
+	* qpack2.m (qpack2): Now using onCleanup to remove work folder.
+
 2011-02-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.8

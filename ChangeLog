@@ -1,3 +1,39 @@
+2011-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-91
+
+	* PLEASE NOTE: The name of the functions REGRID and INTERPD will
+	be changed (to avoid the confusion around "regrid"). The new names
+	are *gridinterp* and *pointinterp*. Both versions will exist for
+	some time. So far you get a warning if you use the obselete version.
+
+	* gformat/gf_regrid.m (gf_regrid): regrid -> gridinterp
+	* arts/arts_regrid.m (arts_regrid):
+
+	* math/gridinterp.m: Copy of regrid, with polished header. This
+	is the version that will be kept.
+
+	* math/pointinterp.m: Copy of interpd, with polished header. This
+	is the version that will be kept.
+
+	* arts/arts_oem.m: "Clean" option removed and try-catch in
+	function removed. Both due to change below.
+
+	* arts/arts_oem_init.m: Workfolder is now mandatory input. This
+	function can not ensure that it is removed properly, and the task
+	is moved to the calling function.
+
+	* arts/arts_abcde.m:
+	* arts/arts_abstable.m:
+	* arts/arts_atmfields.m:
+	* arts/arts_batch.m:
+	* arts/arts_sensor.m:
+	* arts/arts_y.m: All now using onCleanup to remove work folder.
+	This made it possible to remove catch/try.
+
+	* atmlab/atmlab.m (atmlab_defs): Rearranged to keep things in
+	alphabetical order.
+
 2011-04-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-91

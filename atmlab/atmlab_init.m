@@ -68,6 +68,7 @@ if nversion < 7.04
   addpath( fullfile( toppath, 'V7-4' ) ); 
 end
 
+
 %=== Read Atmlab settings
 %
 if exist( 'atmlab_conf' ) == 2
@@ -101,12 +102,14 @@ else
   randn( 'state', rand_state );
 end
 
-% Add directory for site-specific settings
 
+%=== Add directory for site-specific settings
+%
 if isnan(atmlab('ATMLAB_PATH'))
     atmlab('ATMLAB_PATH', toppath);
 end
 
-% define some aliases
 
+%=== Define some aliases
+%
 alias('amsub', 'mhs');

@@ -74,42 +74,33 @@ rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
 
 
 if isempty( workfolder )
-  workfolder     = create_tmpfolder;
-  folder_created = 1;
-else
-  folder_created = 0;
+  workfolder = create_tmpfolder;
+  cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 end
 
-try
 
-  %= Get text for control file, but remove ending '}'
-  %
-  parts = qarts2cfile( 'y' );
-  S     = qarts2cfile( Q, parts, workfolder );
-  S     = S(1:end-1);
+%= Get text for control file, but remove ending '}'
+%
+parts = qarts2cfile( 'y' );
+S     = qarts2cfile( Q, parts, workfolder );
+S     = S(1:end-1);
 
-  %= Add saving of variables
-  %
-  for i = 1:length(vnames1)
-    filename = fullfile( workfolder, [ vnames1{i}, '.xml' ] ); 
-    S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
-  end
-
-  %= Add closing 
-  %
-  S{end+1}  = '}';
-
-  %= Create control file and run 
-  %
-  cfile = fullfile( workfolder, 'cfile.arts' );
-  strs2file( cfile, S );
-  arts( cfile );
-
-
-catch
-  delete_tmpfolder( workfolder );
-  rethrow(lasterror);
+%= Add saving of variables
+%
+for i = 1:length(vnames1)
+  filename = fullfile( workfolder, [ vnames1{i}, '.xml' ] ); 
+  S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
 end
+
+%= Add closing 
+%
+S{end+1}  = '}';
+
+%= Create control file and run 
+%
+cfile = fullfile( workfolder, 'cfile.arts' );
+strs2file( cfile, S );
+arts( cfile );
 
 
 %= Read stored variables
@@ -141,8 +132,4 @@ if nargin >= 3
   end
 end
 
-
-if folder_created
-  delete_tmpfolder( workfolder );
-end
 

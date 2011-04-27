@@ -23,7 +23,7 @@
 %                    Otherwise this is interpreted as the path to a folder 
 %                    where calculation output can be stored. These files
 %                    will be left in the folder. The files are not read if
-%                    corresponding output argument not is considered.
+%                    corresponding output argument is not considered.
 %                    Default is [].
 
 % 2004-09-17   Created by Patrick Eriksson.
@@ -51,10 +51,8 @@ ji      = NaN;
 %- Create workfolder?
 %
 if isempty( workfolder )
-  workfolder     = create_tmpfolder;
-  folder_created = 1;
-else
-  folder_created = 0;
+  workfolder = create_tmpfolder;
+  cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 end
 
 
@@ -68,20 +66,14 @@ if nargout < 5
 end
 
 
-try
-  %
-  parts = qarts2cfile( 'y' );    
-  S     = qarts2cfile( Q, parts, workfolder );
-  cfile = fullfile( workfolder, 'cfile.arts' );
-  strs2file( cfile, S );
-  arts( cfile );
+%- Run ARTS
+%
+parts = qarts2cfile( 'y' );    
+S     = qarts2cfile( Q, parts, workfolder );
+cfile = fullfile( workfolder, 'cfile.arts' );
+strs2file( cfile, S );
+arts( cfile );
 
-catch
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
-  rethrow(lasterror);
-end
 
 
 y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
@@ -120,7 +112,4 @@ if nargout >= 5  & qarts_isset( Q.J_DO ) &  Q.J_DO
 end
 
 
-if folder_created
-  delete_tmpfolder( workfolder );
-end
 

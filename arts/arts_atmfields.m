@@ -61,26 +61,20 @@ if nargin >= 4
 end
 
 
+tmpfolder = create_tmpfolder;
+cu = onCleanup( @()delete_tmpfolder( tmpfolder ) );
 
-tmpfolder   = create_tmpfolder;
 
-try
-  parts = qarts2cfile( 'GetAtmSrf' );
-  S = qarts2cfile( Q, parts, tmpfolder );
-  cfile = fullfile( tmpfolder, 'cfile.arts' );
-  strs2file( cfile, S );
-  arts( cfile );
-  t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
-  z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml') );
-  vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml') );
-  if nargout > 3
-    r_geoid   = xmlLoad( fullfile( tmpfolder, 'r_geoid.xml') );
-    z_surface = xmlLoad( fullfile( tmpfolder, 'z_surface.xml') );
-  end
-  
-  delete_tmpfolder( tmpfolder );
-
-catch
-  delete_tmpfolder( tmpfolder );
-  rethrow(lasterror);
+parts = qarts2cfile( 'GetAtmSrf' );
+S = qarts2cfile( Q, parts, tmpfolder );
+cfile = fullfile( tmpfolder, 'cfile.arts' );
+strs2file( cfile, S );
+arts( cfile );
+t_field   = xmlLoad( fullfile( tmpfolder, 't_field.xml') );
+z_field   = xmlLoad( fullfile( tmpfolder, 'z_field.xml') );
+vmr_field = xmlLoad( fullfile( tmpfolder, 'vmr_field.xml') );
+if nargout > 3
+  r_geoid   = xmlLoad( fullfile( tmpfolder, 'r_geoid.xml') );
+  z_surface = xmlLoad( fullfile( tmpfolder, 'z_surface.xml') );
+end
 end

@@ -168,7 +168,10 @@ Q                          = qarts_abstable( Q );
 %- Init retrieval variables (such as xa) and create Sx
 %----------------------------------------------------------------------------
   
-[Qoem,O,R,xa] = arts_oem_init( Q, O );
+workfolder = create_tmpfolder;
+cu = onCleanup( @()delete_tmpfolder( workfolder ) );
+%  
+[Qoem,O,R,xa] = arts_oem_init( Q, O, workfolder );
 %
 Sx = arts_sx( Q, R );
 
@@ -211,7 +214,6 @@ y = 1.1 * y + si*randn(size(Se,1),1);
 %
 X = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %
-arts_oem( 'clean', R );
 clear Qoem 
 
 

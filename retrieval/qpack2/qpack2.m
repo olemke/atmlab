@@ -59,13 +59,14 @@ empty_y = checkY( Y );
 %------------------------------------------------------------------------------
 %- Loop measurements
 %------------------------------------------------------------------------------
-
+%
 L2 = [];
-  
+% 
 workfolder = create_tmpfolder;
-
+cu = onCleanup( @()delete_tmpfolder( workfolder ) );
+%
 ny = length(Y);
-
+%
 for m = 1 : ny
   
   %- Simulate a (noise free) measurement if y is empty
@@ -127,16 +128,9 @@ for m = 1 : ny
   
   end % empty_y
 end % for m
-
-
-%- Clean-up
 %
-if empty_y
-  delete_tmpfolder( workfolder );
-else
-  arts_oem( 'clean', R );
-end
 return
+%
 %------------------------------------------------------------------------------
 %------------------------------------------------------------------------------
 %------------------------------------------------------------------------------

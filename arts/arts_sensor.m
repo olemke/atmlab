@@ -54,28 +54,19 @@ rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
 rqre_datatype( do_load, @isboolean );                            %&%
 
 
-folder_created = 0;
-%
 if isempty( workfolder )
-  workfolder     = create_tmpfolder;
-  folder_created = 1;
+  workfolder = create_tmpfolder;
+  cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 end
 
 
-try
-  %
-  parts = qarts2cfile( 'GetSensor' );
-  S     = qarts2cfile( Q, parts, workfolder );
-  cfile = fullfile( workfolder, 'cfile.arts' );
-  strs2file( cfile, S );
-  arts( cfile );
-
-catch
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
-  rethrow(lasterror);
-end
+%= Run ARTS
+%
+parts = qarts2cfile( 'GetSensor' );
+S     = qarts2cfile( Q, parts, workfolder );
+cfile = fullfile( workfolder, 'cfile.arts' );
+strs2file( cfile, S );
+arts( cfile );
 
 
 if nargout
@@ -126,6 +117,3 @@ end
 
 end
 
-if folder_created
-  delete_tmpfolder( workfolder );  
-end

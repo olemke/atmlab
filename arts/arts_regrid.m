@@ -38,7 +38,7 @@ grids1 = extract_grids( dim, Q1 );
 grids2 = extract_grids( dim, Q2 );
 
 
-F = regrid( grids1, qarts_get(F0), grids2, 'linear' );
+F = gridinterp( grids1, qarts_get(F0), grids2, 'linear' );
 
 return
 

@@ -20,65 +20,41 @@
 function [R,y,J] = arts_oem( Q, R, x, iter )
 
 
+% Checks done *arts_oem_init* are not repeated here
 
-%- Handle special case of arts_oem('clean',R) ---------------------------
 
-if ischar(Q)  &  strcmp( Q, 'clean' )
-  delete_tmpfolder( R.workfolder );
-  return                               % --->
+%--- Map x to variables ----------------------------------------------
+
+if iter > 1
+  [Q,R] = arts_x2QR( Q, R, x );
 end
 
-%------------------------------------------------------------------------
 
-  
+%--- Run ARTS --------------------------------------------------------
 
-%- Everything is here put into try-catch to enable that work folder is
-%- removed if something goes wrong.
+if nargout == 3
+  do_j  = 1;
+  cfile = R.cfile_yj;
+else
+  do_j  = 0;
+  cfile = R.cfile_y;
+end
 %
-try
-  
-  % Checks done *arts_oem_init* are not repeated here
-
-
-  %--- Map x to variables ----------------------------------------------
-
-  if iter > 1
-    [Q,R] = arts_x2QR( Q, R, x );
-  end
-
-
-  %--- Run ARTS --------------------------------------------------------
-
-  if nargout == 3
-    do_j  = 1;
-    cfile = R.cfile_yj;
-  else
-    do_j  = 0;
-    cfile = R.cfile_y;
-  end
-  %
-  arts( cfile );
-  %
-  y = xmlLoad( fullfile( R.workfolder, 'y.xml' ) );
-  %
-  if do_j  
-    J = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
-  end
-
-  %- Add baseline (should be moved to arts)
-  %
-  if iter > 1
-    y = y + R.bl;
-  end
-
-%- Something went wrong?
+arts( cfile );
 %
-catch
-  delete_tmpfolder( R.workfolder );
-  rethrow(lasterror);
+y = xmlLoad( fullfile( R.workfolder, 'y.xml' ) );
+%
+if do_j  
+  J = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
 end
 
-return
+
+%- Add baseline (should be moved to arts)
+%
+if iter > 1
+  y = y + R.bl;
+end
+
 
 
 

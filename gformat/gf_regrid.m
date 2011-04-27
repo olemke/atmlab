@@ -1,7 +1,7 @@
 % GF_REGRID   Change of rectangular grid for gformat data
 %
-%    Largely an interface to *regrid*. The dimension and size of new data are
-%    determined by the number of grids and their lengths, respectively.
+%    Largely an interface to *gridinterp*. The dimension and size of new data
+%    are determined by the number of grids and their lengths, respectively.
 %
 %    The function considers the atmlab setting EXTRAP, and it must be set to
 %    true or false. If EXTRAP is false, the number of grids in *grids* must
@@ -33,7 +33,7 @@ end
 %- Check input                                                     %&%
 %                                                                  %&%
 rqre_datatype( G, @isgformat );                                    %&%
-% Grids of G are checked inside *regrid*                           %&%
+% Grids of G are checked inside *gridinterp*                       %&%
 rqre_datatype( grids, @iscell );                                   %&%
 rqre_datatype( iopt, @ischar );                                    %&%
 
@@ -48,7 +48,7 @@ for i = 1 : length( G )
     G(i).(gname) = grids{d};
   end
   %
-  G(i).DATA = regrid( agrids, G(i).DATA, grids, iopt );  
+  G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt );  
   %
 end
 

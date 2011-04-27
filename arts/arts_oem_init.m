@@ -46,7 +46,7 @@
 %       sensor_los:
 %       ...
 %
-% FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O[,workfolder])
+% FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
 %        
 % Out   Q            Modified Q structure
 %       O            Modified O structure
@@ -54,8 +54,7 @@
 %       xa           A priori state vector
 % In    O            OEM settings.
 %       Q            Qarts settings.
-% Opt   workfolder   Use this as "workfolder" (see above). If not given, a
-%                    folder is created (in WORK_AREA). 
+%       workfolder   Use this as "workfolder" (see above).
 
 % 2010-01-11   Created by Patrick Eriksson.
 
@@ -77,12 +76,8 @@ R = [];
 
 %- Workfolder
 %
-if nargin == 3
-  rqre_datatype( workfolder, @ischar );                                    %&%
-  R.workfolder = workfolder;
-else
-  R.workfolder = create_tmpfolder;
-end
+rqre_datatype( workfolder, @ischar );                                      %&%
+R.workfolder = workfolder;
 
 
 %- Initialization of variables

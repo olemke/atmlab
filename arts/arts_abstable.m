@@ -51,28 +51,20 @@ rqre_datatype( workfolder, {@isempty,@ischar} );                 %&%
 rqre_datatype( do_load, @isboolean );                            %&%
 
 
-folder_created = 0;
-%
 if isempty( workfolder )
-  workfolder     = create_tmpfolder;
+  workfolder = create_tmpfolder;
+  cu = onCleanup( @()delete_tmpfolder( workfolder ) );
   folder_created = 1;
+else
+  folder_created = 0;  
 end
 
 
-try
-  %
-  parts = qarts2cfile( 'GetAbsTable' );
-  S     = qarts2cfile( Q, parts, workfolder );
-  cfile = fullfile( workfolder, 'cfile.arts' );
-  strs2file( cfile, S );
-  arts( cfile );
-
-catch
-  if folder_created
-    delete_tmpfolder( workfolder );
-  end
-  rethrow(lasterror);
-end
+parts = qarts2cfile( 'GetAbsTable' );
+S     = qarts2cfile( Q, parts, workfolder );
+cfile = fullfile( workfolder, 'cfile.arts' );
+strs2file( cfile, S );
+arts( cfile );
 
 
 if folder_created  |  do_load
@@ -82,9 +74,6 @@ else
 end
 
 
-if folder_created 
-  delete_tmpfolder( workfolder );
-end
 
 
 

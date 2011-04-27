@@ -34,6 +34,8 @@
 function B = regrid(agrids,A,newgrids,iopt)
 %  
 if nargin < 4, iopt = 'linear'; end
+warning( ['This function has been renamed to *gridinterp*, and this ',...
+          'version will be removed. Please change your code.']);
                                                                           %&%
                                                                           %&%
 %- Check input                                                            %&%
