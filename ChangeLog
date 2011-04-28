@@ -1,5 +1,12 @@
 2011-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-92
+
+	* math/gridinterp.m: Missed to make add for the new functions!
+	* math/pointinterp.m: Sorry.
+
+2011-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-91
 
 	* PLEASE NOTE: The name of the functions REGRID and INTERPD will
