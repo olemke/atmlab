@@ -155,16 +155,19 @@ A.isccp_d2_regexp = nan;
 A.isccp_d2_filename = nan;
 
 A.hoaps_iwp_basedir  = nan;
-A.hoaps_iwp_subdir  = nan;
-A.hoaps_iwp_regexp = nan;
+A.hoaps_iwp_subdir   = nan;
+A.hoaps_iwp_regexp   = nan;
+A.hoaps_iwp_filename = nan;
 
 A.hoaps_HTWmm_basedir  = nan;
 A.hoaps_HTWmm_subdir  = nan;
 A.hoaps_HTWmm_regexp = nan;
+A.hoaps_HTWmm_filename = nan;
 
 A.hoaps_HTWdm_basedir  = nan;
 A.hoaps_HTWdm_subdir  = nan;
 A.hoaps_HTWdm_regexp = nan;
+A.hoaps_HTWdm_filename = nan;
 
 A.mhs_basedir = nan;
 A.mhs_subdir = nan;
@@ -178,10 +181,12 @@ A.modis_MOD08_M3_regexp = nan;
 A.modis_MYD08_M3_basedir = nan;
 A.modis_MYD08_M3_subdir = nan;
 A.modis_MYD08_M3_regexp = nan;
+A.modis_MYD08_M3_filename = nan;
 
 A.modis_MYD06_L2_basedir = nan;
 A.modis_MYD06_L2_subdir = nan;
 A.modis_MYD06_L2_regexp = nan;
+A.modis_MYD06_L2_filename = nan;
 
 A.mspps_basedir = nan;
 A.mspps_subdir = nan;
@@ -191,6 +196,12 @@ A.mspps_filename = nan;
 A.patmosx_L2b_basedir = nan;
 A.patmosx_L2b_subdir = nan;
 A.patmosx_L2b_regexp = nan;
+A.patmosx_L2b_filename = nan;
+
+A.patmosx_L3_basedir = nan;
+A.patmosx_L3_subdir = nan;
+A.patmosx_L3_regexp = nan;
+A.patmosx_L3_filename = nan;
 
 %% COLLOCATION DATASETS
 A.collocation_cpr_mhs_basedir = nan;

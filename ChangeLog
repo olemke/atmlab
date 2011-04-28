@@ -1,3 +1,11 @@
+2011-04-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-93
+
+	* datasets/datasets_config.m: 
+	* site-specific/kiruna/datasets_init.m:
+	Added patmos-x datasets
+
 2011-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-92
