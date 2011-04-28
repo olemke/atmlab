@@ -9,6 +9,8 @@ function [data,lat,lon] = homogenize_datalatlon(data,lat,lon)
 % IN:  data,lat,lon
 % OUT: data,lat,lon
 %
+% 'data' may have 2->5 dimensions
+%
 % created by Salomon Eliasson
 % $Id$
 
@@ -27,28 +29,28 @@ end
 %flip data for ascending order
 if max(lon) == lon(1)
     [lon,index] = sort(lon);
-    data = data(:,index,:,:);
+    data = data(:,index,:,:,:);
 end
 if max(lat) == lat(1)
     [lat,index] = sort(lat);
-    data = data(index,:,:,:);
+    data = data(index,:,:,:,:);
 end
 
 %change all longitudes to -180:180
 lon = lon-(lon > 180)*360;
 [lon,lnindex] = sort(lon);
-data = data(:,lnindex,:,:);
+data = data(:,lnindex,:,:,:);
 
 % Need to remove duplicate data at zeros and instead introduce duplicate
 % data for -180 and 180
 [sv,index] = unique(lon);
 lon = lon(index);
-data = data(:,index,:,:);
+data = data(:,index,:,:,:);
 
 if lon(1)==-180 && ~lon(end)==180
     lon = [lon 180];
-    data = [data data(:,1,:,:)];
+    data = [data data(:,1,:,:,:)];
 elseif lon(end)==180 && ~lon(1)==-180
     lon = [-180 lon];
-    data = [data(:,end,:,:) data];
+    data = [data(:,end,:,:,:) data];
 end

@@ -1,5 +1,13 @@
 2011-04-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-94
+
+	* geoplots/resample_geodata.m:
+	* geoplots/gmt/homogenize_datalatlon.m:
+	Adapted so they can handle data arrays with 2 -> 5 dimensions.
+
+2011-04-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-93
 
 	* datasets/datasets_config.m: 
