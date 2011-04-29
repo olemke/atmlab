@@ -1,6 +1,6 @@
 % ATMLAB_EXAMPLE_DATA   Returns path to Atmlab example data folder
 %
-%    The example data folder is found at atmlab/examples/Data.
+%    The example data folder is found at atmlab/demos/data.
 %    
 % FORMAT   p = atmlab_example_data
 %        
@@ -11,6 +11,4 @@
 
 function p = atmlab_example_data
 
-p = fileparts(fileparts(which('atmlab_init')));
-p = fullfile( p, 'demos' );
-p = fullfile( p, 'data' );
+p = fullfile( atmlab_path, 'demos', 'data' );

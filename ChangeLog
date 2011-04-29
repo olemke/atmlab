@@ -1,3 +1,22 @@
+2011-04-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+
+	* atmlab-1-0-95
+
+	* atmlab/atmlab.m: Added functionality for taking direct action
+	when setting fields. This is now done for RAND_STATE and SITE.
+
+	* atmlab/atmlab_init.m: Default now is that a second call will
+	result in an error. Can be overridden. Handling of RAND_STATE
+	moved to atmlab. Header improved.
+
+	* atmlab/addsite.m: Now using atmlab_path. SITE re-set to NaN in
+	case of "unknownsite".
+
+	* atmlab/atmlab_example_data.m: Now using atmlab_path.
+
+	* atmlab/atmlab_path.m: Created.
+
 2011-04-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-94
@@ -10,7 +29,7 @@
 
 	* atmlab-1-0-93
 
-	* datasets/datasets_config.m: 
+	* datasets/datasets_config.m:
 	* site-specific/kiruna/datasets_init.m:
 	Added patmos-x datasets
 

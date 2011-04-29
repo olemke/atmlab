@@ -1,25 +1,44 @@
 % ATMLAB_INIT   Initializes the Atmlab package
 %
-%    Atmlab folders are added to the search path. The folders are put 
-%    at the start of the search path (prepended).
+%    See CONFIGURE for standard usage of this function.
 %
-%    All Atmlab settings are first set to default values. After this,
-%    the function *atmlab_conf* is executed, if such a function is found 
-%    in the search path. See further CONFIGURE.
+%    The following operations are performed:
 %
-%    The random state is initialised according to atmlab setting RAND_STATE.
+%     1. Atmlab folders are added to the search path. The folders are put
+%        at the start of the search path (prepended).
 %
-% FORMAT   atmlab_init
+%     2. If *atmlab_conf* is found, it is called. Otherwise default atmlab
+%        settings are created. 
+%     
+%     3. Default aliases are set (see *alias*).
+%
+% FORMAT   atmlab_init([force_reinit])
+%
+% OPT   force_reinit   Flag to allow repeated call of the function. Default
+%                      is false, which means that a second call during a
+%                      session will cause an error.
 
 % 2002-12-09   Created by Patrick Eriksson.
 
 
-function atmlab_init
+function atmlab_init( force_reinit )
+%
+if nargin == 0, force_reinit = false; end
 
 
 %= Determine path to Atmlab top folder
 %
 toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
+
+
+%= Determine if this is first call of session
+%
+% The function qarts2cfile is used this check, if it is the search path.
+%
+if exist('qarts2cfile','file')  & ~force_reinit
+  error( 'Atmlab is already initialised (and *force_reinit* is false).' );
+end
+
 
 
 %= Add folders to the search path
@@ -69,6 +88,7 @@ if nversion < 7.04
 end
 
 
+
 %=== Read Atmlab settings
 %
 if exist( 'atmlab_conf' ) == 2
@@ -77,37 +97,6 @@ else
   atmlab('defaults');  
 end
 
-
-%=== Init random states
-%
-rand_state = atmlab( 'RAND_STATE' ); 
-%
-if isnan( rand_state )
-  
-  %- Create random state. Add window number to get different states for
-  %  different matlab runs (works only for linux).
-  %
-  nr = getenv('WINDOWID');
-  if isempty(nr)
-    nr = 0;
-  else
-    nr = str2num( nr );
-  end
-  %
-  rand( 'state', sum(100*clock) + nr );
-  randn( 'state', sum(100*clock) + nr );
-  
-else
-  rand( 'state', rand_state );
-  randn( 'state', rand_state );
-end
-
-
-%=== Add directory for site-specific settings
-%
-if isnan(atmlab('ATMLAB_PATH'))
-    atmlab('ATMLAB_PATH', toppath);
-end
 
 
 %=== Define some aliases

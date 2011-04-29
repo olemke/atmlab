@@ -90,10 +90,10 @@
 %----------------------------------------------------------------------------
 % RAND_STATE
 %
-% Initialisation of random states (for rand and randn). Performed inside
-% *atmlab_init*. Either NaN or an integer. If set to NaN, a semi-random 
-% state is generated. Otherwise the specified value is used as state for 
-% both rand and randn.
+% Initialisation of random states (for rand and randn). Either NaN or an
+% integer. If set to NaN, a semi-random state is generated. Otherwise the
+% specified value is used as state for both rand and randn.
+% A new state is initialised directly by this function.
 %----------------------------------------------------------------------------
 % SITE
 %
@@ -142,6 +142,47 @@ persistent A
 [A,value] = prstnt_struct( A, @atmlab_defs, varargin );
 
 
+%- Some settings require direct action
+  
+if length(varargin) == 2
+
+  switch varargin{1}
+    
+   case 'RAND_STATE'
+    %
+    rand_state = varargin{2}
+    %
+    if isnan( rand_state )
+      %- Create random state. Add window number to get different states for
+      %  different matlab runs (works only for linux).
+      %
+      nr = getenv('WINDOWID');
+      if isempty(nr)
+        nr = 0;
+      else
+        nr = str2num( nr );
+      end
+      %
+      rand( 'state', sum(100*clock) + nr );
+      randn( 'state', sum(100*clock) + nr );
+     
+    else
+      rand( 'state', rand_state );
+      randn( 'state', rand_state );
+    end
+
+   case 'SITE'
+    %
+    addsite;
+    
+  end
+end
+%
+return
+
+
+  
+%---------------------------------------------------------------------------
 function A = atmlab_defs
 
 A.ARTS_INCLUDES     = NaN;

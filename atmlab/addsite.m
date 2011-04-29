@@ -7,7 +7,7 @@ function addsite
 % IN  none
 % OUT none
 
-toppath = atmlab('ATMLAB_PATH');
+toppath = atmlab_path;
 
 if isnan(atmlab('SITE'))
     warning('ATMLAB:nosite', 'No site configured, site-specific functions will fail');
@@ -21,6 +21,7 @@ else
 %             run(W{1});
 %         end
     else
-        warning('ATMLAB:unkownsite','Unknown site: %s',atmlab('SITE'))
+        warning('ATMLAB:unkownsite','Unknown site: %s',atmlab('SITE'));
+        atmlab('SITE', NaN );
     end
 end
