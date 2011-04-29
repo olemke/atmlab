@@ -66,7 +66,8 @@ function in = resample_geodata(in,field,newgrid)
 %                3rd example: Same as above but match the data to certain
 %                             lat lons
 %                
-% IMPORTANT: data fields must have the dimensions data(lat,lon,.....)
+% IMPORTANT: data fields must have the dimensions data(lat,lon,.....), or
+%                                                 data(lon,lat,.....)
 %
 % Created by Salomon Eliasson (contact me if the function needs tweeking)
 % $Id: regrid_dataset.m 6417 2011-04-21 06:44:37Z seliasson $
@@ -80,7 +81,7 @@ if nargin ~= 3
 end
 if ~iscell(field), field={field}; end
 assert(isstruct(in) && ischar(field{1}) && (isnumeric(newgrid) || iscell(newgrid)),...
-      BI,'Usage:  in = regrid_dataset(in,field,newgrid)')
+      BI,'Usage:  in = resample_geodata(in,field,newgrid)')
 
 %check fieldnames in struct
 field = field(ismember(field,fieldnames(in)));
@@ -88,6 +89,11 @@ assert(~isempty(field),BI,'Nothing to work on. read help');
 assert(~any(~isfield(in,{'lat','lon'})),BI,'"lat,lon" are required')
 assert(~isequal([size(in.(field{1}),1),size(in.(field{1}),2)],size(in.lat),size(in.lon)),...
     BI,'function only works on regular grids')
+
+a = size(in.(field{1}));
+assert(isequal([length(in.lat),length(in.lon)],a(1:2)) || ...
+    isequal([length(in.lon),length(in.lat)],a(1:2)),...
+    BI, 'data fields must have the dimensions data(lat,lon,.....), or data(lon,lat,.....)');
 
 %check equidegree grid
 cond1 = max(diff(in.lat))-min(diff(in.lat)) < 0.1; %deg 

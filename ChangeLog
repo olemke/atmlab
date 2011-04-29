@@ -1,3 +1,10 @@
+2011-04-29  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-96
+
+	* geoplots/resample_geodata.m: Catch error if data is not
+	data(lat,lon,...) or data(lon,lat,......)
+
 2011-04-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 
