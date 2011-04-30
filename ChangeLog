@@ -1,3 +1,13 @@
+2011-04-30  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-97
+
+	* geoplots/area_weighting.m: Added function that returns a
+	latitude area weight matrix to be applied to data for area weighting.
+
+	* site-specific/kiruna/datasets_init.m: Fixed bug in patmos-x regexp
+
+
 2011-04-29  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-96

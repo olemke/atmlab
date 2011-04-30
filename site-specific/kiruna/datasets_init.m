@@ -123,9 +123,9 @@ datasets_config('patmosx_L2b_basedir','/storage3/data/patmosx/level2b/');
 datasets_config('patmosx_L2b_subdir' ,'$YEAR4' );
 datasets_config('patmosx_L2b_regexp' ,'patmosx_(?<satellite>.{3})_(?<node>.{3})_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{6})$');
 
-datasets_config('patmosx_L3_basedir','/storage3/data/patmosx/level3/')
-datasets_config('patmosx_L3_subdir','$YEAR4/$MONTH')
-datasets_config('patmosx_L3_regexp','patmosx.+_(?<node>.{3})_(?<month>\d{2})_._(?<year>\d{4}).+(?<end>.{3})$');
+datasets_config('patmosx_L3_basedir','/storage3/data/patmosx/level3/');
+datasets_config('patmosx_L3_subdir','$YEAR4/$MONTH');
+datasets_config('patmosx_L3_regexp','(?<year>\d{4})/(?<month>\d{2})/patmosx_.+_(?<node>.{3})_.._._(?<year>\d{4}).+(?<end>.{3})$');
 
 %% COLLOCATION DATA SETS
 datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');
