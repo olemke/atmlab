@@ -1,3 +1,11 @@
+2011-05-01  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-98
+
+	* geoplots/resample_geodata.m: Fixed bug if dealing with 5D data.
+
+	* geoplots/gmt/gmt_plot.m: Added squeeze in one place.
+
 2011-04-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-97

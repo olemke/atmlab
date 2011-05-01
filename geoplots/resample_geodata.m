@@ -200,14 +200,35 @@ in = expand_latlons(in,lat,lon,field);
 [XI,YI] = meshgrid(lon,lat);
 
 %interpolate
-data = zeros([length(lat),length(lon),size(in.(field),3)]);
-for ii  = 1: size(in.(field),3)
-    Z = in.(field)(:,:,ii);
-    data(:,:,ii) = interp2(X,Y,Z,XI,YI);                                   
+sz = size(in.(field));
+data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
+
+switch length(sz)
+    case 5
+        for k = 1: size(in.(field),5)
+            for j = 1: size(in.(field),4)
+                for i = 1: size(in.(field),3)
+                    Z = in.(field)(:,:,i,j,k);
+                    data(:,:,i,j,k) = interp2(X,Y,Z,XI,YI);
+                end
+            end
+        end
+    case 4
+        for j = 1: size(in.(field),4)
+            for i = 1: size(in.(field),3)
+                Z = in.(field)(:,:,i,j);
+                data(:,:,i,j) = interp2(X,Y,Z,XI,YI);
+            end
+        end
+    otherwise
+        for i = 1: size(in.(field),3)
+            Z = in.(field)(:,:,i);
+            data(:,:,i) = interp2(X,Y,Z,XI,YI);
+        end
+
 end
 
 in.(field) = data;
-
 in.lon = lon;
 in.lat = lat;
 
@@ -224,7 +245,7 @@ d = in.lon(2)-in.lon(1);
 % interpolated into
 while in.lon(1)>=lon(1)
     in.lon = [in.lon(1)-d,in.lon,in.lon(end)+d];
-    in.(field) = [in.(field)(:,end,:,:),in.(field),in.(field)(:,1,:,:)];
+    in.(field) = [in.(field)(:,end,:,:,:),in.(field),in.(field)(:,1,:,:,:)];
 end
 
 in.lat = in.lat(:)';  % reshape for row vector
@@ -232,7 +253,7 @@ d = in.lat(2)-in.lat(1);
 
 while in.lat(1)>=lat(1)
     in.lat = [in.lat(1)-d,in.lat,in.lat(end)+d];
-    in.(field) = [in.(field)(1,:,:,:);in.(field);in.(field)(end,:,:,:)];
+    in.(field) = [in.(field)(1,:,:,:,:);in.(field);in.(field)(end,:,:,:,:)];
 end
 
 function in = coarser_grid_withAreaweighting(in,lat,lon,field)
@@ -325,9 +346,9 @@ for ii = 1:length(lat)
         % data with the larger newgrid is just averaged (nanmean)
         test1= in.lat>=lat(ii)-gt/2 & in.lat<lat(ii)+gt/2;
         test2= in.lon>=lon(jj)-gn/2 & in.lon<lon(jj)+gn/2;
-        temp = in.(field)(test1,test2,:,:);
+        temp = in.(field)(test1,test2,:,:,:);
         nvalid(ii,jj)  = numel(temp(~isnan(temp)));
-        data(ii,jj,:,:)= nanmean(temp(:));                                               
+        data(ii,jj,:,:,:)= nanmean(temp(:));                                               
     end
 end
 
