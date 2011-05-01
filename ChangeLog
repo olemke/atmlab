@@ -1,5 +1,11 @@
 2011-05-01  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-99
+
+	* geoplots/resample_geodata.m: Fixed another 5D bug
+
+2011-05-01  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-98
 
 	* geoplots/resample_geodata.m: Fixed bug if dealing with 5D data.

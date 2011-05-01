@@ -348,7 +348,7 @@ for ii = 1:length(lat)
         test2= in.lon>=lon(jj)-gn/2 & in.lon<lon(jj)+gn/2;
         temp = in.(field)(test1,test2,:,:,:);
         nvalid(ii,jj)  = numel(temp(~isnan(temp)));
-        data(ii,jj,:,:,:)= nanmean(temp(:));                                               
+        data(ii,jj,:,:,:)= nanmean(nanmean(temp,1),2);                                               
     end
 end
 
