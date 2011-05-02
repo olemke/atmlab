@@ -201,7 +201,10 @@ in = expand_latlons(in,lat,lon,field);
 
 %interpolate
 sz = size(in.(field));
-data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
+if ~islogical(in.(field))
+    data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
+else data = false([length(lat),length(lon),sz(3:end)]);
+end
 
 switch length(sz)
     case 5
@@ -265,7 +268,11 @@ function in = coarser_grid_withAreaweighting(in,lat,lon,field)
 
 % init
 sz = size(in.(field));
-data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
+if ~islogical(in.(field))
+    data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
+else data = false([length(lat),length(lon),sz(3:end)]);
+end
+
 nvalid = zeros(size(data),'int16'); % keep track of points used
 
 % INTERNAL function
@@ -348,7 +355,7 @@ for ii = 1:length(lat)
         test2= in.lon>=lon(jj)-gn/2 & in.lon<lon(jj)+gn/2;
         temp = in.(field)(test1,test2,:,:,:);
         nvalid(ii,jj)  = numel(temp(~isnan(temp)));
-        data(ii,jj,:,:,:)= nanmean(nanmean(temp,1),2);                                               
+        data(ii,jj,:,:,:)= nanmean(nanmean(temp,1),2);                                              
     end
 end
 

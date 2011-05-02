@@ -1,3 +1,10 @@
+2011-05-02  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-101
+
+	* geoplots/resample_geodata.m: Fixed so that it also work for
+	logical data sets.
+
 2011-05-02  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-100
