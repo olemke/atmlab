@@ -1,3 +1,13 @@
+2011-05-02  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-102
+
+	* files/path_replace_tilde.m:
+
+	New function to replace ~/... with the home directory path.
+
+	* handy/combine_pdfs.m: Use path_replace_tilde.
+
 2011-05-02  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-101

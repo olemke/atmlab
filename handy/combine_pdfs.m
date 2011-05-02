@@ -69,6 +69,7 @@ if ischar(pdffiles), files = dir(pdffiles); pdffiles = {files.name}; end
 %% Make sure filenames are in a row vector and non-empty
 pdffiles = pdffiles(:)';
 pdffiles = pdffiles(~cellfun('isempty',pdffiles));
+pdffiles = path_replace_tilde(pdffiles);
 assert(~isempty(pdffiles), 'atmlab:combine_pdfs', 'List of input pdf files is empty');
 
 %% We trust that the user can count! Not really, better double check here
@@ -190,7 +191,8 @@ exec_gmt_cmd(sprintf('cd %s && pdflatex -interaction batchmode out.tex', ...
              gmtlab('verbosity'));
 
 exec_gmt_cmd(sprintf('cd %s && mv out.pdf ''%s''', ...
-                     tmpfolder, fullfile(options.outdir, options.filename)), ...
+                     tmpfolder, ...
+                     fullfile(path_replace_tilde(options.outdir), options.filename)), ...
              gmtlab('verbosity'));
 
 end
