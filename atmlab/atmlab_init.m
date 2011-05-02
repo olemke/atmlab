@@ -12,32 +12,17 @@
 %     
 %     3. Default aliases are set (see *alias*).
 %
-% FORMAT   atmlab_init([force_reinit])
-%
-% OPT   force_reinit   Flag to allow repeated call of the function. Default
-%                      is false, which means that a second call during a
-%                      session will cause an error.
+% FORMAT   atmlab_init
 
 % 2002-12-09   Created by Patrick Eriksson.
 
 
-function atmlab_init( force_reinit )
-%
-if nargin == 0, force_reinit = false; end
+function atmlab_init
 
 
 %= Determine path to Atmlab top folder
 %
 toppath = fileparts( fileparts( which( 'atmlab_init' ) ) );
-
-
-%= Determine if this is first call of session
-%
-% The function qarts2cfile is used this check, if it is the search path.
-%
-if exist('qarts2cfile','file')  & ~force_reinit
-  error( 'Atmlab is already initialised (and *force_reinit* is false).' );
-end
 
 
 

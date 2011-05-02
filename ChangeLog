@@ -1,3 +1,11 @@
+2011-05-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-104
+
+	* atmlab/atmlab_init.m: Removed "force_reinit" stuff. Just causing
+	problems after e.g. 'clear all' (as reported by Oliver). Now no
+	restriction in calling the function repeatedly.
+
 2011-05-02  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-103
