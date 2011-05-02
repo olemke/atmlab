@@ -1,5 +1,5 @@
 function [data,lat,lon] = homogenize_datalatlon(data,lat,lon)
-%% HOMOGENIZE_DATALATLON sort and rearrange data,lat,lon to common format
+% HOMOGENIZE_DATALATLON sort and rearrange data,lat,lon to common format
 %
 % Purpose: For gridded data.
 %          Makes sure lat lons are ascending, lons are in -180:180 regime, 

@@ -256,7 +256,7 @@ switch in.ctable
         if ~isfield(in,'makecpt')
             a.cptfile = makecpt(in);
         else
-            exec_gmt_cmd(in.makecpt);
+            exec_system_cmd(in.makecpt);
             tmp = splitstring(in.makecpt,'> ');
             a.cptfile = tmp{2};
         end

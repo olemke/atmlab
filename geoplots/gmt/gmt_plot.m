@@ -782,7 +782,7 @@ if in.display && ~any(isnan(openwith))
         openwith,in.filename,in.figuretype);
 end
 
-out = exec_gmt_cmd(command,in.verbosity); % execute all gathered commands
+out = exec_system_cmd(command,in.verbosity); % execute all gathered commands
 
 filename = sprintf('%s.%s',in.filename,in.figuretype);
 
@@ -815,7 +815,7 @@ function file = makelegendpdf(command,in)
 file = fullfile(in.outdir,'legend');
 
 %make sure it's not here
-exec_gmt_cmd(sprintf('rm -f %s.ps',file),in.verbosity);
+exec_system_cmd(sprintf('rm -f %s.ps',file),in.verbosity);
 
 % Make the page large enough to fit most legends
 cmd = {'gmtset PAPER_MEDIA a0'};
@@ -837,7 +837,7 @@ end
 
 command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
 
-exec_gmt_cmd(command,in.verbosity);
+exec_system_cmd(command,in.verbosity);
 
 %% SUBFUNCTIONS FOR SETUP
 %      ||||||

@@ -34,4 +34,4 @@ end
 cptfile = sprintf('%s/ctable.cpt',in.outdir);
 command = sprintf('%s > %s',mkcpt,cptfile);
 
-exec_gmt_cmd(command,in.verbosity);
+exec_system_cmd(command,in.verbosity);

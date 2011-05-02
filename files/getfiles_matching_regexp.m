@@ -23,7 +23,7 @@ end
 
 % MAKE a list of files using UNIX find (regular files only)
 command = sprintf('find ''%s'' -type f',datadir);
-files = exec_gmt_cmd(command,gmtlab('VERBOSITY'));
+files = exec_system_cmd(command,gmtlab('VERBOSITY'));
 
 % use \n for one file per cell element from string output
 files = regexp(files{1},'\n','split');

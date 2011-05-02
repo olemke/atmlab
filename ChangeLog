@@ -1,3 +1,24 @@
+2011-05-02  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-103
+
+	* handy/list_colors.m: Added useful function to get color
+	vectors. From a cell of string arguments it creates a cell of rgb
+	vectors, or if nargin == 0, 10 rgb vectors are output.
+
+	* geoplots/homogenize_datalatlon.m: Moved general function to sort
+	and rearrange data,lat,lon to common format, from gmt to geoplots
+
+	* handy/exec_system_cmd.m: Moved from geoplots/gmt/exec_gmt_cmd.m
+
+	* handy/combine_pdfs.m:
+	* files/getfiles_matching_regexp.m:
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/test_gmt.m:
+	* geoplots/gmt/makecpt.m:
+	* geoplots/gmt/create_gmt_earth.m:
+	Changed exec_gmt_cmd to exec_system_cmd
+
 2011-05-02  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-102

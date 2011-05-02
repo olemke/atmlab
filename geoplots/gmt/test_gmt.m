@@ -94,7 +94,7 @@ warning('on','gmtcatstruct:DuplicatesFound')
 v = gmtlab('pdfviewer');
 if isnan(v), v = gmtlab('open_command');end
 if ~isnan(v)
-    exec_gmt_cmd(sprintf('%s %s&',v,files{end}));
+    exec_system_cmd(sprintf('%s %s&',v,files{end}));
 else
     a = 'No viewer defined. ';
     b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';

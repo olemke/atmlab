@@ -104,7 +104,7 @@ regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 
 col = 1; row = 1;
 for P = pdffiles
-    info  = exec_gmt_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('verbosity'));
+    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('verbosity'));
 
     % Great, pdfinfo uses BigPoints as a unit. Let's throw in some fancy
     % numbers and hope we end up with centimeters after that (DPI*INCH).
@@ -185,12 +185,12 @@ fprintf(fid,'\\end{document}\n');
 fclose(fid);
 
 %% Hand the TeX file over to pdflatex
-exec_gmt_cmd(mvplotcmd, gmtlab('verbosity'));
-exec_gmt_cmd(sprintf('cd %s && pdflatex -interaction batchmode out.tex', ...
+exec_system_cmd(mvplotcmd, gmtlab('verbosity'));
+exec_system_cmd(sprintf('cd %s && pdflatex -interaction batchmode out.tex', ...
                      tmpfolder), ...
              gmtlab('verbosity'));
 
-exec_gmt_cmd(sprintf('cd %s && mv out.pdf ''%s''', ...
+exec_system_cmd(sprintf('cd %s && mv out.pdf ''%s''', ...
                      tmpfolder, ...
                      fullfile(path_replace_tilde(options.outdir), options.filename)), ...
              gmtlab('verbosity'));

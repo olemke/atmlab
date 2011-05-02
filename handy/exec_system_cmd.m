@@ -1,6 +1,6 @@
-function out = exec_gmt_cmd(cmd, verbose)
+function out = exec_system_cmd(cmd, verbose)
 %
-% EXEC_GMT_CMD Executes a system command.
+% EXEC_SYSTEM_CMD Executes a system command.
 %
 % Execute a shell command for GMT.
 %
