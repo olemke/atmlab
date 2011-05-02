@@ -1,3 +1,9 @@
+2011-05-02  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-100
+
+	* atmlab/atmlab.m: Change default for WORK_AREA from Nan to tempdir().
+
 2011-05-01  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-99
@@ -136,7 +142,7 @@
 
 	* geoplots/gmt/test_gmt.m:
 
-	'all_tests'->'all_test.pdf', combine_pdfs requires the file suffix now.
+	'all_tests'->'all_tests.pdf', combine_pdfs requires the file suffix now.
 
 2011-04-26  Salomon Eliasson  <s.eliasson@ltu.se>
 

@@ -199,4 +199,4 @@ A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
 A.SITE              = NaN;
 A.VERBOSITY         = 1;
-A.WORK_AREA         = NaN;
+A.WORK_AREA         = tempdir();
