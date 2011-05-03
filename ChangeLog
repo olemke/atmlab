@@ -1,3 +1,16 @@
+2011-05-03  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-105
+
+	* files/create_tmpfolder.m:
+
+	Prepend instead of append 'atmlab-' to tmpfolder name for better
+	sorting. Also add the username to the tmpfolder name if available.
+
+	* files/delete_tmpfolder.m:
+
+	Use rmdir(...,'s') instead of system-dependent commands.
+
 2011-05-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-104

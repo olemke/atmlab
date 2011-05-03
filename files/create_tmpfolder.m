@@ -25,13 +25,13 @@ function tmpfolder = create_tmpfolder
 atmlab( 'require', {'WORK_AREA'} );
 workarea = atmlab( 'WORK_AREA' );
 %
-if ~ischar( workarea )
-    error( 'atmlab:tmpfolder', 'WORKAREA must be a string' );
+if ~ischar(workarea)
+    error( 'atmlab:create_tmpfolder', 'WORKAREA must be a string' );
 end
 
 if ~isdir(workarea)
-    error( 'atmlab:tmpfolder', ...
-        'The given work area (%s) does not exist.', workarea );
+    error( 'atmlab:create_tmpfolder', ...
+           'The given work area (%s) does not exist.', workarea );
 end
 
 %=== Loop until a new folder with unique name has been created
@@ -39,11 +39,16 @@ end
 ready = 0;
 count = 100;
 %
-while count && ~ready
-  tmpfolder = [tempname(workarea) '-atmlab'];
+username = getenv('USER');
+if (~isempty(username)), username = [username '-']; end
+tmpfolderparts = regexp(tempname(workarea), ...
+    ['(?<dirname>.*' filesep ')(?<basename>[^' filesep ']*)$'], ...
+    'names');
+tmpfolder = [tmpfolderparts.dirname 'atmlab-' username tmpfolderparts.basename];
 
+while count && ~ready
   if ~exist( tmpfolder, 'dir' )
-    [a,b] = mkdir(tmpfolder);     
+    [a,b] = mkdir(tmpfolder);      %#ok<ASGLU>
     if isempty(b)           % Check again if folder exist, for extra safety
       ready = 1;
     end

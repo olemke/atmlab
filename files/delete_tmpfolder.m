@@ -28,7 +28,7 @@ function delete_tmpfolder(tmpfolder)
 atmlab( 'require', {'DEBUG'} );
 db = atmlab( 'DEBUG' );
 %
-if ~isnan(db)  &  db
+if ~isnan(db) && db
   return                   % --->
 end
 
@@ -52,20 +52,9 @@ else
   end
 end
 
-
-%=== The Matlab delete function was tested but no good and secury solution 
-%=== could be found and system commands are used instead.
-%
-if isunix
-  eval([ '!rm -rf ', tmpfolder ])
-elseif ispc
-  [s,v] = dos('ver');    % determine Windows version                  
-  if ~isempty( strfind(v,'Windows XP') ) || ~isempty( strfind(v,'Windows 2000') ) 
-    eval([ '!rmdir /S/Q ', tmpfolder ]);
-  else
-    error('Function not implemented for this Windows version.')  % for this Windows systems the 'deltree' command can be used                                    
-  end
+if (exist(tmpfolder,'dir'))
+    [succ,msg] = rmdir(tmpfolder, 's');
+    if (~succ), error('atmlab:delete_tmpfolder', msg); end
 else
-  error('Unknown computer type.');
+    logtext(1, [tmpfolder ' doesn''t exist. Moving on.\n']);
 end
-
