@@ -1,5 +1,11 @@
 2011-05-03  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-106
+
+	* files/delete_tmpfolder.m: Update doc.
+
+2011-05-03  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-105
 
 	* files/create_tmpfolder.m:

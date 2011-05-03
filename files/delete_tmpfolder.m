@@ -5,13 +5,11 @@
 %    is a required setting. Only folders in the work area are removed for
 %    safety reasons.
 %
-%    No good and safe way to use the Matlab delete function has been found,
-%    and platforms specific commands are used.
-%
 % FORMAT   delete_tmpfolder(tmpfolder)
 %
 % IN       tmpfolder   Full path of folder to remove. 
 
+% 2011-05-03  Switch to Matlab's rmdir(...,'s') function. (OLE)
 % 2005-03-04  WindowsXP and Windows2000 compatibility added by Hermann Berg
 % 2005-01-27  Added force (-f) flag to unix remove command. Without this
 %             the function does not work for users with alias rm='rm -i'.
