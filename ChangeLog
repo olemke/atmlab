@@ -1,3 +1,15 @@
+2011-05-04  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-1-0-110
+
+	* gformat/griddedfield2gf: added method to convert from griddedfield 
+	  to gformat
+	
+	* gformat/gf2griddedfield: modified with more sanity checks
+
+	* retrieval/oem.m: added breakpoint to correctly exit if inversion 
+	  fails to converge
+
 2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-109

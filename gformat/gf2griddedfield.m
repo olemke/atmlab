@@ -1,7 +1,7 @@
 % GF2GRIDDEDFIELD   CONVERTS A GFORMAT STRUCTURE INTO A GRIDDED FIELD
 %
 %    Converts data having the G format into data having the arts xml 
-%    GriddedField.
+%    GriddedField format to use with e.g. xmlStore.
 %
 % FORMAT   GF = gf2griddedfield( G )
 %        
@@ -10,13 +10,16 @@
 
 % 2011-02-08   Created by Ole Martin Christensen.
 
-function GF = gf2griddedfield(G)
+function [GF type] = gf2griddedfield(G)
                                                                    %&%
 rqre_nargin( 1, nargin );                                          %&%
 %                                                                  %&%
-if ~isgformat(G)
-  error('Input data must be a GFormat struckture');
-end
+if ~isgformat(G)                                                   %&%
+  error('Input data must be a GFormat structure');                 %&%
+end                                                                %&%
+if G.DIM < 1 || G.DIM > 4                                          %&%
+  error('Input data must have atleast one and maximum four dimensions') %&%
+end                                                                %&%
 
 GF.name  = G.NAME;
 GF.data  = G.DATA;
@@ -26,5 +29,6 @@ for i = 1:G.DIM
     GF.grids{i} = eval(['G.GRID' n]);
     GF.gridnames{i} = eval(['G.GRID' n '_NAME']);
 end
+type = ['GriddedField', num2str(G.DIM)];
 
 return

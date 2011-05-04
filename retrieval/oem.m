@@ -741,6 +741,8 @@ end
                           test_convergence( x, xnew, SJSJ, O, xnorm, X, iter );
           nlinprint( O.outfids, iter, ga, cost, cost_x, cost_y, dx );
           x = xnew;
+        else
+          break;
         end
       end % while ~converged
       
