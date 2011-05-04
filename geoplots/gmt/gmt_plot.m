@@ -770,8 +770,8 @@ if isnan(openwith)
     openwith = gmtlab('OPEN_COMMAND');
 end
 if in.display && ~any(isnan(openwith))
-    command{end+1} = sprintf('%s %s.%s >/dev/null &',...
-        openwith,in.filename,in.figuretype);
+    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',...
+        openwith,in.outdir,in.filename,in.figuretype);
 end
 
 out = exec_system_cmd(command,in.verbosity); % execute all gathered commands

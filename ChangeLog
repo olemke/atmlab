@@ -1,5 +1,11 @@
 2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-109
+
+	* geoplots/gmt/gmt_plot.m: fixed display plot bug
+
+2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-108
 
 	* geoplots/homogenize_datalatlon.m: Changed the usage a bit. Now
