@@ -114,7 +114,7 @@ for F = field
     % SANITIZE the lat lons
     
     %FIXME switch  this away
-    [in.(F{1}),in.lat,in.lon] = homogenize_datalatlon(in.(F{1}),in.lat,in.lon);
+    [flags,in.lat,in.lon,in.(F{1})] = homogenize_datalatlon(in.lat,in.lon,in.(F{1}));
     % do the REGRIDDING
     in = regriddata(in,F{1},newgrid,flag360);
     % apply REGIONS to data
@@ -125,7 +125,7 @@ for F = field
     if flag360
         in.lon = in.lon+(in.lon < 0)*360;
         [in.lon,lnindex] = sort(in.lon);
-        in.(F{1}) = in.(F{1})(:,lnindex,:,:);
+        in.(F{1}) = in.(F{1})(:,lnindex,:,:,:);
     end
 end
 

@@ -1,5 +1,15 @@
 2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-108
+
+	* geoplots/homogenize_datalatlon.m: Changed the usage a bit. Now
+	also output a structure of flags to indicate which issue the
+	function addressed.
+
+	* geoplots/resample_geodata.m: Fixed small bug
+
+2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-107
 
 	* geoplots/resample_geodata.m: updated error messages. A new
