@@ -100,6 +100,16 @@ else
     b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
     c = 'or type ''help gmtlab'' to learn more';
     fprintf(2,'%s\n%s\n%s\n',a,b,c)
+    if ~system('which xpdf')
+        openwith = 'xpdf';
+    elseif ~system('which evince')
+        openwith = 'evince'; % for gnome users
+    elseif ~system('which okular')
+        openwith  = 'okular'; % for kde users
+    end
+    if exist('openwith','var')
+        exec_system_cmd(sprintf('%s %s&',openwith,files{end}));
+    end
 end
 
 if ~od && ~ischar(gmtlab('OUTDIR'))
@@ -108,7 +118,7 @@ if ~od && ~ischar(gmtlab('OUTDIR'))
     b = 'It is better to set a default directory.';
     c = 'I.e by setting gmtlab(''OUTDIR'',''<Somewhere>''), e.g. in startup.m';
     d = 'Setting this, or inputting a valid directory: in.outdir will suppress this message.';
-    warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
+    fprintf(2,'Warning: %s\n%s\n%s\n%s',a,b,c,d)
 end
 
 %%%%%%%%%%%%%%%%%

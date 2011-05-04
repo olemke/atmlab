@@ -31,7 +31,7 @@ end
 if isfield(in,'color_foreground')
     mkcpt = sprintf('%s --COLOR_FOREGROUND=%s',mkcpt,in.color_foreground);
 end
-cptfile = sprintf('%s/ctable.cpt',in.outdir);
+cptfile = sprintf('%s/ctable.cpt',in.tmpdir);
 command = sprintf('%s > %s',mkcpt,cptfile);
 
 exec_system_cmd(command,in.verbosity);

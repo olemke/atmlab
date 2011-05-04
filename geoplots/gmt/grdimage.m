@@ -1,4 +1,4 @@
-function command = grdimage(file,cptfile)
+function command = grdimage(in)
 % GRDIMAGE appends options to GMT grdimage
 %
 % purpose: Appends options to a short script and calls the GMT
@@ -14,10 +14,10 @@ function command = grdimage(file,cptfile)
 grdimage = 'grdimage';
 
 %location of file, region and projection
-grdimage = sprintf('%s %s.grd -R -J',grdimage,file);
+grdimage = sprintf('%s %s -R -J',grdimage,in.grdfile);
 
 %colortable
-grdimage = sprintf('%s -C%s',grdimage,cptfile);
+grdimage = sprintf('%s -C%s',grdimage,in.plot.color.cptfile);
 
 %Use nearestneigbour interpolation, only use the nearest grid point
 %Otherwise the default bicubic interpolation introduces artifacts.
@@ -26,4 +26,4 @@ grdimage = sprintf('%s -S-n/0',grdimage);
 % selects Overlay plot mode and assuming more pscode will be appended
 grdimage = sprintf('%s -O -K',grdimage);
 
-command = sprintf('%s >> %s.ps',grdimage,file);
+command = sprintf('%s >> %s/%s.ps',grdimage,in.outdir,in.filename);

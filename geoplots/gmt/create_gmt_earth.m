@@ -10,11 +10,11 @@ function commands = create_gmt_earth(in)
 
 in = setup_create_gmt_earth(in);                                           
 
-F = in.filename;
+F = fullfile(in.outdir,in.filename);
 
 % Remove earlier .ps and gmt residules
-commands{1} = sprintf('rm -f %s.ps %s.eps',F,F);                                
-commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
+commands{1} = sprintf('rm -f %s.{ps,eps}',F);                                
+%commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
 
 % Set paper size
 commands{end+1} = 'gmtset PAPER_MEDIA a0';                                      
@@ -54,14 +54,15 @@ commands{end+1} = in.plot.basemap;
 if isfield(in,'nearneighbor')                                                   
     commands{end+1} = in.nearneighbor;
 elseif ~in.gridded && isfield(in.plot,'grid')
-    commands{end+1} = nearneighbor(F,in.plot.grid);
+    in.grdfile = sprintf('%s/%s.grd',in.tmpdir,in.filename);
+    commands{end+1} = nearneighbor(in.grdfile,in.plot.grid);
 end
 
 % IMAGE (plot data)
 if isfield(in,'grdimage')
     commands{end+1} = in.grdimage;
 elseif ~in.nodata
-    commands{end+1} = grdimage(F,in.plot.color.cptfile);
+    commands{end+1} = grdimage(in);
 end
 
 % LEGEND
@@ -182,11 +183,11 @@ function basemap = setupbasemap(in)
 %% setupbasemap
 
 if ~isempty(in.title)
-    basemap = sprintf('psbasemap -B:."%s": -R%s -J%s -Ya5 -G -P -K > %s.ps',...
-        gmt_unicode_converter(in.title),in.plot.region,in.plot.proj,in.filename);
+    basemap = sprintf('psbasemap -B:."%s": -R%s -J%s -Ya5 -G -P -K > %s/%s.ps',...
+        gmt_unicode_converter(in.title),in.plot.region,in.plot.proj,in.outdir,in.filename);
 else
-    basemap = sprintf('psbasemap -R%s -J%s -Ya5 -G -P -K > %s.ps',...
-        in.plot.region,in.plot.proj,in.filename);
+    basemap = sprintf('psbasemap -R%s -J%s -Ya5 -G -P -K > %s/%s.ps',...
+        in.plot.region,in.plot.proj,in.outdir,in.filename);
 end
 
 function a = mkgrid(in)
@@ -198,7 +199,7 @@ if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
     a='';
     return
 end
-a.ungriddedfile = [in.filename '.nc'];
+a.ungriddedfile = in.ungriddedfile;
 
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')    % find the approx density of points
     x = length( unique( floor(in.lat)));
@@ -342,8 +343,8 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
         else
             lsize = in.legend.position_nan;
         end
-        b = sprintf('psscale -D%s -Li -C%s/color_nan.cpt -O -K >> %s.ps',...
-            lsize,in.outdir,in.filename);
+        b = sprintf('psscale -D%s -Li -C%s/color_nan.cpt -O -K >> %s/%s.ps',...
+            lsize,in.tmpdir,in.outdir,in.filename);
     end
     
     % get xtra options
@@ -432,4 +433,4 @@ in = optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s',in.ticks);
 
-basemap = sprintf('%s  -R -J -O >> %s.ps',basemap,in.filename);
+basemap = sprintf('%s  -R -J -O >> %s/%s.ps',basemap,in.outdir,in.filename);

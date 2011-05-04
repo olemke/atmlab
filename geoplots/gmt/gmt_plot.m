@@ -522,28 +522,24 @@ if ~isfield(in,field) && ~isfield(in,'nodata')
         'Data field: "%s" not found',field)
 end
 
-% make TEMPDIR
-% cd to tmpdir so that the temporary .gmtfiles are not saved at '.'. Make
-% sure I cleanup after I'm done
-wa_flag = isnan(atmlab('WORK_AREA'));
-% temporarily set this (unitialized on cleanup)
-if wa_flag, atmlab('WORK_AREA',tempdir); end
-in.tmpdir = create_tmpfolder;
-p = pwd();
-onCleanup(@() cleanup(in.tmpdir,p,wa_flag));
-cd(in.tmpdir);
-
 out = set_GMT_plot(in,field);
 
+% make TEMPDIR & cleanup after I'm done
+out.tmpdir = create_tmpfolder();
+p = pwd();
+onCleanup(@() cleanup(out.tmpdir,p,out.keep_files));
+cd(out.tmpdir);
+
 if out.gridded
-    out.grdfile = [out.filename '.grd'];
+    out.grdfile = sprintf('%s/%s.grd',out.tmpdir,out.filename);
     gmt_nc_save_gridded(out.lon,out.lat,out.(field),out.grdfile);
     if out.verbosity
         fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
     end
 else
     if ~out.nodata
-        gmt_nc_save_ungridded([out.filename '.nc'],out.(field),out.lat,out.lon);
+        out.ungriddedfile = sprintf('%s/%s.nc',out.tmpdir,out.filename);
+        gmt_nc_save_ungridded(out.ungriddedfile,out.(field),out.lat,out.lon);
     end
 end
 
@@ -629,7 +625,6 @@ default.ctable      = 'rainbow';          % color palette
 in = optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
-in.filename = sprintf('%s/%s',in.outdir,in.filename);
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
 
@@ -665,7 +660,7 @@ in = isgridded(in,field);
 if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         'gmtlab:gmt_plot:badInput','numel(data) must length(lat)*length(lon)')
-    [in.(field),in.lat,in.lon] = homogenize_datalatlon(in.(field),in.lat,in.lon);
+    [flags,in.lat,in.lon,in.(field)] = homogenize_datalatlon(in.lat,in.lon,in.(field));
 end
 
 % REGION
@@ -735,7 +730,7 @@ default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
 in.legend           = optargs_struct(in.legend,default);
 
 
-function filename = sort_figures(in,command)                                    %% SORT FIGURES %%
+function filename = sort_figures(in,command)
 %% SORT FIGURES
 
 if in.savelegend
@@ -758,14 +753,11 @@ else
             error('gmtlab:figuretype','%s: not supported',in.figuretype)
     end
     
-    command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
+    command{end+1} = sprintf('ps2raster %s/%s.ps -A -P %s',in.outdir,in.filename,T);
     
     command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
 end
 
-if ~in.keep_files
-    command{end+1} = sprintf('rm -f %s.{grd,asc,ps,nc} *.cpt',in.filename);
-end
 
 % Assemble open command
 openwith = NaN;
@@ -784,7 +776,7 @@ end
 
 out = exec_system_cmd(command,in.verbosity); % execute all gathered commands
 
-filename = sprintf('%s.%s',in.filename,in.figuretype);
+filename = sprintf('%s/%s.%s',in.outdir,in.filename,in.figuretype);
 
 % If no viewer is defined, check for xpdf, then evince, then okular
 if in.display && any(isnan(openwith)) && strcmp(in.figuretype,'pdf')
@@ -1003,8 +995,13 @@ if ~isempty(Errors)
     error('gmtlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
 end
 
-function cleanup(tmpdir,curdir,wa_flag)
-% cd back to the original directory
-if wa_flag, atmlab('WORK_AREA',NaN); end
-cd(curdir);
-rmdir(tmpdir,'s')
+function cleanup(tmpdir,curdir,keepfiles)
+
+if keepfiles
+    fprintf('in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
+    fprintf(2,'Remember to delete the directory when you are done\n')
+else
+    % cd back to the original directory
+    cd(curdir);
+    rmdir(tmpdir,'s')
+end

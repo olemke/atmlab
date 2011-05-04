@@ -66,7 +66,7 @@ ctable(len+1:end,:) = tmp(end:-1:1,:);
 
 %% Make a cptfile out of it
 
-filecpt = sprintf('%s/mypolar.cpt',in.outdir);
+filecpt = sprintf('%s/mypolar.cpt',in.tmpdir);
 fid = fopen(filecpt,'w');
 %##################### HEADER ###############################
 fprintf(fid,'%s\t%s\n','#cpt file created by:','makepolar.m');

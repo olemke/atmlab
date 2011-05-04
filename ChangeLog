@@ -1,3 +1,28 @@
+2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-107
+
+	* geoplots/resample_geodata.m: updated error messages. A new
+	version of this function based on feedback from programming
+	meeting is in the pipeline (half finished)
+
+	* geoplots/gmt/test_gmt.m: try to open final merged.pdf even if
+	'pdfviewer', or 'open_command' is not set in gmtlab. Uses system
+	'which' to see if xpdf, or evince, or okular is installed and
+	picks the first hit to view the pdf.
+
+	* geoplots/gmt/gmt_plot.m: Removed workaround for 'work_area'. and
+	make sure tmp files end up in tmpdir
+
+	* geoplots/gmt/makecpt.m:
+	* geoplots/gmt/grdimage.m:
+	* geoplots/gmt/makepolar.m:
+	* geoplots/gmt/nearneighbor.m:
+	* geoplots/gmt/create_gmt_earth.m:
+	* geoplots/gmt/xtra_nan_legend.m:
+
+	Make sure tmp files end up in tmpdir
+
 2011-05-03  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-106

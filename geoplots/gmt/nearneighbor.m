@@ -18,7 +18,7 @@ nearneighbor = sprintf('%s -bic',nearneighbor); %for binary input
 %location of file
 if isfield(in,'ungriddedfile')
     nearneighbor = sprintf('%s %s',nearneighbor,in.ungriddedfile);
-    nearneighbor = sprintf('%s -G%s.grd',nearneighbor,file);
+    nearneighbor = sprintf('%s -G%s',nearneighbor,file);
 else
     error 'needs in.ungriddedfile '
 end

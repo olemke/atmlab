@@ -73,7 +73,7 @@ function in = resample_geodata(in,field,newgrid)
 % $Id: regrid_dataset.m 6417 2011-04-21 06:44:37Z seliasson $
 
 %% Check input
-BI = 'Salomon:resample_geodata:badInput';
+BI = 'atmlab:resample_geodata:badInput';
 assert(nargin>=2,BI,'Read help for usage')
 if nargin ~= 3
     assert(isfield(in,'newgrid'),BI,'Read help for usage')
@@ -99,7 +99,7 @@ assert(isequal([length(in.lat),length(in.lon)],a(1:2)) || ...
 cond1 = max(diff(in.lat))-min(diff(in.lat)) < 0.1; %deg 
 cond2 = max(diff(in.lon))-min(diff(in.lon)) < 0.1; %deg 
 assert(cond1 && cond2, BI,...
-    'The input grid must be equidegree (homoginous spacing)')
+    'The input grid must be equidegree (constant spacing)')
 
 % preserve information on original longitudes. Internally I want the
 % longitudes to be in 180:180 format
@@ -112,6 +112,8 @@ t.lon=in.lon; t.lat=in.lat;
 for F = field
     in.lon=t.lon;in.lat=t.lat;
     % SANITIZE the lat lons
+    
+    %FIXME switch  this away
     [in.(F{1}),in.lat,in.lon] = homogenize_datalatlon(in.(F{1}),in.lat,in.lon);
     % do the REGRIDDING
     in = regriddata(in,F{1},newgrid,flag360);
@@ -185,7 +187,7 @@ function in = interpolate_grid(in,lat,lon,field)
 % 
 % Out: in         struct          original in with the new lat,lon and data
 
-assert(nargin==4,'Salomons:interpolate_grid:badInput','See help section')
+assert(nargin==4,'atmlab:interpolate_grid:badInput','See help section')
 
 if gmtlab('verbosity')
     fprintf('Changing grid from %dx%d to %dx%d deg by INTERPOLATION\n',...
@@ -330,7 +332,7 @@ function in = coarser_grid(in,lat,lon,field)
 %       is to also output the number of values used in the averaging for
 %       each grid
 
-assert(nargin==4,'Salomons:coarser_grid:badInput','See help resample_geodata')
+assert(nargin==4,'atmlab:coarser_grid:badInput','See help resample_geodata')
 
 gn = mean(diff(lon));
 gt = mean(diff(lat));
