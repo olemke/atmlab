@@ -1,13 +1,27 @@
+2011-05-06  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-111
+
+	* handy/exec_system_cmd.m: Added special error check if there is a
+	problem with the libraries called. The error output gives
+	mitigating instructions on how to fix this for linux and MAC.
+
+	* geoplots/gmt/gmt_plot.m:
+	- Use which gmtset instead to test if it is installed, and then give
+	the appropriate error message.
+	- Fixed bug for legend when plotting subset regions
+	- By default no longer allow more colors levels than unique data values.
+
 2011-05-04  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-1-0-110
 
-	* gformat/griddedfield2gf: added method to convert from griddedfield 
+	* gformat/griddedfield2gf: added method to convert from griddedfield
 	  to gformat
-	
+
 	* gformat/gf2griddedfield: modified with more sanity checks
 
-	* retrieval/oem.m: added breakpoint to correctly exit if inversion 
+	* retrieval/oem.m: added breakpoint to correctly exit if inversion
 	  fails to converge
 
 2011-05-04  Salomon Eliasson  <s.eliasson@ltu.se>

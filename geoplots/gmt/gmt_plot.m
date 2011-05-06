@@ -556,14 +556,15 @@ filename=sort_figures(out,commands);
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-[a,b] = system('gmtset 2>&1');
+[a,b] = system('which gmtset');
 
-if a == 127
-    c  = 'Either GMT is not installed';
-    d  = 'you need to add its installation directory to your PATH';
-    e  = 'e.g. in Matlab you can add the PATH via';
-    f  = 'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])';
-    error('gmtlab:shell','%s%s or %s\n%s:\n%s',b,c,d,e,f)
+if a == 1
+    error('gmtlab:gmt_plot:shell',[ [ b '\n\n'],...
+    'Either GMT is not installed\n',...
+    'or\n',...
+    'You need to add its installation directory to your PATH\n',...
+    'e.g. in Matlab you can add the PATH via \n',...
+    'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])'])
 end
 
 % SET DEFAULTS
@@ -621,7 +622,7 @@ end
 
 % colors & data representation:
 default.ctable      = 'rainbow';          % color palette
-[default.stepsize,default.legend.tick_annotation_format]    = getstepsize(in);    % color level datastep interval
+[default.stepsize,default.legend.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
 in = optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
@@ -712,7 +713,7 @@ if ~isfield(in.legend,'position')
         % vertical
         % fullheight vertical            9.8 2.25 4.5 .2
         % min height (good for 20 lvls)  9.8  1.5   3 .2
-        f = 2* (180/(x(4)-x(3)) -1); %something between 0->1 equivalent to 120->180 lats
+        f = 2- ( x(2)-x(1) )/( x(4)-x(3) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
         v = [9.8 2.25-f*0.75 4.4-f*1.5 .2];
     else v = [];
     end
@@ -849,7 +850,7 @@ datarange = [10^(round(x)-1) * round(d(1) * (1/10^(round(x)-1))),...
 
 
 
-function [stepsize,annot_format] = getstepsize(in)
+function [stepsize,annot_format] = getstepsize(in,field)
 %% getstepsize
 
 if in.nodata
@@ -859,7 +860,12 @@ if in.nodata
 end
 
 % default-ish number of levels
-x = 20;
+nlev = 20;
+
+if length(unique(in.(field)))<nlev
+    nlev = length(unique(in.(field)));
+end
+    
 diff = double(in.datarange(2)-in.datarange(1));
 
 if all(isfield(in,{'stepsize','nlevels'}))
@@ -867,7 +873,7 @@ if all(isfield(in,{'stepsize','nlevels'}))
 elseif ~isfield(in,'stepsize') && isfield(in,'nlevels')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
 else
-    stepsize = diff/x;
+    stepsize = diff/nlev;
 end
 
 % Guess a reasonable annotation format based on stepsize.
