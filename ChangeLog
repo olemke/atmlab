@@ -1,3 +1,18 @@
+2011-05-06  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-112
+
+	* geoplots/gmt/gmtlab.m:
+
+	Set OUTDIR by default to atmlab('WORK_AREA').
+
+	* handy/combine_pdfs.m:
+
+	No need for outdir nan check anymore.
+
+	Make the doc even clearer about where output files are written
+	by default.
+
 2011-05-06  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-111

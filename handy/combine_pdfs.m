@@ -5,6 +5,8 @@ function outfile = combine_pdfs(pdffiles, options)
 %
 % E.g. file = combine_pdfs(files,struct('cols',[2 2 2 2 1],...))
 %
+% By default, pdf files are created in gmtlab('outdir')
+%
 % PURPOSE:  Merge several pdf's (one page each) into a pdf file
 %
 % EXTERNAL DEPENDENCIES: pdfinfo, pdflatex.
@@ -56,9 +58,6 @@ assert(options.vspace >= 0, 'atmlab:combine_pdfs', 'Vertical spacing must be > 0
 assert(options.hspace >= 0, 'atmlab:combine_pdfs', 'Horizontal spacing must be > 0');
 assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
        'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
-if isnan(options.outdir)
-   options.outdir = tempdir; 
-end
 assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
        '%s does not exist', options.outdir);
 

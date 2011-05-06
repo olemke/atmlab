@@ -74,7 +74,7 @@ end
 function B = gmtlab_defs
 %% gmtlab_defs
 B.OPEN_COMMAND      = NaN;
-B.OUTDIR            = NaN;
+B.OUTDIR            = atmlab('WORK_AREA');
 B.PDFVIEWER         = NaN;
 B.PSVIEWER          = NaN;
 B.VERBOSITY         = 0;
