@@ -1,3 +1,12 @@
+2011-05-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-112
+
+	* math/binning_fast.m: Added 2 asserts to make sure
+	the function is used correctly.
+
+	* handy/exec_system_cmd.m: Fixed bug in if-statement
+
 2011-05-06  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-112

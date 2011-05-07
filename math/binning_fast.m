@@ -6,7 +6,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 % vector of values for that bin.
 %
 % The structure elements lat,lon,data must be the same size, and the function
-% will preserve the variable types.
+% will preserve the variable class.
 %
 % In:
 %       
@@ -40,7 +40,19 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %                   2) lat  ( vector )
 %                   3) lon  ( vector )
 %
-% 2010-05-26 Salomon Eliasson
+% USAGE: [data,lat,lon] = binning_fast(in,lonspace) %lonspace is optional
+% 
+% NOTE: A usefull function to get statistics (e.g numel, mean, sum, etc) on
+%       the binned data is binned_statistics
+%
+% Created by Oliver Lemke and Salomon Eliasson
+
+errId = 'atmlab:binning_fast:badInput';
+assert(all(isfield(in,{'lat','lon','data','gridsize'})),...
+    errId,'''lat'',''lon'',''data'',''gridsize'' are required input fields')
+
+assert(isequal(numel(in.data),numel(in.lat),numel(in.lon)),...
+    errId,'data,lat,lon must all be the same size')
 
 d = in.gridsize;
 if nargin==1, lonspace=0;end
