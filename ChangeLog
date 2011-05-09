@@ -1,5 +1,37 @@
 2011-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-115
+
+	* tests/make_check.m: Updated. 
+
+	* tests/test_arts_qpack2: 
+	* tests/test_arts_jacobians.m: Removed both(code very old). 
+
+	* demos/qarts_scattering_demo.m: Added some now needed Ignores for 
+	MC in IY_CLEARSKY_AGENDA.
+
+	* retrieval/qpack2/ChangeLog: Removed this file. Just confusing to
+	have a second ChangeLog. This file will be used in the future.
+        As a consequence there will be no special version number for qpack2.
+	The changes done under 2011 (to keep the latest history): 
+	* qpack2.tex (subsubsection{General features}): Was Q=qpack2 which
+	is old stuff. Now Q = qarts. Error reported by Stefan.
+	* qpack2.m: Now using onCleanup to remove work folder.
+	* qpack2.m: The option CalcTable is now not allowed for
+	ABSORPTION. Too difficult to handle safely in a general manner.
+	This must be handled by the user (and then using LoadTable). Use
+	set ABSORPTION to 'OnTheFly' (in fact, can be the quickest
+	option).
+	* qpack2.tex: Adopted to change above.
+	* qpack2.m (qp2_y2Q): Setting of Z_FIELD through HSE requires now
+	that Q.HSE.ON is true. Added handling of Q.HSE.
+	* qpack2.tex: Added text explaining that t_field etc. are ignored.
+	Added text explaining the HSE part (see 6.1.2).
+	* qp2_l2.m: Added output info from temperature retrievals
+	* qpack2.tex: Added comments about the units of the returned fields
+
+2011-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-114
 
 	* demos/qpack2_demo.m: The example was not updated with respect to

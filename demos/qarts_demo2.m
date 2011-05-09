@@ -50,7 +50,7 @@ Q.INCLUDES               = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 %
 Q.ABS_SPECIES(1).TAG{1}  = 'ClO';
 Q.ABS_SPECIES(1).ATMDATA = gf_artsxml( fullfile( fascod, ...
-                            'subarctic-winter.ClO.xml' ), 'ClO', 'vmr_field' ); 
+                            'tropical.ClO.xml' ), 'ClO', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(2).TAG{1}  = 'O3';
 Q.ABS_SPECIES(2).ATMDATA = gf_artsxml( fullfile( fascod, ...
@@ -58,12 +58,12 @@ Q.ABS_SPECIES(2).ATMDATA = gf_artsxml( fullfile( fascod, ...
 %
 Q.ABS_SPECIES(3).TAG{1}  = 'N2O';
 Q.ABS_SPECIES(3).ATMDATA = gf_artsxml( fullfile( fascod, ...
-                            'subarctic-winter.N2O.xml' ), 'N2O', 'vmr_field' ); 
+                            'tropical.N2O.xml' ), 'N2O', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(4).TAG{1}  = 'H2O-*-490e9-510e9'; % Some local lines not in PWR98
 Q.ABS_SPECIES(4).TAG{2}  = 'H2O-PWR98';
 Q.ABS_SPECIES(4).ATMDATA = gf_artsxml( fullfile( fascod, ...
-                            'subarctic-summer.H2O.xml' ), 'H2O', 'vmr_field' ); 
+                            'tropical.H2O.xml' ), 'H2O', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(5).TAG{1}  = 'N2-SelfContStandardType';
 Q.ABS_SPECIES(5).ATMDATA = gf_set( atmdata_empty(0), 0.781, [] );

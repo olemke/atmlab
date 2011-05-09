@@ -25,7 +25,7 @@ atmlab( 'FMODEL_VERBOSITY', 0 );
 
 %= Qarts
 %
-y0 = [ 4.115 27.94 ];  % Selected to fit both tests
+y0 = [ 4.115 27.94 ];
 dy = 1e-2;
 %
 try
@@ -41,6 +41,7 @@ if any( abs( [min(y) max(y)] - y0 ) > dy )
   error('Unexpected result from *qarts_demo*');
 end
 %
+y0 = [ 3.16 21.65 ];
 try
   [Q,f,y] = qarts_demo2;
 catch
@@ -58,7 +59,7 @@ end
 
 %= Qarts with DOIT
 %
-y0 = [ 152.52 -0.21 ];
+y0 = [ 152.78 -0.21 ];
 dy = 1e-2;
 %
 try
@@ -78,7 +79,7 @@ end
 
 %= Qarts with MC
 %
-y0 = [ 150.3 -0.1 ];
+y0 = [ 148.04 -1.9 ];
 %
 try
   [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( [], 'mc' );
@@ -92,18 +93,6 @@ ind = length(y) + [-1:0];
 if any( abs( y(ind)' - y0 ) > 3*dy(ind)' )
   reset_verbosity( va, vf );
   error('Unexpected result from *qarts_scatting_demo* with MC');
-end
-
-
-
-%= Jacobian tests
-%
-try
-  test_arts_jacobians;
-catch
-  reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *test_arts_jacobians* ===\n\n');
-  rethrow(lasterror);
 end
 
 
@@ -128,7 +117,7 @@ end
 %= Qpack2
 %
 try
-  test_qpack2;
+  L2 = qpack2_demo;
 catch
   reset_verbosity( va, vf );
   fprintf('\n=== Error while running *test_qpack2* ===\n\n');

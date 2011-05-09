@@ -184,7 +184,8 @@ C.OPT_PROP_GAS_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddGas', ...
 if strcmp( lower(method), 'mc' )
   %
   C.METHOD                        = 'MC';
-  Q.IY_CLEARSKY_AGENDA            = { 'iyMC' };    
+  Q.IY_CLEARSKY_AGENDA            = { 'Ignore( iy_error )', ...
+                                      'Ignore( iy_error_type )','iyMC' };    
   %
   C.METHOD_PRMTRS.STD_ERR         = m_arg;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
