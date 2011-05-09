@@ -127,7 +127,7 @@ Q.Z_SURFACE          = 5e3;          % Just a dummy value. A 10 km
 Q.ABS_LINES           = fullfile( atmlab_example_data, 'o3line111ghz' );
 Q.ABS_LINES_FORMAT    = 'Arts';
 %
-Q.ABSORPTION          = 'CalcTable';
+Q.ABSORPTION          = 'OnTheFly';
 Q.ABS_NLS             = [];
 
 %- Pressure grid
@@ -193,6 +193,12 @@ Q.T.RETRIEVE = false;
 Q.T.ATMDATA  = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
                         'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
 
+%- Determine altitudes through HSE
+%
+Q.HSE.ON       = true;
+Q.HSE.P        = 1013;
+Q.HSE.ACCURACY = 0.1;
+
 
 %- Species
 
@@ -212,11 +218,15 @@ Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
 
 %- Water 
 %
-Q.ABS_SPECIES(2).TAG      = { 'H2O-PWR98' };
+% This generates no absorption, as linefile has no H2O lines
+%
+Q.ABS_SPECIES(2).TAG      = { 'H2O' };
 Q.ABS_SPECIES(2).RETRIEVE = false;
 Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
                           'midlatitude-winter.H2O.xml' ), 'H2O', 'vmr_field' );
 
+% O2 and N2 not active, to make example somewhat faster
+if 0
 %- Oxygen
 %
 Q.ABS_SPECIES(3).TAG      = { 'O2-PWR93' };
@@ -230,6 +240,7 @@ Q.ABS_SPECIES(4).TAG      = { 'N2-SelfContStandardType' };
 Q.ABS_SPECIES(4).RETRIEVE = false;
 Q.ABS_SPECIES(4).ATMDATA  = gf_artsxml( fullfile( fascod, ...
                             'midlatitude-winter.N2.xml' ), 'N2', 'vmr_field' );
+end
 
 
 

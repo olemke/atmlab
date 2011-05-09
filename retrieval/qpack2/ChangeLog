@@ -1,3 +1,11 @@
+2011-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* Qpack2.0.10
+
+	* qpack2.tex (subsubsection{General features}): Was Q=qpack2 which
+	is old stuff. Now Q = qarts
+	Error reported by Stefan.
+
 2011-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* Qpack2.0.9

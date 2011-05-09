@@ -1,3 +1,10 @@
+2011-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-114
+
+	* demos/qpack2_demo.m: The example was not updated with respect to
+	HSE and CalcTable. (Reported by Stefan, thanks)
+
 2011-05-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-112
