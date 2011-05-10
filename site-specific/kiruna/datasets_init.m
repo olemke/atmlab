@@ -15,7 +15,7 @@ datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/sat2netcdf-0.4.ja
 % matching period
 
 % variables: YEAR, YEAR02, MONTH, DAY, DOY, SAT, SAT1, SAT2
-% regexp-output: year, doy, hour, minute
+% regexp-output: year, doy, day, hour, minute , end. (end if the file ending)
 
 datasets_config('amsua_basedir', '/storage3/data/amsu');
 datasets_config('amsua_subdir', '$SAT_amsua_$YEAR4/$MONTH/$DAY');
@@ -38,7 +38,7 @@ datasets_config('calipso_regexp', '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T
 
 datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
 datasets_config('cpr_subdir', '$YEAR4/$DOY');
-datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_');
+datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)');
 % same regexp works for all CloudSat's
 
 datasets_config('cloudsat_1B_CPR_basedir', '/storage3/data/cloudsat/1B-CPR.R04/');
@@ -117,15 +117,15 @@ datasets_config('modis_MYD06_L2_regexp' ,'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})
 
 datasets_config('mspps_basedir', '/storage3/data/mspps');
 datasets_config('mspps_subdir', '$SAT_orbital_$YEAR4/$MONTH/$DAY');
-datasets_config('mspps_regexp', datasets_config('amsua_regexp'));
+datasets_config('mspps_regexp', '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$');
 
 datasets_config('patmosx_L2b_basedir','/storage3/data/patmosx/level2b/');
 datasets_config('patmosx_L2b_subdir' ,'$YEAR4' );
-datasets_config('patmosx_L2b_regexp' ,'patmosx_(?<satellite>.{3})_(?<node>.{3})_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{6})$');
+datasets_config('patmosx_L2b_regexp' ,'patmosx_(?<satellite>.{3})_(?<node>.{3})_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{7})$');
 
 datasets_config('patmosx_L3_basedir','/storage3/data/patmosx/level3/');
 datasets_config('patmosx_L3_subdir','$YEAR4/$MONTH');
-datasets_config('patmosx_L3_regexp','(?<year>\d{4})/(?<month>\d{2})/patmosx_.+_(?<node>.{3})_.._._(?<year>\d{4}).+(?<end>.{3})$');
+datasets_config('patmosx_L3_regexp','(?<year>\d{4})/(?<month>\d{2})/patmosx_.+_(?<node>.{3})_.._._(?<year>\d{4}).+(?<end>.{4})$');
 
 %% COLLOCATION DATA SETS
 datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');

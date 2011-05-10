@@ -1,3 +1,17 @@
+2011-05-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-116
+
+	* geoplots/gmt/test_gmt.m: if nargout == 0, don't return anything
+
+	* geoplots/gmt/gmt_plot.m: No longer check if outdir is defined
+	properly or not. Fixed buggy implementation of onCleanup
+
+	* site-specific/kiruna/datasets_init.m: Added (?<end>) in some
+	places.
+
+	* time/dayofyear_inverse.m: Added some asserts and updated header.
+
 2011-05-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-115

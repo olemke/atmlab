@@ -86,6 +86,7 @@ cellfun(@disp,info,'uniformoutput',false)
 disp('Look at help gmt_plot for more detailed descriptions of options ')
 disp('specified here. I suggest looking at the call for each test in test_gmt')
 disp('if you want to see an example on how to create these figures.')
+disp(' ')
 disp('All the tests where merged onto one pdf using combine_pdfs.m.')
 
 warning('on','gmtcatstruct:DuplicatesFound')
@@ -94,7 +95,7 @@ warning('on','gmtcatstruct:DuplicatesFound')
 v = gmtlab('pdfviewer');
 if isnan(v), v = gmtlab('open_command');end
 if ~isnan(v)
-    exec_system_cmd(sprintf('%s %s&',v,files{end}));
+    exec_system_cmd(sprintf('%s %s&',v,files{end}),0);
 else
     a = 'No viewer defined. ';
     b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
@@ -108,7 +109,7 @@ else
         openwith  = 'okular'; % for kde users
     end
     if exist('openwith','var')
-        exec_system_cmd(sprintf('%s %s&',openwith,files{end}));
+        exec_system_cmd(sprintf('%s %s&',openwith,files{end}),1);
     end
 end
 
@@ -121,6 +122,9 @@ if ~od && ~ischar(gmtlab('OUTDIR'))
     fprintf(2,'Warning: %s\n%s\n%s\n%s',a,b,c,d)
 end
 
+if nargout == 0
+    clear files info
+end
 %%%%%%%%%%%%%%%%%
 % SUB FUNCTIONS
 %    |||||||

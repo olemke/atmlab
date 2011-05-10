@@ -527,7 +527,7 @@ out = set_GMT_plot(in,field);
 % make TEMPDIR & cleanup after I'm done
 out.tmpdir = create_tmpfolder();
 p = pwd();
-onCleanup(@() cleanup(out.tmpdir,p,out.keep_files));
+cleanupObject = onCleanup(@() cleanup(out.tmpdir,p,out.keep_files));
 cd(out.tmpdir);
 
 if out.gridded
@@ -592,16 +592,7 @@ if isfield(in,field)
 end
 in = optargs_struct(in,default);
 
-
-if isnan(in.outdir)
-    in.outdir = tempdir;
-    a = sprintf('Files are saved in your tempdir (%s)',in.outdir);
-    in.outdir = in.outdir(1:end-1);
-    b = 'It is better to set a default directory.';
-    c = 'I.e by setting gmtlab(''OUTDIR'',''<Somewhere>''), e.g. in startup.m';
-    d = 'Setting this, or inputting or inputting a valid directory: in.outdir will suppress this message.';
-    warning('warning:input:outdir','%s\n%s\n%s\n%s',a,b,c,d)
-elseif any(ismember(in.outdir,' '))
+if any(ismember(in.outdir,' '))
     error('gmtlab:input','"spaces" ar not supported for outdir (%s)',in.outdir)
 elseif strcmp(in.outdir(1),'~')
     % netcdffunctions don't like ~ for home
