@@ -1,5 +1,11 @@
 2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-118
+
+	* handy/exec_system_cmd.m:  New return value for error
+
+2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-117
 
 	* handy/exec_system_cmd.m: Added extra error catch
