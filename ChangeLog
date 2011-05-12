@@ -1,5 +1,11 @@
 2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-120
+
+	* handy/exec_system_cmd.m: bug in my if-statement
+
+2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-119
 
 	* handy/exec_system_cmd.m: no longer look for specific return
