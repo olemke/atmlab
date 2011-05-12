@@ -1,5 +1,13 @@
 2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-119
+
+	* handy/exec_system_cmd.m: no longer look for specific return
+	codes (except 0)
+
+
+2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-118
 
 	* handy/exec_system_cmd.m:  New return value for error

@@ -32,7 +32,7 @@ for x = cmd'
         fprintf('%s\n',out{i}(1:end-1))
     end
     
-    if any(ret == [127 133])
+    if (ret ~= 0)
         if any(cellfun('isempty',regexp(out{i},...
                 {'symbol lookup error',...
                 'dyld: Symbol not found',...
@@ -45,10 +45,8 @@ for x = cmd'
                 'If you are using LINUX, try setenv(''LD_LIBRARY_PATH'','''')\n',...
                 'If this solves the problem, add the corresponding line to your startup file'])
         else
-            error(errID,'Command not found: "%s"', fullcmd)
+            error(errID,'Command returned error %d: "%s"', ret, out{i})
         end
-    elseif (ret ~= 0)
-        error(errID,'Command returned error %d: "%s"', ret, out{i})
     end
     i = i+1;
 end
