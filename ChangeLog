@@ -1,3 +1,9 @@
+2011-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-117
+
+	* handy/exec_system_cmd.m: Added extra error catch
+
 2011-05-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-116
