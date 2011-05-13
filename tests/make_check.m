@@ -46,7 +46,7 @@ try
   [Q,f,y] = qarts_demo2;
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_demo* ===\n\n');
+  fprintf('\n=== Error while running *qarts_demo2* ===\n\n');
   rethrow(lasterror);
 end
 %
@@ -85,7 +85,7 @@ try
   [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( [], 'mc' );
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');
+  fprintf('\n=== Error while running *qarts_doit_demo* with MC ===\n\n');
   rethrow(lasterror);
 end
 %
@@ -120,7 +120,7 @@ try
   L2 = qpack2_demo;
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *test_qpack2* ===\n\n');
+  fprintf('\n=== Error while running *qpack2_demo* ===\n\n');
   rethrow(lasterror);
 end
 

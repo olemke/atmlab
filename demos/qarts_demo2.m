@@ -24,6 +24,8 @@ function [Q,f,y] = qarts_demo2( varargin )
 [ztan,atmdim] = optargs( varargin, { 30e3, 1 } );
 
 
+%= Atmlab settings
+%
 arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
 %
 if isnan( arts_xmldata_path )
@@ -31,8 +33,13 @@ if isnan( arts_xmldata_path )
 end
 %
 fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
+%
+% EXTRAP must be true here
+oldextrap = atmlab( 'EXTRAP' );
+atmlab( 'EXTRAP', true );
+cu = onCleanup( @()atmlab( 'EXTRAP', oldextrap ) );
 
-
+  
 %= Init Q structures
 %
 Q  = qarts;

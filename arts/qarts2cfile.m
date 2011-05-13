@@ -521,7 +521,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
-      T = add_agenda( T, 'abs_scalar_gas_agenda', { 'abs_scalar_gasCalcLBL' } );
+      T = add_agenda( T, 'abs_scalar_gas_agenda', ...
+                      { 'Ignore(rte_doppler)','abs_scalar_gasCalcLBL' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -557,7 +558,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       %
       T{end+1} = 'abs_lookupCreate'; 
       T        = add_agenda( T, 'abs_scalar_gas_agenda', ... 
-                                       { 'abs_scalar_gasExtractFromLookup' } );
+                 { 'Ignore(rte_doppler)','abs_scalar_gasExtractFromLookup' } );
       %
       abstable = true;
       %   
@@ -567,7 +568,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
       T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
-                                       { 'abs_scalar_gasExtractFromLookup' } );
+                 { 'Ignore(rte_doppler)','abs_scalar_gasExtractFromLookup' } );
       %
       abstable = true;
       %
