@@ -1,3 +1,10 @@
+2011-05-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-124
+
+	* geoplots/geo_single_localtime.m: Added function that returns a
+	global map of data with the same local time.
+
 2011-05-18  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-123
