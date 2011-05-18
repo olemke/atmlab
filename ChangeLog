@@ -1,5 +1,11 @@
 2011-05-18  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-123
+
+	* sensors/ssmt2_read.m: Update doc.
+
+2011-05-18  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-122
 
 	* sensors/ssmt2_read.m:

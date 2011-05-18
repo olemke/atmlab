@@ -43,7 +43,9 @@
 %               
 % IN    filename            Name of SSM/T-2 file
 % OPT   apply_calibration   Pass false to get the raw count values,
-%                           (default: true)
+%                           1: Apply calibration to retrieve BTs
+%                           2: Apply additional experimental per channel
+%                              offset calibration to retrieve BTs
 
 % 2009-11-20   Created by Oliver Lemke.
 
