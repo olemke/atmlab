@@ -1,4 +1,4 @@
-% FUNCTION   An (almost) empty function header.
+% SSMT2_READ   Read SSM/T-2 data file.
 %
 %    Reads an SSM/T-2 file into a structure and applies calibration.
 %
@@ -50,7 +50,7 @@
 function S = ssmt2_read (filename, apply_calibration)
 
 if nargin == 1
-  apply_calibration = true;
+  apply_calibration = 1;
 end
 
 uncompressed_filename='';
@@ -153,10 +153,15 @@ try
     %%%%%%%%%% Apply calibration %%%%%%%%%%
     %
     if (apply_calibration)
+      if (apply_calibration == 2)
+        experimental_offset_calibration = [0.2815 0.2915 0.2782 0.3762 1.1355];
+      else
+        experimental_offset_calibration = [1 1 1 1 1];
+      end    
       for chan = 1:NCHAN
-        rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) + rec.offset(chan);
+        rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) ...
+            + rec.offset(chan) * experimental_offset_calibration(chan);
       end
-      rmfield (rec, 'count');
     end
 
     S.recs(recn) = rec;
