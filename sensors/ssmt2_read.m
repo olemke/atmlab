@@ -7,6 +7,9 @@
 %
 %    Known Bugs: dataset name is not read correctly (but also not important)
 %
+%    To get the exact timestamp for each scan of one scanline use:
+%    datestr(S.recs(1).timestamp)
+%
 % FORMAT   S = ssmt2_read (filename, apply_calibration)
 %        
 % OUT   S   SSM/T-2 structure
@@ -23,12 +26,14 @@
 %               orbit    Orbit number
 %               scan     Scan number
 %               t1x      ?
-%               yyddd    Year and day of year
-%               ols      ?
-%               ts       ?
+%               year     Year of first scan in file
+%               doy      Day of year of first scan in file
+%               ols      seconds since start of day of first scan in file
+%               ts       milliseconds since ols
 %               lat      Latitude earth location vector
 %               lon      Longitude earth location vector
 %               time     Scene time data
+%               timestamp Scene time data as matlab datenum value
 %               count    Scene raw count data (not returned if
 %                        apply_calibration is set to true or not given)
 %               temp     Scene calibrated antenna temperatures (not returned if
@@ -68,8 +73,8 @@ if strcmp( filename(length(filename)-2:end), '.gz')
   filename = uncompressed_filename;
 end
 
-HDRSIZE = 692;
-DATSIZE = 692;
+%HDRSIZE = 692;
+%DATSIZE = 692;
 NPOS    = 28;
 NCHAN   = 5;
 
@@ -129,8 +134,24 @@ try
 
     rec.scan  = fread (fid, 1, 'uint16');
     rec.t1x   = fread (fid, 1, 'uint16');
-    rec.yyddd = fread (fid, 1, 'uint32');
+    yyddd = fread (fid, 1, 'uint32');
+    
+    rec.year = floor(yyddd/1000);
+    rec.doy = yyddd - rec.year*1000;
+    
+    if (rec.year < 50)
+        rec.year = rec.year+2000;
+    else
+        rec.year=rec.year+1900;
+    end;
+        
     rec.ols   = fread (fid, 1, 'uint32');
+    if (recn == 1)
+        firstols = rec.ols;
+    elseif (rec.ols < firstols)
+        rec.ols = rec.ols + 86400;
+    end
+    
     rec.ts    = fread (fid, 1, 'uint32');
 
     latlon = reshape (fread (fid, NPOS*2, 'int16') / 128, 2, NPOS);
@@ -139,6 +160,7 @@ try
   
     timecount = reshape (fread (fid, (1+NCHAN)*NPOS, 'uint16'), 1+NCHAN, NPOS);
     rec.time  = timecount (1, :);
+    rec.timestamp = datenum(rec.year,1,1) + rec.doy + rec.ols/86400 + rec.time/1000/86400;
     rec.count = timecount (2:NCHAN+1, :);
 
     rec.rawcal = fread (fid, 172, 'uint8');
@@ -169,7 +191,7 @@ try
     S.recs(recn) = rec;
     clear rec;
   end
-catch
+catch %#ok<CTCH>
   fclose (fid);
   if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
   return;

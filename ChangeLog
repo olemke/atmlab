@@ -1,3 +1,17 @@
+2011-05-19  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-125
+
+	* sensors/ssmt2_read.m:
+
+	Separate year and day of year into two structure elements.
+
+	Add 86400 to ols if midnight is passed.
+
+	Calculate timestamps (S.recs.timestamp) for each scan value.
+
+	Add documentation on how to get the exact timestamps.
+
 2011-05-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-124
