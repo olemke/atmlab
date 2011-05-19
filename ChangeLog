@@ -1,5 +1,17 @@
 2011-05-19  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-1-0-126
+
+	* sensors/ssmt2_read.m:
+
+	Use onCleanup.
+	
+	Initialize calibration coefficients only once.
+
+	Fix S.dsname. The ebcdic_ascii table had one element too many.
+
+2011-05-19  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-1-0-125
 
 	* sensors/ssmt2_read.m:

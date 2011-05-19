@@ -5,8 +5,6 @@
 %    This function is based on the ssmt2list C program written by Don Moss,
 %    University of Alabama in Huntsville.
 %
-%    Known Bugs: dataset name is not read correctly (but also not important)
-%
 %    To get the exact timestamp for each scan of one scanline use:
 %    datestr(S.recs(1).timestamp)
 %
@@ -14,7 +12,7 @@
 %        
 % OUT   S   SSM/T-2 structure
 %             Header information:
-%               dsname   Dataset name (currently unsupported)
+%               dsname   Dataset name
 %               nscan    Number of scans
 %               ngap     Data gaps
 %               precal   Preflight calibration (not used)
@@ -60,17 +58,21 @@ if nargin == 1
   apply_calibration = 1;
 end
 
-uncompressed_filename='';
 if strcmp( filename(length(filename)-2:end), '.gz')
-  workarea = atmlab( 'WORK_AREA' );
-  uncompressed_filename = tempname(workarea);
+  uncompressed_filename = tempname(atmlab( 'WORK_AREA' ));
+  cleanupObj = onCleanup(@() (delete(uncompressed_filename)));
   cmd = [ 'gunzip -cd ' filename ' > ' uncompressed_filename ];
   st = system (cmd);
   if st
-    delete (uncompressed_filename);
-    error ('Failed to uncompress SSM/T-2 file');
+    error ('atmlab:ssmt2_read', 'Failed to uncompress SSM/T-2 file %s', filename);
   end
   filename = uncompressed_filename;
+end
+
+if (apply_calibration == 2)
+    experimental_offset_calibration = [0.2815 0.2915 0.2782 0.3762 1.1355];
+else
+    experimental_offset_calibration = [1 1 1 1 1];
 end
 
 %HDRSIZE = 692;
@@ -79,7 +81,7 @@ NPOS    = 28;
 NCHAN   = 5;
 
 ebcdic_ascii = [ ...
-	'?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?', ...
+	'?','?','?','?','?','?','?','?','?','?','?','?','?','?','?', ...
 	'?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?', ...
 	'?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?', ...
 	'?','?','?','?','?','?','?','?','?','?','?','?','?','?','?','?', ...
@@ -105,7 +107,7 @@ end
 
 %%%%%%%%%% Read Header %%%%%%%%%%
 %
-S.dsname  = ebcdic_ascii (fread (fid, 44, 'uint8'));
+S.dsname  = ebcdic_ascii(fread (fid, 44, 'uint8=>char'));
 S.nscan   = fread (fid, 1, 'uint16');
 S.ngap    = fread (fid, 1, 'uint16');
 S.precal  = fread (fid, 108, 'uint8');
@@ -128,7 +130,6 @@ try
     
     if (~rec.orbit)
       fclose (fid);
-      if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
       return;
     end
 
@@ -177,15 +178,10 @@ try
     %%%%%%%%%% Apply calibration %%%%%%%%%%
     %
     if (apply_calibration)
-      if (apply_calibration == 2)
-        experimental_offset_calibration = [0.2815 0.2915 0.2782 0.3762 1.1355];
-      else
-        experimental_offset_calibration = [1 1 1 1 1];
-      end    
-      for chan = 1:NCHAN
-        rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) ...
-            + rec.offset(chan) * experimental_offset_calibration(chan);
-      end
+     for chan = 1:NCHAN
+       rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) ...
+           + rec.offset(chan) * experimental_offset_calibration(chan);
+     end
     end
 
     S.recs(recn) = rec;
@@ -193,10 +189,8 @@ try
   end
 catch %#ok<CTCH>
   fclose (fid);
-  if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
   return;
 end
 
 fclose(fid);
-if ~strcmp (uncompressed_filename, ''), delete (uncompressed_filename); end;
 
