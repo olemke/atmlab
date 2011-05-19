@@ -23,7 +23,6 @@ function [info, files] = test_gmt(in)
 % created by Salomon Eliasson
 % $Id$
 
-files = {}; info = {};
 if ~exist('in','var'); in=struct([]); end
 
 % SET some defaults
@@ -32,14 +31,17 @@ default.verbosity = gmtlab('VERBOSITY');
 od = isfield(in,'outdir');
 default.outdir    = gmtlab('OUTDIR');
 in = optargs_struct(in,default); 
+files = {}; info = {};
+
 assert(isnumeric(in.test),sprintf('atmlab:%s:bad_input',mfilename),...
     'in.test must be numeric')
 
 % for the final pdfs
+coltemplate = [2 2 3 1 1 2 1];
 if isequal(in.test,1:7)
-    in.cols = [2 2 2 1 3 1];
+    in.cols = coltemplate;
 else
-    in.cols = 2;
+    in.cols = coltemplate(in.test);
 end
 
 if ~ischar(in.outdir)
@@ -58,7 +60,7 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 [files,info]               = TEST2(in,gridded,ungridded,files,info);
 
 %TEST: sidebar, nan, projection, center
-[files{end+1},info{end+1}] = TEST3(in,gridded); 
+[files,info{end+1}]        = TEST3(in,gridded,files); 
 
 %TEST: contours, nlevels, annotation format, xunit
 [files{end+1},info{end+1}] = TEST4(in);         
@@ -239,22 +241,41 @@ c = 'for plotting satellite granule data directly. You can also change the';
 d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
 info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
 
-function [file,info] = TEST3(in,gridded)
+function [files,info] = TEST3(in,gridded,files)
 %% TEST: sidebar, nan, projection, center
 
 t = 3;
-if ~ismember(t,in.test), file='';info='';return, end %then don't do this test
+if ~ismember(t,in.test), files='';info='';return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
-test.title      = 'upper sidebar, NaN, Hammer projection, center';
-test.projection = 'H';      % hammer
-test.center     = 180;      % Center map at given center longitude
-test.datarange  = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
-a0 = sprintf('Test%.0f',t);
-test.filename = a0;
-file = gmt_plot(catstruct(gridded,test,in),'data');
+test.title      = 'upper sidebar, NaN, Hammer projection, center=180';
+test.legend.orientation = 'h';
+test.projection         =  'H';
+test.center             = 180;      % Center map at given center longitude
+test.datarange          = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
+a0                      = sprintf('Test%.0fa',t);
+test.filename           = a0;
 
-a = ' demonstrates the Hammer projection (using in.projection = ''H''),';
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+test.title              = 'Robinsson projection, center = 0 ';
+test.projection         = 'N';
+test.center             = 0;
+a02                     = sprintf('Test%.0fb',t);
+test.filename           = a02;
+
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+test.title              = 'Sinusoidal projection, center = 90';
+test.projection         = 'I';      % FIXME
+test.center             = 90;
+a03                     = sprintf('Test%.0fc',t);
+test.filename           = a03;
+
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+a = 'Test 3 demonstrates the Hammer, Robinsson and sinusoidal projections ';
+a1 = '(using in.projection = ''H''/''R''/''I''), ';
 b = 'one of many available projections. The test also demonstrates that you can';
 c = 'easily change the center of the projection to e.g. 180E using in.center = 180.';
 d = 'The grey region in the map indicates NaN values, and an extra NaN color box';
@@ -263,7 +284,7 @@ f = 'NaN-legend using in.nanlegend = false. The upper sidebar is automatically s
 g = 'if there are data larger than in.datarange(2), given via in.datarange = [v1,v2].';
 h = 'The color for these values can be changed using';
 i = 'in.color_foreground (default is ''255/255/255'' (white))';
-info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h,i);
+info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,a1,b,c,d,e,f,g,h,i);
 
 function [file,info] = TEST4(in)
 %% TEST: contours, nlevels, annotation format, xunit
@@ -407,11 +428,11 @@ test.filename = sprintf('Test%.0fb',t);
 files{end+1}    = gmt_plot(catstruct(test,in));
 
 % TEST: smallregion
-test.title = 'Kiruna (high details)';
-test.region = '16/22/66.2/70';
-test.coast.rivers = 'a';
-test.filename = sprintf('Test%.0fc',t);
-files{end+1} = gmt_plot(catstruct(test,in));
+% test.title = 'Kiruna (high details)';
+% test.region = '16/22/66.2/70';
+% test.coast.rivers = 'a';
+% test.filename = sprintf('Test%.0fc',t);
+% files{end+1} = gmt_plot(catstruct(test,in));
 
 a = ' demonstrates that you can plot points and text on a map using';
 b = 'in.locations (see help gmt_plot), and demonstrates that there are';

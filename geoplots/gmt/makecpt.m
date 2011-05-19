@@ -19,7 +19,9 @@ else
     mi = in.datarange(1);
     mx = in.datarange(2);
     step = in.stepsize;
-    mkcpt = sprintf('%s -T%f/%f/%f',mkcpt,mi,mx,step);
+    formstr = in.legend.tick_annotation_format;
+    fstr = sprintf('%s -T%s/%s/%s',mkcpt,formstr,formstr,formstr);
+    mkcpt = sprintf(fstr,mi,mx,step);
 end
 
 if isfield(in,'color_nan')
