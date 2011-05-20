@@ -69,12 +69,9 @@ if strcmp( filename(length(filename)-2:end), '.gz')
   filename = uncompressed_filename;
 end
 
-if (apply_calibration == 2)
-    experimental_offset_calibration = [0.2815 0.2915 0.2782 0.3762 1.1355];
-else
-    experimental_offset_calibration = [1 1 1 1 1];
-end
-
+experimental_offset_calibration_xx = [0.2815 0.2915 0.2782 0.3762 1.1355];
+experimental_offset_calibration_20 = [1 1 1 1 1];
+experimental_offset_calibration_100 = [0.2 0.2 0.2 0.2 0.2];
 %HDRSIZE = 692;
 %DATSIZE = 692;
 NPOS    = 28;
@@ -125,7 +122,7 @@ recn = 0;
 while (~feof (fid) && recn < S.nscan)
     recn = recn + 1;
     fseek (fid, recn*692, 'bof');
-    
+
     rec.orbit = fread (fid, 1, 'uint32');
     
     if (~rec.orbit), break, end;
@@ -151,7 +148,7 @@ while (~feof (fid) && recn < S.nscan)
     end
     
     rec.ts    = fread (fid, 1, 'uint32');
-    
+
     latlon = reshape (fread (fid, NPOS*2, 'int16') / 128, 2, NPOS);
     rec.lat = latlon (1, :);
     rec.lon = latlon (2, :);
@@ -159,6 +156,9 @@ while (~feof (fid) && recn < S.nscan)
     timecount = reshape (fread (fid, (1+NCHAN)*NPOS, 'uint16'), 1+NCHAN, NPOS);
     rec.time  = timecount (1, :);
     rec.timestamp = datenum(rec.year,1,1) + rec.doy-1 + rec.ols/86400 + rec.time/1000/86400;
+    if (recn == 1)
+        firsttimestamp = rec.timestamp(1);
+    end
     rec.count = timecount (2:NCHAN+1, :);
     
     rec.rawcal = fread (fid, 172, 'uint8');
@@ -166,7 +166,7 @@ while (~feof (fid) && recn < S.nscan)
     rec.slope  = fread (fid, NCHAN, 'int16')' / 10000;
     %FIXME OLE: The offset factor was changed at some point
     %rec.offset  = fread (fid, NCHAN, 'int16')' / 100;
-    rec.offset  = fread (fid, NCHAN, 'int16')' / 20;
+    rec.offset = fread (fid, NCHAN, 'int16')' / 20;
     
     rec.qc_earth = fread (fid, 1, 'uint16');
     rec.qc_scene = fread (fid, 1, 'uint16');
@@ -175,6 +175,14 @@ while (~feof (fid) && recn < S.nscan)
     %%%%%%%%%% Apply calibration %%%%%%%%%%
     %
     if (apply_calibration)
+        if  firsttimestamp < 730159.709722
+            experimental_offset_calibration=experimental_offset_calibration_100;
+        elseif firsttimestamp >= 730159.709722  && ...
+                firsttimestamp < 731112.613889
+            experimental_offset_calibration=experimental_offset_calibration_20;
+        else
+            experimental_offset_calibration=experimental_offset_calibration_xx;
+        end
         for chan = 1:NCHAN
             rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) ...
                 + rec.offset(chan) * experimental_offset_calibration(chan);
