@@ -100,6 +100,7 @@ ebcdic_ascii = [ ...
     ];
 
 fid = fopen (filename, 'rb', 'b');
+cleanupObj2 = onCleanup(@() (fclose(fid)));
 
 if (fid == -1)
   error ('Can''t open input file')
@@ -121,18 +122,14 @@ S.qc_cal   = fread (fid, NCHAN, 'uint16');
 %%%%%%%%%% Read Data Records %%%%%%%%%%
 %
 recn = 0;
-try
-  while (~feof (fid) && recn < S.nscan)
+while (~feof (fid) && recn < S.nscan)
     recn = recn + 1;
     fseek (fid, recn*692, 'bof');
-
+    
     rec.orbit = fread (fid, 1, 'uint32');
     
-    if (~rec.orbit)
-      fclose (fid);
-      return;
-    end
-
+    if (~rec.orbit), break, end;
+    
     rec.scan  = fread (fid, 1, 'uint16');
     rec.t1x   = fread (fid, 1, 'uint16');
     yyddd = fread (fid, 1, 'uint32');
@@ -145,7 +142,7 @@ try
     else
         rec.year=rec.year+1900;
     end;
-        
+    
     rec.ols   = fread (fid, 1, 'uint32');
     if (recn == 1)
         firstols = rec.ols;
@@ -154,43 +151,37 @@ try
     end
     
     rec.ts    = fread (fid, 1, 'uint32');
-
+    
     latlon = reshape (fread (fid, NPOS*2, 'int16') / 128, 2, NPOS);
     rec.lat = latlon (1, :);
     rec.lon = latlon (2, :);
-  
+    
     timecount = reshape (fread (fid, (1+NCHAN)*NPOS, 'uint16'), 1+NCHAN, NPOS);
     rec.time  = timecount (1, :);
-    rec.timestamp = datenum(rec.year,1,1) + rec.doy + rec.ols/86400 + rec.time/1000/86400;
+    rec.timestamp = datenum(rec.year,1,1) + rec.doy-1 + rec.ols/86400 + rec.time/1000/86400;
     rec.count = timecount (2:NCHAN+1, :);
-
+    
     rec.rawcal = fread (fid, 172, 'uint8');
-
+    
     rec.slope  = fread (fid, NCHAN, 'int16')' / 10000;
-    %FIXME OLE: The offset factor was changed at some point 
+    %FIXME OLE: The offset factor was changed at some point
     %rec.offset  = fread (fid, NCHAN, 'int16')' / 100;
     rec.offset  = fread (fid, NCHAN, 'int16')' / 20;
-
+    
     rec.qc_earth = fread (fid, 1, 'uint16');
     rec.qc_scene = fread (fid, 1, 'uint16');
     rec.qc_cal   = fread (fid, NCHAN, 'uint16')';
-
+    
     %%%%%%%%%% Apply calibration %%%%%%%%%%
     %
     if (apply_calibration)
-     for chan = 1:NCHAN
-       rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) ...
-           + rec.offset(chan) * experimental_offset_calibration(chan);
-     end
+        for chan = 1:NCHAN
+            rec.temp(chan,:) = rec.count(chan,:) * rec.slope(chan) ...
+                + rec.offset(chan) * experimental_offset_calibration(chan);
+        end
     end
-
+    
     S.recs(recn) = rec;
     clear rec;
-  end
-catch %#ok<CTCH>
-  fclose (fid);
-  return;
 end
-
-fclose(fid);
 
