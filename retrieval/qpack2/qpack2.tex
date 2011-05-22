@@ -245,8 +245,8 @@ Q = qarts;
 \end{verbatim}
 This ensures that Q contains all defined fields, also ones introduced more
 lately. If any field is added to \verb|Q|, it shall not change the result of
-older setting files. If a needed addition can not be accomodated with backward
-compability, this generates a new version of Qarts.
+older setting files. If a needed addition can not be accommodated with backward
+compatibility, this generates a new version of Qarts.
 
 All features of ARTS can be accessed through Qarts. Calculations of standard
 type can largely be handled by defining the fields of Qarts that have a direct
@@ -451,7 +451,7 @@ Further comments and description of fields directly associated with specific
 retrieval quantities are found below (no ambition of completeness here).
 
 
-\subsubsection{Varous general fields}
+\subsubsection{Various general fields}
 %
 \newfield 
 \verb|cost|, \verb|cost_x| and \verb|cost_y|:\\
@@ -505,7 +505,7 @@ Change in the state vector x between each iteration. See further \verb|oem.m|.
 %
 \newfield \verb|p_grid|, (\verb|lat_grid|, \verb|lon_grid|), \verb|t_field| and
 \verb|z_field|:\\
-As the ARTS workspace varaibles with the same name. The data are identical to
+As the ARTS workspace variables with the same name. The data are identical to
 the ones that are provided to the forward model. (If temperatures are retrieved,
 this information is used. Otherwise returned data match climatology
 temperatures.)
@@ -521,13 +521,13 @@ etc.
 
 The unit of output follows \verb|Q.SPECIES(i).UNIT|. For example, if the
 selected unit is \verb|rel|, the provided a priori profile is a vector of ones
-and the retrived profile values in the order of 1. The justificattion is to
+and the retrieved profile values in the order of 1. The justification is to
 return data that are fully consistent with the assumptions of the retrieval.
 This point is most critical for the \verb|logrel| case, where the returned data
 theoretically have a normal distribution while converted to VMR it would be
-log-normal. However, using \verb|logrel| can cause substaintail non-linearity
-in the retreival problem and it is likely that the errora not follow normal
-distrubutions. Anyhow, L2 data of \verb|rel| and \verb|logrel| type can be
+log-normal. However, using \verb|logrel| can cause substantial non-linearity
+in the retrieval problem and it is likely that the errors not follow normal
+distributions. Anyhow, L2 data of \verb|rel| and \verb|logrel| type can be
 converted to VMR by the function \verb|qp2_rel2logrel| (see further help text
 of the function).
 
@@ -615,7 +615,7 @@ As corresponding fields above for species (\verb|species1_x| etc.).
 The data types in Qpack2 (and in Qarts) follow largely ARTS. Regarding basic
 data types, there are two main things to consider. Firstly, a distinction is
 made between the logical 0 and 1, and the integers 0 and 1. Accordingly,
-booleans, sometine also denoted as flags, must be set to \verb|true| or
+booleans, sometime also denoted as flags, must be set to \verb|true| or
 \verb|false|. Secondly, vectors are demanded to be columns.
 
 A notable feature of Qpack2 and Qarts is that data fields, booleans and scalars

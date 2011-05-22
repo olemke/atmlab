@@ -1,5 +1,11 @@
 2011-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-130
+
+	* retrieval/qpack2/qpack2.tex: Fixed several spelling mistakes.
+
+2011-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-129
 
 	* Important for Qpack users. L2 output for ABS_SPECIES now follows
