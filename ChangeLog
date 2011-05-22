@@ -1,3 +1,39 @@
+2011-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-129
+
+	* Important for Qpack users. L2 output for ABS_SPECIES now follows
+	the selected unit strictly. More information in qpack2.pdf and
+	email to qpack mailing list.
+
+	* retrieval/qpack2/qpack2.tex: Modified to reflect changes below.
+	The information for L2 'ptz' was old.
+
+	* retrieval/qpack2/qp2_rel2vmr.m: Created.
+
+	* arts/arts_regrid.m (extract_grids): Introduced qname, to improve
+	error message.
+
+	* arts/qarts.m (qarts): Added L2_RANGE as sub-field to ABS_SPECIES
+	and T.
+
+	* retrieval/qpack2/qp2_l2.m (qp2_l2): For absorption species, the
+	conversion to VMR for 'rel' and 'logrel' is removed. That is, the
+	output follwos now throughout the retrieval unit. This is also the
+	case for errors estimates. 
+	Added handling of L2_RANGE (and this part of the function revised).
+
+	* arts/arts_x2QR.m (arts_x2QR): "Extrapolation" was done for VMR
+	independently of retrieval unit selected. This follows now the
+	retrieval unit. For example, if "rel" is selected and the end
+	value is 1.1, the VMRs on this side of the grid are scaled with
+	1.1. Before the end VMR value was used out to the atmospheric limit.
+
+	* arts/arts_oem_init.m (arts_oem_init): Improved header. Revised
+	the set of variables that are stored as part of R.
+
+	* geophysics/nd2vmr.m: Spelling mistake in header.
+
 2011-05-20  Mathias Milz  <mathias.milz@ltu.se>
 
 	* sensors/ssmt2_read.m: 

@@ -8,12 +8,11 @@
 %
 %    The standard sequence of function calls is:
 %
-%       [Qoem,O,R,xa] = arts_oem_init( Q, O );
+%       [Qoem,O,R,xa] = arts_oem_init( Q, O, workfolder );
 %       Sx            = arts_sx( Qoem, R );
 %       Se            = covmat ...
 %       X             = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
 %       %
-%       arts_oem( 'clean', R );
 %       clear Qoem
 %
 %    Fo "non-standard" cases, you have to make a function that can replace
@@ -29,22 +28,19 @@
 %    All pure forward model variables are stored in Q, while all extra data 
 %    needed to handle the inversions are put into R. This data can be used
 %    for further processing or "re-packing" of inversions results.
-%    These fields exist:
+%    These fields always exist:
 %       workfolder: Path to the temporary working folder.
 %       jq        : ARTS description of jacobian quantities.
 %       ji        : Start and stop index in J for each jacobian quantities.
 %       cfile_y   : Name of control file to generate only y
 %       cfile_yj  : Name of control to generate y and J
-%       x_p       : The pressure corresponding to each element of x. 
-%       x_t       : The temperature corresponding to each element of x. 
-%       x_vmr0    : The a priori VMR corresponding to each element of x. 
-%       ---
-%       p_grid    : R can further contain fields corresponding to a number 
-%       lat_grid  : of ARTS WSVs. The same information exists in files and
-%       lon_grid  : these fields are included to minimize reading of files. 
-%       vmr_field : Only some example on these fields are here given.
-%       sensor_los:
-%       ...
+%       p_grid    : As the ARTS WSM with same name.
+%       lat_grid  : As the ARTS WSM with same name.
+%       lon_grid  : As the ARTS WSM with same name.
+%
+%    R can further contain these fields, depending on retrieval settings:
+%       vmr_field0      : A priori vmr field
+%       sensor_response : A copy of Q.SENSOR_RESPONSE 
 %
 % FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
 %        
@@ -54,7 +50,7 @@
 %       xa           A priori state vector
 % In    O            OEM settings.
 %       Q            Qarts settings.
-%       workfolder   Use this as "workfolder" (see above).
+%       workfolder   Use this as "workfolder".
 
 % 2010-01-11   Created by Patrick Eriksson.
 
@@ -69,31 +65,23 @@ rqre_nargin( 2, nargin );                                                  %&%
 if ~qarts_isset( Q.J_DO) | ~Q.J_DO                                         %&%
   error( 'Q.J_DO must be set to true.' );                                  %&%
 end                                                                        %&%
-
-
-R = [];
-
-
-%- Workfolder
-%
 rqre_datatype( workfolder, @ischar );                                      %&%
-R.workfolder = workfolder;
+
+
 
 
 %- Initialization of variables
 %
+R            = [];
+R.workfolder = workfolder;
+%
 [Q,R,t_field,z_field,vmr_field] = init_local( Q, R );
 
 
-%- R
+%- R continued
 %
 nq = length( R.jq );
 nx = R.ji{nq}{2};
-%
-% Fields to handle species unit conversions
-R.x_p    = repmat( NaN, nx, 1 );
-R.x_t    = R.x_p;
-R.x_vmr0 = R.x_p;
 
 
 %- xa
@@ -103,15 +91,14 @@ xa = zeros( nx, 1 );
 
 %- Some other variables
 %
-i_asj   = find( [ Q.ABS_SPECIES.RETRIEVE ] );
-any_gas = false;
+i_asj       = find( [ Q.ABS_SPECIES.RETRIEVE ] );
+store_vmr0  = false;
 
 
 %- O
 %
 O.i_rel = [];
 O.i_log = [];
-
 
 
 
@@ -127,27 +114,35 @@ for i = 1 : nq
 
   case 'Absorption species'   %-----------------------------------------------
     %
-    ig      = i_asj(i);    % Gas species index
-    any_gas = true;
+    store_vmr0 = true;
+    ig         = i_asj(i);    % Gas species index
     %
-    %- Get p, t and vmr for each retrieval point
-    grid1         = R.jq{i}.grids{1};
-    R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
-    R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
-                                                             R.jq{i}.grids ) );
-    R.x_vmr0(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...
-                           get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
+%    grid1         = R.jq{i}.grids{1};
+%    R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
+%    R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
+%                                                            R.jq{i}.grids ) );
+%    R.x_vmr0(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...
+%                           get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
-      xa(ind) = 1;
-      O.i_rel = [ O.i_rel ind ];
+      xa(ind)    = 1;
+      O.i_rel    = [ O.i_rel ind ];
     elseif strcmp( R.jq{i}.mode, 'vmr' )
-      xa(ind) = R.x_vmr0(ind);
+      xa(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...
+                          get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
     elseif strcmp( R.jq{i}.mode, 'nd' )
-      xa(ind) = vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
+      xa(ind)    = vmr2nd( ...
+                     mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...   % VMR
+                       get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) ), ...
+                     repmat( R.jq{i}.grids{1}, ...                    % P
+                       length(ind)/length(R.jq{i}.grids{1}), 1 ), ...
+                     mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...   % T
+                       t_field, R.jq{i}.grids ) ) ...
+                   );
+                  %vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
-      xa(ind) = 0;
-      O.i_log = [ O.i_log ind ];
+      xa(ind)    = 0;
+      O.i_log    = [ O.i_log ind ];
     else                                                                   %&%
       error( sprintf('Unknown gas species retrieval unit (%s).', ...       %&%
                                                          R.jq{i}.mode ) ); %&%
@@ -155,12 +150,8 @@ for i = 1 : nq
     
   case 'Atmospheric temperatures'   %-----------------------------------------
     %
-    %- Get p and t for each retrieval point 
-    grid1         = R.jq{i}.grids{1};
-    R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
-    R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
+    xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
-    xa(ind)       = R.x_t(ind);
    
   case { 'Frequency', 'Polynomial baseline fit', 'Sensor pointing' }
     %
@@ -175,8 +166,8 @@ end
 
 %--- More to put into R ? -----------------------------------------------------
 
-if any_gas
-  R.vmr_field = vmr_field;
+if store_vmr0
+  R.vmr_field0 = vmr_field;
 end
 
 
@@ -332,13 +323,13 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   Q.SENSOR_RESPONSE_AA  = fullfile( R.workfolder, 'sensor_response_aa.xml' );
   Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
   Q.SENSOR_RESPONSE_F_GRID = ...
-                       fullfile( R.workfolder, 'sensor_response_f_grid.xml' );
+                        fullfile( R.workfolder, 'sensor_response_f_grid.xml' );
   Q.SENSOR_RESPONSE_ZA_GRID = ...
                        fullfile( R.workfolder, 'sensor_response_za_grid.xml' );
   Q.SENSOR_RESPONSE_AA_GRID  = ...
                        fullfile( R.workfolder, 'sensor_response_aa_grid.xml' );
   Q.SENSOR_RESPONSE_POL_GRID = ...
-                       fullfile( R.workfolder, 'sensor_response_pol_grid.xml' );
+                      fullfile( R.workfolder, 'sensor_response_pol_grid.xml' );
   Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
   Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
 return

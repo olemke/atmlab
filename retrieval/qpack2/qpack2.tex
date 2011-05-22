@@ -382,11 +382,10 @@ end
 \subsection{Retrieved data}
 \label{sec:l2}
 %---
-Retrieved data are returned as a structure array \verb|L2|, with one element
-for each element in \verb|Y|. The fields of \verb|L2| are not fixed, the set of
-returned fields depend on settings in \verb|Q|. This makes it impossible to use
-qinfo here (as for \verb|Q| and \verb|Y|), and the fields are instead described
-below in this document.
+Retrieved data are returned as a structure array \verb|L2|. The fields of
+\verb|L2| are not fixed, the set of returned fields depend on settings in
+\verb|Q|. This makes it impossible to use qinfo here (as for \verb|Q| and
+\verb|Y|), and the fields are instead described below in this document.
 
 The only mandatory field of \verb|L2| is \verb|converged|. The remaining
 content of L2 is controlled by the Qarts field \verb|L2_EXTRA| and the
@@ -442,6 +441,7 @@ ans =
       polyfit1_eo: 0.0094
       polyfit1_es: 0.0023
       polyfit1_mr: 0.9996
+      ...
 \end{verbatim}
 A description of the options for \verb|Q.L2_EXTRA| is obtained by:
 \begin{verbatim}
@@ -503,12 +503,12 @@ Change in the state vector x between each iteration. See further \verb|oem.m|.
 
 \subsubsection{Background atmospheric state}
 %
-\newfield 
-\verb|p|, \verb|t| and \verb|z|:\\
-A consistent set of pressure, temperature and altitude vectors. The
-vectors are identical to the ones that are provided to the forward
-model. If temperatures are retrieved, this information is used.
-Otherwise returned data match climatology temperatures. 
+\newfield \verb|p_grid|, (\verb|lat_grid|, \verb|lon_grid|), \verb|t_field| and
+\verb|z_field|:\\
+As the ARTS workspace varaibles with the same name. The data are identical to
+the ones that are provided to the forward model. (If temperatures are retrieved,
+this information is used. Otherwise returned data match climatology
+temperatures.)
 
 
 \subsubsection{Retrieved species}
@@ -517,9 +517,19 @@ The retrieved species are indexed after the order they are specified in
 \verb|Q| and named as \verb|species1|, \verb|species2| \dots A number of fields
 is returned for each species. The field names below are valid for species 1. If
 two species are retrieved there is also a field named as \verb|species2_name|
-etc. For fields where unit depends on \verb|Q.SPECIES(i).UNIT|, the unit of the 
-returned field is \verb|vmr| for all settings of \verb|Q.SPECIES(i).UNIT| except 
-for \verb|nd|, where the returned fields are given in number density. 
+etc. 
+
+The unit of output follows \verb|Q.SPECIES(i).UNIT|. For example, if the
+selected unit is \verb|rel|, the provided a priori profile is a vector of ones
+and the retrived profile values in the order of 1. The justificattion is to
+return data that are fully consistent with the assumptions of the retrieval.
+This point is most critical for the \verb|logrel| case, where the returned data
+theoretically have a normal distribution while converted to VMR it would be
+log-normal. However, using \verb|logrel| can cause substaintail non-linearity
+in the retreival problem and it is likely that the errora not follow normal
+distrubutions. Anyhow, L2 data of \verb|rel| and \verb|logrel| type can be
+converted to VMR by the function \verb|qp2_rel2logrel| (see further help text
+of the function).
 
 These set of fields are available:
 
@@ -562,6 +572,13 @@ The species specific averaging kernels. That is, this is the diagonal
 centred sub-matrix covering only the resolution between changes of the
 species at different altitudes. The resolution between variables of
 different retrieval quantities is thus not covered.
+
+\newfield
+\verb|species1_vmr0|:\\
+Added automatically if the retrieval unit is \verb|rel| or \verb|logrel|, to be
+used to convert data to VMR. For example, the retrieved profile in VMR for the
+\verb|rel| case is \verb|x.*vmr0|.
+
 
 
 \subsubsection{Baseline fit variables}

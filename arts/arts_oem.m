@@ -55,7 +55,3 @@ if iter > 1
   y = y + R.bl;
 end
 
-
-
-
-

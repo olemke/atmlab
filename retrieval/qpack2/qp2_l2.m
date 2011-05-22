@@ -149,11 +149,11 @@ end
 % PTZ (last forward model fields)
 %
 if any( strcmp( Q.L2_EXTRA, 'ptz' ) )
-  L2.p_grid = qarts_get( Q.P_GRID );
+  L2.p_grid = R.p_grid;
   if Q.ATMOSPHERE_DIM >= 2
-    L2.lat_grid = qarts_get( Q.LAT_GRID );
+    L2.lat_grid = R.lat_grid;
     if Q.ATMOSPHERE_DIM == 3
-      L2.lon_grid = qarts_get( Q.LON_GRID );
+      L2.lon_grid = R.lon_grid;
     end
   end
   L2.t_field = qarts_get( Q.T_FIELD );
@@ -204,11 +204,9 @@ i_asj    = find([Q.ABS_SPECIES.RETRIEVE]);
 %
 for q = 1 : length(R.jq)
 
-  unitfac = 1;
-  include = 0;
-  do_log  = 0;
-  ind     = I(q,1) : I(q,2);
-  siz     = [ length(ind), 1 ];
+  atmfield = false;
+  ind      = I(q,1) : I(q,2);
+  siz      = [ length(ind), 1 ];   % Modified below for 2D and 3D variables
   
   if strcmp( R.jq{q}.maintag, 'Absorption species' )
     %--------------------------------------------------------------------------
@@ -222,94 +220,135 @@ for q = 1 : length(R.jq)
     %    
     if out 
       s        = sprintf( 'species%d', q );
-      include  = 1;
-      %
-      if strcmp( Q.ABS_SPECIES(ispecies).UNIT, 'logrel' )
-        do_log  = 1;
-        unitfac = R.x_vmr0(ind);
-      elseif strcmp( Q.ABS_SPECIES(ispecies).UNIT, 'rel' )
-        unitfac = R.x_vmr0(ind);
-      end
+      atmfield = true;
+      Astruct  = Q.ABS_SPECIES(ispecies);
       %
       L2.([s,'_name'])  = R.jq{q}.subtag;
-      L2.([s,'_p'])     = Q.ABS_SPECIES(ispecies).GRIDS{1};
-      if Q.ATMOSPHERE_DIM >= 2
-        L2.([s,'_lat']) = Q.ABS_SPECIES(ispecies).GRIDS{2};
-        if Q.ATMOSPHERE_DIM == 3
-          L2.([s,'_lon']) = Q.ABS_SPECIES(ispecies).GRIDS{3};
-          siz = [ length( Q.ABS_SPECIES(ispecies).GRIDS{1} );
-                  length( Q.ABS_SPECIES(ispecies).GRIDS{2} );
-                  length( Q.ABS_SPECIES(ispecies).GRIDS{3} ) ];
-        else
-          siz = [ length( Q.ABS_SPECIES(ispecies).GRIDS{1} );
-                  length( Q.ABS_SPECIES(ispecies).GRIDS{2} ) ];
-        end
-      end
     end
     
   elseif strcmp( R.jq{q}.maintag, 'Atmospheric temperatures' )
     %--------------------------------------------------------------------------
-      
-      s       = 'temperature';
-      include  = 1;
-      %
-      %
-      L2.([s,'_p']) = Q.T.GRIDS{1};
-      if Q.ATMOSPHERE_DIM >= 2
-        L2.([s,'_lat']) = Q.T.GRIDS{2};
-        if Q.ATMOSPHERE_DIM == 3
-          L2.([s,'_lon']) = Q.T.GRIDS{3};
-          siz = [ length( Q.T.GRIDS{1} );
-                  length( Q.T.GRIDS{2} );
-                  length( Q.T.GRIDS{3} ) ];
-        else
-          siz = [ length( Q.T.GRIDS{1} );
-                  length( Q.T.GRIDS{2} ) ];
-        end
-      end
-    
+    rqre_field( Q.T, 'L2', 'Q.T' );                                         %&%
+    out = qarts_get( Q.T.L2 );
+    rqre_datatype( out, @isboolean, vname );                                %&%
+    %
+    if out
+      s        = 'temperature';
+      Astruct  = Q.T;
+    end
     
   elseif strcmp( R.jq{q}.maintag, 'Frequency' )
     %--------------------------------------------------------------------------
     rqre_field( Q.FFIT, 'L2', 'Q.FFIT' );                                   %&%
-    if Q.FFIT.L2
-      s       = 'ffit';
-      include = 1;
+    out = qarts_get( Q.FFIT.L2 );
+    rqre_datatype( out, @isboolean, vname );                                %&%
+    %    
+    if out
+      s = 'ffit';
     end
     
   elseif strcmp( R.jq{q}.maintag, 'Polynomial baseline fit' )
     %--------------------------------------------------------------------------
     rqre_field( Q.POLYFIT, 'L2', 'Q.POLYFIT' );                             %&%
-    if Q.POLYFIT.L2
-      s       = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
-      include = 1;
+    out = qarts_get( Q.POLYFIT.L2 );
+    rqre_datatype( out, @isboolean, vname );                                %&%
+    %
+    if out
+      s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
     end
 
   else
     error( sprintf( 'Unknown retrieval quantity: %s', R.jq{q}.maintag ) );
   end
 
-  if include
-    if ~do_log
-      if any( strcmp( Q.L2_EXTRA, 'xa' ) )
-        L2.([s,'_xa']) = reshape( unitfac .* xa(ind), siz );
+  if out
+
+    %--- Special stuff for atmospheric fields
+    if atmfield
+
+      % Output follows strictly retrieval range (empty L2_RANGE)
+      if ~isfield( Astruct, 'L2_RANGE' )  
+        %
+        % Fill special L2 fields
+        L2.([s,'_p'])     = Astruct.GRIDS{1};
+        %
+        if Q.ATMOSPHERE_DIM >= 2
+          L2.([s,'_lat']) = Astruct.GRIDS{2};
+          siz(2)          = length( Astruct.GRIDS{2} );
+          %
+          if Q.ATMOSPHERE_DIM == 3
+            L2.([s,'_lon']) = Astruct.GRIDS{3};
+            siz(3)          = length( Astruct.GRIDS{3} );
+          end
+        end      
+      
+      % Modify range?
+      else
+        %- Check that L2_RANGE is OK
+        range = qarts_get( Astruct.L2_RANGE );
+        rqre_datatype( range, @isvector, sprintf('L2 range for %s',s) );    %&%
+        if length(range) < Q.ATMOSPHERE_DIM*2                               %&%
+          error( sprintf('L2 range for %s is too short.',s) );              %&%
+        end                                                                 %&%
+        if range(1) >= range(2)                                             %&%
+          error( sprintf( ...                                               %&%
+             'Pressure limits in L2 range (for %s) in wrong order? .',s) ); %&%
+        end                                                                 %&%
+
+        % Pressure dimension
+        [ngrid,ip]    = r2g_local( Astruct.GRIDS{1}, R.p_grid, range(1:2) );
+        siz(1)        = length(ngrid);    
+        L2.([s,'_p']) = ngrid;
+        %
+        % Latitude dimension
+        if Q.ATMOSPHERE_DIM == 1
+          ind              = ind( ip );
+          Astruct.GRIDS{1} = ngrid;     % Used to get VMR0 below
+        elseif Q.ATMOSPHERE_DIM >= 2
+          [ngrid,ilat] = r2g_local( Astruct.GRIDS{2}, R.lat_grid, range(3:4) );
+          siz(2)       = length(ngrid);    
+          L2.([s,'_lat']) = ngrid;
+          %
+          if Q.ATMOSPHERE_DIM == 2
+            ind = ind( matvec( repmat( ip, 1, length(ilat) ) + ...
+                               repmat( (ilat'-1)*length(Astruct.GRIDS{1}), ...
+                                       length(ip), 1 ) ) );
+            Astruct.GRIDS{2} = ngrid;
+          else
+            [ngrid,ilon] = r2g_local( Astruct.GRIDS{3}, R.lon_grid, ...
+                                                                  range(5:6) );
+            siz(3)       = length(ngrid);    
+            L2.([s,'_lon']) = ngrid;
+            ind = ind( matvec( repmat( ip, [1 length(ilat) length(ilon)] ) + ...
+                               repmat( (ilat'-1)*length(Astruct.GRIDS{1}), ...
+                                       [length(ip) 1 length(ilon)] ) + ...
+                               repmat( (reshape(ilon,[1 1 length(ilon)])-1)*...
+                                          length(Astruct.GRIDS{1}) * ...
+                                          length(Astruct.GRIDS{2}), ...
+                                       [1 length(ilat) length(ilon)] ) ) );
+            Astruct.GRIDS{3} = ngrid;
+          end
+        end
+        clear ngrid ip ilat ilon
       end
-      L2.([s,'_x'])  = reshape( unitfac .* X.x(ind), siz );
-    else
-      if any( strcmp( Q.L2_EXTRA, 'xa' ) )
-        L2.([s,'_xa']) = reshape( unitfac .* exp( xa(ind) ), siz );
-      end
-      L2.([s,'_x'])  = reshape( unitfac .* exp( X.x(ind) ), siz );
+    end
+  
+    %--- Fill L2
+    %
+    L2.([s,'_x'])  = reshape( X.x(ind), siz );
+    %
+    if any( strcmp( Q.L2_EXTRA, 'xa' ) )
+      L2.([s,'_xa']) = reshape( xa(ind), siz );
     end
     %
     if any( strcmp( Q.L2_EXTRA, 'e' ) )
-      L2.([s,'_e'])  = reshape( unitfac .* X.e(ind), siz );
+      L2.([s,'_e'])  = reshape( X.e(ind), siz );
     end
     if any( strcmp( Q.L2_EXTRA, 'eo' ) )
-      L2.([s,'_eo']) = reshape( unitfac .* X.eo(ind), siz );
+      L2.([s,'_eo']) = reshape( X.eo(ind), siz );
     end
     if any( strcmp( Q.L2_EXTRA, 'es' ) )    
-      L2.([s,'_es']) = reshape( unitfac .* X.es(ind), siz );  
+      L2.([s,'_es']) = reshape( X.es(ind), siz );  
     end
     %
     if any( strcmp( Q.L2_EXTRA, 'mresp' ) )
@@ -318,5 +357,42 @@ for q = 1 : length(R.jq)
     if any( strcmp( Q.L2_EXTRA, 'A' ) )
       L2.([s,'_A']) = As{q};
     end
+    
+    % If ABS_SPECIES + rel or logrel, save also vmr0
+    if strcmp( R.jq{q}.maintag, 'Absorption species' )
+      if any( strcmp( R.jq{q}.mode, { 'rel', 'logrel' } ) )
+        vmr0 = arts_regrid( Q.ATMOSPHERE_DIM, Q, getdims( ...
+                     R.vmr_field0(ispecies,:,:,:), 2:Q.ATMOSPHERE_DIM+1 ), ...
+                            Astruct.GRIDS );
+        L2.([s,'_vmr0']) = reshape( vmr0, siz );  
+      end    
+    end
   end
 end
+
+
+
+
+
+function [newgrid,ii] = r2g_local( retgrid, fmgrid, range )
+  %
+  np    = length( retgrid );
+  %
+  if range(1) >= retgrid(end)  &  range(2) <= retgrid(1)
+    ii      = find( retgrid >= range(1)  &  retgrid <= range(2) );
+    newgrid = retgrid(ii);     
+  elseif range(1) < retgrid(end)  &  range(2) > retgrid(1)
+    newgrid = [ min([range(2),fmgrid(1)]); 
+                retgrid; 
+                max([range(1),fmgrid(end)]) ];     
+    ii      = [ 1 1:np np ]';
+  elseif range(1) < retgrid(end) 
+    ii      = find( retgrid <= range(2) );
+    newgrid = [ retgrid(ii); max([range(1),fmgrid(end)]) ];     
+    ii      = [ ii; np ];
+  else
+    ii      = find( retgrid >= range(1) );
+    newgrid = [ min([range(2),fmgrid(1)]); retgrid(ii) ];     
+    ii      = [ 1; ii ];
+  end
+return

@@ -3,7 +3,7 @@
 %
 % Calculates VMR-values from number density values.
 %
-% If any of n, p or t is not a scalar, the otehrs must have the 
+% If any of n, p or t is not a scalar, the others must have the 
 % same size or be scalars.
 %
 % Input:    n   vector of number density values [1/m3]
@@ -18,7 +18,7 @@
 %=============================================================
 
 function vmr = nd2vmr(n,p,t)
-
+  
 kb = constants( 'BOLTZMANN_CONST' );
 
 vmr = n*kb.*t./p;

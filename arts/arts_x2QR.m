@@ -43,36 +43,38 @@ for i = 1 : nq
 
    case 'Absorption species'   %----------------------------------------------
     %
-    any_gas = true;
-    ig      = i_asj(i);    % Gas species index
+    if ~any_gas
+      vmr = R.vmr_field0;    % Will be filled with latest VMR for all species
+    end                      % that are retrieved
+    any_gas   = true;
+    ig        = i_asj(i);    % Gas species index
+    %
+    X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, x(ind) );
+    X = arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
     %
     if strcmp( R.jq{i}.mode, 'rel' )
-      X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
-                                              x(ind) .* R.x_vmr0(ind) );
+      vmr(ig,:,:,:) = getdims( vmr(ig,:,:,:), 2:Q.ATMOSPHERE_DIM+1 ) .* X;
     elseif strcmp( R.jq{i}.mode, 'vmr' )
-      X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, x(ind) );
+      vmr(ig,:,:,:) = X;
     elseif strcmp( R.jq{i}.mode, 'nd' )
-      X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
-                                 nd2vmr(x(ind),R.x_p(ind),R.x_t(ind)) );
+      vmr(ig,:,:,:) = nd2vmr( X, repmat(R.p_grid,[1 size2(X,2:3)]), ...
+                             qarts_get(fullfile(R.workfolder,'t_field.xml')) );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
-      X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, ...
-                                         exp(x(ind)) .* R.x_vmr0(ind) );
+      vmr(ig,:,:,:) = getdims( vmr(ig,:,:,:), 2:Q.ATMOSPHERE_DIM+1 ) .* exp(X);
     else                                                                    %&%
       assert( false );                                                      %&%
     end
     %
-    R.vmr_field(ig,:,:,:) = ...
-                          arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
-
+    clear X
+    
    case 'Atmospheric temperatures'   %----------------------------------------
     %
     X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, x(ind) );
     X = arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
     xmlStore( fullfile(R.workfolder,'t_field.xml'), X, 'Tensor3' );
     %
-    % R-x_t just used for conversion to nd, which can not be combined with
-    % t-retrievals.
-    
+    clear X
+   
    case 'Frequency'   %-------------------------------------------------------
     %
     if ~do_sensor
@@ -101,21 +103,23 @@ for i = 1 : nq
     %
     bl = bl + J(:,ind) * x(ind);
       
-
     otherwise   %--------------------------------------------------------------
       error('Unknown retrieval quantitity.'); 
   end 
 end 
 
+
 %- Data to save ?
 %
 if any_gas
-  xmlStore( fullfile(R.workfolder,'vmr_field.xml'), R.vmr_field, 'Tensor4' );
+  xmlStore( fullfile(R.workfolder,'vmr_field.xml'), vmr, 'Tensor4' );
 end
+
 
 %- Update sensor characteristics
 %
 arts_sensor( Q, R.workfolder );
+
 
 %- Total baseline
 %

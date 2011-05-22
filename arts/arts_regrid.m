@@ -34,15 +34,15 @@ rqre_alltypes( dim, {@istensor0,@iswhole} );                     %&%
 rqre_in_range( dim, 1, 3 );                                      %&%
 
 
-grids1 = extract_grids( dim, Q1 );
-grids2 = extract_grids( dim, Q2 );
+grids1 = extract_grids( dim, Q1, 'Q1' );
+grids2 = extract_grids( dim, Q2, 'Q2' );
 
 
 F = gridinterp( grids1, qarts_get(F0), grids2, 'linear' );
 
 return
 
-function grids = extract_grids( dim, Q )
+function grids = extract_grids( dim, Q, qname )
 
 if iscell(Q)
   %
@@ -51,19 +51,19 @@ if iscell(Q)
   
 elseif isstruct(Q)
   %                                                             %&%
-  rqre_field( Q, {'P_GRID'}, 'Q' );                             %&%
+  rqre_field( Q, {'P_GRID'}, qname );                           %&%
   %
   grids{1} = -log( qarts_get( Q.P_GRID ) );
 
   if dim >= 2
     %                                                           %&%
-    rqre_field( Q, {'LAT_GRID'}, 'Q' );                         %&%
+    rqre_field( Q, {'LAT_GRID'}, qname );                       %&%
     %
     grids{2} = qarts_get( Q.LAT_GRID );
 
     if dim > 2
       %                                                         %&%
-      rqre_field( Q, {'LON_GRID'}, 'Q' );                       %&%
+      rqre_field( Q, {'LON_GRID'}, qname );                     %&%
       %
       grids{3} = qarts_get( Q.LON_GRID );
     end
