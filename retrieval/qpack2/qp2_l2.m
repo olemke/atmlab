@@ -12,6 +12,7 @@
 %          'e' : See qinfo(@oem,'e')
 %         'eo' : See qinfo(@oem,'eo')
 %         'es' : See qinfo(@oem,'es')
+%         'ex' : See qinfo(@oem,'ex')
 %         'yf' : See qinfo(@oem,'yf')
 %          'A' : See qinfo(@oem,'A')
 %          'G' : See qinfo(@oem,'G')
@@ -71,7 +72,7 @@ if nargin == 1
   %
   for i = 1 : length( Q.L2_EXTRA )
     switch Q.L2_EXTRA{i} 
-      case {'dx','cost','e','eo','es','yf','A','G','J','S','So','Ss'}
+      case {'dx','cost','e','eo','es','ex','yf','A','G','J','S','So','Ss'}
         L2.(Q.L2_EXTRA{i})= true;
       case 'mresp'
         L2.A = true;
@@ -98,6 +99,7 @@ do_xa    = any( strcmp( Q.L2_EXTRA, 'xa' ) );
 do_e     = any( strcmp( Q.L2_EXTRA, 'e' ) );
 do_eo    = any( strcmp( Q.L2_EXTRA, 'eo' ) );
 do_es    = any( strcmp( Q.L2_EXTRA, 'es' ) ) ;   
+do_ex    = any( strcmp( Q.L2_EXTRA, 'ex' ) ) ;   
 
 
 % Date and position
@@ -349,6 +351,9 @@ for q = 1 : length(R.jq)
     end
     if any( strcmp( Q.L2_EXTRA, 'es' ) )    
       L2.([s,'_es']) = reshape( X.es(ind), siz );  
+    end
+    if any( strcmp( Q.L2_EXTRA, 'ex' ) )    
+      L2.([s,'_ex']) = reshape( X.ex(ind), siz );  
     end
     %
     if any( strcmp( Q.L2_EXTRA, 'mresp' ) )

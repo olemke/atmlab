@@ -49,6 +49,7 @@
 %                   of S).
 %       eo        : Observation error (square root of diagonal elements of So).
 %       es        : Smoothing error (square root of diagonal elements of Ss).
+%       ex        : A priori uncertainty (square root of diag elements of Sx).
 %       yf        : Fitted spectrum.
 %       A         : Averaging kernel matrix.
 %       G         : Gain matrix (also denoted as Dy).
@@ -135,6 +136,12 @@ O.es = false;
 I.es = [ ...
 'Flag to include in X the estimate of smootning error (square root of ',...
 'diagonal elements of Ss).'
+];
+%-----------------------------------------------------------------------------
+O.ex = false;
+I.ex = [ ...
+'Flag to include in X the a priori uncertainty (square root of ',...
+'diagonal elements of Sx).'
 ];
 %-----------------------------------------------------------------------------
 O.G = false;
@@ -882,6 +889,13 @@ end
     end
   end  
 
+  if O.ex
+    if O.sxnorm
+      X.ex = full( sqrt( diag( Sx ) ) .* xnorm );
+    else
+      X.ex = full( sqrt( diag( Sx ) ) );
+    end
+  end
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
