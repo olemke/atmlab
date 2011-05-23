@@ -1,3 +1,20 @@
+2011-05-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-131
+
+	* math/binning_fast.m: Substantial update of binning_fast.
+
+	- It now handles multi dim data, but size(data,1) = length(lat) and
+	length(data).
+
+	- input in.gridsize may now be a scalar (as before), a 2 element
+	vector(Latgridsize,Longridsize), or full lat lon vectors {[lat],[lon]}.
+
+	* math/binned_statistics.m: Added 'UniformOutput', false so that
+	it also works for matrixes in cells.
+
+	* math/taylor_diagram.m: Cleaned up a bit
+
 2011-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-130

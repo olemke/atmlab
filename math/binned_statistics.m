@@ -36,7 +36,7 @@ end
 
 w = warning('off','MATLAB:divideByZero');
 for s = statistics
-    out.(func2str(s{1})) = cellfun(s{1}, data_bins);
+    out.(func2str(s{1})) = cellfun(s{1}, data_bins, 'UniformOutput', false);
 end
 warning(w);
 

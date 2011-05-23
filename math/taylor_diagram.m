@@ -78,26 +78,25 @@ function varargout = taylor_diagram(STDs,RMSs,CORs,opt)
 % Created: G. Maze (07/02/2008)
 %%%%
 %Extra options (added by Salomon)
-% 'pointnames'
-%    names associated with points to be plotted alongside the points
+% 'pointnames' {%s,%s,...}    Names associated with points to be plotted
+%                             alongside the points. Default = {'A','B',...}
 %
-% 'pointcolor'
-%    Color of the individual points
+% 'pointcolor' {%s,%s,} or {[%f rgb],[%f rgb],}
+%                             Color of the individual points. Can be given
+%                             as vector
+%                        
+% 'pointsymbols' ['.','s',..] Symbol associated with point
 %
-% 'pointsymbols'
-%    Symbol associated with point
+% $Id$
 
 %% CHECK THE INPUT FIELDS TO BE SURE WE HAVE:
 % rms^2 = st.^2 + st(end)^2 - 2*st*st(end).*co
 apro = 100;
 di = fix(RMSs*apro)/apro - fix(sqrt(STDs.^2 + STDs(1)^2 - 2*STDs*STDs(1).*CORs)*apro)/apro;
-if find(di~=0)
-    %	help taylordiag.m
-    a1 = 'taylordiag.m : Something''s wrong with the datas';
-    a2 = 'We must have:';
-    a3 = 'RMSs - sqrt(STDs.^2 + STDs(1)^2 - 2*STDs*STDs(1).*CORs) = 0 !';
-    error('%s\n%s\n%s',a1,a2,a3)
-end
+assert(all(di==0),'atmlab:taylor_diagram:badInput',['Something''s wrong with the datas\n'...
+    'We must have:\n','RMSs - sqrt(STDs.^2 + STDs(1)^2 - 2*STDs*STDs(1).*CORs) = 0 !'])
+assert(nargin>=3,'atmlab:taylor_diagram:badInput','USAGE: taylor_diagram(STDs,RMSs,CORs,opt)')
+if nargin ==3, opt = struct; end
 
 %% IN POLAR COORDINATES:
 if isfield(opt,'normalize')&&opt.normalize
@@ -120,10 +119,11 @@ hhh=line([-maxrho -maxrho maxrho maxrho],[-maxrho maxrho maxrho -maxrho],'parent
 xlim([0 maxrho])
 ylim([0 maxrho])
 set(cax,'dataaspectratio',[1 1 1],'plotboxaspectratiomode','auto')
+% Salomons
 %v = [get(cax,'xlim') get(cax,'ylim')];
-%% new
 a = get(cax,'xtick');b = get(cax,'ytick');
 v = [a(1) a(end)+a(2) b(1) b(end)+b(2)];
+
 %% cont..
 ticks = sum(get(cax,'ytick')>=0);
 delete(hhh);
@@ -143,83 +143,35 @@ rinc  = (rmax-rmin)/rticks;
 tick  = (rmin+rinc):rinc:rmax;
 
 %% LOAD DEFAULT PARAMETERS:
-if find(CORs<0)
-    Npan = 2; % double panel
-else
-    Npan = 1;
-end
-tickRMSangle  = 135;
-showlabelsRMS = 1;
-showlabelsSTD = 1;
-tickRMS = tick; rincRMS = rinc;
-tickSTD = tick;
-colSTD = [0 0 0];
-colRMS = [0 .6 0];
-colCOR = [0 0 1];
-tickCOR(1).val = [1 .99 .95 .9:-.1:0];
-tickCOR(2).val = [1 .99 .95 .9:-.1:0 -.1:-.1:-.9 -.95 -.99 -1];
-widthCOR = .8;
-widthRMS = .8;
-widthSTD = .8;
-styleCOR = '-.';
-styleRMS = '--';
-styleSTD = ':';
-titleRMS = 1;
-titleCOR = 1;
-titleSTD = 1;
-%% Salomon's added options
-pointnames={'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',...
+default.Npan = 1+any(CORs<0); %double panel?
+default.tickRMSangle  = 135;
+default.showlabelsRMS = true;
+default.showlabelsSTD = true;
+default.tickRMS = tick;
+default.rincRMS = rinc;
+default.tickSTD = tick;
+default.colSTD = [0 0 0];
+default.colRMS = [0 .6 0];
+default.colCOR = [0 0 1];
+default.tickCOR(1).val = [1 .99 .95 .9:-.1:0];
+default.tickCOR(2).val = [1 .99 .95 .9:-.1:0 -.1:-.1:-.9 -.95 -.99 -1];
+default.widthSTD = .8;
+default.widthRMS = .8;
+default.widthCOR = .8;
+default.styleSTD = ':';
+default.styleRMS = '--';
+default.styleCOR = '-.';
+default.titleSTD = true;
+default.titleRMS = true;
+default.titleCOR = true;
+
+% Salomon's added options
+default.pointnames    ={'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',...
     'P','Q','R','S','T','U','V','W','X','Y','Z'};
-pointcolor(1:length(pointnames))={'r'};
+default.pointcolor    = repmat({[1 0 0]},length(STDs),1);
+default.pointsymbols  = repmat('.',1,length(STDs));
 
-%% LOAD CUSTOM OPTIONS:
-fn = fieldnames(opt);
-for i =1:length(fn)
-    switch lower(fn{i})
-        case 'tickrms'
-            tickRMS = sort(opt.(fn{i}));
-            rincRMS = (max(tickRMS)-min(tickRMS))/length(tickRMS);
-        case 'showlabelsrms'
-            showlabelsRMS = opt.(fn{i});
-        case 'tickrmsangle'
-            tickRMSangle = opt.(fn{i});
-        case 'colrms'
-            colRMS = opt.(fn{i});
-        case 'widthrms'
-            widthRMS = opt.(fn{i});
-        case 'stylerms'
-            styleRMS = opt.(fn{i});
-        case 'titlerms'
-            titleRMS = opt.(fn{i});
-        case 'tickstd'
-            tickSTD = sort(opt.(fn{i}));
-        case 'showlabelsstd'
-            showlabelsSTD = opt.(fn{i});
-        case 'widthstd'
-            widthSTD = opt.(fn{i});
-        case 'stylestd'
-            styleSTD = opt.(fn{i});
-        case 'titlestd'
-            titleSTD = opt.(fn{i});
-        case 'npan'
-            Npan = opt.(fn{i});
-        case 'colcor'
-            colCOR = opt.(fn{i});
-        case 'widthcor'
-            widthCOR = opt.(fn{i});
-        case 'stylecor'
-            styleCOR = opt.(fn{i});
-        case 'titlecor'
-            titleCOR = opt.(fn{i});
-        case 'pointnames'
-            pointnames=opt.(fn{i});
-        case 'pointcolor'
-            pointcolor=opt.(fn{i});
-        case 'pointsymbols'
-            pointsymbols=opt.(fn{i});
-
-    end
-end
+opt = optargs_struct(default,opt);
 
 %% CONTINUE THE PLOT WITH UPDATED OPTIONS:
 
@@ -242,61 +194,61 @@ end
 
 % DRAW RMS CIRCLES:
 % ANGLE OF THE TICK LABELS
-c82 = cos(tickRMSangle*pi/180);
-s82 = sin(tickRMSangle*pi/180);
-for ic = 1 : length(tickRMS)
-    i = tickRMS(ic);
+c82 = cos(opt.tickRMSangle*pi/180);
+s82 = sin(opt.tickRMSangle*pi/180);
+for ic = 1 : length(opt.tickRMS)
+    i = opt.tickRMS(ic);
     iphic = find( sqrt(dx^2+rmax^2-2*dx*rmax*xunit) >= i ,1);
     ig = find(i*cos(th)+dx <= rmax*cos(th(iphic)));
-    hhh = line(xunit(ig)*i+dx,yunit(ig)*i,'linestyle',styleRMS,'color',colRMS,'linewidth',widthRMS,...
+    hhh = line(xunit(ig)*i+dx,yunit(ig)*i,'linestyle',opt.styleRMS,'color',opt.colRMS,'linewidth',opt.widthRMS,...
         'handlevisibility','off','parent',cax);
-    if showlabelsRMS
-        text((i+rincRMS/20)*c82+dx,(i+rincRMS/20)*s82, ...
+    if opt.showlabelsRMS
+        text((i+opt.rincRMS/20)*c82+dx,(i+opt.rincRMS/20)*s82, ...
             ['  ' num2str(i)],'verticalalignment','bottom',...
-            'handlevisibility','off','parent',cax,'color',colRMS,'rotation',tickRMSangle-90)
+            'handlevisibility','off','parent',cax,'color',opt.colRMS,'rotation',opt.tickRMSangle-90)
     end
 end
 
 % DRAW DIFFERENTLY THE CIRCLE CORRESPONDING TO THE OBSERVED VALUE
-%      hhh = line((cos(th)*dx),sin(th)*dx,'linestyle','--','color',colSTD,'linewidth',1,...
+%      hhh = line((cos(th)*dx),sin(th)*dx,'linestyle','--','color',opt.colSTD,'linewidth',1,...
 %                   'handlevisibility','off','parent',cax);
 
 
 % DRAW STD CIRCLES:
 % draw radial circles
-for ic = 1 : length(tickSTD)
-    i = tickSTD(ic);
-    hhh = line(xunit*i,yunit*i,'linestyle',styleSTD,'color',colSTD,'linewidth',widthSTD,...
+for ic = 1 : length(opt.tickSTD)
+    i = opt.tickSTD(ic);
+    hhh = line(xunit*i,yunit*i,'linestyle',opt.styleSTD,'color',opt.colSTD,'linewidth',opt.widthSTD,...
         'handlevisibility','off','parent',cax);
-    if showlabelsSTD
-        if Npan == 2
-            if isempty(find(tickSTD==0, 1))
+    if opt.showlabelsSTD
+        if opt.Npan == 2
+            if isempty(find(opt.tickSTD==0, 1))
                 text(0,-rinc/20,'0','verticalalignment','top','horizontalAlignment','center',...
-                    'handlevisibility','off','parent',cax,'color',colSTD);
+                    'handlevisibility','off','parent',cax,'color',opt.colSTD);
             end
             text(i,-rinc/20, ...
                 num2str(i),'verticalalignment','top','horizontalAlignment','center',...
-                'handlevisibility','off','parent',cax,'color',colSTD)
+                'handlevisibility','off','parent',cax,'color',opt.colSTD)
         else
-            if isempty(find(tickSTD==0, 1))
+            if isempty(find(opt.tickSTD==0, 1))
                 text(-rinc/20,rinc/20,'0','verticalalignment','middle','horizontalAlignment','right',...
-                    'handlevisibility','off','parent',cax,'color',colSTD);
+                    'handlevisibility','off','parent',cax,'color',opt.colSTD);
             end
             text(-rinc/20,i, ...
                 num2str(i),'verticalalignment','middle','horizontalAlignment','right',...
-                'handlevisibility','off','parent',cax,'color',colSTD)
+                'handlevisibility','off','parent',cax,'color',opt.colSTD)
         end
     end
 end
 set(hhh,'linestyle','-') % Make outer circle solid
 
 % DRAW CORRELATIONS LINES EMANATING FROM THE ORIGIN:
-corr = tickCOR(Npan).val;
+corr = opt.tickCOR(opt.Npan).val;
 th  = acos(corr);
 cst = cos(th); snt = sin(th);
 cs = [-cst; cst];
 sn = [-snt; snt];
-line(rmax*cs,rmax*sn,'linestyle',styleCOR,'color',colCOR,'linewidth',widthCOR,...
+line(rmax*cs,rmax*sn,'linestyle',opt.styleCOR,'color',opt.colCOR,'linewidth',opt.widthCOR,...
     'handlevisibility','off','parent',cax)
 
 % annotate them in correlation coef
@@ -304,7 +256,7 @@ rt = 1.05*rmax;
 parfor i = 1:length(corr)
     text(rt*cst(i),rt*snt(i),num2str(corr(i)),...
         'horizontalalignment','center',...
-        'handlevisibility','off','parent',cax,'color',colCOR);
+        'handlevisibility','off','parent',cax,'color',opt.colCOR);
 %     if i == length(corr)
 %         loc = int2str(0);
 %         loc = '1';
@@ -317,13 +269,13 @@ end
 % AXIS TITLES
 axlabweight = 'bold';
 ix = 0;
-if Npan == 1
-    if titleSTD
+if opt.Npan == 1
+    if opt.titleSTD
         ix = ix + 1;
-        ax(ix).handle = ylabel('Standard deviation','color',colSTD,'fontweight',axlabweight);
+        ax(ix).handle = ylabel('Standard deviation','color',opt.colSTD,'fontweight',axlabweight);
     end
     
-    if titleCOR
+    if opt.titleCOR
         ix = ix + 1;
         clear ttt
         pos1 = 45;	DA = 15;
@@ -334,26 +286,26 @@ if Npan == 1
             ith = c(ic);
             ii = ii + 1;
             ttt(ii)=text(dd*cos(ith*pi/180),dd*sin(ith*pi/180),lab(ii));
-            set(ttt(ii),'rotation',ith-90,'color',colCOR,'horizontalalignment','center',...
+            set(ttt(ii),'rotation',ith-90,'color',opt.colCOR,'horizontalalignment','center',...
                 'verticalalignment','bottom','fontsize',get(ax(1).handle,'fontsize'),'fontweight',axlabweight);
         end
         ax(ix).handle = ttt;
     end
     
-    if titleRMS
+    if opt.titleRMS
         ix = ix + 1;
         clear ttt
-        pos1 = tickRMSangle+(180-tickRMSangle)/2; DA = 15; pos1 = 160;
+        pos1 = opt.tickRMSangle+(180-opt.tickRMSangle)/2; DA = 15; pos1 = 160;
         lab = 'RMSD';
         c = fliplr(linspace(pos1-DA,pos1+DA,length(lab)));
-        dd = 1.05*tickRMS(1);
-        dd = .95*tickRMS(2);
+        dd = 1.05*opt.tickRMS(1);
+        dd = .95*opt.tickRMS(2);
         ii = 0;
         for ic = 1 : length(c)
             ith = c(ic);
             ii = ii + 1;
             ttt(ii)=text(dx+dd*cos(ith*pi/180),dd*sin(ith*pi/180),lab(ii));
-            set(ttt(ii),'rotation',ith-90,'color',colRMS,'horizontalalignment','center',...
+            set(ttt(ii),'rotation',ith-90,'color',opt.colRMS,'horizontalalignment','center',...
                 'verticalalignment','top','fontsize',get(ax(1).handle,'fontsize'),'fontweight',axlabweight);
         end
         ax(ix).handle = ttt;
@@ -361,12 +313,12 @@ if Npan == 1
     
     
 else
-    if titleSTD
+    if opt.titleSTD
         ix = ix + 1;
-        ax(ix).handle =xlabel('Standard deviation','fontweight',axlabweight,'color',colSTD);
+        ax(ix).handle =xlabel('Standard deviation','fontweight',axlabweight,'color',opt.colSTD);
     end
     
-    if titleCOR
+    if opt.titleCOR
         ix = ix + 1;
         clear ttt
         pos1 = 90;	DA = 15;
@@ -377,24 +329,24 @@ else
             ith = c(ic);
             ii = ii + 1;
             ttt(ii)=text(dd*cos(ith*pi/180),dd*sin(ith*pi/180),lab(ii));
-            set(ttt(ii),'rotation',ith-90,'color',colCOR,'horizontalalignment','center',...
+            set(ttt(ii),'rotation',ith-90,'color',opt.colCOR,'horizontalalignment','center',...
                 'verticalalignment','bottom','fontsize',get(ax(1).handle,'fontsize'),'fontweight',axlabweight);
         end
         ax(ix).handle = ttt;
     end
     
-    if titleRMS
+    if opt.titleRMS
         ix = ix + 1;
         clear ttt
         pos1 = 160; DA = 10;
         lab = 'RMSD';
         c = fliplr(linspace(pos1-DA,pos1+DA,length(lab)));
-        dd = 1.05*tickRMS(1); ii = 0;
+        dd = 1.05*opt.tickRMS(1); ii = 0;
         for ic = 1 : length(c)
             ith = c(ic);
             ii = ii + 1;
             ttt(ii)=text(dx+dd*cos(ith*pi/180),dd*sin(ith*pi/180),lab(ii));
-            set(ttt(ii),'rotation',ith-90,'color',colRMS,'horizontalalignment','center',...
+            set(ttt(ii),'rotation',ith-90,'color',opt.colRMS,'horizontalalignment','center',...
                 'verticalalignment','bottom','fontsize',get(ax(1).handle,'fontsize'),'fontweight',axlabweight);
         end
         ax(ix).handle = ttt;
@@ -410,7 +362,7 @@ set(get(cax,'ylabel'),'visible','on')
 % set view to 2-D
 view(cax,2);
 % set axis limits
-if Npan == 2
+if opt.Npan == 2
     axis(cax,rmax*[-1.15 1.15 0 1.15]);
     line([-rmax rmax],[0 0],'color',tc,'linewidth',1.2);
     line([0 0],[0 rmax],'color',tc);
@@ -427,22 +379,21 @@ hold on
 pp=zeros(length(STDs),1);
 for ii = 1 : length(STDs)
     pp(ii)=polar(theta(ii),rho(ii));
-    if strcmp(pointsymbols(ii),'s')
-        set(pp(ii),'marker',pointsymbols(ii),'MarkerEdgeColor',pointcolor{ii},'MarkerFaceColor',pointcolor{ii},'markersize',10);
+    if strcmp(opt.pointsymbols(ii),'s')
+        set(pp(ii),'marker',opt.pointsymbols(ii),'MarkerEdgeColor',opt.pointcolor{ii},'MarkerFaceColor',opt.pointcolor{ii},'markersize',10);
     else
-        set(pp(ii),'marker',pointsymbols(ii),'markersize',40);
+        set(pp(ii),'marker',opt.pointsymbols(ii),'markersize',40);
     end
-    %set(pp(ii),'marker','.','markersize',20);
-    set(pp(ii),'color',pointcolor{ii});
+    set(pp(ii),'color',opt.pointcolor{ii});
     if length(STDs)<=26
-        tt(ii)=text(rho(ii)*cos(theta(ii)),rho(ii)*sin(theta(ii)),pointnames{ii},'color',pointcolor{ii});
+        tt(ii)=text(rho(ii)*cos(theta(ii)),rho(ii)*sin(theta(ii)),opt.pointnames{ii},'color',opt.pointcolor{ii});
     else
-        tt(ii)=text(rho(ii)*cos(theta(ii)),rho(ii)*sin(theta(ii)),lower(pointnames{ii}),'color',pointcolor{ii});
+        tt(ii)=text(rho(ii)*cos(theta(ii)),rho(ii)*sin(theta(ii)),lower(opt.pointnames{ii}),'color',opt.pointcolor{ii});
     end
 end
 set(tt,'verticalalignment','bottom','horizontalalignment','right')
 set(tt,'fontsize',12)
-
+hold off
 
 %%% OUTPUT
 switch nargout
