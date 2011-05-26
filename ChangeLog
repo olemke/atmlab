@@ -1,3 +1,9 @@
+2011-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-134
+
+	* geoplots/gmt/test_gmt.m: Fixed newly introduced bug
+
 2011-05-26  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-133

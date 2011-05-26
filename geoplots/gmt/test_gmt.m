@@ -53,6 +53,8 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 
 [gridded,ungridded] = dummy_data;
 
+files = {};
+info  = {};
 %TEST: polar, reference, nlevels, sidebar
 [files,info]               = TEST1(in,gridded,files,info);
 
@@ -60,26 +62,27 @@ warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
 [files,info]               = TEST2(in,gridded,ungridded,files,info);
 
 %TEST: sidebar, nan, projection, center
-[files,info{end+1}]        = TEST3(in,gridded,files); 
+[files,info]               = TEST3(in,gridded,files,info); 
 
 %TEST: contours, nlevels, annotation format, xunit
-[files{end+1},info{end+1}] = TEST4(in);         
+[files,info]               = TEST4(in,files,info);         
 
 %TEST: custom color table, header_size, map_width, grid lines
-[files{end+1},info{end+1}] = TEST5(in,gridded); 
+[files,info]               = TEST5(in,gridded,files,info); 
 
 %TEST: locations, nodata, regions, map details
 [files,info]               = TEST6(in,files,info);          
 
 %TEST: pspolygon, basemap_axis
-[files{end+1},info{end+1}] = TEST7(in);
+[files,info]               = TEST7(in,files,info);
+
+files = files(~cellfun('isempty',files));
+info = info(~cellfun('isempty',info));
 
 % PUT all figure in one pdf
 files{end+1} = combine_pdfs(files,...
     struct('filename','all_tests.pdf','cols',in.cols,'valign','b'));
 
-files = files(~cellfun('isempty',files));
-info = info(~cellfun('isempty',info));
 
 % DISPLAY information about the tests
 disp(' ')
@@ -241,11 +244,11 @@ c = 'for plotting satellite granule data directly. You can also change the';
 d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
 info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
 
-function [files,info] = TEST3(in,gridded,files)
+function [files,info] = TEST3(in,gridded,files,info)
 %% TEST: sidebar, nan, projection, center
 
 t = 3;
-if ~ismember(t,in.test), files='';info='';return, end %then don't do this test
+if ~ismember(t,in.test),return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
 test.title      = 'upper sidebar, NaN, Hammer projection, center=180';
@@ -284,13 +287,13 @@ f = 'NaN-legend using in.nanlegend = false. The upper sidebar is automatically s
 g = 'if there are data larger than in.datarange(2), given via in.datarange = [v1,v2].';
 h = 'The color for these values can be changed using';
 i = 'in.color_foreground (default is ''255/255/255'' (white))';
-info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,a1,b,c,d,e,f,g,h,i);
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,a1,b,c,d,e,f,g,h,i);
 
-function [file,info] = TEST4(in)
+function [files,info] = TEST4(in,files,info)
 %% TEST: contours, nlevels, annotation format, xunit
 
 t = 4;
-if ~ismember(t,in.test), file=''; info = ''; return, end %then don't do this test
+if ~ismember(t,in.test), return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 test.lat = -90:90;
@@ -320,7 +323,7 @@ test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
 a0 = sprintf('Test%.0f',t);
 test.filename = a0;
-file = gmt_plot (catstruct(test,in), 'data');
+files{end+1} = gmt_plot (catstruct(test,in), 'data');
 
 a = ' demonstrates contour maps (see contour options in help gmt_plot), ';
 b = 'where you can optionally choose to show highs and lows in the of the data.';
@@ -329,13 +332,13 @@ d = '(in.xunit=''no unit either'' and in.unit=''no unit'') around the legend';
 e = 'Using the custom colortable (in.colorrange) you can also use';
 f = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
 
-info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
 
-function [file,info] = TEST5(in,gridded) 
+function [files,info] = TEST5(in,gridded,files,info) 
 %% TEST: custom color table, header_size, map_width, grid lines, region
 t = 5;
 
-if ~ismember(t,in.test), file=''; info = ''; return, end %then don't do this test
+if ~ismember(t,in.test), return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 % Add some annotations some intervals.
@@ -369,7 +372,7 @@ test.colorrange.color_model = 'RGB';
 a0 = sprintf('Test%.0f',t);
 test.filename = a0;
 
-file = gmt_plot(catstruct(gridded,test,in),'data');
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = ' demonstrates that you can easily make your own custom colortable using in.colorrange.';
 b = 'You can also insert your own legend annotations to be used instead of';
@@ -379,7 +382,7 @@ e = 'and in this test its demonstrated how to confine the figure to certain';
 f = 'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''';
 g = 'The legend is also automatically made horizontal if the base/height > 3';
 h = 'This can easily be overridden by setting in.orientation.orientation = ''v'' ';
-info = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
 
 function [files,info] = TEST6(in,files,info)
 %% TEST: locations, nodata 
@@ -440,10 +443,10 @@ c = 'several map resolutions available.';
 d = 'The available file types in.figuretype are ''pdf'',''eps'',''png'', and ''tif''';
 info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
 
-function [file,info] = TEST7(in)
+function [files,info] = TEST7(in,files,info)
 %% TEST: pspolygon
 t = 7;
-if ~ismember(t,in.test), file=''; info = '';return, end %then don't do this test
+if ~ismember(t,in.test),return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
 % REGIONS FROM eliasson11:assessing_acp
@@ -482,9 +485,9 @@ test.nodata=true;
 test.basemap_axis='nWeS';
 a0 = sprintf('Test%.0f',t);
 test.filename = a0;
-file = gmt_plot(catstruct(test,in));
+files{end+1} = gmt_plot(catstruct(test,in));
 
 a = ' demonstrates that you can draw polygons on a map, using in.pspoly.';
 b = 'E.g. useful if you want to draw regions of interest on a map';
 
-info = sprintf('%s%s\n%s\n',a0,a,b);
+info{end+1} = sprintf('%s%s\n%s\n',a0,a,b);
