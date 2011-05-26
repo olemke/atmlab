@@ -1,3 +1,9 @@
+2011-05-26  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-133
+	
+	* handy/combine_pdfs.m: Add -f option to mv.
+
 2011-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-132
