@@ -1,4 +1,4 @@
-function command = grdimage(in)
+function command = grdimage(file,in)
 % GRDIMAGE appends options to GMT grdimage
 %
 % purpose: Appends options to a short script and calls the GMT
@@ -26,4 +26,4 @@ grdimage = sprintf('%s -S-n/0',grdimage);
 % selects Overlay plot mode and assuming more pscode will be appended
 grdimage = sprintf('%s -O -K',grdimage);
 
-command = sprintf('%s >> %s/%s.ps',grdimage,in.outdir,in.filename);
+command = sprintf('%s >> %s.ps',grdimage,file);

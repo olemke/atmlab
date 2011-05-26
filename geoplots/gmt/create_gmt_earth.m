@@ -10,7 +10,7 @@ function commands = create_gmt_earth(in)
 
 in = setup_create_gmt_earth(in);                                           
 
-F = fullfile(in.outdir,in.filename);
+F = fullfile(in.tmpdir,in.filename);
 
 % Remove earlier .ps and gmt residules
 commands{1} = sprintf('rm -f %s.{ps,eps}',F);                                
@@ -62,7 +62,7 @@ end
 if isfield(in,'grdimage')
     commands{end+1} = in.grdimage;
 elseif ~in.nodata
-    commands{end+1} = grdimage(in);
+    commands{end+1} = grdimage(F,in);
 end
 
 % LEGEND
@@ -184,10 +184,10 @@ function basemap = setupbasemap(in)
 
 if ~isempty(in.title)
     basemap = sprintf('psbasemap -B:."%s": -R%s -J%s -Ya5 -G -P -K > %s/%s.ps',...
-        gmt_unicode_converter(in.title),in.plot.region,in.plot.proj,in.outdir,in.filename);
+        gmt_unicode_converter(in.title),in.plot.region,in.plot.proj,in.tmpdir,in.filename);
 else
     basemap = sprintf('psbasemap -R%s -J%s -Ya5 -G -P -K > %s/%s.ps',...
-        in.plot.region,in.plot.proj,in.outdir,in.filename);
+        in.plot.region,in.plot.proj,in.tmpdir,in.filename);
 end
 
 function a = mkgrid(in)
@@ -235,7 +235,7 @@ end
 
 if isfield(in,'tickval')
     % make temporary tivkval file
-    fid=fopen(sprintf('%s/tickvalues.txt',gmtlab('OUTDIR')),'w');
+    fid=fopen(sprintf('%s/tickvalues.txt',in.tmpdir),'w');
     fprintf(fid,'%.3f\n',in.tickval);
     fclose(fid);
 end
@@ -261,10 +261,6 @@ switch in.ctable
             tmp = splitstring(in.makecpt,'> ');
             a.cptfile = tmp{2};
         end
-end
-
-if isfield(in,'tickval') 
-    delete(sprintf('%s/tickvalues.txt',gmtlab('OUTDIR'))) %delete temporary
 end
 
 % extra legend box for missing values
@@ -344,7 +340,7 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
             lsize = in.legend.position_nan;
         end
         b = sprintf('psscale -D%s -Li -C%s/color_nan.cpt -O -K >> %s/%s.ps',...
-            lsize,in.tmpdir,in.outdir,in.filename);
+            lsize,in.tmpdir,in.tmpdir,in.filename);
     end
     
     % get xtra options
@@ -433,4 +429,4 @@ in = optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s',in.ticks);
 
-basemap = sprintf('%s  -R -J -O >> %s/%s.ps',basemap,in.outdir,in.filename);
+basemap = sprintf('%s  -R -J -O >> %s/%s.ps',basemap,in.tmpdir,in.filename);

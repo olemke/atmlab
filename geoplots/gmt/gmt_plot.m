@@ -102,9 +102,12 @@ function filename = gmt_plot(in,field)
 %                     |gmtlab('OUTDIR')  ('.' if not set in startup) |
 %                     ------------
 % in.ticks            |%s| 
-%                     E.g '60g50/30g20'. Adds annotations to  major lines
-%                     (e.g 60 xaxis (lon),50 yaxis (lat)) and displays
-%                     minor lines at (e.g 30 xaxis,20 yaxis)
+%                     E.g '60g30/30g15'. The first value for both axis
+%                     denotes the tick interval to annotate, the second
+%                     value is the interval to draw the gridlines. xaxis and
+%                     yaxis are separated by '/'.
+%                     i.e (x-axis: 'annot'g'grid'/ y-axis: 'annot'g'grid')
+%                     Note: To remove gridlines set the second value to 0.
 %                     | determined by input lat/lon range. |
 %                     ------------
 % in.title            |%s| Title of plot | '' |
@@ -667,7 +670,7 @@ if ~isfield(in,'region')
         cond2 = 180-in.lon(end) <= dn(end);
         if cond1 && cond2
             in.region = sprintf('-180/180/%f/%f',...
-                in.lat(1),in.lat(end));
+                in.lat(1)-dt(1)/2,in.lat(end)+dt(end)/2);
         else
             in.region = sprintf('%f/%f/%f/%f',...
                 min(in.lon(:))-dn(1)/2,max(in.lon(:))+dn(end)/2,...
@@ -745,9 +748,8 @@ else
             error('gmtlab:figuretype','%s: not supported',in.figuretype)
     end
     
-    command{end+1} = sprintf('ps2raster %s/%s.ps -A -P %s',in.outdir,in.filename,T);
-    
-    command{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults4 ');
+    command{end+1} = sprintf('ps2raster %s/%s.ps -A -P %s',in.tmpdir,in.filename,T);
+    command{end+1} = sprintf('mv %s/%s.%s %s',in.tmpdir,in.filename,in.figuretype,in.outdir);
 end
 
 

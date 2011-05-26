@@ -26,7 +26,7 @@ function data = geo_single_localtime(utcvec,localtime,data,lon,lat,method)
 %     * If your region data spans a square region (length(lat)=length(lon)) make
 %       sure
 %
-% USAGE: out = lcl_time_array(utcvec,localtime,data,lon,method)
+% USAGE: out = lcl_time_array(utcvec,localtime,data,lon,lat,method)
 %
 % Created by Salomon Eliasson 
 % Modified by Marston Johnston
@@ -51,8 +51,8 @@ factor = (24/360);
 % Get the SIZE of the original data
 sz = size(data);
 
-% PERMUTE so that the data(time,lon,lat...). % This is changed homogenize
-% function
+% PERMUTE so that the data(time,lon,lat...). % data(lat,lon,...) is ensured
+% via the homogenize function
 data = permute(data,[N,2,1,3:N-1]);
 
 % COLLAPSE it to data(time,lon,lat*height*etc)
@@ -103,7 +103,7 @@ if flags.lat_descend
     flags.permute = false; 
 end
 
-% If orig data was data(lon,lat,...), Permute BACK
-if flags.permute
+% If orig data was data(lat,lon,...), Permute BACK
+if ~flags.permute
     data = permute(data,[2,1,3:N-1]);
 end 

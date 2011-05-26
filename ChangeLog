@@ -1,5 +1,25 @@
 2011-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-135
+
+	* geoplots/gmt/test_gmt.m:
+	Fixed data so that lat/lons describe the center of a gridbox as
+	gmt_plot requires.
+
+	* geoplots/gmt/gmt_plot.m:
+	Better description of in.ticks.
+	Fixed bug in determining automatic region.
+
+	* geoplots/geo_single_localtime.m:
+	Fixed bug permuting the final output
+
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/grdimage.m:
+	* geoplots/gmt/create_gmt_earth.m:
+ 	Make sure all tmp files end up in the tmp directory.
+
+2011-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-134
 
 	* geoplots/gmt/test_gmt.m: Fixed newly introduced bug

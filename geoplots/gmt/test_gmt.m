@@ -139,15 +139,15 @@ function [gridded,ungridded] = dummy_data
 %% dummy data
 % GENERATE MAIN DATA 
 
-gridded.lat    = -90:90;
-gridded.lon    = -180:180;
+gridded.lat    = -90+.5:90-.5;
+gridded.lon    = -180+.5:180-.5;
 gridded.data   = zeros(length(gridded.lat),length(gridded.lon));
 ungridded.data = zeros(length(gridded.lat)*length(gridded.lon),1);
 ungridded.lon  = zeros(size(ungridded.data));
 ungridded.lat  = zeros(size(ungridded.data));
 ug=1;
-for j=0:180
-    for i=0:360
+for j=0:179
+    for i=0:359
         gridded.data(j+1,i+1)=sin(((i+180)/360)*pi+pi/2)* cos((j/180)*pi+pi/2)*100+160;
         
         ungridded.data(ug) = gridded.data(j+1,i+1);
@@ -296,11 +296,11 @@ t = 4;
 if ~ismember(t,in.test), return, end %then don't do this test
 test.display = false; % no just put them all in one pdf using conbine_pdfs
 
-test.lat = -90:90;
-test.lon = -180:180;
+test.lat = -90+.5:90-.5;
+test.lon = -180+.5:180-.5;
 for j = test.lat
     for i = test.lon
-        test.data(j+91,i+181) = ((0.1*sin((j+91)/18*pi))+sin((j+91)/180*pi))*(0.1*cos(i/36*pi)+cos(i/360*pi));
+        test.data(j+90.5,i+180.5) = ((0.1*sin((j+91)/18*pi))+sin((j+91)/180*pi))*(0.1*cos(i/36*pi)+cos(i/360*pi));
     end
 end
 
