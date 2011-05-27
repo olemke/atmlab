@@ -1,3 +1,9 @@
+2011-05-27  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-136
+
+	* files/read_openmtp_uth.m: Add reading routine for Open MTP UTH data.
+
 2011-05-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-135
