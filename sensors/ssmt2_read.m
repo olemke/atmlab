@@ -26,7 +26,7 @@
 %               t1x      ?
 %               year     Year of first scan in file
 %               doy      Day of year of first scan in file
-%               ols      seconds since start of day of first scan in file
+%               ols      seconds since start of day
 %               ts       milliseconds since ols
 %               lat      Latitude earth location vector
 %               lon      Longitude earth location vector
@@ -46,16 +46,15 @@
 %               
 % IN    filename            Name of SSM/T-2 file
 % OPT   apply_calibration   Pass false to get the raw count values,
-%                           1: Apply calibration to retrieve BTs
-%                           2: Apply additional experimental per channel
-%                              offset calibration to retrieve BTs
+%                           false: don't apply calibration
+%                           true: apply calibration to retrieve BTs
 
-% 2009-11-20   Created by Oliver Lemke.
+% 2009-11-20   Created by Oliver Lemke and Mathias Milz.
 
 function S = ssmt2_read (filename, apply_calibration)
 
 if nargin == 1
-  apply_calibration = 1;
+  apply_calibration = true;
 end
 
 if strcmp( filename(length(filename)-2:end), '.gz')
@@ -97,15 +96,20 @@ ebcdic_ascii = [ ...
     ];
 
 fid = fopen (filename, 'rb', 'b');
-cleanupObj2 = onCleanup(@() (fclose(fid)));
 
 if (fid == -1)
-  error ('Can''t open input file')
+  error ('atmlab:ssmt2_read', 'Can''t open input file %s', filename);
 end
+cleanupObj2 = onCleanup(@() (fclose(fid)));
 
 %%%%%%%%%% Read Header %%%%%%%%%%
 %
 S.dsname  = ebcdic_ascii(fread (fid, 44, 'uint8=>char'));
+
+if (~strcmp(S.dsname(1:8), 'NSS.SMT2'))
+  error ('atmlab:ssmt2_read', 'Not a valid SSM/T-2 file: %s', filename);
+end
+
 S.nscan   = fread (fid, 1, 'uint16');
 S.ngap    = fread (fid, 1, 'uint16');
 S.precal  = fread (fid, 108, 'uint8');
@@ -193,3 +197,8 @@ while (~feof (fid) && recn < S.nscan)
     clear rec;
 end
 
+if (S.nscan ~= recn)
+    error ('atmlab:ssmt2_read', ...
+        'Premature end of file %s, expected %d records, found %d', ...
+        filename, S.nscan, recn);
+end

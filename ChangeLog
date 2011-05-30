@@ -1,3 +1,20 @@
+2011-05-30  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-137
+
+	* sensors/ssmt2_read.m:
+
+	Check dsname in header to verify that the file is an SSM/T-2 file.
+
+	Create cleanupObj2 only after verifying that fid is valid.
+
+	Throw an error if the number of records read doesn't match the record
+	number in the file header.
+
+	Change apply_calibration to bool.
+
+	Update docs.
+
 2011-05-27  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-136
