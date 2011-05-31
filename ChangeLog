@@ -1,3 +1,9 @@
+2011-05-31  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-138
+
+	* geoplots/geo_single_localtime.m: Shortened at tad using modulo
+
 2011-05-30  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-137

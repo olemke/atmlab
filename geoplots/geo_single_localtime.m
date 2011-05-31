@@ -43,8 +43,6 @@ assert( ( isequal(size(data,1),length(lon)) || isequal(size(data,2),length(lon))
     isequal(size(data,N),length(utcvec)),...
     'atmlab:lcl_time_array:badInput','See usage')
 
-factor = (24/360);
-
 % INTERNALLY make lons -180:180 and adjust data accordingly
 [flags,lat,lon,data] = homogenize_datalatlon(lat,lon,data);
 
@@ -64,10 +62,8 @@ if ismember(0,utcvec) && ~ismember(24,utcvec)
     data = [data; data(1,:,:)];
 end
 
-% get the EQUIVALENT utc for each longitude for the local time
-utc0 = localtime - factor * lon;
-utc0(utc0<0) = utc0(utc0<0) + 24;
-utc0(utc0>24) = utc0(utc0>24) -24;
+% get the EQUIVALENT utc timefor each longitude for the local time
+utc0 = mod(localtime - 24/360 * lon, 24);
 
 % INTERPOLATE
 out = zeros([length(lon),size(data,3)],class(data));
