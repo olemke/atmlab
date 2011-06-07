@@ -517,12 +517,14 @@ function filename = gmt_plot(in,field)
 % Created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
 % $Id$
 
+errId = 'gmtlab:gmt_plot:input';
 if ~exist('field','var')
     field = 'data';
 end
-if ~isfield(in,field) && ~isfield(in,'nodata')
-    error('gmtlab:input',...
-        'Data field: "%s" not found',field)
+assert(ischar(field),errId,['2nd input ''field'' must be the string '...
+    'name of the field in the structure you want to plot'])
+if ~isfield(in,'nodata')
+    assert(isfield(in,field),errId,'Data field: "%s" not found',field)
 end
 
 out = set_GMT_plot(in,field);
@@ -946,7 +948,7 @@ assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
 assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
     '%s%s','Data does not contain any valid',...
     ' values for contour levels to be based on...')
-assert(~(ndims(squeeze(in.(field)))>2),Id,'Too many dimensions in in.%s',field)
+assert(~(ndims(squeeze(in.(field)))>2),Id,'in.%s must not be more than 2 dimensional',field)
 assert(abs(in.datarange(1)-in.datarange(2))>Eps,Id,...
 'min(data) must not be equal to max(data)')
 

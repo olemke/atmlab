@@ -1,3 +1,20 @@
+2011-06-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-139
+
+	* geoplots/resample_geodata.m:
+
+	Complete overhaul after improvement suggestions from the programming meeting.
+	- Now handles data sets with unlimited dimensions.
+	- newgrid can either be a scalar, vector of 2 values for lat or
+	lon, or they can be latitude and longitude vectors to map to.
+	- Function determines from the resolutions of the input grid and
+	the desired output grid which method to use.
+
+	* geoplots/gmt/gmt_plot.m: 
+
+	Better error message
+
 2011-05-31  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-138

@@ -8,19 +8,10 @@ function in = resample_geodata(in,field,newgrid)
 %           assumption if the grid resolution should be COARSER.
 %
 %
-% NOTE:     - Interpolation is linear.
-%           - When regridding to a very coarse resolution and when the finer
-%           grid resolution doesn't cleanly fit in the larger grid, the
-%           local plane assumption will cause some errors, the remedy is
-%           area weighting also depending on latitude. This is not there
-%           yet but can implemented.
-%           - The input grid must be equidegree (homoginous spacing)
 %
-% 'data' fields may have 2->5 dimensions
-% 
 % IN:
 %
-%   in          struct      contains: lat,lon,field1,etc (maybe more fields to regrid)
+%   in          struct      contains: lat,lon,field1,etc (maybe more fields)
 %
 %   field       %s          {'field1',etc}; The field/s  you want to regrid
 %
@@ -30,33 +21,33 @@ function in = resample_geodata(in,field,newgrid)
 %              b) or a 2 element vector [%f %f] means [latstep, lonstep]
 %              e.g. 1*1 -> 1.25*2.75
 %              c) or {[newlat],[newlon]} if you want to match to a predefined
-%              lat lon grid. 
-%              newgrid may be provided in the structure (in.newgrid) for convience
-% 
+%              lat lon grid.
 % OUT:         struct       Original structure 'in' with lat, lon, and specified fields
 %                           replaced with their regridded versions
 %
-% METHOD   The function will do the following:
-% 
-% 1) Makes sure that your data is organised (lat,lon,etc,etc).
-% 2) Makes sure the lat and lon are in acending order.
-% 3) Regrid the data according to specified input 'newgrid'
-% 4) If a region is specified, it'll remove all data outside the region
-%    and output the latlons of the smaller region
-% 
 %
-% NOTE:   If you use new grid = [latstep, lonstep], both have to be higher or lower
-%         than the relsolution of the input data!! FIXME (I could fix this easily)
+% NOTE:     - Interpolation is linear.
+%           - With a combination of conditions
+%                 1) regridding to a very coarse resolution
+%                 2) the finer grid resolution doesn't cleanly fit in the larger grid.
+%             the local plane assumption will cause some errors, the remedy is
+%             to include area weighting depending on latitude. This is 
+%             yet to be implemented. 
+%           - The input data and the newgrid (if full vectors) must be
+%           equidegree (homogeneous spacing)
+%           - If you use new grid = [latstep, lonstep], both have to be higher or lower
+%           than the resolution of the input data, otherwise the
+%           interpolation function is applied also to the coarser grid, but
+%           this will throw a warning.
 %
-%         Important:  (does not apply is you provide new lat lons in regrid{} ) 
-%                   It is assumed that the grid values are centered!! 
-%                   for the interpolation/resampling it is always assumed 
+%         Important:  (but does not apply is you provide new lat lons in regrid{} )
+%                   - It is assumed that the grid values are centered!!
+%                   - For the interpolation/resampling it is always assumed
 %                   that the whole world is in the data.
-%                   (regionize truncates to the specified regions in the next step)
-%             
-% 
-% USAGE:         out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},3); 
-%         e.g.   out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},[3,5]); 
+%
+%
+% USAGE:         out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},3);
+%         e.g.   out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},[3,5]);
 %                out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},...
 %                        {[ newlats ],[ newlons ]} );
 %
@@ -65,303 +56,425 @@ function in = resample_geodata(in,field,newgrid)
 %                2nd example: Same as above but to a 3x5 deg grid
 %                3rd example: Same as above but match the data to certain
 %                             lat lons
-%                
+%
 % IMPORTANT: data fields must have the dimensions data(lat,lon,.....), or
 %                                                 data(lon,lat,.....)
 %
-% Created by Salomon Eliasson (contact me if the function needs tweeking)
+% Created by Salomon Eliasson
 % $Id: regrid_dataset.m 6417 2011-04-21 06:44:37Z seliasson $
 
-%% Check input
-BI = 'atmlab:resample_geodata:badInput';
-assert(nargin>=2,BI,'Read help for usage')
-if nargin ~= 3
-    assert(isfield(in,'newgrid'),BI,'Read help for usage')
-    newgrid = in.newgrid;
-end
+errID = 'atmlab:resample_geodata:badInput';
+assert(nargin==3,errID,'Incorrect number of input arguments')
 if ~iscell(field), field={field}; end
-assert(isstruct(in) && ischar(field{1}) && (isnumeric(newgrid) || iscell(newgrid)),...
-      BI,'Usage:  in = resample_geodata(in,field,newgrid)')
 
-%check fieldnames in struct
-field = field(ismember(field,fieldnames(in)));
-assert(~isempty(field),BI,'Nothing to work on. read help');
-assert(~any(~isfield(in,{'lat','lon'})),BI,'"lat,lon" are required')
-assert(~isequal([size(in.(field{1}),1),size(in.(field{1}),2)],size(in.lat),size(in.lon)),...
-    BI,'function only works on regular grids')
+% CHECK input
+sz                                  = check_input(in,field,newgrid,errID);
 
-a = size(in.(field{1}));
-assert(isequal([length(in.lat),length(in.lon)],a(1:2)) || ...
-    isequal([length(in.lon),length(in.lat)],a(1:2)),...
-    BI, 'data fields must have the dimensions data(lat,lon,.....), or data(lon,lat,.....)');
+% ASSEMBLE_newgrid
+[newlat,newlon]                     = assemble_newgrid(in.lat,in.lon,newgrid,errID);
 
-%check equidegree grid
-cond1 = max(diff(in.lat))-min(diff(in.lat)) < 0.1; %deg 
-cond2 = max(diff(in.lon))-min(diff(in.lon)) < 0.1; %deg 
-assert(cond1 && cond2, BI,...
-    'The input grid must be equidegree (constant spacing)')
+% HOMOGENIZE "new grid" internally
+[rg_flags,newlat,newlon]            = homogenize_datalatlon(newlat,newlon);
 
-% preserve information on original longitudes. Internally I want the
-% longitudes to be in 180:180 format
-flag360 = ( max(in.lon)>180 && ~iscell(newgrid) ) || ...
-    ( iscell(newgrid) && max(newgrid{2}>180) );
-
-
-%% Loop over fields in which to regrid
-t.lon=in.lon; t.lat=in.lat;
-for F = field
-    in.lon=t.lon;in.lat=t.lat;
-    % SANITIZE the lat lons
-    
-    %FIXME switch  this away
-    [flags,in.lat,in.lon,in.(F{1})] = homogenize_datalatlon(in.lat,in.lon,in.(F{1}));
-    % do the REGRIDDING
-    in = regriddata(in,F{1},newgrid,flag360);
-    % apply REGIONS to data
-    if any(isfield(in,{'region','corners'}))
-        in = regionize(in,F{1});
-    end
-    % CHANGE longitudes back to 0:360, if that's how they came in
-    if flag360
-        in.lon = in.lon+(in.lon < 0)*360;
-        [in.lon,lnindex] = sort(in.lon);
-        in.(F{1}) = in.(F{1})(:,lnindex,:,:,:);
-    end
+% LEAVE function if nothing needs to be done
+if isequal(in.lat(:),newlat(:)) && isequal(in.lon(:),newlon(:))
+    warning(errID,['input grid is identical to requested new grid.\n'...
+        'Leaving data untouched'])
+    out = in; return
 end
 
+% CHECK WHICH test
+out.method                          = which_test(in.lat,in.lon,newlat,newlon);
+
+% PRINT to screen what is about to happen
+fprintf('Changing grid from %.3fx%.3f to %.3fx%.3f deg by method: %s\n',...
+    mean(abs(diff(in.lat))),mean(abs(diff(in.lon))),...
+    mean(diff(newlat)),mean(diff(newlon)),....
+    out.method)
+
+
+%% LOOP over FIELDS to regrid
+for F = field
+    fsz = size(in.(F{1}));
+
+    % COLLAPSE data onto the 3rd dimesion
+    data = in.(F{1})(:,:,:);
+    
+    % HOMOGENIZE "input" data internally
+    [flags,lat,lon,data]  = homogenize_datalatlon(in.lat,in.lon,data);
+
+    % CHECK for every field
+    assert(isequal(fsz(1:2),sz(1:2)),...
+        errID,'All input fields for processing don''t have matching lat lon dims')
+   
+    
+    % USE appropriate METHOD
+    switch out.method
+        case 'interpolate'
+            % successfully tested for 4D data and lon=0:360, lat = end:-1:1
+            data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+        case 'coarse grid'
+            % successfully tested for 4D data and lon=0:360, lat = end:-1:1
+            data = coarser_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+        case 'coarse grid with area weighting'
+            % successfully tested for 4D data and lon=0:360, lat = end:-1:1
+            data = coarser_grid_withAreaweighting(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+        case 'shift grid'
+            % successfully: regular, 4D, 
+            data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+        case 'interp and averaging'
+            data = fine_and_coarse(struct('lat',lat,'lon',lon,'data',data),newlat,newlon,true);
+        case 'averaging and iterp'
+            data = fine_and_coarse(struct('lat',lat,'lon',lon,'data',data),newlat,newlon,false);
+        otherwise
+            error('atmlab:resample_geodata:Bug','Shouldn''t be here')
+    end
+    
+    % REORDER data to original sorting order
+    if flags.lat_descend
+        data = data(end:-1:1,:,:);
+    end
+    if flags.lon_descend
+        data = data(:,end:-1:1,:);
+    end
+    if rg_flags.lon360 % the picked newgrid decides...
+        [tilde,lnindex] = sort(newlon+(newlon<0)*360);
+        data = data(:,lnindex,:);
+    end
+    if flags.permute
+        data = permute(data,[2,1,3]);
+    end
+
+    % RESHAPE data back to original format
+    out.(F{1}) = reshape(data,[size(data,1),size(data,2),fsz(3:end)]);
+end
+
+out.lat = newlat;
+out.lon = newlon;
+
+% REORDER lat lons if need be
+if rg_flags.lat_descend
+    out.lat = out.lat(end:-1:1);
+end
+if rg_flags.lon_descend
+    out.lon = out.lon(end:-1:1);
+end
+if rg_flags.lon360
+    out.lon = sort(out.lon+(out.lon<0)*360);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUNFUNCTIONS bellow here
 %
-function in = regriddata(in,field,newgrid,flag360)
-% regriddata core function (wrapper to regrid via interpolate or averaging)
+function sz = check_input(in,field,newgrid,errID)
+%% CHECK_input assorted list of input checks
 
-if iscell(newgrid) % match to given lat lons
-    % internally use the -180:180 scheme
+assert(isstruct(in) && ischar(field{1}) && (isnumeric(newgrid) || iscell(newgrid)),...
+    errID,'Incorrect input argument types')
+
+if iscell(newgrid)
+    assert(length(newgrid)==2 && (min(newgrid{1})>-90 || max(newgrid{1})<90),...
+        errID,'if newgrid is a cell, it must contatin 2 vectors {[LATs] , [LONs]}')
+end
+
+assert(~any(~isfield(in,{'lat','lon'})),errID,'"lat,lon" are required fields')
+
+assert(all(ismember(field,fieldnames(in))),errID,'One or more of the specified data fields is missing');
+
+assert(~isequal([size(in.(field{1}),1),size(in.(field{1}),2)],size(in.lat),size(in.lon)),...
+    errID,'function only works on regular grids, i.e. data(lat,lon,...) or data(lon,lat,...)')
+
+assert(max(diff(in.lat))-min(diff(in.lat))<0.1&&max(diff(in.lon))-min(diff(in.lon))<0.1,...
+    errID,'The input data must be equidegree (constant spacing)')
+
+assert( (isequal(in.lat,sort(in.lat)) || isequal(in.lat,sort(in.lat,'descend')) ) && ...
+    (isequal(in.lon,sort(in.lon)) || isequal(in.lon,sort(in.lon,'descend')) ),...
+    errID,'both lat & lon must be ascending or descending')
+
+sz = size(in.(field{1}));
+assert(isequal([length(in.lat),length(in.lon)],[sz(1),sz(2)]) || ...
+    isequal([length(in.lat),length(in.lon)],[sz(2),sz(1)]),...
+    errID, 'data must have the dimensions data(lat,lon,.....), or data(lon,lat,.....)');
+
+
+function [newlat,newlon] = assemble_newgrid(LAT,LON,newgrid,errID)
+%% ASSEMBLE_newgrid
+% in:    LAT             orig latvector
+%        LON             orig lonvector
+%        newgrid         numeric or cell
+%
+% out:  newlat,newlon vectors to map to, and logical descn flagging is the
+%       are in ascending order or not
+
+if iscell(newgrid)
+    % E.g. for mapping one dataset to anothers lat/lons
     newlat = newgrid{1};
-    if flag360
-        newlon = sort( newgrid{2}-(newgrid{2} > 180)*360 );
-    else newlon = newgrid{2};
-    end
-else               % just regrid
-    g=newgrid;
-    newlat = -90+g(1)/2 : g(1) : 90-g(1)/2;
-    if length(g)==2
-        newlon = -180+g(2)/2 : g(2) : 180-g(2)/2;
+    newlon = newgrid{2};
+    assert(max(diff(newlat))-min(diff(newlat))<0.1&&max(diff(newlon))-min(diff(newlon))<0.1,...
+        errID,'The input newgrid must be equidegree (constant spacing)')
+    
+else
+    % make newlat newlon based on range given by in.lat,in.lon (centered)
+    g=newgrid; if isscalar(g), g = [g,g]; end
+    dn = mean(abs(diff(LON))); dt = mean(abs(diff(LAT)));
+    
+    % LATITUDES
+    if min(LAT) == LAT(1)
+        newlat = LAT(1)-dt/2+g(1)/2 : g(1) : LAT(end)+dt/2-g(1)/2;
+        flt = newlat(end)~=LAT(end)+dt/2-g(1)/2;
     else
-        newlon = -180+g(1)/2 : g(1) : 180-g(1)/2;
+        newlat = LAT(1)+dt/2-g(1)/2 : -g(1) : LAT(end)-dt/2+g(1)/2;
+        flt = newlat(end)~=LAT(end)-dt/2+g(1)/2;
     end
-end
-
-% check so that you only use one or the other method for both lat & lon dims
-cond1 = length(in.lat) < length(newlat) && length(in.lon) > length(newlon);
-cond2 = length(in.lat) > length(newlat) && length(in.lon) < length(newlon);
-
-% check if old grid and newgrid fit together nicely
-cond3 = mean(diff(newlat))/mean(diff(in.lat)) == ...
-    floor(mean(diff(newlat))/mean(diff(in.lat))); 
-
-assert(~(cond1 || cond2),'atmlab:resample_geodata:badInput','%s, %s',...
-    'If you use 2 new grid resolutions',...
-    'both have to be higher or lower than the relsolution of the input data!!')
-
-% PICK method and do the CORE work
-if length(in.lat) < length(newlat) || length(in.lon) < length(newlon)
-    in = interpolate_grid(in,newlat,newlon,field);                         
-end
-if length(in.lat) > length(newlat) || length(in.lon) > length(newlon)
-    if cond3
-        in = coarser_grid(in,newlat,newlon,field);
+    
+    % LONGITUDES
+    if min(LON) == LON(1)
+        newlon = LON(1)-dn/2+g(2)/2 : g(2) : LON(end)+dn/2-g(2)/2;
+        fln = newlon(end)~=LON(end)+dn/2-g(2)/2;
     else
-        in = coarser_grid_withAreaweighting(in,newlat,newlon,field);
+        newlon = LON(1)+dn/2-g(2)/2 : -g(2) : LON(end)-dn/2+g(2)/2;
+        fln = newlon(end)~=LON(end)-dn/2+g(2)/2;
+    end
+    
+    % do they FIT ?
+    if flt
+        warning(errID,'Requested latitude range does not fit into original latitude range')
+    end
+    if fln
+        warning(errID,'Requested longitude range does not fit into original longitude range')
     end
 end
 
-function in = interpolate_grid(in,lat,lon,field)
+function method = which_test(LAT,LON,newlat,newlon)
+%% CHECK_WHICH_test_to_use
+% IN:  lat lons of both grids to decide which method to use
+% OUT: string name of the method to use
+
+% first test is to see if the edges of the input grid match the edges of
+% the new grid
+
+% diff averages
+dnlt = mean(diff(newlat));
+dnln = mean(diff(newlon));
+dlt  = mean(diff(LAT));
+dln  = mean(diff(LON));
+
+% temporay vectors
+nltb   = newlat - dnlt/2;
+nltt   = newlat + dnlt/2;
+nlnb   = newlon - dnln/2;
+nlnt   = newlon + dnln/2;
+ltb    = LAT    - dlt/2;
+ltt    = LAT    + dlt/2;
+lnb    = LAT    - dln/2;
+lnt    = LON    + dln/2;
+
+% LOGICALS
+
+%to a finer grid
+cond1   = dlt > dnlt; %length(LAT) < length(newlat);
+cond2   = dln > dnln; %length(LON) < length(newlon);
+
+%to a coarser grid
+cond3   = dlt < dnlt; %length(LAT) > length(newlat);
+cond4   = dln < dnln; %length(LON) > length(newlon);
+
+% same resolution
+cond5   = dlt == dnlt; %length(LAT) == length(newlat);
+cond6   = dln == dnln; %length(LON) == length(newlon);
+
+% exact fit
+onLatEdges = ismember(nltb(1),ltb) && ismember(nltt(end),ltt);
+onLonEdges = ismember(nlnb(1),lnb) && ismember(nlnt(end),lnt);
+fitlt      = dnlt/dlt == floor(dnlt/dlt);         %dnlt = n*dlt; n interger
+fitln      = dnln/dln == floor(dnln/dln);         %dnln = n*dln; n interger
+
+if (cond1 && ~cond4) || (cond2 && ~cond3)
+    % to a FINER grid
+    
+    method = 'interpolate';
+elseif (cond3 && ~cond2) || (cond4 && ~cond1)
+    % to a COARSER grid
+
+    if fitlt && fitln && onLatEdges && onLonEdges
+    
+        % fit together nicely, this is much faster
+        method = 'coarse grid';
+    else
+        % overlapping gridboxes
+        method = 'coarse grid with area weighting';
+    end
+elseif cond5 && cond6 
+    % SAME resolution but DIFFERENT grid
+    method = 'shift grid';
+elseif cond1 && cond4
+    % to a COMBINATION of both methods (INTERP & AVERAGING)
+    method = 'interp and averaging';
+elseif cond2 && cond3
+    % to a COMBINATION of both methods (AVERAGING & INTERP)
+    method = 'averaging and iterp';
+else
+    error('atmlab:resample_geodata:Bug','Shouldn''t be here')
+end
+
+
+function DATA = interpolate_grid(in,newlat,newlon)
 %% INTERPOLATE_GRID interpolate data to a smaller grid.
-% 
-% IN   in         struct          containing: lat,lon,data to interpolate
-%      lat        %f vect         New latitude vector
-%      lon        %f vect         New longitude vector
-%      field      %s              The name of the field to interpolate
-% 
-% Out: in         struct          original in with the new lat,lon and data
 
-assert(nargin==4,'atmlab:interpolate_grid:badInput','See help section')
+% EXPAND the new lat lons so they encompass orig latlon
+data = in.data;
 
-if gmtlab('verbosity')
-    fprintf('Changing grid from %dx%d to %dx%d deg by INTERPOLATION\n',...
-    mean(diff(in.lat)),mean(diff(in.lon)),mean(diff(lat)),mean(diff(lon)))
+LON=in.lon(:)';
+LAT=in.lat(:)';
+dn = mean(diff(LON));
+dt = mean(diff(LAT));
+
+while LON(1)>=newlon(1)
+    LON = [LON(1)-dn,LON,LON(end)+dn];
+    data = [data(:,end,:),data,data(:,1,:)];
+end
+while LAT(1)>=newlat(1)
+    LAT = [LAT(1)-dt,LAT,LAT(end)+dt];
+    data = [data(1,:,:);data;data(end,:,:)];
 end
 
-
-% Expand the new lat lons so they encompass orig latlon
-in = expand_latlons(in,lat,lon,field);
-
-[X,Y] = meshgrid(in.lon,in.lat);
-[XI,YI] = meshgrid(lon,lat);
-
-%interpolate
-sz = size(in.(field));
-if ~islogical(in.(field))
-    data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
-else data = false([length(lat),length(lon),sz(3:end)]);
+% do the INTERPOLATION
+[X,Y] = meshgrid(LON,LAT);
+[XI,YI] = meshgrid(newlon,newlat);
+DATA = zeros([length(newlat),length(newlon),size(data,3)],class(data));
+for i = 1:size(data,3)
+    DATA(:,:,i) = interp2(X,Y,data(:,:,i),XI,YI);
 end
 
-switch length(sz)
-    case 5
-        for k = 1: size(in.(field),5)
-            for j = 1: size(in.(field),4)
-                for i = 1: size(in.(field),3)
-                    Z = in.(field)(:,:,i,j,k);
-                    data(:,:,i,j,k) = interp2(X,Y,Z,XI,YI);
-                end
-            end
+function data = coarser_grid(in,lat,lon)
+%% coarser_grid by averaging.
+%
+% Purpose: To make gridded data more sparse if the grids fit nicely into each other.
+% NOTE: Biases may be introduced because I am using nanmean. The solution
+%       is to also output the number of values used in the averaging for
+%       each grid (not doing that right now. Add feature if needed)
+
+% PUT lat/lons LAST and make lat lons both size(lat,lon)
+tmpdata = permute(in.data,[3,1,2]); 
+tmplon  = repmat(in.lon,length(in.lat),1);
+tmplat  = repmat(in.lat,1,length(in.lon));
+
+% COLLAPSE data (transposed), lat, lon to simulate UNGRIDDED data
+tmpdata = binning_fast(struct('data',tmpdata(:,:)','lon',tmplon(:),'lat',tmplat(:),...
+    'newlon',lon,'newlat',lat));
+
+% TAKE the grid MEAN for each level (e.g. {[4x288]} -> {[1x288]}).
+tmpdata = binned_statistics(tmpdata,{@mean});
+
+if ndims(in.data)==2
+    data = cell2mat(tmpdata.mean);
+elseif ndims(in.data)==3
+    % make into MATRIX(lat,lat,...)
+    % this loop is because cell2mat doesn't work if cells contain vectors. It
+    % doesn't work in conjuction with repmat, it just scrambled
+    data = zeros(length(lat),length(lon),size(in.data,3));
+    for i = 1:length(lat)
+        for j = 1:length(lon)
+            data(i,j,:) = tmpdata.mean{i,j};
         end
-    case 4
-        for j = 1: size(in.(field),4)
-            for i = 1: size(in.(field),3)
-                Z = in.(field)(:,:,i,j);
-                data(:,:,i,j) = interp2(X,Y,Z,XI,YI);
-            end
-        end
-    otherwise
-        for i = 1: size(in.(field),3)
-            Z = in.(field)(:,:,i);
-            data(:,:,i) = interp2(X,Y,Z,XI,YI);
-        end
-
+    end
 end
 
-in.(field) = data;
-in.lon = lon;
-in.lat = lat;
-
-function in = expand_latlons(in,lat,lon,field)
-%% EXPAND_LATLONS Expand the new lat lons so they encompass orig latlon
-% using the gridspace so that interp2 finds values outside the given range.
-% If not, the edges will contain NaNs that shouldn't be there
-
-
-in.lon=in.lon(:)';% reshape for row vector
-d = in.lon(2)-in.lon(1);
-
-% keep expanding until the new latlons are wider than the latlons to be
-% interpolated into
-while in.lon(1)>=lon(1)
-    in.lon = [in.lon(1)-d,in.lon,in.lon(end)+d];
-    in.(field) = [in.(field)(:,end,:,:,:),in.(field),in.(field)(:,1,:,:,:)];
-end
-
-in.lat = in.lat(:)';  % reshape for row vector
-d = in.lat(2)-in.lat(1);
-
-while in.lat(1)>=lat(1)
-    in.lat = [in.lat(1)-d,in.lat,in.lat(end)+d];
-    in.(field) = [in.(field)(1,:,:,:,:);in.(field);in.(field)(end,:,:,:,:)];
-end
-
-function in = coarser_grid_withAreaweighting(in,lat,lon,field)
-%% COARSER_GRID make a coarse grid from a finer grid 
+function data = coarser_grid_withAreaweighting(in,lat,lon)
+%% COARSER_GRID make a coarse grid from a finer grid
 % method: Uses area weighting for grids that don't fit nicely into each
 % other and assumes local plane assumption, which is good as long as the
 % grids are not too large (see help resample_data).
-% number of valid gridboxes is output along with result (in.nvalid)
 
-% init
-sz = size(in.(field));
-if ~islogical(in.(field))
-    data = zeros([length(lat),length(lon),sz(3:end)],class(in.(field)));
-else data = false([length(lat),length(lon),sz(3:end)]);
+% preallocate
+if ~islogical(in.data)
+    data = zeros([length(lat),length(lon),size(in.data,3)],class(in.data));
+else data = false([length(lat),length(lon),size(in.data,3)]);
 end
 
-nvalid = zeros(size(data),'int16'); % keep track of points used
-
 % INTERNAL function
-% data(ii,jj) = nansum(d(:).*weights(:))/sum(weights(:)); is only for 2dim
-polyWeightSum = @(d,w) (nansum(nansum(d.*w,1),2)./(nansum(nansum(w,1),2)));
+% data(ii,jj) = nansum(subdata(:).*weights(:))/sum(weights(:)); is only for 2dim
+% I need bsxfun because size(d) = [points,levels] and size(w) = [points,1].
+% rdivide is correct.
+% polyWeightSum2 = @(d,w) nansum(d.*repmat(w,1,size(d,2)),1)./sum(repmat(w,1,size(d,2)),1); 
+polyWeightSum = @(d,w) (bsxfun(@rdivide,...
+    nansum(bsxfun(@times,d,w),1),nansum(w))); %30% faster than alt above
 
-% DETERMINE grid spacing from 
+
+
+% DETERMINE new grid BOUNDARIES from grid spacing
 gn = mean(diff(lon)); gt = mean(diff(lat));
 dn = mean(diff(in.lon)); dt = mean(diff(in.lat));
 if isnan(gt), gt = (in.lat(end)-in.lat(1) + dt);end %incase there's only one latitude
 if isnan(gn), gn = (in.lon(end)-in.lon(1) + dn);end %incase there's only one longitude
-if gmtlab('verbosity')
-    fprintf('Changing grid from %dx%d to %dx%d deg by area-weighted AVERAGING\n',...
-    dt,dn,gt,gn)
-end
+
+lattop = lat+gt/2+dt;
+latbot = lat-gt/2;
+lontop = lon+gn/2+dn;
+lonbot = lon-gn/2;
 
 % LOOP over larger grid
 for ii = 1:length(lat)
     for jj=1:length(lon)
         
-        % GET lats lons in or tangent to grid(i,j) 
-        ilon = in.lon >= lon(jj)-gn/2 & in.lon < lon(jj)+gn/2+dn;
-        ilat = in.lat >= lat(ii)-gt/2 & in.lat < lat(ii)+gt/2+dt;
-
-        % get data SUBSET
-        d = in.(field)(ilat,ilon,:,:,:);
-
+        % GET lats lons in or tangent to grid(i,j)
+        ilon = in.lon >= lonbot(jj) & in.lon < lontop(jj);
+        ilat = in.lat >= latbot(ii) & in.lat < lattop(ii);
+        
         % find WEIGHTS
-        % [x,y,width,height] x,y = bottom corner
-        A = [lon(jj)-gn/2,lat(ii)-gt/2,gn,gt]; 
+        % A = [x,y,width,height] x,y = bottom corner
+        A = [lonbot(jj),latbot(ii),gn,gt];
         [x,y] = meshgrid(in.lon(ilon)-dn/2,in.lat(ilat)-dt/2);
         B = [ x(:), y(:), repmat(dn,length(y(:)),1), repmat(dt,length(x(:)),1)];
         weights = rectint(A,B);
-        %keep it the same shape as the data (esp. dim>2)
-        weights = reshape(weights,sum(ilat),sum(ilon));  
-        if length(sz)>2
-            weights = repmat(weights,[1,1,sz(3:end)]);
-        end
+
+        % get data SUBSET
+        d = in.data(ilat,ilon,:);
         
-        nvalid(ii,jj,:,:,:)  = sum(sum(~isnan(d),1),2);
-        data(ii,jj,:,:,:)    = polyWeightSum(d,weights);
+        % COLLAPSE data on the lat/lon dimensions to match output from rectint
+        d = permute(d,[3,1,2]);
+
+        data(ii,jj,:)    = polyWeightSum(d(:,:)',weights');
     end
 end
 
-in.lon         = lon;
-in.lat         = lat;
-in.(field)     = data;
-in.nvalid_data = nvalid;
+function data = fine_and_coarse(in,newlat,newlon,method)
 
-function in = coarser_grid(in,lat,lon,field)
-%% coarser_grid by averaging.
+data = interpolate_grid(in,newlat,newlon);
+warning('atmlab:resample_geodata:incomplete',...
+    ['Using interpolation (interp2) for grids that are finer in one dimension '...
+    'and coarser in the other. This is NO GOOD for the dimension that is coarser, '...
+    'because of linear interpolation.'])
+return
+
+% Code to fix this problem incomplete below:
+
+% %'interp and averaging' = true
+% sz = size(in.data);
+% if method
+%     lp = [sz(2),sz(1)];
+% else lp = [sz(1),sz(2)];
+% end
 % 
-% Purpose: To make gridded data more sparse if the grids fit nicely into each other.
-% NOTE: Biases may be introduced because I am using nanmean. The solution
-%       is to also output the number of values used in the averaging for
-%       each grid
-
-assert(nargin==4,'atmlab:coarser_grid:badInput','See help resample_geodata')
-
-gn = mean(diff(lon));
-gt = mean(diff(lat));
-dn = mean(diff(in.lon));
-dt = mean(diff(in.lat));
-if isnan(gt), gt = (in.lat(end)-in.lat(1) + dt);end %incase there's only one latitude
-if isnan(gn), gn = (in.lon(end)-in.lon(1) + dn);end %incase there's only one longitude
-if gmtlab('verbosity')
-    fprintf('Changing grid from %dx%d to %dx%d deg by AVERAGING\n',...
-    dt,dn,gt,gn)
-end
-
-sz = size(in.(field));
-data = zeros([length(lat),length(lon),sz(3:end)]);
-nvalid = zeros(length(lat),length(lon));
-
-%treat the gridded data as ungridded
-for ii = 1:length(lat)
-    for jj=1:length(lon)
-        % data with the larger newgrid is just averaged (nanmean)
-        test1= in.lat>=lat(ii)-gt/2 & in.lat<lat(ii)+gt/2;
-        test2= in.lon>=lon(jj)-gn/2 & in.lon<lon(jj)+gn/2;
-        temp = in.(field)(test1,test2,:,:,:);
-        nvalid(ii,jj)  = numel(temp(~isnan(temp)));
-        data(ii,jj,:,:,:)= nanmean(nanmean(temp,1),2);                                              
-    end
-end
-
-in.(field)=data;
-in.lon=lon;
-in.lat=lat;
-in.nvalid_data = nvalid;
+% % first INTERPOLATE
+% if method
+%     data = zeros(length(newlat),sz(2),sz(3),class(in.data));
+% else data = zeros(sz(1),length(newlon),sz(3),class(in.data));
+% end
+% 
+% for i = 1:lp(1)
+%     if method
+%         data(:,i,:) = interp1(in.lat,squeeze(in.data(:,i,:)),newlat,'linear','extrap');
+%     else
+%         data(i,:,:) = interp1(in.lon,squeeze(in.data(i,:,:)),newlon,'linear','extrap');
+%     end
+% end
+% 
+% % then COARSEGRID
+% for i = 1:lp(2)
+%     if method
+%         data(i,:,:) = ;
+%     else
+%         %
+%     end
+% end
