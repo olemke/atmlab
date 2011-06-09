@@ -38,18 +38,8 @@ dln = mean(diff(unique(lon)));
 if ig
     sz = size(outdata);
 
-    outdata = outdata(:,:,:);  %collapse to 3D
-    
-    % Get the box that contains all regions (and then some)
-    indexlat = outlat >= min(corner(:,1)) - dlt & outlat <= max(corner(:,3)) + dlt;
-    indexlon = outlon >= min(corner(:,2)) - dln & outlon <= max(corner(:,4)) + dln;
-    outlon = outlon(indexlon);
-    outlat = outlat(indexlat);
-    assert(any(indexlat)&&any(indexlon) ,errID,'no data is in the specified region')
-    
-    % crudely BOX in region
-    z.data = outdata(indexlat,indexlon,:);
-    
+    z.data = outdata(:,:,:);  %collapse to 3Doutdata;
+
     % NaN away everything that is not a region
     z.lat = repmat(outlat,1,length(outlon));
     z.lon = repmat(outlon,1,length(outlat))';

@@ -1,5 +1,13 @@
 2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-145
+
+	* geoplots/regionize.m:
+
+	Decided on a change of behavior. Ready to be announced
+
+2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-144
 
 	* geoplots/regionize.m: Now fixed properly....
