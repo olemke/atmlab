@@ -518,13 +518,15 @@ function filename = gmt_plot(in,field)
 % $Id$
 
 errId = 'gmtlab:gmt_plot:input';
-if ~exist('field','var')
-    field = 'data';
-end
-assert(ischar(field),errId,['2nd input ''field'' must be the string '...
-    'name of the field in the structure you want to plot'])
-if ~isfield(in,'nodata')
+if nargin==2
+    assert(ischar(field),errId,['2nd input ''field'' must be the string '...
+        'name of the field in the structure you want to plot'])
     assert(isfield(in,field),errId,'Data field: "%s" not found',field)
+elseif nargin == 1 && isfield(in,'data')
+    field = 'data';
+elseif nargin == 1
+    in.nodata=true;
+    field = '';
 end
 
 out = set_GMT_plot(in,field);
@@ -591,7 +593,8 @@ default.keep_files        = false;              % keep intermediate files (debug
 default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
 
-if isfield(in,field)
+in = optargs_struct(in,default);
+if ~in.nodata
     default.datarange     = getdatarange(in,field); %
     default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
 end

@@ -201,14 +201,10 @@ if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
 end
 a.ungriddedfile = in.ungriddedfile;
 
-if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')    % find the approx density of points
-    x = length( unique( floor(in.lat)));
-    y = length( unique( floor(in.lon)));
-    A = x*y;
-    delta = sqrt(numel(in.(in.fieldname)) / A);
-    inc = ceil(60/delta *2); % times 2 is to make it a bit bigger
-    if inc>60, inc=60; end
-    a.increment = sprintf('%fm',inc); %i.e. One degree
+if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
+    % find the approx density of points
+    res = mean([ diff(unique(in.lat));diff(unique(in.lon))]) ;
+    a.increment = sprintf('%fm',2*60*res); % 2 x 60min x resolution
 else
     a.increment = in.nearneighbor.increment;
 end

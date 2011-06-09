@@ -1,3 +1,24 @@
+2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-141
+
+	* geoplots/gmt/gmt_plot.m:
+
+	Change rules a bit. If no second argument 'field' is given, and
+	the in their is no data field called 'data' in the structure,
+	continue the function with in.nodata = true (i.e. can still
+	draw coastlines, etc)
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	A better way of determining the search radius if nearneighbor is
+	used.
+
+	* geoplots/resample_geodata.m:
+
+	Fixed output variable name that got screwed in the last commit of
+	the function.
+
 2011-06-09  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-140
