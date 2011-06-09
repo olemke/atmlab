@@ -52,7 +52,7 @@ if ig
     
     % NaN away everything that is not a region
     z.lat = repmat(outlat,1,length(outlon));
-    z.lon = repmat(outlon,length(outlat),1);
+    z.lon = repmat(outlon,1,length(outlat))';
     
     [logical_field,periphery] = get_logicalfield(z,corner,dlt,dln);
     
@@ -127,10 +127,10 @@ end
 % on the periphery of the region
 periphery=false([size(in.data,1),size(in.data,2)]);
 for i = 1:size(corner,1)
-    lt1 = in.lat > corner(i,1) - dlt/2;
-    lt2 = in.lat < corner(i,3) + dlt/2;
-    ln1 = in.lon > corner(i,2) - dln/2;
-    ln2 = in.lon < corner(i,4) + dln/2;
+    lt1 = in.lat >= corner(i,1) - dlt/2;
+    lt2 = in.lat <= corner(i,3) + dlt/2;
+    ln1 = in.lon >= corner(i,2) - dln/2;
+    ln2 = in.lon <= corner(i,4) + dln/2;
 
     periphery = periphery | ( ln1&ln2&lt1&lt2 );
 end

@@ -1,5 +1,12 @@
 2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-143
+
+	* geoplots/regionize.m:
+	Fixed bug with edges and repmat of longitudes.
+
+2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-142
 
 	* geoplots/regionize.m:
