@@ -1,8 +1,10 @@
-2011-06-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+2011-06-09  Marston Johnston <marston@chalmers.se>
 
 	* atmlab-1-0-146
 
-	* retrieval/qpack2/qp2_rel2vmr.m: Added a few comments.
+	* geoplots/regionize.m:
+
+	Fixed some grammar errors
 
 2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
