@@ -94,7 +94,7 @@ end
 
 
 assert(isequal(a(1:2),[length(lat),length(lon)]) || isequal(a(1:2),[length(lon),length(lat)]),...
-    errID,'Dimensions of data must be of form (lat,lon,...) or s(lon,lat,...)')
+    errID,'Dimensions of data must be of form (lat,lon,...) or (lon,lat,...)')
 
 
 % make sure conventions are followed
