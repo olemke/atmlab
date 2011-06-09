@@ -1,3 +1,11 @@
+2011-06-09  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-140
+
+	* geoplots/gmt/gmt_plot.m (getdatarange):
+
+	Convert min/max to double otherwise log10 will fail if data is int.
+
 2011-06-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-139

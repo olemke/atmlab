@@ -835,7 +835,7 @@ function datarange = getdatarange(in,field)
 %% getdatarange
 
 tmp = in.(field)(:);
-d = [min(tmp) max(tmp(~isinf(tmp)))];
+d = double([min(tmp) max(tmp(~isinf(tmp)))]);
 
 % Do some tricks to get the most useful datarange. (rounded, but preserve precision)
 x = log10(d(2)-d(1));
