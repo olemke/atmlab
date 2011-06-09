@@ -94,9 +94,9 @@ errID = 'atmlab:reginize:badInput';
 a = size(data);
 ig = ~isequal(a,size(lat),size(lon));              % is gridded or not
 
-outlon = lon(:);
-outlat = lat(:);
 if ~ig
+    outlon = lon(:);
+    outlat = lat(:);
    outdata = data(:);
    flags = [];
    return
@@ -108,7 +108,7 @@ assert(isequal(a(1:2),[length(lat),length(lon)]) || isequal(a(1:2),[length(lon),
 
 
 % make sure conventions are followed
-[flags,outlat,outlon,outdata] = homogenize_datalatlon(lat,lon,data);
+[flags,outlat,outlon,outdata] = homogenize_datalatlon(lat(:),lon(:),data);
 
 function [logical_field,periphery] = get_logicalfield(in,corner,dlt,dln)
 %% get_logicalfield

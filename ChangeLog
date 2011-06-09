@@ -1,5 +1,12 @@
 2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-144
+
+	* geoplots/regionize.m: Now fixed properly....
+
+
+2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-143
 
 	* geoplots/regionize.m:
