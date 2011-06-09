@@ -1,3 +1,11 @@
+2011-06-09  Marston Johnston  <marstonjohnston@Marston-Johnstons-MacBook.local>
+
+	* atmlab-1-0-148
+	
+	* geoplots/getPredefinedRegions.m (getPredefinedRegions): 
+
+	Added new regions: NH, SH
+
 2011-06-09  Marston Johnston <marston@chalmers.se>
 
 	* atmlab-1-0-147
