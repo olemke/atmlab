@@ -37,22 +37,22 @@ while ~ready
   
   if ~isfield( L2, nx )
     ready = true;
+  
   else
-    %
     nv    = sprintf( 'species%d_vmr0', i );
     na    = sprintf( 'species%d_xa', i );
     ns{1} = sprintf( 'species%d_e', i );
     ns{2} = sprintf( 'species%d_eo', i );
     ns{3} = sprintf( 'species%d_es', i );
-    %
+
     rqre_field( L2, nv, 'sub-field vmr0' );
     rqre_field( L2, na, 'sub-field xa' );
-    %
+
     for j = 1: length(L2)
       %
       vmr0       = L2(j).(nv);
       xa         = L2(j).(na);
-      %
+
       % rel
       if xa(1) == 1
         L2(j).(nx) = L2(j).(nx) .* vmr0;
@@ -62,6 +62,8 @@ while ~ready
             L2(j).(ns{k}) = L2(j).(ns{k}) .* vmr0;
           end
         end
+      
+      % logrel
       elseif xa(1) == 0
         L2(j).(nx) = exp(L2(j).(nx)) .* vmr0;
         L2(j).(na) = vmr0;
@@ -70,6 +72,7 @@ while ~ready
             L2(j).(ns{k}) = (exp(L2(j).(ns{k}))-1) .* vmr0;
           end
         end
+        
       else
         error( 'Could not establish retrieval unit.' );
       end

@@ -1,3 +1,9 @@
+2011-06-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-146
+
+	* retrieval/qpack2/qp2_rel2vmr.m: Added a few comments.
+
 2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-145
