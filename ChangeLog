@@ -1,5 +1,36 @@
 2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-142
+
+	* geoplots/regionize.m:
+
+	Added useful function that singles out user-defined lat/lon
+	regions in data. The function will replace grid boxes that are
+	outside the given region or regions with NaNs for easy statistical
+	applications. A weighting matrix is output along with the output
+	data so that grid boxes that are only partially in the specified
+	region can be weighted accordingly. E.g. for a grid box(i,j) that
+	is completely in the specified region, weights(i,j) = 1, and a
+	grid box(i,j) that is partially in, 0 < weights(i,j) < 1
+
+	* geoplots/getPredefinedRegions.m:
+
+	This function is more or less a list of predefined
+	regions. Expected Input is a cell of strings or a string. Each
+	string is either the 'short name' of one of the predefined
+	regions, or is a user defined region ('lon1/lon2/lat1/lat2'). The
+	output is a matrix of [bottom left corner, top right corner]
+	(e.g. [lat1,lon1,lat2,lon2;...] ).
+
+	The list of shortnames of the regions will be listed if you call:
+	list = fieldnames(getPredefinedRegions)';
+
+	The attributes of all the predefined regions is:
+	attr = getPredefinedRegions;
+
+
+2011-06-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-141
 
 	* geoplots/gmt/gmt_plot.m:
