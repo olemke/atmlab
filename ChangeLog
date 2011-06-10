@@ -1,3 +1,12 @@
+2011-06-10  Marston Johnston  <marston@plushstone.rss.chalmers.se>
+
+        * atmlab-1-0-150
+
+	* geoplots/getPredefinedRegions.m (getPredefinedRegions): 
+
+	Improved the names of regions ('north_trop','south_trop') to 
+	appropriate 'boreal_trop', 'austral_trop'
+	
 2011-06-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-149
