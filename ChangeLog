@@ -1,8 +1,17 @@
+2011-06-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-149
+
+	* geoplots/getPredefinedRegions.m:
+
+	Changed names of recently introduced regions ('nh','sh') to more
+	appropriate 'trop_north', 'trop_south'
+
 2011-06-09  Marston Johnston  <marstonjohnston@Marston-Johnstons-MacBook.local>
 
 	* atmlab-1-0-148
-	
-	* geoplots/getPredefinedRegions.m (getPredefinedRegions): 
+
+	* geoplots/getPredefinedRegions.m:
 
 	Added new regions: NH, SH
 
