@@ -21,8 +21,6 @@ function result = xmlReadPpath(fid, attrlist, itype, ftype, binary, fid2)
 
   result.dim          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.np           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.refraction   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.method       = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.constant     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.pos          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.z            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
@@ -34,8 +32,6 @@ function result = xmlReadPpath(fid, attrlist, itype, ftype, binary, fid2)
   result.background   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.tan_pos      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.geom_tan_pos = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.p            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.t            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.vmr          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.next_parts   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.nreal            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+
 

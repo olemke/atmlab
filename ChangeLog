@@ -1,12 +1,22 @@
+2011-06-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-1-0-151
+
+	* arts/xml/xmlWritePpath.m (xmlWritePpath): Adopted to recent
+	changes of the Ppath structure.
+
+	* arts/xml/xmlReadPpath.m (xmlReadPpath): Adopted to recent
+	changes of the Ppath structure.
+
 2011-06-10  Marston Johnston  <marston@plushstone.rss.chalmers.se>
 
         * atmlab-1-0-150
 
-	* geoplots/getPredefinedRegions.m (getPredefinedRegions): 
+	* geoplots/getPredefinedRegions.m (getPredefinedRegions):
 
-	Improved the names of regions ('north_trop','south_trop') to 
+	Improved the names of regions ('north_trop','south_trop') to
 	appropriate 'boreal_trop', 'austral_trop'
-	
+
 2011-06-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-149
