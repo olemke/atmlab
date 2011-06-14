@@ -285,6 +285,16 @@ A.collocation_hirscs_mhs_data_legacy_subdir = nan;
 A.collocation_hirscs_mhs_data_legacy_regexp = nan;
 A.collocation_hirscs_mhs_data_legacy_filename = nan;
 
+A.collocation_amsua_amsua_basedir = nan;
+A.collocation_amsua_amsua_subdir = nan;
+A.collocation_amsua_amsua_regexp = nan;
+A.collocation_amsua_amsua_filename = nan;
+
+A.collocation_hirs_hirs_basedir = nan;
+A.collocation_hirs_hirs_subdir = nan;
+A.collocation_hirs_hirs_regexp = nan;
+A.collocation_hirs_hirs_filename = nan;
+
 A.collocation_collocation_cpr_mhs_avhrr_basedir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_subdir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_regexp = nan;

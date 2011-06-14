@@ -176,10 +176,17 @@ datasets_config('collocation_hirscs_mhs_data_legacy_basedir', '/storage4/user_da
 datasets_config('collocation_hirscs_mhs_data_legacy_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_hirscs_mhs_data_legacy_filename', 'collocations_data_$SAT1_$SAT2.mat');
 
+datasets_config('collocation_amsua_amsua_basedir', '/storage4/user_data/gerrit/collocations_amsua_amsua');
+datasets_config('collocation_amsua_amsua_subdir', '$YEAR4/$MONTH/$DAY');
+datasets_config('collocation_amsua_amsua_filename', 'collocations_$SAT1_$SAT2.nc.gz');
+
+datasets_config('collocation_hirs_hirs_basedir', '/storage4/user_data/gerrit/collocations_hirs_hirs');
+datasets_config('collocation_hirs_hirs_subdir', '$YEAR4/$MONTH/$DAY');
+datasets_config('collocation_hirs_hirs_filename', 'collocations_$SAT1_$SAT2.nc.gz');
+
+
 datasets_config('collocation_collocation_cpr_mhs_avhrr_basedir', '/storage4/user_data/gerrit/collocations_collocation_cpr_mhs_avhrr');
 datasets_config('collocation_collocation_cpr_mhs_avhrr_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_collocation_cpr_mhs_avhrr_filename', 'collocations_$SAT1_$SAT2.nc.gz');
-
-
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');

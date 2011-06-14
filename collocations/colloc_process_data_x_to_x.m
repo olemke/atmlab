@@ -1,27 +1,29 @@
-function M = colloc_process_data_poes_poes(~, M_c, ...
-    ~, ~, data1, ~, ~, data2)
+function M = colloc_process_data_x_to_x(~, M_c, ...
+    ~, sensor1, ~, data1, ...
+    ~, sensor2, ~, data2)
 
-% colloc_process_data_poes_poes Gather collocation data to store for MHS+MHS
+% colloc_process_data_x_to_x Gather collocation data to store for identical sensors
 %
 % After collocating, and gathering information about the collocations, we
-% want to collect some actual data: in this case, brightness temperatures.
+% want to collect some actual data.
 %
 % FORMAT
 %
-%   M = colloc_process_data_poes_poes(collocations, M, ...
+%   M = colloc_process_data_x_to_x(collocations, M, ...
 %       name1, date1, data1, name2, date2, data2)
 %
 % IN
 %
-%   collocations    Nx4 matrix  As returned by collocate or collocate2
-%   M               matrix      As returned by colloc_process_poes_poes
-%                               (ignored here)
-%   name1           string      name of satellite 1 (ignored here)
+%   collocations    Nx4 matrix  As returned by collocate
+%   M_c             matrix      As returned by colloc_process_poes_poes
+%   sat1
+%   sensor1         string      name of satellite 1
 %   date1           1x5 vector  Contains [year month day hour minute] for the
 %                               start of the primary granule (ignored here)
 %   data1           structure   Fields for brightness temperature should be
 %                               present
-%   name2           string      name of satellite 2 (ignored here)
+%   sat2
+%   sensor2         string      name of satellite 2
 %   date2           1x5 vector  As date1, but for secondary granule
 %                               (ignored here)
 %   data2           structure   As data1, but for secondary granule.
@@ -33,8 +35,12 @@ function M = colloc_process_data_poes_poes(~, M_c, ...
 %
 % $Id$
 
+% Created by Gerrit Holl
+%
+% $Id$
+
 % prepare
-c = colloc_constants('cols_mhs_mhs');
+c = colloc_constants(sprintf('cols_%s_%s', sensor1, sensor2));
 
 % row and column numbers
 r1 = M_c(:, c.overlap.I1);
@@ -48,8 +54,8 @@ i2 = sub2ind(size(data2.lat), r2, c2);
 
 % reshape so that I can use direct addressing for brightness temperatures
 
-tb1 = reshape(data1.tb, [numel(data1.lat) 5]);
-tb2 = reshape(data2.tb, [numel(data2.lat) 5]);
+tb1 = reshape(data1.tb, numel(data1.lat), []);
+tb2 = reshape(data2.tb, numel(data2.lat), []);
 
 %% store info
 

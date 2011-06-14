@@ -1,3 +1,59 @@
+2011-06-14  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-152
+
+	* collocations/colloc_process_x_to_x.m,
+	  collocations/colloc_process_data_x_to_x.m: Added
+	  - Moved common part for processing collocations between two
+	    identical sensors.
+
+	* collocations/colloc_process_poes_poes.m,
+	  collocations/colloc_process_data_poes_poes.m: Deleted
+	  - This is now done via fanciness in colloc_constants.
+	
+	* collocations/colloc_constants.m: Adapted
+	  - Used a subfunction with a nested function to do partial function
+	    application, so colloc_process_x_to_x and ..._data_x_to_x are used
+		for all where sensor pairs are identical.
+	  - Moved common stuff to "generic" definitions
+	  - Changed the following field names (for consistency):
+	  	CPR/AVHRR:
+			SZA -> AVHRR_SZA
+			H_I -> HCS_I
+			H_ZEN -> H_SZA
+			C_ROW -> C_I
+		HIRSCS/MHS:
+			H_LINE -> H_I
+			H_POSI -> H_C
+			SZA -> MHS_SZA
+			SAA -> MHS_SAA
+		CPRPOES/AVHRR:
+			SZA -> AVHRR_SZA
+
+	* tests/verify_colloc_constants.m: Added
+	  - Test whether colloc_constants is somewhat consistent.
+	
+	* collocations/collocate.m: Adapted
+	  - lat and lon are no longer automatically flattened by binning_fast,
+	  so I need to do this explicitly.
+	
+	* sensors/find_scanline_overlaps.m: Added
+	  - Finds first line in granule N not occuring in granule N-1.
+	
+	* datasets/datasets_config.m: Expanded
+	  - Added collocations amsu/amsu and hirs/hirs
+	
+	* site-specific/kiruna/datasets_init.m: Expanded
+	  - Added default Kiruna locations for collocations amsu/amsu and
+	  hirs/hirs.
+	
+	* datasets/find_datadir_by_date.m: Minor change
+	  - Corrected error message; basedir may be correctly defined, but the
+	  directory not created.
+	
+	* collocations/collocate_and_store_date.m: Minor change
+	  - Make error message more useful.
+
 2011-06-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-1-0-151

@@ -86,5 +86,5 @@ if ~fileexists || colloc_config('overwrite')
         write_collocations_netcdf(year, month, day, C{1:3}, sat1, sensor1, sat2, sensor2);
     end
 else
-    logtext(atmlab('OUT'), 'Output file(s) already exist\n');
+    logtext(atmlab('OUT'), 'Output file(s) %s already exist\n', fn);
 end

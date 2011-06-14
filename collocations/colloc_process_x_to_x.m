@@ -1,8 +1,8 @@
-function M = colloc_process_poes_poes(collocations, ...
-    name1, date1, data1, ...
-    name2, date2, data2)
+function M = colloc_process_x_to_x(collocations, ...
+    sat1, sensor1, date1, data1, ...
+    sat2, sensor2, date2, data2)
 
-% colloc_process_poes_poes Gather collocation info to store for MHS+MHS
+% colloc_process_x_to_x Gather collocation info to store for identical sensors
 %
 % After collocating, we want to gather information about the collocations: not
 % only indices and columns, but also time, lat, long, distance, interval. This
@@ -10,19 +10,21 @@ function M = colloc_process_poes_poes(collocations, ...
 %
 % FORMAT
 %
-%   M = colloc_process_poes_poes(collocations, ...
-%       name1, date1, data1, ...
-%       name2, date2, data2);
+%   M = colloc_process_x_to_x(collocations, ...
+%       sat1, sensor1, date1, data1, ...
+%       sat2, sensor2, date2, data2);
 %
 % IN
 %
-%   collocations    Nx4 matrix  As returned by collocate or collocate2
-%   name1           string      Name of primary satellite (not used here)
+%   collocations    Nx4 matrix  As returned by collocate
+%   sat1            string      Name of primary satellite
+%   sensor1
 %   date1           1x5 vector  Contains [year month day hour minute] for the
 %                               start of the primary granule.
 %   data1           structure   Fields time, lat and lon should be present; as
 %                               returned by read_mhs
-%   name2           string      Name of secondary satellite (not used here)
+%   sat2            string      Name of secondary satellite
+%   sensor2
 %   date2           1x5 vector  As date1, but for secondary granule.
 %   data2           structure   As data1, but for secondary granule.
 %
@@ -30,11 +32,13 @@ function M = colloc_process_poes_poes(collocations, ...
 %
 %   M               Nxp matrix  Matrix containing p fields of information for
 %                               all N collocations.
+
+% Created by Gerrit Holl
 %
 % $Id$
 
 % prepare
-c = colloc_constants('cols_mhs_mhs');
+c = colloc_constants(sprintf('cols_%s_%s', sensor1, sensor2));
 c = c.overlap;
 n = size(collocations, 1);
 M = nan*zeros(n, c.NCOLS);
@@ -91,6 +95,7 @@ M(:, c.INT) = M(:, c.TIME2) - M(:, c.TIME1);
 
 %% remove doubles
 
-wrongrows = (M(:, c.I1) < granule_first_line(name1, amsub_or_mhs(name1), date1)) & ...
-            (M(:, c.I2) < granule_first_line(name2, amsub_or_mhs(name2), date2));
+wrongrows = (M(:, c.I1) < granule_first_line(sat1, sensor1, date1)) & ...
+            (M(:, c.I2) < granule_first_line(sat2, sensor2, date2));
 M(wrongrows, :) = [];
+end
