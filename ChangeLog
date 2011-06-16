@@ -1,5 +1,16 @@
 2011-06-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-158
+
+	* handy/exec_system_cmd.m: Changed behaviour, code may break!
+	  - CHANGE IN BEHAVIOUR: Default behaviour is now non-verbose rather
+	    than verbose!
+	  - CHANGE IN BEHAVIOUR: Outputs only the command outputs. Previously,
+	    had a second output that was always equal to 0.
+	  - Improved documentation.
+
+2011-06-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-157
 	
 	* collocations/collocation_read.m: Adapted

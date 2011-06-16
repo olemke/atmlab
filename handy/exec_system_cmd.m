@@ -1,24 +1,42 @@
-function [out,ret] = exec_system_cmd(cmd, verbose)
+function out = exec_system_cmd(cmd, varargin)
 %
-% EXEC_SYSTEM_CMD Executes a system command.
+% EXEC_SYSTEM_CMD Executes one or more system commands.
 %
-% Execute a shell command for GMT.
+% Executes one or more system commands.
 %
-% IN    cmd      Command string
+% If any command returns an error code not equal to 0, this function will
+% throw an error with the error identifier 'atmlab:exec_system_cmd:shell'.
 %
-% OUT   out      A cell containing all stdouts (One for every system call)
+% IN
+%
+%   cmd: string or cell array of strings
+%
+%       Command to pass to the shell. If this is a cell array of strings,
+%       each string will be apssed to the shell in turn.
 %
 %
-% OPT   verbose   Set to true to echo the command.
+%   verbose: bool, optional. Defaults to false
 %
-% updated by: Salomon
+%       If true, each command with be printed to the screen before it is
+%       executed.
+%
+% OUT
+%
+%   out: cell array of strings
+%
+%       For each command passed as input, the output (stdout+stderr)
+%       is collected in a string. Those strings are then collected to
+%       a cell array of strings. If only one input command was given,
+%       this is a cell array with one string.
+%
+% updated by: Salomon, Gerrit
 % Author: Oliver Lemke
 
 if ~iscell(cmd), cmd = {cmd}; end
 
 cmd = cmd(:);
 
-if ~exist('verbose', 'var'), verbose=1; end
+verbose = optargs(varargin, {false});
 errID = 'atmlab:exec_system_cmd:shell';
 out = cell(1,length(cmd)); i = 1; % keep track of output messages
 for x = cmd'
@@ -51,3 +69,4 @@ for x = cmd'
     i = i+1;
 end
 
+end
