@@ -19,7 +19,7 @@ if ~iscell(cmd), cmd = {cmd}; end
 cmd = cmd(:);
 
 if ~exist('verbose', 'var'), verbose=1; end
-errID = 'amtlab:exec_system_cmd:shell';
+errID = 'atmlab:exec_system_cmd:shell';
 out = cell(1,length(cmd)); i = 1; % keep track of output messages
 for x = cmd'
     fullcmd = char(x);

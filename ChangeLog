@@ -1,4 +1,23 @@
+2011-06-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-157
+	
+	* collocations/collocation_read.m: Adapted
+	  - Now that I use exec_system_cmd instead of gunzip for gunzipping,
+	    also adapt the appropiate error identifier
+	
+	* collocations/read_collocs_data_mean.m,
+	  datasets/common_read_collocation_cpr_mhs.m,
+	  datasets/common_read_avhrr.m, datasets/common_read_hirscs.m: Adapted
+	  - Use exec_system_cmd
+	
+	* handy/exec_system_cmd.m: Adapted
+	  - WARNING: CHANGED ERROR IDENTIFIER!
+	    amtlab:exec_system_cmd:shell -> atmlab:exec_system_cmd:shell
+
 2011-06-16  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-156
 
 	* geoplots/gmt/makecpt.m:
 	* geoplots/gmt/gmt_plot.m: 

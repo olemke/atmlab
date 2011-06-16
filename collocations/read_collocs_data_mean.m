@@ -26,7 +26,7 @@ function M = read_collocs_data_mean(fn, cols, c)
 
 logtext(atmlab('OUT'), 'Reading %s\n', fn);
 tmp = tempname(atmlab('WORK_AREA'));
-system(['zcat ' fn '>' tmp]); % 3x faster than ML gunzip
+exec_system_cmd(['zcat ' fn '>' tmp]); % 3x faster than ML gunzip
 %filenames = gunzip(fn, atmlab('WORK_AREA')); 
 %ncid = netcdf.open(filenames{1}, 'NOWRITE');
 ncid = netcdf.open(tmp, 'NOWRITE');

@@ -215,7 +215,8 @@ for i = 1:size(dates, 1)
     catch ME
         switch (ME.identifier)
             case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField', ...
-                    'MATLAB:gunzip:invalidFilename','MATLAB:netcdf:open:noSuchFile'}
+                    'MATLAB:gunzip:invalidFilename','MATLAB:netcdf:open:noSuchFile', ...
+                    'atmlab:exec_system_cmd:shell'}
                 logtext(atmlab('ERR'), 'Problem for %04d-%02d-%02d: %s\n', ...
                     date(1), date(2), date(3), ME.message);
                 continue
