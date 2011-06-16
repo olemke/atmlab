@@ -53,11 +53,7 @@ O.eo         = true;
 O.es         = true;
 O.yf         = true;
 
-O.linear=true;
-O.G = true;
-O.J = true;
-O.A = true;
-O.sxnorm = true;
+
 
 %----------------------------------------------------------------------------
 %- Forward model parameters

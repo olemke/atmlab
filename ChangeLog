@@ -1,5 +1,11 @@
 2011-06-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-155
+
+	* demos/arts_oem_demo.m: Soem test code had not been removed. 
+
+2011-06-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-154
 
 	* retrieval/oem.m: Averaging kernal matrix was incorrect if
