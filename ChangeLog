@@ -1,3 +1,15 @@
+2011-06-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-154
+
+	* retrieval/oem.m: Averaging kernal matrix was incorrect if
+	O.sxnorm == true. However, could be correct for some conditions
+	(my old test falled into this category). Bug found after
+	input from Ole-Martin. The proper scaling is now made. 
+
+	* demos/arts_oem_demo.m: Added code for tests with varying a priori
+	uncertainty. Activated by changing an if-statement.
+
 2011-06-16  Gerrit Holl  <gerrit.holl@ltu.se>
 	
 	* atmlab-1-0-153

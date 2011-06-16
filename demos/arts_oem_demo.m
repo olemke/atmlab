@@ -53,7 +53,11 @@ O.eo         = true;
 O.es         = true;
 O.yf         = true;
 
-
+O.linear=true;
+O.G = true;
+O.J = true;
+O.A = true;
+O.sxnorm = true;
 
 %----------------------------------------------------------------------------
 %- Forward model parameters
@@ -141,10 +145,22 @@ Q.ABS_SPECIES(2).TAG      = { 'O3' };
 Q.ABS_SPECIES(2).RETRIEVE = true;
 Q.ABS_SPECIES(2).GRIDS    = { z2p_simple( 0e3:1e3:90e3 )', [], [] };
 Q.ABS_SPECIES(2).UNIT     = 'vmr';
-Q.ABS_SPECIES(2).SX       = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
+if 1
+  Q.ABS_SPECIES(2).SX     = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
                                     2e-6, 'lin', 0.2, 0.00, @log10 ) + ...
                             covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
                                   0.5e-6, 'lin', 0.5, 0.00, @log10 );
+else
+  arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
+  O3 = xmlLoad( fullfile( arts_xmldata_path, 'atmosphere', 'fascod', ...
+                                                         'tropical.O3.xml' ) );
+  Q.ABS_SPECIES(2).SX     = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
+                            [ O3.grids{1}, 0.5*O3.data ], ...
+                                              'lin', 0.2, 0.00, @log10 ) + ...
+                            covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
+                            [ O3.grids{1}, 0.1*O3.data ], ...
+                                              'lin', 0.5, 0.00, @log10 );
+end
 
 
 

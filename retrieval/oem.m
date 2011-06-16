@@ -845,7 +845,11 @@ end
   end
 
   if O.A 
-    X.A = A;  % No normalisation needed here
+    if O.sxnorm
+      X.A = A .* (xnorm*(1./xnorm'));  %scaling is ni/nj, where ni is xnorm
+    else                               %for retrieved value, and nj for x-state
+      X.A = A; 
+    end
   end  
 
   if O.S  |  O.So  |  O.e  |  O.eo
@@ -867,6 +871,7 @@ end
   if O.S  |  O.Ss  |  O.e  |  O.es
     AI = A - eye(size(A,1));
     Ss = AI * Sx * AI';
+    clear AI;
     %
     if O.sxnorm
       Ss = Ss .* (xnorm*xnorm');
