@@ -1,6 +1,8 @@
 2011-06-16  Salomon Eliasson  <s.eliasson@ltu.se>
 
-	* geoplots/gmt/gmt_plot.m: Fixed annotation format
+	* geoplots/gmt/makecpt.m:
+	* geoplots/gmt/gmt_plot.m: 
+	Fixed annotation format
 
 2011-06-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
