@@ -621,7 +621,7 @@ end
 
 % colors & data representation:
 default.ctable      = 'rainbow';          % color palette
-[default.stepsize,default.legend.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
+[default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
 in = optargs_struct(in,default); clear default
 
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
@@ -726,6 +726,7 @@ if ~isfield(in.legend,'position')
 else
     default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
 end
+default.tick_annotion_format = in.tick_annotation_format;
 default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
 in.legend           = optargs_struct(in.legend,default);
 

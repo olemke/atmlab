@@ -1,8 +1,12 @@
+2011-06-16  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geoplots/gmt/gmt_plot.m: Fixed annotation format
+
 2011-06-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-155
 
-	* demos/arts_oem_demo.m: Soem test code had not been removed. 
+	* demos/arts_oem_demo.m: Soem test code had not been removed.
 
 2011-06-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
