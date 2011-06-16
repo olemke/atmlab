@@ -78,20 +78,23 @@ end
 
 %% ALWAYS get rid of doubles
 % FIXME: at some point in the future, this should be redundant
-filters = [filters ...
-    {{@colloc_select_good_lines, cols.overlap.filter_double{1}, {sat1, sensor1}}, ...
-     {@colloc_select_good_lines, cols.overlap.filter_double{2}, {sat2, sensor2}}}];
-% but only where filter_double has a value
-filters(cellfun(@(c) isempty(c{2}), filters)) = [];
- 
-% make sure the fields are asked for
-for c = horzcat(cols.overlap.filter_double{:})
-    % cannot use union here, because it wants a cellstr :(
-    if ~any(cellfun(@(d) isequal(c, d), cols_in))
-        cols_in = [cols_in c]; %#ok<AGROW>
+if isfield(cols.overlap, 'filter_double')
+    filters = [filters ...
+        {{@colloc_select_good_lines, cols.overlap.filter_double{1}, {sat1, sensor1}}, ...
+        {@colloc_select_good_lines, cols.overlap.filter_double{2}, {sat2, sensor2}}}];
+    % but only where filter_double has a value
+    filters(cellfun(@(c) isempty(c{2}), filters)) = [];
+    
+    % make sure the fields are asked for
+    for c = horzcat(cols.overlap.filter_double{:})
+        % cannot use union here, because it wants a cellstr :(
+        if ~any(cellfun(@(d) isequal(c, d), cols_in))
+            cols_in = [cols_in c]; %#ok<AGROW>
+        end
     end
+else
+    logtext(atmlab('OUT'), 'Not filtering doubles, hopefully this was done when processing\n');
 end
-
 %% get name_struct
 
 name_struct = cols_cell_to_cols_struct(cols, cols_in);
@@ -134,10 +137,15 @@ for i = 1:length(years)
             paths_hdf5{i});
     catch ME
         switch (ME.identifier)
-            case {'atmlab:find_datadir_by_date', 'atmlab:collocation_read', 'atmlab:find_granules_by_date'}
+            case {'atmlab:find_datadir_by_date', 'atmlab:collocation_read', 'atmlab:find_granules_by_date', 'atmlab:input:undefined'}
+                if iscell(s)
+                    s_p = horzcat(s{:});
+                else
+                    s_p = s;
+                end
                 logtext(atmlab('OUT'), ...
                     'Note: no HDF5 @ %d %s %s %s\n', ...
-                    year, s, sensor1, sensor2)
+                    year, s_p, sensor1, sensor2)
                 continue
             otherwise
                 ME.rethrow()

@@ -34,9 +34,13 @@ data.time = compensate_wraparound(data.time);
 
 % verify data integrity
 
+assert(~isempty(data.time), ...
+    'atmlab:invalid_data', ...
+    'Time axis empty: %s', file)
+
 assert(all(diff(data.time)>0), ...
     'atmlab:invalid_data', ...
-    'POES time not monotonically increasing');
+    'POES time not monotonically increasing: %s', file);
 
 % shift dimensions so that it's [row col (channel)]
 

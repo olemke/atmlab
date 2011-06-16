@@ -58,7 +58,7 @@ A.no_amsua_amsua = 2;
 A.process_hirs_hirs = partial_x('hirs', 'hirs');
 A.process_data_hirs_hirs = partial_data_x('hirs', 'hirs');
 
-A.no_amsua_amsua = 2;
+A.no_hirs_hirs = 2;
 
 A.process_collocation_cpr_mhs_avhrr = @colloc_process_collocation_cpr_poes_avhrr;
 A.process_data_collocation_cpr_mhs_avhrr = @colloc_process_data_collocation_cpr_poes_avhrr;

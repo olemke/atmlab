@@ -1,3 +1,23 @@
+2011-06-16  Gerrit Holl  <gerrit.holl@ltu.se>
+	
+	* atmlab-1-0-153
+
+	* collocations/collocation_read.m: Adapted
+	  - Only filter doubles if a filter is defined, don't crash otherwise
+	  - Adapt for error identifiers changed in #6777
+	
+	* collocations/colloc_constants.m: Bugfix
+	  - no_hirs_hirs -> no_amsua_amsua
+	
+	* datasets/common_read_poes_radiometer.m: Adapted
+	  - Check that time-axis is not empty. Throw error if it is.
+	
+	* datasets/datasets_config.m: Adapted
+	  - Adapt for error identifiers changed in #6777
+	
+	* datasets/find_datadir_by_date.m: Adapted
+	  - Adapt for error identifiers changed in #6777
+
 2011-06-14  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-152

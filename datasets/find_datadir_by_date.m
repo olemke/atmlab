@@ -32,7 +32,7 @@ try
     basedir = datasets_config([dataset '_basedir']);
 catch ME
     switch ME.identifier
-        case 'atmlab:prstnt_struct:undefined'
+        case 'atmlab:input:undefined'
             error(errid, ...
                 'No basedir defined for %s, please define %s_basedir.', ...
                 dataset, dataset);

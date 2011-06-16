@@ -50,7 +50,7 @@ try
 catch ME
     switch (ME.identifier)
         % see if any aliases can be identified
-        case 'atmlab:prstnt_struct:undefined'
+        case 'atmlab:input:undefined'
             varargin{1} = replace_aliases(varargin{1});
             [A,value] = prstnt_struct( A, @datasets_defs, varargin);
         otherwise
