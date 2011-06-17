@@ -134,7 +134,13 @@ end
 % Measurement and fits
 %  
 if any( strcmp( Q.L2_EXTRA, 'y' ) )
-  L2.f  = qarts_get( Q.SENSOR_RESPONSE_F );
+  if qarts_isset( Y(m).F )
+    L2.f  = Y(m).F;
+  elseif Q.SENSOR_DO
+    L2.f  = qarts_get( Q.SENSOR_RESPONSE_F );
+  else
+    L2.f  = qarts_get( Q.F_GRID );    
+  end
   L2.y  = Y(m).Y;
 end
 if any( strcmp( Q.L2_EXTRA, 'yf' ) )

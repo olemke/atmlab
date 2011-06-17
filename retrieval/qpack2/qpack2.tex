@@ -475,8 +475,9 @@ measurements (without having \verb|Y| at hand).
 
 \newfield 
 \verb|f|:\\
-Frequency vector of measurement. Equals \verb|Y.F| if set, otherwise
-\verb|Q.F_BACKEND|.
+Frequency vector of measurement. Equals \verb|Y.F| if set. Otherwise
+set \verb|Q.SENSOR_RESPONSE_F| or \verb|Q.F_GRID|, depending on if a sensor is
+applied or not.
 
 \newfield 
 \verb|y|:\\

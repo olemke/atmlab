@@ -1,3 +1,21 @@
+2011-06-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-160
+
+	* demos/qpack2_demo.m: A priori uncertianty now defined for several
+	units and assumptions. Can be tested by changing a switch
+	statement, but, please, make this in a copy outside atmlab (to avoid
+	commiting with the switch statement changed).
+
+	* retrieval/qpack2/qp2_rel2vmr.m: Averaging kernels were not
+	converted, for same reason as bug fixed in 1-0-154. Fixed.
+	Thanks to Ole-Martin that reminded me about this function.
+
+	* retrieval/qpack2/qpack2.tex: Description of Y.F corrected. 
+
+	* retrieval/qpack2/qp2_l2.m: Setting of Y.F did not work in case
+	of SENSOR_DO==0. Bug reported by René. Fixed. 
+
 2011-06-16  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-159

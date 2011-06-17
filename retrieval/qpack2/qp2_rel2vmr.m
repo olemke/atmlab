@@ -41,6 +41,7 @@ while ~ready
   else
     nv    = sprintf( 'species%d_vmr0', i );
     na    = sprintf( 'species%d_xa', i );
+    nA    = sprintf( 'species%d_A', i );
     ns{1} = sprintf( 'species%d_e', i );
     ns{2} = sprintf( 'species%d_eo', i );
     ns{3} = sprintf( 'species%d_es', i );
@@ -53,6 +54,10 @@ while ~ready
       vmr0       = L2(j).(nv);
       xa         = L2(j).(na);
 
+      if isfield( L2, nA )
+        L2(j).(nA) = L2(j).(nA) .* (vmr0*(1./vmr0'));
+      end
+
       % rel
       if xa(1) == 1
         L2(j).(nx) = L2(j).(nx) .* vmr0;
@@ -62,7 +67,7 @@ while ~ready
             L2(j).(ns{k}) = L2(j).(ns{k}) .* vmr0;
           end
         end
-      
+        
       % logrel
       elseif xa(1) == 0
         L2(j).(nx) = exp(L2(j).(nx)) .* vmr0;
@@ -72,7 +77,7 @@ while ~ready
             L2(j).(ns{k}) = (exp(L2(j).(ns{k}))-1) .* vmr0;
           end
         end
-        
+      
       else
         error( 'Could not establish retrieval unit.' );
       end
