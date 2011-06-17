@@ -1,5 +1,12 @@
 2011-06-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-161
+
+	* retrieval/qpack2/qpack2.pdf: Updated, with latest change in tex
+	file.
+
+2011-06-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-160
 
 	* demos/qpack2_demo.m: A priori uncertianty now defined for several
