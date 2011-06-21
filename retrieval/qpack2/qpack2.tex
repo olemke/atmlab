@@ -289,7 +289,7 @@ fields in special way:
   ignored. These fields are set by Qpack2 by the corresponding
   ``atmdata''-fields.
 \item \verb|Q.ABS_SPECIES.ATMDATA| must be set.
-\item \verb|Q.T_ATMDATA| must be set. 
+\item \verb|Q.T.ATMDATA| must be set. 
 \item \verb|Q.Z_ATMDATA| is optional. If not set, geometrical altitudes of the
   pressure levels (the WSV \verb|z_field|) are found by applying hydrostatic
   equilibrium using \verb|Y.HSE_P| and \verb|Y.HSE_Z| (Sec.~\ref{sec:Y}). This
@@ -628,7 +628,7 @@ Q.F_GRID = 'f_odinsmr_ac2a.xml;
 \end{verbatim}
 Note the transpose in the first case (to create a column vector).
 
-The fields \verb|Q.ABS_SPECIES.ATMDATA|, \verb|Q.T_ATMDATA| and
+The fields \verb|Q.ABS_SPECIES.ATMDATA|, \verb|Q.T.ATMDATA| and
 \verb|Q.Z_ATMDATA| are intended for data of climatology character. The data
 format used here is called atmdata. The format is similar to the GriddedField
 format in ARTS, but has also fields for e.g.\ units. The atmdata format is
