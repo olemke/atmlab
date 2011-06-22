@@ -1,3 +1,12 @@
+2011-06-22  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-1-0-162
+	
+	* retrieval/qpack2/qpack2.tex: qp2_rel2logrel changed to
+	qp2_rel2vmr (reported by René).
+
+	* retrieval/qpack2/qpack2.pdf: Updated.
+
 2011-06-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-162
