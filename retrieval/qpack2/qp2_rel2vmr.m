@@ -74,7 +74,7 @@ while ~ready
         L2(j).(na) = vmr0;
         for k = 1 : length(ns)
           if isfield( L2, ns{k} )
-            L2(j).(ns{k}) = (exp(L2(j).(ns{k}))-1) .* vmr0;
+            L2(j).(ns{k}) = (exp(L2(j).(ns{k}))-1) .* L2(j).(nx);
           end
         end
       
