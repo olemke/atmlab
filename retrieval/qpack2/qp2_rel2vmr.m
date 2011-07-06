@@ -15,7 +15,7 @@
 %    parts correctly (the L2 data will only have a stright line for those
 %    parts). 
 %
-%   For 'logrel', errors are converted simply as e_vmr = (exp(e)-1)*vmr0.
+%   For 'logrel', errors are converted simply as e_vmr = (exp(e)-1)*x.
 %
 % FORMAT   L2 = qp2_rel2vmr( L2 )
 %        
@@ -45,6 +45,7 @@ while ~ready
     ns{1} = sprintf( 'species%d_e', i );
     ns{2} = sprintf( 'species%d_eo', i );
     ns{3} = sprintf( 'species%d_es', i );
+    ns{4} = sprintf( 'species%d_ex', i );
 
     rqre_field( L2, nv, 'sub-field vmr0' );
     rqre_field( L2, na, 'sub-field xa' );
@@ -74,7 +75,12 @@ while ~ready
         L2(j).(na) = vmr0;
         for k = 1 : length(ns)
           if isfield( L2, ns{k} )
-            L2(j).(ns{k}) = (exp(L2(j).(ns{k}))-1) .* L2(j).(nx);
+            if strcmp(ns{k},sprintf( 'species%d_ex', i ))
+            %apriori uncertainty is given in rel even for logrel inversions
+              L2(j).(ns{k}) = L2(j).(ns{k}) .* vmr0; 
+            else
+              L2(j).(ns{k}) = (exp(L2(j).(ns{k}))-1) .* L2(j).(nx);
+            end
           end
         end
       
