@@ -78,7 +78,7 @@ for i = 1 : nq
    case 'Frequency'   %-------------------------------------------------------
     %
     if ~do_sensor
-      Q.SENSOR_RESPONSE = R.SENSOR_RESPONSE;
+      Q.SENSOR_RESPONSE = R.sensor_response;
     end    
     %
     fb = qarts_get(Q.SENSOR_RESPONSE.F_BACKEND);

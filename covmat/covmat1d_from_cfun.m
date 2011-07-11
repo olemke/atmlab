@@ -16,8 +16,8 @@
 %       Std    Standard deviations. Given as a two vector matrix. First column
 %              holds position in same unit as *xp*. The second column is the 
 %              standard deviation at the postions of the first column. These
-%              values are then interpolated to *xp*. Possible extrapolation
-%              follows EXTRAP.
+%              values are then interpolated to *xp*, extrapolating end
+%              values to +-Inf (in a "nearest" manner).
 %              If set to a scalar, this value is applied for all *xp*.
 %              If set to [], unit standard deviation is assumed.
 %       cfun   Correlation function. Possible choices are
@@ -27,8 +27,8 @@
 %               'exp' : Exponential decreasing (exp(-dx/cl)).
 %               'gau' : Gaussian (normal) deceasing (exp(-(dx/cl))^2).
 % OPT   Cl     Correlation lengths. Given as a column matrix as *Std*.
-%              Must be given for all *cfun* beside 'drc'. Possible 
-%              extrapolation follows EXTRAP. Scalar input is allowed.
+%              Must be given for all *cfun* beside 'drc'. Extrapolation as
+%              for *Std*. Scalar input is allowed.
 %       cco    Correlation cut-off. All values below this limit are set to 0.
 %       mapfun Mapping function from grid unit to unit for corrleation
 %              lengths. For example, if correlation lengths are given in
@@ -59,8 +59,6 @@ rqre_datatype( cco, @istensor0 );                                           %&%
 if cco < 0  |  cco >= 1                                                     %&%
   error( 'Argument *cco* must be a scalar [0,1[' );                         %&%
 end                                                                         %&%
-%                                                                           %&%
-atmlab( 'require', {'EXTRAP'} );                                            %&%
 
 
 %- Determine standard deviations
@@ -72,11 +70,7 @@ if isempty( Std )
 elseif isscalar( Std )
   si = repmat( Std, n, 1 );
 else  
-  if atmlab( 'EXTRAP' )
-    si = interp1( Std(:,1), Std(:,2), handle_expand(Std(:,1),xp) );
-  else
-    si = interp1( Std(:,1), Std(:,2), xp );
-  end
+  si = interp1( Std(:,1), Std(:,2), handle_expand(Std(:,1),xp) );
 end
 %                                                                           %&%
 if any( isnan(si) )                                                         %&%
@@ -118,11 +112,7 @@ D       = abs( X1 - X2 );
 if isscalar( Cl )
   L = Cl;
 else
-  if atmlab( 'EXTRAP' )
-    cl = interp1( Cl(:,1), Cl(:,2), handle_expand(Cl(:,1),xp) );
-  else
-    cl = interp1( Cl(:,1), Cl(:,2), xp );
-  end
+  cl = interp1( Cl(:,1), Cl(:,2), handle_expand(Cl(:,1),xp) );
   [X1,X2] = meshgrid( cl, cl );
   L       = ( X1 + X2 ) / 2;
   %

@@ -27,7 +27,6 @@ end                                                                %&%
 if any(lat)>90 | any(lat<-90)                                      %&%
    error('latitude range is -90 to 90')                            %&%
 end                                                                %&%
-atmlab( 'require', {'ARTS_XMLDATA_PATH','EXTRAP'} );               %&%
 
 
 cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...

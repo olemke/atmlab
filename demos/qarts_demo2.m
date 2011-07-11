@@ -33,11 +33,6 @@ if isnan( arts_xmldata_path )
 end
 %
 fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
-%
-% EXTRAP must be true here
-oldextrap = atmlab( 'EXTRAP' );
-atmlab( 'EXTRAP', true );
-cu = onCleanup( @()atmlab( 'EXTRAP', oldextrap ) );
 
   
 %= Init Q structures

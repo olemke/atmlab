@@ -10,16 +10,10 @@
 %    column corresponds to a dimension of *A*. Accordingly, each row in *pos*
 %    gives the coordinate for an interpolation point.
 %
-%    The function considers the atmlab setting EXTRAP to allow extrapolation.
-%    EXTRAP must be set to true or false.
-%
-%    With EXTRAP true, it is accepted to make an extrapolation also for
-%    trailing singleton dimensions, which corresponds to that *pos* has more
-%    columns than there are grids in *agrid*.
-%
 %    The Atmlab convention of that 1D objects (including grids) are column
 %    vectors is here strictly followed.
 %
+%    The *extrap* optional argument works here as for *gridinterp*.
 %
 % FORMAT   B = pointinterp(agrids,A,pos,iopt)
 %        
@@ -28,13 +22,15 @@
 %       A        Data to be interpolated. 
 %       pos      Matrix where each row is a position.
 % OPT   iopt     Interpolation option. See *interpn*. Default is 'linear'.
+%       extrap   Special treatment of extrapolation. See above. 
+%                Default is false.
 
 % 2007-05-22   Created by Patrick Eriksson.
 
 
 function B = pointinterp(agrids,A,pos,iopt)
-%  
-if nargin < 4, iopt = 'linear'; end
+%
+[iopt,extrap] = optargs( varargin, { 'linear', false } );
                                                                           %&%
 %- Check input                                                            %&%
 %                                                                         %&%
@@ -54,13 +50,6 @@ for d = 1 : indim                                                         %&%
   rqre_datatype( agrids{d}, @istensor1, 'Grids in *agrids*' );            %&%
   rqre_gridmatch( A, d, agrids{d} );                                      %&%
 end                                                                       %&%
-
-%--- Extrapolation switch
-%                                                                         %&%
-atmlab( 'require', {'EXTRAP'} );                                          %&%
-%
-extrap = atmlab( 'EXTRAP' );
-%                                                                         %&%
 rqre_datatype( extrap, @isboolean );                                      %&%
 
 
@@ -71,12 +60,12 @@ if extrap    % Ignore singleton dimensions
   A    = getdims( A, dims );
 else
   if outdim ~= indim                                                      %&%
-    error( ['With EXTRAP false, the number of columns in *pos* ',...      %&%
+    error( ['With *extrap* false, the number of columns in *pos* ',...    %&%
                 'and the number of grids in *agrids* must be equal.'] );  %&%
   end                                                                     %&%
   asize = size( A );                                                      %&%
   if length(asize) < outdim  ||  any( asize(1:outdim)==1 )                %&%
-    error( ['With EXTRAP false there can not be any singleton ',...       %&%
+    error( ['With *extrap* false there can not be any singleton ',...     %&%
                                               'dimmensions in *A*.'] );   %&%
   end                                                                     %&%
   dims = 1:outdim;

@@ -43,8 +43,7 @@ function [K]=asg_amsu(data1,data2,leg,use_lats)
 fascod     = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'atmosphere', 'fascod' ); 
 artsdirpath='/home/bengt/ARTS/arts/';
 workfolder =create_tmpfolder;
-atmlab( 'EXTRAP', 1 );
-atmlab( 'FMODEL_VERBOSITY', 2 );
+
 
 %- Init ASG structures
 %

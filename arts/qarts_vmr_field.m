@@ -5,10 +5,11 @@
 %   interpolation grids. It is here allowed (and sometime necessary) to set
 %   LAT_GRID and LON_GRID to scalar values.
 %
-%   The function *regrid* is used and EXTRAP must be set. The dimension of the
-%   atmdata can vary between the species with EXTRAP set to true. Extrapolation
-%   (including handling of singleton dimensions) is then possible. With EXTRAP
-%   false, the input atmdata can not have any singleton dimensions.
+%   The interpolation is made as using *gridinterp* with its optional argument
+%   *extrap* set to true. That is, the data are assumed to be defined
+%   everywhere (end values valid all the way to +-INF). This is also valid for
+%   singleton dimensions. The grid for empty/singleton dimensions can be empty
+%   or a scalar.
 %
 %   It is also possible to handle atmdata having day and hour dimensions. The
 %   optional arguments must then be set.

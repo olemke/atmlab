@@ -13,16 +13,18 @@
 %    That is, the number of input arguments is not changed by the data
 %    dimension.
 %
-%    The function considers the atmlab setting EXTRAP to allow extrapolation.
-%    EXTRAP must be set to true or false.
-%
-%    With EXTRAP true, it is accepted to make an extrapolation also for trailing
-%    singleton dimensions, which corresponds to that *newgrids* contain more
-%    grids than *agrid*.
-%
 %    All grids must be sorted in ascending order (demand of interpn).
 %    The Atmlab convention of that 1D objects (including grids) are column
 %    vectors is here strictly followed.
+%
+%    The function allows a special treatment of extrapolation by the optional
+%    argument *extrap*. If set to false, standard matlab functionality is
+%    obtained. If set to true, then data are treated to be constant outside end
+%    points. That is, the data values at end points are assumed to be valid to
+%    -Inf andf Inf, respectively. This can also be seen as a "nearest"
+%    interpolation for positions outside the covered range. This feature is
+%    also applied on singleton dimensions (resulting in a constant value for
+%    that dimension between -Inf to Inf).
 %
 %    A note: For "unsmooth" data, this function should be avoided when going
 %    from a finer to a coarser grid. For such cases, consider the function
@@ -35,13 +37,15 @@
 %       A          Data to be interpolated.
 %       newgrids   Grids for interpolation, as an array of vectors.
 % OPT   iopt       Interpolation option. See *interpn*. Default is 'linear'.
+%       extrap     Special treatment of extrapolation. See above. 
+%                  Default is false.
 
 % 2006-08-22   Created by Patrick Eriksson.
 
 
-function B = gridinterp(agrids,A,newgrids,iopt)
-%  
-if nargin < 4, iopt = 'linear'; end
+function B = gridinterp(agrids,A,newgrids,varargin)
+%
+[iopt,extrap] = optargs( varargin, { 'linear', false } );
                                                                           %&%
                                                                           %&%
 %- Check input                                                            %&%
@@ -63,14 +67,8 @@ for d = 1 : indim                                                         %&%
   rqre_gridmatch( A, d, agrids{d}, true );                                %&%
   rqre_datatype( newgrids{d}, @istensor1, 'Grids in *newgrids*' );        %&%
 end                                                                       %&%
-
-%--- Extrapolation switch
-%                                                                         %&%
-atmlab( 'require', {'EXTRAP'} );                                          %&%
-%
-extrap = atmlab( 'EXTRAP' );
-%                                                                         %&%
 rqre_datatype( extrap, @isboolean );                                      %&%
+
 
 
 %- Check a or determine a's effective dimensions
@@ -80,12 +78,12 @@ if extrap    % Ignore singleton dimensions
   A    = getdims( A, dims );
 else
   if outdim ~= indim                                                      %&%
-    error( ['With EXTRAP false, the number of grids in *newgrids* ',...   %&%
+    error( ['With *extrap* false, the number of grids in *newgrids* ',... %&%
                                     'and *agrids* must be the same.'] );  %&%
   end                                                                     %&%
   asize = size( A );                                                      %&%
   if length(asize) < outdim  ||  any( asize(1:outdim)==1 )                %&%
-    error( ['With EXTRAP false there can not be any singleton ',...       %&%
+    error( ['With *extrap* false there can not be any singleton ',...     %&%
                                               'dimmensions in *A*.'] );   %&%
   end                                                                     %&%
   dims = 1:outdim;
@@ -203,7 +201,7 @@ else                                                             %&%
 end
 
 
-%- Post-processing for EXTRAP
+%- Post-processing for *extrap*
 %
 if extrap  &  dim < outdim
   % Make extrapolation for A's singleton dimensions

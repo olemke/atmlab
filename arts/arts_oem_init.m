@@ -312,7 +312,7 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
               'qartsSensor (i.e. be a structure).'] );                     %&%
     end                                                                    %&% 
     %- A copy of Q.SENSOR_RESPONSE is needed here
-    R.SENSOR_RESPONSE = Q.SENSOR_RESPONSE;
+    R.sensor_response = Q.SENSOR_RESPONSE;
   end
   %
   Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );

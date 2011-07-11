@@ -31,12 +31,10 @@
 %   functions are vectorised, allowing G to be a vector (but not a matrix), and
 %   should handle the case of a varying DIM.
 %  
-%   Interpolation functions considers the atmlab setting 'EXTRAP'. With EXTRAP
-%   set to false, the data are undefined outside the grid ranges. With EXTRAP
-%   set to true, the data are defined everywhere (end values valid all the way
-%   to +-INF). This is also valid for singleton dimensions. There is no basic
-%   restrictions against singleton dimensions, but such cases make little use
-%   without EXTRAP=true. The grid for empty/singleton dimensions can be empty
+%   All interpolation is made as using *gridinterp* with its optional argument
+%   *extrap* set to true. That is, the data are assumed to be defined
+%   everywhere (end values valid all the way to +-INF). This is also valid for
+%   singleton dimensions. The grid for empty/singleton dimensions can be empty
 %   or a scalar.
 %
 %   Definitions of derived types are described in the associated

@@ -11,7 +11,9 @@
 %
 %   Grids for dimensions not used can be left out.
 %
-%   Extrapolation follows EXTRAP.
+%   The actual interpolation is made by gridinterp, with *extrap* set to
+%   true. That is, "extrapolation" following arts retrieval grids is applied
+%   throughout.
 %
 % FORMAT   F = arts_regrid( dim, Q1, F0, Q2 )
 %        
@@ -38,7 +40,7 @@ grids1 = extract_grids( dim, Q1, 'Q1' );
 grids2 = extract_grids( dim, Q2, 'Q2' );
 
 
-F = gridinterp( grids1, qarts_get(F0), grids2, 'linear' );
+F = gridinterp( grids1, qarts_get(F0), grids2, 'linear', true );
 
 return
 

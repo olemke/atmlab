@@ -3,12 +3,11 @@
 %    Largely an interface to *gridinterp*. The dimension and size of new data
 %    are determined by the number of grids and their lengths, respectively.
 %
-%    The function considers the atmlab setting EXTRAP, and it must be set to
-%    true or false. If EXTRAP is false, the number of grids in *grids* must
-%    be equal to G.DIM (and there is no extrapolation outside the grid in G).
-%    With EXTRAP set to true, the data are extrapolated. An extrapolation 
-%    to dimensions above G.DIM is then possible (*grids* can contain 
-%    more than G.DIM grids).
+%   The interpolation is made as using *gridinterp* with its optional argument
+%   *extrap* set to true. That is, the data are assumed to be defined
+%   everywhere (end values valid all the way to +-INF). This is also valid for
+%   singleton dimensions. The grid for empty/singleton dimensions can be empty
+%   or a scalar.
 %
 %    The function is "vectorised". That is, can be called as
 %      G(2:3) = gf_regrid( G(2:3), ...
@@ -48,7 +47,7 @@ for i = 1 : length( G )
     G(i).(gname) = grids{d};
   end
   %
-  G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt );  
+  G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt, true );  
   %
 end
 

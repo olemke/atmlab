@@ -1,5 +1,48 @@
 2011-07-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-165
+
+	* Two changes that can affect your files:
+
+	1. interpd.m and regrid removed (as planned and warned). 
+
+	2. The atmlab setting EXTRAP is removed. If set, you need to
+	remove it from atmlab_conf. This setting was mainly implemented
+	through pointinterp.m and gridinterp.m. These functions now has
+	*extrap* as an optional argument. All interpolation inside qarts
+	and gformat is made with extrap set to true. That is, if you are
+	not using pointinterp or gridinterp directly, you don't need to
+	set anything.
+	
+	* arts/qarts_vmr_field.m: Changes of different kind to match
+	* covmat/covmat1d_from_cfun.m: the changes below regarding EXTRAP.
+	* geophysics/p2z_cira86.m: 
+	* geophysics/z2p_cira86.m: 
+	* gformat/gf_regrid.m: 
+	* gformat/Contents.m: 
+	* demos/qarts_demo2.m: 
+	* demos/asg_demo2.m: 
+	* demos/asg_demo.m: 
+	* arts/arts_regrid.m: 
+	* arts/scenegen/amsu/asg_amsu.m: 
+
+	* math/pointinterp.m (pointinterp): extrap is now function input.
+
+	* math/gridinterp.m (gridinterp): extrap is now function input.
+
+	* math/interpd.m: Removed (see ChangeLog message for 1-0-91).
+
+	* math/regrid.m: As above.
+
+	* atmlab/atmlab.m: EXTRAP removed as setting.
+
+	* arts/arts_oem_init.m: For consistency with other R-fields,
+	changed R.SENSOR_RESPONSE to R.sensor_response.
+
+	* arts/arts_x2QR.m: As above.
+	
+2011-07-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-164
 
 	* arts/qarts.m (qarts): Added WIND_U/V/W_FIELD.

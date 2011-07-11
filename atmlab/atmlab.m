@@ -68,15 +68,6 @@
 %
 % Stream to log error messages to. Used by some subsystems.
 %----------------------------------------------------------------------------
-% EXTRAP
-%
-% Flag for automatic extrapolation of data at interpolation. The approach is to
-% treat data to be constant outside end points. That is, the data values at end
-% points are assumed to be valid to -Inf andf Inf, respectively. 
-%     This functionality is implemented by the functions *interpd* and 
-% *regrid*, which should be used of all atmlab functions of general
-% character. Special functions may not obey this setting variable.
-%----------------------------------------------------------------------------
 % FMODEL_VERBOSITY
 %
 % Verbosity of forward model, if such a feature is supported. If field is
@@ -192,7 +183,6 @@ A.ATMLAB_PATH       = NaN;
 A.ATMLAB_DATA_PATH  = NaN;
 A.DEBUG             = false;
 A.ERR               = 2;
-A.EXTRAP            = false;
 A.FMODEL_VERBOSITY  = 0;
 A.OUT               = 1;
 A.RAND_STATE        = NaN;

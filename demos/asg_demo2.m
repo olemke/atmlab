@@ -407,7 +407,6 @@ G(ind1).SPCFC.MOD_RH=0;
 %-------------------------------------------------------------------------------
 %CREATE FULLSKY SCENARIOUS
 workfolder =create_tmpfolder;
-atmlab( 'EXTRAP', 1 );
 
 warning off
 [Gfs,lon] = asg_create_gfs(G,CS.GRIDS,FS,workfolder);

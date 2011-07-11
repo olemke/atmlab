@@ -496,7 +496,6 @@ G(ind1).SPCFC.MOD_RH=1;
 %-------------------------------------------------------------------------------
 %CREATE FULLSKY SCENARIOUS
 workfolder =create_tmpfolder;
-atmlab( 'EXTRAP', true );
 
 warning off
 
