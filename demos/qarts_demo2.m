@@ -51,6 +51,12 @@ Q.INCLUDES               = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
                              fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
 
 
+%= De-activate parts not used
+%
+Q.CLOUDBOX_DO           = false;
+Q.J_DO                  = false;
+
+
 %= Atmospheric species
 %
 % Note that ATMDATA for nitrogen is set to a scalar
@@ -163,7 +169,6 @@ end
 
 %= Set RTE variables (refraction is here neglected)
 %
-Q.WSMS_BEFORE_RTE        = { 'FlagOff(iy_aux_do)' };
 Q.YCALC_WSMS             = { 'yCalc' };
 %
 Q.PPATH_LMAX             = 20e3;

@@ -74,6 +74,7 @@ Q.P_GRID              = z2p_simple( -250:250:90e3 )';
 %
 Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                               'fascod', 'midlatitude-winter' );
+Q.CLOUDBOX_DO         = false;
 
 %- RTE
 %

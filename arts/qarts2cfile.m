@@ -366,6 +366,19 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                              workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
+  if qarts_isset( Q.WIND_U_FIELD )
+    T{end+1} = file_or_data( 'wind_u_field', 'Tensor3', Q.WIND_U_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end      
+  if qarts_isset( Q.WIND_V_FIELD )
+    T{end+1} = file_or_data( 'wind_v_field', 'Tensor3', Q.WIND_V_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end      
+  if qarts_isset( Q.WIND_W_FIELD )
+    T{end+1} = file_or_data( 'wind_w_field', 'Tensor3', Q.WIND_W_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  %
   if qarts_isset(Q.R_GEOID)
     rqre_datatype( Q.R_GEOID, {@istensor2,@istensor0}, 'Q.R_GEOID' );       %&%
     if isscalar( Q.R_GEOID )
@@ -391,7 +404,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     end
   end
   %
-  T{end+1} = 'atm_checkedCalc';
+  T{end+1} = 'basics_checkedCalc';
   %
   if qarts_isset( Q.HSE )
     if ~isfield( Q.HSE, 'ON' ) & ~isbool( Q.HSE.ON )                        %&%
@@ -521,8 +534,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
-      T = add_agenda( T, 'abs_scalar_gas_agenda', ...
-                      { 'Ignore(rte_doppler)','abs_scalar_gasCalcLBL' } );
+      T = add_agenda( T, 'abs_scalar_gas_agenda', {'abs_scalar_gasCalcLBL'} );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -558,7 +570,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       %
       T{end+1} = 'abs_lookupCreate'; 
       T        = add_agenda( T, 'abs_scalar_gas_agenda', ... 
-                 { 'Ignore(rte_doppler)','abs_scalar_gasExtractFromLookup' } );
+                                       { 'abs_scalar_gasExtractFromLookup' } );
       %
       abstable = true;
       %   
@@ -568,7 +580,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
       T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
-                 { 'Ignore(rte_doppler)','abs_scalar_gasExtractFromLookup' } );
+                                       { 'abs_scalar_gasExtractFromLookup' } );
       %
       abstable = true;
       %
@@ -1173,7 +1185,8 @@ function T = cfile_CldBox( Q, partname, workfolder )
   rqre_datatype( Q.CLOUDBOX_DO, @isboolean, 'Q.CLOUDBOX_DO' );              %&%
   
   if ~Q.CLOUDBOX_DO
-    T{1} = 'cloudboxOff';
+    T{1}     = 'cloudboxOff';
+    T{end+1} = 'cloudbox_checkedCalc';
     return
   end
   
@@ -1208,7 +1221,9 @@ function T = cfile_CldBox( Q, partname, workfolder )
             '   lat_grid,lon_grid,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f', limits );
     T{end+1} = ')';
   end
-
+  %
+  T{end+1} = 'cloudbox_checkedCalc';
+  
   %= Particle field and single scattering data
   %
   nset = qarts_isset(Q.CLOUDBOX.PND_FIELD) + qarts_isset(Q.CLOUDBOX.SCAT_DATA);

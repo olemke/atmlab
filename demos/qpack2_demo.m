@@ -104,6 +104,7 @@ Q.INCLUDES            = { fullfile( arts_includes, 'general.arts' ), ...
 Q.ATMOSPHERE_DIM      = 1;
 Q.STOKES_DIM          = 1;
 Q.J_DO                = true;
+Q.CLOUDBOX_DO         = false;
 
 
 %- Radiative transfer

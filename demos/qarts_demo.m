@@ -55,6 +55,10 @@ Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
 Q.RAW_ATM_EXPAND_1D     = false;
 %
+Q.WIND_U_FIELD          = [];
+Q.WIND_V_FIELD          = [];
+Q.WIND_W_FIELD          = [];
+%
 Q.R_GEOID               = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE             = 500;
 
@@ -102,8 +106,7 @@ Q.SURFACE_PROP_AGENDA   = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                             'rte_gp_lon,t_field)'], ...
                             'surfaceBlackbody' };
 %
-Q.WSMS_BEFORE_RTE       = { 'VectorSet(abs_n2,[0.7808])', ...
-                            'FlagOff(iy_aux_do)' };
+Q.WSMS_BEFORE_RTE       = { 'VectorSet(abs_n2,[0.7808])' };
 Q.YCALC_WSMS            = { 'yCalc' };
 %
 Q.PPATH_LMAX            = 20e3;

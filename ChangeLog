@@ -1,3 +1,15 @@
+2011-07-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-164
+
+	* arts/qarts.m (qarts): Added WIND_U/V/W_FIELD.
+
+	* arts/qarts2cfile.m: Now handling wind_u/v/w_field and 
+	basics/cloudbox_checked.
+	
+	* demos: Updated scripts using arts to changes related to winds and
+	basics/cloudbox_checked.
+
 2011-06-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-163
