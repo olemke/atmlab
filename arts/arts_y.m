@@ -2,9 +2,9 @@
 %
 %    Takes a qarts structure and calculates corresponding spectra.
 %
-%    Auxilary data and jacobians are also returned. These parts require an
-%    active selection through IY_AUX_DO and J_DO, respectively. Otherwise
-%    NaN is returned for these variables.
+%    Auxilary data and jacobians are also returned. The later requires an
+%    active selection through J_DO. Otherwise NaN is returned.
+%    variables.
 %
 % FORMAT   [y,ydata,y_error,y_aux,J,jq,ji] = arts_y( Q [, workfolder] )
 %        
@@ -58,9 +58,6 @@ end
 
 %- Avoid unnecessary calculations
 %
-if nargout < 4
-  Q.IY_AUX_DO = false;
-end
 if nargout < 5
   Q.J_DO = false;
 end
@@ -92,7 +89,7 @@ if nargout >= 3
 end
 
 
-if nargout >= 4  &  qarts_isset( Q.IY_AUX_DO ) &  Q.IY_AUX_DO
+if nargout >= 4  
   y_aux = xmlLoad( fullfile( workfolder, 'y_aux.xml' ) );
 end
 

@@ -1,3 +1,18 @@
+2011-07-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-166
+
+	* Work to sync qarts with arts-1-17-2.
+
+	* arts/qarts2cfile.m (cfile_SctMth): 
+
+	* arts/arts_y.m (arts_y): Removed usage of IY_AUX_DO.
+
+	* arts/qarts.m (qarts): Removed IY_AUX_DO.
+
+	* arts/qarts2cfile.m: Removed handling of IY_AUX_DO. Replaced some
+	DoNothing with Ignore.
+
 2011-07-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-165

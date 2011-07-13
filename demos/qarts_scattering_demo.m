@@ -217,7 +217,6 @@ elseif strcmp( lower(method), 'fos' )
   Q.WSMS_BEFORE_RTE{end+1}        = '   fos_yStandard';
   Q.WSMS_BEFORE_RTE{end+1}        = '}';
   Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(ppath)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lat)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lon)';
@@ -249,7 +248,6 @@ elseif strcmp( lower(method), 'bl' )
   C.METHOD                        = 'BL';
   %
   Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(ppath)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lat)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lon)';
