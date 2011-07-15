@@ -134,7 +134,8 @@ y_c = arts_y( Q );
 
 %= Setting structure for cloudbox and scattering solution method
 %
-C = qartsCloudbox;
+C               = qartsCloudbox;
+Q.WSMS_AT_START = { 'FlagOff( use_mean_scat_data )' };
 
 
 %- Define 1D cloudbox and particles
@@ -225,7 +226,6 @@ elseif strcmp( lower(method), 'fos' )
   Q.WSMS_BEFORE_RTE{end+1}        = sprintf( ...
                                        'ReadXML(fos_angles, "%s")', fos_file );
   Q.WSMS_BEFORE_RTE{end+1}        = 'IndexSet( fos_n, 1 )';
-  Q.WSMS_BEFORE_RTE{end+1}        = 'FlagOff( fos_use_mean_scat_data )';
   %
   if 0
     fos = eq_point_set_polar( 2, 5 );

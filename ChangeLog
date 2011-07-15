@@ -1,3 +1,9 @@
+2011-07-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-166
+
+	* demos/qarts_scattering_demo.m: Adopted to arts-1.17.3.
+
 2011-07-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-166
