@@ -18,7 +18,7 @@ function [corners,nregions,regionstrlong] = getPredefinedRegions(regionstr)
 % current LIST of regions:
 %    - Make sure to update this list if you add a region to the subfunction!!
 %    Allregions = {'earth','global','total','tropics','boreal_trop','austral_trop',...
-%        'sepdz','seadz','ocean_sub','twp','trop_cont','conv_sa','conv_af',...
+%        'sepdz','seadz','ocean_sub','seapdz_boreal','twp','trop_cont','conv_sa','conv_af',...
 %        'swl','kurosho','gulfstr','nwl','westerlies','swe','aus','polar',...
 %        'waf','eaf','saf','sah','neu','sem','nas','cas','tib','eas','sas',...
 %        'sea','ala','cgi','wna','cna','ena','cam','amz','ssa','nau','sau',...
@@ -111,8 +111,8 @@ assert(nargin==1,'atmlab:retrieve_reginfo:badInput','needs input')
 if strcmp(regionstr,'list')
     % Make sure to update this list if you add a region!!
     Allregions = {'earth','global','total','tropics','boreal_trop','austral_trop',...
-        'sepdz','seadz','ocean_sub','twp','trop_cont','conv_sa','conv_af',...
-        'swl','kurosho','gulfstr','nwl','westerlies','swe','aus','polar',...
+        'sepdz','seadz','ocean_sub','seadz_boreal','sepdz_boreal','twp','trop_cont','conv_sa','conv_af',...
+        'swl','kurosho','gulfstr','ocean_sub_boreal','nwl','westerlies','swe','aus','polar',...
         'waf','eaf','saf','sah','neu','sem','nas','cas','tib','eas','sas',...
         'sea','ala','cgi','wna','cna','ena','cam','amz','ssa','nau','sau',...
         'car','ind','med','tne','npa','spa','arc','ant'};
@@ -150,11 +150,24 @@ switch lower(regionstr)
         regionstrlong ='South East Atlantic Dry zone';
         blcorner = [-30,-15;-20,-30];
         trcorner = [-5,10;-5,-15];
+    case 'sepdz_boreal'
+        regionstrlong ='South East Pacific boreal Dry zone';
+        blcorner = [-15,-180]; trcorner = [0,-72];
+    case 'seadz_boreal'
+        regionstrlong ='South East Atlantic boreal Dry zone';
+        blcorner = [-23.5,-30]; trcorner = [-5,10];
     case 'ocean_sub'
         % this is both seadz and sepdz merged
         regionstrlong ='Subsidence zones of the South East Pacific and South East Atlantic';
         [a,b] = retrieve_reginfo('sepdz');
         [c,d] = retrieve_reginfo('seadz');
+        blcorner = cat(1,a,c);
+        trcorner = cat(1,b,d);
+    case 'ocean_sub_boreal'
+        % this is both seadz and sepdz merged
+        regionstrlong ='Subsidence zones boreal of the South East Pacific and South East Atlantic';
+        [a,b] = retrieve_reginfo('sepdz_boreal');
+        [c,d] = retrieve_reginfo('seadz_boreal');
         blcorner = cat(1,a,c);
         trcorner = cat(1,b,d);
     case 'conv_sa'
@@ -178,7 +191,8 @@ switch lower(regionstr)
         trcorner = [16 100;14 155;10 175];
     case 'swl'
         regionstrlong ='Southern midlatitude Westerlies';
-        blcorner = [-60,-180;-60,-50]; trcorner = [-45,-80;-45,180];
+        blcorner = [-60,-180;-60,-50];
+        trcorner = [-45,-80;-45,180];
     case 'kurosho'
         regionstrlong ='The region surrounding the Kurosho Current';
         % need extra region as passing the dateline causes problems

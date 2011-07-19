@@ -563,8 +563,10 @@ filename=sort_figures(out,commands);
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-[a,b] = system('which gmtset');
+errId = 'gmtlab:gmt_plot:badInput'; % common error ID
 
+% Test is GMT is installed and in the path
+[a,b] = system('which gmtset');
 if a == 1
     error('gmtlab:gmt_plot:shell',[ [ b '\n\n'],...
     'Either GMT is not installed\n',...
@@ -653,14 +655,16 @@ end
 % is the data plotable?
 in = isdata(in,field);
 
-% Check to see if the data  is gridded or not
+% Check to see if the data is gridded or not
 in = isgridded(in,field);
 
 % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
 if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
-        'gmtlab:gmt_plot:badInput','numel(data) must length(lat)*length(lon)')
+        errId,'numel(data) must length(lat)*length(lon)')
     [flags,in.lat,in.lon,in.(field)] = homogenize_datalatlon(in.lat,in.lon,in.(field));
+    assert(min(in.lat)>-90 & min(in.lon)>-180 & max(in.lat)<90 & max(in.lon)<180,...
+        errId,'Data does not appear to be centered')
 end
 
 % REGION

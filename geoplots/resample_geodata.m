@@ -172,11 +172,6 @@ function sz = check_input(in,field,newgrid,errID)
 assert(isstruct(in) && ischar(field{1}) && (isnumeric(newgrid) || iscell(newgrid)),...
     errID,'Incorrect input argument types')
 
-if iscell(newgrid)
-    assert(length(newgrid)==2 && (min(newgrid{1})>-90 || max(newgrid{1})<90),...
-        errID,'if newgrid is a cell, it must contatin 2 vectors {[LATs] , [LONs]}')
-end
-
 assert(~any(~isfield(in,{'lat','lon'})),errID,'"lat,lon" are required fields')
 
 assert(all(ismember(field,fieldnames(in))),errID,'One or more of the specified data fields is missing');
@@ -196,6 +191,14 @@ assert(isequal([length(in.lat),length(in.lon)],[sz(1),sz(2)]) || ...
     isequal([length(in.lat),length(in.lon)],[sz(2),sz(1)]),...
     errID, 'data must have the dimensions data(lat,lon,.....), or data(lon,lat,.....)');
 
+if iscell(newgrid)
+    assert(length(newgrid)==2 && (min(newgrid{1})>-90 || max(newgrid{1})<90),...
+        errID,'if newgrid is a cell, it must contatin 2 vectors {[LATs] , [LONs]} (centers)')
+end
+
+if ~iscell(newgrid)
+    assert(min(in.lat)>-90 & max(in.lat)<90 ,errID,'Latitudes are not centers')
+end
 
 function [newlat,newlon] = assemble_newgrid(LAT,LON,newgrid,errID)
 %% ASSEMBLE_newgrid
