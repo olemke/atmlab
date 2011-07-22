@@ -1,3 +1,20 @@
+2011-07-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-168
+
+	* geoplots/full_pressure_levels.m: Included Marston's function for
+	making a pressure matrix (lvls,lat,lon) based on a suface pressure
+	matrix (2D), number of levels, and conversion coefficient vectors
+	A & B used for creating the matrix P = A + B*surfacePressure
+
+	* geoplots/modlev2presslev.m: Included Marston's function for
+	converting model levels to some desired pressure levels. For this
+	you have data on model levels and a pressure matrix of the same
+	size. The pressure matrix can be made using full_pressure_levels.m
+
+	* geoplots/gmt/gmt_plot.m: Fixed bug in determined if
+	the data is centered or not.
+
 2011-07-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-167
