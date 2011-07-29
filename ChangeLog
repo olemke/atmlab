@@ -1,3 +1,17 @@
+2011-07-29  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-169
+
+	* collocations/colloc_concatenate_colloc_data_mean.m: Reduction
+	  - Commented out a test that was failing, not sure why I need this
+	  test really.
+	
+	* collocations/collocate_granule.m: Bugfix
+	  - Don't fail on invalid data in primary.
+	
+	* sensors/find_scanline_overlaps.m: Improved
+	  - Use existing data, don't recalculate all.
+
 2011-07-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-168

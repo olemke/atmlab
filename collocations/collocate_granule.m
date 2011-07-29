@@ -117,7 +117,7 @@ try
     data1 = read_granule(sat1, sensor1, date1, false); % keep doubles for now
 catch ME
     switch ME.identifier
-        case 'MATLAB:load:couldNotReadFile'
+        case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
             logtext(eid, 'Collocating failed: %s\n', ME.message);
             return
         otherwise

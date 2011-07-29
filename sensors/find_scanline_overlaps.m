@@ -47,38 +47,60 @@ allgrans = find_granules_for_period(startdate, enddate, sat, sensor);
 ngrans = size(allgrans, 1);
 logtext(atmlab('OUT'), 'Found %d granules\n', ngrans);
 
-ht = java.util.Hashtable;
+if exist(scanfile, 'file')
+    tm = load(scanfile);
+    ht = tm.ht;
+else
+    ht = java.util.Hashtable;
+end
 
+next = 0;
 for i = 1:ngrans-1
     logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
             allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
-    if i==1
-        cur = reader(find_datafile_by_date(allgrans(i, :), sat, sensor));
-    else
-        cur = next;
+    uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
+    if ht.containsKey(uint32(uni))
+        logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), ht.get(uint32(uni)));
+        continue
     end
     try
+        couldreadcur = false;
+        if isequal(next, 0)
+            cur = reader(find_datafile_by_date(allgrans(i, :), sat, sensor));
+        else
+            cur = next;
+        end
+        couldreadcur = true;
+        couldreadnext = false;
         next = reader(find_datafile_by_date(allgrans(i+1, :), sat, sensor));
+        couldreadnext = true;
     catch ME
         switch ME.identifier
             case {'atmlab:find_datafile_by_date', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:invalid_data'}
                 logtext(atmlab('ERR'), 'Problem: %s\n', ME.message);
-                continue
             otherwise
                 ME.rethrow();
         end
     end
-    uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
-    t_cur = cur.epoch + cur.time;
-    t_next = next.epoch + next.time;
-    %[t_cur, t_next] = unify_time_axis(cur.time, next.time);
-    firstline = find(t_next > t_cur(end), 1, 'first');
-    if ~isempty(firstline)
-        logtext(atmlab('OUT'), 'First line: %d\n', firstline);
-        ht.put(uint32(uni), firstline);
+    %uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
+    if couldreadcur && couldreadnext
+        t_cur = cur.epoch + cur.time;
+        t_next = next.epoch + next.time;
+        %[t_cur, t_next] = unify_time_axis(cur.time, next.time);
+        firstline = find(t_next > t_cur(end), 1, 'first');
+        if ~isempty(firstline)
+            logtext(atmlab('OUT'), 'First line: %d\n', firstline);
+            ht.put(uint32(uni), firstline);
+        else
+            logtext(atmlab('OUT'), 'No first line, setting to -2\n');
+            ht.put(uint32(uni), -2);
+        end
+    elseif couldreadcur
+        logtext(atmlab('OUT'), 'Could not read next, setting next to -3\n');
+        ht.put(uint32(uni), -3);
     else
-        logtext(atmlab('OUT'), 'No first line, setting to -2\n');
-        ht.put(uint32(uni), -2);
+        logtext(atmlab('OUT'), 'Could not read current. setting to -4\n');
+        ht.put(uint32(uni), -4);
     end
 end
 
