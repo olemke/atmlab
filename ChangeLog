@@ -1,3 +1,13 @@
+2011-08-01  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-170
+
+	* files/loadncfile2.m:
+
+	Started reimplementing the loadncfile function using the new
+	high-level NetCDF API in Matlab 2011a because netcdf.open and friends
+	don't work with NetCDF version 3 files anymore.
+
 2011-07-29  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-169
