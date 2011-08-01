@@ -39,7 +39,7 @@ n = size(M_c, 1);
 M = nan*zeros(n, c.data.NCOLS);
 
 % row and column numbers
-r1 = M_c(:, c.overlap.C_ROW);
+r1 = M_c(:, c.overlap.C_I);
 r2 = M_c(:, c.overlap.AVHRR_ROW);
 c2 = M_c(:, c.overlap.AVHRR_COL);
 
