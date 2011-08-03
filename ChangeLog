@@ -1,3 +1,12 @@
+2011-08-03  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-173
+
+	* geoplots/gmt/nearneighbor.m:
+
+	Use -N1/1 instead of just -N1. Works around a bug in gmt 4.5.6 but
+	it's good to set it explicitly anyway.
+
 2011-08-03  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-172

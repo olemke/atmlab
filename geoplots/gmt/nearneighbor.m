@@ -29,7 +29,7 @@ if isfield(in,'increment')
 end
 
 %average with adjasent gridpoint GMT default=4
-nearneighbor = sprintf('%s -N1',nearneighbor);
+nearneighbor = sprintf('%s -N1/1',nearneighbor);
 
 %search radius
 if isfield(in,'search')
