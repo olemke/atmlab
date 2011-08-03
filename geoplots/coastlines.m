@@ -9,6 +9,8 @@
 %    The optional argument *lonrange* can be used when a longitude range
 %    different from [0 360] is used.
 %
+%    Uses the topo.mat file from the matlab demos directory.
+%
 % FORMAT   coastlines([lcolor,lwidth,lonrange])
 %        
 % OPT   lcolor   Line color. Default is [0 0 0].

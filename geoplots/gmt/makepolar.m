@@ -81,7 +81,7 @@ end
 % Set Background and forground colors base on the last color minus 2 times
 % the gradient of color change used in ctable
 if isfield(in,'color_background')
-    BG = in.color_background;
+    BG = sscanf(in.color_background,'%f/%f/%f');
 else
     tmp = ctable(1,1);
     if (tmp-2*inc)>0
@@ -91,7 +91,7 @@ else
     end
 end
 if isfield(in,'color_foreground')
-    FG = in.color_foreground;
+    FG = sscanf(in.color_foreground,'%f/%f/%f');
 else
     tmp = ctable(end,end);
     if (tmp-2*inc)>0
@@ -101,14 +101,14 @@ else
     end
 end
 if isfield(in,'color_nan')
-    N = in.color_nan;
+    N = sscanf(in.color_nan,'%f/%f/%f');
 else
     N = [128 128 128]; %Grey
 end
 % Background, Foreground, and NaN color
 fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','B',abs(BG)); %added abs to garantee >0
 fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','F',abs(FG));
-fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',N);
+fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',abs(N));
 
 fclose(fid);
 

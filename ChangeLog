@@ -1,3 +1,19 @@
+2011-08-03  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-172
+
+	* geoplots/coastlines.m: Added comment about mysterious topo file
+	that is loaded.
+
+	* geoplots/gmt/makepolar.m: Fixed bug in back/foreground colors
+	(and nan_color)
+
+	* atmlab/atmlab_init.m: Added new directory
+
+	* geographical:
+	Created a new directory 'geographical' that is not related to
+	plotting, and moved such functions out of geoplots/
+
 2011-08-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-171
