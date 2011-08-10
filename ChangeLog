@@ -1,3 +1,9 @@
+2011-08-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-175
+
+	* files/create_tmpfolder.m: replace '~/' with [getenv('HOME'),'/']
+
 2011-08-10  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-174

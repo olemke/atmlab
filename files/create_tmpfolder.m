@@ -27,6 +27,8 @@ workarea = atmlab( 'WORK_AREA' );
 %
 if ~ischar(workarea)
     error( 'atmlab:create_tmpfolder', 'WORKAREA must be a string' );
+elseif strcmp(workarea(1:2),'~/')
+    workarea = atmlab('WORK_AREA',[getenv('HOME'),workarea(2:end)]);
 elseif ~strcmp(workarea(1), '/')
     error( 'atmlab:create_tmpfolder', 'WORKAREA must be an absolute path' );
 end
