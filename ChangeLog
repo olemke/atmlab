@@ -1,3 +1,12 @@
+2011-08-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-176
+
+	* retrieval/qpack2/qpack2.tex: Removed EXTRAP. 
+
+	* retrieval/qpack2/qpack2.m: Removed old stuff in header and not
+	used code for CalcTable. 
+
 2011-08-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-175

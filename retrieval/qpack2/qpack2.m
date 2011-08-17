@@ -1,16 +1,11 @@
 % QPACK2   Main function of Qpack2
 %
-%    Read qpack2.pdf for an introduction to Qpack2.
+%    Read qpack2.pdf for an introduction to Qpack2 and user instructions.
 %
 %    The main task to make OEM type inversions. The measurement data in *Y* are
 %    inverted by combining the function oem.m and Qarts (interface to arts-2).
 %    Forward model and retrieval variables are packed into the Qarts structure
 %    Q. OEM specific parameters are found in O.
-%
-%    The measurements to be inverted (Y) must all correspond to the same sensor
-%    characteristics. The sensor response is calculated before the first
-%    inversion is started and it is assumed that the reponse matrix obtained is
-%    valid for all cases.
 %
 %    The data fields of the output structure L2 depends on selected retrieval
 %    quantities and settings in Q. See further *qp2_l2*.
@@ -286,13 +281,6 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   %
   Q.HSE.P = Y(m).HSE_P;
 
-  
-  %- Prepare absorption table, if ABSORPTION = 'CalcTable'
-  %
-  %if strcmp( Q.ABSORPTION, 'CalcTable' )  &  ~qarts_isset( Q.ABS_P )
-  %  Q = qarts_abstable( Q );
-  %end
-  
   
   %- Sensor pos and los
   %
