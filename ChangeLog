@@ -1,18 +1,25 @@
 2011-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-178
+
+	* retrieval/qpack2/qp2_l2.m (qp2_l2): Added "atmfield = true;" for
+	temperature (pointed out by Oliver S).
+
+2011-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-177
 
-	* retrieval/qpack2/qp2_l2.m: Corrected 'rqre_datatype(out,...)'. 
+	* retrieval/qpack2/qp2_l2.m: Corrected 'rqre_datatype(out,...)'.
 	Incorrect variable (vname) was used in some places.
 
 2011-08-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-176
 
-	* retrieval/qpack2/qpack2.tex: Removed EXTRAP. 
+	* retrieval/qpack2/qpack2.tex: Removed EXTRAP.
 
 	* retrieval/qpack2/qpack2.m: Removed old stuff in header and not
-	used code for CalcTable. 
+	used code for CalcTable.
 
 2011-08-10  Salomon Eliasson  <s.eliasson@ltu.se>
 

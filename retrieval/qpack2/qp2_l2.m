@@ -242,6 +242,7 @@ for q = 1 : length(R.jq)
     %
     if out
       s        = 'temperature';
+      atmfield = true;
       Astruct  = Q.T;
     end
     
