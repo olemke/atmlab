@@ -224,7 +224,7 @@ for q = 1 : length(R.jq)
     vname = sprintf( 'Q.ABS_SPECIES(%d)', ispecies );                       %&%
     rqre_field( Q.ABS_SPECIES(ispecies), 'L2', vname );                     %&%
     out = qarts_get( Q.ABS_SPECIES(ispecies).L2 );
-    rqre_datatype( out, @isboolean, vname );                                %&%
+    rqre_datatype( out, @isboolean, sprintf('%s.L2',vname) );               %&%
     %    
     if out 
       s        = sprintf( 'species%d', q );
@@ -238,7 +238,7 @@ for q = 1 : length(R.jq)
     %--------------------------------------------------------------------------
     rqre_field( Q.T, 'L2', 'Q.T' );                                         %&%
     out = qarts_get( Q.T.L2 );
-    rqre_datatype( out, @isboolean, vname );                                %&%
+    rqre_datatype( out, @isboolean, 'Q.T.L2' );                             %&%
     %
     if out
       s        = 'temperature';
@@ -249,7 +249,7 @@ for q = 1 : length(R.jq)
     %--------------------------------------------------------------------------
     rqre_field( Q.FFIT, 'L2', 'Q.FFIT' );                                   %&%
     out = qarts_get( Q.FFIT.L2 );
-    rqre_datatype( out, @isboolean, vname );                                %&%
+    rqre_datatype( out, @isboolean, 'Q.FFIT.L2' );                          %&%
     %    
     if out
       s = 'ffit';
@@ -259,7 +259,7 @@ for q = 1 : length(R.jq)
     %--------------------------------------------------------------------------
     rqre_field( Q.POLYFIT, 'L2', 'Q.POLYFIT' );                             %&%
     out = qarts_get( Q.POLYFIT.L2 );
-    rqre_datatype( out, @isboolean, vname );                                %&%
+    rqre_datatype( out, @isboolean, 'Q.POLYFIT.L2' );                       %&%
     %
     if out
       s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
