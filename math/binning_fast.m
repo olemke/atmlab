@@ -11,7 +11,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 % IN
 %   in       struct containing:
 %               MANDITORY:
-%                   data         [data vector]     of any class. size(data,1)
+%                   data         [data matrix]     of any class. size(data,1)
 %                                                  must be the same length
 %                                                  as lat lon, but data may
 %                                                  have 2 dimensions or more, e.g.
@@ -70,7 +70,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 % Created by Oliver Lemke and Salomon Eliasson
 % $Id$
 
-check_input(in)
+in = check_input(in);
 
 if nargin==1, lonspace=0;end
 [in,lat,lon] = outputlatlons(in,lonspace);
@@ -122,7 +122,7 @@ end
 % ||
 % VV
 
-function check_input(in)
+function in = check_input(in)
 
 errId = 'atmlab:binning_fast:badInput';
 assert(all(isfield(in,{'lat','lon','data'})),...
@@ -131,7 +131,11 @@ assert(all(isfield(in,{'lat','lon','data'})),...
 assert(isfield(in,'gridsize') || (all(isfield(in,{'newlon','newlat'}))),...
     errId,'Either field ''gridsize'' or fields ''newlat'' and ''newlon'' are required' )
 
-assert(isequal(size(in.data,1),numel(in.lat),numel(in.lon)),...
+if isequal(numel(in.data),numel(in.lat),numel(in.lon))
+    in.data = in.data(:); in.lat = in.lat(:); in.lon = in.lon(:);
+end
+
+assert(isequal(size(in.data,1),size(in.lat,1),size(in.lon,1)),...
     errId,'data,lat,lon must all be the same size')
 
 if isfield(in,'newlon')

@@ -1,3 +1,10 @@
+2011-08-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-179
+
+	* math/binning_fast.m: Fixed an assertion and allowed a little
+	more flexibility with the in data.
+
 2011-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-178
