@@ -122,7 +122,7 @@ if nargin == 1
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
           'CldBox', 'SctMthBatch', 'BatchC', 'CloseF' };
-                                                                            %&%    
+                                                                            %&%
   otherwise                                                                 %&%
     error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );        %&%
   end
@@ -264,6 +264,11 @@ function T = cfile_Generl( Q, partname, workfolder )
     rqre_field( Q.ABS_SPECIES, 'TAG', 'Q.ABS_SPECIES' );                    %&%
     T{end+1} = sprintf( 'SpeciesSet(abs_species,[%s])', ...
                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
+  end
+  %  
+  if qarts_isset( Q.Y_UNIT )
+    rqre_datatype( Q.Y_UNIT, @ischar, 'Q.Y_UNIT' );                         %&%
+    T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
   end
   %
   if strcmp( partname, 'GenerlSave' )
@@ -786,6 +791,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
     % Find out sensor structure
     parts{1} = 'init';
+    if qarts_isset( H.SENSOR_POL )
+      parts{end+1} = 'polarisation';
+    end
     if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )  |...
                                  ( qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO )
       parts{end+1} = 'antenna';
@@ -856,6 +864,13 @@ function T = cfile_Sensor( Q, partname, workfolder )
         U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
         U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
         U{end+1} = sprintf( '   %d,%d)', v(1), v(2) );
+       
+      case 'polarisation'
+        if qarts_isset( H.SENSOR_POL )
+          U{end+1} = file_or_data( 'sensor_pol', 'ArrayOfIndex', ...
+                               H.SENSOR_POL, workfolder, Q.INPUT_FILE_FORMAT );
+        end
+        U{end+1} = 'sensor_responsePolarisation';
        
       case 'antenna'
         if qarts_isset( H.ANTENNA_LOS )
@@ -1669,11 +1684,6 @@ function T = add_rtecalcstart( Q )
                                        Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
     T{end+1} = sprintf( 'IndexSet(mc_z_field_is_1D,%d)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
-  end
-  
-  if qarts_isset( Q.Y_UNIT )
-    rqre_datatype( Q.Y_UNIT, @ischar, 'Q.Y_UNIT' );                         %&%
-    T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
   end
 
   if qarts_isset( Q.WSMS_BEFORE_RTE )
