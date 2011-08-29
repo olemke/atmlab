@@ -1,3 +1,10 @@
+2011-08-29  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-183
+
+	* geographical/resample_geodata.m: Fixed some assertions and
+	clarified the help section further.
+
 2011-08-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-182

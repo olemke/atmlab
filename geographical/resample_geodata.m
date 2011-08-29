@@ -15,13 +15,17 @@ function out = resample_geodata(in,field,newgrid)
 %
 %   field       %s          {'field1',etc}; The field/s  you want to regrid
 %
-%   newgrid     %f, or [%f %f], {[newlat],[newlon]}
+%   newgrid     %f, or [%f %f], {[newlat],[newlon]} (e.g. newlat = -90:5:90)
 %
-%              a) Either make a sqaure grid using a scalar %f. e.g 1deg -> 2deg
+%              a) Either make a sqaure grid using a scalar %f. e.g 1deg ->
+%                 2deg (Assumes centered data!)
+%
 %              b) or a 2 element vector [%f %f] means [latstep, lonstep]
-%              e.g. 1*1 -> 1.25*2.75
+%                 e.g. 1*1 -> 1.25*2.75 (Assumes centered data!)
+%
 %              c) or {[newlat],[newlon]} if you want to match to a predefined
-%              lat lon grid.
+%              lat lon grid. (Use this if your data is NOT centered)
+%
 % OUT:         struct       Original structure 'in' with lat, lon, and specified fields
 %                           replaced with their regridded versions
 %
@@ -169,8 +173,8 @@ end
 function sz = check_input(in,field,newgrid,errID)
 %% CHECK_input assorted list of input checks
 
-assert(isstruct(in) && ischar(field{1}) && (isnumeric(newgrid) || iscell(newgrid)),...
-    errID,'Incorrect input argument types')
+assert(isstruct(in) && ischar(field{1}) && isempty(newgrid) && ...
+    (isnumeric(newgrid) || iscell(newgrid)),errID,'Incorrect input argument types')
 
 assert(~any(~isfield(in,{'lat','lon'})),errID,'"lat,lon" are required fields')
 
@@ -191,14 +195,19 @@ assert(isequal([length(in.lat),length(in.lon)],[sz(1),sz(2)]) || ...
     isequal([length(in.lat),length(in.lon)],[sz(2),sz(1)]),...
     errID, 'data must have the dimensions data(lat,lon,.....), or data(lon,lat,.....)');
 
-if iscell(newgrid)
-    assert(length(newgrid)==2 && (min(newgrid{1})>-90 || max(newgrid{1})<90),...
-        errID,'if newgrid is a cell, it must contatin 2 vectors {[LATs] , [LONs]} (centers)')
-end
-
 if ~iscell(newgrid)
     assert(min(in.lat)>-90 & max(in.lat)<90 ,errID,'Latitudes are not centers')
+    if min(in.lon)<0
+        assert(~(all(ismember([-180,180],in.lon))),errID,'Longitudes are probably not centers')
+    else
+        assert(~(all(ismember([0,360],in.lon))),errID,'Longitudes are probably not centers')
+    end
+else
+   assert(length(newgrid)==2,...
+        errID,'if newgrid is a cell, it must contatin 2 vectors {[LATs] , [LONs]}')
+    
 end
+
 
 function [newlat,newlon] = assemble_newgrid(LAT,LON,newgrid,errID)
 %% ASSEMBLE_newgrid
@@ -241,10 +250,12 @@ else
     
     % do they FIT ?
     if flt
-        warning(errID,'Requested latitude range does not fit into original latitude range')
+        warning(errID,['Requested latitude range does not fit into original latitude range\n',...
+            'Suggest to give the latitude vector direcly in newgrid = {[lats][lons]}'])
     end
     if fln
-        warning(errID,'Requested longitude range does not fit into original longitude range')
+        warning(errID,['Requested longitude range does not fit into original longitude range\n',...
+            'Suggest to give the longitude vector direcly in newgrid = {[lats][lons]}'])
     end
 end
 
