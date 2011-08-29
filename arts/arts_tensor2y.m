@@ -1,15 +1,15 @@
-% ARTS_Y2y   Rearrange a tensor to a measurement vector
+% ARTS_tensor2Y   Rearrange a tensor to a measurement vector
 %
-%    Reverses the rearrangement made by *arts_y2Y*.
+%    Reverses the rearrangement made by *arts_y2tensor*.
 %
-% FORMAT   y = arts_Y2y(Y)
+% FORMAT   y = arts_tensor2y(Y)
 %        
 % OUT   y    A measurement vector, sorted as by arts.
-% IN    Y    Measurement data, as returned by *arts_y2Y*.
+% IN    Y    Measurement data, as returned by *arts_y2tensor*.
 
 % 2011-08-29   Created by Patrick Eriksson.
 
-function y = arts_Y2y(Y)
+function y = arts_tensor2y(Y)
   
 [nf,npol,nlos,nblock] = size( Y );
 

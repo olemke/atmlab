@@ -1,4 +1,4 @@
-% ARTS_y2Y   Rearrange a measurement vector to a tensor
+% ARTS_Y2TENSOR   Rearrange a measurement vector to a tensor
 %
 %    ARTS returns the data as a single vector, *y*. This function rearrange
 %    the data into a 4D tensor *Y*. The dimensions of the tensor are:
@@ -9,7 +9,7 @@
 %    dimension is set to -1, an automatic selection is made (to match lenthn
 %    of *y*). Of course, -1 can only be set for a single dimension.
 %
-% FORMAT   Y = arts_y2Y(y,nf[,npol,nlos,nblock])
+% FORMAT   Y = arts_y2tensor(y,nf[,npol,nlos,nblock])
 %        
 % OUT   Y        The data in *y* as a tensor with size [nf,npol,nlos,nblock].
 % IN    y        Measurement vector
@@ -20,7 +20,7 @@
 
 % 2011-08-29   Created by Patrick Eriksson.
 
-function Y = arts_y2Y(y,nf,varargin)
+function Y = arts_y2tensor(y,nf,varargin)
 %
 [npol,nlos,nblock] = optargs( varargin, { 1, 1, 1 } );
 

@@ -1,3 +1,15 @@
+2011-08-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-185
+
+	* arts/arts_y2Y.m: Removed
+
+	* arts/arts_Y2y.m: Removed.
+
+	* arts/arts_y2tensor.m:
+	* arts/arts_tensor2y.m: New name of functions above. Had to change
+	as Mac OS is not case sensetive! (Pointed out by Oliver)
+
 2011-08-29  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-184
