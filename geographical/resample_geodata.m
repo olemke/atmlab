@@ -173,8 +173,15 @@ end
 function sz = check_input(in,field,newgrid,errID)
 %% CHECK_input assorted list of input checks
 
-assert(isstruct(in) && ischar(field{1}) && isempty(newgrid) && ...
-    (isnumeric(newgrid) || iscell(newgrid)),errID,'Incorrect input argument types')
+assert(isstruct(in) && ischar(field{1}) && ...
+    (isnumeric(newgrid) || iscell(newgrid)),...
+    errID,'Incorrect input argument types')
+
+if iscell(newgrid)
+    assert(~any([isempty(newgrid{1}),isempty(newgrid{2})]),...
+        errID,'Lat or Lon vector is empty')
+    
+end
 
 assert(~any(~isfield(in,{'lat','lon'})),errID,'"lat,lon" are required fields')
 

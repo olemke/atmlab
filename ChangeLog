@@ -1,5 +1,11 @@
 2011-08-29  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-184
+
+	* geographical/resample_geodata.m: Bad assertion fixed
+
+2011-08-29  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-183
 
 	* geographical/resample_geodata.m: Fixed some assertions and
