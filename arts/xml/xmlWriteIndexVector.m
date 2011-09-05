@@ -27,7 +27,7 @@ xmlWriteTag (fid, 'IndexVector', ...
              xmlAddAttribute ([], 'nelem', sprintf ('%d', nelem)));
 
 if (strcmp(precision, 'BINARY'))
-    fwrite (fidb, data, 'double');
+    fwrite (fidb, data, 'integer*4');
 else
     fprintf (fid, '%d\n', data);
 end
