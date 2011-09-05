@@ -57,6 +57,9 @@ rqre_datatype( do_load, @isboolean );                            %&%
 if isempty( workfolder )
   workfolder = create_tmpfolder;
   cu = onCleanup( @()delete_tmpfolder( workfolder ) );
+  folder_created = 1;
+else
+  folder_created = 0;  
 end
 
 

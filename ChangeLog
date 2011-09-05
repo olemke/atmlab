@@ -1,3 +1,27 @@
+2011-09-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-186
+
+	* arts/arts_sensor.m (arts_sensor): The internal variable
+	folder_created had got lost in last change of function.
+
+	* demos/qpack2_demo.m (q_demo): BACKEND_DO was not set.
+
+	* arts/qartsSensor.m (qartsSensor): Introduced fields IF2RF and
+	SIDEBAND_MODE.
+
+	* arts/qarts2cfile.m (cfile_Sensor): 
+	  - AntennaOff is now called of ANTENNA_DO is false.
+	  - lo_multi now saved for "multimixer".
+	  - Changed triggering of data. Saving of variables for each
+	  sensor part follows now strictly the main variable. For example,
+	  F_BACKEND is ignored if BACKEND_DO is false.
+	  - Added handling of SIDEBAND_MODE.
+	  - Added handling of IF2RF.
+
+	* arts/qarts2cfile.m (file_or_data): All String variables were
+	taken as file names. Fixed.
+	
 2011-08-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-185

@@ -150,6 +150,7 @@ H                     = qartsSensor;
 %
 H.SENSOR_NORM         = true;
 %
+H.BACKEND_DO          = true;
 df                    = 0.5e6;
 H.F_BACKEND           = [ min(Q.F_GRID)+df : df : max(Q.F_GRID)-df ]';
 %

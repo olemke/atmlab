@@ -794,20 +794,19 @@ function T = cfile_Sensor( Q, partname, workfolder )
     if qarts_isset( H.SENSOR_POL )
       parts{end+1} = 'polarisation';
     end
-    if qarts_isset( H.ANTENNA_LOS )  |  qarts_isset( H.ANTENNA_RESPONSE )  |...
-                                 ( qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO )
+    if qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO
       parts{end+1} = 'antenna';
     end
     if qarts_isset( H.FILL_FGRID )
       parts{end+1} = 'fill_fgrid';
     end
-    if qarts_isset( H.LO )  |  qarts_isset( H.SIDEBAND_RESPONSE )  |  ...
-                                     ( qarts_isset( H.MIXER_DO ) & H.MIXER_DO )
+    if qarts_isset( H.MIXER_DO ) & H.MIXER_DO 
       parts{end+1} = 'mixer';
     end
-    if qarts_isset( H.F_BACKEND )  |  ...
-                              qarts_isset( H.BACKEND_CHANNEL_RESPONSE )  |  ...
-                                 ( qarts_isset( H.BACKEND_DO ) & H.BACKEND_DO )
+    if qarts_isset( H.IF2RF ) & H.IF2RF 
+      parts{end+1} = 'if2rf';
+    end
+    if qarts_isset( H.BACKEND_DO ) & H.BACKEND_DO
       parts{end+1} = 'backend';
     end
     if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
@@ -832,6 +831,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
       case 'init'
         U{1} = ['# Start of sensor part:'];
+        if qarts_isset( H.ANTENNA_DO )  &  ~H.ANTENNA_DO
+          U{end+1} = 'AntennaOff';
+        end
         if qarts_isset( Q.ANTENNA_DIM ) 
           rqre_alltypes( Q.ANTENNA_DIM, {@istensor0,@iswhole}, ...          %&%
                                                           'Q.STOKES_DIM' ); %&%
@@ -845,6 +847,11 @@ function T = cfile_Sensor( Q, partname, workfolder )
         if qarts_isset( Q.MBLOCK_AA_GRID ) 
           U{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
                        Q.MBLOCK_AA_GRID, workfolder, Q.INPUT_FILE_FORMAT );
+        end
+        if qarts_isset( H.SENSOR_NORM )
+          rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%
+                                         'Q.SENSOR_RESPONSE.SENSOR_NORM' ); %&%
+          U{end+1} = sprintf( 'IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
         end
         if qarts_isset( H.SENSOR_NORM )
           rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%
@@ -872,7 +879,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
         end
         U{end+1} = 'sensor_responsePolarisation';
        
-      case 'antenna'
+       case 'antenna'
         if qarts_isset( H.ANTENNA_LOS )
           U{end+1} = file_or_data( 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
                                         workfolder, Q.INPUT_FILE_FORMAT );
@@ -891,10 +898,17 @@ function T = cfile_Sensor( Q, partname, workfolder )
         if qarts_isset( H.SIDEBAND_RESPONSE )           
           U{end+1} = file_or_data( 'sideband_response', 'GriddedField1', ...
                    H.SIDEBAND_RESPONSE, workfolder, Q.INPUT_FILE_FORMAT );
-        end   
+        end
+        if qarts_isset( H.SIDEBAND_MODE )           
+          U{end+1} = file_or_data( 'sideband_mode', 'String', ...
+                   H.SIDEBAND_MODE, workfolder, Q.INPUT_FILE_FORMAT );
+        end
         U{end+1} = 'sensor_responseMixer';
 
-       case 'backend'
+      case 'if2rf'
+        U{end+1} = 'sensor_responseIF2RF';
+        
+      case 'backend'
         if qarts_isset( H.F_BACKEND ) 
           U{end+1} = file_or_data( 'f_backend', 'Vector', H.F_BACKEND, ...
                                         workfolder, Q.INPUT_FILE_FORMAT );
@@ -927,12 +941,17 @@ function T = cfile_Sensor( Q, partname, workfolder )
                                                          'with multiple LO.' );
         end
         if qarts_isset( H.LO ) 
-          U{end+1} = file_or_data( 'lo', 'Vector', H.LO, workfolder, ...
+          U{end+1} = file_or_data( 'lo_multi', 'Vector', H.LO, workfolder, ...
                                                      Q.INPUT_FILE_FORMAT );
         end
         if qarts_isset( H.SIDEBAND_RESPONSE )           
           U{end+1} = file_or_data( 'sideband_response_multi', ...
                      'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, ...
+                                         workfolder, Q.INPUT_FILE_FORMAT );
+        end   
+        if qarts_isset( H.SIDEBAND_MODE )           
+          U{end+1} = file_or_data( 'sideband_mode_multi', ...
+                     'ArrayOfString', H.SIDEBAND_MODE, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
         end   
         if qarts_isset( H.F_BACKEND ) 
@@ -1559,9 +1578,21 @@ function s = file_or_data(artsvar,datatype,qvalue,workfolder,dformat,...
   elseif strcmp( datatype, 'Sparse' )                                      %&%
     rqre_datatype( qvalue, {@ischar,@issparse}, ...                        %&%
                                     sprintf('The input for %s',artsvar) ); %&%
+  elseif strcmp( datatype, 'String' )                                      %&%
+    rqre_datatype( qvalue, {@ischar}, ...                                  %&%
+                                    sprintf('The input for %s',artsvar) ); %&%
   end                                                                      %&%
   
-  if ischar( qvalue )
+  % Determine if input data are a file
+  isfile = ischar( qvalue );
+  if strcmp( datatype, 'String' )       % Special handling of String vars.
+    [p,n,ext] = fileparts( qvalue );  
+    if ~strcmp( ext, {'xml','nc'} )
+      isfile = false;
+    end
+  end
+  
+  if isfile
     s = add_readfile( artsvar, qvalue );
   else
     if nargin > 5
