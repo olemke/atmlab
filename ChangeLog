@@ -1,5 +1,12 @@
 2011-09-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-189
+
+	* geophysics/geodetic2cart.m (geodetic2cart): Did not wortk for
+	vector input.
+
+2011-09-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-188
 
 	* geophysics/geodetic2cart.m: Created.

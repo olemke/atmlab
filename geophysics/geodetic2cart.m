@@ -29,7 +29,7 @@ alpha = acos( b/a );
 
 N = a ./ sqrt(1-(sind(lat)*sin(alpha)).^2);
 
-x = (N+h) * cosd(lat) .* cosd(lon);
-z = (N+h) * cosd(lat) .* sind(lon);
+x = (N+h) .* cosd(lat) .* cosd(lon);
+z = (N+h) .* cosd(lat) .* sind(lon);
 y = (cos(alpha)^2*N+h) .* sind(lat);
 
