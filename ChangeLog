@@ -1,3 +1,19 @@
+2011-09-08  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-190
+
+	* geoplots/gmt/gmt_plot.m: 
+	1) Check that "in" is a structure
+	2) Now internally remove data outside the chosen region to save
+	memory, computational time and to allow for higher resolutions.
+
+	* handy/exec_system_cmd.m: Added USAGE to help section
+
+	* geographical/regionize.m: Changed behavior. Now, by default, trim away
+	regions circumscribing the desired region. Added a fifth input
+	argument 'trim', which can be set to false if you don't want to do this
+	(previous behavior) 
+
 2011-09-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-189

@@ -518,6 +518,7 @@ function filename = gmt_plot(in,field)
 % $Id$
 
 errId = 'gmtlab:gmt_plot:input';
+assert(isstruct(in),errId,'"in" must be a structure')
 if nargin==2
     assert(ischar(field),errId,['2nd input ''field'' must be the string '...
         'name of the field in the structure you want to plot'])
@@ -596,11 +597,6 @@ default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
 
 in = optargs_struct(in,default);
-if ~in.nodata
-    default.datarange     = getdatarange(in,field); %
-    default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
-end
-in = optargs_struct(in,default);
 
 if any(ismember(in.outdir,' '))
     error('gmtlab:input','"spaces" ar not supported for outdir (%s)',in.outdir)
@@ -620,12 +616,7 @@ if ~isempty(in.title)
     default.filename = in.title;
 else default.filename = 'default';
 end
-
-% colors & data representation:
-default.ctable      = 'rainbow';          % color palette
-[default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
-in = optargs_struct(in,default); clear default
-
+in = optargs_struct(in,default);
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
 in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
 in.title = regexprep(in.title,':',' ');
@@ -691,7 +682,33 @@ if ~isfield(in,'region')
             min(in.lon(:)),max(in.lon(:)),...
             min(in.lat(:)),max(in.lat(:)));
     end
+else
+    % remove frivolous data for memory and speed performance in that case
+    x = sscanf(in.region,'%f/%f/%f/%f');
+    lt = in.lat>=x(3) & in.lat <=x(4); %logical vector
+    ln = in.lon>=x(1) & in.lon <=x(2); %logical vector
+    if in.gridded
+        in.(field) = in.(field)(lt,ln);
+        in.lat = in.lat(lt);
+        in.lon = in.lon(ln);        
+    else
+        in.(field) = in.(field)(lt&ln);
+        in.lat = in.lat(lt&ln);
+        in.lon = in.lon(lt&ln);        
+    end
 end
+
+% DATARANGE
+if ~in.nodata
+    default.datarange     = getdatarange(in,field); %
+    default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
+end
+in = optargs_struct(in,default);
+
+% COLORS & DATA REPRESENTATION
+default.ctable      = 'rainbow';          % color palette
+[default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
+in = optargs_struct(in,default); clear default
 
 % LEGEND 
 if isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend)
@@ -916,6 +933,7 @@ end
 
 function in = isgridded(in,field)                                               
 %% ISGRIDDED: Test if the data is gridded
+%  If it is not gridded, flatten the data
 
 if isempty(in.(field))
     error('The data variable: in.%s is empty',field)
@@ -958,7 +976,7 @@ assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
     '%s%s','Data does not contain any valid',...
     ' values for contour levels to be based on...')
 assert(~(ndims(squeeze(in.(field)))>2),Id,'in.%s must not be more than 2 dimensional',field)
-assert(abs(in.datarange(1)-in.datarange(2))>Eps,Id,...
+assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
 'min(data) must not be equal to max(data)')
 
 % check for lat and lons
@@ -1014,4 +1032,7 @@ else
     % cd back to the original directory
     cd(curdir);
     rmdir(tmpdir,'s')
+    if gmtlab('VERBOSITY')
+        fprintf('%s is now removed\n',tmpdir)
+    end
 end

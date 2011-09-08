@@ -29,6 +29,10 @@ function out = exec_system_cmd(cmd, varargin)
 %       a cell array of strings. If only one input command was given,
 %       this is a cell array with one string.
 %
+% USAGE
+%
+%   out = exec_system_cmd(cmd, varargin)
+%
 % updated by: Salomon, Gerrit
 % Author: Oliver Lemke
 

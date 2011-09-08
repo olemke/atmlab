@@ -1,12 +1,19 @@
-function [outdata,outlat,outlon,weights] = regionize(data,lat,lon,corner)
+function [outdata,outlat,outlon,weights] = regionize(data,lat,lon,corner,trim)
 %% regionize
 %
 % PURPOSE: function that nan's out all data outside a given region bounds (or several regions)
 %
-% IN: data
-%     lat
-%     lon
+% IN: data %2 or more dims starting with (lat,lon,...) or (lon,lat,...)
+%     lat  %vector
+%     lon  %vector
 %     corner = [blcorner,trcorner;blcorner,trcorner] % each corner is [lat,lon]
+%     trim   = true or false 
+%          (1=trim data and lat lons outside the region (default), 0=don't)
+%
+%     NOTE REGARDING corner: If you want to use a predefined region, use
+%            e.g. corner = getPredefinedRegion('tropics') %look into function region list
+%
+%     NOTE REGARDING trim: If you need the size of data matrix to remain unchanged, input trim=0
 %
 % OUT:    outdata
 %         outlat
@@ -27,15 +34,19 @@ function [outdata,outlat,outlon,weights] = regionize(data,lat,lon,corner)
 % $Id$
 
 errID = 'atmlab:reginize:badInput';
-assert(nargin==4,errID,'Not enought input arguments')
+assert(nargin>=4,errID,'Not enought input arguments')
 
-[outdata,outlat,outlon,ig,flags] = setup(data,lat,lon);
+% Default action is to trim away NaNs out side region
+if nargin==4, trim = true; end 
 
-% for the sake of grids overlapping the edges
-dlt = mean(diff(unique(lat)));
-dln = mean(diff(unique(lon)));
+[outdata,outlat,outlon,isgridded,flags] = setup(data,lat,lon);
 
-if ig
+if isgridded
+    % for the sake of grids overlapping the edges
+    dlt = mean(diff(unique(lat)));
+    dln = mean(diff(unique(lon)));
+    
+    
     sz = size(outdata);
 
     z.data = outdata(:,:,:);  %collapse to 3Doutdata;
@@ -55,21 +66,31 @@ if ig
     tmp = tmp(:,:);
     tmp(:,~logical_field&~periphery) = NaN;
     z.data = permute(reshape(tmp,tsz),[2,3,1]);
-
-    % Reshape the data array back to the original format
+    
+    %Trim away NaNs outside the region
+    if trim
+        [z.data,outlon,outlat,weights] = trimAwayNaNs_gridded(z.data,outlon,outlat,weights,corner,[dlt,dln]);
+    end
+    
+    % Reshape the data array back to the original lat/lon format (first 2 dims)
     [outdata,outlat,outlon,weights] = useFlags(z.data,outlon,outlat,weights,flags);
     
+    %resurrect matrix size to the original format
     outdata = reshape(outdata,[size(outdata,1),size(outdata,2),sz(3:end)]);
     
 else
     z.data        = outdata(:);
     z.lat         = outlat(:);
     z.lon         = outlon(:);
-    logical_field = get_logicalfield(z,corner);
+    logical_field = get_logicalfield(z,corner,0,0); %dlt and dln = 0 
     
     outlat        = z.lat(logical_field);
     outlon        = z.lon(logical_field);
     outdata       = z.data(logical_field);
+    
+    if trim
+       [outdata,outlon,outlat] = trimAwayNaNs_ungridded(outdata,outlon,outlat,corner); 
+    end
 end
 
 %%%%%%%%%%%%%%%%%
@@ -152,6 +173,46 @@ for i = num'
     weights(i) = AREA/(dlt*dln); % normalized area. Max = 1;
     AREA = 0;
 end
+
+function [data,lon,lat,weights] = trimAwayNaNs_gridded(data,lon,lat,weights,corner,gsize)
+%% Trim dataset to get rid of NaNs outside the regions
+% If you don't need weights, make the 4th argument empty []
+% gsize is the size of the grid [dlat,dlon]
+
+gh = gsize/2; %half boxwidth
+
+% Use the corner input to trim away the data
+if ndims(data)==2
+    data = data(lat>=min(corner(:,1))-gh(1) & lat<=max(corner(:,3))+gh(1),...
+        lon>=min(corner(:,2))-gh(2) & lon<=max(corner(:,4))+gh(2));
+elseif ndims(data==3)
+        data = data(lat>=min(corner(:,1))-gh(1) & lat<=max(corner(:,3))+gh(1),...
+        lon>=min(corner(:,2))-gh(2) & lon<=max(corner(:,4))+gh(2),:);
+end
+
+if ~isempty(weights)
+    weights = weights(lat>=min(corner(:,1))-gh(1) & lat<=max(corner(:,3))+gh(1),...
+        lon>=min(corner(:,2)) -gh(2) & lon<=max(corner(:,4))+gh(2));
+end
+lat = lat(lat>=min(corner(:,1))-gh(1) & lat<=max(corner(:,3))+gh(1));
+lon = lon(lon>=min(corner(:,2))-gh(2) & lon<=max(corner(:,4))+gh(2));
+
+function [data,lon,lat,weights] = trimAwayNaNs_ungridded(data,lon,lat,corner)
+%% Trim dataset to get rid of NaNs outside the regions
+% If you don't need weights, make the 4th argument empty []
+% gsize is the size of the grid [dlat,dlon]
+
+% Use the corner input to trim away the data
+if ndims(data)==2
+    data = data(lat>=min(corner(:,1)) & lat<=max(corner(:,3)) &...
+        lon>=min(corner(:,2)) & lon<=max(corner(:,4)));
+elseif ndims(data==3)
+        data = data(lat>=min(corner(:,1)) & lat<=max(corner(:,3)) &...
+        lon>=min(corner(:,2)) & lon<=max(corner(:,4)),:);
+end
+
+lat = lat(lat>=min(corner(:,1)) & lat<=max(corner(:,3)));
+lon = lon(lon>=min(corner(:,2)) & lon<=max(corner(:,4)));
 
 function [data,lat,lon,weights] = useFlags(data,lon,lat,weights,flags)
 %% useFlags
