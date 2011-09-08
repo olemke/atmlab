@@ -8,16 +8,16 @@
 %    everything else must be specified by the qarts fields or be handled by
 %    include control files.
 %
+%    This function is organised in such way that *qcheck* and *qinfo* can be
+%    used.
+%
 %    Allowed formats differ between the fields. For information about a
 %    specific field, type e.g.:
 %       qinfo( @qarts, 'ABSORPTION' );
 %
-%    This function is organised in such way that *qcheck* and *qinfo* can be
-%    used.
-%
 % FORMAT   [Q,I] = qarts
 %        
-% OUT   Q  Setting structure with default values for all recognised fields.
+% OUT   Q  Setting structure (with all fields set to {}).
 %       I  Includes same fields as Q, where the content of each field
 %          is a description string (used by *qinfo*).
 
