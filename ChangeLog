@@ -1,5 +1,12 @@
 2011-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-193
+
+	* arts/qarts2cfile.m: Moved setting of ATMOSPHERE_DIM to Generl
+	part.
+
+2011-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-192
 
 	* arts/qarts.m: Corrected header text.

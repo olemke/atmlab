@@ -101,7 +101,7 @@ if nargin == 1
 
   case 'GetSensor'
     %
-    S = { 'Generl', 'AtmSrf', 'SensorSave', 'CloseF' };
+    S = { 'Generl', 'SensorSave', 'CloseF' };
    
   case 'y_init'
     %
@@ -259,6 +259,13 @@ function T = cfile_Generl( Q, partname, workfolder )
                                                      Q.INPUT_FILE_FORMAT );
   end
   %
+  if qarts_isset( Q.ATMOSPHERE_DIM )
+    rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...             %&%
+                                                      'Q.ATMOSPHERE_DIM' ); %&%
+    rqre_in_range( Q.ATMOSPHERE_DIM, 1, 3, 'Q.ATMOSPHERE_DIM' );            %&%
+    T{end+1} = sprintf( 'AtmosphereSet%dD', Q.ATMOSPHERE_DIM );
+  end
+  %
   if qarts_isset( Q.ABS_SPECIES )
     rqre_datatype( Q.ABS_SPECIES, @isstruct, 'Q.ABS_SPECIES' );             %&%
     rqre_field( Q.ABS_SPECIES, 'TAG', 'Q.ABS_SPECIES' );                    %&%
@@ -320,13 +327,6 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end                                                                       %&%
   %
   T = [];
-  %
-  if qarts_isset( Q.ATMOSPHERE_DIM )
-    rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...             %&%
-                                                      'Q.ATMOSPHERE_DIM' ); %&%
-    rqre_in_range( Q.ATMOSPHERE_DIM, 1, 3, 'Q.ATMOSPHERE_DIM' );            %&%
-    T{end+1} = sprintf( 'AtmosphereSet%dD', Q.ATMOSPHERE_DIM );
-  end
   %
   if qarts_isset( Q.P_GRID )
     T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder, ...
