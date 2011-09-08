@@ -1,3 +1,11 @@
+2011-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-191
+
+	* math/interp360.m (interp360): Created.
+
+	* files/fileopen.m: Removed a confusing dot in error message 
+
 2011-09-08  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-190
@@ -18,7 +26,7 @@
 
 	* atmlab-1-0-189
 
-	* geophysics/geodetic2cart.m (geodetic2cart): Did not wortk for
+	* geophysics/geodetic2cart.m (geodetic2cart): Did not work for
 	vector input.
 
 2011-09-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>

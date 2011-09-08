@@ -25,6 +25,6 @@ fid = fopen( filename, varargin{:} );
 %= Was open succesful?
 %
 if fid < 0
-  serr = sprintf( 'Could not open the file %s.', filename );
+  serr = sprintf( 'Could not open the file %s', filename );
   error( serr );
 end
