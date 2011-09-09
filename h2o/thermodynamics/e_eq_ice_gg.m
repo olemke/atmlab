@@ -43,18 +43,17 @@
 
 % 2010-08-18 Created by Marston Johnston
 
-function [e] = e_eq_ice_gg(T)
+function [esi] = e_eq_ice_gg(T)
 
 if any(T <= 0), error('Temperatures must be greater than 0K!!'); end
 
 T0  = 273.16;  % K
-ei0 = 6.1173; % hPa
+e0 = 6.1071; % hPa
+a = -9.09718;
+b = -3.56654;
+c = 0.876793;
 
 % Give the log of saturation vapor pressure over ice in hPa
-e = -9.09718*(T0./T-1)...
-    - 3.56654*log10(T0./T)...
-    + 0.876793*(1-T/T0)...
-    + log10(ei0);
+X = a*((T0./T)-1) + b*log10(T0./T) + c*(1-(T/T0));
 
-e = (10.^(e))*1e2; % Converts to Pa and base 10
-
+esi = (e0*10.^X)*1e2; % Converts to Pa

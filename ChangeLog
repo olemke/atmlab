@@ -1,88 +1,13 @@
-2011-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
-
-	* atmlab-1-0-193
-
-	* arts/qarts2cfile.m: Moved setting of ATMOSPHERE_DIM to Generl
-	part.
-
-2011-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
-
-	* atmlab-1-0-192
-
-	* arts/qarts.m: Corrected header text.
-
-2011-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
-
-	* atmlab-1-0-191
-
-	* math/interp360.m (interp360): Created.
-
-	* files/fileopen.m: Removed a confusing dot in error message.
-
-2011-09-08  Salomon Eliasson  <s.eliasson@ltu.se>
-
-	* atmlab-1-0-190
-
-	* geoplots/gmt/gmt_plot.m: 
-	1) Check that "in" is a structure
-	2) Now internally remove data outside the chosen region to save
-	memory, computational time and to allow for higher resolutions.
-
-	* handy/exec_system_cmd.m: Added USAGE to help section
-
-	* geographical/regionize.m: Changed behavior. Now, by default, trim away
-	regions circumscribing the desired region. Added a fifth input
-	argument 'trim', which can be set to false if you don't want to do this
-	(previous behavior) 
-
-2011-09-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
-
-	* atmlab-1-0-189
-
-	* geophysics/geodetic2cart.m (geodetic2cart): Did not work for
-	vector input.
-
-2011-09-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
-
-	* atmlab-1-0-188
-
-	* geophysics/geodetic2cart.m: Created.
-
-	* geophysics/cart2geodetic.m: Created. 
-
-2011-09-05  Oliver Lemke  <olemke@core-dump.info>
-
-	* atmlab-1-0-187
-
-	* arts/xml/xmlWriteIndexVector.m, arts/xml/xmlWriteRowIndex.m:
-
-	Change binary type from double to integer*4.
-
-2011-09-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+2011-09-09  Marston Johnston  <marston@chalmers.se>
 
 	* atmlab-1-0-186
-
-	* arts/arts_sensor.m (arts_sensor): The internal variable
-	folder_created had got lost in last change of function.
-
-	* demos/qpack2_demo.m (q_demo): BACKEND_DO was not set.
-
-	* arts/qartsSensor.m (qartsSensor): Introduced fields IF2RF and
-	SIDEBAND_MODE.
-
-	* arts/qarts2cfile.m (cfile_Sensor): 
-	  - AntennaOff is now called of ANTENNA_DO is false.
-	  - lo_multi now saved for "multimixer".
-	  - Changed triggering of data. Saving of variables for each
-	  sensor part follows now strictly the main variable. For example,
-	  F_BACKEND is ignored if BACKEND_DO is false.
-	  - Added handling of SIDEBAND_MODE.
-	  - Added handling of IF2RF.
-
-	* arts/qarts2cfile.m (file_or_data): All String variables were
-	taken as file names. Fixed.
 	
->>>>>>> .r7140
+	* h2o/thermodynamics/e_eq_water_gg.m: Changed the equation formulations
+	  to make them a little more clear.	
+	
+	* h2o/thermodynamics/e_eq_ice_gg.m: Same as above.
+	
+
 2011-08-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-185

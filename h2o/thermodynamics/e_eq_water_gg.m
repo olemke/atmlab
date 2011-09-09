@@ -44,18 +44,19 @@
 
 % 2010-08-18 Created by Marston Johnston
 
-function [e] = e_eq_water_gg(T)
+function [es] = e_eq_water_gg(T)
 
 if any(T <= 0), error('Temperatures must be greater than 0K!!'); end
 
 Tst  = 373.16;  % K
-e_st = 1013.25; % hPa
+est = 1013.25; % hPa
+a = -7.90298;
+b = 5.02808;
+c = -1.3816*10^(-7);
+d = 11.344;
+f = 8.1328*10^(-3);
+h = -3.49149;
 
 % Gives the log of saturation vapor pressure over water in hPa
-e = -7.90298*(Tst./T-1)...
-    + 5.02808*log10(Tst./T)... 
-    - 1.3816*10^-7*(10.^(11.344*(1-T/Tst))-1)...
-    + 8.1328*10^-3*(10.^(-3.49149*(Tst./T-1))-1)...
-    + log10(e_st);
-
-e = (10.^(e))*1e2; % convert to Pa and base 10
+Z = a*((Tst./T)-1) + b*log10(Tst./T) + c*((10.^(d*(1-(T/Tst))))-1) + f*((10.^(h*((Tst./T)-1)))-1);
+es = (est*10.^Z)*1e2; % convert to Pa
