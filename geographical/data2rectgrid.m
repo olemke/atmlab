@@ -31,7 +31,7 @@
 
 function [Z,N] = data2rectgrid(xedges,yedges,x,y,z,funh,varargin)
 %
-[NaN] = optargs( varargin, { 'backv' } );
+backv = optargs( varargin, { NaN } );
                                                                          %&%
                                                                          %&%
 %= Check input                                                           %&%

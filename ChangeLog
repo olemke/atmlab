@@ -1,5 +1,11 @@
 2011-09-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-188
+
+	* geographical/data2rectgrid.m: Fixed bug
+
+2011-09-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-187
 
 	* geoplots/gmt/makecpt.m: Fixed bug for format string if min and
