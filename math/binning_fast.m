@@ -16,8 +16,8 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %                                                  as lat lon, but data may
 %                                                  have 2 dimensions or more, e.g.
 %                                                  lvls, seasons, etc.
-%                   lat          [lat vector]      of any class
-%                   lon          [lon vector]      of any class
+%                   lat          [lat matrix]      of any class
+%                   lon          [lon matrix]      of any class
 %
 %                 either:
 %                   gridsize     [%f] or [%f %f]   scalar for square
@@ -57,6 +57,9 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %                   3) lon  ( vector )
 %
 % USAGE: [data,lat,lon] = binning_fast(in,lonspace) %lonspace is optional
+%    equivalent to e.g. 
+%        [data,lat,lon] = binning_fast(struct('data',data,'lat',lat,'lon',lon...
+%                             'newlat',[-80+.5:80-.5],'newlon',[-180+.5:180-.5]))
 %
 % NOTE:
 %       1) Including newlon and newlat causes the function to ignore: in.gridsize
@@ -146,11 +149,16 @@ if isfield(in,'newlon')
     
     if isfield(in,'gridsize')
         warning(errId,'%s cancel ''gridsize''',str)
-    elseif isfield(in,'region')
-        warning(errId,'%s cancel ''region''',str)
     end
+    if isfield(in,'region')
+        warning(errId,'Region specified by newlat and newlon has presedence over in.region\n')
+    end
+    %internally span a region, so that values outside this region can be kicked out
+    % [blcorner,trcorner] (lt1,ln1,lt2,ln2)
+    dlt = mean(diff(in.newlat))/2;  dln = mean(diff(in.newlon))/2;
+    in.region = [min(in.newlat)-dlt,min(in.newlon)-dln,max(in.newlat)+dlt,max(in.newlon)+dln];
 end
-
+    
 function in = regionchop(in)
 % Get rid of all data outside of region
 

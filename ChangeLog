@@ -1,3 +1,16 @@
+2011-09-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-187
+
+	* geoplots/gmt/makecpt.m: Fixed bug for format string if min and
+	max values are far from each other.
+
+	* math/binned_statistics.m: Added optional 4th argument to be insert into
+	empty cell elements if you want. Default is unchanged
+
+	* math/binning_fast.m: Fixed bug if in.region does not encompass
+	all data points.
+
 2011-09-09  Marston Johnston  <marston@chalmers.se>
 
 	* atmlab-1-0-186

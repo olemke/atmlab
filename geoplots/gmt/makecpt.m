@@ -19,8 +19,23 @@ else
     mi = in.datarange(1);
     mx = in.datarange(2);
     step = in.stepsize;
-    formstr = in.tick_annotation_format;
-    fstr = sprintf('%s -T%s/%s/%s',mkcpt,formstr,formstr,formstr);
+    
+    
+    i=1;
+    for val = [mi,mx,step]
+        
+        x = floor(log10(val));
+        if val == 0
+            formstr{i} = '%.0f';
+        elseif x>0
+            formstr{i} = sprintf('%%%i.0f',x);
+        else
+            formstr{i} = sprintf('%%.%if',abs(x));
+        end
+        i = i+1;
+    end
+    
+    fstr = sprintf('%s -T%s/%s/%s',mkcpt,formstr{1},formstr{2},formstr{3});
     mkcpt = sprintf(fstr,mi,mx,step);
 end
 
