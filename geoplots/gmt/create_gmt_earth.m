@@ -8,6 +8,9 @@ function commands = create_gmt_earth(in)
 % Created by Salomon Eliasson
 % $Id$
 
+assert(exist('in','var')==1,'gmtlab:badInput',...
+'This is an internal function to be used by gmt_plot.m')
+
 in = setup_create_gmt_earth(in);                                           
 
 F = fullfile(in.tmpdir,in.filename);
@@ -202,9 +205,35 @@ end
 a.ungriddedfile = in.ungriddedfile;
 
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
-    % find the approx density of points
-    res = mean([ diff(unique(in.lat));diff(unique(in.lon))]) ;
-    a.increment = sprintf('%fm',2*60*res); % 2 x 60min x resolution
+    
+    % Set a maximum resolution to avoid memory errors, using the region
+    if isunix
+        % find the free memory in GB
+        x = regexp(exec_system_cmd('free -g'),'\n','split');
+        [notUsed,b] = regexp(x{1}{1},'free');
+        memGB = str2double(x{1}{3}(b-1:b));
+    elseif ismac
+        memGB = 20; %some cracy large number for now
+        fprintf('FIXME: Need the equivalent memcheck for mac\n')
+    elseif ispc
+        fprintf('I''m surprised you even made it here. Wrong operating system, turn back\n')
+    end
+
+    % find the approx density of points (times 2 is sufficient)
+    res = 2 * mean([ diff(unique(in.lat));diff(unique(in.lon))]) ;
+
+    % get number of 1deg boxes in region
+    x = sscanf(in.region,'%f/%f/%f/%f');
+    oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );  
+
+    % A suitable constant found by trail and error
+    constant = 200;
+    maxres = (1/memGB) * constant * oneDegRegion * 4 /1024^3; %4bytes float
+    if res < maxres
+        res = maxres;
+        fprintf('Automatically picked the maximum resolution from the available memory: %.3fdeg\n',res)
+    end
+    a.increment = sprintf('%fm',60*res); % 60min x resolution
 else
     a.increment = in.nearneighbor.increment;
 end

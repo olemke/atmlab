@@ -1,3 +1,13 @@
+2011-09-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-189
+
+	* geoplots/gmt/create_gmt_earth.m: 
+	1) Sets a maximum resolution if the automatic resolution is too
+	high compared to the available RAM.
+	2) Throws an assertion that tells the user that this is an
+	internal function to gmt_plot, if it is called without arguments.
+
 2011-09-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-188
