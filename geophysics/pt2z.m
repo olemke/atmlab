@@ -8,12 +8,12 @@
 %    function is only valid for the Earth.
 %
 %    As the gravitation changes with altitude, an iterative process is
-%    needed. The accyuracy can be controlled by *z_acc*. The calculations
+%    needed. The accuracy can be controlled by *z_acc*. The calculations
 %    are repeated until the max change of the altitudes is below *z_acc*. If
 %    z_acc<0, the calculations are run twice, which should give an accuracy
 %    better than 1 m.
 %
-% FORMAT   z = pt2z( p, t, h2o, p0, z0 [,lat] )
+% FORMAT   z = pt2z( p, t, h2o, p0, z0 [,lat,z_acc] )
 %        
 % OUT   z     Altitudes [m].
 % IN    p     Column vector of pressures [Pa].
