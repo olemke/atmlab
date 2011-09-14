@@ -1,3 +1,9 @@
+DOCUMENTATION:
+
+- It appears the distinction between C_I/C_START is not entirely clear.
+  Document more clearly 1) how to get to the right datafile 2) how to get
+  to the right profile within this datafile
+
 BUGS
 
 - Sometimes, MSPPS starts the minute after the corresponding
