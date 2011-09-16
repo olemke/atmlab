@@ -1,3 +1,12 @@
+2011-09-16  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-192
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	Add memcheck for mac. Change order of tests: First check 'ismac', then
+	'isunix'. Because both are true on mac.
+
 2011-09-14  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-191

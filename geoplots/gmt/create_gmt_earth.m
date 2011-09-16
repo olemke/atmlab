@@ -207,14 +207,14 @@ a.ungriddedfile = in.ungriddedfile;
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
     
     % Set a maximum resolution to avoid memory errors, using the region
-    if isunix
+    if ismac
+        x=regexp(exec_system_cmd('vm_stat | grep -e free -e inactive | sed s/[^0-9]//g'),'\n','split');
+        memGB = (str2double(x{1}{1})+str2double(x{1}{2}))*4096/1024/1024/1024;
+    elseif isunix
         % find the free memory in GB
         x = regexp(exec_system_cmd('free -g'),'\n','split');
         [notUsed,b] = regexp(x{1}{1},'free');
         memGB = str2double(x{1}{3}(b-1:b));
-    elseif ismac
-        memGB = 20; %some cracy large number for now
-        fprintf('FIXME: Need the equivalent memcheck for mac\n')
     elseif ispc
         fprintf('I''m surprised you even made it here. Wrong operating system, turn back\n')
     end
@@ -226,7 +226,7 @@ if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
     x = sscanf(in.region,'%f/%f/%f/%f');
     oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );  
 
-    % A suitable constant found by trail and error
+    % A suitable constant found by trial and error
     constant = 200;
     maxres = (1/memGB) * constant * oneDegRegion * 4 /1024^3; %4bytes float
     if res < maxres
