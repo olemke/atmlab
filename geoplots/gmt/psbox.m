@@ -34,6 +34,7 @@ for i = 1:size(pb,1)
     stdin=[a{1},' M\n',a{2},' D\n',a{3},' D\n',a{4},' D\n',a{5},' D\n',a{6},' D\n',a{7},' D'];
     box = sprintf('echo -e "%s" |',stdin);
     box = sprintf('%s psxy -R%s -J%s -A',box,region,proj);
+    box = sprintf('%s %s',box,in.plotPlacement);
     
     % color and size of box
     

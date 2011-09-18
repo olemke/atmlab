@@ -13,6 +13,8 @@ function command = pslocations(file,in,command)
 for loc = in.locations
     psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);
     psloc = sprintf('%s -R -J',psloc);
+    psloc = sprintf('%s %s',psloc,in.plotPlacement);
+    
     
     
     if isfield(loc,'shape')
@@ -59,6 +61,8 @@ for loc = in.locations
         pstxt = sprintf('%s -Dj0.05i/0.05i',pstxt);
         
         pstxt = sprintf('%s -R -J',pstxt);
+        
+        pstxt = sprintf('%s %s',pstxt,in.plotPlacement);
         
         if isfield(loc,'textcolor') && ~isempty(loc.textcolor)
             color = loc.textcolor;

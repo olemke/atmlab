@@ -32,6 +32,7 @@ for i = 1:size(pp,1)
     
     command = sprintf('echo -e "%s" |',stdin);
     command = sprintf('%s psxy -R -J -A',command);
+    command = sprintf('%s %s',command,in.plotPlacement);
     
     % color and size of box
     

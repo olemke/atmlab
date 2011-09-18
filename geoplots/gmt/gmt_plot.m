@@ -118,6 +118,7 @@ function filename = gmt_plot(in,field)
 %                     ------------                     
 % in.xunit            |%s| String displayed on the x-axis of legend | '' |
 %                     ------------
+% in.plotPlacement    |%s| String of global plotPlacements | '-Ya5 -Xa5' |
 %
 %--------------------------------------------------------------------------
 %
@@ -595,6 +596,7 @@ default.savelegend        = false;              % make an additional pdf-file on
 default.keep_files        = false;              % keep intermediate files (debugging)
 default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
+default.plotPlacement     = '-Xa5 -Ya5';        % String of global plotPlacements
 
 in = optargs_struct(in,default);
 

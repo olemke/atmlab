@@ -1,3 +1,22 @@
+2011-09-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-193
+
+	* geoplots/gmt/test_gmt.m: More desirable behaviour.
+
+	* geoplots/gmt/gmt_plot.m: Added option: plotPlacement to indicate
+	the X and Y position of the plot. default is '-Xa5 -Ya5'
+
+	* geoplots/gmt/pspoly.m:
+	* geoplots/gmt/grdcontour.m:
+	* geoplots/gmt/psscale.m:
+	* geoplots/gmt/psbox.m:
+	* geoplots/gmt/create_gmt_earth.m:
+	* geoplots/gmt/pslocations.m:
+	* geoplots/gmt/pscoast.m:
+	* geoplots/gmt/grdimage.m:
+	Fixed bug in the placement of the plot, which was unveiled by new GMT version
+
 2011-09-16  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-192

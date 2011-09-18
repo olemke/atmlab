@@ -37,18 +37,11 @@ if ( isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) ) || ...
         psscale = sprintf('%si',psscale);
     end
 end
-    
-if isfield(in,'tick_spacing')
-    psscale = sprintf('%s -B%.0f:"%s":/:"%s":',psscale,in.tick_spacing,in.xunit,in.unit);
-else
-    psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
-end
 
-if isfield(in,'cptfile')
-    psscale = sprintf('%s -C%s',psscale,in.cptfile);
-else
-    error 'needs in.cptfile'
-end
+psscale = sprintf('%s %s',psscale,in.plotPlacement);
+
+% selects Overlay plot mode and assume more pscode will be appended later
+psscale = sprintf('%s -O -K',psscale);
 
 if in.sidebar %i.e the triangles bellow the min and above the max values
     switch in.sidebar
@@ -64,8 +57,17 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
     psscale = sprintf('%s %s',psscale,str);
 end
 
-% selects Overlay plot mode and assume more pscode will be appended later
-psscale = sprintf('%s -O -K',psscale);
+if isfield(in,'tick_spacing')
+    psscale = sprintf('%s -B%.0f:"%s":/:"%s":',psscale,in.tick_spacing,in.xunit,in.unit);
+else
+    psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
+end
+
+if isfield(in,'cptfile')
+    psscale = sprintf('%s -C%s',psscale,in.cptfile);
+else
+    error('gmtlab:BadInput:psscale','needs in.cptfile')
+end
 
 if isfield(in,'shift_tick_annotations')
     psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%di',psscale,in.shift_tick_annotations);

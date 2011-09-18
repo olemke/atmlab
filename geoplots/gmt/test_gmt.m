@@ -28,6 +28,8 @@ if ~exist('in','var'); in=struct([]); end
 % SET some defaults
 default.test      = 1:7; % which tests to do (default=all)
 default.verbosity = gmtlab('VERBOSITY');
+default.display   = true;
+default.filename  = 'all_tests' ;
 od = isfield(in,'outdir');
 default.outdir    = gmtlab('OUTDIR');
 in = optargs_struct(in,default); 
@@ -49,7 +51,7 @@ if ~ischar(in.outdir)
     in.outdir = in.outdir(1:end-1);
 end 
 
-warning('off','gmtcatstruct:DuplicatesFound') %I'm intentially doing this often
+warning('off','catstruct:DuplicatesFound') %I'm intentially doing this often
 
 [gridded,ungridded] = dummy_data;
 
@@ -81,7 +83,7 @@ info = info(~cellfun('isempty',info));
 
 % PUT all figure in one pdf
 files{end+1} = combine_pdfs(files,...
-    struct('filename','all_tests.pdf','cols',in.cols,'valign','b'));
+    struct('filename',[in.filename,'.pdf'],'cols',in.cols,'valign','b','outdir',in.outdir));
 
 
 % DISPLAY information about the tests
@@ -97,27 +99,28 @@ disp('All the tests where merged onto one pdf using combine_pdfs.m.')
 warning('on','gmtcatstruct:DuplicatesFound')
 
 % DISPLAY combined plot
-v = gmtlab('pdfviewer');
-if isnan(v), v = gmtlab('open_command');end
-if ~isnan(v)
-    exec_system_cmd(sprintf('%s %s&',v,files{end}),0);
-else
-    a = 'No viewer defined. ';
-    b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
-    c = 'or type ''help gmtlab'' to learn more';
-    fprintf(2,'%s\n%s\n%s\n',a,b,c)
-    if ~system('which xpdf')
-        openwith = 'xpdf';
-    elseif ~system('which evince')
-        openwith = 'evince'; % for gnome users
-    elseif ~system('which okular')
-        openwith  = 'okular'; % for kde users
-    end
-    if exist('openwith','var')
-        exec_system_cmd(sprintf('%s %s&',openwith,files{end}),1);
+if in.display
+    v = gmtlab('pdfviewer');
+    if isnan(v), v = gmtlab('open_command');end
+    if ~isnan(v)
+        exec_system_cmd(sprintf('%s %s&',v,files{end}),0);
+    else
+        a = 'No viewer defined. ';
+        b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
+        c = 'or type ''help gmtlab'' to learn more';
+        fprintf(2,'%s\n%s\n%s\n',a,b,c)
+        if ~system('which xpdf')
+            openwith = 'xpdf';
+        elseif ~system('which evince')
+            openwith = 'evince'; % for gnome users
+        elseif ~system('which okular')
+            openwith  = 'okular'; % for kde users
+        end
+        if exist('openwith','var')
+            exec_system_cmd(sprintf('%s %s&',openwith,files{end}),1);
+        end
     end
 end
-
 if ~od && ~ischar(gmtlab('OUTDIR'))
     a = sprintf('Files are saved in your tempdir (%s)',in.outdir);
     in.outdir = in.outdir(1:end-1);
@@ -130,6 +133,8 @@ end
 if nargout == 0
     clear files info
 end
+
+fprintf('Output file saved at: %s/%s.pdf\n',in.outdir,in.filename)
 %%%%%%%%%%%%%%%%%
 % SUB FUNCTIONS
 %    |||||||
@@ -163,7 +168,7 @@ function [files,info]        = TEST1(in,gridded,files,info)
 t=1;
 if ~ismember(t,in.test), return, end %then don't do this test
 
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % just put them all in one pdf using conbine_pdfs
 %% Test 1a
 
 
@@ -175,7 +180,7 @@ test.header_offset = -.5; %move the header down a bit because of smaller header 
 test.basemap_axis = 'neSW';
 test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
 a0 = sprintf('Test%.0fa',t);
-test.filename = a0;
+in.filename = a0;
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = ' demonstrates the mypolar-colortable which is similar to polar.cpt';
@@ -196,7 +201,7 @@ test.header_size = 20;
 test = rmfield(test,'header_offset');
 test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
 a0 = sprintf('Test%.0fb',t);
-test.filename = a0;
+in.filename = a0;
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = ' demonstrates that you can change the number of intervals that are';
@@ -210,7 +215,7 @@ function [files,info] = TEST2(in,gridded,ungridded,files,info)
 %% TEST: title, unit (gridded and ungridded)
 t = 2;
 if ~ismember(t,in.test), return, end %then don't do this test
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % put them all in one pdf using conbine_pdfs
 
 test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
@@ -218,7 +223,7 @@ test.basemap_axis = 'neSW';
 test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
 test.legend.tick_spacing = 25;
 a0 = sprintf('Test%.0fa',t);
-test.filename = a0;
+in.filename = a0;
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 a = ' demonstrates that you can include some special';
@@ -234,7 +239,7 @@ test.title           = 'ungridded: legend, coastlines';
 test.coast.width     = 1;
 test.coast.color     = '255/255/255';
 a0 = sprintf('Test%.0fb',t);
-test.filename        = a0;
+in.filename        = a0;
 test.unit            = 'kg/m²';
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
@@ -249,7 +254,7 @@ function [files,info] = TEST3(in,gridded,files,info)
 
 t = 3;
 if ~ismember(t,in.test),return, end %then don't do this test
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
 test.title      = 'upper sidebar, NaN, Hammer projection, center=180';
 test.legend.orientation = 'h';
@@ -257,7 +262,7 @@ test.projection         =  'H';
 test.center             = 180;      % Center map at given center longitude
 test.datarange          = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
 a0                      = sprintf('Test%.0fa',t);
-test.filename           = a0;
+in.filename           = a0;
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -265,7 +270,7 @@ test.title              = 'Robinsson projection, center = 0 ';
 test.projection         = 'N';
 test.center             = 0;
 a02                     = sprintf('Test%.0fb',t);
-test.filename           = a02;
+in.filename           = a02;
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -273,7 +278,7 @@ test.title              = 'Sinusoidal projection, center = 90';
 test.projection         = 'I';      % FIXME
 test.center             = 90;
 a03                     = sprintf('Test%.0fc',t);
-test.filename           = a03;
+in.filename           = a03;
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -294,7 +299,7 @@ function [files,info] = TEST4(in,files,info)
 
 t = 4;
 if ~ismember(t,in.test), return, end %then don't do this test
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % put them all in one pdf using conbine_pdfs
 
 test.lat = -90+.5:90-.5;
 test.lon = -180+.5:180-.5;
@@ -322,7 +327,7 @@ test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
 a0 = sprintf('Test%.0f',t);
-test.filename = a0;
+in.filename = a0;
 files{end+1} = gmt_plot (catstruct(test,in), 'data');
 
 a = ' demonstrates contour maps (see contour options in help gmt_plot), ';
@@ -339,7 +344,7 @@ function [files,info] = TEST5(in,gridded,files,info)
 t = 5;
 
 if ~ismember(t,in.test), return, end %then don't do this test
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % put them all in one pdf using conbine_pdfs
 
 % Add some annotations some intervals.
 if ~isfield(in,{'stepsize','nlevels'}) 
@@ -370,7 +375,7 @@ test.colorrange.color_model = 'RGB';
 % makes a colortable that goes from blue to white to green to black to red in RGB format.
 % ------------------------
 a0 = sprintf('Test%.0f',t);
-test.filename = a0;
+in.filename = a0;
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -389,7 +394,7 @@ function [files,info] = TEST6(in,files,info)
 t = 6;
 a0 = sprintf('Test%.0f',t);
 if ~ismember(t,in.test), return, end %then don't do this test
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % put them all in one pdf using conbine_pdfs
 
 names    = {'Kiruna','Brisbane','Stuttgart','Bremen','Idukki',...
     'Oberstdorf','Amsterdam','Lauchhammer','Freiburg'};
@@ -417,7 +422,7 @@ test.basemap_axis = 'neSW';
 test.title = 'SatGroup locations';
 test.nodata = true;
 test.region = '-20/160/-30/70';
-test.filename = sprintf('Test%.0fa',t);
+in.filename = sprintf('Test%.0fa',t);
 files{end+1} = gmt_plot(catstruct(test,in));
 
 % TEST: mediumregion
@@ -427,14 +432,14 @@ end
 test.region     = '-10/30/45/70';
 test.title      = 'Europe';
 test.coast.rivers = 'r';
-test.filename = sprintf('Test%.0fb',t);
+in.filename = sprintf('Test%.0fb',t);
 files{end+1}    = gmt_plot(catstruct(test,in));
 
 % TEST: smallregion
 % test.title = 'Kiruna (high details)';
 % test.region = '16/22/66.2/70';
 % test.coast.rivers = 'a';
-% test.filename = sprintf('Test%.0fc',t);
+% in.filename = sprintf('Test%.0fc',t);
 % files{end+1} = gmt_plot(catstruct(test,in));
 
 a = ' demonstrates that you can plot points and text on a map using';
@@ -447,7 +452,7 @@ function [files,info] = TEST7(in,files,info)
 %% TEST: pspolygon
 t = 7;
 if ~ismember(t,in.test),return, end %then don't do this test
-test.display = false; % no just put them all in one pdf using conbine_pdfs
+in.display = false; % put them all in one pdf using conbine_pdfs
 
 % REGIONS FROM eliasson11:assessing_acp
 a = [-12    80    16   100;...
@@ -484,7 +489,7 @@ test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g','g','g','g','g','g','g','g',
 test.nodata=true;
 test.basemap_axis='nWeS';
 a0 = sprintf('Test%.0f',t);
-test.filename = a0;
+in.filename = a0;
 files{end+1} = gmt_plot(catstruct(test,in));
 
 a = ' demonstrates that you can draw polygons on a map, using in.pspoly.';

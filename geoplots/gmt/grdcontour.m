@@ -14,6 +14,8 @@ function command = grdcontour(file,in)
 %location of file, region and projection
 grdcontour = sprintf('grdcontour %s -R -J',in.grdfile);
 
+grdcontour = sprintf('%s %s',grdcontour,in.plotPlacement);
+
 if isfield(in,'spacing')
     grdcontour = sprintf('%s -A%f',grdcontour,in.spacing);
 end

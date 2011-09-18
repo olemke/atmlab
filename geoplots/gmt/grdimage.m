@@ -16,14 +16,16 @@ grdimage = 'grdimage';
 %location of file, region and projection
 grdimage = sprintf('%s %s -R -J',grdimage,in.grdfile);
 
-%colortable
-grdimage = sprintf('%s -C%s',grdimage,in.plot.color.cptfile);
-
 %Use nearestneigbour interpolation, only use the nearest grid point
 %Otherwise the default bicubic interpolation introduces artifacts.
 grdimage = sprintf('%s -S-n/0',grdimage);
 
+grdimage = sprintf('%s %s',grdimage,in.plotPlacement);
+
 % selects Overlay plot mode and assuming more pscode will be appended
 grdimage = sprintf('%s -O -K',grdimage);
+
+%colortable
+grdimage = sprintf('%s -C%s',grdimage,in.plot.color.cptfile);
 
 command = sprintf('%s >> %s.ps',grdimage,file);

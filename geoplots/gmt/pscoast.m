@@ -13,6 +13,11 @@ function command = pscoast(file,in)
 
 pscoast = sprintf('pscoast -R -J');
 
+pscoast = sprintf('%s %s',pscoast,in.plotPlacement);
+
+% selects Overlay plot mode and assuming more pscode will be appended
+pscoast = sprintf('%s -O -K',pscoast);
+
 % set the minimal area of features to plot
 if isfield(in,'features')
     pscoast = sprintf('%s -A%f',pscoast,in.features);
@@ -37,8 +42,5 @@ end
 if isfield(in,'color') %for coast
     pscoast = sprintf('%s/%s',pscoast,in.color);
 end
-
-% selects Overlay plot mode and assuming more pscode will be appended
-pscoast = sprintf('%s -O -K',pscoast);
 
 command = sprintf('%s >> %s.ps',pscoast,file);

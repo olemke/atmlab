@@ -186,23 +186,25 @@ function basemap = setupbasemap(in)
 %% setupbasemap
 
 if ~isempty(in.title)
-    basemap = sprintf('psbasemap -B:."%s": -R%s -J%s -Ya5 -G -P -K > %s/%s.ps',...
-        gmt_unicode_converter(in.title),in.plot.region,in.plot.proj,in.tmpdir,in.filename);
+    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K -B:."%s": > %s/%s.ps',...
+        in.plot.region,in.plot.proj,in.plotPlacement,gmt_unicode_converter(in.title),in.tmpdir,in.filename);
+
 else
-    basemap = sprintf('psbasemap -R%s -J%s -Ya5 -G -P -K > %s/%s.ps',...
-        in.plot.region,in.plot.proj,in.tmpdir,in.filename);
+    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K > %s/%s.ps',...
+        in.plot.region,in.plot.proj,in.plotPlacement,in.tmpdir,in.filename);
 end
 
 function a = mkgrid(in)
 %% mkgrid %%
 % If nothing is given the increment and search radius is loosely based on the
-% density of the data points
+% density of the data points. nearneighbour uses the command: grdimage
 
 if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
     a='';
     return
 end
 a.ungriddedfile = in.ungriddedfile;
+a.plotPlacement = in.plotPlacement;
 
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'increment')
     
@@ -300,6 +302,8 @@ if ~isstruct(in.coast)
     a='';
     return
 end
+a.plotPlacement = in.plotPlacement;
+
 % Set resolution of coastal features
 rg=sscanf(in.plot.region,'%f/%f/%f/%f');
 ln=rg(2)-rg(1);
@@ -330,11 +334,12 @@ a.width = in.coast.width;
 function a = mkgrdcontour(in)                                                   
 %% mkgrdcontour
 
-default.cptfile = in.plot.color.cptfile;
-default.grdfile = in.grdfile;
+default.cptfile  = in.plot.color.cptfile;
+default.grdfile  = in.grdfile;
 
 for i = 1:length(in.contourline)
     a(i) = catstruct(default,in.contourline(i));
+    a(i).plotPlacement = in.plotPlacement;
 end
 
 
@@ -351,6 +356,7 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
             a.(f{1}) = in.(f{1});
         end
     end
+    a.plotPlacement = in.plotPlacement;
     
     % A little extra legend showig colors of NaNs
     if in.nanlegend
@@ -454,4 +460,4 @@ in = optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s',in.ticks);
 
-basemap = sprintf('%s  -R -J -O >> %s/%s.ps',basemap,in.tmpdir,in.filename);
+basemap = sprintf('%s -R -J %s -O >> %s/%s.ps',basemap,in.plotPlacement,in.tmpdir,in.filename);
