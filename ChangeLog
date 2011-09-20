@@ -1,5 +1,27 @@
 2011-09-20  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-196
+
+	* geographical/resample_geodata.m:
+	1) reference out structure to in structure so also unused fields
+	pass through the function.
+	2) no longer use == to check if the resolution of the new and old
+	grid id the same (use eps = 1e-5).
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot):
+	1) Decided to silently allow the input data to be on a grid
+	defined by its edges. I now internally call resample_geodata to
+	shift such a grid to a centered grid. This is OK since no data leaves
+	gmt_plot anyway.
+	2) Implemented a nicer way of automatically defining the region
+	using suitable formatstrings.
+	3) Made a subfunction for this, since it was already doing this
+	when deciding how to annotate the legend (how many decimals etc.)
+
+	* geoplots/gmt/test_gmt.m: cosmetics
+
+2011-09-20  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-195
 
 	* geoplots/gmt/test_gmt.m: Cosmetics

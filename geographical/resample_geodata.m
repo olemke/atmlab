@@ -71,6 +71,9 @@ errID = 'atmlab:resample_geodata:badInput';
 assert(nargin==3,errID,'Incorrect number of input arguments')
 if ~iscell(field), field={field}; end
 
+% rename the structure so nothing is lost after this function
+out = in;
+
 % CHECK input
 sz                                  = check_input(in,field,newgrid,errID);
 
@@ -91,11 +94,14 @@ end
 out.method                          = which_test(in.lat,in.lon,newlat,newlon);
 
 % PRINT to screen what is about to happen
-fprintf('Changing grid from %.3fx%.3f to %.3fx%.3f deg by method: %s\n',...
-    mean(abs(diff(in.lat))),mean(abs(diff(in.lon))),...
-    mean(diff(newlat)),mean(diff(newlon)),....
-    out.method)
-
+if strcmp(out.method,'shift grid')
+    logtext(1,'shifting the grid, keeping the same resolution\n')
+else
+    logtext(1,'Changing grid from %.3fx%.3f to %.3fx%.3f deg by method: %s\n',...
+        mean(abs(diff(in.lat))),mean(abs(diff(in.lon))),...
+        mean(diff(newlat)),mean(diff(newlon)),....
+        out.method)
+end
 
 %% LOOP over FIELDS to regrid
 for F = field
@@ -274,6 +280,8 @@ function method = which_test(LAT,LON,newlat,newlon)
 % first test is to see if the edges of the input grid match the edges of
 % the new grid
 
+eps = 1e-5; %this corresponds to 1 meter at the equator
+
 % diff averages
 dnlt = mean(diff(newlat));
 dnln = mean(diff(newlon));
@@ -301,8 +309,8 @@ cond3   = dlt < dnlt; %length(LAT) > length(newlat);
 cond4   = dln < dnln; %length(LON) > length(newlon);
 
 % same resolution
-cond5   = dlt == dnlt; %length(LAT) == length(newlat);
-cond6   = dln == dnln; %length(LON) == length(newlon);
+cond5   = abs(dlt-dnlt)<eps; %length(LAT) == length(newlat);
+cond6   = abs(dln-dnln)<eps; %length(LON) == length(newlon);
 
 % exact fit
 onLatEdges = ismember(nltb(1),ltb) && ismember(nltt(end),ltt);
