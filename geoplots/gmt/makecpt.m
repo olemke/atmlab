@@ -51,4 +51,4 @@ end
 cptfile = sprintf('%s/ctable.cpt',in.tmpdir);
 command = sprintf('%s > %s',mkcpt,cptfile);
 
-exec_system_cmd(command,in.verbosity);
+exec_system_cmd(command,gmtlab('verbosity'));

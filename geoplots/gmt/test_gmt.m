@@ -27,7 +27,6 @@ if ~exist('in','var'); in=struct([]); end
 
 % SET some defaults
 default.test      = 1:7; % which tests to do (default=all)
-default.verbosity = gmtlab('VERBOSITY');
 default.display   = true;
 default.filename  = 'all_tests' ;
 od = isfield(in,'outdir');
@@ -38,13 +37,15 @@ files = {}; info = {};
 assert(isnumeric(in.test),sprintf('atmlab:%s:bad_input',mfilename),...
     'in.test must be numeric')
 
+
 % for the final pdfs
-coltemplate = [2 2 3 1 1 2 1];
+coltemplate = [3 3 3 1 1 2 1];
 if isequal(in.test,1:7)
-    in.cols = coltemplate;
+    default.cols = coltemplate;
 else
-    in.cols = coltemplate(in.test);
+    default.cols = coltemplate(in.test);
 end
+in = optargs_struct(in,default); 
 
 if ~ischar(in.outdir)
     in.outdir = tempdir;
@@ -61,7 +62,7 @@ info  = {};
 [files,info]               = TEST1(in,gridded,files,info);
 
 %TEST: title, unit (gridded and ungridded)
-[files,info]               = TEST2(in,gridded,ungridded,files,info);
+[files,info]               = TEST2(in,ungridded,files,info);
 
 %TEST: sidebar, nan, projection, center
 [files,info]               = TEST3(in,gridded,files,info); 
@@ -108,7 +109,7 @@ if in.display
         a = 'No viewer defined. ';
         b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
         c = 'or type ''help gmtlab'' to learn more';
-        fprintf(2,'%s\n%s\n%s\n',a,b,c)
+        logtext(2,'%s\n%s\n%s\n',a,b,c)
         if ~system('which xpdf')
             openwith = 'xpdf';
         elseif ~system('which evince')
@@ -170,56 +171,10 @@ if ~ismember(t,in.test), return, end %then don't do this test
 
 in.display = false; % just put them all in one pdf using conbine_pdfs
 %% Test 1a
-
-
-gridded.data = gridded.data-200;  % for difference 
-test.ctable = 'mypolar';
-test.reference = 0;
-test.legend.sidebar = 3; % both above and below
-test.header_offset = -.5; %move the header down a bit because of smaller header size
-test.basemap_axis = 'neSW';
-test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
-a0 = sprintf('Test%.0fa',t);
-in.filename = a0;
-files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
-
-a = ' demonstrates the mypolar-colortable which is similar to polar.cpt';
-b = 'Using in.ctable=''mypolar'' you can define where the reference value';
-c = 'should be (here in.reference = 0). The white color is centered around this value.';
-d = 'in.basemap_axis = ''nSeW'' is tested, and means that the south (S) and west(W)';
-e = 'axes are labelled. in.sidebar = 3 is tested and means that triangles';
-f = 'above and below legend-range are shown to indicate the color of data outside the datarange';
-g = 'defined by in.datarange = [min max]. The title offset is set to -0.5 here (moving it down)';
-h = 'using in.header_offset = -0.5; See help gmt_plot for more details on these options';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
-
-test.legend.sidebar = 2; % above only
-test.basemap_axis = 'NEsw';
-test.nlevels = 15; 
-test.nwhite = 6;
-test.header_size = 20;
-test = rmfield(test,'header_offset');
-test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
-a0 = sprintf('Test%.0fb',t);
-in.filename = a0;
-files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
-
-a = ' demonstrates that you can change the number of intervals that are';
-b = 'colored white around the reference value when using the mypolar-colortable,';
-c = 'here in.nwhite = 6. You can also change the number of data intervals ';
-d = '(here in.nlevels = 15), change in.headersize (here in.headersize = 20)';
-e = 'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e);
-
-function [files,info] = TEST2(in,gridded,ungridded,files,info)
-%% TEST: title, unit (gridded and ungridded)
-t = 2;
-if ~ismember(t,in.test), return, end %then don't do this test
-in.display = false; % put them all in one pdf using conbine_pdfs
-
 test.title        = 'gridded: title², unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
+test.header_offset = -.5; %move the header down a bit because of smaller header size
 test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
 test.legend.tick_spacing = 25;
 a0 = sprintf('Test%.0fa',t);
@@ -234,20 +189,106 @@ e = '(here in.legend.position = ''9.35i/2i/3i/.5i''; %(''x-displacement/y-displa
 f = 'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25';
 info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
 
-test = rmfield(test,'legend');
-test.title           = 'ungridded: legend, coastlines';
+%% Test 1b
+gridded.data = gridded.data-200;  % for difference 
+test.ctable = 'mypolar';
+test.reference = 0;
+test.legend.sidebar = 3; % both above and below
+test.header_offset = -.5; %move the header down a bit because of smaller header size
+test.basemap_axis = 'neSW';
+test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
+a0 = sprintf('Test%.0fb',t);
+in.filename = a0;
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+a = ' demonstrates the mypolar-colortable which is similar to polar.cpt';
+b = 'Using in.ctable=''mypolar'' you can define where the reference value';
+c = 'should be (here in.reference = 0). The white color is centered around this value.';
+d = 'in.basemap_axis = ''nSeW'' is tested, and means that the south (S) and west(W)';
+e = 'axes are labelled. in.sidebar = 3 is tested and means that triangles';
+f = 'above and below legend-range are shown to indicate the color of data outside the datarange';
+g = 'defined by in.datarange = [min max]. The title offset is set to -0.5 here (moving it down)';
+h = 'using in.header_offset = -0.5; See help gmt_plot for more details on these options';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
+
+%% Test 1c
+test.legend.sidebar = 2; % above only
+test.basemap_axis = 'Nesw';
+test.nlevels = 15; 
+test.nwhite = 6;
+test.header_size = 20;
+test = rmfield(test,'header_offset');
+test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
+a0 = sprintf('Test%.0fc',t);
+in.filename = a0;
+files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
+
+a = ' demonstrates that you can change the number of intervals that are';
+b = 'colored white around the reference value when using the mypolar-colortable,';
+c = 'here in.nwhite = 6. You can also change the number of data intervals ';
+d = '(here in.nlevels = 15), change in.headersize (here in.headersize = 20)';
+e = 'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e);
+
+function [files,info] = TEST2(in,ungridded,files,info)
+%% TEST: title, unit (gridded and ungridded)
+t = 2;
+if ~ismember(t,in.test), return, end %then don't do this test
+in.display = false; % put them all in one pdf using conbine_pdfs
+
+%% test 2a
+r = 1;
+test.nearneighbor.resolution = r;
+test.unit            = 'kg/m²';
+test.basemap_axis    = 'neSW'; 
+test.title           = sprintf('ungridded: resolution = %.0f [deg]',r);
 test.coast.width     = 1;
 test.coast.color     = '255/255/255';
-a0 = sprintf('Test%.0fb',t);
-in.filename        = a0;
-test.unit            = 'kg/m²';
+a0 = sprintf('Test%.0fa',t);
+in.filename          = a0;
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
-a = ' demonstrates the same data as Test2a except in an ungridded form';
+a = ' demonstrates the same data as Test1a except in an ungridded form.';
+a1 = sprintf('%s is chosen to show that the user can decide how far to look for the next point',test.title);
+a2 = 'The search radius, where the values within are used to calculate the grid value,';
+a3 = 'is automatically in.nearneighbor * 1.5';
 b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
 c = 'for plotting satellite granule data directly. You can also change the';
 d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,a1,a2,a3,b,c,d);
+
+%% test 2b
+r = 10;
+test.nearneighbor.resolution = r;
+test.title         = sprintf('ungridded: resolution = %.0f [deg]',r);
+a0                 = sprintf('Test%.0fb',t);
+in.filename        = a0;
+files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
+
+a1 = sprintf(' %s is chosen to show that the user can decide how far to look for the next point',test.title);
+a2 = 'The search radius, where the values within are used to calculate the grid value,';
+a3 = 'is automatically set to in.nearneighbor.resolution * 1.5';
+b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
+c = 'for plotting satellite granule data directly. You can also change the';
+d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a1,a2,a3,b,c,d);
+
+%% test 2c
+r = 60;
+test.nearneighbor.resolution = r;
+test.title         = sprintf('ungridded: resolution = %.0f [deg]',r);
+a0                 = sprintf('Test%.0fc',t);
+in.filename        = a0;
+files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
+
+a1 = sprintf(' %s is chosen to show that the user can decide how far to look for the next point',test.title);
+a2 = 'The search radius, where the values within are used to calculate the grid value,';
+a3 = 'is automatically set to in.nearneighbor.resolution * 1.5';
+b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
+c = 'for plotting satellite granule data directly. You can also change the';
+d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a1,a2,a3,b,c,d);
+
 
 function [files,info] = TEST3(in,gridded,files,info)
 %% TEST: sidebar, nan, projection, center
@@ -256,24 +297,29 @@ t = 3;
 if ~ismember(t,in.test),return, end %then don't do this test
 in.display = false; % put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
+test.datarange = [160,250];
+test.nlevels   = 18;
 test.title      = 'upper sidebar, NaN, Hammer projection, center=180';
 test.legend.orientation = 'h';
 test.projection         =  'H';
 test.center             = 180;      % Center map at given center longitude
 test.datarange          = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
 a0                      = sprintf('Test%.0fa',t);
-in.filename           = a0;
+in.filename             = a0;
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-test.title              = 'Robinsson projection, center = 0 ';
-test.projection         = 'N';
-test.center             = 0;
-a02                     = sprintf('Test%.0fb',t);
-in.filename           = a02;
+test.title               = 'Robinsson projection, center = 0 ';
+test.projection          = 'N';
+test.center              = 0;
+test.legend.tick_spacing = 10;
+a02                      = sprintf('Test%.0fb',t);
+in.filename              = a02;
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
+%test.legend = rmfield(test.legend,'tick_spacing');
+test.legend.tick_spacing = 15;
 test.title              = 'Sinusoidal projection, center = 90';
 test.projection         = 'I';      % FIXME
 test.center             = 90;
@@ -292,7 +338,8 @@ f = 'NaN-legend using in.nanlegend = false. The upper sidebar is automatically s
 g = 'if there are data larger than in.datarange(2), given via in.datarange = [v1,v2].';
 h = 'The color for these values can be changed using';
 i = 'in.color_foreground (default is ''255/255/255'' (white))';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,a1,b,c,d,e,f,g,h,i);
+j = 'Test 3 also shows the use of in.legend.tick_spacing = default,10,15 for a,b,c respectively.';
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,a1,b,c,d,e,f,g,h,i,j);
 
 function [files,info] = TEST4(in,files,info)
 %% TEST: contours, nlevels, annotation format, xunit

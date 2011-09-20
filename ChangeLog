@@ -1,3 +1,27 @@
+2011-09-20  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-194
+
+	* geoplots/gmt/test_gmt.m:
+	1) Fixed so the user can input in.cols for the combine_pdfs call
+	2) Added 2 more ungridded tests
+	3) demonstrated in.legend.tick_spacing to test 3, and made the
+	legend nicer
+
+	* geoplots/gmt/gmt_plot.m:
+	1) changed input name in.nearneighbor.increment to
+	in.nearneighbor.resolution
+	2) Use logtext instead of fprintf.
+
+	* geoplots/gmt/makecpt.m:
+	Adapted to new conditions
+
+	* geoplots/gmt/create_gmt_earth.m:
+	1) fixed nearneighbor bug
+	2) smarter automatic resolutions. Max automatic global resolution is
+	1 minute (1/60 deg).
+	3) use logtext instead of fprintf
+
 2011-09-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-193

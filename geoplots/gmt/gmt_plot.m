@@ -32,6 +32,7 @@ function filename = gmt_plot(in,field)
 % gmtlab( 'PSVIEWER','gv');             %% set viewer for .ps files
 % gmtlab( 'PDFVIEWER','xpdf -z width'); %% set viewer for .pdf files
 % gmtlab( 'OPEN_COMMAND','gnome-open'); %% set a general open command
+% gmtlab( 'VERBOSITY',1); %% This outputs stdout on the screen.
 %    
 % Structure contents: 
 %
@@ -49,8 +50,8 @@ function filename = gmt_plot(in,field)
 % [length(in.lat),length(in.lon)] == size(in.(field));
 %  << transpose: in.(field) = in.(field)'; if this is not the case >>
 %
-% NOTE: 1) If your data is UNGRIDDED I recommend setting in.increment =
-%          arcminutes (default = 60) to something suitable.
+% NOTE: 1) If your data is UNGRIDDED I recommend setting
+%          in.nearneighbor.resolution = Deg (something suitable).
 %       2) gmt_plot automatically detects if the data is gridded or not
 %
 %
@@ -114,8 +115,6 @@ function filename = gmt_plot(in,field)
 %                     ------------                     
 % in.unit             |%s| String displayed on the y-axis of legend | '' |
 %                     ------------
-% in.verbosity        |%f| Display non essential output | gmtlab('VERBOSITY') | 
-%                     ------------                     
 % in.xunit            |%s| String displayed on the x-axis of legend | '' |
 %                     ------------
 % in.plotPlacement    |%s| String of global plotPlacements | '-Ya5 -Xa5' |
@@ -137,15 +136,15 @@ function filename = gmt_plot(in,field)
 %                     | [] |
 %                     ----------------------
 %
-% in.nearneighhbor.   | STRUCTURE with one or more of the following fields:  
+% in.nearneighbor.    | STRUCTURE with one or more of the following fields:  
 %
 %  search             |%s| 
 %                     E.g. 30m' Search for data within 30 [arcmin]
 %                     | Loosely based on the density of the data points |
 %                     ------------
-%  increment          |%s| 
-%                     E.g. '60m' Increment the grid by 60 [arcmin] = 1deg
-%                     | Loosely based on the density of the data points |
+%  resolution         |%f| 
+%                     E.g. 1 [Deg] (== 60minuntes) looks for values withing 1deg
+%                     | Loosely based on the density of the data points, or avialable memory |
 %
 %                     ----------------------
 %
@@ -372,7 +371,7 @@ function filename = gmt_plot(in,field)
 %                     legend should be spread. x=> every xth data value,
 %                     1=>same number of ticks as datarange
 %                     | one tick per data level |
-%                     NOTE: This options is desirable if you have many 
+%                     NOTE: This option is desirable if you have many 
 %                     data levels.
 %                     ------------                        
 %  width              |%f| or |%s|
@@ -533,18 +532,20 @@ end
 
 out = set_GMT_plot(in,field);
 
-% make TEMPDIR & cleanup after I'm done
+% make TEMPDIR and set atmlab('VERBOSITY') to gmtlab('VERBOSITY')
+% cleanup after I'm done
 out.tmpdir = create_tmpfolder();
-p = pwd();
-cleanupObject = onCleanup(@() cleanup(out.tmpdir,p,out.keep_files));
+p = pwd(); V = atmlab('VERBOSITY');
+cleanupObject = onCleanup(@() cleanup(out.tmpdir,p,out.keep_files,V));
+
+atmlab('VERBOSITY',gmtlab('VERBOSITY'));
+
 cd(out.tmpdir);
 
 if out.gridded
     out.grdfile = sprintf('%s/%s.grd',out.tmpdir,out.filename);
     gmt_nc_save_gridded(out.lon,out.lat,out.(field),out.grdfile);
-    if out.verbosity
-        fprintf('Writing grdfile: %s sucessfull\n',out.grdfile)
-    end
+    logtext(1,'Writing grdfile: %s sucessfull\n',out.grdfile)
 else
     if ~out.nodata
         out.ungriddedfile = sprintf('%s/%s.nc',out.tmpdir,out.filename);
@@ -581,7 +582,6 @@ end
 % SET DEFAULTS
 % general
 default.basemap_axis      = 'nSeW';             % Annotates West and South of the map.
-default.verbosity         = gmtlab('VERBOSITY');% Display non essential stdout in command window
 default.display           = true;               % Display figure to screen
 default.figuretype        = 'pdf';              % default figure
 default.outdir            = gmtlab('OUTDIR');   % where to put the figure
@@ -798,7 +798,7 @@ if in.display && ~any(isnan(openwith))
         openwith,in.outdir,in.filename,in.figuretype);
 end
 
-out = exec_system_cmd(command,in.verbosity); % execute all gathered commands
+out = exec_system_cmd(command,gmtlab('verbosity')); % execute all gathered commands
 
 filename = sprintf('%s/%s.%s',in.outdir,in.filename,in.figuretype);
 
@@ -814,7 +814,7 @@ if in.display && any(isnan(openwith)) && strcmp(in.figuretype,'pdf')
         openwith  = 'okular'; % for kde users
     end
     if ~any(isnan(openwith))
-        fprintf('Opening file with %s for now\n',openwith)
+        logtext(1,'Opening file with %s for now\n',openwith)
         system(sprintf('%s %s &',openwith,filename));
     end
 end
@@ -831,7 +831,7 @@ function file = makelegendpdf(command,in)
 file = fullfile(in.outdir,'legend');
 
 %make sure it's not here
-exec_system_cmd(sprintf('rm -f %s.ps',file),in.verbosity);
+exec_system_cmd(sprintf('rm -f %s.ps',file),gmtlab('verbosity'));
 
 % Make the page large enough to fit most legends
 cmd = {'gmtset PAPER_MEDIA a0'};
@@ -853,7 +853,7 @@ end
 
 command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
 
-exec_system_cmd(command,in.verbosity);
+exec_system_cmd(command,gmtlab('verbosity'));
 
 %% SUBFUNCTIONS FOR SETUP
 %      ||||||
@@ -1014,9 +1014,11 @@ associated_w_errors  = command(eindex);
 
 % display GMT calls containing warning
 if ~isempty(Warnings)
-    fprintf('\nGMT completed with the following warning messages:\n')
+    V = atmlab('VERBOSITY'); atmlab('VERBOSITY',1);
+    logtext(1,'\nGMT completed with the following warning messages:\n')
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_warning,Warnings,'UniformOutput',0);
-    fprintf('%s\n',[tmp{:}])
+    logtext(1,'%s\n',[tmp{:}])
+    atmlab('VERBOSITY',V);
 end
 
 % error on GMT errors
@@ -1025,16 +1027,15 @@ if ~isempty(Errors)
     error('gmtlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
 end
 
-function cleanup(tmpdir,curdir,keepfiles)
+function cleanup(tmpdir,curdir,keepfiles,V)
 
 if keepfiles
-    fprintf('in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
-    fprintf(2,'Remember to delete the directory when you are done\n')
+    logtext(1,'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
+    logtext(2,'Remember to delete the directory when you are done\n')
 else
     % cd back to the original directory
     cd(curdir);
     rmdir(tmpdir,'s')
-    if gmtlab('VERBOSITY')
-        fprintf('%s is now removed\n',tmpdir)
-    end
+    logtext(1,'%s is now removed\n',tmpdir)
+    atmlab('VERBOSITY',V);
 end
