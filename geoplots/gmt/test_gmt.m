@@ -171,7 +171,7 @@ if ~ismember(t,in.test), return, end %then don't do this test
 
 in.display = false; % just put them all in one pdf using conbine_pdfs
 %% Test 1a
-test.title        = 'gridded: title², unit';
+test.title        = 'gridded: title² (offset), unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
 test.header_offset = -.5; %move the header down a bit because of smaller header size
@@ -184,17 +184,18 @@ files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 a = ' demonstrates that you can include some special';
 b = 'characters in in.title and in.unit. This test uses ';
 c = 'gridded data, where size(data) = [length(lat),length(lon)]';
+c1 = 'Use in.header_offset my shift the title wrt the plot';
 d = 'You can also change the size and position of the legend';
 e = '(here in.legend.position = ''9.35i/2i/3i/.5i''; %(''x-displacement/y-displacement/height/width''))';
 f = 'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
+info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,c1,d,e,f);
 
 %% Test 1b
 gridded.data = gridded.data-200;  % for difference 
 test.ctable = 'mypolar';
 test.reference = 0;
 test.legend.sidebar = 3; % both above and below
-test.header_offset = -.5; %move the header down a bit because of smaller header size
+test = rmfield(test,'header_offset'); %move the header down a bit because of smaller header size
 test.basemap_axis = 'neSW';
 test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
 a0 = sprintf('Test%.0fb',t);
@@ -217,7 +218,6 @@ test.basemap_axis = 'Nesw';
 test.nlevels = 15; 
 test.nwhite = 6;
 test.header_size = 20;
-test = rmfield(test,'header_offset');
 test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
 a0 = sprintf('Test%.0fc',t);
 in.filename = a0;
