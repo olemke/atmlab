@@ -3,8 +3,8 @@ function filename = gmt_plot(in,field)
 %
 % The function is basically a wrapper that calls gmt shell commands using easy
 % to use matlab arguments. Try test_gmt.m for some examples on how to use the function.
-% It is assumed that the data is CENTERED at the corresponding lat/lon points.
-%
+% Preferably, the data should be CENTERED if the data is gridded (fastest
+% performance).
 %
 % OUT   filename  The filename of the figure.
 %
@@ -655,13 +655,9 @@ if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
     [flags,in.lat,in.lon,in.(field)] = homogenize_datalatlon(in.lat,in.lon,in.(field));
-    %     assert( (min(in.lat)>-90 || max(in.lat)<90) && ...
-    %         (min(in.lon)>-180 || max(in.lon)<180),...
-    %         errId,'Data does not appear to be centered')
-    % I allow this now
-    if ~( (min(in.lat)>-90 || max(in.lat)<90) && ...
-            (min(in.lon)>-180 || max(in.lon)<180))
-        logtext(2,'Data does not appear to be centered. Internally ')
+
+    if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
+        logtext(1,'Data does not appear to be centered. Internally ')
         in = centerGeoData(in,field);
     end
 end

@@ -1,3 +1,13 @@
+2011-09-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-197
+
+	* geoplots/gmt/gmt_plot.m:
+	1) Fixed lame test to see if the data is centered.
+	2) Updated the help section to only say that the data
+	should preferably be centered for speed (otherwise
+	resample_geodata will be called upon)
+
 2011-09-20  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-196
