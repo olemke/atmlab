@@ -1,5 +1,15 @@
 2011-09-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-198
+
+	* geographical/homogenize_datalatlon.m (homogenize_datalatlon):
+	Made a little nicer before programming meeting (without changing
+	any behaviour)
+
+	* geographical/geo_single_localtime.m: Puny edit
+
+2011-09-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-197
 
 	* geoplots/gmt/gmt_plot.m:

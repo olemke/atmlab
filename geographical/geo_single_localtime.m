@@ -33,7 +33,7 @@ function data = geo_single_localtime(utcvec,localtime,data,lon,lat,method)
 %
 % $Id$
 
-if nargin < 6
+if ~exist('method','var')
     method = 'linear';
 end
 
