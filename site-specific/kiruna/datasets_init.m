@@ -53,7 +53,7 @@ datasets_config('cloudsat_2B_CWC_RO_basedir', datasets_config('cpr_basedir'));
 datasets_config('cloudsat_2B_CWC_RO_subdir', datasets_config('cpr_subdir'));
 datasets_config('cloudsat_2B_CWC_RO_regexp', datasets_config('cpr_regexp'));
 
-datasets_config('cloudsat_2B_CWC_RVOD_basedir', '/storage3/data/cloudsat/2B_CWC_RVOD.R04/');
+datasets_config('cloudsat_2B_CWC_RVOD_basedir', '/storage3/data/cloudsat/2B-CWC-RVOD.R04/');
 datasets_config('cloudsat_2B_CWC_RVOD_subdir', datasets_config('cpr_subdir'));
 datasets_config('cloudsat_2B_CWC_RVOD_regexp', datasets_config('cpr_regexp'));
 
@@ -117,7 +117,7 @@ datasets_config('modis_MYD06_L2_regexp' ,'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})
 
 datasets_config('mspps_basedir', '/storage3/data/mspps');
 datasets_config('mspps_subdir', '$SAT_orbital_$YEAR4/$MONTH/$DAY');
-datasets_config('mspps_regexp', '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$');
+datasets_config('mspps_regexp','(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$|\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$');
 
 datasets_config('patmosx_L2b_basedir','/storage3/data/patmosx/level2b/');
 datasets_config('patmosx_L2b_subdir' ,'$YEAR4' );

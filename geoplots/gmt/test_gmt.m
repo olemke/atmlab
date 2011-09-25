@@ -177,18 +177,19 @@ test.basemap_axis = 'neSW';
 test.header_offset = -.3; %move the header down a bit because of smaller header size
 test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
 test.legend.tick_spacing = 25;
-a0 = sprintf('Test%.0fa',t);
-in.filename = a0;
+
+in.filename = sprintf('Test%.0fa',t);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = ' demonstrates that you can include some special';
-b = 'characters in in.title and in.unit. This test uses ';
-c = 'gridded data, where size(data) = [length(lat),length(lon)]';
-c1 = 'Use in.header_offset my shift the title wrt the plot';
-d = 'You can also change the size and position of the legend';
-e = '(here in.legend.position = ''9.35i/2i/3i/.5i''; %(''x-displacement/y-displacement/height/width''))';
-f = 'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,c1,d,e,f);
+x = {'Test 1a demonstrates that you can include some special',...
+'characters in in.title and in.unit. This test uses ',...
+'gridded data, where size(data) = [length(lat),length(lon)]',...
+'Use in.header_offset my shift the title wrt the plot',...
+'You can also change the size and position of the legend',...
+'(here in.legend.position = ''9.35i/2i/3i/.5i''; %(''x-displacement/y-displacement/height/width''))',...
+'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25'};
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 %% Test 1b
 gridded.data = gridded.data-200;  % for difference 
@@ -198,19 +199,19 @@ test.legend.sidebar = 3; % both above and below
 test = rmfield(test,'header_offset'); %move the header down a bit because of smaller header size
 test.basemap_axis = 'neSW';
 test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
-a0 = sprintf('Test%.0fb',t);
-in.filename = a0;
+in.filename = sprintf('Test%.0fb',t);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = ' demonstrates the mypolar-colortable which is similar to polar.cpt';
-b = 'Using in.ctable=''mypolar'' you can define where the reference value';
-c = 'should be (here in.reference = 0). The white color is centered around this value.';
-d = 'in.basemap_axis = ''nSeW'' is tested, and means that the south (S) and west(W)';
-e = 'axes are labelled. in.sidebar = 3 is tested and means that triangles';
-f = 'above and below legend-range are shown to indicate the color of data outside the datarange';
-g = 'defined by in.datarange = [min max]. The title offset is set to -0.5 here (moving it down)';
-h = 'using in.header_offset = -0.5; See help gmt_plot for more details on these options';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
+x = {'Test 1b demonstrates the mypolar-colortable which is similar to polar.cpt',...
+'Using in.ctable=''mypolar'' you can define where the reference value',...
+'should be (here in.reference = 0). The white color is centered around this value.',...
+'in.basemap_axis = ''nSeW'' is tested, and means that the south (S) and west(W)',...
+'axes are labelled. in.sidebar = 3 is tested and means that triangles',...
+'above and below legend-range are shown to indicate the color of data outside the datarange',...
+'defined by in.datarange = [min max]. The title offset is set to -0.5 here (moving it down)',...
+'using in.header_offset = -0.5; See help gmt_plot for more details on these options'};
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 %% Test 1c
 test.legend.sidebar = 2; % above only
@@ -219,16 +220,16 @@ test.nlevels = 15;
 test.nwhite = 6;
 test.header_size = 20;
 test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
-a0 = sprintf('Test%.0fc',t);
-in.filename = a0;
+in.filename = sprintf('Test%.0fc',t);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = ' demonstrates that you can change the number of intervals that are';
-b = 'colored white around the reference value when using the mypolar-colortable,';
-c = 'here in.nwhite = 6. You can also change the number of data intervals ';
-d = '(here in.nlevels = 15), change in.headersize (here in.headersize = 20)';
-e = 'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e);
+x = {'Test 1c demonstrates that you can change the number of intervals that are',...
+'colored white around the reference value when using the mypolar-colortable,',...
+'here in.nwhite = 6. You can also change the number of data intervals ',...
+'(here in.nlevels = 15), change in.headersize (here in.headersize = 20)',...
+'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)'};
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 function [files,info] = TEST2(in,ungridded,files,info)
 %% TEST: title, unit (gridded and ungridded)
@@ -248,47 +249,47 @@ a0 = sprintf('Test%.0fa',t);
 in.filename          = a0;
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
-a = ' demonstrates the same data as Test1a except in an ungridded form.';
-a1 = sprintf('%s is chosen to show that the user can decide how far to look for the next point',test.title);
-a2 = 'The search radius, where the values within are used to calculate the grid value,';
-a3 = 'is automatically in.nearneighbor * 1.5';
-b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
-c = 'for plotting satellite granule data directly. You can also change the';
-d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,a1,a2,a3,b,c,d);
+x = {'Test 2a demonstrates the same data as Test1a except in an ungridded form.',...
+'Test 2a is chosen to show that the user can decide how far to look for the next point',...
+'The search radius, where the values within are used to calculate the grid value,',...
+'is automatically in.nearneighbor * 1.5',...
+'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good',...
+'for plotting satellite granule data directly. You can also change the',...
+'color of the coastlines, e.g. in.coast.color = ''255/255/255.'''};
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 %% test 2b
 r = 10;
 test.nearneighbor.resolution = r;
 test.title         = sprintf('ungridded: resolution = %.0f [deg]',r);
-a0                 = sprintf('Test%.0fb',t);
-in.filename        = a0;
+in.filename        = sprintf('Test%.0fb',t);
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
-a1 = sprintf(' %s is chosen to show that the user can decide how far to look for the next point',test.title);
-a2 = 'The search radius, where the values within are used to calculate the grid value,';
-a3 = 'is automatically set to in.nearneighbor.resolution * 1.5';
-b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
-c = 'for plotting satellite granule data directly. You can also change the';
-d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a1,a2,a3,b,c,d);
+x = {'Test 2b is chosen to show that the user can decide how far to look for the next point',...
+'The search radius, where the values within are used to calculate the grid value,',...
+'is automatically set to in.nearneighbor.resolution * 1.5',...
+'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good',...
+'for plotting satellite granule data directly. You can also change the',...
+'color of the coastlines, e.g. in.coast.color = ''255/255/255.'''};
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 %% test 2c
 r = 60;
 test.nearneighbor.resolution = r;
 test.title         = sprintf('ungridded: resolution = %.0f [deg]',r);
-a0                 = sprintf('Test%.0fc',t);
-in.filename        = a0;
+in.filename        = sprintf('Test%.0fc',t);
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
-a1 = sprintf(' %s is chosen to show that the user can decide how far to look for the next point',test.title);
-a2 = 'The search radius, where the values within are used to calculate the grid value,';
-a3 = 'is automatically set to in.nearneighbor.resolution * 1.5';
-b = 'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good';
-c = 'for plotting satellite granule data directly. You can also change the';
-d = 'color of the coastlines, e.g. in.coast.color = ''255/255/255.''';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a1,a2,a3,b,c,d);
-
+x = {'Test 2c is chosen to show that the user can decide how far to look for the next point',...
+'The search radius, where the values within are used to calculate the grid value,',...
+'is automatically set to in.nearneighbor.resolution * 1.5',...
+'isequal(size(in.data),size(in.lat),size(in.lon))==1. This is e.g. good',...
+'for plotting satellite granule data directly. You can also change the',...
+'color of the coastlines, e.g. in.coast.color = ''255/255/255.'''};
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 function [files,info] = TEST3(in,gridded,files,info)
 %% TEST: sidebar, nan, projection, center
@@ -304,8 +305,8 @@ test.legend.orientation = 'h';
 test.projection         =  'H';
 test.center             = 180;      % Center map at given center longitude
 test.datarange          = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
-a0                      = sprintf('Test%.0fa',t);
-in.filename             = a0;
+
+in.filename             = sprintf('Test%.0fa',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -313,8 +314,7 @@ test.title               = 'Robinsson projection, center = 0 ';
 test.projection          = 'N';
 test.center              = 0;
 test.legend.tick_spacing = 10;
-a02                      = sprintf('Test%.0fb',t);
-in.filename              = a02;
+in.filename              = sprintf('Test%.0fb',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -323,23 +323,24 @@ test.legend.tick_spacing = 15;
 test.title              = 'Sinusoidal projection, center = 90';
 test.projection         = 'I';      % FIXME
 test.center             = 90;
-a03                     = sprintf('Test%.0fc',t);
-in.filename           = a03;
+in.filename             = sprintf('Test%.0fc',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = 'Test 3 demonstrates the Hammer, Robinsson and sinusoidal projections ';
-a1 = '(using in.projection = ''H''/''R''/''I''), ';
-b = 'one of many available projections. The test also demonstrates that you can';
-c = 'easily change the center of the projection to e.g. 180E using in.center = 180.';
-d = 'The grey region in the map indicates NaN values, and an extra NaN color box';
-e = 'is automatically added below the vertical legend. You can suppress the extra';
-f = 'NaN-legend using in.nanlegend = false. The upper sidebar is automatically shown';
-g = 'if there are data larger than in.datarange(2), given via in.datarange = [v1,v2].';
-h = 'The color for these values can be changed using';
-i = 'in.color_foreground (default is ''255/255/255'' (white))';
-j = 'Test 3 also shows the use of in.legend.tick_spacing = default,10,15 for a,b,c respectively.';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a,a1,b,c,d,e,f,g,h,i,j);
+x = {'Test 3 demonstrates the Hammer, Robinsson and sinusoidal projections ',...
+'(using in.projection = ''H''/''R''/''I''), ',...
+'one of many available projections. The test also demonstrates that you can',...
+'easily change the center of the projection to e.g. 180E using in.center = 180.',...
+'The grey region in the map indicates NaN values, and an extra NaN color box',...
+'is automatically added below the vertical legend. You can suppress the extra',...
+'NaN-legend using in.nanlegend = false. The upper sidebar is automatically shown',...
+'if there are data larger than in.datarange(2), given via in.datarange = [v1,v2].',...
+'The color for these values can be changed using',...
+'in.color_foreground (default is ''255/255/255'' (white))',...
+'Test 3 also shows the use of in.legend.tick_spacing = default,10,15 for a,b,c respectively.'};
+
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 function [files,info] = TEST4(in,files,info)
 %% TEST: contours, nlevels, annotation format, xunit
@@ -373,18 +374,18 @@ test.color_foreground = '255/255/0';
 test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
-a0 = sprintf('Test%.0f',t);
-in.filename = a0;
+in.filename = sprintf('Test%.0f',t);
 files{end+1} = gmt_plot (catstruct(test,in), 'data');
 
-a = ' demonstrates contour maps (see contour options in help gmt_plot), ';
-b = 'where you can optionally choose to show highs and lows in the of the data.';
-c = 'It also demonstrated that you can have x and y-labels';
-d = '(in.xunit=''no unit either'' and in.unit=''no unit'') around the legend';
-e = 'Using the custom colortable (in.colorrange) you can also use';
-f = 'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''';
+x = {'Test 4 demonstrates contour maps (see contour options in help gmt_plot), ',...
+'where you can optionally choose to show highs and lows in the of the data.',...
+'It also demonstrated that you can have x and y-labels',...
+'(in.xunit=''no unit either'' and in.unit=''no unit'') around the legend',...
+'Using the custom colortable (in.colorrange) you can also use',...
+'in.colorrange.color_model = ''HSV'' instead of the default ''RGB'''};
 
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f);
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 function [files,info] = TEST5(in,gridded,files,info) 
 %% TEST: custom color table, header_size, map_width, grid lines, region
@@ -421,25 +422,26 @@ test.colorrange.colors  = {{0,'0/0/255'},...
 test.colorrange.color_model = 'RGB';
 % makes a colortable that goes from blue to white to green to black to red in RGB format.
 % ------------------------
-a0 = sprintf('Test%.0f',t);
-in.filename = a0;
 
+in.filename = sprintf('Test%.0f',t);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-a = ' demonstrates that you can easily make your own custom colortable using in.colorrange.';
-b = 'You can also insert your own legend annotations to be used instead of';
-c = 'data values using in.legend.tick_annotations. You can also change in.mapwidth,';
-d = 'in.headersize, the tick spacing for the axis using in.ticks,';
-e = 'and in this test its demonstrated how to confine the figure to certain';
-f = 'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''';
-g = 'The legend is also automatically made horizontal if the base/height > 3';
-h = 'This can easily be overridden by setting in.orientation.orientation = ''v'' ';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n',a0,a,b,c,d,e,f,g,h);
+x = {'Test 5 demonstrates that you can easily make your own custom colortable using in.colorrange.',...
+'You can also insert your own legend annotations to be used instead of',...
+'data values using in.legend.tick_annotations. You can also change in.mapwidth,',...
+'in.headersize, the tick spacing for the axis using in.ticks,',...
+'and in this test its demonstrated how to confine the figure to certain',...
+'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''',...
+'The legend is also automatically made horizontal if the base/height > 3',...
+'This can easily be overridden by setting in.orientation.orientation = ''v'' '};
+
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 function [files,info] = TEST6(in,files,info)
 %% TEST: locations, nodata 
 t = 6;
-a0 = sprintf('Test%.0f',t);
+
 if ~ismember(t,in.test), return, end %then don't do this test
 in.display = false; % put them all in one pdf using conbine_pdfs
 
@@ -489,11 +491,13 @@ files{end+1}    = gmt_plot(catstruct(test,in));
 % in.filename = sprintf('Test%.0fc',t);
 % files{end+1} = gmt_plot(catstruct(test,in));
 
-a = ' demonstrates that you can plot points and text on a map using';
-b = 'in.locations (see help gmt_plot), and demonstrates that there are';
-c = 'several map resolutions available.';
-d = 'The available file types in.figuretype are ''pdf'',''eps'',''png'', and ''tif''';
-info{end+1} = sprintf('%s%s\n%s\n%s\n%s\n',a0,a,b,c,d);
+x = {'Test 6 demonstrates that you can plot points and text on a map using',...
+'in.locations (see help gmt_plot), and demonstrates that there are',...
+'several map resolutions available.',...
+'The available file types in.figuretype are ''pdf'',''eps'',''png'', and ''tif'''};
+
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});
 
 function [files,info] = TEST7(in,files,info)
 %% TEST: pspolygon
@@ -535,11 +539,11 @@ test.pspoly = reg;
 test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g','g','g','g','g','g','g','g','g','g','g'};
 test.nodata=true;
 test.basemap_axis='nWeS';
-a0 = sprintf('Test%.0f',t);
-in.filename = a0;
+in.filename = sprintf('Test%.0f',t);
 files{end+1} = gmt_plot(catstruct(test,in));
 
-a = ' demonstrates that you can draw polygons on a map, using in.pspoly.';
-b = 'E.g. useful if you want to draw regions of interest on a map';
+x = {'Test7 demonstrates that you can draw polygons on a map, using in.pspoly.',...
+'E.g. useful if you want to draw regions of interest on a map'};
 
-info{end+1} = sprintf('%s%s\n%s\n',a0,a,b);
+formstr = repmat('%s\n',1,length(x));
+info{end+1} = sprintf(formstr,x{:});

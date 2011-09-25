@@ -1,3 +1,12 @@
+2011-09-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-199
+
+	* geoplots/gmt/test_gmt.m:
+	Nicer programming to generate strings for info cell.
+
+	* site-specific/kiruna/datasets_init.m: Fixed 2 erroneous entries
+
 2011-09-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-198
