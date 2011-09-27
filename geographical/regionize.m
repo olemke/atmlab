@@ -119,7 +119,7 @@ assert(isequal(a(1:2),[length(lat),length(lon)]) || isequal(a(1:2),[length(lon),
 
 
 % make sure conventions are followed
-[flags,outlat,outlon,outdata] = homogenize_datalatlon(lat(:),lon(:),data);
+[flags,outlat,outlon,outdata] = standardize_geodata(lat(:),lon(:),data);
 
 function [logical_field,periphery] = get_logicalfield(in,corner,dlt,dln)
 %% get_logicalfield

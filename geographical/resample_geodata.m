@@ -80,8 +80,8 @@ sz                                  = check_input(in,field,newgrid,errID);
 % ASSEMBLE_newgrid
 [newlat,newlon]                     = assemble_newgrid(in.lat,in.lon,newgrid,errID);
 
-% HOMOGENIZE "new grid" internally
-[rg_flags,newlat,newlon]            = homogenize_datalatlon(newlat,newlon);
+% STANDARDIZE "new grid" internally
+[rg_flags,newlat,newlon]            = standardize_geodata(newlat,newlon);
 
 % LEAVE function if nothing needs to be done
 if isequal(in.lat(:),newlat(:)) && isequal(in.lon(:),newlon(:))
@@ -110,8 +110,8 @@ for F = field
     % COLLAPSE data onto the 3rd dimesion
     data = in.(F{1})(:,:,:);
     
-    % HOMOGENIZE "input" data internally
-    [flags,lat,lon,data]  = homogenize_datalatlon(in.lat,in.lon,data);
+    % STANDARDIZE "input" data internally
+    [flags,lat,lon,data]  = standardize_geodata(in.lat,in.lon,data);
 
     % CHECK for every field
     assert(isequal(fsz(1:2),sz(1:2)),...

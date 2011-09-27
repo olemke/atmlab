@@ -12,7 +12,7 @@ function data = geo_single_localtime(utcvec,localtime,data,lon,lat,method)
 %                                       size(data,1)= length(lon) &&
 %                                       size(data,4)=length(utcvect)
 %     lon         [%f,...]              longitudes vector
-%     lat         [%f,...]              latitudes vector (needed for function homogenize_datalatlon)
+%     lat         [%f,...]              latitudes vector (needed for function standardize_geodata)
 %     method      %s                    The method interp1 will use (default='linear')
 %
 % OUT
@@ -44,13 +44,13 @@ assert( ( isequal(size(data,1),length(lon)) || isequal(size(data,2),length(lon))
     'atmlab:lcl_time_array:badInput','See usage')
 
 % INTERNALLY make lons -180:180 and adjust data accordingly
-[flags,lat,lon,data] = homogenize_datalatlon(lat,lon,data);
+[flags,lat,lon,data] = standardize_geodata(lat,lon,data);
 
 % Get the SIZE of the original data
 sz = size(data);
 
 % PERMUTE so that the data(time,lon,lat...). % data(lat,lon,...) is ensured
-% via the homogenize function
+% via the standardize function
 data = permute(data,[N,2,1,3:N-1]);
 
 % COLLAPSE it to data(time,lon,lat*height*etc)

@@ -1,3 +1,24 @@
+2011-09-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-201
+
+	* geographical/standardize_geodata.m: Replaced
+	homogenize_datalatlon with this function. This function is more or
+	less the same as the previous, but comments from the programming
+	meeting were incorporated including a function name change. The
+	functions listed below were only changed due to adapt to the new
+	function name.
+
+	* geographical/regionize.m:
+	* geographical/resample_geodata.m:
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/test_gmt.m:
+	* geographical/resample_geodata.m:
+	* geographical/geo_single_localtime.m:
+
+	* geoplots/gmt/create_gmt_earth.m: fprintf to display the
+	resolution of the data (if verbose)
+
 2011-09-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-200

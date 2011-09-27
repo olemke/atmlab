@@ -241,8 +241,8 @@ end
 
 % check if res is acceptable
 if res < maxres
+    logtext(1,'Automatically picked the maximum resolution of: %.3fdeg instead of %.4fdeg defined by measurement density\n',maxres,res)
     res = maxres;
-    logtext(1,'Automatically picked the maximum resolution of: %.3fdeg\n',res)
 else
     logtext(1,'Plot resolution: %.3f Deg',res)
 end

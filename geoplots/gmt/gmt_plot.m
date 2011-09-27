@@ -654,7 +654,7 @@ in = isgridded(in,field);
 if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
-    [flags,in.lat,in.lon,in.(field)] = homogenize_datalatlon(in.lat,in.lon,in.(field));
+    [flags,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
 
     if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
         logtext(1,'Data does not appear to be centered. Internally ')

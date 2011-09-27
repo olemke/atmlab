@@ -218,6 +218,10 @@ test.nwhite = 6;
 test.header_size = 20;
 test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
 in.filename = sprintf('Test%.0fc',t);
+ 
+%this puts standardize_geodata.m to the test
+gridded.data=gridded.data'; gridded.data = gridded.data(end:-1:1,end:-1:1);
+gridded.lat = gridded.lat(end:-1:1);gridded.lon = gridded.lon(end:-1:1);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 x = {'Test 1c demonstrates that you can change the number of intervals that are',...
