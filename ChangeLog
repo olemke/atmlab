@@ -1,3 +1,12 @@
+2011-09-28  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-202
+
+	* datasets/find_datafile_by_unixtime.m: Added
+
+	- Converts unixtime to seconds, rounding seconds to the nearest minute
+	  if rounding errors occur in the process. Then finds datafile.
+
 2011-09-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-201
