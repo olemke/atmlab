@@ -1,3 +1,13 @@
+2011-09-30  Carlos Jimenez  <carlos.jimenez@obspm.fr>
+
+	* atmlab-1-0-205
+
+	* /obspm/datasets_init.m: Adding a folder and corresponding file
+	with our (LERMA, Paris Observatory) specific paths. So far
+	configured only to start using the collocations mscripts. We take the
+	opportunity here to congratulate developer Gerrit Holl for coding
+	such a nice and usefull piece of work.
+
 2011-09-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-204
