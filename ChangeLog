@@ -1,5 +1,19 @@
 2011-09-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-204
+
+	* handy/exec_system_cmd.m: Added an extra output variable the
+	returns the return value from the system command, if you set a 3rd
+	input argument to true
+	(continueOnError). In essence it lets the function keep going even
+	if the system command fails. This does not break backward
+	compatibility.
+
+	* geographical/standardize_geodata.m:
+	Fixed hilariously bad assertion
+
+2011-09-30  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-203
 
 	* geographical/geo_single_localtime.m:

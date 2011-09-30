@@ -32,7 +32,7 @@ function [flags,lat,lon,data] = standardize_geodata(lat,lon,data)
 
 
 % -------    CHECK for errors
-errID = sprintf('gmtlab:%s:badInput',mfilename);
+errID = ['gmtlab:' mfilename ':badInput'];
 dexist = exist('data','var');
 
 assert(isvector(lat) && isvector(lon),errID,'lat and lons must be vectors')
@@ -43,7 +43,7 @@ assert(all(lat>=-90 & lat<=90) && all(lon>=-180 & lon<=360),...
 if dexist
     sz = size(data);
     
-    assert(dexist && ~isequal(prod(sz(1,2)),numel(lat),numel(lat)),....
+    assert(isequal(prod(sz(1:2)),numel(lat)*numel(lon)),...
         errID,'data does not appear to be gridded')
 end
 
@@ -100,7 +100,6 @@ if flags.lat_descend
         data = data(end:-1:1,:,:);
     end
 end
-
 
 % make sure LONGITUDES ARE IN -180:180 REGIME
 if flags.lon360

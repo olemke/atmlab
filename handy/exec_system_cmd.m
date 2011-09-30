@@ -1,4 +1,4 @@
-function out = exec_system_cmd(cmd, varargin)
+function [out,retvals] = exec_system_cmd(cmd, varargin)
 %
 % EXEC_SYSTEM_CMD Executes one or more system commands.
 %
@@ -20,6 +20,10 @@ function out = exec_system_cmd(cmd, varargin)
 %       If true, each command with be printed to the screen before it is
 %       executed.
 %
+%   continueOnError: bool, optional. Defaults to false
+%
+%       
+%
 % OUT
 %
 %   out: cell array of strings
@@ -29,9 +33,11 @@ function out = exec_system_cmd(cmd, varargin)
 %       a cell array of strings. If only one input command was given,
 %       this is a cell array with one string.
 %
+%    retvals: boolean return value if second optional input 'report' is given
+%       
 % USAGE
 %
-%   out = exec_system_cmd(cmd, varargin)
+%   [out,ret] = exec_system_cmd(cmd, varargin)
 %
 % updated by: Salomon, Gerrit
 % Author: Oliver Lemke
@@ -40,9 +46,11 @@ if ~iscell(cmd), cmd = {cmd}; end
 
 cmd = cmd(:);
 
-verbose = optargs(varargin, {false});
+[verbose,continueOnError] = optargs(varargin, {false,false});
+
 errID = 'atmlab:exec_system_cmd:shell';
 out = cell(1,length(cmd)); i = 1; % keep track of output messages
+retvals = zeros(1,length(cmd)); % keep track of return messages (if report is input)
 for x = cmd'
     fullcmd = char(x);
     
@@ -67,7 +75,10 @@ for x = cmd'
                 'If you are using LINUX, try setenv(''LD_LIBRARY_PATH'','''')\n',...
                 'If this solves the problem, add the corresponding line to your startup file'])
         else
-            error(errID,'Command returned error %d: "%s"', ret, out{i})
+            if continueOnError, retvals(i) = ret;
+            else
+                error(errID,'Command returned error %d: "%s"', ret, out{i})
+            end
         end
     end
     i = i+1;
