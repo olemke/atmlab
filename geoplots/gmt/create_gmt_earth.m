@@ -210,7 +210,7 @@ x            = sscanf(in.region,'%f/%f/%f/%f');
 oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );
 globalOneDeg = 360*180;
 % find the approx density of points
-res = mean([ diff(unique(in.lat));diff(unique(in.lon))]) ;
+res = max([ mean(diff(unique(in.lat)));mean(diff(unique(in.lon)))]) ;
 
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'resolution')
     
@@ -241,10 +241,10 @@ end
 
 % check if res is acceptable
 if res < maxres
-    logtext(1,'Automatically picked the maximum resolution of: %.3fdeg instead of %.4fdeg defined by measurement density\n',maxres,res)
+    logtext(1,'Automatically picked the maximum resolution of: %.4fdeg instead of %.4fdeg defined by measurement density\n',maxres,res)
     res = maxres;
 else
-    logtext(1,'Plot resolution: %.3f Deg',res)
+    logtext(1,'Plot resolution: %.4f Deg\n',res)
 end
 a.increment = sprintf('%fm',60*res); % 60min x resolution
 

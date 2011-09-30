@@ -13,7 +13,7 @@ function data = geo_single_localtime(utcvec,localtime,data,lon,lat,method)
 %                                       size(data,4)=length(utcvect)
 %     lon         [%f,...]              longitudes vector
 %     lat         [%f,...]              latitudes vector (needed for function standardize_geodata)
-%     method      %s                    The method interp1 will use (default='linear')utc0 = mod(localtime - 24/360 * lon, 24)
+%     method      %s                    The method interp1 will use (default='linear')
 %
 % OUT
 %     out =      data                   Interpolated data values at the
@@ -62,10 +62,12 @@ data = data(:,:,:);
 % locally make utc CYCLIC (covering the whole day)
 switch method
     case {'nearest','linear'}, n=0;
-    case 'cubic',  n=1;
-    case 'spline', n=2;
+    case 'cubic', n=1;
+    case'spline', n=2;
 end
 
+assert(n < length(utcvec),['atmlab:' mfilename ':badInput'],...
+    'method: "%s" requires utcvec to have at least %d values',method,n+1)
 if n ~= -1
     utcvec = [utcvec(end-n:end)-24, utcvec utcvec(1:n+1)+24];
     data = [data(end-n:end,:,:); data; data(1:n+1,:,:)];
