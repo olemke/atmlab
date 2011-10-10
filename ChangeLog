@@ -1,5 +1,13 @@
 2011-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-208
+
+	* gridcreation/annealing/find_best_freq_set_anneal.m: Rollback
+	  
+	  Commiting this change was in error, rolling back.
+
+2011-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-207
 
 	* datasets/granule_blacklisted.m: Added
