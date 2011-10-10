@@ -1,3 +1,18 @@
+2011-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-207
+
+	* datasets/granule_blacklisted.m: Added
+
+	- Check whether a particular granule is blacklisted, e.g. due to
+	  geolocation issues.
+	  Will be used.
+	
+	* site-specific/kiruna/datasets_init.m, datasets/datasets_config.m:
+
+	- Add field for location of file containing blacklisted granules for
+	  pair of satellite/sensor (satellite/dataset)
+
 2011-09-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-206

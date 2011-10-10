@@ -221,11 +221,16 @@ while go_on
       Wb = W;
       eb = en;
     end
+    
+    % Prevent infinite loop due to de==0
+    if (de==0)
+        continue
+    end
 
     % Probability of this state:
     Pk = exp(-de/T);
     
-    if rand(1,1) < Pk
+    if de~=0 && rand(1,1) < Pk
       s = sn;
       e = en;      
       
@@ -249,17 +254,21 @@ while go_on
 
   if verb>0
     if (use_rel_error)
-      disp(sprintf('T = %g, e_min = %g, e_mean = %g, e_max = %g [fractional errors]',...
+      disp(sprintf('T = %g, e_min = %g, e_mean = %g, e_max = %g [fractional errors], n_succ = %d, i = %d',...
                    h.t_hist(k),...    
                    h.e_min_hist(k),...    
                    h.e_hist(k),...    
-                   h.e_max_hist(k) ))
+                   h.e_max_hist(k),...
+                   n_succ, ...
+                   i))
     else
-      disp(sprintf('T = %g K, e_min = %g K, e_mean = %g K, e_max = %g K',...
+      disp(sprintf('T = %g K, e_min = %g K, e_mean = %g K, e_max = %g K, n_succ = %d, i = %d',...
                    h.t_hist(k),...    
                    h.e_min_hist(k),...    
                    h.e_hist(k),...    
-                   h.e_max_hist(k) ))
+                   h.e_max_hist(k), ...
+                   n_succ, ...
+                   i))
     end
   end
     
@@ -303,6 +312,7 @@ while go_on
   
   % Should we continue? - We use as stop criterion that there were
   % no more successful moves
+  %fprintf('n_succ = %d\n', n_succ);
   if n_succ == 0
     go_on = false;
   end

@@ -190,3 +190,5 @@ datasets_config('collocation_collocation_cpr_mhs_avhrr_subdir', '$YEAR4/$MONTH/$
 datasets_config('collocation_collocation_cpr_mhs_avhrr_filename', 'collocations_$SAT1_$SAT2.nc.gz');
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');
+
+datasets_config('blacklist', '/storage3/user_data/gerrit/blacklist_$SAT_$SENSOR.dat');

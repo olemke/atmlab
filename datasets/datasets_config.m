@@ -310,4 +310,5 @@ A.collocation_collocation_cpr_mhs_avhrr_legacy_subdir = nan;
 A.collocation_collocation_cpr_mhs_avhrr_legacy_regexp = nan;
 A.collocation_collocation_cpr_mhs_avhrr_legacy_filename = nan;
 
+A.blacklist = nan;
 end
