@@ -306,7 +306,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
       % Avoid to generate full matrix that is n x n:
       [i,j,s] = find( Q.TNOISE_C );
       for k = 1 : length(i)
-        s(k) = prod( tnoise_si([i(k) j(k)]) ) * s(k);
+        s(k) = prod( Y(m).TNOISE([i(k) j(k)]) ) * s(k);
       end
       Se = sparse(i,j,s);
     end

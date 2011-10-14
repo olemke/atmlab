@@ -353,6 +353,8 @@ Y.F = Q.SENSOR_RESPONSE.F_BACKEND;
 % Thermal noise standard deviation
 %
 Y.TNOISE = 0.05;
+% To test varying noise
+%Y.TNOISE = linspace( 0.03, 0.07, length(Y.F) )';
 
 % Simulate a measurement
 %
@@ -375,7 +377,7 @@ Y = qpack2( Q, oem, Y );            % Dummy oem structure OK here
 % The correlation specified in Q is included
 %
 for i = 1 : length(Y)
-  Y(i).Y = Y(i).Y + Y(i).TNOISE * make_noise(1,Q.TNOISE_C);
+  Y(i).Y = Y(i).Y + Y(i).TNOISE .* make_noise(1,Q.TNOISE_C);
 end
 
 % Add a constant "baseline shift" for measurement 2

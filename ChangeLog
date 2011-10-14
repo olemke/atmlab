@@ -1,3 +1,17 @@
+2011-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-209
+
+	* demos/qpack2_demo.m (y_demo): Added an alernative definition of
+	Y.TNOISE, then set to a vector.
+
+	* retrieval/qpack2/qpack2.m (qp2_y2Q): The code for non-scalar
+	TNOISE used a removed variable. Fixed a problem reported by our
+	new ARTS friends Fredy and David.
+
+	* arts/qarts.m: Added comment in ABS_LINES regarding cases with no
+	lines.
+
 2011-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-208
@@ -107,6 +121,7 @@
 
 	* site-specific/kiruna/datasets_init.m: Fixed 2 erroneous entries
 
+>>>>>>> .r7174
 2011-09-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-198
