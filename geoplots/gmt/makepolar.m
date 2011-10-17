@@ -171,7 +171,7 @@ TT = TT*(TT>=0);
 if BT < whitedomain || TT < whitedomain
     if BT < whitedomain, nw = whitedomain-BT; end
     if TT < whitedomain, nw = whitedomain-TT; end
-    nw = nw - mod(nw,2);
+    %nw = nw - mod(nw,2); %not sure why this is here
 end
 %special 
 assert(BT+TT+nw == length(tickval)-1,'Salomon:Bug','BT+TT+nw ~= length(tickval)-1')

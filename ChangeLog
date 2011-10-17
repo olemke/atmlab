@@ -1,3 +1,9 @@
+2011-10-17  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-210
+
+	* geoplots/gmt/makepolar.m: Fixed small bug.
+
 2011-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-209
