@@ -117,6 +117,13 @@ function filename = gmt_plot(in,field)
 %                     ------------
 % in.xunit            |%s| String displayed on the x-axis of legend | '' |
 %                     ------------
+%
+% NOTE:               For special characters in the string refer to the
+%                     section on character escape sequences (4.16 in GMT
+%                     cookbook v4.5.7).
+%                     e.g. for unit (or title) \Delta r^{-2} should be
+%                     written '@~D@-r@+-2'
+%
 % in.plotPlacement    |%s| String of global plotPlacements | '-Ya5 -Xa5' |
 %
 %--------------------------------------------------------------------------
@@ -517,7 +524,7 @@ function filename = gmt_plot(in,field)
 % Created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
 % $Id$
 
-errId = 'gmtlab:gmt_plot:input';
+errId = ['gmtlab:' mfilename ':input'];
 assert(isstruct(in),errId,'"in" must be a structure')
 if nargin==2
     assert(ischar(field),errId,['2nd input ''field'' must be the string '...
@@ -571,7 +578,7 @@ errId = 'gmtlab:gmt_plot:badInput'; % common error ID
 % Test is GMT is installed and in the path
 [a,b] = system('which gmtset');
 if a == 1
-    error('gmtlab:gmt_plot:shell',[ [ b '\n\n'],...
+    error(['gmtlab:' mfilenanme ':shell'],[ [ b '\n\n'],...
         'Either GMT is not installed\n',...
         'or\n',...
         'You need to add its installation directory to your PATH\n',...
@@ -601,16 +608,16 @@ default.plotPlacement     = '-Xa5 -Ya5';        % String of global plotPlacement
 in = optargs_struct(in,default);
 
 if any(ismember(in.outdir,' '))
-    error('gmtlab:input','"spaces" ar not supported for outdir (%s)',in.outdir)
+    error(['gmtlab:' mfilename ':input'],...
+        '"spaces" ar not supported for outdir (%s)',in.outdir)
 elseif strcmp(in.outdir(1),'~')
     % netcdffunctions don't like ~ for home
     in.outdir = [getenv('HOME') '/' in.outdir(2:end)];
 end
 
 if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
-    a = 'gmtlab:input'; b = 'Either %s doesn''t exist';
-    c = ', or gmtlab does not have write access to %s';
-    error(a,[b,c],in.outdir,in.outdir)
+    error(['gmtlab:' mfilename ':BadInput'],...
+        'Either %s doesn''t exist, or gmtlab does not have write access to %s',in.outdir,in.outdir)
 end
 
 % replace bad symbols for filename and mask them for the title
@@ -620,7 +627,7 @@ else default.filename = 'default';
 end
 in = optargs_struct(in,default);
 in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
-in.title = regexprep(in.title,'([=,()+*<>!?])','\\$1');
+in.title = regexprep(in.title,'([()])','\\$1');
 in.title = regexprep(in.title,':',' ');
 
 %coast
@@ -639,7 +646,8 @@ if in.nodata
 end
 
 if ~ismember(field,fieldnames(in))
-    error('gmtlab:input','no field by the name of "%s" in struct',field)
+    error(['gmtlab:' mfilename ':BadInput'],...
+        'no field by the name of "%s" in struct',field)
 else
     in.fieldname  = field;
 end
@@ -655,7 +663,7 @@ if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
     [flags,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
-
+    
     if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
         logtext(1,'Data does not appear to be centered. Internally ')
         in = centerGeoData(in,field);
@@ -783,7 +791,8 @@ else
         case 'tif'
             T = '-Tt -Qg -Qt';
         otherwise
-            error('gmtlab:figuretype','%s: not supported',in.figuretype)
+            error(['gmtlab:' mfilename ':FigureType'],...
+                '%s: not supported',in.figuretype)
     end
     
     command{end+1} = sprintf('ps2raster %s/%s.ps -A -P %s',in.tmpdir,in.filename,T);
@@ -939,7 +948,8 @@ function in = isgridded(in,field)
 %  If it is not gridded, flatten the data
 
 if isempty(in.(field))
-    error('The data variable: in.%s is empty',field)
+    error(['gmtlab:' mfilename ':BadInput'],....
+        'The data variable: in.%s is empty',field)
 end
 
 if ndims(in.(field))==3
@@ -1025,7 +1035,8 @@ end
 % error on GMT errors
 if ~isempty(Errors)
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_errors,Errors,'UniformOutput',0);
-    error('gmtlab:GMT','GMT encountered the following errors:\n%s',[tmp{:}])
+    error(['gmtlab:' mfilename ':GMT'],...
+        'GMT encountered the following errors:\n%s',[tmp{:}])
 end
 
 function annot_format = getAnnotFormat(quantity)

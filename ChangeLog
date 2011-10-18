@@ -1,3 +1,11 @@
+2011-10-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geoplots/gmt/gmt_plot.m: Added to help section how to use
+	special characters in the title, unit etc. Also stopped
+	unnecessarily masking a bunch of characters for the title.
+
+	* geoplots/gmt/makepolar.m: Fixed errId's
+
 2011-10-17  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-210

@@ -130,7 +130,7 @@ else
 end
 
 assert(nw<length(tickval)-1,...
-    'gmtlab:input','number of white boxes (%.0f) exceedes nlevels (%.0f)',...
+    ['gmtlab:' mfilename ':input'],'number of white boxes (%.0f) exceedes nlevels (%.0f)',...
     nw,length(tickval)-1)
 
 
@@ -139,7 +139,7 @@ if ismember(ref,tickval) && mod(nw,2)
     % if ref is on one of the edges and nwhite is odd, increase nwhite by 1
     nw = nw+1;
     if input
-        warning('atmlab:badInput',...
+        warning(['gmtlab:' mfilename ':badInput'],...
             '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is exactly on a contour level,',...
             'i.e in.nwhite must be an even number. Increasing ',in.nwhite,nw);
     end
@@ -150,7 +150,7 @@ if ~ismember(ref,tickval) && ~mod(nw,2)
     % if ref is in between the edges and nwhite is even, decrease by 1
     nw = nw-1;
     if input
-        warning('atmlab:makepolar:badInput',...
+        warning(['gmtlab:' mfilename ':badInput'],...
             '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is inbetween contour levels,',...
             'i.e in.nwhite must be an odd number. Decreasing ',in.nwhite,nw);
     end
@@ -174,4 +174,5 @@ if BT < whitedomain || TT < whitedomain
     %nw = nw - mod(nw,2); %not sure why this is here
 end
 %special 
-assert(BT+TT+nw == length(tickval)-1,'Salomon:Bug','BT+TT+nw ~= length(tickval)-1')
+assert(BT+TT+nw == length(tickval)-1,['gmtlab:' mfilename ':Bug'],...
+    'BT+TT+nw ~= length(tickval)-1')
