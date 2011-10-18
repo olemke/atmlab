@@ -41,6 +41,10 @@ datasets_config('cloudsat_ECMWF_AUX_subdir', datasets_config('cpr_subdir'));
 datasets_config('cloudsat_ECMWF_AUX_regexp', datasets_config('cpr_regexp'));
 
 
+datasets_config('cloudsat_2C_PRECIP_COLUMN_basedir', [ whereami,'/cloudsat/2C-PRECIP-COLUMN.R04/'] );
+datasets_config('cloudsat_2C_PRECIP_COLUMN_subdir', datasets_config('cpr_subdir'));
+datasets_config('cloudsat_2C_PRECIP_COLUMN_regexp', datasets_config('cpr_regexp'));
+
 
 %% COLLOCATION DATA SETS
 
