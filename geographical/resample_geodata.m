@@ -12,6 +12,8 @@ function out = resample_geodata(in,field,newgrid)
 % IN:
 %
 %   in          struct      contains: lat,lon,field1,etc (maybe more fields)
+%                           opt: interpolation = 'str'; default='linear'
+%                                for interpolation method in interp2.
 %
 %   field       %s          {'field1',etc}; The field/s  you want to regrid
 %
@@ -30,7 +32,7 @@ function out = resample_geodata(in,field,newgrid)
 %                           replaced with their regridded versions
 %
 %
-% NOTE:     - Interpolation is linear.
+% NOTE:     - Interpolation is linear, unless specified by in.interpolation.
 %           - With a combination of conditions
 %                 1) regridding to a very coarse resolution
 %                 2) the finer grid resolution doesn't cleanly fit in the larger grid.
@@ -67,7 +69,7 @@ function out = resample_geodata(in,field,newgrid)
 % Created by Salomon Eliasson
 % $Id: regrid_dataset.m 6417 2011-04-21 06:44:37Z seliasson $
 
-errID = 'atmlab:resample_geodata:badInput';
+errID = ['atmlab:' mfilename ':badInput'];
 assert(nargin==3,errID,'Incorrect number of input arguments')
 if ~iscell(field), field={field}; end
 
@@ -103,6 +105,16 @@ else
         out.method)
 end
 
+if ~strcmp(out.method,'interpolate') && isfield(in,'interpolation')
+    warning(errID,'Will not interpolate, but instead use method: %s',out.method)
+elseif strcmp(out.method,'interpolate')
+    if isfield(in,'interpolation')
+        intm = in.interpolation;
+    else
+        intm = 'linear';
+    end
+end
+
 %% LOOP over FIELDS to regrid
 for F = field
     fsz = size(in.(F{1}));
@@ -122,7 +134,7 @@ for F = field
     switch out.method
         case 'interpolate'
             % successfully tested for 4D data and lon=0:360, lat = end:-1:1
-            data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+            data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data,'method',intm),newlat,newlon);
         case 'coarse grid'
             % successfully tested for 4D data and lon=0:360, lat = end:-1:1
             data = coarser_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
@@ -131,7 +143,7 @@ for F = field
             data = coarser_grid_withAreaweighting(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
         case 'shift grid'
             % successfully: regular, 4D, 
-            data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+            data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data,'method',intm),newlat,newlon);
         case 'interp and averaging'
             data = fine_and_coarse(struct('lat',lat,'lon',lon,'data',data),newlat,newlon,true);
         case 'averaging and iterp'
@@ -346,7 +358,6 @@ else
     error('atmlab:resample_geodata:Bug','Shouldn''t be here')
 end
 
-
 function DATA = interpolate_grid(in,newlat,newlon)
 %% INTERPOLATE_GRID interpolate data to a smaller grid.
 
@@ -371,8 +382,10 @@ end
 [X,Y] = meshgrid(LON,LAT);
 [XI,YI] = meshgrid(newlon,newlat);
 DATA = zeros([length(newlat),length(newlon),size(data,3)],class(data));
+
+fprintf('Using interpolation method: %s\n',in.method)
 for i = 1:size(data,3)
-    DATA(:,:,i) = interp2(X,Y,data(:,:,i),XI,YI);
+    DATA(:,:,i) = interp2(X,Y,data(:,:,i),XI,YI,in.method);
 end
 
 function data = coarser_grid(in,lat,lon)

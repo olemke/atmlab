@@ -53,7 +53,8 @@ end
 
 warning('off','catstruct:DuplicatesFound') %I'm intentially doing this often
 
-[gridded,ungridded] = dummy_data;
+testDataResolution=1;
+[gridded,ungridded] = test_generate_data_sin_cos(testDataResolution);
 
 files = {};
 info  = {};
@@ -139,29 +140,6 @@ fprintf('Output file saved at: %s/%s.pdf\n',in.outdir,in.filename)
 % SUB FUNCTIONS
 %    |||||||
 %    vvvvvvv
-
-function [gridded,ungridded] = dummy_data
-%% dummy data
-% GENERATE MAIN DATA 
-
-gridded.lat    = -90+.5:90-.5;
-gridded.lon    = -180+.5:180-.5;
-gridded.data   = zeros(length(gridded.lat),length(gridded.lon));
-ungridded.data = zeros(length(gridded.lat)*length(gridded.lon),1);
-ungridded.lon  = zeros(size(ungridded.data));
-ungridded.lat  = zeros(size(ungridded.data));
-ug=1;
-for j=0:179
-    for i=0:359
-        gridded.data(j+1,i+1)=sin(((i+180)/360)*pi+pi/2)* cos((j/180)*pi+pi/2)*100+160;
-        
-        ungridded.data(ug) = gridded.data(j+1,i+1);
-        ungridded.lat(ug)  = j - 90;
-        ungridded.lon(ug)  = i - 180;
-        ug = ug+1;
-    end
-end
-
 
 function [files,info]        = TEST1(in,gridded,files,info)
 %% TEST: Difference plot, reference=0, nlevels, sidebar
