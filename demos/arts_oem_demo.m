@@ -117,6 +117,7 @@ B.dataname            = 'Response';
 B.data                = [1 1];
 %
 H.BACKEND_CHANNEL_RESPONSE{1} = B;
+H.BACKEND_DO = true;
 clear B
 %
 Q.SENSOR_DO           = true;
