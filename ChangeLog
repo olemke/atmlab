@@ -1,3 +1,10 @@
+2011-10-29  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-213
+
+	* geographical/getPredefinedRegions.m: 
+	Fixed region
+
 2011-10-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-212

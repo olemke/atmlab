@@ -144,15 +144,13 @@ switch lower(regionstr)
         blcorner = [-30,-180]; trcorner = [0,180];
     case 'sepdz'
         regionstrlong ='South East Pacific Dry Zone';
-        blcorner = [-27,-110;-18,-130];
-        trcorner = [-18,-72;2,-82];
+        blcorner = [-27,-110;-18,-130]; trcorner = [-18,-72;2,-82];
     case 'seadz'
         regionstrlong ='South East Atlantic Dry zone';
-        blcorner = [-30,-15;-20,-30];
-        trcorner = [-5,10;-5,-15];
+        blcorner = [-30,-15;-20,-30]; trcorner = [-5,10;-5,-15];
     case 'sepdz_boreal'
         regionstrlong ='South East Pacific boreal Dry zone';
-        blcorner = [-15,-180]; trcorner = [0,-72];
+        blcorner = [-15,-180]; trcorner = [0,-80];
     case 'seadz_boreal'
         regionstrlong ='South East Atlantic boreal Dry zone';
         blcorner = [-23.5,-30]; trcorner = [-5,10];
@@ -172,7 +170,7 @@ switch lower(regionstr)
         trcorner = cat(1,b,d);
     case 'conv_sa'
         regionstrlong ='Continental convection area (South America)';
-        blcorner = [-14,-72;-5,-79;0,-80];
+        blcorner = [-14,-71.9;-5,-79;0,-80];
         trcorner = [-5,-50;0,-56;10,-60];
     case 'conv_af'
         regionstrlong ='Continental convection area (Africa)';
