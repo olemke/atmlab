@@ -1,3 +1,29 @@
+2011-10-31  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
+	* atmlab-1-0-214
+
+	* geophysics/cart2geocentric.m: added
+	converts from cartesian to geocentric coordinate systems
+
+	* geophysics/geocentric2cart.m: added
+	converts from geocentric to cartesian coordinate systems
+
+	* geophysics/geodetic2geocentric.m: added
+	converts from geodetic to geocentric coordinate systems
+
+	* geophysics/geocentric2geodetic.m: added
+	converts from geocentric to geodetic coordinate systems
+
+	* geophysics/geocentricposlos2cart.m: added
+	converts a geocentric position and line of sight 
+	into cartesian coordinate systems
+
+	* geophysics/cart2geodetic.m: modified
+        most important changed y and z dimensions
+	
+	* geophysics/geodetic2cart.m: modified
+        most important changed y and z dimensions
+	
 2011-10-29  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-213
@@ -10,7 +36,7 @@
 	* atmlab-1-0-212
 
 	* geographical/test_generate_data_sin_cos.m:
-	generates data gridded and ungridded in a sin cos pattern.
+ 	generates data gridded and ungridded in a sin cos pattern.
 
 	* geographical/resample_geodata.m: Allow the user to specify other
 	interpolation methods if they don't want to use 'linear'. But this

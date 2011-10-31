@@ -1,53 +1,37 @@
-% CART2GEODETIC   Cartesian coordinates to geodetic position to 
+% CART2GEODETIC    converts from geocentric cartesian coordinate 
+%                  to a geodetic coordinate    
 %
-%    Converts Cartesian coordinates to geodetic positions. 
+%   The geodetic coordinates refer to the reference ellipsoid 
+%   specified by input ellipsoid. 
+%   See CART2GEOCENTRIC for a defintion of the geocentric 
+%   coordinate system.
 %
-%    The WGS-84 reference ellisoid is used. The Cartesian coordinates follow
-%    the system used in ARTS.
+% FORMAT [h, lat, lon] = cart2geodetic(x,y,z,ellipsoid) 
 %
-% FORMAT   [h,lat,lon] = geodetic2cart( x,y,z )
-%        
-% OUT   h     Altitude
-%       lat   Geodetic latitude.
-%       lon   Longitude.
-% IN    x     x coordinate
-%       x     y coordinate
-%       z     z coordinate
+% OUT    h         Geodetic height (height above the reference ellipsoid)
+%        lat       Geodetic latitude
+%        lon       Geodetic longitude
+%
+% IN     x    Coordinate in x dimension
+%        y    Coordinate in y dimension
+%        z    Coordinate in z dimension
+% OPT    ellipsoid a row vector with the form [semimajor axis, eccentricity]
+%                  specifying the ellipsoid,
+%                  the semimajor axis must use the same units as x,y,z 
+%        Default is WGS84 reference ellipsoid
+%        http://en.wikipedia.org/wiki/World_Geodetic_System 
 
-% 2011-09-06   Created by Patrick Eriksson.
+% History: created by Bengt Rydberg 2011-10-31
+function [h, lat, lon] = cart2geodetic(x,y,z,ellipsoid)
 
-function [h,lat,lon] = cart2geodetic( x, y, z )
+if nargin<4
+  %WGS84 reference ellipsoid
+  f=1/298.257223563;
+  e=sqrt(f*(2-f));
+  radius= 6378137;
+  ellipsoid=[radius e];
+end 
 
-% The algorith is taken from the Odin processing chain, see
-% http://svn.rss.chalmers.se/projects/odinsmr/browser/oops/trunk/Library/geodetic.c
-  
-% These lines to handle difference in Cartesian system:
-dummy = z;
-z     = y;
-y     = dummy;
-
-a = 6378140.0;
-f = 1.0/298.257;
-
-lon = atan2( y, x );
-if lon < 0.0
-  lon = lon + 2.0*pi;
-end
-
-r  = sqrt( x*x + y*y );
-e2 = 2*f-f*f;
-b  = atan( z/r );
- 	  
-old = 0.0;
-% 	  
-while abs(b-old) > 1e-6
-  old = b;
-  C   = 1.0 / sqrt( 1 - e2*sin(b)^2 );
-  b   = atan( (z+a*C*e2*sin(b))/r );
-end
-
-lat = b;
-h = r/cos(b) - a*C;
-
-lat = 180/pi * lat;
-lon = 180/pi * lon;
+[lat,lon,h] = ecef2geodetic(x,y,z,ellipsoid);
+lat=rad2deg(lat);
+lon=rad2deg(lon);
