@@ -32,7 +32,7 @@ if nargin<4
   ellipsoid=[radius e];
 end 
 
-[x, y, z] = geodetic2cart(lat_gd,lon_gd, h, ellipsoid );
+[x, y, z] = geodetic2cart(h,lat_gd,lon_gd, ellipsoid );
 [r_gc,lat_gc,lon_gc]=cart2geocentric(x,y,z);
 
 

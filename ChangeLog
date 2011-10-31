@@ -1,5 +1,12 @@
 2011-10-31  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
+	* atmlab-1-0-215
+
+	* geophysics/geodetic2geocentric.m: modified
+        fixed small bug.
+	
+2011-10-31  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
 	* atmlab-1-0-214
 
 	* geophysics/cart2geocentric.m: added
