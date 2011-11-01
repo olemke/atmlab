@@ -376,7 +376,7 @@ in.display = false; % put them all in one pdf using conbine_pdfs
 % Add some annotations some intervals.
 if ~isfield(in,{'stepsize','nlevels'}) 
     % assuming we have 20 levels, test the following
-    tmp = cell(1,20);
+    tmp = repmat({''},1,20);
     tmp{1} = 'blue'; tmp{6} = 'light blue'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
     test.legend.tick_annotations = tmp; 
 end

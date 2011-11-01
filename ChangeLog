@@ -1,3 +1,21 @@
+2011-11-01  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-216
+
+	* geoplots/gmt/gmt_plot.m: Fixed help section a bit, but most
+	significantly, no it also checks all the inputs (that a options
+	to gmt_plot)
+
+	* geoplots/gmt/gmt_inputs.m:
+	Added function containing all the GMT inputs and their
+	corresponding test functions.
+
+	* geoplots/gmt/psscale.m:
+	Changed input type for legend.shift_tick_annotations
+
+	* geoplots/gmt/test_gmt.m:
+	fixed small bug
+
 2011-10-31  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
 	* atmlab-1-0-215

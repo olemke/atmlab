@@ -86,7 +86,7 @@ function filename = gmt_plot(in,field)
 %                     ------------
 % in.header_offset    |%f| Moves the title in y-dir on the page | 0.5 [cm] |
 %                     ------------
-% in.keep_files       |%f|
+% in.keep_files       |logical|
 %                     If you don't want to delete intermediate files
 %                     | false |
 %                     ------------
@@ -95,9 +95,9 @@ function filename = gmt_plot(in,field)
 %                     Choose between:  'point' (1/72 inch), 'cm', 'm' and 'inch'
 %                     |'cm'|
 %                     ------------
-% in.nodata           |%f|
+% in.nodata           |logical|
 %                     If you only want a map (compatible with all options)
-%                     | [] |
+%                     | false |
 %                     ------------
 % in.outdir           |%s| E.g. 'name/a/directory'
 %                     |gmtlab('OUTDIR')  ('.' if not set in startup) |
@@ -192,7 +192,7 @@ function filename = gmt_plot(in,field)
 %                     Display rivers. pscoast -Ioption (1-10, a,r,i,c)
 %                     | '1' (major rivers) |
 %                     ------------
-%  width              |%i| Width of coastlines | .3 |
+%  width              |%f| Width of coastlines | .3 |
 %                     ----------------------
 %  color              |%s| color of coast and rivers in rgb
 %                     e.g. '255/255/255' gives white coastlines
@@ -259,7 +259,7 @@ function filename = gmt_plot(in,field)
 %                     | determined by nlevels |
 %                     ------------
 %
-% in.tickval          |%d|
+% in.tickval          |[%d]|
 %                     Vector of values to be used for ticks and data interval
 %                     | determined by datarange and stepsize|
 %                     ------------
@@ -299,15 +299,15 @@ function filename = gmt_plot(in,field)
 %                     psscale GMT command for the NaN legend directly.
 %                     | [] |
 %                     ------------
-% in.savelegend       |%f|
+% in.savelegend       |logical|
 %                     if you want to have a separate pdf for the legend
-%                     | [] |
+%                     | false |
 %                     ------------
-% in.nanlegend        |%f|
+% in.nanlegend        |logical|
 %                     Set to false if you don't want an extra NaN legend
 %                     | true if there are NaN values in the data |
 %                     ------------
-% in.legend           |%f|
+% in.legend           |logical|
 %                     Set to false if you don't want a legend. if in.legend
 %                     is a structure, it's equivalent to in.legend = true
 %                     | true |
@@ -329,7 +329,7 @@ function filename = gmt_plot(in,field)
 %  position_nan       |%s|
 %                     As for in.legend.position, but for the NaN legend
 %                     ------------
-%  equalboxwidth      |%f|
+%  equalboxwidth      |logical|
 %                     If the legend color boxes have to be the same size, 1
 %                     | false (-L option) |
 %                     ------------
@@ -346,9 +346,9 @@ function filename = gmt_plot(in,field)
 %                     | determined by map dimensions |
 %                     ------------
 %  shift_tick_annotations
-%                     |%f|
-%                     Move tick annotations to the right by x inches
-%                     | [] |
+%                     |%s|
+%                     Move tick annotations to the right by x units
+%                     | e.g. '.5i' (.5 inches) |
 %                     ------------
 %  sidebar            |%f|
 %                     Input scalar 0, 1, 2, or 3. Indicates none,
@@ -357,7 +357,8 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  tick_annotations   |{%s,%s,...}|
 %                     E.g. {'','','middle','',''}.
-%                     Number of annotations must be = nlevels.
+%                     Number of annotations must be = nlevels, and all
+%                     cell elements must be strings (or empty strings)
 %                     | [] |
 %                     ------------
 %  tick_annotation_format
@@ -365,7 +366,7 @@ function filename = gmt_plot(in,field)
 %                     E.g. '%3.1e'
 %                     | [] |
 %                     ------------
-%  tick_centering     |%f|
+%  tick_centering     |logical|
 %                     Have tick annotation at the center of the boxes
 %                     | false (edges) |
 %                     ------------
@@ -423,10 +424,8 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  shape              |%s| Shape of marker | 'c' c=filled circle |
 %                     ------------
-%  size               |%s or %f|
-%                      size of shape. If size = %f, cm ('c') is assumend.
-%                      If size = %s, give the size and unit in string (see
-%                      default)
+%  size               |%s|
+%                      size of shape.
 %                     | '.08i' |
 %                     ------------
 %  color              |%s| Color of marker | 'white' |
@@ -452,9 +451,6 @@ function filename = gmt_plot(in,field)
 %                     the grdcontour GMT command directly.
 %                     | [] |
 %                     ------------
-% in.grdcontour       | to explicitly set pscale GMT command
-%
-%                     ----------------------
 %
 % in.contourline.     | Structure with one or more of the following fields:
 %
@@ -476,7 +472,7 @@ function filename = gmt_plot(in,field)
 %  in.grdcontour(2).spacing = y, etc...
 %--------------------------------------------------------------------------
 %
-% DRAW SHAPES ON MAP: FIXME are both necessary?
+% DRAW SHAPES ON MAP:
 %
 % in.psbox.           | Structure with one or more of the following fields:
 %
@@ -524,18 +520,12 @@ function filename = gmt_plot(in,field)
 % Created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
 % $Id$
 
-errId = ['gmtlab:' mfilename ':input'];
-assert(isstruct(in),errId,'"in" must be a structure')
-if nargin==2
-    assert(ischar(field),errId,['2nd input ''field'' must be the string '...
-        'name of the field in the structure you want to plot'])
-    assert(isfield(in,field),errId,'Data field: "%s" not found',field)
-elseif nargin == 1 && isfield(in,'data')
+if ~exist('field','var') && isfield(in,'data')
     field = 'data';
-elseif nargin == 1
-    in.nodata=true;
-    field = '';
+elseif ~exist('field','var')
+    field = ''; in.nodata=true;
 end
+check_input(in)
 
 out = set_GMT_plot(in,field);
 
@@ -1052,6 +1042,7 @@ else
 end
 
 function cleanup(tmpdir,curdir,keepfiles,V)
+%% cleanUp 
 
 if keepfiles
     logtext(1,'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
@@ -1062,4 +1053,54 @@ else
     rmdir(tmpdir,'s')
     logtext(1,'%s is now removed\n',tmpdir)
     atmlab('VERBOSITY',V);
+end
+
+function check_input(in)
+%% CheckInput
+% Checks the input type of all options. If the field is in the list of
+% available options, it will be tested against a anomynous function (e.g.
+% in.region should pass @(x)(ischar(x)) ). The field names and their
+% corresponding test functions are listed in gmt_inputs.
+
+errID = ['gmtlab:' mfilename ':BadInput'];
+assert(isstruct(in),errID,'"in" must be a structure')
+
+% GSE  = gmtStructureElements
+% GSSE = gmtStructStructElements
+[GSE,GSSE] = gmt_inputs;
+
+Fields = fieldnames(in)';
+
+for F = Fields
+    % See if the in.(field) is a listed option
+    test = GSE(ismember(GSE(:,2),F{1}),:);
+    
+    if ~isempty(test)
+        % corresponding test function
+        fun = test{1};
+        strfun = char(fun);
+        
+        assert(fun(in.(test{2})),errID,...
+            'Input type is incorrect. in.%s should pass test: %s',test{2},...
+            strrep(strfun(5:end),'x',['in.' test{2}]));
+        
+        % If in.(field) is itself a structure, do it again (more or less)
+        if isstruct(in.(test{2})) && ismember(test{2},fieldnames(GSSE))
+            Fields2 = fieldnames(in.(test{2}))';
+            for F2 = Fields2
+                test2 = GSSE.(test{2})(ismember(GSSE.(test{2})(:,2),F2{1}),:);
+                if ~isempty(test2)
+                    fun = test2{1};
+                    strfun = char(fun);
+                    assert(fun(in.(test{2}).(test2{2})),errID,...
+                        'Input type is incorrect. in.%s.%s should pass test: %s',...
+                        test{2},test2{2},...
+                        strrep(strfun(5:end),'x',sprintf('in.%s.%s',test{2},test2{2})));
+                else
+                    warning(errID,'in.%s.%s is not a valid field in in.%s ',...
+                        test{2},F2{1},test{2})
+                end
+            end
+        end
+    end
 end

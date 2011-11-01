@@ -70,7 +70,7 @@ else
 end
 
 if isfield(in,'shift_tick_annotations')
-    psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%di',psscale,in.shift_tick_annotations);
+    psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%s',psscale,in.shift_tick_annotations);
 end
 
 if isfield(in,'annot_font_size_primary')
