@@ -1,4 +1,4 @@
-function [data] = modlev2presslev(iarray,P,pgrid)
+function [data] = modlev2presslev(iarray,P,pgrid,nlev)
 % MODELEV2PRESSLEV converts model levels to pressure levels using linear interpolation
 %
 % IN
@@ -6,33 +6,34 @@ function [data] = modlev2presslev(iarray,P,pgrid)
 %     P        [%f,...]            pressure values on model level. Must be same
 %                                  size as iarray. [Pa]
 %     pgrid                        vector containing new presure vertical
-%                                  coordintate. Should be within the model's 
+%                                  coordintates. Should be within the model's 
 %                                  own domain [Pa]
-%     nlev                         scalar number of model levels
+%     nlev     %f                  Number of model vertical levels
 %
 % OUT
 %     out = data                   Interpolated data to the new pressure grid
 %
 % NOTE
-%     * Assumes input dimensions data(lev,....) 
+%     * MUST have the input dimensions data(lev,....) 
 %
-% USAGE: out = modlev2presslev(data,P,pgrid)
+% USAGE: out = modlev2presslev(data(lev,...),P(lev,...),pgrid)
 %
 % $Id$ 
 % Created Marston Johnston
 
 
-assert(nargin == 3,'modlev2presslev:badInput',...
+assert(nargin == 4,['atmlab:' mfilename ':badInput'],...
     'incorrect number of arguments')
-assert(isequal(size(iarray),size(P)),'modlev2presslev:badInput',...
+assert(isequal(size(iarray),size(P)),['atmlab:' mfilename ':badInput'],...
     '''iarray'' and ''P'' must be the same size')
-assert(isvector(pgrid),'modlev2presslev:badInput',...
+assert(isvector(pgrid),['atmlab:' mfilename ':badInput'],...
     'pgrid must be a vector')
-assert(all(pgrid >= min(P(:)))&&all(pgrid <= max(P(:))),'modlev2presslev:badInput',...
+assert(all(pgrid >= min(P(:)))&&all(pgrid <= max(P(:))),...
+    ['atmlab:' mfilename ':badInput'],...
     'pgrid is out side the domain if the pressure matrix')
-nlev = size(P,1);
-assert(isequal(size(iarray,1),nlev),'modlev2presslev:dimError',...
-    'Dimension 1 must equal nlev!');
+assert(isequal(size(iarray,1),nlev),...
+    ['atmlab:' mfilename ':dimError'],...
+    'Dimension 1 must equal to number of levels');
 
 % Get the size of the input array
 sz = size(iarray);

@@ -38,11 +38,13 @@ for i = 0:nvars-1
    end 
 end
 
-grpids = netcdf.inqGrps (ncid);
-for gid = grpids
-    ret = catstruct(ret, read_group(ncid, gid));
+if ~isstudent
+	% Added because it's not avaiable in the 2009a student version
+	grpids = netcdf.inqGrps (ncid);
+	for gid = grpids
+    	ret = catstruct(ret, read_group(ncid, gid));
+	end
 end
-
 netcdf.close (ncid);
 
 

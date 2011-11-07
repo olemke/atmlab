@@ -208,40 +208,26 @@ a.plotPlacement = in.plotPlacement;
 % get number of 1deg boxes in region
 x            = sscanf(in.region,'%f/%f/%f/%f');
 oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );
-globalOneDeg = 360*180;
+
 % find the approx density of points
 res = max([ mean(diff(unique(in.lat)));mean(diff(unique(in.lon)))]) ;
 
-if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'resolution')
-    
-    % A suitable constant found by trial and error
-    % maximum for 360*180 = 1min (programmers choice, use in.nearneighbor.resolution to override)
-    maxres = oneDegRegion * (1/60) * (1/globalOneDeg); %(deg)
-elseif isfield(in.nearneighbor,'resolution')
-    % Find the maximum memory available and test if the desired resolution will
-    % use too much memory
-    if ismac
-        x=regexp(exec_system_cmd('vm_stat | grep -e free -e inactive | sed s/[^0-9]//g'),'\n','split');
-        memGB = (str2double(x{1}{1})+str2double(x{1}{2}))*4096/1024/1024/1024;
-    elseif isunix
-        % find the free memory in GB
-        x = regexp(exec_system_cmd('free -g'),'\n','split');
-        [notUsed,b] = regexp(x{1}{1},'free');
-        memGB = str2double(x{1}{3}(b-1:b));
-    elseif ispc
-        logtext(1,'I''m surprised you even made it here. Wrong operating system, turn back\n')
-    end
-    
-    const = 3; %decrease res, since the netcdf libraries may use more memory
-    maxres = const * sqrt((1/memGB) * oneDegRegion * 8 /1024^3); %4bytes double
+% How much RAM is available?
+memGB = freeRAM()/1024;
+
+% What it translates to in terms of resolution:
+maxres = 3 * sqrt((1/memGB) * oneDegRegion * 8 /1024^3); %4bytes double
+
+if isfield(in,'nearneighbor') &&...
+        isstruct(in.nearneighbor) &&...
+        isfield(in.nearneighbor,'resolution')
     res = in.nearneighbor.resolution;
-else
-    maxres = res;
 end
 
 % check if res is acceptable
 if res < maxres
-    logtext(1,'Automatically picked the maximum resolution of: %.4fdeg instead of %.4fdeg defined by measurement density\n',maxres,res)
+    logtext(1,['Automatically picked the maximum resolution of:',...
+        '%.4fdeg instead of %.4fdeg defined by measurement density\n'],maxres,res)
     res = maxres;
 else
     logtext(1,'Plot resolution: %.4f Deg\n',res)

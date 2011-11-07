@@ -1,3 +1,21 @@
+2011-11-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-217
+
+	* handy/freeRAM.m: Added function that checks how much RAM your
+	computer has available [MB].
+
+	* geoplots/gmt/create_gmt_earth.m: Implemented newly added freeRAM function
+
+	* geoplots/gmt/gmt_plot.m: Changed subfunction name 'cleanup' to 'gmt_cleanup'
+
+	* site-specific/kiruna/datasets_init.m: Had to adapt this for MSPPS
+
+	* files/loadncfile.m: Added ugly work around so this function
+	still works for the student version (2009a)
+
+	* files/getfiles_matching_regexp.m: Replaces '~' with $HOME in path
+
 2011-11-01  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-216

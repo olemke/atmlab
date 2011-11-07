@@ -15,11 +15,15 @@ function files = getfiles_matching_regexp(datadir,regularexp)
 % OUT: files    cell of matching file names
 %
 %
-% 28/3-2011 created by Salomon Eliasson
+% created by Salomon Eliasson
+% $Id$
 
-if isempty(dir(datadir))
-    error('atmlab:input','Directory: %s\nDoes not exist',datadir)
-end
+
+assert(~isempty(dir(datadir)),['atmlab:' mfilename ':BadInput'],...
+    'Directory: %s\nDoes not exist',datadir)
+
+%replace tildas as this doesn't work with the system command
+datadir = [strrep(datadir(1),'~',getenv('HOME')) datadir(2:end)];
 
 % MAKE a list of files using UNIX find (regular files only)
 command = sprintf('find ''%s'' -type f',datadir);

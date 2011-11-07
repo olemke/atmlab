@@ -116,8 +116,8 @@ datasets_config('modis_MYD06_L2_subdir' ,'$YEAR4/$MONTH/$DAY' );
 datasets_config('modis_MYD06_L2_regexp' ,'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})');
 
 datasets_config('mspps_basedir', '/storage3/data/mspps');
-datasets_config('mspps_subdir', '$SAT_orbital_$YEAR4/$MONTH/$DAY');
-datasets_config('mspps_regexp','(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$|\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$');
+datasets_config('mspps_subdir', '');
+datasets_config('mspps_regexp','(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$');
 
 datasets_config('patmosx_L2b_basedir','/storage3/data/patmosx/level2b/');
 datasets_config('patmosx_L2b_subdir' ,'$YEAR4' );

@@ -533,7 +533,7 @@ out = set_GMT_plot(in,field);
 % cleanup after I'm done
 out.tmpdir = create_tmpfolder();
 p = pwd(); V = atmlab('VERBOSITY');
-cleanupObject = onCleanup(@() cleanup(out.tmpdir,p,out.keep_files,V));
+cleanupObject = onCleanup(@() gmtcleanup(out.tmpdir,p,out.keep_files,V));
 
 atmlab('VERBOSITY',gmtlab('VERBOSITY'));
 
@@ -610,7 +610,7 @@ if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
         'Either %s doesn''t exist, or gmtlab does not have write access to %s',in.outdir,in.outdir)
 end
 
-% replace bad symbols for filename and mask them for the title
+% replace bad symbols (for gmt system call) for filename and mask them for the title
 if ~isempty(in.title)
     default.filename = in.title;
 else default.filename = 'default';
@@ -1041,20 +1041,6 @@ else
     annot_format = sprintf('%%.%if',abs(i));
 end
 
-function cleanup(tmpdir,curdir,keepfiles,V)
-%% cleanUp 
-
-if keepfiles
-    logtext(1,'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
-    logtext(2,'Remember to delete the directory when you are done\n')
-else
-    % cd back to the original directory
-    cd(curdir);
-    rmdir(tmpdir,'s')
-    logtext(1,'%s is now removed\n',tmpdir)
-    atmlab('VERBOSITY',V);
-end
-
 function check_input(in)
 %% CheckInput
 % Checks the input type of all options. If the field is in the list of
@@ -1103,4 +1089,18 @@ for F = Fields
             end
         end
     end
+end
+
+function gmtcleanup(tmpdir,curdir,keepfiles,V)
+%% cleanUp 
+
+if keepfiles
+    logtext(1,'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
+    logtext(2,'Remember to delete the directory when you are done\n')
+else
+    % cd back to the original directory
+    cd(curdir);
+    rmdir(tmpdir,'s')
+    logtext(1,'%s is now removed\n',tmpdir)
+    atmlab('VERBOSITY',V);
 end
