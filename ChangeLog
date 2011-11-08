@@ -1,5 +1,11 @@
 2011-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-218 
+
+	* (forgot version number)
+
+2011-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* tests/make_check.m: Wrong name of function in error message for
 	qarts_scatting_demo.
 	Changed target values for test with MC. (Don't understand the old
