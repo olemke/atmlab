@@ -66,7 +66,7 @@ try
   [Q,f,ztan,y_c,y] = qarts_scattering_demo( [], 'doit' );
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_doit_demo* ===\n\n');
+  fprintf('\n=== Error while running *qarts_scatting_demo* ===\n\n');
   rethrow(lasterror);
 end
 %
@@ -79,13 +79,13 @@ end
 
 %= Qarts with MC
 %
-y0 = [ 148.04 -1.9 ];
+y0 = [ 152.4 -0.1 ];
 %
 try
   [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( [], 'mc' );
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_doit_demo* with MC ===\n\n');
+  fprintf('\n=== Error while running *qarts_scatting_demo* with MC ===\n\n');
   rethrow(lasterror);
 end
 %

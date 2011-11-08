@@ -1,3 +1,12 @@
+2011-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* tests/make_check.m: Wrong name of function in error message for
+	qarts_scatting_demo.
+	Changed target values for test with MC. (Don't understand the old
+	values. Too high deviation from DOIT. And far too high Q
+	considering that spherical particles used. For safety, made a test
+	also with arts-2.0.0.) 
+
 2011-11-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-217
