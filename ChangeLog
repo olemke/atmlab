@@ -1,6 +1,17 @@
+2011-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-219
+
+	* geodetic: New folder.
+
+	* geodetic/Contents.m: Short description of folder content.
+
+	* geodetic: Moved wgs84.m, cart2*, geocentric* and geodetic2*
+	functions to this folder.
+
 2011-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-1-0-218 
+	* atmlab-1-0-218
 
 	* (forgot version number)
 
@@ -11,7 +22,7 @@
 	Changed target values for test with MC. (Don't understand the old
 	values. Too high deviation from DOIT. And far too high Q
 	considering that spherical particles used. For safety, made a test
-	also with arts-2.0.0.) 
+	also with arts-2.0.0.)
 
 2011-11-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
