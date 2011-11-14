@@ -1,3 +1,17 @@
+2011-11-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-220
+
+	* geodetic/ellipsoidradii.m: Created.
+
+	* geodetic/ellipsoidmodels.m: Created.
+
+	* geodetic/geodetic2cart.m: Now using ellipsoidmodels.
+
+	* atmlab/atmlab_init.m (atmlab_init): Added geodetic folder.
+
+	* geodetic/radii2sphere.m (radii2sphere): Started. So far just a test.
+
 2011-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-219

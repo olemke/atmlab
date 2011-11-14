@@ -9,7 +9,8 @@
 % That is, the X axis passes (lat,lon)=(0,0), Y axis (0,90) and Z axis
 % (90,x).
 %
-% Referenc ellipsoids are specified by the equatorial radius (r) and its
-% eccentricity (e), as a vector of length two: ellipsiod = [r,e]
+% Reference ellipsoids are specified by the equatorial radius (r) and its
+% eccentricity (e), as a vector of length two: ellipsoid = [r,e]
+% (this fits the definition used in Matlab's mapping toolbox)
 
 

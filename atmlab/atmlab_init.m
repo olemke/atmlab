@@ -55,6 +55,7 @@ addpath( fullfile( toppath, 'geoplots', 'gmt') );
 addpath( fullfile( toppath, 'geoplots' ) );
 addpath( fullfile( toppath, 'geophysics' ) );
 addpath( fullfile( toppath, 'geographical' ) );
+addpath( fullfile( toppath, 'geodetic' ) );
 addpath( fullfile( toppath, 'forwardmodel' ) );
 addpath( fullfile( toppath, 'files' ) ); 
 addpath( fullfile( toppath, 'demos' ) );
