@@ -1,5 +1,15 @@
 2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
+	* atmlab-1-0-226
+
+	* geodetic/line_sphere_intersect.m: added. returns intersection points 
+	of a line and a sphere (or circle)
+	
+	* geodetic/circle_intersect.m: added. returns intersection points of   two 	  circles in two dimensions
+	
+
+2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
 	* atmlab-1-0-225
 
 	* geodetic/radii2sphere.m: Modified.
