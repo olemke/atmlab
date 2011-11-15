@@ -71,31 +71,7 @@ if inplane
                                norm(cc-[x3;y3;z3]) norm(cc-[x4;y4;z4])]-rc)
   
 else
- %rotate the two points p1 and p2 to the 0 longitude plane
- %these points are at the same longitude
- [x1b,y1b,z1b]=geocentric2cart(r(1,1),lats(1),0);
- [x2b,y2b,z2b]=geocentric2cart(r(2,1),lats(2),0);
- %find the intersection point in this plane
- [y]=circle_intersect([x1b z1b],[x2b z2b],...
-                                 (r(1,1)+r(2,1))/2 ,(r(1,1)+r(2,1))/2);
- %find the vector pointing from the intersection point
- %towards point p1 
- [r12,lat12,lon12]=cart2geocentric(x1b-y(1,1),0,z1b-y(1,2));
-
- %the angle between the point P1, circle center, and P2
- dp1=[x1b-y(1,1),0,z1b-y(1,2)];
- dp2=[x2b-y(1,1),0,z2b-y(1,2)];
- rad2deg=constants('RAD2DEG');
- theta=acos(dp1/norm(dp1)*dp2'/norm(dp2))*rad2deg;
- %rotate the vector pointing from the intersection point
- %by some fraction of theta
-  [x12,y12,z12]=geocentric2cart(r12,lat12+theta/4,lon12);
- %calcluate the new position
- [r12,lat12,lon12]=cart2geocentric(y(1,1)+x12,y12,z12+y(1,2));
- %rotate back to the correct longitude plane 
- [x12,y12,z12]=geocentric2cart(r12,lat12,lons(1));
- %find the sphere center and radius 
- [x0,y0,z0,rc]=fourpoints2sphere(x12,y12,z12,x2,y2,z2,x3,y3,z3,x4,y4,z4);
+  [x0,y0,z0,rc]=fourpoints2sphere(x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4);
 
   cc = [x0,y0,z0];
 
@@ -158,7 +134,56 @@ z0=0.5*M14/M11;
 r=sqrt(x0^2+y0^2+z0^2-M15/M11);
 
 
-%returns intersection points of two circles
+
+return
+
+% Old code:
+
+
+  % Cartesian coordinates for middle point
+  dv = A * (a/2);
+  pm = [x1;y1;z1] + dv;
+  pm = mean( [x1 y1 z1;x2 y2 z2;x3 y3 z3;x4 y4 z4] )';
+  
+  [rt,latt,lont] = cart2geocentric( pm(1), pm(2), pm(3) );
+  
+
+  % Find the length from middle point to cc
+  l = sqrt( rc^2 - sum(dv.^2) );
+  
+  % Cartersian point for middle point
+  cc = pm + l*nv;
+
+
+%
+ %rotate the two points p1 and p2 to the 0 longitude plane
+ %these points are at the same longitude
+ [x1b,y1b,z1b]=geocentric2cart(r(1,1),lats(1),0);
+ [x2b,y2b,z2b]=geocentric2cart(r(2,1),lats(2),0);
+ %find the intersection point in this plane
+ [y]=circle_intersect([x1b z1b],[x2b z2b],...
+                                 (r(1,1)+r(2,1))/2 ,(r(1,1)+r(2,1))/2);
+ %find the vector pointing from the intersection point
+ %towards point p1 
+ [r12,lat12,lon12]=cart2geocentric(x1b-y(1,1),0,z1b-y(1,2));
+
+ %the angle between the point P1, circle center, and P2
+ dp1=[x1b-y(1,1),0,z1b-y(1,2)];
+ dp2=[x2b-y(1,1),0,z2b-y(1,2)];
+ rad2deg=constants('RAD2DEG');
+ theta=acos(dp1/norm(dp1)*dp2'/norm(dp2))*rad2deg;
+ %rotate the vector pointing from the intersection point
+ %by some fraction of theta
+  [x12,y12,z12]=geocentric2cart(r12,lat12+theta/4,lon12);
+ %calcluate the new position
+ [r12,lat12,lon12]=cart2geocentric(y(1,1)+x12,y12,z12+y(1,2));
+ %rotate back to the correct longitude plane 
+ [x12,y12,z12]=geocentric2cart(r12,lat12,lons(1));
+ %find the sphere center and radius 
+ [x0,y0,z0,rc]=fourpoints2sphere(x12,y12,z12,x2,y2,z2,x3,y3,z3,x4,y4,z4);
+
+  cc = [x0,y0,z0];
+ %returns intersection points of two circles
 %
 % Format [y]=circle_intersect(P1,P2,r1,r2);
 %
@@ -208,22 +233,3 @@ else
  end
 end
 
-return
-
-% Old code:
-
-
-  % Cartesian coordinates for middle point
-  dv = A * (a/2);
-  pm = [x1;y1;z1] + dv;
-  pm = mean( [x1 y1 z1;x2 y2 z2;x3 y3 z3;x4 y4 z4] )';
-  
-  [rt,latt,lont] = cart2geocentric( pm(1), pm(2), pm(3) );
-  
-
-  % Find the length from middle point to cc
-  l = sqrt( rc^2 - sum(dv.^2) );
-  
-  % Cartersian point for middle point
-  cc = pm + l*nv;
-  

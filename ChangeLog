@@ -1,5 +1,11 @@
 2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
+	* atmlab-1-0-225
+
+	* geodetic/radii2sphere.m: Modified.
+
+2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
 	* atmlab-1-0-224
 
 	* geodetic/radii2sphere.m: Modified.
