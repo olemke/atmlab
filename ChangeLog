@@ -1,3 +1,11 @@
+2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
+	* atmlab-1-0-224
+
+	* geodetic/radii2sphere.m: Modified.
+
+	* geodetic/geocentric2cart.m: modified header.
+
 2011-11-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-223

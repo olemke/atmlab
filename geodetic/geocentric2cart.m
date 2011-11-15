@@ -1,5 +1,4 @@
-% GEOCENTRIC2CART   converts from spherical coordinate 
-%                   to a cartesian position    
+% GEOCENTRIC2CART   converts from spherical coordinate to a cartesian position    
 %
 % See Contents for a defintion of the geocentric 
 % coordinate system
