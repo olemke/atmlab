@@ -1,3 +1,23 @@
+2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
+	* atmlab-1-0-221
+
+	* geodetic/Contents.m: added local line of sight definitions
+
+	* geodetic/cart2geocentric.m: now using only atmlab functions
+
+	* geodetic/geocentric2cart.m: now using only atmlab functions 
+
+	* geodetic/geocentricposlos2cart.m: now using only atmlab functions 
+
+	* geodetic/cart2geodetic.m: now using only atmlab functions
+ 
+	* geodetic/geocentric2geodetic.m: now using only atmlab functions
+
+	* geodetic/geocentric2geodetic.m: now using only atmlab functions
+
+	* geodetic/geodetic2cart.m: now using only atmlab functions 
+
 2011-11-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-220

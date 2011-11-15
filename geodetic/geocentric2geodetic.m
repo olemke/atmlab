@@ -1,12 +1,11 @@
-% GEOCENTRIC2GEODETIC converts from a geocentric coordinate
-%                     to a geodetic coordinate
+% GEOCENTRIC2GEODETIC converts from a geocentric coordinate to a geodetic coordinate
 %  
 %   The geodetic coordinates refer to the reference ellipsoid 
 %   specified by input ellipsoid. 
-%   See CART2GEOCENTRIC for a defintion of the geocentric 
+%   See Contents for a defintion of the geocentric 
 %   coordinate system.
 %
-% FORMAT [h,lat_gd,lon_gd]=geocentric2geodetic(r,lat_gc,lon_gc,ellipsoid)
+% FORMAT [h,lat_gd,lon_gd]=geocentric2geodetic(r,lat_gc,lon_gc[,ellipsoid])
 %
 % OUT    h         Geodetic height (height above the reference ellipsoid)
 %        lat_gd    Geodetic latitude
@@ -18,22 +17,16 @@
 % OPT    ellipsoid a row vector with the form [semimajor axis, eccentricity]
 %                  specifying the ellipsoid,
 %                  the semimajor axis must use the same units as r  
-%        Default is WGS84 reference ellipsoid
-%        http://en.wikipedia.org/wiki/World_Geodetic_System 
+%        Default is WGS84.
 
 % History: created by Bengt Rydberg 2011-10-31
 function [h,lat_gd,lon_gd]=geocentric2geodetic(r,lat_gc,lon_gc,ellipsoid)
 
 if nargin<4
-  %WGS84 reference ellipsoid
-  f=1/298.257223563;
-  e=sqrt(f*(2-f));
-  radius= 6378137;
-  ellipsoid=[radius e];
+   %WGS84 reference ellipsoid
+  ellipsoid = ellipsoidmodels( 'WGS84' );
 end 
 
 [x,y,z]=geocentric2cart(r,lat_gc,lon_gc);
-[lat_gd,lon_gd,h]=ecef2geodetic(x,y,z,ellipsoid);
-lat_gd=rad2deg(lat_gd);
-lon_gd=rad2deg(lon_gd);
+[lat_gd,lon_gd,h]=cart2geodetic(x,y,z,ellipsoid);
 

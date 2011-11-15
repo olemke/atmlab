@@ -1,8 +1,6 @@
-% GEOCENTRICPOSLOS2CART   converts from spherical coordinate 
-%                         and line of sight (LOS) direction 
-%                         to a cartesian position and LOS direction   
+% GEOCENTRICPOSLOS2CART converts from spherical coordinate and line of sight (LOS) direction to a cartesian position and LOS direction   
 %
-% See CART2GEOCENTRIC for a defintion of the geocentric 
+% See Contents for a defintion of the geocentric 
 % coordinate system. The local LOS angles are defined following 
 % the EAST-NORTH-UP system:
 %         za    aa
@@ -28,24 +26,36 @@
 % History: created by Bengt Rydberg 2011-10-31
 function [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,aa)
 
-[x, y, z] = geocentric2cart(r, lat, lon);
+if r == 0
+  error( 'This set of functions are not handling the case of r = 0.' );  
+end
 
+deg2rad = constants( 'DEG2RAD' );
 
 % For lat = +- 90 the azimuth angle gives the longitude along which the
 % LOS goes
 %
-latrad = deg2rad(lat);
-lonrad = deg2rad(lon);
-zarad  = deg2rad(za);
-aarad  = deg2rad(aa);
-
-if abs( lat ) > 89.9999
-  %  
-  dz = sign( lat ).* cos( zarad );
-  dy = sin(zarad).* sin( aarad );
-  dx = sin(zarad).* cos( aarad );
+if abs( lat ) > 89.99
+  %
+  s = sign( lat );
+  %
+  x = 0;
+  y = 0;
+  z = s .* r;
+  %
+  dz = s .* cos( deg2rad .* za );
+  dx = sin( deg2rad .* za );
+  dy = dx .* sin( deg2rad .* aa );
+  dx = dx .* cos( deg2rad .* aa );
 
 else
+  %
+  latrad = deg2rad * lat;
+  lonrad = deg2rad * lon;
+  zarad  = deg2rad * za;
+  aarad  = deg2rad * aa;
+  %
+  [x,y,z] = geocentric2cart( r, lat, lon );
   %
   coslat = cos( latrad );
   sinlat = sin( latrad );
@@ -64,5 +74,9 @@ else
   dz =         sinlat.*dr +         coslat.*dlat;
   dy = coslat.*sinlon.*dr - sinlat.*sinlon.*dlat + coslat.*coslon.*dlon;
 end
+
+
+
+
 
 

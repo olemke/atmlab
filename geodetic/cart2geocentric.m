@@ -1,5 +1,4 @@
-% CART2GEOCENTRIC   converts a cartesian position   
-%                   to spherical coordinate 
+% CART2GEOCENTRIC   converts a cartesian position to spherical coordinate 
 %
 %   The geocentric Cartesian coordinate system is fixed with respect to the
 %   Earth, with its origin at the center of the ellipsoid and its X-, Y-,
@@ -25,8 +24,17 @@
 
 function [r,lat,lon]=cart2geocentric(x,y,z)
 
-[lon,lat,r] = cart2sph(x,y,z);
-lon=rad2deg(lon);
-lat=rad2deg(lat);
+rad2deg = constants( 'RAD2DEG' );
+
+
+r   = sqrt( x.*x + y.*y + z.*z );
+if r > 0
+  lat = rad2deg * asin( z ./ r );
+else
+  error( 'This set of functions are not handling the case of r = 0.' );
+end
+lon = rad2deg * atan2( y, x ); 
+
+
 
 
