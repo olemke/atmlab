@@ -1,5 +1,11 @@
 2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
+	* atmlab-1-0-222
+
+	* geodetic/cartposlos2geocentric.m: Converts cartesian POS/LOS to 		spherical coordinates.  
+
+2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
 	* atmlab-1-0-221
 
 	* geodetic/Contents.m: added local line of sight definitions
