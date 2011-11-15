@@ -1,3 +1,9 @@
+2011-11-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-223
+
+	* geodetic/radii2sphere.m: Still just tests. 
+
 2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
 	* atmlab-1-0-222
