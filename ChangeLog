@@ -1,3 +1,11 @@
+2011-11-18  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-227
+
+	* files/loadncfile.m:
+
+	Add check if the user's matlab version supports netcdf groups.
+
 2011-11-15  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
 	* atmlab-1-0-226

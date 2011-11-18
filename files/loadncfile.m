@@ -38,13 +38,16 @@ for i = 0:nvars-1
    end 
 end
 
-if ~isstudent
-	% Added because it's not avaiable in the 2009a student version
+if (which('netcdf.inqGrps'))
 	grpids = netcdf.inqGrps (ncid);
 	for gid = grpids
     	ret = catstruct(ret, read_group(ncid, gid));
 	end
+else
+    warning('atmlab:loadncfile:groupsunsupported', ...
+        'This Matlab version does not support NetCDF groups.');
 end
+
 netcdf.close (ncid);
 
 
@@ -53,13 +56,12 @@ function grp = read_group(ncid, gid)
 varids = netcdf.inqVarIDs(gid);
 grpname = genvarname(netcdf.inqGrpName(gid));
 for i = varids
-   [varname, scrap, scrap, natts] = netcdf.inqVar (gid, i);
-   svarname = genvarname(varname);
-   grp.(grpname).(svarname) = netcdf.getVar (gid, i);
-   for j = 0:natts-1
-       attname = netcdf.inqAttName (gid, i, j);
-       grp.(grpname).attributes.(svarname).(genvarname(attname)) = ...
-           netcdf.getAtt (gid, i, attname);
-   end 
+    [varname, scrap, scrap, natts] = netcdf.inqVar (gid, i);
+    svarname = genvarname(varname);
+    grp.(grpname).(svarname) = netcdf.getVar (gid, i);
+    for j = 0:natts-1
+        attname = netcdf.inqAttName (gid, i, j);
+        grp.(grpname).attributes.(svarname).(genvarname(attname)) = ...
+            netcdf.getAtt (gid, i, attname);
+    end
 end
-
