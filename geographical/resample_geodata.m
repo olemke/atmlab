@@ -406,7 +406,9 @@ tmpdata = binning_fast(struct('data',tmpdata(:,:)','lon',tmplon(:),'lat',tmplat(
     'newlon',lon,'newlat',lat));
 
 % TAKE the grid MEAN for each level (e.g. {[4x288]} -> {[1x288]}).
-tmpdata = binned_statistics(tmpdata,{@mean});
+if any(isnan(tmpdata(:))), warning(['atmlab:' mfilename ':calculation'],...
+        'There are NaNs in the data, and these may lead to biases on the coarser grid'); end
+tmpdata = binned_statistics(tmpdata,{@nanmean});
 
 if ndims(in.data)==2
     data = cell2mat(tmpdata.mean);
@@ -427,6 +429,10 @@ function data = coarser_grid_withAreaweighting(in,lat,lon)
 % method: Uses area weighting for grids that don't fit nicely into each
 % other and assumes local plane assumption, which is good as long as the
 % grids are not too large (see help resample_data).
+% NOTE: Biases may be introduced because I am using nanmean. The solution
+%       is to also output the number of values used in the averaging for
+%       each grid (not doing that right now. Add feature if needed)
+
 
 % preallocate
 if ~islogical(in.data)
@@ -434,15 +440,7 @@ if ~islogical(in.data)
 else data = false([length(lat),length(lon),size(in.data,3)]);
 end
 
-% INTERNAL function
-% data(ii,jj) = nansum(subdata(:).*weights(:))/sum(weights(:)); is only for 2dim
-% I need bsxfun because size(d) = [points,levels] and size(w) = [points,1].
-% rdivide is correct.
-% polyWeightSum2 = @(d,w) nansum(d.*repmat(w,1,size(d,2)),1)./sum(repmat(w,1,size(d,2)),1); 
-polyWeightSum = @(d,w) (bsxfun(@rdivide,...
-    nansum(bsxfun(@times,d,w),1),nansum(w))); %30% faster than alt above
-
-
+polyWeightSum = @(d,w,i)(nansum(d(i).*w(i))./nansum(w(i)));
 
 % DETERMINE new grid BOUNDARIES from grid spacing
 gn = mean(diff(lon)); gt = mean(diff(lat));
@@ -455,7 +453,7 @@ latbot = lat-gt/2;
 lontop = lon+gn/2+dn;
 lonbot = lon-gn/2;
 
-% LOOP over larger grid
+%LOOP over larger grid
 for ii = 1:length(lat)
     for jj=1:length(lon)
         
@@ -475,8 +473,10 @@ for ii = 1:length(lat)
         
         % COLLAPSE data on the lat/lon dimensions to match output from rectint
         d = permute(d,[3,1,2]);
-
-        data(ii,jj,:)    = polyWeightSum(d(:,:)',weights');
+        
+        for kk = 1:size(d,1)
+            data(ii,jj,kk)    = polyWeightSum(d(kk,:),weights,~isnan(d(kk,:)));
+        end
     end
 end
 

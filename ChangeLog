@@ -1,3 +1,11 @@
+2011-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-228
+
+	* geographical/resample_geodata.m:
+
+	Fixed bug in area weighting
+
 2011-11-18  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-227
