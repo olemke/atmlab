@@ -3,15 +3,15 @@
 % Calculates the Planck function (blackbody radiation) for given wavelength 
 % and temperature.
 % 
-% FORMAT   BT = planck(la,T)
+% FORMAT   BT = planck_wlength(la,T)
 %
 % OUT	   BT = Blackbody radiation.
-% IN       la = wavelength
+% IN       la = wavelength in [m]
 %          T  = Temperature in [K].
 
 % 2003-10-27 Created by Patrick Eriksson
 
-function BT = planck( la, T )
+function BT = planck_wlength( la, T )
 
 planck = constants('PLANCK_CONST');
 boltzmann = constants('BOLTZMANN_CONST');

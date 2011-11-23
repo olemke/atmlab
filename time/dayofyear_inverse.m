@@ -26,7 +26,7 @@ function out = dayofyear_inverse(year,doy)
 %
 % $Id$
 
-errId = 'atmlab:dayofyear_inverse:badInput';
+errId = ['atmlab:' mfilename ':badInput'];
 assert(nargin==2 && isscalar(year) && isscalar(doy),...
     errId,'requires year and doy input as scalars')
 assert(doy<=daysinyear(year),errId, 'too many days')

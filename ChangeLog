@@ -1,3 +1,15 @@
+2011-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-230
+
+	* math/binning_fast: Fixed bug if newgrid is not monotonous.
+
+	* time/dayofyear_inverse.m: cosmetics
+
+	* handy/catstruct.m: cosmetics
+
+	* physics/planck_wlength.m: fixed incorrect function name
+
 2011-11-23  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
 
 	* atmlab-1-0-229

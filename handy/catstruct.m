@@ -60,7 +60,8 @@ if ~isstruct(varargin{end}),
             return
         end
     else
-        error('catstruct:InvalidArgument','Last argument should be a structure, or the string "sorted".') ;
+        error('catstruct:InvalidArgument',...
+            'Last argument should be a structure, or the string "sorted".') ;
     end
 else
     sorted = 0 ;
@@ -73,7 +74,8 @@ for ii=1:N,
     X = varargin{ii} ;
     if ~isempty(X) % Added by Salomon (allow empty arguments)
         if ~isstruct(X),
-            error('catstruct:InvalidArgument',['Argument #' num2str(ii) ' is not a structure.']) ;
+            error('catstruct:InvalidArgument',...
+                ['Argument #' num2str(ii) ' is not a structure.']) ;
         end
         % empty structs are ignored
         FN{ii} = fieldnames(X) ;
@@ -93,7 +95,8 @@ VAL = cat(1,VAL{:}) ;
 [UFN,ind] = unique(FN) ;
 
 if numel(UFN) ~= numel(FN),
-    warning('catstruct:DuplicatesFound','Duplicate fieldnames found. Last value is used and fields are sorted') ;
+    warning('catstruct:DuplicatesFound',...
+        'Duplicate fieldnames found. Last value is used and fields are sorted') ;
     sorted = 1 ;
 end
 

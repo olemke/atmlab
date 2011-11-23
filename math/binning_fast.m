@@ -57,7 +57,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %                   3) lon  ( vector )
 %
 % USAGE: [data,lat,lon] = binning_fast(in,lonspace) %lonspace is optional
-%    equivalent to e.g. 
+%    equivalent to e.g.
 %        [data,lat,lon] = binning_fast(struct('data',data,'lat',lat,'lon',lon...
 %                             'newlat',[-80+.5:80-.5],'newlon',[-180+.5:180-.5]))
 %
@@ -85,8 +85,8 @@ in.data = in.data(:,:); %collapse data
 in = regionchop(in);
 
 % setup new GRIDSIZE
-d(1) = lat(2)-lat(1);
-d(2) = lon(2)-lon(1);
+d(1) = mean(diff(lat));
+d(2) = mean(diff(lon));
 
 %% assign index value
 latindex = floor( (in.lat - (min(lat)-d(1)/2)) /d(1) ) + 1;
@@ -127,7 +127,7 @@ end
 
 function in = check_input(in)
 
-errId = 'atmlab:binning_fast:badInput';
+errId = ['atmlab:' mfilename ':badInput'];
 assert(all(isfield(in,{'lat','lon','data'})),...
     errId,'''lat'',''lon'',''data'' are required input fields')
 
@@ -143,10 +143,16 @@ assert(isequal(size(in.data,1),size(in.lat,1),size(in.lon,1)),...
 
 if isfield(in,'newlon')
     str = 'fields ''newlat'' and ''newlon''';
-    assert(max(diff(in.newlat))-min(diff(in.newlat))<1e-4 && ...
-        max(diff(in.newlon))-min(diff(in.newlon))<1e-4,...
-        errId,'vectors in %s must be monotonously spaced',str)
+    assert(~(any([in.newlon(:)>360;in.newlon(:)<-180;in.newlat(:)>90;in.newlat(:)<-90])),...
+        errId,'lat/lon values are unphysical')
     
+    if ~(max(diff(in.newlat))-min(diff(in.newlat))<1e-4 && ...
+            max(diff(in.newlon))-min(diff(in.newlon))<1e-4)
+        warning(['atmlab:' mfilename, ':WonkyNewgrid'],[...
+            'vectors in fields: ''newlat'' and ''newlon'' are not monotonously spaced. ',...
+            'The output grid will be monotonously spaced, ',...
+            'based on mean(diff(newlat)) and  mean(diff(newlon))'])
+    end
     if isfield(in,'gridsize')
         warning(errId,'%s cancel ''gridsize''',str)
     end
@@ -154,11 +160,12 @@ if isfield(in,'newlon')
         warning(errId,'Region specified by newlat and newlon has presedence over in.region\n')
     end
     %internally span a region, so that values outside this region can be kicked out
-    % [blcorner,trcorner] (lt1,ln1,lt2,ln2)
+    % [blcorner,trcorner] (lt1,ln1,lt2,ln2). This should be safe for both
+    % centered and non-centered grids
     dlt = mean(diff(in.newlat))/2;  dln = mean(diff(in.newlon))/2;
     in.region = [min(in.newlat)-dlt,min(in.newlon)-dln,max(in.newlat)+dlt,max(in.newlon)+dln];
 end
-    
+
 function in = regionchop(in)
 % Get rid of all data outside of region
 
