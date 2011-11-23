@@ -1,3 +1,16 @@
+2011-11-23  Bengt Rydberg  <bengt.rydberg@alumni.chalmers.se>
+
+	* atmlab-1-0-229
+
+	* geodetic/line_plane_intersect.m: added. returns intersection points 
+	of a line and a plane
+	
+	* geodetic/circle_plane_intersect.m: added. returns intersection points 
+	of a circle and a plane
+	
+	* geodetic/circle_sphere_intersect.m: added. returns intersection points 
+	of a circle and a sphere
+
 2011-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-228
