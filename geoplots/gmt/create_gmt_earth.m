@@ -13,7 +13,7 @@ assert(exist('in','var')==1,'gmtlab:badInput',...
 
 in = setup_create_gmt_earth(in);
 
-F = fullfile(in.tmpdir,in.filename);
+F = in.filename;
 
 % Remove earlier .ps and gmt residules
 commands{1} = sprintf('rm -f %s.{ps,eps}',F);
@@ -57,7 +57,7 @@ commands{end+1} = in.plot.basemap;
 if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
     commands{end+1} = in.nearneighbor;
 elseif ~in.gridded && isfield(in.plot,'grid')
-    in.grdfile = sprintf('%s/%s.grd',in.tmpdir,in.filename);
+    in.grdfile = [in.filename '.grd'];
     commands{end+1} = nearneighbor(in.grdfile,in.plot.grid);
 end
 
@@ -184,12 +184,12 @@ function basemap = setupbasemap(in)
 %% setupbasemap
 
 if ~isempty(in.title)
-    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K -B:."%s": > %s/%s.ps',...
-        in.plot.region,in.plot.proj,in.plotPlacement,gmt_unicode_converter(in.title),in.tmpdir,in.filename);
+    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K -B:."%s": > %s.ps',...
+        in.plot.region,in.plot.proj,in.plotPlacement,gmt_unicode_converter(in.title),in.filename);
     
 else
-    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K > %s/%s.ps',...
-        in.plot.region,in.plot.proj,in.plotPlacement,in.tmpdir,in.filename);
+    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K > %s.ps',...
+        in.plot.region,in.plot.proj,in.plotPlacement,in.filename);
 end
 
 function a = mkgrid(in)
@@ -249,15 +249,17 @@ if isfield(in,'cptfile')
     return
 end
 
+% NOTE: remember that I am currently standing in a temporary directory
+
 % MAKE a custom colour table based on manually input color values
 if isfield(in,'colorrange')
     in.ctable = 'colorrange';
 end
 
 if isfield(in,'tickval')
-    % make temporary tivkval file
-    fid=fopen(sprintf('%s/tickvalues.txt',in.tmpdir),'w');
-    logtext(fid,'%.3f\n',in.tickval);
+    % make temporary tickval file
+    fid=fopen('tickvalues.txt','w');
+    fprintf(fid,sprintf('%s\n',getAnnotFormat(in.tickval)),in.tickval);
     fclose(fid);
 end
 
@@ -364,8 +366,8 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
         else
             lsize = in.legend.position_nan;
         end
-        b = sprintf('psscale -D%s -Li -C%s/color_nan.cpt -O -K >> %s/%s.ps',...
-            lsize,in.tmpdir,in.tmpdir,in.filename);
+        b = sprintf('psscale -D%s -Li -Ccolor_nan.cpt -O -K >> %s.ps',...
+            lsize,in.filename);
     end
     
     % get xtra options
@@ -454,4 +456,4 @@ in = optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s',in.ticks);
 
-basemap = sprintf('%s -R -J %s -O >> %s/%s.ps',basemap,in.plotPlacement,in.tmpdir,in.filename);
+basemap = sprintf('%s -R -J %s -O >> %s.ps',basemap,in.plotPlacement,in.filename);

@@ -1,3 +1,33 @@
+2011-11-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-231
+
+	* geoplots/gmt/getAnnotFormat.m: Added function to
+	automatically pick the 'best' format string depending on the size
+	of the value in question
+
+	* geoplots/gmt/create_gmt_earth.m: Fixed bug if your in.tickval
+	values don't fit in %.3f. Now use getAnnotFormat to get the right format
+
+	* geoplots/gmt/reference_maps: Deleted, since I reckon they're not
+	needed.
+
+	* geoplots/gmt/xtra_nan_legend.m: Stopped frivolously appending the
+	temporary direct to the file paths
+
+	* geoplots/gmt/gmt_plot.m: Stopped frivolously appending the
+	temporary direct to the file paths
+
+	* geoplots/gmt/makecpt.m: Now use getAnnotFormat instead. Stopped
+	frivolously appending the temporary direct to the file path
+
+	* geoplots/gmt/cpt_from_colorrange.m: Added two assertions to
+	catch bad input, of which just cost me some time to debug and
+	find. Don't want to do that again
+
+	* geoplots/gmt/makepolar.m: Stopped frivolously appending the
+	temporary direct to the file paths
+
 2011-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-230

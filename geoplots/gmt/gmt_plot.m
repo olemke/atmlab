@@ -540,12 +540,12 @@ atmlab('VERBOSITY',gmtlab('VERBOSITY'));
 cd(out.tmpdir);
 
 if out.gridded
-    out.grdfile = sprintf('%s/%s.grd',out.tmpdir,out.filename);
+    out.grdfile = [out.filename '.grd'];
     gmt_nc_save_gridded(out.lon,out.lat,out.(field),out.grdfile);
     logtext(1,'Writing grdfile: %s sucessfull\n',out.grdfile)
 else
     if ~out.nodata
-        out.ungriddedfile = sprintf('%s/%s.nc',out.tmpdir,out.filename);
+        out.ungriddedfile = [out.filename '.nc'];
         gmt_nc_save_ungridded(out.ungriddedfile,out.(field),out.lat,out.lon);
     end
 end
@@ -785,8 +785,8 @@ else
                 '%s: not supported',in.figuretype)
     end
     
-    command{end+1} = sprintf('ps2raster %s/%s.ps -A -P %s',in.tmpdir,in.filename,T);
-    command{end+1} = sprintf('mv %s/%s.%s %s',in.tmpdir,in.filename,in.figuretype,in.outdir);
+    command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
+    command{end+1} = sprintf('mv %s.%s %s',in.filename,in.figuretype,in.outdir);
 end
 
 
@@ -971,7 +971,7 @@ end
 function in = isdata(in,field)
 %% is there any useable data?
 
-Id  = 'gmtlab:gmt_plot:badInput';
+Id  = ['gmtlab:' mfilename ':badInput'];
 Eps = 1e-10;
 
 assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
@@ -1027,18 +1027,6 @@ if ~isempty(Errors)
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_errors,Errors,'UniformOutput',0);
     error(['gmtlab:' mfilename ':GMT'],...
         'GMT encountered the following errors:\n%s',[tmp{:}])
-end
-
-function annot_format = getAnnotFormat(quantity)
-%% getAnnotFormat
-% Guess a reasonable annotation format based on the provided quantity.
-% in.tick_annotation_format overwrites this default value.
-
-i = floor(log10(quantity));
-if i>0
-    annot_format = sprintf('%%%i.0f',i);
-else
-    annot_format = sprintf('%%.%if',abs(i));
 end
 
 function check_input(in)

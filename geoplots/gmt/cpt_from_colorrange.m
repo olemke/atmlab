@@ -25,11 +25,14 @@ else
     model = colorrange.color_model;
 end
 C = colorrange.colors;
+assert((length(C)-1)>0,['gmtlab:' mfilename,':badInput'],...
+    ['Either there is only one level'...
+    'or the cell is constructed incorrectly (see help gmt_plot)'])
 
 % format to print z-slice in cptfile
 strtot = '%.2f\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\n';
     
-filecpt = sprintf('colorrange.cpt');
+filecpt = 'colorrange.cpt';
 fid = fopen(filecpt,'w');
 
 % header
@@ -39,6 +42,8 @@ fprintf(fid,'%s\n',sprintf('#COLOR_MODEL = %s',model));
 % make z-slices (val1 Red1 Green1 Blue1 val2 Red2 Green2 Blue2)
 for ii = 1:length(C)-1
     val    = C{ii}{1}; val2 = C{ii+1}{1};
+    assert(~isequal(val,val2),['gmtlab:' mfilename ':badInput'],...
+           'consecutive z values may not have the same value')
     color  = splitstring(C{ii}{2},'/');
     color2 = splitstring(C{ii+1}{2},'/'); 
     fprintf(fid,strtot,...
