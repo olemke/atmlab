@@ -1,3 +1,16 @@
+2011-12-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-232
+
+	* physics/constants.m:
+	Changed functionality a bit, although totally backwards
+	compatible.
+	1) if nargin == 2, the unit is also provided.
+	2) if nargin == 0, the list of available constants, their value
+	and unit are shown.
+
+	* math/sphdist.m: Added h1 line, author (Patrick), and date to header
+
 2011-11-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-231
