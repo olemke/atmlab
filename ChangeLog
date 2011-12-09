@@ -1,3 +1,9 @@
+2011-12-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-233
+
+	* math/land_sea_mask.m: Improve documentation
+
 2011-12-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-232

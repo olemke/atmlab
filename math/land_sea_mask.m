@@ -4,7 +4,7 @@
 % when called without arguments, returns a 1-degree land-sea-mask from
 % arts-xml-data. In all other cases, returns a land-water-mask at the
 % indicated resolution from atmlab-data (obtained with GMT).
-% To get a collection of all available types, call this function
+% To get a collection of all available land-water-masks, call this function
 % with a single argument, being a string of length 1 equal to '?' (ASCII
 % character number 63).
 %
@@ -12,6 +12,9 @@
 % longitude value is a repetition of the first, so the 1-deg mask from GMT
 % contains one column more than the previous 1-deg mask in
 % atmlab-xml-data.
+%
+% To configure this, you need to checkout the svn repo 'atmlab-data' and
+% set the environment variable ATMLAB_DATA_PATH appropiately.
 %
 % For implementation notes (how to add masks etc.), see
 % atmlab-data/land_water_mask/README
