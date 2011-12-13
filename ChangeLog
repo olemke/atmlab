@@ -1,3 +1,9 @@
+2011-12-13  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-234
+
+	* handy/combine_pdfs.m: Convert outdir to fullpath.
+
 2011-12-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-233

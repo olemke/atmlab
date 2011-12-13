@@ -52,6 +52,11 @@ default.secret_latex_spacing_tweak = 0.2;
 
 options = optargs_struct(options, default);
 
+%% Convert outdir to fullpath
+options.outdir = path_replace_tilde(options.outdir);
+if (length(options.outdir) == 0 || options.outdir(1) ~= filesep())
+    options.outdir = fullfile(pwd(), options.outdir);
+end
 
 %% Sanity checks
 assert(options.vspace >= 0, 'atmlab:combine_pdfs', 'Vertical spacing must be > 0');
@@ -191,7 +196,7 @@ exec_system_cmd(sprintf('cd %s && pdflatex -interaction batchmode out.tex', ...
 
 exec_system_cmd(sprintf('cd %s && mv -f out.pdf ''%s''', ...
                      tmpfolder, ...
-                     fullfile(path_replace_tilde(options.outdir), options.filename)), ...
+                     fullfile(options.outdir, options.filename)), ...
              gmtlab('verbosity'));
 
 end
