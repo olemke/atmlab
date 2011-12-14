@@ -1,3 +1,23 @@
+2011-12-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-235
+
+	* geoplots/gmt/test_gmt.m: Added fancy strings in test title
+
+	* math/land_sea_mask.m: Made compatible with older matlabs (~)
+
+	* geographical/resample_geodata.m: Fixed interpolating crashing if
+	data are logicals
+
+	* math/sphdist.m: Added output unit to help
+
+	* geoplots/gmt/gmt_plot.m:
+	- Fixed an error in determining the
+	region size in certain cases.
+	- fixed error in help section
+	- listed number of default color levels with the other defaults
+
+
 2011-12-13  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-234

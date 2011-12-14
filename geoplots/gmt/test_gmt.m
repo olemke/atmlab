@@ -148,7 +148,7 @@ if ~ismember(t,in.test), return, end %then don't do this test
 
 in.display = false; % just put them all in one pdf using conbine_pdfs
 %% Test 1a
-test.title        = 'gridded: title² (offset), unit';
+test.title        = 'gridded: title²  * @~D@~r@+-2@~g@~@+ (offset), unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
 test.header_offset = -.3; %move the header down a bit because of smaller header size

@@ -53,7 +53,7 @@ switch nargin
         gridsize = varargin{1};
         if strcmp(gridsize, '?')
             S = dir(fullfile(atmlab('ATMLAB_DATA_PATH'), 'land_water_mask'));
-            [~, ~, ~, ~, tokenStr]= regexp({S.name}, 'land_water_mask_(.*)\.png');
+            [d, d, d, d, tokenStr]= regexp({S.name}, 'land_water_mask_(.*)\.png');
             varargout{1} = cellfun(@(v) v{1}, tokenStr(~cellfun(@isempty, tokenStr)));
         else
             [varargout{1:3}] = land_sea_mask_new(varargin{:});

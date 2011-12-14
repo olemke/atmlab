@@ -122,7 +122,7 @@ function filename = gmt_plot(in,field)
 %                     section on character escape sequences (4.16 in GMT
 %                     cookbook v4.5.7).
 %                     e.g. for unit (or title) \Delta r^{-2} should be
-%                     written '@~D@-r@+-2'
+%                     written '@~D@~r@+-2'
 %
 % in.plotPlacement    |%s| String of global plotPlacements | '-Ya5 -Xa5' |
 %
@@ -563,7 +563,7 @@ filename=sort_figures(out,commands);
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-errId = 'gmtlab:gmt_plot:badInput'; % common error ID
+errId = ['gmtlab:' mfilename ':badInput']; % common error ID
 
 % Test is GMT is installed and in the path
 [a,b] = system('which gmtset');
@@ -585,6 +585,7 @@ default.outdir            = gmtlab('OUTDIR');   % where to put the figure
 default.projection        = 'Q';                % Cylindrical Equidistant Projection.
 default.center            = 0;                  % The center longitude of the map. The region has to be -180:180 (cyclic)
 default.map_width         = 9;                  % in inches
+default.nlevels           = 20;                 % Use 20 color levels by default
 % i.e. default.proj = 'Q0/9i'
 
 default.title             = '';                 % no title by default
@@ -673,17 +674,27 @@ if ~isfield(in,'region')
         annot_format = {getAnnotFormat(mean(diff(in.lon))),...
             getAnnotFormat(mean(diff(in.lat)))};
         
+        % check to see if lon-dlon is out side the boundary. If so, fix the
+        % region to the edges. Same goes for lat...
         cond1 = abs(-180-in.lon(1)) <= dn(1);
         cond2 = 180-in.lon(end) <= dn(end);
-        if cond1 && cond2
-            fstr = sprintf('-180/180/%s/%s',annot_format{1},annot_format{1});
+        cond3 = abs(-90-in.lat(1)) <= dt(1);
+        cond4 = 90-in.lat(end) <= dt(end);
+
+        af = annot_format{1};
+        if cond1 && cond2 && cond3 && cond4
+            in.region = '-180/180/-90/90';
+        elseif cond1 && cond2
+            fstr = sprintf('-180/180/%s/%s',af,af);
             in.region = sprintf(fstr,in.lat(1)-dt(1)/2,in.lat(end)+dt(end)/2);
+        elseif cond3 && cond4
+            fstr = sprintf('%s/%s/-90/90',af,af);
+            in.region = sprintf(fstr,in.lon(1)-dn(1)/2,in.lon(end)+dn(end)/2);
         else
-            fstr = sprintf('%s/%s/%s/%s',...
-                annot_format{1},annot_format{1},annot_format{2},annot_format{2});
+            fstr = sprintf('%s/%s/%s/%s',af,af,af,af);
             in.region = sprintf(fstr,...
-                min(in.lon(:))-dn(1)/2,max(in.lon(:))+dn(end)/2,...
-                min(in.lat(:))-dt(1)/2,max(in.lat(:))+dt(end)/2);
+                in.lon(1)-dn(1)/2,in.lon(end)+dn(end)/2,...
+                in.lat(1)-dt(1)/2,in.lat(end)+dt(end)/2);
         end
     else
         in.region = sprintf('%f/%f/%f/%f',...
@@ -704,6 +715,8 @@ else
         in.lat = in.lat(lt&ln);
         in.lon = in.lon(lt&ln);
     end
+    assert(~isempty(in.lat) && ~isempty(in.lon),...
+        errId,'lat or lon are empty')
 end
 
 % DATARANGE
@@ -889,23 +902,19 @@ if in.nodata
     return
 end
 
-% default-ish number of levels
-nlev = 20;
-
-if length(unique(in.(field)))<nlev
-    nlev = length(unique(in.(field)));
+% default number of levels
+if length(unique(in.(field)))<in.nlevels
+    logtext(1,'unique values < %d\n',in.nlevels)
+    in.nlevels = length(unique(in.(field)));
+    logtext(1,'setting in.nlevels =  length(unique(in.(field)) (%d)\n',...
+        length(unique(in.(field))))
 end
 
-diff = double(in.datarange(2)-in.datarange(1));
-
-if all(isfield(in,{'stepsize','nlevels'}))
+if isfield(in,'stepsize')
     warning('gmtlab:input','in.stepsize overrides in.nlevels')
-elseif ~isfield(in,'stepsize') && isfield(in,'nlevels')
+elseif ~isfield(in,'stepsize')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
-else
-    stepsize = diff/nlev;
 end
-
 annot_format = getAnnotFormat(stepsize);
 
 function sidebar = getsidebar(in)

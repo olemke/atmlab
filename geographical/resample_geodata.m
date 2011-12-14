@@ -381,7 +381,11 @@ end
 % do the INTERPOLATION
 [X,Y] = meshgrid(LON,LAT);
 [XI,YI] = meshgrid(newlon,newlat);
-DATA = zeros([length(newlat),length(newlon),size(data,3)],class(data));
+if islogical(data)
+    DATA = false([length(newlat),length(newlon),size(data,3)]);
+else
+    DATA = zeros([length(newlat),length(newlon),size(data,3)],class(data));
+end
 
 fprintf('Using interpolation method: %s\n',in.method)
 for i = 1:size(data,3)

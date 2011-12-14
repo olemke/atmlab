@@ -11,7 +11,7 @@ function dist=sphdist(lat1,lon1,lat2,lon2,radius)
 %         lon2:  longitude of point #2 in degrees
 %         radius: radius of the sphere
 %
-%  output dist: distance between point #1 and #2
+%  output dist: distance between point #1 and #2 [m]
 %
 % Created by Patrick Eriksson
 % Date: 2010-01-23
