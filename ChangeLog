@@ -1,3 +1,24 @@
+2011-12-15  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-236
+
+	* geoplots/gmt/pstext.m: Added function that enables added text to
+	your map centered at the input lat/lon
+
+	* geoplots/gmt/cpt_from_colorrange.m: Fixed bug is in color table
+	if you press it to the limit
+
+	* geoplots/gmt/create_gmt_earth.m: Adapted for pstext inclusion
+
+	* geoplots/gmt/gmt_inputs.m: forgot in.locations
+
+	* geoplots/gmt/test_gmt.m: Added little test using pstext
+
+	* geoplots/gmt/gmt_plot.m: Added help text for pstext. Fixed bug
+	that was never triggered in gmt_inputs
+
+
+
 2011-12-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-235

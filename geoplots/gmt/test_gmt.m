@@ -353,6 +353,12 @@ test.color_foreground = '255/255/0';
 test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
 test.colorrange.color_model = 'HSV';
 test.nlevels = 5;
+
+% TEST pstext aswell
+test.pstext = struct('text',{'Norrland','Australia'},...
+    'lat',{67+51/60,-25},'lon',{20+13/60,130},'angle',{0,-15},...
+    'color','0/255/0');
+
 in.filename = sprintf('Test%.0f',t);
 files{end+1} = gmt_plot (catstruct(test,in), 'data');
 
@@ -361,8 +367,8 @@ x = {'Test 4 demonstrates contour maps (see contour options in help gmt_plot), '
 'It also demonstrated that you can have x and y-labels',...
 '(in.xunit=''no unit either'' and in.unit=''no unit'') around the legend',...
 'Using the custom colortable (in.colorrange) you can also use',...
-'in.colorrange.color_model = ''HSV'' instead of the default ''RGB'''};
-
+'in.colorrange.color_model = ''HSV'' instead of the default ''RGB''. I also test'...
+'plotting text on top of the map using pstext'};
 
 info{end+1} = sprintf('%s\n',x{:}); 
 

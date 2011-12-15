@@ -424,9 +424,9 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  shape              |%s| Shape of marker | 'c' c=filled circle |
 %                     ------------
-%  size               |%s|
+%  size               |%f|
 %                      size of shape.
-%                     | '.08i' |
+%                     | .08 |
 %                     ------------
 %  color              |%s| Color of marker | 'white' |
 %                     ------------
@@ -507,6 +507,39 @@ function filename = gmt_plot(in,field)
 % in.pspolythick      | See in.psboxthick
 %                     ------------
 %
+%--------------------------------------------------------------------------
+% DRAW TEXT ON A MAP
+%
+% in.pstext           |%s|
+%                     E.g. 'pstext OPT > filename.ps', explicitly sets
+%                     the pstext GMT command directly. If in.pstext is a
+%                     structure, it'll use the structure arguments to 
+%                     generate the command.
+%                     | [] |
+%                     ----------------------
+%
+% in.pstext.          | STRUCTURE with one or more of the following fields:
+%
+%  for multiple text entries define all fields according to :
+%  in.pstext(1).text = 'example',
+%  in.pstext(2).text = 'example2', etc...
+%
+%  lat                |%f| center word at this latitude   |manditory input|
+%
+%  lon                |%f| center word at this longitude  |manditory input|
+%
+%  text               |%s| string to appear at lat/lon    |manditory input|
+%
+%  thick              |%i| text size in points                        |20|
+%
+%  angle              |%f| degrees counter-clockwise from horizontal  |0|
+%
+%  fontnum            |%i| sets the font type                         |1|
+%
+%  justify            |%f| sets the alignment                         |6|
+%
+%  color              |%s| text color                             |'0/0/0'|
+%  
 %--------------------------------------------------------------------------
 %
 % QUICK TEST
@@ -912,6 +945,7 @@ end
 
 if isfield(in,'stepsize')
     warning('gmtlab:input','in.stepsize overrides in.nlevels')
+    stepsize = in.stepsize;
 elseif ~isfield(in,'stepsize')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
 end
@@ -1075,7 +1109,7 @@ for F = Fields
                 if ~isempty(test2)
                     fun = test2{1};
                     strfun = char(fun);
-                    assert(fun(in.(test{2}).(test2{2})),errID,...
+                    assert(fun(in.(test{2})(1).(test2{2})),errID,...
                         'Input type is incorrect. in.%s.%s should pass test: %s',...
                         test{2},test2{2},...
                         strrep(strfun(5:end),'x',sprintf('in.%s.%s',test{2},test2{2})));

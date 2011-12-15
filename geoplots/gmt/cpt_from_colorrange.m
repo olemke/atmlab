@@ -30,7 +30,7 @@ assert((length(C)-1)>0,['gmtlab:' mfilename,':badInput'],...
     'or the cell is constructed incorrectly (see help gmt_plot)'])
 
 % format to print z-slice in cptfile
-strtot = '%.2f\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\n';
+strtab = '\t%s\t%s\t%s\t';
     
 filecpt = 'colorrange.cpt';
 fid = fopen(filecpt,'w');
@@ -46,8 +46,9 @@ for ii = 1:length(C)-1
            'consecutive z values may not have the same value')
     color  = splitstring(C{ii}{2},'/');
     color2 = splitstring(C{ii+1}{2},'/'); 
-    fprintf(fid,strtot,...
-        val, color{1}, color{2}, color{3},...
+    fprintf(fid,[sprintf('%s',getAnnotFormat(val)) strtab],...
+        val, color{1}, color{2}, color{3});
+    fprintf(fid,[sprintf('%s',getAnnotFormat(val2)) strtab '\n'],...
         val2,color2{1},color2{2},color2{3});
 end
 

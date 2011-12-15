@@ -42,7 +42,6 @@ if isfield(in,'measure_unit')
     commands{end+1} = sprintf('gmtset MEASURE_UNIT=%s',in.measure_unit);
 end
 
-
 % other gmtset-commands you might have
 if isfield(in,'gmtset')
     for i = length(in.gmtset)
@@ -112,6 +111,12 @@ elseif isfield(in.plot,'pspoly')
     commands = pspoly(F,in,commands);
 end
 
+% PSTEXT
+if isfield(in,'pstext') && ~isstruct(in.pstext)
+    commands{end+1} = in.pstext;
+elseif isfield(in.plot,'pstext')
+    commands{end+1} = pstext(F,in.plot.pstext,in.plotPlacement);
+end
 
 % CLOSE PS + GRID
 commands{end+1} = in.plot.lastbasemap;
@@ -160,6 +165,11 @@ end
 % CONTOUR LINES
 if isfield(in,'contourline')
     in.plot.grdcontour = mkgrdcontour(in);
+end
+
+% PSTEXT
+if isfield(in,'pstext') && isstruct(in.pstext)
+    in.plot.pstext = setup_pstext(in.pstext);
 end
 
 % LEGEND/S
@@ -338,6 +348,20 @@ for i = 1:length(in.contourline)
     a(i).plotPlacement = in.plotPlacement;
 end
 
+function out = setup_pstext(in)
+%% setup_pstext
+
+assert(all(isfield(in,{'text','lat','lon'})),['gmtlab:' mfilename ':BadInput'],...
+    'in.pstext.{text,lat,lon} are the minimum input requirements for in.pstext')
+
+default.thick   = 20;      % text size in points
+default.angle   = 0;       % degrees counter-clockwise from horizontal
+default.fontnum = 1;       % sets the font type
+default.justify = 6;       % sets the alignment
+default.color   = '0/0/0'; % textcolor (black)
+for i = 1:length(in)
+   out(i) = optargs_struct(in(i),default);
+end
 
 function [a,b] = mklegend(in)
 %% mklegend
