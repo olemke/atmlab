@@ -1,3 +1,18 @@
+2011-12-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-237
+
+	* physics/constants.m: Made some fundamental changes, but kept it
+	'nearly' backwards compatible. 'nearly' since I changed the values
+	of quite a few constants, as they were unreferenced and I found
+	other values, changed the values in the function, and included my
+	reference.
+
+	One major difference is that if you can call the
+	function without inputs and a structure with all the constants and
+	their unit are returned. Now, if you have 2 output arguments, the
+	value and its unit is returned.
+
 2011-12-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-236
