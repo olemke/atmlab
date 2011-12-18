@@ -79,7 +79,7 @@ function [const,unit] = constants(name)
 % list along with the constant's value, its unit, and a reference.
 
 if nargin ==0
-    ifnargin0
+    const = ifnargin0;
     return
 end
    
@@ -202,7 +202,7 @@ end
 
 const_struct = struct('name',name,'value',value,'unit',unit);
 
-function ifnargin0
+function const_struct = ifnargin0
 % if you only want to see what constants there are
 
 const_struct = get_constants_struct;

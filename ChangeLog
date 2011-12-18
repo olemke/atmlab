@@ -1,5 +1,11 @@
 2011-12-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-238
+
+	* physics/constants.m: Forgot the promised output structure
+
+2011-12-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-237
 
 	* physics/constants.m: Made some fundamental changes, but kept it
