@@ -1,3 +1,9 @@
+2011-12-30 	Bengt Rydberg 	bengt.rydberg@alumni.chalmers.se
+
+	* atmlab-1-0-239
+
+	* geodetic/geocentric2geodetic.m: fixed a typo
+
 2011-12-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-238

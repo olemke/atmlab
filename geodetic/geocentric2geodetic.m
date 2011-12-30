@@ -28,5 +28,5 @@ if nargin<4
 end 
 
 [x,y,z]=geocentric2cart(r,lat_gc,lon_gc);
-[lat_gd,lon_gd,h]=cart2geodetic(x,y,z,ellipsoid);
+[h,lat_gd,lon_gd]=cart2geodetic(x,y,z,ellipsoid);
 
