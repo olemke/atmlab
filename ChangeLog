@@ -1,3 +1,9 @@
+2012-01-03 	Bengt Rydberg 	bengt.rydberg@alumni.chalmers.se
+
+	* atmlab-1-0-240
+
+	* geodetic/circle_plane_intersect.m: fixed a problem
+
 2011-12-30 	Bengt Rydberg 	bengt.rydberg@alumni.chalmers.se
 
 	* atmlab-1-0-239

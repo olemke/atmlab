@@ -51,7 +51,8 @@ if sum(cross(n1,n2))==0
 end
 
 %rotate the coordinate system to make the code simpler
-ind1=min(find(n2));
+ind1=find(abs(n2)==max(abs(n2)));
+
 if ind1==1
    indv=[1,2,3];
 elseif ind1==2
