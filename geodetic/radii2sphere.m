@@ -65,17 +65,18 @@ if inplane
   pm         = [xm,ym,zm]';
   cc = pm + rc*nv; 
   
-  
-  % Check
-  constants('EARTH_RADIUS')*([ norm(cc-[x1;y1;z1]) norm(cc-[x2;y2;z2]) ...
-                               norm(cc-[x3;y3;z3]) norm(cc-[x4;y4;z4])]-rc)
-  
+   
 else
   [x0,y0,z0,rc]=fourpoints2sphere(x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4);
 
-  cc = [x0,y0,z0];
+  cc = [x0,y0,z0]';
 
 end
+
+
+% Check
+constants('EARTH_RADIUS')*([ norm(cc-[x1;y1;z1]) norm(cc-[x2;y2;z2]) ...
+                             norm(cc-[x3;y3;z3]) norm(cc-[x4;y4;z4])]-rc)
 
 
 %fourpoints2sphere given four points in the three-dimensional

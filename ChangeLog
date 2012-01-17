@@ -1,3 +1,13 @@
+2012-01-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-241
+
+	* math/polycoeffit.m: New function.
+
+	* math/polysinfit.m: Now check that x and y have same size. And
+	now working as polyfit, also row vectors are handled. Possibility
+	to specify fitting weights added.
+
 2012-01-03 	Bengt Rydberg 	bengt.rydberg@alumni.chalmers.se
 
 	* atmlab-1-0-240
