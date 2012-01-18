@@ -96,6 +96,7 @@ A.cpr_basedir = nan;
 A.cpr_subdir = nan;
 A.cpr_regexp = nan;
 A.cpr_filename = nan;
+A.cpr = SatDataset('name', 'cpr'); % new style 2012-01-18
 
 A.cloudsat_1B_CPR_basedir = nan;
 A.cloudsat_1B_CPR_subdir = nan;
@@ -173,6 +174,7 @@ A.mhs_basedir = nan;
 A.mhs_subdir = nan;
 A.mhs_regexp = nan;
 A.mhs_filename = nan;
+A.mhs = SatDataset('name', 'mhs'); % new style 2012-01-18
 
 A.modis_MOD08_M3_basedir = nan;
 A.modis_MOD08_M3_subdir = nan;
@@ -208,6 +210,7 @@ A.collocation_cpr_mhs_basedir = nan;
 A.collocation_cpr_mhs_subdir = nan;
 A.collocation_cpr_mhs_regexp = nan;
 A.collocation_cpr_mhs_filename = nan;
+A.collocation_cpr_mhs = CollocatedDataset(A.cpr, A.mhs); % new style 2012-01-18
 
 A.collocation_cpr_mhs_hdf5_basedir = nan;
 A.collocation_cpr_mhs_hdf5_subdir = nan;

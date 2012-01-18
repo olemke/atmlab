@@ -17,6 +17,8 @@ datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/sat2netcdf-0.4.ja
 % variables: YEAR, YEAR02, MONTH, DAY, DOY, SAT, SAT1, SAT2
 % regexp-output: year, doy, day, hour, minute , end. (end if the file ending)
 
+% TODO/FIXME: convert to new OO-style with SatDataset
+
 datasets_config('amsua_basedir', '/storage3/data/amsu');
 datasets_config('amsua_subdir', '$SAT_amsua_$YEAR4/$MONTH/$DAY');
 % Matlab doesn't seem to support nested groups, so have to stick with
@@ -39,6 +41,12 @@ datasets_config('calipso_regexp', '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T
 datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
 datasets_config('cpr_subdir', '$YEAR4/$DOY');
 datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)');
+% new style 2012-01-18:
+x = datasets_config('cpr');
+x.basedir = '/storage3/data/cloudsat/2B-CWC-RO.R04';
+x.subdir = '$YEAR4/$DOY';
+x.regexp = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+
 % same regexp works for all CloudSat's
 
 datasets_config('cloudsat_1B_CPR_basedir', '/storage3/data/cloudsat/1B-CPR.R04/');
@@ -102,6 +110,11 @@ datasets_config('hoaps_HTWmm_regexp' ,'HTWmm(?<year>\d{4})(?<month>\d{2})(?<day>
 datasets_config('mhs_basedir', '/storage3/data/mhs');
 datasets_config('mhs_subdir', '$SAT_mhs_$YEAR4/$MONTH/$DAY');
 datasets_config('mhs_regexp', datasets_config('amsua_regexp'));
+% new style 2012-01-18:
+x = datasets_config('mhs');
+x.basedir = '/storage3/data/mhs';
+x.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
+x.regexp = datasets_config('amsua_regexp');
 
 datasets_config('modis_MOD08_M3_basedir','/storage3/data/modis/MOD08_M3/');
 datasets_config('modis_MOD08_M3_subdir' ,'$YEAR4' );

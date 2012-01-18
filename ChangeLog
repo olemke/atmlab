@@ -1,3 +1,36 @@
+2012-01-18  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-242
+
+	* Started refactorisation of collocation codes.
+
+		Aims:
+		- More easily add collocation pairs
+		- More easily specify fields of interest when collocating
+		- Get/add additional data for existing collocations
+		- Increase maintainability
+		- Increase robustness w.r.t. duplicate scanlines
+
+		Means (work in progress):
+		- Redesign datasets configuration and implementation in an
+		  object-oriented way
+		- Split 'core' from additional data
+		- More will follow
+
+		So far, all is compatible, but for users of collocation or
+		datasets codes, this will break some backward-compatibility!
+
+	* datasets/SatDataset.m, collocations/AssociatedDataset.m,
+	  collocations/CollocatedDataset.m:
+		
+		- Added, classes will replace datasets_* cruft and
+		  find_granules_...  etc. functions, ultimately.
+
+	* site-specific/kiruna/datasets_init.m, datasets/datasets_config.m:
+
+		- Started adaptation to new system
+
+		
 2012-01-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-241
@@ -8,13 +41,13 @@
 	now working as polyfit, also row vectors are handled. Possibility
 	to specify fitting weights added.
 
-2012-01-03 	Bengt Rydberg 	bengt.rydberg@alumni.chalmers.se
+2012-01-03 	Bengt Rydberg 	<bengt.rydberg@alumni.chalmers.se>
 
 	* atmlab-1-0-240
 
 	* geodetic/circle_plane_intersect.m: fixed a problem
 
-2011-12-30 	Bengt Rydberg 	bengt.rydberg@alumni.chalmers.se
+2011-12-30 	Bengt Rydberg 	<bengt.rydberg@alumni.chalmers.se>
 
 	* atmlab-1-0-239
 
