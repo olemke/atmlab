@@ -1,3 +1,11 @@
+2012-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* site-specific/kiruna/datasets_init.m: Fixed incorrect regexp
+
+	* geoplots/gmt/gmt_plot.m: Fixed typo bug
+
+	* geoplots/gmt/equidistant_contours.m: This is no longer used
+
 2012-01-18  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-242

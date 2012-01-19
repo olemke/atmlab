@@ -134,7 +134,7 @@ datasets_config('mspps_regexp','(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<ye
 
 datasets_config('patmosx_L2b_basedir','/storage3/data/patmosx/level2b/');
 datasets_config('patmosx_L2b_subdir' ,'$YEAR4' );
-datasets_config('patmosx_L2b_regexp' ,'patmosx_(?<satellite>.{3})_(?<node>.{3})_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{7})$');
+datasets_config('patmosx_L2b_regexp' ,'patmosx_(?<satname>.{3})_(?<node>.{3})_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{7})$');
 
 datasets_config('patmosx_L3_basedir','/storage3/data/patmosx/level3/');
 datasets_config('patmosx_L3_subdir','$YEAR4/$MONTH');
