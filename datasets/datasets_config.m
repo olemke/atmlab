@@ -174,7 +174,9 @@ A.mhs_basedir = nan;
 A.mhs_subdir = nan;
 A.mhs_regexp = nan;
 A.mhs_filename = nan;
-A.mhs = SatDataset('name', 'mhs'); % new style 2012-01-18
+A.mhs = SatDataset('name', 'mhs', ...
+                   'reader', @common_read_poes_radiometer, ...
+                   'granule_duration', 6130); % new style 2012-01-18
 
 A.modis_MOD08_M3_basedir = nan;
 A.modis_MOD08_M3_subdir = nan;
@@ -211,6 +213,8 @@ A.collocation_cpr_mhs_subdir = nan;
 A.collocation_cpr_mhs_regexp = nan;
 A.collocation_cpr_mhs_filename = nan;
 A.collocation_cpr_mhs = CollocatedDataset(A.cpr, A.mhs); % new style 2012-01-18
+A.holl10_data = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 data');
+A.holl10_meandata = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 mean data');
 
 A.collocation_cpr_mhs_hdf5_basedir = nan;
 A.collocation_cpr_mhs_hdf5_subdir = nan;

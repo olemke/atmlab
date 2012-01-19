@@ -1,3 +1,11 @@
+2012-01-19  Gerrit Holl <gerrit.holl@ltu.se>
+
+	* collocations/AssociatedDataset.m: Add to "parent".
+
+	* collocations/TODO: Expanded a bit.
+
+	* datasets/SatDataset.m, datasets/datasets_config.m, collocations/CollocatedDataset.m: Work in progress.
+
 2012-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* site-specific/kiruna/datasets_init.m: Fixed incorrect regexp

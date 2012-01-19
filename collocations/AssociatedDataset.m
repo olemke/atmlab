@@ -12,6 +12,7 @@ classdef AssociatedDataset < SatDataset
         function ad = AssociatedDataset(cd, varargin)
             ad = ad@SatDataset(varargin{:}); % call parent constructor
             ad.parent = cd;
+            cd.add_associated(ad);
         end
     end
 end

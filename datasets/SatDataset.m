@@ -1,4 +1,4 @@
-classdef SatDataset < handle
+classdef SatDataset < handle % subclass from handle to pass-by-reference
     % Class to represent a dataset
     %
     % Work in progress!
@@ -12,14 +12,19 @@ classdef SatDataset < handle
         subdir;
         regexp;
         filename;
+        reader = @(p)[];
+        granule_duration;
     end
     
     % read-only props (alterable with methods)
     properties (SetAccess = protected)
-        collocations = [];
+        collocated_datasets = [];
     end
     
     methods
+        
+        %% constructor
+        
         function ds = SatDataset(varargin)
             % Creates SatDataset object
             %
@@ -29,12 +34,14 @@ classdef SatDataset < handle
                 ds.(varargin{i}) = varargin{i+1};
             end
         end
+                
+        %% methods for internal use (not private, but from other classes)
        
-        function AddCollocation(ds, cd)
+        function add_collocated_dataset(ds, cd)
             % INTERNAL USE. Adds a collocated dataset.
             %
             % This is called by the CollocatedDataset constructor.
-            ds.collocations = [ds.collocations cd];
+            ds.collocated_datasets = [ds.collocated_datasets cd];
         end
     end
 end
