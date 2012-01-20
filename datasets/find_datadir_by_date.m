@@ -26,6 +26,8 @@ function fulldir = find_datadir_by_date(datevec, satname, dataset)
 
 % verify basedir is defined and exists
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 errid = 'atmlab:find_datadir_by_date';
 
 try

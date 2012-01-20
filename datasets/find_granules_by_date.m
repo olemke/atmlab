@@ -39,6 +39,8 @@ function [M, paths] = find_granules_by_date(year, month, day, sat, dataset, ...
 
 % errid = 'atmlab:find_granules_by_date';
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 if ~exist('with_yesterday', 'var')
     with_yesterday = true;
 end

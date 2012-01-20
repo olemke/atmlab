@@ -45,7 +45,7 @@ datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minut
 x = datasets_config('cpr');
 x.basedir = '/storage3/data/cloudsat/2B-CWC-RO.R04';
 x.subdir = '$YEAR4/$DOY';
-x.regexp = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+x.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
 
 % same regexp works for all CloudSat's
 
@@ -114,7 +114,7 @@ datasets_config('mhs_regexp', datasets_config('amsua_regexp'));
 x = datasets_config('mhs');
 x.basedir = '/storage3/data/mhs';
 x.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
-x.regexp = datasets_config('amsua_regexp');
+x.re = datasets_config('amsua_regexp');
 
 datasets_config('modis_MOD08_M3_basedir','/storage3/data/modis/MOD08_M3/');
 datasets_config('modis_MOD08_M3_subdir' ,'$YEAR4' );

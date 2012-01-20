@@ -10,7 +10,7 @@ function write_collocations_netcdf(year, month, day, S, D, M, ...
 %
 % FORMAT
 %   
-%   write_collocations(year, month, day, S, sat1, sensor1, sat2, sensor2)
+%   write_collocations(year, month, day, S, D, M, sat1, sensor1, sat2, sensor2)
 %
 % IN
 %

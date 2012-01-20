@@ -20,7 +20,7 @@ function first = granule_first_line(sat, sensor, d, reload)
 %
 %   sat         string      Satellite
 %   sensor      string      Sensor
-%   datevec     vector      Staring date/time for granule
+%   datevec     vector      Starting date/time for granule
 %   reload      logical     (optional) Reload scanline data (i.e. not
 %                           cached). Defaults to false.
 %
@@ -33,6 +33,8 @@ function first = granule_first_line(sat, sensor, d, reload)
 % $Id$
 
 persistent S;
+
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
 
 if isempty(S)
     S = struct;

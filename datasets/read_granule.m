@@ -33,6 +33,8 @@ function M = read_granule(sat, sensor, datevec, remdouble, force)
 %
 % $Id$
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 if ~exist('remdouble', 'var')
     remdouble = true;
 end

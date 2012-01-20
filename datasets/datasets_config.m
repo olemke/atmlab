@@ -96,7 +96,9 @@ A.cpr_basedir = nan;
 A.cpr_subdir = nan;
 A.cpr_regexp = nan;
 A.cpr_filename = nan;
-A.cpr = SatDataset('name', 'cpr'); % new style 2012-01-18
+A.cpr = SatDataset('name', 'cpr', ...
+                   'reader', @common_read_cpr_2BCWCRO, ...
+                   'granule_duration', 5932); % new style 2012-01-18
 
 A.cloudsat_1B_CPR_basedir = nan;
 A.cloudsat_1B_CPR_subdir = nan;

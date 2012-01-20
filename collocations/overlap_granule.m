@@ -30,6 +30,8 @@ function [granules, names] = overlap_granule(sat1, sensor1, date1, sat2, sensor2
 %
 % $Id$
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 %% special case sat1==poes: do all POES sats
 
 if strcmp(sat2, 'poes')
