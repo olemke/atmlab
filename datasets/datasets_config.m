@@ -242,6 +242,7 @@ A.collocation_mhs_mhs_basedir = nan;
 A.collocation_mhs_mhs_subdir = nan;
 A.collocation_mhs_mhs_regexp = nan;
 A.collocation_mhs_mhs_filename = nan;
+A.collocation_mhs_mhs = CollocatedDataset(A.mhs, A.mhs);
 
 A.collocation_mhs_mhs_hdf5_basedir = nan;
 A.collocation_mhs_mhs_hdf5_subdir = nan;

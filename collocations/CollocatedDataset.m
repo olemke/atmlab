@@ -174,7 +174,7 @@ classdef CollocatedDataset < SatDataset
             if size(secondary_granules, 1)==0
                 error(['atmlab:' mfilename ':noother'], ...
                     'No overlapping granules found for [%s] %s/%s with %s/%s', ...
-                    num2str(date1), sat1, sensor1, sat2, sensor2);
+                    num2str(date1), spec1, self.primary.name, spec2, self.secondary.name);
             end
             
             logtext(fid, 'Found %d other granules to collocate with\n', size(secondary_granules, 1));
@@ -190,8 +190,7 @@ classdef CollocatedDataset < SatDataset
             % incorrect/ need to be corrected for. This causes more problems than it
             % solves, so I will remove the duplicates in the postprocessing instead.
             try
-                % this method stores data in attribute
-                self.primary.read_granule(date1, spec1, false); % keep duplicates for now
+                data1 = self.primary.read_granule(date1, spec1, false); % keep duplicates for now
             catch ME
                 switch ME.identifier
                     case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
@@ -202,12 +201,12 @@ classdef CollocatedDataset < SatDataset
                 end
             end
             
-            self.version{1} = self.primary.version;
-            self.version{2} = '?'; % secondary version not yet available
+            %self.version{1} = self.primary.version;
+            %self.version{2} = '?'; % secondary version not yet available
             
-            if isempty(self.primary.data.time)
+            if isempty(data1.time)
                 logtext(fid, 'Primary is empty, nothing to collocate\n');
-                self.version{2} = 'N/A';
+%                self.version{2} = 'N/A';
                 return
             end
             
@@ -219,26 +218,26 @@ classdef CollocatedDataset < SatDataset
             % the secondary filename in order not to read files one knows will not
             % contain overlap anyway.
             
-            % FIXME: do I really want to manipulate self.primary.data, or
-            % use a local copy? Can I?
-            self.primary.data.time_orig = self.primary.data.time; % store because of subsequent unify_time_axis can lead to errors
-            self.primary.data.eff_range = double(self.primary.data.epoch) + ...
-                    [min(self.primary.data.time)-colloc_config('interval'), ...
-                     max(self.primary.data.time)+colloc_config('interval')];
+            % self.primary and self.secondary may actually be the same
+            % object, do not store any 'temporary' data there.
+            data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
+            data1.eff_range = double(data1.epoch) + ...
+                    [min(data1.time)-colloc_config('interval'), ...
+                     max(data1.time)+colloc_config('interval')];
             
             %% loop through all the granules to collocate with
             
             for i = 1:size(secondary_granules, 1)
                 datecell = num2cell(secondary_granules(i, 1:5));
 
-                logtext(atmlab('OUT'), 'Collocating with %s %04d-%02d-%02d %02d:%02d\n', ...
+                logtext(atmlab('OUT'), 'Collocating with ''%s'' @ %04d-%02d-%02d %02d:%02d\n', ...
                     self.secondary.name, datecell{1:5});
                 
                 % Overlap check 2; primary data with secondary filename
                 data2_start = date2unixsecs(datecell{1:5});
                 data2_end = data2_start + self.secondary.granule_duration;
                 
-                if (data2_start > self.primary.data.eff_range(2)) || (data2_end < self.primary.data.eff_range(1))
+                if (data2_start > data1.eff_range(2)) || (data2_end < data1.eff_range(1))
                     % no possible time overlap; data1 range already compensated for
                     % colloc_config('interval'); no use even reading granule2
                     logtext(atmlab('OUT'), 'Not reading, no overlap with primary\n');
@@ -248,7 +247,7 @@ classdef CollocatedDataset < SatDataset
                 %% read secondary
                 
                 try
-                    self.secondary.read_granule(spec2, false);
+                    data2 = self.secondary.read_granule(secondary_granules(i, :), spec2, false);
                 catch ME
                     switch ME.identifier
                         case {'atmlab:find_datafile_by_date', 'atmlab:invalid_data'}
@@ -260,49 +259,53 @@ classdef CollocatedDataset < SatDataset
                     end
                 end
                 
-                self.version{2} = self.secondary.version;
-                self.secondary.data.time_orig = self.secondary.data.time; % store, see note at data1.time_orig
-                if isempty(self.secondary.data.time)
+                %self.version{2} = self.secondary.version;
+                data2.time_orig = data2.time; % store, see note at data1.time_orig
+                if isempty(data2.time)
                     logtext(fid, 'Secondary is empty, skipping\n');
                     continue
                 end
                 
                 %%
-                switch sign(self.primary.data.epoch - self.secondary.data.epoch)
+                switch sign(data1.epoch - data2.epoch)
                     case -1 % data1 epoch is earliest
-                        self.secondary.data.time = self.secondary.data.time + double(self.secondary.data.epoch - self.primary.data.epoch);
-                        self.secondary.data.epoch = self.primary.data.epoch;
+                        data2.time = data2.time + double(data2.epoch - data1.epoch);
+                        data2.epoch = data1.epoch;
                     case 0 % do nothing
                     case 1 % data2 epoch is earliest
-                        self.primary.data.time = self.primary.data.time + double(self.primary.data.epoch - self.secondary.data.epoch);
-                        self.primary.data.epoch = self.secondary.data.epoch;
+                        % FIXME: Bug? primary changes also for next loop
+                        % iteration? Or should be ok as long as
+                        % epoch/time consistent, maybe will iteratively
+                        % increase but at least consistent
+                        data1.time = data1.time + double(data1.epoch - data2.epoch);
+                        data1.epoch = data2.epoch;
                     otherwise
                         error(['atmlab:' mfilename ':bug'], 'Reached impossible place. Bug.');
                 end
                 
                 % overlap check 3: primary data, secondary data
-                [iv1, iv2] = find_common_time(self.primary.data.time, self.secondary.data.time, colloc_config('interval'));
+                [iv1, iv2] = find_common_time(data1.time, data2.time, colloc_config('interval'));
                 % limit to one day (if needed)
                 switch oneday
                     case 1
                         % only consider data on the same date as the start for data1
-                        if self.primary.data.time(1) < 86400
-                            sameday = self.primary.data.time < 86400;
+                        if data1.time(1) < 86400
+                            sameday = data1.time < 86400;
                         else
-                            sameday = self.primary.data.time < 2*86400;
+                            sameday = data1.time < 2*86400;
                         end
                         if ~all(sameday)
                             logtext(fid, 'taking only %d/%d that are on the same day\n', ...
-                                sum(sameday), length(self.primary.data.time));
+                                sum(sameday), length(data1.time));
                         end
                         iv1 = iv1 & sameday;
                     case 2
                         % only consider data on date after the start date for data1
-                        sameday = self.primary.data.time > 86400;
+                        sameday = data1.time > 86400;
                         iv1 = iv1 & sameday;
                         if ~all(sameday)
                             logtext(fid, 'taking only %d/%d that are on the next day\n', ...
-                                sum(sameday), length(self.primary.data.time));
+                                sum(sameday), length(data1.time));
                         end
                 end
                 if ~(any(iv1) && any(iv2)) % no overlap
@@ -311,12 +314,12 @@ classdef CollocatedDataset < SatDataset
                 end
                 
                 %% perform collocations
-                collocations = collocate(self.primary.data.time(iv1), ...
-                                         self.primary.data.lat(iv1, :), ...
-                                         self.primary.data.lon(iv1, :), ...
-                                         self.secondary.data.time(iv2), ...
-                                         self.secondary.data.lat(iv2, :), ...
-                                         self.secondary.data.lon(iv2, :), ...
+                collocations = collocate(data1.time(iv1), ...
+                                         data1.lat(iv1, :), ...
+                                         data1.lon(iv1, :), ...
+                                         data2.time(iv2), ...
+                                         data2.lat(iv2, :), ...
+                                         data2.lon(iv2, :), ...
                     colloc_config('distance'), colloc_config('interval'));
                 if any(collocations)
                     % compensate for the fact that we passed only a subset to collocate
@@ -330,8 +333,8 @@ classdef CollocatedDataset < SatDataset
                 % should return a matrix with info
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
-                % will store in member 'collocated_data'
-                self.process(collocations);
+                % will store in member 'collocated_data'?
+                result = self.process(collocations, data1, data2);
                 
                 % FIXME: associated datasets
                 % FIXME: additional fields copied
@@ -341,13 +344,13 @@ classdef CollocatedDataset < SatDataset
             end
         end
         
-        function process(self, collocations)
+        function processed = process(self, collocations, data1, data2)
             % Process core collocations
             %
             % + Process 'core' fields
             % + Copy additional fields?
             % + Concatenate to what's already there?
-            self.collocated_data = collocations;
+            processed = collocations;
         end
 
         %%

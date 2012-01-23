@@ -241,7 +241,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
         end        
         
-        function read_granule(self, date, varargin)
+        function data = read_granule(self, date, varargin)
             % read_granule Read any granule
             %
             % High-level function to read a particular granule for a
@@ -266,8 +266,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % OUT
             %
-            %   nothing, but sets member '.data' which is:
-            %               struct  Contains at least lat, lon, time and one or more
+            %   data        struct  Contains at least lat, lon, time and one or more
             %                       data fields. Exact results depend on the particular
             %                       satellite/sensor-pair.
             %
@@ -283,7 +282,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
             %    func2str(reader), datafile);
             try
-                self.data = self.reader(datafile);
+                data = self.reader(datafile);
             catch ME
                 if force
                     switch ME.identifier
@@ -299,19 +298,19 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
             end
             %logtext(colloc_config('stdout'), 'read %s\n', datafile);
-            nlines = size(self.data.time, 1);
+            nlines = size(data.time, 1);
             
             if remdouble
                 % read ballast
                 firstline = self.granule_first_line(datevec, spec);
                 % get rid of ballast in all fields
-                for f = fieldnames(self.data)'
+                for f = fieldnames(data)'
                     fn = f{1};
-                    if isnumeric(self.data.(fn)) && size(self.data.(fn), 1) == nlines
+                    if isnumeric(data.(fn)) && size(data.(fn), 1) == nlines
                         % magic in next lines explained at
                         % http://www.mathworks.de/matlabcentral/newsreader/view_thread/290890
-                        sz = size(self.data.(fn));
-                        self.data.(fn) = reshape(self.data.(fn)(firstline:nlines, :), [nlines-firstline+1, sz(2:end)]);
+                        sz = size(data.(fn));
+                        data.(fn) = reshape(data.(fn)(firstline:nlines, :), [nlines-firstline+1, sz(2:end)]);
                     end
                 end
             end

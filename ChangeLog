@@ -1,4 +1,56 @@
+2012-01-23  Gerrit Holl  <gerrit.holl@ltu.se>
+	
+	* atmlab-1-0-246
+
+	* collocations/TODO: Add some items
+
+	* collocations/CollocatedDataset.m: Bugfixes
+
+	* datasets/SatDataset.m: Bugfixes
+
+	* datasets/datasets_config.m: Add mhs/mhs
+
+2012-01-20  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-245
+
+	* collocations/CollocatedDataset.m:
+	
+	  (overlap_granule): Added, based on function
+	  	- Works, but support for 'POES' shortcut dropped
+
+	  (collocate_granule): Added, based on function
+	  	- Not finished
+
+	* datasets/SatDataset.m:
+
+	  (find_datadir_by_date): Added, based on function
+	  	- Works, but support for 'POES' shortcut dropped
+
+	  (find_granules_by_date): Added, based on function
+	  	- Works, but support for 'POES' shortcut dropped
+	  
+	  (find_granule_by_datetime): Added, based on function find_datafile_by_date
+
+	  (read_granule): Added, based on function
+
+	  (granule_first_line): Added, based on function
+
+	* collocations/overlap_granule.m, collocations/collocate_granule.m,
+	datasets/read_granule.m, datasets/find_datadir_by_date.m,
+	datasets/find_granules_by_date.m, datasets/granule_first_line.m:
+	
+	  - Those are now Deprecated at expense of their OO brothers
+
+	* collocations/write_collocations_netcdf.m: Fix buglet
+
+	* site-specific/kiruna/datasets_init.m: regexp -> re
+
+	* datasets/datasets_config.m: expand cpr example
+
 2012-01-19  Gerrit Holl <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-244
 
 	* collocations/AssociatedDataset.m: Add to "parent".
 
@@ -7,6 +59,8 @@
 	* datasets/SatDataset.m, datasets/datasets_config.m, collocations/CollocatedDataset.m: Work in progress.
 
 2012-01-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-243
 
 	* site-specific/kiruna/datasets_init.m: Fixed incorrect regexp
 
