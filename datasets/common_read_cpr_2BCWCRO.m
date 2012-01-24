@@ -32,8 +32,8 @@ S.time = S.UTC_start + S.Profile_time;
 
 % rename some fields
 
-S.lon = S.Longitude;
-S.lat = S.Latitude;
+S.lon = double(S.Longitude(:));
+S.lat = double(S.Latitude(:));
 S.version = S.product_version;
 
 % add filename

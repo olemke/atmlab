@@ -1,4 +1,4 @@
-classdef CollocatedDataset < SatDataset
+classdef CollocatedDataset < SatDataset %& HomemadeDataset
     % Defines a collocated dataset, between two (other) datasets
     %
     % Work in progress!
@@ -77,23 +77,32 @@ classdef CollocatedDataset < SatDataset
                     'long_name', 'secondary longitude', ...
                     'units', 'degrees_east', ...
                     'valid_range', [-180 180])));
+        
+        cols;
     end
     
     methods
-        function cd = CollocatedDataset(prim, sec, varargin)
-            cd = cd@SatDataset(varargin{:}); % call parent constructor
+        function self = CollocatedDataset(prim, sec, varargin)
+            self = self@SatDataset(varargin{:}); % call parent constructor
             % check that both are SatDataset
             for x = {prim, sec}
                 assert(isa(x{1}, 'SatDataset'), ['atmlab:' mfilename ':TypeError'], ...
                     'Collocations must be between 2 x SatDataset, got %s instead', ...
                     class(x{1}));
-                x{1}.add_collocated_dataset(cd);
+                x{1}.add_collocated_dataset(self);
             end
-            cd.primary = prim;
-            cd.secondary = sec;
-            if isempty(cd.name)
-                cd.name = ['collocations_' prim.name '_' sec.name];
+            self.primary = prim;
+            self.secondary = sec;
+            if isempty(self.name)
+                self.name = ['collocations_' prim.name '_' sec.name];
             end
+            
+            % make 'cols'-structure for internal data specification
+             
+            fnms = fieldnames(self.members);
+            nfields = length(fnms);
+            fv = 1:nfields;
+            self.cols = cell2struct(num2cell(fv), fnms.', 2);
         end
         
         %%
@@ -143,7 +152,7 @@ classdef CollocatedDataset < SatDataset
             secondary_granules = threedays(b:e, :);
         end
         
-        function result = collocate_granule(self, date1, spec1, spec2, varargin)
+        function [result, additional_results] = collocate_granule(self, date1, spec1, spec2, varargin)
             
             % collocate_granule Collocate granules from sat/sensor pairs
             %
@@ -155,16 +164,13 @@ classdef CollocatedDataset < SatDataset
             %
             % TO BE DOCUMENTED
             
-            oneday = optargs(varargin, {false});
+            [additionals, oneday] = optargs(varargin, {{}, false});
+            additional_results = cell(size(additionals));
             
             %% output
             
             fid = atmlab('OUT');
             eid = atmlab('ERR');
-            
-            %% get handles for reading, processing
-            
-            % FIXME?
             
             %% find date/times for which to search for secondary granules
             
@@ -181,7 +187,7 @@ classdef CollocatedDataset < SatDataset
 
             %% 
             
-            result = [];
+            result = zeros(0, length(fieldnames(self.cols)));
 
             %% read data for sat1/sensor1
             % Here, I decide to keep the duplicates for now. Simple is better than
@@ -304,7 +310,7 @@ classdef CollocatedDataset < SatDataset
                         sameday = data1.time > 86400;
                         iv1 = iv1 & sameday;
                         if ~all(sameday)
-                            logtext(fid, 'taking only %d/%d that are on the next day\n', ...
+                            logtext(fid, 'taking from primary only %d/%d that are on the next day\n', ...
                                 sum(sameday), length(data1.time));
                         end
                 end
@@ -333,25 +339,181 @@ classdef CollocatedDataset < SatDataset
                 % should return a matrix with info
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
-                % will store in member 'collocated_data'?
-                result = self.process(collocations, data1, data2);
+                result = [result; self.process(collocations, data1, date1, spec1, data2, secondary_granules(i, :), spec2)]; %#ok<AGROW>
                 
+                %% process additional
+                %
+                % additionals are all subclasses of AssociatedDataset able
+                % to process data and knowing how to store it, how to deal
+                % with it, etc.
+                % for copying, a special AssociatedDataset shall take care
+                % of this
                 % FIXME: associated datasets
                 % FIXME: additional fields copied
-                % FIXME: process should concatenate
-                
+                for j = 1:length(additionals)
+                    additional = additionals{j};
+                    % FIXME: pass more, what else?
+                    % FIXME: multiple datasets from one additional, or
+                    % second additional needing output from 1st additional
+                    % FIXME: concatenation in subfunction or so, will be
+                    % needed in collocate_date and date_range as well
+                    this_additional_result = additional.process(result);
+                    if isempty(additional_results{j})
+                        additional_results{j} = this_additional_result;
+                    else
+                        additional_results{j} = [additional_results{j}; this_additional_result];
+                    end
+                end
                 logtext(fid, 'Info collected\n');
             end
         end
         
-        function processed = process(self, collocations, data1, data2)
+        function result = collocate_date(self, date, spec1, spec2, varargin)
+            
+            % collocate_date Collect all collocations for given date
+            %
+            % This method collects all collocations for the given date.
+            %
+            % FORMAT
+            %
+            %   M = collocate_date([year, month, day], spec1, spec2)
+            %
+            % IN
+            %
+            %   datevec vector      [year month day]
+            %   spec1
+            %   spec2
+            %
+            % OUT
+            %
+            %   M       matrix      results...
+            %
+            % FIXME DOC
+            %
+            % $Id$
+            
+            
+            fid = atmlab('OUT');
+            year = date(1);
+            month = date(2);
+            day = date(3);
+            % find granules for primary dataset; if the length equals one day, do not
+            % take the day before as it's already sorted per day
+            grans = self.primary.find_granules_by_date(date, spec1, ...
+                self.primary.granule_duration~=86400);
+            if isempty(grans)
+                logtext(atmlab('ERR'), 'no granules found %s/%s %d-%d-%d\n', ...
+                    spec1, year, monht, day);
+            end
+            ngrans = size(grans, 1);
+            
+            result = zeros(0, length(fieldnames(self.cols)));
+
+            anysuccess = false;
+            
+            for i = 1:ngrans
+                % keep track, because first granule is probably yesterday
+                thisyear = grans(i, 1);
+                thismonth = grans(i, 2);
+                thisday = grans(i, 3);
+                hour = grans(i, 4);
+                minute = grans(i, 5);
+                
+                logtext(fid, 'Collocating %s %s %04d-%02d-%02d %02d:%02d with %s %s \n', ...
+                    self.primary.name, spec1, thisyear, thismonth, thisday, hour, minute, self.secondary.name, spec2);
+                
+                if ~isequal([thisyear thismonth thisday], [year month day]);
+                    % only take collocations happening in part of granule occuring on
+                    % the day requested
+                    oneday = 2;
+                else % take any collocations happening on the day requested
+                    oneday = 1;
+                end
+                
+                try
+                    result_granule = self.collocate_granule(...
+                        [thisyear, thismonth, thisday, hour, minute], spec1, spec2, oneday);
+                    anysuccess = true;
+                catch ME
+                    switch ME.identifier
+                        case 'atmlab:find_datafile_by_date'
+                            logtext(atmlab('ERR'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
+                                thisyear, thismonth, thisday, hour, minute, self.primary.name, spec1, ME.message);
+                            continue
+                        case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:collocate_granule:noother'}
+                            logtext(atmlab('ERR'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
+                                thisyear, thismonth, thisday, hour, minute, self.primary.name, spec1, ME.message);
+                            continue
+                        case {'MATLAB:hdfinfo:invalidFile'}
+                            logtext(atmlab('ERR'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
+                                self.primary.name, spec1, thisyear, thismonth, thisday, hour, minute, ME.message);
+                            continue
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
+                result = [result; result_granule]; %#ok<AGROW>
+            end
+            
+            if ~anysuccess
+                error('atmlab:collocate_date:nosource', 'no source data found at all');
+            end
+            
+        end
+        
+        function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
             % Process core collocations
             %
             % + Process 'core' fields
             % + Copy additional fields?
             % + Concatenate to what's already there?
-            processed = collocations;
+            %
+            % NOTE: time is assumed to be 1D
+            
+            n = size(collocations, 1);
+            X = mat2cell(collocations, size(collocations, 1), [1 1 1 1]);
+            
+            c = self.cols;
+            nfields = length(fieldnames(c));
+            M = nan*zeros(n, nfields);
+            [line1, pos1, line2, pos2] = X{:};
+            
+            % index for direct addressing
+            i1 = sub2ind(size(data1.lat), line1, pos1);
+            i2 = sub2ind(size(data2.lat), line2, pos2);
+
+            M(:, c.LINE1) = line1;
+            M(:, c.LINE2) = line2;
+                        
+            M(:, c.POS1) = pos1;
+            M(:, c.POS2) = pos2;
+            
+            M(:, c.LAT1) = data1.lat(i1);
+            M(:, c.LON1) = data1.lon(i1);
+            
+            M(:, c.LAT2) = data2.lat(i2);
+            M(:, c.LON2) = data2.lon(i2);
+            
+            % FIXME: this is not correct, use datevec!
+            M(:, c.START1) = data1.epoch; % FIXME: not really
+            M(:, c.START2) = data2.epoch; % FIXME: not really
+            
+            M(:, c.TIME1) = data1.epoch + data1.time(line1);
+            M(:, c.TIME2) = data2.epoch + data2.time(line2);
+                        
+            %% remove duplicates
+            
+            first1 = self.primary.granule_first_line(date1, spec1);
+            first2 = self.secondary.granule_first_line(date2, spec2);
+            wrongrows = (M(:, c.LINE1) < first1) & ...
+                        (M(:, c.LINE2) < first2);
+            logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
+                                   'or secondary before %d\n'], ...
+                                   sum(wrongrows), first1, first2); 
+            M(wrongrows, :) = [];
+            
         end
+
 
         %%
         

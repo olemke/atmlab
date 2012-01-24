@@ -1,3 +1,38 @@
+2012-01-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-251
+
+	* collocations/collocate_date.m: deprecated, use OO way
+
+	* collocations/CollocatedDataset.m:
+
+	(CollocatedDataset): Create 'cols'-structure
+
+	(collocate_granule):
+		- Bugfix, collect data from all granules
+		- Started work on additional datasets for processing
+
+	(collocate_date): Added, mostly from collocate_date.m
+
+	* sensors/cloudsat_read_zipped.m:
+
+	- Added cleanup object
+	- Use Salomons lower-level reading routine
+
+	* datasets/SatDataset.m:
+
+	- Have a 'satname' for single-satellite datasets
+
+	(granule_first_line): Bugfixes, should have output, filenames new scheme
+
+	* datasets/datasets_config.m:
+
+	- Add satname for cpr
+
+	* datasets/common_read_cpr_2BCWCRO.m:
+
+	- Convert lat and lon to double
+
 2012-01-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-250

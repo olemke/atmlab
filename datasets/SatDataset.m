@@ -14,6 +14,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         filename;
         reader = @(p)[];
         granule_duration;
+        satname; % for single-satellite datasets
     end
     
     % read-only props (alterable with methods)
@@ -316,7 +317,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
         end
                 
-        function granule_first_line(self, d, varargin)
+        function first = granule_first_line(self, d, varargin)
             % granule_first_line Returns first scanline not present in previous granule
             %
             % For a certain granule, return the number of the first scanline that
@@ -357,10 +358,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             assert(ischar(spec), ['atmlab:' mfilename], ...
                 'function works only for single-satellite datasets');
-            sat = spec;
+            if isempty(spec)
+                sat = self.satname;
+            else
+                sat = spec;
+            end
             
             if isfield(S, sat) && isfield(S.(sat), self.name) && ~reload
-                ht = S.(sat).(sensor);
+                ht = S.(sat).(self.name);
             else
                 scanfile = datasets_config('firstline_data');
                 scanfile = strrep(scanfile, '$SAT', sat);
@@ -368,7 +373,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 
                 t = load(scanfile);
                 ht = t.ht;
-                S.(sat).(sensor) = ht;
+                S.(sat).(self.name) = ht;
             end
             
             if isscalar(d)

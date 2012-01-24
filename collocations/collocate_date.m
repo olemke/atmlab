@@ -30,6 +30,9 @@ function [overlap, data, meandata] = collocate_date(year, month, day, sat1, sens
 %
 % $Id$
 
+% FIXME: update to new-style
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 fid = atmlab('OUT');
 
 % find granules for primary dataset; if the length equals one day, do not
