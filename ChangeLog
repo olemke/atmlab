@@ -1,3 +1,10 @@
+2012-01-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-250
+
+	* sensors/read_cloudsat_hdf.m: make sure that the output fields
+	are not a 1x1 cell array, strings values are now always row vectors.
+
 2012-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-249

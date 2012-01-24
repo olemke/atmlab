@@ -97,7 +97,17 @@ for i = 1:length(sdsName)
     
     % READ the data.
     d.(sdsName{i}) = hdfread(hdfFile,sdsName{i});
-
+    
+    % hdfread outputs the data in a 1x1 cell. We don't need that
+    if iscell(d.(sdsName{i})) && length(iscell(d.(sdsName{i})))==1
+        d.(sdsName{i}) = d.(sdsName{i}){1};
+    end
+    
+    % make sure strings are always rowvectors
+    if ischar(d.(sdsName{i}))
+        d.(sdsName{i}) = d.(sdsName{i})(:)';
+    end
+        
     % Return SDS attributes if the user has supplied a second output variable.
     if nargout == 2
         attr.(sdsName{i}) = Attributes{ismember(allfields,sdsName{i})};
