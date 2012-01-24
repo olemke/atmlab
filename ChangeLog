@@ -1,6 +1,16 @@
+2012-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-248
+
+	* sensors/cloudsat_read.m (unitconv): Added a fix that should
+	make the function OK independently if HDF returns strings as
+	columns or rows. Row strings now enforced locally in sub-function.
+
+	No time for testing. Please, report if any problems.
+
 2012-01-24  Salomon Eliasson  <s.eliasson@ltu.se>
 
-	* atmlab-1-0-2477
+	* atmlab-1-0-247
 
 	* sensors/cloudsat_read.m: Added note to help section that this
 	function doesn't work from matlab 2011b ->, and suggest to use
