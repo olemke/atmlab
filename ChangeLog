@@ -1,5 +1,12 @@
 2012-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-1-0-249
+
+	* sensors/cloudsat_read.m (unitconv) Changed to correct name of
+	function. vec2row was written as col2row.
+
+2012-01-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-1-0-248
 
 	* sensors/cloudsat_read.m (unitconv): Added a fix that should

@@ -388,7 +388,7 @@ function u=unitconv(unit,field)
 
 % Make sure that *unit* is a row vector (can be column for old HDF versions)
 %
-unit = col2row( unit );
+unit = vec2row( unit );
   
 if strcmp(unit,['mg m^{-3}'])
    u=1e-3;
