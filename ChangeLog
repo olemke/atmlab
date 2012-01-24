@@ -1,5 +1,18 @@
+2012-01-24  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-2477
+
+	* sensors/cloudsat_read.m: Added note to help section that this
+	function doesn't work from matlab 2011b ->, and suggest to use
+	read_cloudsat_hdf.m instead, although this function returns the
+	desired fields and there attributes as is, i.e. without scaling,
+	converting etc.
+
+	* sensors/read_cloudsat_hdf.m: Added alternative cloudsat reading
+	routine.
+
 2012-01-23  Gerrit Holl  <gerrit.holl@ltu.se>
-	
+
 	* atmlab-1-0-246
 
 	* collocations/TODO: Add some items

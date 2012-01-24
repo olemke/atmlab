@@ -67,7 +67,10 @@
 %       c1arg       Arguments for optional choice 1. See above.
 %       choice2     Optional choice 2. See above.
 %       c2arg       Arguments for optional choice 2. See above.
-
+%
+% BUG: This function doesn't from 2011b. You may use read_cloudsat_hdf.m
+% instead 
+%
 % 2007-10-24   Created by Patrick Eriksson.
 
 
