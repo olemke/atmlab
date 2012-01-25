@@ -1,3 +1,28 @@
+2012-01-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-252
+
+	* collocations/AssociatedDataset.m:
+
+	- Is now an abstract class
+
+	- Added abstract methods to be implemented by subclasses
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule):
+		- Pass additionals to reading routines
+		- Wrote more thoughts on additionals processing
+
+	* datasets/SatDataset.m:
+
+	(read_granule):
+		- Prepare for 'additionals'
+
+	* datasets/common_read_cpr_2BCWCRO.m:
+
+	- Optionally add more fields to read
+
 2012-01-24  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-251

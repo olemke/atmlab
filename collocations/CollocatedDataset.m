@@ -162,10 +162,28 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             %
             % spec2: specification for 2 (e.g. satellite).
             %
+            % additionals, cell array of AssociatedDataset-objects (or,
+            % naturally, one of its subclasses)
+            %
+            % oneday
+            %
             % TO BE DOCUMENTED
             
             [additionals, oneday] = optargs(varargin, {{}, false});
             additional_results = cell(size(additionals));
+            
+            % collect all extra fields, for all additional datasets
+            extra_args_primary = {};
+            extra_args_secondary = {};
+            for i = 1:length(additionals)
+                addi = additionals{i};
+                primfields = addi.primary_arguments();
+                secofields = addi.secondary_arguments();
+                extra_args_primary = [extra_args_primary primfields]; %#ok<AGROW>
+                extra_args_secondary = [extra_args_secondary secofields]; %#ok<AGROW>
+            end
+            extra_args_primary = unique(extra_args_primary);
+            extra_args_secondary = unique(extra_args_secondary);
             
             %% output
             
@@ -196,7 +214,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             % incorrect/ need to be corrected for. This causes more problems than it
             % solves, so I will remove the duplicates in the postprocessing instead.
             try
-                data1 = self.primary.read_granule(date1, spec1, false); % keep duplicates for now
+                data1 = self.primary.read_granule(date1, spec1, extra_args_primary, false); % keep duplicates for now
             catch ME
                 switch ME.identifier
                     case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
@@ -253,7 +271,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                 %% read secondary
                 
                 try
-                    data2 = self.secondary.read_granule(secondary_granules(i, :), spec2, false);
+                    data2 = self.secondary.read_granule(secondary_granules(i, :), spec2, extra_args_secondary, false);
                 catch ME
                     switch ME.identifier
                         case {'atmlab:find_datafile_by_date', 'atmlab:invalid_data'}
@@ -355,6 +373,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                     % FIXME: pass more, what else?
                     % FIXME: multiple datasets from one additional, or
                     % second additional needing output from 1st additional
+                    % --> dependencies
                     % FIXME: concatenation in subfunction or so, will be
                     % needed in collocate_date and date_range as well
                     this_additional_result = additional.process(result);
@@ -514,7 +533,6 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             
         end
 
-
         %%
         
         function add_associated(cd, ad)
@@ -526,3 +544,11 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
 
     end
 end
+
+%%%%%%%%%%%%%%%%%%
+%% SUBFUNCTIONS %%
+%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%
+%% END OF FILE %%
+%%%%%%%%%%%%%%%%%

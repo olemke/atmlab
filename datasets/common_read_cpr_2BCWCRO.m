@@ -1,4 +1,4 @@
-function S = common_read_cpr_2BCWCRO(file)
+function S = common_read_cpr_2BCWCRO(file, varargin)
 
 % common_read_cpr_2BCWCRO Read CloudSat CPR data in the common format (see README)
 %
@@ -7,11 +7,12 @@ function S = common_read_cpr_2BCWCRO(file)
 %
 % FORMAT
 %
-%   data = common_read_cpr(file)
+%   data = common_read_cpr(file[, extra])
 %
 % IN
 %
-%   file    string  Path to zipped CPR file
+%   file    string      Path to zipped CPR file
+%   extra   cell array (optional) extra fields.
 %
 % OUT
 %
@@ -22,11 +23,18 @@ function S = common_read_cpr_2BCWCRO(file)
 %
 % $Id$
 
-S = cloudsat_read_zipped(file, ...
-    {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', ...
-     'RO_ice_water_path', 'RO_ice_water_path_uncertainty', ...
-     'IO_RO_ice_water_path', 'IO_RO_ice_water_path_uncertainty', ...
-     'product_version'});
+if (nargin==1)
+    warning(['atmlab:' mfilename], ['Calling ' mfilename ' with 1 argument ' ...
+                'is deprecated. Four additional fields will be included for ' ...
+                'backward compatibility. Pass empty cell-array if this is ' ...
+                'not desired!']);
+end
+
+core_fields = {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', 'product_version'};
+extra_fields = optargs(varargin, {{'RO_ice_water_path', 'RO_ice_water_path_uncertainty', 'IO_RO_ice_water_path', 'IO_RO_ice_water_path_uncertainty'}});
+all_fields = [core_fields extra_fields];
+S = cloudsat_read_zipped(file, all_fields);
+
 % construct time axis with same dimensions
 S.time = S.UTC_start + S.Profile_time;
 

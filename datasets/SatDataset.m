@@ -19,6 +19,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     
     % read-only props (alterable with methods)
     properties (SetAccess = protected)
+        dependencies; % what does generation depend on?
         collocated_datasets = [];
         version; % FIXME should be inaccessible before read_granule! 
         data; % FIXME the same!
@@ -255,12 +256,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % FORMAT
             %
-            %   M = read_granule(date[, spec[, remdouble[, force]]])
+            %   M = read_granule(date[, spec[, extra[, remdouble[, force]]]])
             %
             % IN
             %
             %   datevec     vector      Date-vector indicating the starting time.
-            %   spec        various     (optional) E.g. satellite (noaa18, cloudsat, etc.)            
+            %   spec        various     (optional) E.g. satellite (noaa18, cloudsat, etc.) 
+            %   extra       cellstr     (optional) extra args to reader
             %   remdouble   logical     (optional) Remove doubles or not? Default true.
             %   force       logical     (optional) rather than throwing an error,
             %                           return [] in case of error. Default false.
@@ -274,7 +276,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % $Id$
              
             % optional arguments
-            [spec, remdouble, force] = optargs(varargin, {'', true, false});
+            [spec, extra, remdouble, force] = optargs(varargin, {'', {}, true, false});
             
             % find datafile and function to read it
             datafile = self.find_granule_by_datetime(date, spec);
@@ -283,7 +285,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
             %    func2str(reader), datafile);
             try
-                data = self.reader(datafile);
+                if isempty(extra)
+                    data = self.reader(datafile);
+                else
+                    data = self.reader(datafile, extra);
+                end
             catch ME
                 if force
                     switch ME.identifier
