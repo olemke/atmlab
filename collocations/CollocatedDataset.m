@@ -357,7 +357,8 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                 % should return a matrix with info
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
-                result = [result; self.process(collocations, data1, date1, spec1, data2, secondary_granules(i, :), spec2)]; %#ok<AGROW>
+                this_result = self.process(collocations, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
+                result = [result; this_result]; %#ok<AGROW>
                 
                 %% process additional
                 %
@@ -376,7 +377,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                     % --> dependencies
                     % FIXME: concatenation in subfunction or so, will be
                     % needed in collocate_date and date_range as well
-                    this_additional_result = additional.process(result);
+                    this_additional_result = additional.process(collocations, this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
                     if isempty(additional_results{j})
                         additional_results{j} = this_additional_result;
                     else

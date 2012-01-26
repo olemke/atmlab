@@ -30,9 +30,9 @@ if (nargin==1)
                 'not desired!']);
 end
 
-core_fields = {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', 'product_version'};
-extra_fields = optargs(varargin, {{'RO_ice_water_path', 'RO_ice_water_path_uncertainty', 'IO_RO_ice_water_path', 'IO_RO_ice_water_path_uncertainty'}});
-all_fields = [core_fields extra_fields];
+core_fields = {'Longitude'; 'Latitude'; 'UTC_start'; 'Profile_time'; 'product_version'};
+extra_fields = optargs(varargin, {{'RO_ice_water_path'; 'RO_ice_water_path_uncertainty'; 'IO_RO_ice_water_path'; 'IO_RO_ice_water_path_uncertainty'}});
+all_fields = [core_fields; extra_fields];
 S = cloudsat_read_zipped(file, all_fields);
 
 % construct time axis with same dimensions

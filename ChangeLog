@@ -1,3 +1,35 @@
+2012-01-26  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-253
+
+	* collocations/FieldCopier.m:
+
+	- Class to be used when interested in copying fields from source
+	granules (primary and secondary) to result dataset (one dataset).
+	Writing to disk (NetCDF) is not implemented yet in the new system, but
+	matrices are output correctly in CollocatedDataset.collocate_granule.
+	For an example usage, see the top help text in FieldCopier.
+	
+	* collocations/AssociatedDataset.m:
+
+	- Added 'dependencies' member to later determine in what order
+	additional datasets should be processed, and for what additional
+	datasets the output should be passed on to the next processor.
+
+	* collocations/CollocatedDataset.m: 
+
+	(collocate_granule):
+		- Call correctly the additional processing functions
+
+	* datasets/datasets_config.m:
+
+	- Don't instantiate AssociatedDataset directly; should eventually make
+	subclasses and instantiate those.
+
+	* datasets/common_read_cpr_2BCWCRO.m:
+
+	- Bugfix with row/column cell arrays.
+
 2012-01-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-252

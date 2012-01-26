@@ -13,18 +13,24 @@ classdef AssociatedDataset < SatDataset
     % - additional arguments to reader secondary
     
     properties (SetAccess = protected)
+        dependencies;
         parent;
         % this is split in primary and secondary because from these
         % structures is also derived what arguments to pass on to the
         % respective reading routines
         fieldstruct_primary = struct;
         fieldstruct_secondary = struct;
+        cols;
     end
     
     methods
-        function self = AssociatedDataset(cd, varargin)
+        function self = AssociatedDataset(cd, dependencies, varargin)
+            % cd: CollocatedDataset it belongs to
+            % dependencies: AssociatedDatasets to be processed first
+            % rest of arguments passed on to SatDataset
             self = self@SatDataset(varargin{:}); % call parent constructor
             self.parent = cd;
+            self.dependencies = dependencies;
             cd.add_associated(self);
         end
     end
@@ -34,12 +40,12 @@ classdef AssociatedDataset < SatDataset
         args = primary_arguments(self)
         args = secondary_arguments(self)
         % FIXME: arguments to processing
-        out = process(self, varargin)
+        out = process(self, collocations, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
         
         % for sorting, dependencies, etc.
-        out = lt(self, other)
-        out = gt(self, other)
-        out = eq(self, other)
+        %out = lt(self, other)
+        %out = gt(self, other)
+        %out = eq(self, other)
     end
     
 end
