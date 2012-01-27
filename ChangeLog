@@ -1,3 +1,60 @@
+2012-01-27  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-254
+
+	* collocations/FieldCopier.m:
+
+	- Minor changes
+
+	* collocations/AssociatedDataset.m:
+
+	- Small cleanup
+
+	* collocations/write_collocations_netcdf.m:
+
+	- Added depracating warning now that this is (partially) possible with
+	the new method
+	- Removed redundant comment-marker
+
+	* collocations/collocate_and_store_date.m: tiny change
+
+	- Added 'end' to function
+
+	* collocations/CollocatedDataset.m:
+
+	- Fixed type for scanline (int not short)
+	
+	(collocate_granule):
+		- new output 'also' with any additional info to be passed on to
+		  writing routine
+	
+	(collocate_date):
+		- small changes
+
+	(collocate_and_store_date):
+		- collocate one day and store results
+
+	(store):
+		- write collocs to NetCDF
+
+	(cleanup):
+		- moved from one of the oldies
+
+	* site-specific/kiruna/datasets_init.m:
+		
+	- Added some info on collocations_cpr_mhs
+
+	* handy/logtext.m:
+
+	- Added support for methods in classes (functionname is not filename)
+
+	* datasets/SatDataset.m:
+
+	- removed 'data' and 'version' properties
+
+	* datasets/common_read_cpr_2BCWCRO.m: tiny change
+
+
 2012-01-26  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-253
@@ -29,6 +86,8 @@
 	* datasets/common_read_cpr_2BCWCRO.m:
 
 	- Bugfix with row/column cell arrays.
+
+	* datasets/SatDataset.m: move 'dependencies' to AssociatedDataset
 
 2012-01-25  Gerrit Holl  <gerrit.holl@ltu.se>
 

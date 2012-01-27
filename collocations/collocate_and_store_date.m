@@ -88,3 +88,4 @@ if ~fileexists || colloc_config('overwrite')
 else
     logtext(atmlab('OUT'), 'Output file(s) %s already exist\n', fn);
 end
+end

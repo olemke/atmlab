@@ -33,19 +33,24 @@ classdef AssociatedDataset < SatDataset
             self.dependencies = dependencies;
             cd.add_associated(self);
         end
+        
+        function out = process_day(varargin)
+            % FIXME DOC
+            % FIXME TODO:
+            % for a full day granule, split into individual granules, read
+            % data for each granule, get collocations for this granule,
+            % and pass to self.process(...)
+            out = []; % not implemented yet!
+        end
     end
     
     % those methods must be implemented by subclasses
     methods (Abstract)
         args = primary_arguments(self)
         args = secondary_arguments(self)
-        % FIXME: arguments to processing
-        out = process(self, collocations, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
-        
-        % for sorting, dependencies, etc.
-        %out = lt(self, other)
-        %out = gt(self, other)
-        %out = eq(self, other)
+
+        out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
+        store(self, date, spec, result)
     end
     
 end

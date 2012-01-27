@@ -144,6 +144,10 @@ datasets_config('patmosx_L3_regexp','(?<year>\d{4})/(?<month>\d{2})/patmosx_.+_(
 datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');
 datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
+x = datasets_config('collocation_cpr_mhs');
+x.basedir = '/storage4/user_data/gerrit/testing/collocations_cloudsat_mhs';
+x.subdir = '$YEAR4/$MONTH/$DAY';
+x.filename = 'collocations_$SAT.nc.gz';
 
 datasets_config('collocation_cpr_mhs_hdf5_basedir', '/local/gerrit/data/collocations_hdf5/collocations_cloudsat_mhs');
 datasets_config('collocation_cpr_mhs_hdf5_subdir', '');

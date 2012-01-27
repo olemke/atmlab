@@ -27,20 +27,22 @@ if ~atmlab('VERBOSITY')
     return
 end
 
-[ST, I] = dbstack;
+ST = dbstack;
 if length(ST) < 2
     lineno = -1;
     name = '(none)';
 else
     lineno = ST(2).line;
+    f = ST(2).file;
     name = ST(2).name;
 end
 
 fprintf(fid, '%s:', datestr(now, 'dd-mmm-yyyy HH:MM:SS.FFF'));
 if fid<3 && usejava('desktop') && ~strcmp(name(1), '@') % assume stdout/stderr
     fprintf(fid, '<a href="matlab:opentoline(''%s'', %d, 1)">%s:%d</a>:', ...
-        which(name), lineno, name, lineno);
+        which(f), lineno, name, lineno);
 else
     fprintf(fid, '%s:%d:', name, lineno);
 end
 fprintf(fid, text, varargin{:});
+end

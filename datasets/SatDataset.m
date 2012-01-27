@@ -20,8 +20,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     % read-only props (alterable with methods)
     properties (SetAccess = protected)
         collocated_datasets = [];
-        version; % FIXME should be inaccessible before read_granule! 
-        data; % FIXME the same!
     end
     
     methods

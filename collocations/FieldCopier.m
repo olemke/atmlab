@@ -23,6 +23,9 @@ classdef FieldCopier < AssociatedDataset
     %   corresponds to the first value in the LWC-profile.
     %
     % $Id$
+    %
+    % TODO:
+    %  - set some (but not all!!) clever properties for NetCDF
     
     properties
         cols1;
@@ -63,7 +66,7 @@ classdef FieldCopier < AssociatedDataset
             args = fieldnames(self.fieldstruct_secondary);
         end
         
-        function result = process(self, collocations, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
+        function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
             % FIXME DOC
                          
             n_scanlines = size(data1.lat, 1);
@@ -112,7 +115,7 @@ classdef FieldCopier < AssociatedDataset
             self.cols2 = cc2;
 
      
-            ncollocs = size(collocations, 1);
+            ncollocs = size(processed_core, 1);
             nfields = max(cell2mat(struct2cell(self.cols).'));
             %fields = fieldnames(self.cols);
             result = nan*zeros(ncollocs, nfields); 

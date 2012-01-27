@@ -16,14 +16,15 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
         %version = {'', ''};
         collocated_data;
         
+        % http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-c/NetCDF_002d3-Variable-Types.html#NetCDF_002d3-Variable-Types
         members = struct(...
             'START1', struct(...
-                'type', 'int', ...
+                'type', 'int', ... % won't work after 2038-01-19 03:14:07 UTC
                 'atts', struct(...
                     'long_name', 'primary granule start time', ...
                     'units', 'seconds since 1970-01-01 00:00:00')), ...
             'LINE1', struct(...
-                'type', 'short', ...
+                'type', 'int', ...
                 'atts', struct(...
                     'long_name', 'primary scanline number')), ...
             'POS1', struct(...
@@ -53,7 +54,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                     'long_name', 'secondary granule start time', ...
                     'units', 'seconds since 1970-01-01 00:00:00')), ...
             'LINE2', struct(...
-                'type', 'short', ...
+                'type', 'int', ...
                 'atts', struct(...
                     'long_name', 'secondary scanline number')), ...
             'POS2', struct(...
@@ -152,7 +153,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             secondary_granules = threedays(b:e, :);
         end
         
-        function [result, additional_results] = collocate_granule(self, date1, spec1, spec2, varargin)
+        function [result, additional_results, also] = collocate_granule(self, date1, spec1, spec2, varargin)
             
             % collocate_granule Collocate granules from sat/sensor pairs
             %
@@ -202,11 +203,11 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             end
             
             logtext(fid, 'Found %d other granules to collocate with\n', size(secondary_granules, 1));
-
-            %% 
+            
+            %%
             
             result = zeros(0, length(fieldnames(self.cols)));
-
+            
             %% read data for sat1/sensor1
             % Here, I decide to keep the duplicates for now. Simple is better than
             % complex. My collocation output are rows and column indices, and if I already
@@ -225,12 +226,12 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                 end
             end
             
-            %self.version{1} = self.primary.version;
-            %self.version{2} = '?'; % secondary version not yet available
+            also.version{1} = data1.version;
+            also.version{2} = '?'; % secondary version not yet available
             
             if isempty(data1.time)
                 logtext(fid, 'Primary is empty, nothing to collocate\n');
-%                self.version{2} = 'N/A';
+                %                self.version{2} = 'N/A';
                 return
             end
             
@@ -246,14 +247,14 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             % object, do not store any 'temporary' data there.
             data1.time_orig = data1.time; % store because of subsequent unify_time_axis can lead to errors
             data1.eff_range = double(data1.epoch) + ...
-                    [min(data1.time)-colloc_config('interval'), ...
-                     max(data1.time)+colloc_config('interval')];
+                [min(data1.time)-colloc_config('interval'), ...
+                max(data1.time)+colloc_config('interval')];
             
             %% loop through all the granules to collocate with
             
             for i = 1:size(secondary_granules, 1)
                 datecell = num2cell(secondary_granules(i, 1:5));
-
+                
                 logtext(atmlab('OUT'), 'Collocating with ''%s'' @ %04d-%02d-%02d %02d:%02d\n', ...
                     self.secondary.name, datecell{1:5});
                 
@@ -283,7 +284,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                     end
                 end
                 
-                %self.version{2} = self.secondary.version;
+                also.version{2} = data2.version;
                 data2.time_orig = data2.time; % store, see note at data1.time_orig
                 if isempty(data2.time)
                     logtext(fid, 'Secondary is empty, skipping\n');
@@ -339,11 +340,11 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                 
                 %% perform collocations
                 collocations = collocate(data1.time(iv1), ...
-                                         data1.lat(iv1, :), ...
-                                         data1.lon(iv1, :), ...
-                                         data2.time(iv2), ...
-                                         data2.lat(iv2, :), ...
-                                         data2.lon(iv2, :), ...
+                    data1.lat(iv1, :), ...
+                    data1.lon(iv1, :), ...
+                    data2.time(iv2), ...
+                    data2.lat(iv2, :), ...
+                    data2.lon(iv2, :), ...
                     colloc_config('distance'), colloc_config('interval'));
                 if any(collocations)
                     % compensate for the fact that we passed only a subset to collocate
@@ -377,7 +378,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                     % --> dependencies
                     % FIXME: concatenation in subfunction or so, will be
                     % needed in collocate_date and date_range as well
-                    this_additional_result = additional.process(collocations, this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
+                    this_additional_result = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
                     if isempty(additional_results{j})
                         additional_results{j} = this_additional_result;
                     else
@@ -388,7 +389,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             end
         end
         
-        function result = collocate_date(self, date, spec1, spec2, varargin)
+        function [result, additional_results, also] = collocate_date(self, date, spec1, spec2, varargin)
             
             % collocate_date Collect all collocations for given date
             %
@@ -396,22 +397,25 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             %
             % FORMAT
             %
-            %   M = collocate_date([year, month, day], spec1, spec2)
+            %   [M, addis] = collocate_date([year, month, day], spec1, spec2)
             %
             % IN
             %
             %   datevec vector      [year month day]
             %   spec1
             %   spec2
+            %   additionals (optional) cell array
             %
             % OUT
             %
             %   M       matrix      results...
+            %   addis   cell array  results corresponding to additionals
             %
             % FIXME DOC
             %
             % $Id$
             
+            additionals = optargs(varargin, {{}});
             
             fid = atmlab('OUT');
             year = date(1);
@@ -427,9 +431,14 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             end
             ngrans = size(grans, 1);
             
+            % pre-allocate; I know 'result's right size, but do not know
+            % the right size for additional_results because I don't know
+            % the sizes of the involved fields
             result = zeros(0, length(fieldnames(self.cols)));
-
+            additional_results = cell(size(additionals));
+            
             anysuccess = false;
+            also = struct();
             
             for i = 1:ngrans
                 % keep track, because first granule is probably yesterday
@@ -451,8 +460,15 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                 end
                 
                 try
-                    result_granule = self.collocate_granule(...
-                        [thisyear, thismonth, thisday, hour, minute], spec1, spec2, oneday);
+                    [result_granule, result_granule_addis, new_also] = self.collocate_granule(...
+                        [thisyear, thismonth, thisday, hour, minute], spec1, spec2, additionals, oneday);
+                    if ~isempty(fieldnames(also)) && ~isequal(also, new_also)
+                        warning(['atmlab:' mfilename ':inconsistent'], ...
+                            ['Additional information structures not consistent within the day. ' ...
+                             'Expected: ' struct2string_compact(also) ...
+                             'Got: ' struct2string_compact(new_also)]);
+                    end
+                    also = new_also;
                     anysuccess = true;
                 catch ME
                     switch ME.identifier
@@ -473,12 +489,110 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
                     end
                 end
                 result = [result; result_granule]; %#ok<AGROW>
+                for j = 1:length(additional_results)
+                    if isempty(additional_results{j})
+                        additional_results{j} = result_granule_addis{j};
+                    else
+                        additional_results{j} = [additional_results{j}; result_granule_addis{j}];
+                    end
+                end
             end
             
             if ~anysuccess
                 error('atmlab:collocate_date:nosource', 'no source data found at all');
             end
             
+        end
+        
+        function collocate_and_store_date(self, date, spec1, spec2, varargin)
+            % collocate_and_store_date Collect collocations and store appropiately
+            %
+            % For a given date, check whether a collocation datafile exists.
+            % If it doesn't (or colloc_config('overwrite') is set), collocate the indicated
+            % satellites and sensors with each other and store the result in the
+            % appropiate datafile.
+            %
+            % TODO:
+            % use existing collocation but then read additional datasets
+            %
+            % FORMAT
+            %
+            %   collocate_and_store_date(date, spec1, spec2, additionals)
+            %
+            % IN
+            %
+            %   datevec
+            %   spec1
+            %   spec2
+            %   additionals (optional)
+            %
+            % OUT
+            %
+            %   none (but writes file)
+            
+            additionals = optargs(varargin, {{}});
+            %% get filename
+            
+            if isempty(spec1)
+                spec = spec2;
+            elseif isempty(spec2)
+                spec = spec1;
+            else
+                spec = {spec1, spec2};
+            end
+            
+            fn = self.find_granule_by_datetime(date, spec);
+            mainfileexists = exist(fn, 'file');
+            addisexist = false(size(additionals));
+            for i = 1:length(additionals)
+                fna = additionals{i}.find_granule_by_datetime(date, spec);
+                addisexist(i) = exist(fna, 'file');
+            end
+            
+            % if everything is already there, do nothing
+            if mainfileexists && all(addisexist) && ~colloc_config('overwrite')
+                logtext(atmlab('OUT'), 'All output files already exist:\n', fn);
+                logtext(atmlab('OUT'), '    %s\n', fn);
+                for i = 1:length(additionals)
+                    logtext(atmlab('OUT'), '    %s\n', additionals{i}.find_granule_by_datetime(date, spec));
+                end
+                return
+            end
+                            
+            % so SOME work is to be done, at least
+            
+            if mainfileexists && ~colloc_config('overwrite')
+                % FIXME TODO: store 'additionals'
+                % FIXME TODO: read data for this day
+                for i = 1:length(additionals)
+                    addi = additionals{i}.process_day();
+                    additionals{i}.store(date, spec, addi);
+                end
+
+            else
+                % assumption:
+                % if the main file does not exist, associated don't either
+                
+                try
+                    [result, addis, also] = ...
+                        self.collocate_date(date, spec1, spec2, additionals);
+                catch ME
+                    if strcmp(ME.identifier, 'atmlab:collocate_date:nosource')
+                        logtext(atmlab('ERR'), ...
+                            'No succesful collocations at %04d-%02d-%02d, not writing\n', ...
+                            year, month, day);
+                        return;
+                    else
+                        ME.rethrow();
+                    end
+                end
+                also.spec1 = spec1;
+                also.spec2 = spec2;
+                self.store(date, spec, result, also);
+                for i = 1:length(additionals)
+                    additionals{i}.store(date, spec, addis{i});
+                end
+            end
         end
         
         function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
@@ -501,10 +615,10 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             % index for direct addressing
             i1 = sub2ind(size(data1.lat), line1, pos1);
             i2 = sub2ind(size(data2.lat), line2, pos2);
-
+            
             M(:, c.LINE1) = line1;
             M(:, c.LINE2) = line2;
-                        
+            
             M(:, c.POS1) = pos1;
             M(:, c.POS2) = pos2;
             
@@ -520,21 +634,177 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             
             M(:, c.TIME1) = data1.epoch + data1.time(line1);
             M(:, c.TIME2) = data2.epoch + data2.time(line2);
-                        
+            
             %% remove duplicates
             
             first1 = self.primary.granule_first_line(date1, spec1);
             first2 = self.secondary.granule_first_line(date2, spec2);
             wrongrows = (M(:, c.LINE1) < first1) & ...
-                        (M(:, c.LINE2) < first2);
+                (M(:, c.LINE2) < first2);
             logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
-                                   'or secondary before %d\n'], ...
-                                   sum(wrongrows), first1, first2); 
+                'or secondary before %d\n'], ...
+                sum(wrongrows), first1, first2);
             M(wrongrows, :) = [];
             
         end
 
-        %%
+        function store(self, date, spec, data, also, varargin)
+            % store Write collocation data to netcdf file
+            %
+            % Write collocation data for date in data to a netcdf file.
+            % The filename is determined from self, date, spec.
+            %
+            % FORMAT
+            %
+            %   obj.store(date, spec, data[, info])
+            %
+            % IN
+            %
+            %   date
+            %   spec
+            %   data        actual data (columns by self.cols)
+            %   also        from collocate_granule, _date,
+            %   info        (optional) struct with more info to put in NetCDF
+            %
+            % OUT
+            %
+            %   none (but writes a file)
+            %
+            % $Id$
+            
+            fn = self.find_granule_by_datetime(date, spec);
+            
+            info = optargs(varargin, {struct()});
+            
+            year = date(1);
+            month = date(2);
+            day = date(3);
+            
+            if strcmp(fn(end-1:end), 'gz') % take off this part
+                fn(end-2:end) = '';
+            end
+            
+            outdir = fileparts(fn);
+            % temporary filename, later compressed written to final place
+            temp_out = tempname(atmlab('WORK_AREA'));
+            if ~exist(outdir, 'dir')
+                logtext(atmlab('OUT'), 'Creating %s\n', outdir);
+                mkdir(outdir);
+            end
+            
+            %% create the file
+            
+            logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
+            ncid = netcdf.create(temp_out, 'NC_CLOBBER'); % overwrite existing
+            cleanupObj = onCleanup(@() self.cleanup(temp_out, ncid));
+            
+            %% define the dimensions
+            
+            ncollocs = size(data, 1);
+            dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
+            
+            %% put global attributes
+            
+            utc_time = java.lang.System.currentTimeMillis;
+            [utc_date{1:6}] = unixsecs2date(utc_time/1000);
+            utc_datestr = sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ', ...
+                [utc_date{1:5} round(utc_date{6})]);
+            global_atts = struct(...
+                'Conventions', 'CF-1.4', ...
+                'title', 'Collocations', ...
+                'history', [datestr(now, 'YYYY-mm-dd') ' Collocations generated from scratch'], ...
+                'date', utc_datestr, ...
+                'institution', ['Department of Space Science, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden'], ...
+                'source', 'Collocation codes, part of atmlab', ...
+                'references', 'Holl et al. (2010)', ...
+                'software_version', atmlab_version, ...
+                'maxdist_km', colloc_config('distance'), ...
+                'maxtime_s', colloc_config('interval'), ...
+                'primary_dataset', self.primary.name, ...
+                'primary_info', also.spec1, ...
+                'primary_version', also.version{1}, ...
+                'secondary_dataset', self.secondary.name, ...
+                'secondary_sensor', also.spec2, ...
+                'secondary_version', also.version{2}, ...
+                'start_time', double(date2unixsecs(year, month, day)));
+            % add caller-contributed ones
+            warning('off', 'catstruct:DuplicatesFound');
+            global_atts = catstruct(global_atts, info);
+            warning('on', 'catstruct:DuplicatesFound');
+            % convert to cell-array
+            global_atts = mat2cell([fieldnames(global_atts) struct2cell(global_atts)], ...
+                ones(1, length(fieldnames(global_atts))), 2).';
+            addncattributes(ncid, global_atts);
+            
+            %% define variables, variable attributes, additional dimensions
+            
+            vars = fieldnames(self.cols);
+            
+            varids = zeros(size(vars));
+            dims = struct();
+            for j = 1:length(vars)
+                varname = vars{j};
+                type = self.members.(varname).type;
+                atts = self.members.(varname).atts;
+                
+                % check if we have other dimensions besides the length
+                if isfield(self.members.(varname), 'dims')
+                    dimname = self.members.(varname).dims{1};
+                    dimsize = self.members.(varname).dims{2};
+                    try
+                        if ~isfield(dims, dimname)
+                            dims.(dimname) = netcdf.defDim(ncid, dimname, dimsize);
+                        end
+                    catch ME
+                        switch ME.identifier
+                            case 'MATLAB:netcdf:defDim:nameIsAlreadyInUse'
+                                % no problem
+                            otherwise
+                                ME.rethrow();
+                        end
+                    end
+                    thisdim = [dim_collocs dims.(dimname)];
+                else
+                    thisdim = dim_collocs;
+                end
+                % define variable and put attributes
+                varid = netcdf.defVar(ncid, varname, type, thisdim);
+                varids(j) = varid;
+                for k = fieldnames(atts)'
+                    netcdf.putAtt(ncid, varid, k{1}, atts.(k{1}));
+                end
+            end
+            
+            %% write data
+            
+            % end define mode
+            
+            netcdf.endDef(ncid);
+            
+            % put vars
+            logtext(atmlab('OUT'), 'Writing: ');
+            
+            for j = 1:length(vars)
+                varname = vars{j};
+                fprintf(atmlab('OUT'), '%s ', varname);
+                
+                varid = varids(j);
+                netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
+                fprintf(atmlab('OUT'), '\n');
+            end
+            logtext(atmlab('OUT'), 'Finalising\n');
+            logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', outdir);
+            netcdf.close(ncid);
+            gzipped_filename = gzip(temp_out, outdir);
+            movefile(gzipped_filename{1}, [fn '.gz']);
+            logtext(atmlab('OUT'), 'Done\n');
+            
+        end
+
+        function [M, cols] = read_day(self, date, spec, fields, varargin)
+            % FIXME TODO: implement this!
+        end
+    %%
         
         function add_associated(cd, ad)
             % INTERNAL USE adds an associated dataset
@@ -544,6 +814,25 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
         
 
     end
+    
+    % static/private are used like subfunctions
+    methods (Static, Access = private)
+        function cleanup(temp_out, ncid)
+            logtext(atmlab('OUT'), 'Cleaning up\n');
+            try
+                netcdf.close(ncid);
+            catch ME
+                switch ME.identifier
+                    case {'MATLAB:netcdf:inq:notNetcdfID', 'MATLAB:netcdf:close:notNetcdfID', ...
+                            'MATLAB:netcdf:close:ebadid:notNetcdfID'} % already closed
+                    otherwise
+                        ME.rethrow();
+                end
+            end
+            delete(temp_out);
+        end
+    end
+        
 end
 
 %%%%%%%%%%%%%%%%%%

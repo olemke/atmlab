@@ -42,7 +42,7 @@ S.time = S.UTC_start + S.Profile_time;
 
 S.lon = double(S.Longitude(:));
 S.lat = double(S.Latitude(:));
-S.version = S.product_version;
+S.version = S.product_version; % will be written to NetCDF
 
 % add filename
 

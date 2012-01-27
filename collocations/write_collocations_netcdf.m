@@ -37,6 +37,9 @@ function write_collocations_netcdf(year, month, day, S, D, M, ...
 %
 % $Id$
 
+% FIXME: update to new-style
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 if ~exist('info', 'var')
     info = struct;
 end
@@ -96,7 +99,7 @@ for i = 1:length(fields) % for each satellite
     %% put global attributes
     
     utc_time = java.lang.System.currentTimeMillis;
-    [utc_date{1:6}] = unixsecs2date(utc_time/1000); %#ok<AGROW>
+    [utc_date{1:6}] = unixsecs2date(utc_time/1000);
     utc_datestr = sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ', ...
         [utc_date{1:5} round(utc_date{6})]);
     global_atts = struct(...
