@@ -196,15 +196,21 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %               cellstr satellite, a simple string. For datasets belonging
             %                       to two satellites (such as collocations), a cell
             %                       array of two strings.
-            %   tol         number  Optional: tolerance in seconds. Sometimes, MSPPS
-            %                       doesn't start the same minute as AMSU :(.
+            %   tol         number  Optional: tolerance in seconds. Due to
+            %                       rounding errors, a date like 2009-12-06
+            %                       20:53:00 passed to date2unixsecs and
+            %                       back to unixsecs2date becomes
+            %                       2009-12-06 20:52:59.99999, which is
+            %                       hard to round in a straightforward way
+            %                       (don't want ...52:60). By default, a
+            %                       tolerance of 0.01 seconds is applied.
             %
             % OUT
             %
             %   datafile    string     Path to the looked-for datafile.
             
             errid = ['atmlab:' mfilename];
-            [spec, tol] = optargs(varargin, {'', 0});
+            [spec, tol] = optargs(varargin, {'', 0.01});
             
             % implementation:
             % 1. find the directory containing the files from basedir/subdir
@@ -218,10 +224,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
                 [granules, paths] = self.find_granules_by_date(datevec, spec, false);
-                if exist('tol', 'var') && tol>0 % use tolerance
+                if tol>0 % use tolerance
                     g = mat2cell(granules, size(granules, 1), [1 1 1 1 1]);
                     grans_unisecs = date2unixsecs(g{:});
-                    dv_unisecs = date2unixsecs(datevec(1), datevec(2), datevec(3), datevec(4), datevec(5));
+                    dv_unisecs = date2unixsecs(datevec(1), datevec(2), datevec(3), datevec(4), datevec(5), datevec(6));
                     found = abs(grans_unisecs - dv_unisecs) < tol;
                 else
                     found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);

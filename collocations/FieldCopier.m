@@ -37,7 +37,8 @@ classdef FieldCopier < AssociatedDataset
             % cd            CollocatedDataset
             % fieldstruct1  defines names and how to store, from primary
             % fieldstruct2  the same, from secondary
-            % remaining arguments passed on to SatDataset
+            % remaining arguments passed on to SatDataset, so those are to
+            % be used to say where to store and so on.
             %
             % need to know:
             % - additional arguments to reader primary
@@ -125,8 +126,12 @@ classdef FieldCopier < AssociatedDataset
             r2 = processed_core(:, self.parent.cols.LINE2);
             c1 = processed_core(:, self.parent.cols.POS1);
             c2 = processed_core(:, self.parent.cols.POS2);
-            i1 = sub2ind(size(data1.lat), r1, c1);
-            i2 = sub2ind(size(data2.lat), r2, c2);
+            if self.needs_primary_data()
+                i1 = sub2ind(size(data1.lat), r1, c1);
+            end
+            if self.needs_secondary_data()
+                i2 = sub2ind(size(data2.lat), r2, c2);
+            end
 
             for i = 1:length(allnames)
                 field = allnames{i};
@@ -139,8 +144,22 @@ classdef FieldCopier < AssociatedDataset
                     ii = i2;
                 end
                 
+                % if this fails, data.(field) may not be a column-vector as
+                % required
                 result(:, self.cols.(field)) = data.(field)(ii, :);
             end
+        end
+        
+        function out = needs_primary_data(self)
+            out = ~isempty(fieldnames(self.fieldstruct_primary));
+        end
+        
+        function out = needs_secondary_data(self)
+            out = ~isempty(fieldnames(self.fieldstruct_secondary));
+        end
+        
+        function store(self)
+            error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented!');
         end
     end
 

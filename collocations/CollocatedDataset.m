@@ -215,7 +215,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             % incorrect/ need to be corrected for. This causes more problems than it
             % solves, so I will remove the duplicates in the postprocessing instead.
             try
-                data1 = self.primary.read_granule(date1, spec1, extra_args_primary, false); % keep duplicates for now
+                data1 = self.primary.read_granule(date1, spec1, extra_args_primary, false, false); % keep duplicates for now
             catch ME
                 switch ME.identifier
                     case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
@@ -564,8 +564,9 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             if mainfileexists && ~colloc_config('overwrite')
                 % FIXME TODO: store 'additionals'
                 % FIXME TODO: read data for this day
+                result = self.read_date(date, spec, fieldnames(self.cols));
                 for i = 1:length(additionals)
-                    addi = additionals{i}.process_day();
+                    addi = additionals{i}.process_delayed(result, spec1, spec2);
                     additionals{i}.store(date, spec, addi);
                 end
 
@@ -629,8 +630,13 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             M(:, c.LON2) = data2.lon(i2);
             
             % FIXME: this is not correct, use datevec!
-            M(:, c.START1) = data1.epoch; % FIXME: not really
-            M(:, c.START2) = data2.epoch; % FIXME: not really
+            X = num2cell(date1);
+            % round here; slight loss of precision causes this to be
+            % slightly less than integer, which causes it to be floored
+            % down to the /previous/ integer when storing in NetCDF later
+            M(:, c.START1) = round(date2unixsecs(X{:}));
+            X = num2cell(date2);
+            M(:, c.START2) = round(date2unixsecs(X{:}));
             
             M(:, c.TIME1) = data1.epoch + data1.time(line1);
             M(:, c.TIME2) = data2.epoch + data2.time(line2);
@@ -801,10 +807,52 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             
         end
 
-        function [M, cols] = read_day(self, date, spec, fields, varargin)
-            % FIXME TODO: implement this!
+        function [M, localcols] = read_date(self, date, spec, fields)
+            % Read collocation 'fields' for 'date', 'spec'.
+            %
+            % FIXME DOC
+            %
+            % 'fields' may be 'all', in which case all fields are read.
+            % No guarantee about the order, but this information is
+            % returned via 'localcols'. If you want consistence of order
+            % with actual collocating, consider passing
+            % fieldnames(self.cols) as fields.
+            %
+            % FIXME TODO: share implementation with AssociatedDataset?
+            
+            fn = self.find_granule_by_datetime(date, spec);
+            tmp = tempname(atmlab('WORK_AREA'));
+            exec_system_cmd(['zcat ' fn '>' tmp]); % 3x faster than ML's gunzip
+            c = onCleanup(@()delete(tmp));
+
+            if ischar(fields)
+                if strcmp(fields, 'all')
+                    data = loadncfile(tmp);
+                    fields = fieldnames(data);
+                else
+                    error(['atmlab:' mfilename ':invalid'], ...
+                        ['Invalid ''fields'' argument: ' fields]);
+                end
+            else
+                data = loadncvar(tmp, fields);
+            end
+            
+            % find n. of columns to allocate, keep order
+            data_fields = intersect_unsorted(fields, fieldnames(self.cols));
+            n_columns = sum(cellfun(@(ff) length(self.cols.(ff)), data_fields));
+            n_rows = max(cellfun(@(ff) size(data.(ff), 1), fields));
+            M = nan*zeros(n_rows, n_columns);
+            n = 1;
+            % copy data to matrix
+            for i = 1:length(data_fields)
+                fld = data_fields{i};
+                n_local_cols = length(self.cols.(fld));
+                range_local_cols = n:(n+n_local_cols-1);
+                M(:, range_local_cols) = data.(fld);
+                localcols.(fld) = range_local_cols;
+                n = n + n_local_cols;
+            end
         end
-    %%
         
         function add_associated(cd, ad)
             % INTERNAL USE adds an associated dataset
@@ -812,7 +860,6 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             cd.associated = [cd.associated ad];
         end
         
-
     end
     
     % static/private are used like subfunctions

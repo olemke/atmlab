@@ -18,7 +18,7 @@ function data = common_read_collocation_cpr_mhs(file)
 
 
 tmp = tempname(atmlab('WORK_AREA'));
-exec_system_cmd(['zcat ' file '>' tmp); % 3x faster than gunzip
+exec_system_cmd(['zcat ' file '>' tmp]); % 3x faster than gunzip
 %gunzipped = gunzip(file, atmlab('WORK_AREA'));
 %data = loadncfile(gunzipped{1});
 data = loadncfile(tmp);

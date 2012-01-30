@@ -56,3 +56,14 @@ S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 % remove redundant fields
 S = rmfield(S, {'Longitude', 'Latitude', 'UTC_start', 'Profile_time', 'product_version'});
+
+% convert 1-D fields into column vectors. This is required for processing.
+flds = fieldnames(S);
+for i = 1:length(flds)
+    fld = flds{i};
+    if isvector(S.(fld))
+        S.(fld) = S.(fld)(:);
+    end
+end
+
+end

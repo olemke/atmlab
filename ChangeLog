@@ -1,5 +1,69 @@
 2012-01-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-256
+
+	* handy/intersect_unsorted.m: Added
+		- Like Matlab's intersect, but does not sort the result. Pretty
+		much brute-force algorithm, slow, but okay for short cellstr.
+
+	* datasets/common_read_cpr_2BCWCRO.m:
+		- Convert all 1-D fields into column vectors. This is needed for
+		later processing.
+
+	* datasets/SatDataset.m:
+
+	(find_granule_by_datetime):
+		- make default tolerance 0.01 seconds, due to nasty rounding
+		issues with unixsecs2datetime and datetime2unixsecs. Also pass
+		seconds, for the same reason.
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule): tiny change
+		- explicitly tell read_granule not to force it (e.g. should still
+		throw an error if it fails)
+	
+	(collocate_and_store_date):
+		- pass info on to process_delayed
+
+	(process): bugfix
+		- add correct granule starting times. Round this to prevent later
+		rounding errors / precision-loss errors
+	
+	(read_date): added
+		- read collocations for a day. Return those, possibly in exactly
+		the same way as they would have been read in the first place.
+
+	* collocations/AssociatedDataset.m:
+
+	(process_delayed):
+		- renamed from process_day
+		- Divide collocated data in segments, pass each segment in turn to
+		  .process(), reading data1/data2 in where needed, as indicated by
+		  new abstract methods .needs_primary_data() and
+		  .needs_secondary_data()
+
+	(needs_primary_data) (needs_secondary_data): Added two abstract
+	methods
+
+	* collocations/FieldCopier.m:
+
+	(process_granule):
+		- Only access data-structures if needed, so that the method can be
+		called from delayed-processing routines where not all data is
+		actually read in.
+
+	(needs_primary_data) (needs_secondary_data): Implement these methods (short)
+
+	(store):
+		- Method not implemented yet; make one-liner generating error
+		message because it's an abstract method in the parent-class, and I
+		want this class to be instantiable
+	
+	* datasets/common_read_collocation_cpr_mhs.m: Fixed typo
+
+2012-01-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-255
 
 	* files/loadncvar.m: small improvement
