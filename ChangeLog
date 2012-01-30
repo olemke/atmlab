@@ -1,3 +1,12 @@
+2012-01-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-255
+
+	* files/loadncvar.m: small improvement
+
+	- Make function work regardless as to whether passed cell-array is
+	row-vector or column-vector.
+
 2012-01-27  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-254

@@ -22,7 +22,8 @@
 
 % 2010-02-02   Created by Oliver Lemke.
 % 2010-10-11   Modified by Gerrit Holl.
-% 2010-11-22   Modified by Salomon Eliasson
+% 2010-11-22   Modified by Salomon Eliasson.
+% 2012-01-30   Modified by Gerrit Holl.
 
 function [ret, attr] = loadncvar( filename, varname )
   
@@ -38,7 +39,7 @@ if ischar(varname)
     varid = netcdf.inqVarID (ncid, varname);
     ret = netcdf.getVar (ncid, varid);
 elseif iscell(varname)
-    for v = varname
+    for v = varname(:).'
         varid = netcdf.inqVarID (ncid, v{1});
         ret.(genvarname(v{1})) = netcdf.getVar (ncid, varid);
     end
