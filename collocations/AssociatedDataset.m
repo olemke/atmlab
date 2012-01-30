@@ -75,7 +75,7 @@ classdef AssociatedDataset < SatDataset
                 % to know corresponding date1, data1, etc.
                 if primseg<length(newprim) && segstart == newprim(primseg+1)
                     primseg = primseg + 1;
-                    [dv{1:6}] = unixsecs2date(processed_core(primseg, self.parent.cols.START1));
+                    [dv{1:6}] = unixsecs2date(processed_core(newprim(primseg), self.parent.cols.START1));
                     date1 = cell2mat(dv);
                     if self.needs_primary_data()
                         data1 = self.parent.primary.read_granule(date1, spec1, self.primary_arguments(), false, false);
@@ -83,7 +83,7 @@ classdef AssociatedDataset < SatDataset
                 end
                 if seconseg<length(newsec) && segstart == newsec(seconseg+1)
                     seconseg = seconseg + 1;
-                    [dv{1:6}] = unixsecs2date(processed_core(seconseg, self.parent.cols.START2));
+                    [dv{1:6}] = unixsecs2date(processed_core(newsec(seconseg), self.parent.cols.START2));
                     date2 = cell2mat(dv);
                     if self.needs_secondary_data()
                         data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(), false, false);

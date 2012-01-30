@@ -63,7 +63,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             spec = optargs(varargin, {''});
             errid = ['atmlab:' mfilename]; %find_datadir_by_date';
             
-            assert(any(self.basedir), errid, 'No basedir initialised for %s', dataset);
+            assert(any(self.basedir), errid, 'No basedir initialised for %s', char(self.name));
             assert(exist(self.basedir, 'dir')~=0, errid, ...
                 ['Configured data directory for %s is %s, ' ...
                 'but this does not exist or is not a directory. ' ...
@@ -227,7 +227,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 if tol>0 % use tolerance
                     g = mat2cell(granules, size(granules, 1), [1 1 1 1 1]);
                     grans_unisecs = date2unixsecs(g{:});
-                    dv_unisecs = date2unixsecs(datevec(1), datevec(2), datevec(3), datevec(4), datevec(5), datevec(6));
+                    X = num2cell(datevec);
+                    dv_unisecs = date2unixsecs(X{:});
                     found = abs(grans_unisecs - dv_unisecs) < tol;
                 else
                     found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
@@ -287,6 +288,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % read datafile
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
             %    func2str(reader), datafile);
+            logtext(atmlab('OUT'), 'Reading %s\n', datafile);
             try
                 if isempty(extra)
                     data = self.reader(datafile);

@@ -562,10 +562,12 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             % so SOME work is to be done, at least
             
             if mainfileexists && ~colloc_config('overwrite')
+                logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
                 % FIXME TODO: store 'additionals'
                 % FIXME TODO: read data for this day
                 result = self.read_date(date, spec, fieldnames(self.cols));
                 for i = 1:length(additionals)
+                    logtext(atmlab('OUT'), 'Collocting additionals for ''%s''\n', additionals{i}.name);
                     addi = additionals{i}.process_delayed(result, spec1, spec2);
                     additionals{i}.store(date, spec, addi);
                 end
@@ -871,7 +873,7 @@ classdef CollocatedDataset < SatDataset %& HomemadeDataset
             catch ME
                 switch ME.identifier
                     case {'MATLAB:netcdf:inq:notNetcdfID', 'MATLAB:netcdf:close:notNetcdfID', ...
-                            'MATLAB:netcdf:close:ebadid:notNetcdfID'} % already closed
+                            'MATLAB:netcdf:close:ebadid:notNetcdfID', 'MATLAB:imagesci:netcdf:libraryFailure'} % already closed
                     otherwise
                         ME.rethrow();
                 end

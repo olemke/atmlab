@@ -1,5 +1,33 @@
 2012-01-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-257
+
+	* collocations/FieldCopier.m:
+
+	(process_granule): shut up m-lint
+
+	(store): don't fail TOO early, be versatile with inputs for now
+
+	* collocations/AssociatedDataset.m:
+
+	(process_delayed): Bugfix
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_and_store_date): More verbose
+
+	(cleanup): WAAAAA! YET ANOTHER CHANGED ERRID!!!!!
+
+	* datasets/SatDataset.m:
+
+	(find_datadir_by_date): Less crashy
+
+	(find_granule_by_datetime): Bugfix
+
+	(read_granule): More verbose
+
+2012-01-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-256
 
 	* handy/intersect_unsorted.m: Added

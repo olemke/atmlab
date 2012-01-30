@@ -67,7 +67,7 @@ classdef FieldCopier < AssociatedDataset
             args = fieldnames(self.fieldstruct_secondary);
         end
         
-        function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
+        function result = process_granule(self, processed_core, data1, ~, ~, data2, ~, ~, ~)
             % FIXME DOC
                          
             n_scanlines = size(data1.lat, 1);
@@ -158,7 +158,7 @@ classdef FieldCopier < AssociatedDataset
             out = ~isempty(fieldnames(self.fieldstruct_secondary));
         end
         
-        function store(self)
+        function store(varargin)
             error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented!');
         end
     end
