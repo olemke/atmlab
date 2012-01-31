@@ -11,6 +11,8 @@ function command = psscale(file,in)
 % Created by Salomon Eliasson
 % $Id$
 
+assert(isfield(in,'cptfile'),['gmtlab:' mfilename ':badInput'],'needs in.cptfile')
+
 psscale = sprintf('psscale');
 if isfield(in,'position')
     psscale = sprintf('%s -D%s',psscale,in.position);
@@ -24,7 +26,7 @@ else
 end
 
 if ( isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) ) || ...
-        ( isfield(in,'equalboxwidth') && in.equalboxwidth )|| ...
+        ( isfield(in,'equalboxwidth') && in.equalboxwidth ) || ...
         any(isfield(in,{'box_spacing','tick_centering'}))
     
     psscale = sprintf('%s -L',psscale);
@@ -52,7 +54,8 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
         case 3
             str = '-E';
         otherwise
-            error(sprintf('gmtlab:%sinput',mfilename),'error in determining sidebar')
+            error(['gmtlab:' mfilename ':input'],...
+                'error in determining sidebar')
     end
     psscale = sprintf('%s %s',psscale,str);
 end
@@ -63,11 +66,7 @@ else
     psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
 end
 
-if isfield(in,'cptfile')
-    psscale = sprintf('%s -C%s',psscale,in.cptfile);
-else
-    error('gmtlab:BadInput:psscale','needs in.cptfile')
-end
+psscale = sprintf('%s -C%s',psscale,in.cptfile);
 
 if isfield(in,'shift_tick_annotations')
     psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%s',psscale,in.shift_tick_annotations);

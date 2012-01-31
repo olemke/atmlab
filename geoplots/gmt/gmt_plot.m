@@ -944,7 +944,7 @@ if length(unique(in.(field)))<in.nlevels
 end
 
 if isfield(in,'stepsize')
-    warning('gmtlab:input','in.stepsize overrides in.nlevels')
+    % warning('gmtlab:input','in.stepsize overrides in.nlevels')
     stepsize = in.stepsize;
 elseif ~isfield(in,'stepsize')
     stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;

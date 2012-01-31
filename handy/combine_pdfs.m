@@ -42,19 +42,19 @@ if ~nargin, error('atmlab:combine_pdfs','Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
-default.cols   = 2;
-default.vspace = 1;
-default.hspace = 1;
-default.valign = 'm';
+default.cols     = 2;
+default.vspace   = 1;
+default.hspace   = 1;
+default.valign   = 'm';
 default.filename = 'out.pdf';
-default.outdir = gmtlab('outdir');
+default.outdir   = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.2;
 
 options = optargs_struct(options, default);
 
 %% Convert outdir to fullpath
 options.outdir = path_replace_tilde(options.outdir);
-if (length(options.outdir) == 0 || options.outdir(1) ~= filesep())
+if (isempty(options.outdir) || options.outdir(1) ~= filesep())
     options.outdir = fullfile(pwd(), options.outdir);
 end
 

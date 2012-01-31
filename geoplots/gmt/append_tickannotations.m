@@ -24,13 +24,12 @@ end
 fclose(fid);
 
 % CHECK INPUT
-if ~( sum(~cellfun('isempty', regexp(out,'^[0-9]'))) == length(annotations)) 
-    error('gmtlab:input','Number of annotations must match number of ticks')
-end
+assert(sum(~cellfun('isempty', regexp(out,'^[-+]?[0-9]*\.?[0-9]+'))) == length(annotations),...
+    ['gmtlab:' mfilename ':input'],'Number of annotations must match number of ticks')
 
 fid = fopen(file,'w'); x = 1;
 for i = 1:length(out)
-    if ~isempty(regexp(out{i},'^[0-9]', 'once'))
+    if ~isempty(regexp(out{i},'^[-+]?[0-9]*\.?[0-9]+', 'once'))
         fprintf(fid,'%s',sprintf('%s ; %s\n',out{i},annotations{x}));
         x=x+1;
     else

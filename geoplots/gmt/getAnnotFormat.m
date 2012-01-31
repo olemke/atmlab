@@ -17,10 +17,35 @@ function annot_format = getAnnotFormat(quantity)
 assert(nargin==1,['gmtlab:' mfilename ':badInput'],...
     'USAGE: annot_format = getAnnotFormat(quantity)')
 
-if quantity == 0
+% if quantity ~= 0
+%     sz = floor(log10(abs(quantity)));
+% end
+
+% doesn't matter if the value is possitive or negative
+quantity = abs(quantity); 
+
+cond1 = quantity == 0;
+cond2 = ceil(log10(quantity)) == 0;
+cond3 = quantity - floor(quantity) == 0;
+
+
+
+if cond1
     annot_format = '%.0f';
-elseif floor(log10(quantity))>0
-    annot_format = sprintf('%%%i.0f',min(floor(log10(quantity))));
+elseif cond2 && cond3
+    annot_format = '%1.0f';
+    
+elseif cond2
+    annot_format = sprintf('%%1.%if',...
+        min(abs(floor(log10(quantity - floor(quantity))))));
+    
+elseif cond3
+    annot_format = sprintf('%%%i.0f',...
+        min(abs(ceil(log10(quantity)))));
+    
 else
-    annot_format = sprintf('%%.%if',abs(min(floor(log10(quantity)))));
+    
+    annot_format = sprintf('%%%i.%if',...
+        min(abs(ceil(log10(quantity)))),...
+        min(abs(floor(log10(quantity - floor(quantity))))));
 end
