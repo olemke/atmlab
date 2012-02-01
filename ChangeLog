@@ -1,3 +1,67 @@
+2012-01-31  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-259
+
+	* collocations/FieldCopier.m:
+
+	- clean up properties
+	- remove explicit 'store' method, is implemented elsewhere
+
+	(process_granule):
+
+		- No need for cc1, cc2.
+		- Try to automatically add dimensions. Unfinished, untested.
+
+	* collocations/AssociatedDataset.m:
+
+	- Also derive from HomemadeDataset
+	- clean up properties
+	- removed 'store', implemented elsewhere
+
+	(AssociatedDataset):
+
+		- implement differently allow for either static or dynamic constructor
+		signature
+
+	(members2cols):
+
+		- Added, makes .cols-structure from .members-structure
+
+	* collocations/write_collocations_netcdf.m,
+	collocations/collocate_granule.m:
+
+	- Adapt for changed error-ids
+
+	* collocations/Holl10Data.m: Added
+
+	- Started implementation of 'my own dataset'. Unfinished.
+
+	* collocations/CollocatedDataset.m:
+
+	- Also derive from HomemadeDataset
+	- clean up properties
+
+	(collocate_and_store_date):
+	
+		- Add global attributes for both core and associated
+
+	(read_date): Bugfix
+
+	(cleanup) (store): Moved elsewhere
+
+	* datasets/SatDataset.m:
+
+	- Add 'defaults'
+
+	(SatDataset):
+
+		- Implement 'defaults'
+
+	(find_granule_by_datetime):
+		
+		- Changed errorid
+
+	
 2012-01-31  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-258

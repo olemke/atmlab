@@ -12,9 +12,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         subdir;
         re;
         filename;
-        reader = @(p)[];
+        reader = @(varargin)[];
         granule_duration;
         satname; % for single-satellite datasets
+        
+        % defaults cannot be set in any subclass, because re-defining a
+        % property is not allowed except under special circumstances that
+        % cannot be met here. Therefore, defaults should be encompassed in
+        % a property, a structure, 'defaults', that is /not/ defined here,
+        % but only by the class at the end of the hierarchy
     end
     
     % read-only props (alterable with methods)
@@ -26,13 +32,23 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         
         %% constructor
         
-        function ds = SatDataset(varargin)
+        function self = SatDataset(varargin)
             % Creates SatDataset object
             %
             % properties can be set upon constructing as when calling
             % 'struct'
+            
+            % this may be defined in subclasses
+            if isprop(self, 'defaults')
+                def_fields = fieldnames(self.defaults); %#ok<*MCNPN>
+                for i = 1:length(def_fields)
+                    fldnm = def_fields{i};
+                    self.(fldnm) = self.defaults.(fldnm);
+                end
+            end
+
             for i = 1:2:nargin
-                ds.(varargin{i}) = varargin{i+1};
+                self.(varargin{i}) = varargin{i+1};
             end
         end
         
@@ -209,7 +225,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   datafile    string     Path to the looked-for datafile.
             
-            errid = ['atmlab:' mfilename];
+            errid = 'atmlab:find_granule_by_datetime';
             [spec, tol] = optargs(varargin, {'', 0.01});
             
             % implementation:

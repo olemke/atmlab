@@ -27,10 +27,17 @@ classdef FieldCopier < AssociatedDataset
     % TODO:
     %  - set some (but not all!!) clever properties for NetCDF
     
-    properties
-        cols1;
-        cols2;
-    end
+    properties (SetAccess = protected)
+        
+        % this is split in primary and secondary because from these
+        % structures is also derived what arguments to pass on to the
+        % respective reading routines
+        fieldstruct_primary = struct;
+        fieldstruct_secondary = struct;
+        members = struct(); % set by constructor
+        parent = []; % set dynamically, per instance
+        dependencies = {}; % set dynamically, per instance
+    end    
     
     methods
         function self = FieldCopier(cd, fieldstruct1, fieldstruct2, varargin)
@@ -54,7 +61,7 @@ classdef FieldCopier < AssociatedDataset
             allfields = catstruct(fieldstruct1, fieldstruct2);
             assert(length(fieldnames(fieldstruct1))+length(fieldnames(fieldstruct2))==length(fieldnames(allfields)), ...
                     ['atmlab:' mfilename ':duplicates'], 'Duplicate fieldnames between datasets are not permitted, but were found :(');
-           
+            self.members = allfields;
 
         end
         
@@ -82,12 +89,12 @@ classdef FieldCopier < AssociatedDataset
             % works because there is only copying going on, e.g. no
             % processing that may depend on both data-inputs.
             
-            cc1 = struct; % cols corresponding to primary data
-            cc2 = struct; % cols corresponding to secondary data
-            allfields = catstruct(self.fieldstruct_primary, self.fieldstruct_secondary);
-            allnames = fieldnames(allfields);
+%             cc1 = struct; % cols corresponding to primary data
+%             cc2 = struct; % cols corresponding to secondary data
+            allnames = fieldnames(self.members);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
             total = 0;
+            dimsizes = struct();
             for i = 1:length(allnames)
                 fieldnam = allnames{i};
                 %fieldval = allfields.(fieldnam);
@@ -97,23 +104,51 @@ classdef FieldCopier < AssociatedDataset
                 else
                     dat = data2;
                 end
+                % 'n' is the number of measurements per lat/lon, e.g. the
+                % number of channels, number of height-bins, etc. Should be
+                % scalar...
                 n = numel(dat.(fieldnam))/(n_scanlines*n_scanpos);
                 assert(iswhole(n), ['atmlab:' mfilename ':dimensions'], ...
                     ['Dimension mismatch: scanlines: %d, scanpos: %d, ' ...
                     'field %s: %s'], n_scanlines, n_scanpos, fieldnam, ...
                     num2str(size(dat.(fieldnam))));
+                if (n>1)
+                    % need to specify dimension in NetCDF, if it doesn't
+                    % exist yet, we will need to create the dimension. To
+                    % tell the writing routine that it needs to do so, add
+                    % a field with a name and a number, but only if this
+                    % dimension size is new
+                    
+                    if ~(isfield(self.members, fieldnam) && ...
+                         isfield(self.members.(fieldnam), 'atts') && ...
+                         isfield(self.members.(fieldnam).atts, 'dims'))
+                    % reverse lookup of dimensionality
+                    alldimnames = fieldnames(dimsizes);
+                    alldimvalues = structfun(@(x)x, dimsizes);
+                    if ismember(n, alldimvalues)
+                        nm = alldimnames(alldimvalues==n);
+                    else
+                        nm = sprintf('AUTO_DIM%d_%d', length(alldimvalues)+1, n);
+                        dimsizes.(nm) = n;
+                    end
+                    
+                    self.members.(fieldnam).atts.dims = {nm, n};
+                    end
+                    
+                end
+                    
                 c.(fieldnam) = (total+1):(total+n);
                 total = total + n;
-                if i<=n_inprim
-                    cc1.(fieldnam) = c.(fieldnam);
-                else
-                    cc2.(fieldnam) = c.(fieldnam);
-                end
+%                 if i<=n_inprim
+%                     cc1.(fieldnam) = c.(fieldnam);
+%                 else
+%                     cc2.(fieldnam) = c.(fieldnam);
+%                 end
             end
             % store this information for our offspring
             self.cols = c;
-            self.cols1 = cc1;
-            self.cols2 = cc2;
+%             self.cols1 = cc1;
+%             self.cols2 = cc2;
 
      
             ncollocs = size(processed_core, 1);
@@ -158,9 +193,9 @@ classdef FieldCopier < AssociatedDataset
             out = ~isempty(fieldnames(self.fieldstruct_secondary));
         end
         
-        function store(varargin)
-            error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented!');
-        end
+%         function store(varargin)
+%             error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented!');
+%         end
     end
 
 end

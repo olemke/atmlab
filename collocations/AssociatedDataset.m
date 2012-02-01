@@ -1,4 +1,4 @@
-classdef AssociatedDataset < SatDataset
+classdef AssociatedDataset < SatDataset & HomemadeDataset
     % Defined data associated with CollocatedDataset
     %
     % Meant to be subclassed, not instantiated directly.
@@ -11,27 +11,59 @@ classdef AssociatedDataset < SatDataset
     % need to know:
     % - additional arguments to reader primary
     % - additional arguments to reader secondary
-    
-    properties (SetAccess = protected)
-        dependencies;
+            
+    properties (Abstract, SetAccess = protected)
+        members;
         parent;
-        % this is split in primary and secondary because from these
-        % structures is also derived what arguments to pass on to the
-        % respective reading routines
-        fieldstruct_primary = struct;
-        fieldstruct_secondary = struct;
-        cols;
+        dependencies;
     end
     
     methods
-        function self = AssociatedDataset(cd, dependencies, varargin)
+        function self = AssociatedDataset(varargin)
+            % 2 modes:
+            % if 1st argument is CollocatedDataset, then:
             % cd: CollocatedDataset it belongs to
             % dependencies: AssociatedDatasets to be processed first
             % rest of arguments passed on to SatDataset
-            self = self@SatDataset(varargin{:}); % call parent constructor
-            self.parent = cd;
-            self.dependencies = dependencies;
-            cd.add_associated(self);
+            % otherwise all to parent
+            %
+            % FIXME DOC
+            if nargin>0 && isa(varargin{1}, 'CollocatedDataset') % dynamic style
+                style = 'dynamic';
+                cd = varargin{1};
+                dp = varargin{2};
+                [subargs{1:nargin-2}] = varargin{3:end};
+            else
+                style = 'static';
+                subargs{:} = varargin{:};
+            end
+            self = self@SatDataset(subargs{:}); % call parent constructor
+            if strcmp(style, 'dynamic')
+                self.parent = cd;
+                self.dependencies = dp;
+            end
+            self.parent.add_associated(self);
+        end
+        
+        function members2cols(self)
+            % converts self.members to corresponding self.cols
+            %
+            % Assumes sizes in self.members are correct. This may not
+            % always be the case before the first data is read!
+            allnames = fieldnames(self.members);
+            tot = 1;
+            for i = 1:length(allnames)
+                fname = allnames{i};
+                fl = self.members.(fname);
+                if isfield(fl, 'atts') && isfield(fl.atts, 'dims')
+                    no = self.members.(fname).atts.dims{2};
+                else
+                    no = 1;
+                end
+                % self.cols is in HomemadeDataset
+                self.cols.(fname) = tot:(tot+no-1);
+                tot = tot + no;
+            end
         end
         
         function out = process_delayed(self, processed_core, spec1, spec2, varargin)
@@ -96,8 +128,8 @@ classdef AssociatedDataset < SatDataset
                     out = [out; new_out]; %#ok<AGROW>
                 end
             end
-            %out = []; % not implemented yet!
         end
+        
     end
     
     % those methods must be implemented by subclasses
@@ -108,7 +140,7 @@ classdef AssociatedDataset < SatDataset
         bool = needs_secondary_data(self)
 
         out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
-        store(self, date, spec, result)
+        %store(self, date, spec, result)
     end
     
 end

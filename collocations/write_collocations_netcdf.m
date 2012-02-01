@@ -88,7 +88,8 @@ for i = 1:length(fields) % for each satellite
         catch ME
             switch ME.identifier
                 case {'MATLAB:netcdf:defDim:onlyOneUnlimitedDimensionAllowed', ...
-                        'MATLAB:netcdf:defDim:eunlimit:onlyOneUnlimitedDimensionAllowed'}
+                        'MATLAB:netcdf:defDim:eunlimit:onlyOneUnlimitedDimensionAllowed', ... 
+                        'MATLAB:imagesci:netcdf:libraryFailure'}
                     dim_meancollocs = dim_collocs;
                 otherwise
                     ME.rethrow();
