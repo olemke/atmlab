@@ -1,3 +1,30 @@
+2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-263
+
+	* datasets/SatDataset.m: improved
+
+	- Register with global structure whenever dataset is created or
+	name is (re)defined.
+
+	* datasets/datasets.m: added
+
+	- Contains persistent structure to keep track of datasets
+
+	* datasets/find_info_from_granule.m: improved
+
+	- Use new-style if possible, otherwise fall-back to old style
+
+	* collocations/CollocatedDataset.m: bugfix
+
+	(collocate_and_store_date):
+
+	- Fix error identifier checking
+
+	* time/iso_timestamp.m: Added
+
+	- Return string with current ISO date-time.
+
 2012-02-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-262

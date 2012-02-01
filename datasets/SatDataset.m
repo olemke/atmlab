@@ -50,6 +50,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             for i = 1:2:nargin
                 self.(varargin{i}) = varargin{i+1};
             end
+            
+            % register in global struct, if it has a name
+            if ~isempty(self.name)
+                datasets(self);
+            end
         end
         
         %% things that can be done with datasets
@@ -425,6 +430,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % This is called by the CollocatedDataset constructor.
             ds.collocated_datasets = [ds.collocated_datasets cd];
+        end
+        
+        function set.name(self, value)
+            if ~isempty(self.name)
+                % deregister old name
+                datasets('delete', self);
+            end
+            self.name = value;
+            datasets(self);
         end
     end
 end

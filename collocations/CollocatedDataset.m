@@ -598,13 +598,15 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     [result, addis, also] = ...
                         self.collocate_date(date, spec1, spec2, additionals);
                 catch ME
-                    if strcmp(ME.identifier, 'atmlab:collocate_date:nosource')
-                        logtext(atmlab('ERR'), ...
-                            'No succesful collocations at %04d-%02d-%02d, not writing\n', ...
-                            date(1), date(2), date(3));
-                        return;
-                    else
-                        ME.rethrow();
+                    switch ME.identifier
+                        case {'atmlab:collocate_date:nosource', ...
+                                'atmlab:CollocatedDataset:noother'}
+                            logtext(atmlab('ERR'), ...
+                                'No succesful collocations at %04d-%02d-%02d, not writing\n', ...
+                                date(1), date(2), date(3));
+                            return;
+                        otherwise
+                            ME.rethrow();
                     end
                 end
                 

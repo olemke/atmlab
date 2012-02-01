@@ -2,6 +2,9 @@ function S = find_info_from_granule(dataset, fname)
 
 % find_info_from_granule Extract info from a granule filename
 %
+% FIXME DOC! Explanation below related to old-style, before 2012-02-01.
+% New style is configured differently!
+%
 % For a given dataset and filename, return a structure with information
 % extracted from the filename, such as year, month, day. This is just a
 % short wrapper around <a href="matlab:help regexp">regexp</a>. If no information
@@ -74,5 +77,10 @@ function S = find_info_from_granule(dataset, fname)
 %
 % $Id$
 
-matchy = datasets_config([dataset '_regexp']);
+D = datasets;
+if isfield(D, dataset)
+    matchy = D.(dataset).re;
+else
+    matchy = datasets_config([dataset '_regexp']);
+end
 S = regexp(fname, matchy, 'names');
