@@ -1,3 +1,11 @@
+2012-02-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-265
+
+	* arts/scenegen/asg_use_v2.m: Created.
+
+	* demos/asg_demo_new.m: Just started.
+	
 2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-264
