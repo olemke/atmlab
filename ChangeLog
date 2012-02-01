@@ -1,5 +1,16 @@
 2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-261
+
+	* collocations/CollocatedDataset.m: Improved
+
+	(collocate_and_store_date): small bugfix
+
+	(overlap_granule): bugfix
+		- Was not finding any if all granules were fine
+
+2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-260
 
 	* datasets/HomemadeDataset.m: Added

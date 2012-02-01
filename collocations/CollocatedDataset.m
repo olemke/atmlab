@@ -143,14 +143,24 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 threedays(:, 1), threedays(:, 2), threedays(:, 3), threedays(:, 4), threedays(:, 5));
             
             % last granule starting after the reference granule
+            % those are all 'too late'
             
             b = find(granule_start - colloc_config('interval') > granules_unixsecs, 1, 'last');
             
             % first granule ending before the reference granule
+            % those are all 'too early'
             
             e = find(granule_end + colloc_config('interval') < granules_unixsecs, 1, 'first');
             
-            secondary_granules = threedays(b:e, :);
+            % if all match, none are too early or too late
+            if isempty(b:e)
+                okej = (granule_start < granules_unixsecs) & (granule_end > granules_unixsecs);
+            else
+                % anything not too early, not too late, is good
+                okej = b:e;
+            end
+            
+            secondary_granules = threedays(okej, :);
         end
         
         function [result, additional_results, also] = collocate_granule(self, date1, spec1, spec2, varargin)
@@ -591,7 +601,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     if strcmp(ME.identifier, 'atmlab:collocate_date:nosource')
                         logtext(atmlab('ERR'), ...
                             'No succesful collocations at %04d-%02d-%02d, not writing\n', ...
-                            year, month, day);
+                            date(1), date(2), date(3));
                         return;
                     else
                         ME.rethrow();
