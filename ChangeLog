@@ -1,3 +1,18 @@
+2012-01-31  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-258
+
+	* geoplots/gmt/getAnnotFormat.m: Fixed bug, so that it is more
+	robust and can handle negative numbers
+
+	* geoplots/gmt/append_tickannotations.m: Fixed bad regexp
+
+	* geoplots/gmt/gmt_plot.m: Commented out warning that was annoying me
+
+	* handy/combine_pdfs.m: slightly optimized
+
+	* geoplots/gmt/psscale.m: Small edits
+
 2012-01-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-257
