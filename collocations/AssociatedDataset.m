@@ -35,7 +35,7 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
                 [subargs{1:nargin-2}] = varargin{3:end};
             else
                 style = 'static';
-                subargs{:} = varargin{:};
+                [subargs{1:nargin}] = varargin{:};
             end
             self = self@SatDataset(subargs{:}); % call parent constructor
             if strcmp(style, 'dynamic')
@@ -55,8 +55,8 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
             for i = 1:length(allnames)
                 fname = allnames{i};
                 fl = self.members.(fname);
-                if isfield(fl, 'atts') && isfield(fl.atts, 'dims')
-                    no = self.members.(fname).atts.dims{2};
+                if isfield(fl, 'dims')
+                    no = self.members.(fname).dims{2};
                 else
                     no = 1;
                 end

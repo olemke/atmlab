@@ -51,10 +51,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 self.(varargin{i}) = varargin{i+1};
             end
             
-            % register in global struct, if it has a name
-            if ~isempty(self.name)
-                datasets(self);
-            end
         end
         
         %% things that can be done with datasets

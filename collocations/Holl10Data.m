@@ -70,8 +70,43 @@ classdef Holl10Data < AssociatedDataset
      
      methods
          
-         function out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
-         end
-         
+         function M = process_granule(self, processed_core, data_cpr, ~, ~, data_mhs, ~, ~, ~)
+             % process_granule FIXME DOC
+             %
+             % FIXME DOC
+             
+             self.members2cols(); % only here, because in some cases it happens after reading data
+             % prepare
+             n_collocs = size(processed_core, 1);
+             n_fields = max(cell2mat(struct2cell(self.cols).'));
+             M = nan*zeros(n_collocs, n_fields);
+             if n_collocs==0
+                 return % don't bother
+             end
+                          
+             % row and columns           
+             cpr_i = processed_core(:, self.parent.cols.LINE1);
+             mhs_r = processed_core(:, self.parent.cols.LINE2);
+             mhs_c = processed_core(:, self.parent.cols.POS2);
+             
+             %% cloudsat data
+             
+             M(:, self.cols.ROIWP) = data_cpr.RO_ice_water_path(cpr_i);
+             M(:, self.cols.dROIWP) = data_cpr.RO_ice_water_path_uncertainty(cpr_i);
+             M(:, self.cols.IOROIWP) = data_cpr.IO_RO_ice_water_path(cpr_i);
+             M(:, self.cols.dIOROIWP) = data_cpr.IO_RO_ice_water_path_uncertainty(cpr_i);
+             
+             %% AMSUB/MHS data
+             
+             % index for direct addressing
+             mhs_i = sub2ind(size(data_mhs.lat), mhs_r, mhs_c);
+             
+             % reshape so that I can use direct addressing for brightness temperatures
+             tb = reshape(data_mhs.tb, [numel(data_mhs.lat) 5]);
+             
+             M(:, self.cols.MHS) = tb(mhs_i, :);
+             
+         end  
+
      end
 end

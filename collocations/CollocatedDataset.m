@@ -752,11 +752,3 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
     end
             
 end
-
-%%%%%%%%%%%%%%%%%%
-%% SUBFUNCTIONS %%
-%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%
-%% END OF FILE %%
-%%%%%%%%%%%%%%%%%

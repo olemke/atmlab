@@ -59,6 +59,11 @@ WISHES
 * New style since January 2012 *
 ********************************
 
+- Write long period
+- Read long period, core + associated datasets + new fields
+- Figure out dependencies of multiple associated datasets
+- For FieldCopier, be smart in long_name if possible
+
 - implement new style as methods in various new classes
 - when finished, in old-style add small functions using new-style
 

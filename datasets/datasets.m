@@ -29,8 +29,14 @@ end
 
 if (nargin==1)
     if isfield(S, varargin{1}.name)
-        error(['atmlab:' mfilename], ...
-            'Dataset with name %s already exists!', S.name);
+        if S.(varargin{1}.name) == varargin{1}
+            warning(['atmlab:' mfilename], ...
+                'Dataset with name %s was already defined, equally', ...
+                varargin{1}.name);
+        else
+            error(['atmlab:' mfilename], ...
+                'Dataset with name %s already exists and is different', varargin{1}.name);
+        end
     end
     S.(varargin{1}.name) = varargin{1};
 end

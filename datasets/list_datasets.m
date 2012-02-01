@@ -23,6 +23,9 @@ function datasets = list_datasets(only_config)
 %
 % $Id$
 
+warning(['atmlab:' mfilename ':deprecated'], ...
+    'list_datasets is deprecated, no longer maintained, may fail, etc.. Use ''datasets'' instead');
+
 if ~exist('only_config', 'var')
     only_config = false;
 end

@@ -1,5 +1,34 @@
 2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-264
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Dynamically assign dimensions for NetCDF, based on data. Store this
+	along with the members-structure.
+
+	* collocations/AssociatedDataset.m(members2cols):
+
+	- Two bugfixes
+
+	* collocations/Holl10Data.m(process_granule):
+
+	- Added processing routine, also serves as example
+
+	* collocations/CollocatedDataset.m: cleanup
+
+	* datasets/list_datasets.m: Now deprecated
+
+	* datasets/datasets.m: Small improvement:
+
+	- Warning if re-assigning member to same object
+	- Error is re-assigning member to other object
+
+	* collocations/TODO: expanded
+
+
+2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-263
 
 	* datasets/SatDataset.m: improved

@@ -80,25 +80,11 @@ classdef FieldCopier < AssociatedDataset
             n_scanlines = size(data1.lat, 1);
             n_scanpos = size(data1.lat, 2);
 
-            %% make 'cols' structs, fix field structs
-            % if self.cols is not yet initialised, do this now. This is not
-            % done in constructor because only when I see the data I know
-            % the sizes to allocate for each field
-            % split in primary/secondary, in order to know from what
-            % data-structure to obtain the different fields. This only
-            % works because there is only copying going on, e.g. no
-            % processing that may depend on both data-inputs.
-            
-%             cc1 = struct; % cols corresponding to primary data
-%             cc2 = struct; % cols corresponding to secondary data
             allnames = fieldnames(self.members);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
-            total = 0;
             dimsizes = struct();
             for i = 1:length(allnames)
                 fieldnam = allnames{i};
-                %fieldval = allfields.(fieldnam);
-                %c.(fieldnam) = (total+1):(total+n);
                 if i<=n_inprim
                     dat = data1;
                 else
@@ -112,6 +98,7 @@ classdef FieldCopier < AssociatedDataset
                     ['Dimension mismatch: scanlines: %d, scanpos: %d, ' ...
                     'field %s: %s'], n_scanlines, n_scanpos, fieldnam, ...
                     num2str(size(dat.(fieldnam))));
+                %% if needed, add dimension info to self.members
                 if (n>1)
                     % need to specify dimension in NetCDF, if it doesn't
                     % exist yet, we will need to create the dimension. To
@@ -119,37 +106,27 @@ classdef FieldCopier < AssociatedDataset
                     % a field with a name and a number, but only if this
                     % dimension size is new
                     
+                    % iff self.members.(fieldnam).dims is there
                     if ~(isfield(self.members, fieldnam) && ...
-                         isfield(self.members.(fieldnam), 'atts') && ...
-                         isfield(self.members.(fieldnam).atts, 'dims'))
-                    % reverse lookup of dimensionality
-                    alldimnames = fieldnames(dimsizes);
-                    alldimvalues = structfun(@(x)x, dimsizes);
-                    if ismember(n, alldimvalues)
-                        nm = alldimnames(alldimvalues==n);
-                    else
-                        nm = sprintf('AUTO_DIM%d_%d', length(alldimvalues)+1, n);
-                        dimsizes.(nm) = n;
-                    end
-                    
-                    self.members.(fieldnam).atts.dims = {nm, n};
+                            isfield(self.members.(fieldnam), 'dims'))
+                        % find dimension name from dimension size
+                        alldimnames = fieldnames(dimsizes);
+                        alldimvalues = structfun(@(x)x, dimsizes);
+                        if ismember(n, alldimvalues)
+                            nm = alldimnames(alldimvalues==n);
+                        else
+                            nm = sprintf('AUTO_DIM%d_%d', length(alldimvalues)+1, n);
+                            dimsizes.(nm) = n;
+                        end
+                        % store dimension name and size
+                        self.members.(fieldnam).dims = {nm, n};
                     end
                     
                 end
                     
-                c.(fieldnam) = (total+1):(total+n);
-                total = total + n;
-%                 if i<=n_inprim
-%                     cc1.(fieldnam) = c.(fieldnam);
-%                 else
-%                     cc2.(fieldnam) = c.(fieldnam);
-%                 end
             end
-            % store this information for our offspring
-            self.cols = c;
-%             self.cols1 = cc1;
-%             self.cols2 = cc2;
-
+            
+            self.members2cols();
      
             ncollocs = size(processed_core, 1);
             nfields = max(cell2mat(struct2cell(self.cols).'));

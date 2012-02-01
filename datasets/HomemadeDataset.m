@@ -90,9 +90,9 @@ classdef HomemadeDataset < SatDataset
             global_atts = catstruct(global_atts, info);
             warning('on', 'catstruct:DuplicatesFound');
             % convert to cell-array
-            global_atts = mat2cell([fieldnames(global_atts) struct2cell(global_atts)], ...
+            global_atts_cell = mat2cell([fieldnames(global_atts) struct2cell(global_atts)], ...
                 ones(1, length(fieldnames(global_atts))), 2).';
-            addncattributes(ncid, global_atts);
+            addncattributes(ncid, global_atts_cell);
             
             %% define variables, variable attributes, additional dimensions
             
@@ -179,7 +179,7 @@ classdef HomemadeDataset < SatDataset
     end
     
     % static/private are used like subfunctions
-    methods (Static, Access = private)
+    methods (Static, Access = protected)
         function cleanup(temp_out, ncid)
             logtext(atmlab('OUT'), 'Cleaning up\n');
             try
