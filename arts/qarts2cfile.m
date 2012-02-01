@@ -812,11 +812,14 @@ function T = cfile_Sensor( Q, partname, workfolder )
     if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
       parts{end+1} = 'beamswitch';
     end
-    % If multiple LO are given exchange 'mixer' and 'backend' for 'multimixer'
-    if( strmatch( 'mixer', char(parts) )   &  ...
-        strmatch( 'backend', char(parts) ) &  length(H.LO) > 1 )
-      parts = rmfield( parts, {'mixer' 'backend'} );
-      parts{end+1} = 'multimixer';
+    % If multiple LO are given exchange 'mixer' for 'multimixer' and 'remove
+    % 'backend' 
+    if( any(strcmp( 'mixer', parts ))   &  ...
+        any(strcmp( 'backend', parts )) &  length(H.LO) > 1 )
+      %
+      ir        = find( strcmp('mixer',parts) );
+      parts{ir} = 'multimixer';
+      parts     = parts{ find( ~strcmp('backend',parts) ) };
     end
     parts{end+1} = 'close';
         
