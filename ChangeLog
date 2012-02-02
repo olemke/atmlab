@@ -32,6 +32,20 @@
 	- Warning if re-assigning member to same object
 	- Error is re-assigning member to other object
 
+	* datasets/HomemadeDataset.m: Bugfixes
+
+	(store): Bugfix
+
+		- Bugfix, return struct with attrs, not cell array
+	
+	(cleanup): protected, not private, subclasses must access
+
+	* datasets/SatDataset.m: Bugfix
+
+	(SatDataset): Bugfix
+
+		- Bugfix, do not register name twice
+
 	* collocations/TODO: expanded
 
 
