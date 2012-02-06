@@ -68,9 +68,12 @@
 %       choice2     Optional choice 2. See above.
 %       c2arg       Arguments for optional choice 2. See above.
 %
-% BUG: This function doesn't from 2011b. You may use read_cloudsat_hdf.m
-% instead 
+% INFO: If you want to instead read the cloudsat data as it is (i.e. no scaling,
+%       converting, etc.), use read_cloudsat_hdf directly. The function also
+%       outputs the variable attributes of the fields you wish to retrieve as a
+%       second output argument 
 %
+% $Id$
 % 2007-10-24   Created by Patrick Eriksson.
 
 
@@ -233,9 +236,9 @@ if ~isempty( choice1 )
       lonlims = [-180 180 ];
     end   
 
-    iout = find( inleg & ...
-                 P.Latitude  >= latlims(1) & P.Latitude  <= latlims(2) & ...
-                 P.Longitude >= lonlims(1) & P.Longitude <= lonlims(2) );
+    iout = inleg & ...
+        P.Latitude  >= latlims(1) & P.Latitude  <= latlims(2) & ...
+        P.Longitude >= lonlims(1) & P.Longitude <= lonlims(2);
     
     if isempty(iout)
       P = 'No data matching reading restrictions.';
@@ -258,56 +261,26 @@ P = [];
 
 %
 try
-  for i = 1 : length( fieldlist )
-  
-    ih = find( strcmp( hdfnames{i}, ...
-                                  {fileinfo.Swath.GeolocationFields.Name} ) );
-    
-    if ~isempty( ih )
-      P.(fieldlist{i}) = hdfread( fileinfo.Filename, ...
-                                  fileinfo.Swath.GeolocationFields(ih).Name );
-    else
-      ih = find( strcmp( hdfnames{i}, {fileinfo.Swath.DataFields.Name} ) );
-    
-      if isempty( ih )
-          ih = strcmp(hdfnames{i}, {fileinfo.Swath.Attributes.Name});
-          if any(ih)
-              P.(fieldlist{i}) = fileinfo.Swath.Attributes(ih).Value';
-          else
-              P = sprintf( 'Data do not contain field ''%s''.', fieldlist{i} );
-          end
-          break
-          
-      else
-          P.(fieldlist{i}) = hdfread( fileinfo.Filename, ...
-              fileinfo.Swath.DataFields(ih).Name );
-      end
+    P = read_cloudsat_hdf(fileinfo.Filename,fieldlist);
+    for F = fieldlist
+        % convention to make everything double
+        if ~ischar(P.(F{1}))
+            P.(F{1}) = double(P.(F{1}));
+        end
+        % convention to make all vectors column vectors
+        if isvector(P.(F{1}))
+            P.(F{1}) = P.(F{1})(:);
+        end
+        % apply conditions
+        if ~isempty(iout) && ( isvector(P.(F{1})) || ismatrix(P.(F{1})) )
+            P.(F{1}) = P.(F{1})(iout,:);
+        end
     end
-
-    % 1. Convert to double.
-    % 2. Convert cell data also to be a column vector
-    %
-    if iscell( P.(fieldlist{i}) )
-      P.(fieldlist{i}) = double( P.(fieldlist{i}){1}' );
-    else
-      P.(fieldlist{i}) = double( P.(fieldlist{i}) );
-    end       
-
-    % Make index crop
-    %
-    if ~isempty( iout )  &  size( P.(fieldlist{i}), 1 ) > 1
-       if ~strcmp(fieldlist{i},'EC_height')
-          P.(fieldlist{i}) = P.(fieldlist{i})(iout,:);
-       end 
-    end
-  end
-  %
-  warning( 'on', 'MATLAB:hdfwarn:generic' );
-catch
-  warning( 'on', 'MATLAB:hdfwarn:generic' );
-  P = 'Error while reading file.';
+catch ME
+    P = sprintf('Error while reading file.: %s\n',ME.message);
+    warning('MATLAB:hdfwarn:generic','%s',P);
 end
-%
+
 if ischar( P )
   return
 end
