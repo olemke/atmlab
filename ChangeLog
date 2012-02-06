@@ -1,3 +1,31 @@
+2012-02-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-266
+
+	* geodetic/ellipsoid2d.m: Created.
+
+	* geodetic/wgs84.m: Removed. Use ellipsoidmodels + ellipsoidradii.
+	(New functions give higher flexibility and make clear what
+	latitudes that are expected. In fact, wgs84 mixed expression for
+	geocentruic and geodetic latitudes.)
+
+	* geophysics/pt2z.m: Replaced usage of *wgs84* with
+	*ellipsoidmodels*.
+
+	* arts/qarts.m: Removed reference to WGS84 method as it will be
+	removed.
+
+	* geodetic/ellipsoidradii2.m: Old ellipsoidradii renamed. This
+	function takes geodetic latitudes as input.
+
+	* geodetic/ellipsoidradii.m: Created. Uses geocentric latitudes as
+	input.
+
+	* geodetic/ellipsoidmodels.m: Clarification in header about radius
+	used for spherical Earth.
+
+	* geodetic/radii2sphere.m: Removed (was just a test function).
+
 2012-02-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-265
@@ -5,7 +33,7 @@
 	* arts/scenegen/asg_use_v2.m: Created.
 
 	* demos/asg_demo_new.m: Just started.
-	
+
 2012-02-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-264
@@ -37,7 +65,7 @@
 	(store): Bugfix
 
 		- Bugfix, return struct with attrs, not cell array
-	
+
 	(cleanup): protected, not private, subclasses must access
 
 	* datasets/SatDataset.m: Bugfix

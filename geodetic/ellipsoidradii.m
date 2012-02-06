@@ -1,26 +1,20 @@
-% ELLIPSOIDRADII   Different radii of a reference ellipsoid
+% ELLIPSOIDRADII   Geocentric radius of a reference ellipsoid
 %
-%    Both the actual ellipsoid radius and curvature radius can be obtained
-%    by this function. If *azimuth* is specified, the curvature radius is
-%    returned. Otherwise the radius of ellipsoid is returned.  
+%    Gives the distance from the Earth's centre and the reference ellipsoid
+%    as a function of geoCENTRIC latitude. 
 %
-%    The calculation expressions are taken from radiigeo.pdf, found in the
-%    same folder as this function.
-%
-%    Please note that geoDETIC latitudes are used.
+%    To obtain the radii for geoDETIC latitude, use *ellipsoidradii2*.
 %
 % FORMAT   r = ellipsoidradii( ellipsoid, lat_gd, [azimuth] )
 %    
 % OUT   r          Radii. See above.
 % IN    ellipsoid  Model ellipsoid as returned by *ellipsoidmodels*.
-%       lat_gd     Geodetic latitudes.
-% OPT   azimuth    Azimuthal angle (angle from NS plane). If given curvature
-%                  radii are returned, see above
+%       lat_gd     Geocentric latitudes.
 
-% 2011-11-14   Created by Patrick Eriksson.
+% 2012-02-06   Created by Patrick Eriksson.
 
 
-function r = ellipsoidradii(ellipsoid,lat_gd,azimuth)
+function r = ellipsoidradii(ellipsoid,lat)
 
 % Check input                                                          %&%
 rqre_datatype( ellipsoid, @isvector );                                 %&%
@@ -28,33 +22,22 @@ if length(ellipsoid) ~= 2                                              %&%
  error( 'The argument *ellipsoid* must be a vector of length 2' );     %&%
 end                                                                    %&%
 rqre_in_range( ellipsoid(2), 0, 1, 'element 2 of ellipsoid' );         %&%
-rqre_datatype( lat_gd, @isnumeric );                                   %&%
-rqre_in_range( lat_gd, -90, 90 );                                      %&%
+rqre_datatype( lat, @isnumeric );                                      %&%
 
 
 % Spherical case (all radii the same)
 if ellipsoid(2) == 0
   %
-  r = repmat( ellipsoid(1), size(lat_gd) );
+  r = repmat( ellipsoid(1), size(lat) );
 
-% The actual radius  
-elseif nargin < 3
-  %
-  e2   = ellipsoid(2)^2;
-  sin2 = sind(lat_gd).^2;
-  %
-  r = ellipsoid(1) * sqrt((1-e2).^2*sin2+cosd(lat_gd).^2) ./ sqrt(1-e2*sin2);
-
-% Curvature radius  
+% 
 else
+  % A re-arranged form of the follwing expression is used:
+  % r = ab/sqrt(b^2*cos(lat)^2+a^2*sin(lat)^2)
   %
-  e2    = ellipsoid(2)^2;
-  sin2  = sind(lat_gd).^2;
-  aterm = 1-e2*sin2;
-  %
-  rn = 1 ./ sqrt(aterm);
-  rm = (1-e2) * (rn ./ aterm );
-  %
-  r = ellipsoid(1) ./ ( cosd(azimuth)^2./rm + sind(azimuth)^2./rn );
+  c = 1 - ellipsoid(2)^2;
+  b = ellipsoid(1) * sqrt( c );
+  %  
+  r = b ./ sqrt( c*cosd(lat).^2 + sind(lat).^2 );
 
 end

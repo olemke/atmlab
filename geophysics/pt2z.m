@@ -65,7 +65,7 @@ z = shift2refpoint( p, z, p0, z0 );
 
 %= Set Earth radius and g at z=0
 %
-re = wgs84( 2, lat );
+re = ellipsoidradii( ellipsoidmodels('wgs84'), lat );
 g0 = lat2g0( lat );
 
 

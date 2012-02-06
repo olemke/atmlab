@@ -2,7 +2,7 @@
 %
 %    Returns data for a number of geodetic reference ellipsoids. The
 %    following models are covered:
-%       'SphericalEarth'
+%       'SphericalEarth'  (radius set as constants('EARTH_RADIUS'))
 %       'WGS84'
 %
 %    The reference ellipsoid is returned as [equatorial radius; eccentricity].
