@@ -1,3 +1,34 @@
+2012-02-07  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-270
+
+	* collocations/collocate_and_store_date_range.m, collocations/collocate_and_store_date.m: Now deprecated.
+
+	* collocations/TODO: Expanded
+
+	* collocations/CollocatedDataset.m:
+
+	- 'associated' is a cell array of strings, because it can contain both
+	FieldCopier and other AssociatedDataset derivates
+
+	(collocate_and_store_date_range): Added, translated from functional
+	
+	(read_date): Moved to HomedateDataset and now independente of self.cols
+
+	(read): Moved from collocation_read, but unfinished.
+
+	(add_associated): Adapted because associated now cell-array
+
+	* datasets/HomemadeDataset.m:
+
+	(add_field): Removed. Unused.
+
+	(read_single_day): Moved from CollocatedDataset and adapted
+
+	* datasets/SatDataset.m:
+
+	(read_granule): small implementation change
+
 2012-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-269

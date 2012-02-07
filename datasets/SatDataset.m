@@ -307,11 +307,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %    func2str(reader), datafile);
             logtext(atmlab('OUT'), 'Reading %s\n', datafile);
             try
-                if isempty(extra)
-                    data = self.reader(datafile);
-                else
-                    data = self.reader(datafile, extra);
-                end
+                data = self.reader(datafile, extra);
             catch ME
                 if force
                     switch ME.identifier

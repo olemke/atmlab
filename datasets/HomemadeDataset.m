@@ -158,24 +158,65 @@ classdef HomemadeDataset < SatDataset
             logtext(atmlab('OUT'), 'Done\n');
             
         end
-
-        function add_field(self, name, type, atts)
-            % Adds a single (stored) data field; mainly used for collocated
+        
+    end
+    
+    methods (Access = protected)
+        
+        % protected, those are for internal use, user uses
+        % CollocatedDataset.read
+        function [M, localcols, attr] = read_single_day(self, date, spec, fields)
+            % Read collocation 'fields' for 'date', 'spec'.
             %
-            % cd.add_field(name, type, atts)
+            % FIXME DOC
             %
-            % See also: add_fields
+            % 'fields' may be 'all', in which case all fields are read.
+            % No guarantee about the order, but this information is
+            % returned via 'localcols'. If you want consistence of order
+            % with actual collocating, consider passing
+            % fieldnames(self.cols) as fields.
             
-            if isfield(self.members, name)
-                error(['atmlab:' mfilename ':alreadyexists'], ...
-                    'field with name %s already exists', name);
+            fn = self.find_granule_by_datetime(date, spec);
+            tmp = tempname(atmlab('WORK_AREA'));
+            exec_system_cmd(['zcat ' fn '>' tmp]); % 3x faster than ML's gunzip
+            c = onCleanup(@()delete(tmp));
+            
+            if ischar(fields)
+                if strcmp(fields, 'all')
+                    data = loadncfile(tmp);
+                    attr = data.global_attributes;
+                    fields = fieldnames(data);
+                else
+                    error(['atmlab:' mfilename ':invalid'], ...
+                        ['Invalid ''fields'' argument: ' fields]);
+                end
+            else
+                [data, attr] = loadncvar(tmp, fields);
+                % convert from cell-array of 2x1 cells to struct...
+                if ~isstruct(attr)
+                    X = [attr{:}]; attr = struct(X{:});
+                end
             end
             
-            self.members.(name) = struct(...
-                'type', type, ...
-                'atts', atts);
-            
+            % find n. of columns to allocate, keep order
+            data_fields = intersect_unsorted(fields, fieldnames(self.members));
+            %n_columns = sum(cellfun(@(ff) length(self.cols.(ff)), data_fields));
+            n_columns = sum(cellfun(@(ff) size(data.(ff), 2),  data_fields));
+            n_rows = max(cellfun(@(ff) size(data.(ff), 1), fields));
+            M = nan*zeros(n_rows, n_columns);
+            n = 1;
+            % copy data to matrix
+            for i = 1:length(data_fields)
+                fld = data_fields{i};
+                %n_local_cols = length(self.cols.(fld));
+                n_local_cols = size(data.(fld), 2);
+                range_local_cols = n:(n+n_local_cols-1);
+                M(:, range_local_cols) = data.(fld);
+                localcols.(fld) = range_local_cols;
+                n = n + n_local_cols;
+            end
         end
+        
     end
     
     % static/private are used like subfunctions

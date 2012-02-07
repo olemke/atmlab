@@ -32,6 +32,8 @@ function collocate_and_store_date(year, month, day, ...
 
 % check whether one or two sats should be passed. 
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 switch number_sats_in_dataset(['collocation_' sensor1 '_' sensor2])
     case 1
         s = sat2;

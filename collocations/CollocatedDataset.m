@@ -12,7 +12,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
     % read-only props (may be alterable with methods)
     properties (SetAccess = protected)
         % associated datasets, e.g. additional data, meandata, etc.
-        associated = [];
+        associated = {};
     end
     
     properties (Constant)
@@ -105,9 +105,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             fv = 1:nfields;
             self.cols = cell2struct(num2cell(fv), fnms.', 2);
         end
-        
-        %%
-        
+                
         function secondary_granules = overlap_granule(self, date1, spec2)
             % secondary granules that, judging from filenames, might overlap
             %
@@ -633,6 +631,24 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             end
         end
         
+        function collocate_and_store_date_range(self, date_start, date_end, spec1, spec2)
+            % FIXME DOC
+            logtext(atmlab('OUT'), 'Starting collocations\n');
+            logtext(atmlab('OUT'), '%s %s vs. %s %s\n', self.primary.name, spec1, self.secondary.name, spec2);
+            logtext(atmlab('OUT'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
+            alldates = daterange(date_start, date_end);
+            for i = 1:size(alldates, 1);
+                year = alldates(i, 1);
+                month = alldates(i, 2);
+                day = alldates(i, 3);
+                logtext(atmlab('OUT'), 'collocating %04d-%02d-%02d\n', ...
+                    year, month, day);
+                self.collocate_and_store_date([year, month, day], spec1, spec2);
+            end
+            logtext(atmlab('OUT'), 'Finished!\n');
+            %%%
+        end
+        
         function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
             % Process core collocations
             %
@@ -690,65 +706,111 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             M(wrongrows, :) = [];
             
         end
-
-        function [M, localcols, attr] = read_date(self, date, spec, fields)
-            % Read collocation 'fields' for 'date', 'spec'.
-            %
-            % FIXME DOC
-            %
-            % 'fields' may be 'all', in which case all fields are read.
-            % No guarantee about the order, but this information is
-            % returned via 'localcols'. If you want consistence of order
-            % with actual collocating, consider passing
-            % fieldnames(self.cols) as fields.
-            %
-            % FIXME TODO: share implementation with AssociatedDataset?
+        
+        function [M, M_cols, addis, addis_cols] = read(self, date_start, date_end, spec1, spec2, fields, varargin)
+            %%%
             
-            fn = self.find_granule_by_datetime(date, spec);
-            tmp = tempname(atmlab('WORK_AREA'));
-            exec_system_cmd(['zcat ' fn '>' tmp]); % 3x faster than ML's gunzip
-            c = onCleanup(@()delete(tmp));
+            error(['atmlab:' mfilename], 'Not implemented yet!');
+            
+            %% prepare configuration things
+            
+            [limits, filters] = optargs(varargin, {nan, {}});
 
-            if ischar(fields)
-                if strcmp(fields, 'all')
-                    data = loadncfile(tmp);
-                    attr = data.global_attributes;
-                    fields = fieldnames(data);
-                else
-                    error(['atmlab:' mfilename ':invalid'], ...
-                        ['Invalid ''fields'' argument: ' fields]);
-                end
+            
+            % Not filtering doubles, this should be done when processing
+            % collocations initially
+            
+            
+            %% get name_struct
+            
+            name_struct = cols_cell_to_cols_struct(fields, cols_in);
+            % ncols: highest value
+            C = struct2cell(name_struct);
+            ncols = max(horzcat(C{:}));
+            
+            %% convert limits structure to matrix as wanted by restrain_collocations
+            
+            if isequalwithequalnans(limits, nan)
+                dolimits = false;
+                limmat = zeros(0, 3);
             else
-                [data, attr] = loadncvar(tmp, fields);
-                % convert from cell-array of 2x1 cells to struct...
-                if ~isstruct(attr)
-                    X = [attr{:}]; attr = struct(X{:});
+                dolimits = true;
+                limmat = limstruct2limmat(limits, name_struct);
+            end
+            
+            % for the filters, convert column names to column numbers, using the
+            % earlier obtained name_struct
+            if ~isempty(filters)
+                for i = 1:length(filters)
+                    filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
                 end
             end
             
-            % find n. of columns to allocate, keep order
-            data_fields = intersect_unsorted(fields, fieldnames(self.cols));
-            n_columns = sum(cellfun(@(ff) length(self.cols.(ff)), data_fields));
-            n_rows = max(cellfun(@(ff) size(data.(ff), 1), fields));
-            M = nan*zeros(n_rows, n_columns);
-            n = 1;
-            % copy data to matrix
-            for i = 1:length(data_fields)
-                fld = data_fields{i};
-                n_local_cols = length(self.cols.(fld));
-                range_local_cols = n:(n+n_local_cols-1);
-                M(:, range_local_cols) = data.(fld);
-                localcols.(fld) = range_local_cols;
-                n = n + n_local_cols;
+            %% hdf5 disabled
+            
+            %% pre-allocate at least zero rows
+            
+            M = zeros(0, ncols);
+            
+            %% loop through all the dates
+            
+            dates = daterange(start_date, end_date);
+            for i = 1:size(dates, 1)
+                date = dates(i, :);
+                %% read collocations for date
+                
+                path = find_datafile_by_date(date, s, ...
+                    ['collocation_' sensor1 '_' sensor2]);
+                
+                try
+                    collocations_day = read_collocs_data_mean(path, cols_in, fields);
+                    
+                catch ME
+                    switch (ME.identifier)
+                        case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField', ...
+                                'MATLAB:gunzip:invalidFilename','MATLAB:netcdf:open:noSuchFile', ...
+                                'atmlab:exec_system_cmd:shell'}
+                            logtext(atmlab('ERR'), 'Problem for %04d-%02d-%02d: %s\n', ...
+                                date(1), date(2), date(3), ME.message);
+                            continue
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
+                if isempty(collocations_day)
+                    logtext(atmlab('OUT'), 'no collocations\n');
+                    continue
+                end
+                
+                %% apply limitations
+                if dolimits
+                    lim = collocation_restrain(collocations_day, limmat, filters);
+                    collocations_day = collocations_day(lim, :);
+                end
+                
+                %% add to total
+                L = size(M, 1);
+                N = size(collocations_day, 1);
+                M((L+1):(L+N), :) = collocations_day;
             end
+            
+            cols_out = name_struct;
+            
+            
+            
+           
+            
+            %%%
         end
+        
+        % semi-internal use
         
         function add_associated(cd, ad)
             % INTERNAL USE adds an associated dataset
             %
-            cd.associated = [cd.associated ad];
+            cd.associated = {cd.associated ad};
         end
-                
+        
     end
-            
+    
 end

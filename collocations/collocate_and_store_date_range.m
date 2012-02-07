@@ -19,6 +19,8 @@ function collocate_and_store_date_range(date_start, date_end, ...
 %
 % $Id$
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 logtext(atmlab('OUT'), 'Starting collocations\n');
 logtext(atmlab('OUT'), '%s %s vs. %s %s\n', sat1, sensor1, sat2, sensor2);
 logtext(atmlab('OUT'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
