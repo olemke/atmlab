@@ -24,6 +24,7 @@ if length(ellipsoid) ~= 2                                              %&%
 end                                                                    %&%
 rqre_in_range( ellipsoid(2), 0, 1, 'element 2 of ellipsoid' );         %&%
 rqre_datatype( orbitinc, @isscalar );                                  %&%
+rqre_in_range( orbitinc, 0, 180, 'orbitinc' );                         %&%
 
 
 % Radius at max latitude

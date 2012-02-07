@@ -1,3 +1,18 @@
+2012-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-272
+
+	* geodetic/ellipsoidcurvradius.m: New.
+
+	* geodetic/ellipsoidradii2.m: Curvature radius removed as option.
+	Moved to the function above. 
+
+	* geodetic/ellipsoidradii2.m: Merged two lines of code for
+	curvature radius.
+
+	* geodetic/ellipsoid2d.m: Added check that orbitinc
+	is inside [0,180].
+
 2012-02-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-271
@@ -14,6 +29,7 @@
 
 	* collocations/FieldCopier.m: Fixed bug
 
+>>>>>>> .r7271
 2012-02-07  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-270
