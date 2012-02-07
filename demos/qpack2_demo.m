@@ -44,6 +44,7 @@ end
 O = qp2_l2( Q );         % This ensures that OEM returns the varibles needed 
 %                          to fill the L2 structure, as defined in Q
 O.linear = false;
+O.linear = true
 %
 if ~O.linear 
   O.itermethod = 'GN';
@@ -211,7 +212,7 @@ Q.ABS_SPECIES(1).L2       = true;
 Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:2e3:z_toa)', [], [] };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
                             'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
-switch 2
+switch 1
  case 1  % Constant VMR
   Q.ABS_SPECIES(1).UNIT     = 'vmr';
   Q.ABS_SPECIES(1).SX       = ...
@@ -237,6 +238,7 @@ switch 2
                                        [ Q.ABS_SPECIES(1).ATMDATA.GRID1, ...
                                    0.1 * Q.ABS_SPECIES(1).ATMDATA.DATA ],...
                                                'lin', 0.5, 0.00, @log10 );
+
  case 4 % Constant logrel
   Q.ABS_SPECIES(1).UNIT     = 'logrel';
   Q.ABS_SPECIES(1).SX       = ...
