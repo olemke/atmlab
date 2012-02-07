@@ -151,11 +151,15 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             e = find(granule_end + colloc_config('interval') < granules_unixsecs, 1, 'first');
             
             % if all match, none are too early or too late
-            if isempty(b:e)
+            if isempty(b) && isempty(e)
                 okej = (granule_start < granules_unixsecs) & (granule_end > granules_unixsecs);
-            else
+            elseif ~isempty(b) && ~isempty(e)
                 % anything not too early, not too late, is good
                 okej = b:e;
+            else
+                % the non-empty one as index
+                X={b,e};
+                okej = X{[~isempty(b) ~isempty(e)]};
             end
             
             secondary_granules = threedays(okej, :);
@@ -435,7 +439,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 self.primary.granule_duration~=86400);
             if isempty(grans)
                 logtext(atmlab('ERR'), 'no granules found %s/%s %d-%d-%d\n', ...
-                    spec1, year, monht, day);
+                    self.primary.name,spec1, year, month, day);
             end
             ngrans = size(grans, 1);
             
@@ -484,7 +488,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                             logtext(atmlab('ERR'), 'Error in searching for datafile %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                                 thisyear, thismonth, thisday, hour, minute, self.primary.name, spec1, ME.message);
                             continue
-                        case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:collocate_granule:noother'}
+                        case {'atmlab:collocate', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:CollocatedDataset:noother', 'atmlab:collocate_granule:noother'}
                             logtext(atmlab('ERR'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                                 thisyear, thismonth, thisday, hour, minute, self.primary.name, spec1, ME.message);
                             continue
@@ -579,7 +583,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
                 % FIXME: don't reprocess all additionals, but read those
                 % that are already there?
-                [result, ~, attr] = self.read_date(date, spec, fieldnames(self.cols));
+                [result, ~ , attr] = self.read_date(date, spec, fieldnames(self.cols));
                 info_addi.parent_id = attr.id;
                 
                 for i = 1:length(additionals)
@@ -696,14 +700,14 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             %% remove duplicates
             
-            first1 = self.primary.granule_first_line(date1, spec1);
-            first2 = self.secondary.granule_first_line(date2, spec2);
-            wrongrows = (M(:, c.LINE1) < first1) & ...
-                (M(:, c.LINE2) < first2);
-            logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
-                'or secondary before %d\n'], ...
-                sum(wrongrows), first1, first2);
-            M(wrongrows, :) = [];
+%             first1 = self.primary.granule_first_line(date1, spec1);
+%             first2 = self.secondary.granule_first_line(date2, spec2);
+%             wrongrows = (M(:, c.LINE1) < first1) & ...
+%                 (M(:, c.LINE2) < first2);
+%             logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
+%                 'or secondary before %d\n'], ...
+%                 sum(wrongrows), first1, first2);
+%             M(wrongrows, :) = [];
             
         end
         

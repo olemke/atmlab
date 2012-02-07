@@ -15,7 +15,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         reader = @(varargin)[];
         granule_duration;
         satname; % for single-satellite datasets
-        
+        dataset; % e.g. MYD06_L2 for modis
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that
         % cannot be met here. Therefore, defaults should be encompassed in

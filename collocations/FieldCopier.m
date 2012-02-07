@@ -10,7 +10,7 @@ classdef FieldCopier < AssociatedDataset
     % storing:
     %
     % >> col = datasets_config('collocation_cpr_mhs');
-    % >> f = FieldCopier(col, struct('RO_ice_water_content', '', 'RO_liq_water_content', ''), struct());
+    % >> f = FieldCopier(col, struct('RO_ice_water_content', '', 'RO_liq_water_content', ''), struct(),varagin);
     % >> [result, addis] = col.collocate_granule([2009 12 7 3 28], '', 'noaa18', {f});
     % 
     % Now:
@@ -77,9 +77,6 @@ classdef FieldCopier < AssociatedDataset
         function result = process_granule(self, processed_core, data1, ~, ~, data2, ~, ~, ~)
             % FIXME DOC
                          
-            n_scanlines = size(data1.lat, 1);
-            n_scanpos = size(data1.lat, 2);
-
             allnames = fieldnames(self.members);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
             dimsizes = struct();
@@ -90,6 +87,8 @@ classdef FieldCopier < AssociatedDataset
                 else
                     dat = data2;
                 end
+                n_scanlines = size(dat.lat, 1);
+                n_scanpos = size(dat.lat, 2);
                 % 'n' is the number of measurements per lat/lon, e.g. the
                 % number of channels, number of height-bins, etc. Should be
                 % scalar...

@@ -92,10 +92,14 @@ A.calipso_subdir = nan;
 A.calipso_regexp = nan;
 A.calipso_filename = nan;
 
+%%%% CLOUDSAT
+% old
 A.cpr_basedir = nan;
 A.cpr_subdir = nan;
 A.cpr_regexp = nan;
 A.cpr_filename = nan;
+
+%new
 A.cpr = SatDataset('name', 'cpr', ...
                    'satname', 'cloudsat', ...
                    'reader', @common_read_cpr_2BCWCRO, ...
@@ -106,6 +110,12 @@ A.cloudsat_1B_CPR_subdir = nan;
 A.cloudsat_1B_CPR_regexp = nan;
 A.cloudsat_1B_CPR_filename = nan;
 
+A.cpr_1B = SatDataset('name', 'CPR_1B', ...
+                   'satname', 'cloudsat', ...
+                   'reader', @common_read_cpr, ...
+                   'granule_duration', 5932);
+
+               
 A.cloudsat_2B_GEOPROF_basedir = nan;
 A.cloudsat_2B_GEOPROF_subdir = nan;
 A.cloudsat_2B_GEOPROF_regexp = nan;
@@ -130,6 +140,7 @@ A.cloudsat_ECMWF_AUX_basedir = nan;
 A.cloudsat_ECMWF_AUX_subdir = nan;
 A.cloudsat_ECMWF_AUX_regexp = nan;
 A.cloudsat_ECMWF_AUX_filename = nan;
+%%%%%%%%%%%%%%%%% CLOUDSAT
 
 A.firstline_data = '';
 
@@ -143,36 +154,6 @@ A.hirscs_subdir = nan;
 A.hirscs_regexp = nan;
 A.hirscs_filename = nan;
 
-A.isccp_dx_basedir = nan;
-A.isccp_dx_subdir = nan;
-A.isccp_dx_regexp = nan;
-A.isccp_dx_filename = nan;
-
-A.isccp_d1_basedir = nan;
-A.isccp_d1_subdir = nan;
-A.isccp_d1_regexp = nan;
-A.isccp_d1_filename = nan;
-
-A.isccp_d2_basedir = nan;
-A.isccp_d2_subdir = nan;
-A.isccp_d2_regexp = nan;
-A.isccp_d2_filename = nan;
-
-A.hoaps_iwp_basedir  = nan;
-A.hoaps_iwp_subdir   = nan;
-A.hoaps_iwp_regexp   = nan;
-A.hoaps_iwp_filename = nan;
-
-A.hoaps_HTWmm_basedir  = nan;
-A.hoaps_HTWmm_subdir  = nan;
-A.hoaps_HTWmm_regexp = nan;
-A.hoaps_HTWmm_filename = nan;
-
-A.hoaps_HTWdm_basedir  = nan;
-A.hoaps_HTWdm_subdir  = nan;
-A.hoaps_HTWdm_regexp = nan;
-A.hoaps_HTWdm_filename = nan;
-
 A.mhs_basedir = nan;
 A.mhs_subdir = nan;
 A.mhs_regexp = nan;
@@ -181,34 +162,27 @@ A.mhs = SatDataset('name', 'mhs', ...
                    'reader', @common_read_poes_radiometer, ...
                    'granule_duration', 6130); % new style 2012-01-18
 
-A.modis_MOD08_M3_basedir = nan;
-A.modis_MOD08_M3_subdir = nan;
-A.modis_MOD08_M3_regexp = nan;
-
-A.modis_MYD08_M3_basedir = nan;
-A.modis_MYD08_M3_subdir = nan;
-A.modis_MYD08_M3_regexp = nan;
-A.modis_MYD08_M3_filename = nan;
-
-A.modis_MYD06_L2_basedir = nan;
-A.modis_MYD06_L2_subdir = nan;
-A.modis_MYD06_L2_regexp = nan;
-A.modis_MYD06_L2_filename = nan;
-
+A.modis = SatDataset('name', 'modis', ...
+    'reader', @common_read_modis, ...
+    'granule_duration', 6130, ...
+    'dataset','MYD06_L2'); % new style
+               
+% old
 A.mspps_basedir = nan;
 A.mspps_subdir = nan;
 A.mspps_regexp = nan;
 A.mspps_filename = nan;
 
-A.patmosx_L2b_basedir = nan;
-A.patmosx_L2b_subdir = nan;
-A.patmosx_L2b_regexp = nan;
-A.patmosx_L2b_filename = nan;
+%new
+A.mspps = SatDataset('name', 'mspps', ...
+    'reader', @common_read_mspps, ...
+    'granule_duration', 6130); % new style
 
-A.patmosx_L3_basedir = nan;
-A.patmosx_L3_subdir = nan;
-A.patmosx_L3_regexp = nan;
-A.patmosx_L3_filename = nan;
+A.patmosx = SatDataset('name', 'patmosx', ...
+                   'reader', @common_read_patmosx, ...
+                   'granule_duration', 86400); % new style 2012-01-31
+
+
 
 %% COLLOCATION DATASETS
 A.collocation_cpr_mhs_basedir = nan;
@@ -219,6 +193,13 @@ A.collocation_cpr_mhs = CollocatedDataset(A.cpr, A.mhs); % new style 2012-01-18
 % fixme: impleement those as classes
 %A.holl10_data = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 data');
 %A.holl10_meandata = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 mean data');
+
+% eliasson et. al several datasets
+% patmosx first since the granules are much larger than cloudsats
+A.collocation_cpr_patmosx = CollocatedDataset(A.patmosx,A.cpr); % new style 2012-01-31 
+
+A.collocation_cpr_modis = CollocatedDataset(A.collocation_cpr_patmosx, A.modis); % new style 2012-01-31
+%A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
 
 A.collocation_cpr_mhs_hdf5_basedir = nan;
 A.collocation_cpr_mhs_hdf5_subdir = nan;

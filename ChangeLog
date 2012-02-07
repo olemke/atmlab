@@ -1,3 +1,19 @@
+2012-02-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-271
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/datasets_config.m:
+	Added work in progress
+
+	* datasets/SatDataset.m: Added a descriptive property
+
+	* collocations/CollocatedDataset.m: Fixed bug related to start and
+	end granule index. Temporarily commented out the removing
+	duplicates part.
+
+	* collocations/FieldCopier.m: Fixed bug
+
 2012-02-07  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-270
