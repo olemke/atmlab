@@ -34,6 +34,7 @@
 %       ji        : Start and stop index in J for each jacobian quantities.
 %       cfile_y   : Name of control file to generate only y
 %       cfile_yj  : Name of control to generate y and J
+%       i_rel     : Index of species retrieved as rel (not including logrel)
 %       p_grid    : As the ARTS WSM with same name.
 %       lat_grid  : As the ARTS WSM with same name.
 %       lon_grid  : As the ARTS WSM with same name.
@@ -69,36 +70,28 @@ rqre_datatype( workfolder, @ischar );                                      %&%
 
 
 
-
 %- Initialization of variables
 %
 R            = [];
+R.i_rel      = [];
 R.workfolder = workfolder;
 %
 [Q,R,t_field,z_field,vmr_field] = init_local( Q, R );
 
 
-%- R continued
+
+%- Some internal variables
 %
-nq = length( R.jq );
-nx = R.ji{nq}{2};
+nq          = length( R.jq );
+nx          = R.ji{nq}{2};
+i_asj       = find( [ Q.ABS_SPECIES.RETRIEVE ] );
+store_vmr0  = false;
 
 
 %- xa
 %
 xa = zeros( nx, 1 );
 
-
-%- Some other variables
-%
-i_asj       = find( [ Q.ABS_SPECIES.RETRIEVE ] );
-store_vmr0  = false;
-
-
-%- O
-%
-O.i_rel = [];
-O.i_log = [];
 
 
 
@@ -126,7 +119,7 @@ for i = 1 : nq
     %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
-      O.i_rel    = [ O.i_rel ind ];
+      R.i_rel    = [ R.i_rel ind ];
     elseif strcmp( R.jq{i}.mode, 'vmr' )
       xa(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...
                           get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
@@ -142,7 +135,6 @@ for i = 1 : nq
                   %vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       xa(ind)    = 0;
-      O.i_log    = [ O.i_log ind ];
     else                                                                   %&%
       error( sprintf('Unknown gas species retrieval unit (%s).', ...       %&%
                                                          R.jq{i}.mode ) ); %&%

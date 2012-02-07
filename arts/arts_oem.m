@@ -46,6 +46,12 @@ y = xmlLoad( fullfile( R.workfolder, 'y.xml' ) );
 %
 if do_j  
   J = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
+  %
+  % Jacobian calculated for x, but for "rel" it should be with respect to xa:
+  % (as arts takes x as xa, no scaling needed for "logrel")
+  if ~isempty( R.i_rel )
+    J(:,R.i_rel) =  J(:,R.i_rel) ./ repmat( x(R.i_rel)', size(J,1), 1 );
+  end
 end
 
 

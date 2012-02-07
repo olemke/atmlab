@@ -28,9 +28,7 @@
 %    the comfun function is free to use these variables freely for bookkeeping
 %    etc. This function handles y, x, Sx and Se as totally generic variables
 %    and unit conversion and similar tasks are left to the comfun and
-%    post-processing. This with two exceptions, jacobian rescaling is
-%    performed following the O-fields i_rel and i_log (see further information
-%    for these fields).
+%    post-processing. 
 %
 %    The results are gathered in a structure X, with fields:
 %       x         : Retrieved state.
@@ -182,28 +180,6 @@ I.itermethod = [ ...
 '''LM'' for Marquardt-Levenberg.'
 ];
 %-----------------------------------------------------------------------------
-O.i_log = [];
-I.i_log = [ ...
-'Index of values in x that are retrieved in a log-scale (e.g. the logarithm ',...
-'of VMR/VMRa (see i_rel)). The actual inversion is performed with jacobians ',...
-'provided (that is, must be given to oem.m scaled correctly), but the ',...
-'log-scale transformation is removed for the error characterisation for ',...
-'the jacobians matching this field. No index should be found in both i_rel ',...
-'and i_log.'
-];
-%-----------------------------------------------------------------------------
-O.i_rel = [];
-I.i_rel = [ ...
-'Index of values in x that are retrieved in a relative/fractional unit and a',...
-'rescaling of the jacobians is needed. An example on a relative retrieval ',... 
-'is x = VMR/VMRa, where VMRa is the volume mixing ratio for the a priori ',...
-'state. Accordingly, the corresponding jacobians must describe changes with ',...
-'respect to the a priori state, and a direct calculation for x != xa will ',...
-'not give a correct results. A rescaling back to xa is then needed and this ',...
-'operation can be performed by oem.m by setting this field to the indexes ',...
-'for which a rescaling is needed.'
-];
-%-----------------------------------------------------------------------------
 O.J = false;
 I.J = [ ...
 'Flag to include weighting function matrix in X.'
@@ -351,9 +327,6 @@ end
     end                                                                     %&%
   end                                                                       %&%
   %                                                                         %&%
-  if ~isempty( intersect( O.i_log, O.i_rel ) )                              %&%
-    error( 'No index can be part of both O.i_rel and O.i_log.' );           %&%
-  end                                                                       %&%
                                                                             %&%
   rqre_datatype( Q, @isstruct );                                            %&%
   rqre_datatype( R, {@isempty,@isstruct} );                                 %&%
@@ -776,12 +749,8 @@ end
   %
   if O.J | O.G | O.A | O.S | O.So | O.Ss | O.e | O.eo | O.es    
     %
-    if isnan(J)  |  ( O.jexact  &  ~j_updated )  |  ~isempty( O.i_log )
+    if isnan(J)  |  ( O.jexact  &  ~j_updated ) 
       [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
-      %
-      if ~isempty( O.i_log )
-        J(:,O.i_log) =  J(:,O.i_log) ./ repmat( exp(x(O.i_log)'), size(J,1), 1 );
-      end
       %
       JtSeinv  = J' * Seinv;
       SJSJ     = Sxinv + JtSeinv * J;
@@ -982,10 +951,6 @@ end
     %
     if O.sxnorm
       J = J .* repmat( xnorm', size(J,1), 1 );
-    end
-    %
-    if ~isempty( O.i_rel )
-      J(:,O.i_rel) =  J(:,O.i_rel) ./ repmat( x(O.i_rel)', size(J,1), 1 );
     end
   return
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

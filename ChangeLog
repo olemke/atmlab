@@ -1,3 +1,18 @@
+2012-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-268
+
+	* retrieval/qpack2/qp2_rel2vmr.m: Preperation for handling all
+	variables. Header text updated. (Not yet complete!) 
+
+	* arts/arts_oem.m: Rescaling of J for rel-unit now done here.
+
+	* arts/arts_oem_init.m: i_rel now stored in R (i_log not needed
+	and removed).
+
+	* retrieval/oem.m: Everything around i_rel and i_log removed. Now
+	expected to be handled by *comfun*.
+
 2012-02-06  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-267

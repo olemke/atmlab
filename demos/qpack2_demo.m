@@ -211,7 +211,7 @@ Q.ABS_SPECIES(1).L2       = true;
 Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:2e3:z_toa)', [], [] };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
                             'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
-switch 1
+switch 2
  case 1  % Constant VMR
   Q.ABS_SPECIES(1).UNIT     = 'vmr';
   Q.ABS_SPECIES(1).SX       = ...
