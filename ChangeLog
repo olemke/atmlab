@@ -1,5 +1,14 @@
 2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-274
+
+	* collocations/CollocatedDataset.m (read):
+
+	- Read period of collocations. Not finished, temporary implementation,
+	but appears to work.
+
+2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-273
 
 	* datasets/HomemadeDataset.m(store): Bugfix when data is empty

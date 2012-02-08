@@ -160,7 +160,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 % the non-empty one as index
                 X={b,e};
                 okej = X{[~isempty(b) ~isempty(e)]};
-            end
+            end   
             
             secondary_granules = threedays(okej, :);
         end
@@ -439,7 +439,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 self.primary.granule_duration~=86400);
             if isempty(grans)
                 logtext(atmlab('ERR'), 'no granules found %s/%s %d-%d-%d\n', ...
-                    self.primary.name,spec1, year, month, day);
+                    self.primary.name, spec1, year, month, day);
             end
             ngrans = size(grans, 1);
             
@@ -583,7 +583,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
                 % FIXME: don't reprocess all additionals, but read those
                 % that are already there?
-                [result, ~ , attr] = self.read_date(date, spec, fieldnames(self.cols));
+                [result, ~, attr] = self.read_date(date, spec, fieldnames(self.cols));
                 info_addi.parent_id = attr.id;
                 
                 for i = 1:length(additionals)
@@ -700,75 +700,89 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             %% remove duplicates
             
-%             first1 = self.primary.granule_first_line(date1, spec1);
-%             first2 = self.secondary.granule_first_line(date2, spec2);
-%             wrongrows = (M(:, c.LINE1) < first1) & ...
-%                 (M(:, c.LINE2) < first2);
-%             logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
-%                 'or secondary before %d\n'], ...
-%                 sum(wrongrows), first1, first2);
-%             M(wrongrows, :) = [];
+            first1 = self.primary.granule_first_line(date1, spec1);
+            first2 = self.secondary.granule_first_line(date2, spec2);
+            wrongrows = (M(:, c.LINE1) < first1) & ...
+                (M(:, c.LINE2) < first2);
+            logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
+                'or secondary before %d\n'], ...
+                sum(wrongrows), first1, first2);
+            M(wrongrows, :) = [];
             
         end
         
-        function [M, M_cols, addis, addis_cols] = read(self, date_start, date_end, spec1, spec2, fields, varargin)
-            %%%
-            
-            error(['atmlab:' mfilename], 'Not implemented yet!');
+        function [M, M_cols, addis, addis_cols] = read(self, date_start, date_end, spec, fields, varargin) 
+            % WARNING: instable method, call signature will change!
+            %
+            % Arguments:
+            %  - date_start (1x3 vector, starting date)
+            %  - date_end (1x3 vector, ending date)
+            %  - spec (specification, e.g. satellite or satellite pair)
+            %  - fields, cell array (fieldnames for core: see CollocatedDataset.members)
+            %  - optional: additionals (cell arary of AdditionalDataset)
+            %  - optional: cell array of cell arrays for 
+            %  - optional: limits (Not implemented)
+            %  - optional: filters (Not implemented)
+            % 
+            % FIXME DOC
+            %
+            % FIXME TODO:
+            %  - additionals
+            %  - limits
+            %  - filters
             
             %% prepare configuration things
             
-            [limits, filters] = optargs(varargin, {nan, {}});
+             [additionals, additional_fields, limits, filters] = optargs(varargin, {{}, {}, nan, {}});
+             additionals_day = cell(size(additionals));
+             addis_cols = cell(size(additionals));
 
-            
-            % Not filtering doubles, this should be done when processing
+            % Not filtering duplicates, this should be done when processing
             % collocations initially
-            
             
             %% get name_struct
             
-            name_struct = cols_cell_to_cols_struct(fields, cols_in);
-            % ncols: highest value
-            C = struct2cell(name_struct);
-            ncols = max(horzcat(C{:}));
+%             name_struct = cols_cell_to_cols_struct(fields, cols_in);
+%             % ncols: highest value
+%             C = struct2cell(name_struct);
+%             ncols = max(horzcat(C{:}));
             
-            %% convert limits structure to matrix as wanted by restrain_collocations
-            
-            if isequalwithequalnans(limits, nan)
-                dolimits = false;
-                limmat = zeros(0, 3);
-            else
-                dolimits = true;
-                limmat = limstruct2limmat(limits, name_struct);
-            end
-            
-            % for the filters, convert column names to column numbers, using the
-            % earlier obtained name_struct
-            if ~isempty(filters)
-                for i = 1:length(filters)
-                    filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
-                end
-            end
-            
-            %% hdf5 disabled
-            
-            %% pre-allocate at least zero rows
-            
-            M = zeros(0, ncols);
+%             %% convert limits structure to matrix as wanted by restrain_collocations
+%             
+%             if isequalwithequalnans(limits, nan)
+%                 dolimits = false;
+%                 limmat = zeros(0, 3);
+%             else
+%                 dolimits = true;
+%                 limmat = limstruct2limmat(limits, name_struct);
+%             end
+%             
+%             % for the filters, convert column names to column numbers, using the
+%             % earlier obtained name_struct
+%             if ~isempty(filters)
+%                 for i = 1:length(filters)
+%                     filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
+%                 end
+%             end
+%             
+%             %% pre-allocate at least zero rows
+%             
+%            ncols = length(fieldnames(self.members)); % FIXME: associated datasets
+%            M = zeros(0, ncols);
+            M = [];
             
             %% loop through all the dates
             
-            dates = daterange(start_date, end_date);
+            dates = daterange(date_start, date_end);
             for i = 1:size(dates, 1)
                 date = dates(i, :);
                 %% read collocations for date
-                
-                path = find_datafile_by_date(date, s, ...
-                    ['collocation_' sensor1 '_' sensor2]);
-                
+                                                
                 try
-                    collocations_day = read_collocs_data_mean(path, cols_in, fields);
-                    
+                    [collocations_day, M_cols] = self.read_single_day(date, spec, fields);
+                    for j = 1:length(additionals)
+                        [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
+                    end
                 catch ME
                     switch (ME.identifier)
                         case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField', ...
@@ -786,23 +800,26 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     continue
                 end
                 
-                %% apply limitations
-                if dolimits
-                    lim = collocation_restrain(collocations_day, limmat, filters);
-                    collocations_day = collocations_day(lim, :);
-                end
+                %                 %% apply limitations
+                %                 if dolimits
+                %                     lim = collocation_restrain(collocations_day, limmat, filters);
+                %                     collocations_day = collocations_day(lim, :);
+                %                 end
                 
                 %% add to total
-                L = size(M, 1);
-                N = size(collocations_day, 1);
-                M((L+1):(L+N), :) = collocations_day;
+                if isempty(M) % should mean additionals are empty, too
+                    M = collocations_day;
+                    addis = additionals_day;
+                else
+                    L = size(M, 1);
+                    N = size(collocations_day, 1);
+                    M((L+1):(L+N), :) = collocations_day;
+                    for j = 1:length(additionals)
+                        N_a = size(additionals_day{j}, 1);
+                        additionals{j}((L+1):(L+N_a), :) = additionals_day{j};
+                    end
+                end
             end
-            
-            cols_out = name_struct;
-            
-            
-            
-           
             
             %%%
         end

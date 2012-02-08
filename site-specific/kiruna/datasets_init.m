@@ -116,12 +116,12 @@ x.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3}).+(?<end
 
 %% COLLOCATION DATA SETS
 x = datasets_config('collocation_cpr_patmosx');
-x.basedir = fullfile(scodes('CACHE_DIR'),'collocations_cloudsat_patmosx','core');
+%x.basedir = fullfile(scodes('CACHE_DIR'),'collocations_cloudsat_patmosx','core');
 x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_$SAT.nc.gz';
 
 x = datasets_config('collocation_cpr_modis');
-x.basedir = fullfile(scodes('CACHE_DIR'),'collocations_cloudsat_modis');
+%x.basedir = fullfile(scodes('CACHE_DIR'),'collocations_cloudsat_modis');
 x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_$SAT.nc.gz';
 
