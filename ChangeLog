@@ -1,6 +1,19 @@
+2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-276
+
+	* collocations/CollocatedDataset.m:
+
+	(read): Now, all fields can be passed in a single cell-array
+
+	(deal_fields): Private method. Deal fields over core, additionals,
+	etc.
+
+	* datasets/HomemadeDataset.m (read_single_day): Be more verbose
+
 2012-02-08  Salomon Eliasson  <s.eliasson@ltu.se>
 
-	* atmlab-1-0-274
+	* atmlab-1-0-275
 
 	* site-specific/kiruna/datasets_init.m: removed remaining local code
 

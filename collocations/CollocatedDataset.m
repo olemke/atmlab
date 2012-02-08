@@ -711,64 +711,71 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
         end
         
-        function [M, M_cols, addis, addis_cols] = read(self, date_start, date_end, spec, fields, varargin) 
-            % WARNING: instable method, call signature will change!
+        function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin) 
+            % WARNING: instable method, call signature may change!
             %
             % Arguments:
             %  - date_start (1x3 vector, starting date)
             %  - date_end (1x3 vector, ending date)
             %  - spec (specification, e.g. satellite or satellite pair)
-            %  - fields, cell array (fieldnames for core: see CollocatedDataset.members)
-            %  - optional: additionals (cell arary of AdditionalDataset)
-            %  - optional: cell array of cell arrays for 
+            %  - fields, cell array. From both core and additionals.
             %  - optional: limits (Not implemented)
             %  - optional: filters (Not implemented)
             % 
+            % Outputs:
+            %  - M (matrix with core collocs)
+            %  - M_cols (corresponding columns)
+            %  - addis (cell array of additional matrices)
+            %  - addis_cols (cell arary of corresponding columns)
+            %  - additionals (cell array of corresponding AdditionalDatasets)
+            %
             % FIXME DOC
             %
+            %
             % FIXME TODO:
-            %  - additionals
             %  - limits
             %  - filters
             
             %% prepare configuration things
             
-             [additionals, additional_fields, limits, filters] = optargs(varargin, {{}, {}, nan, {}});
-             additionals_day = cell(size(additionals));
-             addis_cols = cell(size(additionals));
-
+            
+            [limits, filters] = optargs(varargin, {nan, {}});
+            [fields, additionals, additional_fields] = self.deal_fields(all_fields);
+            additionals_day = cell(size(additional_fields));
+            addis_cols = cell(size(additional_fields));
+            
             % Not filtering duplicates, this should be done when processing
             % collocations initially
             
             %% get name_struct
             
-%             name_struct = cols_cell_to_cols_struct(fields, cols_in);
-%             % ncols: highest value
-%             C = struct2cell(name_struct);
-%             ncols = max(horzcat(C{:}));
+            %             name_struct = cols_cell_to_cols_struct(fields, cols_in);
+            %             % ncols: highest value
+            %             C = struct2cell(name_struct);
+            %             ncols = max(horzcat(C{:}));
             
-%             %% convert limits structure to matrix as wanted by restrain_collocations
-%             
-%             if isequalwithequalnans(limits, nan)
-%                 dolimits = false;
-%                 limmat = zeros(0, 3);
-%             else
-%                 dolimits = true;
-%                 limmat = limstruct2limmat(limits, name_struct);
-%             end
-%             
-%             % for the filters, convert column names to column numbers, using the
-%             % earlier obtained name_struct
-%             if ~isempty(filters)
-%                 for i = 1:length(filters)
-%                     filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
-%                 end
-%             end
-%             
-%             %% pre-allocate at least zero rows
-%             
-%            ncols = length(fieldnames(self.members)); % FIXME: associated datasets
-%            M = zeros(0, ncols);
+            %             %% convert limits structure to matrix as wanted by restrain_collocations
+            %
+            %             if isequalwithequalnans(limits, nan)
+            %                 dolimits = false;
+            %                 limmat = zeros(0, 3);
+            %             else
+            %                 dolimits = true;
+            %                 limmat = limstruct2limmat(limits, name_struct);
+            %             end
+            %
+            %             % for the filters, convert column names to column numbers, using the
+            %             % earlier obtained name_struct
+            %             if ~isempty(filters)
+            %                 for i = 1:length(filters)
+            %                     filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
+            %                 end
+            %             end
+            %
+            %             %% pre-allocate at least zero rows
+            %
+            %            ncols = length(fieldnames(self.members)); % FIXME: associated datasets
+            %            M = zeros(0, ncols);
             M = [];
             
             %% loop through all the dates
@@ -814,9 +821,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     L = size(M, 1);
                     N = size(collocations_day, 1);
                     M((L+1):(L+N), :) = collocations_day;
-                    for j = 1:length(additionals)
+                    for j = 1:length(additional_fields)
                         N_a = size(additionals_day{j}, 1);
-                        additionals{j}((L+1):(L+N_a), :) = additionals_day{j};
+                        addis{j}((L+1):(L+N_a), :) = additionals_day{j};
                     end
                 end
             end
@@ -829,9 +836,45 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
         function add_associated(cd, ad)
             % INTERNAL USE adds an associated dataset
             %
-            cd.associated = {cd.associated ad};
+            cd.associated = {cd.associated{:} ad}; %#ok<CCAT>
         end
         
     end
     
+    methods (Access = private)
+        function [fields, additionals, additional_fields] = deal_fields(self, all_fields)
+            % deal fields: core, additionals?
+            n_f = 0;
+            n_add = zeros(size(self.associated));
+            additionals = {};
+            additional_fields = {};
+            for i = 1:length(all_fields)
+                field = all_fields{i};
+                if any(strcmp(fieldnames(self.members), field))
+                    n_f = n_f + 1;
+                    fields{n_f} = field; %#ok<AGROW>
+                else
+                    found = false;
+                    for j = 1:length(self.associated)
+                        asso = self.associated{j};
+                        if any(strcmp(fieldnames(asso.members), field))
+                            n_add(j) = n_add(j) + 1;
+                            additional_fields{j}{n_add(j)} = field; %#ok<AGROW>
+                            % check if this additionaldataset is already
+                            % known
+                            if ~any(strcmp(cellfun(@(X) X.name, additionals, 'UniformOutput', false), asso.name))
+                                additionals = {additionals{:} asso}; %#ok<CCAT>
+                            end
+                            found = true;
+                        end
+                    end
+                    if ~found
+                        error(['atmlab:' mfilename], ...
+                            'Field %s was not found in core or in any additional dataset', ...
+                            field);
+                    end
+                end
+            end
+        end
+    end
 end
