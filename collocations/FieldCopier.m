@@ -45,7 +45,7 @@ classdef FieldCopier < AssociatedDataset
             % fieldstruct1  defines names and how to store, from primary
             % fieldstruct2  the same, from secondary
             % remaining arguments passed on to SatDataset, so those are to
-            % be used to say where to store and so on.
+            % be used to say where to store and so on. 
             %
             % need to know:
             % - additional arguments to reader primary
@@ -62,7 +62,20 @@ classdef FieldCopier < AssociatedDataset
             assert(length(fieldnames(fieldstruct1))+length(fieldnames(fieldstruct2))==length(fieldnames(allfields)), ...
                     ['atmlab:' mfilename ':duplicates'], 'Duplicate fieldnames between datasets are not permitted, but were found :(');
             self.members = allfields;
-
+            
+            if isempty(self.name)
+                % give a name
+                existing_names = fieldnames(datasets);
+                while true
+                    nm = sprintf('FieldCopier_%d_%d', uint64(date2unixsecs()),round(rand(1, 1)*10000));
+                    if ~any(strcmp(nm, existing_names))
+                        break
+                    end
+                end
+                warning(['atmlab:' mfilename], ...
+                    'You didn''t name me! I''ll name myself %s', nm);
+                self.name = nm;
+            end
         end
         
         %% implementation of abstract methods

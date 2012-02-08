@@ -1,5 +1,13 @@
 2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-278
+
+	* collocations/FieldCopier.m:
+	
+	(FieldCopier): if no name is given, construct one and issue warning
+
+2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-277
 
 	* collocations/CollocatedDataset.m:
