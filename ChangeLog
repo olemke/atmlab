@@ -1,3 +1,9 @@
+2012-02-08  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-274
+
+	* site-specific/kiruna/datasets_init.m: removed remaining local code
+
 2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-274
