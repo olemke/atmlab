@@ -1,3 +1,9 @@
+2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-273
+
+	* datasets/HomemadeDataset.m(store): Bugfix when data is empty
+
 2012-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-272
@@ -29,7 +35,6 @@
 
 	* collocations/FieldCopier.m: Fixed bug
 
->>>>>>> .r7271
 2012-02-07  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-270

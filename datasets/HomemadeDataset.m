@@ -139,17 +139,22 @@ classdef HomemadeDataset < SatDataset
             
             netcdf.endDef(ncid);
             
-            % put vars
-            logtext(atmlab('OUT'), 'Writing: ');
-            
-            for j = 1:length(vars(:).')
-                varname = vars{j};
-                fprintf(atmlab('OUT'), '%s ', varname);
+            if isempty(data)
+                logtext(atmlab('OUT'), 'No data, NetCDF file will be dataless\n');
+            else
+                % put vars
+                logtext(atmlab('OUT'), 'Writing: ');
                 
-                varid = varids(j);
-                netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
-                fprintf(atmlab('OUT'), '\n');
+                for j = 1:length(vars(:).')
+                    varname = vars{j};
+                    fprintf(atmlab('OUT'), '%s ', varname);
+                    
+                    varid = varids(j);
+                    netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
+                    fprintf(atmlab('OUT'), '\n');
+                end
             end
+            
             logtext(atmlab('OUT'), 'Finalising\n');
             logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', [fn '.gz']);
             netcdf.close(ncid);
