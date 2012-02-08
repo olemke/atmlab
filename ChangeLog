@@ -1,5 +1,19 @@
 2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-277
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_and_store_date_range): Bugfix, should consider additionals
+
+	(read): give warning message if nargout too small
+
+	* datasets/common_read_poes_radiometer.m:
+
+	- allow second argument, but ignore it
+
+2012-02-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-276
 
 	* collocations/CollocatedDataset.m:

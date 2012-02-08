@@ -1,4 +1,4 @@
-function data = common_read_poes_radiometer(file)
+function data = common_read_poes_radiometer(file, ~)
 
 % common_read_poes_radiometer Read POES data and arrange in the common format
 %

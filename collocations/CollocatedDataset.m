@@ -635,7 +635,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             end
         end
         
-        function collocate_and_store_date_range(self, date_start, date_end, spec1, spec2)
+        function collocate_and_store_date_range(self, date_start, date_end, spec1, spec2, varargin)
             % FIXME DOC
             logtext(atmlab('OUT'), 'Starting collocations\n');
             logtext(atmlab('OUT'), '%s %s vs. %s %s\n', self.primary.name, spec1, self.secondary.name, spec2);
@@ -647,7 +647,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 day = alldates(i, 3);
                 logtext(atmlab('OUT'), 'collocating %04d-%02d-%02d\n', ...
                     year, month, day);
-                self.collocate_and_store_date([year, month, day], spec1, spec2);
+                self.collocate_and_store_date([year, month, day], spec1, spec2, varargin{:});
             end
             logtext(atmlab('OUT'), 'Finished!\n');
             %%%
@@ -735,6 +735,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             % FIXME TODO:
             %  - limits
             %  - filters
+            %  - read back from original data. Currently,
+            %  collocate_and_store_date can already take care of this, if
+            %  collocations exist. 
             
             %% prepare configuration things
             
@@ -744,6 +747,11 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
             
+            if nargout<3 && ~isempty(additionals)
+                warning(['atmlab:' mfilename], ...
+                    '%s was called with %d output arguments, additionals are lost', ...
+                    mfilename, nargout);
+            end
             % Not filtering duplicates, this should be done when processing
             % collocations initially
             
