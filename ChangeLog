@@ -1,3 +1,16 @@
+2012-02-09  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-1-0-280
+
+	* files/loadncfile.m, files/loadncvar.m:
+
+	Don't crash reading variable where one or more dimensions are zero.
+	Returns zeros(dimlength1, dimlength2, ...) for those cases.
+
+	Matlab 2011b changed it's behaviour in this case.
+
+	* files/nc_read_varid.m: Put variable reading into separate file.
+
 2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-279

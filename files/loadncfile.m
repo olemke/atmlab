@@ -30,7 +30,7 @@ end
 for i = 0:nvars-1
    [varname, scrap, scrap, natts] = netcdf.inqVar (ncid, i);
    svarname = genvarname(varname);
-   ret.(svarname) = netcdf.getVar (ncid, i);
+   ret.(svarname) = nc_read_varid(ncid,i);
    for j = 0:natts-1
        attname = netcdf.inqAttName (ncid, i, j);
        ret.attributes.(svarname).(genvarname(attname)) = ...

@@ -37,14 +37,16 @@ end
 
 if ischar(varname)
     varid = netcdf.inqVarID (ncid, varname);
-    ret = netcdf.getVar (ncid, varid);
+    ret = nc_read_varid(ncid, varid);
 elseif iscell(varname)
     for v = varname(:).'
         varid = netcdf.inqVarID (ncid, v{1});
-        ret.(genvarname(v{1})) = netcdf.getVar (ncid, varid);
+        ret.(genvarname(v{1})) = nc_read_varid(ncid, varid);
     end
 else
     error 'varname must be either of type char or cell';
 end
 
 netcdf.close (ncid);
+
+end
