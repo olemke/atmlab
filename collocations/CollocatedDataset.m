@@ -702,7 +702,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             first1 = self.primary.granule_first_line(date1, spec1);
             first2 = self.secondary.granule_first_line(date2, spec2);
-            wrongrows = (M(:, c.LINE1) < first1) & ...
+            wrongrows = (M(:, c.LINE1) < first1) | ...
                 (M(:, c.LINE2) < first2);
             logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
                 'or secondary before %d\n'], ...
@@ -786,6 +786,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %  collocations exist.
             %  - so far limits and filters work only for core fields. Should
             %  work for any fields.
+            %  - add check that associated-datasets match
             %
             % EXAMPLE
             %
@@ -797,8 +798,22 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             %% prepare configuration things        
             
-            [limits, filters_by_name] = optargs(varargin, {struct(), {}});
-            [fields, additionals, additional_fields] = self.deal_fields(all_fields);
+            [limits_all, filters_by_name] = optargs(varargin, {struct(), {}});
+            % distribute fields, limits, etc. over core, additionals
+            [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields);
+            additionals_limits = cell(size(additionals));
+            % use deal_index to sort limits-fields in categories
+            for i = 1:length(all_fields)
+                field = all_fields{i};
+                if any(strcmp(field, fieldnames(limits_all)))
+                    if deal_index(i) == 0
+                        limits_core.(field) = limits_all.(field);
+                    else
+                        additionals_limits{deal_index(i)}.(field) = limits_all.(field);
+                    end
+                end
+            end
+
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
             addis = cell(size(additional_fields));
@@ -808,36 +823,11 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             if nargout<3 && ~isempty(additionals)
                 warning(['atmlab:' mfilename], ...
-                    '%s was called with %d output arguments, additionals are lost', ...
+                    '%s was called with %d (<3) output arguments, additionals are lost', ...
                     mfilename, nargout);
             end
             % Not filtering duplicates, this should be done when processing
             % collocations initially
-            
-            %% get name_struct
-            
-            %             name_struct = cols_cell_to_cols_struct(fields, cols_in);
-            %             % ncols: highest value
-            %             C = struct2cell(name_struct);
-            %             ncols = max(horzcat(C{:}));
-            
-            %             %% convert limits structure to matrix as wanted by restrain_collocations
-            %
-            %             if isequalwithequalnans(limits, nan)
-            %                 dolimits = false;
-            %                 limmat = zeros(0, 3);
-            %             else
-            %                 dolimits = true;
-            %                 limmat = limstruct2limmat(limits, name_struct);
-            %             end
-            %
-            %             % for the filters, convert column names to column numbers, using the
-            %             % earlier obtained name_struct
-            %             if ~isempty(filters)
-            %                 for i = 1:length(filters)
-            %                     filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
-            %                 end
-            %             end
 
             M = [];
             
@@ -852,7 +842,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 %% read collocations for date
                                                 
                 try
-                    [collocations_day, M_cols_here] = self.read_single_day(date, spec, fields);
+                    [collocations_day, M_cols_here] = self.read_single_day(date, spec, fields_core);
                     if max(size(collocations_day))==0
                         logtext(atmlab('OUT'), 'no collocations\n');
                         continue
@@ -881,7 +871,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     % only done after the first time I find collocations,
                     % because only then I know for sure what sizes the
                     % fields have.
-                    limmat = limstruct2limmat(limits, M_cols);
+                    limmat = limstruct2limmat(limits_all, M_cols);
                     for k = 1:length(filters_by_name)
                         filters_by_no{k} = {...
                             filters_by_name{k}{1}, ...
@@ -894,7 +884,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 lim = collocation_restrain(collocations_day, limmat, filters_by_no);
                 collocations_day = collocations_day(lim, :);
                 for j = 1:length(additionals)
-                    additionals_day{j} = additionals{j}.limit(additionals_day{j}, lim);
+                    additionals_day{j} = additionals{j}.limit_to(additionals_day{j}, lim);
                 end
                 %                 if dolimits
                 %                     lim = collocation_restrain(collocations_day, limmat, filters);
@@ -934,17 +924,19 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
     end
     
     methods (Access = private)
-        function [fields, additionals, additional_fields] = deal_fields(self, all_fields)
+        function [fields, additionals, additional_fields, deal_index] = deal_fields(self, all_fields)
             % deal fields: core, additionals?
             n_f = 0;
             n_add = zeros(size(self.associated));
             additionals = {};
             additional_fields = {};
+            deal_index = nan*zeros(size(all_fields));
             for i = 1:length(all_fields)
                 field = all_fields{i};
                 if any(strcmp(fieldnames(self.members), field))
                     n_f = n_f + 1;
                     fields{n_f} = field; %#ok<AGROW>
+                    deal_index(i) = 0;
                 else
                     found = false;
                     for j = 1:length(self.associated)
@@ -953,10 +945,16 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                             n_add(j) = n_add(j) + 1;
                             additional_fields{j}{n_add(j)} = field; %#ok<AGROW>
                             % check if this additionaldataset is already
-                            % known
-                            if ~any(strcmp(cellfun(@(X) X.name, additionals, 'UniformOutput', false), asso.name))
+                            % known, if yes, find index in existing names
+                            existing_names = cellfun(@(X) X.name, additionals, 'UniformOutput', false);
+                            if ~any(strcmp(existing_names, asso.name))
                                 additionals = {additionals{:} asso}; %#ok<CCAT>
                             end
+                            samename = strcmp(cellfun(@(X) X.name, additionals, 'UniformOutput', false), asso.name);
+                            assert(sum(samename)<=1, ['atmlab:' mfilename], ...
+                                ['More than one additional contains field ' ...
+                                 asso.name]);
+                            deal_index(i) = find(samename);
                             found = true;
                         end
                     end

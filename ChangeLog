@@ -1,3 +1,24 @@
+2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-284
+
+	* collocations/AssociatedDataset.m:
+
+	(limit_to): New name for limit, to be not confused with limit_out
+
+	(limit_out): Convert limits as relating to associated to limits as
+	related to core
+
+	* collocations/CollocatedDataset.m:
+
+	(process): Fix bug in removing duplicates; should be removed if either
+	is duplicate, not only if both are duplicate
+
+	(read): Working on filtering based on additionals. Getting far for
+	limits, but filters are more tricky, needs thinking.
+
+	(deal_fields): Also deal indices
+
 2012-02-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-283
