@@ -492,7 +492,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                             logtext(atmlab('ERR'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                                 thisyear, thismonth, thisday, hour, minute, self.primary.name, spec1, ME.message);
                             continue
-                        case {'MATLAB:hdfinfo:invalidFile'}
+                        case {'MATLAB:hdfinfo:invalidFile', 'MATLAB:imagesci:hdfinfo:invalidFile'}
                             logtext(atmlab('ERR'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                                 self.primary.name, spec1, thisyear, thismonth, thisday, hour, minute, ME.message);
                             continue
@@ -815,11 +815,11 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     continue
                 end
                 
-                %                 %% apply limitations
-                %                 if dolimits
-                %                     lim = collocation_restrain(collocations_day, limmat, filters);
-                %                     collocations_day = collocations_day(lim, :);
-                %                 end
+%                 %% apply limitations
+%                 if dolimits
+%                     lim = collocation_restrain(collocations_day, limmat, filters);
+%                     collocations_day = collocations_day(lim, :);
+%                 end
                 
                 %% add to total
                 if isempty(M) % should mean additionals are empty, too
