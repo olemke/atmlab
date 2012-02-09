@@ -129,7 +129,31 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
                 end
             end
         end
-        
+    end
+    
+    methods (Static)
+        function data_out = limit(data_in, lim)
+            % limit Limit data to logical
+            %
+            % FORMAT
+            %
+            %   data = limit(data, lim)
+            %
+            % IN
+            %
+            %   data    matrix          input data
+            %   lim     logical array   what rows to select
+            %
+            % OUT
+            %
+            %   data    matrix          output data
+            %
+            % Limit associated data to logical. This is trivial if the
+            % associated data is at the same resolution as the core data,
+            % but non-trivial if it is on a different resolution.
+            
+            data_out = data_in(lim, :);
+        end
     end
     
     % those methods must be implemented by subclasses

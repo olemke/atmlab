@@ -1,5 +1,24 @@
 2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-282
+
+	* collocations/AssociatedDataset.m (limit): Implemented.
+
+	- Extremely simple in this case, but more complicated when e.g.
+	meandata is implemented.
+
+	* collocations/limstruct2limmat.m: Improved
+
+	- Always return nX3 matrix as promised in docs
+
+	* collocations/CollocatedDataset.m(read): Expanded
+
+	- Implement limits for core-collocs
+	- Implement filters for core-collocs
+	- Todo: imlement those for any fields
+
+2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-281
 
 	* collocations/CollocatedDataset.m(read): Handle empty data well.

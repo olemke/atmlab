@@ -26,6 +26,11 @@ function limmat = limstruct2limmat(limits, name_struct)
 %
 % $Id$
 
+if isempty(fieldnames(limits))
+    limmat = zeros(0, 3);
+    return
+end
+
 fields = fieldnames(limits);
 C = cell(1, length(fields));
 for i = 1:length(fields)
@@ -41,3 +46,4 @@ end
 %     repmat(limits.(c), [size(name_struct.(c), 2) 1])], ...
 %     fieldnames(limits), 'UniformOutput', false);
 limmat = vertcat(C{:});
+end

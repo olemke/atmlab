@@ -712,37 +712,92 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
         end
         
         function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin) 
-            % WARNING: instable method, call signature may change!
+            % collocation_read Read collocations for indicated period
             %
-            % Arguments:
-            %  - date_start (1x3 vector, starting date)
-            %  - date_end (1x3 vector, ending date)
-            %  - spec (specification, e.g. satellite or satellite pair)
-            %  - fields, cell array. From both core and additionals.
-            %  - optional: limits (Not implemented)
-            %  - optional: filters (Not implemented)
+            % This method reads all or a selection of the collocations for
+            % the indicated period, between date_start and date_end.
+            %
+            % FORMAT
+            %
+            % [M, M_cols, addis, addis_cols, additionals] = ...
+            %       col.read(date_start, date_end, spec, fields[, limits[,
+            %       filters]]);
+            %
+            % IN
+            %
+            %   date_start  datevec     First date to read
+            %   date_end    datevec     Last date to read (inclusive)
+            %   spec        various     Specification. Details depend
+            %                           on dataset, but usually a
+            %                           string with a satellite or a
+            %                           cell array of strings with two
+            %                           satellites.
+            %   fields      cell-str    Cell array of strings with all
+            %                           the fields to be read. Can be
+            %                           from the core-dataset or from
+            %                           the additional datasets.
+            %
+            % OPT
+            %
+            %   limits      structure   Structure describing acceptable
+            %                           ranges for zero or more fields.
+            %                           E.g. struct('LAT1', [-30 30])
+            %                           will limit collocations to
+            %                           those where the value of
+            %                           'LAT1', is between -30 and +30,
+            %                           inclusive on both ends.
+            %
+            %   filters     cell-array  Cell array of cell arrays:
+            %                           {filter1, filter2, ...}. Each
+            %                           filter1 is itself a cell-array
+            %                           with 2 or 3 elements:
+            %                           {handle, fieldnames, extra},
+            %                           where handle is a
+            %                           function-handle, fieldnames a
+            %                           cell array of strings with
+            %                           fields whose values will be
+            %                           passed on to the filter, and
+            %                           extra a cell array of arbitrary
+            %                           values that will be passed on
+            %                           to the handle as-is.
             % 
-            % Outputs:
-            %  - M (matrix with core collocs)
-            %  - M_cols (corresponding columns)
-            %  - addis (cell array of additional matrices)
-            %  - addis_cols (cell arary of corresponding columns)
-            %  - additionals (cell array of corresponding AdditionalDatasets)
+            % OUT
             %
-            % FIXME DOC
+            %   M       matrix      with values corresponding to fields stored
+            %                       in core collocations
             %
+            %   M_cols  structure   describing what field ended up in what
+            %                       column of M
             %
-            % FIXME TODO:
-            %  - limits
-            %  - filters
+            %   addis   cell-array  Cell array of matrices similar to 'M',
+            %                       one for each additional dataset for
+            %                       which at least one field was found
+            %
+            %   addis_cols structure Like M_cols, corresponding to each of
+            %                       addis
+            %
+            %   associated cell-array of AssociatedData containing the
+            %                       AssociatedData objects for which at
+            %                       least one field ended up in addis.
+            %
+            % TODO:
             %  - read back from original data. Currently,
-            %  collocate_and_store_date can already take care of this, if
-            %  collocations exist. 
+            %  col.collocate_and_store_date can already take care of this, if
+            %  collocations exist.
+            %  - so far limits and filters work only for core fields. Should
+            %  work for any fields.
+            %
+            % EXAMPLE
+            %
+            % [M, c, MM, cc, aa] = ...
+            %       col.read([2007 1 1],[2007 1 10], 'n18', ...
+            %                {'LAT1', 'LON1', 'LAT2', 'LON2', 'RO_ice_water_path', 'cld_reff_vis','cld_opd_vis'}, ...
+            %                 struct('LAT1', [-30 30]), ...
+            %                 {{@(x, y) x>y, {'LAT1', 'LON1'}}});
             
-            %% prepare configuration things
+            %% prepare configuration things        
             
-            
-            [limits, filters] = optargs(varargin, {nan, {}});
+            [limits, filters_by_name] = optargs(varargin, {struct(), {}});
             [fields, additionals, additional_fields] = self.deal_fields(all_fields);
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
@@ -783,18 +838,15 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %                     filters{i}{2} = cellfun(@(s) name_struct.(s)', filters{i}{2}, 'UniformOutput', false);
             %                 end
             %             end
-            %
-            %             %% pre-allocate at least zero rows
-            %
-            %            ncols = length(fieldnames(self.members)); % FIXME: associated datasets
-            %            M = zeros(0, ncols);
+
             M = [];
             
             %% loop through all the dates
             
             dates = daterange(date_start, date_end);
             M_cols = struct();
-            anywithdata = false;
+            filters_by_no = cell(size(filters_by_name));
+            hitno = 0; % count no. of days with collocs
             for i = 1:size(dates, 1)
                 date = dates(i, :);
                 %% read collocations for date
@@ -806,7 +858,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                         continue
                     end
                     M_cols = M_cols_here;
-                    anywithdata = true;
+                    hitno = hitno + 1;
                     for j = 1:length(additionals)
                         [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
                     end
@@ -823,9 +875,29 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 end
                 
-%                 %% apply limitations
-%                 if dolimits
-%                     lim = collocation_restrain(collocations_day, limmat, filters);
+                %% apply limitations
+                if hitno == 1
+                    % convert limits-structure to limits-matrix. This is
+                    % only done after the first time I find collocations,
+                    % because only then I know for sure what sizes the
+                    % fields have.
+                    limmat = limstruct2limmat(limits, M_cols);
+                    for k = 1:length(filters_by_name)
+                        filters_by_no{k} = {...
+                            filters_by_name{k}{1}, ...
+                            cellfun(@(s) M_cols.(s)', filters_by_name{k}{2}, 'UniformOutput', false), ...
+                            filters_by_name{k}{3:end}};
+                    end
+                    
+                end
+                
+                lim = collocation_restrain(collocations_day, limmat, filters_by_no);
+                collocations_day = collocations_day(lim, :);
+                for j = 1:length(additionals)
+                    additionals_day{j} = additionals{j}.limit(additionals_day{j}, lim);
+                end
+                %                 if dolimits
+                %                     lim = collocation_restrain(collocations_day, limmat, filters);
 %                     collocations_day = collocations_day(lim, :);
 %                 end
                 
@@ -843,7 +915,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 end
             end
-            if ~anywithdata
+            if hitno==0
                 warning(['atmlab:' mfilename], ...
                     'No collocations found at all. Do not trust column descriptions.');
             end
