@@ -1,3 +1,9 @@
+2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-281
+
+	* collocations/CollocatedDataset.m(read): Handle empty data well.
+
 2012-02-09  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-1-0-280

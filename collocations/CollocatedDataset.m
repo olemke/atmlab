@@ -746,6 +746,10 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             [fields, additionals, additional_fields] = self.deal_fields(all_fields);
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
+            addis = cell(size(additional_fields));
+            for i = 1:length(addis)
+                addis{i} = struct();
+            end
             
             if nargout<3 && ~isempty(additionals)
                 warning(['atmlab:' mfilename], ...
@@ -789,12 +793,20 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %% loop through all the dates
             
             dates = daterange(date_start, date_end);
+            M_cols = struct();
+            anywithdata = false;
             for i = 1:size(dates, 1)
                 date = dates(i, :);
                 %% read collocations for date
                                                 
                 try
-                    [collocations_day, M_cols] = self.read_single_day(date, spec, fields);
+                    [collocations_day, M_cols_here] = self.read_single_day(date, spec, fields);
+                    if max(size(collocations_day))==0
+                        logtext(atmlab('OUT'), 'no collocations\n');
+                        continue
+                    end
+                    M_cols = M_cols_here;
+                    anywithdata = true;
                     for j = 1:length(additionals)
                         [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
                     end
@@ -809,10 +821,6 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                         otherwise
                             ME.rethrow();
                     end
-                end
-                if isempty(collocations_day)
-                    logtext(atmlab('OUT'), 'no collocations\n');
-                    continue
                 end
                 
 %                 %% apply limitations
@@ -834,6 +842,10 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                         addis{j}((L+1):(L+N_a), :) = additionals_day{j};
                     end
                 end
+            end
+            if ~anywithdata
+                warning(['atmlab:' mfilename], ...
+                    'No collocations found at all. Do not trust column descriptions.');
             end
             
             %%%
