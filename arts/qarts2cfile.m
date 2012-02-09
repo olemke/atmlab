@@ -385,28 +385,15 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end
   %
   if qarts_isset(Q.R_GEOID)
-    rqre_datatype( Q.R_GEOID, {@istensor2,@istensor0}, 'Q.R_GEOID' );       %&%
-    if isscalar( Q.R_GEOID )
-      T{end+1} = sprintf( ...
-          'r_geoidSpherical(r_geoid,atmosphere_dim,lat_grid,lon_grid,%e)', ...
-                                                                   Q.R_GEOID );
-    else
-      T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, ...
+    rqre_datatype( Q.R_GEOID, {@istensor2}, 'Q.R_GEOID' );                  %&%
+    T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
-    end
   end
   %
   if qarts_isset(Q.Z_SURFACE)
-    rqre_datatype( Q.Z_SURFACE, {@istensor2,@istensor0}, 'Q.Z_SURFACE' );   %&%
-    if isscalar( Q.Z_SURFACE )
-      T{end+1} = 'ncolsGet( ncols, r_geoid )';
-      T{end+1} = 'nrowsGet( nrows, r_geoid )';
-      T{end+1} = sprintf('MatrixSetConstant(z_surface,nrows,ncols,%.3f)', ...
-                                                                  Q.Z_SURFACE );
-    else
-      T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, ...
+    rqre_datatype( Q.Z_SURFACE, {@istensor2},            'Q.Z_SURFACE' );   %&%
+    T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
-    end
   end
   %
   T{end+1} = 'basics_checkedCalc';

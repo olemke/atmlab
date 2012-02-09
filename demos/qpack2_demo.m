@@ -44,7 +44,6 @@ end
 O = qp2_l2( Q );         % This ensures that OEM returns the varibles needed 
 %                          to fill the L2 structure, as defined in Q
 O.linear = false;
-O.linear = true
 %
 if ~O.linear 
   O.itermethod = 'GN';

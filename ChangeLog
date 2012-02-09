@@ -1,3 +1,15 @@
+2012-02-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-283
+
+	* demos/qarts_scattering_demo.m: 
+	* demos/qarts_demo2.m: Adopted to changes below.
+
+	* arts/qarts2cfile.m: Changed for R_GEOID and Z_SURFACE.
+
+	* arts/qarts.m (qarts): Scalar R_GEOID and Z_SURFACE for 2D and 3D
+	now not allowed (was an exception!).
+
 2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-282

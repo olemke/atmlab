@@ -103,8 +103,9 @@ else
   Q.LON_GRID             = [-10:10]';  % A true longitude grid
 end
 %
-Q.R_GEOID                = constants( 'EARTH_RADIUS' );
-Q.Z_SURFACE              = 500;
+Q.R_GEOID                = repmat( constants('EARTH_RADIUS'), ...
+                                      length(Q.LAT_GRID), length(Q.LON_GRID) );
+Q.Z_SURFACE              = repmat( 500, length(Q.LAT_GRID), length(Q.LON_GRID));
 
 
 %= Set-up VMR_FIELD, T_FIELD and Z_FIELD

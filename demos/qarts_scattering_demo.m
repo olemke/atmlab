@@ -270,6 +270,8 @@ if any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 2
   Q.ATMOSPHERE_DIM                = 2;
   Q.RAW_ATM_EXPAND_1D             = true;
   Q.LAT_GRID                      = latlon_grid;
+  Q.R_GEOID                       = repmat( Q.R_GEOID, length(latlon_grid), 1 );
+  Q.Z_SURFACE                     = repmat( Q.Z_SURFACE, length(latlon_grid),1);
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 2 );
   Q.SENSOR_POS(:,2)               = -23;
@@ -288,6 +290,10 @@ elseif strcmp( lower(method), 'mc' )  |  ...
   Q.RAW_ATM_EXPAND_1D             = true;
   Q.LAT_GRID                      = latlon_grid;
   Q.LON_GRID                      = latlon_grid;
+  Q.R_GEOID                       = repmat( Q.R_GEOID, length(latlon_grid), ...
+                                                       length(latlon_grid) );
+  Q.Z_SURFACE                     = repmat( Q.Z_SURFACE, length(latlon_grid),...
+                                                         length(latlon_grid) );
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 3 );
   Q.SENSOR_POS(:,2)               = -23;
