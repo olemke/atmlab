@@ -2,6 +2,10 @@
 
 	* atmlab-1-0-285
 
+	* datasets/read_clavrx_hdf.m: Used by patmos-x read
+
+	* site-specific/kiruna/datasets_init.m: $YEAR-> $YEAR4
+
 	* datasets/common_read_patmosx.m: Added reading routine for
 	patmosx
 
