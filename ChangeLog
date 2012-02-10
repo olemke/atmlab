@@ -1,3 +1,10 @@
+2012-02-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-285
+
+	* datasets/common_read_patmosx.m: Added reading routine for
+	patmosx
+
 2012-02-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-284
