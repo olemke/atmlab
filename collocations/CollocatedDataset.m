@@ -641,13 +641,40 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             logtext(atmlab('OUT'), '%s %s vs. %s %s\n', self.primary.name, spec1, self.secondary.name, spec2);
             logtext(atmlab('OUT'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
             alldates = daterange(date_start, date_end);
-            for i = 1:size(alldates, 1);
+            
+            i = 1;
+            while i <= size(alldates, 1)
                 year = alldates(i, 1);
                 month = alldates(i, 2);
                 day = alldates(i, 3);
                 logtext(atmlab('OUT'), 'collocating %04d-%02d-%02d\n', ...
                     year, month, day);
-                self.collocate_and_store_date([year, month, day], spec1, spec2, varargin{:});
+                try
+                    self.collocate_and_store_date([year, month, day], spec1, spec2, varargin{:});
+                    i = i + 1;
+                catch ME
+                    switch ME.identifier
+                        case {'atmlab:SatDataset:missing_firstline'}
+                            % run firstline-thingies
+                            if strfind(ME.message, self.primary.name)
+                                again = self.primary;
+                                spec = spec1;
+                            elseif strfind(ME.message, self.secondary.name)
+                                again = self.secondary;
+                                spec = spec2;
+                            else
+                                error(['atmlab:' mfilename], ...
+                                    ['I received a missing_firstline-error message but ' ...
+                                     'I don''t know what dataset it is about. This is a bug. ' ...
+                                     'The message was: ' ME.message]);
+                            end
+                            logtext(atmlab('ERR'), 'Warning: I don''t have firstline-data for today for %s. I''ll try to get some! (todays collocation will be redone)', again.name);
+                            again.find_granule_first_line(alldates(i, :), alldates(end, :), spec);
+                            again.granule_first_line(alldates(i, :), spec, true); % force reload
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
             end
             logtext(atmlab('OUT'), 'Finished!\n');
             %%%

@@ -25,6 +25,9 @@ function [allgrans, allpaths] = find_granules_for_period(date1, date2, sat, sens
 %
 % $Id$
 
+% FIXME: update to new-style
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
 dates = daterange(date1, date2);
 ndates = size(dates, 1);
 

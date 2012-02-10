@@ -69,6 +69,7 @@ WISHES
   and reads the fields accordingly. Maybe in the same way can implement
   different associated datasets as super-dataset?
 - go through all the FIXME DOC and actually fix them
+- update first_line-stuff to something prettier
 
 - implement new style as methods in various new classes
 - when finished, in old-style add small functions using new-style

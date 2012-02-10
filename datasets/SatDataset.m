@@ -16,6 +16,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         granule_duration;
         satname; % for single-satellite datasets
         dataset; % e.g. MYD06_L2 for modis
+        firstline_filename = 'firstline_$NAME_$SPEC';
+
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that
         % cannot be met here. Therefore, defaults should be encompassed in
@@ -264,6 +266,52 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
         end        
         
+        function [allgrans, allpaths] = find_granules_for_period(self, date1, date2, spec)
+            
+            % find_granules_for_period List all granules for sat/dataset for period
+            %
+            % For the period between date1 and date2, list all granules (as vectors
+            % indicating the starting date/time) available.
+            %
+            % FORMAT
+            %
+            %   [allgrans, allpaths] = find_granules_for_period(date1, date2, spec)
+            %
+            % IN
+            %
+            %   date1   datevec     starting date
+            %   date2   datevec     ending date
+            %   spec    various
+            %
+            % OUT
+            %
+            %   allgrans matrix     all granules in daterange
+            %   allpaths cellstr    all paths to those granules
+            
+            dates = daterange(date1, date2);
+            ndates = size(dates, 1);
+            
+            allgrans = nan*zeros(ndates*15, 5);
+            allpaths = cell(size(allgrans));
+            
+            n = 0;
+            for i = 1:ndates
+                date = dates(i, :);
+                [grans, paths] = self.find_granules_by_date(date, spec, false);
+                ngrans = size(grans, 1);
+                allgrans(n+1:n+ngrans, :) = grans;
+                allpaths(n+1:n+ngrans) = paths;
+                n = n + ngrans;
+            end
+            
+            to_remove = isnan(allgrans(:, 1));
+            allgrans(to_remove, :) = [];
+            allpaths(to_remove) = [];
+            [allgrans, I] = sortrows(allgrans);
+            allpaths = allpaths(I);
+
+        end
+        
         function data = read_granule(self, date, varargin)
             % read_granule Read any granule
             %
@@ -367,6 +415,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   spec        various     (optional) Might be indicating satellite(s)
             %   reload      logical     (optional) Reload scanline data (i.e. not
             %                           cached). Defaults to false.
+            %   force       logical     (optional) If nothing found, don't
+            %                           throw an error, but return empty.
             %
             % OUT
             %
@@ -375,12 +425,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %                           previous granule found)
             
             persistent S;
-                        
+            
             if isempty(S)
                 S = struct;
             end
             
-            [spec, reload] = optargs(varargin, {'', false});
+            [spec, reload, force] = optargs(varargin, {'', false, false});
             
             assert(ischar(spec), ['atmlab:' mfilename], ...
                 'function works only for single-satellite datasets');
@@ -410,11 +460,122 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             
             first = ht.get(unisecs);
-            if isempty(first)
-                error(['atmlab:' mfilename], 'no data found for %s @ %d', ...
+            if isempty(first) && ~force
+                error(['atmlab:' mfilename ':missing_firstline'], ['no data found for %s @ %d. ', ...
+                    'You may want to run self.find_granule_first_line(...) ', ...
+                    'for a sufficiently long period.'], ...
                     self.name, unisecs);
             end
+            
+        end
+        
+        function find_granule_first_line(self, startdate, enddate, varargin)
+            % find_granule_first_line Create hashtable with scanline overlaps
+            %
+            % Creates a hashtable (such as used by granule_first_line) that maps for
+            % each granule the first scanline not occuring in the previous
+            % scanline.
+            %
+            % The resulting hashtable is written to a file according to
+            % datasets_config('firstline_data'), which is also where
+            % granule_first_line is looking for it.
+            %
+            % FORMAT
+            %
+            %   find_scanline_first_line(startdate, enddate, spec)
+            %
+            % IN
+            %
+            %   startdate   datevec     start here
+            %   enddate     datevec     end here
+            %   spec        various     specification
+            %
+            % OUT
+            %
+            %   none, but writes a file
+            
+            spec = optargs(varargin, {''});            
+            
+            if isempty(spec)
+                sat = self.satname;
+            else
+                sat = spec;    
+            end
 
+            scanfile = datasets_config('firstline_data');
+            scanfile = strrep(scanfile, '$SAT', sat);
+            scanfile = strrep(scanfile, '$SENSOR', self.name);
+            
+            logtext(atmlab('OUT'), 'Locating granules\n');
+            allgrans = self.find_granules_for_period(startdate, enddate, spec);
+            ngrans = size(allgrans, 1);
+            logtext(atmlab('OUT'), 'Found %d granules\n', ngrans);
+            
+            if exist(scanfile, 'file')
+                tm = load(scanfile);
+                ht = tm.ht;
+            else
+                ht = java.util.Hashtable;
+            end
+            
+            uni_first = date2unixsecs(allgrans(1, 1), allgrans(1, 2), allgrans(1, 3), allgrans(1, 4), allgrans(1, 5));
+            if ~ht.containsKey(uint32(uni_first))
+                logtext(atmlab('OUT'), 'Setting very first to flag\n');
+                ht.put(uint32(uni_first), -5);
+            end
+            next = 0;
+            
+            for i = 1:ngrans-1
+                logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
+                    allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
+                uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
+                if ht.containsKey(uint32(uni)) && ht.get(uint32(uni)) ~= -5
+                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), ht.get(uint32(uni)));
+                    continue
+                end
+                try
+                    couldreadcur = false;
+                    if isequal(next, 0)
+                        cur = self.read_granule(allgrans(i, :), spec, {}, false, false);
+                    else
+                        cur = next;
+                    end
+                    couldreadcur = true;
+                    couldreadnext = false;
+                    next = self.read_granule(allgrans(i+1, :), spec, {}, false, false);
+                    couldreadnext = true;
+                catch ME
+                    switch ME.identifier
+                        case {'atmlab:find_datafile_by_date', 'atmlab:atovs_get_l1c:zamsu2l1c', 'atmlab:invalid_data'}
+                            logtext(atmlab('ERR'), 'Problem: %s\n', ME.message);
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
+                %uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
+                if couldreadcur && couldreadnext
+                    t_cur = cur.epoch + cur.time;
+                    t_next = next.epoch + next.time;
+                    %[t_cur, t_next] = unify_time_axis(cur.time, next.time);
+                    firstline = find(t_next > t_cur(end), 1, 'first');
+                    if ~isempty(firstline)
+                        logtext(atmlab('OUT'), 'First line: %d\n', firstline);
+                        ht.put(uint32(uni), firstline);
+                    else
+                        logtext(atmlab('OUT'), 'No first line, setting to -2\n');
+                        ht.put(uint32(uni), -2);
+                    end
+                elseif couldreadcur
+                    logtext(atmlab('OUT'), 'Could not read next, setting next to -3\n');
+                    ht.put(uint32(uni), -3);
+                else
+                    logtext(atmlab('OUT'), 'Could not read current. setting to -4\n');
+                    ht.put(uint32(uni), -4);
+                end
+            end
+            
+            save(scanfile, 'ht');           
+            
         end
         
         %% methods for internal use (not private, but from other classes)
