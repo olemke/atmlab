@@ -44,7 +44,7 @@ S2.latitude = repmat(S2.latitude',[1,length(S2.longitude)]);
 S2.longitude = repmat(S2.longitude,[size(S2.latitude,1),1]);
 
 
-S = concatinateDatafields(S1,S2);
+S = concatenateDatafields(S1,S2);
 clear Sasc Sdec
 % rename some fields
 
@@ -94,7 +94,7 @@ end
 % read the data
 S  = read_clavrx_hdf(filename,all_fields);
 
-function S = concatinateDatafields(Sasc,Sdec)
+function S = concatenateDatafields(Sasc,Sdec)
 %% concatinateDatafields
 % 
 %
@@ -109,10 +109,19 @@ for F = fieldnames(Sasc)'
     end
 end
 
+% Remove buggy values
+sz = size(S.scan_line_time);
+for F = fieldnames(S)'
+    if isequal(size(S.(F{1})),sz)
+        S.(F{1}) = S.(F{1})(S.scan_line_time>=0);
+    end
+end
+
 % SORT the data in ascending time
 [S.scan_line_time,index] = sort(S.scan_line_time);
-for F = fieldnames(Sasc)'
-    if isequal(size(Sasc.(F{1})),sz) && ~strcmp(F{1},'scan_line_time')
-        S.(F{1}) = [Sasc.(F{1})(:);Sdec.(F{1})(:)];
+sz = size(S.scan_line_time);
+for F = fieldnames(S)'
+    if isequal(size(S.(F{1})),sz) && ~strcmp(F{1},'scan_line_time')
+        S.(F{1}) = S.(F{1})(index);
     end
 end

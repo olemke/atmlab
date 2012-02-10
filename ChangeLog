@@ -1,3 +1,11 @@
+2012-02-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-289
+
+	* datasets/common_read_patmosx.m: Fixed bad bug in sorting the
+	data. Now also remove all data that has corresponding scan_times that
+	are invalid
+
 2012-02-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-288
