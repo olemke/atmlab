@@ -431,7 +431,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     T{end+1} = add_savefile( 't_field', workfolder );
     T{end+1} = add_savefile( 'z_field', workfolder );
     T{end+1} = add_savefile( 'vmr_field', workfolder );
-    T{end+1} = add_savefile( 'r_geoid', workfolder );
+    %T{end+1} = add_savefile( 'r_geoid', workfolder );
     T{end+1} = add_savefile( 'z_surface', workfolder );
   end
   

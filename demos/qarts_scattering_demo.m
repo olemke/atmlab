@@ -395,6 +395,9 @@ function in = rotate_in( in )
 
   rot = in(2,2) / 4;
   
+  % The arts_*zaaa* functions have been removed. See ARTS source code if
+  % needed to be reimplemented.
+  
   [x,y,z] = arts_zaaa2cart( RAD2DEG*in(2,:), RAD2DEG*in(1,:) );
   
   u = rotationmat3D( rot, [0 1 0]) * [x;y;z];

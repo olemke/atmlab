@@ -71,10 +71,11 @@ l       = a + sqrt( a*a + r_sensor*r_sensor - pos(1)*pos(1) );
 spos = zeros(1,3);
 slos = zeros(1,2);
 %
-[x,y,z,dx,dy,dz] = arts_poslos2cart( pos(1), pos(2), pos(3), los(1), los(2) );
+[x,y,z,dx,dy,dz] = geocentricposlos2cart( pos(1), pos(2), pos(3), ...
+                                          los(1), los(2) );
 %
 [spos(1),spos(2),spos(3),slos(1),slos(2)] = ...
-                       arts_cart2poslos( x-l*dx, y-l*dy, z-l*dz, dx, dy, dz );
+                   cartposlos2geocentric( x-l*dx, y-l*dy, z-l*dz, dx, dy, dz );
 
 
 %--- dim < 3 specific stuff

@@ -1,3 +1,22 @@
+2012-02-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-290
+
+	* forwardmodel/pathpoint2sensorposlos.m: Now using new functions
+	for conversion between spherical and cartesian coordinate systems.
+
+	* arts/: The following functions are removed, replaced by
+	functions in geodetic/: arts_cart2poslos.m, arts_cart2zaaa.m,
+	arts_sph2cart.m, arts_cart2sph.m, arts_poslos2cart.m and
+	arts_zaaa2cart.m.
+
+	* geodetic/geomtanpoint.m: A function for calculating the 3D
+	geomtrical tangent point, handling non-spherical cases.
+
+	* arts/qarts2cfile.m (cfile_AtmSrf): r_geoid now not saved. (This
+	to not cause conflicts with the present arts-dev version. I assume
+	that nobody pick up the save file.)
+
 2012-02-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-289
