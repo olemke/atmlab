@@ -1,3 +1,12 @@
+2012-02-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-287
+
+	* collocations/CollocatedDataset.m (collocate_granule):
+
+		- Catch here when secondary granule not found, not only in
+		collocate_date
+
 2012-02-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-286
