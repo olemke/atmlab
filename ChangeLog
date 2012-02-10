@@ -1,5 +1,12 @@
 2012-02-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-1-0-286
+
+	* datasets/common_read_patmosx.m: Commited some of the conflict
+
+
+2012-02-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-1-0-285
 
 	* datasets/read_clavrx_hdf.m: Used by patmos-x read
