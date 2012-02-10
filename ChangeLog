@@ -1,5 +1,13 @@
 2012-02-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-1-0-288
+
+	* datasets/SatDataset.m (read_granule):
+
+		- Bugfix in removal of duplicates
+
+2012-02-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-1-0-287
 
 	* collocations/CollocatedDataset.m (collocate_granule):

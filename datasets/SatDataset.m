@@ -327,15 +327,17 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             if remdouble
                 % read ballast
-                firstline = self.granule_first_line(datevec, spec);
-                % get rid of ballast in all fields
-                for f = fieldnames(data)'
-                    fn = f{1};
-                    if isnumeric(data.(fn)) && size(data.(fn), 1) == nlines
-                        % magic in next lines explained at
-                        % http://www.mathworks.de/matlabcentral/newsreader/view_thread/290890
-                        sz = size(data.(fn));
-                        data.(fn) = reshape(data.(fn)(firstline:nlines, :), [nlines-firstline+1, sz(2:end)]);
+                firstline = self.granule_first_line(date, spec);
+                if firstline > 0
+                    % get rid of ballast in all fields
+                    for f = fieldnames(data)'
+                        fn = f{1};
+                        if isnumeric(data.(fn)) && size(data.(fn), 1) == nlines
+                            % magic in next lines explained at
+                            % http://www.mathworks.de/matlabcentral/newsreader/view_thread/290890
+                            sz = size(data.(fn));
+                            data.(fn) = reshape(data.(fn)(firstline:nlines, :), [nlines-firstline+1, sz(2:end)]);
+                        end
                     end
                 end
             end
