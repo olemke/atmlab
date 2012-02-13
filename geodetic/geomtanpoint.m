@@ -23,7 +23,7 @@
 %       lat        Latitude of sensor position.
 %       lon        Longitude of sensor position.
 %       za         Zenith angle of sensor line-of-sight.
-%       za         Azimuth angle of sensor line-of-sight.
+%       aa         Azimuth angle of sensor line-of-sight.
 
 % 2012-02-10 Created by Patrick Eriksson
 

@@ -1,3 +1,14 @@
+2012-02-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-292
+
+	* geodetic/geomtanpoint.m: Corrected header info.
+
+	* geodetic/geocentric2cart.m: New. Work in progress.
+
+	* geodetic/geocentricposlos2cart.m: Now not calling
+	geocentric2cart, to save some time (code instead copied and adopted).
+
 2012-02-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-291
@@ -10,7 +21,7 @@
 	proceed
 
 	* datasets/SatDataset.m:
-	
+
 	(find_granules_for_period): Added
 
 	- Find all granules for indicated period

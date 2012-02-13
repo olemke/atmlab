@@ -55,8 +55,6 @@ else
   zarad  = deg2rad * za;
   aarad  = deg2rad * aa;
   %
-  [x,y,z] = geocentric2cart( r, lat, lon );
-  %
   coslat = cos( latrad );
   sinlat = sin( latrad );
   coslon = cos( lonrad );
@@ -65,6 +63,12 @@ else
   sinza  = sin( zarad );
   cosaa  = cos( aarad );
   sinaa  = sin( aarad );
+  %
+  % As in geocentric2cart, but uses local variables
+  x = r .* coslat; 
+  y = x .* sinlon;
+  x = x .* coslon;
+  z = r .* sinlat;  
   %
   dr     = cosza;
   dlat   = sinza .* cosaa;            % r-terms cancel out below
