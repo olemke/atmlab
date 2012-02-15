@@ -1,3 +1,14 @@
+2012-02-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-293
+
+	* geodetic/geomtanpoint2d.m (geomtanpoint2d): Now complete (but OK?).
+
+	* geodetic/geomtanpoint.m (geomtanpoint): Internal variables renamed.
+
+	* geodetic/geocentricposlos2cart.m (geocentricposlos2cart): Added
+	input checks.
+
 2012-02-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-292

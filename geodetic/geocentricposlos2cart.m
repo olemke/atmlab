@@ -27,8 +27,12 @@
 function [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,aa)
 
 if r == 0
-  error( 'This set of functions are not handling the case of r = 0.' );  
+  error( 'This function is not handling the case of r = 0.' );  
 end
+rqre_in_range( lat, -90, 90 )
+rqre_in_range( lon, -360, 360 )
+rqre_in_range( za, 0, 180 )
+
 
 deg2rad = constants( 'DEG2RAD' );
 

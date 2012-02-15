@@ -38,6 +38,7 @@ rqre_in_range( ellipsoid(2), 0, 1, 'element 2 of ellipsoid' );         %&%
 rqre_datatype( r, @istensor0 );                                        %&%
 rqre_datatype( lat, @istensor0 );                                      %&%
 rqre_datatype( za, @istensor0 );                                       %&%
+rqre_in_range( za, -180, 180 )
 
   
 %- Spherical planet
@@ -102,24 +103,29 @@ else
   C = w12*w12/a2 + w32*w32/b2;
  	
   if B == 0.0
-    x = 0.0;
+    xx = 0.0;
   else 
     K = -2.0*A/B;
     factor = 1.0/(A+(B+C*K)*K);
-    x = sqrt(factor);
-    y = K*x;
+    xx = sqrt(factor);
+    yy = K*xx;
   end 
  	
-  dist1 = (xr-x)*(xr-x) + yr*yr;
-  dist2 = (xr+x)*(xr+x) + yr*yr;
+  dist1 = (xr-xx)*(xr-xx) + yr*yr;
+  dist2 = (xr+xx)*(xr+xx) + yr*yr;
  	
   if dist1 > dist2
-    x = -x;
+    xx = -xx;
   end
   
-  xn = w11*x + w12*yr;
-  zn = w31*x + w32*yr
+  xn = w11*xx + w12*yr;
+  zn = w31*xx + w32*yr;
   
+  rt   = sqrt( xn^2 + zn^2 );
+  l    = sqrt( (xn-x)^2 + (zn-z)^2 );
+  dlat = asind( l*sinza/rt );
+  
+  latt = lat + dlat;
 end
 
 

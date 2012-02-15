@@ -41,13 +41,14 @@ rqre_datatype( lat, @istensor0 );                                      %&%
 rqre_datatype( lon, @istensor0 );                                      %&%
 rqre_datatype( za, @istensor0 );                                       %&%
 rqre_datatype( aa, @istensor0 );                                       %&%
+% Values of r, lat, lon, za and aa checked by geocentricposlos2cart    %&%
 
-  
+[x,y,z,dx,dy,dz] = geocentricposlos2cart( r, lat, lon, za, aa );
+
+
 %- Spherical planet
 %
 if ellipsoid(2) < 1e-7
-
-  [x,y,z,dx,dy,dz] = geocentricposlos2cart( r, lat, lon, za, aa );
    
   ppc = r * sind( abs(za) );
   
@@ -64,8 +65,6 @@ else
   a2 = ellipsoid(1)^2;
   b2 = a2 * ( 1 - ellipsoid(2)^2 ); 
   
-  [x,y,z,dx,dy,dz] = geocentricposlos2cart( r, lat, lon, za, aa );
-
   X = [x,y,z]';
   
   xunit = [dx,dy,dz]';
@@ -90,28 +89,24 @@ else
   C = (w12*w12 + w22*w22)/a2 + w32*w32/b2;
  	
   if B == 0.0
-    x = 0.0;
+    xx = 0.0;
   else 
     K = -2.0*A/B;
     factor = 1.0/(A+(B+C*K)*K);
-    x = sqrt(factor);
-    y = K*x;
+    xx = sqrt(factor);
+    yy = K*x;
   end 
  	
-  dist1 = (xr-x)*(xr-x) + (yr-y)*(yr-y);
-  dist2 = (xr+x)*(xr+x) + (yr+y)*(yr+y);
+  dist1 = (xr-xx)*(xr-xx) + (yr-yy)*(yr-yy);
+  dist2 = (xr+xx)*(xr+xx) + (yr+yy)*(yr+yy);
  	
   if dist1 > dist2
-    x = -x;
+    xx = -xx;
   end
-  
-%  ijk[0] = w11*x + w12*yr;
-%  ijk[1] = w21*x + w22*yr;
-% ijk[2] = w31*x + w32*yr;
 
-  [rt,latt,lont] = cart2geocentric( w11*x + w12*yr, ...
-                                    w21*x + w22*yr, ...
-                                    w31*x + w32*yr );
+  [rt,latt,lont] = cart2geocentric( w11*xx + w12*yr, ...
+                                    w21*xx + w22*yr, ...
+                                    w31*xx + w32*yr );
 end
 
 
