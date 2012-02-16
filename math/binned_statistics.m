@@ -31,6 +31,7 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 % modified by Salomon Eliasson
 % 2010-07-08 Oliver Lemke
 
+assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
 if exist('filter','var')
     assert(isfunction_handle(filter),'atmlab:BadInput','filter must be a function handle')
     data_bins = cellfun(filter, data_bins, 'UniformOutput', false);

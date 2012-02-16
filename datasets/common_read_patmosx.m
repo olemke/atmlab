@@ -80,18 +80,21 @@ function S = gunzip_and_read_patmosx(file,all_fields)
 
 
 % make TEMPDIR & cleanup after I'm done.
-tmpdir = create_tmpfolder();
-cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
-
-[unused,tmpfile] = fileparts(file);
-filename = fullfile(tmpdir,tmpfile);
-[unused,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),1,true);
-
-if logical(test)
-    error(['atmlab:' mfilename ':file'],'error gunzipping\n%s',file)
+if strcmp(file(end-2:end),'.gz')
+    tmpdir = create_tmpfolder();
+    cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
+    
+    [unused,tmpfile] = fileparts(file);
+    filename = fullfile(tmpdir,tmpfile);
+    [unused,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),1,true);
+    
+    if logical(test)
+        error(['atmlab:' mfilename ':file'],'error gunzipping\n%s',file)
+    end
+elseif strcmp(file(end-3:end),'.hdf')
+    filename = file;
 end
-
-% read the data
+% read the data. This also scales the data automatically!
 S  = read_clavrx_hdf(filename,all_fields);
 
 function S = concatenateDatafields(Sasc,Sdec)
@@ -106,14 +109,6 @@ sz = size(Sasc.scan_line_time);
 for F = fieldnames(Sasc)'
     if isequal(size(Sasc.(F{1})),sz)
         S.(F{1}) = [Sasc.(F{1})(:);Sdec.(F{1})(:)];
-    end
-end
-
-% Remove buggy values
-sz = size(S.scan_line_time);
-for F = fieldnames(S)'
-    if isequal(size(S.(F{1})),sz)
-        S.(F{1}) = S.(F{1})(S.scan_line_time>=0);
     end
 end
 

@@ -1,3 +1,14 @@
+2012-02-16  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-1-0-294
+
+	* math/binned_statistics.m: Added an input type check
+
+	* datasets/common_read_patmosx.m (common_read_patmosx): Fixed bug
+	in collapsing data, Decided not to throw away negative time
+	values, and can now take files that are either hdf gziped
+	hdffiles.
+
 2012-02-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-293
