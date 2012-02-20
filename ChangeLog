@@ -1,3 +1,15 @@
+2012-02-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-295
+	
+	* tests/test_arts_ppath.m: Started.
+
+	* arts/xml/xmlReadPpath.m: Adopted to changes of Ppath in present
+	development branch. This brakes consistency with arts 2.0!
+	(I assuming that nobody reads ppathcoming from arts 2.0).
+
+	* arts/xml/xmlWritePpath.m: As above.
+
 2012-02-16  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-294

@@ -19,17 +19,16 @@ xmlWriteTag (fid, 'Ppath', []);
 xmlWriteIndex (fid, fidb, data.dim, precision);
 xmlWriteIndex (fid, fidb, data.np, precision);
 xmlWriteNumeric (fid, fidb, data.constant, precision);
+xmlWriteString (fid, fidb, data.background, precision);
 xmlWriteMatrix (fid, fidb, data.pos, precision);
-xmlWriteVector (fid, fidb, data.z, precision);
+xmlWriteMatrix (fid, fidb, data.los, precision);
+xmlWriteVector (fid, fidb, data.r, precision);
 xmlWriteVector (fid, fidb, data.l_step, precision);
+xmlWriteVector (fid, fidb, data.lspace, precision);
+xmlWriteVector (fid, fidb, data.nreal, precision);
 xmlWriteArrayOf (fid, fidb, data.gp_p, 'GridPos', precision);
 xmlWriteArrayOf (fid, fidb, data.gp_lat, 'GridPos', precision);
 xmlWriteArrayOf (fid, fidb, data.gp_lon, 'GridPos', precision);
-xmlWriteMatrix (fid, fidb, data.los, precision);
-xmlWriteString (fid, fidb, data.background, precision);
-xmlWriteVector (fid, fidb, data.tan_pos, precision);
-xmlWriteVector (fid, fidb, data.geom_tan_pos, precision);
-xmlWriteVector (fid, fidb, data.nreal, precision);
 
 xmlWriteCloseTag (fid, 'Ppath');
 
