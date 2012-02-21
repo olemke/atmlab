@@ -1,0 +1,2 @@
+classdef MeanDataset < ReducedDataset
+end

@@ -1,3 +1,25 @@
+2012-02-21  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-1-0-297
+
+	* collocations/FieldCopier.m (FieldCopier):
+
+	- Change in automated name generation, use class(self), not always
+	'FieldCopier'. This is different for subclasses.
+
+	* collocations/ReducedDataset.m: Added
+
+	- Class between AssociatedDataset and MeanDataset; still empty.
+
+	* collocations/MeanDataset.m: Added
+
+	- Class between ReducedDataset and MeanFieldCopier; still empty.
+
+	* collocations/MeanFieldCopier.m: Added, work in progress
+
+	- Started class to copy fields, but do averaging/std.dev. etc.
+	  Work in progress.
+
 2012-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-296

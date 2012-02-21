@@ -56,7 +56,7 @@ classdef FieldCopier < AssociatedDataset
             self.fieldstruct_secondary = fieldstruct2;
             
             
-            % check consistunce of fieldstructs
+            % check consistence of fieldstructs
             
             allfields = catstruct(fieldstruct1, fieldstruct2);
             assert(length(fieldnames(fieldstruct1))+length(fieldnames(fieldstruct2))==length(fieldnames(allfields)), ...
@@ -67,7 +67,7 @@ classdef FieldCopier < AssociatedDataset
                 % give a name
                 existing_names = fieldnames(datasets);
                 while true
-                    nm = sprintf('FieldCopier_%d_%d', uint64(date2unixsecs()),round(rand(1, 1)*10000));
+                    nm = sprintf([class(self) '_%d_%d'], uint64(date2unixsecs()),round(rand(1, 1)*10000));
                     if ~any(strcmp(nm, existing_names))
                         break
                     end
