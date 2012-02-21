@@ -1,7 +1,15 @@
+2012-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-296
+
+	* tests/test_arts_ppath.m: Further work. Not yet ready. 
+
+	* geodetic/ellipsoidradii.m: Corrected header text.
+
 2012-02-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-295
-	
+
 	* tests/test_arts_ppath.m: Started.
 
 	* arts/xml/xmlReadPpath.m: Adopted to changes of Ppath in present
