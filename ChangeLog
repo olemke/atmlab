@@ -1,3 +1,9 @@
+2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-1-0-298
+
+	* tests/test_arts_ppath.m: Now a complete function.
+
 2012-02-21  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-1-0-297
@@ -20,6 +26,7 @@
 	- Started class to copy fields, but do averaging/std.dev. etc.
 	  Work in progress.
 
+>>>>>>> .r7345
 2012-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-296

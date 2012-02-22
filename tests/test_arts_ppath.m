@@ -1,5 +1,33 @@
-function test_arts_ppath( atmosphere_dim, n  )
+% TEST_ARTS_PPATH   Testing of ARTS ppath calculations
+%
+%    Random test cases are generated. The following variables are
+%    randomised:
+%       length of p_grid
+%       length of lat_grid
+%       length of lon_grid
+%       z_surface
+%       sensor_pos
+%       sensor_los
+%
+%    A ppath calculation for ARTS is performed for each test case. A basic check
+%    of the ARTS calculations performed, by using atmlab functions. If any
+%    error is found, "keyboard" is called. The work folder is then left for
+%    debugging purposes.
+%
+%
+% FORMAT   test_arts_ppath( atmosphere_dim, n, [re_sphere] )
+%        
+% IN    atmosphere_dim   Atmospheric dimensionality
+%       n                Run n cases
+% OPT   re_sphere        Flag to also use a spherical reference ellipsoid
+%                        for 2D and 3D. Default is false.
 
+% 2012-02-22   Created by Patrick.
+
+function test_arts_ppath( atmosphere_dim, n, varargin  )
+%
+[re_sphere] = optargs( varargin, { false } );
+  
   
 %- Fixed settings
 %
@@ -8,20 +36,26 @@ Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.ATMOSPHERE_DIM        = atmosphere_dim;
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
-Q.RAW_ATMOSPHERE        = fullfile( atmlab('ARTS_XMLDATA_PATH'), ...
-                                'atmosphere', 'fascod', 'midlatitude-winter' );
 Q.PPATH_STEP_AGENDA     = { 'ppath_stepGeometric' };
-  Q.PPATH_LMAX          = 10e3;
+Q.PPATH_LMAX            = 10e3;
 %
-if atmosphere_dim == 1
+if atmosphere_dim == 1  ||  re_sphere
   refell                = ellipsoidmodels( 'SphericalEarth' );
   Q.WSMS_AT_START       = { 'refellipsoidEarth( refellipsoid, "Sphere" )' };
-  Q.RAW_ATM_EXPAND_1D   = false;
 else
   refell                = ellipsoidmodels( 'WGS84' );
-  Q.WSMS_AT_START     = { 'refellipsoidEarth( refellipsoid, "WGS84" )' };  
-  Q.RAW_ATM_EXPAND_1D = true;
+  Q.WSMS_AT_START       = { 'refellipsoidEarth( refellipsoid, "WGS84" )' }; 
 end
+
+
+%- Load a test atmosphere
+%
+atmtest =  fullfile( atmlab('ARTS_XMLDATA_PATH'), ...
+                                'atmosphere', 'fascod', 'midlatitude-winter' );
+Az      = xmlLoad( [ atmtest, '.z.xml' ] ); 
+At      = xmlLoad( [ atmtest, '.t.xml' ] ); 
+Ah2o    = xmlLoad( [ atmtest, '.H2O.xml' ] ); 
+
 
 
 %- Create a workfolder
@@ -30,7 +64,7 @@ workfolder = create_tmpfolder;
 
 
 
-%Run through n random cases
+%- Run through n random cases
 
 for c = 1 : n
 
@@ -48,15 +82,23 @@ for c = 1 : n
   %
   if atmosphere_dim == 2
     nlat                = 10 + round( 350*rand );
-    Q.LAT_GRID          = linspace( -135, 135, nlat );
+    Q.LAT_GRID          = linspace( -135, 135, nlat )';
     nlon                = 1;
   elseif atmosphere_dim == 3
     nlat                = 10 + round( 350*rand );
     nlon                = 10 + round( 350*rand );
-    Q.LAT_GRID          = linspace( -90, 90, nlat );
-    Q.LON_GRID          = linspace( -180, 180, nlon );
+    Q.LAT_GRID          = linspace( -90, 90, nlat )';
+    Q.LON_GRID          = linspace( -180, 180, nlon )';
   end
 
+  % Atmospheric fields
+  Q.Z_FIELD = repmat( interpp( Az.grids{1}, Az.data, Q.P_GRID ), ...
+                                                           [ 1, nlat, nlon ] ); 
+  Q.T_FIELD = repmat( interpp( At.grids{1}, At.data, Q.P_GRID ), ...
+                                                           [ 1, nlat, nlon ] ); 
+  Q.VMR_FIELD = repmat( interpp( Ah2o.grids{1}, Ah2o.data, Q.P_GRID ), ...
+                                                        [ 1, 1, nlat, nlon ] ); 
+  Q.VMR_FIELD = shiftdim( Q.VMR_FIELD, -1 );
   %- Surface altitude
   %
   Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
@@ -134,9 +176,11 @@ for c = 1 : n
       end
       
       [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lont );
-      dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ]);
+      dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
       if dd > 1e-4
         fprintf('\n!!! Deviating ppath point found !!!\n');
+        [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
+                                        y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
         keyboard
       end
     end
