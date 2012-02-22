@@ -24,6 +24,10 @@ function [x,y] = histout2plotvecs(n,xout)
 
 % We assume that xout increases monotonically.
 
+% Always make sure the data are row vectors (e.g. incase input doesn't come from hist)
+n=n(:)';
+xout=xout(:)';
+
 % Halv the distance between adjacent points in x:
 d = diff(xout)/2;
 

@@ -1,3 +1,13 @@
+2012-02-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-3
+
+	* graphs/histout2plotvecs.m: Silently make sure the input vectors
+	are row vectors.
+
+	* geoplots/gmt/gmt_plot.m: Added some more documentation on how to
+	make special characters in e.g. the plot title
+
 2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-2

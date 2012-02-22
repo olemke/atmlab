@@ -122,7 +122,9 @@ function filename = gmt_plot(in,field)
 %                     section on character escape sequences (4.16 in GMT
 %                     cookbook v4.5.7).
 %                     e.g. for unit (or title) \Delta r^{-2} should be
-%                     written '@~D@~r@+-2'
+%                     written '@~D@~r@+-2' (see GMT_manpages under plotting
+%                     text (p207 GMT 5.0)
+%
 %
 % in.plotPlacement    |%s| String of global plotPlacements | '-Ya5 -Xa5' |
 %
