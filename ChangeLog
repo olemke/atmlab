@@ -1,3 +1,11 @@
+2012-02-22  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-0
+
+	* Sync major and minor version number with arts.
+
+	* ChangeLog: Remove conflict markers.
+
 2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-298
@@ -26,7 +34,6 @@
 	- Started class to copy fields, but do averaging/std.dev. etc.
 	  Work in progress.
 
->>>>>>> .r7345
 2012-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-1-0-296
@@ -1508,7 +1515,6 @@
 
 	* site-specific/kiruna/datasets_init.m: Fixed 2 erroneous entries
 
->>>>>>> .r7174
 2011-09-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-1-0-198
