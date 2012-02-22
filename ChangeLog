@@ -1,3 +1,11 @@
+2012-02-22  Gerrit Holl  <gerrit.holl@gmail.com>
+
+	* atmlab-2-1-1
+
+	* collocations/CollocatedDataset.m (collocate_and_read_date):
+
+	- Bugfix, misspelt method called
+
 2012-02-22  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-0

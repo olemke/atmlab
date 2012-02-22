@@ -583,7 +583,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
                 % FIXME: don't reprocess all additionals, but read those
                 % that are already there?
-                [result, ~, attr] = self.read_date(date, spec, fieldnames(self.cols));
+                [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 info_addi.parent_id = attr.id;
                 
                 for i = 1:length(additionals)

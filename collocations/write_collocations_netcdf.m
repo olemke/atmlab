@@ -76,7 +76,7 @@ for i = 1:length(fields) % for each satellite
     
     logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
     ncid = netcdf.create(temp_out, 'NC_CLOBBER'); % overwrite existing
-    cleanupObj = onCleanup(@() cleanup(temp_out, ncid));
+    %cleanupObj = onCleanup(@() cleanup(temp_out, ncid)); % FIXME...
     
     %% define the dimensions
     
