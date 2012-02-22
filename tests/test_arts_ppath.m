@@ -97,8 +97,9 @@ for c = 1 : n
   Q.T_FIELD = repmat( interpp( At.grids{1}, At.data, Q.P_GRID ), ...
                                                            [ 1, nlat, nlon ] ); 
   Q.VMR_FIELD = repmat( interpp( Ah2o.grids{1}, Ah2o.data, Q.P_GRID ), ...
-                                                        [ 1, 1, nlat, nlon ] ); 
-  Q.VMR_FIELD = shiftdim( Q.VMR_FIELD, -1 );
+                                                           [ 1, nlat, nlon ] ); 
+  Q.VMR_FIELD = reshape( Q.VMR_FIELD, [1 np nlat nlon ] );
+  
   %- Surface altitude
   %
   Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );

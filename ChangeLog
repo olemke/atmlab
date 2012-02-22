@@ -1,3 +1,10 @@
+2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-2
+
+	* tests/test_arts_ppath.m: vmr_field did not get correct size for
+	2D and 3D.
+
 2012-02-22  Gerrit Holl  <gerrit.holl@gmail.com>
 
 	* atmlab-2-1-1
