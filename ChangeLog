@@ -1,3 +1,10 @@
+2012-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-4
+
+	* arts/various/arts_rslope_crossing.m: A function to test arts'
+	internal function rslope_crossing.
+
 2012-02-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-3

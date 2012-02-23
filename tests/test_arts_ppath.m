@@ -41,10 +41,10 @@ Q.PPATH_LMAX            = 10e3;
 %
 if atmosphere_dim == 1  ||  re_sphere
   refell                = ellipsoidmodels( 'SphericalEarth' );
-  Q.WSMS_AT_START       = { 'refellipsoidEarth( refellipsoid, "Sphere" )' };
+  re_string             = 'refellipsoidEarth( refellipsoid, "Sphere" )';
 else
   refell                = ellipsoidmodels( 'WGS84' );
-  Q.WSMS_AT_START       = { 'refellipsoidEarth( refellipsoid, "WGS84" )' }; 
+  re_string             = 'refellipsoidEarth( refellipsoid, "WGS84" )'; 
 end
 
 
@@ -137,6 +137,7 @@ for c = 1 : n
   %- Define calculation part
   %
   Q.WSMS_AT_END         = { 
+    re_string,  ...
     'basics_checkedCalc', ...
     'cloudbox_checkedCalc', ...
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
@@ -165,9 +166,15 @@ for c = 1 : n
   %- Check result
   %
   if ppath.np > 1
-    re = ellipsoidradii( refell, lat0 );
+    if atmosphere_dim == 1  ||  re_sphere
+      re = refell(1);
+    else
+      re = interp1( Q.LAT_GRID, ellipsoidradii(refell,Q.LAT_GRID), lat0 );
+    end
+    
     [x0,y0,z0,dx,dy,dz] = geocentricposlos2cart( re+Q.SENSOR_POS(1), ...
                                        lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
+
     lt = ppath.lspace + [ 0; cumsum(ppath.l_step) ];
     for i = 1 : size(ppath.pos,1)
       if atmosphere_dim == 3
