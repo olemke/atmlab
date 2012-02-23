@@ -78,7 +78,17 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 'atts', struct(...
                     'long_name', 'secondary longitude', ...
                     'units', 'degrees_east', ...
-                    'valid_range', [-180 180])));
+                    'valid_range', [-180 180])), ...
+            'DIST', struct(...
+                'type', 'single', ...
+                'atts', struct(...
+                    'long_name', 'Distance secondary to primary', ...
+                    'units', 'km')), ...
+            'INT', struct(...
+                'type', 'single', ...
+                'atts', struct(...
+                    'long_name', 'Time secondary minus time primary', ...
+                    'units', 'seconds')));
         
     end
     
@@ -184,6 +194,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             [additionals, oneday] = optargs(varargin, {{}, false});
             additional_results = cell(size(additionals));
+            this_additional_result = cell(size(additionals));
+            
+            additionals = self.sort_additionals(additionals);
             
             % collect all extra fields, for all additional datasets
             extra_args_primary = {};
@@ -390,11 +403,29 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     % --> dependencies
                     % FIXME: concatenation in subfunction or so, will be
                     % needed in collocate_date and date_range as well
-                    this_additional_result = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
-                    if isempty(additional_results{j})
-                        additional_results{j} = this_additional_result;
+                    if isempty(additional.dependencies)
+                        depdata = {};
                     else
-                        additional_results{j} = [additional_results{j}; this_additional_result];
+                        % for each dependency, find out what data to put in
+                        % depdata
+                        depdata = cell(size(additional.dependencies));
+                        for di = 1:length(additional.dependencies)
+                            depcy = additional.dependencies{di};
+                            % dependency should match exactly one
+                            nm_match = cellfun(@(X) strcmp(X.name, depcy.name), additionals);
+                            assert(sum(nm_match)==1, ['atmlab:' mfilename], ...
+                                'Expected one name match. Got %d.', sum(nm_match));
+                            % if the following line fails, something likely
+                            % went wrong when sorting the additionals
+                            % according to their dependencies
+                            depdata{di} = this_additional_result{nm_match};
+                        end
+                    end
+                    this_additional_result{j} = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2, depdata);
+                    if isempty(additional_results{j})
+                        additional_results{j} = this_additional_result{j};
+                    else
+                        additional_results{j} = [additional_results{j}; this_additional_result{j}];
                     end
                 end
                 logtext(fid, 'Info collected\n');
@@ -713,7 +744,6 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             M(:, c.LAT2) = data2.lat(i2);
             M(:, c.LON2) = data2.lon(i2);
             
-            % FIXME: this is not correct, use datevec!
             X = num2cell(date1);
             % round here; slight loss of precision causes this to be
             % slightly less than integer, which causes it to be floored
@@ -722,8 +752,19 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             X = num2cell(date2);
             M(:, c.START2) = round(date2unixsecs(X{:}));
             
-            M(:, c.TIME1) = data1.epoch + data1.time(line1);
-            M(:, c.TIME2) = data2.epoch + data2.time(line2);
+            M(:, c.TIME1) = double(data1.epoch) + double(data1.time(line1));
+            M(:, c.TIME2) = double(data2.epoch) + double(data2.time(line2));
+            
+            M(:, c.DIST) = sphdist(M(:, c.LAT1), M(:, c.LON1), ...
+                                   M(:, c.LAT2), M(:, c.LON2), ...
+                                   constants('EARTH_RADIUS')/1e3);
+            
+            M(:, c.INT) = M(:, c.TIME2) - M(:, c.TIME1);
+
+            %% sort, needed for averaging stuff later
+
+            M = sortrows(M, [c.START1 c.LINE1 c.POS1 c.START2 c.LINE2 c.POS2]);
+
             
             %% remove duplicates
             
@@ -992,6 +1033,32 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 end
             end
+        end
+    end
+    
+    methods (Static, Access = private)
+        function sorted = sort_additionals(additionals)
+            % sort additionals per dependencies
+            oldidx = zeros(size(additionals));
+            for k = 1:100
+                for i = 1:length(additionals)
+                    if ~isempty(additionals{i}.dependencies)
+                        additionals{i}.priority = max(cellfun(@(x) x.priority, additionals{i}.dependencies))+1;
+                    else
+                        additionals{i}.priority = 0;
+                    end
+                end
+                [~, idx] = sort(cellfun(@(x) x.priority, additionals));
+                if isequal(idx, oldidx)
+                    break
+                end
+                oldidx = idx;
+            end
+            if k==100
+                error(['atmlab:' mfilename], ...
+                    'Unable to sort additionals. This might indicate a circular dependency --- or a bug');
+            end
+            sorted = additionals(idx);
         end
     end
 end

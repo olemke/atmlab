@@ -1,3 +1,43 @@
+2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-5
+
+	* collocations/ReducedDataset.m, collocations/MeanDataset.m: Added, abstract class
+
+	* collocations/AssociatedDataset.m:
+
+	- Added property 'priority' that is used later for sorting AD's
+	according to dependencies
+
+	* collocations/MeanFieldCopier.m: Partially implemented
+
+	- So far, constructor and processing a single day appear to work. No
+	reading yet, nor storing, nor much documentation. Testing will be in
+	https://www.sat.ltu.se/svn/internal/gerrit/sources/matlab/testfunctions/transition_collocs.m
+	until further documentation is made
+
+	* collocations/TODO, datasets/SatDataset.m: Added TODO-item
+
+	* collocations/CollocatedDataset.m: Expanded. BREAKS COMPATIBILITY
+
+	(process):
+
+		- Also store DIST and INT
+		- Fix loss-of-precision bug 
+		- Correctly process multiple additionals with dependencies
+
+	(sort_additionals):
+
+		- Implemented correct order of additionals, sorting based on
+		dependencies
+
+	* site-specific/kiruna/datasets_init.m, datasets/datasets_config.m: 
+
+	- collocation_cpr_mhs -> collocation_mhs_cpr. Largest footprint must
+	be primary.
+
+	* handy/catstruct.m: Use logtext rather than fprintf
+
 2012-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-4

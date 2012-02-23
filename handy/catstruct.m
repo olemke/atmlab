@@ -140,7 +140,7 @@ for f = F'
         continue
     end 
     
-    fprintf('Stucture element: ''%s'' will be dealt with recursively\n',f{1})
+    logtext(atmlab('OUT'), 'Stucture element: ''%s'' will be dealt with recursively\n',f{1})
     % If this low level structure appears in more than 1 main level structure,
     % do another catstruct
     

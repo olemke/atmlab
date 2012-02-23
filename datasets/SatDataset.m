@@ -342,6 +342,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %                       data fields. Exact results depend on the particular
             %                       satellite/sensor-pair.
             %
+            % TODO: implement caching, e.g. last N read granules are
+            % stored in memory, in some global array or persistent thingy
+            % or so?
+            %
             % $Id$
              
             % optional arguments

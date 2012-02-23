@@ -18,6 +18,10 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
         dependencies;
     end
     
+    properties
+        priority = 0; % to determine order of passing on
+    end
+    
     methods
         function self = AssociatedDataset(varargin)
             % 2 modes:

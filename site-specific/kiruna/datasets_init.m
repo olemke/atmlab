@@ -128,8 +128,8 @@ x.filename = 'collocations_cpr_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');
 datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
-x = datasets_config('collocation_cpr_mhs');
-x.basedir = '/storage4/user_data/gerrit/testing/collocations_cloudsat_mhs';
+x = datasets_config('collocation_mhs_cpr');
+x.basedir = '/storage4/user_data/gerrit/testing/collocations_mhs_cpr';
 x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_$SAT.nc.gz';
 
