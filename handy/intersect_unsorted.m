@@ -24,6 +24,10 @@ function C = intersect_unsorted(A, B)
 
 n_A = length(A);
 n_B = length(B);
+if n_A*n_B==0
+    C = {};
+    return
+end
 
 k = 0;
 for i = 1:n_A

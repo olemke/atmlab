@@ -221,6 +221,9 @@ classdef HomemadeDataset < SatDataset
                 localcols.(fld) = range_local_cols;
                 n = n + n_local_cols;
             end
+            if isempty(data_fields)
+                localcols = struct();
+            end
         end
         
     end

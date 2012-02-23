@@ -1,5 +1,37 @@
 2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-7
+
+	* collocations/MeanFieldCopier.m (limit_to):
+
+	- Implemented at least for the trivial case where nothing is
+	actually limited. For the non-trivial case I don't know how to
+	solve it yet.
+
+	* collocations/CollocatedDataset.m:
+
+	- Fix error in type for DIST and INT (float, not single)
+
+	(read):
+
+		- Fix bug in applying limitations; interesting in limited data,
+		not in logical itself
+	
+	(deal_fields):
+		
+		- Fix bug in total size of additional_fields, should match with
+		additionals not self.associated
+
+	* handy/intersect_unsorted.m:
+
+		- If either is empty, return empty
+
+	* datasets/HomemadeDataset.m (read_single_day):
+
+		- Set localcols to empty struct if fields is empty.
+
+2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-6
 
 	* files/loadncvar.m: two changes:

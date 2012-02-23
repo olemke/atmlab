@@ -80,12 +80,12 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     'units', 'degrees_east', ...
                     'valid_range', [-180 180])), ...
             'DIST', struct(...
-                'type', 'single', ...
+                'type', 'float', ...
                 'atts', struct(...
                     'long_name', 'Distance secondary to primary', ...
                     'units', 'km')), ...
             'INT', struct(...
-                'type', 'single', ...
+                'type', 'float', ...
                 'atts', struct(...
                     'long_name', 'Time secondary minus time primary', ...
                     'units', 'seconds')));
@@ -936,7 +936,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 %% apply limitations
                 if hitno == 1
                     % convert limits-structure to limits-matrix. This is
-                    % only done after the first time I find collocations,
+                    % done only after the first time I find collocations,
                     % because only then I know for sure what sizes the
                     % fields have.
                     limmat = limstruct2limmat(limits_all, M_cols);
@@ -952,7 +952,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 lim = collocation_restrain(collocations_day, limmat, filters_by_no);
                 collocations_day = collocations_day(lim, :);
                 for j = 1:length(additionals)
-                    additionals_day{j} = additionals{j}.limit_to(additionals_day{j}, lim);
+                    additionals_day{j} = additionals_day{j}(additionals{j}.limit_to(additionals_day{j}, lim), :);
                 end
                 %                 if dolimits
                 %                     lim = collocation_restrain(collocations_day, limmat, filters);
@@ -997,21 +997,28 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             n_f = 0;
             n_add = zeros(size(self.associated));
             additionals = {};
-            additional_fields = {};
+            % pre-allocate so that every field is at least an empty
+            % cell-array
+            %additional_fields = cell(size(self.associated));
+            %for i = 1:length(self.associated)
+            %    additional_fields{i} = {}; 
+            %end
             deal_index = nan*zeros(size(all_fields));
             for i = 1:length(all_fields)
                 field = all_fields{i};
                 if any(strcmp(fieldnames(self.members), field))
+                    % belongs to the core
                     n_f = n_f + 1;
                     fields{n_f} = field; %#ok<AGROW>
                     deal_index(i) = 0;
                 else
+                    % check if it belongs to any associated
                     found = false;
                     for j = 1:length(self.associated)
                         asso = self.associated{j};
                         if any(strcmp(fieldnames(asso.members), field))
                             n_add(j) = n_add(j) + 1;
-                            additional_fields{j}{n_add(j)} = field; %#ok<AGROW>
+                            additional_fields{j}{n_add(j)} = field;  %#ok<AGROW>
                             % check if this additionaldataset is already
                             % known, if yes, find index in existing names
                             existing_names = cellfun(@(X) X.name, additionals, 'UniformOutput', false);
@@ -1033,6 +1040,13 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 end
             end
+            % don't have empty things
+            additional_fields = additional_fields(~cellfun(@isempty, additional_fields));
+            assert(length(additionals)==length(additional_fields), ...
+                ['atmlab:' mfilename ':BUG'], ...
+                'length(additionals) == %d != length(additional_fields) == %d, bug?', ...
+                length(additionals), length(additional_fields));
+
         end
     end
     
