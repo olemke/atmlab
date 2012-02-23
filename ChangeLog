@@ -1,3 +1,9 @@
+2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-8
+
+	* tests/test_arts_ppath.m: Added a check for surface end points.
+
 2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-7

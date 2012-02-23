@@ -175,6 +175,7 @@ for c = 1 : n
     [x0,y0,z0,dx,dy,dz] = geocentricposlos2cart( re+Q.SENSOR_POS(1), ...
                                        lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
 
+    % Check ppath points
     lt = ppath.lspace + [ 0; cumsum(ppath.l_step) ];
     for i = 1 : size(ppath.pos,1)
       if atmosphere_dim == 3
@@ -191,6 +192,24 @@ for c = 1 : n
                                         y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
         keyboard
       end
+    end
+    
+    % Special check for end point
+    if strcmp( ppath.background, 'surface' )
+      if atmosphere_dim == 1
+        dz = abs( ppath.pos(end,1) - Q.Z_SURFACE );
+      elseif atmosphere_dim == 2
+        dz = abs( ppath.pos(end,1) - interp1( Q.LAT_GRID, Q.Z_SURFACE, ...
+                                                          ppath.pos(end,2) ) );
+      else
+        dz = abs( ppath.pos(end,1) - interp2( Q.LAT_GRID, Q.LON_GRID, ...
+                           Q.Z_SURFACE, ppath.pos(end,2), ppath.pos(end,3) ) );
+      end
+      %
+      if dz > 1e-3
+        fprintf('\n!!! Deviating surface point found !!!\n');
+        keyboard        
+      end  
     end
   end
 end
