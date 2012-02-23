@@ -125,7 +125,8 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
                         data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(), false, false);
                     end
                 end
-                new_out = self.process_granule(processed_core(segstart:segend, :), data1, date1, spec1, data2, date2, spec2, depies);
+                depies_seg = cellfun(@(X)X(segstart:segend, :), depies, 'UniformOutput', false);
+                new_out = self.process_granule(processed_core(segstart:segend, :), data1, date1, spec1, data2, date2, spec2, depies_seg);
                 if isempty(out)
                     out = new_out;
                 else

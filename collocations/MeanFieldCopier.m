@@ -71,7 +71,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                     error(['atmlab:' mfilename], 'No processors specified for %s', field);
                 end
                 if ~isfield(fieldstruct.(field), 'limitators');
-                    fieldstruct.(field).limitators = {@(x)true(size(x))};
+                    fieldstruct.(field).limitators = {@(x)true(size(x, 1), 1)};
                 end
                 % populate one or more 'members' for this field
                 procnames = fieldnames(fieldstruct.(field).processors);
@@ -82,6 +82,14 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                     newfield = rmfield(newfield, 'processors');
                     newfield = rmfield(newfield, 'limitators');
                     newfield.orig_name = field;
+                    newfield.type = 'float';
+                    if (isfield(fieldstruct, field) && ...
+                        isfield(fieldstruct.(field), 'stored') && ...
+                        isfield(fieldstruct.(field).stored, procname))
+                        warning('off', 'catstruct:DuplicatesFound');
+                        newfield = catstruct(newfield, fieldstruct.(field).stored.(procname));
+                      
+                    end
                     self.members.(newfieldname) = newfield;
                 end
             end
@@ -160,6 +168,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                     continue
                 end
                 mem = self.members.(memname);
+                warning('off', 'catstruct:DuplicatesFound');
                 self.members.(memname) = catstruct(...
                     ad.members.(mem.orig_name), ...
                     self.members.(memname));

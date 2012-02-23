@@ -403,24 +403,26 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     % --> dependencies
                     % FIXME: concatenation in subfunction or so, will be
                     % needed in collocate_date and date_range as well
-                    if isempty(additional.dependencies)
-                        depdata = {};
-                    else
-                        % for each dependency, find out what data to put in
-                        % depdata
-                        depdata = cell(size(additional.dependencies));
-                        for di = 1:length(additional.dependencies)
-                            depcy = additional.dependencies{di};
-                            % dependency should match exactly one
-                            nm_match = cellfun(@(X) strcmp(X.name, depcy.name), additionals);
-                            assert(sum(nm_match)==1, ['atmlab:' mfilename], ...
-                                'Expected one name match. Got %d.', sum(nm_match));
-                            % if the following line fails, something likely
-                            % went wrong when sorting the additionals
-                            % according to their dependencies
-                            depdata{di} = this_additional_result{nm_match};
-                        end
-                    end
+                    depdata = self.fix_dependencies(additional, additionals, this_additional_result);
+                    
+%                     if isempty(additional.dependencies)
+%                         depdata = {};
+%                     else
+%                         % for each dependency, find out what data to put in
+%                         % depdata
+%                         depdata = cell(size(additional.dependencies));
+%                         for di = 1:length(additional.dependencies)
+%                             depcy = additional.dependencies{di};
+%                             % dependency should match exactly one
+%                             nm_match = cellfun(@(X) strcmp(X.name, depcy.name), additionals);
+%                             assert(sum(nm_match)==1, ['atmlab:' mfilename], ...
+%                                 'Expected one name match. Got %d.', sum(nm_match));
+%                             % if the following line fails, something likely
+%                             % went wrong when sorting the additionals
+%                             % according to their dependencies
+%                             depdata{di} = this_additional_result{nm_match};
+%                         end
+%                     end
                     this_additional_result{j} = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2, depdata);
                     if isempty(additional_results{j})
                         additional_results{j} = this_additional_result{j};
@@ -617,10 +619,12 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 info_addi.parent_id = attr.id;
                 
+                addi = {};
                 for i = 1:length(additionals)
                     logtext(atmlab('OUT'), 'Collecting additionals for ''%s''\n', additionals{i}.name);
-                    addi = additionals{i}.process_delayed(result, spec1, spec2);
-                    additionals{i}.store(date, spec, addi, info_addi);
+                    depdata = self.fix_dependencies(additionals{i}, additionals, addi);
+                    addi{i} = additionals{i}.process_delayed(result, spec1, spec2, depdata);
+                    additionals{i}.store(date, spec, addi{i}, info_addi);
                 end
 
             else
@@ -1073,6 +1077,33 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     'Unable to sort additionals. This might indicate a circular dependency --- or a bug');
             end
             sorted = additionals(idx);
+        end
+        
+        function depdata = fix_dependencies(additional_current, additional_all, results_so_far)
+            % put data in cell array for dependencies
+            %
+            % This static method assures that requirements for additional X
+            % (first argument) are met, given other additionals (second
+            % argument) and results so far (third argument).
+            
+            if isempty(additional_current.dependencies)
+                depdata = {};
+            else
+                % for each dependency, find out what data to put in
+                % depdata
+                depdata = cell(size(additional_current.dependencies));
+                for di = 1:length(additional_current.dependencies)
+                    depcy = additional_current.dependencies{di};
+                    % dependency should match exactly one
+                    nm_match = cellfun(@(X) strcmp(X.name, depcy.name), additional_all);
+                    assert(sum(nm_match)==1, ['atmlab:' mfilename], ...
+                        'Expected one name match. Got %d.', sum(nm_match));
+                    % if the following line fails, something likely
+                    % went wrong when sorting the additionals
+                    % according to their dependencies
+                    depdata{di} = results_so_far{nm_match};
+                end
+            end
         end
     end
 end

@@ -1,3 +1,40 @@
+2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-9
+
+	* collocations/AssociatedDataset.m (process_delayed):
+
+	- Bugfix: for additionals, also select the correct segment
+
+	* collocations/MeanFieldCopier.m:
+
+	(MeanFieldCopier):
+
+		- Bug-fix in fall-back limitator for multi-dim vars
+		- Allow user to specify stored type differently per processor, but
+		default to single (float)
+
+	(process_granule):
+
+		- Silence warning on duplicate fields in catstruct, this is
+		intended.
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule):
+
+		- Move code for caring for dependencies into subfunction (static
+		method) because it's shared with delayed processing
+
+	(collocate_and_store_date):
+
+		- For delayed processing, properly take care of additionals with
+		their dependencies.
+
+	(fix_dependencies): Added
+
+		- Helper function to sort out dependencies.
+
 2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-8
