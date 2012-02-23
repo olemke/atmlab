@@ -1,5 +1,13 @@
 2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-6
+
+	* files/loadncvar.m: two changes:
+		- handle empty cell array, will return empty structure
+		- Add error identifier
+
+2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-5
 
 	* collocations/ReducedDataset.m, collocations/MeanDataset.m: Added, abstract class

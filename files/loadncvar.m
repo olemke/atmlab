@@ -24,6 +24,7 @@
 % 2010-10-11   Modified by Gerrit Holl.
 % 2010-11-22   Modified by Salomon Eliasson.
 % 2012-01-30   Modified by Gerrit Holl.
+% 2012-02-23   Modified by Gerrit Holl.
 
 function [ret, attr] = loadncvar( filename, varname )
   
@@ -39,12 +40,16 @@ if ischar(varname)
     varid = netcdf.inqVarID (ncid, varname);
     ret = nc_read_varid(ncid, varid);
 elseif iscell(varname)
+    if isempty(varname)
+        ret = struct();
+    end
     for v = varname(:).'
         varid = netcdf.inqVarID (ncid, v{1});
         ret.(genvarname(v{1})) = nc_read_varid(ncid, varid);
     end
 else
-    error 'varname must be either of type char or cell';
+    error(['atmlab:' mfilename ':invalid'], ...
+        'varname must be either of type char or cell');
 end
 
 netcdf.close (ncid);
