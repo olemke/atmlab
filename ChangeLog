@@ -1,3 +1,11 @@
+2012-02-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-10
+
+	* geodetic/geocentricposlos2cart.m: 
+	* geodetic/cartposlos2geocentric.m: Changed limit for poles to
+	90-1e-8.
+
 2012-02-23  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-9
@@ -35,6 +43,7 @@
 
 		- Helper function to sort out dependencies.
 
+>>>>>>> .r7371
 2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-8

@@ -48,7 +48,7 @@ for i = 1 : length(za)
   if( za(i) < 1e-4  ||  za(i) > 180-1e-4  )
     aa(i) = 0;
     
-  elseif( abs( lat(i) ) <= 89.99 )
+  elseif abs( lat(i) ) <= 90-1e-8 
     %
     aa(i) = rad2deg * acos( r(i) .* dlat(i) ./ sin( deg2rad * za(i) ) );
 
