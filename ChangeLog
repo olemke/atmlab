@@ -2,14 +2,20 @@
 
 	* atmlab-2-1-11
 
-	* arts/xml/xmlWritePpath.m: 
-	* arts/xml/xmlReadPpath.m: lspace -> l_space. 
+	* tests/test_arts_ppath.m (test_arts_ppath): lspace -> l_space.
+
+2012-02-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-11
+
+	* arts/xml/xmlWritePpath.m:
+	* arts/xml/xmlReadPpath.m: lspace -> l_space.
 
 2012-02-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-10
 
-	* geodetic/geocentricposlos2cart.m: 
+	* geodetic/geocentricposlos2cart.m:
 	* geodetic/cartposlos2geocentric.m: Changed limit for poles to
 	90-1e-8.
 

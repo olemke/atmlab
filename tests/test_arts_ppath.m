@@ -176,7 +176,7 @@ for c = 1 : n
                                        lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
 
     % Check ppath points
-    lt = ppath.lspace + [ 0; cumsum(ppath.l_step) ];
+    lt = ppath.l_space + [ 0; cumsum(ppath.l_step) ];
     for i = 1 : size(ppath.pos,1)
       if atmosphere_dim == 3
         lont = ppath.pos(i,2);
