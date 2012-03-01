@@ -59,7 +59,7 @@ Q.WIND_U_FIELD          = [];
 Q.WIND_V_FIELD          = [];
 Q.WIND_W_FIELD          = [];
 %
-Q.R_GEOID               = constants( 'EARTH_RADIUS' );
+Q.REFELLIPSOID          = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE             = 500;
 
 
@@ -116,8 +116,8 @@ Q.STOKES_DIM            = 1;
 Q.Y_UNIT                = 'RJBT';
 %
 zplat                   = 600e3;
-Q.SENSOR_POS            = Q.R_GEOID + zplat;
-Q.SENSOR_LOS            = geomztan2za( Q.R_GEOID, zplat, ztan );
+Q.SENSOR_POS            = zplat;
+Q.SENSOR_LOS            = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan );
 
   
 %= Sensor

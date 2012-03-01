@@ -1,6 +1,28 @@
+2012-03-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-13
+
+	* demos/qarts_scattering_demo.m:
+	* demos/qarts_demo2.m:
+	* demos/qarts_demo.m: Updated regarding REFELLIPSOID.
+
+	* forwardmodel/geomztan2za.m: Changed to avoid the term "geoid".
+
+	* arts/qarts2cfile.m: Now handling REFELLIPSOID. And R_GEOID removed.
+
+	* arts/qarts.m (qarts): Replaced field R_GEOID with REFELLIPSOID.
+
+	* tests/test_arts_ppath.m (test_arts_ppath): Changed LON-GRID to
+	avoid requirement (of arts) to have identical data at -180 and 180
+	deg.
+
+	* geodetic/r_crossing.m:
+	* geodetic/lat_crossing.m:
+	* geodetic/lon_crossing.m: New functions.
+
 2012-02-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-2-1-11
+	* atmlab-2-1-12
 
 	* tests/test_arts_ppath.m (test_arts_ppath): lspace -> l_space.
 
@@ -56,7 +78,6 @@
 
 		- Helper function to sort out dependencies.
 
->>>>>>> .r7371
 2012-02-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-8

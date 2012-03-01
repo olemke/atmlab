@@ -88,7 +88,7 @@ for c = 1 : n
     nlat                = 10 + round( 350*rand );
     nlon                = 10 + round( 350*rand );
     Q.LAT_GRID          = linspace( -90, 90, nlat )';
-    Q.LON_GRID          = linspace( -180, 180, nlon )';
+    Q.LON_GRID          = linspace( -170, 170, nlon )';
   end
 
   % Atmospheric fields
@@ -179,14 +179,14 @@ for c = 1 : n
     lt = ppath.l_space + [ 0; cumsum(ppath.l_step) ];
     for i = 1 : size(ppath.pos,1)
       if atmosphere_dim == 3
-        lont = ppath.pos(i,2);
+        lont = ppath.pos(i,3);
       else
         lont = 0;
       end
       
       [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lont );
       dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
-      if dd > 1e-4
+      if dd > 1e-2
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
                                         y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
@@ -202,8 +202,8 @@ for c = 1 : n
         dz = abs( ppath.pos(end,1) - interp1( Q.LAT_GRID, Q.Z_SURFACE, ...
                                                           ppath.pos(end,2) ) );
       else
-        dz = abs( ppath.pos(end,1) - interp2( Q.LAT_GRID, Q.LON_GRID, ...
-                           Q.Z_SURFACE, ppath.pos(end,2), ppath.pos(end,3) ) );
+        dz = abs( ppath.pos(end,1) - interp2( Q.LON_GRID, Q.LAT_GRID, ...
+                           Q.Z_SURFACE, ppath.pos(end,3), ppath.pos(end,2) ) );
       end
       %
       if dz > 1e-3

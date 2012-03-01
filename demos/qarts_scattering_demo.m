@@ -90,7 +90,7 @@ Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
                                                         'fascod', 'tropical' );
 Q.RAW_ATM_EXPAND_1D   = false;
 %
-Q.R_GEOID             = constants( 'EARTH_RADIUS' );
+Q.REFELLIPSOID        = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE           = 500;
 
 
@@ -111,9 +111,9 @@ Q.PPATH_LMAX          = 5e3;
 Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
 %
 zplat                 = 600e3;
-sensor_pos            = Q.R_GEOID + zplat;
+sensor_pos            = zplat;
 Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
-Q.SENSOR_LOS          = geomztan2za( Q.R_GEOID, zplat, ztan )';
+Q.SENSOR_LOS          = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan )';
 %
 if strcmp( lower(method), 'bl' )
   Q.IY_CLEARSKY_AGENDA = { 'iyBeerLambertStandardClearsky' };

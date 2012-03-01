@@ -103,8 +103,7 @@ else
   Q.LON_GRID             = [-10:10]';  % A true longitude grid
 end
 %
-Q.R_GEOID                = repmat( constants('EARTH_RADIUS'), ...
-                                      length(Q.LAT_GRID), length(Q.LON_GRID) );
+Q.REFELLIPSOID           = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE              = repmat( 500, length(Q.LAT_GRID), length(Q.LON_GRID));
 
 
@@ -172,10 +171,10 @@ Q.PPATH_STEP_AGENDA      = { 'ppath_stepGeometric' };
 Q.Y_UNIT                 = 'RJBT';
 %
 zplat                    = 600e3;
-Q.SENSOR_POS             = [ Q.R_GEOID(1,1) + zplat, -23, 0 ];
+Q.SENSOR_POS             = [ zplat, -23, 0 ];
 Q.SENSOR_POS             = Q.SENSOR_POS(1:atmdim);
 %
-Q.SENSOR_LOS             = geomztan2za( Q.R_GEOID(1,1), zplat, ztan );
+Q.SENSOR_LOS             = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan );
 if atmdim == 3
   Q.SENSOR_LOS           = [ Q.SENSOR_LOS, 5 ];
 end

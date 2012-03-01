@@ -317,7 +317,7 @@ return
 %    t_field
 %    z_field
 %    vmr_field
-%    r_geoid
+%    refellipsoid
 %    z_surface
 %
 function T = cfile_AtmSrf( Q, partname, workfolder )
@@ -384,9 +384,9 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                              workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
-  if qarts_isset(Q.R_GEOID)
-    rqre_datatype( Q.R_GEOID, {@istensor2}, 'Q.R_GEOID' );                  %&%
-    T{end+1} = file_or_data( 'r_geoid', 'Matrix', Q.R_GEOID, ...
+  if qarts_isset(Q.REFELLIPSOID)
+    rqre_datatype( Q.REFELLIPSOID, {@istensor1}, 'Q.REFELLIPSOID' );        %&%
+    T{end+1} = file_or_data( 'refellipsoid', 'Vector', Q.REFELLIPSOID, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
@@ -431,7 +431,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     T{end+1} = add_savefile( 't_field', workfolder );
     T{end+1} = add_savefile( 'z_field', workfolder );
     T{end+1} = add_savefile( 'vmr_field', workfolder );
-    %T{end+1} = add_savefile( 'r_geoid', workfolder );
+    T{end+1} = add_savefile( 'refellipsoid', workfolder );
     T{end+1} = add_savefile( 'z_surface', workfolder );
   end
   

@@ -2,13 +2,13 @@
 % NAME:    geomztan2za
 %
 %          Converts a vector of geometrical tangent altitudes to zenith 
-%          angles.
+%          angles. A spherical planet is assumed.
 %
-% FORMAT:  za = geomztan2za(r_geoid,z_plat,z_tan)
+% FORMAT:  za = geomztan2za(re,z_plat,z_tan)
 %
 % RETURN:  za        Zenith angles corresponding to z_tan.
-% IN:      r_geoid   Geoid radius.
-%          z_plat    Platform altitude (above geoid).
+% IN:      re        Planet radius.
+%          z_plat    Platform altitude.
 %          z_tan     Geometrical tangent altitudes. 
 %------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@
 %          2000.12.18   Created by Patrick Eriksson. 
 
 
-function za = geomztan2za(r_geoid,z_plat,z_tan)
+function za = geomztan2za(re,z_plat,z_tan)
 
 
-za = (pi - asin((r_geoid+z_tan)./(r_geoid+z_plat)) ) * 180/pi;
+za = (pi - asin((re+z_tan)./(re+z_plat)) ) * 180/pi;
