@@ -1,3 +1,11 @@
+2012-03-05  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-15
+
+	* files/loadncfile.m:
+	* files/loadncvar.m:
+	Added onCleanup to close fid
+
 2012-03-05  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-14

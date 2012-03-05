@@ -30,6 +30,8 @@ function [ret, attr] = loadncvar( filename, varname )
   
 ncid = netcdf.open (filename, 'NOWRITE');
 
+cleanupObject = onCleanup( @() netcdf.close (ncid) );
+
 if (nargout>1)
   attr = getncattributes (ncid);
 else
@@ -51,7 +53,5 @@ else
     error(['atmlab:' mfilename ':invalid'], ...
         'varname must be either of type char or cell');
 end
-
-netcdf.close (ncid);
 
 end

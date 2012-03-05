@@ -14,10 +14,11 @@
 
 % 2010-02-10   Created by Oliver Lemke.
 
-
 function ret = loadncfile( filename )
   
 ncid = netcdf.open (filename, 'NOWRITE');
+
+cleanupObject = onCleanup(@() netcdf.close (ncid));
 
 [scrap,nvars,ngatts] = netcdf.inq(ncid);
 
@@ -48,8 +49,7 @@ else
         'This Matlab version does not support NetCDF groups.');
 end
 
-netcdf.close (ncid);
-
+end
 
 function grp = read_group(ncid, gid)
 
@@ -64,4 +64,6 @@ for i = varids
         grp.(grpname).attributes.(svarname).(genvarname(attname)) = ...
             netcdf.getAtt (gid, i, attname);
     end
+end
+
 end
