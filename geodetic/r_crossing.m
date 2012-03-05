@@ -55,14 +55,20 @@ else
   l1 = -p + sq;
   l2 = -p - sq;
 
-  if l1 <= 0  &  l2 > 0 
-    l = l2; 
-  elseif l1 > 0  &  l2 <= 0
-    l = l1;
-  elseif l1 < l2
-    l = l1;
+  % The case r0==r is best handled seperately
+  if r0 ~= r
+    if l1 <= 0  &  l2 > 0 
+      l = l2; 
+    elseif l1 > 0  &  l2 <= 0
+      l = l1;
+    elseif l1 < l2
+      l = l1;
+    else
+      l = l2;
+    end
   else
-    l = l2;
+    l = max( l1, l2 );
+    assert( l > 0 );
   end
   
   if nargout <= 3
