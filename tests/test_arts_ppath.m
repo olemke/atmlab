@@ -63,6 +63,8 @@ Ah2o    = xmlLoad( [ atmtest, '.H2O.xml' ] );
 workfolder = create_tmpfolder;
 
 
+warning( 'No surface topography !' )
+
 
 %- Run through n random cases
 
@@ -88,7 +90,7 @@ for c = 1 : n
     nlat                = 10 + round( 350*rand );
     nlon                = 10 + round( 350*rand );
     Q.LAT_GRID          = linspace( -90, 90, nlat )';
-    Q.LON_GRID          = linspace( -170, 170, nlon )';
+    Q.LON_GRID          = linspace( -180, 180, nlon )';
   end
 
   % Atmospheric fields
@@ -103,7 +105,13 @@ for c = 1 : n
   %- Surface altitude
   %
   Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
-
+  Q.Z_SURFACE           = repmat(500,nlat,nlon);
+  % Fix that +-180 lon data are the same
+  if atmosphere_dim == 3
+    Q.Z_SURFACE(:,end) = Q.Z_SURFACE(:,1);
+  end
+  
+  
   %- Sensor pos/los
   %
   lat0                  = 0;
@@ -127,7 +135,7 @@ for c = 1 : n
     end
   elseif atmosphere_dim == 3
     lat0                = -90 + 180*rand;    
-    lon0                = -180 + 360*rand;    
+    lon0                = -100 + 200*rand;    
     Q.SENSOR_POS(2)     = lat0;
     Q.SENSOR_POS(3)     = lon0;
     aa0                 = -180 + 360*rand;
@@ -186,7 +194,7 @@ for c = 1 : n
       
       [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lont );
       dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
-      if dd > 1e-2
+      if dd > 5e-3
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
                                         y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
@@ -206,7 +214,7 @@ for c = 1 : n
                            Q.Z_SURFACE, ppath.pos(end,3), ppath.pos(end,2) ) );
       end
       %
-      if dz > 1e-3
+      if dz > 5e-3
         fprintf('\n!!! Deviating surface point found !!!\n');
         keyboard        
       end  

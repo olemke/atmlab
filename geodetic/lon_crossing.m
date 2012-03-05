@@ -40,16 +40,15 @@ if nargin < 7
 end
   
 % Catch cases that needs special attention
-if lon == lon0  |  za0 == 0  |  za0 == 180  |  aa0 == 0  |  aa0 == 180
+if lon == lon0  |  za0 == 0  |  za0 == 180  |  aa0 == 0  |  abs(aa0) == 180
   l = -1;
 else
   tanlon = tand( lon );
   l      = ( y - x*tanlon ) / ( dx*tanlon - dy );
 end
 
-l
 
-if( l <= 0 )
+if l <= 0 
   r   = NaN;
   lat = NaN;
   l   = NaN;

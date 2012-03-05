@@ -9,7 +9,7 @@
 %    Allowed solutions have a distance above zero (ie. l>0, note that the
 %    solution of l=0 is rejected).
 %
-% FORMAT [r,lon,l,za,aa] = lon_crossing(r0,lat0,lon0,za0,aa0,lat
+% FORMAT [r,lon,l,za,aa] = lat_crossing(r0,lat0,lon0,za0,aa0,lat
 %                                                          [,x,y,z,dx,dy,dz])
 %        
 % OUT   r     Radius of crossing point.
@@ -40,12 +40,12 @@ if nargin < 7
 end
   
 
-%For za=0/180 and lat0+-90 there is no solution
+% For za=0/180 and lat0+-90 there is no solution
 if za0 == 0  |  za0 == 180  |  abs(lat) == 90
   l = -1;
 
 % The expressions below can not be used for lat=0
-elseif abs(lat) < 1e-9
+elseif abs(lat) < 1e-7    % lat=1e-8 is tested not work 
   l = -z / dz;
   
 else
@@ -59,45 +59,59 @@ else
   
   % Check if a real solution is possible
   if ac4 > bb
-    l = -1
+    l = -1;
   else
-    d      = -0.5*b/a;
-    e      = -0.5*sqrt(b*b-4*a*c)/a;      
-    l1     = d + e;
-    l2     = d - e;
+    d    = -0.5*b/a;
+    e    = -0.5*sqrt(b*b-4*a*c)/a;      
+    l1   = d + e
+    l2   = d - e
 
-    %
-    if abs(lat0) > abs(lat)  &  sign(lat0) ~= sign(lat)
-      l = max(l1,l2);
+    % Both lat and -lat can end up as a solution (the sign is lost as
+    % tan(lat) is squared). A correct solution requires that l>=0 and that
+    % z+l*dz has the same sigh as lat. If both l1 and l2 fulfils the
+    % criteria we want the solution with smallest l.
+    % For the case lat=lat0, zero ends up as an unwanted solution.
+    if lat ~= lat0
+      l     = 99e99;
+      zsign = sign(lat); 
+      if l1 > 0   &  sign(z+dz*l1) == zsign 
+        l = l1;
+      end 
+      if l2 > 0   &   l2 < l   &   sign(z+dz*l2) == zsign 
+        l = l2;
+      end
+      if l > 98e99
+        l = -1;
+      end
+
     else
-      if( l1 <= 0  &  l2 > 0 )
-        l = l2;
-      elseif( l1 > 0  &  l2 <= 0 )
-        l = l1;
-      elseif( l1 < l2 )  
-        l = l1;
-      else
-        l = l2;
+      l = max( l1, l2 );
+      if l <= 0
+        l = -1;
       end
     end
   end
 end
 
 
-if( l > 0 )
-  if nargout <= 3
-    RAD2DEG = constants( 'RAD2DEG' );
-    r   = sqrt( (x+dx*l)^2 + (y+dy*l)^2 + (z+dz*l)^2 );
-    lon = RAD2DEG * atan2( y+dy*l, x+dx*l );
-  else
-    [r,lat2,lon,za,aa] = cartposlos2geocentric(x+l*dx,y+l*dy,z+l*dz,dx,dy, ...
-                                               dz);
-    assert( abs(lat2-lat) < 1e-6 );
-  end
-else  
+if l <= 0
   r   = NaN;
   lon = NaN;
   l   = NaN;
   za  = NaN;
   aa  = NaN; 
+
+else
+ 
+  if nargout <= 3
+    RAD2DEG = constants( 'RAD2DEG' );
+    xp      = x+dx*l;
+    yp      = y+dy*l;
+    r       = sqrt( xp^2 + yp^2 + (z+dz*l)^2 );
+    lon     = RAD2DEG * atan2( yp, xp );
+  else
+    [r,lat2,lon,za,aa] = cartposlos2geocentric(x+l*dx,y+l*dy,z+l*dz,dx,dy,dz);
+    assert( abs(lat2-lat) < 1e-6 );
+  end
+  
 end
