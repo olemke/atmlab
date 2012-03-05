@@ -197,8 +197,8 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                 %fine = CS_in_MHS & ~flagged;
                 
                 j = j + 1;
-                M(j, self.cols.FIRST) = first;
-                M(j, self.cols.LAST) = last;
+                M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
+                M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
 
                 % limitation to all, e.g. for distances
                 answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);

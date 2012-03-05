@@ -88,7 +88,11 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 'type', 'float', ...
                 'atts', struct(...
                     'long_name', 'Time secondary minus time primary', ...
-                    'units', 'seconds')));
+                    'units', 'seconds')), ...
+            'INDEX', struct(...
+                'type', 'int', ...
+                'atts', struct(...
+                    'long_name', 'Collocation index number')));
         
     end
     
@@ -442,7 +446,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %
             % FORMAT
             %
-            %   [M, addis] = collocate_date([year, month, day], spec1, spec2)
+            %   [M, addis, also] = collocate_date([year, month, day], spec1, spec2)
             %
             % IN
             %
@@ -534,6 +538,12 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 end
                 result = [result; result_granule]; %#ok<AGROW>
+                            
+                % special case; INDEX should be throughout entire date
+                % need to redo this AFTER concatenation but BEFORE further
+                % processing
+                result(:, self.cols.INDEX) = 1:size(result, 1);
+                
                 for j = 1:length(additional_results)
                     if isempty(additional_results{j})
                         additional_results{j} = result_granule_addis{j};
@@ -546,6 +556,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             if ~anysuccess
                 error('atmlab:collocate_date:nosource', 'no source data found at all');
             end
+            
+            % special case; INDEX should be throughout entire date
+            result(:, self.cols.INDEX) = 1:size(result, 1);
             
         end
         
@@ -768,7 +781,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %% sort, needed for averaging stuff later
 
             M = sortrows(M, [c.START1 c.LINE1 c.POS1 c.START2 c.LINE2 c.POS2]);
-
+            
             
             %% remove duplicates
             
@@ -781,6 +794,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 sum(wrongrows), first1, first2);
             M(wrongrows, :) = [];
             
+            % add row-number after all else, here, but REDO just before
+            % storing!
+             M(:, c.INDEX) = 1:size(M, 1);
         end
         
         function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin) 

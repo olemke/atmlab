@@ -1,3 +1,22 @@
+2012-03-05  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-16
+
+	* collocations/MeanFieldCopier.m:
+
+	(process_granule): Bugfix, use proper INDEX
+
+	* collocations/CollocatedDataset.m:
+
+	- Add field INDEX
+
+	(collocate_date):
+
+	- Fix doc error
+	- Bugfix, use proper INDEX, redo after each process core + at end + at
+	each granule
+
+
 2012-03-05  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-15
