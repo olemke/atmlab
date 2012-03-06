@@ -1,5 +1,29 @@
 2012-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-24
+
+	* collocations/AssociatedDataset.m (concatenate):
+
+	- Simple sample implementation, usually concatenation is trivial..
+
+	* collocations/MeanFieldCopier.m (concatenate):
+
+	- ...but in some cases it's not; correct FIRST and LAST so that
+	they're still correct when collocations are not per granule, but for
+	an entire day.
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_date) (collocate_granule):
+
+	- When concatenating different granules, for the additional datasets,
+	use the method additional.concatenate that each additional can
+	implement (default implementation provided). Like this, additionals
+	can assure that appropiate corrections are put in place, e.g. FIRST
+	and LAST should be corrected.
+
+2012-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-23
 
 	* collocations/FieldCopier.m:

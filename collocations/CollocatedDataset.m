@@ -388,7 +388,12 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
                 this_result = self.process(collocations, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
+                old_result = result;
                 result = [result; this_result]; %#ok<AGROW>
+                % correct INDEX
+                if ~isempty(result)
+                    result(:, self.cols.INDEX) = 1:size(result, 1);
+                end
                 
                 %% process additional
                 %
@@ -409,30 +414,15 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     % needed in collocate_date and date_range as well
                     depdata = self.fix_dependencies(additional, additionals, this_additional_result);
                     
-%                     if isempty(additional.dependencies)
-%                         depdata = {};
-%                     else
-%                         % for each dependency, find out what data to put in
-%                         % depdata
-%                         depdata = cell(size(additional.dependencies));
-%                         for di = 1:length(additional.dependencies)
-%                             depcy = additional.dependencies{di};
-%                             % dependency should match exactly one
-%                             nm_match = cellfun(@(X) strcmp(X.name, depcy.name), additionals);
-%                             assert(sum(nm_match)==1, ['atmlab:' mfilename], ...
-%                                 'Expected one name match. Got %d.', sum(nm_match));
-%                             % if the following line fails, something likely
-%                             % went wrong when sorting the additionals
-%                             % according to their dependencies
-%                             depdata{di} = this_additional_result{nm_match};
-%                         end
-%                     end
                     this_additional_result{j} = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2, depdata);
-                    if isempty(additional_results{j})
-                        additional_results{j} = this_additional_result{j};
-                    else
-                        additional_results{j} = [additional_results{j}; this_additional_result{j}];
-                    end
+                    % use special method to concatenate, sometimes need to
+                    % correct values, e.g. FIRST, LAST in case of meandata
+                    additional_results{j} = additional.concatenate(old_result, additional_results{j}, this_additional_result{j});
+%                     if isempty(additional_results{j})
+%                         additional_results{j} = this_additional_result{j};
+%                     else
+%                         additional_results{j} = [additional_results{j}; this_additional_result{j}];
+%                     end
                 end
                 logtext(fid, 'Info collected\n');
             end
@@ -537,6 +527,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                             ME.rethrow();
                     end
                 end
+                old_result = result;
                 result = [result; result_granule]; %#ok<AGROW>
                             
                 % special case; INDEX should be throughout entire date
@@ -547,11 +538,16 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 end
                 
                 for j = 1:length(additional_results)
-                    if isempty(additional_results{j})
-                        additional_results{j} = result_granule_addis{j};
-                    else
-                        additional_results{j} = [additional_results{j}; result_granule_addis{j}];
-                    end
+                    % use special method for concatenation, because some
+                    % additional datasets, such as MeanFieldCopier, need to
+                    % correct certain columns, such as FIRST and LAST, upon
+                    % concatenation
+                    additional_results{j} = additionals{j}.concatenate(old_result, additional_results{j}, result_granule_addis{j});
+%                     if isempty(additional_results{j})
+%                         additional_results{j} = result_granule_addis{j};
+%                     else
+%                         additional_results{j} = [additional_results{j}; result_granule_addis{j}];
+%                     end
                 end
             end
             

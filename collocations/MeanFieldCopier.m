@@ -257,6 +257,25 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
             C = {'FIRST'};
         end
         
+        function new = concatenate(self, old_core_result, old_additional_result, new_additional_result)
+            % when concatenating, need to correct FIRST and LAST
+            if isempty(new_additional_result)
+                new = old_additional_result;
+                return
+            end
+            if ~isempty(old_core_result)
+                correction = old_core_result(end, self.parent.cols.INDEX);
+                new_first = new_additional_result(:, self.cols.FIRST) + correction;
+                new_last = new_additional_result(:, self.cols.LAST) + correction;
+                new_additional_result(:, self.cols.FIRST) = new_first;
+                new_additional_result(:, self.cols.LAST) = new_last;
+            end
+            if isempty(old_additional_result)
+                new = new_additional_result;
+            else
+                new = [old_additional_result; new_additional_result];
+            end
+        end    
     end
     
 end

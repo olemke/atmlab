@@ -145,6 +145,19 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
             C = {};
         end
         
+        
+        function new = concatenate(self, old_core_result, old_additional_result, new_additional_result)
+            % when concatenating, some need to correct for FIRST, LAST, etc.
+            if isempty(new_additional_result)
+                new = old_additional_result;
+            elseif isempty(old_additional_result)
+                new = new_additional_result;
+            else
+                new = [old_additional_result; new_additional_result];
+            end
+        end
+        
+
     end
     
     methods (Static)
