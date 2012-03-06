@@ -259,25 +259,4 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
         
     end
     
-    methods (Static)
-        function lim_out = limit_to(data_in, lim)
-            % for example:
-            % 'lim' may be 258712x1 logical
-            % data_in may be 1820x2 double
-            % then lim_out must be 1820x1 logical
-            if all(lim)
-                lim_out = true(size(data_in, 1), 1);
-            else
-                error(['atmlab:' mfilename 'NotImplemented'], ...
-                    'Limitations with smaller-sized datasets not implemented');
-            end
-        end
-        
-        function lim_out = limit_from(~, lim_in)
-            % FIXME!
-            error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented');
-        end
-        
-        
-    end
 end

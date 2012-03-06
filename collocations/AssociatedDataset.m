@@ -148,53 +148,7 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
     end
     
     methods (Static)
-        function lim_out = limit_to(~, lim_in)
-            % limit_to Limit data to logical
-            %
-            % FORMAT
-            %
-            %   lim_out = limit_to(data, lim)
-            %
-            % IN
-            %
-            %   data    matrix          input data
-            %   lim     logical array   limits applying to core
-            %
-            % OUT
-            %
-            %   lim_out logical array   limits applying to associated
-            %
-            % Limit associated data to logical. This is trivial if the
-            % associated data is at the same resolution as the core data,
-            % but non-trivial if it is on a different resolution.
-            
-            lim_out = lim_in;
-        end
-        
-        function lim_out = limit_from(~, lim_in)
-            % limit_from Translate associated-limits to core-limits
-            %
-            %
-            % FORMAT
-            %
-            %   lim_out = limit_from(data, lim_in)
-            %
-            % IN
-            %
-            %   data    matrix          input data for associated dataset
-            %   lim_in  logical array   limits applying to associated
-            %                           dataset
-            %
-            % OUT
-            %
-            %   lim_out logical array   limits applying to core dataset
-            %
-            % Translate limits. Trivial when on same size, non-trivial
-            % otherwise.
-            
-            lim_out = lim_in;
-        end        
-        
+       
         function M_cols = merge_new_cols(M_core, cols_core, cols_self)
             M_cols = catstruct(cols_core, ...
                 structfun(@(x)x+size(M_core, 2), cols_self, 'UniformOutput', false));

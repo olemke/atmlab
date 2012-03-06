@@ -841,6 +841,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %                           those where the value of
             %                           'LAT1', is between -30 and +30,
             %                           inclusive on both ends.
+            %                           NOTE: This (currently) works only
+            %                           if you let the output data be
+            %                           merged (e.g. 2 output args).
             %
             %   filters     cell-array  Cell array of cell arrays:
             %                           {filter1, filter2, ...}. Each
@@ -855,6 +858,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %                           extra a cell array of arbitrary
             %                           values that will be passed on
             %                           to the handle as-is.
+            %                           NOTE: This (currently) works only
+            %                           if you let the output data be
+            %                           merged (e.g. 2 output args).
             % 
             % OUT
             %
@@ -863,6 +869,11 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %
             %   M_cols  structure   describing what field ended up in what
             %                       column of M
+            %
+            % More than 2 output arguments will change the behaviour; if
+            % you have at most 2 output arguments, the result will be
+            % merged; if not, the result will be separate for each
+            % AdditionalDataset, and limitations will not work!
             %
             %   addis   cell-array  Cell array of matrices similar to 'M',
             %                       one for each additional dataset for
@@ -879,8 +890,6 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %  - read back from original data. Currently,
             %  col.collocate_and_store_date can already take care of this, if
             %  collocations exist.
-            %  - so far limits and filters work only for core fields. Should
-            %  work for any fields.
             %  - add check that associated-datasets match
             %  - when merging, make sure required fields such as FIRST and
             %  LAST are present
@@ -897,21 +906,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             %% prepare configuration things        
             
-            [limits_all, filters_by_name] = optargs(varargin, {struct(), {}});
+            [limits, filters_by_name] = optargs(varargin, {struct(), {}});
             % distribute fields, limits, etc. over core, additionals
             [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields);
-            additionals_limits = cell(size(additionals));
-            % use deal_index to sort limits-fields in categories
-            for i = 1:length(all_fields)
-                field = all_fields{i};
-                if any(strcmp(field, fieldnames(limits_all)))
-                    if deal_index(i) == 0
-                        limits_core.(field) = limits_all.(field);
-                    else
-                        additionals_limits{deal_index(i)}.(field) = limits_all.(field);
-                    end
-                end
-            end
 
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
@@ -943,6 +940,15 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 end
                 
+            else % more than 2 output arguments
+                if ~isempty(fieldnames(limits)) || ~isempty(filters_by_name)
+                    error(['atmlab:' mfilename ':NotImplemented'], ...
+                        ['Applying limits or filters is not supported when ' ...
+                         'additionals are seperately output. Try running ' ...
+                         'with less than 3 output arguments (found %d) or ' ...
+                         'do your own limitations aftewards. Sorry!'], ...
+                         nargout);
+                end
             end
             % Not filtering duplicates, this should be done when processing
             % collocations initially
@@ -995,7 +1001,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     % done only after the first time I find collocations,
                     % because only then I know for sure what sizes the
                     % fields have.
-                    limmat = limstruct2limmat(limits_all, M_cols);
+                    limmat = limstruct2limmat(limits, M_cols);
                     for k = 1:length(filters_by_name)
                         filters_by_no{k} = {...
                             filters_by_name{k}{1}, ...
@@ -1007,13 +1013,6 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 
                 lim = collocation_restrain(collocations_day, limmat, filters_by_no);
                 collocations_day = collocations_day(lim, :);
-                for j = 1:length(additionals)
-                    additionals_day{j} = additionals_day{j}(additionals{j}.limit_to(additionals_day{j}, lim), :);
-                end
-                %                 if dolimits
-                %                     lim = collocation_restrain(collocations_day, limmat, filters);
-%                     collocations_day = collocations_day(lim, :);
-%                 end
                 
                 %% add to total
                 if isempty(M) % should mean additionals are empty, too
