@@ -115,10 +115,6 @@ x.subdir = '$SAT_$YEAR4';
 x.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{7})$';
 
 %% COLLOCATION DATA SETS
-x = datasets_config('collocation_cpr_patmosx');
-x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_patmosx/core';
-x.subdir = '$YEAR4/$MONTH/$DAY';
-x.filename = 'collocations_cpr_patmosx_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 x = datasets_config('collocation_cpr_modis');
 x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_modis/core';

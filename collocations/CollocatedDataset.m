@@ -1024,7 +1024,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     M((L+1):(L+N), :) = collocations_day;
                     for j = 1:length(additional_fields)
                         N_a = size(additionals_day{j}, 1);
-                        addis{j}((L+1):(L+N_a), :) = additionals_day{j};
+                        if ~isempty(additionals_day{j})
+                            addis{j}((L+1):(L+N_a), :) = additionals_day{j};
+                        end
                     end
                 end
             end
