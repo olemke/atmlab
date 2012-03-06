@@ -1,3 +1,17 @@
+2012-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-23
+
+	* collocations/FieldCopier.m:
+
+	(process_granule): Correctly treat multi-dimensional fields
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_and_store_date_range): Document a bit
+
+	(deal_fields): Bugfix, correct order both outputs
+
 2012-03-06  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-22

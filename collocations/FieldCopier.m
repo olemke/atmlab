@@ -170,7 +170,10 @@ classdef FieldCopier < AssociatedDataset
                 
                 % if this fails, data.(field) may not be a column-vector as
                 % required
-                result(:, self.cols.(field)) = data.(field)(ii, :);
+                sz = size(data.(field));
+                DD = reshape(data.(field), prod(sz(1:end-1)), sz(end));
+                result(:, self.cols.(field)) = DD(ii, :);
+                %result(:, self.cols.(field)) = data.(field)(ii, :);
             end
         end
         

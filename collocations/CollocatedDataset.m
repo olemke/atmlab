@@ -688,7 +688,20 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
         end
         
         function collocate_and_store_date_range(self, date_start, date_end, spec1, spec2, varargin)
+            % Collocate and store date range
+            %
+            % col.collocate_and_store_date_range(date_start, date_end, spec1, spec2, varargin)
+            %
+            % IN
+            %
+            %   date_start
+            %   date_end
+            %   spec1
+            %   spec2
+            %   additionals (optional)
+            %
             % FIXME DOC
+            
             logtext(atmlab('OUT'), 'Starting collocations\n');
             logtext(atmlab('OUT'), '%s %s vs. %s %s\n', self.primary.name, spec1, self.secondary.name, spec2);
             logtext(atmlab('OUT'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
@@ -1054,6 +1067,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             n_f = 0;
             n_add = zeros(size(self.associated));
             additionals = {};
+            existing_names = {};
             % pre-allocate so that every field is at least an empty
             % cell-array
             %additional_fields = cell(size(self.associated));
@@ -1078,11 +1092,13 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                             additional_fields{j}{n_add(j)} = field;  %#ok<AGROW>
                             % check if this additionaldataset is already
                             % known, if yes, find index in existing names
-                            existing_names = cellfun(@(X) X.name, additionals, 'UniformOutput', false);
+ %                           existing_names = cellfun(@(X) X.name, additionals, 'UniformOutput', false);
                             if ~any(strcmp(existing_names, asso.name))
-                                additionals = {additionals{:} asso}; %#ok<CCAT>
+ %                               additionals = {additionals{:} asso}; %#ok<CCAT>
+                                additionals{j} = asso;
+                                existing_names{j} = asso.name;
                             end
-                            samename = strcmp(cellfun(@(X) X.name, additionals, 'UniformOutput', false), asso.name);
+                            samename = strcmp(existing_names, asso.name);
                             assert(sum(samename)<=1, ['atmlab:' mfilename], ...
                                 ['More than one additional contains field ' ...
                                  asso.name]);
@@ -1099,6 +1115,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             end
             % don't have empty things
             additional_fields = additional_fields(~cellfun(@isempty, additional_fields));
+            additionals = additionals(~cellfun(@isempty, additionals));
             assert(length(additionals)==length(additional_fields), ...
                 ['atmlab:' mfilename ':BUG'], ...
                 'length(additionals) == %d != length(additional_fields) == %d, bug?', ...
