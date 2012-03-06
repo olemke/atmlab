@@ -136,20 +136,20 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
             %   limitation on data values...
             % - set self.cols appropiately
             % - limitation on data values for fields with more than one,
-            % contains bugs 
+            % contains bugs
             % - implement lim_to_all
             %
             % does not use original data
             
             %%%
-                        
+            
             M_data = deps{1};
             % check that sizes are the same
             assert(size(processed_core, 1)==size(M_data, 1), ...
                 ['atmlab:' mfilename ':SizeError'], ...
                 ['To average fields, core must have same no. of rows as associated. ' ...
-                 'Core has ' num2str(size(processed_core, 1)) ' rows, ' ...
-                 'associated has ' num2str(size(M_data, 1)) ' rows :(.']);
+                'Core has ' num2str(size(processed_core, 1)) ' rows, ' ...
+                'associated has ' num2str(size(M_data, 1)) ' rows :(.']);
             ad = self.dependencies{1};
             cd = ad.parent;
             % split by primary footprint and find first and last index
@@ -185,7 +185,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                 last = lasts(i);
                 M_coll_part = processed_core(first:last, :);
                 M_data_part = M_data(first:last, :);
-                % FIXME TODO 
+                % FIXME TODO
                 %CS_in_MHS = M_coll_part(:, c.overlap.B_DIST) < colloc_config('distance_for_average_MHS');
                 %CS_in_HIRS = M_coll_part(:, c.overlap.H_DIST) < colloc_config('distance_for_average_HIRS');
                 %flagged = M_data_part(:, c.data.ROIWP) < 0;
@@ -199,7 +199,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                 j = j + 1;
                 M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
                 M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
-
+                
                 % limitation to all, e.g. for distances
                 answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
                 lim_for_all_fields = all(horzcat(answers{:}), 2);
@@ -218,7 +218,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                     % further average-processing
                     limsel = lim_for_all_fields;
                     limmers = self.fieldstruct.(fname).limitators;
-
+                    
                     for li = 1:length(limmers)
                         limmer = limmers{li};
                         limhere = limmer(M_data_part(:, ad.cols.(fname)));
@@ -230,7 +230,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
                         % apply all processors and store in appropiate
                         % place
                         for pi = 1:length(procnames)
-                            procname = procnames{pi};   
+                            procname = procnames{pi};
                             proccer = self.fieldstruct.(fname).processors.(procname);
                             M(j, self.cols.([procname '_' fname])) = proccer(M_data_part(limsel, ad.cols.(fname)));
                         end
@@ -248,7 +248,11 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
             
         end
         
-        % FIXME: implement reading, how again?
+        function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
+            M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
+            M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
+        end
+        
     end
     
     methods (Static)
@@ -267,7 +271,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
         
         function lim_out = limit_from(~, lim_in)
             % FIXME!
-            error('Not implemented');
+            error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented');
         end
         
         

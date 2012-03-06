@@ -542,7 +542,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 % special case; INDEX should be throughout entire date
                 % need to redo this AFTER concatenation but BEFORE further
                 % processing
-                result(:, self.cols.INDEX) = 1:size(result, 1);
+                if ~isempty(result)
+                    result(:, self.cols.INDEX) = 1:size(result, 1);
+                end
                 
                 for j = 1:length(additional_results)
                     if isempty(additional_results{j})
@@ -558,7 +560,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             end
             
             % special case; INDEX should be throughout entire date
-            result(:, self.cols.INDEX) = 1:size(result, 1);
+            if ~isempty(result)
+                result(:, self.cols.INDEX) = 1:size(result, 1);
+            end
             
         end
         
@@ -804,6 +808,9 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %
             % This method reads all or a selection of the collocations for
             % the indicated period, between date_start and date_end.
+            % If less than two output arguments are used, additionals will
+            % be merged into the core.
+            % Limitations are only partially implemented so far.
             %
             % FORMAT
             %
@@ -875,6 +882,8 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %  - so far limits and filters work only for core fields. Should
             %  work for any fields.
             %  - add check that associated-datasets match
+            %  - when merging, make sure required fields such as FIRST and
+            %  LAST are present
             %
             % EXAMPLE
             %
@@ -883,6 +892,8 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             %                {'LAT1', 'LON1', 'LAT2', 'LON2', 'RO_ice_water_path', 'cld_reff_vis','cld_opd_vis'}, ...
             %                 struct('LAT1', [-30 30]), ...
             %                 {{@(x, y) x>y, {'LAT1', 'LON1'}}});
+            %
+            %
             
             %% prepare configuration things        
             
@@ -909,10 +920,11 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 addis{i} = struct();
             end
             
+            merge = false;
             if nargout<3 && ~isempty(additionals)
-                warning(['atmlab:' mfilename], ...
-                    '%s was called with %d (<3) output arguments, additionals are lost', ...
-                    mfilename, nargout);
+                merge = true;
+                logtext(atmlab('OUT'), ...
+                    '%s was called with %d (<3) output arguments, additionals will be merged into the first 2 arguments, possibly reducing their size! ');
             end
             % Not filtering duplicates, this should be done when processing
             % collocations initially
@@ -939,6 +951,12 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     hitno = hitno + 1;
                     for j = 1:length(additionals)
                         [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
+                    end
+                    if merge
+                        for j = 1:length(additionals)
+                            [collocations_day, M_cols_here] = additionals{j}.merge(collocations_day, M_cols_here, additionals_day{j}, addis_cols{j});
+                        end
+                        M_cols = M_cols_here;
                     end
                 catch ME
                     switch (ME.identifier)

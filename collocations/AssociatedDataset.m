@@ -134,6 +134,12 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
                 end
             end
         end
+                
+        function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
+            M = [M_core M_self];
+            M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
+        end
+        
     end
     
     methods (Static)
@@ -182,6 +188,11 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
             % otherwise.
             
             lim_out = lim_in;
+        end        
+        
+        function M_cols = merge_new_cols(M_core, cols_core, cols_self)
+            M_cols = catstruct(cols_core, ...
+                structfun(@(x)x+size(M_core, 2), cols_self, 'UniformOutput', false));
         end
     end
     
