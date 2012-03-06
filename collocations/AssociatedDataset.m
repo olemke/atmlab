@@ -140,6 +140,11 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
         end
         
+        function C = get_mergefields(self) %#ok<MANU>
+            % fields that must be present for merging
+            C = {};
+        end
+        
     end
     
     methods (Static)

@@ -1,3 +1,20 @@
+2012-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-20
+
+	* collocations/AssociatedDataset.m:
+
+	(get_mergefields): Method returning required fields for merging
+
+	* collocations/MeanFieldCopier.m:
+
+	(get_mergefields): Needs 'FIRST'
+
+	* collocations/CollocatedDataset.m (read):
+
+	- If merging but required fields missing, add those and give
+	informational message
+
 2012-03-06  Gerrit Holl		<gerrit.holl@ltu.se>
 
 	* atmlab-2-1-19

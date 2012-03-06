@@ -253,6 +253,10 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
         end
         
+        function C = get_mergefields(self) %#ok<MANU>
+            C = {'FIRST'};
+        end
+        
     end
     
     methods (Static)

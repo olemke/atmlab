@@ -924,7 +924,25 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             if nargout<3 && ~isempty(additionals)
                 merge = true;
                 logtext(atmlab('OUT'), ...
-                    '%s was called with %d (<3) output arguments, additionals will be merged into the first 2 arguments, possibly reducing their size! ');
+                    'CollocatedDataset.read was called with %d (<3) output arguments, additionals will be merged into the first 2 arguments, possibly reducing their size!\n', ...
+                    nargout);
+            
+                % if merging, check that required merging fields are all
+                % there
+                for j = 1:length(additionals)
+                    required_fields = additionals{j}.get_mergefields();
+                    given_fields = additional_fields{j};
+                    for k = 1:length(required_fields)
+                        required_field = required_fields{k};
+                        if ~any(strcmp(given_fields, required_field))
+                            logtext(atmlab('OUT'), ...
+                                'Additional dataset %s requires field %s, but not given. Will add unsolicited!\n', ...
+                                additionals{j}.name, required_field);
+                            additional_fields{j} = [additional_fields{j} required_field];
+                        end
+                    end
+                end
+                
             end
             % Not filtering duplicates, this should be done when processing
             % collocations initially
