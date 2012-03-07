@@ -63,30 +63,24 @@ else
   else
     d    = -0.5*b/a;
     e    = -0.5*sqrt(b*b-4*a*c)/a;      
-    l1   = d + e
-    l2   = d - e
+    l1   = d + e;
+    l2   = d - e;
 
-    % Both lat and -lat can end up as a solution (the sign is lost as
-    % tan(lat) is squared). A correct solution requires that l>=0 and that
-    % z+l*dz has the same sigh as lat. If both l1 and l2 fulfils the
-    % criteria we want the solution with smallest l.
-    % For the case lat=lat0, zero ends up as an unwanted solution.
-    if lat ~= lat0
-      l     = 99e99;
-      zsign = sign(lat); 
-      if l1 > 0   &  sign(z+dz*l1) == zsign 
-        l = l1;
-      end 
-      if l2 > 0   &   l2 < l   &   sign(z+dz*l2) == zsign 
-        l = l2;
-      end
-      if l > 98e99
-        l = -1;
-      end
-
+    % If both l1 and l2 are > 0, we want theoretically the smallest
+    % value. However, with lat=lat0 the "zero solution" can deviate
+    % slightly from zero due to numerical issues, and it is not just to
+    % pick the smallest positive value. As a solution, don't except a
+    % final l below 1e-6 if not both l1 and l2 are inside [0,1e-6].
+    lmin = min( l1, l2 );
+    lmax = max( l1, l2 );
+    if( lmin >= 0  && lmax < 1e-6 )
+      l = lmax;
     else
-      l = max( l1, l2 );
-      if l <= 0
+      if( lmin > 1e-6 ) 
+        l = lmin;
+      elseif( lmax > 1e-6 )
+        l = lmax;
+      else
         l = -1;
       end
     end

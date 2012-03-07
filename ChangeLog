@@ -1,3 +1,13 @@
+2012-03-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-25
+
+	* geodetic/lat_crossing.m: 
+	* geodetic/r_crossing.m: Updated following changes in arts. 
+
+	* tests/test_arts_ppath.m: The variable lont was used for two
+	different things.
+
 2012-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-24

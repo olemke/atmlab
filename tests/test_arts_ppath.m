@@ -187,14 +187,14 @@ for c = 1 : n
     lt = ppath.l_space + [ 0; cumsum(ppath.l_step) ];
     for i = 1 : size(ppath.pos,1)
       if atmosphere_dim == 3
-        lont = ppath.pos(i,3);
+        lons = ppath.pos(i,3);
       else
-        lont = 0;
+        lons = 0;
       end
       
-      [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lont );
+      [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lons );
       dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
-      if dd > 5e-3
+      if dd > 1e-2
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
                                         y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
@@ -214,7 +214,7 @@ for c = 1 : n
                            Q.Z_SURFACE, ppath.pos(end,3), ppath.pos(end,2) ) );
       end
       %
-      if dz > 5e-3
+      if dz > 1e-2
         fprintf('\n!!! Deviating surface point found !!!\n');
         keyboard        
       end  

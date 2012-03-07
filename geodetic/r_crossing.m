@@ -39,7 +39,7 @@ if nargin < 7
 end
   
   
-if ( r0 >= r  &  za0 <= 90 )  |  r0*sind(za0) > r 
+if ( r0 >= r  &  za0 <= 90 )  |  r0*sind(za0) > r
   lat = NaN;
   lon = NaN;
   l   = NaN;
@@ -55,22 +55,19 @@ else
   l1 = -p + sq;
   l2 = -p - sq;
 
-  % The case r0==r is best handled seperately
-  if r0 ~= r
-    if l1 <= 0  &  l2 > 0 
-      l = l2; 
-    elseif l1 > 0  &  l2 <= 0
-      l = l1;
-    elseif l1 < l2
-      l = l1;
-    else
-      l = l2;
-    end
+  lmin = min( l1, l2 )
+  lmax = max( l1, l2 )
+
+  % If r0 equals r solutions just above zero can appear (that
+  % shall be rejected). So we pick the biggest solution if lmin is
+  % negative or just above zero. 
+  if( lmin < 1e-6 )
+    l = lmax;
   else
-    l = max( l1, l2 );
-    assert( l > 0 );
+    l = lmin;
   end
-  
+  assert( l > 0 );  
+ 
   if nargout <= 3
     RAD2DEG = constants( 'RAD2DEG' );
     lat     = RAD2DEG * asin( ( z+dz*l ) / r );
