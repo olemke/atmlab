@@ -1,3 +1,11 @@
+2012-03-07  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-26
+
+	* sensors/atovs/zamsu2l1c.sh: Complement helptext
+
+	* sensors/find_scanline_overlaps.m: Add deprecation-warning
+
 2012-03-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-25

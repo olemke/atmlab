@@ -30,6 +30,9 @@ function find_scanline_overlaps(sat, sensor, startdate, enddate)
 %
 % $Id$
 
+warning(['atmlab:' mfilename ':deprecated'], ...
+    'Deprecated, use SatDataset.find_granule_first_line instead');
+
 %colloc_config('stdout', fopen(fullfile('~/log', ['line_overlap_' sat '_' sensor '_out']), 'a'));
 %colloc_config('stderr', fopen(fullfile('~/log', ['line_overlap_' sat '_' sensor '_err']), 'a'));
 scanfile = datasets_config('firstline_data');

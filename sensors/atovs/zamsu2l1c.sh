@@ -1,5 +1,5 @@
 #!/bin/bash
-# zamsu2l1c.sh: converts bzipped amsu l1b files to l1c files.
+# zamsu2l1c.sh: converts bzipped or gzipped amsu l1b files to l1c files.
 # usage: zamsu2l1c.sh /full/path/to/bzipped/amsu/file /path/to/l1c/file
 # based on stolen script from Oliver.
 #
