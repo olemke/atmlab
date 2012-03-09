@@ -63,8 +63,6 @@ Ah2o    = xmlLoad( [ atmtest, '.H2O.xml' ] );
 workfolder = create_tmpfolder;
 
 
-warning( 'No surface topography !' )
-
 
 %- Run through n random cases
 
@@ -105,7 +103,6 @@ for c = 1 : n
   %- Surface altitude
   %
   Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
-  Q.Z_SURFACE           = repmat(500,nlat,nlon);
   % Fix that +-180 lon data are the same
   if atmosphere_dim == 3
     Q.Z_SURFACE(:,end) = Q.Z_SURFACE(:,1);
@@ -184,7 +181,7 @@ for c = 1 : n
                                        lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
 
     % Check ppath points
-    lt = ppath.l_space + [ 0; cumsum(ppath.l_step) ];
+    lt = ppath.lspace + [ 0; cumsum(ppath.lstep) ];
     for i = 1 : size(ppath.pos,1)
       if atmosphere_dim == 3
         lons = ppath.pos(i,3);

@@ -1,3 +1,14 @@
+2012-03-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-28
+
+	* tests/test_arts_ppath.m (test_arts_ppath): As below and
+	non-spherical 3D cases activated.
+
+	* arts/xml/xmlReadPpath.m:
+	* arts/xml/xmlWritePpath.m: l_step -> lstep and l_space -> lspace,
+	following change in arts.
+
 2012-03-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-27
