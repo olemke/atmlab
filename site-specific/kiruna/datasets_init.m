@@ -48,6 +48,11 @@ x.basedir = '/storage3/data/cloudsat/2B-CWC-RO.R04';
 x.subdir = '$YEAR4/$DOY';
 x.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
 
+x = datasets_config('cpr_rvod');
+x.basedir = '/storage3/data/cloudsat/2B-CWC-RVOD.R04';
+x.subdir = '$YEAR4/$DOY';
+x.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+
 % same regexp works for all CloudSat's
 datasets_config('cloudsat_1B_CPR_basedir', '/storage3/data/cloudsat/1B-CPR.R04/');
 datasets_config('cloudsat_1B_CPR_subdir', datasets_config('cpr_subdir'));

@@ -81,35 +81,102 @@ classdef FieldCopier < AssociatedDataset
         %% implementation of abstract methods
         function args = primary_arguments(self)
             args = fieldnames(self.fieldstruct_primary);
+            args = args(structfun(@(X) ~isfield(X, 'dataset'), self.fieldstruct_primary));
         end
         
         function args = secondary_arguments(self)
             args = fieldnames(self.fieldstruct_secondary);
+            args = args(structfun(@(X) ~isfield(X, 'dataset'), self.fieldstruct_secondary));
         end
         
-        function result = process_granule(self, processed_core, data1, ~, ~, data2, ~, ~, ~)
+        function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~)
             % FIXME DOC
-                         
+
             allnames = fieldnames(self.members);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
             dimsizes = struct();
+            % other datasets that may be required (structs filled as needed)
+            D = datasets();
+            also_read = {struct(), struct()};
+            dat_other = {struct(), struct()};
+            % will loop through all the names in total 3 times...
+            % in the first loop, check if data should be from
+            % sibling-datasets, i.e. datasets not occuring in the original
+            % collocation, but on the same size (e.g. CPR RO or RVOD)
+            for i = 1:length(allnames)
+                fieldnam = allnames{i};
+                if isfield(self.members.(fieldnam), 'dataset')
+                    ds = self.members.(fieldnam).dataset;
+                    if i <= n_inprim
+                        j = 1;
+                    else
+                        j = 2;
+                    end
+                    % add field to read from this DS to
+                    % also_read{j}.(dataset_name)
+                    if ~isfield(also_read{j}, ds.name)
+                        logtext(atmlab('OUT'), ...
+                            'Shall read field %s from sibling-dataset %s\n', ...
+                            fieldnam, ds.name);
+                        also_read{j}.(ds.name) = {fieldnam};
+                    else
+                        logtext(atmlab('OUT'), ...
+                            'Shall also read field %s from sibling-dataset %s\n', ...
+                            fieldnam, ds.name);
+                        also_read{j}.(ds.name) = [also_read{j}.(ds.name) fieldnam];
+                    end
+                end
+            end
+            % read what shall also be read
+            for j = 1:2
+                if j == 1
+                    dt = date1;
+                    spc = spec1;
+                else
+                    dt = date2;
+                    spc = spec2;
+                end
+                dsets_to_read = fieldnames(also_read{j});
+                for k = 1:length(dsets_to_read)
+                    dsnm = dsets_to_read{k};
+                    % read fields from this dataset as indicated by
+                    % also_read{j}.(dataset_name)
+                    logtext(atmlab('OUT'), ...
+                        'Reading dataset %s to grab %d fields\n', ...
+                        dsnm, length(also_read{j}.(dsnm)));
+                    % in this reading, do not remove doubles, or there will
+                    % be a mis-match between indices as provided by the
+                    % collocations and indices as determined here
+                    dat_other{j}.(dsnm) = D.(dsnm).read_granule(dt, spc, also_read{j}.(dsnm), false, false);
+                end
+            end
+            % read all 
+            % in the second loop, check sizes etc.
             for i = 1:length(allnames)
                 fieldnam = allnames{i};
                 if i<=n_inprim
+                    j = 1;
                     dat = data1;
                 else
                     dat = data2;
+                    j = 2;
                 end
                 n_scanlines = size(dat.lat, 1);
                 n_scanpos = size(dat.lat, 2);
+                % data either from prim/sec or from 'sibling'
+                if isfield(self.members.(fieldnam), 'dataset')
+                    fdata = dat_other{j}.(self.members.(fieldnam).dataset.name).(fieldnam);
+                else
+                    fdata = dat.(fieldnam);
+                end
                 % 'n' is the number of measurements per lat/lon, e.g. the
                 % number of channels, number of height-bins, etc. Should be
                 % scalar...
-                n = numel(dat.(fieldnam))/(n_scanlines*n_scanpos);
+                n = numel(fdata)/(n_scanlines*n_scanpos);
                 assert(iswhole(n), ['atmlab:' mfilename ':dimensions'], ...
                     ['Dimension mismatch: scanlines: %d, scanpos: %d, ' ...
                     'field %s: %s'], n_scanlines, n_scanpos, fieldnam, ...
-                    num2str(size(dat.(fieldnam))));
+                    num2str(size(fdata)));
                 %% if needed, add dimension info to self.members
                 if (n>1)
                     % need to specify dimension in NetCDF, if it doesn't
@@ -156,22 +223,37 @@ classdef FieldCopier < AssociatedDataset
             if self.needs_secondary_data()
                 i2 = sub2ind(size(data2.lat), r2, c2);
             end
+            
+            % in the third loop, collect the data
 
             for i = 1:length(allnames)
                 field = allnames{i};
                 
+
                 if i <= n_inprim
                     data = data1;
                     ii = i1;
+                    j = 1;
                 else
                     data = data2;
                     ii = i2;
+                    j = 2;
                 end
                 
+                % data either from prim/sec or from 'sibling'
+                if isfield(self.members.(field), 'dataset')
+                    logtext(atmlab('OUT'), ...
+                        'Grabbing field %s from sibling-dataset %s\n', ...
+                        field, self.members.(field).dataset.name);
+                    fdata = dat_other{j}.(self.members.(field).dataset.name).(field);
+                else
+                    fdata = data.(field);
+                end
+                    
                 % if this fails, data.(field) may not be a column-vector as
                 % required
-                sz = size(data.(field));
-                DD = reshape(data.(field), prod(sz(1:end-1)), sz(end));
+                sz = size(fdata);
+                DD = reshape(fdata, prod(sz(1:end-1)), sz(end));
                 result(:, self.cols.(field)) = DD(ii, :);
                 %result(:, self.cols.(field)) = data.(field)(ii, :);
             end

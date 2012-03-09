@@ -1,3 +1,31 @@
+2012-03-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-27
+
+	* collocations/FieldCopier.m:
+
+	New feature: any fieldstruct with a 'dataset' attribute will be gotten
+	from the indicated 'dataset' rather than from the core. To be
+	documented.
+
+	(primary_arguments)
+	(secondary_arguments):
+
+		- Do not pass on fieldnames for arguments to primary/secondary if
+		those fields have a 'dataset' attribute
+
+	(process_granule):
+
+		- If a field has a 'dataset' attribute, read the granule for this
+		dataset. Must have the same granules and dimensions as the core.
+		Useful for e.g. different CPR datasets.
+
+	* collocations/CollocatedDataset.m (collocate_date): Tiny change
+
+	* datasets/datasets_config.m, site-specific/kiruna/datasets_init.m: Add cpr_rvod
+
+	* handy/struct2string_compact.m: Fix recursion-bug
+
 2012-03-07  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-26

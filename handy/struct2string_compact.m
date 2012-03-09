@@ -42,6 +42,8 @@ elseif isboolean(v) || istensor0(v) % isscalar is true for cell array with 1 ele
     s = sprintf('%.*f', n*~(iswhole(v)||isboolean(v)), v);
 elseif iscell(v)
     s = cellfun(@(u) [elem2str(u, n) ','], v, 'UniformOutput', false);
+elseif isscalar(v)
+    s = char(v);
 elseif isvector(v)
     s = arrayfun(@(u) [elem2str(u, n) '-'], v, 'UniformOutput', false);
 else
