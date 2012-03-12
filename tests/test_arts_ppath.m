@@ -14,19 +14,19 @@
 %    error is found, "keyboard" is called. The work folder is then left for
 %    debugging purposes.
 %
-%
-% FORMAT   test_arts_ppath( atmosphere_dim, n, [re_sphere] )
+% FORMAT   test_arts_ppath( atmosphere_dim, n, [re_sphere, do_refr] )
 %        
 % IN    atmosphere_dim   Atmospheric dimensionality
 %       n                Run n cases
 % OPT   re_sphere        Flag to also use a spherical reference ellipsoid
 %                        for 2D and 3D. Default is false.
+%       do_refr          Run with refraction ray tracing WSM (but with n=1).
 
 % 2012-02-22   Created by Patrick.
 
 function test_arts_ppath( atmosphere_dim, n, varargin  )
 %
-[re_sphere] = optargs( varargin, { false } );
+[re_sphere,do_refr] = optargs( varargin, { false, false } );
   
   
 %- Fixed settings
@@ -36,7 +36,16 @@ Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.ATMOSPHERE_DIM        = atmosphere_dim;
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
-Q.PPATH_STEP_AGENDA     = { 'ppath_stepGeometric' };
+if do_refr
+  Q.PPATH_LRAYTRACE     = 2e3;
+  Q.PPATH_STEP_AGENDA   = { 'ppath_stepRefractionEuler' };
+  Q.REFR_INDEX_AGENDA   = { 'Ignore(rte_pressure)', ...
+                            'Ignore(rte_temperature)', ...
+                            'Ignore(rte_vmr_list)', ...
+                            'refr_indexUnit' };
+else
+  Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
+end
 Q.PPATH_LMAX            = 10e3;
 %
 if atmosphere_dim == 1  ||  re_sphere
@@ -65,7 +74,9 @@ workfolder = create_tmpfolder;
 
 
 %- Run through n random cases
-
+%
+maxdd = 0;
+%
 for c = 1 : n
 
   fprintf(' > Doing %d/%d\r',c,n)
@@ -197,6 +208,7 @@ for c = 1 : n
                                         y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
         keyboard
       end
+      if dd > maxdd, maxdd = dd; end
     end
     
     % Special check for end point
@@ -219,7 +231,8 @@ for c = 1 : n
   end
 end
 
-fprintf('\n')
+fprintf( '\n' );
+fprintf( 'Max ppath deviation: %.1e m\n', maxdd );
 
 %- Remove workfolder
 %
