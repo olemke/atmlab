@@ -1,3 +1,14 @@
+2012-03-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-31
+
+	* collocations/FieldCopier.m (process_granule): Bugfix
+
+	- When data is same size as lat/lon, just flatten, don't take last
+	dimension as data-dimension (such as for IWC, bt, etc.)
+
+	* datasets/SatDataset.m: Be a bit more verbose
+
 2012-03-13  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-30

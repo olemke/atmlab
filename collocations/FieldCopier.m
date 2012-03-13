@@ -253,7 +253,11 @@ classdef FieldCopier < AssociatedDataset
                 % if this fails, data.(field) may not be a column-vector as
                 % required
                 sz = size(fdata);
-                DD = reshape(fdata, prod(sz(1:end-1)), sz(end));
+                if isequal(sz, size(data.lat))
+                    DD = fdata(:); % 1 point per lat/lon
+                else % multi-point per lat/lon
+                    DD = reshape(fdata, prod(sz(1:end-1)), sz(end));
+                end
                 result(:, self.cols.(field)) = DD(ii, :);
                 %result(:, self.cols.(field)) = data.(field)(ii, :);
             end

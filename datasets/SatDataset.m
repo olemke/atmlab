@@ -451,6 +451,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 scanfile = strrep(scanfile, '$SAT', sat);
                 scanfile = strrep(scanfile, '$SENSOR', self.name);
                 
+                logtext(atmlab('OUT'), ...
+                    ['Reading %s. ' ...
+                     '(If this fails, run self.find_granule_first_line ' ...
+                     '(SatDataset.find_granule_first_line))\n'], scanfile);
                 t = load(scanfile);
                 ht = t.ht;
                 S.(sat).(self.name) = ht;
@@ -580,7 +584,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
             end
             
-            save(scanfile, 'ht');           
+            logtext(atmlab('OUT'), ...
+                'Writing %s\n', scanfile);
+            save(scanfile, 'ht');    
             
         end
         
