@@ -87,40 +87,57 @@ A.avhrr_subdir = nan;
 A.avhrr_regexp = nan;
 A.avhrr_filename = nan;
 
+%%%% Calipso
+
+% new
+A.calipso = SatDataset('name', 'calipso', ...
+                   'satname', 'calipso', ...
+                   'reader', @common_read_calipso, ...
+                   'granule_duration', 5932);
+
+
+
 A.calipso_basedir = nan;
 A.calipso_subdir = nan;
 A.calipso_regexp = nan;
 A.calipso_filename = nan;
 
 %%%% CLOUDSAT
+
+%new
+A.cpr = SatDataset('name', 'cpr', ...
+                   'satname', 'cloudsat', ...
+                   'reader', @common_read_cpr, ...
+                   'granule_duration', 5932); % new style 2012-01-18
+               
+A.cpr_rvod = SatDataset('name', 'CPR_RVOD', ...
+                   'satname', 'cloudsat', ...
+                   'reader', @common_read_cpr, ...
+                   'granule_duration', 5932);
+               
+A.cpr_cldclass = SatDataset('name', 'CPR_CLDCLASS', ...
+                   'satname', 'cloudsat', ...
+                   'reader', @common_read_cpr, ...
+                   'granule_duration', 5932);
+
+               
+A.cpr_1B = SatDataset('name', 'CPR_1B', ...
+                   'satname', 'cloudsat', ...
+                   'reader', @common_read_cpr, ...
+                   'granule_duration', 5932);
+
+
 % old
 A.cpr_basedir = nan;
 A.cpr_subdir = nan;
 A.cpr_regexp = nan;
 A.cpr_filename = nan;
 
-%new
-A.cpr = SatDataset('name', 'cpr', ...
-                   'satname', 'cloudsat', ...
-                   'reader', @common_read_cpr_2BCWCRO, ...
-                   'granule_duration', 5932); % new style 2012-01-18
-               
-A.cpr_rvod = SatDataset('name', 'CPR_RVOD', ...
-                   'satname', 'cloudsat', ...
-                   'reader', @common_read_cpr_2BCWCRO, ...% use the same reader
-                   'granule_duration', 5932);
-               
 A.cloudsat_1B_CPR_basedir = nan;
 A.cloudsat_1B_CPR_subdir = nan;
 A.cloudsat_1B_CPR_regexp = nan;
 A.cloudsat_1B_CPR_filename = nan;
 
-A.cpr_1B = SatDataset('name', 'CPR_1B', ...
-                   'satname', 'cloudsat', ...
-                   'reader', @common_read_cpr, ...
-                   'granule_duration', 5932);
-
-               
 A.cloudsat_2B_GEOPROF_basedir = nan;
 A.cloudsat_2B_GEOPROF_subdir = nan;
 A.cloudsat_2B_GEOPROF_regexp = nan;
@@ -145,8 +162,6 @@ A.cloudsat_ECMWF_AUX_basedir = nan;
 A.cloudsat_ECMWF_AUX_subdir = nan;
 A.cloudsat_ECMWF_AUX_regexp = nan;
 A.cloudsat_ECMWF_AUX_filename = nan;
-%%%%%%%%%%%%%%%%% CLOUDSAT
-
 A.firstline_data = '';
 
 A.hirs_basedir = nan;
@@ -171,17 +186,18 @@ A.modis = SatDataset('name', 'modis', ...
     'reader', @common_read_modis, ...
     'granule_duration', 6130, ...
     'dataset','MYD06_L2'); % new style
-               
+
+%new
+A.mspps = SatDataset('name', 'mspps', ...
+    'reader', @common_read_mspps, ...
+    'granule_duration', 6130); % new style
+
 % old
 A.mspps_basedir = nan;
 A.mspps_subdir = nan;
 A.mspps_regexp = nan;
 A.mspps_filename = nan;
 
-%new
-A.mspps = SatDataset('name', 'mspps', ...
-    'reader', @common_read_mspps, ...
-    'granule_duration', 6130); % new style
 
 A.patmosx = SatDataset('name', 'patmosx', ...
                    'reader', @common_read_patmosx, ...
@@ -190,21 +206,23 @@ A.patmosx = SatDataset('name', 'patmosx', ...
 
 
 %% COLLOCATION DATASETS
-A.collocation_cpr_mhs_basedir = nan;
-A.collocation_cpr_mhs_subdir = nan;
-A.collocation_cpr_mhs_regexp = nan;
-A.collocation_cpr_mhs_filename = nan;
+
+% NEW STYLE
 A.collocation_mhs_cpr = CollocatedDataset(A.mhs, A.cpr); % new style 2012-01-18
 % fixme: impleement those as classes
 %A.holl10_data = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 data');
 %A.holl10_meandata = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 mean data');
-
-% eliasson et. al several datasets
-% patmosx first since the granules are much larger than cloudsats
-A.collocation_cpr_patmosx = CollocatedDataset(A.patmosx,A.cpr); % new style 2012-01-31 
-
-A.collocation_cpr_modis = CollocatedDataset(A.collocation_cpr_patmosx, A.modis); % new style 2012-01-31
+A.collocation_cpr_calipso = CollocatedDataset(A.cpr,A.calipso);
+A.collocation_cpr_mspps   = CollocatedDataset(A.cpr,A.mspps);
+A.collocation_cpr_patmosx = CollocatedDataset(A.patmosx,A.cpr);
+%A.collocation_cpr_modis = CollocatedDataset(A.collocation_cpr_patmosx, A.modis);
 %A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
+
+% OLD STYLE
+A.collocation_cpr_mhs_basedir = nan;
+A.collocation_cpr_mhs_subdir = nan;
+A.collocation_cpr_mhs_regexp = nan;
+A.collocation_cpr_mhs_filename = nan;
 
 A.collocation_cpr_mhs_hdf5_basedir = nan;
 A.collocation_cpr_mhs_hdf5_subdir = nan;

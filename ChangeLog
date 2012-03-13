@@ -1,3 +1,20 @@
+2012-03-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-30
+
+	* datasets/common_read_mspps.m: Added general MSPPS reading routine
+	* datasets/common_read_calipso.m: Added general Calipso reading routine
+	* datasets/common_read_cpr.m: Added general CloudSat reading routine
+
+	* datasets/common_read_patmosx.m: Now also out put the attributes
+	associated with the gathered fields if user provides 2 output arguments
+
+	* datasets/SatDataset.m: Added 2 new error identifiers
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/datasets_config.m:
+	Added a bunch of new datasets
+
 2012-03-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-29

@@ -33,16 +33,23 @@ datasets_config('avhrr_basedir', '/storage3/data/avhrr');
 datasets_config('avhrr_subdir', '$SAT_gac_$YEAR4/$MONTH/$DAY');
 datasets_config('avhrr_regexp', datasets_config('amsua_regexp'));
 
+%% CALIPSO
 
+% NEW STYLE
+x = datasets_config('calipso');
+x.basedir = '/storage3/data/calipso/CAL_LID_L2_05kmCLay-Prov-V3-01';
+x.subdir = '$YEAR4/$MONTH/$DAY';
+x.re = '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hour>\d{2})-(?<minute>\d{2})-(?<second>\d{2})Z';
+
+% OLD STYLE
 datasets_config('calipso_basedir', '/storage3/data/calipso/CAL_LID_L2_05kmCLay-Prov-V3-01/');
-datasets_config('calipso_subdir', '$YEAR4/$MONTH/$DOY');
+datasets_config('calipso_subdir', '$YEAR4/$MONTH/$DAY');
 datasets_config('calipso_regexp', '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hour>\d{2})-(?<minute>\d{2})-(?<second>\d{2})Z');
 
-%%% CLOUDSAT
-datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
-datasets_config('cpr_subdir', '$YEAR4/$DOY');
-datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)');
-% new style 2012-01-18:
+
+%% CLOUDSAT
+
+% NEW STYLE
 x = datasets_config('cpr');
 x.basedir = '/storage3/data/cloudsat/2B-CWC-RO.R04';
 x.subdir = '$YEAR4/$DOY';
@@ -52,6 +59,16 @@ x = datasets_config('cpr_rvod');
 x.basedir = '/storage3/data/cloudsat/2B-CWC-RVOD.R04';
 x.subdir = '$YEAR4/$DOY';
 x.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+
+x = datasets_config('cpr_cldclass');
+x.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
+x.subdir = '$YEAR4/$DOY';
+x.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+
+% OLD STYLE
+datasets_config('cpr_basedir', '/storage3/data/cloudsat/2B-CWC-RO.R04');
+datasets_config('cpr_subdir', '$YEAR4/$DOY');
+datasets_config('cpr_regexp', '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)');
 
 % same regexp works for all CloudSat's
 datasets_config('cloudsat_1B_CPR_basedir', '/storage3/data/cloudsat/1B-CPR.R04/');
@@ -78,7 +95,6 @@ datasets_config('cloudsat_2C_PRECIP_COLUMN_regexp', datasets_config('cpr_regexp'
 datasets_config('cloudsat_ECMWF_AUX_basedir', '/storage3/data/cloudsat/ECMWF-AUX.R04');
 datasets_config('cloudsat_ECMWF_AUX_subdir', datasets_config('cpr_subdir'));
 datasets_config('cloudsat_ECMWF_AUX_regexp', datasets_config('cpr_regexp'));
-%%%%%
 
 datasets_config('hirs_basedir', '/storage3/data/hirs');
 datasets_config('hirs_subdir', '$SAT_hirs_$YEAR4/$MONTH/$DAY');
@@ -89,14 +105,15 @@ datasets_config('hirscs_subdir', 'LC_$SAT');
 datasets_config('hirscs_filename', 'HIRS.$SAT.Y$YEAR2.D$DOY.nc.gz');
 datasets_config('hirscs_regexp', '\.Y(?<year02>\d{2})\.D(?<doy>\d{3})\.');
 
-datasets_config('mhs_basedir', '/storage3/data/mhs');
-datasets_config('mhs_subdir', '$SAT_mhs_$YEAR4/$MONTH/$DAY');
-datasets_config('mhs_regexp', datasets_config('amsua_regexp'));
-% new style 2012-01-18:
+% NEW 2012-01-18:
 x = datasets_config('mhs');
 x.basedir = '/storage3/data/mhs';
 x.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
 x.re = datasets_config('amsua_regexp');
+
+datasets_config('mhs_basedir', '/storage3/data/mhs');
+datasets_config('mhs_subdir', '$SAT_mhs_$YEAR4/$MONTH/$DAY');
+datasets_config('mhs_regexp', datasets_config('amsua_regexp'));
 
 x = datasets_config('modis');
 x.basedir = '/storage3/data/modis/MYD06_L2/';
@@ -104,15 +121,17 @@ x.subdir = '$YEAR4/$MONTH/$DAY';
 x.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})';
 
 % mspps
-% old style
+
+% NEW
+x = datasets_config('mspps');
+x.basedir = '/storage3/data/mspps/';
+x.subdir = '$SAT_orbital_$YEAR4/$MONTH/$DAY';
+x.re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})';
+
+% OLD
 datasets_config('mspps_basedir', '/storage3/data/mspps');
 datasets_config('mspps_subdir', '');
 datasets_config('mspps_regexp','(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$');
-% new style
-x = datasets_config('mspps');
-x.basedir = '/storage3/data/mspps/';
-x.subdir = '';
-x.re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2}).+(?<end>.{3})$';
 
 x = datasets_config('patmosx');
 x.basedir = '/storage3/data/patmosx/level2b/';
@@ -121,18 +140,37 @@ x.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3}).+(?<end
 
 %% COLLOCATION DATA SETS
 
-x = datasets_config('collocation_cpr_modis');
-x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_modis/core';
-x.subdir = '$YEAR4/$MONTH/$DAY';
-x.filename = 'collocations_cpr_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-
-datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');
-datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
-datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
+% NEW STYLE
 x = datasets_config('collocation_mhs_cpr');
 x.basedir = '/storage4/user_data/gerrit/testing/collocations_mhs_cpr';
 x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_$SAT.nc.gz';
+
+x = datasets_config('collocation_cpr_calipso');
+x.subdir = '$YEAR4/$MONTH/$DAY';
+x.filename = 'collocations_cpr_calipso_$YEAR4_$MONTH_$DAY.nc.gz';
+x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_calipso/core';
+
+x = datasets_config('collocation_cpr_mspps');
+x.subdir = '$YEAR4/$MONTH/$DAY';
+x.filename = 'collocations_cpr_mspps_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_mspps/core';
+
+x = datasets_config('collocation_cpr_patmosx');
+x.subdir = '$YEAR4/$MONTH/$DAY';
+x.filename = 'collocations_cpr_patmosx_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_patmosx/core';
+
+% x = datasets_config('collocation_cpr_modis');
+% x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_modis/core';
+% x.subdir = '$YEAR4/$MONTH/$DAY';
+% x.filename = 'collocations_cpr_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
+
+% OLD STYLE
+datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');
+datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
+datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
 
 datasets_config('collocation_cpr_mhs_hdf5_basedir', '/local/gerrit/data/collocations_hdf5/collocations_cloudsat_mhs');
 datasets_config('collocation_cpr_mhs_hdf5_subdir', '');
