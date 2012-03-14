@@ -126,12 +126,16 @@ for c = 1 : n
   lon0                  = 0;
   aa0                   = 0;
   %
-  if rand < 0.5
+  if rand < 0.33
     Q.SENSOR_POS        = 3e3 + 50e3*rand;
-    Q.SENSOR_LOS        = 90  + 90*rand;    
+    Q.SENSOR_LOS        = 180*rand;    
   else
     Q.SENSOR_POS        = 700e3 + 50e3*randn;
-    Q.SENSOR_LOS        = 180*rand;    
+    if rand < 0.5
+      Q.SENSOR_LOS      = 140  + 40*rand;    
+    else
+      Q.SENSOR_LOS      = 111 + 5*rand;    
+    end
   end
   %
   if atmosphere_dim == 2
@@ -162,7 +166,7 @@ for c = 1 : n
     sprintf('WriteXML("ascii",ppath,"%s/ppath.xml")',workfolder) };
 
 
-  %- Rund ARTS and load result
+  %- Run ARTS and load result
   %
   S = qarts2cfile( Q, ... 
                    { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
@@ -182,6 +186,7 @@ for c = 1 : n
   %- Check result
   %
   if ppath.np > 1
+    
     if atmosphere_dim == 1  ||  re_sphere
       re = refell(1);
     else
@@ -193,7 +198,9 @@ for c = 1 : n
 
     % Check ppath points
     lt = ppath.lspace + [ 0; cumsum(ppath.lstep) ];
+    e  = zeros( size(ppath.pos,1), 1 );
     for i = 1 : size(ppath.pos,1)
+            
       if atmosphere_dim == 3
         lons = ppath.pos(i,3);
       else
@@ -202,14 +209,16 @@ for c = 1 : n
       
       [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lons );
       dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
-      if dd > 1e-2
+      e(i) = dd;
+      if dd > 1
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
                                         y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
         keyboard
       end
-      if dd > maxdd, maxdd = dd; end
     end
+    
+    if max(e) > maxdd, maxdd = max(e); end
     
     % Special check for end point
     if strcmp( ppath.background, 'surface' )
@@ -223,7 +232,7 @@ for c = 1 : n
                            Q.Z_SURFACE, ppath.pos(end,3), ppath.pos(end,2) ) );
       end
       %
-      if dz > 1e-2
+      if dz > 1
         fprintf('\n!!! Deviating surface point found !!!\n');
         keyboard        
       end  
