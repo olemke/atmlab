@@ -7,9 +7,8 @@ function data = cloudsat_read_zipped(CSin, varargin)
 %
 % $Id$
 
-filenames = unzip(CSin, atmlab('WORK_AREA'));
+tmpdir = create_tmpfolder;
+filenames = unzip(CSin, tmpdir);
 CSout = filenames{1};
-c = onCleanup(@()delete(CSout));
-%data = cloudsat_read(CSout, varargin{:});
+c = onCleanup(@() rmdir(tmpdir,'s'));
 data = read_cloudsat_hdf(CSout, varargin{:});
-%delete(CSout);
