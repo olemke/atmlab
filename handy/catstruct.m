@@ -45,7 +45,7 @@ function A = catstruct(varargin)
 % Modified by Salomon Eliassson. 2011
 %       additions: Works recursively
 %                  Allows empty arguments in varargin
-%
+% $Id$
 
 N = nargin ;
 
@@ -140,7 +140,7 @@ for f = F'
         continue
     end 
     
-    logtext(atmlab('OUT'), 'Stucture element: ''%s'' will be dealt with recursively\n',f{1})
+    %logtext(atmlab('OUT'), 'Stucture element: ''%s'' will be dealt with recursively\n',f{1})
     % If this low level structure appears in more than 1 main level structure,
     % do another catstruct
     

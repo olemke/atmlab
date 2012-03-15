@@ -1,5 +1,26 @@
 2012-03-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-35
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/datasets_config.m:
+	Changed the name of 3 collocated datasets to be less confusing
+
+	* handy/catstruct.m: Commented out annoying message
+
+	* datasets/common_read_calipso.m: Moved the column intergration of
+	e.g. IWP out of this function, and suppressed the output of
+	exec_system_cmd.
+
+	* datasets/common_read_patmosx.m: Adapted to the newly downloaded
+	data and suppressed the output of exec_system_cmd.
+
+	* datasets/common_read_mspps.m: Catch error maybe-specific to this
+	dataset and give it another error identifier so that the
+	collocation codes will deal with it properly
+
+2012-03-15  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-34
 
 	* sensors/cloudsat_read_zipped.m: Make sure

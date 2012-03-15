@@ -40,13 +40,15 @@ else
     file2 = strrep(file,'des','asc');
 end
 
-S2 = gunzip_and_read_patmosx(file2,all_fields);
-S2.latitude = repmat(S2.latitude',[1,length(S2.longitude)]);
-S2.longitude = repmat(S2.longitude,[size(S2.latitude,1),1]);
-
+if exist(file2,'file')
+    S2 = gunzip_and_read_patmosx(file2,all_fields);
+    S2.latitude = repmat(S2.latitude',[1,length(S2.longitude)]);
+    S2.longitude = repmat(S2.longitude,[size(S2.latitude,1),1]);
+else
+    S2 = [];
+end
 
 S = concatenateDatafields(S1,S2);
-clear Sasc Sdec
 % rename some fields
 
 % construct time axis with same dimensions
@@ -73,12 +75,10 @@ info = find_info_from_granule('patmosx', file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
-
 %%%%%%%%%%%%%
 % SUBFUNCTION
 
 function [S,attr] = gunzip_and_read_patmosx(file,all_fields)
-
 
 % make TEMPDIR & cleanup after I'm done.
 if strcmp(file(end-2:end),'.gz')
@@ -87,7 +87,7 @@ if strcmp(file(end-2:end),'.gz')
     
     [~,tmpfile] = fileparts(file);
     filename = fullfile(tmpdir,tmpfile);
-    [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),1,true);
+    [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),false,true);
     
     if logical(test)
         error(['atmlab:' mfilename ':file'],'error gunzipping\n%s',file)
@@ -105,14 +105,24 @@ function S = concatenateDatafields(Sasc,Sdec)
 % For each field make sure they are concatinated and then sorted by time (if applicable)
 %
 
-% FLATTEN the data
-sz = size(Sasc.scan_line_time);
-for F = fieldnames(Sasc)'
-    if isequal(size(Sasc.(F{1})),sz)
-        S.(F{1}) = [Sasc.(F{1})(:);Sdec.(F{1})(:)];
+if ~isempty(Sdec)
+    % FLATTEN the data
+    sz = size(Sasc.scan_line_time);
+    for F = fieldnames(Sasc)'
+        if isequal(size(Sasc.(F{1})),sz)
+            S.(F{1}) = [Sasc.(F{1})(:);Sdec.(F{1})(:)];
+        end
     end
+else
+    % FLATTEN the data
+    sz = size(Sasc.scan_line_time);
+    for F = fieldnames(Sasc)'
+        if isequal(size(Sasc.(F{1})),sz)
+            S.(F{1}) = Sasc.(F{1})(:);
+        end
+    end
+    
 end
-
 % SORT the data in ascending time
 [S.scan_line_time,index] = sort(S.scan_line_time);
 sz = size(S.scan_line_time);

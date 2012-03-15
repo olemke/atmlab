@@ -212,9 +212,12 @@ A.collocation_mhs_cpr = CollocatedDataset(A.mhs, A.cpr); % new style 2012-01-18
 % fixme: impleement those as classes
 %A.holl10_data = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 data');
 %A.holl10_meandata = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 mean data');
-A.collocation_cpr_calipso = CollocatedDataset(A.cpr,A.calipso);
-A.collocation_cpr_mspps   = CollocatedDataset(A.cpr,A.mspps);
-A.collocation_cpr_patmosx = CollocatedDataset(A.patmosx,A.cpr);
+
+% calipso is a 5km product and must therefore be the primary dataset
+A.collocation_calipso_cpr = CollocatedDataset(A.calipso,A.cpr); 
+A.collocation_mspps_cpr   = CollocatedDataset(A.mspps,A.cpr);
+A.collocation_patmosx_cpr = CollocatedDataset(A.patmosx,A.cpr);
+
 %A.collocation_cpr_modis = CollocatedDataset(A.collocation_cpr_patmosx, A.modis);
 %A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
 

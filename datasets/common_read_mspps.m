@@ -42,7 +42,16 @@ if nargout == 2
 end
 
 for F = all_fields'
+    try
     S.(F{1}) = hdfread(file,F{1});
+    catch ME
+        if any(strcmp(ME.identifier,{'MATLAB:imagesci:hdfquickinfo:invalidFile'}))
+            error('atmlab:invalid_data','%s:%s found in %s hdfread call',...
+                ME:identifier,ME.message,mfilename)
+        else
+            error(ME.identifier,Me.message)
+        end
+    end
 end
 
 %% RENAME some fields

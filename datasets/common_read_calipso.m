@@ -64,17 +64,6 @@ else
     S = gunzip_and_read_calipso(file,all_fields);
 end
 
-% Do some hard-coded special operations for some fields, since atleast I
-% WANT ONLY ONE COLUMN INTEGRATED VALUE for the entire column.
-layeredFields = {'Ice_Water_Path'};
-Fns = fieldnames(S);
-if ~all(~ismember(Fns,layeredFields))
-    suchFields = Fns(ismember(Fns,layeredFields));
-    for F = suchFields
-        S = columnIntergrateColumns(S,F{1});
-    end
-end
-
 %% RENAME some fields
 
 % get epoch. 
@@ -97,8 +86,6 @@ S = rmfield(S,core_fields);
 % add filename
 S.path = file;
 
-
-
 end
 %%%%%%%%%%%%%
 % SUBFUNCTION
@@ -113,7 +100,7 @@ if strcmp(file(end-2:end),'.gz')
     
     [~,tmpfile] = fileparts(file);
     filename = fullfile(tmpdir,tmpfile);
-    [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),1,true);
+    [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),false,true);
     
     if logical(test)
         error(['atmlab:' mfilename ':file'],'error gunzipping\n%s',file)
@@ -132,34 +119,3 @@ for F = all_fields'
 end
 
 end
-
-function S = columnIntergrateColumns(S,field)
-%% columnIntergrateColumns
-%
-% Purpose: Special function to add the column itergrated values (not
-% volumemetric) together into value per profile. 
-%
-% Note: The field ExtinctionQC_532 should be manditory or is at least
-% highly recommended if looking at products based on the extinction such as
-% IWP is
-%
-
-switch field
-    case 'Ice_Water_Path'
-        if isfield(S,'ExtinctionQC_532')
-            S.(field)(S.ExtinctionQC_532~=0)=NaN;
-        else
-            warning(['atmlab:' mfilename ':Recomendation'],...
-                'Not including field ExtinctionQC_532 is not recommended by the Calipso people')
-        end
-        % I'm assuming here that -9999 means cloud free?
-        S.(field)(S.(field)<0)= 0;
-        % Do the sum here
-        S.(field) = nansum(S.(field),2);   
-    otherwise
-end
-
-
-end
-
-

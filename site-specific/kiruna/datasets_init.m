@@ -146,20 +146,20 @@ x.basedir = '/storage4/user_data/gerrit/testing/collocations_mhs_cpr';
 x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_$SAT.nc.gz';
 
-x = datasets_config('collocation_cpr_calipso');
+x = datasets_config('collocation_calipso_cpr');
 x.subdir = '$YEAR4/$MONTH/$DAY';
-x.filename = 'collocations_cpr_calipso_$YEAR4_$MONTH_$DAY.nc.gz';
-x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_calipso/core';
+x.filename = 'collocations_calipso_cpr_$YEAR4_$MONTH_$DAY.nc.gz';
+x.basedir = '/storage4/user_data/seliasson/collocations_calipso_cloudsat/core';
 
-x = datasets_config('collocation_cpr_mspps');
+x = datasets_config('collocation_mspps_cpr');
 x.subdir = '$YEAR4/$MONTH/$DAY';
-x.filename = 'collocations_cpr_mspps_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_mspps/core';
+x.filename = 'collocations_mspps_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+x.basedir = '/storage4/user_data/seliasson/collocations_mspps_cloudsat/core';
 
-x = datasets_config('collocation_cpr_patmosx');
+x = datasets_config('collocation_patmosx_cpr');
 x.subdir = '$YEAR4/$MONTH/$DAY';
-x.filename = 'collocations_cpr_patmosx_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_patmosx/core';
+x.filename = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+x.basedir = '/storage4/user_data/seliasson/collocations_patmosx_cloudsat/core';
 
 % x = datasets_config('collocation_cpr_modis');
 % x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_modis/core';
