@@ -1,3 +1,14 @@
+2012-03-15  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-36
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- BLIND BUGFIX! Untested.
+	  Bugfix when more than one field has the same non-singleton dimension
+
+	* collocations/SatDataset.m(find_granule_first_line): Tiny grammar fix
+
 2012-03-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-35

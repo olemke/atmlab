@@ -192,7 +192,7 @@ classdef FieldCopier < AssociatedDataset
                         alldimnames = fieldnames(dimsizes);
                         alldimvalues = structfun(@(x)x, dimsizes);
                         if ismember(n, alldimvalues)
-                            nm = alldimnames(alldimvalues==n);
+                            nm = alldimnames{alldimvalues==n};
                         else
                             nm = sprintf('AUTO_DIM%d_%d', length(alldimvalues)+1, n);
                             dimsizes.(nm) = n;
