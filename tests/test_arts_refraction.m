@@ -26,7 +26,7 @@
 
 function test_arts_refraction( varargin )
 %
-[geomztan] = optargs( varargin, { 5e3 } );
+[lrt,geomztan,switchaa] = optargs( varargin, { 5e3, 10e3, false } );
   
   
 %- Fixed settings
@@ -35,11 +35,13 @@ Q = qarts;
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
-Q.PPATH_LRAYTRACE       = 5e3;
-Q.PPATH_LMAX            = Q.PPATH_LRAYTRACE;
 Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionEuler' };
 refell                  = ellipsoidmodels( 'SphericalEarth' );
 re_string               = 'refellipsoidEarth( refellipsoid, "Sphere" )';
+  Q.REFR_INDEX_AGENDA   = { 'Ignore(rte_pressure)', ...
+                            'Ignore(rte_temperature)', ...
+                            'Ignore(rte_vmr_list)', ...
+                            'refr_indexUnit' };
 
 
 %- Load a test atmosphere
@@ -75,8 +77,9 @@ n    = 1 + ( 77.6e-8 * ( Q.P_GRID - eh2o ) + ...
                     ( 64.8e-8 + 3.776e-3 ./ Q.T_FIELD ) .* eh2o ) ./ Q.T_FIELD;
 x    = n .* (refell(1)+Q.Z_FIELD);
 ztan = interp1( x, Q.Z_FIELD, (refell(1)+Q.SENSOR_POS)*sind(Q.SENSOR_LOS), ...
-                'linear');
-
+                'cubic' );
+% Cubic interpolation was found best in comparison to ppath0 result below,
+% closely followed by spline.
 
 
 %- Create a workfolder
@@ -96,9 +99,34 @@ Q.WSMS_AT_END         = {
     sprintf('WriteXML("ascii",ppath,"%s/ppath.xml")',workfolder) };
 
 
+%- Run ARTS for 1D, with short step length
+%
+if 0
+Q.ATMOSPHERE_DIM      = 1;
+Q.PPATH_LRAYTRACE     = 25;
+Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
+%
+S = qarts2cfile( Q, ... 
+                   { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
+                   workfolder );
+cfile = fullfile( workfolder, 'cfile.arts' );
+strs2file( cfile, S );
+notok = arts( cfile, true );
+%
+if notok
+  fprintf('\n!!! Error while running ARTS for 1D !!!\n');
+  keyboard
+end
+%
+ppath0 = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
+end
+
+
 %- Run ARTS for 1D
 %
 Q.ATMOSPHERE_DIM      = 1;
+Q.PPATH_LRAYTRACE     = lrt;
+Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
 S = qarts2cfile( Q, ... 
                    { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
@@ -113,6 +141,10 @@ if notok
 end
 %
 ppath1 = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
+%
+if switchaa
+  ppath1.pos(:,2) = -ppath1.pos(:,2);
+end
 
 
 %- 2D
@@ -121,12 +153,15 @@ Q.ATMOSPHERE_DIM      = 2;
 % 
 Q.SENSOR_POS(2)       = 0; 
 Q.LAT_GRID            = [ 10 : 35 ]';
+if switchaa
+  Q.SENSOR_LOS(1)     = -Q.SENSOR_LOS(1);
+  Q.LAT_GRID          = sort( -Q.LAT_GRID );
+end
 nlat                  = length( Q.LAT_GRID );
 Q.Z_FIELD             = repmat( Q.Z_FIELD, 1 , nlat );
 Q.T_FIELD             = repmat( Q.T_FIELD, 1 , nlat );
 Q.VMR_FIELD           = repmat( Q.VMR_FIELD, [ 1, 1 , nlat] );
 Q.Z_SURFACE           = repmat( Q.Z_SURFACE, nlat, 1 );
-
 %
 S = qarts2cfile( Q, ... 
                    { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
@@ -149,6 +184,10 @@ Q.ATMOSPHERE_DIM      = 3;
 % 
 Q.SENSOR_POS(3)       = 0; 
 Q.SENSOR_LOS(2)       = 0; 
+if switchaa
+  Q.SENSOR_LOS(1)     = -Q.SENSOR_LOS(1);
+  Q.SENSOR_LOS(2)     = 180;   
+end
 Q.LON_GRID            = [ -5 : 2 : 5 ]';
 nlon                  = length( Q.LON_GRID );
 Q.Z_FIELD             = repmat( Q.Z_FIELD, [ 1 , 1, nlon ] );
@@ -197,3 +236,4 @@ fprintf( '       Altitude error for 3D : %6.3f m\n', zmin3-ztan );
 fprintf( '       Latitude error for 3D : %6.3f m\n', (lat3-lat1)*111e3 );
 fprintf( '      Longitude error for 3D : %6.3f m\n\n', lon3*111e3 );
 
+keyboard

@@ -1,3 +1,11 @@
+2012-03-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-33
+
+	* tests/test_arts_refraction.m: Now also possible to make
+	simulations with reversed azimuth angle (to check that all OK for
+	2D with negative za).
+
 2012-03-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-32
