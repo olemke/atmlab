@@ -1,7 +1,6 @@
-% GEOCENTRIC2CART   converts from spherical coordinate to a cartesian position    
+% GEOCENTRIC2CART   converts from spherical coordinate to a cartesian position
 %
-% See Contents for a defintion of the geocentric 
-% coordinate system
+% See Contents.m for a defintion of the geocentric coordinate system
 % 
 % FORMAT  [x,y,z]=geocentric2cart(r,lat,lon) 
 %
@@ -17,7 +16,7 @@
 
 function [x,y,z]=geocentric2cart(r,lat,lon)
 
-if r == 0
+if any( r == 0 )
   error( 'This set of functions are not handling the case of r = 0.' );  
 end
 

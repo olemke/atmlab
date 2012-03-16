@@ -3,8 +3,7 @@
 %   The geodetic coordinates refer to the reference ellipsoid 
 %   specified by input ellipsoid. 
 %
-%   See CART2GEOCENTRIC for a defintion of the geocentric 
-%   coordinate system.
+%   See CART2GEOCENTRIC for a defintion of the geocentric coordinate system.
 %
 % FORMAT [x, y, z] = geodetic2cart(h,lat,lon[,ellipsoid])
 % 

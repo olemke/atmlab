@@ -1,3 +1,21 @@
+2012-03-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-37
+
+	* tests/test_arts_refraction.m: Reference point now calculated by
+	arts, using 1D with 100 m step length.
+
+	* tests/test_arts_ppath.m: Making use of new feature of
+	cartposlos2geocentric.m.
+
+	* geodetic: Polishing of header text in several functions.
+
+	* geodetic/cart2geocentric.m: The original pos/los are now
+	optional arguments, which are used to improve the accuarcy where
+	possible.
+
+	* geodetic/cartposlos2geocentric.m: As above.
+
 2012-03-15  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-36

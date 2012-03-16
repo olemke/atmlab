@@ -1,28 +1,17 @@
-% TEST_ARTS_PPATH   Testing of ARTS ppath calculations
+% TEST_ARTS_REFRACTION   Testing of ARTS ppaths with refraction
 %
-%    Random test cases are generated. The following variables are
-%    randomised:
-%       length of p_grid
-%       length of lat_grid
-%       length of lon_grid
-%       z_surface
-%       sensor_pos
-%       sensor_los
+%   Makes 1D, 2D and 3D calculations with refraction and gives estimate
+%   of the error. The correct value is estimated by making calculations 
+%   with a 100 m step length, which makes the function slow.
 %
-%    A ppath calculation for ARTS is performed for each test case. A basic check
-%    of the ARTS calculations performed, by using atmlab functions. If any
-%    error is found, "keyboard" is called. The work folder is then left for
-%    debugging purposes.
-%
-% FORMAT   test_arts_ppath( atmosphere_dim, n, [re_sphere, do_refr] )
+% FORMAT   test_arts_refraction( [lrt,geomztan,switchaa] )
 %        
-% IN    atmosphere_dim   Atmospheric dimensionality
-%       n                Run n cases
-% OPT   re_sphere        Flag to also use a spherical reference ellipsoid
-%                        for 2D and 3D. Default is false.
-%       do_refr          Run with refraction ray tracing WSM (but with n=1).
+% OPT   lrt        Ray tracing step length
+%       geomztan   Geometrical tangent altitude
+%       switchaa   Make calculations with negative za for 2D and with a 180 
+%                  deg azimuth angle for 3D
 
-% 2012-02-22   Created by Patrick.
+% 2012-03-15   Created by Patrick.
 
 function test_arts_refraction( varargin )
 %
@@ -38,10 +27,6 @@ Q.ABS_SPECIES(1).TAG{1} = 'H2O';
 Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionEuler' };
 refell                  = ellipsoidmodels( 'SphericalEarth' );
 re_string               = 'refellipsoidEarth( refellipsoid, "Sphere" )';
-  Q.REFR_INDEX_AGENDA   = { 'Ignore(rte_pressure)', ...
-                            'Ignore(rte_temperature)', ...
-                            'Ignore(rte_vmr_list)', ...
-                            'refr_indexUnit' };
 
 
 %- Load a test atmosphere
@@ -101,9 +86,8 @@ Q.WSMS_AT_END         = {
 
 %- Run ARTS for 1D, with short step length
 %
-if 0
 Q.ATMOSPHERE_DIM      = 1;
-Q.PPATH_LRAYTRACE     = 25;
+Q.PPATH_LRAYTRACE     = 100;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
 S = qarts2cfile( Q, ... 
@@ -119,7 +103,16 @@ if notok
 end
 %
 ppath0 = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
+%
+[ztan0,imin] = min(ppath0.pos(:,1));
+lat0         = ppath0.pos(imin,2);
+if switchaa
+  lat0 = -lat0;
 end
+fprintf( '\n     Ray tracing step length : %8.3f km\n', lrt/1e3 );
+fprintf( 'Geometrical tangent altitude : %8.3f km\n', geomztan/1e3 );
+fprintf( '  Refracted tangent altitude : %8.3f km\n', ztan0/1e3 );
+  
 
 
 %- Run ARTS for 1D
@@ -145,7 +138,13 @@ ppath1 = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
 if switchaa
   ppath1.pos(:,2) = -ppath1.pos(:,2);
 end
-
+%
+[zmin1,imin] = min(ppath1.pos(:,1));
+lat1         = ppath1.pos(imin,2);
+%
+fprintf( '       Altitude error for 1D : %8.3f m\n', zmin1-ztan0 );
+fprintf( '       Latitude error for 1D : %8.3f m\n', (lat1-lat0)*111e3 );
+  
 
 %- 2D
 %
@@ -176,19 +175,25 @@ if notok
 end
 %
 ppath2 = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
+%
+[zmin2,imin] = min(ppath2.pos(:,1));
+lat2         = ppath2.pos(imin,2);
+fprintf( '       Altitude error for 2D : %8.3f m\n', zmin2-ztan0 );
+fprintf( '       Latitude error for 2D : %8.3f m\n', (lat2-lat0)*111e3 );
+
 
 
 %- 3D
 %
 Q.ATMOSPHERE_DIM      = 3;
 % 
-Q.SENSOR_POS(3)       = 0; 
+Q.SENSOR_POS(3)       = 10; 
 Q.SENSOR_LOS(2)       = 0; 
 if switchaa
   Q.SENSOR_LOS(1)     = -Q.SENSOR_LOS(1);
   Q.SENSOR_LOS(2)     = 180;   
 end
-Q.LON_GRID            = [ -5 : 2 : 5 ]';
+Q.LON_GRID            = Q.SENSOR_POS(3) + [ -5 : 2 : 5 ]';
 nlon                  = length( Q.LON_GRID );
 Q.Z_FIELD             = repmat( Q.Z_FIELD, [ 1 , 1, nlon ] );
 Q.T_FIELD             = repmat( Q.T_FIELD, [ 1 , 1, nlon ] );
@@ -209,31 +214,17 @@ if notok
 end
 %
 ppath3 = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
+%
+[zmin3,imin] = min(ppath3.pos(:,1));
+lat3         = ppath3.pos(imin,2);
+lon3         = ppath3.pos(imin,3)-Q.SENSOR_POS(3);
+fprintf( '       Altitude error for 3D : %8.3f m\n', zmin3-ztan0 );
+fprintf( '       Latitude error for 3D : %8.3f m\n', (lat3-lat0)*111e3 );
+fprintf( '      Longitude error for 3D : %8.3f m\n\n', lon3*111e3 );
+  
 
 
 %- Remove workfolder
 %
 delete_tmpfolder( workfolder );
 
-
-%- report results
-%
-[zmin1,imin] = min(ppath1.pos(:,1));
-lat1         = ppath1.pos(imin,2);
-[zmin2,imin] = min(ppath2.pos(:,1));
-lat2         = ppath2.pos(imin,2);
-[zmin3,imin] = min(ppath3.pos(:,1));
-lat3         = ppath3.pos(imin,2);
-lon3         = ppath3.pos(imin,3);
-%
-fprintf( '\n     Ray tracing step length : %6.3f km\n', Q.PPATH_LRAYTRACE/1e3 );
-fprintf( 'Geometrical tangent altitude : %6.3f km\n', geomztan/1e3 );
-fprintf( '  Refracted tangent altitude : %6.3f km\n', ztan/1e3 );
-fprintf( '       Altitude error for 1D : %6.3f m\n', zmin1-ztan );
-fprintf( '       Altitude error for 2D : %6.3f m\n', zmin2-ztan );
-fprintf( '       Latitude error for 2D : %6.3f m\n', (lat2-lat1)*111e3 );
-fprintf( '       Altitude error for 3D : %6.3f m\n', zmin3-ztan );
-fprintf( '       Latitude error for 3D : %6.3f m\n', (lat3-lat1)*111e3 );
-fprintf( '      Longitude error for 3D : %6.3f m\n\n', lon3*111e3 );
-
-keyboard

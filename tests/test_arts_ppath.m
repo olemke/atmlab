@@ -151,6 +151,7 @@ for c = 1 : n
     Q.SENSOR_POS(2)     = lat0;
     Q.SENSOR_POS(3)     = lon0;
     aa0                 = -180 + 360*rand;
+%    aa0 = 0
     Q.SENSOR_LOS(2)     = aa0;
   end
 
@@ -213,7 +214,9 @@ for c = 1 : n
       if dd > 1
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
-                                        y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz );
+                          y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz, ...
+                          (re+Q.SENSOR_POS(1))*sin(abs(Q.SENSOR_LOS(1))), ...
+                          lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0);
         keyboard
       end
     end

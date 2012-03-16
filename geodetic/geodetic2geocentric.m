@@ -1,9 +1,8 @@
-% GEODETIC2GEOCENTRIC converts from a geodetic coordinate to a geocentric position
+% GEODETIC2GEOCENTRIC converts from a geodetic to a geocentric position
 %  
 %   The geodetic coordinates refer to the reference ellipsoid 
 %   specified by input ellipsoid. 
-%   See Contents for a defintion of the geocentric 
-%   coordinate system.
+%   See Contents for a defintion of the geocentric coordinate system.
 %
 % FORMAT [r,lat_gc,lon_gc]=geodetic2geocentric(h,lat_gd,lon_gd[,ellipsoid])
 %
@@ -27,7 +26,8 @@ if nargin<4
   ellipsoid = ellipsoidmodels( 'WGS84' );
 end 
 
-[x, y, z] = geodetic2cart(h,lat_gd,lon_gd, ellipsoid );
-[r_gc,lat_gc,lon_gc]=cart2geocentric(x,y,z);
+[x,y,z]              = geodetic2cart(h,lat_gd,lon_gd, ellipsoid );
+
+[r_gc,lat_gc,lon_gc] = cart2geocentric(x,y,z);
 
 

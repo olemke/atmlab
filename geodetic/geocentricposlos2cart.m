@@ -1,8 +1,7 @@
-% GEOCENTRICPOSLOS2CART converts from spherical coordinate and line of sight (LOS) direction to a cartesian position and LOS direction   
+% GEOCENTRICPOSLOS2CART converts from spherical POS/LOS to cartesian coordinates
 %
-% See Contents for a defintion of the geocentric 
-% coordinate system. The local LOS angles are defined following 
-% the EAST-NORTH-UP system:
+% See Contents for a defintion of the geocentric coordinate system. 
+% The local LOS angles are defined following the EAST-NORTH-UP system:
 %         za    aa
 %         90    0   points towards north
 %         90    90  points towards east
@@ -26,7 +25,7 @@
 % History: created by Bengt Rydberg 2011-10-31
 function [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,aa)
 
-if r == 0
+if any( r == 0 )
   error( 'This function is not handling the case of r = 0.' );  
 end
 rqre_in_range( lat, -90, 90 )
@@ -35,6 +34,7 @@ rqre_in_range( za, 0, 180 )
 
 
 deg2rad = constants( 'DEG2RAD' );
+
 
 % For lat = +- 90 the azimuth angle gives the longitude along which the
 % LOS goes
