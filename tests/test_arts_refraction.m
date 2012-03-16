@@ -2,7 +2,7 @@
 %
 %   Makes 1D, 2D and 3D calculations with refraction and gives estimate
 %   of the error. The correct value is estimated by making calculations 
-%   with a 100 m step length, which makes the function slow.
+%   with a 250 m step length, which makes the function slow.
 %
 % FORMAT   test_arts_refraction( [lrt,geomztan,switchaa] )
 %        
@@ -32,7 +32,7 @@ re_string               = 'refellipsoidEarth( refellipsoid, "Sphere" )';
 %- Load a test atmosphere
 %
 atmtest =  fullfile( atmlab('ARTS_XMLDATA_PATH'), ...
-                                'atmosphere', 'fascod', 'midlatitude-winter' );
+                                'atmosphere', 'fascod', 'tropical' );
 Az      = xmlLoad( [ atmtest, '.z.xml' ] ); 
 At      = xmlLoad( [ atmtest, '.t.xml' ] ); 
 Ah2o    = xmlLoad( [ atmtest, '.H2O.xml' ] ); 
@@ -87,7 +87,7 @@ Q.WSMS_AT_END         = {
 %- Run ARTS for 1D, with short step length
 %
 Q.ATMOSPHERE_DIM      = 1;
-Q.PPATH_LRAYTRACE     = 100;
+Q.PPATH_LRAYTRACE     = 250;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
 S = qarts2cfile( Q, ... 
@@ -112,6 +112,7 @@ end
 fprintf( '\n     Ray tracing step length : %8.3f km\n', lrt/1e3 );
 fprintf( 'Geometrical tangent altitude : %8.3f km\n', geomztan/1e3 );
 fprintf( '  Refracted tangent altitude : %8.3f km\n', ztan0/1e3 );
+fprintf( 'Rough error estimate of ztan : %8.3f m\n',  ztan0-ztan );
   
 
 

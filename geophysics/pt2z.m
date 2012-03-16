@@ -69,6 +69,16 @@ re = ellipsoidradii( ellipsoidmodels('wgs84'), lat );
 g0 = lat2g0( lat );
 
 
+%= Gas constant and molecular weight of dry air and water vapour 
+%
+r  = constants( 'GAS_CONST' );
+md = 28.966;
+mw = 18.016;
+%
+ep = mw/md;
+rd = 1e3 * r / md;
+
+
 %= How to end iterations
 %
 if z_acc < 0
@@ -87,15 +97,14 @@ for iter = 1:niter
       
 	gp  = ( g(i) + g(i+1) ) / 2;
   
-	%-- Calculate weight mixing ratio for water assuming constant average
-	%   molecular weight of the air
-	r  = (18/28.96) * (h2o(i)+h2o(i+1)) / 2;
+	%-- Calculate average water VMR (= average e/p)
+	hm  = (h2o(i)+h2o(i+1)) / 2;
   
 	%--  The virtual temperature (no liquid water)
-	tv = (1+0.61*r) * (t(i)+t(i+1)) / 2;
+	tv = (t(i)+t(i+1)) / 2 / (1-hm*(1-ep));   % E.g. 3.16 in Wallace&Hobbs
   
 	%-- The change in vertical altitude from i to i+1 
-	dz = 287.053 * (tv/gp) * log( p(i)/p(i+1) );
+	dz = rd * (tv/gp) * log( p(i)/p(i+1) );
 	z(i+1) = z(i) + dz;
       
   end
@@ -108,7 +117,6 @@ for iter = 1:niter
   end
   
 end
-
 
 return
 %----------------------------------------------------------------------------

@@ -6,36 +6,40 @@
 %
 %    The following constants are defined:
 %        
-%       SPEED_OF_LIGHT             [m/s]
-%       BOLTZMANN_CONST            [J/K]
-%       PLANCK_CONST               [Js]
 %       AVOGADRO                   [1/mol]
-%       STEFANBOLTZMANN            [J.K-1.m-2.s-1] Total blackbody emission is STEFANBOLTZMANN*T^4
-%       CBGR                       [K] Temperature of cosmic background radiation 
+%       BOLTZMANN_CONST            [J/K]
+%       CBGR                       [K] Temperature of cosmic background 
+%                                      radiation 
+%       DEG2RAD                    [rad] Conversion from degrees to radians
 %       EARTH_RADIUS               [m] Equatorial radius of the earth.
 %       EARTH_RADIUS_MEAN          [m] Mean radius of the earth.
 %       EARTH_STANDARD_GRAVITY     [m/s^2] As defined from CGPM in m/s^2
-%       EARTHORBIT_RADIUS          [m] Radius of the Earth orbit, around the Sun  
-%       NAUTICAL_MILE              [m] 1 nautical mile 
-%       SUN_RADIUS                 [m] Sun radius
-%       DEG2RAD                    [rad] Conversion from degrees to radians
-%       RAD2DEG                    [deg] Conversion from radians to degrees
+%       EARTHORBIT_RADIUS          [m] Radius of the Earth orbit, around the Sun
 %       GAS_CONST_DRY_AIR          [J.kg-1e4.K-1] Gas constant for dry air
 %       GAS_CONST_WATER_VAPOR      [J.kg-1.K-1] Gas constant for water vapor
-%       SPECIFIC_HEAT_CP_DRY_AIR   [J.kg-1.K-1] Specific heat at constant pressure, at sea level, and at 0°C
-%       SPECIFIC_HEAT_CV_DRY_AIR   [J.kg-1.K-1] Specific heat at constant pressure 
-%       LATENT_HEAT_VAPORIZATION   [J.kg-1] Latent heat of vaporization of water vapor
-%
+%       LATENT_HEAT_VAPORIZATION   [J.kg-1] Latent heat of vaporization of
+%                                           water vapor
+%       NAUTICAL_MILE              [m] 1 nautical mile 
+%       PLANCK_CONST               [Js]
+%       RAD2DEG                    [deg] Conversion from radians to degrees
+%       SPECIFIC_HEAT_CP_DRY_AIR   [J.kg-1.K-1] Specific heat at constant 
+%                                               pressure, at sea level and 0C
+%       SPECIFIC_HEAT_CV_DRY_AIR   [J.kg-1.K-1] Specific heat at constant 
+%                                               pressure 
+%       SPEED_OF_LIGHT             [m/s]
+%       STEFANBOLTZMANN            [J.K-1.m-2.s-1] Total blackbody emission
+%                                                  is STEFANBOLTZMANN*T^4
+%       SUN_RADIUS                 [m] Sun radius
 %        
+% FORMAT   [const,unit] = constants(name)
+%
 % OUT   const   Value of the constant.
-%       unit    string name of the associated unit
+%       unit    String name of the associated unit.
 %
-% IN    name    Name of the constant.   (if empty, the list of constants are shown)
-%   
-%
-% FORMAT   const = constants(name); or
-%          [const,unit] = constants(name);
-%
+% IN    name    Name of the constant (if empty, the list of constants 
+%               are shown).
+  
+
 % 2002-12-12   Created by Claudia Emde and Patrick Eriksson.
 % 2011-12-7    modified by Salomon Eliasson
 % $Id$
@@ -85,35 +89,24 @@ end
    
 switch name
 
-case 'SPEED_OF_LIGHT'
-    %ref: http://en.wikipedia.org/wiki/Speed_of_light
-    const = 2.99792458e8;
-    unit  = 'ms^{-1}';
+case 'AVOGADRO'
+    %ref: http://physics.nist.gov/cgi-bin/cuu/Value?na|search_for=avogadro
+    const = 6.02214129e23;
+    unit  = 'mol^{-1}';
     
 case 'BOLTZMANN_CONST'
     %ref: http://en.wikipedia.org/wiki/Boltzmann_constant
     const = 1.3806488e-23;
     unit  = 'JK^{-1}';
     
-case 'PLANCK_CONST'
-    %ref: http://en.wikipedia.org/wiki/Planck_constant
-    const = 6.62606957e-34;
-    unit  = 'Js';
-    
-case 'AVOGADRO'
-    %ref: http://physics.nist.gov/cgi-bin/cuu/Value?na|search_for=avogadro
-    const = 6.02214129e23;
-    unit  = 'mol^{-1}';
-    
-case 'STEFANBOLTZMANN'
-    const = 2*pi^5*constants('BOLTZMANN_CONST')^4 / ...
-                (15*constants('PLANCK_CONST')^3*constants('SPEED_OF_LIGHT')^2);
-    unit = 'JK^{-4}m^{-2}s^{-1}';
-
 case 'CBGR'
     %ref: http://en.wikipedia.org/wiki/Cosmic_background_radiation
     const = 2.725;
     unit = 'K';
+    
+case 'DEG2RAD'
+    const = pi/180;
+    unit = 'rad';
     
 case 'EARTH_RADIUS'
     %ref: http://en.wikipedia.org/wiki/Earth (equatorial radius)
@@ -135,24 +128,11 @@ case 'EARTHORBIT_RADIUS'
     const = 1.49598261e11;
     unit  = 'm';
     
-case 'NAUTICAL_MILE'
-    % ref: http://en.wikipedia.org/wiki/Nautical_mile
-    const = 1852;
-    unit  = 'm';
+case 'GAS_CONST'
+    %ref: http://en.wikipedia.org/wiki/Gas_constant
+    const = 8.3144621 ;
+    unit  = 'JK^{-1}mol{-1}';
     
-case 'SUN_RADIUS'
-    % ref: http://en.wikipedia.org/wiki/Sun
-    const = 6.955e8;
-    unit  = 'm';
-
-case 'DEG2RAD'
-    const = pi/180;
-    unit = 'rad';
-    
-case 'RAD2DEG'
-    const = 180/pi;
-    unit = 'deg';
-
 case 'GAS_CONST_DRY_AIR'
     %ref: http://en.wikipedia.org/wiki/Gas_constant
     const = 287.04;
@@ -163,6 +143,25 @@ case 'GAS_CONST_WATER_VAPOR'
     const = 461.5; 
     unit  = 'Jkg^{-1}K^{-1}';
     
+case 'LATENT_HEAT_VAPORIZATION'
+    % ref: http://en.wikipedia.org/wiki/Enthalpy_of_vaporization
+    const = 2257e3;
+    unit  = 'Jkg^{-1}';
+ 
+case 'NAUTICAL_MILE'
+    % ref: http://en.wikipedia.org/wiki/Nautical_mile
+    const = 1852;
+    unit  = 'm';
+    
+case 'PLANCK_CONST'
+    %ref: http://en.wikipedia.org/wiki/Planck_constant
+    const = 6.62606957e-34;
+    unit  = 'Js';
+    
+case 'RAD2DEG'
+    const = 180/pi;
+    unit = 'deg';
+
 case 'SPECIFIC_HEAT_CP_DRY_AIR'
     %ref: 56
     const = 1003.5; 
@@ -173,10 +172,21 @@ case 'SPECIFIC_HEAT_CV_DRY_AIR'
     const = 718;
     unit  = 'Jkg^{-1}K^{-1}';
     
-case 'LATENT_HEAT_VAPORIZATION'
-    % ref: http://en.wikipedia.org/wiki/Enthalpy_of_vaporization
-    const = 2257e3;
-    unit  = 'Jkg^{-1}';
+case 'SPEED_OF_LIGHT'
+    %ref: http://en.wikipedia.org/wiki/Speed_of_light
+    const = 2.99792458e8;
+    unit  = 'ms^{-1}';
+    
+case 'STEFANBOLTZMANN'
+    const = 2*pi^5*constants('BOLTZMANN_CONST')^4 / ...
+                (15*constants('PLANCK_CONST')^3*constants('SPEED_OF_LIGHT')^2);
+    unit = 'JK^{-4}m^{-2}s^{-1}';
+
+case 'SUN_RADIUS'
+    % ref: http://en.wikipedia.org/wiki/Sun
+    const = 6.955e8;
+    unit  = 'm';
+
 otherwise
     error(['atmlab:' mfilename ':badInput'],['Unknown constant: ', name])
 end      
@@ -184,14 +194,20 @@ end
 % make sure there's something for unit
 if ~exist('unit','var'), unit = ''; end
 
+
+
+
 function const_struct = get_constants_struct
 % A structure with the same information as the switch case (+units)
 
-name  = {'SPEED_OF_LIGHT','BOLTZMANN_CONST','PLANCK_CONST','AVOGADRO',...
-    'STEFANBOLTZMANN','CBGR','EARTH_RADIUS','EARTH_RADIUS_MEAN','EARTH_STANDARD_GRAVITY',...
-    'EARTHORBIT_RADIUS','NAUTICAL_MILE','SUN_RADIUS','DEG2RAD','RAD2DEG',...
-    'GAS_CONST_DRY_AIR','GAS_CONST_WATER_VAPOR','SPECIFIC_HEAT_CP_DRY_AIR',...
-    'SPECIFIC_HEAT_CV_DRY_AIR','LATENT_HEAT_VAPORIZATION'};
+name  = { ...
+    'AVOGADRO', 'BOLTZMANN_CONST', 'CBGR', 'DEG2RAD', 'EARTH_RADIUS', ...
+    'EARTH_RADIUS_MEAN', 'EARTH_STANDARD_GRAVITY', 'EARTHORBIT_RADIUS',...
+    'GAS_CONST', 'GAS_CONST_DRY_AIR', 'GAS_CONST_WATER_VAPOR', ...
+    'LATENT_HEAT_VAPORIZATION', 'NAUTICAL_MILE', 'PLANCK_CONST', 'RAD2DEG',...
+    'SPECIFIC_HEAT_CP_DRY_AIR', 'SPECIFIC_HEAT_CV_DRY_AIR', ...
+    'SPEED_OF_LIGHT', 'STEFANBOLTZMANN', 'SUN_RADIUS' ...
+};
 
 value = cell(1,length(name));
 unit  = cell(1,length(name));
@@ -201,6 +217,9 @@ for i = 1:length(name)
 end
 
 const_struct = struct('name',name,'value',value,'unit',unit);
+
+
+
 
 function const_struct = ifnargin0
 % if you only want to see what constants there are

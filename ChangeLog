@@ -1,5 +1,20 @@
 2012-03-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-38
+
+	* geophysics/pt2z.m: Now using from GAS_CONST from constants.m and
+	another equation for virtual temperature. Before the gas constant
+	for dry air was hard-coded to 287.0530. The implied value now is
+	287.0421, which gives a change of about 2m at 50 km.
+
+	* physics/constants.m: Sorted constants in alphabetical order
+	(both in header and inside function). Added "GAS_CONST".
+
+	* tests/test_arts_refraction.m (test_arts_refraction): More text
+	output.
+
+2012-03-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-37
 
 	* tests/test_arts_refraction.m: Reference point now calculated by
