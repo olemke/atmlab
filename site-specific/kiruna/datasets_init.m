@@ -115,10 +115,11 @@ datasets_config('mhs_basedir', '/storage3/data/mhs');
 datasets_config('mhs_subdir', '$SAT_mhs_$YEAR4/$MONTH/$DAY');
 datasets_config('mhs_regexp', datasets_config('amsua_regexp'));
 
-x = datasets_config('modis');
+% MODIS
+x = datasets_config('modis_aqua_l2');
 x.basedir = '/storage3/data/modis/MYD06_L2/';
 x.subdir = '$YEAR4/$MONTH/$DAY';
-x.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})';
+x.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})\.(?<version>\d{3})';
 
 % mspps
 
@@ -161,10 +162,10 @@ x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 x.basedir = '/storage4/user_data/seliasson/collocations_patmosx_cloudsat/core';
 
-% x = datasets_config('collocation_cpr_modis');
-% x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_modis/core';
-% x.subdir = '$YEAR4/$MONTH/$DAY';
-% x.filename = 'collocations_cpr_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+x = datasets_config('collocation_modis_cpr');
+x.basedir = '/storage4/user_data/seliasson/collocations_modis_cloudsat/core';
+x.subdir = '$YEAR4/$MONTH/$DAY';
+x.filename = 'collocations_modis_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 
 % OLD STYLE

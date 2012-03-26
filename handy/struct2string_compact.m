@@ -28,6 +28,10 @@ function descr = struct2string_compact(S, varargin)
 
 n = optargs(varargin, {3});
 
+if isempty(fieldnames(S))
+    descr = '';
+    return;
+end
 %descr = cellfun(@(v) sprintf('%s=%.*f,', v, n*~iswhole(S.(v)), S.(v)), fieldnames(S), 'UniformOutput', false);
 descr = cellfun(@(v) sprintf('%s=%s;', v, elem2str(S.(v), n)), fieldnames(S), 'UniformOutput', false);
 descr = strcat(descr{:});

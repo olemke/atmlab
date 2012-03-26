@@ -96,6 +96,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
    
         end
         
+        function S = find_info_from_granule(self,fname)
+        % find_info_from_granule Extract info from a granule filename
+        %
+        % FIXME DOC!
+
+        S = regexp(fname,self.re,'names'); 
+
+        end
+        
         function [M, paths] = find_granules_by_date(self, date, varargin)
             % find_granules_by_date Find all granule start times for date/sat/dataset
             %

@@ -1,3 +1,27 @@
+2012-03-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-39
+
+	* datasets/common_read_mspps.m: Fixed small bug
+
+	* datasets/common_read_calipso.m: Fixed version number
+
+	* datasets/SatDataset.m: Added find_info_from_granule as a
+	method
+
+	* handy/struct2string_compact.m: If input fieldnames are empty,
+	return and empty output
+
+	* datasets/datasets_config.m:
+	* site-specific/kiruna/datasets_init.m:
+	Added modis dataset
+
+	* collocations/CollocatedDataset.m: Small fixes related to empty
+	matrixes etc
+
+	* math/land_sea_mask.m: Added a bit more documentation and added
+	Gerrit as the author of the function
+
 2012-03-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-38

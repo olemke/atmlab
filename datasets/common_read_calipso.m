@@ -80,7 +80,7 @@ S.time = (S.Profile_UTC_Time(:,2)-yymmdd) * (24*3600);
 
 S.lon = double(S.Longitude(:,2));
 S.lat = double(S.Latitude(:,2));
-S.version = 'version 3 (hardcoded)';
+S.version = '051';
 S = rmfield(S,core_fields);
 
 % add filename

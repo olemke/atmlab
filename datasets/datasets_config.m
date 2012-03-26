@@ -174,23 +174,27 @@ A.hirscs_subdir = nan;
 A.hirscs_regexp = nan;
 A.hirscs_filename = nan;
 
-A.mhs_basedir = nan;
-A.mhs_subdir = nan;
-A.mhs_regexp = nan;
-A.mhs_filename = nan;
+% new
 A.mhs = SatDataset('name', 'mhs', ...
                    'reader', @common_read_poes_radiometer, ...
                    'granule_duration', 6130); % new style 2012-01-18
 
-A.modis = SatDataset('name', 'modis', ...
+%old
+A.mhs_basedir = nan;
+A.mhs_subdir = nan;
+A.mhs_regexp = nan;
+A.mhs_filename = nan;
+
+
+A.modis_aqua_l2 = SatDataset('name', 'modis_aqua_L2', ...
     'reader', @common_read_modis, ...
-    'granule_duration', 6130, ...
-    'dataset','MYD06_L2'); % new style
+    'granule_duration', 300, ...
+    'dataset','MYD06_L2');
 
 %new
 A.mspps = SatDataset('name', 'mspps', ...
     'reader', @common_read_mspps, ...
-    'granule_duration', 6130); % new style
+    'granule_duration', 6130);
 
 % old
 A.mspps_basedir = nan;
@@ -217,8 +221,7 @@ A.collocation_mhs_cpr = CollocatedDataset(A.mhs, A.cpr); % new style 2012-01-18
 A.collocation_calipso_cpr = CollocatedDataset(A.calipso,A.cpr); 
 A.collocation_mspps_cpr   = CollocatedDataset(A.mspps,A.cpr);
 A.collocation_patmosx_cpr = CollocatedDataset(A.patmosx,A.cpr);
-
-%A.collocation_cpr_modis = CollocatedDataset(A.collocation_cpr_patmosx, A.modis);
+A.collocation_modis_cpr = CollocatedDataset(A.modis_aqua_l2, A.cpr);
 %A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
 
 % OLD STYLE

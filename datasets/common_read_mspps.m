@@ -47,7 +47,7 @@ for F = all_fields'
     catch ME
         if any(strcmp(ME.identifier,{'MATLAB:imagesci:hdfquickinfo:invalidFile'}))
             error('atmlab:invalid_data','%s:%s found in %s hdfread call',...
-                ME:identifier,ME.message,mfilename)
+                ME.identifier,ME.message,mfilename)
         else
             error(ME.identifier,Me.message)
         end

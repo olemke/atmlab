@@ -249,6 +249,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 switch ME.identifier
                     case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
                         logtext(eid, 'Collocating failed: %s\n', ME.message);
+                        also = struct();
                         return
                     otherwise
                         ME.rethrow();
@@ -809,10 +810,12 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             
             % add row-number after all else, here, but REDO just before
             % storing!
-             M(:, c.INDEX) = 1:size(M, 1);
+            if ~isempty(M)
+                M(:, c.INDEX) = 1:size(M, 1);
+            end
         end
         
-        function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin) 
+        function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin)
             % collocation_read Read collocations for indicated period
             %
             % This method reads all or a selection of the collocations for
@@ -993,8 +996,10 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                     end
                 catch ME
                     switch (ME.identifier)
-                        case {'MATLAB:load:couldNotReadFile', 'MATLAB:nonExistentField', ...
-                                'MATLAB:gunzip:invalidFilename','MATLAB:netcdf:open:noSuchFile', ...
+                        case {'MATLAB:load:couldNotReadFile', ...
+                                'MATLAB:nonExistentField', ...
+                                'MATLAB:gunzip:invalidFilename',...
+                                'MATLAB:netcdf:open:noSuchFile', ...
                                 'atmlab:exec_system_cmd:shell'}
                             logtext(atmlab('ERR'), 'Problem for %04d-%02d-%02d: %s\n', ...
                                 date(1), date(2), date(3), ME.message);

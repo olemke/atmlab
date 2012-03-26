@@ -4,17 +4,17 @@
 % when called without arguments, returns a 1-degree land-sea-mask from
 % arts-xml-data. In all other cases, returns a land-water-mask at the
 % indicated resolution from atmlab-data (obtained with GMT).
-% To get a collection of all available land-water-masks, call this function
-% with a single argument, being a string of length 1 equal to '?' (ASCII
-% character number 63).
 %
-% Note that for the new land-sea masks (obtained with GMT), the last
-% longitude value is a repetition of the first, so the 1-deg mask from GMT
-% contains one column more than the previous 1-deg mask in
-% atmlab-xml-data.
 %
-% To configure this, you need to checkout the svn repo 'atmlab-data' and
-% set the environment variable ATMLAB_DATA_PATH appropiately.
+% NOTE: To get a collection of all AVAILABLE land-water-masks, call this
+% function with a single argument, being a string of length 1 equal to '?'
+% (ASCII character number 63).
+%
+% NOTE: The new land-sea masks (obtained with GMT), the last longitude
+% value is a repetition of the first, so the 1-deg mask from GMT contains
+% one column more than the previous 1-deg mask in atmlab-xml-data. To
+% configure this, you need to checkout the svn repo 'atmlab-data' and set
+% the environment variable ATMLAB_DATA_PATH appropiately.
 %
 % For implementation notes (how to add masks etc.), see
 % atmlab-data/land_water_mask/README
@@ -36,6 +36,8 @@
 %
 %   >> [lat lon M] = land_sea_mask('5min');         
 %   >> pcolor(lon, lat, double(M)); shading('flat');
+%  ------- or -----------
+%   >> gmt_plot(struct('data',M,'lat',lat,'lon',lon))
 %
 % WARNING
 %
@@ -43,6 +45,8 @@
 %   That's 233 MB in uint8, almost 1.9 GB when converted to double.
 %
 % $Id$
+% Created by Gerrit Holl
+
 
 function varargout = land_sea_mask(varargin)
 
@@ -53,7 +57,7 @@ switch nargin
         gridsize = varargin{1};
         if strcmp(gridsize, '?')
             S = dir(fullfile(atmlab('ATMLAB_DATA_PATH'), 'land_water_mask'));
-            [d, d, d, d, tokenStr]= regexp({S.name}, 'land_water_mask_(.*)\.png');
+            [~, ~, ~, ~, tokenStr]= regexp({S.name}, 'land_water_mask_(.*)\.png');
             varargout{1} = cellfun(@(v) v{1}, tokenStr(~cellfun(@isempty, tokenStr)));
         else
             [varargout{1:3}] = land_sea_mask_new(varargin{:});
