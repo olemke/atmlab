@@ -1123,7 +1123,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
                                                      'Q.FFIT.ORDER' );      %&%
       rqre_in_range( Q.FFIT.ORDER, 0, 1, 'Q.FFIT.ORDER' );                  %&%
       T{end+1} = 'jacobianAddFreqShiftAndStretch(jacobian_quantities,';
-      T{end+1} = sprintf('   jacobian_agenda, "interp", %.3e, %d )', ...
+      T{end+1} = sprintf('   jacobian_agenda, f_grid, "interp", %.3e, %d )',...
                                                Q.FFIT.DF, Q.FFIT.ORDER >0 );
     end
   end

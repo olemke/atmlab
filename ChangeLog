@@ -1,3 +1,13 @@
+2012-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-0-1
+
+	* arts/qarts2cfile.m (cfile_Jacobi): Adopted call of
+	jacobianAddFreqShiftAndStretch (changed in arts-2-0-40).
+
+	* demos/qpack2_demo.m: Definition of FFIT with stretch now again
+	behind %. DF now set to 25e3 (a safer value).
+
 2012-02-22  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-0-0

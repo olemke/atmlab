@@ -285,11 +285,11 @@ Q.FFIT.ORDER              = 0;
 Q.FFIT.SX                 = 50e3^2;  
 Q.FFIT.L2                 = true;
 
-Q.FFIT.RETRIEVE           = true;
-Q.FFIT.DF                 = 100e3; 
-Q.FFIT.ORDER              = 1;
-Q.FFIT.SX                 = [300e3^2 0;0 100e3^2]; 
-Q.FFIT.L2                 = true;
+%Q.FFIT.RETRIEVE           = true;
+%Q.FFIT.DF                 = 50e3; 
+%Q.FFIT.ORDER              = 1;
+%Q.FFIT.SX                 = [300e3^2 0;0 100e3^2]; 
+%Q.FFIT.L2                 = true;
 
 
 %- Polyfit
