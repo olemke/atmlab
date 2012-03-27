@@ -13,23 +13,29 @@
 %    z_acc<0, the calculations are run twice, which should give an accuracy
 %    better than 1 m.
 %
-% FORMAT   z = pt2z( p, t, h2o, p0, z0 [,lat,z_acc] )
+% FORMAT   z = pt2z( p, t, h2o, p0, z0 [,lat,z_acc,refell] )
 %        
-% OUT   z     Altitudes [m].
-% IN    p     Column vector of pressures [Pa].
-%       t     Column vector of temperatures [K].
-%       h2o   Water vapour [VMR]. Vector or a scalar, e.g. 0. 
-%       p0    Pressure of reference point [Pa].
-%       z0    Altitude of reference point [m].
-%       lat   Latitude. Default is 45.
-%       z_acc Accuracy for z. Default is -1.
+% OUT   z         Altitudes [m].
+% IN    p         Column vector of pressures [Pa].
+%       t         Column vector of temperatures [K].
+%       h2o       Water vapour [VMR]. Vector or a scalar, e.g. 0. 
+%       p0        Pressure of reference point [Pa].
+%       z0        Altitude of reference point [m].
+%       lat       Latitude. Default is 45.
+%       z_acc     Accuracy for z. Default is -1.
+%       ellipsoid Reference ellipsoid data, see *ellipsoidmodels*. 
+%                 Default is data matching WGS84.
 
 % 2005-05-11   Created by Patrick Eriksson.
 
 
 function z = pt2z(p,t,h2o,p0,z0,varargin)
 %
-[lat,z_acc] = optargs( varargin, { 45, -1 } );
+[lat,z_acc,ellipsoid] = optargs( varargin, { 45, -1, NaN } );
+%
+if isnan(ellipsoid)
+  ellipsoid = ellipsoidmodels('wgs84');
+end
                                                                             %&%
 rqre_nargin( 5, nargin );                                                   %&%
 rqre_datatype( p, @istensor1 );                                             %&%
@@ -65,7 +71,7 @@ z = shift2refpoint( p, z, p0, z0 );
 
 %= Set Earth radius and g at z=0
 %
-re = ellipsoidradii( ellipsoidmodels('wgs84'), lat );
+re = ellipsoidradii( ellipsoid, lat )
 g0 = lat2g0( lat );
 
 
@@ -75,8 +81,8 @@ r  = constants( 'GAS_CONST' );
 md = 28.966;
 mw = 18.016;
 %
-ep = mw/md;
-rd = 1e3 * r / md;
+k  = 1-mw/md        % 1 - eps         
+rd = 1e3 * r / md   % Gas constant for 1 kg dry air
 
 
 %= How to end iterations
@@ -101,7 +107,7 @@ for iter = 1:niter
 	hm  = (h2o(i)+h2o(i+1)) / 2;
   
 	%--  The virtual temperature (no liquid water)
-	tv = (t(i)+t(i+1)) / 2 / (1-hm*(1-ep));   % E.g. 3.16 in Wallace&Hobbs
+	tv = (t(i)+t(i+1)) / ( 2 * (1-hm*k) );   % E.g. 3.16 in Wallace&Hobbs
   
 	%-- The change in vertical altitude from i to i+1 
 	dz = rd * (tv/gp) * log( p(i)/p(i+1) );

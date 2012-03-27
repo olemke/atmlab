@@ -1,3 +1,18 @@
+2012-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-40
+
+	* arts/qarts2cfile.m (cfile_Jacobi): Adopted call of
+	jacobianAddFreqShiftAndStretch (changed in arts-2-0-40).
+
+	* demos/qpack2_demo.m: Definition of FFIT with stretch now again
+	behind %. DF now set to 25e3 (a safer value).
+
+	* geophysics/pt2z.m: Now having ellipsoid as optional input. Some
+	re-arrangements to make code more similar to the one in arts.
+
+	* physics/constants.m: GAS_CONST was missing in header.
+
 2012-03-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-39

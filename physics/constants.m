@@ -15,7 +15,9 @@
 %       EARTH_RADIUS_MEAN          [m] Mean radius of the earth.
 %       EARTH_STANDARD_GRAVITY     [m/s^2] As defined from CGPM in m/s^2
 %       EARTHORBIT_RADIUS          [m] Radius of the Earth orbit, around the Sun
+%       GAS_CONST                  [J.K-1.mol-1] Universal gas constant.
 %       GAS_CONST_DRY_AIR          [J.kg-1e4.K-1] Gas constant for dry air
+%     
 %       GAS_CONST_WATER_VAPOR      [J.kg-1.K-1] Gas constant for water vapor
 %       LATENT_HEAT_VAPORIZATION   [J.kg-1] Latent heat of vaporization of
 %                                           water vapor
@@ -130,7 +132,7 @@ case 'EARTHORBIT_RADIUS'
     
 case 'GAS_CONST'
     %ref: http://en.wikipedia.org/wiki/Gas_constant
-    const = 8.3144621 ;
+    const = 8.3144621;
     unit  = 'JK^{-1}mol{-1}';
     
 case 'GAS_CONST_DRY_AIR'
