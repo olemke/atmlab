@@ -1,3 +1,15 @@
+2012-03-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-41
+
+	* time/unixsecs2date.m: Fixed truncating BUG. Now converts input
+	seconds into double.
+
+	* geoplots/gmt/gmt_plot.m: Remove NaNs from geodata for ungridded
+	data.
+
+	* geographical/resample_geodata.m: Puny change
+
 2012-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-40

@@ -684,11 +684,14 @@ in = isdata(in,field);
 % Check to see if the data is gridded or not
 in = isgridded(in,field);
 
+% Also get rid of NaNs in the geodata (This only applies to ungridded data)
+in = rmNaNsGeo(in,field);
+
 % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
 if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
-    [flags,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
+    [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
     
     if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
         logtext(1,'Data does not appear to be centered. Internally ')
@@ -978,6 +981,36 @@ else
     in.region='-180/180/-90/90';
 end
 
+function in = isdata(in,field)
+%% is there any useable data?
+
+Id  = ['gmtlab:' mfilename ':badInput'];
+Eps = 1e-10;
+
+assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
+assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
+    '%s%s','Data does not contain any valid',...
+    ' values for contour levels to be based on...')
+assert(~(ndims(squeeze(in.(field)))>2),Id,'in.%s must not be more than 2 dimensional',field)
+assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
+    'min(data) must not be equal to max(data)')
+
+% check for lat and lons
+if ~isfield(in,'lat')
+    l = {'Latitude','latitude'};
+    assert(any(isfield(in,l)),Id,'No latitudes present')
+    in.lat = in.(l{isfield(in,l)});
+elseif any(isfield(in,{'Latitude','latitude'}))
+    disp('Several latitude vectors present. Using in.lat')
+end
+if ~isfield(in,'lon')
+    l = {'Longitude','longitude','long'};
+    assert(any(isfield(in,l)),Id,'No longitudes present')
+    in.lon = in.(l{isfield(in,l)});
+elseif any(isfield(in,{'Longitude','longitude','long'}))
+    disp('Several longitude vectors present. Using in.lon')
+end
+
 function in = isgridded(in,field)
 %% ISGRIDDED: Test if the data is gridded
 %  If it is not gridded, flatten the data
@@ -1013,30 +1046,19 @@ if ~isfield(in,'gridded')
     end
 end
 
-function in = isdata(in,field)
-%% is there any useable data?
+function in = rmNaNsGeo(in,field)
+%% rmNaNsGeo
+% Also get rid of NaNs in the geodata
+% This only applies to ungridded data
 
-Id  = ['gmtlab:' mfilename ':badInput'];
-Eps = 1e-10;
+if in.gridded, return; end
 
-assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
-assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
-    '%s%s','Data does not contain any valid',...
-    ' values for contour levels to be based on...')
-assert(~(ndims(squeeze(in.(field)))>2),Id,'in.%s must not be more than 2 dimensional',field)
-assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
-    'min(data) must not be equal to max(data)')
-
-% check for lat and lons
-if ~isfield(in,'lat')
-    l = {'Latitude','latitude'};
-    assert(any(isfield(in,l)),Id,'No latitudes present')
-    in.lat = in.(l{isfield(in,l)});
-end
-if ~isfield(in,'lon')
-    l = {'Longitude','longitude','long'};
-    assert(any(isfield(in,l)),Id,'No longitudes present')
-    in.lon = in.(l{isfield(in,l)});
+index = isnan(in.lat)|isnan(in.lon);
+if any(index)
+    fprintf('Removing %.f values since the correspoding lat/lons are NaN\n',sum(index))
+    in.lat     =  in.lat(~index);
+    in.lon     =  in.lon(~index);
+    in.(field) = in.(field)(~index);
 end
 
 function hunt_down_errors(command,errors)

@@ -19,6 +19,7 @@ function [year, month, day, hour, minute, second] = unixsecs2date(secs)
 %   fractional seconds are allowed.
 %
 %   See also DATE2UNIXSECS.
+%   $Id$
 
 %   Author:      Peter J. Acklam
 %   Time-stamp:  2003-01-14 21:32:11 +0100
@@ -28,4 +29,4 @@ function [year, month, day, hour, minute, second] = unixsecs2date(secs)
    error(nargchk(1, 1, nargin));
 
    [year, month, day, hour, minute, second] ...
-      = jd2date(secs / 86400 + date2jd(1970, 1, 1));
+      = jd2date(double(secs) / 86400 + date2jd(1970, 1, 1));

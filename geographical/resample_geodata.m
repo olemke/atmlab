@@ -160,7 +160,7 @@ for F = field
         data = data(:,end:-1:1,:);
     end
     if rg_flags.lon360 % the picked newgrid decides...
-        [tilde,lnindex] = sort(newlon+(newlon<0)*360);
+        [~,lnindex] = sort(newlon+(newlon<0)*360);
         data = data(:,lnindex,:);
     end
     if flags.permute
