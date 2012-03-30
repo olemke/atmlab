@@ -68,23 +68,23 @@ end
 
 % get epoch. 
 % 
-info =  structfun(@str2double,find_info_from_granule('calipso', file));
-S.epoch = round(date2unixsecs(info(1), info(2), info(3)));
+x = datasets_config('calipso');
+info =  x.find_info_from_granule(file);
+s2d = @str2double;
 
 % See information below header to make sense of this
-yymmdd = str2double(sprintf('%2.0f%02.0f%02.0f',info(1)-2000,info(2),info(3)));
-S.time = (S.Profile_UTC_Time(:,2)-yymmdd) * (24*3600);
+yymmdd = s2d(sprintf('%2.0f%02.0f%02.0f',s2d(info.year)-2000,s2d(info.month),s2d(info.day)));
 
 % I will only use the midway value for the core
 % 
-
 S.lon = double(S.Longitude(:,2));
 S.lat = double(S.Latitude(:,2));
-S.version = '051';
-S = rmfield(S,core_fields);
-
-% add filename
+S.time = (S.Profile_UTC_Time(:,2)-yymmdd) * (24*3600);
+S.epoch = round(date2unixsecs(s2d(info.year), s2d(info.month), s2d(info.day)));
 S.path = file;
+S.version = '051 (hardcoded)';
+
+S = rmfield(S,core_fields);
 
 end
 %%%%%%%%%%%%%

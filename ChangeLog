@@ -1,3 +1,20 @@
+2012-03-30  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-42
+
+	* datasets/datasets_config.m:  Changed collocation
+	primary from modis to cloudsat.
+
+	* site-specific/kiruna/datasets_init.m: Changed collocation
+	primary from modis to cloudsat. Added version to regexp in for patmosx
+
+	* datasets/common_read_cpr.m:
+	* datasets/common_read_mspps.m:
+	* datasets/common_read_patmosx.m:
+	* datasets/common_read_calipso.m:
+	Use x.find_info_from_granule for gathering version, time etc. And
+	make sure the time is double
+
 2012-03-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-41

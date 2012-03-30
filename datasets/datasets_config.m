@@ -221,7 +221,7 @@ A.collocation_mhs_cpr = CollocatedDataset(A.mhs, A.cpr); % new style 2012-01-18
 A.collocation_calipso_cpr = CollocatedDataset(A.calipso,A.cpr); 
 A.collocation_mspps_cpr   = CollocatedDataset(A.mspps,A.cpr);
 A.collocation_patmosx_cpr = CollocatedDataset(A.patmosx,A.cpr);
-A.collocation_modis_cpr = CollocatedDataset(A.modis_aqua_l2, A.cpr);
+A.collocation_cpr_modis = CollocatedDataset(A.cpr,A.modis_aqua_l2);
 %A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
 
 % OLD STYLE

@@ -49,14 +49,20 @@ else
 end
 
 S = concatenateDatafields(S1,S2);
+
 % rename some fields
+S.lon = double(S.longitude(:));
+S.lat = double(S.latitude(:));
 
 % construct time axis with same dimensions
 S.time = S.scan_line_time*3600; % is in hours
+x = datasets_config('patmosx');
+info = x.find_info_from_granule(file);
+date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
+S.epoch = round(date2unixsecs(date.year, date.month, date.day));
+S.version = info.version;
+S.path = file;
 
-S.lon = double(S.longitude(:));
-S.lat = double(S.latitude(:));
-S.version = 'version 5 (hardcoded)'; % will be written to NetCDF.
 S = rmfield(S,core_fields);
 
 % get rid of negative time!
@@ -65,15 +71,6 @@ for F = fieldnames(S)'
     if ~isequal(size(index),size(S.(F{1}))), continue; end
     S.(F{1}) = S.(F{1})(index);
 end
-% add filename
-
-S.path = file;
-
-% get epoch. 
-% 
-info = find_info_from_granule('patmosx', file);
-date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
-S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 %%%%%%%%%%%%%
 % SUBFUNCTION

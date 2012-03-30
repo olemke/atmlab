@@ -137,7 +137,7 @@ datasets_config('mspps_regexp','(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<ye
 x = datasets_config('patmosx');
 x.basedir = '/storage3/data/patmosx/level2b/';
 x.subdir = '$SAT_$YEAR4';
-x.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3}).+(?<end>.{7})$';
+x.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3})_v(?<version>\d{2}).+(?<end>.{7})$';
 
 %% COLLOCATION DATA SETS
 
@@ -162,10 +162,10 @@ x.subdir = '$YEAR4/$MONTH/$DAY';
 x.filename = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 x.basedir = '/storage4/user_data/seliasson/collocations_patmosx_cloudsat/core';
 
-x = datasets_config('collocation_modis_cpr');
-x.basedir = '/storage4/user_data/seliasson/collocations_modis_cloudsat/core';
+x = datasets_config('collocation_cpr_modis');
+x.basedir = '/storage4/user_data/seliasson/collocations_cloudsat_modis/core';
 x.subdir = '$YEAR4/$MONTH/$DAY';
-x.filename = 'collocations_modis_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+x.filename = 'collocations_cpr_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 
 % OLD STYLE

@@ -56,23 +56,21 @@ end
 
 %% RENAME some fields
 
+S.lat = double(S.Latitude);
+S.lon = double(S.Longitude);
+
 % get epoch. 
 % 
-info =  find_info_from_granule('mspps', file);
-thisday = date2unixsecs(str2double(info.year), str2double(info.month), str2double(info.day));
-S.epoch = round(thisday);
+x = datasets_config('mspps');
+info =  x.find_info_from_granule(file);
+s2d = @str2double;
+S.epoch = round(date2unixsecs(s2d(info.year), s2d(info.month), s2d(info.day)));
 
 % See information below header to make sense of this
-S.time = S.Time{1}(:)-( thisday-date2unixsecs(1993,1,1) );
-% I will only use the midway value for the core
-% 
-
-S.lon = double(S.Longitude);
-S.lat = double(S.Latitude);
-S.version = 'unknown';
-S = rmfield(S,core_fields);
-
-% add filename
+S.time = S.Time{1}(:)-( S.epoch-date2unixsecs(1993,1,1) );
 S.path = file;
+S.version = 'unknown';
+
+S = rmfield(S,core_fields);
 
 end

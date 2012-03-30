@@ -29,24 +29,22 @@ extra_fields = optargs(varargin, {{}});
 all_fields = [core_fields; extra_fields];
 S = cloudsat_read_zipped(file, all_fields);
 
-% construct time axis with same dimensions
-S.time = S.UTC_start + S.Profile_time;
-
 % rename some fields
-
 S.lon = double(S.Longitude(:));
 S.lat = double(S.Latitude(:));
-S.version = S.product_version; % will be written to NetCDF
-
-% add filename
-
-S.path = file;
+% construct time axis with same dimensions. Must convert to double because
+% otherwise unixsecstodate will give the wrong time.
+S.time = double( S.UTC_start + S.Profile_time);
 
 % get epoch
-
-info = find_info_from_granule('cpr', file);
+x = datasets_config('cpr');
+info = x.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
+
+S.path = file;
+S.version = S.product_version;
+
 
 % remove redundant fields
 S = rmfield(S,core_fields);
