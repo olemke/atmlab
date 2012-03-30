@@ -30,16 +30,12 @@ if ~qarts_isset( Q.P_GRID )                                                 %&%
 end                                                                         %&%
 grids{1} = qarts_get( Q.P_GRID );
 %
-if qarts_isset( Q.LAT_GRID )                                            
+if Q.ATMOSPHERE_DIM < 3
+  grids{2} = qarts_get( Q.LAT_TRUE );
+  grids{3} = qarts_get( Q.LON_TRUE );
+else
   grids{2} = qarts_get( Q.LAT_GRID );
-else
-  grids{2} = [];  
-end
-%
-if qarts_isset( Q.LON_GRID )                                            
   grids{3} = qarts_get( Q.LON_GRID );
-else
-  grids{3} = [];  
 end
 %
 for i = 1 : length( varargin )

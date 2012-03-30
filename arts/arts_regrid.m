@@ -57,18 +57,19 @@ elseif isstruct(Q)
   %
   grids{1} = -log( qarts_get( Q.P_GRID ) );
 
-  if dim >= 2
+  if dim == 2
+    %                                                           %&%
+    rqre_field( Q, {'LAT_TRUE'}, qname );                       %&%
+    %
+    grids{2} = qarts_get( Q.LAT_TRUE );
+
+  elseif
     %                                                           %&%
     rqre_field( Q, {'LAT_GRID'}, qname );                       %&%
+    rqre_field( Q, {'LON_GRID'}, qname );                       %&%
     %
     grids{2} = qarts_get( Q.LAT_GRID );
-
-    if dim > 2
-      %                                                         %&%
-      rqre_field( Q, {'LON_GRID'}, qname );                     %&%
-      %
-      grids{3} = qarts_get( Q.LON_GRID );
-    end
+    grids{3} = qarts_get( Q.LON_GRID );
   end
 else                                                            %&%
   error( 'Unknown choice for Q.' );                             %&%

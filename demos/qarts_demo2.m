@@ -91,21 +91,24 @@ Q.ATMOSPHERE_DIM         = atmdim;
 %
 Q.P_GRID                 = z2p_simple( [0:500:45e3 46e3:1e3:100e3]' );
 %
-if atmdim < 2
-  Q.LAT_GRID             = 0;          % Only used for interpolation of ATMDATA
+if atmdim == 1
+  Q.LAT_TRUE             = 0;    
+  Q.LON_TRUE             = 80;    
+elseif atmdim == 2
+  Q.LAT_GRID             = [-10:10]'; 
+  Q.LAT_TRUE             = Q.LAT_GRID; 
+  Q.LON_TRUE             = repmat( 0, size( Q.LAT_GRID ) );
 else
-  Q.LAT_GRID             = [-10:10]';  % A true latitude grid
-end
-%
-if atmdim < 3
-  Q.LON_GRID             = 0;          % Only used for interpolation of ATMDATA
-else
-  Q.LON_GRID             = [-10:10]';  % A true longitude grid
+  Q.LAT_GRID             = [-10:10]'; 
+  Q.LON_GRID             = [-10:10]'; 
 end
 %
 Q.REFELLIPSOID           = ellipsoidmodels( 'SphericalEarth' );
-Q.Z_SURFACE              = repmat( 500, length(Q.LAT_GRID), length(Q.LON_GRID));
-
+if atmdim < 3
+  Q.Z_SURFACE            = repmat( 500, length(Q.LAT_TRUE), length(Q.LON_TRUE));
+else
+  Q.Z_SURFACE            = repmat( 500, length(Q.LAT_GRID), length(Q.LON_GRID));
+end
 
 %= Set-up VMR_FIELD, T_FIELD and Z_FIELD
 %
@@ -166,8 +169,12 @@ end
 %
 Q.YCALC_WSMS             = { 'yCalc' };
 %
-Q.PPATH_LMAX             = 20e3;
-Q.PPATH_STEP_AGENDA      = { 'ppath_stepGeometric' };
+Q.PPATH_LMAX            = 20e3;
+Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
+                            'ppath_stepGeometric' };
+Q.PPATH_AGENDA          = { 'Ignore(mblock_index)', 'ppathStepByStep', ...
+                            'Touch(rte_los)' };
+Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
 Q.Y_UNIT                 = 'RJBT';
 %
 zplat                    = 600e3;

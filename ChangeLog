@@ -1,3 +1,28 @@
+2012-03-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-43
+
+	* Start on getting qarts/qpack in sync with arts-2.1. Not ready.
+
+	* retrieval/qpack2/qpack2.m: Now using REFELLIPSOID instead of
+	R_GEOID.
+
+	* arts/arts_regrid.m:
+	* arts/qarts_hse.m:
+	* arts/qarts_vmr_field.m:
+	* arts/qarts_t_or_z_field.m: Now selecting between LAT/LON_TRUE and
+	LAT/LON_GRID depending on the atmospheric diemnsionality. 
+
+	* demos/qarts_demo2.m: 
+	* demos/qarts_demo.m: Updated, following changes below. New value
+	for Q.HSE.P. 
+
+	* arts/qarts.m (qarts): Added LAT_TRUE and LON_TRUE, updated
+	description for LAT_GRID and LON_GRID. Added also PPATH_AGENDA.
+
+	* arts/qarts2cfile.m: Added handling of LAT_TRUE, LON_TRUE and
+	PPATH_AGENDA.
+
 2012-03-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-42
@@ -66,6 +91,7 @@
 	* math/land_sea_mask.m: Added a bit more documentation and added
 	Gerrit as the author of the function
 
+>>>>>>> .r7462
 2012-03-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-38

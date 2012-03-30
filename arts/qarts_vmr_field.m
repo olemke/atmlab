@@ -1,9 +1,9 @@
 % QARTS_VMR_FIELD   Extracts vmr field from Q.ABS_SPECIES.ATMDATA
 %
 %   Performs an interpolation of Q.ABS_SPECIES.ATMDATA. The field ATMDATA must
-%   be set for all species. P_GRID, LAT_GRID and LON_GRID are used as
-%   interpolation grids. It is here allowed (and sometime necessary) to set
-%   LAT_GRID and LON_GRID to scalar values.
+%   be set for all species. For 3D cases, P_GRID, LAT_GRID and LON_GRID are
+%   used as interpolation grids. For 1D and 2D, LAT_TRUE and LON_TRUE replace
+%   LAT_GRID and LON_GRID.
 %
 %   The interpolation is made as using *gridinterp* with its optional argument
 %   *extrap* set to true. That is, the data are assumed to be defined
@@ -46,16 +46,12 @@ if ~qarts_isset( Q.P_GRID )                                                 %&%
 end                                                                         %&%
 grids{1} = qarts_get( Q.P_GRID );
 %
-if qarts_isset( Q.LAT_GRID )                                            
+if Q.ATMOSPHERE_DIM < 3
+  grids{2} = qarts_get( Q.LAT_TRUE );
+  grids{3} = qarts_get( Q.LON_TRUE );
+else
   grids{2} = qarts_get( Q.LAT_GRID );
-else
-  grids{2} = [];  
-end
-%
-if qarts_isset( Q.LON_GRID )                                            
   grids{3} = qarts_get( Q.LON_GRID );
-else
-  grids{3} = [];  
 end
 %
 for i = 1 : length( varargin )

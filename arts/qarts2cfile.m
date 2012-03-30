@@ -342,6 +342,15 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                                          Q.INPUT_FILE_FORMAT );
   end
   %
+  if qarts_isset( Q.LAT_TRUE ) 
+    T{end+1} = file_or_data( 'lat_true', 'Vector', Q.LAT_TRUE, workfolder, ...
+                                                         Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.LON_TRUE ) 
+    T{end+1} = file_or_data( 'lon_true', 'Vector', Q.LON_TRUE, workfolder, ...
+                                                         Q.INPUT_FILE_FORMAT );
+  end
+  %
   if qarts_isset( Q.RAW_ATMOSPHERE )
     rqre_datatype( Q.RAW_ATMOSPHERE, @ischar, 'Q.RAW_ATMOSPHERE' );         %&%
     if qarts_isset( Q.RAW_ATM_EXPAND_1D )                                   %&%
@@ -627,6 +636,9 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T{end+1} = sprintf( 'NumericSet( ppath_lraytrace, %.2e )', ...
                                                        Q.PPATH_LRAYTRACE );
   end  
+  if qarts_isset( Q.PPATH_AGENDA )
+    T = add_agenda( T, 'ppath_agenda', Q.PPATH_AGENDA );
+  end
   if qarts_isset( Q.PPATH_STEP_AGENDA )
     T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
   end

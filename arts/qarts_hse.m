@@ -9,9 +9,7 @@
 %       VMR_FIELD
 %       ABS_SPECIES, that must contain data for H2O. 
 %
-%    In addition, LAT_GRID must be set with a size matching Q.T_FIELD. For
-%    example, LAT_GRID shall be a scalar when ATMOSPHERE_DIM = 1. This latitude
-%    is given to *pt2z*, used for determining the gravitational constant.
+%    In addition, LAT_GRID, or LAT_TRUE for 1D and 2D, must be set.
 %
 % FORMAT   Z = qarts_hse( Q, hse_p, hse_z )
 %        
@@ -30,8 +28,11 @@ rqre_datatype( hse_z, @istensor0 );                                         %&%
 if ~qarts_isset( Q.P_GRID )                                                 %&%
   error( 'Q.P_GRID must be set when using this function' );                 %&%
 end                                                                         %&%
-if ~qarts_isset( Q.LAT_GRID )                                               %&%
-  error( 'Q.LAT_GRID must be set when using this function' );               %&%
+if Q.ATMOSPHERE_DIM < 3  &&  ~qarts_isset( Q.LAT_TRUE )                     %&%
+  error( 'Q.LAT_TRUE must be set when using this function for 1D and 2D.' );%&%
+end                                                                         %&%
+if Q.ATMOSPHERE_DIM == 3  &&  ~qarts_isset( Q.LAT_GRID )                    %&%
+  error( 'Q.LAT_GRID must be set when using this function for 3D.' );       %&%
 end                                                                         %&%
 if ~qarts_isset( Q.T_FIELD     )                                            %&%
   error( 'Q.T_FIELD must be set when using this function' );                %&%
@@ -60,7 +61,11 @@ end                                                                         %&%
 T        = qarts_get( Q.T_FIELD );
 VMR      = qarts_get( Q.VMR_FIELD );
 p_grid   = qarts_get( Q.P_GRID );
-lat_grid = qarts_get( Q.LAT_GRID );
+if Q.ATMOSPHERE_DIM < 3  
+  lat_grid = qarts_get( Q.LAT_TRUE );
+else
+  lat_grid = qarts_get( Q.LAT_GRID );
+end
   
 
 rqre_gridmatch( T, 1, p_grid );                                             %&%

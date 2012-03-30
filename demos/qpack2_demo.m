@@ -118,7 +118,7 @@ Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
 
 %- Surface
 %
-Q.R_GEOID            = constants( 'EARTH_RADIUS' );
+Q.REFELLIPSOID       = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE          = 5e3;          % Just a dummy value. A 10 km
                                      % observation altitude is assumed here
 

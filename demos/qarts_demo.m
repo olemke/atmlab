@@ -65,13 +65,14 @@ Q.Z_SURFACE             = 500;
 
 %= To enforce detailed hydrostatic equilibrium 
 %
-% This demands that a latitude is specified, through LAT_GRID.
+% This demands that a geographical position is specified, through LAT/LON_TRUE.
 %
 Q.HSE.ON                = true;
 Q.HSE.P                 = Q.P_GRID(1);
 Q.HSE.ACCURACY          = 1;
 %
-Q.LAT_GRID              = 15;
+Q.LAT_TRUE              = 15;
+Q.LON_TRUE              = -30;
 
 
 %= Absorption
@@ -94,6 +95,15 @@ Q.ABS_LINESHAPE_FACTOR  = 'VVH';
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'continua.arts' ) };
 
 
+%= Various basic settings
+%
+Q.WSMS_AT_START{end+1}  = 'VectorSet(abs_n2,[0.7808])';
+Q.WSMS_AT_START{end+1}  = 'AgendaSet(g0_agenda){';
+Q.WSMS_AT_START{end+1}  = '  Ignore(lon)';
+Q.WSMS_AT_START{end+1}  = '  g0Earth }';
+Q.WSMS_AT_START{end+1}  = 'NumericSet(molarmass_dry_air,28.966)';
+
+
 %= Set RTE variables (refraction is here neglected)
 %
 Q.EMISSION_AGENDA       = { 'emissionPlanck' };
@@ -106,11 +116,14 @@ Q.SURFACE_PROP_AGENDA   = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                             'rte_gp_lon,t_field)'], ...
                             'surfaceBlackbody' };
 %
-Q.WSMS_BEFORE_RTE       = { 'VectorSet(abs_n2,[0.7808])' };
 Q.YCALC_WSMS            = { 'yCalc' };
 %
 Q.PPATH_LMAX            = 20e3;
-Q.PPATH_STEP_AGENDA     = { 'ppath_stepGeometric' };
+Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
+                            'ppath_stepGeometric' };
+Q.PPATH_AGENDA          = { 'Ignore(mblock_index)', 'ppathStepByStep', ...
+                            'Touch(rte_los)' };
+Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
 %
 Q.STOKES_DIM            = 1;
 Q.Y_UNIT                = 'RJBT';

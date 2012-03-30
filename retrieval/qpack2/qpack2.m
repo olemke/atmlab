@@ -199,11 +199,11 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     if strcmp( Q.ABSORPTION, 'CalcTable' )                                  %&%
       error( 'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     %&%
     end                                                                     %&%
-    if ~qarts_isset(Q.R_GEOID)                                              %&%
-      error( 'Qpack2 requires that Q.R_GEOID is set.' );                    %&%
+    if ~qarts_isset(Q.REFELLIPSOID)                                         %&%
+      error( 'Qpack2 requires that Q.REFELLIPSOID is set.' );               %&%
     end                                                                     %&%
-    Q.R_GEOID = qarts_get( Q.R_GEOID ); 
-    rqre_datatype( Q.R_GEOID, @istensor0, Q.R_GEOID );                      %&%
+    Q.REFELLIPSOID = qarts_get( Q.REFELLIPSOID ); 
+    rqre_datatype( Q.REFELLIPSOID, @istensor1, Q.REFELLIPSOID );            %&%
     if ~qarts_isset(Q.HSE)                                                  %&%
       error( 'Qpack2 requires that Q.HSE is set.' );                        %&%
     end                                                                     %&%
@@ -284,7 +284,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   
   %- Sensor pos and los
   %
-  r = qarts_get( Q.R_GEOID ); 
+  r = Q.REFELLIPSOID(1);
   %
   Q.SENSOR_POS = r + Y(m).Z_PLATFORM;
   Q.SENSOR_LOS = Y(m).ZA;
