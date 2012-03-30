@@ -1,3 +1,11 @@
+2012-03-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-0-2
+
+	* demos/qpack2_demo.m: Q.HSE.P now set to forst element of
+	pressure grid. Old setting of 1013 (Pa) strange, confusing and can
+	cause that the surface slips outside the atmosphere after applying HSE.
+
 2012-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-0-1
