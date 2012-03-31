@@ -63,7 +63,7 @@ elseif isstruct(Q)
     %
     grids{2} = qarts_get( Q.LAT_TRUE );
 
-  elseif
+  elseif dim == 3
     %                                                           %&%
     rqre_field( Q, {'LAT_GRID'}, qname );                       %&%
     rqre_field( Q, {'LON_GRID'}, qname );                       %&%

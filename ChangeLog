@@ -1,3 +1,23 @@
+2012-03-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-44
+
+	* Qarts/qpack now updated with respect to changes in arts.
+	
+	* demos/qpack2_demo.m: Setting of R_GEOID removed.
+
+	* retrieval/qpack2/qpack2.tex: Removed a line about R_GEOID.
+
+	* geophysics/pt2z.m (pt2z): Killed some screen output due to
+	missing ;.
+
+	* retrieval/qpack2/qpack2.m (qp2_y2Q): Y.LATITUDE now moved to
+	Q.LAT_TRUE. And same for longitudes. R_GEOID now not required.
+
+	* demos/qarts_demo.m: 
+	* demos/qpack2_demo.m: 
+	* demos/qarts_abstable_demo.m: R_GEOID -> REFELLIPSOID.
+
 2012-03-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-43

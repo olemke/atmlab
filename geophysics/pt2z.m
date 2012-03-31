@@ -71,7 +71,7 @@ z = shift2refpoint( p, z, p0, z0 );
 
 %= Set Earth radius and g at z=0
 %
-re = ellipsoidradii( ellipsoid, lat )
+re = ellipsoidradii( ellipsoid, lat );
 g0 = lat2g0( lat );
 
 
@@ -81,8 +81,8 @@ r  = constants( 'GAS_CONST' );
 md = 28.966;
 mw = 18.016;
 %
-k  = 1-mw/md        % 1 - eps         
-rd = 1e3 * r / md   % Gas constant for 1 kg dry air
+k  = 1-mw/md;        % 1 - eps         
+rd = 1e3 * r / md;   % Gas constant for 1 kg dry air
 
 
 %= How to end iterations

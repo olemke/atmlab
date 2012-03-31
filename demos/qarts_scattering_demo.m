@@ -70,7 +70,7 @@ Q.STOKES_DIM        = 2;
 Q.ABS_SPECIES(1).TAG{1} = 'ClO';
 Q.ABS_SPECIES(2).TAG{1} = 'O3';
 Q.ABS_SPECIES(3).TAG{1} = 'N2O';
-Q.ABS_SPECIES(4).TAG{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
+Q.ABS_SPECIES(4).TAG{1} = 'H2O-*-490e9-510e9';  % Some local lines not in PWR98
 Q.ABS_SPECIES(4).TAG{2} = 'H2O-PWR98';
 Q.ABS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
 
@@ -108,7 +108,6 @@ Q                     = qarts_abstable( Q );
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 5e3;
-Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
 %
 zplat                 = 600e3;
 sensor_pos            = zplat;
@@ -121,7 +120,7 @@ if strcmp( lower(method), 'bl' )
                            'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
   Q.Y_UNIT             = '1';
 else
-  Q.Y_UNIT            = 'RJBT';
+  Q.Y_UNIT             = 'RJBT';
 end
   
 
@@ -186,7 +185,8 @@ if strcmp( lower(method), 'mc' )
   %
   C.METHOD                        = 'MC';
   Q.IY_CLEARSKY_AGENDA            = { 'Ignore( iy_error )', ...
-                                      'Ignore( iy_error_type )','iyMC' };    
+                                      'Ignore( iy_error_type )', ...
+                                      'Ignore( mblock_index )', 'iyMC' };    
   %
   C.METHOD_PRMTRS.STD_ERR         = m_arg;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
@@ -270,7 +270,6 @@ if any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 2
   Q.ATMOSPHERE_DIM                = 2;
   Q.RAW_ATM_EXPAND_1D             = true;
   Q.LAT_GRID                      = latlon_grid;
-  Q.R_GEOID                       = repmat( Q.R_GEOID, length(latlon_grid), 1 );
   Q.Z_SURFACE                     = repmat( Q.Z_SURFACE, length(latlon_grid),1);
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 2 );
@@ -290,8 +289,6 @@ elseif strcmp( lower(method), 'mc' )  |  ...
   Q.RAW_ATM_EXPAND_1D             = true;
   Q.LAT_GRID                      = latlon_grid;
   Q.LON_GRID                      = latlon_grid;
-  Q.R_GEOID                       = repmat( Q.R_GEOID, length(latlon_grid), ...
-                                                       length(latlon_grid) );
   Q.Z_SURFACE                     = repmat( Q.Z_SURFACE, length(latlon_grid),...
                                                          length(latlon_grid) );
   %  

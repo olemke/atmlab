@@ -113,12 +113,10 @@ Q.Y_UNIT              = 'RJBT';
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
-Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
 
 
 %- Surface
 %
-Q.REFELLIPSOID       = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE          = 5e3;          % Just a dummy value. A 10 km
                                      % observation altitude is assumed here
 
@@ -384,3 +382,4 @@ end
 % Add a constant "baseline shift" for measurement 2
 %
 Y(2).Y = Y(2).Y + 1;
+

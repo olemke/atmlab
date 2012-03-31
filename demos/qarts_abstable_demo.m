@@ -55,7 +55,7 @@ Q.P_GRID                 = z2p_simple( [-750:250:40e3]' );
 Q.RAW_ATMOSPHERE         = fullfile( fascod, 'subarctic-winter' );
 %
 % Needed, but dummy variables
-Q.R_GEOID                = constants( 'EARTH_RADIUS' );
+Q.REFELLIPSOID           = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE              = 500;
 
 

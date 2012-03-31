@@ -199,11 +199,6 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     if strcmp( Q.ABSORPTION, 'CalcTable' )                                  %&%
       error( 'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     %&%
     end                                                                     %&%
-    if ~qarts_isset(Q.REFELLIPSOID)                                         %&%
-      error( 'Qpack2 requires that Q.REFELLIPSOID is set.' );               %&%
-    end                                                                     %&%
-    Q.REFELLIPSOID = qarts_get( Q.REFELLIPSOID ); 
-    rqre_datatype( Q.REFELLIPSOID, @istensor1, Q.REFELLIPSOID );            %&%
     if ~qarts_isset(Q.HSE)                                                  %&%
       error( 'Qpack2 requires that Q.HSE is set.' );                        %&%
     end                                                                     %&%
@@ -244,8 +239,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
 
   %- Map ATMDATA to VMR_FIELD, Z_FIELD and T_FIELD 
   %
-  Q.LAT_GRID  = Y(m).LATITUDE;
-  Q.LON_GRID  = Y(m).LONGITUDE;
+  Q.LAT_TRUE  = Y(m).LATITUDE;
+  Q.LON_TRUE  = Y(m).LONGITUDE;
   %
   if qarts_isset( Y(m).HOUR )
     rqre_datatype( Y(m).HOUR, @istensor0, sprintf('Y(%d).HOUR',m) );        %&%
@@ -284,9 +279,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   
   %- Sensor pos and los
   %
-  r = Q.REFELLIPSOID(1);
-  %
-  Q.SENSOR_POS = r + Y(m).Z_PLATFORM;
+  Q.SENSOR_POS = Y(m).Z_PLATFORM;
   Q.SENSOR_LOS = Y(m).ZA;
 
   
