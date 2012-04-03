@@ -19,18 +19,22 @@
 
 function result = xmlReadPpath(fid, attrlist, itype, ftype, binary, fid2)
 
-  result.dim          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.np           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.constant     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.background   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.pos          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.los          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.r            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.lstep       = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.lspace      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.nreal        = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.gp_p         = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.gp_lat       = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.gp_lon       = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.dim          = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.np           = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.constant     = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.background   = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.start_pos    = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.start_los    = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.end_pos      = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.end_los      = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.pos          = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.los          = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.r            = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.lstep        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.lspace       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.nreal        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.gp_p         = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.gp_lat       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.gp_lon       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
 
 

@@ -1,9 +1,16 @@
+2012-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-45
+
+	* arts/xml/xmlWritePpath.m (xmlWritePpath):
+	* arts/xml/xmlReadPpath.m (xmlReadPpath): Added handling of new fields.
+
 2012-03-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-44
 
 	* Qarts/qpack now updated with respect to changes in arts.
-	
+
 	* demos/qpack2_demo.m: Setting of R_GEOID removed.
 
 	* retrieval/qpack2/qpack2.tex: Removed a line about R_GEOID.
@@ -14,8 +21,8 @@
 	* retrieval/qpack2/qpack2.m (qp2_y2Q): Y.LATITUDE now moved to
 	Q.LAT_TRUE. And same for longitudes. R_GEOID now not required.
 
-	* demos/qarts_demo.m: 
-	* demos/qpack2_demo.m: 
+	* demos/qarts_demo.m:
+	* demos/qpack2_demo.m:
 	* demos/qarts_abstable_demo.m: R_GEOID -> REFELLIPSOID.
 
 2012-03-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
@@ -72,6 +79,7 @@
 
 	* geographical/resample_geodata.m: Puny change
 
+>>>>>>> .r7480
 2012-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-40
