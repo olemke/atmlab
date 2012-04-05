@@ -1,3 +1,10 @@
+2012-04-05  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-46
+
+	* datasets/common_read_modis.m: Added reader for modis level 2
+	data. This follows the conventions of the collocation codes
+
 2012-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-45
