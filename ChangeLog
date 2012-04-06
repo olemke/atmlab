@@ -1,3 +1,22 @@
+2012-04-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-47
+
+	* time/mjd2gmst.m (mjd2gmst):
+	* geographical/sun_eclip.m (sun_eclip):
+	* geographical/sun_celest.m (sun_celest):
+	* geographical/sun_angles.m (sun_angles): Added these function.
+	Made by Craig Haley (obtained by samuel Brohede, thanks both of you).
+
+	* geodetic/sphdist.m: Replaces the function below. New
+	implementation, using a more stable expression according to
+	www.movable-type.co.uk/scripts/latlong.html. I also got different
+	results for distances below 1m, but agreement for longer
+	distances. This version is also more general as both degree and m
+	distance can be obtained.
+
+	* math/sphdist.m: Removed (replaced by function above).
+
 2012-04-05  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-46
