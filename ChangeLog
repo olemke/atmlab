@@ -1,5 +1,12 @@
 2012-04-10  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-49
+
+	* geodetic/sphdist.m: replace the two "*" with ".*" to also handle
+	vectors.
+
+2012-04-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-48
 
 	* files/loadncfile.m: Now possible to pass gzipped files to
