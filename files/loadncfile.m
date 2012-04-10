@@ -10,17 +10,26 @@
 % FORMAT   ret = loadncfile( filename )
 %        
 % OUT   ret        Loaded NetCDF file structure.
-% IN    filename   Name of NetCDF file.
+% IN    filename   Name of NetCDF file. (can be gzipped)
 
+% 2012-04-10   Updated by Salomon
 % 2010-02-10   Created by Oliver Lemke.
 
 function ret = loadncfile( filename )
+
+% UNCOMPRESS first if gzipped
+if strcmp(filename(end-2:end),'.gz')
+	tmpdir = create_tmpfolder;
+	gfile = gunzip(filename,tmpdir);
+	filename = gfile{1};
+	c= onCleanup(@() rmdir(tmpdir,'s'));
+end
   
 ncid = netcdf.open (filename, 'NOWRITE');
 
 cleanupObject = onCleanup(@() netcdf.close (ncid));
 
-[scrap,nvars,ngatts] = netcdf.inq(ncid);
+[~,nvars,ngatts] = netcdf.inq(ncid);
 
 for i = 0:ngatts-1
    attname = netcdf.inqAttName (ncid, -1, i);
@@ -29,7 +38,7 @@ for i = 0:ngatts-1
 end
 
 for i = 0:nvars-1
-   [varname, scrap, scrap, natts] = netcdf.inqVar (ncid, i);
+   [varname, ~, ~, natts] = netcdf.inqVar (ncid, i);
    svarname = genvarname(varname);
    ret.(svarname) = nc_read_varid(ncid,i);
    for j = 0:natts-1
@@ -51,12 +60,12 @@ end
 
 end
 
-function grp = read_group(ncid, gid)
+function grp = read_group(~, gid)
 
 varids = netcdf.inqVarIDs(gid);
 grpname = genvarname(netcdf.inqGrpName(gid));
 for i = varids
-    [varname, scrap, scrap, natts] = netcdf.inqVar (gid, i);
+    [varname, ~, ~, natts] = netcdf.inqVar (gid, i);
     svarname = genvarname(varname);
     grp.(grpname).(svarname) = netcdf.getVar (gid, i);
     for j = 0:natts-1

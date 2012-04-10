@@ -1,3 +1,11 @@
+2012-04-10  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-48
+
+	* files/loadncfile.m: Now possible to pass gzipped files to
+	loadncfile. This is handy to directly read e.g. the collocated data
+	files saved by the collocation dataset
+
 2012-04-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-47
