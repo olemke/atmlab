@@ -27,7 +27,15 @@
 % 2012-02-23   Modified by Gerrit Holl.
 
 function [ret, attr] = loadncvar( filename, varname )
-  
+
+% UNCOMPRESS first if gzipped
+if strcmp(filename(end-2:end),'.gz')
+	tmpdir = create_tmpfolder;
+	gfile = gunzip(filename,tmpdir);
+	filename = gfile{1};
+	c= onCleanup(@() rmdir(tmpdir,'s'));
+end
+
 ncid = netcdf.open (filename, 'NOWRITE');
 
 cleanupObject = onCleanup( @() netcdf.close (ncid) );
