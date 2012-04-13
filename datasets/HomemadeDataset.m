@@ -1,4 +1,4 @@
-classdef HomemadeDataset < handle% < SatDataset %
+classdef HomemadeDataset < SatDataset
     % What Associated and Collocated, but not Sat, -dataset, have.
     %
     % Do not instantiate directly, meant as a mixin-class.
@@ -23,6 +23,10 @@ classdef HomemadeDataset < handle% < SatDataset %
     end    
     
     methods
+        
+        function self = HomemadeDataset(varargin)
+            self = self@SatDataset(varargin{:});
+        end
              
         function [fn, global_atts] = store(self, date, spec, data, varargin)
             % store Write collocation data to netcdf file

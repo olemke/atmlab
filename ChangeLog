@@ -1,5 +1,16 @@
 2012-04-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-55
+
+	* collocations/AssociatedDataset.m, collocations/CollocatedDataset.m,
+	datasets/HomemadeDataset.m: 
+
+	- Simplify class hierarchy, see documentation for new hierarchy.
+
+	* documentation/collocations.tex: Expand documentation
+
+2012-04-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-54
 
 	* documentation/, documentation/bib_all.bib, documentation/copernicus.bst,

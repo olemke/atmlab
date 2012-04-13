@@ -89,7 +89,9 @@ refereed articles \citet{holl10:_collocating_amt} and
 
 \section{Using the Toolkit}
 
-\begin{tikzpicture}
+The diagram below illustrates the most important classes and methods.
+
+\begin{tikzpicture}[every node/.style={font=\scriptsize}]
  \begin{class}{SatDataset}{0, 0}
   \attribute{+ name}
   \attribute{+ basedir}
@@ -111,15 +113,15 @@ refereed articles \citet{holl10:_collocating_amt} and
   \operation{+ find\_granule\_first\_line}
  \end{class}
 
- \begin{class}{HomemadeDataset}{7, 0}
+ \begin{class}{HomemadeDataset}{1, -7}
+  \inherit{SatDataset}
   \attribute{+ cols}
   \operation{+ store}
   \operation{\# read\_single\_day}
  \end{class}
 
- \begin{class}{CollocatedDataset}{5, -10}
- \inherit{SatDataset}
- %\implement{HomemadeDataset}
+ \begin{class}{CollocatedDataset}{-5, -10}
+ \inherit{HomemadeDataset}
  \attribute{+ primary}
  \attribute{+ secondary}
  \attribute{\# associated}
@@ -132,8 +134,34 @@ refereed articles \citet{holl10:_collocating_amt} and
  \operation{+ process}
  \operation{+ read}
  \end{class}
- % workaround, multiple-inheritance seems not to work, so do it like this
- \draw[umlcd style inherit line] (HomemadeDataset) -- (CollocatedDataset);
+
+ \begin{abstractclass}{AssociatedDataset}{3, -10}
+ \inherit{HomemadeDataset}
+ \attribute{+ dependencies}
+ \operation{+ members2cols}
+ \operation{+ process\_delayed}
+ \operation{+ merge}
+ \operation{+ get\_mergefields}
+ \operation{+ concatenate}
+ \operation[0]{+ primary\_arguments}
+ \operation[0]{+ secondary\_arguments}
+ \operation[0]{+ needs\_primary\_data}
+ \operation[0]{+ needs\_secondary\_data}
+ \operation[0]{+ process\_granule}
+ \end{abstractclass}
+
+ \begin{class}{FieldCopier}{-2, -15}
+ \implement{AssociatedDataset}
+ \end{class}
+
+ \begin{class}{MeanFieldCopier}{5, -15}
+ \implement{AssociatedDataset}
+ \end{class}
+
+ \unidirectionalAssociation{MeanFieldCopier}{averages}{}{FieldCopier}
+ \association{CollocatedDataset}{consists of two}{}{SatDataset}{can have many}{}
+
+
 \end{tikzpicture}
 
 \section{Developing the Toolkit}

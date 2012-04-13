@@ -1,4 +1,4 @@
-classdef AssociatedDataset < SatDataset & HomemadeDataset
+classdef AssociatedDataset < HomemadeDataset
     % Defined data associated with CollocatedDataset
     %
     % Meant to be subclassed, not instantiated directly.
@@ -41,7 +41,7 @@ classdef AssociatedDataset < SatDataset & HomemadeDataset
                 style = 'static';
                 [subargs{1:nargin}] = varargin{:};
             end
-            self = self@SatDataset(subargs{:}); % call parent constructor
+            self = self@HomemadeDataset(subargs{:}); % call parent constructor
             if strcmp(style, 'dynamic')
                 self.parent = cd;
                 self.dependencies = dp;

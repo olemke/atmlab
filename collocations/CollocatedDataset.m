@@ -1,4 +1,4 @@
-classdef CollocatedDataset < SatDataset & HomemadeDataset
+classdef CollocatedDataset < HomemadeDataset
     % Defines a collocated dataset, between two (other) datasets
     %
     % Work in progress!
@@ -99,7 +99,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
     methods
         function self = CollocatedDataset(prim, sec, varargin)
             super_args = [varargin, {'primary', prim, 'secondary', sec}];
-            self = self@SatDataset(super_args{:}); % call parent constructor
+            self = self@HomemadeDataset(super_args{:}); % call parent constructor
             % check that both are SatDataset
             for x = {prim, sec}
                 assert(isa(x{1}, 'SatDataset'), ['atmlab:' mfilename ':TypeError'], ...
