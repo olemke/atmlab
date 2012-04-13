@@ -1,5 +1,11 @@
-classdef HomemadeDataset < SatDataset
+classdef HomemadeDataset < handle% < SatDataset %
     % What Associated and Collocated, but not Sat, -dataset, have.
+    %
+    % Do not instantiate directly, meant as a mixin-class.
+    
+    % Do not inherit from SatDataset, diamond rule causes issues with
+    % implicit constructor calling:
+    % http://www.mathworks.se/help/matlab/matlab_oop/creating-subclasses--syntax-and-techniques.html
     %
     % Work in progress!
     %
@@ -103,7 +109,11 @@ classdef HomemadeDataset < SatDataset
             for j = 1:length(vars)
                 varname = vars{j};
                 type = self.members.(varname).type;
-                atts = self.members.(varname).atts;
+                if isfield(self.members.(varname), 'atts')
+                    atts = self.members.(varname).atts;
+                else
+                    atts = struct();
+                end
                 
                 % check if we have other dimensions besides the length
                 if isfield(self.members.(varname), 'dims')
@@ -184,7 +194,7 @@ classdef HomemadeDataset < SatDataset
             fn = self.find_granule_by_datetime(date, spec);
             logtext(atmlab('OUT'), 'Gunzipping and reading %s\n', fn);
             tmp = tempname(atmlab('WORK_AREA'));
-            exec_system_cmd(['zcat ' fn '>' tmp]); % 3x faster than ML's gunzip
+            exec_system_cmd(['gunzip -c ' fn '>' tmp]); % 3x faster than ML's gunzip
             c = onCleanup(@()delete(tmp));
             
             if ischar(fields)

@@ -98,18 +98,20 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
     
     methods
         function self = CollocatedDataset(prim, sec, varargin)
-            self = self@SatDataset(varargin{:}); % call parent constructor
+            super_args = [varargin, {'primary', prim, 'secondary', sec}];
+            self = self@SatDataset(super_args{:}); % call parent constructor
             % check that both are SatDataset
             for x = {prim, sec}
                 assert(isa(x{1}, 'SatDataset'), ['atmlab:' mfilename ':TypeError'], ...
                     'Collocations must be between 2 x SatDataset, got %s instead', ...
-                    class(x{1}));
-                x{1}.add_collocated_dataset(self);
+                     class(x{1}));
             end
-            self.primary = prim;
-            self.secondary = sec;
-            if isempty(self.name)
-                self.name = ['collocations_' prim.name '_' sec.name];
+            
+            %self = self@SatDataset(varargin{:}, 'primary', prim, 'secondary', sec); % call parent constructor
+
+            % add both to corresponding datasets
+            for x = {prim, sec}
+                x{1}.add_collocated_dataset(self);
             end
             
             % make 'cols'-structure for internal data specification
@@ -1073,7 +1075,7 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
             % cell-array
             %additional_fields = cell(size(self.associated));
             %for i = 1:length(self.associated)
-            %    additional_fields{i} = {}; 
+            %    additional_fields{i} = {};
             %end
             deal_index = nan*zeros(size(all_fields));
             for i = 1:length(all_fields)
@@ -1093,16 +1095,16 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                             additional_fields{j}{n_add(j)} = field;  %#ok<AGROW>
                             % check if this additionaldataset is already
                             % known, if yes, find index in existing names
- %                           existing_names = cellfun(@(X) X.name, additionals, 'UniformOutput', false);
+                            %                           existing_names = cellfun(@(X) X.name, additionals, 'UniformOutput', false);
                             if ~any(strcmp(existing_names, asso.name))
- %                               additionals = {additionals{:} asso}; %#ok<CCAT>
+                                %                               additionals = {additionals{:} asso}; %#ok<CCAT>
                                 additionals{j} = asso;
                                 existing_names{j} = asso.name;
                             end
                             samename = strcmp(existing_names, asso.name);
                             assert(sum(samename)<=1, ['atmlab:' mfilename], ...
                                 ['More than one additional contains field ' ...
-                                 asso.name]);
+                                asso.name]);
                             deal_index(i) = find(samename);
                             found = true;
                         end
@@ -1121,7 +1123,13 @@ classdef CollocatedDataset < SatDataset & HomemadeDataset
                 ['atmlab:' mfilename ':BUG'], ...
                 'length(additionals) == %d != length(additional_fields) == %d, bug?', ...
                 length(additionals), length(additional_fields));
-
+            
+        end
+    end
+    
+    methods (Access = protected)
+        function nm = calculate_name(self)
+            nm = [class(self) '__1_' self.primary.name '__2_' self.secondary.name];
         end
     end
     

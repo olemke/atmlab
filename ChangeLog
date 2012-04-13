@@ -1,3 +1,42 @@
+2012-04-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-53
+
+	* collocations/FieldCopier.m (FieldCopier):
+
+	- Re-organise automatic calculations of names
+
+	* datasets/SatDataset.m:
+
+	(SatDataset): If name not given, calculate one
+
+	(calculate_name): Provide default implementation for name-calculation;
+	my be overwritten by subclasses, such as by CollocatedDataset
+
+	* collocations/CollocatedDataset.m:
+
+	(CollocatedDataset): Move stuff around a bit
+
+	(calculate_name): Implement special-case name-calculation
+
+	* datasets/common_read_poes_radiometer.m:
+
+	- Allow for reading either l1b or l1c
+
+	* datasets/HomemadeDataset.m:
+
+	- Do not derive from SatDataset; diamond inheritance causes issues
+	with implicit instructor calling
+
+	(store): Bugfix, do not assume there is a (non-mandatory) '.atts'
+	attribute
+	
+	(read_single_day): Rather than zcat, use gunzip -c
+
+	* datasets/common_read_avhrr.m, datasets/common_read_hirscs.m:
+
+	- Rather than zcat, use gunzip -c
+
 2012-04-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-52

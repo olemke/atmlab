@@ -63,19 +63,6 @@ classdef FieldCopier < AssociatedDataset
                     ['atmlab:' mfilename ':duplicates'], 'Duplicate fieldnames between datasets are not permitted, but were found :(');
             self.members = allfields;
             
-            if isempty(self.name)
-                % give a name
-                existing_names = fieldnames(datasets);
-                while true
-                    nm = sprintf([class(self) '_%d_%d'], uint64(date2unixsecs()),round(rand(1, 1)*10000));
-                    if ~any(strcmp(nm, existing_names))
-                        break
-                    end
-                end
-                warning(['atmlab:' mfilename], ...
-                    'You didn''t name me! I''ll name myself %s', nm);
-                self.name = nm;
-            end
         end
         
         %% implementation of abstract methods

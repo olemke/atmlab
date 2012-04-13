@@ -27,7 +27,7 @@ isgzipped = strcmp(file(end-2:end), '.gz');
 
 if isgzipped % gunzip first
     newfile = tempname(atmlab('WORK_AREA'));
-    exec_system_cmd(['zcat ' file '>' newfile]); % 3x faster than ML gunzip
+    exec_system_cmd(['gunzip -c ' file '>' newfile]); % 3x faster than ML gunzip
     file = newfile;
 %    filenames = gunzip(file, '/tmp');
 %    file = filenames{1};

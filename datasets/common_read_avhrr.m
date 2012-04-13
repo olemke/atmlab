@@ -51,7 +51,7 @@ command = ['java -jar ' datasets_config('sat2netcdf') ' ' ...
     datasets_constants('sat2netcdf_flags') ' ' chanstr ' -avhrr ' infile ...
     ' -outputdir ' atmlab('WORK_AREA')];
 chdir(fileparts(datasets_config('sat2netcdf')));
-exec_system_cmd(['zcat ' file '>' infile]); % 3x faster than gunzip
+exec_system_cmd(['gunzip -c ' file '>' infile]); % 3x faster than gunzip
 %gunzip(file, atmlab('WORK_AREA'));
 exec_system_cmd(command);
 chdir(cwd);

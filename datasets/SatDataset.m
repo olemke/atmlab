@@ -53,6 +53,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 self.(varargin{i}) = varargin{i+1};
             end
             
+            if isempty(self.name)
+                % give a name
+                nm = self.calculate_name();
+                warning(['atmlab:' mfilename], ...
+                    'You didn''t name me! I''ll name myself %s (for now)', nm);
+                self.name = nm;
+            end
+
         end
         
         %% things that can be done with datasets
@@ -615,6 +623,19 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             self.name = value;
             datasets(self);
+        end
+    end
+    
+    methods (Access = protected)
+        function nm = calculate_name(self)
+
+            existing_names = fieldnames(datasets);
+            while true
+                nm = sprintf([class(self) '_%d_%d'], uint64(date2unixsecs()),round(rand(1, 1)*10000));
+                if ~any(strcmp(nm, existing_names))
+                    break
+                end
+            end
         end
     end
 end

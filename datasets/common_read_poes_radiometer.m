@@ -22,7 +22,11 @@ function data = common_read_poes_radiometer(file, ~)
 %
 % $Id$
 
-data = atovs_get_l1c(file);
+if length(file)>3 && strcmpi(file(end-2:end), 'l1c') % already in l1c (like at LERMA)
+    data = atovs_read_data(file);
+else
+    data = atovs_get_l1c(file);
+end
 
 % convert time from milliseconds to seconds
 
