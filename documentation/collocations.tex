@@ -1,0 +1,146 @@
+% For now, this is a seperate document.
+% However, if more components of Atmlab grow documentation in the future, this
+% may become part of a larger body of Atmlab documentation.
+%\documentclass[a4paper,10pt]{memoir}
+\documentclass[a4paper,10pt]{article}
+\usepackage{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{extsizes} % redundant with memoir
+\usepackage{natbib}
+\setcitestyle{authoryear,round,semicolon}
+\usepackage{paralist}
+\usepackage[colorlinks=true,allcolors=black]{hyperref}
+\usepackage[style=index, acronym]{glossaries}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage{siunitx}
+\sisetup{seperr,repeatunits=false}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5}
+%\usetikzlibrary{arrows,positioning,backgrounds,fit,shapes,calc}
+%\usepgfplotslibrary{units}
+\hbadness=10000 % don't bother be about underfull hbox
+\vbadness=10000 % idem dito
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[english]{isodate}
+\usepackage{url}
+\usepackage{pgf-umlcd}
+\makeglossaries
+\input{acronyms.tex}
+
+\title{Collocation Toolkit in Atmlab}
+
+\date{\isodate\today}
+
+\author{Gerrit Holl}
+
+\begin{document}
+\pagenumbering{Roman}
+\maketitle
+%\newpage
+\tableofcontents
+%\newpage
+\listoffigures
+%\newpage
+\listoftables
+%\newpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+
+A frequent task in analysis of geographical data is the collocation in space
+and time between data from different datasets.
+For example, one might wish to collocate geolocated remote sensing measurements from
+spaceborne sensors with model output, or collocate measurements from different
+sensors with each other.
+Usually, someone develops code in his or her favourite programming language
+to tackle the collocation problem at hand.
+Depending on context, the problem can vary considerably in nature and in
+complexity.
+Nevertheless, many sub-problems occur in a wide variety of situations.
+Valuable time may be lost by people re-inventing the wheel over and over
+again.
+
+The Collocations Toolkit is a set of classes and routines to easily
+handle collocations between an arbitrary pair of (satellite) datasets.
+It has been designed for user-friendly processing of long time series of data in a
+wide variety of situations.
+
+The toolkit is currently implemented in Matlab and is fully integrated with
+Atmlab, a package for atmospheric data analysis.
+It is available at a free license and is completely free of charge.
+
+Practical information on how to download the code can be found at
+\url{http://www.sat.ltu.se/projects/collocations/toolkit.php}.
+
+This is a technical document, and does not contain detailed information on
+algorithms used in the process of collocating.
+For information on the algorithms, please refer to the descriptions in the
+refereed articles \citet{holl10:_collocating_amt} and
+\citet{john12:_understanding_jgr}, and in my licentiate thesis
+\citep{holl11:_lic}.
+
+\section{Using the Toolkit}
+
+\begin{tikzpicture}
+ \begin{class}{SatDataset}{0, 0}
+  \attribute{+ name}
+  \attribute{+ basedir}
+  \attribute{+ subdir}
+  \attribute{+ re}
+  \attribute{+ filename}
+  \attribute{+ reader : function\_handle}
+  \attribute{+ granule\_duration : double}
+  \attribute{+ satname}
+  \attribute{+ dataset}
+  \attribute{+ firstline\_filename}
+  \attribute{\# collocated\_dataset}
+  \operation{+ find\_datadir\_by\_date}
+  \operation{+ find\_info\_from\_granule}
+  \operation{+ find\_granules\_by\_date}
+  \operation{+ find\_granule\_by\_datetime}
+  \operation{+ read\_granule}
+  \operation{+ granule\_first\_line}
+  \operation{+ find\_granule\_first\_line}
+ \end{class}
+
+ \begin{class}{HomemadeDataset}{7, 0}
+  \attribute{+ cols}
+  \operation{+ store}
+  \operation{\# read\_single\_day}
+ \end{class}
+
+ \begin{class}{CollocatedDataset}{5, -10}
+ \inherit{SatDataset}
+ %\implement{HomemadeDataset}
+ \attribute{+ primary}
+ \attribute{+ secondary}
+ \attribute{\# associated}
+ \attribute{\# members}
+ \operation{+ overlap\_granule}
+ \operation{+ collocate\_granule}
+ \operation{+ collocate\_date}
+ \operation{+ collocate\_and\_store\_date}
+ \operation{+ collocate\_and\_store\_date\_range}
+ \operation{+ process}
+ \operation{+ read}
+ \end{class}
+ % workaround, multiple-inheritance seems not to work, so do it like this
+ \draw[umlcd style inherit line] (HomemadeDataset) -- (CollocatedDataset);
+\end{tikzpicture}
+
+\section{Developing the Toolkit}
+
+\printglossaries
+
+\bibliographystyle{copernicus}
+\bibliography{bib_all}
+
+\end{document}

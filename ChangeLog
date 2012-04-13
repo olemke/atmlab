@@ -1,5 +1,15 @@
 2012-04-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-54
+
+	* documentation/, documentation/bib_all.bib, documentation/copernicus.bst,
+	documentation/collocations.tex, documentation/acronyms.tex,
+	documentation/pgf-umlcd.sty, documentation/Makefile: Added
+
+	- Started writing a manual for the collocations toolkit
+
+2012-04-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-53
 
 	* collocations/FieldCopier.m (FieldCopier):
@@ -107,6 +117,7 @@
 	* datasets/common_read_modis.m: Added reader for modis level 2
 	data. This follows the conventions of the collocation codes
 
+>>>>>>> .r7511
 2012-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-45
