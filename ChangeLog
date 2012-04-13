@@ -1,3 +1,9 @@
+2012-04-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-51
+
+	* geoplots/gmt/gmt_plot.m: in.datarange is now always double()
+
 2012-04-11  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-50

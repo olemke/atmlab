@@ -763,6 +763,7 @@ if ~in.nodata
     default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
 end
 in = optargs_struct(in,default);
+in.datarange = double(in.datarange);
 
 % COLORS & DATA REPRESENTATION
 default.ctable      = 'rainbow';          % color palette
