@@ -2,7 +2,7 @@
 %
 %   Makes 1D, 2D and 3D calculations with refraction and gives estimate
 %   of the error. The correct value is estimated by making calculations 
-%   with a 250 m step length, which makes the function slow.
+%   with a 100 m step length, which makes the function slow.
 %
 % FORMAT   test_arts_refraction( [lrt,geomztan,switchaa] )
 %        
@@ -15,7 +15,7 @@
 
 function test_arts_refraction( varargin )
 %
-[lrt,geomztan,switchaa] = optargs( varargin, { 5e3, 10e3, false } );
+[lrt,geomztan,switchaa] = optargs( varargin, { 2e3, 10e3, false } );
   
   
 %- Fixed settings
@@ -24,7 +24,7 @@ Q = qarts;
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
-Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionEuler' };
+Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionBasic' };
 refell                  = ellipsoidmodels( 'SphericalEarth' );
 re_string               = 'refellipsoidEarth( refellipsoid, "Sphere" )';
 
@@ -76,6 +76,8 @@ workfolder = create_tmpfolder;
 %
 Q.WSMS_AT_END         = { 
     re_string,  ...
+    'IndexSet(mblock_index,-1)',...
+    'IndexSet(f_index,-1)', ...
     'basics_checkedCalc', ...
     'cloudbox_checkedCalc', ...
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
@@ -87,7 +89,7 @@ Q.WSMS_AT_END         = {
 %- Run ARTS for 1D, with short step length
 %
 Q.ATMOSPHERE_DIM      = 1;
-Q.PPATH_LRAYTRACE     = 250;
+Q.PPATH_LRAYTRACE     = 100;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
 S = qarts2cfile( Q, ... 
@@ -109,10 +111,10 @@ lat0         = ppath0.pos(imin,2);
 if switchaa
   lat0 = -lat0;
 end
-fprintf( '\n     Ray tracing step length : %8.3f km\n', lrt/1e3 );
-fprintf( 'Geometrical tangent altitude : %8.3f km\n', geomztan/1e3 );
+fprintf( '\nGeometrical tangent altitude : %8.3f km\n', geomztan/1e3 );
 fprintf( '  Refracted tangent altitude : %8.3f km\n', ztan0/1e3 );
 fprintf( 'Rough error estimate of ztan : %8.3f m\n',  ztan0-ztan );
+fprintf( '     Ray tracing step length : %8.3f km\n', lrt/1e3 );
   
 
 

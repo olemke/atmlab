@@ -37,14 +37,14 @@ Q.ATMOSPHERE_DIM        = atmosphere_dim;
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
 if do_refr
-  Q.PPATH_LRAYTRACE     = 2e3;
-  Q.PPATH_STEP_AGENDA   = { 'ppath_stepRefractionEuler' };
-  Q.REFR_INDEX_AGENDA   = { 'Ignore(rte_pressure)', ...
+  Q.PPATH_LRAYTRACE     = 1e3;
+  Q.PPATH_STEP_AGENDA   = { 'ppath_stepRefractionBasic' };
+  Q.REFR_INDEX_AGENDA   = { 'Ignore(f_index)', ...
+                            'Ignore(rte_pressure)', ...
                             'Ignore(rte_temperature)', ...
                             'Ignore(rte_vmr_list)', ...
-                            'refr_indexUnit' };
-else
-  Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
+                            'Ignore(rte_edensity)', ...
+                            'NumericSet(refr_index,1.0)' };
 end
 Q.PPATH_LMAX            = 10e3;
 %
@@ -159,6 +159,8 @@ for c = 1 : n
   %
   Q.WSMS_AT_END         = { 
     re_string,  ...
+    'IndexSet(mblock_index,-1)',...
+    'IndexSet(f_index,-1)', ...
     'basics_checkedCalc', ...
     'cloudbox_checkedCalc', ...
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
@@ -169,9 +171,8 @@ for c = 1 : n
 
   %- Run ARTS and load result
   %
-  S = qarts2cfile( Q, ... 
-                   { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
-                   workfolder );
+  S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', ...
+                                                      'CloseF' }, workfolder );
   cfile = fullfile( workfolder, 'cfile.arts' );
   strs2file( cfile, S );
   notok = arts( cfile, true );
@@ -198,7 +199,7 @@ for c = 1 : n
                                        lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
 
     % Check ppath points
-    lt = ppath.lspace + [ 0; cumsum(ppath.lstep) ];
+    lt = ppath.end_lstep + [ 0; cumsum(ppath.lstep) ];
     e  = zeros( size(ppath.pos,1), 1 );
     for i = 1 : size(ppath.pos,1)
             
@@ -211,7 +212,7 @@ for c = 1 : n
       [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lons );
       dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
       e(i) = dd;
-      if dd > 1
+      if dd > 1e-3
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
                           y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz, ...

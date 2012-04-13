@@ -1,3 +1,19 @@
+2012-04-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-52
+
+	* tests/test_arts_refraction.m (test_arts_refraction): Updated and
+	default settings slightly changed.
+
+	* tests/test_arts_ppath.m (test_arts_ppath): Updated following
+	more recent changes in arts.
+
+	* geodetic/cart2geocentric.m: POLELAT (from arts) had not been
+	replaced.
+
+	* arts/xml/xmlReadPpath.m:
+	* arts/xml/xmlWritePpath.m: Updated to changes in arts.
+
 2012-04-13  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-51

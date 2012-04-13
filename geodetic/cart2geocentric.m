@@ -58,7 +58,7 @@ if nargin > 3
     end
     
     % N-S case (not starting at a pole)?
-    if abs(lat0(i)) < POLELAT & ...
+    if abs(lat0(i)) < 90-1e-8  & ...
       ( abs(aa0(i)) < 1e-6  |  abs(aa0(i)-180) < 1e-6 )
       % Check that not lon changed with 180 deg
       if abs(lon(i)-lon0(i)) < 1 
