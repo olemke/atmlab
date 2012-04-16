@@ -1,22 +1,132 @@
 classdef SatDataset < handle % subclass from handle to pass-by-reference
-    % Class to represent a dataset
+    % Class to represent a dataset.
     %
-    % Work in progress!
+    % A dataset describes various properties for datasets stored on disk.
+    % Its <a href="matlab:properties SatDataset">properties</a> include:
+    %
+    % - Properties to describe the location of the granules:
+    %     <a href="matlab:help SatDataset/basedir">basedir</a>
+    %     <a href="matlab:help SatDataset/subdir">subdir</a>
+    %     <a href="matlab:help SatDataset/re">re</a>
+    %     <a href="matlab:help SatDataset/filename">filename</a>
+    %
+    % - Property describing how to read the granule:
+    %     <a href="matlab:help SatDataset/reader">reader</a>
+    %
+    % - Other properties:
+    %     <a href="matlab:help SatDataset/name">name</a>
+    %     <a href="matlab:help SatDataset/granule_duration">granule_duration</a>
+    %     <a href="matlab:help SatDataset/satname">satname</a>
+    %     <a href="matlab:help SatDataset/collocated_datasets">collocated_datasets</a>
+    %
+    % For information on how to create an object from this class, see
+    % <a href="matlab:help SatDataset/SatDataset">SatDataset/SatDataset</a>.
     %
     % $Id$
     
     % read/write props
     properties
+        % Name of the dataset (pseudo-required).
+        %
+        % If not given, a name will be automatically calculated. This name
+        % is not necessarily descriptive, so it's usually good to give a
+        % name upon creating the dataset.
         name;
+        
+        % Basedir for the dataset (required).
+        %
+        % The base directory in which all granules reside. For example,
+        % mhs.basedir = '/storage3/data/mhs'.
         basedir;
+        
+        % Subdir for a particular day of data (required).
+        %
+        % In many datasets, data are stored per date, in subdirectories
+        % such as year/month/day/ or year/doy/. With this property, the user
+        % tells the dataset how the data are sorted. In locating granules,
+        % certain strings are replaced: $SAT, $YEAR4, $YEAR2, $MONTH, $DAY,
+        % $DOY. Example: mhs.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY'.
         subdir;
+        
+        % Regular expression to find individual granule (conditionally optional).
+        %
+        % This is required for datasets where the full filename cannot be
+        % exactly calculated from available information, for example, due
+        % to each filename containing orbit numbers, downlink stations, or
+        % other information not known or relevant. When <a href="matlab:help SatDataset/find_granules_by_date">searching</a>
+        % for granules, the regular expression described by this field is
+        % used for all files in a particular directory, expecting exactly
+        % one match. Therefore, the regular expression (a named one passed
+        % to <a href="matlab:help regexp">regexp</a> must match exactly one file.
+        %
+        % The regular expression may be applied either to the basename, or
+        % to the full path, or to anything in-between.
+        %
+        % Fields used for matching are year02, year04, year, month, day, doy.
+        %
+        % See also: <a href="matlab:help SatDataset/filename">filename</a>, <a href="matlab:help SatDataset/find_granule_by_datetime">find_granule_by_datetime</a>
+        %
+        % Example:
+        % mhs.re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})'
         re;
+        
+        % String describing basename (conditionally optional).
+        %
+        % This is used for datasets where the full filename can be exactly
+        % calculate from available information, and no <a href="matlab:help SatDataset/re">regular expression</a>
+        % is needed. This includes only the basename (no directory).
+        % 
+        % See also: <a href="matlab:help SatDataset/re">re</a>, <a href="matlab:help SatDataset/find_granule_by_datetime">find_granule_by_datetime</a>
+        %
+        % Example:
+        % mhs.collocated_datasets(1).filename = 'collocations_$SAT.nc.gz'
         filename;
+        
+        % Function handle to read a single granule (required)
+        %
+        % This property points to a function handle used to read a single
+        % granule (so it becomes in effect a static method). This function
+        % is passed as a string the full path to a granule, and must return
+        % a structure with at least 'lat', 'lon', and 'time'. Example
+        % routines are included with atmlab, all start with 'common_read_'.
+        %
+        % Example:
+        % mhs.reader = '@<a href="matlab:help common_read_poes_radiometer">common_read_poes_radiometer</a>'
         reader = @(varargin)[];
+        
+        % Granule duration in seconds (required)
+        %
+        % Describes the duration in seconds for a single granule. In case
+        % this varies, choose an upper limit. This is used by
+        % <a href="matlab:help CollocatedDataset/overlap_granule">CollocatedDataset/overlap_granule</a>.
+        %
+        % Example:
+        % mhs.granule_duration = 6130
         granule_duration;
+        
+        % Satellite name for single-satellite datasets (conditionally required)
+        %
+        % Some datasets, such as cpr, are contained only on a single satellite.
+        % However, the database genereated by <a href="matlab:help SatDataset/find_granule_first_line">find_granule_first_line</a>
+        % and used by <a href="matlab:help SatDataset/granule_first_line">granule_first_line</a> still needs a satellite to
+        % generate the string for the filename to store the data. The
+        % satellite name is also used in some verbose output. It is not
+        % needed or used for multi-satellite datasets, where instead the
+        % 'spec' specifies the satellite (such as in MHS).
+        %
+        % Example:
+        % cpr.satname = 'cloudsat'
         satname; % for single-satellite datasets
-        dataset; % e.g. MYD06_L2 for modis
-        firstline_filename = 'firstline_$NAME_$SPEC';
+        % Name for first-line database (predefined)
+        %
+        % Predefined property describing where firstline-db is stored
+        %
+        % The first-line database (see <a href="matlab:help SatDataset/find_granule_first_line">find_granule_first_line</a>
+        % and <a href="matlab:help SatDataset/granule_first_line">granule_first_line</a>)
+        % is needed to prevent duplicates. This contains the filename, but
+        % not the directory. Currently unused? FIXME
+        %
+        % firstline_filename = 'firstline_$NAME_$SPEC';
 
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that
@@ -27,6 +137,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     
     % read-only props (alterable with methods)
     properties (SetAccess = protected)
+        % list of CollocatedDatasets using this SatDataset (read-only)
+        %
+        % This property, which is read-only and automatically filled,
+        % contains a list of <a href="matlab:help CollocatedDataset">CollocatedDataset</a>s
+        % that use this <a href="matlab:help SatDataset">SatDataset</a>.
         collocated_datasets = [];
     end
     
@@ -35,10 +150,26 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %% constructor
         
         function self = SatDataset(varargin)
-            % Creates SatDataset object
+            % Creates a SatDataset object.
             %
-            % properties can be set upon constructing as when calling
-            % 'struct'
+            % For full information on the class, see <a href="matlab:doc SatDataset">doc SatDataset</a>.
+            %
+            % FORMAT
+            %
+            %   ds = SatDataset('name', 'MyDataset', ...
+            %                   'basedir', '/some/where', ...
+            %                   ...);
+            %
+            % IN
+            %
+            %   Any pair of key/value arguments, as when creating a
+            %   structure. Valid keys are properties. To get a list of
+            %   valid properties, call <a href="matlab:properties SatDataset">properties SatDataset</a>
+            %   and/or <a href="matlab:doc SatDataset">doc SatDataset</a>.
+            %
+            % OUT
+            %
+            %   Valid <a href="matlab:help SatDataset">SatDataset</a> object.
             
             % this may be defined in subclasses
             if isprop(self, 'defaults')
@@ -104,19 +235,29 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
    
         end
         
-        function S = find_info_from_granule(self,fname)
-        % find_info_from_granule Extract info from a granule filename
-        %
-        % FIXME DOC!
-
-        S = regexp(fname,self.re,'names'); 
-
+        function S = find_info_from_granule(self, fname)
+            % find_info_from_granule Extract info from a granule filename
+            %
+            % Thin shell around <a href="matlab:help regexp">regexp</a>.
+            %
+            % FORMAT
+            %
+            %   S = ds.find_info_from_granule(fname)
+            %
+            % IN
+            %
+            %   fname   string      (full) path to granule
+            %
+            % OUT
+            %
+            %  - structure containing whatever info could be obtained
+            
+            S = regexp(fname, self.re, 'names');
+            
         end
         
         function [M, paths] = find_granules_by_date(self, date, varargin)
             % find_granules_by_date Find all granule start times for date/sat/dataset
-            %
-            % FIXME DOC
             %
             % This function finds all granule start times for granules with any coverage
             % for the the indicated for the indicated satellite/dataset pair. This
@@ -124,23 +265,32 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % prohibited. Note that the last granule of the date before may or may not
             % actually contain information for the day requested. The
             % function assumes at most one granule for the previous date
-            % contains information for the current date.
+            % contains information for the current date. If two outputs are
+            % requested, paths to the granules are also output, as a cell
+            % array of strings.
             %
             % FORMAT
             %
-            %   [M, paths] = find_granules_by_date(date, spec, with_yesterday)
+            %   [M, paths] = find_granules_by_date(date[, spec[, with_yesterday]])
             %
             % OUT
             %
             %   M     N x m matrix     where each row corresponds to one granule and is
             %                          a datevec.
-            %   paths cell strings     Cell array of strings, corresponding full paths
+            %   paths cell of strings  Cell array of strings, corresponding full paths
             %
             % IN
             %
-            %   date
-            %   spec
-            %   with_yesterday (optional)
+            %   date            vector [year month day]
+            %   spec            string or cellstr, sat or pair of sats
+            %   with_yesterday  (optional) logical, include yesterdays last
+            %                   granule or not. Defaults to 'true', as this
+            %                   is needed to cover all of the date; but if
+            %                   looping over dates, one might not want it.
+            %
+            % EXAMPLE
+            %
+            %   >> [grans, paths] = mhs.find_granules_by_date([2010, 9, 8], 'noaa18');
             %
             % $Id$
             
@@ -204,26 +354,25 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
         end
         
-        function datafile = find_granule_by_datetime(self, datevec, varargin)
-        
+        function datafile = find_granule_by_datetime(self, datevec, varargin)   
             % find_granule_by_datetime Return full path of datafile by date/time
             %
             % Returns the full path of the datafile corresponding to the input
             % arguments. There are two modes:
             %
-            %   - If dataset.filename is defined, the path is
-            %     calculated directly from datasets_config settings and the arguments
+            %   - If <a href="matlab:help SatDataset/filename">dataset.filename</a> is defined, the path is
+            %     calculated directly from <a href="matlab:help SatDataset">dataset</a> properties and the arguments
             %     passed on. The file may or may not actually exist, so in this case,
             %     you can use it to calculate the path when planning to create it.
             %
-            %   - If this is not defined, then dataset.re has to
+            %   - If this is not defined, then <a href="matlab:help SatDataset/re">dataset.re</a> has to
             %     be defined. It will search the filesystem for a file matching the
             %     regular expression and the indicated datevec/spec for this dataset.
             %     In this case, one can apply a tolerance in seconds.
             %
             % FORMAT
             %
-            %   datafile = dataset.find_granule_by_datetime(date, [spec[, tol]])
+            %   datafile = dataset.find_granule_by_datetime(date,[ spec[, tol]])
             %
             % IN
             %
@@ -231,7 +380,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   spec        string/ Name of satellite. For datasets belonging to one
             %               cellstr satellite, a simple string. For datasets belonging
             %                       to two satellites (such as collocations), a cell
-            %                       array of two strings.
+            %                       array of two strings. For
+            %                       single-satellite datasets, not needed.
             %   tol         number  Optional: tolerance in seconds. Due to
             %                       rounding errors, a date like 2009-12-06
             %                       20:53:00 passed to date2unixsecs and
@@ -244,6 +394,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % OUT
             %
             %   datafile    string     Path to the looked-for datafile.
+            %
+            % EXAMPLE
+            %
+            %   >> path = mhs.find_granule_by_datetime([2010 9 8 8 8], 'noaa18');
             
             errid = 'atmlab:find_granule_by_datetime';
             [spec, tol] = optargs(varargin, {'', 0.01});
@@ -283,8 +437,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
         end        
         
-        function [allgrans, allpaths] = find_granules_for_period(self, date1, date2, spec)
-            
+        function [allgrans, allpaths] = find_granules_for_period(self, date1, date2, spec)            
             % find_granules_for_period List all granules for sat/dataset for period
             %
             % For the period between date1 and date2, list all granules (as vectors
@@ -304,6 +457,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   allgrans matrix     all granules in daterange
             %   allpaths cellstr    all paths to those granules
+            %
+            % EXAMPLE
+            %
+            %   >> [allgrans, allpaths] = mhs.find_granules_for_period([2010, 9, 5], [2010 9 7], 'noaa18');
             
             dates = daterange(date1, date2);
             ndates = size(dates, 1);
@@ -334,11 +491,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % High-level function to read a particular granule for a
             % satellite/sensor-pair, if one doesn't know what function is suitable to
-            % use to read it. It also gets rid of ballast.
+            % use to read it. It also gets rid of ballast (duplicates).
             %
-            % Uses member 'reader' to find out what function to use to
-            % read this particular data. Uses self.granule_first_line to find out the first
-            % scanline to use (e.g. the rest are doubles).
+            % Uses member <a href="matlab:help SatDataset/reader">reader</a> to find out what function to use to
+            % read this particular data. Uses <a href="matlab:help SatDataset/granule_first_line">self.granule_first_line</a>
+            % to find out the first scanline to use (e.g. the rest are doubles).
             %
             % FORMAT
             %
@@ -358,6 +515,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   data        struct  Contains at least lat, lon, time and one or more
             %                       data fields. Exact results depend on the particular
             %                       satellite/sensor-pair.
+            %
+            % EXAMPLE
+            %
+            %   >> data = mhs.read_granule([2010 9 8 8 8], 'noaa18', {}, true, false);
             %
             % TODO: implement caching, e.g. last N read granules are
             % stored in memory, in some global array or persistent thingy
@@ -444,6 +605,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   first       number      First scanline not in previous granule.
             %                           Special values: -1 (no data found), -2 (no
             %                           previous granule found)
+            %
+            % EXAMPLE
+            %
+            %   >> first = mhs.granule_first_line([2010 9 8 8 8], 'noaa18', false);
             
             persistent S;
             
@@ -518,6 +683,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % OUT
             %
             %   none, but writes a file
+            %
+            % EXAMPLE
+            %
+            %   >> mhs.find_scanline_first_line([2008 1 1], [2008 12 31], 'noaa18');
             
             spec = optargs(varargin, {''});            
             
@@ -610,13 +779,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %% methods for internal use (not private, but from other classes)
        
         function add_collocated_dataset(ds, cd)
-            % INTERNAL USE. Adds a collocated dataset.
+            % Adds a collocated dataset. INTERNAL USE ONLY!
             %
             % This is called by the CollocatedDataset constructor.
             ds.collocated_datasets = [ds.collocated_datasets cd];
         end
         
         function set.name(self, value)
+            % setter for 'name' property.
             if ~isempty(self.name)
                 % deregister old name
                 datasets('delete', self);
@@ -628,6 +798,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     
     methods (Access = protected)
         function nm = calculate_name(self)
+            % calculate_name Return automated name if name is not given
+            %
+            % This function is called by the constructor if no name is
+            % given. You may wish to override it in a subclass.
 
             existing_names = fieldnames(datasets);
             while true

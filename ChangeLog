@@ -1,3 +1,21 @@
+2012-04-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-56
+
+	* collocations/AssociatedDataset.m, collocations/CollocatedDataset.m,
+	datasets/SatDataset.m, datasets/HomemadeDataset.m:
+
+	- Significantly expand documentation
+
+	* collocations/TODO: revise
+	
+	* datasets/SatDataset.m, datasets/datasets_config.m: Remove 'dataset'
+
+	* documentation/collocations.tex:
+
+	- Make clean what methods are most relevant for end user (work in
+	progress)
+
 2012-04-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-55

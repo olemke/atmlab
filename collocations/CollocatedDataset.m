@@ -1,22 +1,61 @@
 classdef CollocatedDataset < HomemadeDataset
-    % Defines a collocated dataset, between two (other) datasets
+    % Defines a collocated dataset, between two (other) datasets.
     %
-    % Work in progress!
+    % This class contains most of the core functionality for the
+    % collocations toolkit, apart from the very low-level functions doing
+    % the actual collocations. 
+    %
+    % Besides the properties inherited from <a href="matlab:help SatDataset">SatDataset</a>, 
+    % it contains two properties: <a href="matlab:help CollocatedDataset/primary">primary</a> and <a href="matlab:help CollocatedDataset/secondary">secondary</a>.
+    % Those are <a href="matlab:help SatDataset">SatDataset</a> objects (therefore possibly
+    % <a href="matlab:help CollocatedDataset">CollocatedDataset</a> objects!) passed on to the
+    % constructor.
+    %
+    % For instantiation, see <a href="matlab:help CollocatedDataset/CollocatedDataset">constructor info</a>.
+    %
+    % For a full overview of methods, see <a href="matlab:doc CollocatedDataset">doc CollocatedDataset</a>.
     %
     % $Id$
     properties
+        % Primary dataset
+        %
+        % When collocating, there are some considerations as to chosing
+        % the primary vs. the secondary dataset:
+        % 
+        %   - Choose the dataset with the largest footprint as the primary.
+        %     This becomes particularly important when the secondary is
+        %     averaged over the primary using <a href="matlab:help MeanFieldCopier</a>MeanFieldCopier</a>
+        %     or a similar class.
+        %
+        %   - Choose the dataset with the largest granule as the primary.
+        %     As long as there is no caching implemented in <a href="matlab: help SatDataset/read_granule">SatDataset.read_granule</a>,
+        %     this is much faster than the opposite.
         primary;
+        
+        % Secondary dataset
+        %
+        % For considerations, see help for <a href="matlab:help CollocatedDataset/primary">primary</a>.
         secondary;
     end
     
     % read-only props (may be alterable with methods)
     properties (SetAccess = protected)
-        % associated datasets, e.g. additional data, meandata, etc.
+        % Cell array of <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
+        %
+        % This automatically-filled cell-array contains all datasets that
+        % can be used in associated with this <a href="matlab:help CollocatedDataset">CollocatedDataset</a>.
+        % This can be e.g. <a href="matlab:help FieldCopier">FieldCopier</a>, <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>, etc.
         associated = {};
     end
     
     properties (Constant)
         
+        % Structure describing layout of NetCDF files storing collocations
+        %
+        % This read-only structure describes exactly the layout of the
+        % NetCDF files in which the collocations are stored.
+        %
+        % Valid types are at:
         % http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-c/NetCDF_002d3-Variable-Types.html#NetCDF_002d3-Variable-Types
         members = struct(...
             'START1', struct(...
@@ -98,6 +137,21 @@ classdef CollocatedDataset < HomemadeDataset
     
     methods
         function self = CollocatedDataset(prim, sec, varargin)
+            % Constructor for CollocatedDataset
+            %
+            % FORMAT
+            %
+            %   cd = CollocatedDataset(prim, sec, 'prop', 'val', ...)
+            %
+            % IN
+            %
+            %   prim    SatDataset  primary
+            %   sec     SatDataset  secondary
+            %   ... (key - value) pairs as for <a href="matlab:help SatDataset">SatDataset</a>
+            %
+            % OUT
+            %
+            %   cd      CollocatedDataset object
             super_args = [varargin, {'primary', prim, 'secondary', sec}];
             self = self@HomemadeDataset(super_args{:}); % call parent constructor
             % check that both are SatDataset
@@ -125,13 +179,34 @@ classdef CollocatedDataset < HomemadeDataset
         function secondary_granules = overlap_granule(self, date1, spec2)
             % secondary granules that, judging from filenames, might overlap
             %
-            % FIXME DOC
+            % Based on the filename and on the <a href="matlab:help SatDataset/granule_duration">granule_duration</a>
+            % properties, guess what secondary granules need to be read in
+            % order to fully cover the period indicated by the first
+            % granule. This is the first step in performing collocations
+            % for a particular granule.
             %
-            % date1, spec2
+            % This is a low-level function usually not called directly
+            % by the user.
             %
             % Assumes granules contain data for at most one day.
+            % This implies a limitation for the entire collocation toolkit.
             %
-            
+            % FORMAT
+            %
+            %   grans = cd.overlap_granule(datevec1, spec2);
+            %
+            % IN
+            %
+            %   datevec1    datevec     Starting time for primary granule
+            %   spec2       various     Satellite etc. for secondary granule
+            %
+            % OUT
+            %
+            %   grans       matrix      describing secondary start-times
+            %
+            % EXAMPLE
+            %
+            %   >> sec = mhscpr.overlap_granule([2010 9 8 8 8], '');
             
             %% get duration of a granule of sensor1
             
@@ -181,22 +256,56 @@ classdef CollocatedDataset < HomemadeDataset
             secondary_granules = threedays(okej, :);
         end
         
-        function [result, additional_results, also] = collocate_granule(self, date1, spec1, spec2, varargin)
-            
+        function [result, additional_results, also] = collocate_granule(self, date1, spec1, spec2, varargin)           
             % collocate_granule Collocate granules from sat/sensor pairs
             %
-            % date1: datevec for 1.
+            % This method collocates a granule from the primary with all
+            % overlapping granules from the secondary satellite, and
+            % returns the results. 
             %
-            % spec1: specification for 1 (e.g. satellite).
+            % FORMAT
             %
-            % spec2: specification for 2 (e.g. satellite).
+            %   [result, additional_results, also] = ...
+            %       cd.collocate_granule(date1, spec1, spec2[, additionals[, oneday]])
             %
-            % additionals, cell array of AssociatedDataset-objects (or,
-            % naturally, one of its subclasses)
+            % IN
             %
-            % oneday
+            %   date1   datevec     starting date/time for primary
+            %   spec1   various     specification, e.g. satellite or pair
+            %                       of satellites, for the primary. May be
+            %                       empty if not applicable.
+            %   spec2   various     specification for the secondary
+            %   addis   cell-array  optional; cell array of objects from
+            %                       classes implementing <a href="matlab:help AdditionalDataset">AdditionalDataset</a>,
+            %                       such as <a href="matlab:help FieldCopier">FieldCopier</a>
+            %                       or <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>.
+            %                       Defaults to empty cell-array {}.
+            %   oneday  logical     optional. If true, force collocations to be all
+            %                       from the indicated day. If false, all
+            %                       collocations from all granules covering
+            %                       this day will be considered. Defaults
+            %                       to false, but if one is looping through
+            %                       the days one wants it to be true.
+            %   
+            % OUT
             %
-            % TO BE DOCUMENTED
+            %   result  matrix      Contains core collocation-info. Columns
+            %                       described by <a href="matlab:help CollocatedDataset/cols">CollocatedDataset.cols</a>.
+            %   add_res cell-array  Cell array of matrices. The elements of
+            %                       this cell-array correspond to the
+            %                       elements of input arguments 'addis'.
+            %                       For each matrix, the columns are
+            %                       described by the corresponding <a href="matlab:help AssociatedDataset/cols">cols</a>
+            %                       member for the <a href="matlab:help AssociatedDataset">AssociatedDataset</a>
+            %                       object.
+            %   also    struct      More information.
+            %
+            % EXAMPLE
+            %
+            %   (example assumes fc is a <a href="matlab:help FieldCopier">FieldCopier</a>)
+            %
+            % >> [result, additional_results, also] = ...
+            %   mhscpr.collocate_granule([2010 9 8 8 8], 'noaa18', '', {fc}, true)
             
             [additionals, oneday] = optargs(varargin, {{}, false});
             additional_results = cell(size(additionals));
@@ -371,6 +480,7 @@ classdef CollocatedDataset < HomemadeDataset
                 end
                 
                 %% perform collocations
+                logtext(atmlab('OUT'), 'Performing collocations\n');
                 collocations = collocate(data1.time(iv1), ...
                     data1.lat(iv1, :), ...
                     data1.lon(iv1, :), ...
@@ -431,31 +541,37 @@ classdef CollocatedDataset < HomemadeDataset
             end
         end
         
-        function [result, additional_results, also] = collocate_date(self, date, spec1, spec2, varargin)
-            
+        function [result, additional_results, also] = collocate_date(self, date, spec1, spec2, varargin)           
             % collocate_date Collect all collocations for given date
             %
-            % This method collects all collocations for the given date.
+            % This method takes all granules from the primary that contain
+            % data for the indicated date. It then <a href="matlab:help CollocatedDataset/collocate_granule">collocates each granule</a>
+            % with the secondary and thus collects all collocations for the
+            % given date. The result is not stored, but returned; to store
+            % the result, use <a href="matlab:help CollocatedDataset/collocate_and_store_date">CollocatedDataset.collocate_and_store_date</a>.
             %
             % FORMAT
             %
-            %   [M, addis, also] = collocate_date([year, month, day], spec1, spec2)
+            %   [M, addis, also] = cd.collocate_date([year, month, day], spec1, spec2[, additionals])
             %
             % IN
             %
-            %   datevec vector      [year month day]
-            %   spec1
-            %   spec2
-            %   additionals (optional) cell array
+            %   datevec     vector      [year month day]
+            %   spec1       various     sat for primary, if applicable
+            %   spec2       various     sat for secondary, if applicable
+            %   additionals (optional)  cell array; see help for
+            %                           corresponding argument for
+            %                           <a href="matlab:help CollocatedDataset/collocate_granule">CollocatedDataset.collocate_granule</a>.
             %
             % OUT
             %
-            %   M       matrix      results...
-            %   addis   cell array  results corresponding to additionals
+            %   For output arguments, see help for <a href="matlab:help CollocatedDataset/collocate_granule">CollocatedDataset.collocate_granule</a>.
             %
-            % FIXME DOC
-            %
-            % $Id$
+            % EXAMPLE
+            % 
+            % (example assumes fc is a <a href="matlab:help FieldCopier">FieldCopier</a>)
+            % >> [result, additional_results, also] = ...
+            %   mhscpr.collocate_date([2010 9 8], 'noaa18', '', {fc})
             
             additionals = optargs(varargin, {{}});
             
@@ -569,12 +685,12 @@ classdef CollocatedDataset < HomemadeDataset
             % collocate_and_store_date Collect collocations and store appropiately
             %
             % For a given date, check whether a collocation datafile exists.
-            % If it doesn't (or colloc_config('overwrite') is set), collocate the indicated
+            % If it doesn't (or <a href="matlab:help colloc_config">colloc_config</a>('overwrite') is set), collocate the indicated
             % satellites and sensors with each other and store the result in the
             % appropiate datafile.
             %
-            % TODO:
-            % use existing collocation but then read additional datasets
+            % This only works on a single day; for long periods of time,use
+            % <a href="matlab:help CollocatedDataset/collocate_and_store_date_range">CollocatedDataset.collocate_and_store_date_range</a>.
             %
             % FORMAT
             %
@@ -582,14 +698,16 @@ classdef CollocatedDataset < HomemadeDataset
             %
             % IN
             %
-            %   datevec
-            %   spec1
-            %   spec2
-            %   additionals (optional)
+            %   Input arguments as for <a href="matlab:help CollocatedDataset/collocate_date">CollocatedDataset.collocate_date</a>
             %
             % OUT
             %
             %   none (but writes file)
+            % 
+            % EXAMPLE
+            %
+            % (example assumes fc is a <a href="matlab:help FieldCopier">FieldCopier</a>)
+            % >> mhscpr.collocate_date([2010 9 8], 'noaa18', '', {fc})
             
             additionals = optargs(varargin, {{}});
             % get filename
@@ -689,17 +807,34 @@ classdef CollocatedDataset < HomemadeDataset
         function collocate_and_store_date_range(self, date_start, date_end, spec1, spec2, varargin)
             % Collocate and store date range
             %
-            % col.collocate_and_store_date_range(date_start, date_end, spec1, spec2, varargin)
+            % Loop through a range of dates and for each date,
+            % <a href="matlab:help CollocatedDataset/collocate_and_store_date">collocate and store</a> collocations for each date.
+            %
+            % This is the most suitable method for collocating large
+            % quantities of data.
+            %
+            % FORMAT
+            % 
+            %   col.collocate_and_store_date_range(date_start, date_end, spec1, spec2, varargin)
             %
             % IN
             %
-            %   date_start
-            %   date_end
-            %   spec1
-            %   spec2
-            %   additionals (optional)
+            %   date_start      datevec     starting date
+            %   date_end        datevec     ending date
+            %   spec1           various     sat or sat pair or empty
+            %   spec2           various     sat or sat pair or empty
+            %   additionals     cell-arary  (optional) <a href="matlab:help AssociatedDataset">AssociatedDataset</a>s, if any
             %
-            % FIXME DOC
+            % OUT
+            %
+            %   No output; the volume of data may be very large, so the
+            %   only 'output' is written to disc.
+            %
+            % EXAMPLE
+            %            
+            % (example assumes fc is a <a href="matlab:help FieldCopier">FieldCopier</a>)
+            %   mhscpr.collocate_and_store_date_range([2010 9 1], ...
+            %       [2010 9 30], '', 'noaa18', {fc});
             
             logtext(atmlab('OUT'), 'Starting collocations\n');
             logtext(atmlab('OUT'), '%s %s vs. %s %s\n', self.primary.name, spec1, self.secondary.name, spec2);
@@ -747,10 +882,33 @@ classdef CollocatedDataset < HomemadeDataset
         function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
             % Process core collocations
             %
-            % + Process 'core' fields
-            % + Copy additional fields?
-            % + Concatenate to what's already there?
+            % This method processes the output of <a href="matlab:help collocate</a>collocate</a>
+            % and converts it to a matrix that is passed on for further
+            % processing.
             %
+            % This is an internal method not normally called by the end
+            % user.
+            %
+            % FORMAT
+            %
+            %    M = cd.process(collocs, data1, date1, spec1, ...
+            %                            data2, date2, spec2);
+            %
+            % IN
+            %
+            %   collocs     matrix      as output by <a href="matlab:help collocate</a>collocate</a>
+            %   data1       struct      as returned by primary <a href="matlab:help SatDataset/reader">reader</a>
+            %   date1       datevec     datevec for primary
+            %   spec1       various     spec for primary (sat, sat pair, ...)
+            %   data2       struct      as returned by secondary <a href="matlab:help SatDataset/reader">reader</a>
+            %   date2       datevec     datevec for secondary
+            %   spec2       various     spec for secondary
+            %
+            % OUT
+            %
+            %   M           matrix      collocations, columns described by
+            %                           <a href="matlab:help CollocatedDataset/cols">self.cols</a>
+            
             % NOTE: time is assumed to be 1D
             
             n = size(collocations, 1);
@@ -818,13 +976,13 @@ classdef CollocatedDataset < HomemadeDataset
         end
         
         function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin)
-            % collocation_read Read collocations for indicated period
+            % Read collocations for indicated period
             %
             % This method reads all or a selection of the collocations for
             % the indicated period, between date_start and date_end.
-            % If less than two output arguments are used, additionals will
-            % be merged into the core.
-            % Limitations are only partially implemented so far.
+            % If less than two output arguments are requested, additionals will
+            % be merged with the core.
+            % Merging is required in the presence of limitations.
             %
             % FORMAT
             %
@@ -845,10 +1003,8 @@ classdef CollocatedDataset < HomemadeDataset
             %                           the fields to be read. Can be
             %                           from the core-dataset or from
             %                           the additional datasets.
-            %
-            % OPT
-            %
-            %   limits      structure   Structure describing acceptable
+            %   limits      structure   (optional)
+            %                           Structure describing acceptable
             %                           ranges for zero or more fields.
             %                           E.g. struct('LAT1', [-30 30])
             %                           will limit collocations to
@@ -858,8 +1014,8 @@ classdef CollocatedDataset < HomemadeDataset
             %                           NOTE: This (currently) works only
             %                           if you let the output data be
             %                           merged (e.g. 2 output args).
-            %
-            %   filters     cell-array  Cell array of cell arrays:
+            %   filters     cell-array  (optional)
+            %                           Cell array of cell arrays:
             %                           {filter1, filter2, ...}. Each
             %                           filter1 is itself a cell-array
             %                           with 2 or 3 elements:
@@ -1056,17 +1212,38 @@ classdef CollocatedDataset < HomemadeDataset
         
         % semi-internal use
         
-        function add_associated(cd, ad)
-            % INTERNAL USE adds an associated dataset
+        function add_associated(self, ad)
+            % Add an associated dataset INTERNAL USE ONLY
             %
-            cd.associated = {cd.associated{:} ad}; %#ok<CCAT>
+            % FORMAT
+            %
+            %   cd.add_associated(ad);
+            
+            self.associated = {self.associated{:} ad}; %#ok<CCAT>
         end
         
     end
     
     methods (Access = private)
         function [fields, additionals, additional_fields, deal_index] = deal_fields(self, all_fields)
-            % deal fields: core, additionals?
+            % deal fields over core, additionals, etc.
+            %
+            % FORMAT
+            %
+            %   [fields, additionals, additional_fields, deal_index] = ...
+            %       deal_fields(all_fields)
+            %
+            % IN
+            %
+            %   all_fields  cell-array  all fields to be sorted
+            %
+            % OUT
+            %
+            %   fields_core         cell array  fields in core
+            %   additionals         cell array  <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
+            %   additional_fields   cell array of cell array of fields
+            %   deal_index          vector
+            
             n_f = 0;
             n_add = zeros(size(self.associated));
             additionals = {};
@@ -1136,6 +1313,21 @@ classdef CollocatedDataset < HomemadeDataset
     methods (Static, Access = private)
         function sorted = sort_additionals(additionals)
             % sort additionals per dependencies
+            %
+            % Taking into account dependencies, sort the <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
+            % in an appropiate order.
+            %
+            % FORMAT
+            %
+            %   sorted_addis = cd.sort_additionals(unsorted_addis)
+            %
+            % IN
+            %
+            %   cell array of <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
+            %
+            % OUT
+            %
+            %   cell array of <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
             oldidx = zeros(size(additionals));
             for k = 1:100
                 for i = 1:length(additionals)
@@ -1164,6 +1356,23 @@ classdef CollocatedDataset < HomemadeDataset
             % This static method assures that requirements for additional X
             % (first argument) are met, given other additionals (second
             % argument) and results so far (third argument).
+            %
+            % FORMAT
+            %
+            %   depdata = cd.fix_dependencies(this_additional, all_additionals, result_so_far)
+            %
+            % IN
+            %
+            %   this_additional   <a href="matlab:help AdditionalDataset">AdditionalDataset</a> currently being worked on
+            %   all_additionanls  cell array of all <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
+            %   result_so_far     cell array with results of <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
+            %                     already processed
+            %
+            % OUT
+            %
+            %   depdata           cell array with results to be passed on
+            %                     to the <a href="matlab:help AdditionalDataset">AdditionalDataset</a>
+            %                     under consideration
             
             if isempty(additional_current.dependencies)
                 depdata = {};

@@ -1,10 +1,11 @@
 classdef HomemadeDataset < SatDataset
-    % What Associated and Collocated, but not Sat, -dataset, have.
+    % Any SatDataset that is locally created and stored.
     %
-    % Do not instantiate directly, meant as a mixin-class.
+    % This class is an 'intermediate' class between <a href="matlab:help SatDataset">SatDataset</a> 
+    % and <a href="matlab:help CollocatedDataset">CollocatedDataset</a>, but also parent to <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
+    % It is unlikely you wish to instantiate this class directly.
     
-    % Do not inherit from SatDataset, diamond rule causes issues with
-    % implicit constructor calling:
+    % Note on implicit and explicit constructor calling:
     % http://www.mathworks.se/help/matlab/matlab_oop/creating-subclasses--syntax-and-techniques.html
     %
     % Work in progress!
@@ -18,8 +19,14 @@ classdef HomemadeDataset < SatDataset
     
     
     properties
+        % structure describing columns of internally stored data
+        %
+        % The cols-structure describes columns of data passed around
+        % internally as a matrix. For example, mid-level methods like
+        % <a href="matlab:help CollocatedDataset/collocate_date">CollocatedDataset.collocate_date</a>
+        % return a matrix, whose columns are then described by the
+        % cols-member.
         cols = struct;
-        %members;
     end    
     
     methods
@@ -33,16 +40,18 @@ classdef HomemadeDataset < SatDataset
             %
             % Write collocation data for date in data to a netcdf file.
             % The filename is determined from self, date, spec.
+            % This is a relatively low-level function and not normally
+            % called directly; rather call <a href="matlab:help CollocatedDataset/collocate_and_store_date">CollocatedDataset.collocate_and_store_date</a>
             %
             % FORMAT
             %
-            %   obj.store(date, spec, data[, info])
+            %   [fn, global_atts] = obj.store(date, spec, data[, info])
             %
             % IN
             %
-            %   date
-            %   spec
-            %   data        actual data (columns by self.cols)
+            %   date        vector [year month day] to which data corresponds
+            %   spec        string / cellstr, satellite (or so)
+            %   data        actual data, columns described by <a href="matlab:help HomemadeDataset/cols">self.cols</a>
             %   info        (optional) struct with more info to put in NetCDF
             %
             % OUT
@@ -187,13 +196,34 @@ classdef HomemadeDataset < SatDataset
         function [M, localcols, attr] = read_single_day(self, date, spec, fields)
             % Read collocation 'fields' for 'date', 'spec'.
             %
-            % FIXME DOC
+            % Low-level function, not normally called directly. To read
+            % collocated data, use <a href="matlab:help CollocatedDataset/read">CollocatedDataset.read</a>.
+            %
+            % Reads a single day of data.
+            %
+            % FORMAT
+            %
+            %   [M, localcols, attr] = ds.read_single_day(date, spec, fields)
+            %
+            % IN
+            %   
+            %   date    datevec     datevec for which to read data
+            %   spec    various     satellite(s)
+            %   fields  cellstr     fields to read from data.
+            %
+            % Note:
             %
             % 'fields' may be 'all', in which case all fields are read.
             % No guarantee about the order, but this information is
-            % returned via 'localcols'. If you want consistence of order
+            % returned via 'localcols'. If you need consistence of order
             % with actual collocating, consider passing
             % fieldnames(self.cols) as fields.
+            %
+            % OUT
+            %
+            %   M           matrix      contains requested data
+            %   localcols   struct      describes data columns
+            %   attr        struct      contains NetCDF global attributes
             
             fn = self.find_granule_by_datetime(date, spec);
             logtext(atmlab('OUT'), 'Gunzipping and reading %s\n', fn);

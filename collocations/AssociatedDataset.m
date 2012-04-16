@@ -1,10 +1,21 @@
 classdef AssociatedDataset < HomemadeDataset
-    % Defined data associated with CollocatedDataset
+    % Defines data associated with CollocatedDataset
     %
-    % Meant to be subclassed, not instantiated directly.
-    % To just copy fields, use subclass FieldCopier
+    % The data stored with a <a href="matlab:help CollocatedDataset">CollocatedDataset</a> is only the
+    % very core needed to retrieve collocations. Any other data needs to be
+    % stored by using one or more AssociatedDataset objects.
     %
-    % Work in progress!
+    % Classes derived from AssociatedDataset describe datasets with data
+    % associated with <a href="matlab:help CollocatedDataset">CollocatedDataset</a>s.
+    % The class AssociatedDataset itself is an abstract class, and can
+    % therefore not be instantianed directly. However, it may be subclassed
+    % for the implementation of an arbitrary AssociatedDataset.
+    % Full implementations of AssociatedDataset that come with atmlab are
+    % <a href="matlab:help FieldCopier">FieldCopier</a> and <a
+    % href="matlab:help MeanFieldCopier">MeanFieldCopier</a>.
+    %
+    % The properties and methods are documented here, because subclasses
+    % provide mere implementations; the signature does not change.
     %
     % $Id$
     
@@ -13,13 +24,30 @@ classdef AssociatedDataset < HomemadeDataset
     % - additional arguments to reader secondary
             
     properties (Abstract, SetAccess = protected)
+        % Describes how data are stored in NetCDF files
+        %
+        % This property gives a full description of how data are stored in
+        % NetCDF files. The value of the property may be different for
+        % different instances (objects) of any subclass, so the property
+        % has no predefined value (unlike <a href="matlab:help CollocatedDataset/members">CollocatedDataset.members</a>).
         members;
+        % Parent dataset that this AssociatedDataset is associated with
+        %
+        % Pointing to a <a href="matlab:help CollocatedDataset">CollocatedDataset</a>,
+        % this property describes what the AssociatedDataset relates to.
         parent;
+        % Other AssociatedDatasets that need to be considered first.
+        %
+        % Contains a collection of other AssociatedDataset objects that
+        % need to be considered first. For example, to process a
+        % <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>, one
+        % first needs a <a href="matlab:help FieldCopier">FieldCopier</a>.
         dependencies;
     end
     
     properties
-        priority = 0; % to determine order of passing on
+        % priority is dynamically set when sorting for dependencies
+        priority = 0;
     end
     
     methods

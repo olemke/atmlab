@@ -34,6 +34,7 @@
 \usepackage{pgf-umlcd}
 \makeglossaries
 \input{acronyms.tex}
+\newcommand{\methodused}[1]{{\bfseries #1}}
 
 \title{Collocation Toolkit in Atmlab}
 
@@ -42,7 +43,7 @@
 \author{Gerrit Holl}
 
 \begin{document}
-\pagenumbering{Roman}
+%\pagenumbering{Roman}
 \maketitle
 %\newpage
 \tableofcontents
@@ -89,7 +90,10 @@ refereed articles \citet{holl10:_collocating_amt} and
 
 \section{Using the Toolkit}
 
-The diagram below illustrates the most important classes and methods.
+The diagram below illustrates the most important classes and methods in
+the collocations toolkit.
+Methods that an end-user will commonly call are shown \methodused{like
+this}.
 
 \begin{tikzpicture}[every node/.style={font=\scriptsize}]
  \begin{class}{SatDataset}{0, 0}
@@ -106,7 +110,7 @@ The diagram below illustrates the most important classes and methods.
   \attribute{\# collocated\_dataset}
   \operation{+ find\_datadir\_by\_date}
   \operation{+ find\_info\_from\_granule}
-  \operation{+ find\_granules\_by\_date}
+  \operation{+ \methodused{find\_granules\_by\_date}}
   \operation{+ find\_granule\_by\_datetime}
   \operation{+ read\_granule}
   \operation{+ granule\_first\_line}
@@ -128,9 +132,9 @@ The diagram below illustrates the most important classes and methods.
  \attribute{\# members}
  \operation{+ overlap\_granule}
  \operation{+ collocate\_granule}
- \operation{+ collocate\_date}
+ \operation{+ \methodused{collocate\_date}}
  \operation{+ collocate\_and\_store\_date}
- \operation{+ collocate\_and\_store\_date\_range}
+ \operation{+ \methodused{collocate\_and\_store\_date\_range}}
  \operation{+ process}
  \operation{+ read}
  \end{class}

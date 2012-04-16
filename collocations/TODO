@@ -1,3 +1,25 @@
+********************************
+* New style since January 2012 *
+********************************
+
+- Get new-fields when reading long period? Or force to store first?
+- For FieldCopier, be smart in long_name if possible
+- single 'CPR' super-dataset that knows in what actual datasets fields are
+  and reads the fields accordingly. Maybe in the same way can implement
+  different associated datasets as super-dataset?
+- go through all the FIXME DOC and actually fix them
+- do caching in read_granule
+
+- when finished, in old-style add small functions using new-style
+
+Fix:
+    - mhs/amsub
+    - bugs
+    
+*********************************
+* Old style before January 2012 *
+*********************************
+
 DOCUMENTATION:
 
 - It appears the distinction between C_I/C_START is not entirely clear.
@@ -55,34 +77,3 @@ WISHES
 - Add an extensive testing suite.
 
 
-********************************
-* New style since January 2012 *
-********************************
-
-- Read long period, core + associated datasets + new fields
-- Figure out dependencies of multiple associated datasets
-- For FieldCopier, be smart in long_name if possible
-- fix granules_first_line automatic generation or at least a smart hint on
-  what to do
-- convert glanules_first_line generation to new-style
-- single 'CPR' super-dataset that knows in what actual datasets fields are
-  and reads the fields accordingly. Maybe in the same way can implement
-  different associated datasets as super-dataset?
-- go through all the FIXME DOC and actually fix them
-- update first_line-stuff to something prettier
-- do caching in read_granule
-
-- implement new style as methods in various new classes
-- when finished, in old-style add small functions using new-style
-
-Remove:
-    - special case 'poes'
-    - S, D, M, ...
-    - ...
-
-Update:
-    - collocate_granule
-
-Fix:
-    - mhs/amsub
-    - bugs
