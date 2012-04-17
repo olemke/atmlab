@@ -1,5 +1,31 @@
 2012-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-58
+
+	* collocations/MeanFieldCopier.m → collocations/Collapser.m:
+
+	- rename class
+
+	- inherit directly from AssociatedDataset, no current need for
+	  in-between classes
+
+	- Significant expand documentation, more-or-less finished now.
+
+	* collocations/ReducedDataset.m, collocations/MeanDataset.m: deleted.
+
+	- Let Collapser inherit directly from AssociatedDataset, no classes
+	in-between that do nothing
+
+	* collocations/AssociatedDataset.m: Finish online documentation
+
+	* collocations/Holl10Data.m: Make clear that this is work in progress
+
+	* documentation/collocations.tex, collocations/CollocatedDataset.m: Adapt for renamed class
+
+	* datasets/HomemadeDataset.m: Expand documentation
+
+2012-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-57
 
 	* collocations/FieldCopier.m, collocations/AssociatedDataset.m,

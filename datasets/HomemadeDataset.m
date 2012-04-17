@@ -275,6 +275,7 @@ classdef HomemadeDataset < SatDataset
     % static/private are used like subfunctions
     methods (Static, Access = protected)
         function cleanup(temp_out, ncid)
+            % remove temporary files and close NetCDF
             logtext(atmlab('OUT'), 'Cleaning up\n');
             try
                 netcdf.close(ncid);

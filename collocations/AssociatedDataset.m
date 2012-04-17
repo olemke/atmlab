@@ -12,7 +12,7 @@ classdef AssociatedDataset < HomemadeDataset
     % for the implementation of an arbitrary AssociatedDataset.
     % Full implementations of AssociatedDataset that come with atmlab are
     % <a href="matlab:help FieldCopier">FieldCopier</a> and <a
-    % href="matlab:help MeanFieldCopier">MeanFieldCopier</a>.
+    % href="matlab:help Collapser">Collapser</a>.
     %
     % The properties and methods are documented here, because subclasses
     % provide mere implementations; the signature does not change.
@@ -40,7 +40,7 @@ classdef AssociatedDataset < HomemadeDataset
         %
         % Contains a collection of other AssociatedDataset objects that
         % need to be considered first. For example, to process a
-        % <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>, one first needs a <a href="matlab:help FieldCopier">FieldCopier</a>.
+        % <a href="matlab:help Collapser">Collapser</a>, one first needs a <a href="matlab:help FieldCopier">FieldCopier</a>.
         dependencies;
     end
     
@@ -51,14 +51,40 @@ classdef AssociatedDataset < HomemadeDataset
     
     methods
         function self = AssociatedDataset(varargin)
-            % 2 modes:
-            % if 1st argument is CollocatedDataset, then:
-            % cd: CollocatedDataset it belongs to
-            % dependencies: AssociatedDatasets to be processed first
-            % rest of arguments passed on to SatDataset
-            % otherwise all to parent
+            % constructor for AssociatedDataset
             %
-            % FIXME DOC
+            % Note that AssociatedDataset can not be constructed, but some
+            % sub-classes may be. In the examples below the class is called
+            % AssociatedDataset, but replace this by whatever class you are
+            % using to construct your object.
+            %
+            % FORMAT
+            %
+            %   ad = AssociatedDataset(cd, ...)
+            %
+            % IN
+            %
+            %   cd  CollocatedDataset
+            %
+            %       This argument is only present for dynamic subclasses,
+            %       such as <a href="matlab:help FieldCopier">FieldCopier</a>.
+            %       Contains <a href="matlab:help CollocatedDataset">CollocatedDataset</a> to which this
+            %       AssociatedDataset belongs.
+            %
+            %   dp  cell array
+            %
+            %       This arguments is only present for dynamic subclasses.
+            %       Cell array of other AssociatedDataset objects on which
+            %       this AssociatedDataset depends, e.g., that have to be
+            %       calculated first.
+            %   
+            % Remaining arguments passed on to parent. For static
+            % subclasses, all arguments are directly passed on to the
+            % parent.
+            %
+            % OUT
+            %
+            %   AssociatedDataset-derived object.
             if nargin>0 && isa(varargin{1}, 'CollocatedDataset') % dynamic style
                 style = 'dynamic';
                 cd = varargin{1};
@@ -81,6 +107,20 @@ classdef AssociatedDataset < HomemadeDataset
             %
             % Assumes sizes in self.members are correct. This may not
             % always be the case before the first data is read!
+            % This has no input or output, because it operates entirely on
+            % the own object.
+            %
+            % FORMAT
+            %
+            %   ad.members2cols()
+            %
+            % IN
+            %
+            %   (none, but uses <a href="matlab:help AssociatedDataset.members">members</a>)
+            %
+            % OUT
+            %
+            %   (none, but sets <a href="matlab:help AssociatedDataset.cols">cols</a>))
             allnames = fieldnames(self.members);
             tot = 1;
             for i = 1:length(allnames)
@@ -98,19 +138,42 @@ classdef AssociatedDataset < HomemadeDataset
         end
         
         function out = process_delayed(self, processed_core, spec1, spec2, varargin)
-            % FIXME DOC
+            % process associated data when core data is already there
             %
-            % processed_core   should match self.parent.cols
-            % spec1
-            % spec2
-            % depies    cell array with outputs of process_delayed for
-            %           whatever this processing function depends on,
-            %           defaults to empty cell array
+            % Sometimes, core collocations already exist, but one or more
+            % associated datasets do not exist yet. This method, that is
+            % not designed to be called directly by the end user, takes
+            % care of this.
             %
-            % FIXME TODO:
-            % for a full day granule, split into individual granules, read
-            % data for each granule, get collocations for this granule,
-            % and pass to self.process(...)
+            % This method just splits a day of collocations into segments
+            % and passes each segment to <a href="matlab:help AssociatedDataset/process_granule">process_granule</a>.
+            % That's where the actual processing is done, and for
+            % process_granule there is no difference between processing
+            % directly and processing later.
+            %
+            % FORMAT
+            %
+            %   out = ad.process_delayed(processed_core, spec1, spec2[, depies])
+            %
+            % IN
+            %   
+            %   processed_core      matrix
+            %
+            %       Matrix with processed core collocation data. The
+            %       columns are described by self.parent.cols.
+            %
+            %   spec1               various     sat (or so) for primary
+            %   spec2               various     sat (or so) for secondary
+            %   depies              cell array
+            %
+            %       Contains output for all previous dependencies.
+            %
+            % OUT
+            %
+            %   out                 matrix
+            %
+            %       Data matrix with columns described by self.cols
+            
             
             depies = optargs(varargin, {{}});
             % divide in segments where new primary, new secondary starts
@@ -163,18 +226,79 @@ classdef AssociatedDataset < HomemadeDataset
         end
                 
         function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
+            % horizontally combine core and associated
+            %
+            % Combine core data, core 'cols', associated data and
+            % associated 'cols'. This may or may not be trivial depending
+            % on the actual data. If more than two matrices need to be
+            % merged, apply this method iteratively.
+            %
+            % FORMAT
+            %
+            %   [M_new, M_cols] = ad.merge(M_core, cols_core, M_here, cols_here)
+            %
+            % IN
+            %
+            %   M_core      matrix      selection from core collocations
+            %   cols_core   structure   structure describing M_core
+            %   M_here      matrix      selection of associated data
+            %   cols_here   structure   structure describing M_here
+            %
+            % OUT
+            %
+            %   M_new       matrix      combination M_core, M_here
+            %   cols_new    structure   structure describing M_new
+            
             M = [M_core M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
         end
         
         function C = get_mergefields(self) %#ok<MANU>
-            % fields that must be present for merging
+            % Get minimum fields required to do merging
+            %
+            % In some cases, <a href="matlab:help AssociatedDataset/merge">merge</a> requires a certain minimum
+            % of fields in order to perform the merging. This method
+            % returns the minimum for a particular object (usually constant
+            % per class).
+            %
+            % FORMAT
+            %
+            %   C = ad.get_mergefields();
+            %
+            % IN
+            %
+            %   (none)
+            %
+            % OUT
+            %
+            %   C       cell array of strings   names of needed fields
+            %
             C = {};
-        end
-        
+        end       
         
         function new = concatenate(self, old_core_result, old_additional_result, new_additional_result)
-            % when concatenating, some need to correct for FIRST, LAST, etc.
+            % to concatenate old and new data matrices
+            %
+            % To concatenate old and new data matrices, sometimes some
+            % fields need to be corrected, otherwise this is trivial.
+            % However, always use this method to concatenate data, just in
+            % case date have to be corrected. An example where this is
+            % necessary is for a <a href="matlab:help Collapser">Collapser</a>, where FIRST and LAST need to be
+            % corrected.
+            %
+            % FORMAT
+            %
+            %   new = ad.concatenate(old_core, old_addi, new_addi)
+            %
+            % IN
+            %
+            %   old_core    matrix      old core result
+            %   old_addi    matrix      old additional result
+            %   new_addi    matrix      new additional result
+            %
+            % OUT
+            %
+            %   new         matrix      concatenated additional result
             if isempty(new_additional_result)
                 new = old_additional_result;
             elseif isempty(old_additional_result)
@@ -190,6 +314,25 @@ classdef AssociatedDataset < HomemadeDataset
     methods (Static)
        
         function M_cols = merge_new_cols(M_core, cols_core, cols_self)
+            % merge different cols-structures describing matrix of data
+            %
+            % This static method merges two cols-structure that describe a
+            % matrix of data.
+            %
+            % FORMAT
+            %
+            %   cols_new = merge_new_cols(M, cols_core, cols_self)
+            %
+            % IN
+            %
+            %   M           matrix      original data
+            %   cols_core   structure   describing M
+            %   cols_self   structure   describing new
+            %
+            % OUT
+            %
+            %   M_cols      matrix      new structure describing merged
+            
             M_cols = catstruct(cols_core, ...
                 structfun(@(x)x+size(M_core, 2), cols_self, 'UniformOutput', false));
         end
@@ -289,7 +432,7 @@ classdef AssociatedDataset < HomemadeDataset
         %       <a href="matlab:AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>. For each
         %       dependency, this cell array contains an element with the
         %       output of the process_granule method for that particular
-        %       <a href="matlab:help AssociatedDataset">AssociatedDataset</a>. For example, for a <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>
+        %       <a href="matlab:help AssociatedDataset">AssociatedDataset</a>. For example, for a <a href="matlab:help Collapser">Collapser</a>
         %       it will contain a single element with the output of
         %       FieldCopier.process_granule.
         out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)

@@ -24,7 +24,7 @@ classdef CollocatedDataset < HomemadeDataset
         % 
         %   - Choose the dataset with the largest footprint as the primary.
         %     This becomes particularly important when the secondary is
-        %     averaged over the primary using <a href="matlab:help MeanFieldCopier</a>MeanFieldCopier</a>
+        %     averaged over the primary using <a href="matlab:help Collapser</a>Collapser</a>
         %     or a similar class.
         %
         %   - Choose the dataset with the largest granule as the primary.
@@ -44,7 +44,7 @@ classdef CollocatedDataset < HomemadeDataset
         %
         % This automatically-filled cell-array contains all datasets that
         % can be used in associated with this <a href="matlab:help CollocatedDataset">CollocatedDataset</a>.
-        % This can be e.g. <a href="matlab:help FieldCopier">FieldCopier</a>, <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>, etc.
+        % This can be e.g. <a href="matlab:help FieldCopier">FieldCopier</a>, <a href="matlab:help Collapser">Collapser</a>, etc.
         associated = {};
     end
     
@@ -278,7 +278,7 @@ classdef CollocatedDataset < HomemadeDataset
             %   addis   cell-array  optional; cell array of objects from
             %                       classes implementing <a href="matlab:help AdditionalDataset">AdditionalDataset</a>,
             %                       such as <a href="matlab:help FieldCopier">FieldCopier</a>
-            %                       or <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>.
+            %                       or <a href="matlab:help Collapser">Collapser</a>.
             %                       Defaults to empty cell-array {}.
             %   oneday  logical     optional. If true, force collocations to be all
             %                       from the indicated day. If false, all
@@ -658,7 +658,7 @@ classdef CollocatedDataset < HomemadeDataset
                 
                 for j = 1:length(additional_results)
                     % use special method for concatenation, because some
-                    % additional datasets, such as MeanFieldCopier, need to
+                    % additional datasets, such as Collapser, need to
                     % correct certain columns, such as FIRST and LAST, upon
                     % concatenation
                     additional_results{j} = additionals{j}.concatenate(old_result, additional_results{j}, result_granule_addis{j});

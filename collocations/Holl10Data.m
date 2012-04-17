@@ -1,6 +1,8 @@
 classdef Holl10Data < AssociatedDataset
     % CPR-MHS collocations (1 per CPR) for Holl et. al, 2010
     %
+    % WORK IN PROGRESS!
+    %
     % $Id$
     
     properties (SetAccess = protected)
@@ -72,6 +74,8 @@ classdef Holl10Data < AssociatedDataset
          
          function M = process_granule(self, processed_core, data_cpr, ~, ~, data_mhs, ~, ~, ~)
              % process_granule FIXME DOC
+             %
+             % WORK IN PROGRESS
              %
              % FIXME DOC
              

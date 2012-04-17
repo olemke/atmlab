@@ -1,76 +1,148 @@
-classdef MeanFieldCopier < MeanDataset
-    % provide statistics for small footprint over large footprint
+classdef Collapser < AssociatedDataset
+    % collapse small footprint upon large footprint
     %
     % This class can be used for collocations where the primary has a
     % significantly larger footprint than the secondary, such as between
-    % MHS and CloudSat or between MHS and AVHRR. It can be used for
+    % MHS and CloudSat or between MHS and AVHRR. It can be used e.g. for
     % calculation of arbitrary statistics, such as mean, standard
-    % deviation, etc. Whereas the originial collocations contain one entry
+    % deviation, etc., or for selecting a single small-footprint for each
+    % large-footprint. Whereas the original collocations contain one entry
     % for each of the smaller footprints --- thus repeating many times the
     % entry for the larger footprint --- a dataset with this class contains
     % at most one entry for each of the larger footprints. This is usually
     % the desirable effect.
     %
-    % The class is associated with an <a href="matlab:help AssociatedDataset">AssociatedDataset</a> that works on
-    % the full-size --- usually this is <a href="matlab:help FieldCopier">FieldCopier</a>.
+    % The class is normally associated with an <a href="matlab:help AssociatedDataset">AssociatedDataset</a> that works on
+    % the full-size --- often this is <a href="matlab:help FieldCopier">FieldCopier</a>.
     %
-    % Based on a FieldCopier, takes one structure whose members indicate:
-    % - what fields to copy (from first 'inside' footprint)
-    % - what other processing to do, e.g. member 'processors' is itself a
-    % structure with MEAN=@mean, STD=@std, etc.
-    % - how to store fields (default: like parent; warning: loss of
-    % precision may occur in default case, e.g. averaging int to int)
-    % - ...
-    % - overall limitators (e.g. maximum distance), those are passed the
-    % core collocations where secondary is within primary (e.g. Nx14), and
-    % should return a Nx1-logical
-    % - specific limitators (e.g. positive values), those are passed the
-    % data that the processors will act upon (e.g. (Nxp) where p is 1 for
-    % scalar data, but may also be an entire profile), and should return
-    % a Nx1-logical.
-    % 
-    % for this one, 'fieldstruct' and 'members' are different, since
-    % 'members' relates to what's actually stored, which may be more than
-    % 'fieldstruct', which relates to fields. E.g. if MEAN and STD for a
-    % field IWP are stored, we have in fieldstruct
-    % IWP.processors.MEAN = @mean;
-    % IWP.processors.STD = @std;
-    % but in members
-    % MEAN_IWP
-    % STD_IWP
+    % For each primary footprint, the class copies data for the primary and
+    % gathers data for the secondary. The data for the secondary is then
+    % input to processing-functions, that can do arbitrary processing.
+    % For example, processing functions may calculate the mean, the standard
+    % deviation, the secondary closest to the primary, etc. Any
+    % function-handle can be passed. The class can either pass all secondary
+    % footprints, or a sub-set based on prescribed limitations (also with
+    % function-handles). If no secondary footprints meet the requirements,
+    % the primary footprint is not selected either. Limitations can be
+    % either global (applying to all processors) or local (applying to a
+    % single processor).
     %
-    % FIXME DOC
+    % Information on fields to be copied, fields to be processed, processor
+    % functions, local limitatiors, global limitations, and how to store
+    % fields, is all contained in a structure passed on to the constructor.
+    % See <a href="matlab:help Collapser/Collapser">constructor documentation</a> for details.
     %
+    % EXAMPLE
+    %
+    %   >> mfcs.RO_ice_water_path.limitators = {@(X)(X>0)};
+    %   >> mfcs.RO_ice_water_path.processors.MEAN = @mean;
+    %   >> mfcs.RO_ice_water_path.stored.NO.type = 'single';
+    %   >> global_lims = {@(X)(X(:, mhscpr.cols.DIST)<7.5), @(X)(abs(X(:, mhscpr.cols.INT))<600)};
+    %   % f from <a href="matlab:help FieldCopier">FieldCopier</a> example
+    %   >> mfc = MeanFieldCopier(f, mfcs, global_lims, ...
+    %           'name', 'MyLittleThing', 'basedir', '/some/path', ...
+    %           'subdir', '$YEAR4/$MONTH/$DAY', ...
+    %           'filename', 'mean_collocations_$SAT.nc.gz');
+    %
+    % (also see the <a href="matlab:help Collapser/Collapser">constructor documentation</a>)
+    
     % TODO:
-    %  - store result of limitators as bitfield
-    %  - do storing
-    %      + store limitators in NetCDF props
-    %  - do reading
+    %  - store result of limitators as bitfield?
+    %  - store limitators in NetCDF props
     
     properties (SetAccess = protected)
-        members = []; % set dynamically
-        parent = []; % the same
-        dependencies = {}; % the same
-        fieldstruct = []; % also dynamically set
-        overall_limitators = []; % the trend may be clear by now
+        members = []; % See <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
+        parent = []; % See <a href="matlab:help AssociatedDataset.parent">AssociatedDataset.parent</a>
+        dependencies = {}; % See <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>
+        fieldstruct = []; % Structure with all fields information
+        overall_limitators = []; % List of global limitators
     end
         
     % $Id$
     methods
-        function self = MeanFieldCopier(ad, fieldstruct, overall_limitators, varargin)
-            % - first  the corresponding associated-dataset
-            % - second the fieldstruct, see class doc
-            % - third cell array of 'global' limitators operating on core
-            % - rest passed to parent classes, ultimately to SatDataset
-            % FIXME DOC
-            
+        function self = Collapser(ad, fieldstruct, overall_limitators, varargin)
+            % constructor for Collapser class
+            %
+            % This constructs a <a href="matlab:help Collapser">Collapser</a>
+            %
+            % FORMAT
+            %
+            %   cl = Collapser(ad, fs, global_lims, ...)
+            %
+            % IN
+            %
+            %   ad      AssociatedDataset
+            %
+            %       <a href="matlab:help AssociatedDataset">AssociatedDataset</a> from which this Collapser should
+            %       take its data.
+            %
+            %   fs      structure
+            %
+            %       Structure giving full information on fields to process
+            %       and how to process them. The fieldnames for the
+            %       structure correspond to fields in the AssociatedDataset
+            %       that the Collapser relates to. For each field, the
+            %       value is a structure with the following fields:
+            %       
+            %           limitators  cell array of function_handle
+            %               
+            %               All function handles in the cell array are
+            %               applied to the vector of measurements
+            %               corresponding to the secondary footprints. The
+            %               function handles must return a logical with one
+            %               value for each row of data (or for each element
+            %               if the data are 1-D). The data are then limited
+            %               to those elements where all limitators return
+            %               true.
+            %
+            %           processors  structure
+            %
+            %               A structure with a field for each processing.
+            %               The field is the processors name, such as MEAN,
+            %               STD, etc. The value is a function handle. This
+            %               function handle takes as input the secondary
+            %               footprints corresponding to the primary
+            %               footprint, after global and local limitators
+            %               are applied. The function handle must return a
+            %               single, scalar value, or a single row of values
+            %               if the input data are 2-D.
+            %           
+            %               The final members field will prepend each field
+            %               with the name of its processor, e.g.
+            %               MEAN_RO_ice_water_path, STD_RO_ice_water_path.
+            %
+            %           stored      structure
+            %
+            %               This structure contains information on how each
+            %               field is stored. Fieldnames should be the same
+            %               as for processors. Values are like 'fs1' in the
+            %               <a href="matlab:help FieldCopier/Fieldcopier">Fieldcopier constructor</a>.
+            %               By default, no attributes are stored and all
+            %               fields are stored as single (float).
+            %
+            %   global_lims     cell array of function handles. Each
+            %                   function handle receives as input a matrix
+            %                   of collocations, e.g. Nx14 when there are N
+            %                   secondary inside the primary, and shall
+            %                   return a logical of Nx1. All limitators are
+            %                   processed sequentially and are applied to
+            %                   all fields.
+            %
+            % OUT
+            %
+            %   Collapser object --- see <a href="matlab:help Collapser">class documentation</a>.
+            %
+            % EXAMPLE
+            %
+            %   See <a href="matlab:help Collapser">class docs</a>.
+
             cd = ad.parent;
             dependency = ad;
             
             % sort out which ones are just copied, which one processed
             % smartly
             
-            self = self@MeanDataset(cd, {dependency}, varargin{:}); % call parent constructor
+            self = self@AssociatedDataset(cd, {dependency}, varargin{:}); % call parent constructor
             
             % make sure all members have at least 'processors' and
             % 'limiters'; set noops where they don't.
@@ -258,19 +330,15 @@ classdef MeanFieldCopier < MeanDataset
         end
         
         function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
-            % FIXME DOC
             M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
         end
         
         function C = get_mergefields(self) %#ok<MANU>
-            % FIXME DOC
             C = {'FIRST'};
         end
         
         function new = concatenate(self, old_core_result, old_additional_result, new_additional_result)
-            % FIXME DOC
-            % when concatenating, need to correct FIRST and LAST
             if isempty(new_additional_result)
                 new = old_additional_result;
                 return
