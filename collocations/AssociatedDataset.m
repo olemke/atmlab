@@ -40,8 +40,7 @@ classdef AssociatedDataset < HomemadeDataset
         %
         % Contains a collection of other AssociatedDataset objects that
         % need to be considered first. For example, to process a
-        % <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>, one
-        % first needs a <a href="matlab:help FieldCopier">FieldCopier</a>.
+        % <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>, one first needs a <a href="matlab:help FieldCopier">FieldCopier</a>.
         dependencies;
     end
     
@@ -198,11 +197,101 @@ classdef AssociatedDataset < HomemadeDataset
     
     % those methods must be implemented by subclasses
     methods (Abstract)
+        % Arguments to pass on to primary reader
+        %
+        % This method returns a cell array with arguments that shall be
+        % passed on to the primary reader.
+        %
+        % FORMAT
+        %
+        %   args = ad.primary_arguments()
+        %
+        % IN
+        %
+        %   nothing
+        %
+        % OUT
+        %
+        %   cell array with arguments passed on to primary reader.
         args = primary_arguments(self)
+        
+        % Arguments to pass on to secondary reader
+        %
+        % See <a href="matlab:help AssociatedDataset/primary_arguments">primary_arguments</a>.
         args = secondary_arguments(self)
+        
+        % Whether primary data is used at all.
+        %
+        % This method is used in 'late' processing, e.g. when the
+        % collocations already exist, but associated data does not. For
+        % late processing, not all original data may need to be re-read.
+        % This method tells whether the primary data should be re-read.
+        %
+        % FORMAT
+        %
+        %   reread = ad.needs_primary_data()
+        %
+        % IN
+        %
+        %   nothing
+        %
+        % OUT
+        %
+        %   logical scalar (boolean), true if data must be reread
         bool = needs_primary_data(self)
+        
+        % Whether secondary data is used at all
+        %
+        % See <a href="matlab:help AssociatedDataset/needs_primary_data">needs_primary_data</a>.
         bool = needs_secondary_data(self)
 
+        % Process a single granule
+        %
+        % This is the core method for any AssociatedDataset implementation.
+        % It takes collocations as <a href="matlab:help CollocatedDataset/process">processed</a> by a <a href="matlab:help CollocatedDataset">CollocatedDataset</a>,
+        % as well as original data from the primary and the secondary (if
+        % so requested by <a href="matlab:help AssociatedDataset.needs_primary_data">needs_primary_data</a> and <a href="matlab:help AssociatedDataset.needs_secondary_data">needs_secondary_data</a>).
+        % It then does the necessary processing (such as copying in the
+        % case of <a href="matlab:help FieldCopier">FieldCopier</a>).
+        %
+        % This method is not normally called directly by the user. However,
+        % it is to me re-implemented in any special-purpose
+        % AssociatedDataset.
+        %
+        % FORMAT
+        %
+        %   out = ad.process_granule(processed_core, ...
+        %               data1, date1, spec1, ...
+        %               data2, date2, spec2, ...
+        %               dependencies)
+        %
+        % IN
+        %
+        %   processed_core  matrix
+        %
+        %       matrix with one row for each collocation and columns
+        %       described by <a href="matlab:help CollocatedDataset/cols">CollocatedDataset.cols</a>.
+        %       This is the output of <a href="matlab:help CollocatedDataset/process">CollocatedDataset.process</a>.
+        %
+        %   data1           structure
+        %
+        %       Full data for the primary, as output by the primary reader.
+        %
+        %   date1           datevec     date/time for primary granule
+        %   spec1           various     specification (e.g. sat) for primary.
+        %   data2           like data1, but for secondary
+        %   date2           like date1, but for secondary
+        %   spec2           like spec1, but for secondary
+        %
+        %   dependencies    cell array
+        %
+        %       Cell array with elements corresponding to
+        %       <a href="matlab:AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>. For each
+        %       dependency, this cell array contains an element with the
+        %       output of the process_granule method for that particular
+        %       <a href="matlab:help AssociatedDataset">AssociatedDataset</a>. For example, for a <a href="matlab:help MeanFieldCopier">MeanFieldCopier</a>
+        %       it will contain a single element with the output of
+        %       FieldCopier.process_granule.
         out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
         %store(self, date, spec, result)
     end

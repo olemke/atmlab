@@ -1,7 +1,18 @@
-classdef MeanFieldCopier < MeanDataset% & FieldCopier
-    % copy fields and average them over the larger footprint
+classdef MeanFieldCopier < MeanDataset
+    % provide statistics for small footprint over large footprint
     %
-    % the secondary will be averaged over the primary
+    % This class can be used for collocations where the primary has a
+    % significantly larger footprint than the secondary, such as between
+    % MHS and CloudSat or between MHS and AVHRR. It can be used for
+    % calculation of arbitrary statistics, such as mean, standard
+    % deviation, etc. Whereas the originial collocations contain one entry
+    % for each of the smaller footprints --- thus repeating many times the
+    % entry for the larger footprint --- a dataset with this class contains
+    % at most one entry for each of the larger footprints. This is usually
+    % the desirable effect.
+    %
+    % The class is associated with an <a href="matlab:help AssociatedDataset">AssociatedDataset</a> that works on
+    % the full-size --- usually this is <a href="matlab:help FieldCopier">FieldCopier</a>.
     %
     % Based on a FieldCopier, takes one structure whose members indicate:
     % - what fields to copy (from first 'inside' footprint)
@@ -105,29 +116,28 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
             self.members.LAST.atts.long_name = 'Last corresponding row in overlap';
             
         end
-        
-        
+                
         function args = primary_arguments(~)
-            % needs nothing, because uses ONLY FieldCopier output
             args = {};
         end
         
         function args = secondary_arguments(~)
-            % see comment for primary_arguments
             args = {};
         end
         
         function bool = needs_primary_data(~)
-            % see comment for primary_arguments
             bool = false;
         end
         
         function bool = needs_secondary_data(~)
-            % see comment for primary_arguments
             bool = false;
         end
         
         function M = process_granule(self, processed_core, ~, ~, ~, ~, ~, ~, deps)
+            
+            
+            M_data = deps{1};
+                        
             % FIXME TODO
             %
             % - pre-allocate M, need to know no. of cols
@@ -142,8 +152,7 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
             % does not use original data
             
             %%%
-            
-            M_data = deps{1};
+
             % check that sizes are the same
             assert(size(processed_core, 1)==size(M_data, 1), ...
                 ['atmlab:' mfilename ':SizeError'], ...
@@ -249,15 +258,18 @@ classdef MeanFieldCopier < MeanDataset% & FieldCopier
         end
         
         function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
+            % FIXME DOC
             M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
         end
         
         function C = get_mergefields(self) %#ok<MANU>
+            % FIXME DOC
             C = {'FIRST'};
         end
         
         function new = concatenate(self, old_core_result, old_additional_result, new_additional_result)
+            % FIXME DOC
             % when concatenating, need to correct FIRST and LAST
             if isempty(new_additional_result)
                 new = old_additional_result;

@@ -1,3 +1,13 @@
+2012-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-57
+
+	* collocations/FieldCopier.m, collocations/AssociatedDataset.m,
+	collocations/MeanFieldCopier.m, collocations/CollocatedDataset.m:
+
+	- Significantly expand documentation. Will rename MeanFieldCopier in
+	next commit.
+
 2012-04-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-56

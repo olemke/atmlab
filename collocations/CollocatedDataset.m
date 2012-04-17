@@ -882,7 +882,7 @@ classdef CollocatedDataset < HomemadeDataset
         function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
             % Process core collocations
             %
-            % This method processes the output of <a href="matlab:help collocate</a>collocate</a>
+            % This method processes the output of <a href="matlab:help collocate">collocate</a>
             % and converts it to a matrix that is passed on for further
             % processing.
             %

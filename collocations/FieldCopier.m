@@ -1,55 +1,130 @@
 classdef FieldCopier < AssociatedDataset
-    % class to simply copy fields from original datasets to collocated
+    % class to copy fields from original datasets to collocated datasets
     % 
-    % Works by passing on fieldnames to reading routine(s) and copying data
-    % UNPROCESSED to output reading.
+    % A common task associated with <a href="matlab:help CollocatedDataset">collocating</a> different <a href="matlab:help SatDataset">dataset</a>s
+    % is to copy fields from the original datasets to use with the collocations.
+    % FieldCopier implements <a href="matlab:help AssociatedDataset">AssociatedDataset</a>, meaning that it has at
+    % least all the properties and methods that are indicated by AssociatedDataset.
+    % Therefore, it can be used wherever documentation describes the need
+    % for an AssociatedDataset.
     %
-    % For initialisation, see FieldCopier.FieldCopier (constructor)
+    % To copy fields as-is, create an instance of FieldCopier and pass this
+    % on to the CollocatedDataset methods <a href="matlab:help CollocatedDataset/collocate_granule">collocate_granule</a>,
+    % <a href="matlab:help CollocatedDataset/collocate_date">collocate_date</a>, <a href="matlab:help CollocatedDataset/collocate_and_store_date">collocate_and_store_date</a>, or <a href="matlab:help CollocatedDataset/collocate_and_store_date_range">collocate_and_store_date_range</a>.
+    % Fieldnames are taken upon creation from two structures passed on to the
+    % constructor: one for the primary, and one for the secondary. The
+    % fieldnames of those structures are passed on to the respective
+    % <a href="matlab:help SatDataset/reader">reader</a>s, who are expected to return structures with the
+    % appropiate data stored in them with the same fieldnames.
+    % The values for the fields in the structures passed on to the
+    % constructor contain information on how to store the data, among other
+    % things. See also the example below.
     %
-    % Example, just finding collocations for a single granule, without
-    % storing:
+    % When a FieldCopier is created, it is automatically registered with
+    % the <a href="matlab:help CollocatedDataset">CollocatedDataset</a> to which it belongs, in <a href="matlab:help CollocatedDataset/associated">CollocatedDataset.associated</a>.
+    % Therefore, only for some tasks involving a FieldCopier, one needs to
+    % pass the reference to the method using it. For other tasks, this is
+    % taken care of automatically.
     %
-    % >> col = datasets_config('collocation_cpr_mhs');
-    % >> f = FieldCopier(col, struct('RO_ice_water_content', '', 'RO_liq_water_content', ''), struct(),varagin);
-    % >> [result, addis] = col.collocate_granule([2009 12 7 3 28], '', 'noaa18', {f});
-    % 
-    % Now:
-    % - `result` is a 91818x12 matrix with columns described in col.cols
-    % - `addis` is a 1x1 cell array with outputs corresponding to the 1x1
-    %   cell-array {f}
-    % - addis{1} is a 91818x250 matrix with columns described in f.cols, in
-    %   this case corresponding to 125 IWC and 125 LWC values, e.g.
-    %   f.cols.RO_liq_water_content(1) = 126 meaning column 126 of addis{1}
-    %   corresponds to the first value in the LWC-profile.
+    % FORMAT
     %
-    % $Id$
+    %   See <a href="matlab:help Fieldcopier/Fieldcopier">FieldCopier.FieldCopier</a> (constructor)
+    %
+    % EXAMPLE
+    %
+    % % obtain object for <a href="matlab:help CollocatedDataset">CollocatedDataset</a>
+    % >> D = datasets;
+    % >> mhscpr = D.CollocatedDataset__1_mhs__2_cpr;
+    % % define structures to be passed on when creating FieldCopier
+    % % For this to work, the <a href="matlab:help SatDataset">SatDataset</a> in <a href="matlab:help CollocatedDataset/primary">mhscpr.primary</a>
+    % % must have a <a href="matlab:help SatDataset/reader">reader</a> that accepts {'tb'} as a second argument,
+    % % and then returns a structure containing a field 'tb' with appropriate
+    % % data. Similarly, <a href="matlab:help CollocatedDataset/secondary">mhscpr.secondary</a>.reader shall take
+    % % {'RO_ice_water_path'} as a second argument and return a structure
+    % % with a field 'RO_ice_water_path'.
+    % >> fc1 = struct('tb', struct('type', 'float', 'atts', struct('long_name', 'My BT')));
+    % >> fc2 = struct('RO_ice_water_path', struct('type', 'int', 'atts', struct('long_name', 'My IWP')));
+    % % create FieldCopier object with minimum of information
+    % >> fc = FieldCopier(mhscpr, fc1, fc2, 'basedir', '/tmp/testing', ...
+    %                     'subdir', '$YEAR4/$MONTH/$DAY', ...
+    %                     'filename', 'collocations_$SAT.nc.gz');
+    % % Collocate along with FieldCopier
+    % >> mhscpr.collocate_and_store_date_range([2009 7 1], [2009 7 5], ...
+    %                                          'noaa18', '', {fc});
+    %
+    % This code now creates two files for each date in the daterange (ten
+    % files in total): one for the <a href="matlab:help CollocatedDataset">CollocatedDataset</a>, containing the very
+    % core information, and one for the FieldCopier, containing two fields;
+    % one copied from the primary <a href="matlab:help SatDataset">dataset</a>, and one copied from the secondary
+    % <a href="matlab:help SatDataset">dataset</a>.
     %
     % TODO:
     %  - set some (but not all!!) clever properties for NetCDF
+    %
+    % $Id$
     
     properties (SetAccess = protected)
         
-        % this is split in primary and secondary because from these
-        % structures is also derived what arguments to pass on to the
-        % respective reading routines
+        % Structure with fields corresponding to primary
         fieldstruct_primary = struct;
+        
+        % Structure with fields corresponding to secondary
         fieldstruct_secondary = struct;
+        
+        % Structure with all fields and info on how to store the NetCDF
+        %
+        % See also <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
         members = struct(); % set by constructor
-        parent = []; % set dynamically, per instance
-        dependencies = {}; % set dynamically, per instance
+        
+        % Parent <a href="matlab:help CollocatedDataset">CollocatedDataset</a>.
+        %
+        % See also <a href="matlab:help AssociatedDataset.parent">AssociatedDataset.parent</a>
+        parent = [];
+        % FieldCopier has no dependencies
+        %
+        % See also <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>
+        dependencies = {};
     end    
     
     methods
         function self = FieldCopier(cd, fieldstruct1, fieldstruct2, varargin)
-            % cd            CollocatedDataset
-            % fieldstruct1  defines names and how to store, from primary
-            % fieldstruct2  the same, from secondary
-            % remaining arguments passed on to SatDataset, so those are to
-            % be used to say where to store and so on. 
+            % Creates a FieldCopier object
             %
-            % need to know:
-            % - additional arguments to reader primary
-            % - additional arguments to reader secondary
+            % Used to create a <a href="matlab:help FieldCopier">FieldCopier</a> object.
+            %
+            % FORMAT
+            %
+            %   cd      CollocatedDataset   <a href="matlab:help CollocatedDataset"> that this FieldCopier belongs to.
+            %
+            %   fs1     structure
+            %
+            %       Full definition of fields and information on how to
+            %       store. The names of the fields correspond to fields
+            %       copies from the primary in a process explained in the
+            %       <a href="matlab:help FieldCopier">class documentation</a>. The value for each field is itself
+            %       a structure containing information on how to store the
+            %       field in the final NetCDF file. This structure can have
+            %       the following fields:
+            %           
+            %           type    string, NetCDF-3 type, such as 'int',
+            %                   'float'. Full list <a href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-c/NetCDF_002d3-Variable-Types.html#NetCDF_002d3-Variable-Types">in NetCDF docs</a>.
+            %
+            %           atts    structure, fields and values are all
+            %                   strings and are stored as NetCDF
+            %                   attributes. I suggest to use <a href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html">CF</a>
+            %                   conventions.
+            %
+            %                   NOTE: in the future, attributes not
+            %                   provided may possibly be guessed based on
+            %                   original data.
+            %
+            %   fs2     structure
+            %
+            %       Like fs1, but corresponding to the secondary.
+            %
+            %   ...remaining arguments passed on to <a href="matlab:help SatDataset">SatDataset</a>,
+            %   so those indicate name, where to store, etc. 
+            
             self = self@AssociatedDataset(cd, {}, varargin{:}); % call parent constructor
             
             self.fieldstruct_primary = fieldstruct1;
@@ -77,8 +152,6 @@ classdef FieldCopier < AssociatedDataset
         end
         
         function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~)
-            % FIXME DOC
-
             allnames = fieldnames(self.members);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
             dimsizes = struct();
