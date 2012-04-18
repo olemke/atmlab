@@ -212,7 +212,7 @@ for c = 1 : n
       [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lons );
       dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
       e(i) = dd;
-      if dd > 1e-3
+      if dd > 1
         fprintf('\n!!! Deviating ppath point found !!!\n');
         [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
                           y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz, ...

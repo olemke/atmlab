@@ -1,3 +1,10 @@
+2012-04-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-61
+
+	* tests/test_arts_ppath.m (test_arts_ppath): Changed accuracy
+	threshold to 1 m.
+
 2012-04-18  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-60
@@ -62,6 +69,7 @@
 	- Significantly expand documentation. Will rename MeanFieldCopier in
 	next commit.
 
+>>>>>>> .r7523
 2012-04-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-56
