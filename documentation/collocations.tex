@@ -39,7 +39,7 @@
 \newcommand{\methodused}[1]{{\bfseries #1}}
 \newcommand{\collocs}{Collocations Toolkit}
 
-\title{\collocs\ in Atmlab}
+\title{\collocs\ in Atmlab (version 2-1-60)}
 
 \date{\isodate\today}
 
@@ -116,10 +116,20 @@ This involves:
 \begin{itemize}
 \item The easy way: via predefined-classes such as FieldCopier
 and Collector (\autoref{sec:simple}).
+FieldCopiers are to copy fields from the original data to a collocated
+dataset, whereas Collectors can be used e.g.\ for averaging a small-footprint
+over a large-footprint dataset, or perform another task where the data are
+reduced (``collapsed'').
 \item The advanced way: via user-defined subclasses of AssociatedDataset
 (\autoref{sec:advanced}).
 \end{itemize}
 \end{itemize}
+
+Currently, some settings are still defined in the global-structure obtained
+via \lstinline|colloc_config|.
+Most notably, this is the case for the maximum distance and maximum time
+interval considered a collocation (all measurements are treated as points).
+This is to change soon.
 
 \autoref{fig:cd} shows the most important classes and methods that together
 form the \collocs.
@@ -234,9 +244,31 @@ too can list granules, contains the same properties to define where the data
 shall reside, etc.
 With CollocatedDataset it shares the capability that it can store data (via
 the intermediate class HomemadeDataset).
+For detailed information, consult the online documentation
+(\lstinline|doc FieldCopier|).
+
+A Collapser can be used for collocations between datasets with different
+footprint sizes.
+For example, it may be used to calculate the mean, the standard deviation, and
+other statistics, for CloudSat \gls{CPR} footprints over larger \gls{MHS}
+footprints.
+For detailed information, see \lstinline|doc Collapser|
 
 \subsubsection{The advanced way: rolling your own class}
 \label{sec:advanced}
+
+The tasks performed by FieldCopier and Collapser cover many situations, but
+far from all.
+For the greatest flexibility, you can create your own implementation of
+AssociatedDataset.
+This requires to create a subclass from AssociatedDataset, similar to
+FieldCopier and Collapser, and implement at least all attributes and methods
+that are abstract in AssociatedDataset.
+Then, an object of this class can be passed on in the same place as
+FieldCopier and Collapser.
+
+The best documentation to date is the full class documentation and the source
+code for AssociatedDataset, FieldCopier, and Collapser.
 
 \section{Class diagram}
 

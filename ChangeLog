@@ -1,5 +1,13 @@
 2012-04-18  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-60
+
+	* documentation/collocations.tex:
+
+	- Improve documentation a bit more. Pretty good draft now.
+
+2012-04-18  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-59
 
 	* collocations/collocate.m: Add warning; this too is now a method.
