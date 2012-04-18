@@ -1,3 +1,23 @@
+2012-04-18  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-59
+
+	* collocations/collocate.m: Add warning; this too is now a method.
+
+	* collocations/TODO: Added one item
+
+	- should be more straightforward to configure max time and dist
+
+	* collocations/CollocatedDataset.m:
+
+	- Make collocate a static method, not a function anymore
+
+	* datasets/SatDataset.m:
+
+	- Expand documentation for property 'reader'
+
+	* documentation/collocations.tex: Significantly expand documentation
+
 2012-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-58

@@ -28,6 +28,9 @@ function collocations = collocate(t1, lat1, long1, t2, lat2, long2, maxdist, max
 % Originally created by Gerrit Holl.
 % $Id$
 
+warning(['atmlab:' mfilename], 'old style function, being phased out, use OO way');
+
+
 %% data checks
 
 nrows1 = size(lat1, 1);

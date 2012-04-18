@@ -85,12 +85,58 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % Function handle to read a single granule (required)
         %
         % This property points to a function handle used to read a single
-        % granule (so it becomes in effect a static method). This function
-        % is passed as a string the full path to a granule, and must return
-        % a structure with at least 'lat', 'lon', and 'time'. Example
-        % routines are included with atmlab, all start with 'common_read_'.
+        % granule (so it becomes in effect a static method). The documentation
+        % below is a prescription of the interface that the function handle
+        % assigned to this property must have in order for methods like
+        % <a href="atmlab:help SatDataset/read_granule">read_granule</a> and <a href="atmlab:help CollocatedDataset/collocate_granule">CollocatedDataset.collocate_granule</a> to work.
+        % It is not the documentation for any method that already exists!
         %
-        % Example:
+        % FORMAT
+        %
+        %   data = cd.reader(fullpath, fields)
+        %
+        % IN
+        %
+        %   fullpath    string      Full path to granule to be read.
+        %   fields      cellstr     
+        %
+        %       Any other fields to be read. This is used by the <a  href="atmlab:help FieldCopier">FieldCopier</a>
+        %       class to copy fields from the original datasets.
+        % 
+        % OUT
+        %
+        %   The function shall return a single output. This output is a
+        %   structure with at least the following fields:
+        %
+        %       lat     double
+        %
+        %           Latitude in degrees. This must be a 2-D matrix, although
+        %           the dimensions may be 1 (so it can be a row-vector, a
+        %           column-vector, a scalar, or a matrix). It contains the
+        %           latitude for every single measurement in the data.
+        %
+        %       lon     double
+        %
+        %           Longitude in degrees. Like the latitude. The sizes of the
+        %           fields 'lat' and 'lon' must be exactly equal.
+        %
+        %       time    double
+        %
+        %           Time in seconds since 00:00 UT. This must be a column
+        %           vector where the number of elements is equal to the number
+        %           of rows in the 'lat' and 'lon' fields (one scanline can
+        %           only have a single time).
+        %
+        % EXAMPLE
+        %
+        %   This function is not normally called directly by the user, but
+        %   since it must often be implemented by the user, examples consist
+        %   of example implementations. The <a href="matlab:what datasets">datasets</a> directory
+        %   contains a number of functions with names starting with
+        %   'common_read'. Those are all implementations for 'reader' used for
+        %   various datasets that come with atmlab. For example, for data
+        %   stored in the same format as AMSU, MHS, HIRS, one can use:
+        %
         % mhs.reader = '@<a href="matlab:help common_read_poes_radiometer">common_read_poes_radiometer</a>'
         reader = @(varargin)[];
         
@@ -98,7 +144,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %
         % Describes the duration in seconds for a single granule. In case
         % this varies, choose an upper limit. This is used by
-        % <a href="matlab:help CollocatedDataset/overlap_granule">CollocatedDataset/overlap_granule</a>.
+        % <a href="matlab:help CollocatedDataset/overlap_granule">CollocatedDataset.overlap_granule</a>.
         %
         % Example:
         % mhs.granule_duration = 6130

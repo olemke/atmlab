@@ -32,11 +32,14 @@
 \usepackage[english]{isodate}
 \usepackage{url}
 \usepackage{pgf-umlcd}
+\usepackage{listings}
+\lstset{language=Matlab}
 \makeglossaries
 \input{acronyms.tex}
 \newcommand{\methodused}[1]{{\bfseries #1}}
+\newcommand{\collocs}{Collocations Toolkit}
 
-\title{Collocation Toolkit in Atmlab}
+\title{\collocs\ in Atmlab}
 
 \date{\isodate\today}
 
@@ -56,7 +59,7 @@
 
 \section{Introduction}
 
-A frequent task in analysis of geographical data is the collocation in space
+A frequent task in analysis of geophysical data is the collocation in space
 and time between data from different datasets.
 For example, one might wish to collocate geolocated remote sensing measurements from
 spaceborne sensors with model output, or collocate measurements from different
@@ -69,7 +72,7 @@ Nevertheless, many sub-problems occur in a wide variety of situations.
 Valuable time may be lost by people re-inventing the wheel over and over
 again.
 
-The Collocations Toolkit is a set of classes and routines to easily
+The \collocs\ is a set of classes and routines to easily
 handle collocations between an arbitrary pair of (satellite) datasets.
 It has been designed for user-friendly processing of long time series of data in a
 wide variety of situations.
@@ -88,13 +91,156 @@ refereed articles \citet{holl10:_collocating_amt} and
 \citet{john12:_understanding_jgr}, and in my licentiate thesis
 \citep{holl11:_lic}.
 
-\section{Using the Toolkit}
+This is an introductory document.
+For full information on all classes and methods, please refer to the online
+documentation in Matlab (best accessed with the help browser, e.g.\
+\lstinline!doc SatDataset!)
+\section{Getting started}
 
-The diagram below illustrates the most important classes and methods in
-the collocations toolkit.
-Methods that an end-user will commonly call are shown \methodused{like
-this}.
+To get started with collocations:
 
+\begin{itemize}
+\item Configure your datasets (\autoref{sec:SatDataset}).
+This involves:
+\begin{itemize}
+\item Defining where your data are stored
+\item Creating a reading routine, if this does not already exist
+\item Defining how the data shall be read
+\end{itemize}
+\item Define your CollocatedDatasets (\autoref{sec:CollocatedDataset})
+\begin{itemize}
+\item Define what datasets are collocated with each other
+\item Define where the data shall be stored
+\end{itemize}
+\item Define what additional data shall be processed.
+\begin{itemize}
+\item The easy way: via predefined-classes such as FieldCopier
+and Collector (\autoref{sec:simple}).
+\item The advanced way: via user-defined subclasses of AssociatedDataset
+(\autoref{sec:advanced}).
+\end{itemize}
+\end{itemize}
+
+\autoref{fig:cd} shows the most important classes and methods that together
+form the \collocs.
+
+\section{Defining the base datasets}
+\label{sec:SatDataset}
+
+Before we can start collocating, we need to be able to read data for the
+datasets we want to collocate.
+A SatDataset object contains all information needed to find granules on the
+file-system given a particular date and time, to read the granule (while
+removing duplicates) and to return it in a format that a CollocatedDataset can
+work with.
+See the class diagram in \autoref{fig:cd} for a list of attributes and
+methods.
+
+\begin{itemize}
+\item Find granules. The methods \lstinline!find_datadir_by_date!,
+\lstinline|find_granules_by_date|, \lstinline|find_granules_for_period|,
+and \lstinline|find_granule_by_datetime|
+locate granules on the file system for a particular date and time.
+This is done using the attributes \lstinline|basedir|, \lstinline|subdir|,
+\lstinline|re|, and \lstinline|filename|.
+This functionality is essential for finding collocations, but also useful in
+its own right.
+For example, \lstinline|find_granules_for_period| is useful for time series
+analysis.
+\item Collect and find information on duplicates.
+For many datasets, subsequent granules contain duplicates: a number of
+scanlines are repeated.
+The method \lstinline|find_granule_first_line| creates a hashtable describing
+for each granule what the first scanline is that does not occur in the
+previous scanline, and stores this to a file.
+Then, \lstinline|granule_first_line| looks this up from the hashtable.
+Reading routines in the \collocs\ use this information by default to guarantee
+no duplicates occur in final products.
+\item Actually read the data.
+This is done with the method \lstinline|read_granule|.
+In order to make this work, a tailor-made reading routine needs to be provided
+via the property \lstinline|reader|, passed as a function handle.
+This routine provides the interface between the data as stored on disc (which
+can be in an arbitrary format) and the data as represented inside the
+\collocs.
+Detailed documentation can be found with \lstinline|help SatDataset/reader|.
+\end{itemize}
+
+As far as I can see, there is no need to subclass SatDataset; 
+functionality you will need is contained in the class.
+
+\section{Defining the collocated datasets}
+\label{sec:CollocatedDataset}
+
+This class contains all the functionality related to actually finding
+collocations.
+
+A CollocatedDataset consists of two SatDatasets.
+The CollocatedDataset derives from SatDataset.
+That has some implications:
+\begin{itemize}
+\item Anything that works for SatDataset, also works for CollocatedDataset:
+list granules, find duplicates (normally none), actually read the data, etc.
+\item Since a CollocatedDataset consists of two SatDatasets, one or two of
+those may actually be CollocatedDatasets themselves
+\end{itemize}
+
+In practice, this still needs an appropiate \lstinline|reader| routine,
+something not currently implemented in Atmlab, but on the TODO-list.
+
+Beyond the abilities of a SatDataset, a CollocatedDataset performs the
+following tasks:
+\begin{itemize}
+\item Performing collocations between granules, as described by
+\citet{holl10:_collocating_amt} and subsequent papers
+\item Storing those collocations in an appropiate format\footnote{This is
+actually implemented in the parent-class HomemadeDataset, but as an end-user
+you don't need to worry about this}.
+This is done in particular via the \lstinline|collocate_and_store_date| and
+\lstinline|collocate_and_store_date_range| methods.
+\item Reading those collocations at a later date, possibly along with
+appropiate AssociatedDatasets.
+This is done with the \lstinline|read| method.
+\end{itemize}
+
+For full information on how to create a CollocatedDataset object, the
+properties and the methods, use \lstinline|doc CollocatedDataset| on the
+Matlab command-line.
+
+\subsection{Defining additional data}
+
+Core collocations contain only the bare information, that applies always:
+scanline numbers, scanline indices, latitude, longitude, times for both
+instruments, distance, time interval, and a running number.
+For most applications, this is not sufficient: one also wants a subset of the
+data from the original datasets, or even geophysical data calculates from this
+original data.
+To this end, collocation methods (like
+\lstinline|collocate_and_store_date_range|) and reading methods (such as
+\lstinline|read|) take as as argument a collection of additional objects known
+as AssociatedDatasets.
+The AssociatedDataset is an abstract class.
+It prescribes a particular interfaces, prescribes a number of tasks, but does
+not actually implement them.
+Two implementations are provided (see \autoref{sec:simple})
+
+\subsubsection{The simple way: FieldCopier and Collector}
+\label{sec:simple}
+
+With a FieldCopier, one can do exactly what the name says: copy fields exactly
+from the original data to the collocated data.
+Like the CollocatedDataset, the FieldCopier derives from SatDataset, so it
+too can list granules, contains the same properties to define where the data
+shall reside, etc.
+With CollocatedDataset it shares the capability that it can store data (via
+the intermediate class HomemadeDataset).
+
+\subsubsection{The advanced way: rolling your own class}
+\label{sec:advanced}
+
+\section{Class diagram}
+
+\begin{figure}
 \begin{tikzpicture}[every node/.style={font=\scriptsize}]
  \begin{class}{SatDataset}{0, 0}
   \attribute{+ name}
@@ -106,12 +252,13 @@ this}.
   \attribute{+ granule\_duration : double}
   \attribute{+ satname}
   \attribute{+ dataset}
-  \attribute{+ firstline\_filename}
+  %\attribute{+ firstline\_filename}
   \attribute{\# collocated\_dataset}
   \operation{+ find\_datadir\_by\_date}
   \operation{+ find\_info\_from\_granule}
   \operation{+ \methodused{find\_granules\_by\_date}}
   \operation{+ find\_granule\_by\_datetime}
+  \operation{+ \methodused{find\_granules\_for\_period}}
   \operation{+ read\_granule}
   \operation{+ granule\_first\_line}
   \operation{+ find\_granule\_first\_line}
@@ -131,6 +278,7 @@ this}.
  \attribute{\# associated}
  \attribute{\# members}
  \operation{+ overlap\_granule}
+ \operation{+ collocate}
  \operation{+ collocate\_granule}
  \operation{+ \methodused{collocate\_date}}
  \operation{+ collocate\_and\_store\_date}
@@ -154,25 +302,32 @@ this}.
  \operation[0]{+ process\_granule}
  \end{abstractclass}
 
- \begin{class}{FieldCopier}{-2, -15}
+ \begin{class}{FieldCopier}{-3, -15}
  \implement{AssociatedDataset}
  \end{class}
 
- \begin{class}{Collapser}{5, -15}
+ \begin{class}{Collapser}{4, -15}
  \implement{AssociatedDataset}
  \end{class}
 
- \unidirectionalAssociation{Collapser}{averages}{}{FieldCopier}
+ \unidirectionalAssociation{Collapser}{collects}{}{FieldCopier}
  \association{CollocatedDataset}{consists of two}{}{SatDataset}{can have many}{}
 
 
 \end{tikzpicture}
+\caption{Diagram of the most important classes and methods in the toolkit.
+Methods that an end-user will commonly call are shown \methodused{like this}.
+This is a class diagram \citep{wiki:cd}.
+\label{fig:cd}%
+}
+\end{figure}
 
-\section{Developing the Toolkit}
+\clearpage
+\section{Other stuff}
 
 \printglossaries
 
 \bibliographystyle{copernicus}
-\bibliography{bib_all}
+\bibliography{bib_all,extra}
 
 \end{document}
