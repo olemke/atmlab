@@ -1,3 +1,13 @@
+2012-04-19  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-0-3
+
+	* h2o/thermodynamics/potential_temperature.m: corrected name of
+	variables according to earlier commit in physics/constants.
+
+	* retrieval/qpack2/qp2_rel2vmr.m: added to check for proper variables i
+	logrel and rel case.
+
 2012-03-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-0-2

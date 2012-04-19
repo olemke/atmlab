@@ -128,16 +128,18 @@ while ~ready
           end
           %
           for k = 1 : length(ns)
-            L2(j).(ns{k}) = L2(j).(ns{k}) .* L2(j).(nx);
+              if isfield( L2, ns{k} )
+                L2(j).(ns{k}) = L2(j).(ns{k}) .* L2(j).(nx);
+              end
           end
           %
           if isfield( L2, nsx )
-            % The a prioy uncertainty defined with respect to xa
+            % The a priori uncertainty defined with respect to xa
             L2(j).(nsx) = L2(j).(nsx) .* vmr0;
           end
           %
           for k = 1 : length(nS)
-            if isfield( L2, ns{k} )
+            if isfield( L2, nS{k} )
               L2(j).(nS{k}) = L2(j).(nS{k}) .* (L2(j).(nx)*L2(j).(nx)');
             end
           end
