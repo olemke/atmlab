@@ -73,4 +73,6 @@ S.version = 'unknown';
 
 S = rmfield(S,core_fields);
 
+S = removeInvalidGeoTimedata(S);
+
 end

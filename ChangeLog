@@ -1,11 +1,49 @@
+2012-04-20  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-63
+
+	* datasets/datasets_config.m: Added two datasets and added
+	attributes to the collocated datasets
+
+	* site-specific/kiruna/datasets_init.m: Added 2 datasets and
+	cleaned up a bit
+
+	* datasets/common_read_modis.m: Adapted to
+	removeInvalidGeoTimedata.m, added more documentation, fixed
+	undesired behavior
+
+	* datasets/common_read_dardar.m: Added reader
+	for the DARDAR dataset
+
+	* datasets/common_read_avhrr_cmsaf_gac.m: Added reader for the
+	AVHRR_CMSAF dataset
+
+	* datasets/removeInvalidGeoTimedata.m:
+	Added common internal function that the common_read_<datasets>
+	functions use.
+
+	* datasets/common_read_mspps.m,common_read_patmosx.m,/common_read_calipso.m:
+	adapted to datasets/removeInvalidGeoTimedata.m
+
+	* datasets/SatDataset.m: Put in a little assertion for clearer
+	error message
+
+	* collocations/CollocatedDataset.m: Tweeked a string for
+	readability
+
+	* datasets/common_read_hirscs.m,common_read_cpr_2BCWCRO.m,
+	* datasets/common_read_avhrr.m,common_read_poes_radiometer.m,common_read_collocation_cpr_mhs.m:
+	propset Id
+
+
 2012-04-20  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-62
 
 	* collocations/Collapser.m: Clean up old commented-out code
-	
+
 	* collocations/CollocatedDataset.m:
-	
+
 	- Add props for distance and interval
 	- Use those props rather than global constant
 	- collocate now ordinary method, not static, and using distance

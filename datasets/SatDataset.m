@@ -297,6 +297,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % OUT
             %
             %  - structure containing whatever info could be obtained
+            assert(~isempty(self.re),['atmlab:' mfilename],'self.re (regular expression for file) is empty')
             
             S = regexp(fname, self.re, 'names');
             

@@ -73,18 +73,7 @@ end
 S.version = info.version;
 S.path = file;
 
-%% remove INVALID geodata and time
-ltindex = S.lat >= -90 & S.lat <= 90;
-lnindex = S.lon >= -180 & S.lon <= 180;
-tindex = S.time >= 0 & S.time <= 3600*24;
-if any(~(ltindex | lnindex | tindex))
-    for F = fieldnames(S)'
-        if isequal(size(S.(F{1}),1),size(ltindex,1))
-            S.(F{1}) = S.(F{1})(ltindex | lnindex | tindex,:);
-        end
-    end
-end
-
+S = removeInvalidGeoTimedata(S);
 
 end
 %%%%%%%%%%%%%
@@ -94,7 +83,7 @@ function S = flattenMatrixes(S,fields)
 %% Flatted matrixes according to conventions
 
 for F = fields(:)'
-    tmp = permute(S.(F{1}),[3,1,2]);
+    tmp = permute(S.(F{1}),[3,1,2]); % this will work for 2 and 3 dim data
     S.(F{1}) = squeeze(permute(tmp(:,:),[2,1]));
 end
 
@@ -114,6 +103,7 @@ function S = dealWithPseudoFields(S,field,file)
 switch field
     case 'modis_IWP'
         dependent_fields = {'Cloud_Water_Path','Quality_Assurance_1km','Cloud_Phase_Optical_Properties'};
+        rmflag = ~ismember(dependent_fields,fieldnames(S));
         for F = dependent_fields
             S.(F{1}) = hdfread(file,F{1});
         end
@@ -150,7 +140,7 @@ switch field
         
 end
 
-S=rmfield(S,dependent_fields);
+S=rmfield(S,dependent_fields(rmflag));
 end
 
 function S = interpolate_geodataTime(S)

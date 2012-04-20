@@ -87,21 +87,15 @@ A.avhrr_subdir = nan;
 A.avhrr_regexp = nan;
 A.avhrr_filename = nan;
 
-%%%% Calipso
+A.avhrr_cmsaf = SatDataset('name','avhrr_cmsaf_gac',...
+                   'reader', @common_read_avhrr_cmsaf_gac, ...
+                   'granule_duration',7200);
 
 % new
 A.calipso = SatDataset('name', 'calipso', ...
                    'satname', 'calipso', ...
                    'reader', @common_read_calipso, ...
                    'granule_duration', 5932);
-
-
-
-A.calipso_basedir = nan;
-A.calipso_subdir = nan;
-A.calipso_regexp = nan;
-A.calipso_filename = nan;
-
 %%%% CLOUDSAT
 
 %new
@@ -164,6 +158,11 @@ A.cloudsat_ECMWF_AUX_regexp = nan;
 A.cloudsat_ECMWF_AUX_filename = nan;
 A.firstline_data = '';
 
+A.dardar = SatDataset('name','dardar',...
+                   'reader', @common_read_dardar, ...
+                   'granule_duration',5932);
+             
+
 A.hirs_basedir = nan;
 A.hirs_subdir = nan;
 A.hirs_regexp = nan;
@@ -177,8 +176,8 @@ A.hirscs_filename = nan;
 % new
 A.mhs = SatDataset('name', 'mhs', ...
                    'reader', @common_read_poes_radiometer, ...
-                   'granule_duration', 6130); % new style 2012-01-18
-
+                   'granule_duration', 6130);
+               
 %old
 A.mhs_basedir = nan;
 A.mhs_subdir = nan;
@@ -211,17 +210,33 @@ A.patmosx = SatDataset('name', 'patmosx', ...
 
 %% COLLOCATION DATASETS
 
-% NEW STYLE
-A.collocation_mhs_cpr = CollocatedDataset(A.mhs, A.cpr); % new style 2012-01-18
+A.collocation_avhrrCMSAF_cpr = CollocatedDataset(A.cpr,A.avhrr_cmsaf,...
+    'name','CollocatedDataset_avhrrCMSAF_cpr','distance',5,'interval',600);
+
+% calipso is a 5km product and must therefore be the primary dataset
+A.collocation_calipso_cpr = CollocatedDataset(A.calipso,A.cpr,...
+    'name','CollocatedDataset_calipso_cpr','distance',5,'interval',180);
+
+A.collocation_cpr_modis = CollocatedDataset(A.cpr,A.modis_aqua_l2,...
+    'name','CollocatedDataset_cpr_modis','distance',2,'interval',180);
+
+A.collocation_cpr_dardar = CollocatedDataset(A.cpr,A.dardar,...
+    'name','CollocatedDataset_cpr_dardar','distance',1,'interval',1); % these are always collocated
+
+A.collocation_mhs_cpr = CollocatedDataset(A.mhs, A.cpr,...
+    'name','CollocatedDataset_mhs_cpr','distance',20,'interval',600);
+
+A.collocation_mspps_cpr   = CollocatedDataset(A.mspps,A.cpr,...
+    'name','CollocatedDataset_mspps_cpr','distance',20,'interval',600);
+
+A.collocation_patmosx_cpr = CollocatedDataset(A.patmosx,A.cpr,...
+    'name','CollocatedDataset_patmosx_cpr','distance',8,'interval',600);
+
+
 % fixme: impleement those as classes
 %A.holl10_data = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 data');
 %A.holl10_meandata = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 mean data');
 
-% calipso is a 5km product and must therefore be the primary dataset
-A.collocation_calipso_cpr = CollocatedDataset(A.calipso,A.cpr); 
-A.collocation_mspps_cpr   = CollocatedDataset(A.mspps,A.cpr);
-A.collocation_patmosx_cpr = CollocatedDataset(A.patmosx,A.cpr);
-A.collocation_cpr_modis = CollocatedDataset(A.cpr,A.modis_aqua_l2);
 %A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
 
 % OLD STYLE
@@ -254,7 +269,9 @@ A.collocation_mhs_mhs_basedir = nan;
 A.collocation_mhs_mhs_subdir = nan;
 A.collocation_mhs_mhs_regexp = nan;
 A.collocation_mhs_mhs_filename = nan;
-A.collocation_mhs_mhs = CollocatedDataset(A.mhs, A.mhs);
+
+% commented out to avoid warning messages till Gerrit is back
+%A.collocation_mhs_mhs = CollocatedDataset(A.mhs, A.mhs);
 
 A.collocation_mhs_mhs_hdf5_basedir = nan;
 A.collocation_mhs_mhs_hdf5_subdir = nan;

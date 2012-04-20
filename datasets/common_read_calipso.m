@@ -85,7 +85,7 @@ S.path = file;
 S.version = '051 (hardcoded)';
 
 S = rmfield(S,core_fields);
-
+S = removeInvalidGeoTimedata(S);
 end
 %%%%%%%%%%%%%
 % SUBFUNCTION

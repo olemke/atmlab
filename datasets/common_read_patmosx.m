@@ -65,13 +65,9 @@ S.path = file;
 
 S = rmfield(S,core_fields);
 
-% get rid of negative time!
-index = S.time>0;
-for F = fieldnames(S)'
-    if ~isequal(size(index),size(S.(F{1}))), continue; end
-    S.(F{1}) = S.(F{1})(index);
-end
+S = removeInvalidGeoTimedata(S);
 
+end
 %%%%%%%%%%%%%
 % SUBFUNCTION
 
@@ -94,6 +90,8 @@ elseif strcmp(file(end-3:end),'.hdf')
 end
 % read the data. This also scales the data automatically!
 [S,attr]  = read_clavrx_hdf(filename,all_fields);
+
+end 
 
 function S = concatenateDatafields(Sasc,Sdec)
 %% concatinateDatafields
@@ -127,4 +125,6 @@ for F = fieldnames(S)'
     if isequal(size(S.(F{1})),sz) && ~strcmp(F{1},'scan_line_time')
         S.(F{1}) = S.(F{1})(index);
     end
+end
+
 end
