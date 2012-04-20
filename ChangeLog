@@ -1,3 +1,20 @@
+2012-04-20  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-62
+
+	* collocations/Collapser.m: Clean up old commented-out code
+	
+	* collocations/CollocatedDataset.m:
+	
+	- Add props for distance and interval
+	- Use those props rather than global constant
+	- collocate now ordinary method, not static, and using distance
+	  and interval props rather than arguments
+
+	* documentation/collocations.tex: change docs accordingly
+
+	* documentation/Makefile: makeglossaries
+
 2012-04-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-61

@@ -266,16 +266,6 @@ classdef Collapser < AssociatedDataset
                 last = lasts(i);
                 M_coll_part = processed_core(first:last, :);
                 M_data_part = M_data(first:last, :);
-                % FIXME TODO
-                %CS_in_MHS = M_coll_part(:, c.overlap.B_DIST) < colloc_config('distance_for_average_MHS');
-                %CS_in_HIRS = M_coll_part(:, c.overlap.H_DIST) < colloc_config('distance_for_average_HIRS');
-                %flagged = M_data_part(:, c.data.ROIWP) < 0;
-                %
-                %if all(flagged | ~CS_in_MHS) % don't bother, all are flagged
-                %    continue
-                %end
-                %
-                %fine = CS_in_MHS & ~flagged;
                 
                 j = j + 1;
                 M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);

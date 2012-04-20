@@ -7,6 +7,7 @@ TARGET=collocations
 ${TARGET}.pdf: ${TARGET}.tex
 	pdflatex -shell-escape -halt-on-error ${TARGET}
 	bibtex ${TARGET}
+	makeglossaries ${TARGET}
 	pdflatex -shell-escape -halt-on-error ${TARGET}
 	pdflatex -shell-escape -halt-on-error ${TARGET}
 clean:
