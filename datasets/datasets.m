@@ -20,7 +20,7 @@ end
 
 if (nargin==2)
     if (strcmp(varargin{1}, 'delete'))
-        S = rmfield(S.name, varargin{2});
+        S = rmfield(S, varargin{2}.name);
     else
         error(['atmlab:' mfilename ':invalid'], ...
             'Invalid call sig. See help text.');

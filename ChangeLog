@@ -1,3 +1,9 @@
+2012-04-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-64
+
+	* datasets/datasets.m: Bugfix in renaming dataset
+
 2012-04-20  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-63
