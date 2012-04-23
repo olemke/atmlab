@@ -34,6 +34,7 @@ function result = xmlReadPpath(fid, attrlist, itype, ftype, binary, fid2)
   result.end_los      = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
   result.end_lstep    = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
   result.nreal        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+  result.ngroup       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
   result.gp_p         = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
   result.gp_lat       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
   result.gp_lon       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );

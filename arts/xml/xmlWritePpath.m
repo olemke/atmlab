@@ -31,6 +31,7 @@ xmlWriteVector (fid, fidb, data.end_pos, precision);
 xmlWriteVector (fid, fidb, data.end_los, precision);
 xmlWriteNumeric (fid, fidb, data.end_lstep, precision);
 xmlWriteVector (fid, fidb, data.nreal, precision);
+xmlWriteVector (fid, fidb, data.ngroup, precision);
 xmlWriteArrayOf (fid, fidb, data.gp_p, 'GridPos', precision);
 xmlWriteArrayOf (fid, fidb, data.gp_lat, 'GridPos', precision);
 xmlWriteArrayOf (fid, fidb, data.gp_lon, 'GridPos', precision);

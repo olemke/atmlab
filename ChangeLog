@@ -1,3 +1,13 @@
+2012-04-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-65
+
+	* tests/test_arts_ppath.m: Corrected sin to sind when calling
+	cartposlos2geocentric.
+
+	* arts/xml/xmlReadPpath.m (xmlReadPpath):
+	* arts/xml/xmlWritePpath.m (xmlWritePpath): Added handling of ngroup.
+
 2012-04-23  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-64
