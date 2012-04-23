@@ -1,3 +1,11 @@
+2012-04-23 Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-66
+
+	* collocations/{colloc_config,CollocatedDataset}.m: Comment more
+
+	* documentation/collocations.tex, documentation/extra.bib: update
+
 2012-04-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-65

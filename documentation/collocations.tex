@@ -110,6 +110,7 @@ This involves:
 \item Define your CollocatedDatasets (\autoref{sec:CollocatedDataset})
 \begin{itemize}
 \item Define what datasets are collocated with each other
+\item Define maximum distance and time to have a collocation
 \item Define where the data shall be stored
 \end{itemize}
 \item Define what additional data shall be processed.
@@ -125,11 +126,11 @@ reduced (``collapsed'').
 \end{itemize}
 \end{itemize}
 
-Currently, some settings are still defined in the global-structure obtained
-via \lstinline|colloc_config|.
-Most notably, this is the case for the maximum distance and maximum time
-interval considered a collocation (all measurements are treated as points).
-This is to change soon.
+% Currently, some settings are still defined in the global-structure obtained
+% via \lstinline|colloc_config|.
+% Most notably, this is the case for the maximum distance and maximum time
+% interval considered a collocation (all measurements are treated as points).
+% This is to change soon.
 
 \autoref{fig:cd} shows the most important classes and methods that together
 form the \collocs.
@@ -138,7 +139,7 @@ form the \collocs.
 \label{sec:SatDataset}
 
 Before we can start collocating, we need to be able to read data for the
-datasets we want to collocate.
+datasets we want to collocate, and to systematically go through a large number of granules
 A SatDataset object contains all information needed to find granules on the
 file-system given a particular date and time, to read the granule (while
 removing duplicates) and to return it in a format that a CollocatedDataset can
@@ -234,6 +235,18 @@ It prescribes a particular interfaces, prescribes a number of tasks, but does
 not actually implement them.
 Two implementations are provided (see \autoref{sec:simple})
 
+Implementations of AssociatedDataset have their objects created in different ways, but used
+similarly.
+When instantiated, they are registered with the CollocatedDataset to which
+they belong.
+Then, when e.g.\ \lstinline|collocate_and_store_date_range| or so is called for this
+dataset, the user can specify what AssociatedDatasets should be generated along
+with it.
+When collocations are read, there is no need (nor the possibility) to specify
+AssociatedDatasets.
+Each field-name must be unique across CollocatedDatasets and AssociatedDatasets,
+the reading routine figures out from where to read each field.
+
 \subsubsection{The simple way: FieldCopier and Collector}
 \label{sec:simple}
 
@@ -252,7 +265,7 @@ footprint sizes.
 For example, it may be used to calculate the mean, the standard deviation, and
 other statistics, for CloudSat \gls{CPR} footprints over larger \gls{MHS}
 footprints.
-For detailed information, see \lstinline|doc Collapser|
+For detailed information, see \lstinline|doc Collapser|.
 
 \subsubsection{The advanced way: rolling your own class}
 \label{sec:advanced}
@@ -265,10 +278,11 @@ This requires to create a subclass from AssociatedDataset, similar to
 FieldCopier and Collapser, and implement at least all attributes and methods
 that are abstract in AssociatedDataset.
 Then, an object of this class can be passed on in the same place as
-FieldCopier and Collapser.
+FieldCopier, Collapser, or any other implementations.
 
 The best documentation to date is the full class documentation and the source
-code for AssociatedDataset, FieldCopier, and Collapser.
+code for AssociatedDataset, FieldCopier, Collapser, and other implementations
+for AssociatedDataset.
 
 \section{Class diagram}
 

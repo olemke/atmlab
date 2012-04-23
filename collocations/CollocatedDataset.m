@@ -1141,7 +1141,7 @@ classdef CollocatedDataset < HomemadeDataset
                 end
             end
             % Not filtering duplicates, this should be done when processing
-            % collocations initially
+            % collocations initially, just before storing
 
             M = [];
             
@@ -1163,6 +1163,7 @@ classdef CollocatedDataset < HomemadeDataset
                     end
                     M_cols = M_cols_here;
                     hitno = hitno + 1;
+                    % also read for all additionals
                     for j = 1:length(additionals)
                         [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
                     end
