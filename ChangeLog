@@ -1,5 +1,12 @@
 2012-04-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-69
+
+	* tests/test_arts_ppath.m:  REFR_INDEX_AGENDA updated with
+	refr_index_group. 
+
+2012-04-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-68
 
 	* tests/test_arts_ppath.m: Added code for additional testing.
