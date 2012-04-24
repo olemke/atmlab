@@ -17,6 +17,42 @@ classdef AssociatedDataset < HomemadeDataset
     % The properties and methods are documented here, because subclasses
     % provide mere implementations; the signature does not change.
     %
+    % AssociatedDataset Properties:
+    %
+    %  abstract properties:
+    %
+    %   members -       Describes how data are stored in NetCDF
+    %   parent -        SatDataset that this AssociatedDataset belongs to
+    %   dependencies -  Other AssociatedDataset that must be processed first
+    %
+    %  (remaining properties from <a href="matlab:help HomemadeDataset">HomemadeDataset</a>)
+    %
+    % AssociatedDataset Methods: (partial overview)
+    %
+    %  Constructor:
+    %
+    %   AssociatedDataset -     Create AssociatedDataset object
+    %  
+    %  Abstract methods:
+    %
+    %   primary_arguments -     Get args for primary reader
+    %   secondary_arguments -   Get args for secondary reader
+    %   needs_primary_data -    Need data from primary?
+    %   needs_secondary_data -  Need data from secondary?
+    %   process_granule -       Process a single granule
+    %
+    %  Implemented methods:
+    %
+    %   process_delayed -       Process data when core read from disk
+    %   merge -                 Combine core and associated
+    %   get_mergefields -       Return fields needed to merge
+    %   concatenate -           Vertically concatenate data
+    %
+    %  (remaining methods from <a href="matlab:help HomemadeDataset">HomemadeDataset</a>)
+    %
+    %  See also: FieldCopier (implementation), Collapser (implementation),
+    %            HomemadeDataset (superclass), CollocatedDataset, SatDataset.
+    %   
     % $Id$
     
     % need to know:

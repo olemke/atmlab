@@ -32,7 +32,18 @@ classdef Collapser < AssociatedDataset
     % fields, is all contained in a structure passed on to the constructor.
     % See <a href="matlab:help Collapser/Collapser">constructor documentation</a> for details.
     %
-    % EXAMPLE
+    % Collapser Properties:
+    %
+    %   fieldstruct -           Structure with complete field information
+    %   overall_limitators -    Limitations applied to all fields
+    %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>)
+    %
+    % Collapser Methods:
+    %
+    %   Collapser -             Create Collapser object
+    %  (remaining methods from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>)
+    %
+    % Example:
     %
     %   >> mfcs.RO_ice_water_path.limitators = {@(X)(X>0)};
     %   >> mfcs.RO_ice_water_path.processors.MEAN = @mean;
@@ -44,7 +55,8 @@ classdef Collapser < AssociatedDataset
     %           'subdir', '$YEAR4/$MONTH/$DAY', ...
     %           'filename', 'mean_collocations_$SAT.nc.gz');
     %
-    % (also see the <a href="matlab:help Collapser/Collapser">constructor documentation</a>)
+    % See also: AssociatedDataset (abstract superclass), FieldCopier,
+    %           CollocatedDataset, SatDataset, Collapser (constructor)
     
     % TODO:
     %  - store result of limitators as bitfield?
@@ -60,6 +72,7 @@ classdef Collapser < AssociatedDataset
         
     % $Id$
     methods
+        %% constructor
         function self = Collapser(ad, fieldstruct, overall_limitators, varargin)
             % constructor for Collapser class
             %
@@ -189,6 +202,7 @@ classdef Collapser < AssociatedDataset
             
         end
                 
+        %% implementation of abstract methods
         function args = primary_arguments(~)
             args = {};
         end
@@ -319,6 +333,7 @@ classdef Collapser < AssociatedDataset
             
         end
         
+        %% re-implementation of parents' methods
         function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
             M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);

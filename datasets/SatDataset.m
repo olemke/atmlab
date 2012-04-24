@@ -1,27 +1,89 @@
 classdef SatDataset < handle % subclass from handle to pass-by-reference
     % Class to represent a dataset.
     %
-    % A dataset describes various properties for datasets stored on disk.
-    % Its <a href="matlab:properties SatDataset">properties</a> include:
+    % Objects from this class lie at the basis of everything that the
+    % Collocation Toolkit does. For example, a <a href="matlab:help CollocatedDataset">CollocatedDataset</a>
+    % consists of two SatDatasets. The SatDataset describes where the data
+    % are stored on the disk, how the data are read, and contains some more
+    % information needed for collocations. However, a SatDataset can
+    % certainly also be used stand-alone, for example, to loop through all
+    % the granule in a particular time period.
     %
-    % - Properties to describe the location of the granules:
-    %     <a href="matlab:help SatDataset/basedir">basedir</a>
-    %     <a href="matlab:help SatDataset/subdir">subdir</a>
-    %     <a href="matlab:help SatDataset/re">re</a>
-    %     <a href="matlab:help SatDataset/filename">filename</a>
+    % When <a href="matlab:help SatDataset/SatDataset">instantiating</a> an object from this class, (or, for that matter,
+    % any class in the toolkit!), you should define a number of its properties
+    % (see below). This can be done either when creating the class (see
+    % <a href="matlab:help SatDataset/SatDataset">constructor info</a>), or later, in the same way as setting a member
+    % of a structure. It's probably best to define overall properties, such
+    % as name, granule_duration, etc., when creating, and to define local
+    % properties later. For example:
     %
-    % - Property describing how to read the granule:
-    %     <a href="matlab:help SatDataset/reader">reader</a>
+    % >> spam = SatDataset('name', 'MyDataset', 'granule_duration', '3600', ...
+    %                      'satname', 'SpamSat');
     %
-    % - Other properties:
-    %     <a href="matlab:help SatDataset/name">name</a>
-    %     <a href="matlab:help SatDataset/granule_duration">granule_duration</a>
-    %     <a href="matlab:help SatDataset/satname">satname</a>
-    %     <a href="matlab:help SatDataset/collocated_datasets">collocated_datasets</a>
+    % and later:
     %
-    % For information on how to create an object from this class, see
-    % <a href="matlab:help SatDataset/SatDataset">SatDataset/SatDataset</a>.
+    % >> spam.basedir = '/here/are/the/data';
     %
+    % When a dataset is created, it is registered in a global structure
+    % that can be obtained by calling <a href="matlab:datasets">datasets</a>. For this reason, it
+    % is recommended to always at least give a dataset a name when it is
+    % first created. Not doing so will result in a warning and an
+    % automatically calculated name, which is probably neither helpful nor
+    % descriptive.
+    %
+    % A number of datasets are pre-configured in <a href="matlab:help datasets_config">datasets_config</a>.
+    % 
+    % SatDataset properties:
+    %
+    %  Properties to describe the location of the granules:
+    %
+    %   basedir -   Specify root for all datasets
+    %   subdir -    Specify directory for individual granule
+    %   re -        Regular expression matching individual granule
+    %   filename -  Exact filename calculating path for individual granule
+    %
+    %  Property describing how to read the granule:
+    %
+    %   reader -    Reading routine for one granule for this dataset
+    %
+    %  Other properties:
+    %
+    %   name -      Name with which this dataset is registered
+    %   granule_duration - Duration of a single granule in seconds
+    %   satname -   Name for a single-satellite dataset
+    %   collocated_datasets - Read-only prop. listing <a href="matlab:help CollocatedDataset">CollocatedDatasets</a>.
+    %
+    % SatDataset methods:
+    %
+    %   A selection of the most important methods is shown below.
+    %   For a full listing, see <a href="matlab:doc SatDataset">doc SatDataset</a>.
+    %
+    %  Class instantiation:
+    %
+    %   SatDataset -                Info on creating a SatDataset object
+    %
+    %  Methods for finding granules:
+    %
+    %   find_datadir_by_date -      Find dir. containing granules for date
+    %   find_granules_by_date -     Find all granules for date
+    %   find_granules_for_period -  Find all granules for multi-day period
+    %   find_granule_by_datetime -  Find granule starting at exact datetime
+    %
+    %  Methods for reading granules:
+    %
+    %   read_granule -              Read granule starting at exact datetime
+    %
+    %  Methods for detecting duplicates:
+    %
+    %   find_granule_first_line -   Create hashtable cataloguing duplicates
+    %   granule_first_line -        Look up entry from this hashtable
+    %
+    %  Other useful methods:
+    %
+    %   find_info_from_granule -    Get information from granule filename
+    %
+    % See also: CollocatedDataset, HomemadeDataset (child), AssociatedDataset, FieldCopier, Collapser
+    % 
     % $Id$
     
     % read/write props

@@ -26,14 +26,21 @@ classdef FieldCopier < AssociatedDataset
     % pass the reference to the method using it. For other tasks, this is
     % taken care of automatically.
     %
-    % FORMAT
+    % FieldCopier Properties:
     %
-    %   See <a href="matlab:help Fieldcopier/Fieldcopier">FieldCopier.FieldCopier</a> (constructor)
+    %   fieldstruct_primary -   Describes what is copied from primary
+    %   fieldstruct_secondary - Describes what is copied from secondary
+    %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>)
     %
-    % EXAMPLE
+    % FieldCopier Methods:
+    %
+    %   FieldCopier -           Create FieldCopier object
+    %  (remaining methods implemented based on <a href="matlab:help AssociatedDataset">AssociatedDataset</a>)
+    %
+    % Example:
     %
     % % obtain object for <a href="matlab:help CollocatedDataset">CollocatedDataset</a>
-    % >> D = datasets;
+    % >> D = <a href="matlab:help datasets">datasets</a>;
     % >> mhscpr = D.CollocatedDataset__1_mhs__2_cpr;
     % % define structures to be passed on when creating FieldCopier
     % % For this to work, the <a href="matlab:help SatDataset">SatDataset</a> in <a href="matlab:help CollocatedDataset/primary">mhscpr.primary</a>
@@ -60,6 +67,8 @@ classdef FieldCopier < AssociatedDataset
     %
     % TODO:
     %  - set some (but not all!!) clever properties for NetCDF
+    %
+    % See also: AssociatedDataset (abstract superclass), CollocatedDataset, SatDataset, Collapser, datasets
     %
     % $Id$
     

@@ -1,19 +1,49 @@
 classdef CollocatedDataset < HomemadeDataset
-    % Defines a collocated dataset, between two (other) datasets.
+    % Defines a collocated dataset, between two (different) datasets.
     %
-    % This class contains most of the core functionality for the
-    % collocations toolkit, apart from the very low-level functions doing
-    % the actual collocations. 
+    % A CollocatedDataset consists of two <a href="matlab:help SatDataset">SatDataset</a>s.
+    % To start collocating, first create two <a href="matlab:help SatDataset">SatDataset</a>
+    % objects and define all required properties there. Predefined datasets
+    % are defined in <a href="matlab:help datasets_config">datasets_config</a>. Then <a href="matlab:help CollocatedDataset/CollocatedDataset">create</a> a CollocatedDataset.
     %
-    % Besides the properties inherited from <a href="matlab:help SatDataset">SatDataset</a>, 
-    % it contains two properties: <a href="matlab:help CollocatedDataset/primary">primary</a> and <a href="matlab:help CollocatedDataset/secondary">secondary</a>.
-    % Those are <a href="matlab:help SatDataset">SatDataset</a> objects (therefore possibly
-    % <a href="matlab:help CollocatedDataset">CollocatedDataset</a> objects!) passed on to the
-    % constructor.
+    % CollocatedDataset Properties:
     %
-    % For instantiation, see <a href="matlab:help CollocatedDataset/CollocatedDataset">constructor info</a>.
+    %   primary -   primary dataset
+    %   secondary - secondary dataset
+    %   distance -  maximum collocation distance (km)
+    %   interval -  maximum collocation time (seconds)
+    %   members -   structure containing full info on how data are stored
+    %   (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> properties)
+    %
+    % CollocatedDataset methods:
+    %
+    %  Class instantiation:
+    %
+    %   CollocatedDataset -         created CollocatedDataset object
+    %
+    %  Finding and storing collocations:
+    %
+    %   overlap_granule -           Find overlapping granules from filenames
+    %   collocate_granule -         Collocate primary with all secondaries
+    %   collocate_date -            Collocate all granules in day
+    %   collocate_and_store_date -  Collocate entire day and store results
+    %   collocate_and_store_date_range - Collocate many days and store
+    %
+    %  Reading collocations:
+    %
+    %   read -                      Read collocations for date range
+    %
+    %  (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> methods)
     %
     % For a full overview of methods, see <a href="matlab:doc CollocatedDataset">doc CollocatedDataset</a>.
+    %
+    % Example:
+    %
+    %   >> D = datasets;
+    %   >> mhscpr = CollocatedDataset(D.mhs, D.cpr, 'distance', 10, 'interval', 300, 'name', 'NarrowCPRMHSCollocs');
+    %
+    % See also: SatDataset (grandparent), HomemadeDataset (superclass), AssociatedDataset,
+    %           FieldCopier, Collapser
     %
     % $Id$
     properties

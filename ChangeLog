@@ -1,4 +1,32 @@
-2012-04-23 Gerrit Holl  <gerrit.holl@ltu.se>
+2012-04-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-67
+
+	* collocations/CollocatedDataset.m:
+
+	- Improve class documentation
+
+	* datasets/datasets_config.m:
+
+	- Move everything old-style down down down
+
+	* datasets/SatDataset.m:
+
+	- Improve class documentation
+
+	* collocations/Collapser.m:
+
+	- Improve class documentation
+
+	* collocations/AssociatedDataset.m:
+
+	- Improve class documentation
+
+	* datasets/HomemadeDataset.m:
+
+	- Improve class documentation
+
+2012-04-23  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-66
 

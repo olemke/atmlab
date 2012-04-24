@@ -4,6 +4,31 @@ classdef HomemadeDataset < SatDataset
     % This class is an 'intermediate' class between <a href="matlab:help SatDataset">SatDataset</a> 
     % and <a href="matlab:help CollocatedDataset">CollocatedDataset</a>, but also parent to <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
     % It is unlikely you wish to instantiate this class directly.
+    %
+    % This class contains methods and properties that are related to
+    % storing data to disk and reading data in the same (NetCDF) format
+    % again from disk. It inherits from <a href="matlab:help SatDataset">SatDataset</a> and is parent to
+    % <a href="matlab:help CollocatedDataset">CollocatedDataset</a> and <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
+    %
+    % HomemadeDataset Properties:
+    %
+    %   cols -  Structure describing columns for matrix-stored data
+    %  (remaining properties inherited from <a href="matlab:help SatDataset">SatDataset</a>)
+    % 
+    % HomemadeDataset Methods:
+    %
+    %  Constructor:
+    %
+    %   HomemadeDataset -   Create HomemadeDataset object (why would you?)
+    %
+    %  I/O:
+    %
+    %   store -             Store <a href="matlab:help HomemadeDataset/cols">cols</a>-described matrix to NetCDF
+    %   read_single_day -   Read a single day of stored data
+    %  (remaining methods inherited from <a href="matlab:help SatDataset">SatDataset</a>)
+    %
+    % See also: SatDataset (superclass), CollocatedDataset (subclass),
+    %           AssociatedDataset (abstract subclass)
     
     % Note on implicit and explicit constructor calling:
     % http://www.mathworks.se/help/matlab/matlab_oop/creating-subclasses--syntax-and-techniques.html
@@ -19,7 +44,7 @@ classdef HomemadeDataset < SatDataset
     
     
     properties
-        % structure describing columns of internally stored data
+        % structure describing columns of (internally) stored data
         %
         % The cols-structure describes columns of data passed around
         % internally as a matrix. For example, mid-level methods like
