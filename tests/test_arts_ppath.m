@@ -223,24 +223,6 @@ for c = 1 : n
     end
     
     if max(e) > maxdd, maxdd = max(e); end
-    
-    % Special check for end point
-    if strcmp( ppath.background, 'surface' )
-      if atmosphere_dim == 1
-        dz = abs( ppath.pos(end,1) - Q.Z_SURFACE );
-      elseif atmosphere_dim == 2
-        dz = abs( ppath.pos(end,1) - interp1( Q.LAT_GRID, Q.Z_SURFACE, ...
-                                                          ppath.pos(end,2) ) );
-      else
-        dz = abs( ppath.pos(end,1) - interp2( Q.LON_GRID, Q.LAT_GRID, ...
-                           Q.Z_SURFACE, ppath.pos(end,3), ppath.pos(end,2) ) );
-      end
-      %
-      if dz > 1
-        fprintf('\n!!! Deviating surface point found !!!\n');
-        keyboard        
-      end  
-    end
   end
 end
 
@@ -251,3 +233,13 @@ fprintf( 'Max ppath deviation: %.1e m\n', maxdd );
 %
 delete_tmpfolder( workfolder );
 
+
+return
+for i = 1:122
+  [x0,y0,z0] = geocentric2cart( ppath0.r(i), ppath0.pos(i,2), ppath0.pos(i,3) );
+  [x,y,z] = geocentric2cart( ppath.r(i), ppath.pos(i,2), ppath.pos(i,3) );
+  s = norm( [ x0-x, y0-y, z0-z ] );
+  fprintf( '%3d: %.2e\n', i, s );
+end
+
+  
