@@ -1,3 +1,12 @@
+2012-04-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-71
+
+	* physics/constants.m: Added LATENT_HEAT_VAPORIZATION_273, and
+	throw an error about using LATENT_HEAT_VAPORIZATION as this number
+	is only valid for 373.15K. LATENT_HEAT_VAPORIZATION_273 is only
+	correct at 0deg.
+
 2012-04-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-70

@@ -20,7 +20,10 @@
 %     
 %       GAS_CONST_WATER_VAPOR      [J.kg-1.K-1] Gas constant for water vapor
 %       LATENT_HEAT_VAPORIZATION   [J.kg-1] Latent heat of vaporization of
-%                                           water vapor
+%                                           water vapor (at 373.15K)
+%
+%       LATENT_HEAT_VAPORIZATION_273 [J.kg-1] Latent heat of vaporization of
+%                                           water vapor at 273K
 %       NAUTICAL_MILE              [m] 1 nautical mile 
 %       PLANCK_CONST               [Js]
 %       RAD2DEG                    [deg] Conversion from radians to degrees
@@ -72,7 +75,7 @@
 % SPECIFIC_HEAT_CONST_PRES
 % 1005 -> 1003.5
 % LATENT_HEAT_VAPORIZATION
-% 2501e3 -> 2257e3
+% This is not a constant, but depends on the temperature
 
 function [const,unit] = constants(name)
 
@@ -102,7 +105,7 @@ case 'BOLTZMANN_CONST'
     unit  = 'JK^{-1}';
     
 case 'CBGR'
-    %ref: http://en.wikipedia.org/wiki/Cosmic_background_radiation
+    %ref: http://en.wikipedia.org/w/index.php?title=Cosmic_background_radiation&oldid=480943337
     const = 2.725;
     unit = 'K';
     
@@ -147,9 +150,17 @@ case 'GAS_CONST_WATER_VAPOR'
     
 case 'LATENT_HEAT_VAPORIZATION'
     % ref: http://en.wikipedia.org/wiki/Enthalpy_of_vaporization
+    error(['atmlab:' mfilename ':notConstant'],....
+        ['The latent heat vaporization is a strong function of temperature.\n',...
+        'Use ''LATENT_HEAT_VAPORIZATION_273'' for the correct value at 273.15 degress celcius'])
     const = 2257e3;
     unit  = 'Jkg^{-1}';
  
+case 'LATENT_HEAT_VAPORIZATION_273'
+    %http://en.wikipedia.org/w/index.php?title=Water_%28data_page%29&oldid=487536389
+    const = 2496.5e3;
+    unit  = 'Jkg^{-1}';
+    
 case 'NAUTICAL_MILE'
     % ref: http://en.wikipedia.org/wiki/Nautical_mile
     const = 1852;
