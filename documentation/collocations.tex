@@ -39,7 +39,7 @@
 \newcommand{\methodused}[1]{{\bfseries #1}}
 \newcommand{\collocs}{Collocations Toolkit}
 
-\title{\collocs\ in Atmlab (version 2-1-60)}
+\title{\collocs\ in Atmlab (version 2-1-70)}
 
 \date{\isodate\today}
 
@@ -94,7 +94,7 @@ refereed articles \citet{holl10:_collocating_amt} and
 This is an introductory document.
 For full information on all classes and methods, please refer to the online
 documentation in Matlab (best accessed with the help browser, e.g.\
-\lstinline!doc SatDataset!)
+type \lstinline!doc SatDataset! on the Matlab commandline)
 \section{Getting started}
 
 To get started with collocations:
@@ -139,10 +139,10 @@ form the \collocs.
 \label{sec:SatDataset}
 
 Before we can start collocating, we need to be able to read data for the
-datasets we want to collocate, and to systematically go through a large number of granules
+datasets we want to collocate, and to systematically go through a large number of granules.
 A SatDataset object contains all information needed to find granules on the
 file-system given a particular date and time, to read the granule (while
-removing duplicates) and to return it in a format that a CollocatedDataset can
+removing duplicates) and to return it in a format that a CollocatedDataset object can
 work with.
 See the class diagram in \autoref{fig:cd} for a list of attributes and
 methods.
@@ -177,8 +177,9 @@ can be in an arbitrary format) and the data as represented inside the
 Detailed documentation can be found with \lstinline|help SatDataset/reader|.
 \end{itemize}
 
-As far as I can see, there is no need to subclass SatDataset; 
-functionality you will need is contained in the class.
+Unless you want to re-implement the collocation algorithm, there is no need
+to subclass SatDataset; all the functionality you will need is contained in
+the class.
 
 \section{Defining the collocated datasets}
 \label{sec:CollocatedDataset}
@@ -196,13 +197,13 @@ list granules, find duplicates (normally none), actually read the data, etc.
 those may actually be CollocatedDatasets themselves
 \end{itemize}
 
-In practice, this still needs an appropiate \lstinline|reader| routine,
+In practice, the CollocatedDataset class still needs an appropiate \lstinline|reader| routine,
 something not currently implemented in Atmlab, but on the TODO-list.
 
 Beyond the abilities of a SatDataset, a CollocatedDataset performs the
 following tasks:
 \begin{itemize}
-\item Performing collocations between granules, as described by
+\item Collocations between granules, as described by
 \citet{holl10:_collocating_amt} and subsequent papers
 \item Storing those collocations in an appropiate format\footnote{This is
 actually implemented in the parent-class HomemadeDataset, but as an end-user
@@ -231,34 +232,54 @@ To this end, collocation methods (like
 \lstinline|read|) take as as argument a collection of additional objects known
 as AssociatedDatasets.
 The AssociatedDataset is an abstract class.
-It prescribes a particular interfaces, prescribes a number of tasks, but does
-not actually implement them.
-Two implementations are provided (see \autoref{sec:simple})
+This means that it defines for a number of methods that the inputs and output
+are, but it does not actually implement the methods.
+It also described what properties the class has.
+Two implementations are provided (see \autoref{sec:simple}).
+Those contain at least all the methods and properties defined in AssociatedDataset,
+and it is in the class AssociatedDataset that those are documented.
 
 Implementations of AssociatedDataset have their objects created in different ways, but used
 similarly.
-When instantiated, they are registered with the CollocatedDataset to which
+When instantiated, the objects are registered with the CollocatedDataset to which
 they belong.
-Then, when e.g.\ \lstinline|collocate_and_store_date_range| or so is called for this
+Then, when e.g.\ \lstinline|collocate_and_store_date_range| is called for this
 dataset, the user can specify what AssociatedDatasets should be generated along
 with it.
+When reading collocations, there is no need to specify the AssociatedDatasets.
+The reading routine figures out automatically from what dataset (the core, or one
+of the AssociatedDatasets) a particular field originates.
+That means all fieldnames must be unique%
+\footnote{This can cause problems for some field names; for example, a field like
+\lstinline|quality_flag| may occur in several datasets.
+In the future, this will probably be solved by prepending the name of the dataset
+to the name of the field in case of ambiguity.}.
 When collocations are read, there is no need (nor the possibility) to specify
 AssociatedDatasets.
 Each field-name must be unique across CollocatedDatasets and AssociatedDatasets,
 the reading routine figures out from where to read each field.
 
-\subsubsection{The simple way: FieldCopier and Collector}
+\subsubsection{The simple way: FieldCopier and Collapser}
 \label{sec:simple}
+
+FieldCopier and Collapser are both implementations of AssociatedDataset.
+The usage of most (but not all) methods is identical.
+Therefore, most of the documentation is in AssociatedDataset, and not in
+FieldCopier or Collapser.
 
 With a FieldCopier, one can do exactly what the name says: copy fields exactly
 from the original data to the collocated data.
-Like the CollocatedDataset, the FieldCopier derives from SatDataset, so it
-too can list granules, contains the same properties to define where the data
-shall reside, etc.
+Like the CollocatedDataset, the FieldCopier derives from SatDataset%
+\footnote{In an indirect way: as illustrated by \autoref{fig:cd}, FieldCopier
+implements AssociatedDataset, AssociatedDataset derives from HomemadeDataset,
+and HomemadeDataset derives from SatDataset.
+One could say that SatDataset is the great-grandparent of FieldCopier}, so it
+too can list granules, it contains the same properties to define where the data
+will be stored, etc.
 With CollocatedDataset it shares the capability that it can store data (via
 the intermediate class HomemadeDataset).
 For detailed information, consult the online documentation
-(\lstinline|doc FieldCopier|).
+(\lstinline|doc FieldCopier| on the Matlab command line).
 
 A Collapser can be used for collocations between datasets with different
 footprint sizes.

@@ -746,7 +746,22 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     ['Reading %s. ' ...
                      '(If this fails, run self.find_granule_first_line ' ...
                      '(SatDataset.find_granule_first_line)).\n'], scanfile);
-                t = load(scanfile);
+                try
+                    t = load(scanfile);
+                catch ME
+                    switch (ME.identifier)
+                        case {'MATLAB:load:couldNotReadFile'}
+                            newME = MException(['atmlab:' mfilename ':failed'], ...
+                                ['Unable to locate duplicates for %s. Failed to read file: %s.\n', ...
+                                 'You might want to run the ''find_granule_first_line'' method?'], ...
+                                self.name, scanfile);
+                            newME.addCause(ME);
+                            newME.throw();
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
+                                
                 ht = t.ht;
                 S.(sat).(self.name) = ht;
             end

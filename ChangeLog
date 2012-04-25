@@ -1,3 +1,23 @@
+2012-04-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-70
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Resort, put deprecated style all at the end
+
+	* datasets/SatDataset.m(granule_first_line):
+
+	- Give a more helpful error message if no granule_first_line found
+
+	* documentation/collocations.tex:
+
+	- Small improvements based on comments from Salomon
+
+	* datasets/datasets_config.m:
+
+	- Add comment
+
 2012-04-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-69

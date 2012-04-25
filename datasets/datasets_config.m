@@ -55,7 +55,7 @@ function A = datasets_defs
 %% define locations of tools and meta-stuff
 
 A.sat2netcdf = nan;
-A.firstline_data = '';
+A.firstline_data = ''; % contains global default
 A.blacklist = nan;
 
 %% define datasets
