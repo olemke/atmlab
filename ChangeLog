@@ -1,3 +1,57 @@
+2012-04-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-73
+
+	* collocations/Collapser.m(process_granule): remove FIXME
+
+	* TODO: tick off item
+
+	* collocations/CollocatedDataset.m:
+
+	- Added 'gridsize' property
+
+	(collocate_granule):
+
+		- Write distance/time when collocation
+		- Remove some commented out code
+		- Don't crash on unreadable file
+
+	(collocate_and_store_date):
+
+		- Be more helpful in output text
+
+	(collocate):
+
+		- Use object-local gridsize
+		- Use mean Earth radius
+
+	* handy/CachedData.m: Added
+
+	- Class to cache data
+
+	* datasets/datasets_config.m:
+
+	- Give dardar a sat (atrain)
+	- Give mhsmhs a name, distance, interval
+	- Remove some FIXMEs
+
+	* datasets/SatDataset.m:
+
+	- Added member for cached data
+
+	(read_granule):
+
+		- Cache data with CachedData object
+
+	(find_granule_first_line):
+
+		- Correct error in example
+
+	* datasets/removeInvalidGeoTimedata.m:
+
+	- Don't remove too much times
+	
+
 2012-04-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-72

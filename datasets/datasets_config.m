@@ -93,6 +93,7 @@ A.cpr_1B = SatDataset('name', 'CPR_1B', ...
                    'granule_duration', 5932);
 
 A.dardar = SatDataset('name','dardar',...
+                   'satname', 'atrain', ...
                    'reader', @common_read_dardar, ...
                    'granule_duration',5932);
              
@@ -139,17 +140,13 @@ A.collocation_mspps_cpr   = CollocatedDataset(A.mspps,A.cpr,...
 A.collocation_patmosx_cpr = CollocatedDataset(A.patmosx,A.cpr,...
     'name','CollocatedDataset_patmosx_cpr','distance',8,'interval',600);
 
+A.collocation_mhs_mhs = CollocatedDataset(A.mhs, A.mhs, ...
+    'name', 'collocation_mhs_mhs', 'distance', 15, 'interval', 900);
 
 % FIXME GH: implement those as classes
 %A.holl10_data = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 data');
 %A.holl10_meandata = AssociatedDataset(A.collocation_cpr_mhs, 'name', 'holl10 mean data');
 
-% FIXME: Will we ever need this one?
-%A.eliasson12_data = AssociatedDataset(A.collocation_cpr_patmosx, 'name', 'eliasson12 data');
-
-
-% commented out to avoid warning messages till Gerrit is back
-%A.collocation_mhs_mhs = CollocatedDataset(A.mhs, A.mhs);
 
 
 

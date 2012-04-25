@@ -9,8 +9,6 @@
   different associated datasets as super-dataset?
 - go through all the FIXME DOC and actually fix them
 - do caching in read_granule
-- provide settings like distance, time for a CollocatedDataset-object,
-  overwriting, and for a particular call of collocate...*
 
 - when finished, in old-style add small functions using new-style
 

@@ -24,9 +24,9 @@ function S = removeInvalidGeoTimedata(S)
 
 ltindex = S.lat >= -90 & S.lat <= 90;
 lnindex = S.lon >= -180 & S.lon <= 180;
-tindex = S.time >= 0 & S.time <= 3600*24;
-if any(~(ltindex & lnindex & tindex))
-    logtext(atmlab('OUT'),'Removing invalid lat,lon,time data')
+%tindex = S.time >= 0 & S.time <= 3600*24;
+if any(~(ltindex & lnindex))% & tindex))
+    logtext(atmlab('OUT'),'Removing invalid lat, lon data\n')
     for F = fieldnames(S)'
         if isequal(size(S.(F{1}),1),size(ltindex,1))
             S.(F{1}) = S.(F{1})(ltindex & lnindex & tindex,:);

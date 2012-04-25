@@ -224,19 +224,6 @@ classdef Collapser < AssociatedDataset
             
             M_data = deps{1};
                         
-            % FIXME TODO
-            %
-            % - pre-allocate M, need to know no. of cols
-            % - use smaller subset, user passes on limitation somehow,
-            %   should be to class constructor; limitation on distance,
-            %   limitation on data values...
-            % - set self.cols appropiately
-            % - limitation on data values for fields with more than one,
-            % contains bugs
-            % - implement lim_to_all
-            %
-            % does not use original data
-            
             %%%
 
             % check that sizes are the same

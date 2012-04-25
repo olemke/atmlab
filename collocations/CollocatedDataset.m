@@ -77,6 +77,17 @@ classdef CollocatedDataset < HomemadeDataset
         %
         % The maximum time interval that is considered a collocation.
         interval;
+        
+        % Grid-size (in degrees) to use inside collocationg algorithm
+        %
+        % The size of the grid that is used inside the collocation
+        % algorithm. The method <a href="matlab:help CollocatedDataset/collocate">collocate</a> works by gridding the
+        % measurements on a equirectangular lat-lon grid (see algorithm
+        % description in John. et al (2012)). The grid size does not affect
+        % the final collocations, but it may affect the speed of the
+        % collocations. It has a default value of 2 (degrees), so there is
+        % no need to change this. Change at your own risk.
+        gridsize = 2;
     end
     
     % read-only props (may be alterable with methods)
@@ -531,7 +542,8 @@ classdef CollocatedDataset < HomemadeDataset
                 end
                 
                 %% perform collocations
-                logtext(atmlab('OUT'), 'Performing collocations\n');
+                logtext(atmlab('OUT'), 'Performing collocations (distance < %g km, time < %g s)\n', ...
+                                       self.distance, self.interval);
                 collocations = self.collocate(data1.time(iv1), ...
                     data1.lat(iv1, :), ...
                     data1.lon(iv1, :), ...
@@ -560,32 +572,19 @@ classdef CollocatedDataset < HomemadeDataset
                 
                 %% process additional
                 %
-                % additionals are all subclasses of AssociatedDataset able
+                % additionals are all implementations of AssociatedDataset able
                 % to process data and knowing how to store it, how to deal
                 % with it, etc.
-                % for copying, a special AssociatedDataset shall take care
-                % of this
-                % FIXME: associated datasets
-                % FIXME: additional fields copied
+                % For copying, there is FieldCopier.
                 for j = 1:length(additionals)
                     additional = additionals{j};
-                    % FIXME: pass more, what else?
-                    % FIXME: multiple datasets from one additional, or
-                    % second additional needing output from 1st additional
-                    % --> dependencies
-                    % FIXME: concatenation in subfunction or so, will be
-                    % needed in collocate_date and date_range as well
+                    % Get data that this additional depends upon
                     depdata = self.fix_dependencies(additional, additionals, this_additional_result);
                     
                     this_additional_result{j} = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2, depdata);
                     % use special method to concatenate, sometimes need to
                     % correct values, e.g. FIRST, LAST in case of meandata
                     additional_results{j} = additional.concatenate(old_result, additional_results{j}, this_additional_result{j});
-%                     if isempty(additional_results{j})
-%                         additional_results{j} = this_additional_result{j};
-%                     else
-%                         additional_results{j} = [additional_results{j}; this_additional_result{j}];
-%                     end
                 end
                 logtext(fid, 'Info collected\n');
             end
@@ -656,7 +655,7 @@ classdef CollocatedDataset < HomemadeDataset
                 hour = grans(i, 4);
                 minute = grans(i, 5);
                 
-                logtext(fid, 'Collocating %s %s %04d-%02d-%02d %02d:%02d with %s %s \n', ...
+                logtext(fid, 'Collocating %s ''%s'' %04d-%02d-%02d %02d:%02d with %s %s \n', ...
                     self.primary.name, spec1, thisyear, thismonth, thisday, hour, minute, self.secondary.name, spec2);
                 
                 if ~isequal([thisyear thismonth thisday], [year month day]);
@@ -688,7 +687,7 @@ classdef CollocatedDataset < HomemadeDataset
                             logtext(atmlab('ERR'), 'Error in collocating with datafile at %4d-%02d-%02d %02d:%02d %s %s: %s. SKIPPING\n', ...
                                 thisyear, thismonth, thisday, hour, minute, self.primary.name, spec1, ME.message);
                             continue
-                        case {'MATLAB:hdfinfo:invalidFile', 'MATLAB:imagesci:hdfinfo:invalidFile'}
+                        case {'MATLAB:hdfinfo:invalidFile', 'MATLAB:imagesci:hdfinfo:invalidFile', 'MATLAB:imagesci:validate:fileOpen'}
                             logtext(atmlab('ERR'), 'Cannot read datafile %s %s %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                                 self.primary.name, spec1, thisyear, thismonth, thisday, hour, minute, ME.message);
                             continue
@@ -780,8 +779,9 @@ classdef CollocatedDataset < HomemadeDataset
             
             % if everything is already there, do nothing
             if mainfileexists && all(addisexist) && ~colloc_config('overwrite')
-                % FIXME TODO: should I check that the fields match?
-                logtext(atmlab('OUT'), 'All output files already exist:\n', fn);
+                logtext(atmlab('OUT'), 'All output files already exist.\n');
+                logtext(atmlab('OUT'), 'I did not read them --- I assume their contents are as expected.\n');
+                logtext(atmlab('OUT'), 'I found the following files:\n');
                 logtext(atmlab('OUT'), '    %s\n', fn);
                 for i = 1:length(additionals)
                     logtext(atmlab('OUT'), '    %s\n', additionals{i}.find_granule_by_datetime(date, spec));
@@ -798,8 +798,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             if mainfileexists && ~colloc_config('overwrite')
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
-                % FIXME: don't reprocess all additionals, but read those
-                % that are already there?
+                logtext(atmlab('OUT'), 'I will reprocess ALL additionals\n');
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 info_addi.parent_id = attr.id;
                 
@@ -1337,7 +1336,7 @@ classdef CollocatedDataset < HomemadeDataset
 
             %% determine earth radius
 
-            earth_radius = constants('EARTH_RADIUS')/1e3; % km
+            earth_radius = constants('EARTH_RADIUS_MEAN')/1e3; % m -> km
 
             %% find collocations
 
@@ -1351,14 +1350,12 @@ classdef CollocatedDataset < HomemadeDataset
             % "Nearby" cell means a neighbouring cell, except near the poles, where it
             % can be much further away (because the cells are equirectangular)
 
-            gridsize = 2;
-
             [grid1, lat_grid1, lon_grid1] = binning_fast(...
                 struct(...
                     'lat', lat1(:), ...
                     'lon', long1(:), ...
                     'data', uint32(1:numel(lat1)).', ...
-                    'gridsize', gridsize));
+                    'gridsize', self.gridsize));
             n_grid_lats = length(lat_grid1);
             n_grid_lons = length(lon_grid1);
             grid2 = binning_fast(...
@@ -1366,7 +1363,7 @@ classdef CollocatedDataset < HomemadeDataset
                     'lat', lat2(:), ...
                     'lon', long2(:), ...
                     'data', uint32(1:numel(lat2)).', ...
-                    'gridsize', gridsize));
+                    'gridsize', self.gridsize));
 
             % Check each cell where there is data for grid1 AND at least one
             % neighbouring cell, or the cell itself, has data for grid2

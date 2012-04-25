@@ -236,6 +236,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %
         % firstline_filename = 'firstline_$NAME_$SPEC';
 
+        % Cache for reading granules
+        cache = CachedData();
+        
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that
         % cannot be met here. Therefore, defaults should be encompassed in
@@ -608,7 +611,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % FORMAT
             %
-            %   M = read_granule(date[, spec[, extra[, remdouble[, force]]]])
+            %   M = read_granule(date[, spec[, extra[, remdouble[, force[, reload]]]]])
             %
             % IN
             %
@@ -618,6 +621,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   remdouble   logical     (optional) Remove doubles or not? Default true.
             %   force       logical     (optional) rather than throwing an error,
             %                           return [] in case of error. Default false.
+            %   reload      logical     (optional) Do not use caching, but
+            %                           reload in any case.
             %
             % OUT
             %
@@ -636,12 +641,35 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % $Id$
              
             % optional arguments
-            [spec, extra, remdouble, force] = optargs(varargin, {'', {}, true, false});
+            [spec, extra, remdouble, force, reload] = optargs(varargin, {'', {}, true, false, false});
             
-            % find datafile and function to read it
+            %% generate varname for caching
+            X = date;
+            X(end+1:6) = 0;
+            dtstr = datestr(datenum(X), 'yydddddmmmHHMM');
+            if ~isempty(spec)
+                spstr = 'X';
+            elseif ischar(spec)
+                spstr = spec;
+            else
+                XX = char(spec);
+                spstr = XX(:).';
+            end
+            
+            vn = genvarname([self.name spstr dtstr num2str(remdouble) num2str(force)]);
+            
+            %% read cached if appropiate
+            if ~reload && self.cache.has_entry(vn)
+                logtext(atmlab('OUT'), 'Reading %s from cache (entry %s)\n', ...
+                    self.name, vn);
+                data = self.cache.get_entry(vn);
+                return
+            end
+            
+            %% find datafile and function to read it
             datafile = self.find_granule_by_datetime(date, spec);
             
-            % read datafile
+            %% read datafile
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
             %    func2str(reader), datafile);
             logtext(atmlab('OUT'), 'Reading %s\n', datafile);
@@ -664,6 +692,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %logtext(colloc_config('stdout'), 'read %s\n', datafile);
             nlines = size(data.time, 1);
             
+            %% remove duplicates
             if remdouble
                 % read ballast
                 firstline = self.granule_first_line(date, spec);
@@ -680,6 +709,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     end
                 end
             end
+            
+            %% cache results
+            self.cache.set_entry(vn, data);
         end
                 
         function first = granule_first_line(self, d, varargin)
@@ -796,7 +828,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % FORMAT
             %
-            %   find_scanline_first_line(startdate, enddate, spec)
+            %   cd.find_granule_first_line(startdate, enddate, spec)
             %
             % IN
             %
@@ -810,7 +842,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % EXAMPLE
             %
-            %   >> mhs.find_scanline_first_line([2008 1 1], [2008 12 31], 'noaa18');
+            %   >> mhs.find_granule_first_line([2008 1 1], [2008 12 31], 'noaa18');
             
             spec = optargs(varargin, {''});            
             
