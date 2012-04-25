@@ -1,5 +1,13 @@
 2012-04-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-72
+
+	* physics/constants.m: Fixed bug that crashes function if I have
+	no imput arguments
+
+
+2012-04-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-71
 
 	* physics/constants.m: Added LATENT_HEAT_VAPORIZATION_273, and
