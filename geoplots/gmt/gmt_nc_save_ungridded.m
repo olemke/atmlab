@@ -31,7 +31,7 @@ len = netcdf.defDim (ncid, 'numel', length(data));
 
 varid1 = netcdf.defVar (ncid, 'x', 'double', len);
 varid2 = netcdf.defVar (ncid, 'y', 'double', len);
-varid3 = netcdf.defVar (ncid, 'z', gmt_get_nctype(data), len);
+varid3 = netcdf.defVar (ncid, 'z', gmt_get_nctype3(data), len);
 
 netcdf.endDef (ncid);
 

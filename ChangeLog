@@ -1,3 +1,17 @@
+2012-04-26  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-74
+
+	* geoplots/gmt/gmt_nc_save_ungridded.m: Uses gmt_get_nctype3.m
+	instead of gmt_get_nctype.m
+
+	* math/column_integrate.m (column_integrate): Added function that
+	effectively column integrates column data. E.g. IWC -> IWP
+
+	* geoplots/gmt/gmt_get_nctype3.m (nc_type): added function taylor
+	made for netcdf3, since this is the default netcdf. Was
+	erroneously supporting the uint types in gmt_get_nctype.m
+
 2012-04-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-73
