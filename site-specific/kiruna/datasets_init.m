@@ -56,12 +56,12 @@ x.subdir = '$YEAR4/$MONTH/$DAY';
 x.re = 'DARDAR-CLOUD_v(?<version>.+)_(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})';
 
 
-
 x = datasets_config('mhs');
 x.basedir = '/storage3/data/mhs';
 x.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
-x.re = datasets_config('amsua_regexp');
-
+% Matlab doesn't seem to support nested groups, so have to stick with
+% |-approach instead. Same regexp works for all POES.
+x.re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})';
 
 
 x = datasets_config('modis_aqua_l2');

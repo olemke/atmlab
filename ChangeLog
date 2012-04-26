@@ -1,3 +1,9 @@
+2012-04-26	Gerrit Holl	<gerrit.holl@ltu.se>
+
+	* atmlab-2-1-75
+
+	* site-specific/kiruna/datasets_init.m: Bugfix for mhs-regexp
+
 2012-04-26  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-74
