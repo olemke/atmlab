@@ -1,6 +1,6 @@
 % QP2_REL2VMR  Convert 'rel' or 'logrel' data to VMR
 %
-%    If one or several absorption species have been retrived with 'rel' or
+%    If one or several absorption species have been retrieved with 'rel' or
 %    'logrel' as unit, but prefer to have the L2 data as VMR values, this
 %    function makes the conversion.
 %    
@@ -10,9 +10,14 @@
 %    *qp2_l2*). After the conversion, the a priori field (xa) is modified and
 %    the VMR field is removed.
 %
+%    IMPORTANT: Only fields starting with "species" are treated. This means
+%    that e.g. the Jacobian (J) and covariance matrices are not converted.
+%    Averaging kernels are converted as they are stored separately among the
+%    species. 
+%
 %    Note that if L2_RANGE has been used to include parts outside the range of
 %    the retrieval grids, the obtained VMR profile is not representing those
-%    parts correctly (the L2 data will only have a stright line for those
+%    parts correctly (the L2 data will only have a straight line for those
 %    parts). 
 %
 %    For 'logrel', errors are converted simply as e_vmr = e*x_vmr.
@@ -50,9 +55,6 @@ while ~ready
     ns{2} = sprintf( 'species%d_eo', i );
     ns{3} = sprintf( 'species%d_es', i );
     nsx   = sprintf( 'species%d_ex', i );
-    nS{1} = sprintf( 'species%d_S', i );
-    nS{2} = sprintf( 'species%d_So', i );
-    nS{3} = sprintf( 'species%d_Ss', i );
     
     rqre_field( L2, nv, 'sub-field vmr0' );
 
@@ -82,6 +84,7 @@ while ~ready
       end  % Remaining option mval>1 equals nd
     
       % Ready if VMR or ND
+
       if rel | logrel  
     
         vmr0       = L2(j).(nv);
@@ -107,13 +110,7 @@ while ~ready
           if isfield( L2, nsx )
             L2(j).(nsx) = L2(j).(nsx) .* vmr0;
           end
-          %
-          for k = 1 : length(nS)
-            if isfield( L2, nS{k} )
-              L2(j).(nS{k}) = L2(j).(nS{k}) .* (vmr0*vmr0');
-            end
-          end
-          
+
           
         % logrel
         else
@@ -128,25 +125,18 @@ while ~ready
           end
           %
           for k = 1 : length(ns)
-              if isfield( L2, ns{k} )
-                L2(j).(ns{k}) = L2(j).(ns{k}) .* L2(j).(nx);
-              end
+            if isfield( L2, ns{k} )
+              L2(j).(ns{k}) = L2(j).(ns{k}) .* L2(j).(nx);
+            end
           end
           %
           if isfield( L2, nsx )
-            % The a priori uncertainty defined with respect to xa
             L2(j).(nsx) = L2(j).(nsx) .* vmr0;
-          end
-          %
-          for k = 1 : length(nS)
-            if isfield( L2, nS{k} )
-              L2(j).(nS{k}) = L2(j).(nS{k}) .* (L2(j).(nx)*L2(j).(nx)');
-            end
           end
         end
 
-      end  % if rel      
-    end  % for j
+      end  
+    end  
     
     L2 = rmfield( L2, nv );
 

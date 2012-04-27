@@ -1,3 +1,22 @@
+2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-0-4
+
+	* retrieval/qpack2/qpack2.tex: Added a section treating units,
+	particularly rel and logrel.
+
+	* retrieval/qpack2/qp2_rel2vmr.m (qp2_rel2vmr): Code for
+	S-matrices removed (did not work). Header text improved, now
+	stating clearly which fields that are converted.
+
+	* retrieval/qpack2/qp2_l2.m: Somewhat improved header text. 
+	others are
+
+	* arts/arts_oem_init.m (arts_oem_init): Removed some obselete
+	comments.
+
+	* retrieval/oem.m: Some small improvements of help text. 
+
 2012-04-19  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-0-3
@@ -359,7 +378,7 @@
 
 	* retrieval/qpack2/qp2_rel2vmr.m: Rearranged. xa now used to
 	determine the retrieval unit. Now also handling measurement response
-	and covarainace matrices. Also handling that some species
+	and covariance matrices. Also handling that some species
 	retrieved with VMR as unit.
 
 2012-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>

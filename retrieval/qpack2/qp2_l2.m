@@ -3,7 +3,8 @@
 %    The function allows that a L2 structure is generated where the set of
 %    fields can be controlled through Q. The fields of L2 are determined by the
 %    settings of the L2 field of the retrieval quantities (such as
-%    Q.POLYFIT.L2) and Q.L2_EXTRA. 
+%    Q.POLYFIT.L2) and Q.L2_EXTRA. The naming and content of the L2 fields
+%    are described further in the Qpack2 manual.
 %
 %    Possible choices for L2_EXTRA are:
 %    ----------: These data are transferred from X, the output of *oem*
@@ -30,6 +31,13 @@
 %        'ptz' : Includes 'p_grid', 'z_field' and 't_field' from corresponding
 %                fields of Q. For higher atmospheric dimensionalities 
 %                'lat_grid' and 'lon_grid* are also included.
+%
+%    The variables G, J S, So and Ss are stored as complete matrices. The
+%    matrix A, and the vectors e, eo, es, ex and xa (as well as x and mr)
+%    are splitted, and are stored separately for each retrieval quantity.
+%
+%    A field speciesX_vmr0 is added automatically when the retrieval unit is
+%    rel or logrel.
 %
 %    It must be ensured that the output of *oem* includes the data to be
 %    extracted here. This is most easily done by this function, following the

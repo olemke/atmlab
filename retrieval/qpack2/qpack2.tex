@@ -145,6 +145,10 @@ change/commit.
 \section{Overview}
 \label{sec:overview}
 %---
+
+
+\subsection{Practicalities}
+%
 A retrieval by Qpack2 has three main steps:
 \begin{verbatim}
 % 1: Define forward model and retrieval settings
@@ -205,6 +209,41 @@ Qpack2, but shows how an OEM inversion is performed with ARTS as the forward
 model, and the calculation steps in this example gives a good view of the
 inside of Qpack2.
 
+
+\subsection{Units}
+\label{sec:units}
+%
+In most cases SI units are used. For example, frequency off-sets are retrieved
+in Hz. For retrieval of species profiles several ``units'' can be used. First
+of all, both volume mixing ratio and number density retrievals can be made.
+These options are selected by setting the species unit to \verb|vmr| and
+\verb|nd|, respectively.
+
+Further, the species unit can be also be set to \verb|rel|. In this case, the
+retrieved profile is expressed in fractions of the a priori profile. For
+example, the a priori state corresponds to 1, and $x=2$ signifies that the
+species amount is double as high as the a priori. The remaining species unit is
+\verb|logrel|, that is defined as the natural logarithm of the \verb|rel| unit.
+The main reason for using this unit is to introduce a constrain of positive
+species values. For example, if z is a retrieved \verb|logrel| value and $v_a$
+is the a priori VMR, the retrieved volume mixing ratio is $v_a\exp(z)$,
+which always is greater than 0.
+
+The prescribed or selected unit is used for all related variables. Maybe most
+importantly, a priori covariance matrices must be specified correspondingly.
+For example, if the selected species unit is \verb|rel|, the 1 standard
+deviation a priori uncertainty should be in the order of 0.5 (that corresponds
+to a 50\% uncertainty). The same applies to output data. No automatic unit
+conversions are performed (in contrast to the earlier Qpack version), e.g. the
+returned a priori profile for \verb|logrel| retrievals is a vector of zeros.
+The basic idea is to return data that are fully consistent with the
+assumptions of the retrieval. 
+
+Data retrieved using the \verb|rel| and \verb|logrel| units can be converted to
+volume mixing ratio data by the function \verb|qp2_rel2vmr|. However, this
+function handles only data directly associated with the species, it does not
+cover, for example, the Jacobian matrix. See further the help text of the
+function.
  
 
 
@@ -517,21 +556,8 @@ The retrieved species are indexed after the order they are specified in
 \verb|Q| and named as \verb|species1|, \verb|species2| \dots A number of fields
 is returned for each species. The field names below are valid for species 1. If
 two species are retrieved there is also a field named as \verb|species2_name|
-etc. 
-
-The unit of output follows \verb|Q.SPECIES(i).UNIT|. For example, if the
-selected unit is \verb|rel|, the provided a priori profile is a vector of ones
-and the retrieved profile values in the order of 1. The justification is to
-return data that are fully consistent with the assumptions of the retrieval.
-This point is most critical for the \verb|logrel| case, where the returned data
-theoretically have a normal distribution while converted to VMR it would be
-log-normal. However, using \verb|logrel| can cause substantial non-linearity
-in the retrieval problem and it is likely that the errors not follow normal
-distributions. Anyhow, L2 data of \verb|rel| and \verb|logrel| type can be
-converted to VMR by the function \verb|qp2_rel2vmr| (see further help text
-of the function).
-
-These set of fields are available:
+etc. The unit of output follows \verb|Q.SPECIES(i).UNIT|, see further
+Section~\ref{sec:units}. These set of fields are available:
 
 \newfield 
 \verb|species1_name|:\\
