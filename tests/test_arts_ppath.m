@@ -76,7 +76,8 @@ workfolder = create_tmpfolder;
 
 %- Run through n random cases
 %
-maxdd = 0;
+emaxatm  = 0;
+emaxsurf = 0;
 %
 for c = 1 : n
 
@@ -200,8 +201,8 @@ for c = 1 : n
                                        lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
 
     % Check ppath points
-    lt = ppath.end_lstep + [ 0; cumsum(ppath.lstep) ];
-    e  = zeros( size(ppath.pos,1), 1 );
+    lt    = ppath.end_lstep + [ 0; cumsum(ppath.lstep) ];
+    e     = zeros( size(ppath.pos,1), 1 );
     for i = 1 : size(ppath.pos,1)
             
       if atmosphere_dim == 3
@@ -223,12 +224,18 @@ for c = 1 : n
       end
     end
     
-    if max(e) > maxdd, maxdd = max(e); end
+    if strcmp( ppath.background, 'surface' )
+      if max(e(end)) > emaxsurf, emaxsurf = e(end); end
+      e(end) = 0;
+    end
+    %
+    if max(e) > emaxatm, emaxatm = max(e); end
   end
 end
 
 fprintf( '\n' );
-fprintf( 'Max ppath deviation: %.1e m\n', maxdd );
+fprintf( 'Max atmospheric deviation: %.1e m\n', emaxatm );
+fprintf( '    Max surface deviation: %.1e m\n', emaxsurf );
 
 %- Remove workfolder
 %
