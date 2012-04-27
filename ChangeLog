@@ -1,3 +1,114 @@
+2012-04-27  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-79
+
+	* Moved a large number of files to a new "deprecated/"-directory
+	  that is NOT included in the path by default. To use the old-style
+	  collocation functions from now on, add the directory "deprecated/"
+	  by hand. Those functions will not be maintained any longer (all are
+	  now methods or are superfluous):
+ 	  collocations/colloc_process_data_collocation_cpr_poes_avhrr.m,
+	  collocations/colloc_process_meandata_collocation_cpr_poes_avhrr.m,
+	  collocations/collocation_read.m, collocations/collocate_date.m,
+	  collocations/colloc_concatenate_colloc_data_mean.m,
+	  collocations/write_collocations.m, collocations/collocate.m,
+	  collocations/colloc_process_data_cpr_mhs.m,
+	  collocations/read_collocs_data_mean.m,
+	  collocations/colloc_process_cpr_mhs.m,
+	  collocations/overlap_granule.m,
+	  collocations/cols_cell_to_cols_struct.m,
+	  collocations/write_collocations_netcdf.m,
+	  collocations/colloc_process_x_to_x.m,
+	  collocations/colloc_process_collocation_cpr_poes_avhrr.m,
+	  collocations/collocate_and_store_date.m,
+	  collocations/collocation_read_frompipe.m,
+	  collocations/colloc_process_data_hirscs_poes.m,
+	  collocations/collocation_read_dual.m,
+	  collocations/colloc_process_data_cpr_avhrr.m,
+	  collocations/colloc_process_hirscs_poes.m,
+	  collocations/collocate_and_store_date_range.m,
+	  collocations/colloc_select_good_lines.m,
+	  collocations/colloc_process_meandata_cpr_mhs.m,
+	  collocations/colloc_process_cpr_avhrr.m,
+	  collocations/collocate_granule.m,
+	  collocations/colloc_process_data_x_to_x.m, datasets/list_datasets.m,
+	  datasets/find_granules_by_date.m, datasets/granule_first_line.m,
+	  datasets/find_datafile_by_unixtime.m,
+	  datasets/find_granules_for_period.m,
+	  datasets/find_info_from_granule.m, datasets/find_datadir_by_date.m,
+	  datasets/find_datafile_by_date.m, datasets/number_sats_in_dataset.m.
+
+	* collocations/FieldCopier.m:
+	
+	- Moved documentation from constructor to property
+	
+	(FieldCopier):
+
+		- Suggest 'realname' attribute when duplicate fieldname error
+
+	(primary_arguments) (secondary_arguments) (needs_primary_data)
+	(needs_secondary_data):
+
+		- Use new 'fieldargs' static private method for shared code
+
+	(fieldargs):
+
+		- New static private method to get arguments passed to reader
+		  from a particular field-structure (not dataset, consider
+		  realname, etc.)
+
+	(process_granule):
+
+		- Implement new 'realname' scheme. The 'realname' attribute allows
+		  for a difference between the name under which a field is stored
+		  in the original data and the name under which it will be stored
+		  in the collocations.
+
+	* collocations/FieldMultiInstrumentCopier.m: Added
+
+	- Working on new class that allows to get instrument on the same
+	satellite, roughly the same resolution (same no. of collocs), but a
+	different footprint size; e.g. when collocating CPR with MHS, find the
+	closest HIRS and AMSU-A as well. Current status: code generates no
+	errors, but results are garbage. Work in progress.
+
+	* collocations/AssociatedPOESPlusCPR.m: Added
+
+	- First implementation of FieldMultiInstrumentCopier; not working
+	properly yet (garbage results). Work in progress.
+
+	* collocations/AssociatedDataset.m: tiny change in docs
+
+	* collocations/README: Update URI
+
+	* datasets/datasets_config, site-specific/kiruna/datasets_init.m:
+
+	- Added AMSU-A, HIRS, AMSU-B
+	- Changed default collocation distance for mhs-cpr to be consistent
+	with my earlier work
+
+	* handy/CachedData.m:
+
+	(set_entry): Also output new size in verbose output
+
+	(del_old_entry): Output new size after removing
+
+	(cachesize): Move functionality to new method
+
+	(toolarge): Use new functionality from cachesize
+
+	* datasets/common_read_cpr:
+	
+	- Bugfix. Ensure correct field-cell orientation.
+
+	* datasets/common_read_poes_radiometer.m:
+
+	- Don't use old, deprecated info-finder; use OO style
+
+	* datasets/SatDataset.m:
+
+	- Remove TODO related to caching, because it's now implemented.
+
 2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-78

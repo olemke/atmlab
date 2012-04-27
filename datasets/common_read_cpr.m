@@ -26,7 +26,7 @@ function S = common_read_cpr(file, varargin)
 
 core_fields = {'Longitude'; 'Latitude'; 'UTC_start'; 'Profile_time'; 'product_version'};
 extra_fields = optargs(varargin, {{}});
-all_fields = [core_fields; extra_fields];
+all_fields = [core_fields(:); extra_fields(:)];
 S = cloudsat_read_zipped(file, all_fields);
 
 % rename some fields

@@ -432,6 +432,7 @@ classdef AssociatedDataset < HomemadeDataset
         % so requested by <a href="matlab:help AssociatedDataset.needs_primary_data">needs_primary_data</a> and <a href="matlab:help AssociatedDataset.needs_secondary_data">needs_secondary_data</a>).
         % It then does the necessary processing (such as copying in the
         % case of <a href="matlab:help FieldCopier">FieldCopier</a>).
+        % It must also set self.cols correctly.
         %
         % This method is not normally called directly by the user. However,
         % it is to me re-implemented in any special-purpose

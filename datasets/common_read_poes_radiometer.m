@@ -60,6 +60,7 @@ data.version = '0'; % dunno
 
 % add epoch
 
-info = find_info_from_granule('amsub', file); % amsua/amsub/mhs etc. all the same
+d = datasets;
+info = d.mhs.find_info_from_granule(file);
 data.epoch = round(date2unixsecs(str2double(info.year), str2double(info.month), ...
     str2double(info.day)));

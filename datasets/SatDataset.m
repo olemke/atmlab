@@ -634,10 +634,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   >> data = mhs.read_granule([2010 9 8 8 8], 'noaa18', {}, true, false);
             %
-            % TODO: implement caching, e.g. last N read granules are
-            % stored in memory, in some global array or persistent thingy
-            % or so?
-            %
             % $Id$
              
             % optional arguments

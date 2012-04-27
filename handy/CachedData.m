@@ -68,8 +68,9 @@ classdef CachedData < handle
             %   s   string      string by which it is stored
             %   d   any         data to be stored
             
-            logtext(atmlab('OUT'), 'Setting cache entry: %s\n', s);
+            logtext(atmlab('OUT'), 'Setting cache entry: %s (new size: ', s);
             self.cache.(s) = d;
+            fprintf(atmlab('OUT'), '%d bytes)\n', self.cachesize());
             if self.toolarge()
                 self.del_old_entry();
             end
@@ -87,6 +88,7 @@ classdef CachedData < handle
             flds = fieldnames(self.cache);
             logtext(atmlab('OUT'), 'Pruning cache entry %s\n', flds{1});
             self.cache = rmfield(self.cache, flds{1});
+            logtext(atmlab('OUT'), 'New size: %d bytes\n', self.cachesize());
         end
         
 
@@ -94,9 +96,14 @@ classdef CachedData < handle
             % whether or not to remove old entry
             %
             % Check whether the current size exceeds the total size.
-            dummy = self.cache; %#ok<NASGU>
+            b = self.cachesize() > self.maxsize;
+        end
+        
+        function c = cachesize(self)
+            % get size in bytes
+            dummy = self.cache;
             X = whos('dummy');
-            b = X.bytes > self.maxsize;
+            c = X.bytes;
         end
     end
 end

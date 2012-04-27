@@ -75,9 +75,51 @@ classdef FieldCopier < AssociatedDataset
     properties (SetAccess = protected)
         
         % Structure with fields corresponding to primary
+        %
+        % The names of the fields correspond to fields as they will be
+        % stored in the collocated NetCDF file. Unless otherwise indicated,
+        % the same field name will be read from the primary dataset.
+        %
+        % The value for each field is itself a structure containing
+        % information on (among other things) how to store the
+        % field in the final NetCDF file. This structure can have
+        % the following fields:
+        %
+        %   type    string, NetCDF-3 type, such as 'int',
+        %           'float'. Full list <a href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-c/NetCDF_002d3-Variable-Types.html#NetCDF_002d3-Variable-Types">in NetCDF docs</a>.
+        %           This field is mandatory.
+        %
+        %   atts    structure, fields and values are all
+        %           strings and are stored as NetCDF
+        %           attributes. I suggest to use <a href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html">CF</a>
+        %           conventions.
+        %
+        %           NOTE: in the future, attributes not
+        %           provided may possibly be guessed based on
+        %           original data.
+        %
+        %   dataset string. This can be used in case the field
+        %           is not in the same dataset, but in a different
+        %           dataset based on the same instrument. This dataset
+        %           must have exactly the same number of scanlines and
+        %           scanpositions. For a dataset with less data but the
+        %           same number of collocations (for example, a different
+        %           instrument on the same satellite), use
+        %           <a href="matlab:help FieldMultiInstrumentCopier">FieldMultiInstrumentCopier</a>
+        %
+        %   realname string. This can be passed if the field
+        %           should be stored under a different name in
+        %           the FieldCopier dataset than in the
+        %           original dataset, for example, when
+        %           different fields have the same name. Here,
+        %           'realname' is the name as stored in the
+        %           original data, and the structure fieldname
+        %           is the name as stored in the FieldCopier data.
         fieldstruct_primary = struct;
         
-        % Structure with fields corresponding to secondary
+        % Structure with fields corresponding to secondary.
+        %
+        % See <a href="matlab:help FieldCopier/fieldstruct_primary">fieldstruct_primary</a> for info.
         fieldstruct_secondary = struct;
         
         % Structure with all fields and info on how to store the NetCDF
@@ -89,6 +131,7 @@ classdef FieldCopier < AssociatedDataset
         %
         % See also <a href="matlab:help AssociatedDataset.parent">AssociatedDataset.parent</a>
         parent = [];
+        
         % FieldCopier has no dependencies
         %
         % See also <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>
@@ -103,29 +146,19 @@ classdef FieldCopier < AssociatedDataset
             %
             % FORMAT
             %
-            %   cd      CollocatedDataset   <a href="matlab:help CollocatedDataset"> that this FieldCopier belongs to.
+            %   fc = FieldCopier(cd, fs1, fs2, 'name', 'MyFC', ...
+            %                    'basedir', '/some/where', ...
+            %                    ...) % etc.
+            %
+            % IN
+            %
+            %   cd      CollocatedDataset   <a href="matlab:help CollocatedDataset">CollocatedDataset</a> that this FieldCopier belongs to.
             %
             %   fs1     structure
             %
             %       Full definition of fields and information on how to
-            %       store. The names of the fields correspond to fields
-            %       copies from the primary in a process explained in the
-            %       <a href="matlab:help FieldCopier">class documentation</a>. The value for each field is itself
-            %       a structure containing information on how to store the
-            %       field in the final NetCDF file. This structure can have
-            %       the following fields:
-            %           
-            %           type    string, NetCDF-3 type, such as 'int',
-            %                   'float'. Full list <a href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-c/NetCDF_002d3-Variable-Types.html#NetCDF_002d3-Variable-Types">in NetCDF docs</a>.
-            %
-            %           atts    structure, fields and values are all
-            %                   strings and are stored as NetCDF
-            %                   attributes. I suggest to use <a href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html">CF</a>
-            %                   conventions.
-            %
-            %                   NOTE: in the future, attributes not
-            %                   provided may possibly be guessed based on
-            %                   original data.
+            %       store. For full instructions on fields and values,
+            %       see <a href="matlab:help FieldCopier/fieldstruct_primary">property documentation</a>.
             %
             %   fs2     structure
             %
@@ -133,6 +166,10 @@ classdef FieldCopier < AssociatedDataset
             %
             %   ...remaining arguments passed on to <a href="matlab:help SatDataset">SatDataset</a>,
             %   so those indicate name, where to store, etc. 
+            %
+            % OUT
+            %
+            %   A FieldCopier object.
             
             self = self@AssociatedDataset(cd, {}, varargin{:}); % call parent constructor
             
@@ -144,20 +181,20 @@ classdef FieldCopier < AssociatedDataset
             
             allfields = catstruct(fieldstruct1, fieldstruct2);
             assert(length(fieldnames(fieldstruct1))+length(fieldnames(fieldstruct2))==length(fieldnames(allfields)), ...
-                    ['atmlab:' mfilename ':duplicates'], 'Duplicate fieldnames between datasets are not permitted, but were found :(');
+                    ['atmlab:' mfilename ':duplicates'], [...
+                        'Duplicate fieldnames between datasets are not permitted, but were found. ' ...
+                        'I suggest to use the ''realname'' attribute for the <a href="matlab:help FieldCopier/fieldstruct_primary">fieldstruct</a>.']);
             self.members = allfields;
             
         end
         
         %% implementation of abstract methods
         function args = primary_arguments(self)
-            args = fieldnames(self.fieldstruct_primary);
-            args = args(structfun(@(X) ~isfield(X, 'dataset'), self.fieldstruct_primary));
+            args = self.fieldargs(self.fieldstruct_primary);
         end
         
         function args = secondary_arguments(self)
-            args = fieldnames(self.fieldstruct_secondary);
-            args = args(structfun(@(X) ~isfield(X, 'dataset'), self.fieldstruct_secondary));
+            args = self.fieldargs(self.fieldstruct_secondary);
         end
         
         function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~)
@@ -169,11 +206,16 @@ classdef FieldCopier < AssociatedDataset
             also_read = {struct(), struct()};
             dat_other = {struct(), struct()};
             % will loop through all the names in total 3 times...
-            % in the first loop, check if data should be from
+            % in the first loop, check:
+            % - what names should be used to read
+            % - if data should be from
             % sibling-datasets, i.e. datasets not occuring in the original
             % collocation, but on the same size (e.g. CPR RO or RVOD)
             for i = 1:length(allnames)
                 fieldnam = allnames{i};
+                if ~isfield(self.members.(fieldnam), 'realname')
+                    self.members.(fieldnam).realname = fieldnam;
+                end
                 if isfield(self.members.(fieldnam), 'dataset')
                     ds = self.members.(fieldnam).dataset;
                     if i <= n_inprim
@@ -183,16 +225,20 @@ classdef FieldCopier < AssociatedDataset
                     end
                     % add field to read from this DS to
                     % also_read{j}.(dataset_name)
+                    % here, store the realname as it has in the original
+                    % dataset, because that will in any case be the
+                    % fieldname in the data-structure returned by
+                    % .read_granule.
                     if ~isfield(also_read{j}, ds.name)
                         logtext(atmlab('OUT'), ...
-                            'Shall read field %s from sibling-dataset %s\n', ...
-                            fieldnam, ds.name);
-                        also_read{j}.(ds.name) = {fieldnam};
+                            'Shall read field %s (stored as %s) from sibling-dataset %s\n', ...
+                            fieldnam, self.members.(fieldnam).realname, ds.name);
+                        also_read{j}.(ds.name) = {self.members.(fieldnam).realname};
                     else
                         logtext(atmlab('OUT'), ...
-                            'Shall also read field %s from sibling-dataset %s\n', ...
-                            fieldnam, ds.name);
-                        also_read{j}.(ds.name) = [also_read{j}.(ds.name) fieldnam];
+                            'Shall also read field %s (stored as %s) from sibling-dataset %s\n', ...
+                            fieldnam, self.members.(fieldnam).realname, ds.name);
+                        also_read{j}.(ds.name) = [also_read{j}.(ds.name) self.members.(fieldnam).realname];
                     end
                 end
             end
@@ -213,7 +259,7 @@ classdef FieldCopier < AssociatedDataset
                     logtext(atmlab('OUT'), ...
                         'Reading dataset %s to grab %d fields\n', ...
                         dsnm, length(also_read{j}.(dsnm)));
-                    % in this reading, do not remove doubles, or there will
+                    % in this reading, do not remove duplicates, or there will
                     % be a mis-match between indices as provided by the
                     % collocations and indices as determined here
                     dat_other{j}.(dsnm) = D.(dsnm).read_granule(dt, spc, also_read{j}.(dsnm), false, false);
@@ -234,9 +280,9 @@ classdef FieldCopier < AssociatedDataset
                 n_scanpos = size(dat.lat, 2);
                 % data either from prim/sec or from 'sibling'
                 if isfield(self.members.(fieldnam), 'dataset')
-                    fdata = dat_other{j}.(self.members.(fieldnam).dataset.name).(fieldnam);
+                    fdata = dat_other{j}.(self.members.(fieldnam).dataset.name).(self.members.(fieldnam).realname);
                 else
-                    fdata = dat.(fieldnam);
+                    fdata = dat.(self.members.(fieldnam).realname);
                 end
                 % 'n' is the number of measurements per lat/lon, e.g. the
                 % number of channels, number of height-bins, etc. Should be
@@ -244,8 +290,8 @@ classdef FieldCopier < AssociatedDataset
                 n = numel(fdata)/(n_scanlines*n_scanpos);
                 assert(iswhole(n), ['atmlab:' mfilename ':dimensions'], ...
                     ['Dimension mismatch: scanlines: %d, scanpos: %d, ' ...
-                    'field %s: %s'], n_scanlines, n_scanpos, fieldnam, ...
-                    num2str(size(fdata)));
+                    'field %s (stored as %s): %s'], n_scanlines, n_scanpos, fieldnam, ...
+                    self.members.(fieldnam).realname, num2str(size(fdata)));
                 %% if needed, add dimension info to self.members
                 if (n>1)
                     % need to specify dimension in NetCDF, if it doesn't
@@ -314,9 +360,9 @@ classdef FieldCopier < AssociatedDataset
                     logtext(atmlab('OUT'), ...
                         'Grabbing field %s from sibling-dataset %s\n', ...
                         field, self.members.(field).dataset.name);
-                    fdata = dat_other{j}.(self.members.(field).dataset.name).(field);
+                    fdata = dat_other{j}.(self.members.(field).dataset.name).(self.members.(field).realname);
                 else
-                    fdata = data.(field);
+                    fdata = data.(self.members.(field).realname);
                 end
                     
                 % if this fails, data.(field) may not be a column-vector as
@@ -333,16 +379,33 @@ classdef FieldCopier < AssociatedDataset
         end
         
         function out = needs_primary_data(self)
-            out = ~isempty(fieldnames(self.fieldstruct_primary));
+            out = ~isempty(self.fieldargs(self.fieldstruct_primary));
         end
         
         function out = needs_secondary_data(self)
-            out = ~isempty(fieldnames(self.fieldstruct_secondary));
+            out = ~isempty(self.fieldargs(self.fieldstruct_secondary));
         end
         
-%         function store(varargin)
-%             error(['atmlab:' mfilename ':NotImplemented'], 'Not implemented!');
-%         end
     end
 
+    methods (Static, Access = private)
+        function fargs = fieldargs(fieldstruct)
+            % determine from a fieldstruct what arguments to pass
+            names = fieldnames(fieldstruct);
+            fargs = {};
+            for i = 1:length(names)
+                if ~isfield(fieldstruct.(names{i}), 'dataset')
+                    if isfield(fieldstruct.(names{i}), 'realname')
+                        fargs{i} = fieldstruct.(names{i}).realname; %#ok<AGROW>
+                    else
+                        fargs{i} = names{i}; %#ok<AGROW>
+                    end
+                end
+            end
+        end
+        
+        function nm = get_realname_from_fieldstruct(nm)
+            
+        end
+    end
 end
