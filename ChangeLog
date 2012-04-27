@@ -1,3 +1,30 @@
+2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-78
+
+	* Consolidating with atmlab-2.0:
+
+	* retrieval/qpack2/qp2_l2.m: Somewhat improved header text. 
+
+	* retrieval/qpack2/qp2_rel2vmr.m (qp2_rel2vmr): Code for
+	S-matrices removed (did not work). Header text improved, now
+	stating clearly which fields that are converted.
+
+	* retrieval/qpack2/qpack2.tex: Added a section treating units,
+	particularly rel and logrel.
+
+	* arts/arts_oem_init.m (arts_oem_init): Removed some obselete
+	comments.
+
+	* retrieval/oem.m: Some small improvements of help text. 
+
+	* demos/qpack2_demo.m: Q.HSE.P now set to first element of
+	pressure grid. Old setting of 1013 (Pa) strange, confusing and can
+	cause that the surface slips outside the atmosphere after applying HSE.
+
+	* h2o/thermodynamics/potential_temperature.m: corrected name of
+	variables according to earlier commit in physics/constants.
+
 2012-04-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-77
@@ -465,7 +492,6 @@
 	* datasets/common_read_modis.m: Added reader for modis level 2
 	data. This follows the conventions of the collocation codes
 
->>>>>>> .r7511
 2012-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-45
@@ -547,7 +573,6 @@
 
 	* geographical/resample_geodata.m: Puny change
 
->>>>>>> .r7480
 2012-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-40

@@ -196,7 +196,7 @@ Q.T.ATMDATA  = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
 %- Determine altitudes through HSE
 %
 Q.HSE.ON       = true;
-Q.HSE.P        = 1013;
+Q.HSE.P        = Q.P_GRID(1);
 Q.HSE.ACCURACY = 0.1;
 
 

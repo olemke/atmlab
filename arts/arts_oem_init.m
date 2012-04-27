@@ -110,13 +110,6 @@ for i = 1 : nq
     store_vmr0 = true;
     ig         = i_asj(i);    % Gas species index
     %
-%    grid1         = R.jq{i}.grids{1};
-%    R.x_p(ind)    = repmat( grid1, length(ind)/length(grid1), 1 );
-%    R.x_t(ind)    = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
-%                                                            R.jq{i}.grids ) );
-%    R.x_vmr0(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...
-%                           get_vmrfield_local(vmr_field,ig), R.jq{i}.grids ) );
-    %
     if strcmp( R.jq{i}.mode, 'rel' )
       xa(ind)    = 1;
       R.i_rel    = [ R.i_rel ind ];
@@ -132,7 +125,6 @@ for i = 1 : nq
                      mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, ...   % T
                        t_field, R.jq{i}.grids ) ) ...
                    );
-                  %vmr2nd( R.x_vmr0(ind), R.x_p(ind), R.x_t(ind) );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       xa(ind)    = 0;
     else                                                                   %&%

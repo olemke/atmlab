@@ -1,68 +1,68 @@
 % OEM   Data inversion by "optimal estimation method"
 %
-%    The name OEM is here kept as it is so well established in the atmospheric
-%    community. A better name would be "the maximum a posteriori solution". See
-%    "Inverse methods for atmospheric sounding: Theory and practice" by C.D.
-%    Rodgers for background and theory.
+%   The name OEM is here kept as it is so well established in the atmospheric
+%   community. A better name would be "the maximum a posteriori solution". See
+%   "Inverse methods for atmospheric sounding: Theory and practice" by C.D.
+%   Rodgers for background and theory.
 %
-%    The Marquardt-Levenberg method is implemented following Eq. 5.36 of
-%    Rodgers' book. The gamma factor, here denoted as ga, is not allowed to
-%    exceed O.ga_max. When a succesful iteration has been performed, ga is
-%    decreased following O.ga_factor_ok. For cases when a lower cost is not
-%    obtained, ga is increased by O.ga_factor_not_ok. Values of ga below 1 will
-%    be treated as zero. If not a lower cost is obtained for ga=0, then ga=1 is
-%    tested. O.ga_start is used as start value for ga.
+%   The OEM calculations are controlled by the structure O. The fields of O,
+%   and associated descriptions, are listed by
+%      qinfo(@oem)
 %
-%    The OEM calculations are controlled by the structure O. The fields of O,
-%    and associated descriptions, are listed by
-%       qinfo(@oem)
+%   The Marquardt-Levenberg method is implemented following Eq. 5.36 of
+%   Rodgers' book. The gamma factor, here denoted as ga, is not allowed to
+%   exceed O.ga_max. When a succesful iteration has been performed, ga is
+%   decreased following O.ga_factor_ok. For cases when a lower cost is not
+%   obtained, ga is increased by O.ga_factor_not_ok. Values of ga below 1 will
+%   be treated as zero. If not a lower cost is obtained for ga=0, then ga=1 is
+%   tested. O.ga_start is used as start value for ga.
 %
-%    The communication with the forward model is handled by the function
-%    handle comfun. If comfun is set to @arts_oem, the following calls will 
-%    be made:
-%       [R,yf,J]  = arts_oem( Q, R, x, iter );
-%       [R,yf]    = arts_oem( Q, R, x, iter );
-%    That is, this function expects the comfun function to provide spectrum 
-%    and jacobian (only spectrum in the second case) for present state (the x 
-%    vector). The oem function does not use any information in Q and R, and
-%    the comfun function is free to use these variables freely for bookkeeping
-%    etc. This function handles y, x, Sx and Se as totally generic variables
-%    and unit conversion and similar tasks are left to the comfun and
-%    post-processing. 
-%
-%    The results are gathered in a structure X, with fields:
-%       x         : Retrieved state.
-%       converged : Convergence flag. 1 if convergency criterion has been 
-%                   reached. Otherwise 0 for non-linear inversions when the
-%                   maximum number of iterations is reached, or -1 for 
-%                   Marquardt-Levenberg when the maximum value for gamma is
-%                   passed. Set to NaN for linear retrievals.
-%       cost      : Total cost, normalised by length of y. A succesful retrieval
-%                   shall then have a cost in the order of 1.
-%       cost_y    : Cost corresponding to the measurement vector.
-%       cost_x    : Cost corresponding to the state vector.
-%       dx        : Change in the state vector x between each iteration.
-%                   A normalisation to the length of x is applied.
-%       e         : Total retrieval error (square root of diagonal elements 
-%                   of S).
-%       eo        : Observation error (square root of diagonal elements of So).
-%       es        : Smoothing error (square root of diagonal elements of Ss).
-%       ex        : A priori uncertainty (square root of diag elements of Sx).
-%       yf        : Fitted spectrum.
-%       A         : Averaging kernel matrix.
-%       G         : Gain matrix (also denoted as Dy).
-%       J         : Jacobian (weighting function matrix).
-%       S         : Covariance matrix for total error. That is, the sum
-%                   of So and Ss.
-%       So        : Covariance matrix for observation error.
-%       Ss        : Covariance matrix for smoothing error.
-%       Xiter     : The x-vector after each iteration.
+%   The results are gathered in a structure X, with fields:
+%      x         : Retrieved state.
+%      converged : Convergence flag. 1 if convergency criterion has been 
+%                  reached. Otherwise 0 for non-linear inversions when the
+%                  maximum number of iterations is reached, or -1 for 
+%                  Marquardt-Levenberg when the maximum value for gamma is
+%                  passed. Set to NaN for linear retrievals.
+%      cost      : Total cost, normalised by length of y. A succesful retrieval
+%                  shall then have a cost in the order of 1.
+%      cost_y    : Cost corresponding to the measurement vector.
+%      cost_x    : Cost corresponding to the state vector.
+%      dx        : Change in the state vector x between each iteration.
+%                  A normalisation to the length of x is applied.
+%      e         : Total retrieval error (square root of diagonal elements 
+%                  of S).
+%      eo        : Observation error (square root of diagonal elements of So).
+%      es        : Smoothing error (square root of diagonal elements of Ss).
+%      ex        : A priori uncertainty (square root of diag elements of Sx).
+%      yf        : Fitted spectrum.
+%      A         : Averaging kernel matrix.
+%      G         : Gain matrix (also denoted as Dy).
+%      J         : Jacobian (weighting function matrix).
+%      S         : Covariance matrix for total error. That is, the sum
+%                  of So and Ss.
+%      So        : Covariance matrix for observation error.
+%      Ss        : Covariance matrix for smoothing error.
+%      Xiter     : The x-vector after each iteration.
 %   The fields *x* and *converged* are always included (if an actual inversion 
 %   is performed). Other fields are included if corresponding O field is set.
 %   Note that the case x=x0, where x0 is the start value of x, is treated as
 %   iteration 1, and the first value in variables covering all iterations 
 %   corresponds to the sitatuation when no inversion/iteration has been
 %   performed. 
+%
+%   The communication with the forward model is handled by the function
+%   handle comfun. If comfun is set to @arts_oem, the following calls will 
+%   be made:
+%      [R,yf,J]  = arts_oem( Q, R, x, iter );
+%      [R,yf]    = arts_oem( Q, R, x, iter );
+%   That is, this function expects the comfun function to provide spectrum 
+%   and jacobian (only spectrum in the second case) for present state (the x 
+%   vector). The oem function does not use any information in Q and R, and
+%   the comfun function is free to use these variables freely for bookkeeping
+%   etc. This function handles y, x, Sx and Se as totally generic variables
+%   and unit conversion and similar tasks are left to the comfun and
+%   post-processing. 
 %
 %   Use the first format to check default values for O. The second format
 %   is intended for extracting retrieval characteristics (corresponding to
@@ -250,9 +250,9 @@ I.stop_dx = [ ...
 O.sxnorm = false;
 I.sxnorm = [ ...
 'Flag to internally perform a normalisation of x, based on the diagonal ',...
-'elements of Sx. This to avoid a pure condition number for a matrix ',...
-'inversion that is encountered when units are such that retrieved values ',...
-'vary strongly in magnitude.',...
+'elements of Sx. Numerical problems can occur when the retrieved values ',...
+'differ strongly in magnitude (due to poor condition number for matrix ',...
+'inversions). This flag can be used to overcome this problem.',...
 '#The inverse of Sx must be calculated internally if this option is used ',...
 'and there is no use in pre-calculating *Sxinv*.'
 ];

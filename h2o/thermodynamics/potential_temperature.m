@@ -27,8 +27,8 @@ function theta = potential_temperature(rh, T, p)
 % 2009-08-15   Created by Isaac Moradi.
 
 % set constants
-cp = constants('SPECIFIC_HEAT_CONST_PRES');
-cv = constants('SPECIFIC_HEAT_CONST_VOL');
+cp = constants('SPECIFIC_HEAT_CP_DRY_AIR');
+cv = constants('SPECIFIC_HEAT_CV_DRY_AIR');
 k = (cp - cv) / cp; % c is specific heat at constant pressure and volume
 
 % calculate water vapor mixing ratio
