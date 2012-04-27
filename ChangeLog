@@ -1,5 +1,11 @@
 2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-0-5
+
+	* demos/qpack2_demo.m: Q.FFIT.DF was not set as stated below.
+
+2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-0-4
 
 	* retrieval/qpack2/qpack2.tex: Added a section treating units,
@@ -10,7 +16,6 @@
 	stating clearly which fields that are converted.
 
 	* retrieval/qpack2/qp2_l2.m: Somewhat improved header text. 
-	others are
 
 	* arts/arts_oem_init.m (arts_oem_init): Removed some obselete
 	comments.
@@ -31,7 +36,7 @@
 
 	* atmlab-2-0-2
 
-	* demos/qpack2_demo.m: Q.HSE.P now set to forst element of
+	* demos/qpack2_demo.m: Q.HSE.P now set to first element of
 	pressure grid. Old setting of 1013 (Pa) strange, confusing and can
 	cause that the surface slips outside the atmosphere after applying HSE.
 
