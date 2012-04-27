@@ -693,6 +693,17 @@ if in.gridded
         errId,'numel(data) must length(lat)*length(lon)')
     [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
     
+    % DO some special treatment of data crossing the dateline that is not continuous
+    % after changing to -180:180 regime
+    if max(diff(in.lon))>5*min(diff(in.lon))
+        % check to see if there is a sizeable gap in the data e.g. 80->300
+       in.lon = in.lon+(in.lon < 0)*360;
+       [in.lon,lnindex] = sort(in.lon);
+        in.(field) = in.(field)(:,lnindex);
+    end
+    assert(max(diff(in.lon))<5*min(diff(in.lon)),['atmlab:' mfilename, ':Error'],...
+        'The longitudes are not continuous. FIXME: put workaround in place')
+    
     if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
         logtext(1,'Data does not appear to be centered. Internally ')
         in = centerGeoData(in,field);

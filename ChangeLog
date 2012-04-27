@@ -1,7 +1,16 @@
+2012-04-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-77
+
+	* geoplots/gmt/gmt_plot.m (gmt_plot): Fixed bug if longitudes are
+	in the 0:360 regime, but are not continuous after changing to the
+	-180:180 long regime, which is done by default. e.g. if lons go
+	from 80:300
+
 2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-76
-	
+
 	* tests/test_arts_ppath.m (test_arts_ppath): Somewhat more
 	detailed accuracy reporting message.
 
