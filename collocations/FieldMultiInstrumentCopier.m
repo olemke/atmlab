@@ -142,7 +142,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                     other_instrument = other_instruments{k}{i};
                     logtext(atmlab('OUT'), 'Also taking same-satellite instrument %s\n', ...
                         other_instrument);
-                    data_other = d.(other_instrument).read_granule(date, spec);
+                    data_other = d.(other_instrument).read_granule(date, spec, {}, false);
                     pc_other = processed_core;
                 
                     

@@ -1,3 +1,16 @@
+2012-04-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-80
+
+	* collocations/FieldMultiInstrumentCopier.m (process_granule):
+
+	- Bugfix. Pass correct flag NOT to remove duplicates when reading
+	additional instruments from the same satellite, so that
+	scanline-numbers between the two are consistent and therefore correct.
+	Removal of duplicates is taken care of elsewhere in the processing
+	chain.
+
+	
 2012-04-27  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-79
