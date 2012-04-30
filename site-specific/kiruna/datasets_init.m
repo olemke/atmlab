@@ -51,8 +51,8 @@ x.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>
 
 
 x = datasets_config('dardar');
-x.basedir = '/storage3/data/dardar';
-x.subdir = '$YEAR4/$MONTH/$DAY';
+x.basedir = '/storage2/data/dardar';
+x.subdir = '$YEAR4/$YEAR4_$MONTH_$DAY';
 x.re = 'DARDAR-CLOUD_v(?<version>.+)_(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})';
 
 % Matlab doesn't seem to support nested groups, so have to stick with
@@ -93,6 +93,12 @@ x = datasets_config('patmosx');
 x.basedir = '/storage3/data/patmosx/level2b/';
 x.subdir = '$SAT_$YEAR4';
 x.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3})_v(?<version>\d{2}).+(?<end>.{7})$';
+
+%% other home-made datasets
+
+x = datasets_config('darsub');
+x.basedir = '/storage4/user_data/gerrit/dardar_subsel';
+x.subdir = '$YEAR4/$MONTH/$DAY';
 
 %% COLLOCATION DATA SETS
 

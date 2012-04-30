@@ -1,5 +1,35 @@
 2012-04-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-81
+
+	* datasets/HomemadeDataset.m:
+
+	- Add 'members' as a private property
+
+	(HomemadeDataset):
+
+		- Actually do something in the constructor, so that the user can
+		create their own HomemadeDataset; 'darsub' is such a one.
+
+	(getmembers):
+		
+		- Retrieve private property 'members'.
+
+	* datasets/datasets_config.m:
+
+	- Added 'darsub', a HomemadeDataset for our own DARDAR selection
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- dardar now at /storage2
+	- added 'darsub' for our dardar-subselection
+
+	* datasets/convert_dardar.m:
+
+	- Convert actual DARDAR to our own subselection
+
+2012-04-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-80
 
 	* collocations/FieldMultiInstrumentCopier.m (process_granule):

@@ -52,12 +52,31 @@ classdef HomemadeDataset < SatDataset
         % return a matrix, whose columns are then described by the
         % cols-member.
         cols = struct;
+        
+    end
+    
+    properties (SetAccess = private, GetAccess = private)
+        members;
     end    
     
     methods
         
         function self = HomemadeDataset(varargin)
-            self = self@SatDataset(varargin{:});
+            args = varargin;
+            % extract 'members' because SatDataset is not allowed to set
+            % HomemadeDataset private property, and it must be private in
+            % order for subclasses to redefine it etc.
+            setmem = false;
+            if any(strcmp(args, 'members'))
+                setmem = true;
+                i = find(strcmp(args, 'members'));
+                mem = args{i+1};
+                args = [args(1:i-1) args(i+2:end)];
+            end
+            self = self@SatDataset(args{:});
+            if setmem
+                self.members = mem;
+            end
         end
              
         function [fn, global_atts] = store(self, date, spec, data, varargin)
@@ -212,6 +231,9 @@ classdef HomemadeDataset < SatDataset
             
         end
         
+        function mem = getmembers(self)
+            mem = self.members;
+        end
     end
     
     methods (Access = protected)
