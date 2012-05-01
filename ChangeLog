@@ -1,3 +1,20 @@
+2012-05-01  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-82
+
+	* datasets/removeInvalidGeoTimedata.m:
+
+	- Fixed bug.
+
+	* datasets/SatDataset.m:
+
+	-d changed datestr(datenum(X), 'yydddddmmmHHMM') to 
+	dtstr = datestr(datenum(X), 'yydd_dddmmmHHMM');
+
+	* datasets/datasets_config.m:
+
+	- Changed the primary for avhrrCMSAF on CPR
+
 2012-04-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-81

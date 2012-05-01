@@ -642,7 +642,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %% generate varname for caching
             X = date;
             X(end+1:6) = 0;
-            dtstr = datestr(datenum(X), 'yydddddmmmHHMM');
+            dtstr = datestr(datenum(X), 'yydd_dddmmmHHMM');
             if ~isempty(spec)
                 spstr = 'X';
             elseif ischar(spec)
