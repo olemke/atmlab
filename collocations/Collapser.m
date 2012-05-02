@@ -273,7 +273,9 @@ classdef Collapser < AssociatedDataset
                 M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
                 
                 % limitation to all, e.g. for distances
-                if ~isempty(self.overall_limitators)
+                if isempty(self.overall_limitators)
+                    lim_for_all_fields = true(size(M_data_part, 1), 1);
+                else
                     answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
                     lim_for_all_fields = all(horzcat(answers{:}), 2);
                     if ~any(lim_for_all_fields)

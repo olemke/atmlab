@@ -20,6 +20,7 @@ classdef CachedData < handle
     %   has_entry -     Check whether entry exists
     %   set_entry -     Set new entry and, if needed, remove old
     %   clear -         Completely clear the cache
+    %   cachesize -     Get current cache-size in bytes
     
     % $Id$
     properties
@@ -81,6 +82,13 @@ classdef CachedData < handle
             % clear the cache completely
             self.cache = struct();
         end
+        
+        function c = cachesize(self)
+            % get size in bytes
+            dummy = self.cache; %#ok<NASGU>
+            X = whos('dummy');
+            c = X.bytes;
+        end
     end
     
     methods (Access = private)
@@ -104,11 +112,6 @@ classdef CachedData < handle
             b = self.cachesize() > self.maxsize;
         end
         
-        function c = cachesize(self)
-            % get size in bytes
-            dummy = self.cache;
-            X = whos('dummy');
-            c = X.bytes;
-        end
+
     end
 end

@@ -1,5 +1,18 @@
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-87
+
+	* handy/CachedData.m:
+
+	(cachesize): Added method to get current cache-size
+
+	* collocations/Collapser(process_granule):
+
+	- Bugfix: was crashing when specific limitators, but no overall
+	limitators, were present.
+
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-86
 
 	* handy/CachedData.m(clear):
