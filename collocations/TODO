@@ -2,13 +2,14 @@
 * New style since January 2012 *
 ********************************
 
+- In FieldCopier and FieldMultiInstrumentCopier, provide a way to store
+  index, pos, start, etc. for the new one. Maybe with some 'magic' in
+  read_granule or the actual readers?
 - Get new-fields when reading long period? Or force to store first?
 - For FieldCopier, be smart in long_name if possible
 - single 'CPR' super-dataset that knows in what actual datasets fields are
   and reads the fields accordingly. Maybe in the same way can implement
   different associated datasets as super-dataset?
-- go through all the FIXME DOC and actually fix them
-- do caching in read_granule
 
 - when finished, in old-style add small functions using new-style
 

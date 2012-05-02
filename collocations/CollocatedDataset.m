@@ -109,7 +109,7 @@ classdef CollocatedDataset < HomemadeDataset
         %
         % Valid types are at:
         % http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-c/NetCDF_002d3-Variable-Types.html#NetCDF_002d3-Variable-Types
-        members = struct(...
+        members_const = struct(...
             'START1', struct(...
                 'type', 'int', ... % won't work after 2038-01-19 03:14:07 UTC
                 'atts', struct(...
@@ -232,6 +232,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             % make 'cols'-structure for internal data specification
              
+            self.members = self.members_const;
             fnms = fieldnames(self.members);
             nfields = length(fnms);
             fv = 1:nfields;

@@ -1,3 +1,17 @@
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-84
+
+	* collocations/CollocatedDataset.m, collocations/Collapser.m,
+	collocations/FieldCopier.m, collocations/FieldMultiInstrumentCopier.m,
+	datasets/HomemadeDataset.m: Bugfix
+
+	- Bugfix: define members only once and publicly, so that all that need
+	to can access it and it is defined equally
+
+	* collocations/TODO: Added one TODO-item allowing for multi-instrument
+	to store lineno, pos, etc.
+
 2012-04-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-83

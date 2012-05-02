@@ -42,7 +42,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
     
     
     properties (SetAccess = protected)
-        members
+        %members
         parent
         dependencies
     end
@@ -135,7 +135,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                         fc_other = self.fieldcopier_other_secondary;
                         arg_i_other = 5;
                     otherwise
-                        error('BUG! CRASH! This place unreachable!');
+                        error('BUG! CRASH! This place ought to be unreachable!');
                 end
                 
                 for i = 1:length(other_instruments{k})

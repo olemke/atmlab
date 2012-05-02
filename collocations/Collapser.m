@@ -63,7 +63,7 @@ classdef Collapser < AssociatedDataset
     %  - store limitators in NetCDF props
     
     properties (SetAccess = protected)
-        members = []; % See <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
+        %members = []; % See <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
         parent = []; % See <a href="matlab:help AssociatedDataset.parent">AssociatedDataset.parent</a>
         dependencies = {}; % See <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>
         fieldstruct = []; % Structure with all fields information

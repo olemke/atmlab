@@ -53,16 +53,16 @@ classdef HomemadeDataset < SatDataset
         % cols-member.
         cols = struct;
         
-    end
-    
-    properties (SetAccess = private, GetAccess = private)
         members;
     end    
     
     methods
         
         function self = HomemadeDataset(varargin)
+            self = self@SatDataset(varargin{:});
+            %{
             args = varargin;
+            
             % extract 'members' because SatDataset is not allowed to set
             % HomemadeDataset private property, and it must be private in
             % order for subclasses to redefine it etc.
@@ -77,6 +77,7 @@ classdef HomemadeDataset < SatDataset
             if setmem
                 self.members = mem;
             end
+            %}
         end
              
         function [fn, global_atts] = store(self, date, spec, data, varargin)

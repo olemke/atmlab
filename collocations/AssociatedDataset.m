@@ -66,7 +66,7 @@ classdef AssociatedDataset < HomemadeDataset
         % NetCDF files. The value of the property may be different for
         % different instances (objects) of any subclass, so the property
         % has no predefined value (unlike <a href="matlab:help CollocatedDataset/members">CollocatedDataset.members</a>).
-        members;
+        %members;
         % Parent dataset that this AssociatedDataset is associated with
         %
         % Pointing to a <a href="matlab:help CollocatedDataset">CollocatedDataset</a>,

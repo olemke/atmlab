@@ -125,7 +125,7 @@ classdef FieldCopier < AssociatedDataset
         % Structure with all fields and info on how to store the NetCDF
         %
         % See also <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
-        members = struct(); % set by constructor
+        %members = struct(); % set by constructor
         
         % Parent <a href="matlab:help CollocatedDataset">CollocatedDataset</a>.
         %
