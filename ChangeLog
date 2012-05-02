@@ -1,5 +1,18 @@
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-85
+
+	* collocations/Collapser.m(process_granule):
+
+	- Bugfix: when no limitators are applied at all, keep everything. Was
+	throwing away everything because no limitators were true.
+
+	* TODO:
+
+	- Added one item related to inconsistent fieldcopiers etc.
+
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-84
 
 	* collocations/CollocatedDataset.m, collocations/Collapser.m,

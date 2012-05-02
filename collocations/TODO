@@ -10,6 +10,8 @@
 - single 'CPR' super-dataset that knows in what actual datasets fields are
   and reads the fields accordingly. Maybe in the same way can implement
   different associated datasets as super-dataset?
+- Add some kind of checksum to check that read collocs are consistent with
+  collocs from the object as it was stored, a hash of some kind?
 
 - when finished, in old-style add small functions using new-style
 

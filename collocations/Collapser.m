@@ -273,10 +273,12 @@ classdef Collapser < AssociatedDataset
                 M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
                 
                 % limitation to all, e.g. for distances
-                answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
-                lim_for_all_fields = all(horzcat(answers{:}), 2);
-                if ~any(lim_for_all_fields)
-                    continue
+                if ~isempty(self.overall_limitators)
+                    answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
+                    lim_for_all_fields = all(horzcat(answers{:}), 2);
+                    if ~any(lim_for_all_fields)
+                        continue
+                    end
                 end
                 
                 % for each field, apply limitations and call processing
@@ -288,15 +290,19 @@ classdef Collapser < AssociatedDataset
                     % limitations return true (including
                     % lim_for_all_fields) the collocation is selected for
                     % further average-processing
-                    limsel = lim_for_all_fields;
-                    limmers = self.fieldstruct.(fname).limitators;
-                    
-                    for li = 1:length(limmers)
-                        limmer = limmers{li};
-                        limhere = limmer(M_data_part(:, ad.cols.(fname)));
-                        limsel = limsel(:) & limhere(:);
+                    if isempty(self.fieldstruct.(fname).limitators);
+                        limsel = true(size(M_data_part, 1), 1);
+                    else
+                        limsel = lim_for_all_fields;
+                        limmers = self.fieldstruct.(fname).limitators;
+                        
+                        for li = 1:length(limmers)
+                            limmer = limmers{li};
+                            limhere = limmer(M_data_part(:, ad.cols.(fname)));
+                            limsel = limsel(:) & limhere(:);
+                        end
                     end
-                    
+                        
                     if any(limsel)
                         procnames = fieldnames(self.fieldstruct.(fname).processors);
                         % apply all processors and store in appropiate
@@ -314,7 +320,7 @@ classdef Collapser < AssociatedDataset
             % pre-allocation or no relevant data was found
             rest = isnan(M(:, 1));
             M(rest, :) = [];
-            logtext(atmlab('OUT'), '%d collocations -> %d mean collocations\n', ...
+            logtext(atmlab('OUT'), '%d collocations -> %d collapsed collocations\n', ...
                 size(processed_core, 1), size(M, 1));
             %%%
             
