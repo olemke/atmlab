@@ -4,7 +4,8 @@ classdef CollocatedDataset < HomemadeDataset
     % A CollocatedDataset consists of two <a href="matlab:help SatDataset">SatDataset</a>s.
     % To start collocating, first create two <a href="matlab:help SatDataset">SatDataset</a>
     % objects and define all required properties there. Predefined datasets
-    % are defined in <a href="matlab:help datasets_config">datasets_config</a>. Then <a href="matlab:help CollocatedDataset/CollocatedDataset">create</a> a CollocatedDataset.
+    % are defined in <a href="matlab:help define_datasets">define_datasets</a>. Then <a href="matlab:help CollocatedDataset/CollocatedDataset">create</a> a CollocatedDataset.
+    % To list existing datasets, use <a href="matlab:help datasets">datasets</a>.
     %
     % CollocatedDataset Properties:
     %

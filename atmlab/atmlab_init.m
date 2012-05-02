@@ -84,7 +84,9 @@ else
   atmlab('defaults');  
 end
 
-
+if atmlab('LEGACY_MODE')
+    addpath( fullfile( toppath, 'arts', 'deprecated' ) ); 
+end
 
 %=== Define some aliases
 %

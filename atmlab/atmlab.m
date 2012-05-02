@@ -75,6 +75,10 @@
 %   ARTS (both versions):
 %     A number between 0 and 3, where 3 means highest level of verbosity.
 %----------------------------------------------------------------------------
+% LEGACY_MODE
+%
+% Include deprecated functions and settings. Used by some subsystems.
+%----------------------------------------------------------------------------
 % OUT
 %
 % Stream to log ordinary messages to. Used by some subsystems.
@@ -184,6 +188,7 @@ A.ATMLAB_DATA_PATH  = NaN;
 A.DEBUG             = false;
 A.ERR               = 2;
 A.FMODEL_VERBOSITY  = 0;
+A.LEGACY_MODE       = false;
 A.OUT               = 1;
 A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;

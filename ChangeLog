@@ -1,5 +1,59 @@
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab 2-1-88
+
+	* BACKWARD-INCOMPATIBLE CHANGES:
+
+	- Datasets no longer defined in datasets_config! Use structure
+	returned by 'datasets' to access them.
+
+	- Set atmlab('LEGACY_MODE') if you want to use old-style definitions
+
+	* datasets/define_datasets.m: Added
+
+	- Now this is where datasets are defined.
+
+	* datasets/datasets_config.m:
+	
+	- Trimmed to a minimum, moved most to 'datasets'
+	
+	* collocations/FieldMultiInstrumentCopier.m(FieldMultiInstrumentCopier):
+
+	- In constructor, set 'members' to empty structure if it is an empty
+	array.
+
+	* Moved more to deprecated/:
+		  - sensors/find_scanline_overlaps.m
+		  - datasets/read_granule.m
+
+	* collocations/CollocatedDataset.m, datasets/SatDataset.m:
+
+	- Update documentation to reflect change with datasets_config
+
+	* atmlab/atmlab.m:
+
+	- Added flag 'LEGACY_MODE' that can be used to include deprecated code
+	that is disabled by default
+
+	* atmlab/atmlab_init.m:
+
+	- Respect atmlab('LEGACY_MODE'); if true, add directory 'deprecated'.
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Use 'datasets' rather than 'datasets_config'
+	- Excecute old-style only if atmlab('LEGACY_MODE') is true
+
+	* datasets/common_read_cpr.m, datasets/convert_dardar.m,
+	datasets/common_read_patmosx.m, datasets/common_read_dardar.m,
+	datasets/common_read_mspps.m, datasets/common_read_avhrr_cmsaf_gac.m,
+	datasets/common_read_modis.m:
+
+	- Use 'datasets' rather than 'datasets_config'.
+
+
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-87
 
 	* handy/CachedData.m:

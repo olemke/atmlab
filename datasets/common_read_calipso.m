@@ -68,8 +68,8 @@ end
 
 % get epoch. 
 % 
-x = datasets_config('calipso');
-info =  x.find_info_from_granule(file);
+D = datasets;
+info =  D.calipso.find_info_from_granule(file);
 s2d = @str2double;
 
 % See information below header to make sense of this

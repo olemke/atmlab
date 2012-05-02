@@ -53,8 +53,8 @@ S.lat = double(S.Latitude(:));
 S.lon = double(S.Longitude(:));
 
 % get the verion directly from the filename
-x = datasets_config('modis_aqua_l2');
-info = x.find_info_from_granule(file);
+D = datasets;
+info = D.modis_aqua_L2.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 %data starts at 1993, I need an offset

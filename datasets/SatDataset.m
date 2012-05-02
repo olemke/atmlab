@@ -31,7 +31,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     % automatically calculated name, which is probably neither helpful nor
     % descriptive.
     %
-    % A number of datasets are pre-configured in <a href="matlab:help datasets_config">datasets_config</a>.
+    % A number of datasets are pre-defined in <a href="matlab:help define_datasets">define_datasets</a>.
+    % All registered datasets can be listed with <a href="matlab:help datasets">datasets</a>.
     % 
     % SatDataset properties:
     %

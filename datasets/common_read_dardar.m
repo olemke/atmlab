@@ -50,8 +50,8 @@ S.lon = double(S.longitude(:));
 S.time = double(S.time(:));
 
 % get the verion directly from the filename
-x = datasets_config('dardar');
-info = x.find_info_from_granule(file);
+D = datasets;
+info = D.dardar.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 

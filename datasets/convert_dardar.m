@@ -7,8 +7,9 @@ function convert_dardar(dt1, dt2)
     %
     % $Id$
     
-    dd_full = datasets_config('dardar');
-    dd_sub = datasets_config('darsub');
+    D = datasets;
+    dd_full = D.dardar;
+    dd_sub = D.dardarsub;
     
     tostore = fieldnames(dd_sub.getmembers());
     [grans, paths] = dd_full.find_granules_for_period(dt1, dt2, '');

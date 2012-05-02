@@ -62,8 +62,8 @@ S.lon  = double(S.lon(:)*0.01); % use scale (see attributes)
 S.time = double(S.time(:));
 
 % get the verion directly from the filename
-x = datasets_config('avhrr_cmsaf');
-info = x.find_info_from_granule(file);
+D = datasets;
+info = D.avhrr_cmsaf_gac.find_info_from_granule(file);
 S.epoch = round(date2unixsecs(str2double(info.year), str2double(info.month), str2double(info.day)));
 
 %% Flatted matrixes according to conventions (not the pseudo fields)

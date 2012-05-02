@@ -37,8 +37,8 @@ S.lat = double(S.Latitude(:));
 S.time = double( S.UTC_start + S.Profile_time);
 
 % get epoch
-x = datasets_config('cpr');
-info = x.find_info_from_granule(file);
+D = datasets;
+info = D.cpr.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 

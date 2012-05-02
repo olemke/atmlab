@@ -57,6 +57,9 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
         
          function self = FieldMultiInstrumentCopier(varargin)
              self = self@AssociatedDataset(varargin{:});
+             if isempty(self.members)
+                 self.members = struct(); % temporary default
+             end
          end
 %             % Create FieldMultiInstrumentCopier object
 %             %

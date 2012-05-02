@@ -61,8 +61,8 @@ S.lon = double(S.Longitude);
 
 % get epoch. 
 % 
-x = datasets_config('mspps');
-info =  x.find_info_from_granule(file);
+D = datasets;
+info = D.mspps.find_info_from_granule(file);
 s2d = @str2double;
 S.epoch = round(date2unixsecs(s2d(info.year), s2d(info.month), s2d(info.day)));
 
