@@ -1,5 +1,13 @@
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-86
+
+	* handy/CachedData.m(clear):
+
+	- Added method to clear the cache
+
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-85
 
 	* collocations/Collapser.m(process_granule):

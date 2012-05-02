@@ -19,6 +19,7 @@ classdef CachedData < handle
     %   get_entry -     Retrieve entry
     %   has_entry -     Check whether entry exists
     %   set_entry -     Set new entry and, if needed, remove old
+    %   clear -         Completely clear the cache
     
     % $Id$
     properties
@@ -76,6 +77,10 @@ classdef CachedData < handle
             end
         end        
         
+        function clear(self)
+            % clear the cache completely
+            self.cache = struct();
+        end
     end
     
     methods (Access = private)
