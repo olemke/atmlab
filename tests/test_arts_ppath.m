@@ -73,6 +73,10 @@ Ah2o    = xmlLoad( [ atmtest, '.H2O.xml' ] );
 workfolder = create_tmpfolder;
 
 
+%- To avoid getting same random sequence between sessions:
+% 
+RandStream.setDefaultStream(RandStream('mt19937ar','seed',sum(100*clock)));
+
 
 %- Run through n random cases
 %
@@ -115,12 +119,15 @@ for c = 1 : n
   
   %- Surface altitude
   %
-  Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
-  % Fix that +-180 lon data are the same
-  if atmosphere_dim == 3
-    Q.Z_SURFACE(:,end) = Q.Z_SURFACE(:,1);
+  if re_sphere
+    Q.Z_SURFACE           = repmat( 500, nlat, nlon );
+  else
+    Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
+    % Fix that +-180 lon data are the same
+    if atmosphere_dim == 3
+      Q.Z_SURFACE(:,end) = Q.Z_SURFACE(:,1);
+    end
   end
-  
   
   %- Sensor pos/los
   %
