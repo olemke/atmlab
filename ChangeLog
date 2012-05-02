@@ -1,5 +1,14 @@
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-90
+
+	* datasets/define_datasets.m:
+
+	- Added new associated-dataset to work with FieldMultiInstrumentCopier
+	semi-reproducing dataset from my first paper (work in progress).
+
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-89
 
 	* collocations/FieldMultiInstrumentCopier.m,
