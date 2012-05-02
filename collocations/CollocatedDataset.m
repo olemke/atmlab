@@ -1039,7 +1039,7 @@ classdef CollocatedDataset < HomemadeDataset
             %
             % [M, M_cols, addis, addis_cols, additionals] = ...
             %       col.read(date_start, date_end, spec, fields[, limits[,
-            %       filters]]);
+            %       filters[, associated_datasets]]]);
             %
             % IN
             %
@@ -1082,6 +1082,14 @@ classdef CollocatedDataset < HomemadeDataset
             %                           NOTE: This (currently) works only
             %                           if you let the output data be
             %                           merged (e.g. 2 output args).
+            %
+            %   ads     cell array of AssociatedDatasets
+            %
+            %       Limit searching of fields in AssociatedDatasets to this
+            %       cell-array of AssociatedDatasets. This is necessary if
+            %       multiple AssociatedDatasets contain the same fields,
+            %       and it is thus ambiguous from what AssociatedDataset a
+            %       field is to be read.
             % 
             % OUT
             %
@@ -1127,9 +1135,9 @@ classdef CollocatedDataset < HomemadeDataset
             
             %% prepare configuration things        
             
-            [limits, filters_by_name] = optargs(varargin, {struct(), {}});
+            [limits, filters_by_name, ads] = optargs(varargin, {struct(), {}, self.associated});
             % distribute fields, limits, etc. over core, additionals
-            [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields);
+            [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields, ads);
 
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
@@ -1444,7 +1452,7 @@ classdef CollocatedDataset < HomemadeDataset
     end
     
     methods (Access = private)
-        function [fields, additionals, additional_fields, deal_index] = deal_fields(self, all_fields)
+        function [fields, additionals, additional_fields, deal_index] = deal_fields(self, all_fields, ads)
             % deal fields over core, additionals, etc.
             %
             % FORMAT
@@ -1466,6 +1474,7 @@ classdef CollocatedDataset < HomemadeDataset
             n_f = 0;
             n_add = zeros(size(self.associated));
             additionals = {};
+            additional_fields = {};
             existing_names = {};
             % pre-allocate so that every field is at least an empty
             % cell-array
@@ -1484,10 +1493,22 @@ classdef CollocatedDataset < HomemadeDataset
                 else
                     % check if it belongs to any associated
                     found = false;
-                    for j = 1:length(self.associated)
-                        asso = self.associated{j};
+                    for j = 1:length(ads)
+                        asso = ads{j};
                         if any(strcmp(fieldnames(asso.members), field))
                             n_add(j) = n_add(j) + 1;
+                            already_exists = cellfun(@(X) any(strcmp(field, X)), additional_fields);
+                            if any(already_exists)
+                                error(['atmlab:' mfilename], ...
+                                    ['More than one additional contains field ' ...
+                                     field '. Found in: ' ...
+                                     additionals{already_exists}.name ' and ' ...
+                                     asso.name '.\n' ...
+                                     'Now I don''t know where to grab it from. ' ...
+                                     'Please pass subset of AssociatedDatasets on to CollocatedDataset.read (' ...
+                                     'see <a href="matlab:help CollocatedDataset/read">help</a>)']);
+                            end
+                            
                             additional_fields{j}{n_add(j)} = field;  %#ok<AGROW>
                             % check if this additionaldataset is already
                             % known, if yes, find index in existing names
@@ -1498,9 +1519,9 @@ classdef CollocatedDataset < HomemadeDataset
                                 existing_names{j} = asso.name;
                             end
                             samename = strcmp(existing_names, asso.name);
-                            assert(sum(samename)<=1, ['atmlab:' mfilename], ...
-                                ['More than one additional contains field ' ...
-                                asso.name]);
+%                            assert(sum(samename)<=1, ['atmlab:' mfilename], ...
+%                                ['More than one additional contains field ' ...
+%                                asso.name]);
                             deal_index(i) = find(samename);
                             found = true;
                         end

@@ -12,6 +12,11 @@
   different associated datasets as super-dataset?
 - Add some kind of checksum to check that read collocs are consistent with
   collocs from the object as it was stored, a hash of some kind?
+- in CollocatedDataset.read, more advanced info-passing for associated-datasets where
+  fields to read are from, e.g. full structure with info per
+  field rather than cell array limiting associated-datasets to
+  check in the first place
+
 
 - when finished, in old-style add small functions using new-style
 

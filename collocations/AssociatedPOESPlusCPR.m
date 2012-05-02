@@ -46,77 +46,7 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
         end
         
         %% implementation of abstract methods
-        
-%         function args = primary_arguments(self)
-%             args = self.fieldcopier.primary_arguments();
-%         end
-%         
-%         function args = secondary_arguments(self)
-%             args = self.fieldcopier.secondary_arguments();
-%         end
-%         
-%         function bool = needs_primary_data(self)
-%             bool = self.fieldcopier.needs_primary_data();
-%         end
-%         
-%         function bool = needs_secondary_data(self)
-%             bool = self.fieldcopier.needs_secondary_data();
-%         end
-%         
-%         function out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
-%             d = datasets;
-%             
-%             %% copy fields for MHS and CPR
-%             
-%             out_mhs_cpr = self.fieldcopier_mhs_cpr.process_granule(processed_core, data1, date1, spec1, data2, date2, spec2, dependencies);
-%             
-%             %% get fields for AMSU-A and HIRS
-%             
-%             % (ab)use a FieldCopier also for AMSU-A and HIRS by editing
-%             % processed_core and putting in the AMSUA line/pos instead of
-%             % the MHS ones.
-%             
-%             pc_amsua = processed_core;
-%             pc_hirs = processed_core;
-%             
-%             data_amsua = d.amsua.read_granule(date1, spec1);
-%             data_hirs = d.hirs.read_granule(date1, spec1);
-%             
-%             [aah aaw] = size(data_amsua.lon); % amsu-a width, amsu-a height
-%             
-%             mhs_line = processed_core(:, self.parent.LINE1);
-%             mhs_pos = processed_core(:, self.parent.POS1);
-%             
-%             amsua_line = min(max(round(mhs_line/3), 1), aah);
-%             amsua_pos = min(max(round(mhs_pos/3), 1), aaw);
-%             
-%             pc_amsua(:, self.parent.LINE1) = amsua_line;
-%             pc_amsua(:, self.parent.POS1) = amsua_pos;
-%             
-%             out_amsua = self.fieldcopier_amsua.process_granule(pc_amsua, data_amsua, date1, spec1, data2, date2, spec2, dependencies);
-%                 
-%             % TODO: optimise this bit of code
-%             % find hirs scanline (row) closest in time for each mhs scanline
-% 
-%             hirs_line =  arrayfun(...
-%                     @(v) mini(abs(hirs.time-v)), ...
-%                     data_mhs.time(mhs_line));
-%             % find hirs pixel (col) in scanline closest in distance to CPR-point
-%             hirs_pos = arrayfun(...
-%                 @(i) mini(...
-%                 (hirs.lat(hirs_line(i), :)-processed_core(i, self.parent.LAT2)).^2 + ...
-%                 (hirs.lon(hirs_line(i), :)-processed_core(i, self.parent.LON2)).^2 ...
-%                 ), 1:size(processed_core, 1));
-%             
-%             pc_hirs(:, self.parent.LINE1) = hirs_line;
-%             pc_hirs(:, self.parent.POS1) = hirs_pos;
-%             
-%             out_hirs = self.fieldcopier_hirs.process_granule(pc_hirs, data_hirs, date1, spec1, data2, date2, spec2, dependencies);
-%             
-%             out = self.merge(out_mhs_cpr, out_amsua);
-%             out = self.merge(out, out_hirs);
-%         end
-        
+                
         function [newline, newpos] = translate(self, processed_core, data_orig, dsname, data_other)
                         
             origline = processed_core(:, self.parent.cols.LINE1);

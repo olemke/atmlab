@@ -61,18 +61,6 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                  self.members = struct(); % temporary default
              end
          end
-%             % Create FieldMultiInstrumentCopier object
-%             %
-%             d = datasets;
-%             self.parent = d.CollocatedDataset_mhs_cpr;
-%             self.fieldcopier_mhscpr = FieldCopier(self.parent, f_mhs, f_cpr);
-%             self.fieldcopier_other.amsua = FieldCopier(self.parent, f_amsua, struct());
-%             self.fieldcopier_other.hirs = FieldCopier(self.parent, f_hirs, struct());
-%             
-%             self.fieldstruct_mhs = f_mhs;
-%             self.fieldstruct_other.amsua = f_amsua;
-%             self.fieldstruct_other.hirs = f_hirs;
-%         end
         
         %% implementation of abstract methods
         

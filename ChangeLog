@@ -1,6 +1,25 @@
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
-	* atmlab 2-1-88
+	* atmlab-2-1-89
+
+	* collocations/FieldMultiInstrumentCopier.m,
+	collocations/AssociatedPOESPlusCPR.m:
+
+	- Remove code that was already commented out
+
+	* collocations/CollocatedDataset.m:
+
+	(read): Add option to check only limited subset of AssociatedDatasets
+	for fieldnames. 
+
+	(deal_fields): Implement new option in (read). Give proper error
+	message in case of ambiguity.
+
+	* collocations/TODO: Added TODO-item related to CollocatedDataset.read
+
+2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-88
 
 	* BACKWARD-INCOMPATIBLE CHANGES:
 
