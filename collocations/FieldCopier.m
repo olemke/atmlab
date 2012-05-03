@@ -284,6 +284,10 @@ classdef FieldCopier < AssociatedDataset
                 else
                     fdata = dat.(self.members.(fieldnam).realname);
                 end
+                % special case: fields with one value per scanline
+                if size(fdata, 1) == n_scanlines && size(fdata, 2) == 1
+                    fdata = repmat(fdata, [1 n_scanpos]);
+                end
                 % 'n' is the number of measurements per lat/lon, e.g. the
                 % number of channels, number of height-bins, etc. Should be
                 % scalar...
@@ -370,6 +374,9 @@ classdef FieldCopier < AssociatedDataset
                 sz = size(fdata);
                 if isequal(sz, size(data.lat))
                     DD = fdata(:); % 1 point per lat/lon
+                elseif sz(1) == size(data.lat, 1) && sz(2) == 1 % e.g. time
+                    DD = repmat(fdata, [1 size(data.lat, 2)]);
+                    DD = DD(:);
                 else % multi-point per lat/lon
                     DD = reshape(fdata, prod(sz(1:end-1)), sz(end));
                 end

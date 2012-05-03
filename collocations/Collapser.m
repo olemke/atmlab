@@ -10,7 +10,7 @@ classdef Collapser < AssociatedDataset
     % for each of the smaller footprints --- thus repeating many times the
     % entry for the larger footprint --- a dataset with this class contains
     % at most one entry for each of the larger footprints. This is usually
-    % the desirable effect.
+    % the desirable behaviour.
     %
     % The class is normally associated with an <a href="matlab:help AssociatedDataset">AssociatedDataset</a> that works on
     % the full-size --- often this is <a href="matlab:help FieldCopier">FieldCopier</a>.
@@ -50,7 +50,7 @@ classdef Collapser < AssociatedDataset
     %   >> mfcs.RO_ice_water_path.stored.NO.type = 'single';
     %   >> global_lims = {@(X)(X(:, mhscpr.cols.DIST)<7.5), @(X)(abs(X(:, mhscpr.cols.INT))<600)};
     %   % f from <a href="matlab:help FieldCopier">FieldCopier</a> example
-    %   >> mfc = MeanFieldCopier(f, mfcs, global_lims, ...
+    %   >> mfc = Collapser(f, mfcs, global_lims, ...
     %           'name', 'MyLittleThing', 'basedir', '/some/path', ...
     %           'subdir', '$YEAR4/$MONTH/$DAY', ...
     %           'filename', 'mean_collocations_$SAT.nc.gz');
@@ -66,7 +66,60 @@ classdef Collapser < AssociatedDataset
         %members = []; % See <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
         parent = []; % See <a href="matlab:help AssociatedDataset.parent">AssociatedDataset.parent</a>
         dependencies = {}; % See <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>
-        fieldstruct = []; % Structure with all fields information
+        
+        % Structure with all fields information
+        %
+        % The members of this fieldstruct must correspond to fieldnames
+        % contained by the <a href="matlab:help AssociatedDataset.parent">parent</a> dataset. The value of each entry
+        % in this struct is itself a structure, as follows:
+        %
+        % entry_name (structure with name corresponding to parent fieldname)
+        %
+        %   limitators  cell-array of function_handle
+        %
+        %       Each limitator receives as input the subset of secondary
+        %       footprints that fall within the primary footprint. Each
+        %       limitator must return a logical 1-D vector with the same
+        %       length as the number of footprints in the input. Any later
+        %       processing functions are applied only to those collocations
+        %       for which ALL limitators return true.
+        %
+        %   processors  structure
+        %
+        %       A structure with a field for each processing.
+        %       The field is the processors name, such as MEAN,
+        %       STD, etc. The value is a function handle. This
+        %       function handle takes as input the secondary
+        %       footprints corresponding to the primary
+        %       footprint, after global and local limitators
+        %       are applied. The function handle must return a
+        %       single, scalar value, or a single row of values
+        %       if the input data are 2-D.
+        %
+        %       The final members field will prepend each field
+        %       with the name of its processor, e.g.
+        %       MEAN_RO_ice_water_path, STD_RO_ice_water_path.
+        %
+        %   stored      structure
+        %
+        %       This structure contains information on how each
+        %       field is stored. Fieldnames should be the same
+        %       as for processors. Values are like for the <a href="matlab:help FieldCopier/fieldstruct_primary">Fieldcopier</a>.
+        %       By default, no attributes are stored and all
+        %       fields are stored as single (float).
+        fieldstruct = []; 
+        % Cell array of global limitators.
+        %
+        % Global limitators are applied to the subset of secondary
+        % footprints corresponding to a shared primary footprint before
+        % going into any field-specific processing. It is suitable to use
+        % for limiting distance or time for a certain averaging function.
+        % Each function handle receives as input a matrix
+        % of collocations, e.g. Nx14 when there are N
+        % secondary inside the primary, and shall
+        % return a logical of Nx1. All limitators are
+        % processed sequentially and are applied to
+        % all fields.
         overall_limitators = []; % List of global limitators
     end
         
@@ -92,54 +145,11 @@ classdef Collapser < AssociatedDataset
             %   fs      structure
             %
             %       Structure giving full information on fields to process
-            %       and how to process them. The fieldnames for the
-            %       structure correspond to fields in the AssociatedDataset
-            %       that the Collapser relates to. For each field, the
-            %       value is a structure with the following fields:
-            %       
-            %           limitators  cell array of function_handle
-            %               
-            %               All function handles in the cell array are
-            %               applied to the vector of measurements
-            %               corresponding to the secondary footprints. The
-            %               function handles must return a logical with one
-            %               value for each row of data (or for each element
-            %               if the data are 1-D). The data are then limited
-            %               to those elements where all limitators return
-            %               true.
+            %       and how to process them. See <a href="matlab:help Collapser/fieldstruct">property docs</a> for details.
             %
-            %           processors  structure
+            %   global_lims     cell array
             %
-            %               A structure with a field for each processing.
-            %               The field is the processors name, such as MEAN,
-            %               STD, etc. The value is a function handle. This
-            %               function handle takes as input the secondary
-            %               footprints corresponding to the primary
-            %               footprint, after global and local limitators
-            %               are applied. The function handle must return a
-            %               single, scalar value, or a single row of values
-            %               if the input data are 2-D.
-            %           
-            %               The final members field will prepend each field
-            %               with the name of its processor, e.g.
-            %               MEAN_RO_ice_water_path, STD_RO_ice_water_path.
-            %
-            %           stored      structure
-            %
-            %               This structure contains information on how each
-            %               field is stored. Fieldnames should be the same
-            %               as for processors. Values are like 'fs1' in the
-            %               <a href="matlab:help FieldCopier/Fieldcopier">Fieldcopier constructor</a>.
-            %               By default, no attributes are stored and all
-            %               fields are stored as single (float).
-            %
-            %   global_lims     cell array of function handles. Each
-            %                   function handle receives as input a matrix
-            %                   of collocations, e.g. Nx14 when there are N
-            %                   secondary inside the primary, and shall
-            %                   return a logical of Nx1. All limitators are
-            %                   processed sequentially and are applied to
-            %                   all fields.
+            %       See <a href="matlab:help Collapser/overall_limitators">property documentation</a>.
             %
             % OUT
             %

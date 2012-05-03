@@ -38,7 +38,9 @@ if (nargin==1)
                 'Dataset with name %s already exists and is different', varargin{1}.name);
         end
     end
-    S.(varargin{1}.name) = varargin{1};
+    if varargin{1}.visible
+        S.(varargin{1}.name) = varargin{1};
+    end
 end
 
 SS = S;

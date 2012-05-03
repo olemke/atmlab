@@ -135,7 +135,9 @@ classdef AssociatedDataset < HomemadeDataset
                 self.parent = cd;
                 self.dependencies = dp;
             end
-            self.parent.add_associated(self);
+            if self.visible
+                self.parent.add_associated(self);
+            end
         end
         
         function members2cols(self)

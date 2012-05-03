@@ -16,6 +16,8 @@
   fields to read are from, e.g. full structure with info per
   field rather than cell array limiting associated-datasets to
   check in the first place
+- For a Collapser, access to the AssociatedDatasets could be useful even
+  for global limitators?
 
 
 - when finished, in old-style add small functions using new-style

@@ -57,9 +57,9 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
         
          function self = FieldMultiInstrumentCopier(varargin)
              self = self@AssociatedDataset(varargin{:});
-             if isempty(self.members)
-                 self.members = struct(); % temporary default
-             end
+%             if isempty(self.members)
+%                 self.members = struct(); % temporary default
+%             end
          end
         
         %% implementation of abstract methods
@@ -147,15 +147,9 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                     args{arg_i_other} = data_other;
                     out_other{k}{i} = fc_other.(other_instrument).process_granule(args{:}); %#ok<AGROW>
                    
-                    allmembers = catstruct(allmembers, fc_other.(other_instrument).members);
+%                    allmembers = catstruct(allmembers, fc_other.(other_instrument).members);
                 end
             end
-            % now that all process_granule methods have been called, the
-            % sizes on the various 'members' fields should be set
-            % appropiately. Since each call had at least one (primary or
-            % secondary) in common with the other, via the 'chain' all have
-            % also been checked against duplicates through the various
-            % FieldCopiers
                    
             % merge matrices and cols-structures appropiately
             out = out_core;
@@ -167,7 +161,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                 end
             end
             self.cols = newcols;
-            self.members = allmembers;
+%            self.members = allmembers;
             
         end
     end

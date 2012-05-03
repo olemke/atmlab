@@ -240,6 +240,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % Cache for reading granules
         cache = CachedData();
         
+        % Make this dataset visible. Defaults to true.
+        %
+        % If you're creating a dataset for fully internal use, you might
+        % want to set this to false to prevent automatic searchers from
+        % detecting it.
+        visible = true;
+        
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that
         % cannot be met here. Therefore, defaults should be encompassed in
@@ -618,7 +625,16 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   datevec     vector      Date-vector indicating the starting time.
             %   spec        various     (optional) E.g. satellite (noaa18, cloudsat, etc.) 
-            %   extra       cellstr     (optional) extra args to reader
+            %   extra       cellstr (optional)
+            %
+            %       Extra args to reader. Usually, those are extra fields
+            %       that are to be read. Two of those extra fields are a
+            %       special-case and taken care of by read_granule, and not
+            %       passed on to the reader: 'scanline_position' and
+            %       'scanline_number' are assigned according to the
+            %       position in the scanline and the scanline number,
+            %       accordingly.
+            %
             %   remdouble   logical     (optional) Remove doubles or not? Default true.
             %   force       logical     (optional) rather than throwing an error,
             %                           return [] in case of error. Default false.
@@ -639,6 +655,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
              
             % optional arguments
             [spec, extra, remdouble, force, reload] = optargs(varargin, {'', {}, true, false, false});
+            
+            % special case: remove 'scanline_position' and
+            % 'scanline_number' from 'extra'. Those are in reality always
+            % returned, but readers do not necessarily understand them.
+            
+            extra(strcmp(extra, 'scanline_number')) = [];
+            extra(strcmp(extra, 'scanline_position')) = [];
             
             %% generate varname for caching
             X = date;
@@ -688,6 +711,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             %logtext(colloc_config('stdout'), 'read %s\n', datafile);
             nlines = size(data.time, 1);
+            npos = size(data.lat, 2);
+            
+            % add scanline_number and scanline_position (before removing
+            % duplicates!)
+            
+            data.scanline_number = repmat((1:nlines).', [1 npos]);
+            data.scanline_position = repmat(1:npos, [nlines 1]);
             
             %% remove duplicates
             if remdouble

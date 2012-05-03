@@ -118,6 +118,14 @@ D.collocation_mhs_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
 D.collocation_mhs_mhs.filename  = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 D.collocation_mhs_mhs.basedir   = '/storage4/user_data/seliasson/collocations_patmosx_cloudsat/core';
 
+%% Associated datasets
+
+D.associated_CPR_MHS_AMSU_HIRS.basedir = '/storage3/user_data/gerrit/collocations_cpr_mhs_amsu_hirs';
+D.associated_CPR_MHS_AMSU_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
+D.associated_CPR_MHS_AMSU_HIRS.filename = 'collocations_fulldata.nc.gz';
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collocations_collapsed.nc.gz';
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');
 

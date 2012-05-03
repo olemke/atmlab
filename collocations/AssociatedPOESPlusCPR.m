@@ -36,10 +36,21 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             self = self@FieldMultiInstrumentCopier(d.CollocatedDataset_mhs_cpr, {}, varargin{:});
             
             self.parent = d.CollocatedDataset_mhs_cpr;
-            self.fieldcopier_core = FieldCopier(self.parent, f_mhs, f_cpr, 'name', [self.name '_sub_mhs_cpr']);
-            self.fieldcopier_other_primary.amsua = FieldCopier(self.parent, f_amsua, struct(), 'name', [self.name '_sub_amsua']);
-            self.fieldcopier_other_primary.hirs = FieldCopier(self.parent, f_hirs, struct(), 'name', [self.name '_sub_hirs']);
+            self.fieldcopier_core = FieldCopier(self.parent, f_mhs, f_cpr, 'name', [self.name '_sub_mhs_cpr'], 'visible', false);
+            self.fieldcopier_other_primary.amsua = FieldCopier(self.parent, f_amsua, struct(), 'name', [self.name '_sub_amsua'], 'visible', false);
+            self.fieldcopier_other_primary.hirs = FieldCopier(self.parent, f_hirs, struct(), 'name', [self.name '_sub_hirs'], 'visible', false);
 
+            self.members = catstruct(self.fieldcopier_core.members, ...
+                self.fieldcopier_other_primary.amsua.members, ...
+                self.fieldcopier_other_primary.hirs.members);
+            
+            if length(fieldnames(self.members)) < (...
+                    length(fieldnames(self.fieldcopier_other_primary.amsua.members)) + ...
+                    length(fieldnames(self.fieldcopier_other_primary.hirs.members)) + ...
+                    length(fieldnames(self.fieldcopier_core.members)))
+                error(['amtlab:' mfilename], 'Duplicate fieldnames found!');
+            end
+            
             %            self.fieldstruct_mhs = f_mhs;
 %            self.fieldstruct_amsua = f_amsua;
 %            self.fieldstruct_hirs = f_hirs;

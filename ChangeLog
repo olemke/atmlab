@@ -1,3 +1,61 @@
+2012-05-03  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-91
+
+	* collocations/Collapser.m:
+
+	- Update example (MeanFieldCopier now Collapser)
+	- Move some documentation from constructor to properties
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Can now copy fields that have only one value per scanline (such as
+	time)
+
+	* datasets/SatDataset.m:
+
+	- Added 'visible' property that controls whether this dataset should
+	be registered with 'datasets', with 'self.associated' (see below),
+	etc.
+
+	(read_granule):
+
+	- New special case, 'scanline_number' and 'scanline_position' are
+	always added, therefore not passed on to actual reader.
+
+	* datasets/datasets.m:
+
+	- Only "register" dataset if self.visible is true
+
+	* collocations/AssociatedDataset.m(AssociatedDataset):
+
+	- Only "register" dataset if self.visible is true
+
+	* collocations/AssociatedPOESPlusCPR.m:
+
+	- For internal 'sub'-datasets, set 'visible' to false in order not to
+	confuse subsequent reading-routines.
+
+	* datasets/define_datasets.m:
+
+	- Bugfix when checking if dataset is defined
+	- Do not add redundant fields (B_LAT, B_LONG, etc.)
+	- Add some more non-redundant fields
+	- Add Collapser belonging to Holl10-like-dataset. Now I have more or
+	less all the Holl10-functionality in the new style.
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Added basedir, subdir for new associated-datasets
+
+	* collocations/FieldMultiInstrumentCopier.m:
+
+	- Bugfix: 'members'-structure needs to be present not only after
+	processing, but only when reading from disk without doing any
+	processing.
+
+	* collocations/TODO: Added item.
+
 2012-05-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-90
