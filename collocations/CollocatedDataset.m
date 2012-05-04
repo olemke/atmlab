@@ -881,6 +881,7 @@ classdef CollocatedDataset < HomemadeDataset
                 info_core.secondary_version = also.version{2};
                 info_core.start_time = double(date2unixsecs(date(1), date(2), date(3)));
 
+                logtext(atmlab('OUT'), 'Storing %d collocations\n', size(result, 1));
                 [~, attr] = self.store(date, spec, result, info_core);
                 
                 if ~isempty(additionals) && ~isempty(self.log)

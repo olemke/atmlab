@@ -31,10 +31,15 @@ classdef CachedData < handle
     end
     
     properties (GetAccess = private, SetAccess = private)
-        cache = struct();
+        cache;
     end
     
     methods
+        function self = CachedData()
+            self = self@handle();
+            self.cache = struct();
+        end
+        
         function data = get_entry(self, s)
             % Retrieve entry from cache
             %

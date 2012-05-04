@@ -238,7 +238,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % firstline_filename = 'firstline_$NAME_$SPEC';
 
         % Cache for reading granules
-        cache = CachedData();
+        cache;
         
         % Make this dataset visible. Defaults to true.
         %
@@ -310,6 +310,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     'You didn''t name me! I''ll name myself %s (for now)', nm);
                 self.name = nm;
             end
+            
+            self.cache = CachedData();
 
         end
         

@@ -1,5 +1,22 @@
 2012-05-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-94
+
+	* collocations/CollocatedDataset.m(collocate_and_store_date):
+
+	- Verbosely write how many collocations I'm going to store
+
+	* handy/CachedData.m(CachedData):
+
+	- Bugfix, should create structure in constructor
+
+	* datasets/SatDataset.m(SatDataset):
+
+	- Bugfix, should create CachedData-object in constructer, otherwise
+	all objects will share one single cache.
+
+2012-05-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-93
 
 	* collocations/CollocatedDataset.m:
