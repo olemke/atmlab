@@ -174,7 +174,7 @@ classdef HomemadeDataset < SatDataset
                 end
                 
                 % check if we have other dimensions besides the length
-                if isfield(self.members.(varname), 'dims')
+                if isfield(self.members.(varname), 'dims') && size(data, 1)>0
                     dimname = self.members.(varname).dims{1};
                     dimsize = self.members.(varname).dims{2};
                     try
@@ -219,8 +219,8 @@ classdef HomemadeDataset < SatDataset
                     
                     varid = varids(j);
                     netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
-                    fprintf(atmlab('OUT'), '\n');
                 end
+                fprintf(atmlab('OUT'), '\n');
             end
             
             logtext(atmlab('OUT'), 'Finalising\n');

@@ -1,5 +1,44 @@
 2012-05-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-93
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_and_store_date):
+
+	- Don't process additionals if there are no collocations
+
+	(collocate_and_store_date_range):
+
+	- Add a little function for the logfile-cleanup to leave a message in
+	the log if collocations finished prematurely.
+
+	* handy/CachedData.m:
+
+	(set_entry) (del_old_entry):
+
+	- Don't only output the size in bytes, but also in no. entries
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Bugfix: don't try to define dimension if there are no collocs,
+	  NetCDF doesn't like [0 nonzero] dimension.
+
+	- Wartfix: Write newline after all fields, not every field.
+
+	* datasets/SatDataset.m(read_granule):
+
+	- Bugfix: Satellite-name was not included with cache-name due to an
+	erroneous tilde. This caused cache for different sats to be mixed,
+	which goes wrong as soon as collocations are performed between two
+	granules for two different sats but with the exact same starting time.
+
+	* datasets/define_datasets.m:
+
+	- For dardarsub, also add temperature
+
+2012-05-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-92
 
 	* collocations/CollocatedDataset.m:

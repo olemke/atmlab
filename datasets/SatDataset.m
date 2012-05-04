@@ -667,7 +667,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             X = date;
             X(end+1:6) = 0;
             dtstr = datestr(datenum(X), 'yydd_dddmmmHHMM');
-            if ~isempty(spec)
+            if isempty(spec)
                 spstr = 'X';
             elseif ischar(spec)
                 spstr = spec;

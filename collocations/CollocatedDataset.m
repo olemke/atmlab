@@ -203,6 +203,7 @@ classdef CollocatedDataset < HomemadeDataset
     
     properties (GetAccess = private, SetAccess = private)
         log;
+        success = false;
     end
     
     methods
@@ -425,7 +426,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             logtext(fid, 'Found %d other granules to collocate with\n', size(secondary_granules, 1));
             
-            %%
+            %% pre-allocate
             
             result = zeros(0, length(fieldnames(self.cols)));
             
@@ -826,6 +827,10 @@ classdef CollocatedDataset < HomemadeDataset
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
                 logtext(atmlab('OUT'), 'I will reprocess ALL additionals\n');
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
+                if isempty(result)
+                    logtext(atmlab('OUT'), 'Upon reading collocations, appears there are none, skipping\n');
+                    return
+                end
                 info_addi.parent_id = attr.id;
                 
                 if ~isempty(self.log)
@@ -921,7 +926,7 @@ classdef CollocatedDataset < HomemadeDataset
             %       [2010 9 30], '', 'noaa18', {fc});
             
             self.log = fileopen(fullfile(self.basedir, self.logfile), 'a');
-            c = onCleanup(@()fclose(self.log));
+            c = onCleanup(@self.cleanup_log);
             logtext(self.log, self.marker);
             logtext(self.log, 'Starting collocations: %s %s %s vs. %s %s from %s to %s\n', ...
                 atmlab_version(), self.primary.name, spec1, self.secondary.name, spec2, ...
@@ -967,6 +972,7 @@ classdef CollocatedDataset < HomemadeDataset
             end
             logtext(self.log, 'Collocations finished. All seems fine.\n');
             logtext(atmlab('OUT'), 'Finished!\n');
+            self.success = true;
             %%%
         end
         
@@ -1582,6 +1588,13 @@ classdef CollocatedDataset < HomemadeDataset
                 length(additionals), length(additional_fields));
             
         end
+        
+        function cleanup_log(self)
+            if ~self.success
+                logtext(self.log, 'Collocations ended prematurely\n');
+            end
+            fclose(self.log);
+        end
     end
     
     methods (Access = protected)
@@ -1673,5 +1686,6 @@ classdef CollocatedDataset < HomemadeDataset
                 end
             end
         end
+        
     end
 end
