@@ -1,3 +1,39 @@
+2012-05-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-92
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_and_store_date) (collocate_and_store_date_range):
+
+	- Log very briefly what is done to a logfile inside the base, when
+	writing
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Move collocated datasets into their own subdir
+	- Added amsub/amsub, amsub/mhs, mhs/amsub core & associated
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Do not store, this is done in cleanup-function
+
+	* datasets/convert_dardar.m: Write docs
+
+	* datasets/common_read_dardar.m:
+
+	- Ensure consistency in orientation of vectors
+
+	* datasets/common_read_dardarsub.m: Added
+
+	* datasets/define_datasets.m:
+
+	- Some more fields in dardarsub
+	- Added reader for dardarsub
+    - Added amsub/amsub, amsub/mhs, mhs/amsub core & associated
+	- Remove commented-out code
+
+
 2012-05-03  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-91

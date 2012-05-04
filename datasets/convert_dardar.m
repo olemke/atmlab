@@ -1,9 +1,17 @@
 function convert_dardar(dt1, dt2)
     % convert full dardar to subselected dardar
     %
-    % FIXME DOC
+    % Fields are defined by dataset 'dardarsub'
     %
-    % FIXME TEST
+    % FORMAT
+    %
+    %   convert_dardar(dt1, dt2)
+    %
+    % IN
+    %
+    %   dt1     datevec, starting date
+    %   dt2     datevec, ending date
+    %
     %
     % $Id$
     
@@ -13,7 +21,7 @@ function convert_dardar(dt1, dt2)
     
     tostore = fieldnames(dd_sub.getmembers());
     [grans, paths] = dd_full.find_granules_for_period(dt1, dt2, '');
-   
+
     builtins = {'time', 'lat', 'lon'};
     
     for i = 1:size(grans, 1);

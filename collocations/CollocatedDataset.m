@@ -89,6 +89,19 @@ classdef CollocatedDataset < HomemadeDataset
         % collocations. It has a default value of 2 (degrees), so there is
         % no need to change this. Change at your own risk.
         gridsize = 2;
+        
+        % Logfile for describing what collocations were performed
+        %
+        % When collocations are read and written to disk, the toolkit will
+        % write a short report to this file reporting what collocations
+        % were located etc. This is used only by
+        % <a href="matlab:help CollocatedDataset/collocate_and_store_date_range">collocate_and_store_date_range</a>.
+        % The logfile is put directly in self.basedir and appended to on
+        % every occasion.
+        logfile = 'collocations_log';
+        
+        % Marker to seperate between different logfile entries
+        marker = [repmat('-', [1 72]) '\n'];
     end
     
     % read-only props (may be alterable with methods)
@@ -186,6 +199,10 @@ classdef CollocatedDataset < HomemadeDataset
                 'atts', struct(...
                     'long_name', 'Collocation index number')));
         
+    end
+    
+    properties (GetAccess = private, SetAccess = private)
+        log;
     end
     
     methods
@@ -778,7 +795,7 @@ classdef CollocatedDataset < HomemadeDataset
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
                 addisexist(i) = exist(fna, 'file');
             end
-            
+                        
             % if everything is already there, do nothing
             if mainfileexists && all(addisexist) && ~colloc_config('overwrite')
                 logtext(atmlab('OUT'), 'All output files already exist.\n');
@@ -788,6 +805,9 @@ classdef CollocatedDataset < HomemadeDataset
                 for i = 1:length(additionals)
                     logtext(atmlab('OUT'), '    %s\n', additionals{i}.find_granule_by_datetime(date, spec));
                 end
+                if ~isempty(self.log)
+                    logtext(self.log, '%s nothing to be done\n', mat2str(date));
+                end
                 return
             end
                             
@@ -796,7 +816,11 @@ classdef CollocatedDataset < HomemadeDataset
             info_addi = struct();
             info_addi.history = [datestr(now, 'YYYY-mm-dd') ' Obtained additionals from collocs'];
             info_addi.parent_dataset = self.name;
-            info_addi.parent_spec = spec;
+            if iscell(spec)
+                info_addi.parent_spec = [spec{:}];
+            else
+                info_addi.parent_spec = spec;
+            end
             
             if mainfileexists && ~colloc_config('overwrite')
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
@@ -804,6 +828,9 @@ classdef CollocatedDataset < HomemadeDataset
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 info_addi.parent_id = attr.id;
                 
+                if ~isempty(self.log)
+                    logtext(self.log, '%s Collocations present, additionals regenerated\n', mat2str(date));
+                end
                 addi = {};
                 for i = 1:length(additionals)
                     logtext(atmlab('OUT'), 'Collecting additionals for ''%s''\n', additionals{i}.name);
@@ -816,6 +843,9 @@ classdef CollocatedDataset < HomemadeDataset
                 % assumption:
                 % if the main file does not exist, associated don't either
                 
+                if ~isempty(self.log)
+                    logtext(self.log, '%s Generating collocations\n', mat2str(date));
+                end
                 try
                     [result, addis, also] = ...
                         self.collocate_date(date, spec1, spec2, additionals);
@@ -848,6 +878,9 @@ classdef CollocatedDataset < HomemadeDataset
 
                 [~, attr] = self.store(date, spec, result, info_core);
                 
+                if ~isempty(additionals) && ~isempty(self.log)
+                        logtext(self.log, '%s Generating additionals\n', mat2str(date));
+                end
                 info_addi.parent_id = attr.id;
                 for i = 1:length(additionals)
                     additionals{i}.store(date, spec, addis{i}, info_addi);
@@ -887,6 +920,12 @@ classdef CollocatedDataset < HomemadeDataset
             %   mhscpr.collocate_and_store_date_range([2010 9 1], ...
             %       [2010 9 30], '', 'noaa18', {fc});
             
+            self.log = fileopen(fullfile(self.basedir, self.logfile), 'a');
+            c = onCleanup(@()fclose(self.log));
+            logtext(self.log, self.marker);
+            logtext(self.log, 'Starting collocations: %s %s %s vs. %s %s from %s to %s\n', ...
+                atmlab_version(), self.primary.name, spec1, self.secondary.name, spec2, ...
+                mat2str(date_start), mat2str(date_end));
             logtext(atmlab('OUT'), 'Starting collocations\n');
             logtext(atmlab('OUT'), '%s %s vs. %s %s\n', self.primary.name, spec1, self.secondary.name, spec2);
             logtext(atmlab('OUT'), 'From %s to %s\n', mat2str(date_start), mat2str(date_end));
@@ -926,6 +965,7 @@ classdef CollocatedDataset < HomemadeDataset
                     end
                 end
             end
+            logtext(self.log, 'Collocations finished. All seems fine.\n');
             logtext(atmlab('OUT'), 'Finished!\n');
             %%%
         end

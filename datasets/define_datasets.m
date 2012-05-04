@@ -91,6 +91,7 @@ SatDataset('name', 'patmosx', ...
 HomemadeDataset('name', 'dardarsub', ...
                 'satname', 'atrain', ...
                 'granule_duration', 5932, ...
+                'reader', @common_read_dardarsub, ...
                 'members', struct(...
                     'iwc', struct(...
                         'type', 'float', ...
@@ -118,13 +119,27 @@ HomemadeDataset('name', 'dardarsub', ...
                     'lat', struct(...
                         'type', 'float', ...
                         'atts', struct(...
-                            'type', 'float', ...
                             'units', '?')), ...
                     'lon', struct(...
                         'type', 'float', ...
                         'atts', struct(...
-                            'type', 'float', ...
-                            'units', '?'))));
+                            'units', '?')), ...
+                    'vis_optical_depth', struct(...
+                        'type', 'float', ...
+                        'atts', struct(...
+                            'long_name', 'visible optical depth')), ...
+                    'vis_optical_depth_error', struct(...
+                        'type', 'float', ...
+                        'atts', struct(...
+                            'long_name', 'visible optical depth error')), ...
+                    'day_night_flag', struct(...
+                        'type', 'int', ...
+                        'atts', struct(...
+                            'long_name', 'day night flag')), ...
+                    'land_water_mask', struct(...
+                        'type', 'int', ...
+                        'atts', struct(...
+                            'long_name', 'land water mask'))));
 
 %% Collocated datasets (the core)
 
@@ -170,6 +185,21 @@ CollocatedDataset(D.mhs, D.mhs, ...
     'distance', 15, ...
     'interval', 900);
 
+CollocatedDataset(D.mhs, D.amsub, ...
+    'name', 'collocation_mhs_amsub', ...
+    'distance', 15, ...
+    'interval', 900);
+
+CollocatedDataset(D.amsub, D.mhs, ...
+    'name', 'collocation_amsub_mhs', ...
+    'distance', 15, ...
+    'interval', 900);
+
+CollocatedDataset(D.amsub, D.amsub, ...
+    'name', 'collocation_amsub_amsub', ...
+    'distance', 15, ...
+    'interval', 900);
+
 %% helpers for AssociatedDataset definitions
 
 longrange = [-180 180];
@@ -202,22 +232,13 @@ laa.atts.long_name = 'Local azimuth angle';
 laa.atts.units = 'degrees';
 laa.atts.valid_range = [-180 180];
 
+
 %% AssociatedDatasets (FieldCopier, Collapser, etc.)
 
-%f_mhs.B_LONG.type = 'float';
-%f_mhs.B_LONG.realname = 'lon';
-%f_mhs.B_LONG.atts.long_name = 'AMSU-B/MHS Longitude';
-%f_mhs.B_LONG.atts.units = longunit;
-%f_mhs.B_LONG.atts.valid_range = longrange;
-%f_mhs.B_LAT.type = 'float';
-%f_mhs.B_LAT.realname = 'lat';
-%f_mhs.B_LAT.atts.long_name = 'AMSU-B/MHS Latitude';
-%f_mhs.B_LAT.atts.units = latunit;
-%f_mhs.B_LAT.atts.valid_range = latrange;
-%f_mhs.B_TIME.type = 'int';
-%f_mhs.B_TIME.realname = 'time';
-%f_mhs.B_TIME.atts.long_name = 'AMSU-B/MHS measurement time';
-%f_mhs.B_TIME.atts.units = timeunit;
+D = datasets; % reload
+
+% similar to old CloudSat/MHS
+
 f_mhs.B_LZA = lza;
 f_mhs.B_LAA = laa;
 f_mhs.B_SZA = sza;
@@ -255,9 +276,6 @@ f_amsua.A_LINE.atts.long_name = 'AMSU-A scanline number';
 f_amsua.A_POS.type = 'byte';
 f_amsua.A_POS.realname = 'scanline_position';
 f_amsua.A_POS.atts.long_name = 'AMSU-A scanline position';
-% FIXME: f_amsua.A_START
-% FIXME: f_amsua.A_I
-% FIXME: f_amsua.A_C
 
 f_hirs.H_LONG.type = 'float';
 f_hirs.H_LONG.realname = 'lon';
@@ -286,24 +304,7 @@ f_hirs.H_LINE.atts.long_name = 'HIRS scanline number';
 f_hirs.H_POS.type = 'byte';
 f_hirs.H_POS.realname = 'scanline_position';
 f_hirs.H_POS.atts.long_name = 'HIRS scanline position';
-% FIXME: f_hirs.H_START
-% FIXME: f_hirs.H_I
-% FIXME: f_hirs.H_C
 
-%f_cpr.C_LONG.type = 'double';
-%f_cpr.C_LONG.realname = 'lon';
-%f_cpr.C_LONG.atts.long_name = 'CloudSat Longitude';
-%f_cpr.C_LONG.atts.units = longunit;
-%f_cpr.C_LONG.atts.valid_range = longrange;
-%f_cpr.C_LAT.type = 'double';
-%f_cpr.C_LAT.realname = 'lat';
-%f_cpr.C_LAT.atts.long_name = 'CloudSat Latitude';
-%f_cpr.C_LAT.atts.units = latunit;
-%f_cpr.C_LAT.atts.valid_range = latrange;
-%f_cpr.C_TIME.type = 'int';
-%f_cpr.C_TIME.realname = 'time';
-%f_cpr.C_TIME.atts.long_name = 'CloudSat measurement time';
-%f_cpr.C_TIME.atts.units = timeunit;
 f_cpr.ROIWP.type = 'float';
 f_cpr.ROIWP.realname = 'RO_ice_water_path';
 f_cpr.ROIWP.atts.long_name = 'CloudSat Radar-Only CPR IWP';
@@ -320,17 +321,58 @@ f_cpr.dIOROIWP.type = 'float';
 f_cpr.dIOROIWP.realname = 'IO_RO_ice_water_path_uncertainty';
 f_cpr.dIOROIWP.atts.long_name = 'CloudSat Radar-Only Ice-Only CPR IWP uncertainty';
 f_cpr.dIOROIWP.atts.units = 'g/m^2';
-% FIXME: f_cpr.C_START
-% FIXME: f_cpr.C_I
-% FIXME: f_cpr.C_C
-
 
 AssociatedPOESPlusCPR(f_mhs, f_amsua, f_hirs, f_cpr, ...
     'name', 'associated_CPR_MHS_AMSU_HIRS');
 
-d = datasets;
-global_lims = {@(X)(X(:, d.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
-               @(X)(abs(X(:, d.CollocatedDataset_mhs_cpr.cols.INT))<600)};
+% Similar to old POES-POES
+
+f_mhs1.LZA1 = lza;
+f_mhs1.LAA1 = laa;
+f_mhs1.SZA1 = sza;
+f_mhs1.SAA1 = saa;
+f_mhs1.BT1.type = 'float';
+f_mhs1.BT1.realname = 'tb';
+f_mhs1.BT1.dims = {'MHS_CHANS', 5};
+f_mhs1.BT1.atts.long_name = 'MHS Brightness Temperature, primary';
+f_mhs1.BT1.atts.units = 'Kelvin';
+
+f_amsub1 = f_mhs1;
+f_amsub1.BT1.dims = {'AMSUB_CHANS', 5};
+f_amsub1.BT1.atts.long_name = 'AMSU-B Brightness Temperature, primary';
+
+f_mhs2.LZA2 = lza;
+f_mhs2.LAA2 = laa;
+f_mhs2.SZA2 = sza;
+f_mhs2.SAA2 = saa;
+f_mhs2.BT2.type = 'float';
+f_mhs2.BT2.realname = 'tb';
+f_mhs2.BT2.dims = {'MHS_CHANS', 5};
+f_mhs2.BT2.atts.long_name = 'MHS Brightness Temperature, secondary';
+f_mhs2.BT2.atts.units = 'Kelvin';
+
+f_amsub2 = f_mhs2;
+f_amsub2.BT2.dims = {'AMSUB_CHANS', 5};
+f_amsub2.BT2.atts.long_name = 'AMSU-B Brightness Temperature, primary';
+
+FieldCopier(D.collocation_mhs_mhs, f_mhs1, f_mhs2, ...
+    'name', 'associated_mhs_mhs');
+
+FieldCopier(D.collocation_mhs_amsub, f_mhs1, f_amsub2, ...
+    'name', 'associated_mhs_amsub');
+
+FieldCopier(D.collocation_amsub_mhs, f_amsub1, f_mhs2, ...
+    'name', 'associated_amsub_mhs');
+
+FieldCopier(D.collocation_amsub_amsub, f_amsub1, f_amsub2, ...
+    'name', 'associated_amsub_amsub');
+
+% Collapser datasets
+
+% similar to old Cloudsat/POES meandata
+
+global_lims = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
+               @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
 appccs.ROIWP.limitators = {@(X)(X>=0)}; % not flagged
 appccs.ROIWP.processors.NO = @length;
 appccs.ROIWP.stored.NO.type = 'int';
@@ -350,8 +392,9 @@ appccs.ROIWP.processors.FRAC = @(X)(sum(X>0) / length(X));
 appccs.ROIWP.stored.FRAC.type = 'float';
 appccs.ROIWP.stored.FRAC.atts.long_name = ['Cloud fraction according to ' f_cpr.ROIWP.atts.long_name];
 
+D = datasets;
 
-Collapser(d.associated_CPR_MHS_AMSU_HIRS, appccs, global_lims, ...
+Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, global_lims, ...
     'name', 'collapsed_associated_CPR_MHS_AMSU_HIRS');
 
 

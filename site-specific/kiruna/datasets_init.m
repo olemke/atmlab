@@ -87,6 +87,7 @@ D.patmosx.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3})
 
 D.dardarsub.basedir = '/storage4/user_data/gerrit/dardar_subsel';
 D.dardarsub.subdir = '$YEAR4/$MONTH/$DAY';
+D.dardarsub.re = D.dardar.re;
 
 %% COLLOCATION DATA SETS
 
@@ -106,7 +107,7 @@ D.CollocatedDataset_cpr_modis.basedir   = '/storage4/user_data/seliasson/colloca
 D.CollocatedDataset_cpr_modis.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_cpr_modis.filename  = 'collocations_cpr_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.CollocatedDataset_mhs_cpr.basedir   = '/storage4/user_data/gerrit/testing/collocations_mhs_cpr';
+D.CollocatedDataset_mhs_cpr.basedir   = '/storage4/user_data/gerrit/collocated_datasets/mhs_cpr';
 D.CollocatedDataset_mhs_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_mhs_cpr.filename  = 'collocations_$SAT.nc.gz';
 
@@ -114,18 +115,43 @@ D.CollocatedDataset_mspps_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_mspps_cpr.filename  = 'collocations_mspps_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 D.CollocatedDataset_mspps_cpr.basedir   = '/storage4/user_data/seliasson/collocations_mspps_cloudsat/core';
 
+D.collocation_mhs_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
 D.collocation_mhs_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
-D.collocation_mhs_mhs.filename  = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.collocation_mhs_mhs.basedir   = '/storage4/user_data/seliasson/collocations_patmosx_cloudsat/core';
+D.collocation_mhs_mhs.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
+
+D.collocation_amsub_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
+D.collocation_amsub_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
+D.collocation_amsub_mhs.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
+
+D.collocation_mhs_amsub.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
+D.collocation_mhs_amsub.subdir    = '$YEAR4/$MONTH/$DAY';
+D.collocation_mhs_amsub.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
+
+D.collocation_amsub_amsub.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
+D.collocation_amsub_amsub.subdir    = '$YEAR4/$MONTH/$DAY';
+D.collocation_amsub_amsub.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
 
 %% Associated datasets
 
-D.associated_CPR_MHS_AMSU_HIRS.basedir = '/storage3/user_data/gerrit/collocations_cpr_mhs_amsu_hirs';
+D.associated_CPR_MHS_AMSU_HIRS.basedir = '/storage3/user_data/gerrit/collocated_datasets/mhs_cpr';
 D.associated_CPR_MHS_AMSU_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
-D.associated_CPR_MHS_AMSU_HIRS.filename = 'collocations_fulldata.nc.gz';
+D.associated_CPR_MHS_AMSU_HIRS.filename = 'fulldata_$SAT.nc.gz';
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
-D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collocations_collapsed.nc.gz';
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed.nc.gz';
+
+D.associated_mhs_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
+D.associated_mhs_mhs.subdir = D.collocation_mhs_mhs.subdir;
+D.associated_mhs_mhs.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
+D.associated_mhs_amsub.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/mhs_amsub';
+D.associated_mhs_amsub.subdir = D.collocation_mhs_amsub.subdir;
+D.associated_mhs_amsub.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
+D.associated_amsub_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/amsub_mhs';
+D.associated_amsub_mhs.subdir = D.collocation_amsub_mhs.subdir;
+D.associated_amsub_mhs.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
+D.associated_amsub_amsub.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
+D.associated_amsub_amsub.subdir = D.collocation_amsub_amsub.subdir;
+D.associated_amsub_amsub.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');
 
@@ -196,7 +222,7 @@ if atmlab('LEGACY_MODE')
     
     
     % OLD STYLE
-    datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/collocations_cloudsat_mhs');
+    datasets_config('collocation_cpr_mhs_basedir', '/storage4/user_data/gerrit/archived/201011_collocations_cloudsat_mhs');
     datasets_config('collocation_cpr_mhs_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_cpr_mhs_filename', 'collocations_$SAT.nc.gz');
     
@@ -216,7 +242,7 @@ if atmlab('LEGACY_MODE')
     datasets_config('collocation_cpr_mhs_meandata_legacy_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_cpr_mhs_meandata_legacy_filename', 'collocations_meandata_$SAT.mat');
     
-    datasets_config('collocation_mhs_mhs_basedir', '/storage4/user_data/gerrit/collocations_mhs_mhs');
+    datasets_config('collocation_mhs_mhs_basedir', '/storage4/user_data/gerrit/archived/201007-201203_collocations_poes_poes');
     datasets_config('collocation_mhs_mhs_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_mhs_mhs_filename', 'collocations_$SAT1_$SAT2.nc.gz');
     
@@ -224,15 +250,15 @@ if atmlab('LEGACY_MODE')
     datasets_config('collocation_mhs_mhs_legacy_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_mhs_mhs_legacy_filename', 'collocations_$SAT1_$SAT2.mat');
     
-    datasets_config('collocation_mhs_mhs_data_legacy_basedir', '/storage4/user_data/gerrit/collocations_mhs_mhs');
+    datasets_config('collocation_mhs_mhs_data_legacy_basedir', '/storage4/user_data/gerrit/archived/201011_collocations_mhs_mhs');
     datasets_config('collocation_mhs_mhs_data_legacy_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_mhs_mhs_data_legacy_filename', 'collocations_data_$SAT1_$SAT2.mat');
     
-    datasets_config('collocation_cpr_avhrr_basedir', '/storage4/user_data/gerrit/collocations_cpr_avhrr');
+    datasets_config('collocation_cpr_avhrr_basedir', '/storage4/user_data/gerrit/archived/201011_collocations_cpr_avhrr');
     datasets_config('collocation_cpr_avhrr_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_cpr_avhrr_filename', 'collocations_$SAT.nc.gz');
     
-    datasets_config('collocation_hirscs_mhs_basedir', '/storage4/user_data/gerrit/collocations_hirscs_mhs');
+    datasets_config('collocation_hirscs_mhs_basedir', '/storage4/user_data/gerrit/archived/201007_collocations_hirscs_mhs');
     datasets_config('collocation_hirscs_mhs_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_hirscs_mhs_filename', 'collocations_$SAT1_$SAT2.nc.gz');
     
@@ -244,16 +270,16 @@ if atmlab('LEGACY_MODE')
     datasets_config('collocation_hirscs_mhs_data_legacy_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_hirscs_mhs_data_legacy_filename', 'collocations_data_$SAT1_$SAT2.mat');
     
-    datasets_config('collocation_amsua_amsua_basedir', '/storage4/user_data/gerrit/collocations_amsua_amsua');
+    datasets_config('collocation_amsua_amsua_basedir', '/storage4/user_data/gerrit/archived/201106_collocations_amsua_amsua');
     datasets_config('collocation_amsua_amsua_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_amsua_amsua_filename', 'collocations_$SAT1_$SAT2.nc.gz');
     
-    datasets_config('collocation_hirs_hirs_basedir', '/storage4/user_data/gerrit/collocations_hirs_hirs');
+    datasets_config('collocation_hirs_hirs_basedir', '/storage4/user_data/gerrit/archived/201106_collocations_hirs_hirs');
     datasets_config('collocation_hirs_hirs_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_hirs_hirs_filename', 'collocations_$SAT1_$SAT2.nc.gz');
     
     
-    datasets_config('collocation_collocation_cpr_mhs_avhrr_basedir', '/storage4/user_data/gerrit/collocations_collocation_cpr_mhs_avhrr');
+    datasets_config('collocation_collocation_cpr_mhs_avhrr_basedir', '/storage4/user_data/gerrit/archived/201010_collocations_collocation_cpr_mhs_avhrr');
     datasets_config('collocation_collocation_cpr_mhs_avhrr_subdir', '$YEAR4/$MONTH/$DAY');
     datasets_config('collocation_collocation_cpr_mhs_avhrr_filename', 'collocations_$SAT1_$SAT2.nc.gz');
 end

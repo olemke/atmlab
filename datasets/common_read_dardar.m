@@ -41,6 +41,9 @@ for F = all_fields'
         continue
     end
     S.(F{1}) = hdfread(file,F{1});
+    if isvector(S.(F{1})) && ~iscolumn(S.(F{1})) && length(S.(F{1})) == length(S.time)
+        S.(F{1}) = S.(F{1}).';
+    end
 end
 
 
