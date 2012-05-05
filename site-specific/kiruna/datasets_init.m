@@ -119,11 +119,11 @@ D.collocation_mhs_mhs.basedir   = '/storage4/user_data/gerrit/collocated_dataset
 D.collocation_mhs_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
 D.collocation_mhs_mhs.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
 
-D.collocation_amsub_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
+D.collocation_amsub_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_mhs';
 D.collocation_amsub_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
 D.collocation_amsub_mhs.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
 
-D.collocation_mhs_amsub.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
+D.collocation_mhs_amsub.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/mhs_amsub';
 D.collocation_mhs_amsub.subdir    = '$YEAR4/$MONTH/$DAY';
 D.collocation_mhs_amsub.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
 

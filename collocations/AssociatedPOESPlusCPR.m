@@ -63,6 +63,12 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             origline = processed_core(:, self.parent.cols.LINE1);
             origpos = processed_core(:, self.parent.cols.POS1);
 
+            if size(origline, 1)==0
+                newline = origline;
+                newpos = origpos;
+                return
+            end
+
             switch dsname
                 case 'amsua'
                     [aah aaw] = size(data_other.lon);

@@ -133,7 +133,26 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                     other_instrument = other_instruments{k}{i};
                     logtext(atmlab('OUT'), 'Also taking same-satellite instrument %s\n', ...
                         other_instrument);
-                    data_other = d.(other_instrument).read_granule(date, spec, {}, false);
+                    try
+                        data_other = d.(other_instrument).read_granule(date, spec, {}, false);
+                    catch ME
+                        switch ME.identifier
+                            case {'atmlab:invalid_data'}
+                                logtext(atmlab('ERR'), 'Unable to read %s data, skipping\n', ...
+                                    other_instrument);
+                                % return something of the right width
+                                flds = fieldnames(fc_other.(other_instrument).members);
+                                hasdim = structfun(@(x)(isfield(x, 'dims')), fc_other.(other_instrument).members);
+                                sz_singles = sum(~hasdim);
+                                sz_multid = sum(cellfun(@(x)(fc_other.(other_instrument).members.(x).dims{2}), flds(hasdim)));
+                                ncols = sz_singles + sz_multid;
+                                nrows = size(processed_core, 1);
+                                out_other{k}{i} = nan*zeros(nrows, ncols); %#ok<AGROW>
+                                continue;
+                            otherwise
+                                ME.rethrow();
+                        end
+                    end
                     pc_other = processed_core;
                 
                     

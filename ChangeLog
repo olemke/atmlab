@@ -1,3 +1,21 @@
+2012-05-05  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-95
+
+	* collocations/FieldMultiInstrumentCopier.m(process_granule):
+
+	- When one of the other instruments cannot be read, calculate what
+	size of matrix should have been returned and insert an equally-sized
+	matrix with nans instead.
+
+	* collocations/AssociatedPOESPlusCPR.m(translate):
+
+	- When origline is empty, result should also be, with same dims.
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Fix basedir for amsub_mhs and mhs_amsub (was wrong)
+
 2012-05-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-94
