@@ -1,3 +1,9 @@
+2012-05-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-96
+
+	* tests/test_arts_ppath.m: Now three options for "aspherity".
+
 2012-05-05  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-95

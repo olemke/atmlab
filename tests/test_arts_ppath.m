@@ -6,6 +6,7 @@
 %       length of lat_grid
 %       length of lon_grid
 %       z_surface
+%       z_field
 %       sensor_pos
 %       sensor_los
 %
@@ -14,19 +15,22 @@
 %    error is found, "keyboard" is called. The work folder is then left for
 %    debugging purposes.
 %
-% FORMAT   test_arts_ppath( atmosphere_dim, n, [re_sphere, do_refr] )
+% FORMAT   test_arts_ppath( atmosphere_dim, n, [unsphere, do_refr] )
 %        
 % IN    atmosphere_dim   Atmospheric dimensionality
 %       n                Run n cases
-% OPT   re_sphere        Flag to also use a spherical reference ellipsoid
-%                        for 2D and 3D. Default is false.
+% OPT   unsphere         Deviation from spherical geometry. Default is 0.
+%                        Possible choices:
+%                          0: 1D geometry
+%                          1: z_field disturbed
+%                          2: 1 + non-spherical ellipsoid
 %       do_refr          Run with refraction ray tracing WSM (but with n=1).
 
 % 2012-02-22   Created by Patrick.
 
 function test_arts_ppath( atmosphere_dim, n, varargin  )
 %
-[re_sphere,do_refr] = optargs( varargin, { false, false } );
+[unsphere,do_refr] = optargs( varargin, { 0, false } );
   
   
 %- Fixed settings
@@ -49,7 +53,7 @@ if do_refr
 end
 Q.PPATH_LMAX            = 10e3;
 %
-if atmosphere_dim == 1  ||  re_sphere
+if atmosphere_dim == 1  ||  unsphere < 2
   refell                = ellipsoidmodels( 'SphericalEarth' );
   re_string             = 'refellipsoidEarth( refellipsoid, "Sphere" )';
 else
@@ -111,6 +115,9 @@ for c = 1 : n
   % Atmospheric fields
   Q.Z_FIELD = repmat( interpp( Az.grids{1}, Az.data, Q.P_GRID ), ...
                                                            [ 1, nlat, nlon ] ); 
+  if unsphere
+    Q.Z_FIELD = Q.Z_FIELD + 3*randn( size(Q.Z_FIELD) );
+  end
   Q.T_FIELD = repmat( interpp( At.grids{1}, At.data, Q.P_GRID ), ...
                                                            [ 1, nlat, nlon ] ); 
   Q.VMR_FIELD = repmat( interpp( Ah2o.grids{1}, Ah2o.data, Q.P_GRID ), ...
@@ -119,7 +126,7 @@ for c = 1 : n
   
   %- Surface altitude
   %
-  if re_sphere
+  if ~unsphere
     Q.Z_SURFACE           = repmat( 500, nlat, nlon );
   else
     Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
@@ -198,7 +205,7 @@ for c = 1 : n
   %
   if ppath.np > 1
     
-    if atmosphere_dim == 1  ||  re_sphere
+    if atmosphere_dim == 1  ||  ~unsphere
       re = refell(1);
     else
       re = interp1( Q.LAT_GRID, ellipsoidradii(refell,Q.LAT_GRID), lat0 );
