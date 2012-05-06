@@ -571,8 +571,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % IN
             %
-            %   date1   datevec     starting date
-            %   date2   datevec     ending date
+            %   date1   datevec     starting date   [y,m,d]
+            %   date2   datevec     ending date     [y,m,d]
             %   spec    various
             %
             % OUT
@@ -584,7 +584,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   >> [allgrans, allpaths] = mhs.find_granules_for_period([2010, 9, 5], [2010 9 7], 'noaa18');
             
-            dates = daterange(date1, date2);
+            
+            dates = daterange(date1(1:3), date2(1:3));
             ndates = size(dates, 1);
             
             allgrans = nan*zeros(ndates*15, 5);
@@ -605,7 +606,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             allpaths(to_remove) = [];
             [allgrans, I] = sortrows(allgrans);
             allpaths = allpaths(I);
-
         end
         
         function data = read_granule(self, date, varargin)

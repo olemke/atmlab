@@ -32,29 +32,41 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 % 2010-07-08 Oliver Lemke
 
 assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
-if exist('filter','var')
+if exist('filter','var') && ~isempty(filter)
     assert(isfunction_handle(filter),'atmlab:BadInput','filter must be a function handle')
     data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
 end
 
 w = warning('off','MATLAB:divideByZero');
-for s = statistics
-    out.(func2str(s{1})) = cellfun(s{1}, data_bins, 'UniformOutput', false);
+for i = 1:length(statistics)
+    try
+        A.(func2str(statistics{i}))=0;
+        statname= func2str(statistics{i});
+    catch ME
+        if strcmp(ME.identifier,'MATLAB:AddField:InvalidFieldName')
+            statname = sprintf('statistic%.0f',i);
+        end
+    end
+    out.(statname) = cellfun(statistics{i}, data_bins, 'UniformOutput', false);
 end
 warning(w);
 
-% Replace empty cells with something (e.g. NaN)
+%% - Replace empty cells with something (e.g. NaN). put the data array must have the same class as "replace"
+%
 if exist('replace','var')
     for F = fieldnames(out)'
-        test =  cellfun('isempty',out.(F{1}));
+        % putting back [] if the input was empty to begin with would be desirable, since e.g. nansum([])=0,
+        % 
+        test =  cellfun('isempty',data_bins) | cellfun('isempty',out.(F{1}));
         if any(test(:))
-            test =  out.(F{1})(~cellfun('isempty',out.(F{1})));
-            if ~strcmp(class(replace),class(test{1}))
-                fprintf('Replacing "[]" with "%.0f" instead of "%f" since class(replace):%s ~= class(data_bins):%s\n',...
-                    ones(1,class(out.(F{1}){1}))*replace,replace,class(replace),class(test{1}));
-                replace = ones(1,class(out.(F{1}){1}))*replace;
+            
+            if ~strcmp(class(replace),class(data_bins{1,1}))
+                warning(['atmlab:' mfilename ':dataClass'],...
+                    ['replace  value "%f" is not the same class as data_bins\n',...
+                    'E.g. this means you cannot call cell2mat without an error'],replace)
             end
-            out.(F{1})(cellfun('isempty',out.(F{1})))={replace};
+            % this still won't work for [0xn] cells
+            out.(F{1}){test}=replace;
         end
     end
 end

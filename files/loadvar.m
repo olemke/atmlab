@@ -6,7 +6,7 @@
 %        x = loadvar( 'data.mat', 'x' )
 %
 % FORMAT   x = loadvar( filename, varname )
-%        
+%
 % OUT   x          Loaded variable
 % IN    filename   Name of file.
 %       varname    Name of variable.
@@ -15,11 +15,12 @@
 
 
 function x = loadvar( filename, varname )
-  
+
 X = load( filename, varname );
 
 if ~isfield( X, varname )
-  error( 'The file does not contain the requested variable.' );
+    error( ['atmlab:' mfilename ':variableNotFound'],...
+        lastwarn);
 else
-  x = getfield( X, varname );
+    x = X.(varname);
 end

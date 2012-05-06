@@ -1,9 +1,12 @@
 function [S,attr] = common_read_patmosx(file, varargin)
 
-% common_read_patmosx Read Patmos-x data in the common format (see README)
+% COMMON_READ_PATMOSX reads patmosx data
 %
-% This file reads data from a PATMOS-x file (actually 2 files) and rearranges the fields to
-% the common format.
+% Read PATMOS-x data and output the data in the format common to all
+% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% always retrieved from the data file.
+%
+% NOTE: This reader actually reads 2 files, one ascending, one descending
 %
 %
 % IN
@@ -65,7 +68,9 @@ S.path = file;
 
 S = rmfield(S,core_fields);
 
-S = removeInvalidGeoTimedata(S);
+S = MaskInvalidGeoTimedataWithNaN(S);
+'check the dimesions of the data'
+keyboard 
 
 end
 %%%%%%%%%%%%%

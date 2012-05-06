@@ -174,7 +174,7 @@ function filename = gmt_plot(in,field)
 %                     pscoast GMT command.
 %                     |[]|
 %                     ----------------------
-% in.coast            |%s|
+% in.coast            |logical|
 %                     If you don't want coastlines, set to false. If
 %                     in.coast is a structure, it'll use the structure
 %                     arguments to generate the pscoast command.
@@ -589,6 +589,7 @@ end
 commands = create_gmt_earth(out);
 
 % finalize
+
 filename=sort_figures(out,commands);
 
 %%%%%%%%%%%%%%%%%%%%
@@ -630,6 +631,8 @@ default.keep_files        = false;              % keep intermediate files (debug
 default.unit              = '';                 % unit displayed with legend
 default.xunit             = '';                 % xlabel for the legend
 default.plotPlacement     = '-Xa5 -Ya5';        % String of global plotPlacements
+default.color_background  = '0/0/0';
+default.color_foreground  = '255/255/255';
 
 in = optargs_struct(in,default);
 

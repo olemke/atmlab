@@ -10,7 +10,7 @@
 
 % 2009-11-26   Created by Oliver Lemke.
 
-function data = atovs_get_l1c( filename );
+function data = atovs_get_l1c( filename )
 
 tf = create_tmpfolder;
 atovs_file = [ tf '/atovs.l1c' ];

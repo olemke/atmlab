@@ -1,9 +1,10 @@
 function [S,attr] = common_read_calipso(file, varargin)
 
-% common_read_calipso Read CALIPSO data in the common format
+% COMMON_READ_CALIPSO reads calipso data
 %
-% This file reads data from a CALIPSO file and rearranges the fields to
-% the common format.
+% Read calipso caliop data and output the data in the format common to all
+% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% always retrieved from the data file.
 %
 %
 % IN
@@ -24,8 +25,9 @@ function [S,attr] = common_read_calipso(file, varargin)
 % FORMAT
 %
 %   [S,attr] = common_read_calipso(file, varargin)
-%
+
 % $Id$
+% Created by Salomon Eliasson
 
 %% INFORMATION
 %
@@ -85,7 +87,7 @@ S.path = file;
 S.version = '051 (hardcoded)';
 
 S = rmfield(S,core_fields);
-S = removeInvalidGeoTimedata(S);
+S = MaskInvalidGeoTimedataWithNaN(S);
 end
 %%%%%%%%%%%%%
 % SUBFUNCTION

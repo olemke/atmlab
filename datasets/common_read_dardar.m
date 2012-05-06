@@ -1,10 +1,10 @@
 function S = common_read_dardar(file, varargin)
 
-% common_read_modis Read DARDAR data in the common format (see README)
+% COMMON_READ_DARDAR Read DARDAR data in the common format
 %
 % This file reads data from a DARDAR file and rearranges the fields to
-% the common format.
-%
+% the common format. Geodata and time data are always retrieved from the
+% data file.
 %
 % IN
 %
@@ -21,7 +21,7 @@ function S = common_read_dardar(file, varargin)
 % FORMAT
 %
 %   S = common_read_dardar(file, varargin)
-%
+
 % $Id$
 % Created by Salomon Eliasson
 
@@ -48,9 +48,9 @@ end
 
 
 % CONSTRUCT time axis with same dimensions
-S.lat = double(S.latitude(:));
-S.lon = double(S.longitude(:));
-S.time = double(S.time(:));
+S.lat = double(S.latitude);
+S.lon = double(S.longitude);
+S.time = double(S.time);
 
 % get the verion directly from the filename
 D = datasets;
@@ -66,9 +66,10 @@ end
 S.version = info.version;
 S.path = file;
 
-S = removeInvalidGeoTimedata(S);
-
 S = rmfield(S,{'latitude','longitude'});
+
+S = MaskInvalidGeoTimedataWithNaN(S);
+
 end
 %%%%%%%%%%%%%
 % SUBFUNCTION
@@ -106,8 +107,8 @@ switch field
         
         S.dardar_IWP_error(cloudFree)=0;
         
-        S.dardar_IWP = S.dardar_IWP(:);
-        S.dardar_IWP_error = S.dardar_IWP_error(:);
+        S.dardar_IWP = S.dardar_IWP;
+        S.dardar_IWP_error = S.dardar_IWP_error;
 end
 
 S=rmfield(S,dependent_fields(rmflag));

@@ -1,3 +1,55 @@
+2012-05-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-97
+
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/gmt_inputs.m:
+	-Fixed bug in class check for in.coast, and cleaned up a tad
+
+	* geoplots/gmt/create_gmt_earth.m:
+	- Added COLOR_BACKGROUND and COLOR_FOREGROUND to psbasemap
+
+	* files/loadvar.m:
+	- small changes: fixed some mlint warnings
+
+	* datasets/SatDataset.m:
+	-Puny update
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+
+	- Added function to mask invalid data from the
+	common_read_<dataset> functions with NaNs
+
+	* datasets/{common_read_calipso.m,common_read_mspps.m,
+	common_read_dardar.m,common_read_patmosx.m,common_read_cpr.m,
+	common_read_modis,common_read_avhrr_cmsaf_gac}:
+
+	- Mask invalid data with NaNs instead of just removing them
+	- Don't flatten the data unnecessarily
+	- Update the header
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m:
+	- Added MIRS to the list
+
+	* time/daterange.m:
+	- Expanded so that it also handles datevec with
+	h,min,sec.
+
+	* math/binned_statistics.m:
+
+	- Patch so that if func2str gives an unusable string for the
+	structure, call it statistic1 , etc instead.
+
+	- Passing an empty limiter is now also possible.
+
+	- No longer try to be smart and pick another "replace with" value
+	for empty cells is the class of the array in the cell are
+	different from the class of the "replace value". Instead pass a
+	warning.
+
+	* sensors/atovs/atovs_get_l1c.m: small edit
+
 2012-05-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-96

@@ -1,9 +1,10 @@
 function S = common_read_modis(file, varargin)
 
-% common_read_modis Read modis data in the common format (see README)
+% COMMON_READ_MODIS reads modis data
 %
-% This file reads data from a modis file and rearranges the fields to
-% the common format.
+% Read MODIS data and output the data in the format common to all
+% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% always retrieved from the data file.
 %
 %
 % IN
@@ -21,7 +22,7 @@ function S = common_read_modis(file, varargin)
 % FORMAT
 %
 %   S = common_read_modis(file, varargin)
-%
+
 % $Id$
 % Created by Salomon Eliasson
 
@@ -49,8 +50,8 @@ S = interpolate_geodataTime(S);
 
 % CONSTRUCT time axis with same dimensions
 
-S.lat = double(S.Latitude(:));
-S.lon = double(S.Longitude(:));
+S.lat = double(S.Latitude);
+S.lon = double(S.Longitude);
 
 % get the verion directly from the filename
 D = datasets;
@@ -59,9 +60,6 @@ date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 %data starts at 1993, I need an offset
 S.time = S.Scan_Start_Time(:) + date2unixsecs(1993) -S.epoch;
-
-%% Flatted matrixes according to conventions
-S = flattenMatrixes(S,extra_fields(~ismember(extra_fields,pseudo_fields)));
 
 S = rmfield(S,core_fields);
 
@@ -73,21 +71,11 @@ end
 S.version = info.version;
 S.path = file;
 
-S = removeInvalidGeoTimedata(S);
+S = MaskInvalidGeoTimedataWithNaN(S);
 
 end
 %%%%%%%%%%%%%
 % SUBFUNCTION
-
-function S = flattenMatrixes(S,fields)
-%% Flatted matrixes according to conventions
-
-for F = fields(:)'
-    tmp = permute(S.(F{1}),[3,1,2]); % this will work for 2 and 3 dim data
-    S.(F{1}) = squeeze(permute(tmp(:,:),[2,1]));
-end
-
-end
 
 function S = dealWithPseudoFields(S,field,file)
 %% dealWithPseudoFields
@@ -107,7 +95,6 @@ switch field
         for F = dependent_fields
             S.(F{1}) = hdfread(file,F{1});
         end
-        S = flattenMatrixes(S,dependent_fields);
 end
 
 % use dependent fields to BUILD the pseudo field
@@ -129,11 +116,11 @@ switch field
         usefull=uint8(sum(2.^[0,1]));
         flaggedAsGood = bitand(typecast(S.Quality_Assurance_1km(:,2),'uint8'),usefull)==usefull;
         
-        % remove all non applicable data
+        % mask all non applicable data with NaN
         [sz1,~] = size(S.Cloud_Water_Path);
         for F = fieldnames(S)'
             if isequal(size(S.(F{1}),1),sz1)
-                S.(F{1}) = S.(F{1})(clearPixel | (icePhase & flaggedAsGood));
+                S.(F{1})(~(clearPixel | (icePhase & flaggedAsGood)))=NaN;
             end
         end
         S.modis_IWP = S.Cloud_Water_Path;
@@ -156,6 +143,9 @@ function S = interpolate_geodataTime(S)
 % Use the sampling as described in variable documentation
 %Longitude:Cell_Along_Swath_Sampling = 3, 2028, 5 ;
 %Longitude:Cell_Across_Swath_Sampling = 3, 1348, 5 ;
+
+
+error('This will fail if the data crosses the dateline!')
 [X,Y] = meshgrid(3:5:size(S.Scan_Start_Time,2)*5-2,3:5:size(S.Scan_Start_Time,1)*5-2);
 [Xi,Yi] = meshgrid(1:1354,1:size(S.Scan_Start_Time,1)*5);
 

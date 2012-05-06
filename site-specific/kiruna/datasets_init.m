@@ -71,6 +71,10 @@ D.hirs.basedir = '/storage3/data/hirs';
 D.hirs.subdir = '$SAT_hirs_$YEAR4/$MONTH/$DAY';
 D.hirs.re = poes_re;
 
+D.mirs.basedir = '/storage3/data/mirs/';
+D.mirs.subdir = '$SAT_$YEAR4-$MONTH-$DAY';
+D.mirs.re = '\.D(?<year>\d{2})(?<doy>\d{3})\.S(?<hour>\d{2})(?<minute>\d{2})\.E';
+
 D.modis_aqua_L2.basedir = '/storage3/data/modis/MYD06_L2/';
 D.modis_aqua_L2.subdir = '$YEAR4/$MONTH/$DAY';
 D.modis_aqua_L2.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})\.(?<version>\d{3})';

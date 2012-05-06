@@ -1,9 +1,11 @@
 function S = common_read_cpr(file, varargin)
 
-% COMMON_READ_CPR read CloudSat CPR data in the common format (see README)
+% COMMON_READ_CPR reads cloudsat data
 %
-% This file reads data from a CloudSat CPR file and rearranges the fields to
-% the common format.
+% Read CloudSat data and output the data in the format common to all
+% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% always retrieved from the data file.
+%
 %
 % FORMAT
 %
@@ -20,7 +22,7 @@ function S = common_read_cpr(file, varargin)
 %                   time    time in seconds since 00:00 UT
 %                   lat     latitude in degrees, one column per viewing angle
 %                   lon     longitude in [-180, 180] degrees, colums as for lat
-%
+
 % $Id$
 % Gerrit Holl
 
@@ -30,8 +32,8 @@ all_fields = [core_fields(:); extra_fields(:)];
 S = cloudsat_read_zipped(file, all_fields);
 
 % rename some fields
-S.lon = double(S.Longitude(:));
-S.lat = double(S.Latitude(:));
+S.lon = double(S.Longitude);
+S.lat = double(S.Latitude);
 % construct time axis with same dimensions. Must convert to double because
 % otherwise unixsecstodate will give the wrong time.
 S.time = double( S.UTC_start + S.Profile_time);
@@ -57,5 +59,7 @@ for i = 1:length(flds)
         S.(fld) = S.(fld)(:);
     end
 end
+
+S = MaskInvalidGeoTimedataWithNaN(S);
 
 end

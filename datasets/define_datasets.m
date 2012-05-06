@@ -1,12 +1,13 @@
 function varargout = define_datasets(varargin)
 % define datasets
 %
-% This function defines datasets. It has tw modes:
+% This function defines datasets. It has two modes:
 %
 % - no inputs and no outputs, just define datasets
 % - one input 'check', return logical scalar to say if it has been defined
 
 % $Id$
+% Gerrit Holl
 
 persistent defined;
 
@@ -72,7 +73,11 @@ SatDataset('name', 'mhs', ...
 SatDataset('name', 'hirs', ...
     'reader', @common_read_poes_radiometer, ...
     'granule_duration', 6130);
-
+                
+SatDataset('name', 'mirs', ...
+    'reader', @common_read_mirs, ...
+    'granule_duration', 7200);
+                
 SatDataset('name', 'modis_aqua_L2', ...
     'reader', @common_read_modis, ...
     'granule_duration', 300);

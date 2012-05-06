@@ -194,8 +194,8 @@ function basemap = setupbasemap(in)
 %% setupbasemap
 
 if ~isempty(in.title)
-    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K -B:."%s": > %s.ps',...
-        in.plot.region,in.plot.proj,in.plotPlacement,gmt_unicode_converter(in.title),in.filename);
+    basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K --COLOR_FOREGROUND=%s --COLOR_BACKGROUND=%s -B:."%s": > %s.ps',...
+        in.plot.region,in.plot.proj,in.plotPlacement,in.color_foreground,in.color_background,gmt_unicode_converter(in.title),in.filename);
     
 else
     basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K > %s.ps',...

@@ -1,10 +1,10 @@
 function S = common_read_avhrr_cmsaf_gac(file, varargin)
 
-% common_read_cmsaf_gac Read AVHRR based data developed by CMSAF in the common format (see README)
+% COMMON_READ_AVHRR_CMSAF_GAC Read avhhrCMSAF data in the common format
 %
-% This file reads data from a AVHRR CMSAF GAC IWP file and rearranges the fields to
-% the common format.
-%
+% This file reads data from a avhhrCMSAF file and rearranges the fields to
+% the common format. Geodata and time data are always retrieved from the
+% data file.
 %
 % IN
 %
@@ -21,7 +21,7 @@ function S = common_read_avhrr_cmsaf_gac(file, varargin)
 % FORMAT
 %
 %   S = common_read_cmsaf_gac(file, varargin)
-%
+
 % $Id$
 % Created by Salomon Eliasson
 
@@ -57,9 +57,9 @@ end
 S.time = S.time*3600;
 S.time = repmat(S.time,size(S.lon,1),1);
 
-S.lat  = double(S.lat(:)*0.01); % use scale (see attributes)
-S.lon  = double(S.lon(:)*0.01); % use scale (see attributes)
-S.time = double(S.time(:));
+S.lat  = double(S.lat*0.01); % use scale (see attributes)
+S.lon  = double(S.lon*0.01); % use scale (see attributes)
+S.time = double(S.time);
 
 % get the verion directly from the filename
 D = datasets;
@@ -76,7 +76,7 @@ if any(ismember(pseudo_fields,extra_fields))
 end
 S.version = info.version;
 
-S = removeInvalidGeoTimedata(S);
+S = MaskInvalidGeoTimedataWithNaN(S);
 
 end
 %%%%%%%%%%%%%
