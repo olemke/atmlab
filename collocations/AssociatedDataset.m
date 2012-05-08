@@ -211,9 +211,15 @@ classdef AssociatedDataset < HomemadeDataset
             %   out                 matrix
             %
             %       Data matrix with columns described by self.cols
-            
-            
+ 
             depies = optargs(varargin, {{}});
+            % data checks
+            errid = ['atmlab:' mfilename ':InvalidFormat'];
+            errmes = 'Data are not properly sorted: %s has descending elements';
+            assert(all(diff(processed_core(:, self.parent.cols.START1))>0), ...
+                errid, errmes, 'START1');
+            assert(all(diff(processed_core(:, self.parent.cols.START2))>0), ...
+                errid, errmes, 'START2');
             % divide in segments where new primary, new secondary starts
             [~, newprim] = unique(processed_core(:, self.parent.cols.START1), 'rows', 'first');
             [~, newsec] = unique(processed_core(:, self.parent.cols.START2), 'rows', 'first');

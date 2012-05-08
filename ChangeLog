@@ -1,5 +1,14 @@
 2012-05-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-100
+
+	* collocations/AssociatedDataset.m(process_delayed):
+
+	- Check that data are properly sorted. If not, error, because
+	otherwise there might be incorrect results later on!
+
+2012-05-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-99
 
 	* datasets/HomemadeDataset.m(read_single_day):
