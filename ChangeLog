@@ -1,5 +1,13 @@
 2012-05-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-99
+
+	* datasets/HomemadeDataset.m(read_single_day):
+
+	- Change from protected to public
+
+2012-05-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-98
 
 	* datasets/HomemadeDataset.m(store):

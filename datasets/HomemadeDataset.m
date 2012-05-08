@@ -235,9 +235,6 @@ classdef HomemadeDataset < SatDataset
         function mem = getmembers(self)
             mem = self.members;
         end
-    end
-    
-    methods (Access = protected)
         
         % protected, those are for internal use, user uses
         % CollocatedDataset.read
