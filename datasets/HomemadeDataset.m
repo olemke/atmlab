@@ -225,7 +225,7 @@ classdef HomemadeDataset < SatDataset
             
             logtext(atmlab('OUT'), 'Finalising\n');
             logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', [fn '.gz']);
-%            netcdf.close(ncid); % do not close, this is done in the cleanup-fuction!
+            netcdf.close(ncid);
             gzipped_filename = gzip(temp_out, outdir);
             movefile(gzipped_filename{1}, [fn '.gz']);
             logtext(atmlab('OUT'), 'Done\n');

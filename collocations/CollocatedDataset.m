@@ -1216,7 +1216,7 @@ classdef CollocatedDataset < HomemadeDataset
                     end
                 end
                 
-            else % more than 2 output arguments
+            elseif nargout>=3 % more than 2 output arguments
                 if ~isempty(fieldnames(limits)) || ~isempty(filters_by_name)
                     error(['atmlab:' mfilename ':NotImplemented'], ...
                         ['Applying limits or filters is not supported when ' ...

@@ -1,3 +1,17 @@
+2012-05-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-98
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Fixed SERIOUS bug causing possible data corruption in
+	collocated-data!
+
+	* collocations/CollocatedDataset.m:
+
+	- When there are no additionals, do not complain about limits or
+	filters.
+
 2012-05-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-97
