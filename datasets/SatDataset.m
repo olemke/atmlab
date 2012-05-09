@@ -918,8 +918,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
                     allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
                 uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
-                if self.firstlines.isKey(uni) && ~any(self.firstlines.(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR]);
-                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.get(uint32(uni)));
+                if self.firstlines.isKey(uni) && ~any(self.firstlines(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
+                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines(uni));
                     continue
                 end
                 try

@@ -1,5 +1,14 @@
 2012-05-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-102
+
+	* datasets/SatDataset.m(find_granules_first_line):
+
+	- Bugfix: X.(elem) --> X(elem). Was actually causing unhandled
+	C++-level exception.
+
+2012-05-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-101
 
 	* collocations/AssociatedDataset.m(process_delayed):
