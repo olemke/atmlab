@@ -809,7 +809,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 sat = spec;
             end
             
-            if isequal(self.firstlines, []) % load first
+            if isequal(self.firstlines, []) || ~isfield(self.firstlines, spec) % load first
                 scanfile = datasets_config('firstline_data');
                 scanfile = strrep(scanfile, '$SAT', sat);
                 scanfile = strrep(scanfile, '$SENSOR', self.name);
@@ -834,7 +834,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     end
                 end
                                 
-                self.firstlines = t.first;
+                self.firstlines.(spec) = t.first;
             end
             
             if isscalar(d)
@@ -844,8 +844,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 unisecs = uint32(date2unixsecs(dv{:}));
             end
             
-            first = self.firstlines(unisecs);
-            if isempty(first) && ~force
+
+            if self.firstlines.(spec).isKey(unisecs)
+                first = self.firstlines.(spec)(unisecs);
+            elseif force
+                first = [];
+            else
                 error(['atmlab:' mfilename ':missing_firstline'], ['no data found for %s @ %d. ', ...
                     'You may want to run self.find_granule_first_line(...) ', ...
                     'for a sufficiently long period.'], ...
@@ -893,6 +897,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
 
             scanfile = datasets_config('firstline_data');
             scanfile = strrep(scanfile, '$SAT', sat);
+
             scanfile = strrep(scanfile, '$SENSOR', self.name);
             
             logtext(atmlab('OUT'), 'Locating granules\n');
@@ -902,15 +907,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             if exist(scanfile, 'file')
                 tm = load(scanfile);
-                self.firstlines = tm.first;
+                self.firstlines.(spec) = tm.first;
             else
-                self.firstlines = containers.Map('KeyType', 'uint32', 'ValueType', 'int32');
+                self.firstlines.(spec) = containers.Map('KeyType', 'uint32', 'ValueType', 'int32');
             end
             
             uni_first = date2unixsecs(allgrans(1, 1), allgrans(1, 2), allgrans(1, 3), allgrans(1, 4), allgrans(1, 5));
-            if ~self.firstlines.isKey(uni_first)
+            if ~self.firstlines.(spec).isKey(uni_first)
                 logtext(atmlab('OUT'), 'Setting very first to flag\n');
-                self.firstlines(uni_first) = self.FL_INITIAL;
+                self.firstlines.(spec)(uni_first) = self.FL_INITIAL;
             end
             next = 0;
 
@@ -918,8 +923,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
                     allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
                 uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
-                if self.firstlines.isKey(uni) && ~any(self.firstlines(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
-                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines(uni));
+                if self.firstlines.(spec).isKey(uni) && ~any(self.firstlines.(spec)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
+                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(spec)(uni));
                     continue
                 end
                 try
@@ -951,23 +956,23 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     firstline = find(t_next > t_cur(end), 1, 'first');
                     if ~isempty(firstline)
                         logtext(atmlab('OUT'), 'First line: %d\n', firstline);
-                        self.firstlines(uni) = firstline;
+                        self.firstlines.(spec)(uni) = firstline;
                     else
                         logtext(atmlab('OUT'), 'No first line, setting to flag\n');
-                        self.firstlines(uni) = self.FL_ALLDUPL;
+                        self.firstlines.(spec)(uni) = self.FL_ALLDUPL;
                     end
                 elseif couldreadcur
                     logtext(atmlab('OUT'), 'Could not read next, flagging \n');
-                    self.firstlines(uni) = self.FL_NONEXT;
+                    self.firstlines.(spec)(uni) = self.FL_NONEXT;
                 else
                     logtext(atmlab('OUT'), 'Could not read current. flagging\n');
-                    self.firstlines(uni) = self.FL_NOCUR;
+                    self.firstlines.(spec)(uni) = self.FL_NOCUR;
                 end
             end
             
             logtext(atmlab('OUT'), ...
                 'Writing %s\n', scanfile);
-            first = self.firstlines; %#ok<NASGU>
+            first = self.firstlines.(spec); %#ok<NASGU>
             save(scanfile, 'first');    
             
         end
