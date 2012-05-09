@@ -59,7 +59,7 @@ info = D.modis_aqua_L2.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 %data starts at 1993, I need an offset
-S.time = S.Scan_Start_Time(:) + date2unixsecs(1993) -S.epoch;
+S.time = S.Scan_Start_Time + date2unixsecs(1993) -S.epoch;
 
 S = rmfield(S,core_fields);
 
@@ -107,7 +107,7 @@ switch field
         
         % Removing all points that are not flagged as IWP
         icePhase = S.Cloud_Phase_Optical_Properties==3;
-      
+        
         % only KEEP retrievals that are USEFUL and CONFIDENT
         
         % this corresponds to the 1st and 2nd bit in the 2nd byte in
@@ -139,21 +139,49 @@ function S = interpolate_geodataTime(S)
 %
 % NOTE: This will destroy all data outside the bounds of the sampled data!
 %
+% Warning: Slight dodgyness
+%
+% - I am using 'linear' interpolation on a geoid.
+% - When LONGITUDES contain lon < -175 & lon > 175 the satellite clearly
+%   passes the  dateline. For such swaths I temporarily switch to 0:360
+%   representation, interpolate, and then switch back to -180:180
+%   representation.
+% - The incorrect interpolation of LATITUDES if the modis passes the poles is deemed
+%   small and ignored here since the sampled footprints are about 5km
+%   apart. e.g. in the worst case (for this footprint resolution):
+%   [89.95 89.95] is interpolated to [89.95 89.95 89.95 89.95 89.95]
+%   instead of [89.95 89.98 90 89.98 89.95]
+%
 
 % Use the sampling as described in variable documentation
 %Longitude:Cell_Along_Swath_Sampling = 3, 2028, 5 ;
 %Longitude:Cell_Across_Swath_Sampling = 3, 1348, 5 ;
 
 
-error('This will fail if the data crosses the dateline!')
-[X,Y] = meshgrid(3:5:size(S.Scan_Start_Time,2)*5-2,3:5:size(S.Scan_Start_Time,1)*5-2);
+[X,Y]   = meshgrid(3:5:size(S.Scan_Start_Time,2)*5-2,3:5:size(S.Scan_Start_Time,1)*5-2);
 [Xi,Yi] = meshgrid(1:1354,1:size(S.Scan_Start_Time,1)*5);
 
 fields2DealWith = {'Latitude','Longitude','Scan_Start_Time'};
 
+lonflag = false;
 for F = fields2DealWith
     Z = S.(F{1});
+    
+    % dateline patch
+    if strcmp(F{1},'Longitude')
+        Z(Z<-180) = NaN; % get rid of fill values
+        if any(Z(:)<-175 ) && any(Z(:)>175) % Fill = -999
+            % CONVERT LONGITUDES to [0 360] regime if the dateline is crossed
+            Z=Z+(Z < 0)*360;
+            lonflag=true;
+        end
+    end
+    
     S.(F{1}) = interp2(X,Y,Z,Xi,Yi);
+    
+    if strcmp(F{1},'Longitude') && lonflag
+        S.(F{1}) = S.(F{1})-(S.(F{1}) > 180)*360;
+    end
 end
 
 end

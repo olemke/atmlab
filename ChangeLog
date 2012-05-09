@@ -1,5 +1,21 @@
 2012-05-09  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-104
+
+	* datasets/common_read_modis.m:
+	- Fixed bug in interpolation. Now taking into account when
+	longitudes include the dateline.
+	- Added some documentation on what I am doing.
+	- Was still flattening the time array
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+	- fixed bugs due to changing from the flattened matrixes conventions
+
+
+2012-05-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+
 	* atmlab-2-1-103
 
 	* sensors/amsub_cloudfilter.m:

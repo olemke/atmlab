@@ -9,9 +9,6 @@ function S = MaskInvalidGeoTimedataWithNaN(S)
 %       'lat','lon','time'), i.e. -180<=lon<=180,  -90<=lat<=90,
 %       0<=time.
 %
-% NOTE: If any data is removed the output data will be unavoidedly
-% flattened along the geo dimension
-%
 %
 % IN
 %     S         struct                  output structure from
@@ -25,6 +22,9 @@ function S = MaskInvalidGeoTimedataWithNaN(S)
 % $Id$
 % Salomon Eliasson
 
+assert(isequal(size(S.lat),size(S.lon),size(S.time)),...
+    ['atmlab:' mfilename ':badInput'],'S.lat, S.lon, and S.time must be the same size')
+
 ltindex = S.lat >= -90 & S.lat <= 90;
 lnindex = S.lon >= -180 & S.lon <= 180;
 tindex  = S.time >= 0;
@@ -33,10 +33,11 @@ index = ltindex & lnindex & tindex;
 
 if any(~(index))
     logtext(atmlab('OUT'),...
-        'Removing %d data values (%.2f%%) due to invalid (lat, lon, or time) \n',sum(~index),100*sum(~index)/length(index))
+        'Removing %d data values (%.2f%%) due to invalid (lat, lon, or time) \n',...
+        sum(~index(:)),100*sum(~index(:))/length(index(:)))
     for F = fieldnames(S)'
         if isequal(size(S.(F{1}),1),size(index,1))
-            S.(F{1})(~index,:) = NaN;
+            S.(F{1})(~index) = NaN;
         end
     end
     
