@@ -1,3 +1,17 @@
+2012-05-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-103
+
+	* sensors/amsub_cloudfilter.m:
+	- Added function for the AMSU-b cloud filter that returns a
+	logical vector where false = cloud/ surface tainted or tb18 is
+	too cold for a proper UTH retrieval
+
+	* sensors/amsub_tb2uth.m:
+	- Added some explanatory text throughout code, and revised header
+	- Added some insertions and check to avoid errors
+	- Now also works for vectors and not just scalars.
+
 2012-05-09  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-102
