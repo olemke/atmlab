@@ -1,3 +1,18 @@
+2012-05-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-101
+
+	* collocations/AssociatedDataset.m(process_delayed):
+
+	- Bugfix, correct comparison is >=0, not >0!
+
+	* datasets/SatDataset.m:
+
+	- Reimplement granules_first_line and find_granules_first_line. Rerun
+	your granules_first_line-databases! Now a native Matlab Map, not a
+	Java.Util.Hashtable. Additionally fixed a bug, flags are now negative
+	respetively positive according to what should be done with the data.
+
 2012-05-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-100

@@ -262,6 +262,20 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % contains a list of <a href="matlab:help CollocatedDataset">CollocatedDataset</a>s
         % that use this <a href="matlab:help SatDataset">SatDataset</a>.
         collocated_datasets = [];
+        
+    end
+    
+    % flags
+    properties (Constant)
+        FL_INITIAL = -5;
+        FL_NOTFOUND = -2;
+        FL_ALLDUPL = typecast(int32(-1), 'uint32');
+        FL_NONEXT = -3;
+        FL_NOCUR = -4;
+    end
+    
+    properties (GetAccess = private, SetAccess = private)
+        firstlines;
     end
     
     methods
@@ -780,11 +794,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   >> first = mhs.granule_first_line([2010 9 8 8 8], 'noaa18', false);
             
-            persistent S;
-            
-            if isempty(S)
-                S = struct;
-            end
+%             if isequal(self.firstlines, []) % first run
+%                 self.firstlines = containers.Map(
+%                 S = struct;
+%             end
             
             [spec, reload, force] = optargs(varargin, {'', false, false});
             
@@ -796,9 +809,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 sat = spec;
             end
             
-            if isfield(S, sat) && isfield(S.(sat), self.name) && ~reload
-                ht = S.(sat).(self.name);
-            else
+            if isequal(self.firstlines, []) % load first
                 scanfile = datasets_config('firstline_data');
                 scanfile = strrep(scanfile, '$SAT', sat);
                 scanfile = strrep(scanfile, '$SENSOR', self.name);
@@ -823,8 +834,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     end
                 end
                                 
-                ht = t.ht;
-                S.(sat).(self.name) = ht;
+                self.firstlines = t.first;
             end
             
             if isscalar(d)
@@ -834,7 +844,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 unisecs = uint32(date2unixsecs(dv{:}));
             end
             
-            first = ht.get(unisecs);
+            first = self.firstlines(unisecs);
             if isempty(first) && ~force
                 error(['atmlab:' mfilename ':missing_firstline'], ['no data found for %s @ %d. ', ...
                     'You may want to run self.find_granule_first_line(...) ', ...
@@ -847,7 +857,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         function find_granule_first_line(self, startdate, enddate, varargin)
             % find_granule_first_line Create hashtable with scanline overlaps
             %
-            % Creates a hashtable (such as used by granule_first_line) that maps for
+            % Creates a map (such as used by granule_first_line) that maps for
             % each granule the first scanline not occuring in the previous
             % scanline.
             %
@@ -892,24 +902,24 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             if exist(scanfile, 'file')
                 tm = load(scanfile);
-                ht = tm.ht;
+                self.firstlines = tm.first;
             else
-                ht = java.util.Hashtable;
+                self.firstlines = containers.Map('KeyType', 'uint32', 'ValueType', 'int32');
             end
             
             uni_first = date2unixsecs(allgrans(1, 1), allgrans(1, 2), allgrans(1, 3), allgrans(1, 4), allgrans(1, 5));
-            if ~ht.containsKey(uint32(uni_first))
+            if ~self.firstlines.isKey(uni_first)
                 logtext(atmlab('OUT'), 'Setting very first to flag\n');
-                ht.put(uint32(uni_first), -5);
+                self.firstlines(uni_first) = self.FL_INITIAL;
             end
             next = 0;
-            
+
             for i = 1:ngrans-1
                 logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
                     allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
                 uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
-                if ht.containsKey(uint32(uni)) && ht.get(uint32(uni)) ~= -5
-                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), ht.get(uint32(uni)));
+                if self.firstlines.isKey(uni) && ~any(self.firstlines.(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR]);
+                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.get(uint32(uni)));
                     continue
                 end
                 try
@@ -941,23 +951,24 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     firstline = find(t_next > t_cur(end), 1, 'first');
                     if ~isempty(firstline)
                         logtext(atmlab('OUT'), 'First line: %d\n', firstline);
-                        ht.put(uint32(uni), firstline);
+                        self.firstlines(uni) = firstline;
                     else
-                        logtext(atmlab('OUT'), 'No first line, setting to -2\n');
-                        ht.put(uint32(uni), -2);
+                        logtext(atmlab('OUT'), 'No first line, setting to flag\n');
+                        self.firstlines(uni) = self.FL_ALLDUPL;
                     end
                 elseif couldreadcur
-                    logtext(atmlab('OUT'), 'Could not read next, setting next to -3\n');
-                    ht.put(uint32(uni), -3);
+                    logtext(atmlab('OUT'), 'Could not read next, flagging \n');
+                    self.firstlines(uni) = self.FL_NONEXT;
                 else
-                    logtext(atmlab('OUT'), 'Could not read current. setting to -4\n');
-                    ht.put(uint32(uni), -4);
+                    logtext(atmlab('OUT'), 'Could not read current. flagging\n');
+                    self.firstlines(uni) = self.FL_NOCUR;
                 end
             end
             
             logtext(atmlab('OUT'), ...
                 'Writing %s\n', scanfile);
-            save(scanfile, 'ht');    
+            first = self.firstlines; %#ok<NASGU>
+            save(scanfile, 'first');    
             
         end
         
