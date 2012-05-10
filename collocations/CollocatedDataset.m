@@ -33,6 +33,7 @@ classdef CollocatedDataset < HomemadeDataset
     %  Reading collocations:
     %
     %   read -                      Read collocations for date range
+    %   list_fields -               Find what fields can be read
     %
     %  (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> methods)
     %
@@ -1100,7 +1101,8 @@ classdef CollocatedDataset < HomemadeDataset
             %   fields      cell-str    Cell array of strings with all
             %                           the fields to be read. Can be
             %                           from the core-dataset or from
-            %                           the additional datasets.
+            %                           the additional datasets. See
+            %                           <a href="matlab:help CollocatedDataset/list_fields">list_fields</a> for a full list.
             %   limits      structure   (optional)
             %                           Structure describing acceptable
             %                           ranges for zero or more fields.
@@ -1180,9 +1182,19 @@ classdef CollocatedDataset < HomemadeDataset
             %
             %
             
+            narginchk(5, 8);
+            
             %% prepare configuration things        
             
             [limits, filters_by_name, ads] = optargs(varargin, {struct(), {}, self.associated});
+                        
+            rqre_datatype(date_start, @isvector);
+            rqre_datatype(date_end, @isvector);
+            rqre_datatype(spec, {@ischar, @iscellstr});
+            rqre_datatype(limits, @isstruct);
+            rqre_datatype(filters_by_name, @iscell);
+            rqre_datatype(ads, @iscell);
+            
             % distribute fields, limits, etc. over core, additionals
             [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields, ads);
 
@@ -1243,7 +1255,7 @@ classdef CollocatedDataset < HomemadeDataset
                                                 
                 try
                     [collocations_day, M_cols_here] = self.read_single_day(date, spec, fields_core);
-                    if max(size(collocations_day))==0
+                    if numel(collocations_day)==0
                         logtext(atmlab('OUT'), 'no collocations\n');
                         continue
                     end
@@ -1494,6 +1506,36 @@ classdef CollocatedDataset < HomemadeDataset
 
             % removing 0's
             collocations(collocations(:, 1)==0, :)=[];
+        end
+        
+        function varargout = list_fields(self)
+            % return struct with valid fields in this dataset + associated
+            %
+            % If called without output arguments, writes to atmlab('OUT') a
+            % pretty-printed list of all fields that are valid to pass on
+            % to self.read. With one output argument, return a structure
+            % with this information. No input arguments.
+            
+            S.(self.name) = list_fields@HomemadeDataset(self);
+            for i = 1:length(self.associated)
+                S.(self.associated{i}.name) = self.associated{i}.list_fields();
+            end
+            switch nargout
+                case 0 % write it out nicely
+                    mems = fieldnames(S);
+                    for i = 1:length(mems)
+                        fprintf(atmlab('OUT'), '%s:\n', mems{i});
+                        fprintf(atmlab('OUT'), '    ');
+                        for k = 1:length(S.(mems{i}))
+                            fprintf(atmlab('OUT'), '%s ', S.(mems{i}){k});
+                        end
+                        fprintf(atmlab('OUT'), '\n\n');
+                    end
+                case 1
+                    varargout = {S};
+                otherwise
+                    error(['atmlab:' mfilename], 'Too many output arguments');
+            end
         end
 
     end

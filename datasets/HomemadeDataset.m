@@ -236,6 +236,11 @@ classdef HomemadeDataset < SatDataset
             mem = self.members;
         end
         
+        function fields = list_fields(self)
+            % return valid fields in this dataset
+            fields = fieldnames(self.getmembers());
+        end
+        
         % protected, those are for internal use, user uses
         % CollocatedDataset.read
         function [M, localcols, attr] = read_single_day(self, date, spec, fields)

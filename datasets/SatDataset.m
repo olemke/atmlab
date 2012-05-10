@@ -598,7 +598,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   >> [allgrans, allpaths] = mhs.find_granules_for_period([2010, 9, 5], [2010 9 7], 'noaa18');
             
-            
+            narginchk(4, 4);
             dates = daterange(date1(1:3), date2(1:3));
             ndates = size(dates, 1);
             
@@ -834,7 +834,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     end
                 end
                                 
-                self.firstlines.(spec) = t.first;
+                self.firstlines.(sat) = t.first;
             end
             
             if isscalar(d)
@@ -845,8 +845,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             
 
-            if self.firstlines.(spec).isKey(unisecs)
-                first = self.firstlines.(spec)(unisecs);
+            if self.firstlines.(sat).isKey(unisecs)
+                first = self.firstlines.(sat)(unisecs);
             elseif force
                 first = [];
             else
@@ -907,15 +907,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             if exist(scanfile, 'file')
                 tm = load(scanfile);
-                self.firstlines.(spec) = tm.first;
+                self.firstlines.(sat) = tm.first;
             else
-                self.firstlines.(spec) = containers.Map('KeyType', 'uint32', 'ValueType', 'int32');
+                self.firstlines.(sat) = containers.Map('KeyType', 'uint32', 'ValueType', 'int32');
             end
             
             uni_first = date2unixsecs(allgrans(1, 1), allgrans(1, 2), allgrans(1, 3), allgrans(1, 4), allgrans(1, 5));
-            if ~self.firstlines.(spec).isKey(uni_first)
+            if ~self.firstlines.(sat).isKey(uni_first)
                 logtext(atmlab('OUT'), 'Setting very first to flag\n');
-                self.firstlines.(spec)(uni_first) = self.FL_INITIAL;
+                self.firstlines.(sat)(uni_first) = self.FL_INITIAL;
             end
             next = 0;
 
@@ -923,8 +923,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
                     allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
                 uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
-                if self.firstlines.(spec).isKey(uni) && ~any(self.firstlines.(spec)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
-                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(spec)(uni));
+                if self.firstlines.(sat).isKey(uni) && ~any(self.firstlines.(sat)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
+                    logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(sat)(uni));
                     continue
                 end
                 try
@@ -942,7 +942,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     switch ME.identifier
                         case {'atmlab:find_datafile_by_date', 'atmlab:atovs_get_l1c:zamsu2l1c',...
                                 'atmlab:invalid_data','atmlab:find_granule_by_datetime',...
-                                'MATLAB:imagesci:hdfinfo:invalidFile'}
+                                'MATLAB:imagesci:hdfinfo:invalidFile', 'MATLAB:imagesci:validate:fileOpen'}
                             logtext(atmlab('ERR'), 'Problem: %s\n', ME.message);
                         otherwise
                             ME.rethrow();
@@ -956,25 +956,26 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     firstline = find(t_next > t_cur(end), 1, 'first');
                     if ~isempty(firstline)
                         logtext(atmlab('OUT'), 'First line: %d\n', firstline);
-                        self.firstlines.(spec)(uni) = firstline;
+                        self.firstlines.(sat)(uni) = firstline;
                     else
                         logtext(atmlab('OUT'), 'No first line, setting to flag\n');
-                        self.firstlines.(spec)(uni) = self.FL_ALLDUPL;
+                        self.firstlines.(sat)(uni) = self.FL_ALLDUPL;
                     end
                 elseif couldreadcur
                     logtext(atmlab('OUT'), 'Could not read next, flagging \n');
-                    self.firstlines.(spec)(uni) = self.FL_NONEXT;
+                    self.firstlines.(sat)(uni) = self.FL_NONEXT;
                 else
                     logtext(atmlab('OUT'), 'Could not read current. flagging\n');
-                    self.firstlines.(spec)(uni) = self.FL_NOCUR;
+                    self.firstlines.(sat)(uni) = self.FL_NOCUR;
+                end
+                
+                if mod(i, 10)==0 % store
+                    self.store_firstline(scanfile);
                 end
             end
             
-            logtext(atmlab('OUT'), ...
-                'Writing %s\n', scanfile);
-            first = self.firstlines.(spec); %#ok<NASGU>
-            save(scanfile, 'first');    
-            
+            self.store_firstline(scanfile);
+                        
         end
         
         %% methods for internal use (not private, but from other classes)
@@ -1003,7 +1004,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % This function is called by the constructor if no name is
             % given. You may wish to override it in a subclass.
-
+            
             existing_names = fieldnames(datasets);
             while true
                 nm = sprintf([class(self) '_%d_%d'], uint64(date2unixsecs()),round(rand(1, 1)*10000));
@@ -1011,6 +1012,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     break
                 end
             end
+        end
+    end
+    
+    methods (Access = private)
+        function store_firstline(self)
+            logtext(atmlab('OUT'), ...
+                'Writing %s\n', scanfile);
+            first = self.firstlines.(sat); %#ok<NASGU>
+            save(scanfile, 'first');
         end
     end
 end

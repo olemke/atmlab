@@ -38,7 +38,7 @@ else
 end
 
 fprintf(fid, '%s:', datestr(now, 'dd-mmm-yyyy HH:MM:SS.FFF'));
-if fid<3 && usejava('desktop') && ~strcmp(name(1), '@') % assume stdout/stderr
+if fid<3 && usejava('desktop') && ~strcmp(name(1), '@') && ~strcmp(name, '(none)') % assume stdout/stderr
     fprintf(fid, '<a href="matlab:opentoline(''%s'', %d, 1)">%s:%d</a>:', ...
         which(f), lineno, name, lineno);
 else

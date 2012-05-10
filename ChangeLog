@@ -1,5 +1,30 @@
 2012-05-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-106
+
+	* collocations/CollocatedDataset.m:
+
+	(list_fields): New method, lists all fields that can be read
+
+	(read): Add some checks, fix a bug
+
+	* handy/logtext.m: Bugfix if running interactively with jvm
+
+	* collocations/HomemadeDataset.m:
+
+	(list_fields): New method, give all fields in dataset
+
+	* datasets/SatDataset.m:
+
+	(granule_first_line) (find_granule_first_line):
+
+	- Bugfix, self.(sat) not self.(spec), otherwise crash for no-spec
+	datasets
+
+	(store_firstline): Move functionality here
+
+2012-05-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-105
 
 	* datasets/SatDataset.m(find_granules_first_line,granule_first_line):
