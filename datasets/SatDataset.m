@@ -1016,7 +1016,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     methods (Access = private)
-        function store_firstline(self)
+        function store_firstline(self, scanfile)
             logtext(atmlab('OUT'), ...
                 'Writing %s\n', scanfile);
             first = self.firstlines.(sat); %#ok<NASGU>

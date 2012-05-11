@@ -1265,11 +1265,16 @@ classdef CollocatedDataset < HomemadeDataset
                     for j = 1:length(additionals)
                         [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
                     end
+                    stoplater = false;
                     if merge
                         for j = 1:length(additionals)
                             [collocations_day, M_cols_here] = additionals{j}.merge(collocations_day, M_cols_here, additionals_day{j}, addis_cols{j});
                         end
                         M_cols = M_cols_here;
+                        if numel(collocations_day)==0
+                            logtext(atmlab('OUT'), 'At least one of the additionals had 0 elements. Upon merging, no collocations left --- continuing with next day\n');
+                            stoplater = true;
+                        end
                     end
                 catch ME
                     switch (ME.identifier)
@@ -1284,6 +1289,10 @@ classdef CollocatedDataset < HomemadeDataset
                         otherwise
                             ME.rethrow();
                     end
+                end
+                
+                if stoplater
+                    continue
                 end
                 
                 %% apply limitations

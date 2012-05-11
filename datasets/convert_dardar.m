@@ -26,7 +26,14 @@ function convert_dardar(dt1, dt2)
     
     for i = 1:size(grans, 1);
         dt = grans(i, :);
-        
+                
+        [~, bs] = fileparts(paths{i});
+        dd_sub.filename = [bs '_selection.nc.gz'];
+        ff = fullfile(dd_sub.find_datadir_by_date(dt), dd_sub.filename);
+        if exist(ff, 'file')
+            logtext(atmlab('OUT'), 'Already exists, skipping: %s\n', ff);
+            continue
+        end
         data = dd_full.read_granule(dt, '', ...
             setdiff(tostore, builtins), ...
             false, false, false); % (no duplicate removing, no force-on-error, no reloading)
@@ -49,8 +56,6 @@ function convert_dardar(dt1, dt2)
         
         dd_sub.cols = cc;
         
-        [~, bs] = fileparts(paths{i});
-        dd_sub.filename = [bs '_selection.nc.gz'];
         info = struct();
         info.title = 'Reduced DARDAR data';
         dd_sub.store(dt(1:3), '', M, info);
