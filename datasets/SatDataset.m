@@ -978,6 +978,49 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                         
         end
         
+        function earliest = find_earliest_granule(self, spec)
+            % find the earliest granule for this dataset
+            %
+            % Must always be between Unix Genesis (1970-01-01) and current
+            % date. Might provide incorrect results if not every day has
+            % collocations. Use with caution. A safe but slow alternative
+            % is to run <a href="matlab:help SatDataset/find_granules_for_period">.find_granules_for_period</a> for a very long date interval.
+            %
+            % EXAMPLE
+            %
+            %   gran = d.find_earliest_granule('noaa18')
+            %
+            % Uses bisection.
+            
+            MAXSTEPS = 100;
+            early = [1970 1 1];
+            late = datevec(now);
+            mid = [0 0 0];
+            
+            for i = 1:MAXSTEPS
+                oldmid = mid;
+                mid = datevec((datenum(early)+datenum(late))/2);
+                % ceil to just next date
+                mid = mid(1:3);
+                if all(oldmid == mid)
+                    earliest = late;
+                    break
+                end
+                if any(self.find_granules_by_date(mid, spec))
+                    late = mid;
+                else
+                    early = mid;
+                end
+                
+            end
+            
+            grans = self.find_granules_by_date(earliest, spec);
+            if isempty(grans)
+                error(['atmlab:' mfilename ':nogranule'], ...
+                    'No granules found for %s %s', self.name, spec);
+            end
+            earliest = grans(1, :);
+        end
         %% methods for internal use (not private, but from other classes)
        
         function add_collocated_dataset(ds, cd)

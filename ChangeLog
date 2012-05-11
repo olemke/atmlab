@@ -1,3 +1,15 @@
+2012-05-11  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-109
+
+	* datasets/SatDataset.m(find_earliest_granule):
+
+	- Added, finds the very first granule for dataset.
+
+	* datasets/common_read_dardarsub.m:
+
+	- Add a little bit of documentation
+
 2012-05-11  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-108

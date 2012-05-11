@@ -1,4 +1,9 @@
 function S = common_read_dardarsub(file, varargin)
+    % read dardarsub data
+    %
+    % format as other common_read_-functions.
+    %
+    % $Id$
 
     core_fields   = {'time','lat','lon'};
     extra_fields  = optargs(varargin, {{}});
