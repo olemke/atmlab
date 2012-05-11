@@ -123,6 +123,10 @@ D.collocation_mhs_mhs.basedir   = '/storage4/user_data/gerrit/collocated_dataset
 D.collocation_mhs_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
 D.collocation_mhs_mhs.filename  = 'collocations_$SAT1_$SAT2.nc.gz';
 
+D.CollocatedDataset_patmosx_cpr.basedir   = '/storage4/user_data/seliasson/collocations_patmosx_cloudsat/core';
+D.CollocatedDataset_patmosx_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
+D.CollocatedDataset_patmosx_cpr.filename  = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
 D.collocation_amsub_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/amsub_mhs';
 D.collocation_amsub_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
 D.collocation_amsub_mhs.filename  = 'collocations_$SAT1_$SAT2.nc.gz';

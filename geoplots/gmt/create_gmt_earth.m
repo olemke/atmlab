@@ -20,7 +20,7 @@ commands{1} = sprintf('rm -f %s.{ps,eps}',F);
 %commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
 
 % Set paper size
-commands{end+1} = 'gmtset PAPER_MEDIA a0';
+commands{end+1} = 'gmtset PAPER_MEDIA A0+';
 
 % Annotations of axis
 if isfield(in,'basemap_axis')
@@ -378,7 +378,7 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
     end
     a.plotPlacement = in.plotPlacement;
     
-    % A little extra legend showig colors of NaNs
+    % A little extra legend showing colors of NaNs
     if in.nanlegend
         if ~isfield(in.legend,'position_nan')
             nandef = {[str2double(in.legend.xpos(1:end-1)),...

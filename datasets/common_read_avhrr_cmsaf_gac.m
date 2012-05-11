@@ -55,7 +55,7 @@ end
 
 % turn time data into seconds (in hours)
 S.time = S.time*3600;
-S.time = repmat(S.time,size(S.lon,1),1);
+S.time = repmat(S.time,1,size(S.lon,1))';
 
 S.lat  = double(S.lat*0.01); % use scale (see attributes)
 S.lon  = double(S.lon*0.01); % use scale (see attributes)

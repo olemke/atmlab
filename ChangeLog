@@ -1,9 +1,38 @@
+2012-05-11  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-108
+
+	* datasets/common_read_avhrr_cmsaf_gac.m:
+
+	- fixed bug in time dimensions
+
+	* datasets/common_read_patmosx.m:
+
+	- removed comment
+
+	* site-specific/kiruna/datasets_init.m:
+
+	-Added missing patmosx entries
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	- changed default paper size to A0+
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- Bug fix related to making a pdf of the legend only.
+
+	* handy/combine_pdfs.m:
+
+	- Added some line breaks in the generated latex for the sake of
+	readability in the output code.
+
 2012-05-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-107
 
 	* collocations/CollocatedDataset.m(read):
-	
+
 	- Bugfix, if there are core collocs but no collapsed ones and data are
 	combined, it was failing with an error message. Now works correctly.
 

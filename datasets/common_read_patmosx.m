@@ -69,8 +69,6 @@ S.path = file;
 S = rmfield(S,core_fields);
 
 S = MaskInvalidGeoTimedataWithNaN(S);
-'check the dimesions of the data'
-keyboard 
 
 end
 %%%%%%%%%%%%%

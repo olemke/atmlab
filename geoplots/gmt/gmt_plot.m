@@ -832,8 +832,18 @@ function filename = sort_figures(in,command)
 
 if in.savelegend
     % MAKE a separate file for the legend
-    in.filename = makelegendpdf(command(~cellfun('isempty',regexp(command,'psscale'))),in);
-    command = {};
+    findPsScale = ~cellfun('isempty',regexp(command,'psscale'));
+    if ~any(findPsScale)
+        v = atmlab('VERBOSITY');
+        atmlab('VERBOSITY',1);
+        logtext(atmlab('ERR'),'There is no data to make a legend of\n')
+        atmlab('VERBOSITY',v);
+        filename = '';
+        
+        return
+    end
+    in.filename = makelegendpdf(command(findPsScale));
+    command{end+1} = sprintf('mv %s.%s %s',in.filename,in.figuretype,in.outdir);
 else
     
     % for figuretypes (pdf,eps,png, or tif)
@@ -896,19 +906,19 @@ hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
 fprintf('GMT plot stored at:  %s\n',filename)
 
-function file = makelegendpdf(command,in)
+function file = makelegendpdf(command)
 %% Make a separate pdf for the legend
 % Only allowed to have 1 or 2 psscale commands in the commad list. the first one
 % is the regular legend. The second is for the nan legend (if it exists)
 
-file = fullfile(in.outdir,'legend');
+file ='legend';
 
 %make sure it's not here
 exec_system_cmd(sprintf('rm -f %s.ps',file),gmtlab('verbosity'));
 
 % Make the page large enough to fit most legends
 cmd = {'gmtset PAPER_MEDIA a0'};
-command = [cmd, command];
+command = [cmd, command{1}];
 
 %Remove trailing .ps entry
 crop=regexp(command,'>>');
@@ -924,8 +934,8 @@ for i = 2:length(command)
     end
 end
 
+% This forces it to be a pdf
 command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
-
 exec_system_cmd(command,gmtlab('verbosity'));
 
 %% SUBFUNCTIONS FOR SETUP

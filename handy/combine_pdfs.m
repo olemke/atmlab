@@ -148,7 +148,7 @@ c = onCleanup(@() delete_tmpfolder(tmpfolder));
 %% Assemble our pretty tex file
 file = fullfile(tmpfolder, 'out.tex');
 fid = fopen(file,'w');
-fprintf(fid,'\\documentclass[a4paper,10pt]{report}');
+fprintf(fid,'\\documentclass[a4paper,10pt]{report}\n');
 
 margin=0.1;
 fprintf(fid,['\\usepackage[margin=%.2fcm,paperwidth=%.2fcm,' ...
@@ -162,18 +162,24 @@ fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
 fprintf(fid,'\\setlength{\\parindent}{0in}\n');
 fprintf(fid,'\\begin{document}\n');
+% if ~isempty(options.title) % not ready for this
+%     % centering, huge hardcoded
+%     fprintf(fid,'\\begin{center}\n');
+%     fprintf(fid,'{\\Huge %s}\n',strrep(options.title,'_','\_'));
+%     fprintf(fid,'\\end{center}\n');
+% end
 fprintf(fid,'\\centering\n');
 
 row = 1; filenum = 1;
 for R = layout.plotsbyrow
     col=1;
     for P = R{:}
-        fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}', options.valign, P.width);
+        fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}\n', options.valign, P.width);
         tmpplotname=sprintf('plot%d.pdf', filenum);
         mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
         filenum=filenum+1;
-        fprintf(fid,'\\includegraphics{%s}', tmpplotname);
-        fprintf(fid,'\\end{minipage}');
+        fprintf(fid,'\\includegraphics{%s}\n', tmpplotname);
+        fprintf(fid,'\\end{minipage}\n');
         
         if (col ~= length(R{:}))
             fprintf(fid,'\\hspace{%.2fcm}\n', options.hspace);
