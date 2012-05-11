@@ -1,4 +1,4 @@
-% LOADVAR   Loads a specific varaible from a file
+% LOADVAR   Loads a specific variable from a MATLAB data file
 %
 %    The function enables direct loading of a named variable (matlab's load
 %    function puts into a struct). To load the variable x from file data.mat:
@@ -23,4 +23,6 @@ if ~isfield( X, varname )
         lastwarn);
 else
     x = X.(varname);
+end
+
 end

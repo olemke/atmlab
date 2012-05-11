@@ -974,7 +974,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
             end
             
-            self.store_firstline(scanfile);
+            self.store_firstline(scanfile, sat);
                         
         end
         
@@ -1006,7 +1006,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     earliest = late;
                     break
                 end
-                if any(self.find_granules_by_date(mid, spec))
+                if any(self.find_granules_by_date(mid, spec, false))
                     late = mid;
                 else
                     early = mid;
@@ -1014,10 +1014,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 
             end
             
-            grans = self.find_granules_by_date(earliest, spec);
+            grans = self.find_granules_by_date(earliest, spec, false);
             if isempty(grans)
+                if iscell(spec)
+                    tt = [spec{:}];
+                else
+                    tt = spec;
+                end
                 error(['atmlab:' mfilename ':nogranule'], ...
-                    'No granules found for %s %s', self.name, spec);
+                    'No granules found for %s %s', self.name, tt);
             end
             earliest = grans(1, :);
         end
@@ -1059,7 +1064,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     methods (Access = private)
-        function store_firstline(self, scanfile)
+        function store_firstline(self, scanfile, sat)
             logtext(atmlab('OUT'), ...
                 'Writing %s\n', scanfile);
             first = self.firstlines.(sat); %#ok<NASGU>

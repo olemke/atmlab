@@ -1,5 +1,20 @@
 2012-05-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-110
+
+	* handy/PersistentCachedData.m:
+
+	- Added. Like CachedData, but persistent: store data on disk.
+	Important: Read documentation before use!
+
+	* files/loadvar.m: Improve documentation
+
+	* datasets/SatDataset.m(store_firstline):
+
+	- Bugfix, should have two arguments
+
+2012-05-11  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-109
 
 	* datasets/SatDataset.m(find_earliest_granule):
