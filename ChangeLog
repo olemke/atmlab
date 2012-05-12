@@ -1,3 +1,19 @@
+2012-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-111
+
+	* datasets/common_read_avhrr_cmsaf_gac.m:
+
+	-No longer remove bad values but rather mask them with NaN in
+	order to not flatten the data matrixes, and only one time per
+	scanline.
+
+	* datasets/common_read_mspps.m:
+	* datasets/common_read_modis.m:
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+
+	- Adapted function to the "only one time per scanline"-convention
+
 2012-05-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-110

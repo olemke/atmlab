@@ -58,8 +58,9 @@ D = datasets;
 info = D.modis_aqua_L2.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
-%data starts at 1993, I need an offset
-S.time = S.Scan_Start_Time + date2unixsecs(1993) -S.epoch;
+%data starts at 1993, I need an offset. Only need one time per scan line
+%(first 4 are NaN due to interpolation)   
+S.time = S.Scan_Start_Time(:,5) + date2unixsecs(1993) -S.epoch;
 
 S = rmfield(S,core_fields);
 

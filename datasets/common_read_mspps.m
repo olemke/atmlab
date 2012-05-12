@@ -70,8 +70,7 @@ s2d = @str2double;
 S.epoch = round(date2unixsecs(s2d(info.year), s2d(info.month), s2d(info.day)));
 
 % See information below header to make sense of this
-S.time = S.Time{1}-( S.epoch-date2unixsecs(1993,1,1) );
-S.time = repmat(S.time,90,1)'; %make it the same size as the lat,lons
+S.time = S.Time{1}(:)-( S.epoch-date2unixsecs(1993,1,1) );
 
 S.path = file;
 S.version = 'unknown';

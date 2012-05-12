@@ -55,19 +55,15 @@ end
 
 % turn time data into seconds (in hours)
 S.time = S.time*3600;
-S.time = repmat(S.time,1,size(S.lon,1))';
 
-S.lat  = double(S.lat*0.01); % use scale (see attributes)
-S.lon  = double(S.lon*0.01); % use scale (see attributes)
+S.lat  = double(S.lat'*0.01); % use scale (see attributes), make along x across
+S.lon  = double(S.lon'*0.01); % use scale (see attributes), make along x across
 S.time = double(S.time);
 
 % get the verion directly from the filename
 D = datasets;
 info = D.avhrr_cmsaf_gac.find_info_from_granule(file);
 S.epoch = round(date2unixsecs(str2double(info.year), str2double(info.month), str2double(info.day)));
-
-%% Flatted matrixes according to conventions (not the pseudo fields)
-S = flattenMatrixes(S,extra_fields(~ismember(extra_fields,pseudo_fields)));
 
 if any(ismember(pseudo_fields,extra_fields))
     for P = pseudo_fields(:)'
@@ -79,18 +75,9 @@ S.version = info.version;
 S = MaskInvalidGeoTimedataWithNaN(S);
 
 end
+
 %%%%%%%%%%%%%
 % SUBFUNCTION
-
-function S = flattenMatrixes(S,fields)
-%% Flatted matrixes according to conventions
-
-for F = fields(:)'
-    tmp = permute(S.(F{1}),[3,1,2]);
-    S.(F{1}) = squeeze(permute(tmp(:,:),[2,1]));
-end
-
-end
 
 function S = dealWithPseudoFields(S,field,file)
 %% dealWithPseudoFields
@@ -108,9 +95,8 @@ switch field
         dependent_fields = {'cwp','cty'};
         rmflag = ~ismember(dependent_fields,fieldnames(S));
         for F = dependent_fields
-            S.(F{1}) = loadncvar(file,F{1});
+            S.(F{1}) = loadncvar(file,F{1})'; % orientation is across x along
         end
-        S = flattenMatrixes(S,dependent_fields);
 end
 
 % use dependent fields to BUILD the pseudo field
@@ -124,13 +110,10 @@ switch field
         % grab values flagged as ice phase
         icePhase = S.cty==2;
              
-        % remove all non applicable data
-        [sz1,~] = size(S.cwp);
-        for F = fieldnames(S)'
-            if isequal(size(S.(F{1}),1),sz1)
-                S.(F{1}) = S.(F{1})(clearPixel | icePhase);
-            end
-        end
+        % NaN all non applicable data
+        S.cwp(~(clearPixel | icePhase)) = NaN;
+        
+        % Therefore we can call this simply IWP
         S.AVHRR_IWP = S.cwp;
         
 end
