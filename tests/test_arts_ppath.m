@@ -102,7 +102,7 @@ for c = 1 : n
   nlon                = 1;
   %
   if atmosphere_dim == 2
-    nlat                = 10 + round( 350*rand );
+    nlat                = 10 + round( 531*rand );
     Q.LAT_GRID          = linspace( -135, 135, nlat )';
     nlon                = 1;
   elseif atmosphere_dim == 3
@@ -116,24 +116,34 @@ for c = 1 : n
   Q.Z_FIELD = repmat( interpp( Az.grids{1}, Az.data, Q.P_GRID ), ...
                                                            [ 1, nlat, nlon ] ); 
   if unsphere
-    Q.Z_FIELD = Q.Z_FIELD + 3*randn( size(Q.Z_FIELD) );
+    Q.Z_FIELD = Q.Z_FIELD + 5*randn( size(Q.Z_FIELD) );
   end
   Q.T_FIELD = repmat( interpp( At.grids{1}, At.data, Q.P_GRID ), ...
                                                            [ 1, nlat, nlon ] ); 
   Q.VMR_FIELD = repmat( interpp( Ah2o.grids{1}, Ah2o.data, Q.P_GRID ), ...
                                                            [ 1, nlat, nlon ] ); 
   Q.VMR_FIELD = reshape( Q.VMR_FIELD, [1 np nlat nlon ] );
+  %
+  if atmosphere_dim == 3
+    % Fix border conditions
+    Q.Z_FIELD(:,:,end) = Q.Z_FIELD(:,:,1);
+    Q.Z_FIELD(:,1,:)   = repmat(Q.Z_FIELD(:,1,1),[1 1 nlon]);
+    Q.Z_FIELD(:,end,:) = repmat(Q.Z_FIELD(:,end,1),[1 1 nlon]);
+  end
   
   %- Surface altitude
   %
   if ~unsphere
     Q.Z_SURFACE           = repmat( 500, nlat, nlon );
   else
-    Q.Z_SURFACE           = 500 + 1e3*rand + 1e3*rand( nlat, nlon );
-    % Fix that +-180 lon data are the same
+    Q.Z_SURFACE           = 500*rand + 5e3*rand( nlat, nlon );
     if atmosphere_dim == 3
+      % Avoid strong topography at the poles:
+      Q.Z_SURFACE        = Q.Z_SURFACE .* repmat(cosd(Q.LAT_GRID),1,nlon);
+      % Fix border conditions
       Q.Z_SURFACE(:,end) = Q.Z_SURFACE(:,1);
     end
+    Q.Z_SURFACE = Q.Z_SURFACE + 500;  
   end
   
   %- Sensor pos/los
@@ -143,7 +153,7 @@ for c = 1 : n
   aa0                   = 0;
   %
   if rand < 0.33
-    Q.SENSOR_POS        = 3e3 + 50e3*rand;
+    Q.SENSOR_POS        = 7e3 + 40e3*rand;
     Q.SENSOR_LOS        = 180*rand;    
   else
     Q.SENSOR_POS        = 700e3 + 50e3*randn;
