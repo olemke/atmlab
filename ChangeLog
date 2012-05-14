@@ -1,5 +1,13 @@
 2012-05-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-113
+
+	* collocations/CollocatedDataset.m:
+
+	- Fixed incorrect netcdf type for POS1 and POS2 (byte -> int)
+
+2012-05-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-112
 
 	* sensors/atovs/zamsu2l1c.sh:
