@@ -1,3 +1,23 @@
+2012-05-14  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-114
+
+	* collocations/CollocatedDataset.m:
+
+	- Added member 'pcd'. Can be set to PersistentCachedData-object.
+	  See «help CollocatedDataset/pcd» for usage info.
+
+	(read):
+
+	- Use pcd if possible
+
+	(calc_cache_key):
+
+	- Helper function calculating (unique?) cache-key from input arguments
+	akin to .read().
+
+	* handy/PersistentCachedData.m: Be more verbose
+
 2012-05-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-113

@@ -50,7 +50,9 @@ classdef PersistentCachedData < CachedData
                         ME.rethrow();
                 end
             end
-            data = loadvar(fullfile(self.cachedir, [s '.mat']), 'data');
+            ldfl = fullfile(self.cachedir, [s '.mat']);
+            logtext(atmlab('OUT'), 'Reading from persistent cache: %s\n', ldfl);
+            data = loadvar(ldfl, 'data');
         end
         
         function v = has_entry(self, s)
@@ -65,7 +67,10 @@ classdef PersistentCachedData < CachedData
         
         function set_entry(self, s, data)
             set_entry@CachedData(self, s, data);
-            save(fullfile(self.cachedir, [s '.mat']), 'data');
+            svfl = fullfile(self.cachedir, [s '.mat']);
+            logtext(atmlab('OUT'), 'Storing cache-entry to disk: %s -> %s\n', ...
+                s, svfl);
+            save(svfl, 'data');
             logtext(atmlab('OUT'), 'New size: %d bytes\n', self.disk_cachesize());
             if self.disk_toolarge()
                 self.del_old_disk_entry()

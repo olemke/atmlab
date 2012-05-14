@@ -14,7 +14,8 @@ classdef CollocatedDataset < HomemadeDataset
     %   distance -  maximum collocation distance (km)
     %   interval -  maximum collocation time (seconds)
     %   members -   structure containing full info on how data are stored
-    %   (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> properties)
+    %               (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> properties)
+    %   pcd -       if set, cache <a href="matlab:help CollocatedDataset/read">read</a> results to disk
     %
     % CollocatedDataset methods:
     %
@@ -103,6 +104,27 @@ classdef CollocatedDataset < HomemadeDataset
         
         % Marker to seperate between different logfile entries
         marker = [repmat('-', [1 72]) '\n'];
+        
+        % Set diskcache to store results of '.read' to disk.
+        %
+        % Runnig <a href="matlab:help CollocatedDataset/read">.read()</a> can take considerable time. Therefore, it is worthwhile
+        % to cache the results. If 'pcd' is set to a <a href="matlab:help PersistentCachedData">PersistentCachedData</a>,
+        % .read() will cache the results and read from disk if possible.
+        % WARNING: DO NOT SET PCD TO A DIRECTORY YOU ARE OTHERWISE
+        % USING! The caching mechanism may remove files from this
+        % directory, so be very careful. Caching works by calculating a key
+        % (almost certainly unique) based on input arguments and storing
+        % the results in a .mat-file in the cache-directory.
+        %
+        % Example use:
+        % >> d = datasets;
+        % >> d.collocation_mhs_amsub.pcd = PersistentCachedData('/local/gerrit/cache');
+        % >> [M, c] = d.collocation_mhs_amsub.read([2006 4 25], [2006 4 26], {'noaa18', 'noaa16'}, {'LAT1', 'LAT2', 'BT1'});
+        % (later)
+        % >> [M, c] = d.collocation_mhs_amsub.read([2006 4 25], [2006 4 26], {'noaa18', 'noaa16'}, {'LAT1', 'LAT2', 'BT1'});
+        % 14-May-2012 11:37:33.707:PersistentCachedData.get_entry:54:Reading from persistent cache: /local/gerrit/cache/aff3735816ae90b11a4ddfd571f88e3b.mat
+        pcd;
+
     end
     
     % read-only props (may be alterable with methods)
@@ -1074,7 +1096,7 @@ classdef CollocatedDataset < HomemadeDataset
             end
         end
         
-        function [M, M_cols, addis, addis_cols, additionals] = read(self, date_start, date_end, spec, all_fields, varargin)
+        function varargout = read(self, date_start, date_end, spec, all_fields, varargin)
             % Read collocations for indicated period
             %
             % This method reads all or a selection of the collocations for
@@ -1194,6 +1216,17 @@ classdef CollocatedDataset < HomemadeDataset
             rqre_datatype(limits, @isstruct);
             rqre_datatype(filters_by_name, @iscell);
             rqre_datatype(ads, @iscell);
+            
+            % try to read from cache
+            if ~isempty(self.pcd)
+                cachestr = self.calc_cache_key(date_start, date_end, spec, all_fields, limits, filters_by_name, ads, nargout);
+                if self.pcd.has_entry(cachestr)
+                    varargout = self.pcd.get_entry(cachestr);
+                    return
+                else
+                    logtext(atmlab('OUT'), 'No cache entry found, starting reading\n');
+                end
+            end
             
             % distribute fields, limits, etc. over core, additionals
             [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields, ads);
@@ -1333,6 +1366,20 @@ classdef CollocatedDataset < HomemadeDataset
             if hitno==0
                 warning(['atmlab:' mfilename], ...
                     'No collocations found at all. Do not trust column descriptions.');
+            end
+            
+            varargout{1} = M;
+            if nargout > 1
+                varargout{2} = M_cols;
+                if nargout > 2
+                    varargout(3:5) = {addis, addis_cols, additionals};
+                end
+            end
+            
+            % possibly cache result
+            if ~isempty(self.pcd)
+                logtext(atmlab('OUT'), 'Storing result in cache\n');
+                self.pcd.set_entry(cachestr, varargout);
             end
             
             %%%
@@ -1652,6 +1699,38 @@ classdef CollocatedDataset < HomemadeDataset
     methods (Access = protected)
         function nm = calculate_name(self)
             nm = [class(self) '__1_' self.primary.name '__2_' self.secondary.name];
+        end
+        
+        function s = calc_cache_key(self, date_start, date_end, spec, all_fields, limits, filters_by_name, ads, no)
+            % calculate a unique cache-key based on inputs
+            
+            % first generate an array of int8
+            if isempty(spec)
+                sp = uint8(0);
+            elseif ischar(spec)
+                sp = uint8(spec);
+            else
+                sp = cellfun(@uint8, spec, 'UniformOutput', false);
+                sp = [sp{:}];
+            end
+            af = cellfun(@uint8, all_fields, 'UniformOutput', false);
+            af = [af{:}];
+            ff = cellfun(@(x) uint8([func2str(x{1}) horzcat(x{2}{:})]), filters_by_name, 'UniformOutput', false);
+            ff = [ff{:}];
+            ads = cellfun(@(x) uint8(x.name), ads, 'UniformOutput', false);
+            ads = [ads{:}];
+            D = [uint8(self.name), ...
+                 typecast(uint16(date_start), 'uint8'), ...
+                 typecast(uint16(date_end), 'uint8'), ...
+                 sp, af, ff, ads, ...
+                 uint8(struct2string_compact(limits)), ...
+                 uint8(no)];
+                        
+            md = java.security.MessageDigest.getInstance('md5');
+            md.update(D);
+            digest = md.digest;
+            s = genvarname(sprintf('%02x', typecast(digest, 'uint8')));
+
         end
     end
     
