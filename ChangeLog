@@ -1,3 +1,11 @@
+2012-05-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-116
+
+	* datasets/common_read_dardarsub.m:
+
+	- Added the rest of the required fields
+
 2012-05-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-115
