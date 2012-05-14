@@ -1,3 +1,21 @@
+2012-05-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-112
+
+	* sensors/atovs/zamsu2l1c.sh:
+
+	-Removed frivolous copying atovsin.log to the current directory.
+
+	- Return status = 6 , return = 'Killed' if the script is  killed
+	by e.g. <cntrl c>
+
+	* sensors/atovs/atovs_get_l1c.m: 
+
+	- Use onCleanup to savely delete tmpdir
+
+	- Special catch incase status = 6 (Killed)
+
+
 2012-05-12  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-111

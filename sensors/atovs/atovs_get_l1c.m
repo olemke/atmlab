@@ -12,19 +12,20 @@
 
 function data = atovs_get_l1c( filename )
 
-tf = create_tmpfolder;
+tf = create_tmpfolder();
+cleanupObject = onCleanup(@() delete_tmpfolder(tf));
+
 atovs_file = [ tf '/atovs.l1c' ];
 try
-  cmd = ['zamsu2l1c.sh "' filename '" "' atovs_file '"'];
-  [result,err] = system(cmd);
-  if result ~= 0
-    error('atmlab:atovs_get_l1c:zamsu2l1c', err);
-  end
-  [data, err] = atovs_read_data( atovs_file );
-catch
-  delete_tmpfolder(tf);
-  error('atmlab:atovs_get_l1c:zamsu2l1c', err);
+    cmd = ['zamsu2l1c.sh "' filename '" "' atovs_file '"'];
+    [status,err] = system(cmd);
+    if status == 6
+        error('atmlab:atovs_get_l1c:zamsu2l1c','Killed')
+    end
+    if status ~= 0
+        error('atmlab:atovs_get_l1c:zamsu2l1c', err);
+    end
+    data = atovs_read_data( atovs_file );
+catch ME
+    error('atmlab:atovs_get_l1c:zamsu2l1c', ME.message);
 end
-
-delete_tmpfolder(tf);
-

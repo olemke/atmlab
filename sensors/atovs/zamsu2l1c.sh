@@ -8,7 +8,6 @@
 # to trace an error check where output file exist. if it does not exist
 # something went wrong.
 
-
 AMSUFILE=$1
 L1CFILE=$2
 TMPD=/tmp/zamsu2l1c$$
@@ -35,7 +34,11 @@ esac
 [ "$L1CFILE" ] && [ "$(echo "$L1CFILE" | sed 's/^\(.\).*$/\1/')" != "/" ] \
 && L1CFILE="$(pwd)/$L1CFILE"
 
-trap "cd $OLDDIR; [ -e $TMPD/atovin.log ] && cp $TMPD/atovin.log .; rm -rf $TMPD" QUIT TERM KILL EXIT
+#trap "cd $OLDDIR; [ -e $TMPD/atovin.log ] && cp $TMPD/atovin.log .; rm -rf $TMPD" QUIT TERM KILL EXIT
+# Copying atovin.log to current doesn't make sense because it's
+# overwritten by other jobs running at the same time
+trap "cd $OLDDIR; rm -rf $TMPD" QUIT EXIT
+trap "echo 1; echo \"Killed\"; exit 6" TERM KILL SIGINT
 
 if [ ! $# -eq 2 -a ! $# -eq 1 ]
     then
