@@ -158,7 +158,7 @@ classdef AssociatedDataset < HomemadeDataset
             %
             % OUT
             %
-            %   (none, but sets <a href="matlab:help AssociatedDataset.cols">cols</a>))
+            %   (none, but sets <a href="matlab:help AssociatedDataset.cols">cols</a>)
             allnames = fieldnames(self.members);
             tot = 1;
             for i = 1:length(allnames)

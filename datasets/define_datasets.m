@@ -399,9 +399,13 @@ appccs.ROIWP.stored.STD.atts.units = f_cpr.ROIWP.atts.units;
 appccs.ROIWP.processors.CV = @(X)(std(X) ./ mean(X));
 appccs.ROIWP.stored.CV.type = 'int';
 appccs.ROIWP.stored.CV.atts.long_name = ['Coefficient of variation of CPR ' f_cpr.ROIWP.atts.long_name];
-appccs.ROIWP.processors.FRAC = @(X)(sum(X>0) / length(X));
-appccs.ROIWP.stored.FRAC.type = 'float';
-appccs.ROIWP.stored.FRAC.atts.long_name = ['Cloud fraction according to ' f_cpr.ROIWP.atts.long_name];
+for iwp = [1 10 100 1000]
+    fn = sprintf('FRAC%d', iwp);
+    appccs.ROIWP.processors.(fn) = @(X)(sum(X>=iwp) / length(X));
+    appccs.ROIWP.stored.(fn).type = 'float';
+    appccs.ROIWP.stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s > %d %s', ...
+        f_cpr.ROIWP.atts.long_name, iwp, f_cpr.ROIWP.atts.units);
+end
 
 D = datasets;
 

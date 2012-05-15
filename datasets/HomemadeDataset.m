@@ -54,6 +54,9 @@ classdef HomemadeDataset < SatDataset
         cols = struct;
         
         members;
+        
+        % write data even if data are already there
+        overwrite = false;
     end    
     
     methods

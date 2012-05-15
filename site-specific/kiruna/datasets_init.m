@@ -146,7 +146,7 @@ D.associated_CPR_MHS_AMSU_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_CPR_MHS_AMSU_HIRS.filename = 'fulldata_$SAT.nc.gz';
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
-D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed.nc.gz';
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed_$SAT.nc.gz';
 
 D.associated_mhs_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
 D.associated_mhs_mhs.subdir = D.collocation_mhs_mhs.subdir;

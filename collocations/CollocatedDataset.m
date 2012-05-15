@@ -465,7 +465,7 @@ classdef CollocatedDataset < HomemadeDataset
                 switch ME.identifier
                     case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
                         logtext(eid, 'Collocating failed: %s\n', ME.message);
-                        also = struct();
+                        also = struct('version', {{'?', '?'}});
                         return
                     otherwise
                         ME.rethrow();
@@ -501,8 +501,8 @@ classdef CollocatedDataset < HomemadeDataset
             for i = 1:size(secondary_granules, 1)
                 datecell = num2cell(secondary_granules(i, 1:5));
                 
-                logtext(atmlab('OUT'), 'Collocating with ''%s'' @ %04d-%02d-%02d %02d:%02d\n', ...
-                    self.secondary.name, datecell{1:5});
+                logtext(atmlab('OUT'), 'Collocating with ''%s'' ''%s'' @ %04d-%02d-%02d %02d:%02d\n', ...
+                    self.secondary.name, spec2, datecell{1:5});
                 
                 % Overlap check 2; primary data with secondary filename
                 data2_start = date2unixsecs(datecell{1:5});
@@ -813,11 +813,11 @@ classdef CollocatedDataset < HomemadeDataset
             end
             
             fn = self.find_granule_by_datetime(date, spec);
-            mainfileexists = exist(fn, 'file');
+            mainfileexists = exist(fn, 'file') || self.overwrite;
             addisexist = false(size(additionals));
             for i = 1:length(additionals)
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
-                addisexist(i) = exist(fna, 'file');
+                addisexist(i) = exist(fna, 'file') || additionals{i}.overwrite;
             end
                         
             % if everything is already there, do nothing
@@ -830,7 +830,7 @@ classdef CollocatedDataset < HomemadeDataset
                     logtext(atmlab('OUT'), '    %s\n', additionals{i}.find_granule_by_datetime(date, spec));
                 end
                 if ~isempty(self.log)
-                    logtext(self.log, '%s nothing to be done\n', mat2str(date));
+                    logtext(self.log, '%s %s %s nothing to be done\n', mat2str(date), spec1, spec2);
                 end
                 return
             end
@@ -848,7 +848,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             if mainfileexists && ~colloc_config('overwrite')
                 logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
-                logtext(atmlab('OUT'), 'I will reprocess ALL additionals\n');
+                logtext(atmlab('OUT'), 'I will reprocess some additionals\n');
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 if isempty(result)
                     logtext(atmlab('OUT'), 'Upon reading collocations, appears there are none, skipping\n');
@@ -857,14 +857,22 @@ classdef CollocatedDataset < HomemadeDataset
                 info_addi.parent_id = attr.id;
                 
                 if ~isempty(self.log)
-                    logtext(self.log, '%s Collocations present, additionals regenerated\n', mat2str(date));
+                    logtext(self.log, '%s %s %s Collocations present, regenerate additionals\n', mat2str(date), spec1, spec2);
                 end
                 addi = {};
                 for i = 1:length(additionals)
-                    logtext(atmlab('OUT'), 'Collecting additionals for ''%s''\n', additionals{i}.name);
-                    depdata = self.fix_dependencies(additionals{i}, additionals, addi);
-                    addi{i} = additionals{i}.process_delayed(result, spec1, spec2, depdata);
-                    additionals{i}.store(date, spec, addi{i}, info_addi);
+                    if addisexist(i)
+                        logtext(atmlab('OUT'), 'Reading additionals for ''%s''\n', additionals{i}.name);
+                        [addi{i}, cc] = additionals{i}.read_single_day(date, spec, 'all');
+                        if isempty(fieldnames(additionals{i}.cols))
+                            additionals{i}.cols = cc;
+                        end
+                    else
+                        logtext(atmlab('OUT'), 'Collecting additionals for ''%s''\n', additionals{i}.name);
+                        depdata = self.fix_dependencies(additionals{i}, additionals, addi);
+                        addi{i} = additionals{i}.process_delayed(result, spec1, spec2, depdata);
+                        additionals{i}.store(date, spec, addi{i}, info_addi);
+                    end
                 end
 
             else
@@ -872,7 +880,7 @@ classdef CollocatedDataset < HomemadeDataset
                 % if the main file does not exist, associated don't either
                 
                 if ~isempty(self.log)
-                    logtext(self.log, '%s Generating collocations\n', mat2str(date));
+                    logtext(self.log, '%s %s %s Generating collocations\n', mat2str(date), spec1, spec2);
                 end
                 try
                     [result, addis, also] = ...
@@ -1221,6 +1229,7 @@ classdef CollocatedDataset < HomemadeDataset
             if ~isempty(self.pcd)
                 cachestr = self.calc_cache_key(date_start, date_end, spec, all_fields, limits, filters_by_name, ads, nargout);
                 if self.pcd.has_entry(cachestr)
+                    logtext(atmlab('OUT'), 'Reading from cache entry %s\n', cachestr)
                     varargout = self.pcd.get_entry(cachestr);
                     return
                 else
@@ -1379,7 +1388,8 @@ classdef CollocatedDataset < HomemadeDataset
             % possibly cache result
             if ~isempty(self.pcd)
                 logtext(atmlab('OUT'), 'Storing result in cache\n');
-                self.pcd.set_entry(cachestr, varargout);
+                self.pcd.set_entry(cachestr, varargout, ...
+                    {self.name, date_start, date_end, spec, all_fields, limits, evalc('disp(filters_by_name)')}); % OUCH! :(
             end
             
             %%%

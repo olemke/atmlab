@@ -69,6 +69,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %   find_granules_by_date -     Find all granules for date
     %   find_granules_for_period -  Find all granules for multi-day period
     %   find_granule_by_datetime -  Find granule starting at exact datetime
+    %   find_extreme_granule -      Find first or last granule for dataset
     %
     %  Methods for reading granules:
     %
@@ -970,51 +971,69 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
                 
                 if mod(i, 10)==0 % store
-                    self.store_firstline(scanfile);
+                    self.store_firstline(scanfile, sat);
                 end
             end
             
             self.store_firstline(scanfile, sat);
                         
         end
-        
-        function earliest = find_earliest_granule(self, spec)
-            % find the earliest granule for this dataset
+                
+
+        function outer = find_extreme_granule(self, spec, mode, varargin)
+            % find the earliest or latest granule for this dataset
             %
             % Must always be between Unix Genesis (1970-01-01) and current
             % date. Might provide incorrect results if not every day has
             % collocations. Use with caution. A safe but slow alternative
             % is to run <a href="matlab:help SatDataset/find_granules_for_period">.find_granules_for_period</a> for a very long date interval.
             %
+            % Second argument is either 'first' or 'last'.
+            %
             % EXAMPLE
             %
-            %   gran = d.find_earliest_granule('noaa18')
+            %   gran = d.find_extreme_granule('noaa18', 'first')
             %
-            % Uses bisection.
+            % Uses bisection. Works poorly, misses granules if total period
+            % is short.
             
+            switch mode
+                case 'first'
+                    a = 1;
+                    b = 2;
+                    extrema = {[1970 1 1], datevec(now)};
+                case 'last'
+                    a = 2;
+                    b = 1;
+                    extrema = {[self.find_extreme_granule(spec, 'first') 0], datevec(now)};
+                otherwise
+                    error(['atmlab:' mfilename ':InvalidUse', ...
+                        '''mode'' must be ''first'' or ''last'', not %s'], ...
+                        mode);
+            end
             MAXSTEPS = 100;
-            early = [1970 1 1];
-            late = datevec(now);
+            %early = [1970 1 1];
+            %late = datevec(now);
             mid = [0 0 0];
             
             for i = 1:MAXSTEPS
                 oldmid = mid;
-                mid = datevec((datenum(early)+datenum(late))/2);
+                mid = datevec((datenum(extrema{1})+datenum(extrema{2}))/2);
                 % ceil to just next date
                 mid = mid(1:3);
                 if all(oldmid == mid)
-                    earliest = late;
+                    outer = extrema{b};
                     break
                 end
                 if any(self.find_granules_by_date(mid, spec, false))
-                    late = mid;
+                    extrema{b} = mid;
                 else
-                    early = mid;
+                    extrema{a} = mid;
                 end
                 
             end
             
-            grans = self.find_granules_by_date(earliest, spec, false);
+            grans = self.find_granules_by_date(outer, spec, false);
             if isempty(grans)
                 if iscell(spec)
                     tt = [spec{:}];
@@ -1024,8 +1043,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 error(['atmlab:' mfilename ':nogranule'], ...
                     'No granules found for %s %s', self.name, tt);
             end
-            earliest = grans(1, :);
+            
+            switch mode
+                case 'first'
+                    outer = grans(1, :);
+                case 'last'
+                    outer = grans(end, :);
+            end
         end
+
         %% methods for internal use (not private, but from other classes)
        
         function add_collocated_dataset(ds, cd)

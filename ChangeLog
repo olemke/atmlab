@@ -1,3 +1,63 @@
+2012-05-15  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-117
+
+	* collocations/AssociatedDataset.m(members2cols):
+
+	- Fix typo in docs
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule):
+	
+	- Bugfix: if last primary granule was unreadable,
+	  version was wrong
+
+	- Provide more useful info when going to collocate
+
+	(collocate_and_store_date):
+
+	- Use 'overwrite' as a property, e.g. allow overwrite on for
+	individual datasets, off for others
+
+	- Provide sat/sensor-pair in logfile
+
+	- Implemented TODO-item: when multiple associated-datasets exist, and
+	one or more (but not all) already exist, read those from files,
+	regenerate the rest. Note: this won't regenerate datasets present but
+	depending on regenerated datasets (e.g. if FieldCopier is regenerated,
+	Collapser does not automatically follow)
+
+	(read):
+
+	- Report reading from cache
+	- Store info along with cache (but no function-handles, because
+	function-handles store along with them the entire workspace!)
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Bugfix, collapsed CPR-AMSU-etc. was not including $SAT
+
+	* handy/PersistentCachedData.m:
+
+	(set_entry): Allow to store metadata in info.mat
+
+	* datasets/HomemadeDataset.m:
+
+	- Added 'members' property (see above for use)
+
+	* datasets/SatDataset.m:
+
+	(find_extreme_granule): Added. Finds earlier or latest granule in
+	dataset. Not foolproof, use with care.
+
+	(find_granules_first_line): Bugfix for storing every 10th result
+
+	* datasets/define_datasets.m:
+
+	- for ROIWP, store not only cloud fraction, but 4 fractions for 1, 10,
+	100, 1000 g/m²
+
 2012-05-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-116

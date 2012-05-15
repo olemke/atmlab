@@ -65,8 +65,9 @@ classdef PersistentCachedData < CachedData
             end
         end
         
-        function set_entry(self, s, data)
+        function set_entry(self, s, data, varargin)
             set_entry@CachedData(self, s, data);
+            info = optargs(varargin, {struct()});
             svfl = fullfile(self.cachedir, [s '.mat']);
             logtext(atmlab('OUT'), 'Storing cache-entry to disk: %s -> %s\n', ...
                 s, svfl);
@@ -75,6 +76,13 @@ classdef PersistentCachedData < CachedData
             if self.disk_toolarge()
                 self.del_old_disk_entry()
             end
+            % store info
+            infofile = fullfile(self.cachedir, 'info.mat');
+            if exist(infofile, 'file')
+                all_info = loadvar(infofile, 'all_info');
+            end
+            all_info.(s) = info;
+            save(infofile, 'all_info');
         end
         
         function sz = disk_cachesize(self)
