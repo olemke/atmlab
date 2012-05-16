@@ -37,8 +37,8 @@ if length(datevec)>3
     hour = num2str(datevec(4), '%02d');
     minute = num2str(datevec(5), '%02d');
 else
-    hour = 0;
-    minute = 0;
+    hour = '0';
+    minute = '0';
 end
 year02 = year(3:4);
 doy = num2str(round(dayofyear(datevec(1), datevec(2), datevec(3))), '%03d');

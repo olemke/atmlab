@@ -1,5 +1,11 @@
 2012-05-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-119
+
+	* datasets/strrep_variables.m: Bugfix: str not int
+
+2012-05-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-118
 
 	* datasets/CollocatedMicrowaveOnlyIWP.m:
