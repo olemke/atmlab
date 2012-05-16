@@ -226,7 +226,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %
         % Example:
         % cpr.satname = 'cloudsat'
-        satname; % for single-satellite datasets
+        satname;
+        
         % Name for first-line database (predefined)
         %
         % Predefined property describing where firstline-db is stored
@@ -247,6 +248,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % want to set this to false to prevent automatic searchers from
         % detecting it.
         visible = true;
+        
+        % List of satellites
+        %
+        % For multi-satellite datasets, this may contain a list of
+        % satellites for this dataset. This is only for information and
+        % does not need to be complete. It may be used e.g. for looping
+        % through all the possible datasets. Not to be confused with
+        % <a href="matlab:help SatDataset/satname">satname</a>, which is for single-satellite datasets.
+        sats;
         
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that

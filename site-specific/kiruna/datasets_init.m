@@ -93,6 +93,11 @@ D.dardarsub.basedir = '/storage4/user_data/gerrit/dardar_subsel';
 D.dardarsub.subdir = '$YEAR4/$MONTH/$DAY';
 D.dardarsub.re = D.dardar.re;
 
+D.cmoiwp.basedir = '/storage4/user_data/gerrit/cmoiwp';
+D.cmoiwp.subdir = '$YEAR4/$MONTH/$DAY';
+D.cmoiwp.filename = '$SAT_$YEAR4_$MONTH_$DAY_$HOUR_$MINUTE.nc.gz';
+D.cmoiwp.re = '(?<satname>[a-z0-9]{6})_(?<year>\d{4})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<minute>\d{2})';
+
 %% COLLOCATION DATA SETS
 
 D.CollocatedDataset_avhrrCMSAF_cpr.basedir   = '/storage4/user_data/seliasson/collocations_avhrrCMSAF_cpr/core';

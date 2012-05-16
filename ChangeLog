@@ -1,3 +1,34 @@
+2012-05-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-118
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- New dataset. This is version 0.0 of collocation-based MW-only IWP.
+	To generate data, NN toolbox is needed, to read data, it is not.
+
+	* datasets/common_read_netcdf_dataset.m:
+
+	- Reader for my dataset
+
+	* datasets/SatDataset.m:
+
+	- Add property 'sats' for multi-sat datasets, can be set for
+	information to make easier looping through all data
+
+	* datasets/define_datasets.m:
+
+	- Add cmoiwp-dataset
+	- Add 'sats'-attribute for several SatDatasets
+
+	* site-specific/kiruna/datasets_init.m:
+	
+	- Add path for new cmoiwp dataset
+
+	* datasets/strrep_variables.m:
+
+	- Also replaec hour and minute
+
 2012-05-15  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-117

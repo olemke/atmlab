@@ -10,6 +10,8 @@ function s_out = strrep_variables(s, satname, datevec)
 % $DAY
 % $DOY
 % $SAT  or  $SAT1 and $SAT2
+% $HOUR
+% $MINUTE
 %
 % FORMAT
 %
@@ -31,11 +33,18 @@ function s_out = strrep_variables(s, satname, datevec)
 year = num2str(datevec(1), '%04d');
 month = num2str(datevec(2), '%02d');
 day = num2str(datevec(3), '%02d');
+if length(datevec)>3
+    hour = num2str(datevec(4), '%02d');
+    minute = num2str(datevec(5), '%02d');
+else
+    hour = 0;
+    minute = 0;
+end
 year02 = year(3:4);
 doy = num2str(round(dayofyear(datevec(1), datevec(2), datevec(3))), '%03d');
 
 to_replace = {'$YEAR4', year, '$MONTH', month, '$DAY', day, ...
-    '$YEAR2', year02, '$DOY', doy};
+    '$YEAR2', year02, '$DOY', doy, '$HOUR', hour, '$MINUTE', minute};
 
 if iscellstr(satname)
     to_replace = [to_replace {'$SAT1', satname{1}, '$SAT2', satname{2}}];
@@ -49,3 +58,5 @@ else
 end
 
 s_out = strrep_multi(s, to_replace{:});
+
+end
