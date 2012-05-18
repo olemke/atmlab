@@ -26,7 +26,7 @@ H = field{2};
 assert(isequal(size(in.(D)),size(in.(H))),['atmlab:' mfilename ':badInput'],...
 'data component in.%s is not the same size as the z-component in.%s',D,H)
 
-fprintf('\nColumn integrating in.%s over z-component in.%s...\n',D,H)
+fprintf('Column integrating in.%s over z-component in.%s...\n',D,H)
 if any(~strcmp('double',{class(in.(D)),class(in.(H))}))
     in.(D) = double(in.(D));
     in.(H) = double(in.(H));

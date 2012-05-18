@@ -72,7 +72,7 @@ D.hirs.subdir = '$SAT_hirs_$YEAR4/$MONTH/$DAY';
 D.hirs.re = poes_re;
 
 D.mirs.basedir = '/storage3/data/mirs/';
-D.mirs.subdir = '$SAT_$YEAR4-$MONTH-$DAY';
+D.mirs.subdir = '$SAT_$YEAR4/$MONTH/$DAY';
 D.mirs.re = '\.D(?<year>\d{2})(?<doy>\d{3})\.S(?<hour>\d{2})(?<minute>\d{2})\.E';
 
 D.modis_aqua_L2.basedir = '/storage3/data/modis/MYD06_L2/';
@@ -104,11 +104,11 @@ D.CollocatedDataset_avhrrCMSAF_cpr.basedir   = '/storage4/user_data/seliasson/co
 D.CollocatedDataset_avhrrCMSAF_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_avhrrCMSAF_cpr.filename  = 'collocations_avhrrCMSAF_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
+D.CollocatedDataset_calipso_cpr.basedir   = '/storage4/user_data/seliasson/collocations_calipso_cloudsat/core';
 D.CollocatedDataset_calipso_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_calipso_cpr.filename  = 'collocations_calipso_cpr_$YEAR4_$MONTH_$DAY.nc.gz';
-D.CollocatedDataset_calipso_cpr.basedir   = '/storage4/user_data/seliasson/collocations_calipso_cloudsat/core';
 
-D.CollocatedDataset_cpr_dardar.basedir   = '/storage4/user_data/seliasson/collocations_cpr_dardar/core';
+D.CollocatedDataset_cpr_dardar.basedir   = '/storage4/user_data/seliasson/collocations_cloudsat_dardar/core';
 D.CollocatedDataset_cpr_dardar.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_cpr_dardar.filename  = 'collocations_cpr_dardar_$YEAR4_$MONTH_$DAY.nc.gz';
 
@@ -120,9 +120,13 @@ D.CollocatedDataset_mhs_cpr.basedir   = '/storage4/user_data/gerrit/collocated_d
 D.CollocatedDataset_mhs_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_mhs_cpr.filename  = 'collocations_$SAT.nc.gz';
 
+D.CollocatedDataset_mspps_cpr.basedir   = '/storage4/user_data/seliasson/collocations_mspps_cloudsat/core';
 D.CollocatedDataset_mspps_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_mspps_cpr.filename  = 'collocations_mspps_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.CollocatedDataset_mspps_cpr.basedir   = '/storage4/user_data/seliasson/collocations_mspps_cloudsat/core';
+
+D.CollocatedDataset_mirs_cpr.basedir   = '/storage4/user_data/seliasson/collocations_mirs_cloudsat/core';
+D.CollocatedDataset_mirs_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
+D.CollocatedDataset_mirg_cpr.filename  = 'collocations_mirs_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 D.collocation_mhs_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
 D.collocation_mhs_mhs.subdir    = '$YEAR4/$MONTH/$DAY';

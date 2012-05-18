@@ -28,13 +28,6 @@ function S = common_read_dardar(file, varargin)
 core_fields   = {'time','latitude','longitude'};
 extra_fields  = optargs(varargin, {{}});
 all_fields    = [core_fields(:); extra_fields(:)];
-% List of hand-made fields that can be composed already here to save memory and
-% storage space. I call them "pseudo fields" (e.g. modis_IWP that depends on 3
-% fields in the modis file). The loop of hdfread will check if any psudeo fields
-% are present. If so, it will be processed and the fields this pseudo field
-% requires to be created are further assumed to be frivolous and therefore
-% removed afterwards.
-pseudo_fields = {'dardar_IWP'};
 
 for F = all_fields'
     if ismember(F{1},pseudo_fields)
@@ -58,11 +51,6 @@ info = D.dardar.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
-if any(ismember(pseudo_fields,extra_fields))
-    for P = pseudo_fields(:)'
-        S = dealWithPseudoFields(S,P{1},file);
-    end
-end
 S.version = info.version;
 S.path = file;
 
@@ -70,46 +58,4 @@ S = rmfield(S,{'latitude','longitude'});
 
 S = MaskInvalidGeoTimedataWithNaN(S);
 
-end
-%%%%%%%%%%%%%
-% SUBFUNCTION
-
-function S = dealWithPseudoFields(S,field,file)
-%% dealWithPseudoFields
-%
-% List of hand-made fields that can be composed already here to save memory
-% and storage space. Will check in the loop if this field is present. The
-% fields required to generate the pseudo fields are further assumed to be
-% frivolous and therefore removed afterwards.
-
-% READ dependent fields
-switch field
-    case 'dardar_IWP'
-        dependent_fields = {'iwc','height','ln_iwc_error'};
-        rmflag = ~ismember(dependent_fields,fieldnames(S));
-        for F = dependent_fields
-            S.(F{1}) = hdfread(file,F{1});
-        end
-        S.height = repmat(S.height,size(S.iwc,1),1);
-end
-
-% use dependent fields to BUILD the pseudo field
-switch field
-    case 'dardar_IWP'
-        
-        % get the footprints that are cloud free
-        cloudFree = sum(S.iwc,2)==0;
-        S.dardar_IWP = column_integrate(S,{'iwc','height'});
-        
-        % with IWP comes also IWP error
-        S.dardar_IWP_error = column_integrate(...
-            struct('errorIWC',S.iwc.*S.ln_iwc_error,'height',S.height),{'errorIWC','height'})./S.dardar_IWP;
-        
-        S.dardar_IWP_error(cloudFree)=0;
-        
-        S.dardar_IWP = S.dardar_IWP;
-        S.dardar_IWP_error = S.dardar_IWP_error;
-end
-
-S=rmfield(S,dependent_fields(rmflag));
 end

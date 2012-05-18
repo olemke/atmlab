@@ -83,10 +83,8 @@ function S = dealWithPseudoFields(S,field,file)
 %
 % List of hand-made fields that can be composed already here to save memory
 % and storage space. Will check in the loop if this field is present. The
-% crux is that the fields the psuedo field relies on must be read, hence
-% listed before it. This is because they are ofcourse needed to build the
-% data field. and the fields it required are further assumed to be
-% frivolous and therefore removed afterwards. This part is hardcoded
+% fields the pseudo fields required are further assumed to be frivolous and therefore
+% removed afterwards. This part is hardcoded
 
 % READ dependent fields
 switch field

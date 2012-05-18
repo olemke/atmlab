@@ -1,3 +1,26 @@
+2012-05-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-120
+
+	* datasets/common_read_modis.m:
+	- Fixed incorrect help
+
+	* datasets/common_read_mirs.m:
+	- Added reading routine for MIRS dataset (based on AMSU-b)
+
+	* datasets/common_read_dardarsub.m:
+	- Added pseudo fields
+
+	* datasets/common_read_dardar.m:
+	- Removed pseudo fields
+
+	* math/column_integrate.m:
+	- better output to screen
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m:
+	- Added MIRS collocated dataset
+
 2012-05-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-119
