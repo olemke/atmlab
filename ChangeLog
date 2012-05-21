@@ -1,3 +1,17 @@
+2012-05-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-121
+
+	* datasets/define_datasets.m:
+	- Added granule duration to cmo dataset and added collocated
+	dataset cmo_cpr
+
+	* datasets/common_read_mirs.m:
+	- Use year02 instead of year
+
+	* site-specific/kiruna/datasets_init.m:
+	-Added Gerrit's CMO dataset and fixed some bugs in the MIRS definition
+
 2012-05-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-120

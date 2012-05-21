@@ -54,7 +54,7 @@ S.time  = double(S.scanUTC);
 D = datasets;
 info = D.mirs.find_info_from_granule(file);
 % year = YEAR2
-date = dayofyear_inverse(2000+str2double(info.year), str2double(info.doy));
+date = dayofyear_inverse(2000+str2double(info.year02), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 S.version = X.algsn; %actually algorithm serial number
