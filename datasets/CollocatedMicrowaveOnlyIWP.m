@@ -17,14 +17,23 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     
     properties (GetAccess = private, SetAccess = private)
        selection; 
-       maxsize = 10000;
+       maxsize = 10000; % max number of entries for neural net
     end
+    
+    properties (Constant)
+        version = 0.1;
+        changelog = [...
+            'version 0.0: initial version, negative IWP, linear all\n' ...
+            'version 0.1: cf [0, 1], log-IWP retrieved, more descriptive atts\n'];
+    end
+    
     methods
         function self = CollocatedMicrowaveOnlyIWP(varargin)
             self = self@HomemadeDataset(varargin{:});
             self.setcols();
             self.setmembers();
             self.reader = @(varargin) (common_read_netcdf_dataset(self, varargin{:}));
+            %self.basedir = sprintf('%s/v%03.1f', self.basedir, self.version);
         end
         
         function getdata(self, start_date, end_date)
@@ -54,9 +63,10 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             BT = self.data(self.selection, self.localcols.B_BT(3:5)).';
             IWP = self.data(self.selection, self.localcols.MEAN_ROIWP).';
             
+            positive = IWP>0;
             net = fitnet(6);
             net.trainParam.showWindow = false;
-            net = train(net, BT, IWP);
+            net = train(net, BT(:, positive), log10(IWP(positive)));
             self.nets.retrieval = net;
         end
         
@@ -65,7 +75,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             
             BT = self.data(self.selection, self.localcols.B_BT(3:5)).';
             cloudfrac = self.data(self.selection, self.localcols.FRAC100_ROIWP).';
-            net = fitnet(6);
+            net = patternnet(6);
             net.trainParam.showWindow = false;
             net = train(net, BT, cloudfrac);
             self.nets.classification = net;
@@ -76,6 +86,19 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             y = self.nets.classification(self.data(:, self.localcols.B_BT(3:5)).');
             bins = linspace(0, 1, 10);
             satboxplot(x, y, bins, 'kx');
+        end
+        
+        function plot_test_retrieval_net(self)
+            xbt = self.data(:, self.localcols.B_BT(3:5));
+            x = self.data(:, self.localcols.MEAN_ROIWP);
+            yc = self.nets.classification(xbt.');
+            yf = 10.^self.nets.retrieval(xbt.');
+            y = yc.*yf;
+            plot(x, y, '.');
+            xlabel('CPR IWP [g/m^2]');
+            ylabel('Gerrit IWP [g/m^2]');
+            set(gca, 'XScale', 'log');
+            set(gca, 'YScale', 'log');
         end
         
         function storenets(self, fl)
@@ -94,7 +117,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             %graninfo = ds.find_info_from_granule(ds.find_granule_by_datetime(dt, spec));
             mytb = reshape(grandata.tb(:), [numel(grandata.lat) 5]);
             cf = self.nets.classification(mytb(:, 3:5).');
-            fiwp = self.nets.retrieval(mytb(3:5).');
+            fiwp = 10.^self.nets.retrieval(mytb(3:5).');
             ciwp = cf .* fiwp;
             time = repmat(grandata.time, [1 90]);
             time = time(:);
@@ -106,7 +129,11 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             M(:, self.cols.cf) = cf;
             M(:, self.cols.fiwp) = fiwp;
             M(:, self.cols.ciwp) = ciwp;
-            info.version = '0.0';
+            M = sortrows(M, self.cols.time);
+            info.version = sprintf('%03.1f', self.version);
+            info.history = self.changelog;
+            % FIXME: resort
+            % FIXME: more additional info
             self.store(dt, spec, M, info);
         end
         
@@ -122,13 +149,23 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
         
         function setmembers(self)
             self.members.lat.type = 'float';
+            self.members.lat.atts.long_name = 'Latitude';
+            self.members.lat.atts.valid_range = [-90 90];
+            self.members.lat.atts.units = 'degrees_north';
             self.members.lon.type = 'float';
+            self.members.lon.atts.long_name = 'Longitude';
+            self.members.lon.atts.units = 'degrees_east';
+            self.members.lon.atts.valid_range = [-180 180];
             self.members.time.type = 'int';
             self.members.cf.type = 'float';
             self.members.fiwp.type = 'float';
-            self.members.fiwp.atts.long_name = 'Full uncorrected IWP';
+            self.members.fiwp.atts.long_name = 'Full uncorrected Ice Water Path';
+            self.members.fiwp.atts.description = 'Uncorrected Ice Water Path, retrieved even when there may be no cloud';
+            self.members.fiwp.atts.units = 'g/m^2';
             self.members.ciwp.type = 'float';
+            self.members.ciwp.atts.units = 'g/m^2';
             self.members.ciwp.atts.long_name = 'CF-corrected IWP';
+            self.members.ciwp.atts.description = 'Corrected Ice Water Path, including guess ''is there a cloud?''';
         end
     end
     

@@ -736,7 +736,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     ME.rethrow();
                 end
             end
-            %logtext(colloc_config('stdout'), 'read %s\n', datafile);
+            
+            %% check/convert datafile contents
+            rqre_field(data, 'time');
+            rqre_field(data, 'lat');
+            rqre_field(data, 'lon');
+            rqre_field(data, 'epoch');
+            if isinteger(data.time)
+                data.time = double(data.time);
+            end
             nlines = size(data.time, 1);
             npos = size(data.lat, 2);
             

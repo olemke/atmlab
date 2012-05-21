@@ -37,5 +37,8 @@ else
 end
 
 if ~isfield( Q, fieldname )
-  error( sprintf('%s is required to have the field *%s*.', vname, fieldname ) );
+  error(['atmlab:' mfilename ':missingfield'], ...
+      '%s is required to have the field *%s*.', vname, fieldname);
+end
+
 end

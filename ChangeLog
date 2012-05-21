@@ -1,3 +1,46 @@
+2012-05-21  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-122
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Include version in cmoiwp-basedir
+
+	* handy/rqre_field.m:
+
+	- Add error identifier
+
+	* datasets/SatDataset.m(read_granule):
+
+	- Add some checks on reader-output
+	- Convert time to double if it's integer
+
+	* datasets/CollocatedMicrowaveOnlyIWP:
+
+	- Added version and changelog props
+
+	(make_retrieval_net):
+
+	- Retrieve log(IWP), not IWP
+
+	(make_classification_net):
+
+	- Force cloud-frac within [0, 1]
+
+	(plot_test_retrieval_net):
+
+	- Added
+
+	(retrieve_and_store_gran):
+
+	- Resort data. Rerun collocs!
+	- Correct for retrieving log not lin
+	- Use class version
+
+	(setmembers):
+
+	- Add more attributes
+
 2012-05-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-121
