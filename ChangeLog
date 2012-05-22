@@ -1,3 +1,13 @@
+2012-05-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-123
+
+	* files/loadncfile2.m:
+
+	-deleted depricated file. Use loadncfile.m instead. (although this
+	won't work for matlab's older than 2010a)
+
+
 2012-05-21  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-122
