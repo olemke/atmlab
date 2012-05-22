@@ -1,5 +1,15 @@
 2012-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-125
+
+	* datasets/HomemadeDataset(read_single_day):
+
+	- Set cleanup-object before creating 'tmp', if 'gunzip -c' fails,
+	'tmp' would not get removed. OTOH, removing an empty file is just a
+	warning, so that's okay.
+
+2012-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-124
 
 	* datasets/HomemadeDataset.m(cleanup):

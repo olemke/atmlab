@@ -274,8 +274,8 @@ classdef HomemadeDataset < SatDataset
             fn = self.find_granule_by_datetime(date, spec);
             logtext(atmlab('OUT'), 'Gunzipping and reading %s\n', fn);
             tmp = tempname(atmlab('WORK_AREA'));
-            exec_system_cmd(['gunzip -c ' fn '>' tmp]); % 3x faster than ML's gunzip
             c = onCleanup(@()delete(tmp));
+            exec_system_cmd(['gunzip -c ' fn '>' tmp]); % 3x faster than ML's gunzip
             
             if ischar(fields)
                 if strcmp(fields, 'all')
