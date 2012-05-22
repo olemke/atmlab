@@ -1302,7 +1302,7 @@ classdef CollocatedDataset < HomemadeDataset
                         continue
                     end
                     M_cols = M_cols_here;
-                    hitno = hitno + 1;
+                    %hitno = hitno + 1;
                     % also read for all additionals
                     for j = 1:length(additionals)
                         [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
@@ -1335,6 +1335,8 @@ classdef CollocatedDataset < HomemadeDataset
                 
                 if stoplater
                     continue
+                else
+                    hitno = hitno + 1;
                 end
                 
                 %% apply limitations

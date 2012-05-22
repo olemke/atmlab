@@ -1,3 +1,21 @@
+2012-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-217
+
+	* collocations/CollocatedDataset.m(read):
+
+	- Fix rare bug if very first-read datafile has core but no additionals
+	and stuff is merged
+
+	* datasets/CollocateMicrowaveOnlyIWP:
+
+	- Improve docs
+	- mark illegal methods accordingly
+	- Use more data to train networks
+	- Be more needy in IWP-network
+	- Remove plotting routines, they don't belong here
+	- Call cf -> cf100
+
 2012-05-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-126
