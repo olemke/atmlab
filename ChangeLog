@@ -1,3 +1,28 @@
+2012-05-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-126
+
+	* files/uncompress.m:
+	- Added function the uncompresses files based on their file
+	endings. If it neither ends with .gz or .zip it does nothing. This
+	calls a system call to gunzip or unzip instead of using MATLABS
+	own slow version. (ca. factor 3 time faster for the typical file
+	sizes we deal with)
+
+	* datasets/common_read_mirs.m:
+	* datasets/common_read_avhrr_cmsaf_gac.m:
+	* datasets/common_read_hirscs.m:
+	* datasets/common_read_patmosx.m:
+	* datasets/common_read_calipso.m:
+	* files/loadncvar.m:
+	* files/loadncfile.m:
+	* sensors/cloudsat_read_zipped.m:
+	- Use the uncompress function instead of the slow matlab versions
+
+	* datasets/common_read_mspps.m:
+	- No longer output empty attributes structure
+
+
 2012-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-125

@@ -24,8 +24,9 @@ function [S,attr] = common_read_patmosx(file, varargin)
 % FORMAT
 %
 %   S = common_read_patmosx(file, varargin)
-%
+
 % $Id$
+% Salomon Eliasson
 
 core_fields = {'latitude','longitude','scan_line_time'};
 extra_fields = optargs(varargin, {{}});
@@ -33,7 +34,11 @@ all_fields = [core_fields(:); extra_fields(:)];
 
 % read both ascending and descending files. Get the attributes incase
 % wanted
-[S1,attr] = gunzip_and_read_patmosx(file,all_fields);
+tmpdir = create_tmpfolder();
+cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
+file = uncompress(file,tmpdir);
+% read the data. This also scales the data automatically!
+S1  = read_clavrx_hdf(filename,all_fields);
 S1.latitude = repmat(S1.latitude',[1,length(S1.longitude)]);
 S1.longitude = repmat(S1.longitude,[size(S1.latitude,1),1]);
 
@@ -44,7 +49,10 @@ else
 end
 
 if exist(file2,'file')
-    S2 = gunzip_and_read_patmosx(file2,all_fields);
+    tmpdir2 = create_tmpfolder();
+    cleanupObject2 = onCleanup(@() delete_tmpfolder(tmpdir2));
+    file = uncompress(file,tmpdir2);
+    S2  = read_clavrx_hdf(filename,all_fields);
     S2.latitude = repmat(S2.latitude',[1,length(S2.longitude)]);
     S2.longitude = repmat(S2.longitude,[size(S2.latitude,1),1]);
 else
@@ -73,28 +81,6 @@ S = MaskInvalidGeoTimedataWithNaN(S);
 end
 %%%%%%%%%%%%%
 % SUBFUNCTION
-
-function [S,attr] = gunzip_and_read_patmosx(file,all_fields)
-
-% make TEMPDIR & cleanup after I'm done.
-if strcmp(file(end-2:end),'.gz')
-    tmpdir = create_tmpfolder();
-    cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
-    
-    [~,tmpfile] = fileparts(file);
-    filename = fullfile(tmpdir,tmpfile);
-    [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),false,true);
-    
-    if logical(test)
-        error(['atmlab:' mfilename ':file'],'error gunzipping\n%s',file)
-    end
-elseif strcmp(file(end-3:end),'.hdf')
-    filename = file;
-end
-% read the data. This also scales the data automatically!
-[S,attr]  = read_clavrx_hdf(filename,all_fields);
-
-end 
 
 function S = concatenateDatafields(Sasc,Sdec)
 %% concatinateDatafields

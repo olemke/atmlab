@@ -1,4 +1,4 @@
-function [S,attr] = common_read_mspps(file, varargin)
+function S = common_read_mspps(file, varargin)
 
 % COMMON_READ_MSPPS reads mspps data
 %
@@ -34,13 +34,6 @@ function [S,attr] = common_read_mspps(file, varargin)
 core_fields = {'Latitude','Longitude','Time'};
 extra_fields = optargs(varargin, {{}});
 all_fields = [core_fields(:); extra_fields(:)];
-
-% read both ascending and descending files. Get the attributes incase
-% wanted
-if nargout == 2
-    disp('There are no attributes associated with MSPPS data')
-    attr = [];
-end
 
 for F = all_fields'
     try

@@ -131,15 +131,12 @@ function S = read_native_mirs(filename)
 % 2009-11-20   Created by Oliver Lemke and Salomon Eliasson.
 
 errId = ['atmlab:' mfilename ':error'];
-if strcmp( filename(length(filename)-2:end), '.gz')
-    uncompressed_filename = tempname(atmlab( 'WORK_AREA' ));
-    cleanupObj = onCleanup(@() (delete(uncompressed_filename)));
-    cmd = [ 'gunzip -cd ' filename ' > ' uncompressed_filename ];
-    st = system (cmd);
-    if st
-        error (errId, 'Failed to uncompress file %s', filename);
-    end
-    filename = uncompressed_filename;
+
+tmpdir = create_tmpfolder();
+cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
+[filename,fail] = uncompress(filename,tmpdir);
+if fail
+    error (errId, 'Failed to uncompress file %s', filename);
 end
 
 fid = fopen (filename, 'rb', 'b');

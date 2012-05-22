@@ -38,13 +38,10 @@ pseudo_fields = {'AVHRR_IWP'};
 
 S.path = file; % get original file
 
-% UNCOMPRESS first if gzipped
-if strcmp(file(end-2:end),'.gz')
-	tmpdir = create_tmpfolder;
-	gfile = gunzip(file,tmpdir);
-	file = gfile{1};
-	c= onCleanup(@() rmdir(tmpdir,'s'));
-end
+% UNCOMPRESS (if needed)
+tmpdir = create_tmpfolder;
+c = onCleanup(@() rmdir(tmpdir,'s'));
+file = uncompress(file,tmpdir);
 
 for F = all_fields'
     if ismember(F{1},pseudo_fields)

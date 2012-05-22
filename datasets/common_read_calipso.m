@@ -58,12 +58,14 @@ core_fields = {'Latitude','Longitude','Profile_UTC_Time'};
 extra_fields = optargs(varargin, {{}});
 all_fields = [core_fields(:); extra_fields(:)];
 
-% read both ascending and descending files. Get the attributes incase
-% wanted
-if nargout == 2
-    [S,attr] = gunzip_and_read_calipso(file,all_fields);
-else
-    S = gunzip_and_read_calipso(file,all_fields);
+% make TEMPDIR & cleanup after I'm done.
+tmpdir = create_tmpfolder();
+cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
+file = uncompress(file,tmpdir);
+
+% READ the data. This also scales the data automatically!
+for F = all_fields'
+    S.(F{1})  = hdfread(file,F{1});
 end
 
 %% RENAME some fields
@@ -88,36 +90,5 @@ S.version = '051 (hardcoded)';
 
 S = rmfield(S,core_fields);
 S = MaskInvalidGeoTimedataWithNaN(S);
-end
-%%%%%%%%%%%%%
-% SUBFUNCTION
-
-function [S,attr] = gunzip_and_read_calipso(file,all_fields)
-
-
-% make TEMPDIR & cleanup after I'm done.
-if strcmp(file(end-2:end),'.gz')
-    tmpdir = create_tmpfolder();
-    cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
-    
-    [~,tmpfile] = fileparts(file);
-    filename = fullfile(tmpdir,tmpfile);
-    [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',file,filename),false,true);
-    
-    if logical(test)
-        error(['atmlab:' mfilename ':file'],'error gunzipping\n%s',file)
-    end
-elseif strcmp(file(end-3:end),'.hdf')
-    filename = file;
-end
-% read the data. This also scales the data automatically!
-for F = all_fields'
-    if nargout==2
-        info = hdfinfo(filename,'hdf');
-        index = ismember({info.SDS.Name},F{1});
-        attr.(F{1}) = info.SDS(index).Attributes;
-    end
-    S.(F{1})  = hdfread(filename,F{1});
-end
 
 end

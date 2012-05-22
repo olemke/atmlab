@@ -20,24 +20,15 @@ function data = common_read_hirscs(file)
 %                   time    time in seconds since 00:00 UT
 %                   lat     latitude in degrees
 %                   lon     longitude in [-180, 180] degrees
-%
+
 % $Id$
+% Gerrit Holl
 
-isgzipped = strcmp(file(end-2:end), '.gz');
-
-if isgzipped % gunzip first
-    newfile = tempname(atmlab('WORK_AREA'));
-    exec_system_cmd(['gunzip -c ' file '>' newfile]); % 3x faster than ML gunzip
-    file = newfile;
-%    filenames = gunzip(file, '/tmp');
-%    file = filenames{1};
-end
+tmpdir = create_tmpfolder();
+cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
+file = uncompress(file,tmpdir);
 
 ncid = netcdf.open(file, 'NC_NOWRITE');
-
-if isgzipped % remove gunzipped file
-    delete(file);
-end
 
 [~, nvars] = netcdf.inq(ncid);
 for i = 0:nvars-1

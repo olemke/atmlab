@@ -17,12 +17,13 @@
 
 function ret = loadncfile( filename )
 
-% UNCOMPRESS first if gzipped
+errId = ['atmlab:' mfilename];
+% UNCOMPRESS if needed
 if strcmp(filename(end-2:end),'.gz')
 	tmpdir = create_tmpfolder;
-	gfile = gunzip(filename,tmpdir);
-	filename = gfile{1};
-	c= onCleanup(@() rmdir(tmpdir,'s'));
+    c= onCleanup(@() rmdir(tmpdir,'s'));
+	[filename,fail] = uncompress(filename,tmpdir);
+    if fail, error(errId,'Uncompressing failed'); end
 end
   
 ncid = netcdf.open (filename, 'NOWRITE');
@@ -54,7 +55,7 @@ if (which('netcdf.inqGrps'))
     	ret = catstruct(ret, read_group(ncid, gid));
 	end
 else
-    warning('atmlab:loadncfile:groupsunsupported', ...
+    warning(errId, ...
         'This Matlab version does not support NetCDF groups.');
 end
 
