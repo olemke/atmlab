@@ -19,7 +19,7 @@ classdef HomemadeDataset < SatDataset
     %
     %  Constructor:
     %
-    %   HomemadeDataset -   Create HomemadeDataset object (why would you?)
+    %   HomemadeDataset -   Create HomemadeDataset object
     %
     %  I/O:
     %
@@ -32,15 +32,8 @@ classdef HomemadeDataset < SatDataset
     
     % Note on implicit and explicit constructor calling:
     % http://www.mathworks.se/help/matlab/matlab_oop/creating-subclasses--syntax-and-techniques.html
-    %
-    % Work in progress!
-    %
-    % $Id$
     
-    % read-only props (may be alterable with methods)
-    %properties (SetAccess = protected)        
-        %members = struct();
-    %end
+    % $Id$
     
     
     properties
@@ -337,6 +330,7 @@ classdef HomemadeDataset < SatDataset
                     case {'MATLAB:netcdf:inq:notNetcdfID', 'MATLAB:netcdf:close:notNetcdfID', ...
                             'MATLAB:netcdf:close:ebadid:notNetcdfID', 'MATLAB:imagesci:netcdf:libraryFailure'} % already closed
                     otherwise
+                        delete(temp_out);
                         ME.rethrow();
                 end
             end

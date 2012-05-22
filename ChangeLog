@@ -1,3 +1,12 @@
+2012-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-124
+
+	* datasets/HomemadeDataset.m(cleanup):
+
+	- Delete file even if error is not caught, before rethrowing.
+	  Maybe this will get rid of the empty NetCDF-files?
+
 2012-05-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-123
