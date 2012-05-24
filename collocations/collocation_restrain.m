@@ -1,4 +1,4 @@
-function rows = collocation_restrain(data, ranges, filters)
+function rows = collocation_restrain(data, varargin)
 
 % collocation_restrain Find rows fulfilling restrictions
 %
@@ -9,14 +9,19 @@ function rows = collocation_restrain(data, ranges, filters)
 %   data    matrix      As produced by collocation_read
 %   ranges  Nx3 matrix  Matrix containing rows [colno min max], where data
 %                       rows from the data are selected if
-%                       min <= data(row, col) <= max
-%   filters cell array 
+%                       min <= data(row, col) <= max.
+%                       Defaults to [] (do nothing)
+%   filters cell array  FIXME DOC
 %
 % OUT
 %
 %   rows    logical     Rows where limitations are met
 %
+% See also: limstruct2limmat
+%
 % $Id$
+
+[ranges, filters] = optargs(varargin, {[], {}});
 
 if isempty(ranges)
     rows = true(size(data, 1), 1);

@@ -419,7 +419,7 @@ for iwp = [1 10 100 1000]
     fn = sprintf('FRAC%d', iwp);
     appccs.ROIWP.processors.(fn) = @(X)(sum(X>=iwp) / length(X));
     appccs.ROIWP.stored.(fn).type = 'float';
-    appccs.ROIWP.stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s > %d %s', ...
+    appccs.ROIWP.stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
         f_cpr.ROIWP.atts.long_name, iwp, f_cpr.ROIWP.atts.units);
 end
 

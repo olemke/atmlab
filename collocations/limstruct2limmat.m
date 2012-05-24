@@ -24,6 +24,8 @@ function limmat = limstruct2limmat(limits, name_struct)
 %   limmat      Nx3 matrix      First row column numbers; 2nd and 3rd row
 %                               the ranges as mentioned.
 %
+% See also: collocation_restrain
+% 
 % $Id$
 
 if isempty(fieldnames(limits))

@@ -26,6 +26,12 @@ Fix:
     - mhs/amsub
     - bugs
     
+BUGS:
+    - if the FieldCopier no prim. fields are asked, but prim. sibling
+      are, failing to read primary therefore data1.lat empty
+    - Why is cmoiwp starting time sometimes a minute later than the
+      corresponding MHS starting time?
+
 *********************************
 * Old style before January 2012 *
 *********************************

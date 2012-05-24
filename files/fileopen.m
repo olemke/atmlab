@@ -7,7 +7,7 @@
 % FORMAT   See *fopen*.
 
 % 2002-12-20   Created by Patrick Eriksson.
-
+% 2012-05-24   Improved by Gerrit Holl.
 
 function fid = fileopen(filename,varargin)
                                                                            %&%
@@ -19,12 +19,13 @@ rqre_datatype( filename, @ischar );                                        %&%
 
 %= Call fopen
 %
-fid = fopen( filename, varargin{:} );
+[fid, message] = fopen( filename, varargin{:} );
 
 
 %= Was open succesful?
 %
 if fid < 0
-  serr = sprintf( 'Could not open the file %s', filename );
-  error( serr );
+  error(['atmlab:' mfilename ':IOError'], 'Could not open file %s: %s', filename, message );
+end
+
 end

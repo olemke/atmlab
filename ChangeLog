@@ -1,3 +1,47 @@
+2012-05-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-218
+
+	* collocations/TODO: - Added 2 bugs to be fixed
+
+	* collocations/collocation_restrain.m,
+	collocations/limstruct2limmat.m:
+
+	- Added "see also" in the docs between those two functions
+
+	* files/fileopen.m:
+
+	- If it fails, also pass the error message, and give a nice
+	error-identifier
+
+	* datasets/SatDataset.m:
+
+	(find_granule_by_datetime):
+
+	- If 'tol' is given explicitly, always use the regexp-way to find a
+	file (tol makes no sense otherwise anyway).
+
+	(read_granule):
+
+	- Add some checks
+	- Use a one-second tolerance
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Added some TODO-items
+	- Increased hardcoded number of elemnts in network
+	- Add limits as properties to object and networks
+	- Add stored-file as properties to object and networks
+	- Bump version number to 0.3 and enlarge changelog
+	- Clearly split limitations in training-limitations and
+	retrieval-limitations
+	- Add more limitations (NO_ROIWP, CV_ROIWP)
+	- Store more fields
+
+	* define_datasets.m:
+
+	- Fix small error
+
 2012-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-217

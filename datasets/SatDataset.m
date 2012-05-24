@@ -505,7 +505,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % find_granule_by_datetime Return full path of datafile by date/time
             %
             % Returns the full path of the datafile corresponding to the input
-            % arguments. There are two modes:
+            % arguments. There are two modes (FIXME: document explicit tol
+            % behaviour):
             %
             %   - If <a href="matlab:help SatDataset/filename">dataset.filename</a> is defined, the path is
             %     calculated directly from <a href="matlab:help SatDataset">dataset</a> properties and the arguments
@@ -556,7 +557,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             fulldir = self.find_datadir_by_date(datevec, spec);
             
-            if ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename) % calculate directly
+            if nargin <= 3 && ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename) % calculate directly
                 fn = strrep_variables(self.filename, spec, datevec);
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
@@ -683,6 +684,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % optional arguments
             [spec, extra, remdouble, force, reload] = optargs(varargin, {'', {}, true, false, false});
             
+            % checks for earlier error detection
+            rqre_datatype(date, @isnumeric);
+            rqre_datatype(spec, {@ischar, @iscellstr});
+            rqre_datatype(extra, @iscell);
+            rqre_datatype(remdouble, @islogical);
+            rqre_datatype(force, @islogical);
+            rqre_datatype(reload, @islogical);
+            
             % special case: remove 'scanline_position' and
             % 'scanline_number' from 'extra'. Those are in reality always
             % returned, but readers do not necessarily understand them.
@@ -714,7 +723,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             
             %% find datafile and function to read it
-            datafile = self.find_granule_by_datetime(date, spec);
+            datafile = self.find_granule_by_datetime(date, spec, 1);
             
             %% read datafile
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
