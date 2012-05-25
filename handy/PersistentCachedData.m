@@ -74,6 +74,9 @@ classdef PersistentCachedData < CachedData
                 s, svfl);
             save(svfl, 'data');
             logtext(atmlab('OUT'), 'New size: %d bytes\n', self.disk_cachesize());
+            if self.disk_free() + self.disk_cachesize() < self.minFreeSpace
+                error(['atmlab:' mfilename ':noSpace'],'df + du < minFreeCache')
+            end
             if self.disk_toolarge()
                 self.del_old_disk_entry()
             end
@@ -99,16 +102,14 @@ classdef PersistentCachedData < CachedData
         end
         
         function b = disk_toolarge(self)
-            b = self.disk_cachesize() > self.storedsize || self.disk_free() < minFreeSpace;
+            b = self.disk_cachesize() > self.storedsize || self.disk_free() < self.minFreeSpace;
         end
         
         function del_old_disk_entry(self)
             % remove oldest cache-entry on disk. Should contain only
             % MAT-files!
-            
-            if self.disk_free() + self.disk_cachesize() < minFreeCache
-                error(['atmlab:' mfilename ':noSpace'],'df + du < minFreeCache')
-            end
+           
+
             d = dir(self.cachedir);
             % all but 2 should end in .mat
             for i = 1:length(d)

@@ -22,8 +22,8 @@ errId = ['atmlab:' mfilename];
 if strcmp(filename(end-2:end),'.gz')
 	tmpdir = create_tmpfolder;
     c= onCleanup(@() rmdir(tmpdir,'s'));
-	[filename,fail] = uncompress(filename,tmpdir);
-    if fail, error(errId,'Uncompressing failed'); end
+	filename = uncompress(filename,tmpdir);
+    if isempty(filename), error(errId,'Uncompressing failed'); end
 end
   
 ncid = netcdf.open (filename, 'NOWRITE');

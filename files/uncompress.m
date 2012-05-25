@@ -1,4 +1,4 @@
-function [filename,fail] = uncompress(compfile,tmpdir)
+function filename = uncompress(compfile,tmpdir)
 %% uncompress
 %
 % Purpose: uncompress a file and return the name of the uncompressed file
@@ -6,12 +6,11 @@ function [filename,fail] = uncompress(compfile,tmpdir)
 % IN        compfile        full path to compressed file
 %           tmpdir          The directory you want to uncompress it into (optional)
 %
-% OUT       filename        The fullpath to the uncompressed fail
-%           fail            true if the operation failed
+% OUT       filename        The fullpath to the uncompressed filename.
+%                           Empty if the file was never uncompressed.
 %
 % NOTE
-%           If the file doesn't end with .gz or .zip, it just streams
-%           through and infile = outfile, and the tmpdir is not used
+%           Known compression formats are .gz, .zip, and .bz2
 %
 % Salomon Eliasson
 % $Id$
@@ -22,16 +21,15 @@ end
 
 [~,tmpfile,fend] = fileparts(compfile);
 
+filename = '';
 switch fend
     case '.zip'
-        [out,test] = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('VERBOSITY'));
+        out = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('DEBUG'));
         filename =  strtrim(out{1}(strfind(out{1}, 'inflating:')+length('inflating:')+1:end));
-        fail = logical(test);
     case '.gz'
         filename = fullfile(tmpdir,tmpfile);
-        [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',compfile,filename),atmlab('VERBOSITY'));
-        fail = logical(test);
-    otherwise
-        filename= compfile;
-        fail = false;
+        exec_system_cmd(sprintf('gunzip -c %s > %s',compfile,filename),atmlab('DEBUG'));
+    case '.bz2'
+        filename = fullfile(tmpdir,tmpfile);
+        exec_system_cmd(sprintf('bunzip2 -c %s > %s',compfile,filename),atmlab('DEBUG'));
 end

@@ -400,12 +400,14 @@ classdef FieldCopier < AssociatedDataset
             % determine from a fieldstruct what arguments to pass
             names = fieldnames(fieldstruct);
             fargs = {};
+            k = 0;
             for i = 1:length(names)
                 if ~isfield(fieldstruct.(names{i}), 'dataset')
+                    k = k + 1;
                     if isfield(fieldstruct.(names{i}), 'realname')
-                        fargs{i} = fieldstruct.(names{i}).realname; %#ok<AGROW>
+                        fargs{k} = fieldstruct.(names{i}).realname; %#ok<AGROW>
                     else
-                        fargs{i} = names{i}; %#ok<AGROW>
+                        fargs{k} = names{i}; %#ok<AGROW>
                     end
                 end
             end

@@ -817,7 +817,7 @@ classdef CollocatedDataset < HomemadeDataset
             addisexist = false(size(additionals));
             for i = 1:length(additionals)
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
-                addisexist(i) = exist(fna, 'file') || additionals{i}.overwrite;
+                addisexist(i) = exist(fna, 'file') && ~additionals{i}.overwrite;
             end
                         
             % if everything is already there, do nothing

@@ -1,3 +1,20 @@
+2012-05-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-221
+
+	* files/loadncvar.m: 
+	* files/loadncfile.m:
+	* files/uncompress.m:
+	Update uncompress
+
+	* datasets/define_datasets.m: Added dataset
+
+	* collocations/FieldCopier.m: Bug fix by Gerrit
+
+	* collocations/CollocatedDataset.m: fixed logical error for overwrite
+
+	* handy/PersistentCachedData.m: Fixed bug introduced by my last commit
+
 2912-05-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-220
