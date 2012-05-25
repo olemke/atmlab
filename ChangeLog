@@ -1,3 +1,14 @@
+2012-05-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-222
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Started restructuring. Work in progress. Will have a lot more
+	networks with more consistent names and outputs. Will guarantee
+	consistency between training and retrieval limitations. But still work
+	in progress.
+
 2012-05-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-221

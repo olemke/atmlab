@@ -29,17 +29,26 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
        selection; 
        maxsize = 20000; % max number of entries for neural net
        retrieval_limits;
-       training_limits;
+%        target_limits = ...
+%             struct(...
+%                 'retrieval', struct(...
+%                     'MEAN_ROIWP', [eps inf], ... % positive
+%                     'NO_ROIWP', [10 inf], ... % at least 10
+%                     'FRAC1_ROIWP', [1 1], ... % fully cloudy
+%                     'CV_ROIWP', [0 1]), ... % sd <= mean
+%                 'classification', struct());
+            
        fromfile;
     end
     
     properties (Constant)
-        version = 0.3;
-        changelog = [...
+        version = nan; % not in useable state! will be 0.4
+        changelog = sprintf([...
             'version 0.0: initial version, negative IWP, linear all\n' ...
             'version 0.1: cf [0, 1], log-IWP retrieved, more descriptive atts\n', ...
             'version 0.2: more descriptive atts, cf -> cf100, improved training sel\n' ...
-            'version 0.3: added lza, pos, line, fromfile; apply more lims; apply same lims to retrieved as to trained (afap)'];
+            'version 0.3: added lza, pos, line, fromfile; apply more lims; apply same lims to retrieved as to trained (afap)', ...
+            'version 0.4: more flexible approach, store more fields']);
     end
     
     methods
@@ -48,26 +57,22 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             self.setcols();
             self.setmembers();
             self.reader = @(varargin) (common_read_netcdf_dataset(self, varargin{:}));
-            self.training_limits.retrieval = struct(...
-                'MEAN_ROIWP', [eps inf], ... % positive
-                'NO_ROIWP', [10 inf], ... % at least 10
-                'FRAC1_ROIWP', [1 1], ... % fully cloudy
-                'CV_ROIWP', [0 1]); % sd <= mean
+            
         end
         
         function getdata(self, start_date, end_date)
             d = datasets;
             
-            self.retrieval_limits = ...
-                struct('LAT1', [-30 30], ...
-                       'POS1', [40 50], ...
-                       'B_BT', [0 400]);
+%            self.retrieval_limits = ...
+%                struct('LAT1', [-30 30], ...
+%                       'POS1', [40 50], ...
+%                       'B_BT', [0 400]);
             
             [M, c] = d.CollocatedDataset_mhs_cpr.read(...
                 start_date, end_date, 'noaa18', ...
                 {'LAT1', 'LON1', 'POS1', 'TIME1', 'B_BT', 'B_LZA', ...
                  'NO_ROIWP', 'MEAN_ROIWP', 'CV_ROIWP', 'FRAC1_ROIWP', 'FRAC10_ROIWP', 'FRAC100_ROIWP', 'FRAC1000_ROIWP'}, ...
-                 self.retrieval_limits);
+                 struct('B_BT', [0 400]));
              
              self.data = M;
              self.localcols = c;
@@ -78,20 +83,121 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
              end
         end
         
-        function make_retrieval_net(self)
-            % prepare neural network with BT and IWP
-            %
-            % takes BT, IWP. Warning; each row is a channel, each column a
-            % collocation. This is opposite of Collocations Toolbox.
-                        
+        function make_and_train_network(self, name, source, kind, target, varargin)
+            % name: (string)
+            % source: e.g. {'B_LAT', 'B_BT', 3:5, 'B_POS'}
+            % kind: @fitnet, @patternnet, ...
+            % chans: MHS-channels to use
+            % target: (string), fieldname in data to train against
+            % lims_retrieval: (optional) structure, default empty
+            % lims_overall: (optional), structure, default empty
+            % transform (optional): function_handle for target, e.g. log10
+            
+            narginchk(5, 8);
+            [lims_retrieval, lims_overall, transform] = optargs(varargin, {struct(), struct(), @(x)x});
+            rqre_datatype(name, @ischar);
+            rqre_datatype(source, @iscell);
+            rqre_datatype(target, @ischar);
+            rqre_datatype(kind, @isfunction_handle);
+            rqre_datatype(lims_retrieval, @isstruct);
+            rqre_datatype(lims_overall, @isstruct);
+            rqre_datatype(transform, @isfunction_handle);
+            
+            lims = catstruct(lims_retrieval, lims_overall);
+            % fill source with numbers where not present, so that each
+            % string is followed by a 1, e.g.
+            % {'LAT1', 'BT', 3:5} --> {'LAT1', 1, 'BT', 3:5}
+            isaname = cellfun(@ischar, source);
+            namewithoutno = diff([isaname true])==0;
+            filler = cell(size(source));
+            filler(namewithoutno) = {1};
+            source = [source; filler];
+            source = source(:).';
+            source(cellfun(@isempty, source)) = [];
+            sstruct = struct(source{:});
+            % get appropiate columns in self.data
+            allpos = cellfun(@(X) self.localcols.(X)(sstruct.(X)), fieldnames(sstruct), 'UniformOutput', false);
+            allpos = [allpos{:}];
+            
             self.needsbox();
             if isempty(self.data)
                 error(['atmlab:' mfilename ':nodata'], ...
                     'No data found. Did you run .getdata(...)?');
             end
-%            subdat = self.data(self.selection, :);
+
             dat = self.data;
-            dat = dat(collocation_restrain(dat, limstruct2limmat(self.training_limits.retrieval, self.localcols)), :);
+            dat = dat(collocation_restrain(dat, limstruct2limmat(lims, self.localcols)), :);
+                        
+            if size(dat, 1) > self.maxsize
+                subsel = unique(round(linspace(1, size(dat, 1), self.maxsize)));
+                logtext(atmlab('OUT'), 'Reducing %d -> %d points before training\n', size(dat, 1), self.maxsize);
+                dat = dat(subsel, :);
+            end
+
+            sourcedat = dat(:, allpos); % might include BT, lat, angle...
+            targetdat = dat(:, self.localcols.(target));
+            
+            net = kind(6);
+                        
+            net.trainParam.showWindow = false;
+            logtext(atmlab('OUT'), 'Training...\n');
+            net = train(net, sourcedat.', transform(targetdat).');
+            logtext(atmlab('OUT'), 'Trained\n');
+
+            self.nets.(name) = net;
+            self.nets.(name).userdata.name = name;
+            self.nets.(name).userdata.target = target;
+            self.nets.(name).userdata.kind = func2str(kind);
+            self.nets.(name).userdata.source = source; % store cell-array, makes me feel safer than struct because of order
+            self.nets.(name).userdata.lims = ...
+                struct('retrieval', lims_retrieval, ...
+                       'training', lims_overall);
+            self.nets.(name).userdata.transform = func2str(transform);
+            
+        end
+        
+        function S = retrieve(self, input_data, cols)
+           % get whatever can be retrieved from all known nets
+           %
+           % for each row, go through each network, and if conditions are
+           % met, retrieve
+           %
+           % cols fields must be as <network>.userdata.source
+                     
+           % single row impl.
+           netnames = fieldnames(self.nets);
+           for i = 1:length(netnames)
+               netname = netnames{i};
+               net = self.nets.(netname);
+               % apply same limitations as upon retrieval
+               limmat = limstruct2limmat(net.userdata.lims.retrieval, cols);
+               % logical true for rows where conditions are OK
+               OK = collocation_restrain(input_data, limmat);
+               % initialise matrix
+               S.(netname) = nan(size(input_data, 1), net.numOutputs);
+               fnms = net.userdata.source(1:2:end);
+               src = net.userdata.source;
+               sstruct = struct(src{:});
+               colnos = cellfun(@(X) cols.(X)(sstruct.(X)), fnms, 'UniformOutput', false);
+               S.(netname)(OK, :) = net(input_data(OK, [colnos{:}]).');
+           end
+        end
+        
+        function make_retrieval_net(self, lims)
+            % prepare neural network with BT and IWP
+            %
+            % takes BT, IWP. Warning; each row is a channel, each column a
+            % collocation. This is opposite of Collocations Toolbox.
+            
+            self.needsbox();
+            if isempty(self.data)
+                error(['atmlab:' mfilename ':nodata'], ...
+                    'No data found. Did you run .getdata(...)?');
+            end
+            
+            dat = self.data;
+            dat = dat(collocation_restrain(dat, limstruct2limmat(self.target_limits.retrieval, self.localcols)), :);
+            dat = dat(collocation_restrain(dat, limstruct2limmat(lims, self.localcols)), :);
             
             if size(dat, 1) > self.maxsize
                 subsel = unique(round(linspace(1, size(dat, 1), self.maxsize)));
@@ -107,6 +213,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             logtext(atmlab('OUT'), 'Training...\n');
             net = train(net, BT.', log10(IWP).');
             logtext(atmlab('OUT'), 'Trained\n');
+            
             self.nets.retrieval = net;
             self.nets.retrieval.userdata.retrieval_limits = self.retrieval_limits;
             self.nets.retrieval.userdata.training_limits = self.training_limits;
