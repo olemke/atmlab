@@ -1,3 +1,23 @@
+2012-05-25  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-219
+
+	* handy/PersistentCachedData.m:
+	- Added a default minimum free disk space to avoid filling your
+	disk with cache data.
+
+	- added method that calculates the amount of free space on your
+	drive using the 'df -k <CACHEDIR>' command. output is converted
+	to bytes.
+
+	- Now also check that there is enough free space on the drive, not
+	just enough compared to what you want to allocate for the cache
+
+	* files/uncompress.m:
+	- use -d instead of -p in unzip to avoid making empty files if
+	there is a failure.
+	- Removed unnecessary assertion and throw better errors
+
 2012-05-24  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-218

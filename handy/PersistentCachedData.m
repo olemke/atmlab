@@ -14,8 +14,9 @@ classdef PersistentCachedData < CachedData
     % $Id$
     
     properties
-        % maximum size of what's stored on disk. Default 10 GB.
-        storedsize = 10*2^30;
+        % maximum size of what's stored on disk. Default 10 GiB.
+        storedsize   = 10*2^30; % maxStoredSize =  10*2^30;
+        minFreeSpace = 5*2^30;  % minimun free space you want left over (5GiB)
         
         % directory to store cache-files
         %
@@ -85,18 +86,29 @@ classdef PersistentCachedData < CachedData
             save(infofile, 'all_info');
         end
         
+        function df = disk_free(self)
+            % get the free space using df (output in bytes)
+            x = exec_system_cmd(sprintf('df -k %s',self.cachedir));
+            df = structfun(@str2double,regexp(x{1}(regexp(x{1},'\n'):end),'^[^ ]+ +[0-9]+ +[0-9]+ +(?<bytes>[0-9]+)','names'));
+            df = df*1024;
+        end
+        
         function sz = disk_cachesize(self)
             d = dir(self.cachedir);
             sz = sum(arrayfun(@(x) x.bytes, d));
         end
         
         function b = disk_toolarge(self)
-            b = self.disk_cachesize() > self.storedsize;
+            b = self.disk_cachesize() > self.storedsize || self.disk_free() < minFreeSpace;
         end
         
         function del_old_disk_entry(self)
             % remove oldest cache-entry on disk. Should contain only
             % MAT-files!
+            
+            if self.disk_free() + self.disk_cachesize() < minFreeCache
+                error(['atmlab:' mfilename ':noSpace'],'df + du < minFreeCache')
+            end
             d = dir(self.cachedir);
             % all but 2 should end in .mat
             for i = 1:length(d)

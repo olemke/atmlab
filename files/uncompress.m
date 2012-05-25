@@ -19,21 +19,19 @@ function [filename,fail] = uncompress(compfile,tmpdir)
 if nargin==1
     tmpdir = atmlab('WORK_AREA');
 end
-assert(logical(exist(compfile,'file')),...
-    ['salomons:' mfilename ':badInput'],'File: %s\n doesn''t exist',compfile)
 
 [~,tmpfile,fend] = fileparts(compfile);
 
 switch fend
     case '.zip'
-        filename = fullfile(tmpdir,tmpfile);
-        [~,test] = exec_system_cmd(sprintf('unzip -p %s > %s',compfile,filename),atmlab('VERBOSITY'),true);
+        [out,test] = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('VERBOSITY'));
+        filename =  strtrim(out{1}(strfind(out{1}, 'inflating:')+length('inflating:')+1:end));
         fail = logical(test);
     case '.gz'
         filename = fullfile(tmpdir,tmpfile);
-        [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',compfile,filename),atmlab('VERBOSITY'),true);
+        [~,test] = exec_system_cmd(sprintf('gunzip -c %s > %s',compfile,filename),atmlab('VERBOSITY'));
         fail = logical(test);
     otherwise
         filename= compfile;
-        fail=false;
+        fail = false;
 end
