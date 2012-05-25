@@ -98,6 +98,14 @@ D.cmoiwp.subdir = '$YEAR4/$MONTH/$DAY';
 D.cmoiwp.filename = '$SAT_$YEAR4_$MONTH_$DAY_$HOUR_$MINUTE.nc.gz';
 D.cmoiwp.re = '(?<satname>[a-z0-9]{6})_(?<year>\d{4})_(?<month>\d{2})_(?<day>\d{2})_(?<hour>\d{2})_(?<minute>\d{2})';
 
+for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3'}
+    ds = D.(sprintf('cmoiwp_%s', v{1}));
+    ds.basedir = sprintf('/storage4/user_data/gerrit/cmoiwp/%s', strrep(v{1}, '_', '.'));
+    ds.subdir = D.cmoiwp.subdir;
+    ds.filename = D.cmoiwp.filename;
+    ds.re = D.cmoiwp.re;
+end
+
 %% COLLOCATION DATA SETS
 
 D.CollocatedDataset_avhrrCMSAF_cpr.basedir   = '/storage4/user_data/seliasson/collocations_avhrrCMSAF_cpr/core';

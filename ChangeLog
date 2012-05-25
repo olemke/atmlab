@@ -1,3 +1,13 @@
+2912-05-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-220
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added specific versions of cmoiwp
+	
+	* datasets/CollocatedMicrowaveOnlyIWP.m: Fix typo
+
 2012-05-25  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-219

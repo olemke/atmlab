@@ -12,7 +12,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     % TODO:
     %
     %   - Different networks for different viewing angles or viewing angle
-    %   as in input
+    %   as an input
     %   - Same for different latitude regions
     %   - Better way to treat different versions in parallel
     
@@ -271,6 +271,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             self.members.line.type = 'int';
             self.members.line.atts.long_name = 'AMSU-B/MHS scanline number';
         end
+        
     end
     
     methods (Access = private, Static)

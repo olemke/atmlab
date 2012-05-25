@@ -156,7 +156,15 @@ HomemadeDataset('name', 'dardarsub', ...
                         'atts', struct(...
                             'long_name', 'land water mask'))));
                         
-CollocatedMicrowaveOnlyIWP('name', 'cmoiwp','granule_duration', 6130); % reader set in this constructor
+cmoiwp = CollocatedMicrowaveOnlyIWP('name', 'cmoiwp','granule_duration', 6130); % reader set in this constructor
+
+% old versions thereof
+
+for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3'}
+    SatDataset('name', sprintf('cmoiwp_%s', v{1}), ...
+    'granule_duration', cmoiwp.granule_duration, ...
+    'reader', cmoiwp.reader);
+end
 
 %% Collocated datasets (the core)
 
