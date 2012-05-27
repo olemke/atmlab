@@ -23,6 +23,10 @@ function S = MaskInvalidGeoTimedataWithNaN(S)
 % Salomon Eliasson
 
 errId = ['atmlab:' mfilename ':badInput'];
+if isempty(S.lat)
+    warning(errId,'Data stuct is empty')
+    return
+end
 assert(isequal(size(S.lat),size(S.lon)),errId,'S.lat, and S.lon must be the same size')
 assert(isequal([size(S.lat,1),1],size(S.time)),errId,...
     'S.time must be a vector of the same length as the geodata')

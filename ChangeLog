@@ -1,3 +1,13 @@
+2012-05-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-223
+
+	* datasets/common_read_patmosx.m:
+	Fixed bugs introduced by latest adaptation
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+	Skip if the input structure is empty
+
 2012-05-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-222
@@ -13,7 +23,7 @@
 
 	* atmlab-2-1-221
 
-	* files/loadncvar.m: 
+	* files/loadncvar.m:
 	* files/loadncfile.m:
 	* files/uncompress.m:
 	Update uncompress

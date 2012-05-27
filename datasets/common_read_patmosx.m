@@ -36,7 +36,7 @@ all_fields = [core_fields(:); extra_fields(:)];
 % wanted
 tmpdir = create_tmpfolder();
 cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
-file = uncompress(file,tmpdir);
+filename = uncompress(file,tmpdir);
 % read the data. This also scales the data automatically!
 S1  = read_clavrx_hdf(filename,all_fields);
 S1.latitude = repmat(S1.latitude',[1,length(S1.longitude)]);
@@ -51,7 +51,7 @@ end
 if exist(file2,'file')
     tmpdir2 = create_tmpfolder();
     cleanupObject2 = onCleanup(@() delete_tmpfolder(tmpdir2));
-    file = uncompress(file,tmpdir2);
+    filename = uncompress(file2,tmpdir2);
     S2  = read_clavrx_hdf(filename,all_fields);
     S2.latitude = repmat(S2.latitude',[1,length(S2.longitude)]);
     S2.longitude = repmat(S2.longitude,[size(S2.latitude,1),1]);
