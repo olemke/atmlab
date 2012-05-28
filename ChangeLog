@@ -1,3 +1,11 @@
+2012-05-28  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-224
+
+	* files/loadncfile.m:
+
+	Add support for reading files with nested or empty groups.
+
 2012-05-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-223

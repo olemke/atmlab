@@ -52,7 +52,8 @@ end
 if (which('netcdf.inqGrps'))
 	grpids = netcdf.inqGrps (ncid);
 	for gid = grpids
-    	ret = catstruct(ret, read_group(ncid, gid));
+        grp = read_group(ncid, gid);
+    	ret = catstruct(ret, grp);
 	end
 else
     warning(errId, ...
@@ -64,7 +65,9 @@ end
 function grp = read_group(~, gid)
 
 varids = netcdf.inqVarIDs(gid);
+chgrpids = netcdf.inqGrps(gid);
 grpname = genvarname(netcdf.inqGrpName(gid));
+grp.(grpname)=struct();
 for i = varids
     [varname, ~, ~, natts] = netcdf.inqVar (gid, i);
     svarname = genvarname(varname);
@@ -75,5 +78,10 @@ for i = varids
             netcdf.getAtt (gid, i, attname);
     end
 end
+for chgid = chgrpids
+    childgroup = read_group(gid, chgid);
+    grp.(grpname) = catstruct(grp.(grpname), childgroup);
+end
+
 
 end
