@@ -1460,6 +1460,10 @@ classdef CollocatedDataset < HomemadeDataset
             assert(max(abs(lat1(:)))<=90, errid, 'Invalid data in lat1');
             assert(max(abs(long2(:)))<=180, errid, 'Invalid data in long2');
             assert(max(abs(lat2(:)))<=180, errid, 'Invalid data in lat2');
+            assert(max(lat1(:))~=min(lat1(:)), errid, 'lat1 constant');
+            assert(max(lat2(:))~=min(lat2(:)), errid, 'lat2 constant');
+            assert(max(long1(:))~=min(long1(:)), errid, 'lon1 constant');
+            assert(max(long2(:))~=min(long2(:)), errid, 'lon2 constant');
 
             %% make t, rows, cols at the same grid --> no need for ind2sub
 
@@ -1563,11 +1567,11 @@ classdef CollocatedDataset < HomemadeDataset
                                     index2 colno2];
                                 count = count + nnear;
                             end
-                        end % for each in grid1
-                    end % if we have any candidate-collocations in this cell
-                    if count > .8*size(collocations, 1) % pre-allocate more
-                        collocations = [collocations; ...
-                            zeros(size(collocations, 1), 4, 'uint32')];
+                            if count > .8*size(collocations, 1) % pre-allocate more
+                                collocations = [collocations; ...
+                                    zeros(size(collocations, 1), 4, 'uint32')];
+                            end
+                        end
                     end
                 end % for all grid rows
             end % for all grid columns

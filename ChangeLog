@@ -1,3 +1,16 @@
+2012-05-28  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* collocations/CollocatedDataset.m(collocate):
+
+	- Add additional checks: if all lat/lon are constant, assume something
+	is wrong and fail
+
+	- Move additional pre-allocation one loop upward
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Added TODO-item (info on data used for training)
+
 2012-05-28  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-226

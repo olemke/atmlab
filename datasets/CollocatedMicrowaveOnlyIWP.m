@@ -15,6 +15,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     %   as an input
     %   - Same for different latitude regions
     %   - Better way to treat different versions in parallel
+    %   - Add info on datarange used for training
     
     % $Id$
     
