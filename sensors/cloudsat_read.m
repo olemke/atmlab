@@ -363,33 +363,32 @@ function u=unitconv(unit,field)
 %
 unit = vec2row( unit );
   
-if strcmp(unit,['mg m^{-3}'])
+if strcmp(unit,['mg m^{-3}']) |  strcmp(unit,['mg/m^3'])
+  keyboard
    u=1e-3;
 elseif strcmp(unit,['um'])
    u=1e-6;
 elseif strcmp(unit,['degrees'])
    u=1;
-elseif strcmp(unit,['m'])
+elseif strcmp(unit,['m'])  |  strcmp(unit,['/m'])
    u=1;
 elseif strcmp(unit,['meters'])
    u=1;
-elseif strcmp(unit,['dBZe'])
+elseif strcmp(unit,['dBZe'])  |  strcmp(unit,['dbz'])  |  strcmp(unit,['dBZ'])
    u=1;
 elseif strcmp(unit,['dB*100'])
    u=1e-2;
-elseif strcmp(unit,['--'])
-   u=1;
 elseif strcmp(unit,['km'])
    u=1e3;
+elseif strcmp(unit,['1/km'])  |  strcmp(unit,['/km'])
+   u=1e-3;
 elseif strcmp(unit,['seconds'])
    u=1;
-elseif strcmp(unit,['none'])
-   u=1;
-elseif strcmp(unit,['None'])
+elseif strcmp(unit,['--'])  |  strcmp(unit,['none'])  |  strcmp(unit,['None'])
    u=1;
 elseif strcmp(unit,['%'])
    u=1;
-elseif strcmp(unit,['g m^{-2}'])
+elseif strcmp(unit,['g m^{-2}'])  |  strcmp(unit,['g/m^2'])
    u=1;
 elseif strcmp(unit,['K'])
    u=1;
@@ -397,8 +396,6 @@ elseif strcmp(unit,['L^{-1}'])
    u=1e3;
 elseif strcmp(unit,['cm^{-3}'])
    u=1e6;
-elseif strcmp(unit,['dBZ'])
-   u=1;
 elseif strcmp(unit,['Pa'])
    u=1;
 elseif strcmp(unit,['kg/kg']) |  strcmp(unit,['kg kg**-1']) 
@@ -408,7 +405,7 @@ else
    warning( 'cloudsat_read:unknownUnit', ...
         ['Could not identify field type unit in subfunction unitconv. ',...
 	     'No unit conversion performed for ',field,'. ',...
-	     'Unit is in ',unit','.'] );
+	     'Unit is in ',unit,'.'] );
 end
 
 return
