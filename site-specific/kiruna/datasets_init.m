@@ -89,7 +89,7 @@ D.patmosx.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3})
 
 %% other home-made datasets
 
-D.dardarsub.basedir = '/storage4/user_data/gerrit/dardar_subsel';
+D.dardarsub.basedir = '/storage3/data/dardar_subsel';
 D.dardarsub.subdir = '$YEAR4/$MONTH/$DAY';
 D.dardarsub.re = D.dardar.re;
 

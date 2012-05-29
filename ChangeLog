@@ -1,3 +1,11 @@
+2012-05-29  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-229
+
+	* site-specific/kiruna/datasets_init.m:
+
+	Change path to dardar_subsel to /storage3/data/ .
+
 2012-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-228
