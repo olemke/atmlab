@@ -15,7 +15,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     %   as an input
     %   - Same for different latitude regions
     %   - Better way to treat different versions in parallel
-    %   - Add info on datarange used for training
+    %   - Add info on data used for training
     
     % $Id$
     
@@ -43,7 +43,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     end
     
     properties (Constant)
-        version = nan; % not in useable state! will be 0.4
+        version = 0.4;
         changelog = sprintf([...
             'version 0.0: initial version, negative IWP, linear all\n' ...
             'version 0.1: cf [0, 1], log-IWP retrieved, more descriptive atts\n', ...
@@ -88,21 +88,24 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             % name: (string)
             % source: e.g. {'B_LAT', 'B_BT', 3:5, 'B_POS'}
             % kind: @fitnet, @patternnet, ...
-            % chans: MHS-channels to use
             % target: (string), fieldname in data to train against
             % lims_retrieval: (optional) structure, default empty
             % lims_overall: (optional), structure, default empty
-            % transform (optional): function_handle for target, e.g. log10
+            % {transform, inverse_transform} (optional): function_handle
+            % for target, e.g. log10, and its inverse
+            
             
             narginchk(5, 8);
-            [lims_retrieval, lims_overall, transform] = optargs(varargin, {struct(), struct(), @(x)x});
+            [lims_retrieval, lims_overall, transform] = optargs(varargin, {struct(), struct(), {@(x)x, @(x)x}});
             rqre_datatype(name, @ischar);
             rqre_datatype(source, @iscell);
             rqre_datatype(target, @ischar);
             rqre_datatype(kind, @isfunction_handle);
             rqre_datatype(lims_retrieval, @isstruct);
             rqre_datatype(lims_overall, @isstruct);
-            rqre_datatype(transform, @isfunction_handle);
+            rqre_datatype(transform, @iscell);
+            rqre_datatype(transform{1}, @isfunction_handle);
+            rqre_datatype(transform{2}, @isfunction_handle);
             
             lims = catstruct(lims_retrieval, lims_overall);
             % fill source with numbers where not present, so that each
@@ -129,7 +132,10 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             dat = self.data;
             dat = dat(collocation_restrain(dat, limstruct2limmat(lims, self.localcols)), :);
                         
-            if size(dat, 1) > self.maxsize
+            if size(dat, 1) == 0
+                logtext(atmlab('OUT'), 'Cannot train network, no data, stopping now\n');
+                return
+            elseif size(dat, 1) > self.maxsize
                 subsel = unique(round(linspace(1, size(dat, 1), self.maxsize)));
                 logtext(atmlab('OUT'), 'Reducing %d -> %d points before training\n', size(dat, 1), self.maxsize);
                 dat = dat(subsel, :);
@@ -141,8 +147,8 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             net = kind(6);
                         
             net.trainParam.showWindow = false;
-            logtext(atmlab('OUT'), 'Training...\n');
-            net = train(net, sourcedat.', transform(targetdat).');
+            logtext(atmlab('OUT'), 'Training %s(data)...\n', func2str(transform{1}));
+            net = train(net, sourcedat.', transform{1}(targetdat).');
             logtext(atmlab('OUT'), 'Trained\n');
 
             self.nets.(name) = net;
@@ -153,11 +159,15 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             self.nets.(name).userdata.lims = ...
                 struct('retrieval', lims_retrieval, ...
                        'training', lims_overall);
-            self.nets.(name).userdata.transform = func2str(transform);
+            % store with func2str, otherwise entire workspace is stored
+            % along with it. This is not only too large, it also causes
+            % problems with 'self', which will be recreated upon
+            % deserialization, causing "already exists" errors.
+            self.nets.(name).userdata.transform = {func2str(transform{1}) func2str(transform{2})};
             
         end
         
-        function S = retrieve(self, input_data, cols)
+        function [M, c] = retrieve(self, input_data, cols)
            % get whatever can be retrieved from all known nets
            %
            % for each row, go through each network, and if conditions are
@@ -167,6 +177,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
                      
            % single row impl.
            netnames = fieldnames(self.nets);
+           M = zeros(size(input_data, 1), length(netnames));
            for i = 1:length(netnames)
                netname = netnames{i};
                net = self.nets.(netname);
@@ -175,15 +186,22 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
                % logical true for rows where conditions are OK
                OK = collocation_restrain(input_data, limmat);
                % initialise matrix
-               S.(netname) = nan(size(input_data, 1), net.numOutputs);
+               M(:, i) = nan(size(input_data, 1), net.numOutputs);
+               c.(netname) = i;
+               
                fnms = net.userdata.source(1:2:end);
                src = net.userdata.source;
                sstruct = struct(src{:});
                colnos = cellfun(@(X) cols.(X)(sstruct.(X)), fnms, 'UniformOutput', false);
-               S.(netname)(OK, :) = net(input_data(OK, [colnos{:}]).');
+               % apply the network
+               retr = net(input_data(OK, [colnos{:}]).');
+               % inverse transform
+               ivt = str2func(net.userdata.transform{2});
+               M(OK, i) = ivt(retr);
            end
         end
-        
+
+        %{
         function make_retrieval_net(self, lims)
             % prepare neural network with BT and IWP
             %
@@ -235,7 +253,62 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             self.nets.classification100.userdata.retrieval_limits = self.retrieval_limits;
             self.nets.classification100.userdata.training_limits = self.training_limits;
         end
+%}        
         
+        function makenets(self)
+            % make many nets, quite hardcoded
+            
+            latrange.antarctic = [-90 -60];
+            latrange.shmidlat = [-60 -30];
+            latrange.tropical = [-30 30];
+            latrange.nhmidlat = [30 60];
+            
+            angrange.nadir = [0 5];
+            angrange.smallang = [5 15];
+            angrange.midang = [15 25];
+            angrange.bigang = [25 35];
+            
+            train_iwp.MEAN_ROIWP = [realmin realmax];
+            train_iwp.NO_ROIWP = [10 realmax];
+            train_iwp.FRAC1_ROIWP = [1 1];
+            train_iwp.CV_ROIWP = [0 1];
+
+            train_cf = struct();
+            
+            lrfn = fieldnames(latrange);
+            arfn = fieldnames(angrange);
+            for i = 1:length(lrfn)
+                for j = 1:length(arfn)
+                    lr = lrfn{i};
+                    ar = arfn{j};
+                    retr_lims.LAT1 = latrange.(lr);
+                    retr_lims.B_LZA = angrange.(ar);
+                                        
+                    logtext(atmlab('OUT'), 'Training %s %s FIWP\n', lr, ar);
+
+                    self.make_and_train_network(...
+                        [lr '_' ar '_fiwp'], ...
+                        {'B_BT', 3:5}, ...
+                        @fitnet, ...
+                        'MEAN_ROIWP', ...
+                        retr_lims, ...
+                        train_iwp, ...
+                        {@log10, @(x)10.^x});
+                                        
+                    logtext(atmlab('OUT'), 'Training %s %s CF100\n', lr, ar);
+
+                    self.make_and_train_network(...
+                        [lr '_' ar '_fc100'], ...
+                        {'B_BT', 3:5}, ...
+                        @patternnet, ...
+                        'FRAC100_ROIWP', ...
+                        retr_lims, ...
+                        train_cf, ...
+                        {@(x)x, @(x)x});
+                end
+            end
+
+        end
         function storenets(self, fl)
             self.needsbox();
             self.fromfile = fullfile(self.basedir, fl);
@@ -272,10 +345,23 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             grandata.time = repmat(grandata.time, [1 90]);
             
             mytb = reshape(grandata.tb, [numel(grandata.lat) size(grandata.tb, 3)]);
+            
+            % need LAT1, B_LZA, B_BT
+            cols.LAT1 = 1;
+            cols.B_LZA = 2;
+            cols.B_BT = 3:7; % for retrieve, have to provide all, even if only 3 used, because of storing of limitations struct
+            M_in = zeros(numel(grandata.lat), 7);
+            M_in(:, cols.LAT1) = grandata.lat(:);
+            M_in(:, cols.B_LZA) = grandata.lza(:);
+            M_in(:, cols.B_BT) = mytb;
             logtext(atmlab('OUT'), 'Retrieving values\n');
-            cf100 = self.nets.classification100(mytb(:, 3:5).');
-            fiwp = 10.^self.nets.retrieval(mytb(:, 3:5).');
-            ciwp = cf100 .* fiwp;
+            [M_retr ~] = self.retrieve(M_in, cols);
+            fiwp = nanmean(M_retr(:, 1:2:29), 2);
+            cf100 = nanmean(M_retr(:, 2:2:30), 2);
+            ciwp = fiwp .* cf100;
+            %cf100 = self.nets.classification100(mytb(:, 3:5).');
+            %fiwp = 10.^self.nets.retrieval(mytb(:, 3:5).');
+            %ciwp = cf100 .* fiwp;
             logtext(atmlab('OUT'), 'Post-processing\n');
             M = zeros(numel(grandata.lat), max(structfun(@(x)max(x), self.cols)));
             M(:, self.cols.mhs_bt_345) = mytb(:, 3:5);
@@ -288,17 +374,17 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             M(:, self.cols.lza) = grandata.lza(:);
             M(:, self.cols.pos) = grandata.pos(:);
             M(:, self.cols.line) = grandata.line(:);
-            storelims.lat = self.nets.retrieval.userdata.retrieval_limits.LAT1;
-            storelims.pos = self.nets.retrieval.userdata.retrieval_limits.POS1;
-            storelims.mhs_bt_345 = self.nets.retrieval.userdata.retrieval_limits.B_BT;
-            M = M(collocation_restrain(M, limstruct2limmat(storelims, self.cols)), :);
+%            storelims.lat = self.nets.retrieval.userdata.retrieval_limits.LAT1;
+%            storelims.pos = self.nets.retrieval.userdata.retrieval_limits.POS1;
+%            storelims.mhs_bt_345 = self.nets.retrieval.userdata.retrieval_limits.B_BT;
+%            M = M(collocation_restrain(M, limstruct2limmat(storelims, self.cols)), :);
             M = sortrows(M, [self.cols.time, self.cols.pos]);
             info.title = 'MW-only IWP from ANN trained with CPR collocs';
             info.version = sprintf('%03.1f', self.version);
             info.history = self.changelog;
             info.source = 'Retrieved from collocated CPR/MHS MW-only-trained ANN';
             info.nnet = self.fromfile;
-            info.stored_lims = struct2string_compact(storelims);
+%            info.stored_lims = struct2string_compact(storelims);
             % FIXME: more additional info
             logtext(atmlab('OUT'), 'Storing\n');
             self.store(dt, spec, M, info);

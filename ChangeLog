@@ -1,3 +1,15 @@
+2012-05-29  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-230
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Bumped version to 0.4
+
+	- Generate many networks, depending on lat. and lza.
+
+	- Use those for retrieving...
+
 2012-05-29  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-229
