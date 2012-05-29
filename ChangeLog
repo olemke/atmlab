@@ -1,3 +1,11 @@
+2012-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-228
+	
+	* tests/test_arts_ppath.m: A flag introduced to just check for
+	direct errors. Made 3D somewhat faster (by making atmospheric
+	fields smaller).
+
 2012-05-28  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* collocations/CollocatedDataset.m(collocate):

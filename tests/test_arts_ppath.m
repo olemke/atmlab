@@ -30,7 +30,7 @@
 
 function test_arts_ppath( atmosphere_dim, n, varargin  )
 %
-[unsphere,do_refr] = optargs( varargin, { 0, false } );
+[unsphere,do_refr,do_check] = optargs( varargin, { 0, false, true } );
   
   
 %- Fixed settings
@@ -106,10 +106,10 @@ for c = 1 : n
     Q.LAT_GRID          = linspace( -135, 135, nlat )';
     nlon                = 1;
   elseif atmosphere_dim == 3
-    nlat                = 10 + round( 350*rand );
-    nlon                = 10 + round( 350*rand );
-    Q.LAT_GRID          = linspace( -90, 90, nlat )';
-    Q.LON_GRID          = linspace( -180, 180, nlon )';
+    nlat                = 10 + round( 190*rand );
+    nlon                = 10 + round( 190*rand );
+    Q.LAT_GRID          = linspace( -80, 80, nlat )';
+    Q.LON_GRID          = linspace( -90, 90, nlon )';
   end
 
   % Atmospheric fields
@@ -172,8 +172,8 @@ for c = 1 : n
       aa0               = 180;
     end
   elseif atmosphere_dim == 3
-    lat0                = -90 + 180*rand;    
-    lon0                = -100 + 200*rand;    
+    lat0                = -45 + 90*rand;    
+    lon0                = -15 + 30*rand;    
     Q.SENSOR_POS(2)     = lat0;
     Q.SENSOR_POS(3)     = lon0;
     aa0                 = -180 + 360*rand;
@@ -207,59 +207,67 @@ for c = 1 : n
     fprintf('\n!!! Error while running ARTS !!!\n');
     keyboard
   end
-  %
-  ppath = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
+
+  if do_check
+  
+    ppath = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );
 
 
-  %- Check result
-  %
-  if ppath.np > 1
-    
-    if atmosphere_dim == 1  ||  ~unsphere
-      re = refell(1);
-    else
-      re = interp1( Q.LAT_GRID, ellipsoidradii(refell,Q.LAT_GRID), lat0 );
-    end
-    
-    [x0,y0,z0,dx,dy,dz] = geocentricposlos2cart( re+Q.SENSOR_POS(1), ...
-                                       lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
-
-    % Check ppath points
-    lt    = ppath.end_lstep + [ 0; cumsum(ppath.lstep) ];
-    e     = zeros( size(ppath.pos,1), 1 );
-    for i = 1 : size(ppath.pos,1)
-            
-      if atmosphere_dim == 3
-        lons = ppath.pos(i,3);
+    %- Check result
+    %
+    if ppath.np > 1
+      
+      if atmosphere_dim == 1  ||  ~unsphere
+        re = refell(1);
       else
-        lons = 0;
+        re = interp1( Q.LAT_GRID, ellipsoidradii(refell,Q.LAT_GRID), lat0 );
       end
       
-      [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lons );
-      dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
-      e(i) = dd;
-      if dd > 1
-        fprintf('\n!!! Deviating ppath point found !!!\n');
-        [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
-                          y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz, ...
-                          (re+Q.SENSOR_POS(1))*sind(abs(Q.SENSOR_LOS(1))), ...
-                          lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0);
-        keyboard
+      [x0,y0,z0,dx,dy,dz] = geocentricposlos2cart( re+Q.SENSOR_POS(1), ...
+                                         lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0 );
+
+      % Check ppath points
+      lt    = ppath.end_lstep + [ 0; cumsum(ppath.lstep) ];
+      e     = zeros( size(ppath.pos,1), 1 );
+      for i = 1 : size(ppath.pos,1)
+              
+        if atmosphere_dim == 3
+          lons = ppath.pos(i,3);
+        else
+          lons = 0;
+        end
+        
+        [xt,yt,zt] = geocentric2cart( ppath.r(i), ppath.pos(i,2), lons );
+        dd = norm( [ xt-(x0+lt(i)*dx), yt-(y0+lt(i)*dy), zt-(z0+lt(i)*dz) ] );
+        e(i) = dd;
+        if dd > 1
+          fprintf('\n!!! Deviating ppath point found !!!\n');
+          [rt,latt,lont,zat,aat] = cartposlos2geocentric( x0+lt(i)*dx, ...
+                           y0+lt(i)*dy, z0+lt(i)*dz, dx, dy, dz, ...
+                           (re+Q.SENSOR_POS(1))*sind(abs(Q.SENSOR_LOS(1))), ...
+                           lat0, lon0, abs(Q.SENSOR_LOS(1)), aa0);
+          keyboard
+        end
       end
+      
+      if strcmp( ppath.background, 'surface' )
+        if max(e(end)) > emaxsurf, emaxsurf = e(end); end
+        e(end) = 0;
+      end
+      %
+      if max(e) > emaxatm, emaxatm = max(e); end
     end
-    
-    if strcmp( ppath.background, 'surface' )
-      if max(e(end)) > emaxsurf, emaxsurf = e(end); end
-      e(end) = 0;
-    end
-    %
-    if max(e) > emaxatm, emaxatm = max(e); end
   end
 end
+%
+if do_check
+  fprintf( '\n' );
+  fprintf( 'Max atmospheric deviation: %.1e m\n', emaxatm );
+  fprintf( '    Max surface deviation: %.1e m\n', emaxsurf );
+else
+  fprintf( '\n' );
+end
 
-fprintf( '\n' );
-fprintf( 'Max atmospheric deviation: %.1e m\n', emaxatm );
-fprintf( '    Max surface deviation: %.1e m\n', emaxsurf );
 
 %- Remove workfolder
 %
