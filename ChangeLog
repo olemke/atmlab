@@ -1,3 +1,11 @@
+2012-05-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-231
+
+	* site-specific/kiruna/datasets_init.m, datasets/define_datasets.m:
+
+	- Added cmoiwp_v0_4
+
 2012-05-29  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-230
