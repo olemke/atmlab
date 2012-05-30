@@ -24,7 +24,14 @@ function S = common_read_mirs(file, varargin)
 % $Id$
 % Created by Salomon Eliasson
 
-X = read_native_mirs(file);
+try
+    X = read_native_mirs(file);
+catch ME
+    if strcmp(ME.identifier,'MATLAB:subsassignnumelmismatch') % such as if nprf if incorrect
+        error('atmlab:invalid_data','Something is wrong with the file')
+    end
+end
+    
 core_fields   = {'scanUTC','lat','lon'};
 extra_fields  = optargs(varargin, {{}});
 all_fields    = [core_fields(:); extra_fields(:)];
@@ -134,17 +141,15 @@ errId = ['atmlab:' mfilename ':error'];
 
 tmpdir = create_tmpfolder();
 cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
-[filename,fail] = uncompress(filename,tmpdir);
-if fail
-    error (errId, 'Failed to uncompress file %s', filename);
-end
+filename = uncompress(filename,tmpdir);
+if isempty(filename), error(errId,'Uncompressing failed'); end
 
 fid = fopen (filename, 'rb', 'b');
-
+cleanupObj2 = onCleanup(@() (fclose(fid)));
 if (fid == -1)
     error (errId, 'Can''t open input file %s', filename);
 end
-cleanupObj2 = onCleanup(@() (fclose(fid)));
+
 
 % READ THE BINARY DATA file
 

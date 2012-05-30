@@ -38,9 +38,11 @@ tindex  = S.time >= 0;
 index = ltindex & lnindex;
 
 if any(~(index(:))) || any(~tindex)
-    logtext(atmlab('OUT'),...
-        'Removing %d data values (%.2f%%) due to invalid (lat, lon, or time) \n',...
-        sum(~index(:)),100*sum(~index(:))/length(index(:)))
+    if logical(sum(~index(:)))
+        logtext(atmlab('OUT'),...
+            'Removing %d data values (%.2f%%) due to invalid (lat, lon, or time) \n',...
+            sum(~index(:)),100*sum(~index(:))/length(index(:)))
+    end
     for F = fieldnames(S)'
         if strcmp(F{1},'time')
             S.time(~tindex)     = NaN;

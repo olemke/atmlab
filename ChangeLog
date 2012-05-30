@@ -1,3 +1,12 @@
+2012-05-30  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* datasets/common_read_mirs.m:
+	added try catch around the reading part. Added one message that
+	happens if reported nscans < length nscans
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+	Only talk about removing invalid data if there are any
+
 2012-05-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-231
