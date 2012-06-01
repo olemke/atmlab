@@ -91,9 +91,13 @@ classdef PersistentCachedData < CachedData
         
         function df = disk_free(self)
             % get the free space using df (output in bytes)
-            x = exec_system_cmd(sprintf('df -k %s',self.cachedir));
-            df = structfun(@str2double,regexp(x{1}(regexp(x{1},'\n'):end),'^[^ ]+ +[0-9]+ +[0-9]+ +(?<bytes>[0-9]+)','names'));
-            df = df*1024;
+            % stat -f ... %a ... gives no. of blocks available
+            % stat -f ... %s ... gives block size
+            sizes = exec_system_cmd({['stat -f --printf=''%a'' ' self.cachedir], ['stat -f --printf=''%s'' ' self.cachedir]});
+            df = (str2double(sizes{1}) * str2double(sizes{2}));
+            %x = exec_system_cmd(sprintf('df -k %s',self.cachedir));
+            %df = structfun(@str2double,regexp(x{1}(regexp(x{1},'\n'):end),'^[^ ]+ +[0-9]+ +[0-9]+ +(?<bytes>[0-9]+)','names'));
+            %df = df*1024;
         end
         
         function sz = disk_cachesize(self)

@@ -1,3 +1,9 @@
+2012-06-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* handy/PersistentCachedData.m(disk_free):
+
+	- Use stat -f instead of df -k to get disk-free
+
 2012-05-30  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* datasets/common_read_mirs.m:
