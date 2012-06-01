@@ -30,7 +30,7 @@ end
                                                                  %&%
 atmlab( 'require', {'ARTS_PATH','FMODEL_VERBOSITY'} );           %&%
 
-exec = atmlab( 'ARTS_PATH' );
+exec   = atmlab( 'ARTS_PATH' );
 rlevel = atmlab( 'FMODEL_VERBOSITY' );
                                                                  %&%
 if isempty( exec )                                               %&%
@@ -40,8 +40,15 @@ if isempty( rlevel )                                             %&%
   rlevel = 0;                                                    %&%
 end                                                              %&%
 
-status = system( sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+outdir = fileparts( cfile );
 
+if isempty( outdir )
+  status = system( sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+else
+  status = system( sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+end
+  
+  
 if status  &  ~errortol
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')

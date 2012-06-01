@@ -1,3 +1,10 @@
+2012-06-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-234
+
+	* arts/arts.m (arts): If cfile is path (and not just a filename),
+	the folder where cfile is plöaced is used to set -o outdir.
+
 2012-06-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* handy/PersistentCachedData.m(disk_free):
@@ -44,7 +51,7 @@
 2012-05-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-228
-	
+
 	* tests/test_arts_ppath.m: A flag introduced to just check for
 	direct errors. Made 3D somewhat faster (by making atmospheric
 	fields smaller).
