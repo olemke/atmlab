@@ -58,17 +58,20 @@ D = datasets;
 info = D.modis_aqua_L2.find_info_from_granule(file);
 date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
-%data starts at 1993, I need an offset. Only need one time per scan line
-%(first 4 are NaN due to interpolation)   
-S.time = S.Scan_Start_Time(:,5) + date2unixsecs(1993) -S.epoch;
-
-S = rmfield(S,core_fields);
 
 if any(ismember(pseudo_fields,extra_fields))
     for P = pseudo_fields(:)'
         S = dealWithPseudoFields(S,P{1},file);
     end
 end
+
+%I need to do this after flagging, or the dimensions will be wrong.
+% data starts at 1993, I need an offset. Only need one time per scan line
+%(first 4 are NaN due to interpolation)   
+S.time = S.Scan_Start_Time(:,5) + date2unixsecs(1993) -S.epoch;
+
+S = rmfield(S,core_fields);
+
 S.version = info.version;
 S.path = file;
 
@@ -113,8 +116,12 @@ switch field
         % Quality_Assurance_1km (regarding cloud_water_path). By doing this
         % I'm also disregarding values with marginal confidence
         usefull=uint8(sum(2.^[0,1]));
-        flaggedAsGood = bitand(typecast(S.Quality_Assurance_1km(:,2),'uint8'),usefull)==usefull;
         
+        % bitand only work on vectors
+        S.Quality_Assurance_1km = permute(S.Quality_Assurance_1km,[3,1,2]);
+        
+        flaggedAsGood = bitand(typecast(S.Quality_Assurance_1km(2,:),'uint8'),usefull)==usefull;
+        flaggedAsGood = reshape(flaggedAsGood,size(S.Cloud_Water_Path,1),size(S.Cloud_Water_Path,2));
         % mask all non applicable data with NaN
         [sz1,~] = size(S.Cloud_Water_Path);
         for F = fieldnames(S)'

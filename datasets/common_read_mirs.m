@@ -29,7 +29,10 @@ try
 catch ME
     if strcmp(ME.identifier,'MATLAB:subsassignnumelmismatch') % such as if nprf if incorrect
         error('atmlab:invalid_data','Something is wrong with the file')
+    else
+        error(ME.identifier,ME.message)
     end
+    
 end
     
 core_fields   = {'scanUTC','lat','lon'};
@@ -138,7 +141,9 @@ function S = read_native_mirs(filename)
 % 2009-11-20   Created by Oliver Lemke and Salomon Eliasson.
 
 errId = ['atmlab:' mfilename ':error'];
-
+if ~exist(filename,'file')
+    error(errId,'No such file:  %s',filename)
+end
 tmpdir = create_tmpfolder();
 cleanupObject = onCleanup(@() delete_tmpfolder(tmpdir));
 filename = uncompress(filename,tmpdir);

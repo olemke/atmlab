@@ -39,10 +39,14 @@ for F = all_fields'
     try
     S.(F{1}) = hdfread(file,F{1});
     catch ME
+        if strcmp(ME.identifier,'MATLAB:imagesci:hdfread:noDataSets')
+            fprintf(2,'Dataset: %s is missing from file. skipping...\n',F{1})
+        end
         if any(strcmp(ME.identifier,{...
                 'MATLAB:imagesci:hdfquickinfo:invalidFile',...
-                'MATLAB:imagesci:hdfinfo:invalidFile'}))
-            error(['atmlab:' mfilename ':invalidData'],'"%s:%s" for file: %s',...
+                'MATLAB:imagesci:hdfinfo:invalidFile',...
+                'MATLAB:imagesci:hdfread:noDataSets'}))
+            error('atmlab:invalid_data','"%s:%s" for file: %s',...
                 ME.identifier,ME.message,mfilename)
         else
             error(ME.identifier,ME.message)

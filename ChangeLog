@@ -1,3 +1,18 @@
+2012-06-03  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-235
+
+	* datasets/common_read_mspps.m:
+	* datasets/common_read_mirs.m:
+	Added error to look out for
+
+	* datasets/common_read_modis.m:
+	Fixed bugs introduced by no longer flattening the matrixes.
+
+	* datasets/define_datasets.m:
+	* site-specific/kiruna/datasets_init.m:
+	Added collocated datasets with dardar as reference
+
 2012-06-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-234
