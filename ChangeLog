@@ -1,3 +1,19 @@
+2012-06-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-236
+
+	* handy/PersistentCachedData.m:
+	- added '-v7.3' flag to save, since sometimes my .mat files are > 2GB
+
+	* collocations/CollocatedDataset.m:
+	- Fixed logical bug:
+	mf = exist(fn, 'file') || self.overwrite
+	to
+	mf = exist(fn, 'file') && ~self.overwrite
+
+	* datasets/common_read_dardar.m:
+	- removed pseudo fields
+
 2012-06-03  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-235

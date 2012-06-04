@@ -813,7 +813,7 @@ classdef CollocatedDataset < HomemadeDataset
             end
             
             fn = self.find_granule_by_datetime(date, spec);
-            mainfileexists = exist(fn, 'file') || self.overwrite;
+            mainfileexists = exist(fn, 'file') && ~self.overwrite;
             addisexist = false(size(additionals));
             for i = 1:length(additionals)
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
