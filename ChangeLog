@@ -1,3 +1,12 @@
+2012-06-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-237
+
+	* collocations/CollocatedDataset.m(read):
+
+	- Fix bug in cols-struct if last day-to-be-read has nonzero collocs,
+	but zero upon merging.
+
 2012-06-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-236

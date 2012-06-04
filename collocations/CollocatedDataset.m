@@ -1242,6 +1242,7 @@ classdef CollocatedDataset < HomemadeDataset
 
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
+            addis_cols_here = cell(size(additional_fields));
             addis = cell(size(additional_fields));
             for i = 1:length(addis)
                 addis{i} = struct();
@@ -1289,6 +1290,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             dates = daterange(date_start, date_end);
             M_cols = struct();
+            M_cols_merged = struct();
             filters_by_no = cell(size(filters_by_name));
             hitno = 0; % count no. of days with collocs
             for i = 1:size(dates, 1)
@@ -1296,27 +1298,36 @@ classdef CollocatedDataset < HomemadeDataset
                 %% read collocations for date
                                                 
                 try
-                    [collocations_day, M_cols_here] = self.read_single_day(date, spec, fields_core);
+                    [collocations_day, M_cols_core_here] = self.read_single_day(date, spec, fields_core);
                     if numel(collocations_day)==0
                         logtext(atmlab('OUT'), 'no collocations\n');
                         continue
                     end
-                    M_cols = M_cols_here;
+                    M_cols_core = M_cols_core_here;
                     %hitno = hitno + 1;
                     % also read for all additionals
                     for j = 1:length(additionals)
-                        [additionals_day{j}, addis_cols{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
+                        [additionals_day{j}, addis_cols_here{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
+                        if numel(additionals_day{j})>0
+                            addis_cols{j} = addis_cols_here{j};
+                        end
                     end
                     stoplater = false;
                     if merge
+                        M_cols_merged_here = M_cols_core_here;
                         for j = 1:length(additionals)
-                            [collocations_day, M_cols_here] = additionals{j}.merge(collocations_day, M_cols_here, additionals_day{j}, addis_cols{j});
+                            [collocations_day, M_cols_merged_here] = additionals{j}.merge(collocations_day, M_cols_merged_here, additionals_day{j}, addis_cols_here{j});
                         end
-                        M_cols = M_cols_here;
+                        %M_cols = M_cols_here;
                         if numel(collocations_day)==0
                             logtext(atmlab('OUT'), 'At least one of the additionals had 0 elements. Upon merging, no collocations left --- continuing with next day\n');
                             stoplater = true;
+                        else
+                            M_cols_merged = M_cols_merged_here;
                         end
+                        M_cols = M_cols_merged;
+                    else
+                        M_cols = M_cols_core;
                     end
                 catch ME
                     switch (ME.identifier)
