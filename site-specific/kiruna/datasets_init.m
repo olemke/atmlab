@@ -6,7 +6,7 @@ function datasets_init
 % Created by Gerrit Holl
 % $Id$
 
-datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/sat2netcdf-0.4.jar');
+datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/2010/05/sat2netcdf-0.4.jar');
 
 % to find a datafile: search in basedir/subdir, first try filename with string
 % substitution, otherwise list all and try to match regexp.

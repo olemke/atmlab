@@ -85,7 +85,7 @@ else
 end
 
 if atmlab('LEGACY_MODE')
-    addpath( fullfile( toppath, 'arts', 'deprecated' ) ); 
+    addpath( fullfile( toppath, 'deprecated' ) ); 
 end
 
 %=== Define some aliases

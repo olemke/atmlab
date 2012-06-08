@@ -1,3 +1,16 @@
+2012-06-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-239
+
+	* collocations/TODO: Added one item
+
+	* atmlab/atmlab_init.m: Wrong path for 'deprecated'
+
+	* site-specific/kiruna/datasets_init.m: Update path for sat2netcdf
+	
+	* datasets/CollocatedMicrowaveOnlyIWP.m: Improved a bit, work in
+	progress
+
 2012-06-08  Stefan Buehler  <sbuehler(at)ltu.se>
 
 	* atmlab-2-1-238

@@ -18,6 +18,8 @@
   check in the first place
 - For a Collapser, access to the AssociatedDatasets could be useful even
   for global limitators?
+- the CachedData objects should also check if the ASsociatedDatasets are
+  the same
 
 
 - when finished, in old-style add small functions using new-style

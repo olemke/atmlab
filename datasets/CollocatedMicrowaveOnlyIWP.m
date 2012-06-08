@@ -14,8 +14,8 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     %   - Different networks for different viewing angles or viewing angle
     %   as an input
     %   - Same for different latitude regions
-    %   - Better way to treat different versions in parallel
     %   - Add info on data used for training
+    %   - Study performance using LESS input data
     
     % $Id$
     
@@ -43,13 +43,14 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     end
     
     properties (Constant)
-        version = 0.4;
+        version = 0.5;
         changelog = sprintf([...
             'version 0.0: initial version, negative IWP, linear all\n' ...
             'version 0.1: cf [0, 1], log-IWP retrieved, more descriptive atts\n', ...
             'version 0.2: more descriptive atts, cf -> cf100, improved training sel\n' ...
             'version 0.3: added lza, pos, line, fromfile; apply more lims; apply same lims to retrieved as to trained (afap)', ...
-            'version 0.4: more flexible approach, store more fields']);
+            'version 0.4: more flexible approach, store more fields, retrieve globally with many networks', ...
+            'version 0.5: add nhpolar']);
     end
     
     methods
@@ -262,6 +263,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             latrange.shmidlat = [-60 -30];
             latrange.tropical = [-30 30];
             latrange.nhmidlat = [30 60];
+            latrange.nhpolar = [60 90];
             
             angrange.nadir = [0 5];
             angrange.smallang = [5 15];
