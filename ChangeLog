@@ -1,3 +1,10 @@
+2012-06-08  Stefan Buehler  <sbuehler(at)ltu.se>
+
+	* atmlab-2-1-238
+
+	* math/rms.m: Removed "error" from short description, as suggested
+	by Salomon.
+
 2012-06-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-237

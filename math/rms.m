@@ -1,4 +1,4 @@
-% RMS Calculate root mean square (RMS) error
+% RMS Calculate root mean square (RMS)
 %
 % This function squares all elements of x, sums them up, divides by
 % the number of elements, and takes the root.
