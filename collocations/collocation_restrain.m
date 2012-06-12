@@ -70,3 +70,5 @@ for k = 1:length(filters)
         sum(rows), sum(rows&lim));
     rows = rows&lim;
 end
+
+end

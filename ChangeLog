@@ -1,3 +1,18 @@
+2012-06-12  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-241
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Fixed bug leading to nonphysical IWP retrievals
+	- Now store ciwp as uint16
+	
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added cmoiwp_v0_5
+
+	* collocations/collocation_restrain.m: tiny change
+
 2012-06-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-240

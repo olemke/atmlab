@@ -11,9 +11,6 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     %
     % TODO:
     %
-    %   - Different networks for different viewing angles or viewing angle
-    %   as an input
-    %   - Same for different latitude regions
     %   - Add info on data used for training
     %   - Study performance using LESS input data
     
@@ -50,7 +47,8 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             'version 0.2: more descriptive atts, cf -> cf100, improved training sel\n' ...
             'version 0.3: added lza, pos, line, fromfile; apply more lims; apply same lims to retrieved as to trained (afap)', ...
             'version 0.4: more flexible approach, store more fields, retrieve globally with many networks', ...
-            'version 0.5: add nhpolar']);
+            'version 0.5: made global, better error checks']);
+        lims_always = struct('B_BT', [100 400]);
     end
     
     methods
@@ -74,7 +72,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
                 start_date, end_date, 'noaa18', ...
                 {'LAT1', 'LON1', 'POS1', 'TIME1', 'B_BT', 'B_LZA', ...
                  'NO_ROIWP', 'MEAN_ROIWP', 'CV_ROIWP', 'FRAC1_ROIWP', 'FRAC10_ROIWP', 'FRAC100_ROIWP', 'FRAC1000_ROIWP'}, ...
-                 struct('B_BT', [0 400]));
+                 self.lims_always);
              
              self.data = M;
              self.localcols = c;
@@ -183,7 +181,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
                netname = netnames{i};
                net = self.nets.(netname);
                % apply same limitations as upon retrieval
-               limmat = limstruct2limmat(net.userdata.lims.retrieval, cols);
+               limmat = limstruct2limmat(catstruct(self.lims_always, net.userdata.lims.retrieval), cols);
                % logical true for rows where conditions are OK
                OK = collocation_restrain(input_data, limmat);
                % initialise matrix
@@ -360,7 +358,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             [M_retr ~] = self.retrieve(M_in, cols);
             fiwp = nanmean(M_retr(:, 1:2:29), 2);
             cf100 = nanmean(M_retr(:, 2:2:30), 2);
-            ciwp = fiwp .* cf100;
+            ciwp = uint16(fiwp .* cf100);
             %cf100 = self.nets.classification100(mytb(:, 3:5).');
             %fiwp = 10.^self.nets.retrieval(mytb(:, 3:5).');
             %ciwp = cf100 .* fiwp;
@@ -440,7 +438,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
                  'account whether a cloud is present or not.'];
             self.members.fiwp.atts.units = 'g/m^2';
             
-            self.members.ciwp.type = 'float';
+            self.members.ciwp.type = 'int';
             self.members.ciwp.atts.units = 'g/m^2';
             self.members.ciwp.atts.long_name = 'CF-corrected IWP';
             self.members.ciwp.atts.description = ...
