@@ -1,3 +1,10 @@
+2012-06-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-240
+
+	* arts/qarts2cfile.m: AtmSrfSave was incorrectly included for the
+	GetAbsTable option.
+
 2012-06-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-239
@@ -7,7 +14,7 @@
 	* atmlab/atmlab_init.m: Wrong path for 'deprecated'
 
 	* site-specific/kiruna/datasets_init.m: Update path for sat2netcdf
-	
+
 	* datasets/CollocatedMicrowaveOnlyIWP.m: Improved a bit, work in
 	progress
 
@@ -63,7 +70,7 @@
 	* atmlab-2-1-234
 
 	* arts/arts.m (arts): If cfile is path (and not just a filename),
-	the folder where cfile is plöaced is used to set -o outdir.
+	the folder where cfile is placed is used to set -o outdir.
 
 2012-06-01  Gerrit Holl  <gerrit.holl@ltu.se>
 

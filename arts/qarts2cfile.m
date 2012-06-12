@@ -97,7 +97,7 @@ if nargin == 1
 
   case 'GetAbsTable'
     %
-    S = { 'Generl', 'AtmSrf', 'AbsrptSave', 'CloseF' };
+    S = { 'Generl', 'AbsrptSave', 'CloseF' };
 
   case 'GetSensor'
     %
