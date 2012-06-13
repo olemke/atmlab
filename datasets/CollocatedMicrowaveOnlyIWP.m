@@ -13,6 +13,8 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     %
     %   - Add info on data used for training
     %   - Study performance using LESS input data
+    %   - fix problem with discontinuities per lat (and lza?)
+    %   - use a land-water-mask?
     
     % $Id$
     
@@ -40,14 +42,15 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     end
     
     properties (Constant)
-        version = 0.5;
+        version = 0.6;
         changelog = sprintf([...
             'version 0.0: initial version, negative IWP, linear all\n' ...
             'version 0.1: cf [0, 1], log-IWP retrieved, more descriptive atts\n', ...
             'version 0.2: more descriptive atts, cf -> cf100, improved training sel\n' ...
-            'version 0.3: added lza, pos, line, fromfile; apply more lims; apply same lims to retrieved as to trained (afap)', ...
-            'version 0.4: more flexible approach, store more fields, retrieve globally with many networks', ...
-            'version 0.5: made global, better error checks']);
+            'version 0.3: added lza, pos, line, fromfile; apply more lims; apply same lims to retrieved as to trained (afap)\n', ...
+            'version 0.4: more flexible approach, store more fields, retrieve globally with many networks\n', ...
+            'version 0.5: made global, better error checks\n', ...
+            'version 0.6: don''t store when flagged, fix bug for nhpolar ...\n']);
         lims_always = struct('B_BT', [100 400]);
     end
     
@@ -269,7 +272,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             angrange.bigang = [25 35];
             
             train_iwp.MEAN_ROIWP = [realmin realmax];
-            train_iwp.NO_ROIWP = [10 realmax];
+            train_iwp.NO_ROIWP = [10 intmax];
             train_iwp.FRAC1_ROIWP = [1 1];
             train_iwp.CV_ROIWP = [0 1];
 
@@ -356,13 +359,14 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             M_in(:, cols.B_BT) = mytb;
             logtext(atmlab('OUT'), 'Retrieving values\n');
             [M_retr ~] = self.retrieve(M_in, cols);
-            fiwp = nanmean(M_retr(:, 1:2:29), 2);
-            cf100 = nanmean(M_retr(:, 2:2:30), 2);
+            fiwp = nanmean(M_retr(:, 1:2:size(M_retr, 2)), 2);
+            cf100 = nanmean(M_retr(:, 2:2:size(M_retr, 2)), 2);
             ciwp = uint16(fiwp .* cf100);
             %cf100 = self.nets.classification100(mytb(:, 3:5).');
             %fiwp = 10.^self.nets.retrieval(mytb(:, 3:5).');
             %ciwp = cf100 .* fiwp;
             logtext(atmlab('OUT'), 'Post-processing\n');
+            unflagged = isfinite(fiwp) & isfinite(cf100);
             M = zeros(numel(grandata.lat), max(structfun(@(x)max(x), self.cols)));
             M(:, self.cols.mhs_bt_345) = mytb(:, 3:5);
             M(:, self.cols.lat) = grandata.lat(:);
@@ -374,6 +378,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             M(:, self.cols.lza) = grandata.lza(:);
             M(:, self.cols.pos) = grandata.pos(:);
             M(:, self.cols.line) = grandata.line(:);
+            M = M(unflagged, :);
 %            storelims.lat = self.nets.retrieval.userdata.retrieval_limits.LAT1;
 %            storelims.pos = self.nets.retrieval.userdata.retrieval_limits.POS1;
 %            storelims.mhs_bt_345 = self.nets.retrieval.userdata.retrieval_limits.B_BT;

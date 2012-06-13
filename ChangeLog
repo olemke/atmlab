@@ -1,3 +1,36 @@
+2012-06-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-242
+
+	* datasets/SatDataset.m(level3):
+
+	- Added method to calculate level3-data, averaged data, binned for an
+	indicated period. Work in progress, don't rely on this being stable
+	yet.
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Added TODO-items based on looking at early results.
+	- Fix bug causing nhpolar to be absent
+
+	* math/binned_statistics.m:
+
+	- Don't silently ignore if different error than expected is thrown
+
+	* math/binning_fast.m:
+
+	- Give a more helpful error message if input dimensions are
+	inconsistent
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- Added pointer in section on "grids" how to actually control
+	gridlines (this was not mentioned in the section for 'grids')
+
+	* datasets/define_datasets, site-specific/kiruna/datasets_init.m:
+
+	- Added cmoiwp_v0_6
+
 2012-06-12  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-241

@@ -1006,7 +1006,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                         
         end
                 
-
         function outer = find_extreme_granule(self, spec, mode, varargin)
             % find the earliest or latest granule for this dataset
             %
@@ -1078,7 +1077,89 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     outer = grans(end, :);
             end
         end
+        
+        function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, varargin)
+            % Calculate level3 (gridded mean) for period
+            %
+            % - data1
+            % - data2
+            % - spec
+            % - fields
+            % - (optional) limiters
+            % - (optional) struct with options to binning_fast
+            %
+            % Returns:
+            %
+            % - gridmean: 3-D matrix, [nlat nlon nfield]
+            %
+            % FIXME DOC
+            
+            [limiters, data] = optargs(varargin, {{}, struct()});
+            allgrans = self.find_granules_for_period(date1, date2, spec);
+            allstats = {};
+            i = 0;
+            while i < size(allgrans, 1)
+                
+                data.lat = zeros(1e6, 1, 'single');
+                data.lon = zeros(1e6, 1, 'single');
+                data.data = zeros(1e6, length(fields), 'single');
+                
+                N = 1;
+                X = whos('data');
+                while X.bytes < 1e9 && i < size(allgrans, 1)
+                    i = i + 1;
+                    grandata = self.read_granule(allgrans(i, :), spec, fields);
+                    nnew = size(grandata.lat, 1);
+                    new = N:(N+nnew-1);
+                    if new(end) > size(data.lat, 1)
+                        % double allocation
+                        data.lat = [data.lat; zeros(size(data.lat, 1), 1, 'single')];
+                        data.lon = [data.lon; zeros(size(data.lon, 1), 1, 'single')];
+                        data.data = [data.data; zeros(size(data.data, 1), length(fields), 'single')];
+                    end
+                    data.lat(new) = grandata.lat;
+                    data.lon(new) = grandata.lon;
+                                    
+                    C = cellfun(@(f) single(grandata.(f)), fields, 'UniformOutput', false);
+                    data.data(new, :) = horzcat(C{:});
+                    N = N + nnew;
 
+                    X = whos('data');
+                end
+                data.lat(N:end, :) = [];
+                data.lon(N:end, :) = [];
+                data.data(N:end, :) = [];
+                
+%                 data.lat = grandata.lat;
+%                 data.lon = grandata.lon;
+%                 C = cellfun(@(f) double(grandata.(f)), fields, 'UniformOutput', false);
+%                 data.data = horzcat(C{:});
+                logtext(atmlab('OUT'), 'Binning\n');
+                [binned, lat, lon] = binning_fast(data);
+                stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limiters);
+                logtext(atmlab('OUT'), 'Calculating statistics\n');
+                stats.statistic1 = cell2mat(stats.statistic1);
+                % cell2mat on multi-dim will flatten 2nd dimension,
+                % unflatten and put this dimension at the end again
+                stats.statistic2 = permute(reshape(cell2mat(stats.statistic2), [size(stats.statistic2, 1) size(stats.statistic2{1, 1}, 2), size(stats.statistic2, 2)]), [1 3 2]);
+                allstats = [allstats {stats}];
+            end
+            logtext(atmlab('OUT'), 'Finalising\n');
+            % calculate total count
+            allcount = cellfun(@(x) x.statistic1, allstats, 'UniformOutput', false);
+            allcount = cat(3, allcount{:});
+            totalcount = sum(allcount, 3);
+            
+            % calculate total sum
+            %allsums = cellfun(@(x) bsxfun(@times, x.statistic1, x.statistic2), allstats, 'UniformOutput', false);
+            allsums = cellfun(@(x) x.statistic2, allstats, 'UniformOutput', false);
+            allsums = cat(4, allsums{:});
+            totalsum = sum(allsums, 4);
+            
+            % calculate overall mean
+            gridmean = bsxfun(@ldivide, totalcount, totalsum);
+        end
+        
         %% methods for internal use (not private, but from other classes)
        
         function add_collocated_dataset(ds, cd)

@@ -139,7 +139,8 @@ if isequal(numel(in.data),numel(in.lat),numel(in.lon))
 end
 
 assert(isequal(size(in.data,1),size(in.lat,1),size(in.lon,1)),...
-    errId,'data,lat,lon must all be the same size')
+    errId, ['data,lat,lon must all have the same first dimension. Found: ' ...
+            'data %d, lat %d, lon %d'], size(in.data, 1), size(in.lat, 1), size(in.lon, 1));
 
 if isfield(in,'newlon')
     str = 'fields ''newlat'' and ''newlon''';

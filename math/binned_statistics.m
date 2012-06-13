@@ -45,6 +45,8 @@ for i = 1:length(statistics)
     catch ME
         if strcmp(ME.identifier,'MATLAB:AddField:InvalidFieldName')
             statname = sprintf('statistic%.0f',i);
+        else
+            ME.rethrow();
         end
     end
     out.(statname) = cellfun(statistics{i}, data_bins, 'UniformOutput', false);

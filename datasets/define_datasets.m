@@ -160,7 +160,7 @@ cmoiwp = CollocatedMicrowaveOnlyIWP('name', 'cmoiwp','granule_duration', 6130); 
 
 % old versions thereof
 
-for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3', 'v0_4', 'v0_5'}
+for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3', 'v0_4', 'v0_5', 'v0_6'}
     SatDataset('name', sprintf('cmoiwp_%s', v{1}), ...
     'granule_duration', cmoiwp.granule_duration, ...
     'reader', cmoiwp.reader);

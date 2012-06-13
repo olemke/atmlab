@@ -201,6 +201,8 @@ function filename = gmt_plot(in,field)
 %                     | COLOR_BAGROUND |
 %                     ----------------------
 %
+% (for grid, see in.ticks)
+%
 %--------------------------------------------------------------------------
 %
 % COLORS & DATA REPRESENTATION:
