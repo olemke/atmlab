@@ -559,9 +559,11 @@ function filename = gmt_plot(in,field)
 
 if ~exist('field','var') && isfield(in,'data')
     field = 'data';
-elseif ~exist('field','var')
-    field = ''; in.nodata=true;
 end
+
+assert(logical(exist('field','var')),['atmlab:' mfilename ':badInput'],...
+    'I need a "field".\nIf you want to plot the map with no data, input in.nodata=true')
+
 check_input(in)
 
 out = set_GMT_plot(in,field);

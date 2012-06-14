@@ -1,8 +1,7 @@
 function values = bin(x, y, xbin)
-
-% bin Bin y according to x in xbin
+%% bin Bin y according to x in xbin
 %
-% Bin the contents of y in the bins x according to the values in x.
+% Bin the contents of y in the xbins according to the values in x.
 % E.g. y(i) is binned according to the value of x(i). Binning rules
 % as for <a href="matlab:help histc">histc</a>.
 %

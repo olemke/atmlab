@@ -1,3 +1,14 @@
+2012-06-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geoplots/gmt/gmt_plot.m:
+	- No longer accept combination of missing 'field' && missing argument in.nodata
+
+	* atasets/define_datasets.m:
+	- Collocation constrsaints: Changed several time intervals to
+	better match the distances between datasets to be collocated.
+
+	* math/bin.m: puny edit to heeader
+
 2012-06-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-242
@@ -39,7 +50,7 @@
 
 	- Fixed bug leading to nonphysical IWP retrievals
 	- Now store ciwp as uint16
-	
+
 	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
 
 	- Added cmoiwp_v0_5
