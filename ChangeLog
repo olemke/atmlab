@@ -1,3 +1,11 @@
+2012-06-14  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-0-6
+
+	* arts/xml/xmlWriteMatrix.m:
+
+	Add missing attrlist argument. Fixes writing of GriddedFields.
+
 2012-04-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-0-5
