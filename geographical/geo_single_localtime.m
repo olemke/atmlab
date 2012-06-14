@@ -1,19 +1,21 @@
 function data = geo_single_localtime(utcvec,localtime,data,lon,lat,method)
-% GEO_SINGLE_LOCALTIME creates a matrix of data so that all grids have the same local time
+% GEO_SINGLE_LOCALTIME Interpolates data to a specific local time
 %
 % IN
-%     utcvec      [%f,...]              utc values covering a day. e.g. 0:3:21
-%     localtime   %f                    scalar local time in decimals e.g.1.5=01:30AM
+%     utcvec      [%f,...]              UTC values covering a day, e.g. [0 3 21]
+%     localtime   %f                    scalar local time as a decimal number,
+%                                       e.g. 1.5 = 01:30AM
 %     data        data(lon,...,time)    data matrix with the dimensions
 %                                       data(lat,lon,...,time)
 %                                       or
 %                                       data(lon,lat,...,time)
-%
-%                                       size(data,1)= length(lon) &&
-%                                       size(data,4)=length(utcvect)
 %     lon         [%f,...]              longitudes vector
-%     lat         [%f,...]              latitudes vector (needed for function standardize_geodata)
-%     method      %s                    The method interp1 will use (default='linear')
+%     lat         [%f,...]              latitudes vector (needed for function
+%                                                         standardize_geodata)
+%     method      %s                    The method interp1 will use. It can be
+%                                       one of 'nearest', 'linear' (default),
+%                                       'spline' or 'cubic'
+%                                       
 %
 % OUT
 %     out =      data                   Interpolated data values at the
@@ -47,7 +49,7 @@ assert(ismember(method,{'nearest','linear','cubic','spline'}),...
 ['atmlab:' mfilename ':badInput'],'method: "%s" not valid',method)
 
 % INTERNALLY make lons -180:180 and adjust data accordingly
-[flags,lat,lon,data] = standardize_geodata(lat,lon,data);
+[flags,lat,lon,data] = standardize_geodata(lat,lon,data); %#ok<ASGLU>
 
 % Get the SIZE of the original data
 sz = size(data);
@@ -94,7 +96,7 @@ if flags.lon360
         out = out(2:end,:);
     end
     lon = lon +(lon < 0)*360;
-    [lon,indexlon] = sort(lon);
+    [lon,indexlon] = sort(lon); %#ok<ASGLU>
     out = out(indexlon,:);
     if flags.duplicate
         % reintroduce duplicates at 0 and 360

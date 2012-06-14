@@ -12,7 +12,11 @@
 
 % 2002-12-13  Created by Oliver Lemke.
 
-function xmlWriteMatrix(fid, fidb, data, precision)
+function xmlWriteMatrix(fid, fidb, data, precision, attrlist)
+
+if nargin < 5
+  attrlist = [];
+end
 
 s = size (data);
 
@@ -23,7 +27,6 @@ end
 nr = s(1);
 nc = s(2);
 
-attrlist = [];
 attrlist = xmlAddAttribute (attrlist, 'nrows', sprintf ('%d', nr));
 attrlist = xmlAddAttribute (attrlist, 'ncols', sprintf ('%d', nc));
 

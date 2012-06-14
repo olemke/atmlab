@@ -1,4 +1,16 @@
+2012-06-14  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-244
+
+	* arts/xml/xmlWriteMatrix.m:
+
+	Add missing attrlist argument. Fixes writing of GriddedFields.
+
+	* ChangeLog: Add missing version number to previous commit.
+
 2012-06-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-243
 
 	* geoplots/gmt/gmt_plot.m:
 	- No longer accept combination of missing 'field' && missing argument in.nodata
