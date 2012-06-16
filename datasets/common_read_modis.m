@@ -35,7 +35,7 @@ all_fields    = [core_fields(:); extra_fields(:)];
 % are present. If so, it will be processed and the fields this pseudo field
 % requires to be created are further assumed to be frivolous and therefore
 % removed afterwards.
-pseudo_fields = {'modis_IWP'};
+pseudo_fields = {'modis_IWP','modis_Tau_ice','modis_Re_ice'};
 
 for F = all_fields'
     if ismember(F{1},pseudo_fields)
@@ -60,14 +60,12 @@ date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 if any(ismember(pseudo_fields,extra_fields))
-    for P = pseudo_fields(:)'
-        S = dealWithPseudoFields(S,P{1},file);
-    end
+    S = dealWithPseudoFields(S, pseudo_fields(ismember(pseudo_fields,extra_fields)),file);
 end
 
 %I need to do this after flagging, or the dimensions will be wrong.
 % data starts at 1993, I need an offset. Only need one time per scan line
-%(first 4 are NaN due to interpolation)   
+%(first 4 are NaN due to interpolation)
 S.time = S.Scan_Start_Time(:,5) + date2unixsecs(1993) -S.epoch;
 
 S = rmfield(S,core_fields);
@@ -81,7 +79,7 @@ end
 %%%%%%%%%%%%%
 % SUBFUNCTION
 
-function S = dealWithPseudoFields(S,field,file)
+function S = dealWithPseudoFields(S,fields,file)
 %% dealWithPseudoFields
 %
 % List of hand-made fields that can be composed already here to save memory
@@ -90,50 +88,72 @@ function S = dealWithPseudoFields(S,field,file)
 % removed afterwards. This part is hardcoded
 
 % READ dependent fields
-switch field
-    case 'modis_IWP'
-        dependent_fields = {'Cloud_Water_Path','Quality_Assurance_1km','Cloud_Phase_Optical_Properties'};
-        rmflag = ~ismember(dependent_fields,fieldnames(S));
-        for F = dependent_fields
-            S.(F{1}) = hdfread(file,F{1});
-        end
+% So far this function assumesa you always need cloud phase and quality
+% flag
+common_fields = {'Quality_Assurance_1km','Cloud_Phase_Optical_Properties'};
+associatedFields = {'Cloud_Water_Path','Cloud_Effective_Radius','Cloud_Optical_Thickness'};
+pseudo_fields = {'modis_IWP','modis_Tau_ice','modis_Re_ice'};
+dependent_fields = [common_fields,associatedFields(ismember(pseudo_fields,fields))];
+
+% remove dependent fields if they aren't already in S (see the end of this function)
+rmflag = ~ismember(dependent_fields,fieldnames(S));
+
+for D = dependent_fields
+    S.(D{1}) = hdfread(file,D{1});
 end
 
-% use dependent fields to BUILD the pseudo field
-switch field
-    case 'modis_IWP'
-        
-        % Keeping record of the pixels that are deemed to be cloud free
-        clearPixel = S.Cloud_Phase_Optical_Properties==1;
-        S.Cloud_Water_Path(clearPixel)=0;
-        
-        % Removing all points that are not flagged as IWP
-        icePhase = S.Cloud_Phase_Optical_Properties==3;
-        
-        % only KEEP retrievals that are USEFUL and CONFIDENT
-        
-        % this corresponds to the 1st and 2nd bit in the 2nd byte in
-        % Quality_Assurance_1km (regarding cloud_water_path). By doing this
-        % I'm also disregarding values with marginal confidence
-        usefull=uint8(sum(2.^[0,1]));
-        
-        % bitand only work on vectors
-        S.Quality_Assurance_1km = permute(S.Quality_Assurance_1km,[3,1,2]);
-        
-        flaggedAsGood = bitand(typecast(S.Quality_Assurance_1km(2,:),'uint8'),usefull)==usefull;
-        flaggedAsGood = reshape(flaggedAsGood,size(S.Cloud_Water_Path,1),size(S.Cloud_Water_Path,2));
-        % mask all non applicable data with NaN
-        [sz1,~] = size(S.Cloud_Water_Path);
-        for F = fieldnames(S)'
-            if isequal(size(S.(F{1}),1),sz1)
-                S.(F{1})(~(clearPixel | (icePhase & flaggedAsGood)))=NaN;
-            end
+%% From here I assume the following exist  {'Quality_Assurance_1km','Cloud_Phase_Optical_Properties'};
+% use dependent fields to BUILD the pseudo fields
+sz = size(S.(dependent_fields{1}));
+
+% Keeping record of the pixels that are deemed to be cloud free
+clearPixel = S.Cloud_Phase_Optical_Properties==1;
+
+% Removing all points that are not flagged as ice clouds
+icePhase = S.Cloud_Phase_Optical_Properties==3;
+
+% only KEEP retrievals that are USEFUL and CONFIDENT
+
+% this corresponds to the 1st and 2nd bit in the 2nd byte in
+% Quality_Assurance_1km (regarding cloud_water_path. I assume the
+% same apply to Re and Tau that CWP is based on anyway). By doing this
+% I'm also disregarding values with marginal confidence
+usefull=uint8(sum(2.^[0,1]));
+
+% bitand only works on vectors
+S.Quality_Assurance_1km = permute(S.Quality_Assurance_1km,[3,1,2]);
+
+flaggedAsGood = bitand(typecast(S.Quality_Assurance_1km(2,:),'uint8'),usefull)==usefull;
+flaggedAsGood = reshape(flaggedAsGood,sz(1),sz(2));
+% mask all non applicable data with NaN
+
+
+% This will only work if the pseudoField is one of the 3 above
+for F = fieldnames(S)'
+    % mask non-ice or bad data with Nans
+    if isequal(size(S.(F{1})),sz)
+        % zero that which has no clouds
+        if strcmp(F{1},{'Cloud_Water_Path','Cloud_Effective_Radius','Cloud_Optical_Thickness'})
+            S.(F{1})(clearPixel)=0;
         end
-        S.modis_IWP = S.Cloud_Water_Path;
-        
+        S.(F{1})(~(clearPixel | (icePhase & flaggedAsGood)))=NaN;
+    end
 end
 
+for F = fields
+    switch F{1}
+        case 'modis_IWP'
+            S.modis_IWP = S.Cloud_Water_Path;
+        case 'modis_Re_ice'
+            S.modis_Re_ice = S.Cloud_Effective_Radius;
+        case 'modis_Tau_ice'
+            S.modis_Tau_ice = S.Cloud_Optical_Thickness;
+    end
+end
+
+% re
 S=rmfield(S,dependent_fields(rmflag));
+
 end
 
 function S = interpolate_geodataTime(S)

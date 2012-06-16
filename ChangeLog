@@ -1,5 +1,14 @@
 2012-06-16  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-246
+
+	* datasets/common_read_modis.m: Added modis_Re_ice and
+	modis_Tau_ice as additional "pseudo fields" that can be put
+	together in this function
+
+
+2012-06-16  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-245
 
 	* handy/PersistentCachedData.m:
