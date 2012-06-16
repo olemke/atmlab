@@ -73,7 +73,7 @@ classdef PersistentCachedData < CachedData
             logtext(atmlab('OUT'), 'Storing cache-entry to disk: %s -> %s\n', ...
                 s, svfl);
             save(svfl, '-v7.3', 'data');
-            logtext(atmlab('OUT'), 'New size: %d bytes\n', self.disk_cachesize());
+            logtext(atmlab('OUT'), 'New size: %d bytes (%dGiB) \n', self.disk_cachesize(),self.disk_cachesize()/1024^3);
             if self.disk_free() + self.disk_cachesize() < self.minFreeSpace
                 error(['atmlab:' mfilename ':noSpace'],'df + du < minFreeCache')
             end

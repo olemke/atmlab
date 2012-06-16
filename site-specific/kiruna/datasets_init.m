@@ -178,6 +178,11 @@ D.CollocatedDataset_calipso_dardarsub.basedir     = '/storage4/user_data/seliass
 D.CollocatedDataset_calipso_dardarsub.subdir      = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_calipso_dardarsub.filename    = 'collocations_calipso_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
 
+
+D.CollocatedDataset_cmoiwp_v0_6_dardarsub.basedir      = '/storage4/user_data/seliasson/collocations_cmoiwp_v0_6_dardarsub/core';
+D.CollocatedDataset_cmoiwp_v0_6_dardarsub.subdir       = '$YEAR4/$MONTH/$DAY';
+D.CollocatedDataset_cmoiwp_v0_6_dardarsub.filename     = 'collocations_cmoiwp_v0_6_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
+
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.basedir      = '/storage4/user_data/seliasson/collocations_cmoiwp_v0_4_dardarsub/core';
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.subdir       = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.filename     = 'collocations_cmoiwp_v0_4_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
