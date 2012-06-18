@@ -1,3 +1,9 @@
+2012-06-18  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-247
+
+	* geographical/geo_single_localtime.m: Small fix in docs.
+
 2012-06-16  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-246

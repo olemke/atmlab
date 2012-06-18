@@ -2,7 +2,7 @@ function data = geo_single_localtime(utcvec,localtime,data,lon,lat,method)
 % GEO_SINGLE_LOCALTIME Interpolates data to a specific local time
 %
 % IN
-%     utcvec      [%f,...]              UTC values covering a day, e.g. [0 3 21]
+%     utcvec      [%f,...]              UTC values covering a day, e.g. 0:3:21
 %     localtime   %f                    scalar local time as a decimal number,
 %                                       e.g. 1.5 = 01:30AM
 %     data        data(lon,...,time)    data matrix with the dimensions
