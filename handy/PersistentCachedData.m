@@ -73,15 +73,17 @@ classdef PersistentCachedData < CachedData
             logtext(atmlab('OUT'), 'Storing cache-entry to disk: %s -> %s\n', ...
                 s, svfl);
             save(svfl, '-v7.3', 'data');
-            logtext(atmlab('OUT'), 'New size: %d bytes (%dGiB) \n', self.disk_cachesize(),self.disk_cachesize()/1024^3);
+            logtext(atmlab('OUT'), 'New size: %d bytes (%.3fGiB) \n', ...
+                self.disk_cachesize(),self.disk_cachesize()/1024^3);
             if self.disk_free() + self.disk_cachesize() < self.minFreeSpace
                 error(['atmlab:' mfilename ':noSpace'],'df + du < minFreeCache')
             end
             if self.disk_toolarge()
                 self.del_old_disk_entry()
             end
-            % store info
-            infofile = fullfile(self.cachedir, 'info.mat');
+            % store info. salomon: I'll make the name a bit more unique
+            % here
+            infofile = fullfile(self.cachedir, ['info' [datestr(now,'ddmmyy') '-' num2str(cputime)] '.mat']);
             if exist(infofile, 'file')
                 all_info = loadvar(infofile, 'all_info');
             end

@@ -1,3 +1,12 @@
+2012-06-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-248
+
+	* handy/PersistentCachedData.m: Grew tired of info.mat crashing
+	long running codes and made the name a bit more unique to avoid
+	conflicts. If this file is used somewhere else this fix, just
+	introduced a bug. Haven't noticed anything yet though...
+
 2012-06-18  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-247
