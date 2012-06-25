@@ -1,3 +1,13 @@
+2012-06-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-249
+
+	* arts/xml/xmlReadGriddedField5.m
+	* arts/xml/xmlReadGriddedField6.m:
+	* arts/xml/xmlWrieGriddedField5.m
+	* arts/xml/xmlWriteGriddedField6.m: Created (to match Oliver's
+	recent extension in arts).
+
 2012-06-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-248

@@ -1,10 +1,10 @@
 % ARTS_BATCH   Performs ARTS batch calculations
 %
 %    Largely as *arts_y* but calculates several spectra in a single run,
-%    batch calculations. The data to be changed between each spectrim is
-%    stored in Q.BATCH, with details drescribed in qartsBatch.
+%    batch calculations. The data to be changed between each spectrum is
+%    stored in Q.BATCH, with details described in qartsBatch.
 %
-% FORMAT   Q = arts_sensor( Q [, workfolder] )
+% FORMAT   Y = arts_batch( Q [, workfolder] )
 %        
 % OUT   Y            Calculated spectra.
 % IN    Q            Qarts structure.

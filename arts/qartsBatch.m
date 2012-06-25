@@ -1,9 +1,7 @@
 % QARTSBATCH   Defines setting fields for ARTS batch calculations
 %
-%    The function provides default values for all recognised fields and a 
-%    description of each field. Default value is normally NaN, but
-%    exceptions exist when some standard choice exists. To list default
-%    values just type 'qartsBatch'.
+%    The function provides default values for all recognised fields and a
+%    description of each field. To list default values just type 'qartsBatch'.
 %
 %    This function is organised in such way that *qcheck* and *qinfo*
 %    can be used.
@@ -21,7 +19,7 @@ function [B,I] = qartsBatch
  
 
 %-----------------------------------------------------------------------------
-B.DATA = [];
+B.DATA = {};
 I.DATA = [ ...
 'Batch data. This field is a cell array where each element shall have the ',...
 'the fields:', ...
@@ -36,12 +34,12 @@ I.DATA = [ ...
 '#   Q.BATCH.DATA{1}.X    = 113.3+randn(5,1,1)*0.05;'
 ];
 %-----------------------------------------------------------------------------
-B.N = NaN;
+B.N = {};
 I.N = [ ...
 'Number of batch cases to run.'
 ];
 %-----------------------------------------------------------------------------
-B.WSM = {'RteCalc{}'};
+B.WSM = {};
 I.WSM = [ ...
 'Series of WSM calls to finish *ybatch_calc_agenda*.'
 ];
