@@ -68,7 +68,6 @@ Q.STOKES_DIM          = 1;
 
 %- Atmosphere
 %
-Q.R_GEOID             = constants( 'EARTH_RADIUS' );
 Q.Z_SURFACE           = 0;
 Q.P_GRID              = z2p_simple( -250:250:90e3 )';
 %
@@ -81,11 +80,10 @@ Q.CLOUDBOX_DO         = false;
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
-Q.PPATH_STEP_AGENDA   = { 'ppath_stepGeometric' };
 Q.Y_UNIT              = 'RJBT';
 %
 Q.SENSOR_LOS          = 70;
-Q.SENSOR_POS          = Q.R_GEOID + Q.Z_SURFACE;
+Q.SENSOR_POS          = Q.Z_SURFACE;
 
 %- Exclude cosmic background radiation. A relative change of the spectrum
 %- corresponds then to a relative change of the ozone profile.

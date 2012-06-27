@@ -1,3 +1,23 @@
+2012-06-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-251
+
+	* Qarts/Qpack demos now runs with arts-2.1.156
+
+	* demos/arts_oem_demo.m: Still used R_GEOID!
+
+	* demos/qarts_demo.m (qarts_demo): Several additions/changes (as
+	general.arts not used here).
+
+	* demos/qarts_demo2.m (qarts_demo2): Removed some stuff defined
+	already in general.arts.
+
+	* demos/qarts_scattering_demo.m: Slight change of FOS part.
+
+	* arts: Changes to qarts, to get synced with arts. Renamed/added
+	agendas: surface_rtprop_agenda, iy_surface_agenda. Added several
+	new variables such as edensity_field, mag_u_field.
+
 2012-06-27  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-250

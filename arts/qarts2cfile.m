@@ -393,6 +393,24 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                              workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
+  if qarts_isset( Q.MAG_U_FIELD )
+    T{end+1} = file_or_data( 'mag_u_field', 'Tensor3', Q.MAG_U_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end      
+  if qarts_isset( Q.MAG_V_FIELD )
+    T{end+1} = file_or_data( 'mag_v_field', 'Tensor3', Q.MAG_V_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end      
+  if qarts_isset( Q.MAG_W_FIELD )
+    T{end+1} = file_or_data( 'mag_w_field', 'Tensor3', Q.MAG_W_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  %
+  if qarts_isset( Q.EDENSITY_FIELD )
+    T{end+1} = file_or_data( 'edensity_field', 'Tensor3', Q.EDENSITY_FIELD, ...
+                                             workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  %
   if qarts_isset(Q.REFELLIPSOID)
     rqre_datatype( Q.REFELLIPSOID, {@istensor1}, 'Q.REFELLIPSOID' );        %&%
     T{end+1} = file_or_data( 'refellipsoid', 'Vector', Q.REFELLIPSOID, ...
@@ -454,7 +472,7 @@ return
 %    basic absorption variables, such as abs_lines (if used)
 %    abs_lookup  (if used)
 %    abs_scalar_gas_agenda
-%    emission_agenda
+%    blackbody_radiation_agenda
 %
 function T = cfile_Absrpt( Q, partname, workfolder )
   %
@@ -589,8 +607,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
   end %  qarts_isset( Q.ABSORPTION )
 
   
-  if qarts_isset( Q.EMISSION_AGENDA )
-    T = add_agenda( T, 'emission_agenda', Q.EMISSION_AGENDA );
+  if qarts_isset( Q.BLACKBODY_RADIATION_AGENDA )
+    T = add_agenda( T, 'blackbody_radiation_agenda', ...
+                                                Q.BLACKBODY_RADIATION_AGENDA );
   end
 
   if abstable  &  strcmp( partname, 'AbsrptSave' )
@@ -603,7 +622,8 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
-%    surface_prop_agenda
+%    surface_rtprop_agenda
+%    iy_surface_agenda
 %    iy_space_agenda
 %    ppath_lmax
 %    ppath_lraytrace
@@ -621,8 +641,11 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T = {};
   %
-  if qarts_isset( Q.SURFACE_PROP_AGENDA )
-    T = add_agenda( T, 'surface_prop_agenda', Q.SURFACE_PROP_AGENDA );
+  if qarts_isset( Q.SURFACE_RTPROP_AGENDA )
+    T = add_agenda( T, 'surface_rtprop_agenda', Q.SURFACE_RTPROP_AGENDA );
+  end
+  if qarts_isset( Q.IY_SURFACE_AGENDA )
+    T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
   end
   if qarts_isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );

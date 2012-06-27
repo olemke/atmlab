@@ -218,9 +218,6 @@ elseif strcmp( lower(method), 'fos' )
   Q.WSMS_BEFORE_RTE{end+1}        = '   fos_yStandard';
   Q.WSMS_BEFORE_RTE{end+1}        = '}';
   Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lat)';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lon)';
   Q.WSMS_BEFORE_RTE{end+1}        = '   iyFOS';
   Q.WSMS_BEFORE_RTE{end+1}        = '}';
   Q.WSMS_BEFORE_RTE{end+1}        = sprintf( ...

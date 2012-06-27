@@ -169,12 +169,7 @@ end
 %
 Q.YCALC_WSMS             = { 'yCalc' };
 %
-Q.PPATH_LMAX            = 20e3;
-Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
-                            'ppath_stepGeometric' };
-Q.PPATH_AGENDA          = { 'Ignore(mblock_index)', 'ppathStepByStep', ...
-                            'Touch(rte_los)' };
-Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
+Q.PPATH_LMAX             = 20e3;
 Q.Y_UNIT                 = 'RJBT';
 %
 zplat                    = 600e3;

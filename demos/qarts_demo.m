@@ -58,6 +58,10 @@ Q.RAW_ATM_EXPAND_1D     = false;
 Q.WIND_U_FIELD          = [];
 Q.WIND_V_FIELD          = [];
 Q.WIND_W_FIELD          = [];
+Q.MAG_U_FIELD           = [];
+Q.MAG_V_FIELD           = [];
+Q.MAG_W_FIELD           = [];
+Q.EDENSITY_FIELD        = [];
 %
 Q.REFELLIPSOID          = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE             = 500;
@@ -106,20 +110,22 @@ Q.WSMS_AT_START{end+1}  = 'NumericSet(molarmass_dry_air,28.966)';
 
 %= Set RTE variables (refraction is here neglected)
 %
-Q.EMISSION_AGENDA       = { 'emissionPlanck' };
+Q.IY_CLEARSKY_AGENDA    = { 'iyEmissionStandardClearsky' };
+Q.BLACKBODY_RADIATION_AGENDA = { 'blackbody_radiationPlanck' };
 Q.IY_SPACE_AGENDA       = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                             'MatrixCBR(iy,stokes_dim,f_grid)' };
-Q.IY_CLEARSKY_AGENDA    = { 'iyEmissionStandardClearsky' };
-Q.SURFACE_PROP_AGENDA   = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
-                           ['InterpAtmFieldToRteGps(surface_skin_t,',...
-                            'atmosphere_dim,','rte_gp_p,rte_gp_lat,',...
-                            'rte_gp_lon,t_field)'], ...
+Q.SURFACE_RTPROP_AGENDA = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
+                           ['InterpAtmFieldToRtePos(surface_skin_t,',...
+                            'atmosphere_dim, p_grid, lat_grid,', ...
+                            'lon_grid, z_field, rte_pos, t_field)'], ...
                             'surfaceBlackbody' };
+Q.IY_SURFACE_AGENDA    = { 'iySurfaceRtpropAgenda' };
 %
 Q.YCALC_WSMS            = { 'yCalc' };
 %
 Q.PPATH_LMAX            = 20e3;
 Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
+                            'Ignore(edensity_field)', 'Ignore(f_index)', ... 
                             'ppath_stepGeometric' };
 Q.PPATH_AGENDA          = { 'Ignore(mblock_index)', 'ppathStepByStep', ...
                             'Touch(rte_los)' };
