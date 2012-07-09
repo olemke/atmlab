@@ -24,7 +24,7 @@ function S = MaskInvalidGeoTimedataWithNaN(S)
 
 errId = ['atmlab:' mfilename ':badInput'];
 if isempty(S.lat)
-    warning(errId,'Data stuct is empty')
+    warning(errId,'Data struct is empty')
     return
 end
 assert(isequal(size(S.lat),size(S.lon)),errId,'S.lat, and S.lon must be the same size')

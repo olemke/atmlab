@@ -1,3 +1,29 @@
+2012-07-09  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-252
+
+	* collocations/CollocatedDataset.m(collocate_granule):
+
+	- Catch if secondary cannot be read due to CRC error
+
+	* sensors/cloudsat_read.m:
+	
+	- Remove keyboard statement! There are 10 other occurences of
+	'keyboard' in atmlab... should they really be there? Authors, please
+	check.
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m: Fix typo
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added CPR/AMSUB collocated + associated datasets
+
+	* datasets/SatDataset.m:
+
+	(read_granule): Fix bug with flagged firstline
+
+	(level3): Fix bug if no data
+
 2012-06-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-251

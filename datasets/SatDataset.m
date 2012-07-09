@@ -767,7 +767,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             if remdouble
                 % read ballast
                 firstline = self.granule_first_line(date, spec);
-                if firstline > 0
+                if firstline > 0 && firstline < intmax(class(firstline))
                     % get rid of ballast in all fields
                     for f = fieldnames(data)'
                         fn = f{1};
@@ -1111,6 +1111,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     grandata = self.read_granule(allgrans(i, :), spec, fields);
                     nnew = size(grandata.lat, 1);
                     new = N:(N+nnew-1);
+                    if nnew==0 % no data
+                        continue
+                    end
                     if new(end) > size(data.lat, 1)
                         % double allocation
                         data.lat = [data.lat; zeros(size(data.lat, 1), 1, 'single')];

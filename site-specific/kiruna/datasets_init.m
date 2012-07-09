@@ -156,6 +156,10 @@ D.CollocatedDataset_mhs_cpr.basedir   = '/storage4/user_data/gerrit/collocated_d
 D.CollocatedDataset_mhs_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_mhs_cpr.filename  = 'collocations_$SAT.nc.gz';
 
+D.CollocatedDataset_amsub_cpr.basedir = '/storage4/user_data/gerrit/collocated_datasets/amsub_cpr';
+D.CollocatedDataset_amsub_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
+D.CollocatedDataset_amsub_cpr.filename  = 'collocations_$SAT.nc.gz';
+
 D.CollocatedDataset_mspps_cpr.basedir   = '/storage4/user_data/seliasson/collocations_mspps_cpr/core';
 D.CollocatedDataset_mspps_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_mspps_cpr.filename  = 'collocations_mspps_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
@@ -212,9 +216,18 @@ D.CollocatedDataset_patmosx_dardarsub.filename  = 'collocations_patmosx_dardarsu
 D.associated_CPR_MHS_AMSU_HIRS.basedir = '/storage3/user_data/gerrit/collocated_datasets/mhs_cpr';
 D.associated_CPR_MHS_AMSU_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_CPR_MHS_AMSU_HIRS.filename = 'fulldata_$SAT.nc.gz';
+
+D.associated_CPR_AMSUB_AMSUA_HIRS.basedir = '/storage3/user_data/gerrit/collocated_datasets/amsub_cpr';
+D.associated_CPR_AMSUB_AMSUA_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
+D.associated_CPR_AMSUB_AMSUA_HIRS.filename = 'fulldata_$SAT.nc.gz';
+
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed_$SAT.nc.gz';
+
+D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.basedir = D.associated_CPR_AMSUB_AMSUA_HIRS.basedir;
+D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.subdir = D.associated_CPR_AMSUB_AMSUA_HIRS.subdir;
+D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.filename = D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename;
 
 D.associated_mhs_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
 D.associated_mhs_mhs.subdir = D.collocation_mhs_mhs.subdir;

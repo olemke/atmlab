@@ -364,7 +364,6 @@ function u=unitconv(unit,field)
 unit = vec2row( unit );
   
 if strcmp(unit,['mg m^{-3}']) |  strcmp(unit,['mg/m^3'])
-  keyboard
    u=1e-3;
 elseif strcmp(unit,['um'])
    u=1e-6;

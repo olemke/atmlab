@@ -521,7 +521,7 @@ classdef CollocatedDataset < HomemadeDataset
                     data2 = self.secondary.read_granule(secondary_granules(i, :), spec2, extra_args_secondary, false);
                 catch ME
                     switch ME.identifier
-                        case {'atmlab:find_datafile_by_date', 'atmlab:invalid_data', 'atmlab:find_granule_by_datetime'}
+                        case {'atmlab:find_datafile_by_date', 'atmlab:invalid_data', 'atmlab:find_granule_by_datetime', 'atmlab:exec_system_cmd:shell'}
                             logtext(eid, 'Error in reading datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                                 datecell{:}, ME.message);
                             continue

@@ -231,6 +231,11 @@ CollocatedDataset(D.mhs, D.cpr,...
     'distance', 15, ...
     'interval', 900); %16.6m/s
 
+CollocatedDataset(D.amsub, D.cpr, ...
+    'name', 'CollocatedDataset_amsub_cpr', ...
+    'distance', 15, ...
+    'interval', 900);
+
 CollocatedDataset(D.mspps, D.cpr,...
     'name', 'CollocatedDataset_mspps_cpr', ...
     'distance', 20, ...
@@ -339,6 +344,10 @@ f_mhs.B_BT.dims = {'MHS_CHANS', 5};
 f_mhs.B_BT.atts.long_name = 'MHS Brightness Temperature';
 f_mhs.B_BT.atts.units = 'Kelvin';
 
+f_amsub = f_mhs;
+f_amsub.B_BT.dims{1} = 'AMSUB_CHANS';
+f_amsub.B_BT.atts.long_name = 'AMSU-B Brightness Temperature';
+
 f_amsua.A_LONG.type = 'float';
 f_amsua.A_LONG.realname = 'lon';
 f_amsua.A_LONG.atts.long_name = 'AMSU-A Longitude';
@@ -414,6 +423,9 @@ f_cpr.dIOROIWP.atts.units = 'g/m^2';
 
 AssociatedPOESPlusCPR(f_mhs, f_amsua, f_hirs, f_cpr, ...
     'name', 'associated_CPR_MHS_AMSU_HIRS');
+
+AssociatedPOESPlusCPR(f_amsub, f_amsua, f_hirs, f_cpr, ...
+    'name', 'associated_CPR_AMSUB_AMSUA_HIRS');
 
 % Similar to old POES-POES
 
@@ -491,6 +503,8 @@ D = datasets;
 Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, global_lims, ...
     'name', 'collapsed_associated_CPR_MHS_AMSU_HIRS');
 
+Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, global_lims, ...
+    'name', 'collapsed_associated_CPR_AMSUB_AMSUA_HIRS');
 
 %%
 
