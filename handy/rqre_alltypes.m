@@ -8,7 +8,7 @@
 %    Issues an error if criterion not fulfilled. This error assumes that all
 %    functions are named as isxxxx, where xxxx is the name of the data type.
 %
-%    Use *rqre_datatype* for check with respect to a single or one of several
+%    Use *<a href="matlab:help rqre_datatype">rqre_datatype</a>* for check with respect to a single or one of several
 %    types.
 %
 % FORMAT   rqre_alltypes( a, funchandles [,nonstdname] )

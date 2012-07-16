@@ -970,7 +970,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     switch ME.identifier
                         case {'atmlab:find_datafile_by_date', 'atmlab:atovs_get_l1c:zamsu2l1c',...
                                 'atmlab:invalid_data','atmlab:find_granule_by_datetime',...
-                                'MATLAB:imagesci:hdfinfo:invalidFile', 'MATLAB:imagesci:validate:fileOpen'}
+                                'MATLAB:imagesci:hdfinfo:invalidFile', 'MATLAB:imagesci:validate:fileOpen', 'atmlab:exec_system_cmd:shell'}
                             logtext(atmlab('ERR'), 'Problem: %s\n', ME.message);
                         otherwise
                             ME.rethrow();

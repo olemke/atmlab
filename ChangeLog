@@ -1,3 +1,35 @@
+2012-07-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-254
+
+	* collocations/Collapser.m:
+
+	- Fieldstruct now also uses a member 'incore'; if this is set to a
+	value evaluating to true, the processing will not be done upon the
+	AssociatedDataset, but upon its parent (e.g. the CollocatedDataset).
+
+	(Collapser):
+
+	- When incore is set, self fieldstruct.field.origin to cd; otherwise
+	to ad.
+
+	(process_granule):
+
+	- Respect new incore option to grab from code if indicated
+
+	* handy/rqre_alltypes.m:
+
+	- In doc, make rqre_datatype a link to the relevant help
+
+	* handy/rqre_datatype.m:
+
+	- In doc, make rqre_alltypes a link to the relevant help
+
+	* datasets/SatDataset.m/find_granule_first_line:
+
+	- Adapt for externalised unzipping in cloudsat reading routine; new
+	error identifier
+
 2012-07-16  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-253

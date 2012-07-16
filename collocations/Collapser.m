@@ -107,6 +107,14 @@ classdef Collapser < AssociatedDataset
         %       as for processors. Values are like for the <a href="matlab:help FieldCopier/fieldstruct_primary">Fieldcopier</a>.
         %       By default, no attributes are stored and all
         %       fields are stored as single (float).
+        %
+        %   incore      logical (scalar boolean)
+        %
+        %       If set to 'true', this field is not taken from the
+        %       AssociatedDataset, but from the AssociatedDataset's parent,
+        %       the CollocatedDataset or the core. This can be used to e.g.
+        %       calculate an average position or to store a vector of
+        %       line-numbers in the collapsed dataset.
         fieldstruct = []; 
         % Cell array of global limitators.
         %
@@ -167,9 +175,9 @@ classdef Collapser < AssociatedDataset
             
             self = self@AssociatedDataset(cd, {dependency}, varargin{:}); % call parent constructor
             
-            % make sure all members have at least 'processors' and
-            % 'limiters'; set noops where they don't.
-            % also populate actual 'members' structure
+            % make sure all members have at least 'processors',
+            % 'limiters', 'stored' and 'incore'; set appropiate
+            % values where they don't
             fields = fieldnames(fieldstruct);
             for i = 1:length(fields)
                 field = fields{i};
@@ -178,6 +186,14 @@ classdef Collapser < AssociatedDataset
                 end
                 if ~isfield(fieldstruct.(field), 'limitators');
                     fieldstruct.(field).limitators = {@(x)true(size(x, 1), 1)};
+                end
+                if ~isfield(fieldstruct.(field), 'incore')
+                    fieldstruct.(field).incore = false;
+                end
+                if fieldstruct.(field).incore
+                    fieldstruct.(field).origin = cd;
+                else
+                    fieldstruct.(field).origin = ad;
                 end
                 % populate one or more 'members' for this field
                 procnames = fieldnames(fieldstruct.(field).processors);
@@ -262,7 +278,7 @@ classdef Collapser < AssociatedDataset
                 mem = self.members.(memname);
                 warning('off', 'catstruct:DuplicatesFound');
                 self.members.(memname) = catstruct(...
-                    ad.members.(mem.orig_name), ...
+                    self.members.(memname).origin.members.(mem.orig_name), ...
                     self.members.(memname));
             end
             self.members2cols();
@@ -297,20 +313,25 @@ classdef Collapser < AssociatedDataset
                 % function on sub-limited set, if any are actually left
                 for k = 1:length(fields)
                     fname = fields{k};
+                    if self.fieldstruct.(fname).incore
+                        M_source = M_coll_part;
+                    else
+                        M_source = M_data_part;
+                    end
                     
                     % iteratively apply limitations, only if all
                     % limitations return true (including
                     % lim_for_all_fields) the collocation is selected for
                     % further average-processing
                     if isempty(self.fieldstruct.(fname).limitators);
-                        limsel = true(size(M_data_part, 1), 1);
+                        limsel = true(size(M_source, 1), 1);
                     else
                         limsel = lim_for_all_fields;
                         limmers = self.fieldstruct.(fname).limitators;
                         
                         for li = 1:length(limmers)
                             limmer = limmers{li};
-                            limhere = limmer(M_data_part(:, ad.cols.(fname)));
+                            limhere = limmer(M_source(:, self.fieldstruct.(fname).origin.cols.(fname)));
                             limsel = limsel(:) & limhere(:);
                         end
                     end
@@ -322,7 +343,7 @@ classdef Collapser < AssociatedDataset
                         for pi = 1:length(procnames)
                             procname = procnames{pi};
                             proccer = self.fieldstruct.(fname).processors.(procname);
-                            M(j, self.cols.([procname '_' fname])) = proccer(M_data_part(limsel, ad.cols.(fname)));
+                            M(j, self.cols.([procname '_' fname])) = proccer(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
                         end
                     end
                 end
