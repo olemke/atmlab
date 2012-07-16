@@ -12,14 +12,15 @@ Contributed with functions of various kind.
 
 Oliver Lemke <olemke@ltu.se>
 ---
+ARTS XML and NetCDF interface.
 Maintaining SVN repository and the mailing list.
-Created the XML format for data files.
 
 
 Salomon Eliasson <s.eliasson@ltu.se>
 ---
 GMT plotting interface, 
 some other small functions
+
 
 Gerrit Holl <gerrit.holl@ltu.se>
 ---
@@ -32,9 +33,11 @@ Christian Mätzler <christian.matzler@iap.unibe.ch>
 ---
 Mie scattering functions (ATMLAB/mie).
 
+
 Peter J. Acklam (pjacklam@online.no)
 ---
 Time and date utilities (main part of (ATMLAB/time). 
+
 
 Philipp Berens (berens@tuebingen.mpg.de )
 ---
@@ -47,3 +50,4 @@ http://www.jstatsoft.org/v31/i10
 
 Please cite this paper when the provided code is used. See licensing terms for
 details.
+
