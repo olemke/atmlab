@@ -69,6 +69,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %   find_granules_by_date -     Find all granules for date
     %   find_granules_for_period -  Find all granules for multi-day period
     %   find_granule_by_datetime -  Find granule starting at exact datetime
+    %   find_granule_by_unixsecs -  Similar, but in unixsecs
     %   find_extreme_granule -      Find first or last granule for dataset
     %
     %  Methods for reading granules:
@@ -584,6 +585,21 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             
         end        
+        
+        function datafile = find_granule_by_unixsecs(self, unixsecs, varargin)
+            % find_granule_by_unixsecs Find granule starting at indicated time
+            %
+            % IN
+            %
+            %   unixsecs    time in seconds since 1970-01-01T00:00:00Z
+            %
+            % ...remaining arguments passed on to <a href="matlab:help SatDataset/find_granule_by_datetime">find_granule_by_datetime</a>
+            
+
+            [year month day hour minute second] = unixsecs2date(unixsecs);
+            datafile = self.find_granule_by_datetime([year month day hour minute second], varargin{:});
+
+        end
         
         function [allgrans, allpaths] = find_granules_for_period(self, date1, date2, spec)            
             % find_granules_for_period List all granules for sat/dataset for period

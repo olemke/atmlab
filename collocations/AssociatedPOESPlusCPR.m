@@ -21,11 +21,12 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
     methods
         %% constructor
         
-        function self = AssociatedPOESPlusCPR(f_mhs, f_amsua, f_hirs, f_cpr, varargin)
+        function self = AssociatedPOESPlusCPR(pparent, f_mhs, f_amsua, f_hirs, f_cpr, varargin)
             % Create AssociatedPoesPlusCPR object
             %
             % IN
             %
+            %   parent      either mhs_cpr or amsub_cpr
             %   f_mhs       struct      fields from MHS
             %   f_amsua     struct      fields from AMSUA
             %   f_hirs      struct      fields from HIRS
@@ -33,9 +34,9 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             %
             % FIXME DOC
             d = datasets;
-            self = self@FieldMultiInstrumentCopier(d.CollocatedDataset_mhs_cpr, {}, varargin{:});
+            self = self@FieldMultiInstrumentCopier(pparent, {}, varargin{:});
             
-            self.parent = d.CollocatedDataset_mhs_cpr;
+            self.parent = pparent;
             self.fieldcopier_core = FieldCopier(self.parent, f_mhs, f_cpr, 'name', [self.name '_sub_mhs_cpr'], 'visible', false);
             self.fieldcopier_other_primary.amsua = FieldCopier(self.parent, f_amsua, struct(), 'name', [self.name '_sub_amsua'], 'visible', false);
             self.fieldcopier_other_primary.hirs = FieldCopier(self.parent, f_hirs, struct(), 'name', [self.name '_sub_hirs'], 'visible', false);

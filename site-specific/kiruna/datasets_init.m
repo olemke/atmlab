@@ -36,16 +36,15 @@ D.calipso.re = '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hour>\d{2})-(?<m
 
 D.cpr.basedir = '/storage3/data/cloudsat/2B-CWC-RO.R04';
 D.cpr.subdir = '$YEAR4/$DOY';
-D.cpr.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+D.cpr.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_(?<granule_number>\d{5})_CS_(?<product_name>[\dA-Z\-]*)_(?<subset>[A-Z]*)_(?<id>[A-Z])_(?<release>R[0-9]{2})_(?<epoch>E\d{2})(?<end>\.hdf.zip)';
 
 D.CPR_RVOD.basedir = '/storage3/data/cloudsat/2B-CWC-RVOD.R04';
 D.CPR_RVOD.subdir = '$YEAR4/$DOY';
-D.CPR_RVOD.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
+D.CPR_RVOD.re = D.cpr.re;
 
 D.CPR_CLDCLASS.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
 D.CPR_CLDCLASS.subdir = '$YEAR4/$DOY';
-D.CPR_CLDCLASS.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_.+(?<end>.{8}$)';
-
+D.CPR_CLDCLASS.re = D.cpr.re;
 
 D.dardar.basedir = '/storage3/data/dardar';
 D.dardar.subdir = '$YEAR4/$YEAR4_$MONTH_$DAY';
@@ -241,6 +240,13 @@ D.associated_amsub_mhs.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
 D.associated_amsub_amsub.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/amsub_amsub';
 D.associated_amsub_amsub.subdir = D.collocation_amsub_amsub.subdir;
 D.associated_amsub_amsub.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
+
+D.c2dp.basedir = '/storage3/user_data/gerrit/collocated_datasets/testing/c2dp';
+D.c2dp.subdir = '$YEAR4/$MONTH/$DAY';
+D.c2dp.filename = 'c2dp_fullday_$SAT.nc.gz';
+
+D.cdpc_2dcp.basedir = '/storage3/user_data/gerrit/collocated_datasets/testing/cdpc_2dcp';
+D.cdpc_2dcp.subdir = '$YEAR4/$DOY';
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');
 

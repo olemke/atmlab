@@ -1,3 +1,39 @@
+2012-07-18  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-255
+
+	* handy/nbytes2string.m: Added
+
+	- Provide human-readable format for disk size (32 MiB, 2.4 GiB, ...)
+
+	* datasets/SatDataset.m(find_granule_by_unixsecs): Added
+
+	- Like the old, deprecated function
+
+	* datasets/define_datasets.m:
+
+	- Add cdpc_2dcp, associated_CPR_MHS_AMSU_HIRS,
+	associated_CPR_AMSUB_AMSUA_HIRS, c2df
+
+	* datasets/define_c2dp.m:
+
+	- Added; special function because it needs subfunctions.
+
+	* collocations/AssociatedPOESPlusCPR.m:
+
+	- Can now create either for mhs_cpr or amsub_cpr
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Improve re for CPR datasets
+	
+	- Add c2dp and cdpc_2dcp
+
+	* handy/CachedData.m(set_entry),
+	handy/PersistentCachedData.m(set_entry):
+
+	- Use nbytes2string when reporting size
+
 2012-07-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-254

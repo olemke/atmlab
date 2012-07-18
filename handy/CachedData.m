@@ -77,7 +77,7 @@ classdef CachedData < handle
             
             logtext(atmlab('OUT'), 'Setting cache entry: %s (new size: ', s);
             self.cache.(s) = d;
-            fprintf(atmlab('OUT'), '%d entries, %d bytes)\n', length(fieldnames(self.cache)), self.cachesize());
+            fprintf(atmlab('OUT'), '%d entries, %s)\n', length(fieldnames(self.cache)), nbytes2string(self.cachesize()));
             if self.toolarge()
                 self.del_old_entry();
             end
