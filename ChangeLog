@@ -1,3 +1,12 @@
+2012-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-256
+
+	* arts/qarts2cfile.m: Removed reading of y_error (now not existing).
+
+	* arts/arts_y.m: y_error now just returned as NaN (temporarily
+	solution).
+
 2012-07-18  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-255

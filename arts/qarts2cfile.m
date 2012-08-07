@@ -705,7 +705,6 @@ function T = cfile_RteExe( Q, partname, workfolder )
   end
   %
   T{end+1} = add_savefile( 'y',       workfolder );
-  T{end+1} = add_savefile( 'y_error', workfolder );
   T{end+1} = add_savefile( 'y_f',     workfolder );
   T{end+1} = add_savefile( 'y_pol',   workfolder );
   T{end+1} = add_savefile( 'y_pos',   workfolder );

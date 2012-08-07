@@ -84,11 +84,6 @@ if nargout >= 2
 end
 
 
-if nargout >= 3
-  y_error = xmlLoad( fullfile( workfolder, 'y_error.xml' ) );
-end
-
-
 if nargout >= 4  
   y_aux = xmlLoad( fullfile( workfolder, 'y_aux.xml' ) );
 end
