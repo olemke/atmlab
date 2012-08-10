@@ -1,3 +1,13 @@
+2012-08-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-257
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- Fixed potentially very severe security bug: the semicolon (;) was
+	not removed from the filename, meaning that literally anything could
+	happen.
+
 2012-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-256

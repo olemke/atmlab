@@ -659,7 +659,7 @@ if ~isempty(in.title)
 else default.filename = 'default';
 end
 in = optargs_struct(in,default);
-in.filename = regexprep(in.filename,'[:=, ()*/<>!?%]','_');
+in.filename = regexprep(in.filename,'[:=, ()*/<>!?%;]','_');
 in.title = regexprep(in.title,'([()])','\\$1');
 in.title = regexprep(in.title,':',' ');
 
