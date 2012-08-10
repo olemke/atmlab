@@ -1,5 +1,18 @@
 2012-08-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-258
+
+	* handy/sanitise.m: Added
+
+	- Centralise functionality to sanitise input to be passed to
+	exec_system_cmd (thus to system).
+
+	* handy/exec_system_cmd.m: Added link to sanitise in documentation.
+
+	* geoplots/gmt/gmt_plot.m: Use sanitise for dir and file
+
+2012-08-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-257
 
 	* geoplots/gmt/gmt_plot.m:

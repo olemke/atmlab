@@ -640,10 +640,9 @@ default.color_foreground  = '255/255/255';
 
 in = optargs_struct(in,default);
 
-if any(ismember(in.outdir,' '))
-    error(['gmtlab:' mfilename ':input'],...
-        '"spaces" ar not supported for outdir (%s)',in.outdir)
-elseif strcmp(in.outdir(1),'~')
+in.outdir = sanitise(in.outdir);
+
+if strcmp(in.outdir(1),'~')
     % netcdffunctions don't like ~ for home
     in.outdir = [getenv('HOME') '/' in.outdir(2:end)];
 end
@@ -659,7 +658,7 @@ if ~isempty(in.title)
 else default.filename = 'default';
 end
 in = optargs_struct(in,default);
-in.filename = regexprep(in.filename,'[:=, ()*/<>!?%;]','_');
+in.filename = sanitise(in.filename);
 in.title = regexprep(in.title,'([()])','\\$1');
 in.title = regexprep(in.title,':',' ');
 

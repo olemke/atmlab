@@ -4,6 +4,11 @@ function [out,retvals] = exec_system_cmd(cmd, varargin)
 %
 % Executes one or more system commands.
 %
+% You are strongly recommended to pass each of them through sanitise first,
+% as to avoid potentially destroying the universe. The safest alternative
+% is usually not to use exec_system_cmd if it can be avoided (e.g. for
+% deleting files).
+%
 % If any command returns an error code not equal to 0, this function will
 % throw an error with the error identifier 'atmlab:exec_system_cmd:shell'.
 %
@@ -38,6 +43,8 @@ function [out,retvals] = exec_system_cmd(cmd, varargin)
 % USAGE
 %
 %   [out,ret] = exec_system_cmd(cmd, varargin)
+%
+% See also: sanitise
 %
 % updated by: Salomon, Gerrit
 % Author: Oliver Lemke
