@@ -676,8 +676,12 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
                                           workfolder, Q.INPUT_FILE_FORMAT );
   end
-  if qarts_isset( Q.IY_CLEARSKY_AGENDA )
-    T = add_agenda( T, 'iy_clearsky_agenda', Q.IY_CLEARSKY_AGENDA );
+  if qarts_isset( Q.IY_MAIN_AGENDA )
+    T = add_agenda( T, 'iy_main_agenda', Q.IY_MAIN_AGENDA );
+  end
+  if qarts_isset( Q.IY_AUX_VARS )
+    T{end+1} = file_or_data( 'iy_aux_vars', 'ArrayOfString', Q.IY_AUX_VARS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );

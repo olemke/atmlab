@@ -1,7 +1,7 @@
 % QARTS_DEMO   A simple demonstration of Qarts
 %
-%    Gives an example on basic usage of Qarts. No include files are used, beside
-%    absorption model data, and all settings are done inside the file. 
+%    Gives an example on basic usage of Qarts. No include files are used, 
+%    beside absorption model data, and all settings are done inside the file. 
 %
 %    The example simulated Odin-SMR observations around 501 GHz, but 
 %    with a simplified set-up. 
@@ -44,7 +44,7 @@ Q.OUTPUT_FILE_FORMAT    = 'ascii';
 %
 Q.ATMOSPHERE_DIM        = 1;
 %
-Q.P_GRID                = z2p_simple( [0:500:45e3 46e3:1e3:100e3]' );
+Q.P_GRID                = z2p_simple( [0:500:45e3 46e3:1e3:95e3]' );
 %
 arts_xmldata_path       = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
@@ -52,7 +52,7 @@ if isnan( arts_xmldata_path )
 end
 %
 Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                        'fascod', 'tropical' );
+                                                       'fascod', 'tropical' );
 Q.RAW_ATM_EXPAND_1D     = false;
 %
 Q.WIND_U_FIELD          = [];
@@ -110,7 +110,7 @@ Q.WSMS_AT_START{end+1}  = 'NumericSet(molarmass_dry_air,28.966)';
 
 %= Set RTE variables (refraction is here neglected)
 %
-Q.IY_CLEARSKY_AGENDA    = { 'iyEmissionStandardClearsky' };
+Q.IY_MAIN_AGENDA        = { 'iyEmissionStandard' };
 Q.BLACKBODY_RADIATION_AGENDA = { 'blackbody_radiationPlanck' };
 Q.IY_SPACE_AGENDA       = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                             'MatrixCBR(iy,stokes_dim,f_grid)' };
@@ -119,7 +119,8 @@ Q.SURFACE_RTPROP_AGENDA = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                             'atmosphere_dim, p_grid, lat_grid,', ...
                             'lon_grid, z_field, rte_pos, t_field)'], ...
                             'surfaceBlackbody' };
-Q.IY_SURFACE_AGENDA    = { 'iySurfaceRtpropAgenda' };
+Q.IY_SURFACE_AGENDA     = { 'iySurfaceRtpropAgenda' };
+Q.IY_AUX_VARS           = [];
 %
 Q.YCALC_WSMS            = { 'yCalc' };
 %

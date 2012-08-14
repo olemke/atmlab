@@ -4,7 +4,7 @@
 %    (or at least almost all) variable created during an ARTS run.
 %
 %    A "normal" calculation is performed, corresponding to *arts_y*. Such
-%    an ARTS run include RteCalc and calculation of jacobians (pending on
+%    an ARTS run include yCalc and calculation of jacobians (pending on
 %    state of Q.J). At the end of the control file, saving of the 
 %    variables specified in *vnames1* is added. These files are later 
 %    loaded into Matlab and the content is copied to the output argument
@@ -13,11 +13,13 @@
 %    To extract y and ppath for the case in *qarts_demo*:
 %
 %       Q = qarts_demo;
-%       vnames1 = {'y','ppath'};
+%       vnames1 = {'y','z_field'};
 %       V1 = arts_abcde(Q,vnames1);
 %
 %    First element of V1 (V1{1}) will then be y, and the second element
-%    ppath.
+%    z_field.
+%
+%    The stuff below is presently not working, but will be updated later:
 %
 %    It is also possible to extract indexed files. That is, file stored
 %    by the WSM WriteXMLIndexed. This is done with the second pair of
@@ -89,7 +91,8 @@ S     = S(1:end-1);
 %
 for i = 1:length(vnames1)
   filename = fullfile( workfolder, [ vnames1{i}, '.xml' ] ); 
-  S{end+1} = sprintf('WriteXML(%s){"%s"}', vnames1{i}, filename );
+  S{end+1} = sprintf('WriteXML("%s",%s,"%s")', Q.OUTPUT_FILE_FORMAT, ...
+                                                        vnames1{i}, filename );
 end
 
 %= Add closing 

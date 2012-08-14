@@ -1,3 +1,19 @@
+2012-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-259
+
+	* arts/arts_abcde.m: Updated for V1 part. (V2 requires further
+	changes in arts).
+
+	* arts/arts_y.m (arts_y): y_error rtemoved as output argument.
+
+	* demos/qarts_demo.m: Updated.
+
+	* arts/qarts2cfile.m: Adopted to changes below.
+
+	* arts/qarts.m (qarts): Added IY_AUX_VARS and changed
+	IY_CLEARSKY_AGENDA to IY_MAIN_AGENDA.
+
 2012-08-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-258

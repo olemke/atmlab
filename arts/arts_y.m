@@ -6,13 +6,12 @@
 %    active selection through J_DO. Otherwise NaN is returned.
 %    variables.
 %
-% FORMAT   [y,ydata,y_error,y_aux,J,jq,ji] = arts_y( Q [, workfolder] )
+% FORMAT   [y,ydata,y_aux,J,jq,ji] = arts_y( Q [, workfolder] )
 %        
 % OUT   y            Spectrum vector.
 %       ydata        Data to determine frequency, position and LOS for each 
 %                    value of *y*. A structure with fields: 
 %                    'f', 'pol', 'pos' and 'los', corresponding to *y_f* etc.
-%       y_error      Estimate of calculation accuracy (see *y_error*).
 %       y_aux        Auxilary data (see *y_aux*).
 %       J            Jacobian. NaN returned if Q.J not defined.
 %       jq           Jacobian quantities. NaN returned if Q.J not defined.
@@ -28,7 +27,7 @@
 
 % 2004-09-17   Created by Patrick Eriksson.
 
-function [y,ydata,y_error,y_aux,J,jq,ji] = arts_y( Q, workfolder )
+function [y,ydata,y_aux,J,jq,ji] = arts_y( Q, workfolder )
 %
 if nargin < 2, workfolder = []; end
                                                                          %&%
@@ -41,7 +40,6 @@ rqre_datatype( workfolder, {@isempty,@ischar} );                         %&%
 
 %- Default output
 %
-y_error = NaN;
 y_aux   = NaN;
 J       = NaN;
 jq      = NaN;
@@ -58,7 +56,7 @@ end
 
 %- Avoid unnecessary calculations
 %
-if nargout < 5
+if nargout < 4
   Q.J_DO = false;
 end
 
@@ -84,11 +82,11 @@ if nargout >= 2
 end
 
 
-if nargout >= 4  
+if nargout >= 3 
   y_aux = xmlLoad( fullfile( workfolder, 'y_aux.xml' ) );
 end
 
-if nargout >= 5  & qarts_isset( Q.J_DO ) &  Q.J_DO
+if nargout >= 4  & qarts_isset( Q.J_DO ) &  Q.J_DO
   %
   J = xmlLoad( fullfile( workfolder, 'jacobian.xml' ) );
   %
