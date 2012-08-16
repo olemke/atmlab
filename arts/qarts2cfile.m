@@ -553,7 +553,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
-      T = add_agenda( T, 'abs_scalar_gas_agenda', {'abs_scalar_gasCalcLBL'} );
+      T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
+                   'abs_mat_per_speciesInit', 'abs_mat_per_speciesCalcLBL' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -588,8 +589,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       end
       %
       T{end+1} = 'abs_lookupCreate'; 
-      T        = add_agenda( T, 'abs_scalar_gas_agenda', ... 
-                                       { 'abs_scalar_gasExtractFromLookup' } );
+      T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
+              'abs_mat_per_speciesInit', 'abs_scalar_gasExtractFromLookup' } );
       %
       abstable = true;
       %   
@@ -598,8 +599,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
-      T        = add_agenda( T, 'abs_scalar_gas_agenda', ...
-                                       { 'abs_scalar_gasExtractFromLookup' } );
+      T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
+              'abs_mat_per_speciesInit', 'abs_scalar_gasExtractFromLookup' } );
       %
       abstable = true;
       %
