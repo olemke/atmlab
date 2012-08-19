@@ -1,3 +1,14 @@
+2012-08-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-261
+
+	* geoplots/gmt/gmt_plot.m:
+	Fixed bugs related to: in.nodata, in.region where lons 0:360
+	regime, and some incorrect documentation on in.psbox
+
+	* geoplots/gmt/psbox.m: Fixed bug
+	* geoplots/gmt/makepolar.m: Fixed bug
+
 2012-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-260

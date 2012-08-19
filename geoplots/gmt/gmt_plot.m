@@ -477,7 +477,7 @@ function filename = gmt_plot(in,field)
 %--------------------------------------------------------------------------
 %
 % DRAW SHAPES ON MAP:
-%
+%  in.psbox = [%f %f %f %f]
 % in.psbox.           | Structure with one or more of the following fields:
 %
 %                     ----------------------
@@ -561,12 +561,16 @@ if ~exist('field','var') && isfield(in,'data')
     field = 'data';
 end
 
-assert(logical(exist('field','var')),['atmlab:' mfilename ':badInput'],...
+assert(logical(exist('field','var')) || (isfield(in,'nodata')&&in.nodata) ,...
+    ['atmlab:' mfilename ':badInput'],...
     'I need a "field".\nIf you want to plot the map with no data, input in.nodata=true')
 
 check_input(in)
 
-out = set_GMT_plot(in,field);
+if isfield(in,'nodata')&&in.nodata
+    out = set_GMT_plot(in);
+else out = set_GMT_plot(in,field);
+end
 
 % make TEMPDIR and set atmlab('VERBOSITY') to gmtlab('VERBOSITY')
 % cleanup after I'm done
@@ -699,14 +703,19 @@ if in.gridded
         errId,'numel(data) must length(lat)*length(lon)')
     [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
     
+    
     % DO some special treatment of data crossing the dateline that is not continuous
-    % after changing to -180:180 regime
-    if max(diff(in.lon))>5*min(diff(in.lon))
-        % check to see if there is a sizeable gap in the data e.g. 80->300
+    % after changing to -180:180 regime OR if in.region is in 0:360 mode
+
+    if max(diff(in.lon))>5*min(diff(in.lon)) || ...
+            structfun(@str2double,regexp(in.region,'.+/(?<lnmax>.+)/.+/.+','names')) > 180 % this is a 360 test
+        
        in.lon = in.lon+(in.lon < 0)*360;
        [in.lon,lnindex] = sort(in.lon);
         in.(field) = in.(field)(:,lnindex);
     end
+    
+    
     assert(max(diff(in.lon))<5*min(diff(in.lon)),['atmlab:' mfilename, ':Error'],...
         'The longitudes are not continuous. FIXME: put workaround in place')
     

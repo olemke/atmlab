@@ -167,10 +167,17 @@ TT = sum(tickval > ref ) -whitedomain;
 BT = BT*(BT>=0);
 TT = TT*(TT>=0);
 
-% if reference is on the EDGE
+% if reference is close to an EDGE
 if BT < whitedomain || TT < whitedomain
-    if BT < whitedomain, nw = whitedomain-BT; end
-    if TT < whitedomain, nw = whitedomain-TT; end
+    if BT < whitedomain
+        nw = nw - (whitedomain-BT);
+        TT = TT + (whitedomain-BT);
+    end
+    if TT < whitedomain
+        nw = nw - (whitedomain-TT);
+        BT = BT + (whitedomain-TT);
+        
+    end
     %nw = nw - mod(nw,2); %not sure why this is here
 end
 %special 
