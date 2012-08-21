@@ -471,7 +471,7 @@ return
 %
 %    basic absorption variables, such as abs_lines (if used)
 %    abs_lookup  (if used)
-%    abs_scalar_gas_agenda
+%    abs_mat_per_species_agenda
 %    blackbody_radiation_agenda
 %
 function T = cfile_Absrpt( Q, partname, workfolder )
@@ -590,7 +590,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       %
       T{end+1} = 'abs_lookupCreate'; 
       T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-              'abs_mat_per_speciesInit', 'abs_scalar_gasExtractFromLookup' } );
+         'abs_mat_per_speciesInit', 'abs_mat_per_speciesExtractFromLookup' } );
       %
       abstable = true;
       %   
@@ -600,7 +600,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
       T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-              'abs_mat_per_speciesInit', 'abs_scalar_gasExtractFromLookup' } );
+         'abs_mat_per_speciesInit', 'abs_mat_per_speciesExtractFromLookup' } );
       %
       abstable = true;
       %
@@ -1333,9 +1333,6 @@ function T = cfile_CldBox( Q, partname, workfolder )
 
   %= Agendas for scattering properties 
   %
-  if qarts_isset(Q.CLOUDBOX.OPT_PROP_GAS_AGENDA)
-    T = add_agenda( T, 'opt_prop_gas_agenda', Q.CLOUDBOX.OPT_PROP_GAS_AGENDA );
-  end
   if qarts_isset(Q.CLOUDBOX.OPT_PROP_PART_AGENDA)
     T = add_agenda( T, 'opt_prop_part_agenda', Q.CLOUDBOX.OPT_PROP_PART_AGENDA);
   end

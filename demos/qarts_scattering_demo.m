@@ -79,7 +79,7 @@ Q.ABS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
 %
 Q.ATMOSPHERE_DIM      = 1;
 %
-Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:100e3] )';
+Q.P_GRID              = z2p_simple( [0:500:45e3 46e3:1e3:80e3] )';
 %
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
@@ -115,7 +115,7 @@ Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan )';
 %
 if strcmp( lower(method), 'bl' )
-  Q.IY_CLEARSKY_AGENDA = { 'iyBeerLambertStandardClearsky' };
+  Q.IY_MAIN_AGENDA     = { 'iyBeerLambertStandardClearsky' };
   Q.IY_SPACE_AGENDA    = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                            'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
   Q.Y_UNIT             = '1';
@@ -174,19 +174,15 @@ C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
 %C.PND_FIELD{1}.data = 0.2 * C.PND_FIELD{1}.data;
 
+
 % Set up scattering method
-
-%- Agenda used by both DOIT and MC
 %
-C.OPT_PROP_GAS_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddGas', ...
-                                                        'abs_vecAddGas' };
-
 if strcmp( lower(method), 'mc' )
   %
   C.METHOD                        = 'MC';
-  Q.IY_CLEARSKY_AGENDA            = { 'Ignore( iy_error )', ...
-                                      'Ignore( iy_error_type )', ...
-                                      'Ignore( mblock_index )', 'iyMC' };    
+  Q.IY_MAIN_AGENDA                = { 'Ignore( mblock_index )', 'iyMC', ...
+                                      'Touch(ppath)' };
+  Q.IY_AUX_VARS                   = { 'Error (uncorrelated)' };
   %
   C.METHOD_PRMTRS.STD_ERR         = m_arg;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
@@ -318,8 +314,13 @@ Q.CLOUDBOX    = C;
 
 % Calculate radiances with scattering
 %
-[y,ydata,dy] = arts_y( Q );
-
+if strcmp( lower(method), 'mc' )
+  [y,ydata,y_aux] = arts_y( Q );
+  dy = y_aux{1};
+else
+  y  = arts_y( Q );
+  dy = NaN;
+end
 
 return
 
