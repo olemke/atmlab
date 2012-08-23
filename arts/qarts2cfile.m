@@ -626,6 +626,7 @@ return
 %    surface_rtprop_agenda
 %    iy_surface_agenda
 %    iy_space_agenda
+%    iy_transmitter_agenda
 %    ppath_lmax
 %    ppath_lraytrace
 %    ppath_step_agenda
@@ -650,6 +651,9 @@ function T = cfile_RteSet( Q, partname, workfolder )
   end
   if qarts_isset( Q.IY_SPACE_AGENDA )
     T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
+  end
+  if qarts_isset( Q.IY_TRANSMITTER_AGENDA )
+    T = add_agenda( T, 'iy_transmitter_agenda', Q.IY_TRANSMITTER_AGENDA );
   end
   if qarts_isset( Q.PPATH_LMAX )
     rqre_datatype( Q.PPATH_LMAX, @istensor0, 'Q.PPATH_LMAX' );              %&%
@@ -1256,9 +1260,10 @@ function T = cfile_CldBox( Q, partname, workfolder )
   %
   qcheck( @qartsCloudbox, Q.CLOUDBOX );
 
-  rqre_datatype( Q.CLOUDBOX.METHOD, @ischar, 'Q.Q.CLOUDBOX.METHOD' );       %&%
-  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC','FOS','BL'} ) )        %&%
-    error( 'Q.CLOUDBOX.METHOD must be ''DOIT'', ''MC'' or ''FOS''.' )       %&%
+  rqre_datatype( Q.CLOUDBOX.METHOD, @ischar, 'Q.CLOUDBOX.METHOD' );         %&%
+  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC','FOS','NONE'} ) ) %&%
+    error( ...                                                              %&% 
+       'Q.CLOUDBOX.METHOD must be ''DOIT'', ''MC'', ''FOS'' or ''none''.' ) %&%
   end                                                                       %&%
 
   %= Cloudbox
@@ -1471,7 +1476,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     %
     T = {};
     %
-  elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'BL' )
+  elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'NONE' )
     %
     T = {};
     %

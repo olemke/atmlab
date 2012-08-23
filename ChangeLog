@@ -1,3 +1,15 @@
+2012-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-263
+
+	* demos/qarts_scattering_demo.m: BL part now qworking again.
+
+	* arts/qartsCloudbox.m (qartsCloudbox): Updated information for
+	METHOD.
+
+	* arts/qarts2cfile.m (cfile_RteSet):
+	* arts/qarts.m (qarts): Added IY_TRANSMITTER_AGENDA.
+
 2012-08-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-262

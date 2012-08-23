@@ -115,8 +115,8 @@ Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan )';
 %
 if strcmp( lower(method), 'bl' )
-  Q.IY_MAIN_AGENDA     = { 'iyBeerLambertStandardClearsky' };
-  Q.IY_SPACE_AGENDA    = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
+  Q.IY_MAIN_AGENDA     = { 'iyTransmissionStandard' };
+  Q.IY_TRANSMITTER_AGENDA = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                            'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
   Q.Y_UNIT             = '1';
 else
@@ -238,15 +238,9 @@ elseif strcmp( lower(method), 'fos' )
 
 elseif strcmp( lower(method), 'bl' )
   %
-  C.METHOD                        = 'BL';
-  %
-  Q.WSMS_BEFORE_RTE{end+1}        = 'AgendaSet( iy_cloudbox_agenda ){';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_p)';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lat)';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   Ignore(rte_gp_lon)';
-  Q.WSMS_BEFORE_RTE{end+1}        = '   iyBeerLambertStandardCloudbox';
-  Q.WSMS_BEFORE_RTE{end+1}        = '}';
-  
+  C.METHOD = 'none';
+
+    
 else
   error( ...
     'Allowed options for *method* are ''doit'', ''mc'', ''fos'' and ''bl''.' );
