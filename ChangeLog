@@ -1,3 +1,12 @@
+2012-09-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-264
+
+	* handy/combine_pdfs.m: Added option to scale individual figures
+	for plotting. Useful if figures have very different sizes.
+
+	* geoplots/gmt/gmt_plot.m: fixed small region related bug
+
 2012-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-263

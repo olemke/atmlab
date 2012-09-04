@@ -702,27 +702,7 @@ if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
     [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
-    
-    
-    % DO some special treatment of data crossing the dateline that is not continuous
-    % after changing to -180:180 regime OR if in.region is in 0:360 mode
 
-    if max(diff(in.lon))>5*min(diff(in.lon)) || ...
-            structfun(@str2double,regexp(in.region,'.+/(?<lnmax>.+)/.+/.+','names')) > 180 % this is a 360 test
-        
-       in.lon = in.lon+(in.lon < 0)*360;
-       [in.lon,lnindex] = sort(in.lon);
-        in.(field) = in.(field)(:,lnindex);
-    end
-    
-    
-    assert(max(diff(in.lon))<5*min(diff(in.lon)),['atmlab:' mfilename, ':Error'],...
-        'The longitudes are not continuous. FIXME: put workaround in place')
-    
-    if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
-        logtext(1,'Data does not appear to be centered. Internally ')
-        in = centerGeoData(in,field);
-    end
 end
 
 % REGION
@@ -783,6 +763,27 @@ else
         errId,'lat or lon are empty')
 end
 
+if in.gridded
+    % DO some special treatment of data crossing the dateline that is not continuous
+    % after changing to -180:180 regime OR if in.region is in 0:360 mode
+
+    if max(diff(in.lon))>5*min(diff(in.lon)) || ...
+            structfun(@str2double,regexp(in.region,'.+/(?<lnmax>.+)/.+/.+','names')) > 180 % this is a 360 test
+        
+       in.lon = in.lon+(in.lon < 0)*360;
+       [in.lon,lnindex] = sort(in.lon);
+        in.(field) = in.(field)(:,lnindex);
+    end
+    
+    
+    assert(max(diff(in.lon))<5*min(diff(in.lon)),['atmlab:' mfilename, ':Error'],...
+        'The longitudes are not continuous. FIXME: put workaround in place')
+    
+    if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
+        logtext(1,'Data does not appear to be centered. Internally ')
+        in = centerGeoData(in,field);
+    end
+end
 % DATARANGE
 if ~in.nodata
     default.datarange     = getdatarange(in,field); %
