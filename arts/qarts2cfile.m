@@ -554,7 +554,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
       T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-                   'abs_mat_per_speciesInit', 'abs_mat_per_speciesCalcLBL' } );
+                   'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddLBL' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -590,7 +590,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       %
       T{end+1} = 'abs_lookupCreate'; 
       T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-         'abs_mat_per_speciesInit', 'abs_mat_per_speciesExtractFromLookup' } );
+         'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
       %
       abstable = true;
       %   
@@ -600,7 +600,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
       T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-         'abs_mat_per_speciesInit', 'abs_mat_per_speciesExtractFromLookup' } );
+         'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
       %
       abstable = true;
       %
@@ -681,8 +681,15 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
                                           workfolder, Q.INPUT_FILE_FORMAT );
   end
+  if qarts_isset( Q.TRANSMITTER_POS )
+    T{end+1} = file_or_data( 'transmitter_pos', 'Matrix', Q.TRANSMITTER_POS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
   if qarts_isset( Q.IY_MAIN_AGENDA )
     T = add_agenda( T, 'iy_main_agenda', Q.IY_MAIN_AGENDA );
+  end
+  if qarts_isset( Q.IY_SUB_AGENDA )
+    T = add_agenda( T, 'iy_sub_agenda', Q.IY_SUB_AGENDA );
   end
   if qarts_isset( Q.IY_AUX_VARS )
     T{end+1} = file_or_data( 'iy_aux_vars', 'ArrayOfString', Q.IY_AUX_VARS,...

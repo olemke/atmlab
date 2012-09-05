@@ -1,3 +1,16 @@
+2012-09-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-265
+
+	* demos/qarts_demo.m (qarts_demo): New settings for
+	TRANSMITTER_POS and PPATH_AGENDA.
+
+	* arts/qarts2cfile.m (cfile_RteSet): Added handling of the
+	variables added below.
+	(cfile_Absrpt): Updated to change of absorption WSMs.
+
+	* arts/qarts.m: Added IY_SUB_AGENDA and TRANSMITTER_POS.
+
 2012-09-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-264

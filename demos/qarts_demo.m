@@ -126,10 +126,9 @@ Q.YCALC_WSMS            = { 'yCalc' };
 %
 Q.PPATH_LMAX            = 20e3;
 Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
-                            'Ignore(edensity_field)', 'Ignore(f_index)', ... 
+                            'Ignore(edensity_field)', 'Ignore(f_grid)', ... 
                             'ppath_stepGeometric' };
-Q.PPATH_AGENDA          = { 'Ignore(mblock_index)', 'ppathStepByStep', ...
-                            'Touch(rte_los)' };
+Q.PPATH_AGENDA          = { 'Ignore(rte_pos2)', 'ppathStepByStep' };
 Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
 %
 Q.STOKES_DIM            = 1;
@@ -138,6 +137,7 @@ Q.Y_UNIT                = 'RJBT';
 zplat                   = 600e3;
 Q.SENSOR_POS            = zplat;
 Q.SENSOR_LOS            = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan );
+Q.TRANSMITTER_POS       = [];
 
   
 %= Sensor
