@@ -1,3 +1,13 @@
+2012-09-11  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-266
+
+	* graphs/scatter_density_plot.m:
+
+	- Started re-implementing code Salomon used for his comparison plots.
+	Currently contains a fraction of the functionality, but in a much
+	cleaner form. To be continued.
+
 2012-09-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-265
