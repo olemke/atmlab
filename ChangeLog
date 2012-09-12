@@ -1,3 +1,11 @@
+2012-09-12  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-267
+
+	* arts/qarts2cfile.m:
+
+	Rename abs_mat_per_speciesAddLBL -> abs_mat_per_speciesAddOnTheFly.
+
 2012-09-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-266

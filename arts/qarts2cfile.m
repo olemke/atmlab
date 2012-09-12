@@ -554,7 +554,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
       T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-                   'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddLBL' } );
+                   'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddOnTheFly' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
