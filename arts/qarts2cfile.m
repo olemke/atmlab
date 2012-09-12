@@ -553,8 +553,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
-      T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-                   'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddOnTheFly' } );
+      T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
+                'Ignore(rte_mag)', 'Ignore(ppath_los)', ...
+                'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddOnTheFly' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -589,8 +590,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       end
       %
       T{end+1} = 'abs_lookupCreate'; 
-      T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-         'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
+      T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
+          'Ignore(rte_mag)', 'Ignore(ppath_los)', ...
+          'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
       %
       abstable = true;
       %   
@@ -599,8 +601,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
-      T = add_agenda( T, 'abs_mat_per_species_agenda', { 'Ignore(rte_mag)', ...
-         'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
+      T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
+           'Ignore(rte_mag)', 'Ignore(ppath_los)', ...
+           'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
       %
       abstable = true;
       %
@@ -887,11 +890,6 @@ function T = cfile_Sensor( Q, partname, workfolder )
         if qarts_isset( Q.MBLOCK_AA_GRID ) 
           U{end+1} = file_or_data( 'mblock_aa_grid', 'Vector', ...
                        Q.MBLOCK_AA_GRID, workfolder, Q.INPUT_FILE_FORMAT );
-        end
-        if qarts_isset( H.SENSOR_NORM )
-          rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%
-                                         'Q.SENSOR_RESPONSE.SENSOR_NORM' ); %&%
-          U{end+1} = sprintf( 'IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
         end
         if qarts_isset( H.SENSOR_NORM )
           rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%

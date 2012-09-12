@@ -1,3 +1,14 @@
+2012-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-268
+
+	* arts/qartsSensor.m (qartsSensor): Corrected info for
+	SIDEBAND_RESPONSE.
+
+	* arts/qarts2cfile.m (cfile_Sensor): sensor_norm was set twice.
+
+	* arts/qarts.m (qarts): I.IY_AUX_VARS was misspelled.
+
 2012-09-12  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-267
