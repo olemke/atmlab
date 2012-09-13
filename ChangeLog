@@ -1,3 +1,15 @@
+2012-09-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-269
+
+	* graphs/scatter_density_plot.m: Expanded and bugfix
+
+	- options 'medprops', 'scatprops' and 'diagonal' specify style for
+	adding those three to the plot, with [] (default) meaning not drawing
+	anything
+
+	- Fixed bug in drawing median binned by y-value
+
 2012-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-268

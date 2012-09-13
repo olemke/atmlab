@@ -4,7 +4,9 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %
 % Create a scatter-density plot in the style of Eliasson et. al (2012).
 % This routine plots a 2-dimensional histogram between the provided
-% variables and plots median y(x) and median x(y) in the same graph.
+% variables, optionally plotting median y(x), median x(y) and the actual
+% measurement points in the same graph.
+%
 % Adding labels, titles, axes-properties etc. is not done in this function,
 % but should be done by the user manually, or by passing the 'axprops'
 % option. See below for an example.
@@ -19,7 +21,9 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %       invtrans    inverse of trans, e.g. @(x)10.^(x)
 %       axprops     structure with axes properties
 %       ncolour     number of unique colours
-%       medprops    structure with props for median-lines
+%       medprops    if defined, structure with props for median-lines
+%       scatprops   if defined, structure with props for scatter-points
+%       diagonal    if defined, structure with props for diag-line
 %       ...
 %
 % OUT
@@ -35,6 +39,7 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %   opts.invtrans = @(x)10.^(x); % inverse transformation
 %   opts.axprops.xscale = 'log'; % logarithmic x-scale
 %   opts.axprops.yscale = 'log'; % idem dito
+%   opts.medprops = struct('LineWidth', 3, 'LineStyle', '-', 'Color', [0 0 0]);
 %   [h_ax, h_cb] = scatter_density_plot(x, y, opts);
 %
 %
@@ -49,7 +54,9 @@ defaults = struct(...
     'invtrans', @(x)x, ...
     'axprops', struct(), ...
     'ncolour', 20, ...
-    'medprops', struct('LineWidth', 3, 'LineStyle', '-', 'Color', [0 0 0]));
+    'medprops', [], ...
+    'scatprops', [], ...
+    'diagonal', []);
 opts = optargs(varargin, {defaults});
 opts = optargs_struct(opts, defaults);
 
@@ -59,6 +66,8 @@ opts = optargs_struct(opts, defaults);
 [N, BX, BY] = hist2d(opts.trans(x), opts.trans(y), opts.bins, opts.bins);
 xbins = BX(1, :);
 ybins = BY(:, 1);
+
+%% plot the actual 2d-histogram
 pcolor(opts.invtrans(xbins), opts.invtrans(ybins), N);
 
 set(gca(), opts.axprops);
@@ -72,8 +81,22 @@ set(gcf(), 'colormap', largecolour);
 
 %plot_quantiles();
 hold('on');
-plot_medians(x, y, xbins, opts);
-plot_medians(y, x, ybins, opts);
+if ~isempty(opts.medprops)
+    plot_medians(x, y, xbins, ybins, opts);
+end
+
+%% plot actual measurements
+
+if ~isempty(opts.scatprops)
+    plot(x, y, opts.scatprops);
+end
+
+%% plot diagonal
+
+if ~isempty(opts.diagonal)
+    plot([1e-3 1e6], [1e-3 1e6], opts.diagonal);
+end
+%plot_medians(y, x, ybins, opts);
 
 h_ax = gca();
 h_cb = colorbar();
@@ -86,10 +109,13 @@ set(gca, 'layer', 'top'); % otherwise grid is below everything
 
 end
 
-function plot_medians(x, y, xbins, opts)
-binned = bin(opts.trans(x), opts.trans(y), xbins);
-medians = cellfun(@median, binned);
-plot(opts.invtrans(xbins), opts.invtrans(medians), opts.medprops);
+function plot_medians(x, y, xbins, ybins, opts)
+binned_x = bin(opts.trans(x), opts.trans(y), xbins);
+binned_y = bin(opts.trans(y), opts.trans(x), ybins);
+medians_x = cellfun(@median, binned_x);
+medians_y = cellfun(@median, binned_y);
+plot(opts.invtrans(xbins), opts.invtrans(medians_x), opts.medprops);
+plot(opts.invtrans(medians_y), opts.invtrans(ybins), opts.medprops);
 
 end
 
