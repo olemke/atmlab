@@ -3,6 +3,16 @@ function S = common_read_dardarsub(file, varargin)
     %
     % format as other common_read_-functions.
     %
+    % You can read special fields here:
+    %               "dardar_IWP" is just the column integral of IWC, 
+    %               "dardar_ln_IWP_uncertainty" is the column intral
+    %               uncertainty. It has twice as many elements since it
+    %               reports a minimum IWP and a maximum IWP 
+    %
+    %
+    % NOTE: This function only reads the sub selected data saved as netcdf
+    % on our servers. For regular DARDAR data use common_read_dardar
+    %
     % $Id$
 
     core_fields   = {'time','lat','lon'};
@@ -51,7 +61,7 @@ switch field
             S.(F{1}) = loadncvar(file, F{1});
         end
     case 'dardar_ln_IWP_error'
-        dependent_fields = {'ln_iwc_error','height'};
+        dependent_fields = {'ln_iwc_error','iwc','height'};
         rmflag = ~ismember(dependent_fields,fieldnames(S));
         for F = dependent_fields
             S.(F{1}) = loadncvar(file, F{1});
@@ -68,8 +78,13 @@ switch field
 
     case 'dardar_ln_IWP_error'
         
-        S.dardar_ln_IWP_error = column_integrate(S,{'ln_iwc_error','height'})';
-
+        % iwc_max = exp(ln(iwc)+ln_iwc_error)
+        %          = exp(ln(iwc)) * exp(ln_iwc_error)
+        %         = iwc * exp(ln_iwc_error)
+        S.dardar_IWP_error_max = column_integrate(catstruct(S,struct('maxError',S.iwc.*exp(S.ln_iwc_error))),{'maxError','height'})';
+        
+        S.dardar_IWP_error_min = column_integrate(catstruct(S,struct('minError',S.iwc.*exp(-S.ln_iwc_error))),{'minError','height'})';
+        
 end
 
 S=rmfield(S,dependent_fields(rmflag));

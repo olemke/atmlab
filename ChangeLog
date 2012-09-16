@@ -1,3 +1,11 @@
+2012-09-16  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-270
+
+	* datasets/common_read_dardarsub.m:
+	Implemented column integration of ln_iwc_error. Will produce two
+	IWP vectors based on IWC-delta and IWC+delta.
+
 2012-09-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-269
