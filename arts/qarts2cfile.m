@@ -589,7 +589,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       end
       %
-      T{end+1} = 'abs_lookupCreate'; 
+      T{end+1} = 'abs_lookupCalc'; 
       T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
           'Ignore(rte_mag)', 'Ignore(ppath_los)', ...
           'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );

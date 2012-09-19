@@ -1,3 +1,9 @@
+2012-09-19  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-271
+
+	* arts/qarts2cfile.m: abs_lookupCreate -> abs_lookupCalc.
+
 2012-09-16  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-270
