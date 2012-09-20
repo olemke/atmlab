@@ -11,6 +11,8 @@
 % OUT      tb   brightness temperatures [K]
 % IN       i    intensities [W/m^2Hz]
 %          f    frequencies [Hz]
+%
+% See also: planck
 
 % 2002-12-12   Created by Claudia Emde.
 
@@ -25,3 +27,5 @@ a = planck/boltzmann;
 b = 2*planck/speed_light^2;
 
 tb = a * f ./ log((b*f.^3)./i + 1 );
+
+end

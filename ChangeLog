@@ -1,3 +1,23 @@
+2012-09-20  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-272
+
+	* physics/planck.m: Added pointer to i2planckTb
+
+	* forwardmodel/i2planckTb.m: Added pointer to planck
+
+	* math/find_extrema_with_prominence.m: Added
+
+	- Locate local extrema with associated prominence. Actually, it's not
+	the prominence that is located but the distance to the next more
+	extreme peak.
+
+	* graphs/plot_extrema_shaded.m: Added
+
+	- Visualise data by plotting a shaded area between local maxima and
+	local minima, as well as plotting the data itself (themselves?). To be
+	improved.
+
 2012-09-19  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-271
