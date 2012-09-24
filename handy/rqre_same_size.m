@@ -11,9 +11,13 @@
 
 % 2010-01-04   Created by Patrick Eriksson.
 
-function rqre_same_size( a, b )
+function rqre_same_size(a, b)
 
-if any( size(a) ~= size(b) )
-  error( 'The variables %s and %s must have the same size.', inputname(1), ...
-                                                             inputname(2) );
+if any(size(a) ~= size(b))
+  error(['atmlab:' mfilename], ...
+      'The variables %s and %s must have the same size. Sizes found: %s %s', ...
+        inputname(1), inputname(2), ...
+        mat2str(size(a)), mat2str(size(b)));
+end
+
 end

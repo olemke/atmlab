@@ -1,3 +1,27 @@
+2012-09-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-273
+
+	* graphs/splitax.m: Added
+
+	- Split axes into a new figure with N vertically stacked subplots.
+	This is useful e.g. if one wants a very widely extended x-axis but is
+	too lazy to split from the start.
+
+	* graphs/plot_extrema_shaded.m: Tidying up
+
+	* math/movingstd.m: Added
+
+	- Downloaded from File Exchange. Calculates moving standard devation.
+
+	* math/running_stats.m: Added
+
+	- Calculate arbitrary running statistics. Warning: very slow!
+
+	* handy/rqre_same_size.m:
+
+	- Give a useful error message if condition is not met.
+
 2012-09-20  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-272

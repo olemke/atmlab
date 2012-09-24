@@ -35,8 +35,6 @@ maxs_sorted = sortrows(maxs_with_prom, [2 1]);
 
 % interpolate to draw polygon
 
-xx = linspace(x(1), x(end), 2000);
-
 x_min = [x(1); x(mins_sorted(end-no_min+1:end, 1)); x(end)];
 y_min = [y(1); y(mins_sorted(end-no_min+1:end, 1)); y(end)];
 x_max = [x(1); x(maxs_sorted(end-no_max+1:end, 1)); x(end)];
@@ -45,8 +43,20 @@ y_max = [y(1); y(maxs_sorted(end-no_max+1:end, 1)); y(end)];
 % resort according to x_min
 [~, i_min] = sort(x_min);
 [~, i_max] = sort(x_max);
-% TODO: shaded
+
+% this was an attempt to use splines
+% x_below = x_min(i_min);
+% x_above = x_max(i_max(end:-1:1));
+% y_below = y_min(i_min);
+% y_above = y_max(i_max(end:-1:1));
+% xx_below = linspace(x_below(1), x_below(end), 500);
+% xx_above = linspace(x_above(1), x_above(end), 500);
+% yy_below = spline(x_below, y_below, xx_below);
+% yy_above = spline(x_above, y_above, xx_above);
+%fh = fill([xx_below, xx_above], [yy_below, yy_above], [.1 .1 .1], varargin{:});
+
 fh = fill([x_min(i_min); x_max(i_max(end:-1:1))], [y_min(i_min); y_max(i_max(end:-1:1))], [.1 .1 .1], varargin{:});
+
 %plot(x_min(i_min), y_min(i_min), x_max(i_max), y_max(i_max), '-');
 %set(fh,'FaceAlpha',.5,'EdgeAlpha',.5);
 end
