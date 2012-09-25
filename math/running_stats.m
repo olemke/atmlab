@@ -1,15 +1,6 @@
 function stat_vectors = running_stats(x, y, binsize_xunit, stat_handles)
 % running_stats Calculate running statistics
 %
-% *** WARNING ***********************************************************
-% *                                                                     *
-% * This function is very slow. Only use if your data are small or      *
-% * there is no efficient way. Most statistics, such as mean,           *
-% * standard devation and quantile calculation, have more efficient     *
-% * specialised ways to calculate running statistics!                   *
-% *                                                                     *
-% ***********************************************************************
-%
 % FORMAT
 %
 %   stats = running_stat(x, y, binsize, stat_handles)
@@ -23,10 +14,15 @@ function stat_vectors = running_stats(x, y, binsize_xunit, stat_handles)
 %       quantity to calculate statistics for
 %
 %   winsize [scalar]
-%       size of window, same unit as x
+%       size of window.
+%       if positive, interpreted as same unit as x
+%       if negative but >-1, interpreted as fraction (negative is just a
+%       trick here to pass a flag)
 %
 %   stat_handles [cell array of function handles]
 %       functions to apply to each running window
+%       Note that each function MUST accept a dimension as its second
+%       argument, such as median(X, 2)!
 %
 % OUT
 %
@@ -34,15 +30,6 @@ function stat_vectors = running_stats(x, y, binsize_xunit, stat_handles)
 %       Output of all handles in stat_handles for each running window.
 %       Padded with nans at begin and end where sliding stats are
 %       undefined.
-%
-% *** WARNING ***********************************************************
-% *                                                                     *
-% * This function is very slow. Only use if your data are small or      *
-% * there is no efficient way. Most statistics, such as mean,           *
-% * standard devation and quantile calculation, have more efficient     *
-% * specialised ways to calculate running statistics!                   *
-% *                                                                     *
-% ***********************************************************************
 %
 % See also: smooth, medfilt1, movingstd, filter
 %
@@ -71,22 +58,39 @@ if length(spacing_xunit)>1
         'spacing in independent quantity not constant']);
 end
 
-binsize_n = round(binsize_xunit/spacing_xunit);
+N = round(binsize_xunit/spacing_xunit);
+L = length(x);
 
 % pre-allocate
 stat_vectors = cell(size(stat_handles));
-for i = 1:length(size(stat_handles))
+for i = 1:length(stat_handles)
     stat_vectors{i} = nan(size(x));
 end
 
-% FIXME: can this be done in a faster way?
-for i = (binsize_n/2+1):(length(x)-binsize_n/2)
-    slice = (i-(binsize_n/2)):(i+(binsize_n/2));
-    segment = y(slice);
-    for j = 1:length(stat_handles)
-        stat_vectors{j}(i) = stat_handles{j}(segment);
-    end
+% Yes: idea from
+% http://www.mathworks.com/matlabcentral/fileexchange/29029-summarizes-data-using-a-sliding-window-without-loops/content/movingstat.m
+
+% re-arrange data so there are columns for each window (needs memory)
+data_arranged = y(repmat(0:N-1,L-N+1,1)+cumsum(ones(L-N+1,N)));
+if iseven(N)
+    ran = (N/2):(L-N/2);
+else
+    ran = (ceil(N/2)):(L-floor(N/2));
 end
+
+% TODO: do in chunks similar to medfilt1
+for j = 1:length(stat_handles)
+    stat_vectors{j}(ran) = stat_handles{j}(data_arranged, 2);
+end
+
+% this is the slow version:
+% for i = (binsize_n/2+1):(length(x)-binsize_n/2)
+%     slice = (i-(binsize_n/2)):(i+(binsize_n/2));
+%     segment = y(slice);
+%     for j = 1:length(stat_handles)
+%         stat_vectors{j}(i) = stat_handles{j}(segment);
+%     end
+% end
 
 
 end

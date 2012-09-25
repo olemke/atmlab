@@ -1,4 +1,4 @@
-function splitax(h, N, varargin)
+function splitax(oldax, N, varargin)
 
 % splitax Split axes h in N vertical subplots
 %
@@ -22,11 +22,11 @@ function splitax(h, N, varargin)
 
 extra = optargs(varargin, {struct()});
 opts = optargs_struct(extra, ...
-    struct('legend', -1));
+    struct('legend', 0));
 
 fig = figure();
 newax = zeros(1, N);
-oldlim = get(h, 'XLim');
+oldlim = get(oldax, 'XLim');
 oldrange = oldlim(2) - oldlim(1);
 
 if opts.legend
@@ -38,18 +38,20 @@ end
 for i = 1:N
     newax(i) = subplot(Ntot, 1, i);
     % copy all children of 'h' to new subplot
-    copyobj(get(h, 'Children'), newax(i));
+    copyobj(get(oldax, 'Children'), newax(i));
     % set xlim correctly
     set(newax(i), 'xlim', [oldlim(1) + (i-1)*oldrange/N, ...
-                           oldlim(2) - (N-i)*oldrange/N]);
+                           oldlim(2) - (N-i)*oldrange/N], ...
+                  'XGrid', get(oldax, 'XGrid'), ...
+                  'YGrid', get(oldax, 'YGrid'));
     % copy labels
     %xlabel(get(get(h, 'XLabel'), 'String'));
-    ylabel(get(get(h, 'YLabel'), 'String'));
-    ylim(get(h, 'YLim'));
+    ylabel(get(get(oldax, 'YLabel'), 'String'));
+    ylim(get(oldax, 'YLim'));
 end
 
 if (opts.legend)
-    leg = findobj('Tag', 'legend', 'Parent', get(h, 'Parent'));
+    leg = findobj('Tag', 'legend', 'Parent', get(oldax, 'Parent'));
     if isempty(leg)
         error(['atmlab:' mfilename ':nolegend'], ...
             ['Legend was requested to be copied ' ...
@@ -68,11 +70,11 @@ if (opts.legend)
     set(newleg, 'Position', legpos);
 end
 
-xlabel(get(get(h, 'XLabel'), 'String'));
+%xlabel(get(get(h, 'XLabel'), 'String'));
 
-ht = suptitle(get(get(h, 'Title'), 'String'));
-htax = get(ht, 'Parent');
-xlabel(htax, get(get(h, 'XLabel'), 'String'));
-ylabel(htax, get(get(h, 'YLabel'), 'String'));
+suptitle(get(get(oldax, 'Title'), 'String'));
+%htax = get(ht, 'Parent');
+xlabel(newax(N), get(get(oldax, 'XLabel'), 'String'));
+%ylabel(htax, get(get(h, 'YLabel'), 'String'));
 
 end

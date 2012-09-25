@@ -1,3 +1,19 @@
+2012-09-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-274
+
+	* graphs/splitax.m:
+
+	- Fixed default legend setting
+	- Copy grid settings
+	- Set title to suptitle, xlabel to lowest subplot and ylabel to each
+	subplot
+
+	* math/running_stats.m:
+
+	- Changed implementation. Now fast, but memory-intensive. TODO:
+	compromise if out-of-memory.
+
 2012-09-24  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-273
