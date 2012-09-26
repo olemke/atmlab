@@ -1,3 +1,16 @@
+2012-09-26  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-275
+
+	* graphs/splitax.m:
+
+	- Don't turn figures visible that aren't. Bug (?) in suptitle, don't
+	know how to fix there.
+
+	* math/running_stats.m: Expanded
+
+	- Added ability for fractional bin (choose negative binsize > -1)
+	
 2012-09-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-274

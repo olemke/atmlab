@@ -1,4 +1,4 @@
-function stat_vectors = running_stats(x, y, binsize_xunit, stat_handles)
+function stat_vectors = running_stats(x, y, binsize, stat_handles)
 % running_stats Calculate running statistics
 %
 % FORMAT
@@ -17,7 +17,9 @@ function stat_vectors = running_stats(x, y, binsize_xunit, stat_handles)
 %       size of window.
 %       if positive, interpreted as same unit as x
 %       if negative but >-1, interpreted as fraction (negative is just a
-%       trick here to pass a flag)
+%       trick here to pass a flag), then extra stat_handle appended showing
+%       number of samples used for each statistic
+%       
 %
 %   stat_handles [cell array of function handles]
 %       functions to apply to each running window
@@ -58,14 +60,27 @@ if length(spacing_xunit)>1
         'spacing in independent quantity not constant']);
 end
 
+
+if binsize > 0
+    stat_vectors = running_stats_linear(x, y, binsize, stat_handles, spacing_xunit);
+elseif binsize < 0 && binsize > -1
+    % fractional binsize, e.g. 0.01 is all within 1%
+    stat_vectors = running_stats_fractional(x, y, binsize, stat_handles, spacing_xunit);
+else
+    error(['atmlab:' mfilename], ...
+        'Binsize must be >0 or <0 & >-1. Found: %.3f', binsize);
+end
+
+end
+
+function stat_vectors = running_stats_linear(x, y, binsize_xunit, stat_handles, spacing_xunit)
+    
+
 N = round(binsize_xunit/spacing_xunit);
 L = length(x);
 
 % pre-allocate
-stat_vectors = cell(size(stat_handles));
-for i = 1:length(stat_handles)
-    stat_vectors{i} = nan(size(x));
-end
+stat_vectors = preallocate_stat_vectors(x, stat_handles);
 
 % Yes: idea from
 % http://www.mathworks.com/matlabcentral/fileexchange/29029-summarizes-data-using-a-sliding-window-without-loops/content/movingstat.m
@@ -92,5 +107,57 @@ end
 %     end
 % end
 
+
+end
+
+function stat_vectors = running_stats_fractional(x, y, binsize_frac, stat_handles, spacing_xunit)
+
+L = length(x);
+
+% fraction is passed negative
+binsize_frac = -binsize_frac;
+
+% always tell the length
+stat_handles = [stat_handles {@size}];
+
+% pre-allocate
+stat_vectors = preallocate_stat_vectors(x, stat_handles);
+
+% get lower and upper edge of segments for each x
+
+lo = x .* (1 - binsize_frac);
+hi = x .* (1 + binsize_frac);
+
+% translate this to indices
+
+N = ceil(2 * (x * binsize_frac) / spacing_xunit);
+fst = find(N > 100, 1, 'first'); % arbitrary start
+
+% try brute-force first (POITROAE)
+for i = fst:length(y)
+    % search for indices corresponding to lo(i) and hi(i)
+    slice = floor(i-(N(i)/2)):ceil(i+(N(i)/2));
+    if (slice(1) < 1) || (slice(end) > L)
+        continue
+    end
+    segment = y(slice);
+    
+    for j = 1:length(stat_handles)
+        stat_vectors{j}(i) = stat_handles{j}(segment, 1);
+    end
+    
+    if mod(i, 100000)==0
+        logtext(atmlab('OUT'), '%d/%d done\n', i, length(y));
+    end
+end
+
+end
+
+function stat_vectors = preallocate_stat_vectors(x, stat_handles)
+
+stat_vectors = cell(size(stat_handles));
+for i = 1:length(stat_handles)
+    stat_vectors{i} = nan(size(x));
+end
 
 end

@@ -24,7 +24,7 @@ extra = optargs(varargin, {struct()});
 opts = optargs_struct(extra, ...
     struct('legend', 0));
 
-fig = figure();
+fig = figure('Visible', get(get(oldax, 'Parent'), 'Visible'));
 newax = zeros(1, N);
 oldlim = get(oldax, 'XLim');
 oldrange = oldlim(2) - oldlim(1);
@@ -72,7 +72,10 @@ end
 
 %xlabel(get(get(h, 'XLabel'), 'String'));
 
+% suptitle calls axes() which sets figure to visible, may not want that!
+vis = get(gcf(), 'Visible');
 suptitle(get(get(oldax, 'Title'), 'String'));
+set(gcf(), 'Visible', vis);
 %htax = get(ht, 'Parent');
 xlabel(newax(N), get(get(oldax, 'XLabel'), 'String'));
 %ylabel(htax, get(get(h, 'YLabel'), 'String'));
