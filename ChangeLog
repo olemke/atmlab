@@ -1,3 +1,12 @@
+2012-09-27  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-276
+
+	* math/running_stats.m: Bugfix
+
+	- Fig bug in fractional window size, where 1% was taken as [x-1%,
+	x+1%] rather than [x-½%, x+½%].
+
 2012-09-26  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-275

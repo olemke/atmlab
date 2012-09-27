@@ -125,8 +125,8 @@ stat_vectors = preallocate_stat_vectors(x, stat_handles);
 
 % get lower and upper edge of segments for each x
 
-lo = x .* (1 - binsize_frac);
-hi = x .* (1 + binsize_frac);
+lo = x .* (1 - binsize_frac/2);
+hi = x .* (1 + binsize_frac/2);
 
 % translate this to indices
 
