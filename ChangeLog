@@ -1,3 +1,10 @@
+2012-09-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-277
+
+	* datasets/define_datasets.m:
+	Added field "instrument_flag" to dardarsub dataset.
+
 2012-09-27  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-276
