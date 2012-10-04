@@ -29,6 +29,12 @@ function [Q,f,y] = qarts_demo( varargin )
 Q  = qarts;
 
 
+%= Overall settings
+%
+Q.INCLUDES               = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                             fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+
+
 %= De-activate parts not used
 %
 Q.CLOUDBOX_DO           = false;
@@ -95,8 +101,6 @@ Q.ABS_LINES             = fullfile( atmlab_example_data , 'lines501.4' );
 Q.ABS_LINESHAPE         = 'Voigt_Kuntz6';
 Q.ABS_LINESHAPE_CUTOFF  = -1;
 Q.ABS_LINESHAPE_FACTOR  = 'VVH';
-%
-Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'continua.arts' ) };
 
 
 %= Various basic settings
@@ -132,7 +136,7 @@ Q.PPATH_AGENDA          = { 'Ignore(rte_pos2)', 'ppathStepByStep' };
 Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
 %
 Q.STOKES_DIM            = 1;
-Q.Y_UNIT                = 'RJBT';
+Q.IY_UNIT                = 'RJBT';
 %
 zplat                   = 600e3;
 Q.SENSOR_POS            = zplat;

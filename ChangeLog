@@ -1,3 +1,15 @@
+2012-10-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-278
+
+	* demos/qarts_demo.m: Y_UNIT -> IY_UNIT wherever used.
+
+	(qarts_demo): Now using general.arts (until arts stable again?)
+
+	* arts/qarts2cfile.m (cfile_Generl): Adopted to change below.
+
+	* arts/qarts.m: Renamed Y_UNIT to IY_UNIT.
+
 2012-09-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-277

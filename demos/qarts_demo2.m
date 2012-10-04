@@ -170,7 +170,7 @@ end
 Q.YCALC_WSMS             = { 'yCalc' };
 %
 Q.PPATH_LMAX             = 20e3;
-Q.Y_UNIT                 = 'RJBT';
+Q.IY_UNIT                 = 'RJBT';
 %
 zplat                    = 600e3;
 Q.SENSOR_POS             = [ zplat, -23, 0 ];

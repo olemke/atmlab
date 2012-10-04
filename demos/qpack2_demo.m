@@ -109,7 +109,7 @@ Q.CLOUDBOX_DO         = false;
 
 %- Radiative transfer
 %
-Q.Y_UNIT              = 'RJBT'; 
+Q.IY_UNIT              = 'RJBT'; 
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;

@@ -80,7 +80,7 @@ Q.CLOUDBOX_DO         = false;
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
-Q.Y_UNIT              = 'RJBT';
+Q.IY_UNIT              = 'RJBT';
 %
 Q.SENSOR_LOS          = 70;
 Q.SENSOR_POS          = Q.Z_SURFACE;

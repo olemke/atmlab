@@ -118,9 +118,9 @@ if strcmp( lower(method), 'bl' )
   Q.IY_MAIN_AGENDA     = { 'iyTransmissionStandard' };
   Q.IY_TRANSMITTER_AGENDA = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
                            'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
-  Q.Y_UNIT             = '1';
+  Q.IY_UNIT             = '1';
 else
-  Q.Y_UNIT             = 'RJBT';
+  Q.IY_UNIT             = 'RJBT';
 end
   
 

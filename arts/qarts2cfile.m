@@ -273,9 +273,9 @@ function T = cfile_Generl( Q, partname, workfolder )
                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
   end
   %  
-  if qarts_isset( Q.Y_UNIT )
-    rqre_datatype( Q.Y_UNIT, @ischar, 'Q.Y_UNIT' );                         %&%
-    T{end+1} = sprintf( 'StringSet(y_unit,"%s")', Q.Y_UNIT );
+  if qarts_isset( Q.IY_UNIT )
+    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );                       %&%
+    T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
   end
   %
   if strcmp( partname, 'GenerlSave' )

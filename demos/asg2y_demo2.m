@@ -96,7 +96,7 @@ function [Q,instrument,FS]=asg_q(instrument,FS)
 
  %- SENSOR variabels
  Q.ANTENNA_DIM=1;
- Q.Y_UNIT            = 'RJBT';
+ Q.IY_UNIT            = 'RJBT';
  Q.SENSOR_DO=0;
 
  %Sensor stuff
