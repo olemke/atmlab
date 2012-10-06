@@ -1,3 +1,15 @@
+2012-10-06  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-279
+
+	* datasets/common_read_dardarsub.m: Added variable ln_iwp_error,
+	based on what we did in eliassonxx:_sytematic_jgr
+
+	* graphs/scatter_density_plot.m: Added transx and transy and their
+	recipricals
+
+	* collocations/CollocatedDataset.m: Added assertion
+
 2012-10-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-278

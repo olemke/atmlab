@@ -17,8 +17,10 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %   y       vector  data on y-axis
 %   opts    structure with options:
 %       bins        no. bins or vector with all bins (see hist2d)
-%       trans       transformation, e.g. @(x)log10(x)
-%       invtrans    inverse of trans, e.g. @(x)10.^(x)
+%       trans       transformation, e.g. @(x)log10(x) on both axis
+%       invtrans    inverse of trans, e.g. @(x)10.^(x) on both axis
+%       transx       transformation, e.g. @(x)log10(x)
+%       invtransx    inverse of trans, e.g. @(x)10.^(x)
 %       axprops     structure with axes properties
 %       ncolour     number of unique colours
 %       medprops    if defined, structure with props for median-lines
@@ -34,15 +36,18 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 % EXAMPLE
 %
 %   To compare IWP products with logarithmic axes, one may use e.g.:
+
 %
-%   opts.trans = @(x)log10(x);   % provide transformation
-%   opts.invtrans = @(x)10.^(x); % inverse transformation
+%   opts.trans = @(x)log10(x);   % provide transformation on both axis
+%   opts.invtrans = @(x)10.^(x); % inverse transformation on both axis
+%   opts.transx = @(x)log10(x);   % provide transformation
+%   opts.invtransx = @(x)10.^(x); % inverse transformation
 %   opts.axprops.xscale = 'log'; % logarithmic x-scale
 %   opts.axprops.yscale = 'log'; % idem dito
 %   opts.medprops = struct('LineWidth', 3, 'LineStyle', '-', 'Color', [0 0 0]);
 %   [h_ax, h_cb] = scatter_density_plot(x, y, opts);
 %
-%
+% $Id$
 % Created by Gerrit Holl based on code from Salomon Eliasson
 %
 % See also: hist, hist2d, bin, median
@@ -51,24 +56,45 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 defaults = struct(...
     'bins', 50, ...
     'trans', @(x)x, ...
+    'transx',[],...
+    'transy',[],...
     'invtrans', @(x)x, ...
+    'invtransx', [], ...
+    'invtransy', [], ...
     'axprops', struct(), ...
     'ncolour', 20, ...
     'medprops', [], ...
     'scatprops', [], ...
     'diagonal', []);
 opts = optargs(varargin, {defaults});
+
 opts = optargs_struct(opts, defaults);
+
+
+if isempty(opts.transx)
+   opts.transx = opts.trans;
+   opts.invtransx = opts.invtrans;
+end
+if isempty(opts.transy)
+   opts.transy = opts.trans;
+   opts.invtransy = opts.invtrans;
+end
+
 
 % create the actual 2-d histogram. Apply forward transformation upon data,
 % then inverse transformation upon plotting. This allows for e.g.
 % logarithmic representations.
-[N, BX, BY] = hist2d(opts.trans(x), opts.trans(y), opts.bins, opts.bins);
+[N, BX, BY] = hist2d(opts.transx(x), opts.transy(y), opts.bins, opts.bins);
 xbins = BX(1, :);
 ybins = BY(:, 1);
 
+paddedx = [xbins(1)-diff(xbins(1:2)),xbins,xbins(end)+diff(xbins(1:2))];
+paddedy = [ybins(1)-diff(ybins(1:2));ybins;ybins(end)+diff(ybins(1:2))];
+paddedN = [zeros(1,size(N,2)+2);[zeros(size(N,2),1),N,zeros(size(N,2),1)];zeros(1,size(N,2)+2)];
+
 %% plot the actual 2d-histogram
-pcolor(opts.invtrans(xbins), opts.invtrans(ybins), N);
+pcolor(opts.invtransx(paddedx), opts.invtransy(paddedy), paddedN);
+%pcolor(opts.invtransx(xbins), opts.invtransy(ybins), N);
 
 set(gca(), opts.axprops);
 shading('flat');
@@ -110,8 +136,8 @@ set(gca, 'layer', 'top'); % otherwise grid is below everything
 end
 
 function plot_medians(x, y, xbins, ybins, opts)
-binned_x = bin(opts.trans(x), opts.trans(y), xbins);
-binned_y = bin(opts.trans(y), opts.trans(x), ybins);
+binned_x = bin(opts.transx(x), opts.transy(y), xbins);
+binned_y = bin(opts.transy(y), opts.transx(x), ybins);
 medians_x = cellfun(@median, binned_x);
 medians_y = cellfun(@median, binned_y);
 plot(opts.invtrans(xbins), opts.invtrans(medians_x), opts.medprops);

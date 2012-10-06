@@ -81,9 +81,19 @@ switch field
         % iwc_max = exp(ln(iwc)+ln_iwc_error)
         %          = exp(ln(iwc)) * exp(ln_iwc_error)
         %         = iwc * exp(ln_iwc_error)
-        S.dardar_IWP_error_max = column_integrate(catstruct(S,struct('maxError',S.iwc.*exp(S.ln_iwc_error))),{'maxError','height'})';
         
-        S.dardar_IWP_error_min = column_integrate(catstruct(S,struct('minError',S.iwc.*exp(-S.ln_iwc_error))),{'minError','height'})';
+        %
+        % As in eliasson13:_systematic_jgr Sect. 4.1
+        % This is assumed OK:
+        %
+        % ln(IWP^+/IWP_0) \approx ln(IWP_0/IWP_-)
+        % therefore
+        % \sigma_{IWP}=\frac{ln(\frac{IWP^+}{IWP^-})}{2}
+        
+        IWP_plus = column_integrate(catstruct(S,struct('maxError',S.iwc.*exp(S.ln_iwc_error))),{'maxError','height'})';
+        IWP_minus = column_integrate(catstruct(S,struct('minError',S.iwc.*exp(-S.ln_iwc_error))),{'minError','height'})';
+        
+        S.dardar_ln_IWP_error = log(IWP_plus./IWP_minus)/2;
         
 end
 

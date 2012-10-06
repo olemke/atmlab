@@ -1131,8 +1131,10 @@ classdef CollocatedDataset < HomemadeDataset
             %   fields      cell-str    Cell array of strings with all
             %                           the fields to be read. Can be
             %                           from the core-dataset or from
-            %                           the additional datasets. See
-            %                           <a href="matlab:help CollocatedDataset/list_fields">list_fields</a> for a full list.
+            %                           the additional datasets. It must
+            %                           contain at least some fields from
+            %                           the core dataset. See <a href="matlab:help CollocatedDataset/list_fields">list_fields</a> for a full list.
+            %
             %   limits      structure   (optional)
             %                           Structure describing acceptable
             %                           ranges for zero or more fields.
@@ -1712,6 +1714,8 @@ classdef CollocatedDataset < HomemadeDataset
                 ['atmlab:' mfilename ':BUG'], ...
                 'length(additionals) == %d != length(additional_fields) == %d, bug?', ...
                 length(additionals), length(additional_fields));
+            assert(logical(exist('fields','var')),['atmlab:' mfilename ':notImplemented'],...
+                'No fields from the core dataaset are listed in all_fields')
             
         end
         
