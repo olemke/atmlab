@@ -1,3 +1,11 @@
+2012-10-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-280
+
+	* geoplots/gmt/nearneighbor.m
+	* geoplots/gmt/create_gmt_earth.m:
+	fixed bug if I give a string for the nearneighbor command
+
 2012-10-06  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-279

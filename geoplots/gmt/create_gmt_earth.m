@@ -55,6 +55,7 @@ commands{end+1} = in.plot.basemap;
 % NEARNEIGHBOR
 if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
     commands{end+1} = in.nearneighbor;
+    in.grdfile = [in.filename '.grd'];
 elseif ~in.gridded && isfield(in.plot,'grid')
     in.grdfile = [in.filename '.grd'];
     commands{end+1} = nearneighbor(in.grdfile,in.plot.grid);

@@ -38,4 +38,4 @@ else
     error 'needs in.search'
 end
 
-command = sprintf('%s >> %s.ps',nearneighbor,file);
+command = sprintf('%s >> %s.ps',nearneighbor,file(1:end-4));
