@@ -1,3 +1,18 @@
+2012-10-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* h2o/thermodynamics/relhum_to_vmr.m: Added Mathias's relative
+	humidity to volume mixing ratio.
+
+	* site-specific/kiruna/datasets_init.m: Small fix to mhs_dardar
+
+	* sensors/amsub_cloudfilter.m: Added 2 extra output. Now
+	[cloudfilter,tooColdFilter,diffFilter] = amsu_cloudfilter(),
+	where cloudfilter = tooColdFilter & diffFilter
+
+	* datasets/define_datasets.m: Added MHS dardar collocated dataset
+
+	* geoplots/gmt/create_gmt_earth.m: small fix
+
 2012-10-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-280

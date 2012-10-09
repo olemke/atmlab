@@ -270,7 +270,11 @@ end
 if isfield(in,'tickval')
     % make temporary tickval file
     fid=fopen('tickvalues.txt','w');
-    fprintf(fid,sprintf('%s\n',getAnnotFormat(in.tickval)),in.tickval);
+    if isfield(in,'tick_annotation_format')
+        fprintf(fid,in.tick_annotation_format,in.tickval);
+    else
+        fprintf(fid,sprintf('%s\n',getAnnotFormat(in.tickval)),in.tickval);
+    end
     fclose(fid);
 end
 

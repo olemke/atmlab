@@ -1,4 +1,4 @@
-function combifilter=amsub_cloudfilter(tb18, tdiff, viewangle)
+function [combifilter,tooCold,diffFilter]=amsub_cloudfilter(tb18, tdiff, viewangle)
 %% AMSUB_CLOUDFILTER gets a cloud/surface filter for passive microwave
 %
 % PUPOSE
@@ -7,16 +7,21 @@ function combifilter=amsub_cloudfilter(tb18, tdiff, viewangle)
 %           and 18
 %
 % IN
-%       tb18        vect        Channel 18 brightness temperature
-%       tdiff       vect        Difference vector:
-%                               ch20 - ch18, or ch19 - ch18
-%       viewangle   vect        satellite viewangle. (0=nadir)
+%       tb18            vect        Channel 18 brightness temperature
+%       tdiff           vect        Difference vector:
+%                                   ch20 - ch18, or ch19 - ch18
+%       viewangle       vect        satellite viewangle. (0=nadir)
 %
 % OUT
-%       filter      vect        filter, true where the data are OK, false
-%                               where they are tainted by clouds 
+%       combifilter     vect        filter, true where the data (not too
+%                                   cold & not cloud filtered) are OK
 %
-
+%       tooCold         vect        filter, true where the tb18 is warmer
+%                                   than the angular dependent cutoff temp 
+%
+%       diffFilter     vect        filter, true where tdiff > 0 (angular
+%                                    dependent) 
+%
 % $Id$
 % Mathias Milz and Salomon Eliasson
 
@@ -45,6 +50,10 @@ for k = 1:length(viewangle)
     closest_angle=find(abs(ang-viewangle(k))<= min(abs(ang-viewangle(k))));
     TB(k) = thresh_tb(closest_angle(1));
 end
-combifilter = tb18 > TB & tdiff > 0; %i.e. surface & cloud
+
+tooCold = tb18 > TB;
+diffFilter = tdiff > 0;
+
+combifilter = tooCold & diffFilter; %i.e. surface & cloud
 
 end
