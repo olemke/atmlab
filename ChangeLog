@@ -1,4 +1,16 @@
+2012-10-11  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-282
+
+	* datasets/common_read_dardarsub.m: Return height as a vector
+	instead to save space and memory. The height vector is valid for
+	all profiles
+
+	* math/column_integrate.m: Added more help
+
 2012-10-09  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-281
 
 	* h2o/thermodynamics/relhum_to_vmr.m: Added Mathias's relative
 	humidity to volume mixing ratio.

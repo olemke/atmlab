@@ -5,7 +5,7 @@ function INT = column_integrate(in,field)
 %
 % IN: 1) in = structure containing all data fields
 %     2) field = {'data','z'}; The first field is the data, the second is the
-%     height (z) component. Z component can be either ascending or descending
+%     height (z) component (same size as the data). Z component can be either ascending or descending
 %
 % OUT: INT = column integrated in.(field{1})
 %
