@@ -1,3 +1,10 @@
+2012-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-283
+
+	* arts/qarts2cfile.m: If statement checking Q.ABS_SPECIES.RETRIEVE
+	was incorrect.
+
 2012-10-11  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-282
@@ -45,6 +52,7 @@
 
 	* collocations/CollocatedDataset.m: Added assertion
 
+>>>>>>> .r7911
 2012-10-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-278

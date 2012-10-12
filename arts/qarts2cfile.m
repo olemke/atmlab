@@ -1068,7 +1068,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   %                                                                         %&%
   rqre_field( Q.ABS_SPECIES, 'RETRIEVE', 'Q.ABS_SPECIES' );                 %&%
   %
-  if any( [ Q.ABS_SPECIES.RETRIEVE ] )      
+  if any( [ Q.ABS_SPECIES.RETRIEVE ] == true )      
     %                                                                       %&%
     if ~isfield( Q.ABS_SPECIES, {'UNIT','GRIDS'} )                          %&%
       error( ['With Q.ABS_SPECIES.RETRIEVED true the fields ', ...          %&%
