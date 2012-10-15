@@ -1638,17 +1638,18 @@ classdef CollocatedDataset < HomemadeDataset
             end
         end
         
-        function data = read_homemade_granule(self, fullpath, fields)
+        function [data, attr] = read_homemade_granule(self, fullpath, fields)
             core_fields = {'LAT1', 'LON1', 'TIME1'};
 
             all_fields = [core_fields(:); fields(:)];
             
-            data = read_homemade_granule@HomemadeDataset(self, fullpath, all_fields); % call parent constructor
+            [data, attr] = read_homemade_granule@HomemadeDataset(self, fullpath, all_fields); % call parent constructor
 
             %data = loadncvar(fullpath, all_fields);
             data.time = data.TIME1;
             data.lat = data.LAT1;
             data.lon = data.LON1;
+            data.version = ['COL(' attr.primary_version ', ' attr.secondary_version ')'];
             
         end
 

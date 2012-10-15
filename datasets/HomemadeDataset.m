@@ -323,7 +323,7 @@ classdef HomemadeDataset < SatDataset
             end
         end
         
-        function S = read_homemade_granule(self, file, varargin)
+        function [S, strattr] = read_homemade_granule(self, file, varargin)
             % read netcdf-stored dataset such as dardarsub, CMIWP, ...
             %
             % format as other common_read_-functions.

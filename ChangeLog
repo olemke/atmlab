@@ -1,5 +1,17 @@
 2012-10-15  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-286
+
+	* datasets/HomemadeDataset.m (read_homemade_granule):
+
+	- Also return attributes
+
+	* collocations/CollocatedDataset.m (read_homemade_granule):
+
+	- Also set version and also return attributes
+
+2012-10-15  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-285
 
 	* collocations/TODO: Added several issues
