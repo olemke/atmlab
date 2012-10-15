@@ -258,12 +258,19 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % through all the possible datasets. Not to be confused with
         % <a href="matlab:help SatDataset/satname">satname</a>, which is for single-satellite datasets.
         sats;
+    
+        % try to use regular expression for finding; a regular expression
+        % may still be needed for identifying information by
+        % find_info_from_granule, but not used for finding a filename in
+        % the first place.
+        tryre = true;
         
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that
         % cannot be met here. Therefore, defaults should be encompassed in
         % a property, a structure, 'defaults', that is /not/ defined here,
         % but only by the class at the end of the hierarchy
+            
     end
     
     % read-only props (alterable with methods)
@@ -398,7 +405,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % OUT
             %
             %  - structure containing whatever info could be obtained
-            assert(~isempty(self.re),['atmlab:' mfilename],'self.re (regular expression for file) is empty')
+            if isempty(self.re) % try to convert it
+                self.pos2re();
+            end
             
             S = regexp(fname, self.re, 'names');
             
@@ -449,8 +458,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             datadir = self.find_datadir_by_date(date, spec);
             yearstr = num2str(date(1), '%04d'); % for comparing easily with 2digit years
             
-            matchy = self.re;
-            if isequalwithequalnans(matchy, nan) || isempty(matchy)
+            if self.tryre && ~isequaln(self.re, nan) && ~isempty(self.re)
+                matchy = self.re;
+            else
                 matchy = self.filename; % exact match only
             end
             
@@ -558,7 +568,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             fulldir = self.find_datadir_by_date(datevec, spec);
             
-            if nargin <= 3 && ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename) % calculate directly
+            if nargin() <= 3 && ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename) % calculate directly
                 fn = strrep_variables(self.filename, spec, datevec);
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
@@ -1179,6 +1189,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             gridmean = bsxfun(@ldivide, totalcount, totalsum);
         end
         
+        function pos2re(~)
+            error(['atmlab:' mfilename ':cannotconvert'], ...
+                ['The regular expression self.re was not defined, so ' ...
+                 'I tried to convert it automagically from location '...
+                 'information. However, I don''t know how to do this. ' ...
+                 'I give up. Please help me: either implement ' ...
+                 'a pos2re() method, or define a re member.']);
+        end
         %% methods for internal use (not private, but from other classes)
        
         function add_collocated_dataset(ds, cd)

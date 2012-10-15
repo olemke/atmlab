@@ -1,3 +1,59 @@
+2012-10-15  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-285
+
+	* collocations/TODO: Added several issues
+
+	* datasets/SatDataset.m:
+
+	- Added member 'tryre', defaults to true. See source code for
+	documentation.
+
+	(find_info_from_granule):
+
+	- Try to convert using pos2re
+
+	(pos2re): Added
+
+	- Try to convert position to re. In this class, just empty. In
+	HomemadeDataset, actually implemented.
+
+	* datasets/HomemadeDataset.m:
+
+	- Use default reader self.read_homemade_granule
+
+	(read_homemade_granule)
+
+	- Read a single granule for further, possibly iterative collocating
+
+	(pos2re): Added
+
+	- Implementation for SatDataset.pos2re
+
+	* collocations/CollocatedDataset.m
+	
+	(collocate_and_store_date_range): Bugfix
+
+	- If log not writeable, log to /dev/null instead
+
+	(read_homemade_granule): Added
+
+	- Implementation for HomemadeDataset.read_homemade_granule
+
+	(granule_first_line): Added
+
+	- Collocations have no duplicates; always returns 1
+
+	* forwardmodel/i2planckTb.m: tiny change
+
+	- Added pointer to diplanck2Tb
+
+	* forwardmodel/di2planckTb.m: tiny change
+
+	- Added pointer to i2planckTb
+
+	* define_datasets: Add missing semicolon
+
 2012-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-284

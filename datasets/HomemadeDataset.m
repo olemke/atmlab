@@ -74,6 +74,11 @@ classdef HomemadeDataset < SatDataset
                 self.members = mem;
             end
             %}
+                   
+             if ~any(strcmp(varargin, 'reader')) % set reader
+                 self.reader = @self.read_homemade_granule;
+             end
+             
         end
              
         function [fn, global_atts] = store(self, date, spec, data, varargin)
@@ -270,6 +275,8 @@ classdef HomemadeDataset < SatDataset
             %   M           matrix      contains requested data
             %   localcols   struct      describes data columns
             %   attr        struct      contains NetCDF global attributes
+            %
+            % See also: HomemadeDataset/read_homemade_granule
             
             fn = self.find_granule_by_datetime(date, spec);
             logtext(atmlab('OUT'), 'Gunzipping and reading %s\n', fn);
@@ -316,8 +323,66 @@ classdef HomemadeDataset < SatDataset
             end
         end
         
+        function S = read_homemade_granule(self, file, varargin)
+            % read netcdf-stored dataset such as dardarsub, CMIWP, ...
+            %
+            % format as other common_read_-functions.
+            %
+            % Besides a simple loadncvar, this adds fields 'epoch', 'path'
+            % and 'version'.
+            %
+            % Method based on common_read_netcdf_dataset, which is in turn
+            % based on common_read_dardarsub
+            
+            fields  = optargs(varargin, {{}});
+            
+            [S, attr] = loadncvar(file, fields);
+            C(1:2*length(attr)) = deal([attr{:}]);
+            strattr = struct(C{:});
+            
+            % get additional stuff
+            info = self.find_info_from_granule(file);
+            
+            if isfield(info, 'doy')
+                date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
+                date = [date.year date.month date.day];
+            else
+                date = [str2double(info.year) str2double(info.month) str2double(info.day)];
+            end
+            S.epoch = round(date2unixsecs(date(1), date(2), date(3)));
+            
+            S.path = file;
+            
+            if isfield(strattr, 'version')
+                S.version = strattr.version;
+            end
+            
+            if isfield(S, 'lat')
+                S = MaskInvalidGeoTimedataWithNaN(S);
+            end
+        end
+        
+        function pos2re(self)
+            % convert self.{basedir,subdir,filename} to self.re
+            %
+            % This method attempts to convert
+            % self.{basedir,subdir,filename) to self.re at a best-effert
+            % basis.
+            r = fullfile(self.basedir, self.subdir, self.filename);
+            self.re = strrep_multi(r, ...
+                '$YEAR4', '(?<year>\d{4})', ...
+                '$MONTH', '(?<month>\d{2})', ...
+                '$DAY', '(?<day>\d{2})', ...
+                '$YEAR2', '(?<year>\d{2})', ...
+                '$DOY', '(?<doy>\d{3})', ...
+                '$HOUR', '(?<hour>\d{2})', ...
+                '$MINUTE', '(?<minute>\d{2})', ...
+                '$SAT', '(?<satname>[a-z0-9]*)');
+            % but we don't need it, therefore don't use it
+            self.tryre = false;
+        end
     end
-    
+        
     % static/private are used like subfunctions
     methods (Static, Access = protected)
         function cleanup(temp_out, ncid)

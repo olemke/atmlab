@@ -21,6 +21,18 @@
 - the CachedData objects should also check if the ASsociatedDatasets are
   the same
 
+- Port to new NetCDF interface
+
+- Unify strrep_variables and pos2re, also make more flexible, redesign?
+
+Memory issue: sometimes too many collocations with too many fields, all in
+double, needs solution.
+
+Fundamental solution: split over several files per day
+Postponing the problem: more memory-efficient
+    -> don't always double
+    -> don't duplicate/copy data
+
 
 - when finished, in old-style add small functions using new-style
 

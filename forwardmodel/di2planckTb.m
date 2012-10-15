@@ -17,6 +17,8 @@
 %                vector.
 %          di    Jacobian or higher Stokes components, in radiance. Can be a
 %                matrix, where each row corresponds to a frequency.
+%
+% See also: i2planckTb, planck
 
 % 2010-12-15   Created by Patrick Eriksson.
 
@@ -44,3 +46,5 @@ b = 2*planck/speed_light^2;
 tb = a * f ./ log((b*f.^3)./i + 1 );
 
 dtb = repmat( tb.^2./(a*i.*f.*(1+i./(b*f.^3))), 1, size(di,2) ) .* di;
+
+end

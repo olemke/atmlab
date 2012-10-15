@@ -12,7 +12,7 @@
 % IN       i    intensities [W/m^2Hz]
 %          f    frequencies [Hz]
 %
-% See also: planck
+% See also: planck, di2planckTb
 
 % 2002-12-12   Created by Claudia Emde.
 

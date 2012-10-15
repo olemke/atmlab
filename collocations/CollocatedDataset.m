@@ -961,7 +961,18 @@ classdef CollocatedDataset < HomemadeDataset
             %   mhscpr.collocate_and_store_date_range([2010 9 1], ...
             %       [2010 9 30], '', 'noaa18', {fc});
             
-            self.log = fileopen(fullfile(self.basedir, self.logfile), 'a');
+            try
+                self.log = fileopen(fullfile(self.basedir, self.logfile), 'a');
+            catch ME
+                switch ME.identifier
+                    case 'atmlab:fileopen:IOError'
+                        logtext(atmlab('ERR'), ...
+                            'Unable to append to logfile at %s. Error message: %s. Not writing logfile', ...
+                            fullfile(self.basedir, self.logfile), ...
+                            ME.message);
+                        self.log = fileopen('/dev/null', 'w');
+                end
+            end
             c = onCleanup(@self.cleanup_log);
             logtext(self.log, self.marker);
             logtext(self.log, 'Starting collocations: %s %s %s vs. %s %s from %s to %s\n', ...
@@ -1625,6 +1636,24 @@ classdef CollocatedDataset < HomemadeDataset
                 otherwise
                     error(['atmlab:' mfilename], 'Too many output arguments');
             end
+        end
+        
+        function data = read_homemade_granule(self, fullpath, fields)
+            core_fields = {'LAT1', 'LON1', 'TIME1'};
+
+            all_fields = [core_fields(:); fields(:)];
+            
+            data = read_homemade_granule@HomemadeDataset(self, fullpath, all_fields); % call parent constructor
+
+            %data = loadncvar(fullpath, all_fields);
+            data.time = data.TIME1;
+            data.lat = data.LAT1;
+            data.lon = data.LON1;
+            
+        end
+
+        function line = granule_first_line(~, varargin)
+            line = uint32(1); % collocated datasets do not contain duplicates
         end
 
     end
