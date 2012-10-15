@@ -279,6 +279,10 @@ classdef CollocatedDataset < HomemadeDataset
             nfields = length(fnms);
             fv = 1:nfields;
             self.cols = cell2struct(num2cell(fv), fnms.', 2);
+            
+            if isempty(self.granule_duration)
+                self.granule_duration = 86400;
+            end
         end
                 
         function secondary_granules = overlap_granule(self, date1, spec2)

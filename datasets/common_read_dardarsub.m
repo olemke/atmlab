@@ -54,10 +54,9 @@ function S = dealWithPseudoFields(S,field,file)
 %% dealWithPseudoFields
 %
 % List of hand-made fields that can be composed already here to save memory
-% and storage space. Will check in the loop if this field is present. The
-% fields the pseudo fields required are further assumed to be frivolous and therefore
-% removed afterwards. This part is hardcoded
-
+% and storage space. The fields the pseudo fields required are further
+% assumed to be frivolous and therefore removed afterwards, unless these
+% fields were already read before this function.
 % READ dependent fields
 switch field
     case 'dardar_IWP'

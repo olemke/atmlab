@@ -1,3 +1,22 @@
+2012-10-15  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-284
+
+	* datasets/common_read_dardarsub.m: Fixed some text in help
+
+	* datasets/common_read_cpr.m: Added pseudo field 'Cloud_Type' from
+	sibling dataset
+
+	* datasets/define_datasets.m:
+	* site-specific/kiruna/datasets_init.m:
+	Added cldCloud dataset
+
+	* collocations/CollocatedDataset.m: Gerrit added a default
+	granule_duration is it is missing
+
+	* collocations/FieldCopier.m: Gerrit fixed  bug if there is a
+	sibling dataset but no primary
+
 2012-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-283

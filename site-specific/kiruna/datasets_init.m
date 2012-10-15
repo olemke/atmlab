@@ -42,9 +42,9 @@ D.CPR_RVOD.basedir = '/storage3/data/cloudsat/2B-CWC-RVOD.R04';
 D.CPR_RVOD.subdir = '$YEAR4/$DOY';
 D.CPR_RVOD.re = D.cpr.re;
 
-D.CPR_CLDCLASS.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
-D.CPR_CLDCLASS.subdir = '$YEAR4/$DOY';
-D.CPR_CLDCLASS.re = D.cpr.re;
+D.cprCldclass.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
+D.cprCldclass.subdir = '$YEAR4/$DOY';
+D.cprCldclass.re = D.cpr.re;
 
 D.dardar.basedir = '/storage3/data/dardar';
 D.dardar.subdir = '$YEAR4/$YEAR4_$MONTH_$DAY';

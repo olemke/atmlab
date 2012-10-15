@@ -276,8 +276,15 @@ classdef FieldCopier < AssociatedDataset
                     dat = data2;
                     j = 2;
                 end
-                n_scanlines = size(dat.lat, 1);
-                n_scanpos = size(dat.lat, 2);
+                if isempty(fieldnames(dat))
+                    logtext(atmlab('OUT'), 'No fields from either primary or secondary, hopefully sibling has same number of lats\n');
+                    reflat = dat_other{j}.(self.members.(fieldnam).dataset.name).lat;
+                else                    
+                    reflat = dat.lat;
+                end
+                n_scanlines = size(reflat, 1);
+                n_scanpos = size(reflat, 2);
+                
                 % data either from prim/sec or from 'sibling'
                 if isfield(self.members.(fieldnam), 'dataset')
                     fdata = dat_other{j}.(self.members.(fieldnam).dataset.name).(self.members.(fieldnam).realname);
@@ -336,11 +343,11 @@ classdef FieldCopier < AssociatedDataset
             r2 = processed_core(:, self.parent.cols.LINE2);
             c1 = processed_core(:, self.parent.cols.POS1);
             c2 = processed_core(:, self.parent.cols.POS2);
-            if self.needs_primary_data()
-                i1 = sub2ind(size(data1.lat), r1, c1);
+            if self.needs_primary_data() || ~isempty(fieldnames(dat_other{j}))
+                i1 = sub2ind(size(reflat), r1, c1);
             end
-            if self.needs_secondary_data()
-                i2 = sub2ind(size(data2.lat), r2, c2);
+            if self.needs_secondary_data() || ~isempty(fieldnames(dat_other{j}))
+                i2 = sub2ind(size(reflat), r2, c2);
             end
             
             % in the third loop, collect the data
@@ -372,9 +379,9 @@ classdef FieldCopier < AssociatedDataset
                 % if this fails, data.(field) may not be a column-vector as
                 % required
                 sz = size(fdata);
-                if isequal(sz, size(data.lat))
+                if isequal(sz, size(reflat))
                     DD = fdata(:); % 1 point per lat/lon
-                elseif sz(1) == size(data.lat, 1) && sz(2) == 1 % e.g. time
+                elseif sz(1) == size(reflat, 1) && sz(2) == 1 % e.g. time
                     DD = repmat(fdata, [1 size(data.lat, 2)]);
                     DD = DD(:);
                 else % multi-point per lat/lon
