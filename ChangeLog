@@ -1,5 +1,13 @@
 2012-10-17  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-289
+
+	* collocations/FieldCopier.m (process_granule):
+
+	- catch if sibling absent
+
+2012-10-17  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-288
 
 	* collocations/FieldCopier.m (process_granule):

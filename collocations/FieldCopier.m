@@ -262,7 +262,19 @@ classdef FieldCopier < AssociatedDataset
                     % in this reading, do not remove duplicates, or there will
                     % be a mis-match between indices as provided by the
                     % collocations and indices as determined here
-                    dat_other{j}.(dsnm) = D.(dsnm).read_granule(dt, spc, also_read{j}.(dsnm), false, false);
+                    try
+                        dat_other{j}.(dsnm) = D.(dsnm).read_granule(dt, spc, also_read{j}.(dsnm), false, false);
+                    catch ME
+                        switch ME.identifier
+                            case 'atmlab:find_granule_by_datetime'
+                                logtext(atmlab('ERR'), ...
+                                    'I tried to collect fields from dataset %s, but failed: %s', ...
+                                    dsnm, ME.message);
+                                continue
+                            otherwise
+                                ME.rethrow();
+                        end
+                    end
                 end
             end
             % read all 
