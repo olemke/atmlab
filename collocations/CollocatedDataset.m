@@ -357,9 +357,13 @@ classdef CollocatedDataset < HomemadeDataset
                 % anything not too early, not too late, is good
                 okej = b:e;
             else
-                % the non-empty one as index
-                X={b,e};
-                okej = X{[~isempty(b) ~isempty(e)]};
+                % this means:
+                % if b is empty, then 1:e
+                % if e is empty, then b:end
+                okej = max([~isempty(b)+1 b]):max([isempty(e)*size(threedays, 1) e]);
+                
+                %X={b,e};
+                %okej = X{[~isempty(b) ~isempty(e)]};
             end   
             
             secondary_granules = threedays(okej, :);
@@ -1645,8 +1649,9 @@ classdef CollocatedDataset < HomemadeDataset
             
             [data, attr] = read_homemade_granule@HomemadeDataset(self, fullpath, all_fields); % call parent constructor
 
-            %data = loadncvar(fullpath, all_fields);
-            data.time = data.TIME1;
+            % collocations have time in unixsecs, but datasets have time in
+            % seconds since start of day, which happens to equal data.epoch
+            data.time = data.TIME1 - data.epoch;
             data.lat = data.LAT1;
             data.lon = data.LON1;
             data.version = ['COL(' attr.primary_version ', ' attr.secondary_version ')'];

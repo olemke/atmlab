@@ -1,3 +1,16 @@
+2012-10-17  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-287
+
+	* datasets/define_datasets.m:
+	- Added MODIS field copier and collapser.
+	- Tidied up a little
+
+	* site-specific/kiruna/datasets_init.m: Added MODIS field copier
+	and collapser.
+
+	* collocations/CollocatedDataset.m: Gerrit fixed bug in overlap_granule
+
 2012-10-15  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-286
