@@ -1,3 +1,12 @@
+2012-10-17  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-288
+
+	* collocations/FieldCopier.m (process_granule):
+
+	- fix bug in grabbing size of latitude-vector from wrong parent
+	dataset
+
 2012-10-17  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-287
