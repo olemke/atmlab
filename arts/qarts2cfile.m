@@ -418,7 +418,6 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end
   %
   if qarts_isset(Q.Z_SURFACE)
-    rqre_datatype( Q.Z_SURFACE, {@istensor2},            'Q.Z_SURFACE' );   %&%
     T{end+1} = file_or_data( 'z_surface', 'Matrix', Q.Z_SURFACE, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
   end

@@ -1,3 +1,10 @@
+2012-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-290
+
+	* arts/qarts2cfile.m: Removed demand that Z_SURFACE is stored as
+	a Matrix (to allow pre-saving to file as for e.g. T_FIELD).
+
 2012-10-17  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-289
