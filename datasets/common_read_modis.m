@@ -35,7 +35,7 @@ all_fields    = [core_fields(:); extra_fields(:)];
 % are present. If so, it will be processed and the fields this pseudo field
 % requires to be created are further assumed to be frivolous and therefore
 % removed afterwards.
-pseudo_fields = {'modis_IWP','modis_Tau_ice','modis_Re_ice'};
+pseudo_fields = {'modis_IWP','Tau_ice','Re_ice'};
 
 for F = all_fields'
     if ismember(F{1},pseudo_fields)
@@ -92,7 +92,7 @@ function S = dealWithPseudoFields(S,fields,file)
 % flag
 common_fields = {'Quality_Assurance_1km','Cloud_Phase_Optical_Properties'};
 associatedFields = {'Cloud_Water_Path','Cloud_Effective_Radius','Cloud_Optical_Thickness'};
-pseudo_fields = {'modis_IWP','modis_Tau_ice','modis_Re_ice'};
+pseudo_fields = {'modis_IWP','Tau_ice','Re_ice'};
 dependent_fields = [common_fields,associatedFields(ismember(pseudo_fields,fields))];
 
 % remove dependent fields if they aren't already in S (see the end of this function)
@@ -144,10 +144,10 @@ for F = fields
     switch F{1}
         case 'modis_IWP'
             S.modis_IWP = S.Cloud_Water_Path;
-        case 'modis_Re_ice'
-            S.modis_Re_ice = S.Cloud_Effective_Radius;
-        case 'modis_Tau_ice'
-            S.modis_Tau_ice = S.Cloud_Optical_Thickness;
+        case 'Re_ice'
+            S.Re_ice = S.Cloud_Effective_Radius;
+        case 'Tau_ice'
+            S.Tau_ice = S.Cloud_Optical_Thickness;
     end
 end
 

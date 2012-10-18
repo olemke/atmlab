@@ -19,7 +19,7 @@ function INT = column_integrate(in,field)
 % USAGE: IWP = column_integrate(in,{'RO_ice_water_content','Height'})
 %
 % $Id$
-% 27/8-2010 Salomon Eliasson
+% Salomon Eliasson
 
 D = field{1};
 H = field{2};

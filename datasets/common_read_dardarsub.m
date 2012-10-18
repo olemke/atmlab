@@ -33,7 +33,7 @@ function S = common_read_dardarsub(file, varargin)
     S.epoch = round(date2unixsecs(date.year, date.month, date.day));
     
     if any(ismember(pseudo_fields,extra_fields))
-        for P = pseudo_fields(:)'
+        for P = pseudo_fields(ismember(pseudo_fields,extra_fields))
             S = dealWithPseudoFields(S,P{1},file);
         end
     end

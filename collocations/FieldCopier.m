@@ -290,7 +290,16 @@ classdef FieldCopier < AssociatedDataset
                 end
                 if isempty(fieldnames(dat))
                     logtext(atmlab('OUT'), 'No fields from either primary or secondary, hopefully sibling has same number of lats\n');
-                    reflat = cellfun(@(x) x.(self.members.(fieldnam).dataset.name).lat, dat_other, 'UniformOutput', false);
+                    % test if they both are there. If there is no primary
+                    % or secondary dataset, on e will be empty
+                    testE = [~isempty(fieldnames(dat_other{1})) ~isempty(fieldnames(dat_other{2}))];
+                    if all(testE)
+                        reflat = cellfun(@(x) x.(self.members.(fieldnam).dataset.name).lat, dat_other, 'UniformOutput', false);
+                    else
+                        reflat = {dat_other{testE}.(self.members.(fieldnam).dataset.name).lat};
+                        % workaround since relat{2} is called for later on
+                        reflat(2) = reflat;
+                    end
                 else                    
                     reflat = {data1.lat, data2.lat};
                 end

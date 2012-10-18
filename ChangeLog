@@ -1,3 +1,21 @@
+2012-10-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-294
+
+	* datasets/common_read_modis.m: Renamed some pseudo fields.
+
+	* datasets/common_read_dardarsub.m:
+	Fixed bug always processing ln_dardar_IWP even if not asked for.
+
+	* datasets/define_datasets.m:
+	- Added the rest of modis and trimmed the datatypes of dardar from
+	double to single, and the modis data types from double to short.
+
+	* math/column_integrate.m: small change to header
+
+	* collocations/FieldCopier.m (process_granule):
+	- Fixed bug in previous bug fix. Really only a workaround though....
+
 2012-10-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-293
