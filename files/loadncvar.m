@@ -9,12 +9,12 @@
 %
 %    lat = loadncvar( 'mydata.nc', 'lat');
 %    grid = loadncvar( 'mydata.nc', { 'lat', 'lon' } );
-%    
+%
 %    Note: If you wish to load the whole netcdf file into a structure use
 %          struct = loadncfile (filename), instead.
 %
 % FORMAT   [ret, attr] = loadncvar( filename, varname )
-%        
+%
 % OUT   ret        Loaded variable.
 % OUT   attr       Global attributes.
 % IN    filename   Name of NetCDF file.
@@ -25,15 +25,16 @@
 % 2010-11-22   Modified by Salomon Eliasson.
 % 2012-01-30   Modified by Gerrit Holl.
 % 2012-02-23   Modified by Gerrit Holl.
+% 2012-10-18   Modified by Salomon Eliasson.
 
 function [ret, attr] = loadncvar( filename, varname )
 
 errId = ['atmlab:' mfilename];
 % UNCOMPRESS if needed
 if strcmp(filename(end-2:end),'.gz')
-	tmpdir = create_tmpfolder;
+    tmpdir = create_tmpfolder;
     c= onCleanup(@() rmdir(tmpdir,'s'));
-	filename = uncompress(filename,tmpdir);
+    filename = uncompress(filename,tmpdir);
     if isempty(filename), error(errId,'Uncompressing failed'); end
 end
 
@@ -42,9 +43,9 @@ ncid = netcdf.open (filename, 'NOWRITE');
 cleanupObject = onCleanup( @() netcdf.close (ncid) );
 
 if (nargout>1)
-  attr = getncattributes (ncid);
+    attr = getncattributes (ncid);
 else
-  attr = [];
+    attr = [];
 end
 
 if ischar(varname)
@@ -55,7 +56,13 @@ elseif iscell(varname)
         ret = struct();
     end
     for v = varname(:).'
-        varid = netcdf.inqVarID (ncid, v{1});
+        try
+            varid = netcdf.inqVarID (ncid, v{1});
+        catch ME
+            if ~isempty(regexp(ME.message,'Variable not found', 'once'))
+                error(errId,'Variable ''%s'' not found in file',v{1})
+            end
+        end
         ret.(genvarname(v{1})) = nc_read_varid(ncid, varid);
     end
 else

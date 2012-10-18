@@ -42,7 +42,7 @@ function S = common_read_dardarsub(file, varargin)
     S.version = info.version;
 
     if isfield(S,'height')
-        fprintf('Saving memory: extracting height vector from repetitive height matrix...\n')
+        logtext(1,'Saving memory: extracting height vector from repetitive height matrix...\n')
         S.height = S.height(:,1);
     end
 

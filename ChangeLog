@@ -1,3 +1,14 @@
+2012-10-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-291
+
+	* datasets/common_read_dardarsub.m:
+	* math/column_integrate.m:
+	Changed fprintf to logtext
+
+	* files/loadncvar.m: If it fails because a fields is missing,
+	report it by name.
+
 2012-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-290
