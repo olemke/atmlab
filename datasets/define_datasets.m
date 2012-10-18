@@ -512,22 +512,60 @@ f_amsua.A_POS.atts.long_name = 'AMSU-A scanline position';
 % ---------
 % CPR
 % ---------
-f_cpr.ROIWP.type = 'float';
-f_cpr.ROIWP.realname = 'RO_ice_water_path';
-f_cpr.ROIWP.atts.long_name = 'CloudSat Radar-Only CPR IWP';
-f_cpr.ROIWP.atts.units = 'g/m^2';
-f_cpr.dROIWP.type = 'float';
-f_cpr.dROIWP.realname = 'RO_ice_water_path_uncertainty';
+f_cpr.cloud_scenario.realname           = 'cloud_scenario';
+f_cpr.cloud_scenario.type               = 'short';
+f_cpr.cloud_scenario.dataset            = D.cprCldclass;
+f_cpr.cloud_scenario.atts.long_name     = 'Cloud Scenario';
+f_cpr.cloud_scenario.atts.units         = 'none';
+f_cpr.cloud_scenario.atts.description   =  'See table 5 in 2B_CLDCLASS_PDICD_5.0.pdf on this dataset';
+f_cpr.Cloud_Types.realname          = 'Cloud_Types';
+f_cpr.Cloud_Types.type              = 'byte';
+f_cpr.Cloud_Types.dataset           = D.cprCldclass;
+f_cpr.Cloud_Types.atts.long_name    = 'Cloud Types';
+f_cpr.Cloud_Types.atts.units        = 'none';
+f_cpr.Cloud_Types.atts.description  = ['A condensed version of cloud scenario, where the only single '...
+                                    'cloud types per profile are retrieved, i.e. if there are multiple '...
+                                    'cloudtypes in the same column, the cloudtype is called mixedCloud Types = '...
+                                    'No cloud (0), Ci (1), As (2), Ac (3), St (4), Sc (5), Cu (6), Ns (7), DC (8), mixed (9)'];
+f_cpr.Data_quality.type = 'short';
+f_cpr.Data_quality.atts.long_name = 'data quality';
+f_cpr.Data_quality.atts.units = 'none';
+f_cpr.Data_quality.atts.description = 'If 0, then data is of good quality, otherwise treat as bitfield with 8 flags';
+f_cpr.dROIWP.type           = 'float';
+f_cpr.dROIWP.realname       = 'RO_ice_water_path_uncertainty';
 f_cpr.dROIWP.atts.long_name = 'CloudSat Radar-Only CPR IWP uncertainty';
-f_cpr.dROIWP.atts.units = 'g/m^2';
-f_cpr.IOROIWP.type = 'float';
-f_cpr.IOROIWP.realname = 'IO_RO_ice_water_path';
-f_cpr.IOROIWP.atts.long_name = 'CloudSat Radar-Only Ice-Only CPR IWP';
-f_cpr.IOROIWP.atts.units = 'g/m^2';
-f_cpr.dIOROIWP.type = 'float';
-f_cpr.dIOROIWP.realname = 'IO_RO_ice_water_path_uncertainty';
-f_cpr.dIOROIWP.atts.long_name = 'CloudSat Radar-Only Ice-Only CPR IWP uncertainty';
-f_cpr.dIOROIWP.atts.units = 'g/m^2';
+f_cpr.dROIWP.atts.units     = 'g/m^2';
+f_cpr.dIOROIWP.type             = 'float';
+f_cpr.dIOROIWP.realname         = 'IO_RO_ice_water_path_uncertainty';
+f_cpr.dIOROIWP.atts.long_name   = 'CloudSat Radar-Only Ice-Only CPR IWP uncertainty';
+f_cpr.dIOROIWP.atts.units       = 'g/m^2';
+f_cpr.Height.type           = 'short';
+f_cpr.Height.atts.long_name = 'Height of range bin in Reflectivity/Cloud Mask above reference surface (~ mean sea level)';
+f_cpr.Height.atts.units     = 'm';
+f_cpr.IOROIWP.type              = 'float';
+f_cpr.IOROIWP.realname          = 'IO_RO_ice_water_path';
+f_cpr.IOROIWP.atts.long_name    = 'CloudSat Radar-Only Ice-Only CPR IWP';
+f_cpr.IOROIWP.atts.units        = 'g/m^2';
+f_cpr.IO_RO_ice_water_path      = f_cpr.IOROIWP;
+f_cpr.IO_RO_ice_water_path.type = 'short';
+f_cpr.RO_ice_water_content.type             = 'short';
+f_cpr.RO_ice_water_content.atts.long_name   = 'ice water content';
+f_cpr.RO_ice_water_content.atts.units       = 'g/m^3';
+f_cpr.ROIWP.type                = 'float';
+f_cpr.ROIWP.realname            = 'RO_ice_water_path';
+f_cpr.ROIWP.atts.long_name      = 'CloudSat Radar-Only CPR IWP';
+f_cpr.ROIWP.atts.units          = 'g/m^2';
+f_cpr.RO_ice_water_path         = f_cpr.ROIWP;
+f_cpr.RO_ice_water_path.type    = 'short'; %int16
+f_cpr.RVOD_ice_water_path.type              = 'int';
+f_cpr.RVOD_ice_water_path.dataset           = D.CPR_RVOD;
+f_cpr.RVOD_ice_water_path.atts.long_name    = 'RVOD ice water path';
+f_cpr.RVOD_ice_water_path.atts.units        = 'g/m^2';
+                                
+f_cpr.fields = fieldnames(f_cpr); % To later choose a subselection (see fieldCopiers)
+% dependencies
+f_cpr.Cloud_Types.dependenacies     = getSelection(f_cpr,{'cloud_scenario'});
+
 
 % -----------
 % DARDAR_SUB
@@ -751,6 +789,14 @@ FieldCopier(D.collocation_amsub_mhs, f_amsub1, f_mhs2, ...
 FieldCopier(D.collocation_amsub_amsub, f_amsub1, f_amsub2, ...
     'name', 'associated_amsub_amsub');
 
+FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
+    getSelection(f_cpr,{'Cloud_Types'}),struct(),...
+    'name','cpr_dardarsub_cloudTypes');
+
+FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
+    getSelection(f_cpr,{'RO_ice_water_path','IO_RO_ice_water_path'}),getSelection(f_dardarsub,{'dardar_IWP'}),...
+    'name','cpr_dardarsub_IWP');
+
 FieldCopier(D.CollocatedDataset_dardarsub_modis, ...
     getSelection(f_dardarsub,{'dardar_IWP'}),getSelection(f_modis,{'modis_IWP','RE_ICE','TAU_ICE'}),...
     'name','dardarsub_modis_aqua_L2_IWP');
@@ -758,7 +804,7 @@ FieldCopier(D.CollocatedDataset_dardarsub_modis, ...
 %% Collapser datasets
 
 % similar to old Cloudsat/POES meandata
-
+D = datasets;
 % --------------
 % LIMITERS
 % ------------ 
@@ -796,7 +842,7 @@ end
 closest.fn = @(x)(x); %workaround, see this collapser
 closest.ln = 'Only the closest modis pixel';
 closest.ty = 'double';
-modis_global = {@(X)(X(:,D.dardarsub_modis_aqua_L2_IWP.cols.DIST)==min(X(:,D.dardarsub_modis_aqua_L2_IWP.cols.DIST)))};
+modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.DIST)==min(X(:,D.dardarsub_modis_aqua_L2_IWP.cols.DIST)))};
 modis.modis_IWP.processors.CLOSEST          = closest.fn;
 modis.modis_IWP.stored.CLOSEST.long_name    = closest.ln;
 modis.modis_IWP.stored.CLOSEST.type         = closest.ty;

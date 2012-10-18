@@ -36,7 +36,6 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 % EXAMPLE
 %
 %   To compare IWP products with logarithmic axes, one may use e.g.:
-
 %
 %   opts.trans = @(x)log10(x);   % provide transformation on both axis
 %   opts.invtrans = @(x)10.^(x); % inverse transformation on both axis

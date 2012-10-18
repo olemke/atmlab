@@ -1,5 +1,18 @@
 2012-10-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-292
+
+	* graphs/scatter_density_plot.m:
+	reconnected examples with the help section
+
+	* datasets/define_datasets.m:
+	- Added CloudSat fields for fieldCopier
+	- fixed bug in modis Collapser datasets
+
+	* site-specific/kiruna/datasets_init.m: Added dardar fieldCopiers
+
+2012-10-18  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-291
 
 	* datasets/common_read_dardarsub.m:

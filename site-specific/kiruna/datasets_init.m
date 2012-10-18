@@ -248,6 +248,17 @@ D.cdpc_2dcp.basedir = '/storage3/user_data/gerrit/collocated_datasets/testing/cd
 D.cdpc_2dcp.subdir = '$YEAR4/$DOY';
 
 % --------
+% DARDAR
+% --------
+D.cpr_dardarsub_IWP.basedir     = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/cpr_dardarsub_IWP';
+D.cpr_dardarsub_IWP.filename    = 'collocations_cpr_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
+D.cpr_dardarsub_IWP.subdir      = '$YEAR4/$MONTH/$DAY';
+
+D.cpr_dardarsub_cloudTypes.basedir  = strrep(D.cpr_dardarsub_IWP.basedir,'IWP','cloudTypes');
+D.cpr_dardarsub_cloudTypes.filename = D.cpr_dardarsub_IWP.filename;
+D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
+
+% --------
 % MODIS
 % --------
 % Fc
