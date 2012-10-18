@@ -110,8 +110,12 @@ for i = 1 : length(za)
     dlon  = -sinlon(i)/coslat(i)/r(i)*dx(i) + coslon(i)/coslat(i)/r(i)*dy(i);
     aa(i) = rad2deg * acos( r(i) * dlat(i) / sin( deg2rad * za(i) ) );
     %
-    if isnan( aa(i) )
-      aa(i) = 180 *(1 - dlat(i) >= 0);
+    if isnan( aa(i) ) |  ~isreal( aa(i) )
+      if dlat >= 0
+        aa(i) = 0;
+      else
+        aa(i) = 180;
+      end
     elseif dlon(i) < 0
       aa(i) = -aa(i);
     end

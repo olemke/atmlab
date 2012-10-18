@@ -1,3 +1,14 @@
+2012-10-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-293
+
+	* geodetic/cartposlos2geocentric.m: It seems that numerical problems
+	gives an imaginary aa, instaed of NaN in arts. Extended this
+	check. The result if imaginary was alos wrong (0 and 180 was mixed up).
+
+	* forwardmodel/pathpoint2sensorposlos.m: Removed restriction that
+	za must be > 90. And now actually also working for 2D.
+
 2012-10-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-292

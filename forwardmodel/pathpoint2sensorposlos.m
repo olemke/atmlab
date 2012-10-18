@@ -2,10 +2,11 @@
 %
 %   Calculates sensor position and line-of-sight (LOS) based on a point
 %   along a pure geometrical (no refraction) propagation path, and the
-%   sensor altitude (given as the radius, from goid center). Both a position
+%   sensor altitude (given as the radius, from geoid center). Both a position
 %   and a LOS for the propagation path point must be given.
 %
 %   Positions and LOS are given following the ARTS coordinate systems.
+%   Note that LOS is defined as the viewing direction (not photon direction).
 %  
 %   Positions have dimensions (r), (r,lat) and (r,lat,lon) for 1D/2D/3D.
 %   
@@ -44,10 +45,6 @@ end                                                                      %&%
 if  ~( (dim<=2 & length(plos)==1)  | (dim==3 & length(plos)==2) )        %&%
   error('Length of *plos* does not match *dim*.' );                      %&%
 end                                                                      %&%
-%                                                                        %&%
-if abs(plos(1)) < 90                                                     %&%
-  error( 'The function accepts only zenith angles > 90 degrees.' );      %&%
-end                                                                      %&%
 
 
 %- Make calculations always in 3D
@@ -57,14 +54,26 @@ pos(1:dim)          = ppos;
 %
 los                 = zeros(1,2);
 los(1:length(plos)) = plos;
-
-
-%- Length from path point to sensor radius (by law of cosines)
 %
-deg2rad = constants( 'DEG2RAD' );
-a       = pos(1)*cos(deg2rad*los(1));
-l       = a + sqrt( a*a + r_sensor*r_sensor - pos(1)*pos(1) );
+if dim == 2
+  los(1) = abs( los(1) );
+  if plos(1) < 0
+    los(2) = 180;
+  end
+end
 
+
+
+%- Length from path point to sensor radius 
+%
+r_tan = pos(1)*sind( los(1) );
+r2    = r_tan * r_tan;
+% Distance to tangent point:
+l     = sqrt( r_sensor*r_sensor - r2 ); 
+% Add or remove distance to tangent point
+if los(1) ~= 90
+  l     = l - sign(los(1)-90)*sqrt( pos(1)*pos(1) - r2 );
+end
 
 %- Position and LOS of sensor
 %
