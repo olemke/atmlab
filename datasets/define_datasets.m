@@ -551,6 +551,13 @@ f_cpr.IO_RO_ice_water_path.type = 'short';
 f_cpr.RO_ice_water_content.type             = 'short';
 f_cpr.RO_ice_water_content.atts.long_name   = 'ice water content';
 f_cpr.RO_ice_water_content.atts.units       = 'g/m^3';
+f_cpr.RO_ice_water_content_uncertainty.type             = 'short';
+f_cpr.RO_ice_water_content_uncertainty.atts.long_name   = 'ice water content uncertainty';
+f_cpr.RO_ice_water_content_uncertainty.atts.units       = '%';
+f_cpr.RO_ice_water_content_uncertainty.atts.description = ['Fractional uncertainty in the RO retrieved '...
+                                                'IWC (from the ice-only retrieval), expressed in percent '...
+                                                'and rounded to the nearest integer. A value of 250 indicates '... 
+                                                'an uncertainty >= 250%.'];
 f_cpr.ROIWP.type                = 'float';
 f_cpr.ROIWP.realname            = 'RO_ice_water_path';
 f_cpr.ROIWP.atts.long_name      = 'CloudSat Radar-Only CPR IWP';
@@ -571,32 +578,31 @@ f_cpr.Cloud_Types.dependenacies     = getSelection(f_cpr,{'cloud_scenario'});
 % DARDAR_SUB
 % -----------
 
-f_dardarsub.IWC.realname        = 'iwc';
-f_dardarsub.IWC.type            = 'float';
-f_dardarsub.IWC.atts.long_name  = 'Retrieved Ice Water Content, the mass of ice per unit';
-f_dardarsub.IWC.atts.unit       = 'kg m-3';
+f_dardarsub.dardar_IWP.type            = 'float'; % is enough since max IWP ca. 14000 g/m^2
+f_dardarsub.dardar_IWP.atts.long_name  = 'DARDAR Ice Water Path';
+f_dardarsub.dardar_IWP.atts.unit       = 'kg/m^2';
+f_dardarsub.dardar_IWP.atts.description='Column integrated ''iwc''';
 f_dardarsub.HEIGHT.realname         = 'height';
 f_dardarsub.HEIGHT.type             = 'float';
 f_dardarsub.HEIGHT.atts.long_name   = 'Height';
 f_dardarsub.HEIGHT.atts.unit        = 'm';
+f_dardarsub.IWC.realname        = 'iwc';
+f_dardarsub.IWC.type            = 'float';
+f_dardarsub.IWC.atts.long_name  = 'Retrieved Ice Water Content, the mass of ice per unit';
+f_dardarsub.IWC.atts.unit       = 'kg m-3';
 f_dardarsub.IWC_ERROR.realname      = 'ln_iwc_error';
 f_dardarsub.IWC_ERROR.type          = 'float';
 f_dardarsub.IWC_ERROR.atts.long_name= '1-sigma random error in natural logarithm of IWC';
 f_dardarsub.IWC_ERROR.atts.unit     = 'ln(kg m-3)';
 f_dardarsub.INSTR_FLAG.realname         = 'instrument_flag';
-f_dardarsub.INSTR_FLAG.type             = 'float';
+f_dardarsub.INSTR_FLAG.type             = 'short';
 f_dardarsub.INSTR_FLAG.atts.long_name   = 'Instrument flag (0==nothing/1==lidar/2==radar/3==radar+lidar)';
 f_dardarsub.INSTR_FLAG.atts.units       = 'dimensionless';
-f_dardarsub.dardar_IWP.realname        = 'dardar_IWP';
-f_dardarsub.dardar_IWP.type            = 'float'; % is enough since max IWP ca. 14000 g/m^2
-f_dardarsub.dardar_IWP.atts.long_name  = 'DARDAR Ice Water Path';
-f_dardarsub.dardar_IWP.atts.unit       = 'kg/m^2';
-f_dardarsub.dardar_IWP.atts.description='Column integrated ''iwc''';
-f_dardarsub.IWP_ERROR.realname          = 'dardar_ln_IWP_error';
-f_dardarsub.IWP_ERROR.type              = 'float';
-f_dardarsub.IWP_ERROR.atts.long_name    = 'DARDAR ln_IWP_error';
-f_dardarsub.IWP_ERROR.atts.unit         = 'ln(kg/m^2)';
-f_dardarsub.IWP_ERROR.atts.description  = 'Column integrated ''ln_iwc_error''';
+f_dardarsub.dardar_ln_IWP_error.realname          = 'dardar_ln_IWP_error';
+f_dardarsub.dardar_ln_IWP_error.type              = 'float';
+f_dardarsub.dardar_ln_IWP_error.atts.long_name    = 'DARDAR ln_IWP_error';
+f_dardarsub.dardar_ln_IWP_error.atts.unit         = 'ln(kg/m^2)';
+f_dardarsub.dardar_ln_IWP_error.atts.description  = 'Column integrated ''ln_iwc_error''';
 f_dardarsub.VOD.realname        = 'vis_optical_depth';
 f_dardarsub.VOD.type            = 'float';
 f_dardarsub.VOD.atts.long_name  = 'visible optical depth';
@@ -612,7 +618,7 @@ f_dardarsub.VOD_ERROR.atts.description  = 'Visible optical depth error';
 f_dardarsub.fields = fieldnames(f_dardarsub); % To later choose a subselection (see fieldCopiers)
 % for theose that have dependencies
 f_dardarsub.dardar_IWP.dependenacies    = catstruct(getSelection(f_dardarsub,{'IWC'}), getSelection(f_dardarsub,{'HEIGHT'}));
-f_dardarsub.IWP_ERROR.dependenacies     = catstruct(f_dardarsub.dardar_IWP.dependenacies,getSelection(f_dardarsub,{'IWC_ERROR'}));
+f_dardarsub.dardar_ln_IWP_error.dependenacies     = catstruct(f_dardarsub.dardar_IWP.dependenacies,getSelection(f_dardarsub,{'IWC_ERROR'}));
 
 % ---------
 % HIRS
