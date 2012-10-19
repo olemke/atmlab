@@ -568,7 +568,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             fulldir = self.find_datadir_by_date(datevec, spec);
             
-            if nargin() <= 3 && ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename) % calculate directly
+            if (nargin() <= 3 && ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename)) || ~self.tryre % calculate directly
                 fn = strrep_variables(self.filename, spec, datevec);
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
@@ -584,10 +584,16 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
                 
                 nfound = sum(found);
+                if iscell(spec) % short-string for error message
+                    sp = horzcat(spec{:});
+                else
+                    sp = spec;
+                end
+                
                 if nfound==0
-                    error(errid, 'No datafile found for %s %s [%s]', self.name, spec, num2str(datevec));
+                    error(errid, 'No datafile found for %s %s [%s]', self.name, sp, num2str(datevec));
                 elseif nfound > 1
-                    error(errid, 'Multiple datefiles found for %s %s', self.name, spec);
+                    error(errid, 'Multiple datefiles found for %s %s', self.name, sp);
                 else
                     datafile = paths{found};
                 end

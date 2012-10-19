@@ -1,3 +1,15 @@
+2012-10-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-298
+
+	* collocations/CollocatedDataset.m (read):
+
+	- Catch unfound file
+
+	* datasets/SatDataset (overlap_granule):
+
+	- Bugfix with self.tryre
+
 2012-10-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-297
