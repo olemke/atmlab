@@ -1,3 +1,10 @@
+2012-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-296
+
+	* math/pointinterp.m: Did not work at all! varargin was missing in
+	function declaration.
+
 2012-10-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-295

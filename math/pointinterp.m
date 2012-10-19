@@ -28,7 +28,7 @@
 % 2007-05-22   Created by Patrick Eriksson.
 
 
-function B = pointinterp(agrids,A,pos,iopt)
+function B = pointinterp(agrids,A,pos,varargin)
 %
 [iopt,extrap] = optargs( varargin, { 'linear', false } );
                                                                           %&%
