@@ -1645,9 +1645,23 @@ classdef CollocatedDataset < HomemadeDataset
         function [data, attr] = read_homemade_granule(self, fullpath, fields)
             core_fields = {'LAT1', 'LON1', 'TIME1'};
 
-            all_fields = [core_fields(:); fields(:)];
+            errID = ['atmlab:' mfilename ':error'];
+            % core
+            [data, attr] = read_homemade_granule@HomemadeDataset(self, fullpath, core_fields); % call parent constructor
             
-            [data, attr] = read_homemade_granule@HomemadeDataset(self, fullpath, all_fields); % call parent constructor
+            % FIXME: implement subset-ads
+            [~, additionals1, additional_fields1] = self.deal_fields(fields, self.associated);
+            info = self.find_info_from_granule(fullpath);
+            for i = 1:length(additionals1) % this is where the fieldCopiers are
+                tmppath = additionals1{i}.find_granule_by_datetime(...
+                    [str2double(info.year),str2double(info.month),str2double(info.day)],...
+                    info.satname);
+                 [tmpS, tmpA] = additionals1{i}.read_homemade_granule(tmppath, additional_fields1{i}); % call parent constructor
+                     attr.(self.associated{1}(i).name) = tmpA;
+                     tmpS.(['path_' self.associated{1}(i).name]) = tmpS.path;
+                     data = catstruct(data,rmfield(tmpS,{'path','epoch'}));
+            end
+            assert(all(ismember([core_fields(:);fields(:)],fieldnames(data))),errID,'Some field(s) is(are) missing')
 
             % collocations have time in unixsecs, but datasets have time in
             % seconds since start of day, which happens to equal data.epoch
@@ -1676,16 +1690,19 @@ classdef CollocatedDataset < HomemadeDataset
             % IN
             %
             %   all_fields  cell-array  all fields to be sorted
+            %   ads         cell-array of associated datasets that must be
+            %               a subset of self.associated
             %
             % OUT
             %
             %   fields_core         cell array  fields in core
             %   additionals         cell array  <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
             %   additional_fields   cell array of cell array of fields
-            %   deal_index          vector
+            %   deal_index          vector          
             
             n_f = 0;
             n_add = zeros(size(self.associated));
+            fields = {};
             additionals = {};
             additional_fields = {};
             existing_names = {};
@@ -1753,8 +1770,8 @@ classdef CollocatedDataset < HomemadeDataset
                 ['atmlab:' mfilename ':BUG'], ...
                 'length(additionals) == %d != length(additional_fields) == %d, bug?', ...
                 length(additionals), length(additional_fields));
-            assert(logical(exist('fields','var')),['atmlab:' mfilename ':notImplemented'],...
-                'No fields from the core dataaset are listed in all_fields')
+%             assert(logical(exist('fields','var')),['atmlab:' mfilename ':notImplemented'],...
+%                 'No fields from the core dataaset are listed in all_fields')
             
         end
         

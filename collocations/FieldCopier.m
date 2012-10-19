@@ -190,11 +190,11 @@ classdef FieldCopier < AssociatedDataset
         
         %% implementation of abstract methods
         function args = primary_arguments(self)
-            args = self.fieldargs(self.fieldstruct_primary);
+            args = self.fieldargs(self.fieldstruct_primary, self.parent.primary);
         end
         
         function args = secondary_arguments(self)
-            args = self.fieldargs(self.fieldstruct_secondary);
+            args = self.fieldargs(self.fieldstruct_secondary, self.parent.secondary);
         end
         
         function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~)
@@ -414,23 +414,24 @@ classdef FieldCopier < AssociatedDataset
         end
         
         function out = needs_primary_data(self)
-            out = ~isempty(self.fieldargs(self.fieldstruct_primary));
+            out = ~isempty(self.fieldargs(self.fieldstruct_primary, self.parent.primary));
         end
         
         function out = needs_secondary_data(self)
-            out = ~isempty(self.fieldargs(self.fieldstruct_secondary));
+            out = ~isempty(self.fieldargs(self.fieldstruct_secondary, self.parent.secondary));
         end
         
     end
 
     methods (Static, Access = private)
-        function fargs = fieldargs(fieldstruct)
+        function fargs = fieldargs(fieldstruct, coreparent)
             % determine from a fieldstruct what arguments to pass
             names = fieldnames(fieldstruct);
             fargs = {};
             k = 0;
             for i = 1:length(names)
-                if ~isfield(fieldstruct.(names{i}), 'dataset')
+                if ~isfield(fieldstruct.(names{i}), 'dataset') || ...
+                        strcmp(fieldstruct.(names{i}).dataset.name, coreparent.name) 
                     k = k + 1;
                     if isfield(fieldstruct.(names{i}), 'realname')
                         fargs{k} = fieldstruct.(names{i}).realname; %#ok<AGROW>

@@ -1,3 +1,22 @@
+2012-10-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-297
+
+	* collocations/FieldCopier.m (fieldargs):
+	- Gerrit fixed function to not always ignore field in a sibling
+	dataset. e.g. if the secondary dataset is the sibling dataset.
+
+	* collocations/CollocatedDataset.m
+	(read_homemade_granule):
+	- Made possible to read collocated dataset from core and fieldcopier
+	to collocate with another dataset.
+	(deal_fields):
+	- Gerrit removed assertion so that empty 'field' is now allowed.
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m:
+	Changed the name of the modis collocated dataset
+
 2012-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-296

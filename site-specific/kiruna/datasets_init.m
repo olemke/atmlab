@@ -262,13 +262,13 @@ D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
 % MODIS
 % --------
 % Fc
-D.dardarsub_modis_aqua_L2_IWP.basedir   = '/storage4/user_data/seliasson/collocations_dardarsub_modis/dardarsub_modis_aqua_L2_IWP';
-D.dardarsub_modis_aqua_L2_IWP.filename  = 'collocations_dardarsub_modis_aqua_L2_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.dardarsub_modis_aqua_L2_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_IWP.basedir   = '/storage4/user_data/seliasson/collocations_dardarsub_modis/dardarsub_modis_IWP';
+D.dardarsub_modis_IWP.filename  = 'collocations_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
 % Co
-D.dardarsub_modis_aqua_L2_IWP_mean.basedir  = '/storage4/user_data/seliasson/collocations_dardarsub_modis/dardarsub_modis_aqua_L2_IWP/averaged2primary';
-D.dardarsub_modis_aqua_L2_IWP_mean.filename = 'collocations_dardarsub_modis_aqua_L2_averaged2primary_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.dardarsub_modis_aqua_L2_IWP_mean.subdir   = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_IWP_mean.basedir  = '/storage4/user_data/seliasson/collocations_dardarsub_modis/dardarsub_modis_IWP/averaged2primary';
+D.dardarsub_modis_IWP_mean.filename = 'collocations_dardarsub_modis_averaged2primary_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_IWP_mean.subdir   = '$YEAR4/$MONTH/$DAY';
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');
 
