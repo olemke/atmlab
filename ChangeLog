@@ -1,3 +1,16 @@
+2012-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-300
+
+	* arts/arts_version.m: Created.
+
+	* arts/arts.m: Added result as output argument.
+
+	* arts/qarts2cfile.m (add_rtecalcstart): Adopting to change below.
+
+	* arts/qartsCloudbox.m (qartsCloudbox): Replaced Z_FIELD_IS_1D (as
+	now not used by MCGeneral) with MIN_ITER.
+
 2012-10-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* graphs/scatter_density_plot.m:
@@ -42,6 +55,7 @@
 	* datasets/define_datasets.m:
 	Changed the name of the modis collocated dataset
 
+>>>>>>> .r7936
 2012-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-296

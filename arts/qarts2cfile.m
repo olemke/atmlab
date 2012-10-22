@@ -1724,14 +1724,14 @@ function T = add_rtecalcstart( Q )
     if ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR' )  |  ...              %&%
        ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME' )  |  ...             %&%
        ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER' )  |  ...             %&%
-       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'Z_FIELD_IS_1D' )                %&%
+       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MIN_ITER' )                     %&%
       error( ['With Q.CLOUDBOX_DO=1 and MC method selected, ',...           %&%
            'CLOUDBOX.METHOD_PRMTRS must contain the fields: STD_ERR, ',...  %&%
-              'MAX_TIME, MAX_ITER and Z_FIELD_IS_1D'] )                     %&%
+              'MAX_TIME, MAX_ITER and MIN_ITER'] )                          %&%
     end                                                                     %&%
     %                                                                       %&%
     rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, {'STD_ERR','MAX_TIME',...         %&%
-                                       'MAX_ITER', 'Z_FIELD_IS_1D' }, ...   %&%
+                                       'MAX_ITER', 'MIN_ITER' }, ...        %&%
                                 'Q.CLOUDBOX.METHOD_PRMTRS when using MC' ); %&%
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR, @istensor0, ...        %&%
                                       'Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR' ); %&%
@@ -1739,8 +1739,8 @@ function T = add_rtecalcstart( Q )
                                      'Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME' ); %&%
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, @istensor0, ...       %&%
                                      'Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D, @isboolean, ...  %&%
-                                'Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D' ); %&%
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER, @istensor0, ...       %&%
+                                'Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER' );      %&%
     %
     T{end+1} = sprintf( 'NumericSet(mc_std_err,%.3e)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
@@ -1748,8 +1748,8 @@ function T = add_rtecalcstart( Q )
                                        Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
     T{end+1} = sprintf( 'IndexSet(mc_max_iter,%d)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );
-    T{end+1} = sprintf( 'IndexSet(mc_z_field_is_1D,%d)', ...
-                                       Q.CLOUDBOX.METHOD_PRMTRS.Z_FIELD_IS_1D );
+    T{end+1} = sprintf( 'IndexSet(mc_min_iter,%d)', ...
+                                       Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER );
   end
 
   if qarts_isset( Q.WSMS_BEFORE_RTE )

@@ -11,18 +11,19 @@
 %    all inside a string, as:
 %       arts '-w all';
 %
-% FORMAT   status = arts( cfile [,errortol] )
+% FORMAT   [status,result] = arts( cfile [,errortol] )
 %        
 % OUT   status     Status returned by ARTS. Is 0 if all OK.
+%       result     String containing messages to standard output.
 % IN    cfile      Name on control file, or OK command line option such as
 %                  '-h'.
 % OPT   errortol   Flag to tolerate error. If set to 0, an ARTS error gives
 %                  rise also to a Matlab error. Default is 0.
 
-% 2004-09-07   Created by Patrick Eriksson .
+% 2004-09-07   Created by Patrick Eriksson.
 
 
-function status = arts(cfile,errortol)
+function [status,result] = arts(cfile,errortol)
 
 if nargin < 2
   errortol = 0;
@@ -43,12 +44,13 @@ end                                                              %&%
 outdir = fileparts( cfile );
 
 if isempty( outdir )
-  status = system( sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+  [status,result] = system( sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
 else
-  status = system( sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+  [status,result] = system( ...
+             sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
 end
   
-  
+
 if status  &  ~errortol
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')
