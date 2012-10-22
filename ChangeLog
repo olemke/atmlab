@@ -1,3 +1,16 @@
+2012-10-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* graphs/scatter_density_plot.m:
+	- added hold('off') at the end
+	- added extra options (legend,atleastN) for plotting median lines.
+
+	* site-specific/kiruna/datasets_init.m:
+	- Added another dataset and an associated dataset
+
+	* datasets/define_datasets.m:
+	- Added another dataset and an associated dataset
+	- added field missing_val to Cloud_Types
+
 2012-10-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-298

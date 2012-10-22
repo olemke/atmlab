@@ -23,11 +23,18 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %       invtransx    inverse of trans, e.g. @(x)10.^(x)
 %       axprops     structure with axes properties
 %       ncolour     number of unique colours
-%       medprops    if defined, structure with props for median-lines
 %       scatprops   if defined, structure with props for scatter-points
 %       diagonal    if defined, structure with props for diag-line
+%       medprops    if defined, structure with props for median-lines, 
+%                   Additional fields that can be included in opts.medprops:
+%                   'atleastN'    Only calculate median where there are
+%                                 atleast N binned values. 
+%                   'legend'      Cell of names to be displayed in a
+%                                 legend related to the median lines
+%                   
+%                   
 %       ...
-%
+%   
 % OUT
 %
 %   h_ax     handle to main axes
@@ -132,15 +139,37 @@ axis('square');
 grid('on');
 set(gca, 'layer', 'top'); % otherwise grid is below everything
 
+hold('off');
 end
 
 function plot_medians(x, y, xbins, ybins, opts)
+
 binned_x = bin(opts.transx(x), opts.transy(y), xbins);
 binned_y = bin(opts.transy(y), opts.transx(x), ybins);
+
+if isfield(opts.medprops,'atleastN')
+    binned_x(cellfun(@numel,binned_x)<opts.medprops(1).atleastN)={NaN};
+    binned_y(cellfun(@numel,binned_y)<opts.medprops(1).atleastN)={NaN};
+    opts.medprops = rmfield(opts.medprops,'atleastN');
+end
 medians_x = cellfun(@median, binned_x);
 medians_y = cellfun(@median, binned_y);
-plot(opts.invtrans(xbins), opts.invtrans(medians_x), opts.medprops);
-plot(opts.invtrans(medians_y), opts.invtrans(ybins), opts.medprops);
+
+% do some extra things related to median lines before passing options to
+% the plot function
+if isfield(opts.medprops,'legend')
+    strs = {opts.medprops.legend};
+    opts.medprops = rmfield(opts.medprops,'legend');
+end
+
+
+
+t(1) = plot(opts.invtrans(xbins), opts.invtrans(medians_x), opts.medprops);
+t(2) = plot(opts.invtrans(medians_y), opts.invtrans(ybins), opts.medprops(length(opts.medprops)));
+
+if exist('strs','var')
+    legend(t,strs)
+end
 
 end
 

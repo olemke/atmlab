@@ -209,7 +209,21 @@ D.CollocatedDataset_patmosx_dardarsub.basedir   = '/storage4/user_data/seliasson
 D.CollocatedDataset_patmosx_dardarsub.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_patmosx_dardarsub.filename  = 'collocations_patmosx_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
+% -------------------------------
+% Collocated collocated datasets
+% -------------------------------
+D.dardarsub_modis_cldclass.basedir    = '/storage4/user_data/seliasson/collocations_dardarsub_modis_cldclass/core';
+D.dardarsub_modis_cldclass.subdir     = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_cldclass.filename   = 'collocations_dardarsub_modis_cldclass_$YEAR4_$MONTH_$DAY.nc.gz';
+
+D.dardarsub_modis_cprCldclass_cloudTypes.basedir  = '/storage4/user_data/seliasson/collocations_dardarsub_modis_cldclass/CollocatedDataset_dardarsub_modis_cprCldclass_cloudTypes';
+D.dardarsub_modis_cprCldclass_cloudTypes.subdir   = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_cprCldclass_cloudTypes.filename = 'collocations_CollocatedDataset_dardarsub_modis_cprCldclass_$YEAR4_$MONTH_$DAY.nc.gz';
+%     
+
+
 %% Associated datasets
+% ----------------------
 
 D.associated_CPR_MHS_AMSU_HIRS.basedir = '/storage3/user_data/gerrit/collocated_datasets/mhs_cpr';
 D.associated_CPR_MHS_AMSU_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
