@@ -18,5 +18,8 @@ if nargin & long_on_screen
   disp(s)
 end
 
-s = s( 1 : (min(find(s==' '))-1) );
+i1 = findstr( s, 'arts-' );
+i2 = min( find( s(i1:end) == ' ' ) );
+
+s = s( i1+[0:i2-2] );
   

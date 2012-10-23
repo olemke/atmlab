@@ -89,7 +89,7 @@ if isnan( arts_includes )
   error( 'You need to ARTS_INCLUDES to run this example.' );
 end                                                      
 %
-fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
+fascod = fullfile( arts_xmldata_path, 'planets', 'Earth', 'Fascod' );
 
 
 %- Init Q
@@ -208,7 +208,7 @@ Q.ABS_SPECIES(1).RETRIEVE = true;
 Q.ABS_SPECIES(1).L2       = true;
 Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:2e3:z_toa)', [], [] };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
-                            'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
+      'midlatitude-winter', 'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
 switch 1
  case 1  % Constant VMR
   Q.ABS_SPECIES(1).UNIT     = 'vmr';
@@ -254,7 +254,7 @@ end
 Q.ABS_SPECIES(2).TAG      = { 'H2O' };
 Q.ABS_SPECIES(2).RETRIEVE = false;
 Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
-                          'midlatitude-winter.H2O.xml' ), 'H2O', 'vmr_field' );
+    'midlatitude-winter', 'midlatitude-winter.H2O.xml' ), 'H2O', 'vmr_field' );
 
 % O2 and N2 not active, to make example somewhat faster
 if 0

@@ -57,8 +57,8 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                       'fascod', 'tropical' );
+Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
+                                            'Fascod', 'tropical', 'tropical' );
 Q.RAW_ATM_EXPAND_1D     = false;
 %
 Q.WIND_U_FIELD          = [];

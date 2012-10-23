@@ -1,3 +1,20 @@
+2012-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-301
+
+	* demos/qpack2_demo.m:
+	* demos/qarts_demo2.m:
+	* demos/qarts_demo.m: Paths to fascod files updated.
+
+	* arts/arts_version.m: Changed extraction of version string. Old
+	version failed occasionally (extra empty line at start?).
+
+	* arts/qarts2cfile.m (add_rtecalcstart): Changed printing format
+	string MAX_TIME, to make sure that it is printed as an Index.
+
+	* arts/qarts2cfile.m (add_includes): Improved handling of atmlab(
+	'ARTS_INCLUDES' ) set to NaN.
+
 2012-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-300

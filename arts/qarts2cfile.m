@@ -1698,11 +1698,15 @@ function T = add_includes( T, name, field )
     arts_includes = atmlab( 'ARTS_INCLUDES' );
     %
     for i = 1 : length( field )
-      if isnan( arts_includes )  &  strfind( field{i}, 'ARTS_INCLUDES' )   %&%
-        error( ...                                                         %&%
+      if strfind( field{i}, 'ARTS_INCLUDES' )
+        if isnan( arts_includes )                                          %&%
+          error( ...                                                       %&%
            'Atmlab setting ARTS_INCLUDES is requested, but is not set.' ); %&%
-      end                                                                  %&%
-      s        = strrep( field{i}, 'ARTS_INCLUDES', arts_includes );
+        end                                                                %&%
+        s = strrep( field{i}, 'ARTS_INCLUDES', arts_includes );
+      else
+        s = field{i};
+      end
       T{end+1} = sprintf( 'INCLUDE "%s"', s );
     end
   end
@@ -1744,7 +1748,7 @@ function T = add_rtecalcstart( Q )
     %
     T{end+1} = sprintf( 'NumericSet(mc_std_err,%.3e)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
-    T{end+1} = sprintf( 'IndexSet(mc_max_time,%d)', ...
+    T{end+1} = sprintf( 'IndexSet(mc_max_time,%.0f)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME );
     T{end+1} = sprintf( 'IndexSet(mc_max_iter,%d)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER );

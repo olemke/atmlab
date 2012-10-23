@@ -32,7 +32,7 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
+fascod = fullfile( arts_xmldata_path, 'planets', 'Earth', 'Fascod' );
 
   
 %= Init Q structures
@@ -57,20 +57,20 @@ Q.J_DO                  = false;
 % Note that ATMDATA for nitrogen is set to a scalar
 %
 Q.ABS_SPECIES(1).TAG{1}  = 'ClO';
-Q.ABS_SPECIES(1).ATMDATA = gf_artsxml( fullfile( fascod, ...
+Q.ABS_SPECIES(1).ATMDATA = gf_artsxml( fullfile( fascod, 'tropical', ...
                             'tropical.ClO.xml' ), 'ClO', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(2).TAG{1}  = 'O3';
-Q.ABS_SPECIES(2).ATMDATA = gf_artsxml( fullfile( fascod, ...
+Q.ABS_SPECIES(2).ATMDATA = gf_artsxml( fullfile( fascod, 'subarctic-summer',...
                               'subarctic-summer.O3.xml' ), 'O3', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(3).TAG{1}  = 'N2O';
-Q.ABS_SPECIES(3).ATMDATA = gf_artsxml( fullfile( fascod, ...
+Q.ABS_SPECIES(3).ATMDATA = gf_artsxml( fullfile( fascod, 'tropical', ...
                             'tropical.N2O.xml' ), 'N2O', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(4).TAG{1}  = 'H2O-*-490e9-510e9'; % Some local lines not in PWR98
 Q.ABS_SPECIES(4).TAG{2}  = 'H2O-PWR98';
-Q.ABS_SPECIES(4).ATMDATA = gf_artsxml( fullfile( fascod, ...
+Q.ABS_SPECIES(4).ATMDATA = gf_artsxml( fullfile( fascod, 'tropical', ...
                             'tropical.H2O.xml' ), 'H2O', 'vmr_field' ); 
 %
 Q.ABS_SPECIES(5).TAG{1}  = 'N2-SelfContStandardType';
