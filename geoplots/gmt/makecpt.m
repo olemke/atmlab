@@ -2,13 +2,13 @@ function file = makecpt(in)
 % MAKECPT appends options to GMT makecpt
 %
 % PURPOSE: Appends options to a short script and calls the GMT
-% 
+%
 % IN      struct           options here (see help gmt_plot)
 %
 % NOTE    list of colortables found at /usr/lib/gmt/share/cpt/
 %
 % Created by Salomon Eliasson
-% $Id$ 
+% $Id$
 
 mkcpt = sprintf('makecpt -C%s',in.ctable);
 
@@ -23,15 +23,10 @@ else
     mkcpt = sprintf(fstr,mi,mx,step);
 end
 
-if isfield(in,'color_nan')
-    mkcpt = sprintf('%s --COLOR_NAN=%s',mkcpt,in.color_nan);
-end
-if isfield(in,'color_background')
-    mkcpt = sprintf('%s --COLOR_BACKGROUND=%s',mkcpt,in.color_background);
-end
-if isfield(in,'color_foreground')
-    mkcpt = sprintf('%s --COLOR_FOREGROUND=%s',mkcpt,in.color_foreground);
-end
+mkcpt = sprintf('%s --COLOR_NAN=%s',mkcpt,in.color_nan);
+mkcpt = sprintf('%s --COLOR_BACKGROUND=%s',mkcpt,in.color_background);
+mkcpt = sprintf('%s --COLOR_FOREGROUND=%s',mkcpt,in.color_foreground);
+
 file = 'ctable.cpt';
 command = [mkcpt ' > ' file];
 

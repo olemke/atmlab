@@ -29,9 +29,9 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %                   Additional fields that can be included in opts.medprops:
 %                   'atleastN'    Only calculate median where there are
 %                                 atleast N binned values. 
-%                   'legend'      Cell of names to be displayed in a
-%                                 legend related to the median lines
-%                   
+%                   legend.names  = {names} to be displayed in a legend related to the median lines
+%              e.g. legend.Location = 'NorthWest'
+%                   etc. (except for legend.names, fieldnames and options must be valid for legend() )
 %                   
 %       ...
 %   
@@ -158,7 +158,7 @@ medians_y = cellfun(@median, binned_y);
 % do some extra things related to median lines before passing options to
 % the plot function
 if isfield(opts.medprops,'legend')
-    strs = {opts.medprops.legend};
+    leg = opts.medprops.legend;
     opts.medprops = rmfield(opts.medprops,'legend');
 end
 
@@ -167,8 +167,12 @@ end
 t(1) = plot(opts.invtrans(xbins), opts.invtrans(medians_x), opts.medprops);
 t(2) = plot(opts.invtrans(medians_y), opts.invtrans(ybins), opts.medprops(length(opts.medprops)));
 
-if exist('strs','var')
-    legend(t,strs)
+if exist('leg','var')
+    lh = legend(t,leg.names);
+    leg = rmfield(leg,'names');
+    for F = fieldnames(leg)'
+        set(lh,F{1},leg.(F{1}))
+    end
 end
 
 end

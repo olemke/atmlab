@@ -293,16 +293,19 @@ test.title               = 'Robinsson projection, center = 0 ';
 test.projection          = 'N';
 test.center              = 0;
 test.legend.tick_spacing = 10;
+test.extra_legend        = struct('name','nan','type','nan','position','7.85i/0i/.8c/0.8c');
 in.filename              = sprintf('Test%.0fb',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-%test.legend = rmfield(test.legend,'tick_spacing');
-test.legend.tick_spacing = 15;
-test.title              = 'Sinusoidal projection, center = 90';
-test.projection         = 'I';      % FIXME
-test.center             = 90;
-in.filename             = sprintf('Test%.0fc',t);
+test.extra_legend           = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize',25);
+test.legend.position        = '12c/0c/20c/2ch';
+test.legend.annot_font_size_primary = 20;
+test.legend.tick_spacing    = 15;
+test.title                  = 'Sinusoidal projection, center = 90';
+test.projection             = 'I';
+test.center                 = 90;
+in.filename                 = sprintf('Test%.0fc',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 

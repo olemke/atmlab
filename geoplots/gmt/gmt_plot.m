@@ -272,7 +272,7 @@ function filename = gmt_plot(in,field)
 % (see below). Assign a color to a relative value, e.g between 0-1, where
 % 0 is for the minimum of the datarange and 1 is for the color of the
 % maximum datarange. For example,
-% in.colorrange.colors = {{0,'red'},{.3,'black'},{0.5,'green'},{1,'blue'}},
+% in.colorrange.colors = {{0,'250/0/0''},{.3,'0/0/0'},{0.5,'0/255/0'},{1,'0/0/255'}},
 % makes a colortable that goes from red to black to green to blue.
 % Naturally you can also use the 'contour values' directly as long as you
 % assign all levels a color.
@@ -293,23 +293,34 @@ function filename = gmt_plot(in,field)
 %------------------------------------------------------------------------------------
 % LEGENDS:
 %
+% in.extra_legend     structure containing:
+%       name          |%s| an associated string name. E.g., 'NaN',
+%                           'masked', etc...
+%       type          |%s| 'bg','fg', or 'nan', means use the color for the background,
+%                           foreground, or nan, given in
+%                           in.color_background, in.color_foreground,
+%                           in.color_nan. So far these are the only 3
+%                           options.
+%       position      |%s| Optional
+%                     e.g '9.7i/2.3i/0.8c/0.8c' (i = inch , c = cm)
+%                     ('x-displacement/y-displacement/height/width'). Append 'h'
+%                     for horisontal legend.
+%                     | placement otherwise determined by the placement of the main legend|
+%      fontsize      |%f| optional
+%                     ------------
 % in.pscale           |%s|
 %                     E.g. 'psscale OPT > filename.ps', explicitly sets the
 %                     psscale GMT command for the legend directly.
 %                     | [] |
 %                     ------------
-% in.pscale_nan       |%s|
+% in.pscale_extra     |%s|
 %                     E.g. 'psscale OPT > filename.ps', explicitly sets the
-%                     psscale GMT command for the NaN legend directly.
+%                     psscale GMT command for the extra legend directly.
 %                     | [] |
 %                     ------------
 % in.savelegend       |logical|
 %                     if you want to have a separate pdf for the legend
 %                     | false |
-%                     ------------
-% in.nanlegend        |logical|
-%                     Set to false if you don't want an extra NaN legend
-%                     | true if there are NaN values in the data |
 %                     ------------
 % in.legend           |logical|
 %                     Set to false if you don't want a legend. if in.legend
@@ -320,7 +331,7 @@ function filename = gmt_plot(in,field)
 % in.legend.          | STRUCTURE with one or more of the following fields:
 %
 %  annot_font_size_primary
-%                     |%f| Size of annotations in legend  | [] |
+%                     |%f| Size of annotations in legend  | 14 |
 %                     ------------
 %  box_spacing        |%f| Space between legend boxes | 0 (side by side) |
 %                     ------------
@@ -329,9 +340,6 @@ function filename = gmt_plot(in,field)
 %                     ('x-displacement/y-displacement/height/width'). Append 'h'
 %                     for horisontal legend.
 %                     | size determined by map dimensions |
-%                     ------------
-%  position_nan       |%s|
-%                     As for in.legend.position, but for the NaN legend
 %                     ------------
 %  equalboxwidth      |logical|
 %                     If the legend color boxes have to be the same size, 1
@@ -641,6 +649,7 @@ default.xunit             = '';                 % xlabel for the legend
 default.plotPlacement     = '-Xa5 -Ya5';        % String of global plotPlacements
 default.color_background  = '0/0/0';
 default.color_foreground  = '255/255/255';
+default.color_nan         = '150/150/150';
 
 in = optargs_struct(in,default);
 
@@ -787,7 +796,9 @@ end
 % DATARANGE
 if ~in.nodata
     default.datarange     = getdatarange(in,field); %
-    default.nanlegend     = any(isnan(in.(field)(:))); % include NaNs in the legend
+    if any(isnan(in.(field)(:)))
+        default.extra_legend = struct('name','NaN','type','nan'); % include NaNs in the legend
+    end
 end
 in = optargs_struct(in,default);
 in.datarange = double(in.datarange);
@@ -1029,7 +1040,7 @@ assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
 assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
     '%s%s','Data does not contain any valid',...
     ' values for contour levels to be based on...')
-assert(~(ndims(squeeze(in.(field)))>2),Id,'in.%s must not be more than 2 dimensional',field)
+assert(~(~ismatrix(squeeze(in.(field)))),Id,'in.%s must not be more than 2 dimensional',field)
 assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
     'min(data) must not be equal to max(data)')
 

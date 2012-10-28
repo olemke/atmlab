@@ -34,6 +34,7 @@ strtab = '\t%s\t%s\t%s\t';
     
 filecpt = 'colorrange.cpt';
 fid = fopen(filecpt,'w');
+CO = onCleanup(@() fclose(fid));
 
 % header
 fprintf(fid,'%s\n','#cpt file created by: cpt_from_colorrange.m');
@@ -51,5 +52,3 @@ for ii = 1:length(C)-1
     fprintf(fid,[sprintf('%s',getAnnotFormat(val2)) strtab '\n'],...
         val2,color2{1},color2{2},color2{3});
 end
-
-fclose(fid);

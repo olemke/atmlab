@@ -148,7 +148,7 @@ switch field
             singleType.(F)(cloudfree) = false;
         end
         
-        % mixed clouds where not cloudfree and not only one cloud type (=9)
+        % mixed clouds is where the profile is not cloudfree nor does it contain only one cloud type (=9)
         S.Cloud_Types = (length(cloudTypes)+1)*ones(size(singleType.Ci),'int8'); 
         for i = 1:length(cloudTypes)
             F = cloudTypes{i};

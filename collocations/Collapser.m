@@ -284,7 +284,8 @@ classdef Collapser < AssociatedDataset
             self.members2cols();
             
             nfields = max(cell2mat(struct2cell(self.cols).'));
-            M = nan*zeros(size(uniques, 1), nfields);
+            flag = -realmax(); % hopefully, no real data has this value!
+            M = flag*ones(size(uniques, 1), nfields);
             
             fields = fieldnames(self.fieldstruct);
             j = 0; % counter increases only when there is data
@@ -351,9 +352,9 @@ classdef Collapser < AssociatedDataset
             
             % remove remaining part of M, e.g. where I did too much
             % pre-allocation or no relevant data was found
-            rest = isnan(M(:, 1));
+            rest = M(:, 1)==flag;
             M(rest, :) = [];
-            logtext(atmlab('OUT'), '%d collocations -> %d collapsed collocations\n', ...
+            logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
                 size(processed_core, 1), size(M, 1));
             %%%
             

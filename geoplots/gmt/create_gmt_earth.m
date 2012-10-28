@@ -74,12 +74,10 @@ if isfield(in,'psscale')
 elseif ~isempty(in.plot.legend)
     commands{end+1} = psscale(F,in.plot.legend);
 end
-
-% NaN LEGEND
-if isfield(in,'psscale_nan')
-    commands{end+1} = in.psscale_nan;
-elseif ~isempty(in.plot.nanlegend)
-    commands{end+1} = in.plot.nanlegend;
+if isfield(in,'psscale_extra')
+    commands{end+1} = in.psscale_extra;
+elseif ~in.nodata && isfield(in.plot.color,'cptextra') && ~isstruct(in.plot.color.cptextra)
+    commands{end+1} = in.plot.extralegend;
 end
 
 % COASTLINES
@@ -174,7 +172,7 @@ if isfield(in,'pstext') && isstruct(in.pstext)
 end
 
 % LEGEND/S
-[in.plot.legend,in.plot.nanlegend] = mklegend(in);
+[in.plot.legend,in.plot.extralegend] = mklegend(in);
 
 % Close file with this
 in.plot.lastbasemap = last_psbasemap(in);
@@ -288,8 +286,13 @@ switch in.ctable
         a.cptfile = makepolar(tickval,in);
     case 'colorrange'
         % make ctable to be input to makecpt -C%s
-        cpt_from_colorrange(in.colorrange);
-        a.cptfile = makecpt(in);
+        if isfield(in.colorrange,'colors')
+            cpt_from_colorrange(in.colorrange);
+            a.cptfile = makecpt(in);
+        elseif isfield(in.colorrange,'discrete_colors')
+            a.cptfile = cpt_discrete_colors(in);
+         end
+        
     otherwise
         logtext(1,'Processing makecpt\n')
         if ~isfield(in,'makecpt')
@@ -302,8 +305,8 @@ switch in.ctable
 end
 
 % extra legend box for missing values
-if in.nanlegend
-    a.cptnan = xtra_nan_legend(in);
+if isfield(in,'extra_legend')
+    a.cptextra = extra_legend(in);
 end
 
 function a = mkcoast(in)
@@ -382,21 +385,25 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
         end
     end
     a.plotPlacement = in.plotPlacement;
-    
-    % A little extra legend showing colors of NaNs
-    if in.nanlegend
-        if ~isfield(in.legend,'position_nan')
-            nandef = {[str2double(in.legend.xpos(1:end-1)),...
+    if isfield(in,'extra_legend')
+        if ~isfield(in.extra_legend,'position')
+            def = {[str2double(in.legend.xpos(1:end-1)),...
                 -.2, .2, .2],...
                 [.4, str2double(in.legend.ypos(1:end-1)), .2, .2]};
-            tmp = sprintf('%.2fi/',nandef{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
-            tmp = sprintf('%.2fi/',nandef{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
+            tmp = sprintf('%.2fi/',def{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
+            tmp = sprintf('%.2fi/',def{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
             lsize = nsz{ strcmp(in.legend.orientation,'h') +1 };
         else
-            lsize = in.legend.position_nan;
+            lsize = in.extra_legend.position;
         end
-        b = sprintf('psscale -D%s -Li -Ccolor_nan.cpt -O -K >> %s.ps',...
-            lsize,in.filename);
+        if isfield(in.extra_legend,'fontsize')
+            b = sprintf('psscale -D%s -Xa5 -Ya5 -Li -O -K -C%s --ANNOT_FONT_SIZE_PRIMARY=%d >> %s.ps',...
+                lsize,in.plot.color.cptextra,in.extra_legend.fontsize,in.filename);
+            
+        else
+            b = sprintf('psscale -D%s -Xa5 -Ya5 -Li -O -K -C%s  >> %s.ps',...
+                lsize,in.plot.color.cptextra,in.filename);
+        end
     end
     
     % get xtra options

@@ -1,6 +1,6 @@
 classdef FieldCopier < AssociatedDataset
     % class to copy fields from original datasets to collocated datasets
-    % 
+    %
     % A common task associated with <a href="matlab:help CollocatedDataset">collocating</a> different <a href="matlab:help SatDataset">dataset</a>s
     % is to copy fields from the original datasets to use with the collocations.
     % FieldCopier implements <a href="matlab:help AssociatedDataset">AssociatedDataset</a>, meaning that it has at
@@ -136,7 +136,7 @@ classdef FieldCopier < AssociatedDataset
         %
         % See also <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>
         dependencies = {};
-    end    
+    end
     
     methods
         function self = FieldCopier(cd, fieldstruct1, fieldstruct2, varargin)
@@ -165,7 +165,7 @@ classdef FieldCopier < AssociatedDataset
             %       Like fs1, but corresponding to the secondary.
             %
             %   ...remaining arguments passed on to <a href="matlab:help SatDataset">SatDataset</a>,
-            %   so those indicate name, where to store, etc. 
+            %   so those indicate name, where to store, etc.
             %
             % OUT
             %
@@ -181,9 +181,9 @@ classdef FieldCopier < AssociatedDataset
             
             allfields = catstruct(fieldstruct1, fieldstruct2);
             assert(length(fieldnames(fieldstruct1))+length(fieldnames(fieldstruct2))==length(fieldnames(allfields)), ...
-                    ['atmlab:' mfilename ':duplicates'], [...
-                        'Duplicate fieldnames between datasets are not permitted, but were found. ' ...
-                        'I suggest to use the ''realname'' attribute for the <a href="matlab:help FieldCopier/fieldstruct_primary">fieldstruct</a>.']);
+                ['atmlab:' mfilename ':duplicates'], [...
+                'Duplicate fieldnames between datasets are not permitted, but were found. ' ...
+                'I suggest to use the ''realname'' attribute for the <a href="matlab:help FieldCopier/fieldstruct_primary">fieldstruct</a>.']);
             self.members = allfields;
             
         end
@@ -268,8 +268,26 @@ classdef FieldCopier < AssociatedDataset
                         switch ME.identifier
                             case 'atmlab:find_granule_by_datetime'
                                 logtext(atmlab('ERR'), ...
-                                    'I tried to collect fields from dataset %s, but failed: %s', ...
+                                    'I tried to collect fields from dataset %s, but failed: %s\n', ...
                                     dsnm, ME.message);
+                                
+                                % HORRIBLE workaround in place
+                                if ~isempty(regexp(ME.message,'No datafile found for cprCldclass','once'))
+                                    % I will find the dimensions of a samesized variable and set Cloud_Types to 127 (int8).
+                                    %I can't have the code crash because
+                                    %data from the sibling dataset is
+                                    %missing. Use D.cpr Latitude to get the
+                                    %dimensions
+                                    logtext(2,['See commented out workaround ' ...
+                                               'below in FieldCopier\n')
+                                    % logtext(atmlab('ERR'), ...
+                                    %     'Horrible workaround in place for ''Cloud_types'' because of missing file in sibling dataset\n')
+                                    % logtext(atmlab('ERR'), ...
+                                    %     'Getting dimesions for ''Cloud_Types'' (sibling) from ''lat'' in 2B-CWC-RO (big brother) instead\n')                                    
+                                    % dat_other{j}.(dsnm) = D.cpr.read_granule(dt, spc, {}, false, false);
+                                    % dat_other{j}.(dsnm).Cloud_Types = 127*ones(size(dat_other{j}.(dsnm).lat)); % flag value of 127
+                                end
+                                
                                 continue
                             otherwise
                                 ME.rethrow();
@@ -277,7 +295,7 @@ classdef FieldCopier < AssociatedDataset
                     end
                 end
             end
-            % read all 
+            % read all
             % in the second loop, check sizes etc.
             for i = 1:length(allnames)
                 fieldnam = allnames{i};
@@ -300,7 +318,7 @@ classdef FieldCopier < AssociatedDataset
                         % workaround since relat{2} is called for later on
                         reflat(2) = reflat;
                     end
-                else                    
+                else
                     reflat = {data1.lat, data2.lat};
                 end
                 n_scanlines = size(reflat{j}, 1);
@@ -349,15 +367,15 @@ classdef FieldCopier < AssociatedDataset
                     end
                     
                 end
-                    
+                
             end
             
             self.members2cols();
-     
+            
             ncollocs = size(processed_core, 1);
             nfields = max(cell2mat(struct2cell(self.cols).'));
             %fields = fieldnames(self.cols);
-            result = nan*zeros(ncollocs, nfields); 
+            result = nan*zeros(ncollocs, nfields);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
             
             r1 = processed_core(:, self.parent.cols.LINE1);
@@ -372,11 +390,11 @@ classdef FieldCopier < AssociatedDataset
             end
             
             % in the third loop, collect the data
-
+            
             for i = 1:length(allnames)
                 field = allnames{i};
                 
-
+                
                 if i <= n_inprim
                     data = data1;
                     ii = i1;
@@ -396,7 +414,7 @@ classdef FieldCopier < AssociatedDataset
                 else
                     fdata = data.(self.members.(field).realname);
                 end
-                    
+                
                 % if this fails, data.(field) may not be a column-vector as
                 % required
                 sz = size(fdata);
@@ -422,7 +440,7 @@ classdef FieldCopier < AssociatedDataset
         end
         
     end
-
+    
     methods (Static, Access = private)
         function fargs = fieldargs(fieldstruct, coreparent)
             % determine from a fieldstruct what arguments to pass
@@ -431,7 +449,7 @@ classdef FieldCopier < AssociatedDataset
             k = 0;
             for i = 1:length(names)
                 if ~isfield(fieldstruct.(names{i}), 'dataset') || ...
-                        strcmp(fieldstruct.(names{i}).dataset.name, coreparent.name) 
+                        strcmp(fieldstruct.(names{i}).dataset.name, coreparent.name)
                     k = k + 1;
                     if isfield(fieldstruct.(names{i}), 'realname')
                         fargs{k} = fieldstruct.(names{i}).realname; %#ok<AGROW>

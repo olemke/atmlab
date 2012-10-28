@@ -1,3 +1,41 @@
+2012-10-28  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-302
+
+	* geoplots/gmt/cpt_from_colorrange.m: Use onCleanup()
+
+	* geoplots/gmt/makecpt.m: Small edit
+
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/extra_legend.m:
+	* geoplots/gmt/create_gmt_earth.m:
+	* geoplots/gmt/gmt_inputs.m:
+	Added option in.extra_legend. This replaces the old in.nanlegend
+	and can be used for the background, foreground, or nan
+	colors. E.g., I used this to make a coloured legend 'box' indicating the color
+	that I cloud masked with.
+	* geoplots/gmt/gmt_inputs.m: Also cleaned it up a bit
+
+	* geoplots/gmt/test_gmt.m: Put the extra_legend to the test as well
+
+	* datasets/define_datasets.m: Corrected some modis fields
+
+	* datasets/common_read_cpr.m: Fixed comment
+
+	* graphs/scatter_density_plot.m: Added possibility to pass any
+	options to the legend command
+
+	* sensors/hirs_tb2uth.m: Added function to calculate UTH from HIRS
+	radiances, much like the amsu_tb2uth.m function. Currently only
+	has the regression coefficients for NOAA18, calculated (by Ajil) using
+	tropical profiles from the Chavallier dataset.
+
+	* collocations/FieldCopier.m: Added a commented out workaround for
+	when the file for the sibling dataset is missing.
+
+	* collocations/Collapser.m: use -realmax() as an internal  flag
+	value instead of NaN.
+
 2012-10-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-301
@@ -29,6 +67,8 @@
 	now not used by MCGeneral) with MIN_ITER.
 
 2012-10-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-299
 
 	* graphs/scatter_density_plot.m:
 	- added hold('off') at the end
@@ -72,7 +112,6 @@
 	* datasets/define_datasets.m:
 	Changed the name of the modis collocated dataset
 
->>>>>>> .r7936
 2012-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-296
