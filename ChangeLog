@@ -1,3 +1,15 @@
+2012-10-29  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-303
+
+	* collocations/FieldCopier.m: Bugfix
+
+	- Fix syntax-error (!)
+
+	* collocations/TODO:
+
+	- Expanded. Why does this always grow, never shrink?
+
 2012-10-28  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-302

@@ -33,8 +33,16 @@ Postponing the problem: more memory-efficient
     -> don't always double
     -> don't duplicate/copy data
 
+- More portable way of collocating collocated datasets: get the output
+  from CollocatedDataset.read(...) for one day, put this in a structure as
+  expected by .reader(...), then make this a dynamic dataset
 
 - when finished, in old-style add small functions using new-style
+
+- handle properly when sibling is missing but core exists
+- write proper error message if duration is missing
+- write proper error message if input fieldcopier is bollocks
+- default granule duration?
 
 Fix:
     - mhs/amsub
