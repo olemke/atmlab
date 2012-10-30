@@ -1,3 +1,10 @@
+2012-10-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-304
+
+	* forwardmodel/lorentz_lshape.m (lorentz_lshape): Fixed types in
+	header and updated to use new rqre functions.
+
 2012-10-29  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-303

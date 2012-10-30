@@ -9,9 +9,9 @@
 %    is set.
 %
 %    Default values correspond to the basic Lorentz shape. The van
-%    Vleck-Weisskopf line shape is obtained witj prefac=2 and mirror=true.
+%    Vleck-Weisskopf line shape is obtained with prefac=2 and mirror=true.
 %
-% FORMAT   l = doppler_lshape( f, f0, dp [, prefac, mirror ] )
+% FORMAT   l = lorentz_lshape( f, f0, dp [, prefac, mirror ] )
 %        
 % OUT   l       Line shape. Dimensions [f,dp]. 
 % IN    f       Frequency vector.
@@ -34,12 +34,11 @@ function l = lorentz_lshape( f, f0, dp, varargin )
 rqre_nargin( 3, nargin )                                                   %&%
 %                                                                          %&%
 rqre_datatype( f, {@istensor1} );                                          %&%
-rqre_scalar( f0, [], 0 );                                                  %&%
+rqre_datatype( f0, {@istensor1} );                                         %&%
 rqre_datatype( dp, {@istensor0,@istensor1} );                              %&%
 %                                                                          %&%
-rqre_scalar( prefac, [], 0, 2 );                                           %&%
-rqre_datatype( f, {@iswhole} );                                            %&%
-rqre_boolean( mirror );                                                    %&%
+rqre_datatype( prefac, {@istensor1} );                                     %&%
+rqre_datatype( mirror, {@isboolean} );                                     %&%
 
 
 %- Allocate output
