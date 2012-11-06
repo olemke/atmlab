@@ -49,10 +49,15 @@ else
   [status,result] = system( ...
              sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
 end
-  
+
+
 
 if status  &  ~errortol
+  result
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')
+
+elseif rlevel
+  result
 end
 

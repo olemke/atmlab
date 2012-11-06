@@ -272,11 +272,6 @@ function T = cfile_Generl( Q, partname, workfolder )
     T{end+1} = sprintf( 'SpeciesSet(abs_species,[%s])', ...
                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
   end
-  %  
-  if qarts_isset( Q.IY_UNIT )
-    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );                       %&%
-    T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
-  end
   %
   if strcmp( partname, 'GenerlSave' )
     T{end+1} = add_savefile( 'output_file_format', workfolder );
@@ -696,6 +691,10 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.IY_AUX_VARS )
     T{end+1} = file_or_data( 'iy_aux_vars', 'ArrayOfString', Q.IY_AUX_VARS,...
                                           workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.IY_UNIT )
+    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );                       %&%
+    T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
   end
   %
   T{end+1} = add_savefile( 'sensor_pos', workfolder );
@@ -1288,8 +1287,6 @@ function T = cfile_CldBox( Q, partname, workfolder )
             '   lat_grid,lon_grid,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f', limits );
     T{end+1} = ')';
   end
-  %
-  T{end+1} = 'cloudbox_checkedCalc';
   
   %= Particle field and single scattering data
   %
@@ -1339,6 +1336,8 @@ function T = cfile_CldBox( Q, partname, workfolder )
       T{end+1} = 'pnd_fieldCalc';
     end
   end
+  %
+  T{end+1} = 'cloudbox_checkedCalc';
 
   %= Agendas for scattering properties 
   %

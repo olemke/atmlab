@@ -1,22 +1,20 @@
 % QARTS_SCATTERING_DEMO  Demonstration of scattering calculations by Qarts
 %
-%   ARTS has three modules for performing scattering calculations: DOIT, FOS,
-%   and MC. The DOIT method is implemented for both 1D and 3D, but is only
-%   recommended for 1D. MC is only implemented for 3D. FOS is defined for all
-%   atmospheric dimensionalities. This function runs a simple scenario with
-%   DOIT-1D, MC (3D) or FOS (1/2/3D). In addition, the transmission through
-%   the atmosphere can be calculated, including the total attenuation of
-%   clouds. This "method" is denoted as BL (Beer-Lambert)
+%   ARTS has three modules for performing scattering calculations: DOIT, MC,
+%   and TR (iyTransmissionStandard). The DOIT method is implemented for both 1D
+%   and 3D, but is only recommended for 1D. MC is only implemented for 3D. TR
+%   is defined for all atmospheric dimensionalities. This function runs a
+%   simple scenario with DOIT-1D, MC (3D) or TR (1/2/3D). 
 %
 %   The 1D scenario used for DOIT is expanded to 3D for MC. The cloud is then
 %   given a rectangular shape (in lat and lon). The 1D cloud values are applied
-%   inside a range of [-1.5,-1.5] degrees, in both latitude and longitude.
-%   This extended by a linear transition to clear sky conditions over 0.5
+%   inside a range of [-9,9] degrees, in both latitude and longitude.
+%   This extended by a linear transition to clear sky conditions over 3
 %   degrees. That is, a perfect match between DOIT and MC can not be
-%   expected as the "3D cloud" has a smaller extension than the 1D one.
+%   expected as the "3D cloud" has a smaller extension than the 1D one, this
+%   especially if a very low tangent altitude is selected.
 %
-%   The cloud is expanded in same way for FOS and BL, when 2D or 3D is 
-%   selected.
+%   The cloud is expanded in same way for TR, when 2D or 3D is selected.
 %
 % FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, method, m_arg )
 %
@@ -28,13 +26,13 @@
 %        dy         Error estimate. Only valid for MC.
 % OPT    ztan       Tangent altitudes. Default is [7 10 13] km.
 %        method     Scattering method to use. Default is 'mc'. Other options
-%                   are 'doit', 'fos' and 'bl'. (Upper or lower case letters 
+%                   are 'doit', 'and 'tr'. (Upper or lower case letters 
 %                   do not matter).
 %        m_arg      Method argument. Not used for DOIT. For MC it is the
 %                   Target calculation accuracy for MC, in K. Default is 5K.
-%                   For FOS and BL this is atmospheric dimensionality to use.
+%                   For TR this is atmospheric dimensionality to use.
 
-% 2010-12-01  Extended to also handle BL by Patrick Eriksson.
+% 2010-12-01  Extended to also handle TR by Patrick Eriksson.
 % 2010-02-12  Extended to also handle FOS by Patrick Eriksson.
 % 2007-07-27  Extended to also handle MC by Patrick Eriksson.
 % 2005-06-13  Created by Claudia Emde
@@ -86,8 +84,8 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'atmosphere', ...
-                                                        'fascod', 'tropical' );
+Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
+                                            'Fascod', 'tropical', 'tropical' );
 Q.RAW_ATM_EXPAND_1D   = false;
 %
 Q.REFELLIPSOID        = ellipsoidmodels( 'SphericalEarth' );
@@ -114,13 +112,13 @@ sensor_pos            = zplat;
 Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan )';
 %
-if strcmp( lower(method), 'bl' )
-  Q.IY_MAIN_AGENDA     = { 'iyTransmissionStandard' };
+if strcmp( lower(method), 'tr' )
+  Q.IY_MAIN_AGENDA        = { 'iyTransmissionStandard' };
   Q.IY_TRANSMITTER_AGENDA = { 'Ignore(rte_pos)', 'Ignore(rte_los)', ...
-                           'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
-  Q.IY_UNIT             = '1';
+                              'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
+  Q.IY_UNIT               = '1';
 else
-  Q.IY_UNIT             = 'RJBT';
+  Q.IY_UNIT               = 'RJBT';
 end
   
 
@@ -143,7 +141,7 @@ C.LIMITS = [ 6e3 16e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
-T_grid = [200 270];   % MC does not accept a single temperature
+T_grid = [200 270];   % MC does not accept a single temperature!
 
 
 % Create scattering properties for a simple cloud assumption
@@ -172,37 +170,38 @@ C.SCAT_DATA{1} = mie_arts_scat_data( Q.F_GRID,  T_grid, rfr_index, theta, r );
 % Calculate a pnd field for a homogeneous cloud
 C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 
-%C.PND_FIELD{1}.data = 0.2 * C.PND_FIELD{1}.data;
-
 
 % Set up scattering method
 %
 if strcmp( lower(method), 'mc' )
   %
   C.METHOD                        = 'MC';
-  Q.IY_MAIN_AGENDA                = { 'Ignore( mblock_index )', 'iyMC', ...
+  Q.IY_MAIN_AGENDA                = { 'Ignore( rte_pos2 )', 'iyMC', ...
                                       'Touch(ppath)' };
   Q.IY_AUX_VARS                   = { 'Error (uncorrelated)' };
   %
   C.METHOD_PRMTRS.STD_ERR         = m_arg;
   C.METHOD_PRMTRS.MAX_TIME        = -1;
   C.METHOD_PRMTRS.MAX_ITER        = -1;
-  C.METHOD_PRMTRS.Z_FIELD_IS_1D   = Q.RAW_ATM_EXPAND_1D;
+  C.METHOD_PRMTRS.MIN_ITER        = 100;
   %
 elseif strcmp( lower(method), 'doit' )
   %
   C.METHOD                        = 'DOIT';
+  % Need a trick here for setting RJ
+  Q.IY_UNIT                       = '1';
+  Q.WSMS_BEFORE_RTE{end+1}        = 'StringSet(iy_unit,"RJBT")';  
   % Angular grids
   C.METHOD_PRMTRS.N_ZA_GRID       =  19;
   C.METHOD_PRMTRS.N_AA_GRID       =  10;
-  C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile(atmlab_example_data, ...
+  C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile( atmlab_example_data, ...
                                                            'doit_za_grid.xml');
-  C.METHOD_PRMTRS.EPSILON         = [0.1 0.01 0.01 0.01];
+  C.METHOD_PRMTRS.EPSILON         = [ 0.1 0.01 0.01 0.01 ];
   C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
-  C.METHOD_PRMTRS.ALL_F           = true;
+  C.METHOD_PRMTRS.ALL_F           = false;
   %
   C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
-                                                         'abs_vecAddPart' };
+                                                           'abs_vecAddPart' };
   C.SPT_CALC_AGENDA = { 'opt_prop_sptFromMonoData' };
 
 elseif strcmp( lower(method), 'fos' )
@@ -236,23 +235,23 @@ elseif strcmp( lower(method), 'fos' )
   %  
   xmlStore( fos_file, fos, 'Matrix' );
 
-elseif strcmp( lower(method), 'bl' )
+elseif strcmp( lower(method), 'tr' )
   %
   C.METHOD = 'none';
 
     
 else
   error( ...
-    'Allowed options for *method* are ''doit'', ''mc'', ''fos'' and ''bl''.' );
+    'Allowed options for *method* are ''doit'', ''mc'' and ''tr''.' );
 end
 
 
 %- Map to 2D or 3D?
 %
-latlon_grid = [-25:0.5:25]';
-csize       = 1;
+latlon_grid = [-45 -15:0.5:15 45]';
+csize       = 6;
 %
-if any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 2
+if any( strcmp( lower(method), {'fos','tr'} ) )  &  m_arg == 2
   %
   Q.ATMOSPHERE_DIM                = 2;
   Q.RAW_ATM_EXPAND_1D             = true;
@@ -270,7 +269,7 @@ if any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 2
   C.PND_FIELD{1}.data(:,3:4)      = repmat(p,[1 2]);
   %  
 elseif strcmp( lower(method), 'mc' )  |  ...
-     ( any( strcmp( lower(method), {'fos','bl'} ) )  &  m_arg == 3 )  
+     ( any( strcmp( lower(method), {'fos','tr'} ) )  &  m_arg == 3 )  
   %
   Q.ATMOSPHERE_DIM                = 3;
   Q.RAW_ATM_EXPAND_1D             = true;

@@ -1,3 +1,19 @@
+2012-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-305
+
+	* demos/qarts_scattering_demo.m: Updated to work with newest arts
+	version. In addition: BL option renamed to TR, and 2D/3D cloudbox
+	made much bigger to simplify comparison between DOIT and MC.
+
+	* arts/qarts2cfile.m (cfile_CldBox): cloudbox_checkedCalc now
+	called after pndf_field is set (required after change in arts).
+
+	(cfile_RteSet): IY_UNIT moved here from General part.
+
+	* arts/arts.m: ARTS output was not shown, independent of report
+	level, due to change in matlab. Fixed.
+
 2012-10-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-304
