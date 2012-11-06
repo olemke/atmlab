@@ -53,11 +53,11 @@ end
 
 
 if status  &  ~errortol
-  result
+  disp( result )
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')
 
 elseif rlevel
-  result
+  disp( result )
 end
 

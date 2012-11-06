@@ -1,5 +1,12 @@
 2012-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-306
+
+	* arts/arts.m: A variable name got included in report text.
+	Removed.
+
+2012-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-305
 
 	* demos/qarts_scattering_demo.m: Updated to work with newest arts
