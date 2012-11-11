@@ -1,3 +1,10 @@
+2012-11-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-306
+
+	* demos/qarts_scattering_demo.m: Added input argument for scaling
+	of IWC.
+
 2012-11-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-306

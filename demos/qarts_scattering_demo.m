@@ -16,7 +16,7 @@
 %
 %   The cloud is expanded in same way for TR, when 2D or 3D is selected.
 %
-% FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( ztan, method, m_arg )
+% FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo([ztan,method,m_arg,iwpfac])
 %
 %  OUT   Q          Qarts setting structure.
 %        f          Frequency grid.
@@ -31,6 +31,8 @@
 %        m_arg      Method argument. Not used for DOIT. For MC it is the
 %                   Target calculation accuracy for MC, in K. Default is 5K.
 %                   For TR this is atmospheric dimensionality to use.
+%        iwcfac     Scaling factor of the IWC used. Default is 1. Set to 0
+%                   to obtain "clear-sky" also inside cloudbox.
 
 % 2010-12-01  Extended to also handle TR by Patrick Eriksson.
 % 2010-02-12  Extended to also handle FOS by Patrick Eriksson.
@@ -40,7 +42,7 @@
 
 function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( varargin )
 %
-[ztan,method,m_arg] = optargs( varargin, { [7 10 13]*1e3, 'mc', 5 } );
+[ztan,method,m_arg,iwcfac] = optargs( varargin, { [7 10 13]*1e3, 'mc', 5, 1 });
 
 
 %= Init Q structure
@@ -105,7 +107,7 @@ Q                     = qarts_abstable( Q );
 %
 Q.YCALC_WSMS          = { 'yCalc' };
 %
-Q.PPATH_LMAX          = 5e3;
+Q.PPATH_LMAX          = 1e3;
 %
 zplat                 = 600e3;
 sensor_pos            = zplat;
@@ -160,7 +162,7 @@ theta = 0:10:180;
 % Particle size [m]
 r = 50e-6;
 % ice mass content
-imc = 0.005*1e-3;
+imc = iwcfac * 0.005*1e-3;
 % cloud altitude
 alt = [11e3 13e3];
 
