@@ -23,6 +23,7 @@ function test_arts_refraction( varargin )
 Q = qarts;
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.F_GRID                = 100e9;
+Q.CLOUDBOX_DO           = false,
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
 Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionBasic' };
 refell                  = ellipsoidmodels( 'SphericalEarth' );
@@ -31,8 +32,8 @@ re_string               = 'refellipsoidEarth( refellipsoid, "Sphere" )';
 
 %- Load a test atmosphere
 %
-atmtest =  fullfile( atmlab('ARTS_XMLDATA_PATH'), ...
-                                'atmosphere', 'fascod', 'tropical' );
+atmtest =  fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', 'Earth', ...
+                                       'Fascod', 'tropical', 'tropical' );
 Az      = xmlLoad( [ atmtest, '.z.xml' ] ); 
 At      = xmlLoad( [ atmtest, '.t.xml' ] ); 
 Ah2o    = xmlLoad( [ atmtest, '.H2O.xml' ] ); 
@@ -74,14 +75,12 @@ workfolder = create_tmpfolder;
 
 %- Define calculation part
 %
+Q.WSMS_AT_START       = { 'IndexSet(stokes_dim,1)' };
 Q.WSMS_AT_END         = { 
     re_string,  ...
-    'IndexSet(mblock_index,-1)',...
-    'IndexSet(f_index,-1)', ...
-    'basics_checkedCalc', ...
-    'cloudbox_checkedCalc', ...
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
     'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")', ...
+    'VectorSet(rte_pos2,[])', ...
     'ppathCalc', ...
     sprintf('WriteXML("ascii",ppath,"%s/ppath.xml")',workfolder) };
 
@@ -92,9 +91,8 @@ Q.ATMOSPHERE_DIM      = 1;
 Q.PPATH_LRAYTRACE     = 100;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
-S = qarts2cfile( Q, ... 
-                   { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
-                   workfolder );
+S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'CldBox', ...
+                      'RteSet', 'CloseF' }, workfolder );
 cfile = fullfile( workfolder, 'cfile.arts' );
 strs2file( cfile, S );
 notok = arts( cfile, true );
@@ -124,9 +122,8 @@ Q.ATMOSPHERE_DIM      = 1;
 Q.PPATH_LRAYTRACE     = lrt;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
-S = qarts2cfile( Q, ... 
-                   { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
-                   workfolder );
+S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'CldBox', ...
+                      'RteSet', 'CloseF' }, workfolder );
 cfile = fullfile( workfolder, 'cfile.arts' );
 strs2file( cfile, S );
 notok = arts( cfile, true );
@@ -165,9 +162,8 @@ Q.T_FIELD             = repmat( Q.T_FIELD, 1 , nlat );
 Q.VMR_FIELD           = repmat( Q.VMR_FIELD, [ 1, 1 , nlat] );
 Q.Z_SURFACE           = repmat( Q.Z_SURFACE, nlat, 1 );
 %
-S = qarts2cfile( Q, ... 
-                   { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
-                   workfolder );
+S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'CldBox', ...
+                      'RteSet', 'CloseF' }, workfolder );
 cfile = fullfile( workfolder, 'cfile.arts' );
 strs2file( cfile, S );
 notok = arts( cfile, true );
@@ -204,9 +200,8 @@ Q.VMR_FIELD           = repmat( Q.VMR_FIELD, [ 1, 1 , 1, nlon] );
 Q.Z_SURFACE           = repmat( Q.Z_SURFACE, [ 1, nlon ] );
 
 %
-S = qarts2cfile( Q, ... 
-                   { 'Generl', 'AtmSrf', 'AbsrptSave', 'RteSet', 'CloseF' }, ...
-                   workfolder );
+S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'CldBox', ...
+                      'RteSet', 'CloseF' }, workfolder );
 cfile = fullfile( workfolder, 'cfile.arts' );
 strs2file( cfile, S );
 notok = arts( cfile, true );
