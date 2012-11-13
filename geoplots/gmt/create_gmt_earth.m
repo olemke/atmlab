@@ -76,7 +76,7 @@ elseif ~isempty(in.plot.legend)
 end
 if isfield(in,'psscale_extra')
     commands{end+1} = in.psscale_extra;
-elseif ~in.nodata && isfield(in.plot.color,'cptextra') && ~isstruct(in.plot.color.cptextra)
+elseif ~isempty(in.plot.extralegend)
     commands{end+1} = in.plot.extralegend;
 end
 

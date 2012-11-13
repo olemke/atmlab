@@ -1168,11 +1168,10 @@ for F = Fields
     if ~isempty(test)
         % corresponding test function
         fun = test{1};
-        strfun = char(fun);
+        strfun = func2str(fun);
         
         assert(fun(in.(test{2})),errID,...
-            'Input type is incorrect. in.%s should pass test: %s',test{2},...
-            strrep(strfun(5:end),'x',['in.' test{2}]));
+            'Input type is incorrect. in.%s should pass test: %s',test{2},strfun);
         
         % If in.(field) is itself a structure, do it again (more or less)
         if isstruct(in.(test{2})) && ismember(test{2},fieldnames(GSSE))
