@@ -1,3 +1,12 @@
+2012-11-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-308
+
+	* arts/qarts2cfile.m (cfile_CldBox): Added handling of
+	PARTICLE_MASSES.
+
+	* arts/qartsCloudbox.m (qartsCloudbox): Added PARTICLE_MASSES.
+
 2012-11-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-307

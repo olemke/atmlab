@@ -1287,6 +1287,11 @@ function T = cfile_CldBox( Q, partname, workfolder )
             '   lat_grid,lon_grid,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f', limits );
     T{end+1} = ')';
   end
+
+  if qarts_isset( Q.CLOUDBOX.PARTICLE_MASSES )
+    T{end+1} = file_or_data( 'particle_masses', 'Matrix', ...
+                 Q.CLOUDBOX.PARTICLE_MASSES, workfolder, Q.INPUT_FILE_FORMAT );
+  end
   
   %= Particle field and single scattering data
   %
