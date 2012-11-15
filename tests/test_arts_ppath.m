@@ -30,15 +30,16 @@
 
 function test_arts_ppath( atmosphere_dim, n, varargin  )
 %
-[unsphere,do_refr,do_check] = optargs( varargin, { 0, false, true } );
-  
+[unsphere,do_refr] = optargs( varargin, { 0, false } );
+
+do_check = 1;
   
 %- Fixed settings
 %
 Q = qarts;
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.ATMOSPHERE_DIM        = atmosphere_dim;
-Q.CLOUDBOX_DO           = false,
+Q.CLOUDBOX_DO           = false;
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
 if do_refr
@@ -191,7 +192,7 @@ for c = 1 : n
     'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")', ...
     'VectorSet(rte_pos2,[])', ...
     'ppathCalc', ...
-    sprintf('WriteXML("ascii",ppath,"%s/ppath.xml")',workfolder) };
+    sprintf('ppathWriteXMLPartial("ascii",ppath,"%s/ppath.xml")',workfolder) };
 
 
   %- Run ARTS and load result
