@@ -1,3 +1,13 @@
+2012-11-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-311
+
+	* tests/test_arts_refraction.m: Now MUCH faster by using
+	ppathWriteXMLPartial.
+
+	* tests/test_arts_ppath.m: Changed RandStream.setDefaultStream to
+	RandStream.setGlobalStream, follwoing warning from matlab.
+
 2012-11-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-310

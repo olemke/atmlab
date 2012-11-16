@@ -81,7 +81,7 @@ workfolder = create_tmpfolder;
 
 %- To avoid getting same random sequence between sessions:
 % 
-RandStream.setDefaultStream(RandStream('mt19937ar','seed',sum(100*clock)));
+RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
 
 
 %- Run through n random cases

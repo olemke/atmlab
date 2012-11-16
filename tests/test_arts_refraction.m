@@ -23,7 +23,7 @@ function test_arts_refraction( varargin )
 Q = qarts;
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
 Q.F_GRID                = 100e9;
-Q.CLOUDBOX_DO           = false,
+Q.CLOUDBOX_DO           = false;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
 Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionBasic' };
 refell                  = ellipsoidmodels( 'SphericalEarth' );
@@ -82,13 +82,13 @@ Q.WSMS_AT_END         = {
     'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")', ...
     'VectorSet(rte_pos2,[])', ...
     'ppathCalc', ...
-    sprintf('WriteXML("ascii",ppath,"%s/ppath.xml")',workfolder) };
+    sprintf('ppathWriteXMLPartial("ascii",ppath,"%s/ppath.xml")',workfolder) };
 
 
 %- Run ARTS for 1D, with short step length
 %
 Q.ATMOSPHERE_DIM      = 1;
-Q.PPATH_LRAYTRACE     = 100;
+Q.PPATH_LRAYTRACE     = 10;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
 S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'CldBox', ...
