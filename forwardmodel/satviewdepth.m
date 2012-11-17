@@ -35,8 +35,10 @@ rqre_datatype( z, {@istensor1} );                                          %&%
 rqre_datatype( Abs, {@istensor2} );                                        %&%
 rqre_datatype( ztan, {@istensor1} );                                       %&%
 %                                                                          %&%
-rqre_scalar( tau, [], 0 );                                                 %&%
-rqre_scalar( Re, [], 0 );                                                  %&%
+rqre_datatype( tau, {@istensor0} );                                        %&%
+rqre_in_range( tau, 0 );                                                   %&%
+rqre_datatype( Re, {@istensor0} );                                         %&%
+rqre_in_range( Re, 0 );                                                    %&%
 %                                                                          %&%
 if ~issorted(z)                                                            %&%
   error('Argument *z* must be a sorted increasing vector.');               %&%

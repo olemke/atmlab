@@ -56,11 +56,11 @@ function [a1,a2] = example_heading(b,c,d,e)
 % The comment string %&% marks lines that can be removed for          %&%
 % 'operational applications'. See README.                             %&%
 %                                                                     %&%
-rqre_char( b );                                                       %&%
+rqre_datatype( b, {@ischar} );                                        %&%
 rqre_datatype( c, {@ischar,@istensor2} );                             %&%
-rqre_boolean( d );                                                    %&%
-rqre_boolean( d );                                                    %&%
-rqre_scalar( e, [], 1, 3 );                                           %&%
+rqre_datatype( d, {@isboolean} );                                     %&%
+rqre_datatype( e, {@istensor0} );                                     %&%
+rqre_in_range( e, 1, 3 );                                             %&%
 
 %- ...
 %

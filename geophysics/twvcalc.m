@@ -27,11 +27,11 @@ function twv = twvcalc(p, t, z, h2o, plogspacing, verbose)
 
 rqre_nargin( 5, nargin );
 
-rqre_datatype( 'vector', p );
-rqre_datatype( 'vector', t );
-rqre_datatype( 'vector', z );
-rqre_datatype( 'vector', h2o );
-rqre_scalar( 'plogspacing', plogspacing );
+rqre_datatype( p, {@istensor1} );                                           %&%
+rqre_datatype( t, {@istensor1} );                                           %&%
+rqre_datatype( z, {@istensor1} );                                           %&%
+rqre_datatype( h2o, {@istensor1} );                                         %&%
+rqre_datatype( plogspacing, {@istensor0} );                                 %&%
 
 np = length( p );
 

@@ -46,8 +46,10 @@ rqre_nargin( 2, nargin )                                                   %&%
 rqre_datatype( Z, {@istensor3} );                                          %&%
 rqre_datatype( T, {@istensor3} );                                          %&%
 %                                                                          %&%
-rqre_scalar( zmin, [], 0, 20e3 );                                          %&%
-rqre_scalar( zmax, [], 0, 20e3 );                                          %&%
+rqre_datatype( zmin, {@istensor0} );                                       %&%
+rqre_in_range( zmin, 0, 20e3 );                                            %&%
+rqre_datatype( zmax, {@istensor0} );                                       %&%
+rqre_in_range( zmax, 0, 20e3 );                                            %&%
 %                                                                          %&%
 if any( size(Z) ~= size(T) )                                               %&%
   error( 'Mismatch in size between *Z* and *T*.' );                        %&%

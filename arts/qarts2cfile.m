@@ -1471,6 +1471,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
                        'Ignore(rte_los)', 'iyInterpCloudboxField' } );
 
     if ~strcmp( partname, 'SctMthBatch' )
+      T{end+1} = 'sensor_checkedCalc';
       T{end+1} = 'CloudboxGetIncoming';
       T{end+1} = 'DoitInit';
       T{end+1} = 'ScatteringDoit';
@@ -1517,7 +1518,7 @@ function T = cfile_BatchC( Q, partname, workfolder )
     error( 'Q.BATCH.DATA must be a structure array.' );
   end
   %
-  rqre_scalar( 'Q.BATCH.N', Q.BATCH.N, 1 );
+  rqre_datatype( Q.BATCH.N, {@istensor0} );
 
   %- Store batch data and create batch_calc_agenda
   %

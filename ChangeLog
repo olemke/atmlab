@@ -1,3 +1,21 @@
+2012-11-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-312
+
+	* forwardmodel/satviewdepth.m: Replaced calls of rqre_scalar and
+	* geophysics/tropopause.m      rqre_bool (removed functions).
+	* geophysics/twvcalc.m
+	* forwardmodel/satviewdepth.m
+	* arts/qarts2cfile.m
+	* examples/example_heading.m
+	* arts/qarts_abs_species.m
+
+	* demos/qarts_scattering_demo.m: Added call of
+	sensor_checkedCalc before yCalc.
+
+	* arts/qarts2cfile.m (cfile_SctMth): Added call of
+	sensor_checkedCalc for doit part.
+
 2012-11-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-311

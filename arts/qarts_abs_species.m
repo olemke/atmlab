@@ -53,9 +53,9 @@ set_defaults;
 
 %= Check input
 %
-%rqre_datatype( 'cellstr', tags );
-%rqre_bool( 'argument *nonlin*', do_j );
-%rqre_bool( 'argument *do_j*', do_j );
+rqre_datatype( tags, {@iscellstr} );                                       %&%
+rqre_datatype( do_j, {@isboolean} );                                       %&%
+rqre_datatype( nonlin, {@isboolean} );                                     %&%
 
 
 i = length(Q.ABS_SPECIES) + 1;

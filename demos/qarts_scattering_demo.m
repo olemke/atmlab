@@ -105,9 +105,9 @@ Q                     = qarts_abstable( Q );
 
 %= Set RTE variables
 %
-Q.YCALC_WSMS          = { 'yCalc' };
+Q.YCALC_WSMS          = { 'sensor_checkedCalc','yCalc' };
 %
-Q.PPATH_LMAX          = 1e3;
+Q.PPATH_LMAX          = 5e3;
 %
 zplat                 = 600e3;
 sensor_pos            = zplat;
