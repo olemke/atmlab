@@ -131,9 +131,9 @@ flaggedAsGood = reshape(flaggedAsGood,sz(1),sz(2));
 % This will only work if the pseudoField is one of the 3 above
 for F = fieldnames(S)'
     % mask non-ice or bad data with Nans
-    if isequal(size(S.(F{1})),sz)
+    if isequal(size(S.(F{1})),size(clearPixel))
         % zero that which has no clouds
-        if strcmp(F{1},{'Cloud_Water_Path','Cloud_Effective_Radius','Cloud_Optical_Thickness'})
+        if any(strcmp(F{1},{'Cloud_Water_Path','Cloud_Effective_Radius','Cloud_Optical_Thickness'}))
             S.(F{1})(clearPixel)=0;
         end
         S.(F{1})(~(clearPixel | (icePhase & flaggedAsGood)))=NaN;
