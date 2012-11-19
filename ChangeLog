@@ -1,3 +1,13 @@
+2012-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-314
+
+	* demos/qarts_scattering_demo.m: There was a mistake in the
+	setting of 2D and 3D cloudbox. PPATH_LMAX now 5 km.
+
+	* demos/qarts_mcdoit_demo.m: Added, at least temporarily to help
+	testing of DOIT and MC changes. Not documented. 
+
 2012-11-18  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-313

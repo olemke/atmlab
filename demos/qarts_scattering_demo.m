@@ -250,8 +250,8 @@ end
 
 %- Map to 2D or 3D?
 %
-latlon_grid = [-45 -15:0.5:15 45]';
-csize       = 6;
+latlon_grid = [-45 -20:0.5:20 45]';
+csize       = 10;
 %
 if any( strcmp( lower(method), {'fos','tr'} ) )  &  m_arg == 2
   %
@@ -281,7 +281,7 @@ elseif strcmp( lower(method), 'mc' )  |  ...
                                                          length(latlon_grid) );
   %  
   Q.SENSOR_POS                    = repmat( Q.SENSOR_POS, 1, 3 );
-  Q.SENSOR_POS(:,2)               = -23;
+  Q.SENSOR_POS(:,2)               = -20;
   Q.SENSOR_POS(:,3)               = 0;
   Q.SENSOR_LOS                    = repmat( Q.SENSOR_LOS, 1, 2 );
   Q.SENSOR_LOS(:,2)               = 0;
