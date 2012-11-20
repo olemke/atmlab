@@ -8,11 +8,12 @@
 %
 %   The 1D scenario used for DOIT is expanded to 3D for MC. The cloud is then
 %   given a rectangular shape (in lat and lon). The 1D cloud values are applied
-%   inside a range of [-9,9] degrees, in both latitude and longitude.
-%   This extended by a linear transition to clear sky conditions over 3
-%   degrees. That is, a perfect match between DOIT and MC can not be
-%   expected as the "3D cloud" has a smaller extension than the 1D one, this
-%   especially if a very low tangent altitude is selected.
+%   inside a range of [-15,15] degrees, in both latitude and longitude. This
+%   extended by a linear transition to clear sky conditions over 3 degrees.
+%   That is, a perfect match between DOIT and MC can not always be expected as
+%   the "3D cloud" has a smaller extension than the 1D one, this especially if
+%   a very low tangent altitude is selected (your path can then even be
+%   totally outside of the cloud box).
 %
 %   The cloud is expanded in same way for TR, when 2D or 3D is selected.
 %
@@ -86,7 +87,7 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
+Q.RAW_ATMOSPHERE      = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
                                             'Fascod', 'tropical', 'tropical' );
 Q.RAW_ATM_EXPAND_1D   = false;
 %
@@ -107,7 +108,8 @@ Q                     = qarts_abstable( Q );
 %
 Q.YCALC_WSMS          = { 'sensor_checkedCalc','yCalc' };
 %
-Q.PPATH_LMAX          = 5e3;
+Q.PPATH_LMAX          = 5e3/max([1,6*iwcfac]);
+Q.PPATH_LMAX 
 %
 zplat                 = 600e3;
 sensor_pos            = zplat;
@@ -250,7 +252,7 @@ end
 
 %- Map to 2D or 3D?
 %
-latlon_grid = [-45 -20:0.5:20 45]';
+latlon_grid = [-45 -20:5:20 45]';
 csize       = 10;
 %
 if any( strcmp( lower(method), {'fos','tr'} ) )  &  m_arg == 2
@@ -286,7 +288,6 @@ elseif strcmp( lower(method), 'mc' )  |  ...
   Q.SENSOR_LOS                    = repmat( Q.SENSOR_LOS, 1, 2 );
   Q.SENSOR_LOS(:,2)               = 0;
   %
-  csize                           = 1;
   C.LIMITS                        = [ C.LIMITS csize*[-2 2 -2 2] ];
   C.PND_FIELD{1}.grids{2}         = [ -90 csize*[-2 -1.5 1.5 2] 90 ];
   C.PND_FIELD{1}.grids{3}         = C.PND_FIELD{1}.grids{2};

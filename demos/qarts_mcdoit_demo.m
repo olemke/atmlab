@@ -86,10 +86,12 @@ arts_abstable( Q, workfolder );
 
 %= Set RTE variables
 %
-Q.IY_UNIT               = 'RJBT';
+Q.IY_UNIT             = 'RJBT';
 Q.YCALC_WSMS          = { 'sensor_checkedCalc', 'yCalc' };
 %
-Q.PPATH_LMAX          = 2e3;
+Q.PPATH_LMAX          = 5e3/max([1,iwp/0.5]);
+Q.PPATH_LMAX 
+
 %
 Q.SENSOR_POS          = 830e3;
 Q.SENSOR_LOS          = 145;

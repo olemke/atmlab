@@ -1,3 +1,16 @@
+2012-11-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-315
+
+	* demos/qarts_scattering_demo.m:
+	* demos/qarts_mcdoit_demo.m: Now setting PPATH_LMAX following IWP,
+	in order to keep max tau relatively constant.
+
+	* arts/arts.m (arts): Changed to ensure out0 always also comes out
+	in matlab.
+
+	* demos/qarts_scattering_demo.m: Corrected header. 
+
 2012-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-314
