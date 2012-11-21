@@ -1,3 +1,10 @@
+2012-11-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-318
+
+	* demos/qarts_mcdoit_demo.m
+	* demos/qarts_scattering_demo.m: Removed displaying of PPATH_LMAX.
+
 2012-11-21  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-317
@@ -34,6 +41,7 @@
 	* geoplots/gmt/gmt_plot.m: Made Finding out if the data is gridded or
 	ungridded more robust
 
+>>>>>>> .r8030
 2012-11-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-315

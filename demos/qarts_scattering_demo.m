@@ -109,7 +109,6 @@ Q                     = qarts_abstable( Q );
 Q.YCALC_WSMS          = { 'sensor_checkedCalc','yCalc' };
 %
 Q.PPATH_LMAX          = 5e3/max([1,6*iwcfac]);
-Q.PPATH_LMAX 
 %
 zplat                 = 600e3;
 sensor_pos            = zplat;
