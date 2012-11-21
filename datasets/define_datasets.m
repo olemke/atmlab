@@ -94,6 +94,13 @@ SatDataset('name', 'patmosx', ...
     'reader', @common_read_patmosx, ...
     'granule_duration', 86400);
 
+% FIXME: add reader
+SatDataset('name', 'saphir_l1a', ...
+    'granule_duration', 6130); % FIXME: verify granule_duration
+
+SatDataset('name', 'saphir_l2a', ...
+    'granule_duration', 6130); % FIXME: verify granule_duration
+
 %% datasets generated here (non-collocated)
 
 % dardarsub

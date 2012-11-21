@@ -16,7 +16,18 @@
 
 function x = loadvar( filename, varname )
 
-X = load( filename, varname );
+try
+    X = load( filename, varname );
+catch ME
+    switch ME.identifier
+        case 'MATLAB:load:numColumnsNotSame'
+            % Matlab tried to load as ASCII and failed.
+            % Try to load as binary MAT-file instead.
+            X = load(filename, varname, '-mat');
+        otherwise
+            ME.rethrow();
+    end
+end
 
 if ~isfield( X, varname )
     error( ['atmlab:' mfilename ':variableNotFound'],...

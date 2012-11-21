@@ -53,6 +53,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %   granule_duration - Duration of a single granule in seconds
     %   satname -   Name for a single-satellite dataset
     %   collocated_datasets - Read-only prop. listing <a href="matlab:help CollocatedDataset">CollocatedDatasets</a>.
+    %   starttimesfile - Name for filename containing start times if not in filename
     %
     % SatDataset methods:
     %
@@ -71,6 +72,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %   find_granule_by_datetime -  Find granule starting at exact datetime
     %   find_granule_by_unixsecs -  Similar, but in unixsecs
     %   find_extreme_granule -      Find first or last granule for dataset
+    %   get_starttime -             Get starttime from db (if not in file)
+    %   set_starttimes -            Update starttimes-db
     %
     %  Methods for reading granules:
     %
@@ -270,6 +273,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % cannot be met here. Therefore, defaults should be encompassed in
         % a property, a structure, 'defaults', that is /not/ defined here,
         % but only by the class at the end of the hierarchy
+
+        % Some datasets do not contain a starting time in the filename,
+        % even if there are multiple granule per day. To resolve this, in
+        % the root of the dataset (e.g. directly in basedir) we store a
+        % hashtable (Container.Map) that records the starting time based
+        % on a id that is unique per filename (e.g. orbit number). One
+        % example of such a dataset is Saphir.
+        starttimesfile;
             
     end
     
@@ -1110,6 +1121,22 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
         end
         
+        function start_datevec = get_starttime(self, gran)
+            % get starttime from db, if not in file
+            %
+            % Not implemented yet, just here as placeholder.
+            error(['atmlab:' mfilename ':NotImplemented', ...
+                'Not implemented yet.');
+        end
+
+        function set_starttime(self, gran)
+            % get starttime from db, if not in file
+            %
+            % Not implemented yet, just here as placeholder.
+            error(['atmlab:' mfilename ':NotImplemented', ...
+                'Not implemented yet.');
+            end
+
         function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, varargin)
             % Calculate level3 (gridded mean) for period
             %

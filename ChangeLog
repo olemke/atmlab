@@ -1,3 +1,23 @@
+2012-11-21  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-317
+
+	* files/loadvar.m: Expanded
+
+	- By default, `load` tries to read any file whose name doesn't add in
+	mat as ASCII. Now, loadvar will try to read it as MAT if loading it as
+	ASCII fails due to a formatting error.
+
+	* datasets/SatDataset.m: Expanded
+
+	- In preparation for handling Saphir data, add properties and methods
+	for getting the starting time from an external file. The methods are
+	documented but not yet implemented.
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added saphir_l1a and saphir_l2a; incompletel, work in progress.
+
 2012-11-21  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-316
