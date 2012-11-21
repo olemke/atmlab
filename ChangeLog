@@ -1,3 +1,19 @@
+2012-11-21  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-316
+
+	* datasets/define_datasets.m:
+	+ Added field to homemade dataset
+	+ Changed instrument_flag type from float to short
+
+	* math/column_integrate.m: Clarified a comment
+
+	* handy/exec_system_cmd.m: Use logtext() instead of fprintf to see
+	the timestamp, function, and line number
+
+	* geoplots/gmt/gmt_plot.m: Made Finding out if the data is gridded or
+	ungridded more robust
+
 2012-11-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-315
@@ -9,7 +25,7 @@
 	* arts/arts.m (arts): Changed to ensure out0 always also comes out
 	in matlab.
 
-	* demos/qarts_scattering_demo.m: Corrected header. 
+	* demos/qarts_scattering_demo.m: Corrected header.
 
 2012-11-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
@@ -19,7 +35,7 @@
 	setting of 2D and 3D cloudbox. PPATH_LMAX now 5 km.
 
 	* demos/qarts_mcdoit_demo.m: Added, at least temporarily to help
-	testing of DOIT and MC changes. Not documented. 
+	testing of DOIT and MC changes. Not documented.
 
 2012-11-18  Salomon Eliasson  <s.eliasson@ltu.se>
 

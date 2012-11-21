@@ -1080,7 +1080,7 @@ pos2 = b==length(in.lat)&a==length(in.lon); %(lon,lat)
 % if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
 % assume it's not.
 if ~isfield(in,'gridded')
-    ig = ~ (isequal(size(in.(field)),size(in.lat),size(in.lon))) ;
+    ig = ~ (isequal(size(in.(field)(:)),size(in.lat(:)),size(in.lon(:))));
     if ~ig
         in.(field) = in.(field)(:);
         in.lat     = in.lat(:);

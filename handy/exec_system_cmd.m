@@ -61,12 +61,12 @@ retvals = zeros(1,length(cmd)); % keep track of return messages (if report is in
 for x = cmd'
     fullcmd = char(x);
     
-    if verbose>0, fprintf('%s\n',fullcmd); end
+    if verbose>0, logtext(1,'%s\n',fullcmd); end
     
     [ret,out{i}] = system(fullcmd);
     
     if verbose>0 && ~isempty(out{i})
-        fprintf('%s\n',out{i}(1:end-1))
+        logtext(1,'%s\n',out{i}(1:end-1))
     end
     
     if (ret ~= 0)

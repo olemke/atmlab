@@ -32,7 +32,7 @@ if any(~strcmp('double',{class(in.(D)),class(in.(H))}))
     in.(H) = double(in.(H));
 end
 
-%% Mask missing data with NaN
+%% Mask missing data (i.e., defined as less than zero) with NaNs
 in.(D)(in.(D) < 0)=NaN;
 in.(H)(in.(H) < 0)=NaN;
 
