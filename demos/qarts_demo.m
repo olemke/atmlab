@@ -1,7 +1,6 @@
 % QARTS_DEMO   A simple demonstration of Qarts
 %
-%    Gives an example on basic usage of Qarts. No include files are used, 
-%    beside absorption model data, and all settings are done inside the file. 
+%    Gives an example on basic usage of Qarts.
 %
 %    The example simulated Odin-SMR observations around 501 GHz, but 
 %    with a simplified set-up. 
@@ -27,12 +26,11 @@ function [Q,f,y] = qarts_demo( varargin )
 %= Init Q structures
 %
 Q  = qarts;
-
-
-%= Overall settings
 %
-Q.INCLUDES               = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                             fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
 
 
 %= De-activate parts not used
@@ -95,21 +93,11 @@ Q.ABS_SPECIES(4).TAG{2} = 'H2O-PWR98';
 Q.ABS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
 %
 Q.ABSORPTION            = 'OnTheFly';  % A simple, but slow, option!
-% abs_n2 is set below
 Q.ABS_LINES_FORMAT      = 'Arts';
 Q.ABS_LINES             = fullfile( atmlab_example_data , 'lines501.4' );
 Q.ABS_LINESHAPE         = 'Voigt_Kuntz6';
 Q.ABS_LINESHAPE_CUTOFF  = -1;
 Q.ABS_LINESHAPE_FACTOR  = 'VVH';
-
-
-%= Various basic settings
-%
-Q.WSMS_AT_START{end+1}  = 'VectorSet(abs_n2,[0.7808])';
-Q.WSMS_AT_START{end+1}  = 'AgendaSet(g0_agenda){';
-Q.WSMS_AT_START{end+1}  = '  Ignore(lon)';
-Q.WSMS_AT_START{end+1}  = '  g0Earth }';
-Q.WSMS_AT_START{end+1}  = 'NumericSet(molarmass_dry_air,28.966)';
 
 
 %= Set RTE variables (refraction is here neglected)
@@ -128,7 +116,7 @@ Q.IY_AUX_VARS           = [];
 %
 Q.YCALC_WSMS            = { 'yCalc' };
 %
-Q.PPATH_LMAX            = 20e3;
+Q.PPATH_LMAX            = 10e3;
 Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
                             'Ignore(edensity_field)', 'Ignore(f_grid)', ... 
                             'ppath_stepGeometric' };

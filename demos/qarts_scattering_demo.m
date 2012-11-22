@@ -58,7 +58,31 @@ Q.J_DO              = false;
 Q.SENSOR_DO         = false;
 %
 Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                        fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+                        fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
+
+
+%= Set standard clear-sky agendas
+%
+Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
+Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__PassiveSensorPath)';
+Q.WSMS_AT_START{3} = ...
+                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
+Q.WSMS_AT_START{4} = ...
+         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
+Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
+Q.WSMS_AT_START{6} = ...
+                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+Q.WSMS_AT_START{6} = ...
+                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+
+%- Blackbody surface
+Q.SURFACE_RTPROP_AGENDA{1} = 'Ignore(rte_los)';
+Q.SURFACE_RTPROP_AGENDA{2} = 'InterpAtmFieldToRtePos(surface_skin_t,';
+Q.SURFACE_RTPROP_AGENDA{3} = '  atmosphere_dim,p_grid,lat_grid,lon_grid,'; 
+Q.SURFACE_RTPROP_AGENDA{4} = '  z_field,rte_pos,t_field)';
+Q.SURFACE_RTPROP_AGENDA{5} = 'surfaceBlackbody';
 
 
 %= General part
@@ -134,8 +158,8 @@ y_c = arts_y( Q );
 
 %= Setting structure for cloudbox and scattering solution method
 %
-C               = qartsCloudbox;
-Q.WSMS_AT_START = { 'FlagOff( use_mean_scat_data )' };
+C                      = qartsCloudbox;
+Q.WSMS_AT_START{end+1} = 'FlagOff( use_mean_scat_data )';
 
 
 %- Define 1D cloudbox and particles

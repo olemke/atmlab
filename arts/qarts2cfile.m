@@ -228,11 +228,11 @@ function T = cfile_Generl( Q, partname, workfolder )
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Arts2{';
   %
+  T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
+  %
   if qarts_isset( Q.WSMS_AT_START )
     T = add_wsms( T, ' WSMS_AT_START', Q.WSMS_AT_START );
   end
-  %
-  T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
   if qarts_isset( Q.OUTPUT_FILE_FORMAT )
     rqre_datatype( Q.OUTPUT_FILE_FORMAT, @ischar, 'Q.OUTPUT_FILE_FORMAT' ); %&%
@@ -716,7 +716,9 @@ function T = cfile_RteExe( Q, partname, workfolder )
   end                                                                       %&%
   %
   T = add_rtecalcstart( Q );
-  %   
+  %       
+  T{end+1} = 'sensor_checkedCalc';
+  %
   if qarts_isset( Q.YCALC_WSMS )
     T = add_wsms( T, 'YCALC_WSMS', Q.YCALC_WSMS );
   end
@@ -758,6 +760,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
   rqre_datatype( Q.SENSOR_DO, @isboolean, 'Q.SENSOR_DO' );                  %&%
   if ~Q.SENSOR_DO
     T{1} = 'sensorOff';
+    T{2} = 'sensor_checkedCalc';
     return                           % Return
   end
     
@@ -1012,10 +1015,8 @@ function T = cfile_Sensor( Q, partname, workfolder )
       end
 
       T = { T{:} U{:} };
-
     end
   end
-  
   
   %- Saving
   %
@@ -1749,7 +1750,7 @@ function T = add_rtecalcstart( Q )
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, @istensor0, ...       %&%
                                      'Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER' ); %&%
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER, @istensor0, ...       %&%
-                                'Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER' );      %&%
+                                     'Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER' ); %&%
     %
     T{end+1} = sprintf( 'NumericSet(mc_std_err,%.3e)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );

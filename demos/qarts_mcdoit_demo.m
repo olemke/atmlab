@@ -24,7 +24,24 @@ Q.J_DO              = false;
 Q.SENSOR_DO         = false;
 %
 Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                        fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+                        fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
+                        fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
+
+
+%= Set standard clear-sky agendas
+%
+Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
+Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__PassiveSensorPath)';
+Q.WSMS_AT_START{3} = ...
+                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
+Q.WSMS_AT_START{4} = ...
+         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
+Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
+Q.WSMS_AT_START{6} = ...
+                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+Q.WSMS_AT_START{6} = ...
+                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
 
 
 %= General part
@@ -66,7 +83,7 @@ R(1,2,1) = rsurf*0.1;
 
 fname = fullfile(workfolder,'surface_reflectivity.xml');
 xmlStore( fname, R, 'Tensor3' );
-Q.WSMS_AT_START{1} = sprintf('ReadXML(surface_reflectivity,"%s")',fname);
+Q.WSMS_AT_START{end+1} = sprintf('ReadXML(surface_reflectivity,"%s")',fname);
 %
 Q.SURFACE_RTPROP_AGENDA{1} = 'specular_losCalc';
 Q.SURFACE_RTPROP_AGENDA{2} = 'InterpAtmFieldToRtePos(surface_skin_t,';
@@ -87,7 +104,7 @@ arts_abstable( Q, workfolder );
 %= Set RTE variables
 %
 Q.IY_UNIT             = 'RJBT';
-Q.YCALC_WSMS          = { 'sensor_checkedCalc', 'yCalc' };
+Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 5e3/max([1,iwp/0.5]);
 %

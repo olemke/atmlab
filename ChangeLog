@@ -1,3 +1,22 @@
+2012-11-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-320
+
+	* demos/qarts_mcdoit_demo.m:
+	* demos/qarts_scattering_demo.m:
+	* demos/arts_oem_demo.m:
+	* demos/qpack2_demo.m
+	* demos/qarts_demo2.m
+	* demos/qarts_demo.m: Adatped to sensor_checkedCalc and
+	reorganisation of include files.
+
+	* arts/qarts2cfile.m (cfile_Generl): INCLUDES now done before
+	Q.WSMS_AT_START. This is reveresed order compared to before.
+	This to ensure that no active choices are overwritten.
+
+	(cfile_RteExe): Call of sensor_checkedCalc now included
+	automatically.
+
 2012-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-319

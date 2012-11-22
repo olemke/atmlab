@@ -95,21 +95,33 @@ fascod = fullfile( arts_xmldata_path, 'planets', 'Earth', 'Fascod' );
 %- Init Q
 %
 Q = qarts;
-
-
-%- General 
 %
-Q.INCLUDES            = { fullfile( arts_includes, 'general.arts' ), ...
-                          fullfile( arts_includes, 'continua.arts' ) };
+Q.INCLUDES            = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                          fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
+                          fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
+                          fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
 Q.ATMOSPHERE_DIM      = 1;
 Q.STOKES_DIM          = 1;
 Q.J_DO                = true;
 Q.CLOUDBOX_DO         = false;
 
 
+%- Define agendas
+%
+Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
+Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__PassiveSensorPath)';
+Q.WSMS_AT_START{3} = ...
+                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
+Q.WSMS_AT_START{4} = ...
+         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
+Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
+Q.WSMS_AT_START{6} = ...
+                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+
+
 %- Radiative transfer
 %
-Q.IY_UNIT              = 'RJBT'; 
+Q.IY_UNIT             = 'RJBT'; 
 Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 250;
@@ -117,8 +129,8 @@ Q.PPATH_LMAX          = 250;
 
 %- Surface
 %
-Q.Z_SURFACE          = 5e3;          % Just a dummy value. A 10 km
-                                     % observation altitude is assumed here
+Q.Z_SURFACE           = 5e3;          % Just a dummy value. A 10 km
+                                      % observation altitude is assumed here
 
 
 %- Absorption

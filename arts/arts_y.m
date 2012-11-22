@@ -70,7 +70,6 @@ strs2file( cfile, S );
 arts( cfile );
 
 
-
 y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
 
 
