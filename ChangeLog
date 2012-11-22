@@ -1,3 +1,19 @@
+2012-11-22  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-319
+
+	* datasets/SatDataset.m: Fixed missing ']'
+
+	* time/daterange.m: added an otherwise error to the switch
+
+	* files/uncompress.m: Fixed bad behaviour. Now, if the file does
+	not have the suffix .zip, .gz, or .bz2, then do nothing
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m:
+	* datasets/common_read_patmosxL3.m:
+	Added patmosxL3 dataset
+
 2012-11-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-318

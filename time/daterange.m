@@ -25,8 +25,8 @@ function dates = daterange(date1, date2)
 %
 %
 % $Id$
-
-assert(length(date1)==length(date2),['atmlab' mfilename ':badInput'],...
+errId = ['atmlab' mfilename ':badInput'];
+assert(length(date1)==length(date2),errId,...
     'length(date1)~=length(date2)')
 
 dl = length(date1);
@@ -53,7 +53,9 @@ switch dl
         dates = dates(:, 1:5);
     case 6
         dates = datevec(dn1:1/(24*3600):dn2); %seconds steps
-        
+    
+    otherwise
+        error(errId,'datevector lengths=%d is not supported',dl)    
 end
 
 end

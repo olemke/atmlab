@@ -112,6 +112,11 @@ for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3', 'v0_4', 'v0_5', 'v0_6'}
     ds.re = D.cmoiwp.re;
 end
 
+%% Level 3 DATASETS (not for collocating)
+D.patmosxL3.basedir   = '/storage3/data/patmosx/level3';
+D.patmosxL3.subdir    = '$YEAR4/$MONTH/';
+D.patmosxL3.re        = 'patmosx_aft_mor_.+(?<year>\d{4})';
+
 %% COLLOCATION DATA SETS
 
 %% MW datasets

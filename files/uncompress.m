@@ -21,7 +21,6 @@ end
 
 [~,tmpfile,fend] = fileparts(compfile);
 
-filename = '';
 switch fend
     case '.zip'
         out = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('DEBUG'));
@@ -32,4 +31,7 @@ switch fend
     case '.bz2'
         filename = fullfile(tmpdir,tmpfile);
         exec_system_cmd(sprintf('bunzip2 -c %s > %s',compfile,filename),atmlab('DEBUG'));
+    otherwise
+        % no nothing
+        filename = compfile;
 end

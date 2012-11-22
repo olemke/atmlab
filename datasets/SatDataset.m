@@ -1125,7 +1125,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % get starttime from db, if not in file
             %
             % Not implemented yet, just here as placeholder.
-            error(['atmlab:' mfilename ':NotImplemented', ...
+            error(['atmlab:' mfilename ':NotImplemented'], ...
                 'Not implemented yet.');
         end
 
@@ -1133,7 +1133,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % get starttime from db, if not in file
             %
             % Not implemented yet, just here as placeholder.
-            error(['atmlab:' mfilename ':NotImplemented', ...
+            error(['atmlab:' mfilename ':NotImplemented'], ...
                 'Not implemented yet.');
             end
 
