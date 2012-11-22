@@ -22,18 +22,17 @@ if isnan( arts_xmldata_path )
   error('You need to ARTS_XMLDATA_PATH to run this example.');
 end
 %
-fascod = fullfile( arts_xmldata_path, 'atmosphere', 'fascod' );
+fascod = fullfile( arts_xmldata_path, 'planets', 'Earth', 'Fascod' );
 
 
 %= Init Q structures
 %
 Q  = qarts;
-
-
-%= Overall settings
 %
-Q.INCLUDES               = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                             fullfile( 'ARTS_INCLUDES', 'continua.arts' )};
+Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
 
 
 %= Atmospheric species and absorption models
@@ -52,7 +51,8 @@ Q.P_GRID                 = z2p_simple( [0:250:40e3]' );
 
 %= Reference atmosphere
 %
-Q.RAW_ATMOSPHERE         = fullfile( fascod, 'subarctic-winter' );
+Q.RAW_ATMOSPHERE         = fullfile( fascod, 'subarctic-winter', ...
+                                             'subarctic-winter' );
 %
 % Needed, but dummy variables
 Q.REFELLIPSOID           = ellipsoidmodels( 'SphericalEarth' );

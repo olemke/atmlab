@@ -1,5 +1,18 @@
 2012-11-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-322
+
+	* demos/qarts_mcdoit_demo.m
+	* demos/qarts_scattering_demo.m
+	* demos/qpack2_demo.m
+	* demos/arts_oem_demo.m
+	* demos/qarts_demo2.m: Changed to use ppath_agenda__FollowSensorLosPath.
+
+	* demos/qarts_abstable_demo.m (qarts_abstable_demo): Missed this
+	one in last commit.
+
+2012-11-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-321
 
 	* demos/qarts_scattering_demo.m

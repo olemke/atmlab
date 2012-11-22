@@ -56,7 +56,7 @@ Q.J_DO                  = false;
 % Here we do it by using the predefined agenda templates
 %
 Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
-Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__PassiveSensorPath)';
+Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
 Q.WSMS_AT_START{3} = ...
                     'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
 Q.WSMS_AT_START{4} = ...
