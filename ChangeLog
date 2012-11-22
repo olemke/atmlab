@@ -1,5 +1,12 @@
 2012-11-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-321
+
+	* demos/qarts_scattering_demo.m
+	* demos/qarts_mcdoit_demo.m: iy_surface_agenda was set twice.
+
+2012-11-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-320
 
 	* demos/qarts_mcdoit_demo.m:
