@@ -1,5 +1,7 @@
 2012-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-323
+
 	* geographical/ungridded2gridded.m: Added function to easily grid,
 	for example, ungridded "swath" satellite data to a regular
 	grid. Is really a wrapper around binning_fast() and binned statistics().
