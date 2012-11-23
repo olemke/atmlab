@@ -37,7 +37,6 @@ if exist('filter','var') && ~isempty(filter)
     data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
 end
 
-w = warning('off','MATLAB:divideByZero');
 for i = 1:length(statistics)
     try
         A.(func2str(statistics{i}))=0;
@@ -51,7 +50,6 @@ for i = 1:length(statistics)
     end
     out.(statname) = cellfun(statistics{i}, data_bins, 'UniformOutput', false);
 end
-warning(w);
 
 %% - Replace empty cells with something (e.g. NaN). put the data array must have the same class as "replace"
 %

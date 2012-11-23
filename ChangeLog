@@ -1,3 +1,16 @@
+2012-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* geographical/ungridded2gridded.m: Added function to easily grid,
+	for example, ungridded "swath" satellite data to a regular
+	grid. Is really a wrapper around binning_fast() and binned statistics().
+
+	* geographical/resample_geodata.m: Made clear in docs that this
+	function is only for gridded data
+
+	* math/binning_fast.m: added assertion if in.region is not numeric
+
+	* math/binned_statistics.m: Removed depricated warning
+
 2012-11-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-322

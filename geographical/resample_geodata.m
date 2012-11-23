@@ -1,7 +1,7 @@
 function out = resample_geodata(in,field,newgrid)
 % RESAMPLE_GEODATA regrid the data to a new gridsize or fitting to new lat lons
 %
-% PURPOSE:  To resample the data according a given gridsize or lat/lon
+% PURPOSE:  To resample GRIDDED data according a given gridsize or lat/lon
 %           vectors. The data is regridded using matlabs INTERPOLATION
 %           functions if the grid resolution should be FINER and the data
 %           is RESAMPLED using area wieghting averages using a local plane

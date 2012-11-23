@@ -30,10 +30,10 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %
 %                             or
 %                  newlat        [lat vector]      bin into new lat grid
-%                  newlon        [lat vector]      bin into new lon grid
+%                  newlon        [lon vector]      bin into new lon grid
 %
 %              OPTIONAL
-%                  region        [blcorner,trcorner] (lt1,ln1,lt2,ln2)
+%                  region        [blcorner,trcorner] (lat1,lon1,lat2,lon2)
 %
 %
 %          If region is given, the function will only bin the data within the
@@ -186,7 +186,7 @@ function [in,lat,lon] = outputlatlons(in,lonspace)
 % Sets up lat lon and adjusts in.lon to the requested (if requested)
 % longitude regime (0:360 or -180:180)
 %
-errId = 'atmlab:binning_fast:badInput';
+errId = ['atmlab:' mfilename ':badInput'];
 
 testmore = in.lon>180; %logical for any lons > 180
 testless = in.lon<0; %logical for any lons < 0
@@ -223,5 +223,7 @@ d = in.gridsize;
 assert(numel(d)<=2,errId,'''gridsize'' should contain 1 or 2 values')
 
 if isscalar(d), d = [d,d]; end
+assert(isnumeric(in.region),errId,'in.region must be a numeric vector of coordinates')
+
 lat = in.region(1)+0.5*d(1):d(1):in.region(3)-0.5*d(1);
 lon = in.region(2)+0.5*d(2):d(2):in.region(4)-0.5*d(2);
