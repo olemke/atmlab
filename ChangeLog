@@ -1,3 +1,10 @@
+2012-11-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-324
+
+	* arts/arts.m: Don't display on screen if "result" is picked up by
+	calling function.
+
 2012-11-23  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-323
@@ -111,7 +118,6 @@
 	* geoplots/gmt/gmt_plot.m: Made Finding out if the data is gridded or
 	ungridded more robust
 
->>>>>>> .r8030
 2012-11-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-315
@@ -614,7 +620,6 @@
 
 	* collocations/CollocatedDataset.m: Added assertion
 
->>>>>>> .r7911
 2012-10-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-278

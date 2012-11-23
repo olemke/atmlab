@@ -57,7 +57,7 @@ if status  &  ~errortol
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')
 
-else
+elseif nargout < 2
   disp( result )
 end
 

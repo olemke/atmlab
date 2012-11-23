@@ -1488,7 +1488,8 @@ function T = cfile_SctMth( Q, partname, workfolder )
     %
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'NONE' )
     %
-    T = {};
+    T = add_agenda( {}, 'iy_cloudbox_agenda', { 'Ignore(rte_pos)', ...
+                        'Ignore(rte_los)', 'Ignore(f_grid)', 'Touch(iy)' } );
     %
   else                                                                      %&%
     error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );                       %&%
