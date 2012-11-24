@@ -1,3 +1,15 @@
+2012-11-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-325
+
+	* demos/qarts_scattering_demo.m (qarts_scattering_demo): Added
+	flag to run with refraction.
+
+	* arts/qarts2cfile.m (cfile_SctMth): Removed call of
+	sensor_checkedCalc as also included in RteExe.
+
+	* tests/test_arts_ppath.m: Updated.
+
 2012-11-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-324

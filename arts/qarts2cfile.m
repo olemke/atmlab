@@ -760,7 +760,6 @@ function T = cfile_Sensor( Q, partname, workfolder )
   rqre_datatype( Q.SENSOR_DO, @isboolean, 'Q.SENSOR_DO' );                  %&%
   if ~Q.SENSOR_DO
     T{1} = 'sensorOff';
-    T{2} = 'sensor_checkedCalc';
     return                           % Return
   end
     

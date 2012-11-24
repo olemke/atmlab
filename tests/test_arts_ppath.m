@@ -37,11 +37,16 @@ do_check = 1;
 %- Fixed settings
 %
 Q = qarts;
-Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
+%
+Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'agendas.arts' ) };
 Q.ATMOSPHERE_DIM        = atmosphere_dim;
 Q.CLOUDBOX_DO           = false;
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
+%
+Q.WSMS_AT_START{1} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
+%
 if do_refr
   Q.PPATH_LRAYTRACE     = 1e3;
   Q.PPATH_STEP_AGENDA   = { 'ppath_stepRefractionBasic' };
@@ -52,7 +57,11 @@ if do_refr
                             'Ignore(rte_edensity)', ...
                             'NumericSet(refr_index,1.0)', ...
                             'NumericSet(refr_index_group,1.0)' };
+else
+  Q.WSMS_AT_START{end+1} = ...
+                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
 end
+
 Q.PPATH_LMAX            = 10e3;
 %
 if atmosphere_dim == 1  ||  unsphere < 2
@@ -185,9 +194,9 @@ for c = 1 : n
 
   %- Define calculation part
   %
-  Q.WSMS_AT_START       = { 'IndexSet(stokes_dim,1)' };
+  Q.WSMS_AT_START{end+1} = 'IndexSet(stokes_dim,1)';
+  Q.WSMS_AT_START{end+1} = re_string;
   Q.WSMS_AT_END         = { 
-    re_string,  ...
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
     'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")', ...
     'VectorSet(rte_pos2,[])', ...

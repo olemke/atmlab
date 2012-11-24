@@ -17,7 +17,8 @@
 %
 %   The cloud is expanded in same way for TR, when 2D or 3D is selected.
 %
-% FORMAT [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo([ztan,method,m_arg,iwpfac])
+% FORMAT [Q,f,ztan,y_c,y,dy] = 
+%                  qarts_scattering_demo([ztan,method,m_arg,iwpfac,do_refr])
 %
 %  OUT   Q          Qarts setting structure.
 %        f          Frequency grid.
@@ -34,6 +35,7 @@
 %                   For TR this is atmospheric dimensionality to use.
 %        iwcfac     Scaling factor of the IWC used. Default is 1. Set to 0
 %                   to obtain "clear-sky" also inside cloudbox.
+%        do_refr    Flag to run with refraction. Default is false.
 
 % 2010-12-01  Extended to also handle TR by Patrick Eriksson.
 % 2010-02-12  Extended to also handle FOS by Patrick Eriksson.
@@ -43,7 +45,8 @@
 
 function [Q,f,ztan,y_c,y,dy] = qarts_scattering_demo( varargin )
 %
-[ztan,method,m_arg,iwcfac] = optargs( varargin, { [7 10 13]*1e3, 'mc', 5, 1 });
+[ztan,method,m_arg,iwcfac,do_refr] = ...
+                      optargs( varargin, { [7 10 13]*1e3, 'mc', 5, 1, false });
 
 
 %= Init Q structure
@@ -68,12 +71,18 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
 Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
 Q.WSMS_AT_START{3} = ...
-                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
-Q.WSMS_AT_START{4} = ...
          'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
-Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
-Q.WSMS_AT_START{6} = ...
+Q.WSMS_AT_START{4} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
+Q.WSMS_AT_START{5} = ...
                  'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+if do_refr
+  Q.WSMS_AT_START{6} = ...
+                    'Copy(ppath_step_agenda,ppath_step_agenda__RefractedPath)';
+  Q.WSMS_AT_START{7} = 'Copy(refr_index_agenda,refr_index_agenda__GasThayer)';
+else
+  Q.WSMS_AT_START{6} = ...
+                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
+end
 
 %- Blackbody surface
 Q.SURFACE_RTPROP_AGENDA{1} = 'Ignore(rte_los)';
@@ -131,6 +140,7 @@ Q                     = qarts_abstable( Q );
 Q.YCALC_WSMS          = { 'sensor_checkedCalc','yCalc' };
 %
 Q.PPATH_LMAX          = 5e3/max([1,6*iwcfac]);
+Q.PPATH_LRAYTRACE     = Q.PPATH_LMAX;
 %
 zplat                 = 600e3;
 sensor_pos            = zplat;
