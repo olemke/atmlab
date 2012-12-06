@@ -130,7 +130,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % The regular expression may be applied either to the basename, or
         % to the full path, or to anything in-between.
         %
-        % Fields used for matching are year02, year04, year, month, day, doy.
+        % Fields used for matching are:
+        %       year02, year04, year, month, day, doy, hour, minute, orbitno
+        %
+        % For datasets that are L1 or L2, data is usually sorted at least
+        % per day, but often per granule, which may be specified either by
+        % hour/minute or by orbitno, some unique orbit number. Hopefully
+        % each filename specifies either hour/minute uniquely within a
+        % day, or an orbit number uniquely. See 'kiruna_init' for examples
+        % of what to write in re.
         %
         % See also: <a href="matlab:help SatDataset/filename">filename</a>, <a href="matlab:help SatDataset/find_granule_by_datetime">find_granule_by_datetime</a>
         %
@@ -268,12 +276,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % the first place.
         tryre = true;
         
-        % defaults cannot be set in any subclass, because re-defining a
-        % property is not allowed except under special circumstances that
-        % cannot be met here. Therefore, defaults should be encompassed in
-        % a property, a structure, 'defaults', that is /not/ defined here,
-        % but only by the class at the end of the hierarchy
-
+        % Flag if it needs an exernal starttimes-file
+        %
+        % Defaults to false
+        needs_starttimesfile = false;
+        
         % Some datasets do not contain a starting time in the filename,
         % even if there are multiple granule per day. To resolve this, in
         % the root of the dataset (e.g. directly in basedir) we store a
@@ -281,7 +288,17 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % on a id that is unique per filename (e.g. orbit number). One
         % example of such a dataset is Saphir.
         starttimesfile;
-            
+
+        % Database of starting times for datasets where those are not
+        % clear from the filename.
+        starttimes
+
+        % defaults cannot be set in any subclass, because re-defining a
+        % property is not allowed except under special circumstances that
+        % cannot be met here. Therefore, defaults should be encompassed in
+        % a property, a structure, 'defaults', that is /not/ defined here,
+        % but only by the class at the end of the hierarchy
+
     end
     
     % read-only props (alterable with methods)
@@ -293,6 +310,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % that use this <a href="matlab:help SatDataset">SatDataset</a>.
         collocated_datasets = [];
         
+        % Full path for db containing start-times where applicable.
+        %
+        % This is simply basedir/starttimesfile
+        starttimes_fullpath
     end
     
     % flags
@@ -304,8 +325,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         FL_NOCUR = -4;
     end
     
+    % internally used properties
     properties (GetAccess = private, SetAccess = private)
         firstlines;
+        cachedstarttimes;
     end
     
     methods
@@ -353,6 +376,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 warning(['atmlab:' mfilename], ...
                     'You didn''t name me! I''ll name myself %s (for now)', nm);
                 self.name = nm;
+            end
+
+            if isempty(self.starttimesfile)
+                self.starttimesfile = 'granule_start_times.mat';
             end
             
             self.cache = CachedData();
@@ -443,8 +470,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % OUT
             %
-            %   M     N x m matrix     where each row corresponds to one granule and is
-            %                          a datevec.
+            %   M     N x 6 matrix     where each row corresponds to one granule.
+            %                          The first five columns are year,
+            %                          month, day, hour, minute. The last
+            %                          column may contain a granule number
+            %                          for some datasets, or -1 otherwise.
+            %                          
             %   paths cell of strings  Cell array of strings, corresponding full paths
             %
             % IN
@@ -479,10 +510,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             files = dir(datadir);
             nfiles = length(files);
-            M = zeros(nfiles, 5);
+            M = zeros(nfiles, 6);
             for i = 1:nfiles
                 fname = files(i).name;
-                nam = regexp(fname, matchy, 'names');
+                %nam = regexp(fname, matchy, 'names');
+                nam = self.find_info_from_granule(fname);
                 if ~isempty(nam)
                     % if present, year/month/day should be the same
                     if (isfield(nam, 'year02') && ~isempty(nam.year02) && ~strcmp(nam.year02, yearstr(3:4))) || ...
@@ -500,6 +532,18 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     end
                     if isfield(nam, 'minute')
                         M(i, 5) = str2double(nam.minute);
+                    end
+                    if self.needs_starttimesfile
+                        if isfield(nam, 'orbitno2') % need both numbers
+                            % specifies range, so so product should be
+                            % unique
+                            M(i, 6) = str2double(nam.orbitno) * ...
+                                      str2double(nam.orbitno2);
+                        else
+                            M(i, 6) = str2double(nam.orbitno);
+                        end
+                    else
+                        M(i, 6) = -1;
                     end
                 end
             end
@@ -584,9 +628,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
                 [granules, paths] = self.find_granules_by_date(datevec, spec, false);
-                if tol>0 % use tolerance
-                    g = mat2cell(granules, size(granules, 1), [1 1 1 1 1]);
-                    grans_unisecs = date2unixsecs(g{:});
+                if self.needs_starttimesfile % use orbit-ids
+                    orbitid = datevec(6);
+                    found = granules(:, 6) == orbitid;
+                elseif tol>0 % use tolerance
+                    g = mat2cell(granules, size(granules, 1), ...
+                                 repmat(1, [1 size(granules, 2)]));
+                    grans_unisecs = date2unixsecs(g{1:5});
                     X = num2cell(datevec);
                     dv_unisecs = date2unixsecs(X{:});
                     found = abs(grans_unisecs - dv_unisecs) < tol;
@@ -642,7 +690,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   date1   datevec     starting date   [y,m,d]
             %   date2   datevec     ending date     [y,m,d]
-            %   spec    various
+            %   spec    various     (optional)
             %
             % OUT
             %
@@ -653,11 +701,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             %   >> [allgrans, allpaths] = mhs.find_granules_for_period([2010, 9, 5], [2010 9 7], 'noaa18');
             
-            narginchk(4, 4);
+            narginchk(3, 4);
+            if ~exist('spec', 'var')
+                spec = [];
+            end
             dates = daterange(date1(1:3), date2(1:3));
             ndates = size(dates, 1);
             
-            allgrans = nan*zeros(ndates*15, 5);
+            allgrans = nan*zeros(ndates*15, 6);
             allpaths = cell(size(allgrans));
             
             n = 0;
@@ -991,9 +1042,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             next = 0;
 
             for i = 1:ngrans-1
-                logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
-                    allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5));
-                uni = date2unixsecs(allgrans(i+1, 1), allgrans(i+1, 2), allgrans(i+1, 3), allgrans(i+1, 4), allgrans(i+1, 5));
+                logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d (%d)\n', i, ngrans-1, ...
+                    allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5), allgrans(i, 6));
+                if self.needs_starttimesfile
+                    uni = self.get_starttime(allgrans(i+1, :));
+                else
+                    dv = allgrans(i+1, :);
+                    uni = date2unixsecs(dv(1), dv(2), dv(3), dv(4), dv(5));
+                end
+                uni = uint32(uni);
                 if self.firstlines.(sat).isKey(uni) && ~any(self.firstlines.(sat)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
                     logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(sat)(uni));
                     continue
@@ -1120,22 +1177,43 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     outer = grans(end, :);
             end
         end
-        
-        function start_datevec = get_starttime(self, gran)
+
+        function start_datevec = get_starttime(self, datevec)
             % get starttime from db, if not in file
             %
-            % Not implemented yet, just here as placeholder.
-            error(['atmlab:' mfilename ':NotImplemented'], ...
-                'Not implemented yet.');
+            % based on datevec, last elem is granule-number
+            gran_no = datevec(6);
+            if ~self.starttimes.isKey(gran_no)
+                self.set_starttime(datevec);
+            end
+            start_datevec = self.starttimes(gran_no);
         end
 
-        function set_starttime(self, gran)
+        function set_starttime(self, datevec)
             % get starttime from db, if not in file
             %
-            % Not implemented yet, just here as placeholder.
-            error(['atmlab:' mfilename ':NotImplemented'], ...
-                'Not implemented yet.');
-            end
+            % needs datevec including granule number
+
+            gran_no = datevec(6);
+            fullpath = self.find_granule_by_datetime(datevec);
+            logtext(atmlab('OUT'), 'Reading %s to get start-time\n', ...
+                fullpath);
+ %           data = read_saphir_l1(fullpath, 'ScanTimestart');
+            % Don't remove duplicates, as I need to run this function
+            % before I can even begin to /detect/ duplicates!
+            S = self.read_granule(datevec, [], {}, false);
+%             X = textscan(data.data.ScanTimestart(1).Data, '%4d%2d%2d %2d%2d%2d%6d');
+%            [year, month, day, hour, minute, second, ~] = deal(X{:});
+            self.starttimes(gran_no) = S.epoch;
+
+            % since storing a small hashtable is so much quicker than
+            % reading a large granule-file, doing this every time is a
+            % small price to pay for easier programming
+            % might add a conditional here?
+
+            tm = self.starttimes;
+            save(self.starttimes_fullpath, 'tm');
+        end
 
         function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, varargin)
             % Calculate level3 (gridded mean) for period
@@ -1230,6 +1308,41 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                  'I give up. Please help me: either implement ' ...
                  'a pos2re() method, or define a re member.']);
         end
+        
+        %% getters and setters for properties
+        
+                function path = get.starttimes_fullpath(self)
+            path = fullfile(self.basedir, self.starttimesfile);
+        end
+        
+        function times = get.starttimes(self)
+            if isequaln(self.cachedstarttimes, []) % not initialised
+                try
+                    self.cachedstarttimes = loadvar(self.starttimes_fullpath, 'tm');
+                catch ME
+                    switch ME.identifier
+                        case {'MATLAB:load:couldNotReadFile', 'MATLAB:load:notBinaryFile'}
+                            logtext(atmlab('OUT'), ...
+                                ['Unable to read starttimes-file at %s ' ...
+                                '(%s). Initialising new.\n'], ...
+                                self.starttimes_fullpath, ME.message);
+                            self.cachedstarttimes = containers.Map('KeyType', 'uint32', 'ValueType', 'int64');
+                    end
+                end
+            end
+            times = self.cachedstarttimes;
+        end
+
+        function set.starttimes(self, val)
+            if ~isa(val, containers.Map)
+                error(['atmlab:' mfilename ':invalid'], ...
+                    'starttimes should be a containers.Map, found %s', ...
+                    class(val));
+            end
+            logtext(atmlab('OUT'), 'Writing %s\n', self.starttimes_fullpath);
+            save(self.starttimes_fullpath, 'val');
+        end
+
         %% methods for internal use (not private, but from other classes)
        
         function add_collocated_dataset(ds, cd)

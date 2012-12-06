@@ -21,6 +21,8 @@ function S = common_read_avhrr_cmsaf_gac(file, varargin)
 % FORMAT
 %
 %   S = common_read_cmsaf_gac(file, varargin)
+%
+% See also: SatDataset/reader
 
 % $Id$
 % Created by Salomon Eliasson

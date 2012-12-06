@@ -88,11 +88,11 @@ D.patmosx.re = 'patmosx_(?<satname>[a-z0-9]{3})_asc_(?<year>\d{4})_(?<doy>\d{3})
 
 D.saphir_l1a.basedir = '/storage3/data/meghatropiques/saphir_l1a';
 D.saphir_l1a.subdir = '$YEAR4/$MONTH/$DAY';
-D.saphir_l1a.re = 'MT1SAPSL1A__(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno1>\d{5})_(?<orbitno2>\d{5})_00\.h5\.gz$';
+D.saphir_l1a.re = 'MT1SAPSL1A__(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno>\d{5})_(?<orbitno2>\d{5})_00\.h5\.gz$';
 
 D.saphir_l2a.basedir = '/storage3/data/meghatropiques/saphir_l2a';
 D.saphir_l2a.subdir = '$YEAR4/$MONTH/$DAY';
-D.saphir_l2a.re = 'MT1SAPS_(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno1>\d{5})_(?<orbitno2>\d{5})_00_GP_\d\.\d\d_L2A\.h5';
+D.saphir_l2a.re = 'MT1SAPS_(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno>\d{5})_(?<orbitno2>\d{5})_00_GP_\d\.\d\d_L2A\.h5';
 %% other home-made datasets
 
 D.dardarsub.basedir = '/storage3/data/dardar_subsel';

@@ -1,10 +1,17 @@
-function filename = uncompress(compfile,tmpdir)
+function filename = uncompress(compfile,varargin)
 %% uncompress
 %
 % Purpose: uncompress a file and return the name of the uncompressed file
 %
 % IN        compfile        full path to compressed file
-%           tmpdir          The directory you want to uncompress it into (optional)
+%           tmpdir          The directory you want to uncompress it into
+%                           (optional, defaults to atmlab('WORK_AREA'))
+%           flags           structure with additional flags, so far one
+%                           field:
+%               unidentified --- what to do if compressed file not recognised?
+%                   'ignore'    default, do nothing
+%                   'warn'      write a message
+%                   'error'     issue an error
 %
 % OUT       filename        The fullpath to the uncompressed filename.
 %                           Empty if the file was never uncompressed.
@@ -12,12 +19,11 @@ function filename = uncompress(compfile,tmpdir)
 % NOTE
 %           Known compression formats are .gz, .zip, and .bz2
 %
-% Salomon Eliasson
+% Salomon Eliasson and others
 % $Id$
 
-if nargin==1
-    tmpdir = atmlab('WORK_AREA');
-end
+[tmpdir, flags] = optargs(varargin, {atmlab('WORK_AREA'), struct()});
+flags = optargs_struct(flags, struct('unidentified', 'ignore'));
 
 [~,tmpfile,fend] = fileparts(compfile);
 
@@ -32,6 +38,22 @@ switch fend
         filename = fullfile(tmpdir,tmpfile);
         exec_system_cmd(sprintf('bunzip2 -c %s > %s',compfile,filename),atmlab('DEBUG'));
     otherwise
-        % no nothing
+        switch flags.unidentified
+            case 'ignore'
+                % do nothing...
+            case 'warn'
+                logtext(atmlab('OUT'), ...
+                'Did not uncompress %s because I didn''t recognise the compression', ...
+                    compfile);
+            case 'error'
+                error(['atmlab:' mfilename ':unidentified'], ...
+                    'I tried to uncompress %s, but I don''t know how!', ...
+                        compfile);
+            otherwise
+                error(['atmlab:' mfilename], 'Unknown flag %s=%s', ...
+                    'unidentified', flags.unidentified);
+        end
         filename = compfile;
+end
+
 end

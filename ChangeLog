@@ -1,3 +1,94 @@
+2012-12-06  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-326
+
+	* sensors/read_saphir_l1.m: Added
+
+	- Reading routine for saphir l1 data. Mostly written by Mathias
+	with small adaptations by me.
+
+	* datasets/common_read_saphir.m: Added
+
+	- Higher leven function to plug into collocation system. Possibly
+	unfinished.
+
+	* files/uncompress.m: Expanded
+
+	- Don't stubbornly continue when uncompression fails, instead
+	provide an option what to do: ignore, warn, or quit with error
+	message. Also, use atmlab('WORK_AREA') as tmpdir by default.
+
+	* datasets/define_datasets.m:
+
+	- Improved saphir, added three necessary props.
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Improved saphir regexp
+
+	* datasets/SatDataset.m:
+
+	(re): Expanded documentation for this property, reflecting that also
+	orbitno and orbitno2 may be needed.
+
+	(needs_starttimesfile): Added property for those needing
+	starttimesfile
+
+	(starttimes): Added property. Database of starting times. Has
+	getter/setter.
+
+	(starttime_fullpath): Added read-only property to get the fullpath of
+	the starting time. Uses a getter.
+
+	(cachedstarttimes): Added read-only property to cache starting times
+	for granules.
+
+	(SatDataset): Use default value for starttimesfile
+
+	(get_starttime): Implemented. Retrieve starting time based on
+	granule-id.
+
+	(set_starttime): Implemented. Read starting-time from granule and
+	store this in mapping table.
+
+	(find_granules_by_date): Expanded
+
+	- The granule-matrix now has a 6th column that is used for instruments
+	where the filename does not unique determine the starting time. The
+	6th column is used for a identifier that can be uniquely calculated
+	from information obtained from the filename, e.g. one or more numbers
+	representing the orbit(s).
+
+	(find_granule_by_datetime): Expanded
+
+	- Adapt for new style of granule-matrix. If self.needs_starttimesfile
+	is true, the sixth column (orbit-id or so) must also be equal to the
+	rest. Note that this is incompatible with the use of a tolerance —
+	there must be an exact match.
+
+	(find_granules_for_period): Expanded
+
+	- Make the 'spec' argument optional
+
+	- Adapt for new granule-matrix style (more preallocation).
+
+	(find_granule_first_line): Expanded
+
+	- Adapt for new style of granule-matrix. Now considers the option that
+	the starting time needs to be obtained from the file (using
+	self.get_starttime).
+
+	(get.starttimes): Added. Getter for starttimes property.
+
+	- Read from self.cachedstarttimes if possible, otherwise read from
+	file.
+
+	(set.starttimes): Added. Add particular starting time and store to
+	file.
+	
+	* datasets/common_read_avhrr_cmsaf_gac.m: Minor change (added "see
+	also") 
+
 2012-11-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-325
