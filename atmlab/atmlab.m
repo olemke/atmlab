@@ -83,6 +83,10 @@
 %
 % Stream to log ordinary messages to. Used by some subsystems.
 %----------------------------------------------------------------------------
+% PYTHON
+%
+% Path to Python interpreter to use in relevant situations.
+%----------------------------------------------------------------------------
 % RAND_STATE
 %
 % Initialisation of random states (for rand and randn). Either NaN or an
@@ -175,7 +179,7 @@ end
 %
 return
 
-
+end
   
 %---------------------------------------------------------------------------
 function A = atmlab_defs
@@ -190,8 +194,12 @@ A.ERR               = 2;
 A.FMODEL_VERBOSITY  = 0;
 A.LEGACY_MODE       = false;
 A.OUT               = 1;
+X = exec_system_cmd('type -p python');
+A.PYTHON            = strtrim(X{1});
 A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
 A.SITE              = NaN;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = tempdir();
+
+end
