@@ -213,20 +213,32 @@ end
 a.ungriddedfile = in.ungriddedfile;
 a.plotPlacement = in.plotPlacement;
 
-% get resolution of data to pick a good search radius (not used if given)
+% ----------------------
+% AREA
+
 % get number of 1deg boxes in region
 x            = sscanf(in.region,'%f/%f/%f/%f');
 oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );
 
-% find the approx density of points
-res = max([ mean(diff(unique(in.lat)));mean(diff(unique(in.lon)))]) ;
 
-% How much RAM is available?
-memGB = freeRAM()/1024;
+% ---------------------
+% Maximum resolution 
 
-% What it translates to in terms of resolution:
-maxres = 3 * sqrt((1/memGB) * oneDegRegion * 8 /1024^3); %4bytes double
+% memGB = freeRAM()/1024; % How much RAM is available? TO LARGE
+% some reasonable maximum default
+% apparently it costs 1200bytes per point
 
+memGB = .1;
+maxpoints = memGB*1024^3  / 1200;
+maxres = oneDegRegion/maxpoints;
+
+% -----------------------------------------------------
+% Resolution inferred by data, or by user defined
+
+%data
+res = max([ abs(median(diff(in.lat)));abs(median(diff(in.lon)))]) ;
+
+%user
 if isfield(in,'nearneighbor') &&...
         isstruct(in.nearneighbor) &&...
         isfield(in.nearneighbor,'resolution')
@@ -235,7 +247,7 @@ end
 
 % check if res is acceptable
 if res < maxres
-    logtext(1,['Automatically picked the maximum resolution of:',...
+    fprintf(['Automatically picked the maximum resolution of: ',...
         '%.4fdeg instead of %.4fdeg defined by measurement density\n'],maxres,res)
     res = maxres;
 else
@@ -245,7 +257,7 @@ a.increment = sprintf('%fm',60*res); % 60min x resolution
 
 % use increment to decide the search radius, unless given
 if ~isfield(in,'nearneighbor') || ~isfield(in.nearneighbor,'search')
-    a.search = sprintf('%fm', 1.5*( str2double(a.increment(1:end-1)) ));
+    a.search = sprintf('%fm', 1.25*str2double(a.increment(1:end-1)));
 else
     a.search = in.nearneighbor.search;
 end

@@ -1,3 +1,10 @@
+2012-12-07  Salomon Eliason  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-327
+
+	* geoplots/gmt/create_gmt_earth.m: Improved finding the right
+	resolution to internally grid (using nearneighbor) ungridded data.
+
 2012-12-06  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-326
