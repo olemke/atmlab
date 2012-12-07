@@ -30,12 +30,15 @@ assert( isnumeric( a ) );                                                   %&%
 assert( istensor0( lowlim ) );                                              %&%
 assert( istensor0( highlim ) );                                             %&%
 
-if any( a(:) < lowlim )  |  any( a(:) > highlim )
+if any( a(:) < lowlim )  ||  any( a(:) > highlim )
   if nargin < 4  ||  isempty(nonstdname)
     vname = sprintf( 'The variable *%s*', inputname(1) );
   else
     assert( ischar( nonstdname ) );
     vname = sprintf( '%s', nonstdname );
   end
-  error('%s is required to be in the range [%d,%d].', vname, lowlim, highlim );
+  error(['atmlab:' mfilename ':invalid'], ...
+      '%s is required to be in the range [%d,%d].', vname, lowlim, highlim );
+end
+
 end

@@ -635,7 +635,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     g = mat2cell(granules, size(granules, 1), ...
                                  repmat(1, [1 size(granules, 2)]));
                     grans_unisecs = date2unixsecs(g{1:5});
-                    X = num2cell(datevec);
+                    X = num2cell(datevec(1:5));
                     dv_unisecs = date2unixsecs(X{:});
                     found = abs(grans_unisecs - dv_unisecs) < tol;
                 else
@@ -845,6 +845,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             rqre_field(data, 'lat');
             rqre_field(data, 'lon');
             rqre_field(data, 'epoch');
+            
             if isinteger(data.time)
                 data.time = double(data.time);
             end
@@ -857,10 +858,17 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             data.scanline_number = repmat((1:nlines).', [1 npos]);
             data.scanline_position = repmat(1:npos, [nlines 1]);
             
+            if ~isfield(data, 'version') % try from filename
+                fileinfo = self.find_info_from_granule(datafile);
+                if isfield(fileinfo, 'version')
+                    data.version = fileinfo.version;
+                end
+            end
+            
             %% remove duplicates
             if remdouble
                 % read ballast
-                firstline = self.granule_first_line(date, spec);
+                firstline = self.granule_first_line(date(1:5), spec);
                 if firstline > 0 && firstline < intmax(class(firstline))
                     % get rid of ballast in all fields
                     for f = fieldnames(data)'
@@ -1178,15 +1186,25 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
         end
 
-        function start_datevec = get_starttime(self, datevec)
-            % get starttime from db, if not in file
+        function start_unixsecs = get_starttime(self, datevec)
+            % get starttime for granule 
+            %
+            % This is either taken directly from the datevec, or it is
+            % taken from a database.
             %
             % based on datevec, last elem is granule-number
-            gran_no = datevec(6);
-            if ~self.starttimes.isKey(gran_no)
-                self.set_starttime(datevec);
+            
+            if self.needs_starttimesfile
+                gran_no = datevec(6);
+                if ~self.starttimes.isKey(gran_no)
+                    self.set_starttime(datevec);
+                end
+                start_unixsecs = self.starttimes(gran_no);
+            else
+                start_datevec = datevec(1:5);
+                X = num2cell(start_datevec);
+                start_unixsecs = date2unixsecs(X{:});
             end
-            start_datevec = self.starttimes(gran_no);
         end
 
         function set_starttime(self, datevec)

@@ -12,8 +12,13 @@ all_fields    = [core_fields(:); extra_fields(:)];
 
 data = read_saphir_l1(file, all_fields);
 
-S.lat = data.data.LatScan;
-S.lon = data.data.LonScan;
+% need to rotate lat and lon
+S.lat = data.data.LatScan.';
+S.lon = data.data.LonScan.';
+
+% lon is in [0 360], convert to [-180, 180]
+S.lon = convert_360_180(S.lon);
+
 % interpret time strings
 tmsm = cell2mat(data.data.ScanTimestart);
 tt = textscan(tmsm(:, 1:21).', '%4d%2d%2d %2d%2d%2d%6d');

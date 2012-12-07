@@ -323,7 +323,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             %% find starting time in unixsecs
             
-            granule_start = date2unixsecs(date1(1), date1(2), date1(3), date1(4), date1(5));
+            granule_start = self.primary.get_starttime(date1);
             granule_end = granule_start + duration;
             
             %% find all granules yesterday/today/tomorrow
@@ -337,8 +337,14 @@ classdef CollocatedDataset < HomemadeDataset
                 self.secondary.find_granules_by_date(date1, spec2, false); ...
                 self.secondary.find_granules_by_date(tomorrow, spec2, false)];
             threedays = sortrows(threedays);
-            granules_unixsecs = date2unixsecs(...
-                threedays(:, 1), threedays(:, 2), threedays(:, 3), threedays(:, 4), threedays(:, 5));
+            % get corresponding starting times
+            granules_unixsecs = zeros(1, size(threedays, 1));
+            for i = 1:size(threedays, 1)
+                st = self.secondary.get_starttime(threedays(i, :));
+                granules_unixsecs(i) = st;
+            end
+%             granules_unixsecs = date2unixsecs(...
+%                 threedays(:, 1), threedays(:, 2), threedays(:, 3), threedays(:, 4), threedays(:, 5));
             
             % last granule starting after the reference granule
             % those are all 'too late'
@@ -507,14 +513,15 @@ classdef CollocatedDataset < HomemadeDataset
             %% loop through all the granules to collocate with
             
             for i = 1:size(secondary_granules, 1)
-                datecell = num2cell(secondary_granules(i, 1:5));
+                % Overlap check 2; primary data with secondary filename
+                data2_start = self.secondary.get_starttime(secondary_granules(i, :));
+                data2_end = data2_start + self.secondary.granule_duration;
+                
+                [datecell{1:5}] = unixsecs2date(data2_start);
                 
                 logtext(atmlab('OUT'), 'Collocating with ''%s'' ''%s'' @ %04d-%02d-%02d %02d:%02d\n', ...
                     self.secondary.name, spec2, datecell{1:5});
                 
-                % Overlap check 2; primary data with secondary filename
-                data2_start = date2unixsecs(datecell{1:5});
-                data2_end = data2_start + self.secondary.granule_duration;
                 
                 if (data2_start > data1.eff_range(2)) || (data2_end < data1.eff_range(1))
                     % no possible time overlap; data1 range already compensated for
@@ -529,7 +536,11 @@ classdef CollocatedDataset < HomemadeDataset
                     data2 = self.secondary.read_granule(secondary_granules(i, :), spec2, extra_args_secondary, false);
                 catch ME
                     switch ME.identifier
-                        case {'atmlab:find_datafile_by_date', 'atmlab:invalid_data', 'atmlab:find_granule_by_datetime', 'atmlab:exec_system_cmd:shell'}
+                        case {'atmlab:find_datafile_by_date', ...
+                                'atmlab:invalid_data', ...
+                                'atmlab:find_granule_by_datetime', ...
+                                'atmlab:exec_system_cmd:shell', ...
+                                'atmlab:rqre_in_range:invalid'}
                             logtext(eid, 'Error in reading datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                                 datecell{:}, ME.message);
                             continue

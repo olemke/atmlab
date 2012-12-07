@@ -1,3 +1,50 @@
+2012-12-07  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-328
+
+	* math/convert_360_180.m: Added.
+
+	- Convert longitudes in range [0, 360] to longitudes in range [-180,
+	180].
+
+	* collocations/CollocatedDataset.m:
+
+	(overlap_granule): Use get_starttime() method to get start time
+
+	(collocate_granule): Use get_starttime() method
+
+	* datasets/SatDataset:
+	
+	(find_granule_by_datetime):
+
+	- Fixed bug where id was interpreted as seconds
+
+	(read_granule):
+
+	- Add version if available in filename but not in data
+
+	- Fixed bug in interpreting firstline
+
+	(get_starttime):
+
+	- Adapt so it can be used for any granule, not only the ones that
+	don't have info in the filename
+
+	* datasets/common_read_saphir:
+
+	- Transpose lat/lon
+
+	- Convert lon to [-180, 180]
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added collocation_mhs_saphir
+
+	* handy/rqre_in_range.m:
+
+	- Add helpful error identifier
+	- Small fixes
+
 2012-12-07  Salomon Eliason  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-327
