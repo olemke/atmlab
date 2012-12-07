@@ -1024,7 +1024,7 @@ classdef CollocatedDataset < HomemadeDataset
                                      'I don''t know what dataset it is about. This is a bug. ' ...
                                      'The message was: ' ME.message]);
                             end
-                            logtext(atmlab('ERR'), 'Warning: I don''t have firstline-data for today for %s. I''ll try to get some! (todays collocation will be redone)', again.name);
+                            logtext(atmlab('ERR'), 'Warning: I don''t have firstline-data for today for %s. I''ll try to get some! (todays collocation will be redone)\n', again.name);
                             again.find_granule_first_line(alldates(i, :), alldates(end, :), spec);
                             again.granule_first_line(alldates(i, :), spec, true); % force reload
                         otherwise

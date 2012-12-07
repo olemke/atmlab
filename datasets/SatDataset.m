@@ -971,7 +971,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 unisecs = uint32(d);
             else
                 dv = num2cell(d);
-                unisecs = uint32(date2unixsecs(dv{:}));
+                unisecs = uint32(self.get_starttime(d));
             end
             
 
@@ -1050,15 +1050,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             next = 0;
 
             for i = 1:ngrans-1
-                logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d (%d)\n', i, ngrans-1, ...
-                    allgrans(i, 1), allgrans(i, 2), allgrans(i, 3), allgrans(i, 4), allgrans(i, 5), allgrans(i, 6));
-                if self.needs_starttimesfile
-                    uni = self.get_starttime(allgrans(i+1, :));
-                else
-                    dv = allgrans(i+1, :);
-                    uni = date2unixsecs(dv(1), dv(2), dv(3), dv(4), dv(5));
-                end
+                uni = self.get_starttime(allgrans(i+1, :));
                 uni = uint32(uni);
+                                
+                [ddv{1:5}] = unixsecs2date(double(uni));
+                logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
+                    ddv(1), ddv(2), ddv(3), ddv(4), ddv(5));
+
                 if self.firstlines.(sat).isKey(uni) && ~any(self.firstlines.(sat)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
                     logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(sat)(uni));
                     continue
@@ -1205,6 +1203,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 X = num2cell(start_datevec);
                 start_unixsecs = date2unixsecs(X{:});
             end
+            
+            start_unixsecs = round(start_unixsecs);
         end
 
         function set_starttime(self, datevec)
