@@ -1,3 +1,61 @@
+2012-12-11  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-241
+
+	* math/convert_360_180.m:
+	
+	- Removed, duplicates functionality shift_longitudes
+
+	* collocations/CollocatedDataset.m:
+
+	(overlap_granule): Reimplemented; simpler implementation, fixes bugs
+
+	(collocate_granule):
+
+	- Changed protocol of communicating "refresh only" to
+	granule_first_line, part of bugfix described below
+
+	(read):
+
+	- State clearly when reading because no pcd is defined at all.
+
+	* datasets/SatDataset.m:
+
+	(granule_first_line):
+
+	- Enable reload functionality
+	
+	(find_granule_first_line):
+
+	- Fix bug causing endless loop with wrong start-time
+	
+	- More informative "set to flag" message
+
+	- Fix bug in calling signature to logtext
+
+	(set_starttime):
+
+	- Only set start-time if I could read the tfile
+
+	(get.starttimes):
+
+	- Don't try to read starttime-file if N/A
+
+	* handy/PersistentCachedData.m(delete_old_entry):
+
+	- Fig bug causing endless loop when trying to delete old entry
+
+	* site-specific/kiruna/datasets_init.m: Add collocation_amsub_saphir
+
+	* datasets/common_read_saphir.m:
+
+	- Use shift_longitudes instead of convert_360_180
+
+	* datasets/define_datasets.m:
+
+	- Increase saphir granule duration
+	- Added collocation_amsub_saphir
+
 2012-12-07  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-240

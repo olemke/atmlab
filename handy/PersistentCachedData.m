@@ -115,19 +115,34 @@ classdef PersistentCachedData < CachedData
             % remove oldest cache-entry on disk. Should contain only
             % MAT-files!
            
+            % by default, Matlab issues warnings, not errors, if deletion
+            % fails. Fortunately, this can be turned into an error with
+            % this undocumented Matlab code.
+            % works in 8.0.0.783 (R2012b) and many older versions.
+            
+            X1 = warning('error', 'MATLAB:DELETE:DirectoryDeletion');
+            X2 = warning('error', 'MATLAB:DELETE:FileNotFound');
+            X3 = warning('error', 'MATLAB:DELETE:Permission');
 
             d = dir(self.cachedir);
-            % all but 2 should end in .mat
+            % all but 2 must end in .mat
             for i = 1:length(d)
-                assert(any(strcmp(d.name, {'.', '..'})) || ...
-                      ((length(d.name) >= 4) && strcmp(d.name(end-3:end), '.mat')), ...
+                assert(any(strcmp(d(i).name, {'.', '..'})) || ...
+                      ((length(d(i).name) >= 4) && strcmp(d(i).name(end-3:end), '.mat')), ...
                       ['atmlab:' mfilename ':NotACacheDir']);
             end
             while self.disk_toolarge()
                 d = dir(self.cachedir);
+                d = d(~[d.isdir]); % don't include directories
                 [~, i] = min(arrayfun(@(x) x.datenum, d));
-                delete(d(i).name);
+                % FIXME: 
+                delete(fullfile(self.cachedir, d(i).name));
             end
+            
+            % reset warning-config to old state
+            warning(X1);
+            warning(X2);
+            warning(X3);
         end
     end
 end

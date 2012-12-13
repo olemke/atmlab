@@ -939,7 +939,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 sat = spec;
             end
             
-            if isequal(self.firstlines, []) || ~isfield(self.firstlines, spec) % load first
+            if isequal(self.firstlines, []) || ~isfield(self.firstlines, spec) || reload % load first
                 scanfile = datasets_config('firstline_data');
                 scanfile = strrep(scanfile, '$SAT', sat);
                 scanfile = strrep(scanfile, '$SENSOR', self.name);
@@ -1042,9 +1042,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 self.firstlines.(sat) = containers.Map('KeyType', 'uint32', 'ValueType', 'int32');
             end
             
-            uni_first = date2unixsecs(allgrans(1, 1), allgrans(1, 2), allgrans(1, 3), allgrans(1, 4), allgrans(1, 5));
+            uni_first = self.get_starttime(allgrans(1, :));
             if ~self.firstlines.(sat).isKey(uni_first)
-                logtext(atmlab('OUT'), 'Setting very first to flag\n');
+                logtext(atmlab('OUT'), 'Setting very first to flag: %d:%d\n', ...
+                    uni_first, self.FL_INITIAL);
                 self.firstlines.(sat)(uni_first) = self.FL_INITIAL;
             end
             next = 0;
@@ -1055,7 +1056,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                                 
                 [ddv{1:5}] = unixsecs2date(double(uni));
                 logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
-                    ddv(1), ddv(2), ddv(3), ddv(4), ddv(5));
+                    ddv{1}, ddv{2}, ddv{3}, ddv{4}, ddv{5});
 
                 if self.firstlines.(sat).isKey(uni) && ~any(self.firstlines.(sat)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
                     logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(sat)(uni));
@@ -1219,18 +1220,33 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
  %           data = read_saphir_l1(fullpath, 'ScanTimestart');
             % Don't remove duplicates, as I need to run this function
             % before I can even begin to /detect/ duplicates!
-            S = self.read_granule(datevec, [], {}, false);
+            success = false;
+            try
+                S = self.read_granule(datevec, [], {}, false);
+                success = true;
+            catch ME
+                switch ME.identifier
+                    case 'atmlab:rqre_in_range:invalid'
+                        logtext(atmlab('ERR'), ...
+                            'Cannot determine start time, setting to 0: %s\n', ...
+                            ME.message);
+                    otherwise
+                        ME.rethrow();
+                end
+            end
 %             X = textscan(data.data.ScanTimestart(1).Data, '%4d%2d%2d %2d%2d%2d%6d');
 %            [year, month, day, hour, minute, second, ~] = deal(X{:});
-            self.starttimes(gran_no) = S.epoch;
+            if success
+                self.starttimes(gran_no) = S.epoch;
+                tm = self.starttimes; %#ok<NASGU>
+                save(self.starttimes_fullpath, 'tm');
+
+            end
 
             % since storing a small hashtable is so much quicker than
             % reading a large granule-file, doing this every time is a
             % small price to pay for easier programming
             % might add a conditional here?
-
-            tm = self.starttimes;
-            save(self.starttimes_fullpath, 'tm');
         end
 
         function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, varargin)
@@ -1329,26 +1345,31 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         
         %% getters and setters for properties
         
-                function path = get.starttimes_fullpath(self)
+        function path = get.starttimes_fullpath(self)
             path = fullfile(self.basedir, self.starttimesfile);
         end
         
         function times = get.starttimes(self)
-            if isequaln(self.cachedstarttimes, []) % not initialised
-                try
-                    self.cachedstarttimes = loadvar(self.starttimes_fullpath, 'tm');
-                catch ME
-                    switch ME.identifier
-                        case {'MATLAB:load:couldNotReadFile', 'MATLAB:load:notBinaryFile'}
-                            logtext(atmlab('OUT'), ...
-                                ['Unable to read starttimes-file at %s ' ...
-                                '(%s). Initialising new.\n'], ...
-                                self.starttimes_fullpath, ME.message);
-                            self.cachedstarttimes = containers.Map('KeyType', 'uint32', 'ValueType', 'int64');
+            if ~self.needs_starttimesfile
+                times = [];
+            else
+                if isequaln(self.cachedstarttimes, []) % not initialised
+                    try
+                        self.cachedstarttimes = loadvar(self.starttimes_fullpath, 'tm');
+                    catch ME
+                        switch ME.identifier
+                            case {'MATLAB:load:couldNotReadFile', 'MATLAB:load:notBinaryFile'}
+                                logtext(atmlab('OUT'), ...
+                                    ['Unable to read starttimes-file at %s ' ...
+                                    '(%s). Initialising new.\n'], ...
+                                    self.starttimes_fullpath, ME.message);
+                                self.cachedstarttimes = containers.Map('KeyType', 'uint32', 'ValueType', 'int64');
+                        end
                     end
                 end
+                
+                times = self.cachedstarttimes;
             end
-            times = self.cachedstarttimes;
         end
 
         function set.starttimes(self, val)

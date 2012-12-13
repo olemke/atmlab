@@ -17,7 +17,7 @@ S.lat = data.data.LatScan.';
 S.lon = data.data.LonScan.';
 
 % lon is in [0 360], convert to [-180, 180]
-S.lon = convert_360_180(S.lon);
+S.lon = shift_longitudes(S.lon, -180, 180);
 
 % interpret time strings
 tmsm = cell2mat(data.data.ScanTimestart);

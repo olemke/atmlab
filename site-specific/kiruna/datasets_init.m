@@ -141,6 +141,10 @@ D.collocation_mhs_saphir.basedir = '/storage3/user_data/gerrit/collocated_datase
 D.collocation_mhs_saphir.subdir = '$YEAR4/$MONTH/$DAY';
 D.collocation_mhs_saphir.filename = 'collocations_$SAT.nc.gz';
 
+D.collocation_amsub_saphir.basedir = '/storage3/user_data/gerrit/collocated_datasets/amsub_saphir';
+D.collocation_amsub_saphir.subdir = '$YEAR4/$MONTH/$DAY';
+D.collocation_amsub_saphir.filename = 'collocations_$SAT.nc.gz';
+
 %% CPR as reference
 
 D.CollocatedDataset_avhrrCMSAF_cpr.basedir   = '/storage4/user_data/seliasson/collocations_avhrrCMSAF_cpr/core';

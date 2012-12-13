@@ -317,14 +317,11 @@ classdef CollocatedDataset < HomemadeDataset
             %
             %   >> sec = mhscpr.overlap_granule([2010 9 8 8 8], '');
             
-            %% get duration of a granule of sensor1
-            
-            duration = self.primary.granule_duration;
             
             %% find starting time in unixsecs
             
-            granule_start = self.primary.get_starttime(date1);
-            granule_end = granule_start + duration;
+            primary_unixsecs = self.primary.get_starttime(date1);
+            %granule_end = primary_unixsecs + duration;
             
             %% find all granules yesterday/today/tomorrow
             
@@ -338,30 +335,51 @@ classdef CollocatedDataset < HomemadeDataset
                 self.secondary.find_granules_by_date(tomorrow, spec2, false)];
             threedays = sortrows(threedays);
             % get corresponding starting times
-            granules_unixsecs = zeros(1, size(threedays, 1));
+            secondary_unixsecs = zeros(1, size(threedays, 1));
             for i = 1:size(threedays, 1)
                 st = self.secondary.get_starttime(threedays(i, :));
-                granules_unixsecs(i) = st;
+                secondary_unixsecs(i) = st;
             end
 %             granules_unixsecs = date2unixsecs(...
 %                 threedays(:, 1), threedays(:, 2), threedays(:, 3), threedays(:, 4), threedays(:, 5));
+
+%            primstart_before_secstart = primary_unixsecs < secondary_unixsecs;
             
+            primstart_before_secend = primary_unixsecs < secondary_unixsecs + self.secondary.granule_duration + self.interval;
+            
+            primend_after_secstart = primary_unixsecs + self.primary.granule_duration + self.interval > secondary_unixsecs;
+            
+            okej = primstart_before_secend & primend_after_secstart;
+            
+%{          
+            
+            
+            % first granule 
+
             % last granule starting after the reference granule
             % those are all 'too late'
             
-            b = find(granule_start - self.interval > granules_unixsecs, 1, 'last');
+            toolate = primary_unixsecs - self.interval > secondary_unixsecs;
+            b = find(toolate, 1, 'last');
             
             % first granule ending before the reference granule
             % those are all 'too early'
             
-            e = find(granule_end + self.interval < granules_unixsecs, 1, 'first');
+            tooearly = granule_end + self.interval < secondary_unixsecs;
+            e = find(tooearly, 1, 'first');
             
             % if all match, none are too early or too late
             if isempty(b) && isempty(e)
-                okej = (granule_start < granules_unixsecs) & (granule_end > granules_unixsecs);
+                okej = (primary_unixsecs < secondary_unixsecs) & (granule_end > secondary_unixsecs);
             elseif ~isempty(b) && ~isempty(e)
                 % anything not too early, not too late, is good
                 okej = b:e;
+            elseif (all(tooearly) && none(toolate)) || ...
+                   (all(toolate) && none(tooearly))
+                % all too early, none too late
+                % all too late, none too early
+                % this means all are off
+                okej = [];
             else
                 % this means:
                 % if b is empty, then 1:e
@@ -371,7 +389,7 @@ classdef CollocatedDataset < HomemadeDataset
                 %X={b,e};
                 %okej = X{[~isempty(b) ~isempty(e)]};
             end   
-            
+%}            
             secondary_granules = threedays(okej, :);
         end
 
@@ -1026,7 +1044,7 @@ classdef CollocatedDataset < HomemadeDataset
                             end
                             logtext(atmlab('ERR'), 'Warning: I don''t have firstline-data for today for %s. I''ll try to get some! (todays collocation will be redone)\n', again.name);
                             again.find_granule_first_line(alldates(i, :), alldates(end, :), spec);
-                            again.granule_first_line(alldates(i, :), spec, true); % force reload
+                            again.granule_first_line(0, spec, true, true); % force reload
                         otherwise
                             ME.rethrow();
                     end
@@ -1267,6 +1285,8 @@ classdef CollocatedDataset < HomemadeDataset
                 else
                     logtext(atmlab('OUT'), 'No cache entry found, starting reading\n');
                 end
+            else
+                logtext(atmlab('OUT'), 'No cache object defined, starting reading\n');
             end
             
             % distribute fields, limits, etc. over core, additionals
