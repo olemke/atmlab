@@ -1,9 +1,22 @@
+2012-12-17  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-242
+
+	* datasets/define_datasets.m:
+	- Added HIRS-DARDAR  and MHS-DARDAR datasets
+	- changed behaviour of local function getSelection() to simplify
+	things a bit. The function is used to only get certain fields
+	associated with a dataset for the fieldCopier-datasets.
+
+	* site-specific/kiruna/datasets_init.m:
+	Added HIRS-DARDAR  and MHS-DARDAR datasets
+
 2012-12-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-241
 
 	* math/convert_360_180.m:
-	
+
 	- Removed, duplicates functionality shift_longitudes
 
 	* collocations/CollocatedDataset.m:

@@ -209,6 +209,10 @@ D.CollocatedDataset_cmoiwp_v0_4_dardarsub.basedir      = '/storage4/user_data/se
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.subdir       = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.filename     = 'collocations_cmoiwp_v0_4_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
 
+D.CollocatedDataset_hirs_dardarsub.basedir   = '/storage4/user_data/seliasson/collocations_hirs_dardarsub/core';
+D.CollocatedDataset_hirs_dardarsub.subdir    = '$YEAR4/$MONTH/$DAY';
+D.CollocatedDataset_hirs_dardarsub.filename  = 'collocations_hirs_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
 D.CollocatedDataset_dardarsub_modis.basedir   = '/storage4/user_data/seliasson/collocations_dardarsub_modis/core';
 D.CollocatedDataset_dardarsub_modis.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_dardarsub_modis.filename  = 'collocations_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
@@ -291,6 +295,17 @@ D.cpr_dardarsub_IWP.subdir      = '$YEAR4/$MONTH/$DAY';
 D.cpr_dardarsub_cloudTypes.basedir  = strrep(D.cpr_dardarsub_IWP.basedir,'IWP','cloudTypes');
 D.cpr_dardarsub_cloudTypes.filename = D.cpr_dardarsub_IWP.filename;
 D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
+% -----------------------
+
+
+D.mhs_dardarsub.basedir    = strrep(D.CollocatedDataset_mhs_dardarsub.basedir,'core',D.mhs_dardarsub.name);
+D.mhs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';
+D.mhs_dardarsub.filename   = 'collocations_mhs_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
+
+D.hirs_dardarsub.basedir    = strrep(D.CollocatedDataset_hirs_dardarsub.basedir,'core',D.hirs_dardarsub.name);
+D.hirs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';
+D.hirs_dardarsub.filename   = 'collocations_hirs_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
+
 
 % --------
 % MODIS
