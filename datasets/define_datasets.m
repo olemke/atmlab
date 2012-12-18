@@ -513,14 +513,12 @@ laa.atts.long_name = 'Local azimuth angle';
 laa.atts.units = 'degrees';
 laa.atts.valid_range = [-180 180];
 
-
-%% AssociatedDatasets (FieldCopier, Collapser, etc.)
-
-
 % function to extract some fields from a structure contianing more than
 % needed, since only the fields used are should be in the fieldCopier
 % This requires that x.fields = fieldnames(x) exists.
 getSelection = @(x,F,y)(rmfield(x,F(~ismember(F,y))));
+
+%% AssociatedDatasets (FieldCopier, Collapser, etc.)
  
 D = datasets; % reload
 
@@ -702,6 +700,10 @@ f_hirs.H_POS.type = 'byte';
 f_hirs.H_POS.realname = 'scanline_position';
 f_hirs.H_POS.atts.long_name = 'HIRS scanline position';
 
+% --------
+% MHS
+% --------
+
 f_mhs.B_LZA = lza;
 f_mhs.B_LAA = laa;
 f_mhs.B_SZA = sza;
@@ -711,9 +713,27 @@ f_mhs.B_BT.realname = 'tb';
 f_mhs.B_BT.dims = {'MHS_CHANS', 5};
 f_mhs.B_BT.atts.long_name = 'MHS Brightness Temperature';
 f_mhs.B_BT.atts.units = 'Kelvin';
+% --------
+% AMSU-B
+% --------
+
+% very similar to MHS
 f_amsub = f_mhs;
 f_amsub.B_BT.dims{1} = 'AMSUB_CHANS';
 f_amsub.B_BT.atts.long_name = 'AMSU-B Brightness Temperature';
+
+% --------
+% SAPHIR
+% --------
+
+for i = 1:6
+    fn = sprintf('TB%d', i);
+    f_saphir.(fn).type = 'float';
+    f_saphir.(fn).realname = sprintf('TbCh%d', i);
+    f_saphir.(fn).atts.long_name = sprintf('Saphir Brightness Temperature, channel %d', i);
+    f_saphir.(fn).atts.units = 'Kelvin';
+end
+
 
 % ---------
 % MODIS
@@ -849,6 +869,12 @@ FieldCopier(D.collocation_amsub_mhs, f_amsub1, f_mhs2, ...
 
 FieldCopier(D.collocation_amsub_amsub, f_amsub1, f_amsub2, ...
     'name', 'associated_amsub_amsub');
+
+FieldCopier(D.collocation_mhs_saphir, f_mhs, f_saphir, ...
+    'name', 'associated_mhs_saphir');
+
+FieldCopier(D.collocation_amsub_saphir, f_amsub, f_saphir, ...
+    'name', 'associated_amsub_saphir');
 
 FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
     getSelection(f_cpr,fieldnames(f_cpr),{'Cloud_Types'}),struct(),...

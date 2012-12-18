@@ -628,15 +628,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
                 [granules, paths] = self.find_granules_by_date(datevec, spec, false);
-                if self.needs_starttimesfile % use orbit-ids
-                    orbitid = datevec(6);
-                    found = granules(:, 6) == orbitid;
-                elseif tol>0 % use tolerance
-                    g = mat2cell(granules, size(granules, 1), ...
-                                 repmat(1, [1 size(granules, 2)]));
-                    grans_unisecs = date2unixsecs(g{1:5});
-                    X = num2cell(datevec(1:5));
-                    dv_unisecs = date2unixsecs(X{:});
+                if tol>0 % use tolerance
+%                     g = mat2cell(granules, size(granules, 1), ...
+%                                  repmat(1, [1 size(granules, 2)]));
+                    grans_unisecs = self.get_starttime(granules);
+%                     X = num2cell(datevec);
+%                     dv_unisecs = round(date2unixsecs(X{:}));
+                    dv_unisecs = double(self.get_starttime(datevec));
                     found = abs(grans_unisecs - dv_unisecs) < tol;
                 else
                     found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
@@ -1186,26 +1184,37 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         end
 
         function start_unixsecs = get_starttime(self, datevec)
-            % get starttime for granule 
+            % get starttime for granule/granules
             %
             % This is either taken directly from the datevec, or it is
             % taken from a database.
             %
             % based on datevec, last elem is granule-number
+            %
+            % FIXME DOC
             
-            if self.needs_starttimesfile
-                gran_no = datevec(6);
-                if ~self.starttimes.isKey(gran_no)
-                    self.set_starttime(datevec);
+            if ~isvector(datevec) % pseudo-broadcast with recursion
+                start_unixsecs = zeros(size(datevec, 1), 1);
+                for i = 1:size(datevec, 1)
+                    start_unixsecs(i) = self.get_starttime(datevec(i, :));
                 end
-                start_unixsecs = self.starttimes(gran_no);
             else
-                start_datevec = datevec(1:5);
-                X = num2cell(start_datevec);
-                start_unixsecs = date2unixsecs(X{:});
+                
+                if self.needs_starttimesfile
+                    
+                    gran_no = datevec(6);
+                    if ~self.starttimes.isKey(gran_no)
+                        self.set_starttime(datevec);
+                    end
+                    start_unixsecs = self.starttimes(gran_no);
+                else
+                    start_datevec = datevec(1:5);
+                    X = num2cell(start_datevec);
+                    start_unixsecs = date2unixsecs(X{:});
+                end
+                
+                start_unixsecs = round(start_unixsecs);
             end
-            
-            start_unixsecs = round(start_unixsecs);
         end
 
         function set_starttime(self, datevec)

@@ -1112,13 +1112,8 @@ classdef CollocatedDataset < HomemadeDataset
             M(:, c.LAT2) = data2.lat(i2);
             M(:, c.LON2) = data2.lon(i2);
             
-            X = num2cell(date1);
-            % round here; slight loss of precision causes this to be
-            % slightly less than integer, which causes it to be floored
-            % down to the /previous/ integer when storing in NetCDF later
-            M(:, c.START1) = round(date2unixsecs(X{:}));
-            X = num2cell(date2);
-            M(:, c.START2) = round(date2unixsecs(X{:}));
+            M(:, c.START1) = self.primary.get_starttime(date1);
+            M(:, c.START2) = self.secondary.get_starttime(date2);
             
             M(:, c.TIME1) = double(data1.epoch) + double(data1.time(line1));
             M(:, c.TIME2) = double(data2.epoch) + double(data2.time(line2));

@@ -256,16 +256,42 @@ classdef AssociatedDataset < HomemadeDataset
                     [dv{1:6}] = unixsecs2date(processed_core(newsec(seconseg), self.parent.cols.START2));
                     date2 = cell2mat(dv);
                     if self.needs_secondary_data()
-                        data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(), false, false);
+%                         try
+                            data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(), false, false);
+%                             local_success = true;
+%                         catch ME
+%                             switch ME.identifier
+%                                 case 'atmlab:find_granule_by_datetime'
+%                                     logtext(atmlab('ERR'), ...
+%                                         'Problem finding associated %s %s %s: %s\n', ...
+%                                         self.parent.secondary.name, ...
+%                                         mat2str(date2), ...
+%                                         spec2, ...
+%                                         ME.message);
+%                                     error('ERROR ERROR'); % temporarily here
+%                                     % fill with nans
+%                                     local_success = false;
+%                                     rows = segstart:segend;
+%                                     cls = 1:max(structfun(@max, self.cols));
+%                                 otherwise
+%                                     ME.rethrow();
+%                             end
+%                         end
+                                        
                     end
                 end
-                depies_seg = cellfun(@(X)X(segstart:segend, :), depies, 'UniformOutput', false);
-                new_out = self.process_granule(processed_core(segstart:segend, :), data1, date1, spec1, data2, date2, spec2, depies_seg);
+%                 if local_success
+                    depies_seg = cellfun(@(X)X(segstart:segend, :), depies, 'UniformOutput', false);
+                    new_out = self.process_granule(processed_core(segstart:segend, :), data1, date1, spec1, data2, date2, spec2, depies_seg);
+%                 else
+%                     new_out = nan * zeros(length(rows), length(cls));
+%                 end
                 if isempty(out)
                     out = new_out;
                 else
                     out = [out; new_out]; %#ok<AGROW>
                 end
+                % reset data1/data2 to empty structs to be sure not to
             end
         end
                 

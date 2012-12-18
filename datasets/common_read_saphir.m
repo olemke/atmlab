@@ -29,9 +29,14 @@ S.epoch = round(date2unixsecs(dv(1, 1), dv(1, 2), dv(1, 3), ...
 S.time = date2unixsecs(dv(:, 1), dv(:, 2), dv(:, 3), ...
             dv(:, 4), dv(:, 5), dv(:, 6)) - S.epoch;
 
+wrong_way = {'TbCh1', 'TbCh2', 'TbCh3', 'TbCh4', 'TbCh5', 'TbCh6'};
 % copy over extra fields
 for i = 1:length(extra_fields)
-    S.(extra_fields{i}) = data.(extra_fields{i});
+    S.(extra_fields{i}) = data.data.(extra_fields{i});
+    if any(strcmp(extra_fields{i}, wrong_way))
+        S.(extra_fields{i}) = S.(extra_fields{i}).';
+    end
+        
 end
 
 end

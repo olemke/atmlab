@@ -285,6 +285,14 @@ D.c2dp.filename = 'c2dp_fullday_$SAT.nc.gz';
 D.cdpc_2dcp.basedir = '/storage3/user_data/gerrit/collocated_datasets/testing/cdpc_2dcp';
 D.cdpc_2dcp.subdir = '$YEAR4/$DOY';
 
+D.associated_mhs_saphir.basedir = '/storage3/user_data/gerrit/collocated_datasets/mhs_saphir';
+D.associated_mhs_saphir.subdir = '$YEAR4/$MONTH/$DAY';
+D.associated_mhs_saphir.filename = 'fulldata_$SAT.nc.gz';
+
+D.associated_amsub_saphir.basedir = '/storage3/user_data/gerrit/collocated_datasets/amsub_saphir';
+D.associated_amsub_saphir.subdir = '$YEAR4/$MONTH/$DAY';
+D.associated_amsub_saphir.filename = 'fulldata_$SAT.nc.gz';
+
 % --------
 % DARDAR
 % --------
