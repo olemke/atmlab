@@ -1027,6 +1027,7 @@ classdef CollocatedDataset < HomemadeDataset
                     self.collocate_and_store_date([year, month, day], spec1, spec2, varargin{:});
                     i = i + 1;
                 catch ME
+                    X = ME.getReport();
                     switch ME.identifier
                         case {'atmlab:SatDataset:missing_firstline'}
                             % run firstline-thingies
@@ -1045,6 +1046,11 @@ classdef CollocatedDataset < HomemadeDataset
                             logtext(atmlab('ERR'), 'Warning: I don''t have firstline-data for today for %s. I''ll try to get some! (todays collocation will be redone)\n', again.name);
                             again.find_granule_first_line(alldates(i, :), alldates(end, :), spec);
                             again.granule_first_line(0, spec, true, true); % force reload
+                        case {'atmlab:FieldCopier:nosibling'}
+                            logtext(atmlab('ERR'), ...
+                                ['Failed to find sibling for one dataset for one granule, giving up on everything on entire day, sorry.\n ' ...
+                                 'Tell Gerrit to implement fix.\n Message was: ' ME.message '. Stacktrace was: ' X '\n']);
+                             i = i + 1;
                         otherwise
                             ME.rethrow();
                     end

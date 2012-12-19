@@ -267,28 +267,31 @@ classdef FieldCopier < AssociatedDataset
                     catch ME
                         switch ME.identifier
                             case 'atmlab:find_granule_by_datetime'
-                                logtext(atmlab('ERR'), ...
+%                                 logtext(atmlab('ERR'), ...
+%                                     'I tried to collect fields from dataset %s, but failed: %s\n', ...
+%                                     dsnm, ME.message);
+                                error(['atmlab:' mfilename ':nosibling'], ...
                                     'I tried to collect fields from dataset %s, but failed: %s\n', ...
                                     dsnm, ME.message);
-                                
+                                    
                                 % HORRIBLE workaround in place
-                                if ~isempty(regexp(ME.message,'No datafile found for cprCldclass','once'))
+%                                 if ~isempty(regexp(ME.message,'No datafile found for cprCldclass','once'))
                                     % I will find the dimensions of a samesized variable and set Cloud_Types to 127 (int8).
                                     %I can't have the code crash because
                                     %data from the sibling dataset is
                                     %missing. Use D.cpr Latitude to get the
                                     %dimensions
-                                    logtext(2,['See commented out workaround ' ...
-                                               'below in FieldCopier\n'])
+%                                     logtext(2,['See commented out workaround ' ...
+%                                                'below in FieldCopier\n'])
                                     % logtext(atmlab('ERR'), ...
                                     %     'Horrible workaround in place for ''Cloud_types'' because of missing file in sibling dataset\n')
                                     % logtext(atmlab('ERR'), ...
                                     %     'Getting dimesions for ''Cloud_Types'' (sibling) from ''lat'' in 2B-CWC-RO (big brother) instead\n')                                    
                                     % dat_other{j}.(dsnm) = D.cpr.read_granule(dt, spc, {}, false, false);
                                     % dat_other{j}.(dsnm).Cloud_Types = 127*ones(size(dat_other{j}.(dsnm).lat)); % flag value of 127
-                                end
+%                                 end
                                 
-                                continue
+%                                 continue
                             otherwise
                                 ME.rethrow();
                         end

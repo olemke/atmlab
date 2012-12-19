@@ -1,3 +1,16 @@
+2012-12-19  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-244
+
+	* datasets/define_datasets.m: Added another field to cloudsat fieldCopier
+
+	* collocations/FieldCopier.m: Commented out from logtexts
+
+	* collocations/CollocatedDataset.m: Skip entire day granule from sibling
+	dataset is missing
+
+	* site-specific/kiruna/datasets_init.m: Changed dome filenames
+
 2012-12-18  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-243
