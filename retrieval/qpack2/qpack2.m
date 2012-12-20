@@ -277,10 +277,11 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   Q.HSE.P = Y(m).HSE_P;
 
   
-  %- Sensor pos and los
+  %- Sensor pos, los and time
   %
   Q.SENSOR_POS = Y(m).Z_PLATFORM;
   Q.SENSOR_LOS = Y(m).ZA;
+  Q.SENSOR_TIME = 0;     % Dummy value can be used as only single spectra used
 
   
   %- Se

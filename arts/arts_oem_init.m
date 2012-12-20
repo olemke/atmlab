@@ -127,9 +127,9 @@ for i = 1 : nq
                    );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       xa(ind)    = 0;
-    else                                                                   %&%
-      error( sprintf('Unknown gas species retrieval unit (%s).', ...       %&%
-                                                         R.jq{i}.mode ) ); %&%
+    else                                                                    %&%
+      error( sprintf('Unknown gas species retrieval unit (%s).', ...        %&%
+                                                         R.jq{i}.mode ) );  %&%
     end
     
   case 'Atmospheric temperatures'   %-----------------------------------------
@@ -137,7 +137,8 @@ for i = 1 : nq
     xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
    
-  case { 'Frequency', 'Polynomial baseline fit', 'Sensor pointing' }
+   case { 'Frequency', 'Sensor pointing', 'Polynomial baseline fit', ...
+                                          'Sinusoidal baseline fit' }
     %
     xa(ind) = 0;    
 
@@ -273,11 +274,11 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   %
   R.jq = xmlLoad( fullfile( R.workfolder, 'jacobian_quantities.xml' ) );
   R.ji = xmlLoad( fullfile( R.workfolder, 'jacobian_indices.xml' ) );
-  %                                                                      %&%
-  if length( R.jq ) == 0                                                 %&%
-    % Ending up here means probably a bug!                               %&%
-    error( 'No retrieval quantities defined!?' );                        %&%
-  end                                                                    %&%
+  %                                                                         %&%
+  if length( R.jq ) == 0                                                    %&%
+    % Ending up here means probably a bug!                                  %&%
+    error( 'No retrieval quantities defined!?' );                           %&%
+  end                                                                       %&%
   %
   for i = 1 : length(R.ji)           % Fix different indexing
     for j = 1 : length(R.ji{i})
@@ -287,14 +288,26 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
 
   %- Sensor
   %
-  %- Check special cases                                                   %&%
-  %                                                                        %&%
-  if qarts_isset(Q.FFIT) & Q.FFIT.RETRIEVE
-    if ~isstruct( Q.SENSOR_RESPONSE )                                      %&%
-      error( ['When any frequency fit is performed ',...                   %&%
-              '(Q.FFIT_RETRIEVAL=true), Q.SENSOR_RESPONSE must follow ',...%&%
-              'qartsSensor (i.e. be a structure).'] );                     %&%
-    end                                                                    %&% 
+  %- Check special cases                                                    %&%
+  %                                                                         %&%
+  if qarts_isset(Q.POINTING) & Q.POINTING.RETRIEVE
+    if ~qarts_isset( Q.SENSOR_LOS )                                         %&%
+      error( ['When any pointing retrieval is performed, Q.SENSOR_LOS ',... %&%
+              'must be set.'] );                                            %&%
+    end                                                                     %&%
+    if ~qarts_isset( Q.SENSOR_TIME )                                        %&%
+      error( ['When any pointing retrieval is performed, Q.SENSOR_TIME ',...%&%
+              'must be set.'] );                                            %&%
+    end
+    R.los = qarts_get( Q.SENSOR_LOS );
+  end
+  % 
+  if ( qarts_isset(Q.FSHIFTFIT)   & Q.FSHIFTFIT.RETRIEVE )  | ...
+     ( qarts_isset(Q.FSTRETCHFIT) & Q.FSTRETCHFIT.RETRIEVE )
+    if ~isstruct( Q.SENSOR_RESPONSE )                                       %&%
+      error( ['When any frequency fit is performed Q.SENSOR_RESPONSE ',...  %&%
+              'must follow qartsSensor (i.e. be a structure).'] );          %&%
+    end                                                                     %&% 
     %- A copy of Q.SENSOR_RESPONSE is needed here
     R.sensor_response = Q.SENSOR_RESPONSE;
   end

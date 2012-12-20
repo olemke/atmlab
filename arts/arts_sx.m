@@ -33,7 +33,7 @@ i_asj = find( [ Q.ABS_SPECIES.RETRIEVE ] );
 
 
 %--- Loop retrieval quantities and fill xa and R fields -----------------------
-%.-----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 
 for i = 1 : nq
 
@@ -64,19 +64,44 @@ for i = 1 : nq
     %
     Sx(ind,ind) = Q.T.SX;
    
-   case 'Frequency'   %--------------------------------------------------------
+   case 'Sensor pointing'   %--------------------------------------------------
     %
-    rqre_field( Q.FFIT, 'SX', 'Q.FFIT' );                                   %&%
-    rqre_datatype( Q.FFIT.SX, @istensor2, 'Q.FFIT.SX' );                    %&%
-    if any( size(Q.FFIT.SX) ~= length(ind) )                                %&%
-      error( sprintf('Wrong size of Q.FFIT.SX.') );                         %&%
+    if ~strcmp( R.jq{i}.subtag, 'Zenith angle off-set' )                    %&%
+      error( 'Unknown pointing subtag.' );                                  %&%
+    end                                                                     %&%
+    rqre_field( Q.POINTING, 'SX', 'Q.POINTING' );                           %&%
+    rqre_datatype( Q.POINTING.SX, @istensor2, 'Q.POINTING.SX' );            %&%
+    if any( size(Q.POINTING.SX) ~= length(ind) )                            %&%
+      error( sprintf('Wrong size of Q.POINTING.SX.') );                     %&%
     end                                                                     %&%
     %
-    Sx(ind,ind) = Q.FFIT.SX;
-
+    Sx(ind,ind) = Q.POINTING.SX;
+   
+   case 'Frequency'   %--------------------------------------------------------
+    %
+    if strcmp( R.jq{i}.subtag, 'Shift' )
+      rqre_field( Q.FSHIFTFIT, 'SX', 'Q.FSHIFTFIT' );                       %&%
+      rqre_datatype( Q.FSHIFTFIT.SX, @istensor2, 'Q.FSHIFTFIT.SX' );        %&%
+      if any( size(Q.FSHIFTFIT.SX) ~= length(ind) )                         %&%
+        error( sprintf('Wrong size of Q.FSHIFTFIT.SX.') );                  %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.FSHIFTFIT.SX;
+      %
+    elseif strcmp( R.jq{i}.subtag, 'Stretch' )
+      rqre_field( Q.FSTRETCHFIT, 'SX', 'Q.FSTRETCHFIT' );                   %&%
+      rqre_datatype( Q.FSTRETCHFIT.SX, @istensor2, 'Q.FSTRETCHFIT.SX' );    %&%
+      if any( size(Q.FSTRETCHFIT.SX) ~= length(ind) )                       %&%
+        error( sprintf('Wrong size of Q.FSTRETCHFIT.SX.') );                %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.FSTRETCHFIT.SX;
+      %
+    else                                                                    %&%
+      error( 'Unknown frequency subtag' );                                  %&%
+    end
+    
    case 'Polynomial baseline fit'   %------------------------------------------
     %
-    c      = sscanf(R.jq{i}.subtag(end+[-1:0]), '%d' );
+    c      = sscanf( R.jq{i}.subtag(end+[-1:0]), '%d' );
     sxname = sprintf( 'SX%d', c );
     rqre_field( Q.POLYFIT, sxname, 'Q.POLYFIT' );                           %&%
     rqre_datatype( Q.POLYFIT.(sxname), @istensor2, ...                      %&%
@@ -86,6 +111,20 @@ for i = 1 : nq
     end                                                                     %&%
     %
     Sx(ind,ind) = Q.POLYFIT.(sxname);
+ 
+   case 'Sinusoidal baseline fit'   %------------------------------------------
+    %
+    c      = sscanf( R.jq{i}.subtag(end+[-1:0]), '%d' ) + 1;
+    sxname = sprintf( 'SX%d', c );
+    rqre_field( Q.SINEFIT, sxname, 'Q.SINEFIT' );                           %&%
+    rqre_datatype( Q.SINEFIT.(sxname), @istensor2, ...                      %&%
+                                          sprintf('Q.SINEFIT.%s',sxname) ); %&%
+    if any( size(Q.SINEFIT.(sxname))*2 ~= length(ind) )                     %&%
+      error( sprintf('Wrong size of Q.SINEFIT.%s.',sxname) );               %&%
+    end                                                                     %&%
+    %
+    Sx(ind(1:2:end),ind(1:2:end)) = Q.SINEFIT.(sxname);
+    Sx(ind(2:2:end),ind(2:2:end)) = Q.SINEFIT.(sxname);
    
   otherwise   %----------------------------------------------------------------
     error( sprintf('Unknown retrieval quantity (%s).',R.jq{i}.maintag) ); 

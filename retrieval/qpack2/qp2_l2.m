@@ -254,14 +254,34 @@ for q = 1 : length(R.jq)
       Astruct  = Q.T;
     end
     
-  elseif strcmp( R.jq{q}.maintag, 'Frequency' )
+  elseif strcmp( R.jq{q}.maintag, 'Sensor pointing' )
     %--------------------------------------------------------------------------
-    rqre_field( Q.FFIT, 'L2', 'Q.FFIT' );                                   %&%
-    out = qarts_get( Q.FFIT.L2 );
-    rqre_datatype( out, @isboolean, 'Q.FFIT.L2' );                          %&%
+    rqre_field( Q.POINTING, 'L2', 'Q.POINTING' );                           %&%
+    out = qarts_get( Q.POINTING.L2 );
+    rqre_datatype( out, @isboolean, 'Q.POINTING.L2' );                      %&%
     %    
     if out
-      s = 'ffit';
+      s = 'pointing';
+    end
+  
+  elseif strcmp( R.jq{q}.maintag, 'Frequency' )
+    %--------------------------------------------------------------------------
+    if strcmp( R.jq{q}.subtag, 'Shift' )
+      rqre_field( Q.FSHIFTFIT, 'L2', 'Q.FSHIFTFIT' );                       %&%
+      out = qarts_get( Q.FSHIFTFIT.L2 );
+      rqre_datatype( out, @isboolean, 'Q.FSHIFTFIT.L2' );                   %&%
+      if out
+        s = 'fshift';
+      end
+    elseif strcmp( R.jq{q}.subtag, 'Stretch' )
+      rqre_field( Q.FSTRETCHFIT, 'L2', 'Q.FSTRETCHFIT' );                   %&%
+      out = qarts_get( Q.FSTRETCHFIT.L2 );
+      rqre_datatype( out, @isboolean, 'Q.FSTRETCHFIT.L2' );                 %&%
+      if out
+        s = 'fstretch';
+      end
+    else                                                                    %&%
+      error( 'Unknown frequency subtag' );                                  %&%
     end
     
   elseif strcmp( R.jq{q}.maintag, 'Polynomial baseline fit' )
@@ -271,9 +291,19 @@ for q = 1 : length(R.jq)
     rqre_datatype( out, @isboolean, 'Q.POLYFIT.L2' );                       %&%
     %
     if out
-      s = sprintf( 'polyfit%s', R.jq{q}.subtag(end) );
+      s = sprintf( 'polyfit%d', sscanf(R.jq{q}.subtag(end+[-1:0]),'%d') );
     end
 
+  elseif strcmp( R.jq{q}.maintag, 'Sinusoidal baseline fit' )
+    %--------------------------------------------------------------------------
+    rqre_field( Q.SINEFIT, 'L2', 'Q.SINEFIT' );                             %&%
+    out = qarts_get( Q.SINEFIT.L2 );
+    rqre_datatype( out, @isboolean, 'Q.SINEFIT.L2' );                       %&%
+    %
+    if out
+      s = sprintf( 'sinefit%d', sscanf(R.jq{q}.subtag(end+[-1:0]),'%d')+1 );
+    end
+    
   else
     error( sprintf( 'Unknown retrieval quantity: %s', R.jq{q}.maintag ) );
   end

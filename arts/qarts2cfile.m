@@ -631,6 +631,8 @@ return
 %    rte_agenda
 %    sensor_pos
 %    sensor_los
+%    sensor_time
+%    transmitter_pos
 %
 function T = cfile_RteSet( Q, partname, workfolder )
   %                                                                         %&%
@@ -676,6 +678,10 @@ function T = cfile_RteSet( Q, partname, workfolder )
   end
   if qarts_isset( Q.SENSOR_LOS )
     T{end+1} = file_or_data( 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.SENSOR_TIME )
+    T{end+1} = file_or_data( 'sensor_time', 'Vector', Q.SENSOR_TIME,...
                                           workfolder, Q.INPUT_FILE_FORMAT );
   end
   if qarts_isset( Q.TRANSMITTER_POS )
@@ -1156,21 +1162,30 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   
   %- Frequency
   %
-  if qarts_isset(Q.FFIT) 
-    rqre_datatype( Q.FFIT, @isstruct, 'Q.FFIT' );                           %&%
-    rqre_field( Q.FFIT, 'RETRIEVE', 'Q.FFIT' );                             %&%
-    rqre_datatype( Q.FFIT.RETRIEVE, @isboolean, ...                         %&%
-                                                      'Q.FFIT.RETRIEVAL' ); %&%
-    if Q.FFIT.RETRIEVE
-      rqre_field( Q.FFIT, 'DF', 'Q.FFIT' );                                 %&%
-      rqre_datatype( Q.FFIT.DF, @istensor0, 'Q.FFIT.DF' );                  %&%
-      rqre_field( Q.FFIT, 'ORDER', 'Q.FFIT' );                              %&%
-      rqre_alltypes( Q.FFIT.ORDER, {@istensor0,@iswhole}, ...               %&%
-                                                     'Q.FFIT.ORDER' );      %&%
-      rqre_in_range( Q.FFIT.ORDER, 0, 1, 'Q.FFIT.ORDER' );                  %&%
-      T{end+1} = 'jacobianAddFreqShiftAndStretch(jacobian_quantities,';
-      T{end+1} = sprintf('   jacobian_agenda, f_grid, "interp", %.3e, %d )', ...
-                                               Q.FFIT.DF, Q.FFIT.ORDER >0 );
+  if qarts_isset(Q.FSHIFTFIT) 
+    rqre_datatype( Q.FSHIFTFIT, @isstruct, 'Q.FSHIFTFIT' );                 %&%
+    rqre_field( Q.FSHIFTFIT, 'RETRIEVE', 'Q.FSHIFTFIT' );                   %&%
+    rqre_datatype( Q.FSHIFTFIT.RETRIEVE, @isboolean, ...                    %&%
+                                                 'Q.FSHIFTFIT.RETRIEVAL' ); %&%
+    if Q.FSHIFTFIT.RETRIEVE
+      rqre_field( Q.FSHIFTFIT, 'DF', 'Q.FSHIFTFIT' );                       %&%
+      rqre_datatype( Q.FSHIFTFIT.DF, @istensor0, 'Q.FSHIFTFIT.DF' );        %&%
+      T{end+1} = 'jacobianAddFreqShift(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = sprintf('   f_grid,sensor_pos,sensor_time,0,%f)', ...
+                                                            Q.FSHIFTFIT.DF );
+    end
+  end
+  if qarts_isset(Q.FSTRETCHFIT) 
+    rqre_datatype( Q.FSTRETCHFIT, @isstruct, 'Q.FSTRETCHFIT' );             %&%
+    rqre_field( Q.FSTRETCHFIT, 'RETRIEVE', 'Q.FSTRETCHFIT' );               %&%
+    rqre_datatype( Q.FSTRETCHFIT.RETRIEVE, @isboolean, ...                  %&%
+                                               'Q.FSTRETCHFIT.RETRIEVAL' ); %&%
+    if Q.FSTRETCHFIT.RETRIEVE
+      rqre_field( Q.FSTRETCHFIT, 'DF', 'Q.FSTRETCHFIT' );                   %&%
+      rqre_datatype( Q.FSTRETCHFIT.DF, @istensor0, 'Q.FSTRETCHFIT.DF' );    %&%
+      T{end+1} = 'jacobianAddFreqStretch(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = sprintf('   f_grid,sensor_pos,sensor_time,0,%f)', ...
+                                                          Q.FSTRETCHFIT.DF );
     end
   end
 
@@ -1184,14 +1199,15 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     if Q.POINTING.RETRIEVE
       rqre_field( Q.POINTING, 'DZA', 'Q.POINTING' );                        %&%
       rqre_datatype( Q.POINTING.DZA, @istensor0, 'Q.POINTING.DZA' );        %&%
-      rqre_field( Q.POINTING, 'POLY_ORDER', Q.POINTING );                   %&%
+      rqre_field( Q.POINTING, 'POLY_ORDER', 'Q.POINTING' );                 %&%
       rqre_alltypes( Q.POINTING.POLY_ORDER, {@istensor0,@iswhole}, ...      %&%
                                                  'Q.POINTING.POLY_ORDER' ); %&%
-      rqre_in_range( Q.POINTING.ORDER, 0, [], 'Q.POINTING.POLY_ORDER' );    %&%
-      T{end+1} = 'jacobianAddPointing(jacobian_quantities, jacobian_agenda,';
-      T{end+1} =  '   sensor_pos, sensor_time';
-      T{end+1} = sprintf( '   %g,%d)', Q.POINTING.DZA, ...
-                                                       Q.POINTING.POLY_ORDER );
+      rqre_field( Q.POINTING, 'CALCMODE', 'Q.POINTING' );                   %&%
+      rqre_datatype( Q.POINTING.CALCMODE, @ischar, Q.POINTING.CALCMODE' );  %&%
+      T{end+1} = 'jacobianAddPointingZa(jacobian_quantities, jacobian_agenda,';
+      T{end+1} =  '   sensor_pos, sensor_time,';
+      T{end+1} = sprintf( '   %d,"%s",%d)', Q.POINTING.POLY_ORDER, ...
+                                         Q.POINTING.CALCMODE, Q.POINTING.DZA );
     end
   end
 
@@ -1200,16 +1216,34 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   if qarts_isset(Q.POLYFIT) 
     rqre_datatype( Q.POLYFIT, @isstruct, 'Q.POLYFIT' );                     %&%
     rqre_field( Q.POLYFIT, 'RETRIEVE', 'Q.POLYFIT' );                       %&%
-    rqre_datatype( Q.POLYFIT.RETRIEVE, @isboolean, ...                      %&%
-                                                   'Q.POLYFIT.RETRIEVAL' ); %&%
+    rqre_datatype( Q.POLYFIT.RETRIEVE, @isboolean, 'Q.POLYFIT.RETRIEVAL' ); %&%
     if Q.POLYFIT.RETRIEVE
       rqre_field( Q.POLYFIT, 'ORDER', 'Q.POLYFIT' );                        %&%
       rqre_alltypes( Q.POLYFIT.ORDER, {@istensor0,@iswhole}, ...            %&%
                                                        'Q.POLYFIT.ORDER' ); %&%
       T{end+1} = 'jacobianAddPolyfit(jacobian_quantities, jacobian_agenda,';
-      T{end+1} =  '   sensor_response_pol_grid,sensor_response_f_grid,';
-      T{end+1} =  '   sensor_response_za_grid, sensor_pos,';
-      T{end+1} = sprintf( '   %d)', Q.POLYFIT.ORDER );
+      T{end+1} =  '   sensor_response_pol_grid,sensor_response_za_grid,';
+      T{end+1} = sprintf( '   sensor_pos,%d)', Q.POLYFIT.ORDER );
+    end
+  end
+  
+  %- Sinefit
+  %
+  if qarts_isset(Q.SINEFIT) 
+    rqre_datatype( Q.SINEFIT, @isstruct, 'Q.SINEFIT' );                     %&%
+    rqre_field( Q.SINEFIT, 'RETRIEVE', 'Q.SINEFIT' );                       %&%
+    rqre_datatype( Q.SINEFIT.RETRIEVE, @isboolean, 'Q.SINEFIT.RETRIEVAL' ); %&%
+    if Q.SINEFIT.RETRIEVE
+      rqre_field( Q.SINEFIT, 'PERIODS', 'Q.SINEFIT' );                      %&%
+      rqre_datatype( Q.SINEFIT.PERIODS, @istensor1, 'Q.SINEFIT.PERIODS' );  %&%
+      T{end+1} = 'jacobianAddSinefit(jacobian_quantities, jacobian_agenda,';
+      T{end+1} =  '   sensor_response_pol_grid,sensor_response_za_grid,';
+      s = sprintf( '   sensor_pos,[%f', Q.SINEFIT.PERIODS(1) );
+      for i = 2:length(Q.SINEFIT.PERIODS)
+        s = sprintf( '%s,%f', s, Q.SINEFIT.PERIODS(i) );
+      end
+      s = [ s, '])' ];
+      T{end+1} = s;
     end
   end
   

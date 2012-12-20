@@ -1,3 +1,24 @@
+2012-12-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-245
+
+	* demos/qpack2_demo.m: Extended to cover changes and new retrieval
+	varibles.
+
+	* retrieval/qpack2/qp2_l2.m:
+	* arts/arts_sx.m:
+	* arts/arts_oem.m:
+	* arts/arts_oem_init.m:
+	* arts/qarts2cfile.m:
+	* arts/qarts.m: Added POINTING as retrieval variable (basically
+	from scratch). Changed from using FFIT to FSHIFTFIT and
+	FSTRETCHFIT. Added SINEFIT as retrieval quantity.
+
+	* arts/arts_polybasis_func.m: Extended to return multiple basis
+	functions in parallel.
+
+	* arts/qarts.m (qarts): Added SENSOR_TIME.
+
 2012-12-19  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-244

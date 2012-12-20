@@ -75,21 +75,32 @@ for i = 1 : nq
     %
     clear X
    
+   case 'Sensor pointing'   %-------------------------------------------------
+    %
+    if ~strcmp( R.jq{i}.subtag, 'Zenith angle off-set' )                    %&%
+      error( 'Unknown pointing subtag.' );                                  %&%
+    end                                                                     %&%
+    %
+    Q.SENSOR_LOS(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
+                                                    R.jq{i}.grids{1} )* x(ind);
+    
    case 'Frequency'   %-------------------------------------------------------
     %
+    assert( length(ind) == 1 );                                             %&%
     if ~do_sensor
       Q.SENSOR_RESPONSE = R.sensor_response;
     end    
     %
     fb = qarts_get(Q.SENSOR_RESPONSE.F_BACKEND);
+    %   
+    if strcmp( R.jq{i}.subtag, 'Shift' )
+      df = x(ind(1));
+    elseif strcmp( R.jq{i}.subtag, 'Stretch' )
+      df = arts_polybasis_func( fb, 1 ) * x(ind(1));
+    else                                                                    %&%
+      error( 'Unknown frequency subtag' );                                  %&%
+    end
     %
-    % Shift part
-    df = x(ind(1));
-    %
-    % Stretch part
-    if length( ind ) > 1
-      df = df + x(ind(2)) * arts_polybasis_func( fb, 1 );
-    end     
     Q.SENSOR_RESPONSE.F_BACKEND = fb + df;
     do_sensor                   = true;
     clear   fb;
@@ -102,7 +113,16 @@ for i = 1 : nq
     end
     %
     bl = bl + J(:,ind) * x(ind);
-      
+
+   case 'Sinusoidal baseline fit'   %-----------------------------------------
+    %
+    if ~j_loaded
+      J        = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
+      j_loaded = 1;
+    end
+    %
+    bl = bl + J(:,ind) * x(ind);
+    
     otherwise   %--------------------------------------------------------------
       error('Unknown retrieval quantitity.'); 
   end 

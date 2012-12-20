@@ -6,27 +6,35 @@
 %   "weight" for changing the backend frequencies to match a retrieved frequency
 %   stretch.
 %
-% FORMAT   b = arts_polybasis_func( grid, polcoeff )
+% FORMAT   B = arts_polybasis_func( grid, polcoeff )
 %        
-% OUT      b          Calculated basis function.
+% OUT      B          Calculated basis function(s), stored as columns.
 % IN       x          The grid 
-%          polcoeff   Polynomial coefficient.
+%          polcoeff   Polynomial coefficients. Can be a single index (e.g. 1)
+%                     or a range (e.g. 0:3)
 
 % 2009-10-22   Created by Patrick Eriksson.
 
 
-function b = arts_polybasis_func( grid, polcoeff )
-  
-if polcoeff == 0
-  %
-  b = ones( size(grid) );
-  
-else
-  %
-  x1 = min( grid );
-  b = ( grid - x1 ) / ( 0.5*( max(grid) - x1 ) ) - 1;
-  if polcoeff > 1
-    b = b.^ polcoeff;
+function B = arts_polybasis_func( grid, polcoeff )
+
+n = length(polcoeff);
+B = zeros( length(grid), n );
+
+for i = 1 : n
+  if polcoeff(i) == 0
+    %
+    B(:,i) = 1;
+    %
+  else
+    %
+    x1 = min( grid );
+    b = ( grid - x1 ) / ( 0.5*( max(grid) - x1 ) ) - 1;
+    if polcoeff > 1
+      b = b.^ polcoeff(i);
+    end
+    %
+    B(:,i) = b - mean(b);
+    %
   end
-  b = b - mean(b);
 end

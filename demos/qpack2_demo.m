@@ -287,32 +287,56 @@ end
 
 
 
-%- Frequency (shift retrieval here, shift+stretch also possible)
+%- Pointing
 %
-Q.FFIT.RETRIEVE           = true;
-Q.FFIT.DF                 = 25e3; 
-Q.FFIT.ORDER              = 0;
-Q.FFIT.SX                 = 50e3^2;  
-Q.FFIT.L2                 = true;
+% Here just included for testing purposes, nothing to use for ground-based
+% spectrometers. 
+%
+%Q.POINTING.RETRIEVE       = true;
+%Q.POINTING.DZA            = 0.1; 
+%Q.POINTING.POLY_ORDER     = 0;
+%Q.POINTING.CALCMODE       = 'recalc';
+%Q.POINTING.SX             = 1;  
+%Q.POINTING.L2             = true;
 
-%Q.FFIT.RETRIEVE           = true;
-%Q.FFIT.DF                 = 25e3; 
-%Q.FFIT.ORDER              = 1;
-%Q.FFIT.SX                 = [300e3^2 0;0 100e3^2]; 
-%Q.FFIT.L2                 = true;
+
+%- Frequency shift
+%
+Q.FSHIFTFIT.RETRIEVE      = true;
+Q.FSHIFTFIT.DF            = 25e3; 
+Q.FSHIFTFIT.SX            = 50e3^2;  
+Q.FSHIFTFIT.L2            = true;
+
+%- Frequency stretch
+%
+%Q.FSTRETCHFIT.RETRIEVE     = true;
+%Q.FSTRETCHFIT.DF           = 25e3; 
+%Q.FSTRETCHFIT.SX           = 50e3^2;  
+%Q.FSTRETCHFIT.L2           = true;
 
 
 %- Polyfit
 %
 % A polynomial of order 3 is used for "baseline fit".
 %
-Q.POLYFIT.RETRIEVE        = true;
+Q.POLYFIT.RETRIEVE        = false;
 Q.POLYFIT.ORDER           = 3;
 Q.POLYFIT.L2              = true;
 Q.POLYFIT.SX0             = 1^2; 
 Q.POLYFIT.SX1             = 0.5^2; 
 Q.POLYFIT.SX2             = 0.2^2;
 Q.POLYFIT.SX3             = 0.1^2; 
+
+
+%- Sinefit
+%
+% Here demonstrated with two period lengths
+%
+%Q.SINEFIT.RETRIEVE        = true;
+%Q.SINEFIT.PERIODS         = [ 75e3 200e3 ]';
+%Q.SINEFIT.L2              = true;
+%Q.SINEFIT.SX1             = 0.2^2; 
+%Q.SINEFIT.SX2             = 0.4^2; 
 
 return
 %-----------------------------------------------------------------------------
