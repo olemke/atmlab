@@ -63,7 +63,34 @@ for i = 1 : nq
     end                                                                     %&%
     %
     Sx(ind,ind) = Q.T.SX;
-   
+
+   case 'Wind'   %-------------------------------------------------------------
+    %
+    if strcmp( R.jq{i}.subtag, 'u' )             
+      rqre_field( Q.WIND_U, 'SX', 'Q.WIND_U' );                             %&%
+      rqre_datatype( Q.WIND_U.SX, @istensor2, 'Q.WIND_U.SX' );              %&%
+      if any( size(Q.WIND_U.SX) ~= length(ind) )                            %&%
+        error( sprintf('Wrong size of Q.WIND_U.SX.') );                     %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.WIND_U.SX;
+    elseif strcmp( R.jq{i}.subtag, 'v' )             
+      rqre_field( Q.WIND_V, 'SX', 'Q.WIND_V' );                             %&%
+      rqre_datatype( Q.WIND_V.SX, @istensor2, 'Q.WIND_V.SX' );              %&%
+      if any( size(Q.WIND_V.SX) ~= length(ind) )                            %&%
+        error( sprintf('Wrong size of Q.WIND_V.SX.') );                     %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.WIND_V.SX;
+    elseif strcmp( R.jq{i}.subtag, 'w' ) 
+      rqre_field( Q.WIND_W, 'SX', 'Q.WIND_W' );                             %&%
+      rqre_datatype( Q.WIND_W.SX, @istensor2, 'Q.WIND_W.SX' );              %&%
+      if any( size(Q.WIND_W.SX) ~= length(ind) )                            %&%
+        error( sprintf('Wrong size of Q.WIND_W.SX.') );                     %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.WIND_W.SX;
+    else                                                                    %&%
+      error( 'Unknown wind subtag.' );                                      %&%
+    end
+    
    case 'Sensor pointing'   %--------------------------------------------------
     %
     if ~strcmp( R.jq{i}.subtag, 'Zenith angle off-set' )                    %&%

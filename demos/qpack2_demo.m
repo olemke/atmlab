@@ -287,6 +287,23 @@ end
 
 
 
+%- Wind
+%
+% Here demonstrated for v-component, that should the component of main
+% concern for ground-based instruments. This component can be seen as the
+% part of the horisontal wind going along the viewing direction, where
+% postive values mean a movement away from the sensor.
+%
+%Q.WIND_V_FIELD    = [];   % This is a short-cut for zero wind.
+%
+%Q.WIND_V.RETRIEVE = true;
+%Q.WIND_V.L2       = true;
+%Q.WIND_V.GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:4e3:z_toa)', [], [] };
+%Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 40, ...
+%                                               'lin', 0.5, 0.00, @log10 );
+
+
+
 %- Pointing
 %
 % Here just included for testing purposes, nothing to use for ground-based
@@ -402,6 +419,7 @@ Y(2) = Y(1);
 %
 Y(2).LONGITUDE = pi;
 Y(2).ZA        = 45;
+
 
 % Calculate simulated spectra
 %

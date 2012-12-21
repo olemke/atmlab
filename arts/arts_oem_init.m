@@ -76,7 +76,7 @@ R            = [];
 R.i_rel      = [];
 R.workfolder = workfolder;
 %
-[Q,R,t_field,z_field,vmr_field] = init_local( Q, R );
+[Q,R,t_field,z_field,vmr_field,wind_u,wind_v,wind_w] = init_local( Q, R );
 
 
 
@@ -136,7 +136,44 @@ for i = 1 : nq
     %
     xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
-   
+
+  case 'Wind'   %-------------------------------------------------------------
+    %
+    if strcmp( R.jq{i}.subtag, 'u' )
+      if isnan( wind_u )                                                    %&%
+        error( 'If u-wind is retrieved, *WIND_U_FIELD* must be set.' );     %&%
+      end                                                                   %&%
+      Q = force_file_local( Q, 'WIND_U_FIELD', 'Tensor3', R );
+      if isempty( wind_u )
+        wind_u = zeros( size( t_field ) );
+      end
+      xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_u, ...
+                                                             R.jq{i}.grids ) );
+    elseif strcmp( R.jq{i}.subtag, 'v' )
+      if isnan( wind_v )                                                    %&%
+        error( 'If v-wind is retrieved, *WIND_V_FIELD* must be set.' );     %&%
+      end                                                                   %&%
+      Q = force_file_local( Q, 'WIND_V_FIELD', 'Tensor3', R );
+      if isempty( wind_v )
+        wind_v = zeros( size( t_field ) );
+      end
+      xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_v, ...
+                                                             R.jq{i}.grids ) );
+    elseif strcmp( R.jq{i}.subtag, 'w' )
+      if isnan( wind_w )                                                    %&%
+        error( 'If w-wind is retrieved, *WIND_W_FIELD* must be set.' );     %&%
+      end                                                                   %&%
+      Q = force_file_local( Q, 'WIND_W_FIELD', 'Tensor3', R );
+      if isempty( wind_w )
+        wind_w = zeros( size( t_field ) );
+      end
+      xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_w, ...
+                                                             R.jq{i}.grids ) );
+    else                                                                    %&%
+      error( 'Unknown wind subtag.' );                                      %&%
+    end
+    
+   %---------------------------------------------------------------------------
    case { 'Frequency', 'Sensor pointing', 'Polynomial baseline fit', ...
                                           'Sinusoidal baseline fit' }
     %
@@ -204,7 +241,8 @@ return
 
 
 
-function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
+function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
+                                                             init_local( Q, R )
 
   %- Copy some data to R
   %
@@ -250,6 +288,23 @@ function [Q,R,t_field,z_field,vmr_field] = init_local( Q, R )
   Q = force_file_local( Q, 'T_FIELD', 'Tensor3', R );
   Q = force_file_local( Q, 'Z_FIELD', 'Tensor3', R );
   Q = force_file_local( Q, 'VMR_FIELD', 'Tensor4', R );
+  %
+  % Winds (some stuff done, further above if wind is retrieved):
+  if qarts_isset( Q.WIND_U_FIELD )
+    wind_u = qarts_get( Q.WIND_U_FIELD );
+  else
+    wind_u = NaN;
+  end
+  if qarts_isset( Q.WIND_V_FIELD )
+    wind_v = qarts_get( Q.WIND_V_FIELD );
+  else
+    wind_v = NaN;
+  end
+  if qarts_isset( Q.WIND_W_FIELD )
+    wind_w = qarts_get( Q.WIND_W_FIELD );
+  else
+    wind_w = NaN;
+  end
   
   %- Absorption
   %

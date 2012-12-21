@@ -253,6 +253,42 @@ for q = 1 : length(R.jq)
       atmfield = true;
       Astruct  = Q.T;
     end
+
+  elseif strcmp( R.jq{q}.maintag, 'Wind' )
+    %--------------------------------------------------------------------------
+    if strcmp( R.jq{q}.subtag, 'u' )
+      rqre_field( Q.WIND_U, 'L2', 'Q.WIND_U' );                             %&%
+      out = qarts_get( Q.WIND_U.L2 );
+      rqre_datatype( out, @isboolean, 'Q.WIND_U.L2' );                      %&%
+      %
+      if out
+        s        = 'wind_u';
+        atmfield = true;
+        Astruct  = Q.WIND_U;
+      end
+    elseif strcmp( R.jq{q}.subtag, 'v' )
+      rqre_field( Q.WIND_V, 'L2', 'Q.WIND_V' );                             %&%
+      out = qarts_get( Q.WIND_V.L2 );
+      rqre_datatype( out, @isboolean, 'Q.WIND_V.L2' );                      %&%
+      %
+      if out
+        s        = 'wind_v';
+        atmfield = true;
+        Astruct  = Q.WIND_V;
+      end
+    elseif strcmp( R.jq{q}.subtag, 'w' )
+      rqre_field( Q.WIND_W, 'L2', 'Q.WIND_W' );                             %&%
+      out = qarts_get( Q.WIND_W.L2 );
+      rqre_datatype( out, @isboolean, 'Q.WIND_W.L2' );                      %&%
+      %
+      if out
+        s        = 'wind_w';
+        atmfield = true;
+        Astruct  = Q.WIND_W;
+      end
+    else                                                                    %&%
+      error( 'Unknown wind subtag.' );                                      %&%
+    end
     
   elseif strcmp( R.jq{q}.maintag, 'Sensor pointing' )
     %--------------------------------------------------------------------------

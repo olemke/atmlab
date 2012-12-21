@@ -74,7 +74,23 @@ for i = 1 : nq
     xmlStore( fullfile(R.workfolder,'t_field.xml'), X, 'Tensor3' );
     %
     clear X
-   
+
+   case 'Wind'   %------------------------------------------------------------
+    %
+    X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, x(ind) );
+    X = arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
+    if strcmp( R.jq{i}.subtag, 'u' )
+      xmlStore( fullfile(R.workfolder,'wind_u_field.xml'), X, 'Tensor3' );
+    elseif strcmp( R.jq{i}.subtag, 'v' )
+      xmlStore( fullfile(R.workfolder,'wind_v_field.xml'), X, 'Tensor3' );
+    elseif strcmp( R.jq{i}.subtag, 'w' )
+      xmlStore( fullfile(R.workfolder,'wind_w_field.xml'), X, 'Tensor3' );
+    else                                                                    %&%
+      error( 'Unknown wind subtag.' );                                      %&%
+    end
+    %
+    clear X
+    
    case 'Sensor pointing'   %-------------------------------------------------
     %
     if ~strcmp( R.jq{i}.subtag, 'Zenith angle off-set' )                    %&%

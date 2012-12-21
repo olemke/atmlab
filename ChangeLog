@@ -1,3 +1,26 @@
+2012-12-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-246
+
+	* Winds introduced as retrieval variables.
+
+	* demos/qpack2_demo.m: Added a small example for wind. 
+
+	* retrieval/qpack2/qp2_l2.m:
+	* arts/arts_oem_init.m:
+	* arts/arts_x2QR.m:
+	* arts/arts_sx.m: Added handling of WIND_U/V/W.
+
+	* arts/qarts2cfile.m: Added handling of WIND_U/V/W jacobians.
+
+	* arts/qarts_t_or_z_field.m: Removed. Use the function below.
+
+	* arts/qarts_atm_field.m: New (a general version of
+	qarts_t_or_z_field).
+
+	* arts/qarts.m Introduced WIND_U/V/W. Removed Z_ATMDATA, replaced
+	with Z, having ATMDATA as sub-field (to mimic T).
+
 2012-12-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-245

@@ -314,6 +314,7 @@ return
 %    vmr_field
 %    refellipsoid
 %    z_surface
+%    winds
 %
 function T = cfile_AtmSrf( Q, partname, workfolder )
   %                                                                         %&%
@@ -1159,6 +1160,113 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     end  
   end
 
+  %- Wind, U
+  %                                                                         %&%
+  if qarts_isset( Q.WIND_U )
+    if ~isfield( Q.WIND_U, 'RETRIEVE' )                                     %&%
+       error( 'When Q.WIND_U exists, the field RETRIEVE must be set.' );    %&%
+    end                                                                     %&%
+    rqre_datatype( Q.WIND_U.RETRIEVE, @isboolean, 'Q.WIND_U.RETRIEVE' );    %&%
+    if Q.WIND_U.RETRIEVE                                                    
+      %                                                                     %&%
+      if ~isfield( Q.WIND_U, {'GRIDS'} )                                    %&%
+        error( ...                                                          %&%
+          'With Q.WIND_U.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
+      end                                                                   %&%
+      rqre_datatype( Q.WIND_U.GRIDS, @iscell, 'Q.WIND_U.GRIDS' );           %&%
+      if length(Q.WIND_U.GRIDS) ~= 3                                        %&%
+        error( 'Q.WIND_U.GRIDS has not length 3.' );                        %&%
+      end                                                                   %&%
+      %
+      name1    = 'wind_u_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T{end+1} = file_or_data( name1, 'Vector', Q.WIND_U.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'wind_u_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T{end+1} = file_or_data( name2, 'Vector', Q.WIND_U.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'wind_u_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T{end+1} = file_or_data( name3, 'Vector', Q.WIND_U.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      T{end+1} ='jacobianAddWind(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,"u")', name1, name2, name3 );
+    end  
+  end  
+
+  %- Wind, V
+  %                                                                         %&%
+  if qarts_isset( Q.WIND_V )
+    if ~isfield( Q.WIND_V, 'RETRIEVE' )                                     %&%
+       error( 'When Q.WIND_V exists, the field RETRIEVE must be set.' );    %&%
+    end                                                                     %&%
+    rqre_datatype( Q.WIND_V.RETRIEVE, @isboolean, 'Q.WIND_V.RETRIEVE' );    %&%
+    if Q.WIND_V.RETRIEVE                                                    
+      %                                                                     %&%
+      if ~isfield( Q.WIND_V, {'GRIDS'} )                                    %&%
+        error( ...                                                          %&%
+          'With Q.WIND_V.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
+      end                                                                   %&%
+      rqre_datatype( Q.WIND_V.GRIDS, @iscell, 'Q.WIND_V.GRIDS' );           %&%
+      if length(Q.WIND_V.GRIDS) ~= 3                                        %&%
+        error( 'Q.WIND_V.GRIDS has not length 3.' );                        %&%
+      end                                                                   %&%
+      %
+      name1    = 'wind_v_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T{end+1} = file_or_data( name1, 'Vector', Q.WIND_V.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'wind_v_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T{end+1} = file_or_data( name2, 'Vector', Q.WIND_V.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'wind_v_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T{end+1} = file_or_data( name3, 'Vector', Q.WIND_V.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      T{end+1} ='jacobianAddWind(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,"v")', name1, name2, name3 );
+    end  
+  end  
+  
+  %- Wind, W
+  %                                                                         %&%
+  if qarts_isset( Q.WIND_W )
+    if ~isfield( Q.WIND_W, 'RETRIEVE' )                                     %&%
+       error( 'When Q.WIND_W exists, the field RETRIEVE must be set.' );    %&%
+    end                                                                     %&%
+    rqre_datatype( Q.WIND_W.RETRIEVE, @isboolean, 'Q.WIND_W.RETRIEVE' );    %&%
+    if Q.WIND_W.RETRIEVE                                                    
+      %                                                                     %&%
+      if ~isfield( Q.WIND_W, {'GRIDS'} )                                    %&%
+        error( ...                                                          %&%
+          'With Q.WIND_W.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
+      end                                                                   %&%
+      rqre_datatype( Q.WIND_W.GRIDS, @iscell, 'Q.WIND_W.GRIDS' );           %&%
+      if length(Q.WIND_W.GRIDS) ~= 3                                        %&%
+        error( 'Q.WIND_W.GRIDS has not length 3.' );                        %&%
+      end                                                                   %&%
+      %
+      name1    = 'wind_w_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T{end+1} = file_or_data( name1, 'Vector', Q.WIND_W.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'wind_w_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T{end+1} = file_or_data( name2, 'Vector', Q.WIND_W.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'wind_w_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T{end+1} = file_or_data( name3, 'Vector', Q.WIND_W.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      T{end+1} ='jacobianAddWind(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,"w")', name1, name2, name3 );
+    end  
+  end  
   
   %- Frequency
   %

@@ -55,7 +55,7 @@ if do_j
 end
 
 
-%- Add baseline (should be moved to arts)
+%- Add baseline
 %
 if iter > 1
   y = y + R.bl;

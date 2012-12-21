@@ -95,7 +95,7 @@ Q.ABS_SPECIES(5).ATMDATA = gf_set( atmdata_empty(0), 0.781, [] );
 %
 Q.T.ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
          'climatology', 'cira86', 'cira86.t.xml' ), 'Temperature', 't_field' );
-Q.Z_ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
+Q.Z.ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
            'climatology', 'cira86', 'cira86.z.xml' ), 'Altitudes', 'z_field' );
 
 
@@ -127,8 +127,8 @@ end
 %= Set-up VMR_FIELD, T_FIELD and Z_FIELD
 %
 Q.VMR_FIELD              = qarts_vmr_field( Q );
-Q.T_FIELD                = qarts_t_or_z_field( Q, 't', 45 );% Note interp.
-Q.Z_FIELD                = qarts_t_or_z_field( Q, 'z', 45 );% to DOY 45
+Q.T_FIELD                = qarts_atm_field( Q, 't', 45 );% Note interp.
+Q.Z_FIELD                = qarts_atm_field( Q, 'z', 45 );% to DOY 45
 
 
 %= Absorption

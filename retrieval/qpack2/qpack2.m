@@ -264,12 +264,12 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   mjd = date2mjd( Y(m).YEAR, Y(m).MONTH, Y(m).DAY, ho, mi, se );
   %
   Q.VMR_FIELD = qarts_vmr_field( Q, mjd, ho );
-  Q.T_FIELD   = qarts_t_or_z_field( Q, 't', mjd, ho );
-  if  qarts_isset(Q.Z_ATMDATA)
-    Q.Z_FIELD   = qarts_t_or_z_field( Q, 'z', mjd, ho );
+  Q.T_FIELD   = qarts_atm_field( Q, 't', mjd, ho );
+  if  qarts_isset(Q.Z)
+    Q.Z_FIELD   = qarts_atm_field( Q, 'z', mjd, ho );
   else
     if ~Q.HSE.ON
-      error( 'If Q.Z_FILED* shall be set by HSE, Q.HSE.ON must be true.' );
+      error( 'If Q.Z_FIELD* shall be set by HSE, Q.HSE.ON must be true.' );
     end
     Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
   end
