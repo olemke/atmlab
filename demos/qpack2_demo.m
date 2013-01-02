@@ -41,7 +41,7 @@ end
 
 %- OEM variables
 %
-O = qp2_l2( Q );         % This ensures that OEM returns the varibles needed 
+O = qp2_l2( Q );         % This ensures that OEM returns the variables needed 
 %                          to fill the L2 structure, as defined in Q
 O.linear = false;
 %
@@ -336,7 +336,7 @@ Q.FSHIFTFIT.L2            = true;
 %
 % A polynomial of order 3 is used for "baseline fit".
 %
-Q.POLYFIT.RETRIEVE        = false;
+Q.POLYFIT.RETRIEVE        = true;
 Q.POLYFIT.ORDER           = 3;
 Q.POLYFIT.L2              = true;
 Q.POLYFIT.SX0             = 1^2; 

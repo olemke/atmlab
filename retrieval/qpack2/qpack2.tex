@@ -33,12 +33,10 @@
 %---
 Qpack2 is a retrieval system, implemented in Matlab, for performing inversions
 of atmospheric observations inside the framework of ``optimal estimation''
-(OEM). So far, only cases where the aim is to retrieve vertical profiles of
-atmospheric quantities (1D cases) are handled. Accordingly, the present main
-application areas of Qpack2 are ground-based observations and inversion of
-individual satellite spectra/scans. Inversion of satellite scanning sequences
-where atmospheric fields to be retrieved have also a latitude or longitude
-extension (2D or 3D) could be considered as part of future development.
+(OEM). Only cases where the aim is to retrieve vertical profiles of atmospheric
+quantities (1D cases) are handled. Accordingly, the main application areas of
+Qpack2 are ground-based observations and inversion of individual satellite
+spectra.
 
 The package should be general and flexible for covered measurements. For
 example, there is basically no limitations regarding observation geometry.
@@ -54,9 +52,10 @@ profiles can automatically be extracted from climatology data.
 %---
 Qpack2 is part of the more general Atmlab package of Matlab functions. In fact,
 it is largely a merge of some of the systems in Atmlab. The computational
-engine, i.e.\ the forward model, of Qpack2 is ARTS-2 (not part of Atmlab). The
-communication with ARTS-2 is made through the Qarts system. OEM inversions are
-performed by the function \verb|oem.m|. Climatology data are stored and
+engine, i.e.\ the forward model, of Qpack2 is ARTS-2 ({\it Eriksson et al.},
+2011). ARTS is a C++ program, downloaded separately (i.e.\ not part of Atmlab).
+The communication with ARTS-2 is made through the Qarts system. OEM inversions
+are performed by the function \verb|oem.m|. Climatology data are stored and
 interpolated through the atmdata format.
 
 This can be seen as a direct successor of Qpack ({\it Eriksson et al.}, 2005),
@@ -71,8 +70,8 @@ Data formats are now more clearly defined and the ambition level around
 documentation is higher (but still modest). A main improvement compared to
 Qpack is that extraction of a priori data from climatology data is now an
 integrated part. On the other hand, the feature of classifying errors into
-different categories (0-3 in Qpack) and the associated plotting features are
-removed as it was hardly used.
+different categories (0-3 in Qpack) and the associated plotting features were
+removed as these features are dificult to implement in a generic way.
 
 Quality checks are not handled by Qpack2. For example, there is no default
 check that the frequencies of the measurements are as expected. This for
@@ -98,7 +97,7 @@ atmlab settings is obtained by:
 >> help atmlab
 \end{verbatim}
 At least the following atmlab settings are used: \verb|ARTS_PATH|,
-\verb|ARTS_INCLUDES|, \verb|FMODEL_VERBOSITY|, \verb|VERBOSITY|
+\verb|ARTS_INCLUDES|, \verb|VERBOSITY|, \verb|FMODEL_VERBOSITY|
 and \verb|WORK_AREA|. Some example settings:
 \begin{verbatim}
 atmlab( 'ARTS_PATH',          fullfile(homedir,'ARTS/arts/src/arts') );
@@ -135,10 +134,7 @@ Wildcards are allowed when defining fields:
 >> qinfo(@qarts,'ABS_*')
 \end{verbatim}
 Details around development and bug fixes are described in the ChangeLog file of
-Qpack2 (\verb|atmlab/retrieval/qpack2/ChangeLog|). The versions of Qpack2 are
-numbered as Qpack2.x.y, where x is increased when a change can not be
-accommodated with backward compatibility and y is increased for each
-change/commit.
+Atmlab (\verb|atmlab/ChangeLog|).
 
 
 
@@ -206,7 +202,7 @@ itself. The example file is also appended to this document as Appendix
 \ref{app:qfun}. A related example is \verb|arts_oem_demo|. It does not use
 Qpack2, but shows how an OEM inversion is performed with ARTS as the forward
 model, and the calculation steps in this example gives a good view of the
-inside of Qpack2.
+interior of Qpack2.
 
 
 \subsection{Units}
@@ -281,9 +277,7 @@ Appendix~\ref{app:q}. It is recommended to initialise \verb|Q| as
 Q = qarts;
 \end{verbatim}
 This ensures that Q contains all defined fields, also ones introduced more
-lately. If any field is added to \verb|Q|, it shall not change the result of
-older setting files. If a needed addition can not be accommodated with backward
-compatibility, this generates a new version of Qarts.
+lately. 
 
 All features of ARTS can be accessed through Qarts. Calculations of standard
 type can largely be handled by defining the fields of Qarts that have a direct
@@ -292,7 +286,7 @@ and ARTS, beside that Qarts use uppercase for its fields and ARTS lowercase for
 its variables (e.g.\ \verb|Z_SURFACE| and \verb|z_surface|, respectively).
 Qarts has also several fields that allow inclusion of workspace method (WSM)
 calls. Some of these fields match ARTS agendas and have then a dedicated
-purpose (e.g.\ \verb|SURFACE_PROP_AGENDA|). There are also fields where you are
+purpose (e.g.\ \verb|SURFACE_RTPROP_AGENDA|). There are also fields where you are
 free to include any set of WSM calls (e.g.\ \verb|WSMS_BEFORE_RTE|). You can
 also use ARTS's include feature through the field \verb|INCLUDES|.
 
@@ -376,7 +370,7 @@ O.linear = true;
 \subsection{Measurement data}
 \label{sec:Y}
 %---
-The series of measurements (spectra or scans) to be treated is packed into a
+The series of measurements to be treated is packed into a
 data structure denoted as \verb|Y|. The data fields of this structure are
 described in \verb|qp2_y|, following the \verb|qinfo| format:
 \begin{verbatim}
@@ -607,26 +601,43 @@ used to convert data to VMR. For example, the retrieved profile in VMR for the
 
 \subsubsection{Baseline fit variables}
 %
-There is so far only a single main approach for baseline fits, \verb|POLYFIT|.
-A set of fields is added for each polynomial coefficient, and for the first
-polynomial coefficient they are
+There are two approaches for performing baseline fits, denoted as
+\verb|POLYFIT| and \verb|SINEFIT|. The two approaches can be used 
+seperately, or be combined.
+
+A set of fields is added for each polynomial coefficient, and
+for the first polynomial coefficient they are
 
 \newfield \verb|P.polyfit0_x|, \verb|P.polyfit0_xa|,
 \verb|P.polyfit0_e|,
-\verb|P.polyfit0_eo|, \verb|P.polyfit0_es| and\\\verb|P.polyfit0_mr|:\\
-As corresponding fields above for species (\verb|species1_x| etc.).
+\verb|P.polyfit0_eo|, \verb|P.polyfit0_es| and\\
+\verb|P.polyfit0_mr|:\\
+As corresponding fields above for species (\verb|species1_x| etc.).\\
 
+\noindent
+Fields are added in a similar manner for \verb|SINEFIT|. For the first 
+selected ripple period the fields are
+
+\newfield \verb|P.sinefit1_x|, \verb|P.sinefit1_xa|,
+\verb|P.sinefit1_e|,
+\verb|P.sinefit1_eo|, \verb|P.sinefit1_es| and\\
+\verb|P.sinefit1_mr|:\\
+These fields have length 2, where the two values correspond to the cosine and
+sine terms, respectively. 
 
 
 \subsubsection{Frequency fit variables}
 %
-If only a ``frequency shift'' retrieval is performed, the fields listed below
-hold scalars. If also a ``stretch fit'' is made, the fields are vectors of
-length 2. The set of fields are:
+Both a shift and a stretch factor can be retrieved:
 
-\newfield \verb|P.ffit_x|, \verb|P.ffit_xa|,
-\verb|P.ffit_e|,
-\verb|P.ffit_eo|, \verb|P.ffit_es| and\\\verb|P.ffit_mr|:\\
+\newfield \verb|P.fshift_x|, \verb|P.fshift_xa|,
+\verb|P.fshift_e|,
+\verb|P.fshift_eo|, \verb|P.fshift_es| and\\\verb|P.fshift_mr|:\\
+As corresponding fields above for species (\verb|species1_x| etc.).
+
+\newfield \verb|P.fstretch_x|, \verb|P.fstretch_xa|,
+\verb|P.fstretch_e|,
+\verb|P.fstretch_eo|, \verb|P.fstretch_es| and\\\verb|P.fstretch_mr|:\\
 As corresponding fields above for species (\verb|species1_x| etc.).
 
 
@@ -669,7 +680,7 @@ as GriddedField4 but imported as
 Q.T_ATMDATA = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
                         'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
 \end{verbatim}
-data of atmdata type are obtained:
+This produces data of atmdata type:
 \begin{verbatim}
 >> Q.T_ATMDATA
 
@@ -712,7 +723,12 @@ NetCDF, that format can also be used (\verb|arts_nc_write_|{\it datatype} and
 \section*{References}
 Eriksson, P., C. Jim\'enez, and S. A. Buehler, Qpack, a general tool for
 instrument simulation and retrieval work, {\it J. Quant. Spectrosc. Radiat.
-  Transfer}, 91, 47-64, 2005.
+  Transfer}, 91, 47-64, 2005. \vspace{1ex}
+
+\noindent
+Eriksson, P., S. A. Buehler and C. P. Davis and C. Emde and O. Lemke, 
+ARTS, the atmospheric radiative transfer simulator, Version 2, 
+{\it J. Quant. Spectrosc. Radiat. Transfer}, 112, 1551-1558, 2011.
 
 
 
