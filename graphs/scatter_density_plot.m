@@ -17,6 +17,8 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %   y       vector  data on y-axis
 %   opts    structure with options:
 %       bins        no. bins or vector with all bins (see hist2d)
+%       xbins       bins for x only (default: equal to bins)
+%       ybins       bins for y only (default: equal to bins)
 %       trans       transformation, e.g. @(x)log10(x) on both axis
 %       invtrans    inverse of trans, e.g. @(x)10.^(x) on both axis
 %       transx       transformation, e.g. @(x)log10(x)
@@ -32,6 +34,10 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %                   legend.names  = {names} to be displayed in a legend related to the median lines
 %              e.g. legend.Location = 'NorthWest'
 %                   etc. (except for legend.names, fieldnames and options must be valid for legend() )
+%       linreg      if defined, structure with props for linreg-line
+%       normalise   string representing how to normalise, if at all:
+%                   'none'  (default) just write collocs
+%                   'x'     normalise per x-bin
 %                   
 %       ...
 %   
@@ -61,6 +67,8 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 % set default values and handle options
 defaults = struct(...
     'bins', 50, ...
+    'xbins', [], ...
+    'ybins', [], ...
     'trans', @(x)x, ...
     'transx',[],...
     'transy',[],...
@@ -71,16 +79,26 @@ defaults = struct(...
     'ncolour', 20, ...
     'medprops', [], ...
     'scatprops', [], ...
-    'diagonal', []);
+    'diagonal', [], ...
+    'linreg', [], ...
+    'normalise', 'none');
 opts = optargs(varargin, {defaults});
 
 opts = optargs_struct(opts, defaults);
 
+if isempty(opts.xbins)
+    opts.xbins = opts.bins;
+end
+
+if isempty(opts.ybins)
+    opts.ybins = opts.bins;
+end
 
 if isempty(opts.transx)
    opts.transx = opts.trans;
    opts.invtransx = opts.invtrans;
 end
+
 if isempty(opts.transy)
    opts.transy = opts.trans;
    opts.invtransy = opts.invtrans;
@@ -90,13 +108,24 @@ end
 % create the actual 2-d histogram. Apply forward transformation upon data,
 % then inverse transformation upon plotting. This allows for e.g.
 % logarithmic representations.
-[N, BX, BY] = hist2d(opts.transx(x), opts.transy(y), opts.bins, opts.bins);
+[N, BX, BY] = hist2d(opts.transx(x), opts.transy(y), opts.xbins, opts.ybins);
 xbins = BX(1, :);
 ybins = BY(:, 1);
 
 paddedx = [xbins(1)-diff(xbins(1:2)),xbins,xbins(end)+diff(xbins(1:2))];
 paddedy = [ybins(1)-diff(ybins(1:2));ybins;ybins(end)+diff(ybins(1:2))];
-paddedN = [zeros(1,size(N,2)+2);[zeros(size(N,2),1),N,zeros(size(N,2),1)];zeros(1,size(N,2)+2)];
+paddedN = [zeros(1,size(N,2)+2);[zeros(size(N,1),1),N,zeros(size(N,1),1)];zeros(1,size(N,2)+2)];
+
+switch opts.normalise
+    case '(none)' % do nothing
+    case 'x'
+        newpaddedN = bsxfun(@rdivide, paddedN, sum(paddedN, 1));
+        newpaddedN(:, sum(paddedN, 1)==0) = 0;
+        paddedN = newpaddedN;
+    otherwise
+        error(['atmlab:' mfilename ':invalid', ...
+            'Invalid option for normalise: %s. See help.'], normalise);
+end
 
 %% plot the actual 2d-histogram
 pcolor(opts.invtransx(paddedx), opts.invtransy(paddedy), paddedN);
@@ -130,14 +159,25 @@ if ~isempty(opts.diagonal)
 end
 %plot_medians(y, x, ybins, opts);
 
-h_ax = gca();
-h_cb = colorbar();
+%% plot linreg
+
+if ~isempty(opts.linreg)
+    p = polyfit(x, y, 1);
+    xx = linspace(min(x), max(x), 10);
+    yy = polyval(p, xx);
+    plot(xx, yy, opts.linreg);
+end
+
+
 
 %% tweak the looks
 
 axis('square');
 grid('on');
-set(gca, 'layer', 'top'); % otherwise grid is below everything
+set(gca(), 'layer', 'top'); % otherwise grid is below everything
+
+h_ax = gca();
+h_cb = colorbar();
 
 hold('off');
 end

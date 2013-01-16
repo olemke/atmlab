@@ -1,4 +1,10 @@
-% SSMT2_READ   Read SSM/T-2 data file.
+% SSMT2_READ   Read SSM/T-2 data file - old style.
+%
+% ************************************************
+% *                DEPRECATED                    *
+% *       Use ssmt2_read_ngdc instead!           *
+% *                DEPRECATED                    *
+% ************************************************
 %
 %    Reads an SSM/T-2 file into a structure and applies calibration.
 %
@@ -48,6 +54,12 @@
 % OPT   apply_calibration   Pass false to get the raw count values,
 %                           false: don't apply calibration
 %                           true: apply calibration to retrieve BTs
+%
+% ************************************************
+% *                DEPRECATED                    *
+% *       Use ssmt2_read_ngdc instead!           *
+% *                DEPRECATED                    *
+% ************************************************
 
 % 2009-11-20   Created by Oliver Lemke and Mathias Milz.
 

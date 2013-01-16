@@ -94,6 +94,34 @@ classdef CachedData < handle
             X = whos('dummy');
             c = X.bytes;
         end
+        
+        function varargout = evaluate(self, no, func, varargin)
+            % Execute func(arg1, arg2, ...) if output not already cached
+            %
+            % This method calculates a key from all its arguments. If no
+            % value is stored in association with this key, it executes
+            % func(arg1, arg2, ...) and stores the results with the key,
+            % then returns the results. If there is a value already stored,
+            % it returns the value(s). The first argument is a number,
+            % it represents the number of output arguments taken from the
+            % expression.
+            %
+            % FORMAT
+            %
+            %   out = cd.evaluane(no, @func, arg1, arg2, ...)
+
+            % generate a unique (?) string
+            nm = genvarname(DataHash([{no, func}, varargin]));
+            
+            if self.has_entry(nm)
+                varargout = self.get_entry(nm);
+            else
+                logtext(atmlab('OUT'), 'executing, then caching %s([%d arguments])\n', ...
+                    func2str(func), length(varargin));
+                [varargout{1:no}] = func(varargin{:});
+                self.set_entry(nm, varargout);
+            end
+        end
     end
     
     methods (Access = private)

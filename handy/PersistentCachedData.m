@@ -32,6 +32,9 @@ classdef PersistentCachedData < CachedData
     
     methods
         function self = PersistentCachedData(cachedir)
+            % pcd = PersistentCachedData(cachedir)
+            %
+            % See warning!
             self = self@CachedData();
             self.cachedir = cachedir;
         end

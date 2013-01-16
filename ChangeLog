@@ -1,3 +1,39 @@
+2013-01-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-248
+
+	* graphs/scatter_density_plot.m: expanded
+
+	- Added possibility to individually specify xbins, ybins
+	- Added option to normalise according to specified dimension
+	- Added option to add linear-regression line
+	- Return handles to axes and colorbar
+
+	* handy/CachedData.m (evaluate):
+
+	- Added method to evalute arbitrary expression and cache the result.
+	  If the same expression is asked to be evaluated again, the result is
+	  rather read from cache, saving considerable time. Can of course also
+	  be used with PersistentCachedData, because this is a child-class.
+
+	* collocations/CollocatedDataset.m, datasets/HomemadeDataset.m:
+
+	- Moved `pcd` property from CollocatedDataset to HomemadeDataset
+
+	* sensors/ssmt2_read_ngdc.m: Added.
+
+	- Reader for SSM-T/2 from NGDC data
+
+	* sensors/ssmt2_reader_netcdf.py: Added
+
+	- Used by reader. Needs Python + NetCDF-library. Permission pending.
+
+	* sensors/ssmt2_read.m: Added deprecation warning to docs.
+
+	* datasets/define_datasets.m:
+
+	- Added smmt2. Work in progress.
+
 2013-01-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-247

@@ -104,26 +104,6 @@ classdef CollocatedDataset < HomemadeDataset
         
         % Marker to seperate between different logfile entries
         marker = [repmat('-', [1 72]) '\n'];
-        
-        % Set diskcache to store results of '.read' to disk.
-        %
-        % Runnig <a href="matlab:help CollocatedDataset/read">.read()</a> can take considerable time. Therefore, it is worthwhile
-        % to cache the results. If 'pcd' is set to a <a href="matlab:help PersistentCachedData">PersistentCachedData</a>,
-        % .read() will cache the results and read from disk if possible.
-        % WARNING: DO NOT SET PCD TO A DIRECTORY YOU ARE OTHERWISE
-        % USING! The caching mechanism may remove files from this
-        % directory, so be very careful. Caching works by calculating a key
-        % (almost certainly unique) based on input arguments and storing
-        % the results in a .mat-file in the cache-directory.
-        %
-        % Example use:
-        % >> d = datasets;
-        % >> d.collocation_mhs_amsub.pcd = PersistentCachedData('/local/gerrit/cache');
-        % >> [M, c] = d.collocation_mhs_amsub.read([2006 4 25], [2006 4 26], {'noaa18', 'noaa16'}, {'LAT1', 'LAT2', 'BT1'});
-        % (later)
-        % >> [M, c] = d.collocation_mhs_amsub.read([2006 4 25], [2006 4 26], {'noaa18', 'noaa16'}, {'LAT1', 'LAT2', 'BT1'});
-        % 14-May-2012 11:37:33.707:PersistentCachedData.get_entry:54:Reading from persistent cache: /local/gerrit/cache/aff3735816ae90b11a4ddfd571f88e3b.mat
-        pcd;
 
     end
     

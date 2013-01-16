@@ -110,6 +110,11 @@ SatDataset('name', 'saphir_l2a', ...
     'satname', 'meghatropiques', ...
     'granule_duration', 7000); % FIXME: verify granule_duration
 
+SatDataset('name', 'ssmt2', ...
+    'needs_starttimesfile', false, ...
+    'reader', @common_read_ssmt2, ...
+    'granule_duration', 6300); % FIXME: verify granule_duration
+
 %% datasets generated here (non-collocated)
 
 % dardarsub
@@ -745,6 +750,9 @@ for i = 1:6
     f_saphir.(fn).atts.long_name = sprintf('Saphir Brightness Temperature, channel %d', i);
     f_saphir.(fn).atts.units = 'Kelvin';
 end
+
+f_saphir.IncidencAngle.type = 'float';
+f_saphir.IncidencAngle.atts.long_name = sprintf('SAPHIR incidence angle');
 
 
 % ---------
