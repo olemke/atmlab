@@ -81,7 +81,7 @@ defaults = struct(...
     'scatprops', [], ...
     'diagonal', [], ...
     'linreg', [], ...
-    'normalise', 'none');
+    'normalise', '(none)');
 opts = optargs(varargin, {defaults});
 
 opts = optargs_struct(opts, defaults);
@@ -124,7 +124,7 @@ switch opts.normalise
         paddedN = newpaddedN;
     otherwise
         error(['atmlab:' mfilename ':invalid', ...
-            'Invalid option for normalise: %s. See help.'], normalise);
+            'Invalid option for normalise: %s. See help.'], opts.normalise);
 end
 
 %% plot the actual 2d-histogram

@@ -364,6 +364,21 @@ CollocatedDataset(D.amsub, D.saphir_l1a, ...
     'distance', 15, ...
     'interval', 900);
 
+CollocatedDataset(D.ssmt2, D.ssmt2, ...
+    'name', 'collocation_ssmt2_ssmt2', ...
+    'distance', 20, ...
+    'interval', 900);
+
+CollocatedDataset(D.ssmt2, D.mhs, ...
+    'name', 'collocation_ssmt2_mhs', ...
+    'distance', 15, ...
+    'interval', 900);
+
+CollocatedDataset(D.ssmt2, D.amsub, ...
+    'name', 'collocation_ssmt2_amsub', ...
+    'distance', 15, ...
+    'interval', 900);
+
 % CPR as reference
 
 CollocatedDataset(D.avhrr_cmsaf_gac, D.cpr,...
@@ -754,6 +769,31 @@ end
 f_saphir.IncidencAngle.type = 'float';
 f_saphir.IncidencAngle.atts.long_name = sprintf('SAPHIR incidence angle');
 
+% ---------
+% SSM/T-2
+% ---------
+
+% (vs. others)
+
+f_ssmt2.SSMT2_BT.type = 'float';
+f_ssmt2.SSMT2_BT.dims = {'SSMT2_CHANS', 5};
+f_ssmt2.SSMT2_BT.realname = 'tb';
+f_ssmt2.SSMT2_BT.atts.long_name = 'SSM T/2 Brightness Temperature';
+f_ssmt2.SSMT2_BT.atts.units = 'Kelvin';
+f_ssmt2.SSMT2_channel_quality_flag.type = 'float';
+f_ssmt2.SSMT2_channel_quality_flag.dims = f_ssmt2.SSMT2_BT.dims;
+f_ssmt2.SSMT2_channel_quality_flag.realname = 'channel_quality_flag';
+f_ssmt2.SSMT2_channel_quality_flag.atts.long_name = 'SSM T/2 channel quality flag';
+
+% (vs. self)
+
+% use same field-names but with _1, _2 added
+
+fn = fieldnames(f_ssmt2);
+for i = 1:length(fn)
+    f_ssmt2_1.([fn{i} '_1']) = f_ssmt2.(fn{i});
+    f_ssmt2_2.([fn{i} '_2']) = f_ssmt2.(fn{i});
+end
 
 % ---------
 % MODIS
@@ -895,6 +935,15 @@ FieldCopier(D.collocation_mhs_saphir, f_mhs, f_saphir, ...
 
 FieldCopier(D.collocation_amsub_saphir, f_amsub, f_saphir, ...
     'name', 'associated_amsub_saphir');
+
+FieldCopier(D.collocation_ssmt2_mhs, f_ssmt2, f_mhs, ...
+    'name', 'associated_ssmt2_mhs');
+
+FieldCopier(D.collocation_ssmt2_amsub, f_ssmt2, f_amsub, ...
+    'name', 'associated_ssmt2_amsub');
+
+FieldCopier(D.collocation_ssmt2_mhs, f_ssmt2_1, f_ssmt2_2, ...
+    'name', 'associated_ssmt2_ssmt2');
 
 FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
     getSelection(f_cpr,fieldnames(f_cpr),{'Cloud_Types'}),struct(),...

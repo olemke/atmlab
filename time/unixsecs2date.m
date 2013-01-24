@@ -26,7 +26,10 @@ function [year, month, day, hour, minute, second] = unixsecs2date(secs)
 %   E-mail:      pjacklam@online.no
 %   URL:         http://home.online.no/~pjacklam
 
-   error(nargchk(1, 1, nargin));
+   narginchk(1, 1);
 
-   [year, month, day, hour, minute, second] ...
-      = jd2date(double(secs) / 86400 + date2jd(1970, 1, 1));
+   dv = datevec(addtodate(datenum(1970, 1, 1, 0, 0, 0), secs, 'second'));
+   C = num2cell(dv);
+   [year, month, day, hour, minute, second] = deal(C{:});
+
+end

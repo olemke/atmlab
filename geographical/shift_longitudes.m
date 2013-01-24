@@ -20,9 +20,20 @@ function lon = shift_longitudes(lon,varargin)
                                                                          %&%
                                                                          %&%
 if lonhigh - lonlow ~= 360                                               %&%
-  error( 'Longitude range (lonhigh-lonlow) must be 360 degrees.' );      %&%
+  error(['atmlab:' mfilename], ...
+      'Longitude range (lonhigh-lonlow) must be 360 degrees.' );      %&%
 end                                                                      %&%
 
+if any(isnan(lon(:)))
+    warning(['atmlab:' mfilename], ...
+        'Found nans in longitude!');
+end
+
+if nanmax(lon(:)) - nanmin(lon(:)) > 360
+    error('atmlab:invalid_data', ...
+        'Range in longitudes exceeds 360. Differences up to %g found.', ...
+        nanmax(lon(:)) - nanmin(lon(:)));
+end
 
 ind = find( lon < lonlow );
 %
@@ -38,5 +49,5 @@ while ~isempty(ind)
   ind = find( lon > lonhigh );
 end
 
-
+end
   

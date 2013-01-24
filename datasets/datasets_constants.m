@@ -29,6 +29,10 @@ A.POES_satellite_numbers = [15 16 17 18 19 29499]; % for metopa, use NORAD numbe
 A.POES_satellites_amsub = {'noaa15', 'noaa16', 'noaa17', 'N15', 'N16', 'N17'};
 A.POES_satellites_mhs = {'noaa18', 'noaa19', 'metopa', 'N18', 'N19', 'MA'};
 
+%% all sats with SSMT2
+
+A.DMSP_satellite_names = {'F11', 'F12', 'F14', 'F15'};
+
 %% define what reading function to use for what sensor
 
 A.read_cpr = @common_read_cpr_2BCWCRO;

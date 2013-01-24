@@ -10,7 +10,7 @@ import netCDF4 as nc
 
 if len(sys.argv) < 3:
 	print "Usage: read_test.py [input file name] [output file name]"
-	sys.exit(0)
+	sys.exit(1)
 
 f_in=sys.argv[1]
 
@@ -19,7 +19,7 @@ compiled=re.compile(pattern)
 
 if not re.search(pattern,f_in):	
 	print "Input data file not *.T2"
-	sys.exit(0)
+	sys.exit(1)
 
 # Read data file in
 		
@@ -35,20 +35,32 @@ for i in range(len(data)):
 		break
 	if i == (len(data)-1):
 		print "No header found, quitting"
-		sys.exit(0)
+		sys.exit(1)
 
 hdr=string.split(data[0:head_end],"\n")
 
 if len(hdr) == 0:
 	print "Header is empty, quitting"
-	sys.exit(0)
+	sys.exit(1)
 
 
 # Set key header variables
 
-ndata=int(string.split([s for s in hdr if "number of data records" in s][0],": ")[1])
-nhdr=int(string.split([s for s in hdr if "number of header records" in s][0],": ")[1])
-nbytes=int(string.split([s for s in hdr if "record bytes" in s][0],": ")[1])
+try:
+    nhdr=int(string.split([s for s in hdr if "number of header records" in s][0],": ")[1])
+    nbytes=int(string.split([s for s in hdr if "record bytes" in s][0],": ")[1])
+    if "number of data records" in s:
+        ndata=int(string.split([s for s in hdr if "number of data records" in s][0],": ")[1])
+    else:
+        nrec=int([s for s in hdr if "number of records" in s][0].split(":")[1].strip())
+        ndata = nrec - nhdr
+        print >>sys.stderr, ("Warning: "
+            "didn't find number of data records directly.\n"
+            "Using number of records - number of header records ({} - {}) "
+            "instead").format(nrec, nhdr)
+except IndexError:
+    print >>sys.stderr, "Failed to determine record sizes from header, exiting"
+    sys.exit(1)
 
 nrec=nhdr+ndata
 fsize=nrec*nbytes

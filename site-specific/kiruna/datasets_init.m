@@ -54,6 +54,8 @@ D.dardar.re = 'DARDAR-CLOUD_v(?<version>.+)_(?<year>\d{4})(?<doy>\d{3})(?<hour>\
 % |-approach instead. Same regexp works for all POES.
 poes_re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})';
 
+%% Passive
+
 D.mhs.basedir = '/storage3/data/mhs';
 D.mhs.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
 D.mhs.re = poes_re;
@@ -93,7 +95,13 @@ D.saphir_l1a.re = 'MT1SAPSL1A__(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?
 D.saphir_l2a.basedir = '/storage3/data/meghatropiques/saphir_l2a';
 D.saphir_l2a.subdir = '$YEAR4/$MONTH/$DAY';
 D.saphir_l2a.re = 'MT1SAPS_(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno>\d{5})_(?<orbitno2>\d{5})_00_GP_\d\.\d\d_L2A\.h5';
-%% other home-made datasets
+
+D.ssmt2.basedir = '/storage3/data/ssmt_ngdc';
+D.ssmt2.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
+D.ssmt2.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
+D.ssmt2.re = '(?<satname>F[0-9]{2})(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})\.T2\.gz';
+
+%% Non-collocated home-made
 
 D.dardarsub.basedir = '/storage3/data/dardar_subsel';
 D.dardarsub.subdir = '$YEAR4/$MONTH/$DAY';
@@ -111,6 +119,13 @@ for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3', 'v0_4', 'v0_5', 'v0_6'}
     ds.filename = D.cmoiwp.filename;
     ds.re = D.cmoiwp.re;
 end
+
+D.c2dp.basedir = '/storage3/user_data/gerrit/collocated_datasets/c2dp';
+D.c2dp.subdir = '$YEAR4/$MONTH/$DAY';
+D.c2dp.filename = 'c2dp_fullday_$SAT.nc.gz';
+
+D.cdpc_2dcp.basedir = '/storage3/user_data/gerrit/collocated_datasets/cdpc_2dcp';
+D.cdpc_2dcp.subdir = '$YEAR4/$DOY';
 
 %% Level 3 DATASETS (not for collocating)
 D.patmosxL3.basedir   = '/storage3/data/patmosx/level3';
@@ -144,6 +159,18 @@ D.collocation_mhs_saphir.filename = 'collocations_$SAT.nc.gz';
 D.collocation_amsub_saphir.basedir = '/storage3/user_data/gerrit/collocated_datasets/amsub_saphir';
 D.collocation_amsub_saphir.subdir = '$YEAR4/$MONTH/$DAY';
 D.collocation_amsub_saphir.filename = 'collocations_$SAT.nc.gz';
+
+D.collocation_ssmt2_ssmt2.basedir = '/storage3/user_data/gerrit/collocated_datasets/ssmt2_ssmt2';
+D.collocation_ssmt2_ssmt2.subdir = '$YEAR4/$MONTH/$DAY';
+D.collocation_ssmt2_ssmt2.filename = 'collocations_$SAT1_$SAT2.nc.gz';
+
+D.collocation_ssmt2_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/ssmt2_mhs';
+D.collocation_ssmt2_mhs.subdir = '$YEAR4/$MONTH/$DAY';
+D.collocation_ssmt2_mhs.filename = 'collocations_$SAT1_$SAT2.nc.gz';
+
+D.collocation_ssmt2_amsub.basedir = '/storage3/user_data/gerrit/collocated_datasets/ssmt2_amsub';
+D.collocation_ssmt2_amsub.subdir = '$YEAR4/$MONTH/$DAY';
+D.collocation_ssmt2_amsub.filename = 'collocations_$SAT1_$SAT2.nc.gz';
 
 %% CPR as reference
 
@@ -278,12 +305,18 @@ D.associated_amsub_amsub.basedir = '/storage3/user_data/gerrit/collocated_datase
 D.associated_amsub_amsub.subdir = D.collocation_amsub_amsub.subdir;
 D.associated_amsub_amsub.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
 
-D.c2dp.basedir = '/storage3/user_data/gerrit/collocated_datasets/testing/c2dp';
-D.c2dp.subdir = '$YEAR4/$MONTH/$DAY';
-D.c2dp.filename = 'c2dp_fullday_$SAT.nc.gz';
+D.associated_ssmt2_amsub.basedir = D.collocation_ssmt2_amsub.basedir;
+D.associated_ssmt2_amsub.subdir = D.collocation_ssmt2_amsub.subdir;
+D.associated_ssmt2_amsub.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
 
-D.cdpc_2dcp.basedir = '/storage3/user_data/gerrit/collocated_datasets/testing/cdpc_2dcp';
-D.cdpc_2dcp.subdir = '$YEAR4/$DOY';
+D.associated_ssmt2_mhs.basedir = D.collocation_ssmt2_mhs.basedir;
+D.associated_ssmt2_mhs.subdir = D.collocation_ssmt2_mhs.subdir;
+D.associated_ssmt2_mhs.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
+
+D.associated_ssmt2_ssmt2.basedir = D.collocation_ssmt2_ssmt2.basedir;
+D.associated_ssmt2_ssmt2.subdir = D.collocation_ssmt2_ssmt2.subdir;
+D.associated_ssmt2_ssmt2.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
+
 
 D.associated_mhs_saphir.basedir = '/storage3/user_data/gerrit/collocated_datasets/mhs_saphir';
 D.associated_mhs_saphir.subdir = '$YEAR4/$MONTH/$DAY';

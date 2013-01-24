@@ -18,8 +18,8 @@ function utc_datestr = iso_timestamp()
 % $Id$
 
 utc_time = java.lang.System.currentTimeMillis;
-[utc_date{1:6}] = unixsecs2date(utc_time/1000);
+[utc_date{1:6}] = unixsecs2date(uint32(floor(utc_time/1000)));
 utc_datestr = sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ', ...
-    [utc_date{1:5} round(utc_date{6})]);
+    utc_date{1:6});
 
 end

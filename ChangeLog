@@ -1,3 +1,50 @@
+2013-01-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-249
+
+	* graphs/scatter_density_plot.m:
+
+	- Bugfix related no option 'normalise'
+
+	* sensors/ssmt2_reader_netcdf.py:
+
+	- When error, use exit code 1, not 0
+
+	- Catch situation when there is no "number of data records". Instead,
+	use "number of records" minus "number of header records".
+
+	* time/unixsecs2date.m:
+
+	- Re-implemented. No more rounding issues. Also no more fractional
+	seconds.
+
+	* time/iso_timestamp.m:
+
+	- Adapt for lack of fractional seconds in unixsecs2date
+
+	* geographical/shift_longitudes.m:
+
+	- Bugfix. Was getting endless loop if input invalid, e.g. range larger
+	than 360. Will now throw an error if this is the case.
+
+	* datasets/SatDataset.m:
+
+	(reader): Document what error shall be thrown.
+
+	(overlap_granule):
+	
+	- Get rid of "tolerance" option, redundant with
+	bugfix in unixsecs2date.
+
+	* datasets/datasets_constants.m: Added DMSP sats
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added ssmt2 and 3 collocated datasets with ssmt2, and their
+	fieldcopiers
+
+	- Moved c2dp to "other home-made"
+
 2013-01-16  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-248

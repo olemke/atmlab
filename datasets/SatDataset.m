@@ -203,6 +203,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %           of rows in the 'lat' and 'lon' fields (one scanline can
         %           only have a single time).
         %
+        % THROWS
+        %
+        %       If the data cannot be read, throws an error with
+        %       error identifier `atmlab:invalid_data`.
+        %
         % EXAMPLE
         %
         %   This function is not normally called directly by the user, but
@@ -571,8 +576,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % find_granule_by_datetime Return full path of datafile by date/time
             %
             % Returns the full path of the datafile corresponding to the input
-            % arguments. There are two modes (FIXME: document explicit tol
-            % behaviour):
+            % arguments. There are two modes
             %
             %   - If <a href="matlab:help SatDataset/filename">dataset.filename</a> is defined, the path is
             %     calculated directly from <a href="matlab:help SatDataset">dataset</a> properties and the arguments
@@ -582,7 +586,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   - If this is not defined, then <a href="matlab:help SatDataset/re">dataset.re</a> has to
             %     be defined. It will search the filesystem for a file matching the
             %     regular expression and the indicated datevec/spec for this dataset.
-            %     In this case, one can apply a tolerance in seconds.
             %
             % FORMAT
             %
@@ -596,14 +599,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %                       to two satellites (such as collocations), a cell
             %                       array of two strings. For
             %                       single-satellite datasets, not needed.
-            %   tol         number  Optional: tolerance in seconds. Due to
-            %                       rounding errors, a date like 2009-12-06
-            %                       20:53:00 passed to date2unixsecs and
-            %                       back to unixsecs2date becomes
-            %                       2009-12-06 20:52:59.99999, which is
-            %                       hard to round in a straightforward way
-            %                       (don't want ...52:60). By default, a
-            %                       tolerance of 0.01 seconds is applied.
             %
             % OUT
             %
@@ -614,7 +609,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   >> path = mhs.find_granule_by_datetime([2010 9 8 8 8], 'noaa18');
             
             errid = 'atmlab:find_granule_by_datetime';
-            [spec, tol] = optargs(varargin, {'', 0.01});
+            spec = optargs(varargin, {''});
             
             % implementation:
             % 1. find the directory containing the files from basedir/subdir
@@ -623,22 +618,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             fulldir = self.find_datadir_by_date(datevec, spec);
             
-            if (nargin() <= 3 && ~isequalwithequalnans(self.filename, nan) && ~isempty(self.filename)) || ~self.tryre % calculate directly
+            if (nargin() <= 3 && ~isequaln(self.filename, nan) && ~isempty(self.filename)) || ~self.tryre % calculate directly
                 fn = strrep_variables(self.filename, spec, datevec);
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
                 [granules, paths] = self.find_granules_by_date(datevec, spec, false);
-                if tol>0 % use tolerance
-%                     g = mat2cell(granules, size(granules, 1), ...
-%                                  repmat(1, [1 size(granules, 2)]));
-                    grans_unisecs = self.get_starttime(granules);
-%                     X = num2cell(datevec);
-%                     dv_unisecs = round(date2unixsecs(X{:}));
-                    dv_unisecs = double(self.get_starttime(datevec));
-                    found = abs(grans_unisecs - dv_unisecs) < tol;
-                else
-                    found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
-                end
+                found = granules(:, 4)==datevec(4) & granules(:, 5)==datevec(5);
                 
                 nfound = sum(found);
                 if iscell(spec) % short-string for error message
@@ -1056,7 +1041,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 logtext(atmlab('OUT'), 'granule %d/%d: %d-%02d-%02d %02d:%02d\n', i, ngrans-1, ...
                     ddv{1}, ddv{2}, ddv{3}, ddv{4}, ddv{5});
 
-                if self.firstlines.(sat).isKey(uni) && ~any(self.firstlines.(sat)(uni)==[self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR])
+                if self.firstlines.(sat).isKey(uni) && ...
+                        ~any(self.firstlines.(sat)(uni) == ...
+                            cellfun(@int64, {self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR}))
                     logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(sat)(uni));
                     continue
                 end
