@@ -1,3 +1,27 @@
+2013-01-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-250
+
+	* datasets/SatDataset.m(read_granule):
+
+	- Adapt to altered find_granule_by_datetime (see yesterdays commit).
+
+	* collocations/FieldCopier.m:
+	
+	(process_granule):
+
+	- Handle more nicely the case of a missing sibling-dataset. If set, a
+	filler value in self.members.field.missing will be used instead. If
+	this is not set, an error message will tell the user to set it. If the
+	filler value is used, this shall be recognised by
+	CollocatedDataset.read, and it will be replaced back by nans upon
+	reading, with an appropriate message. The second part is not yet
+	implemented. WORK IN PROGRESS.
+
+	* handy/none.m: Added
+
+	- Smill utility in analogy to `all` and `any`.
+
 2013-01-24  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-249

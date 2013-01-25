@@ -800,7 +800,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             
             %% find datafile and function to read it
-            datafile = self.find_granule_by_datetime(date, spec, 1);
+            datafile = self.find_granule_by_datetime(date, spec);
             
             %% read datafile
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
