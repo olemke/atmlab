@@ -2,7 +2,7 @@
 %
 %    The main features of Qpack2 are demonstrated. The example case is airborne
 %    measurements of ozone at 110.8 GHz. Synthetic measurement data are
-%    generated internally. See the code and intrnal comments for details.
+%    generated internally. See the code and internal comments for details.
 %
 %    Everything is here put into a single file. For practical retrievals it
 %    is probably better to put the definitions of Q (together with O?) in a
@@ -60,13 +60,28 @@ L2 = qpack2( Q, O, Y );
 %- Plot, if no output argument
 %
 if ~nargout
+  
+  % Profiles
+  figure(1),clf
   plot( L2(1).species1_x*1e6, p2z_simple(L2(1).species1_p)/1e3, 'b', ...
         L2(2).species1_x*1e6, p2z_simple(L2(2).species1_p)/1e3, 'r', ...
         L2(1).species1_xa*1e6, p2z_simple(L2(1).species1_p)/1e3, 'k-' );
   xlabel( 'Ozone [VMR]' );
   ylabel( 'Approximate altitude [km]' );
+  axis( [ 0 8 10 90 ] )
   legend( 'Retrieval 1', 'Retrieval 2', 'True and a priori' );
+
+  % Spectra
+  figure(2),clf
+  h=plot( L2(1).f/1e9, L2(1).y, 'k.', L2(2).f/1e9, L2(2).y, 'k.', ...
+          L2(1).f/1e9, L2(1).yf, 'b-', L2(2).f/1e9, L2(2).yf, 'r-', ...
+          L2(1).f/1e9, L2(1).bl, 'b-.', L2(2).f/1e9, L2(2).bl, 'r-.' );
+  xlabel( 'Frequency [GHz]' );
+  ylabel( 'Tb [K]' );
+  axis( [ min(L2(1).f/1e9) max(L2(1).f/1e9) 0 18 ] )
+  legend( h(3:end), 'Fitted 1', 'Fitted 2', 'Baseline 1', 'Baseline 2' );
 end
+
 return
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
@@ -108,14 +123,15 @@ Q.CLOUDBOX_DO         = false;
 
 %- Define agendas
 %
-Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
-Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
-Q.WSMS_AT_START{3} = ...
+Q.WSMS_AT_START{1}    = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
+Q.WSMS_AT_START{2}    = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
+Q.WSMS_AT_START{3}    = ...
                     'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
-Q.WSMS_AT_START{4} = ...
+Q.WSMS_AT_START{4}    = ...
          'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
-Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
-Q.WSMS_AT_START{6} = ...
+Q.WSMS_AT_START{5}    = ...
+                     'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
+Q.WSMS_AT_START{6}    = ...
                  'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
 
 
@@ -129,7 +145,7 @@ Q.PPATH_LMAX          = 250;
 
 %- Surface
 %
-Q.Z_SURFACE           = 5e3;          % Just a dummy value. A 10 km
+Q.Z_SURFACE           = 1e3;          % Just a dummy value. A 10 km
                                       % observation altitude is assumed here
 
 
@@ -183,26 +199,26 @@ Q.MBLOCK_ZA_GRID      = 0;
 
 %- Correlation of thermal noise 
 %
-f    = H.F_BACKEND;
-cl   = 1.4 * ( f(2) - f(1) );
-cfun = 'gau';
-cco  = 0.05;
+f              = H.F_BACKEND;
+cl             = 1.4 * ( f(2) - f(1) );
+cfun           = 'gau';
+cco            = 0.05;
 %
-Q.TNOISE_C = covmat1d_from_cfun( f, [], cfun, cl, cco );
+Q.TNOISE_C     = covmat1d_from_cfun( f, [], cfun, cl, cco );
 %
 clear H f
 
 
 %- Define L2 structure (beside retrieval quantities below)
 %
-Q.L2_EXTRA = { 'cost', 'dx', 'xa', 'y', 'yf', 'bl', 'ptz', 'mresp', 'A', ...
-               'e', 'eo', 'es', 'date' };
+Q.L2_EXTRA     = { 'cost', 'dx', 'xa', 'y', 'yf', 'bl', 'ptz', ...
+                   'mresp', 'A', 'e', 'eo', 'es', 'date' };
 
 
 %- Temperature
 %
-Q.T.RETRIEVE = false;
-Q.T.ATMDATA  = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
+Q.T.RETRIEVE   = false;
+Q.T.ATMDATA    = gf_artsxml( fullfile( arts_xmldata_path, 'climatology', ...
                         'msis90', 'msis90.t.xml' ), 'Temperature', 't_field' );
 
 %- Determine altitudes through HSE
@@ -221,6 +237,7 @@ Q.ABS_SPECIES(1).L2       = true;
 Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:2e3:z_toa)', [], [] };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
       'midlatitude-winter', 'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
+% For demonstration, setting sfor several units are provided:
 switch 1
  case 1  % Constant VMR
   Q.ABS_SPECIES(1).UNIT     = 'vmr';
@@ -294,19 +311,19 @@ end
 % part of the horisontal wind going along the viewing direction, where
 % postive values mean a movement away from the sensor.
 %
-%Q.WIND_V_FIELD    = [];   % This is a short-cut for zero wind.
+Q.WIND_V_FIELD    = [];      % This is a short-cut for zero wind.
 %
-%Q.WIND_V.RETRIEVE = true;
-%Q.WIND_V.L2       = true;
-%Q.WIND_V.GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:4e3:z_toa)', [], [] };
-%Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 40, ...
-%                                               'lin', 0.5, 0.00, @log10 );
+Q.WIND_V.RETRIEVE = false;   % Set to true to activate retrieval
+Q.WIND_V.L2       = true;
+Q.WIND_V.GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:4e3:z_toa)', [], [] };
+Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 40, ...
+                                                    'lin', 0.5, 0.00, @log10 );
 
 
 
 %- Pointing
 %
-% Here just included for testing purposes, nothing to use for ground-based
+% Here just included for testing purposes, of little interest for ground-based
 % spectrometers. 
 %
 %Q.POINTING.RETRIEVE       = true;
@@ -326,10 +343,10 @@ Q.FSHIFTFIT.L2            = true;
 
 %- Frequency stretch
 %
-%Q.FSTRETCHFIT.RETRIEVE     = true;
-%Q.FSTRETCHFIT.DF           = 25e3; 
-%Q.FSTRETCHFIT.SX           = 50e3^2;  
-%Q.FSTRETCHFIT.L2           = true;
+Q.FSTRETCHFIT.RETRIEVE     = false;   % Set to true to activate retrieval
+Q.FSTRETCHFIT.DF           = 25e3; 
+Q.FSTRETCHFIT.SX           = 50e3^2;  
+Q.FSTRETCHFIT.L2           = true;
 
 
 %- Polyfit
@@ -349,11 +366,11 @@ Q.POLYFIT.SX3             = 0.1^2;
 %
 % Here demonstrated with two period lengths
 %
-%Q.SINEFIT.RETRIEVE        = true;
-%Q.SINEFIT.PERIODS         = [ 75e3 200e3 ]';
-%Q.SINEFIT.L2              = true;
-%Q.SINEFIT.SX1             = 0.2^2; 
-%Q.SINEFIT.SX2             = 0.4^2; 
+Q.SINEFIT.RETRIEVE        = false;   % Set to true to activate retrieval
+Q.SINEFIT.PERIODS         = [ 75e3 200e3 ]';
+Q.SINEFIT.L2              = true;
+Q.SINEFIT.SX1             = 0.2^2; 
+Q.SINEFIT.SX2             = 0.4^2; 
 
 return
 %-----------------------------------------------------------------------------
@@ -391,7 +408,7 @@ Y.LONGITUDE = exp(1);
 % An airborn measurement assumed here
 %
 Y.Z_PLATFORM = 10.5e3;
-Y.ZA         = 70;
+Y.ZA         = 50;
 
 % Reference point for hydrostatic equilibrium
 %
@@ -404,7 +421,7 @@ Y.F = Q.SENSOR_RESPONSE.F_BACKEND;
 
 % Thermal noise standard deviation
 %
-Y.TNOISE = 0.05;
+Y.TNOISE = 0.1;
 % To test varying noise
 %Y.TNOISE = linspace( 0.03, 0.07, length(Y.F) )';
 

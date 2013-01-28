@@ -1,3 +1,12 @@
+2013-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-251
+
+	* demos/qpack2_demo.m: Some spell fixes and some comments added.
+
+	* demos/qarts_demo.m: Added Ignore(ppath_lraytrace) to
+	PPATH_STEP_AGENDA.
+
 2013-01-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-250
@@ -7,7 +16,7 @@
 	- Adapt to altered find_granule_by_datetime (see yesterdays commit).
 
 	* collocations/FieldCopier.m:
-	
+
 	(process_granule):
 
 	- Handle more nicely the case of a missing sibling-dataset. If set, a
@@ -56,7 +65,7 @@
 	(reader): Document what error shall be thrown.
 
 	(overlap_granule):
-	
+
 	- Get rid of "tolerance" option, redundant with
 	bugfix in unixsecs2date.
 

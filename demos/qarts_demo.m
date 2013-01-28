@@ -119,7 +119,7 @@ Q.YCALC_WSMS            = { 'yCalc' };
 Q.PPATH_LMAX            = 10e3;
 Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
                             'Ignore(edensity_field)', 'Ignore(f_grid)', ... 
-                            'ppath_stepGeometric' };
+                            'Ignore(ppath_lraytrace)', 'ppath_stepGeometric' };
 Q.PPATH_AGENDA          = { 'Ignore(rte_pos2)', 'ppathStepByStep' };
 Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
 %
