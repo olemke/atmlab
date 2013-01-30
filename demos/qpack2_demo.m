@@ -121,18 +121,19 @@ Q.J_DO                = true;
 Q.CLOUDBOX_DO         = false;
 
 
-%- Define agendas
+%= Define agendas
 %
-Q.WSMS_AT_START{1}    = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
-Q.WSMS_AT_START{2}    = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
-Q.WSMS_AT_START{3}    = ...
-                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
-Q.WSMS_AT_START{4}    = ...
-         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
-Q.WSMS_AT_START{5}    = ...
-                     'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
-Q.WSMS_AT_START{6}    = ...
-                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+% Here we do it by using the predefined agenda templates 
+%   (found in arts/controlfiles/general/agendas.arts)
+% This works only if the pre-defined agenda is names following the pattern:
+%   name_of_agenda__(Something)
+%
+Q.PPATH_AGENDA               = { 'ppath_agenda__FollowSensorLosPath'   };
+Q.PPATH_STEP_AGENDA          = { 'ppath_step_agenda__GeometricPath'    };
+Q.BLACKBODY_RADIATION_AGENDA = { 'blackbody_radiation_agenda__Planck'  };
+Q.IY_SPACE_AGENDA            = { 'iy_space_agenda__CosmicBackground'   };
+Q.IY_SURFACE_AGENDA          = { 'iy_surface_agenda__UseSurfaceRtprop' };
+Q.IY_MAIN_AGENDA             = { 'iy_main_agenda__Emission'            };
 
 
 %- Radiative transfer

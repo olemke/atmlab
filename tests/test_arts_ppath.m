@@ -45,11 +45,11 @@ Q.CLOUDBOX_DO           = false;
 Q.F_GRID                = 100e9;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
 %
-Q.WSMS_AT_START{1} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
+Q.PPATH_AGENDA          = { 'ppath_agenda__FollowSensorLosPath'   };
 %
 if do_refr
   Q.PPATH_LRAYTRACE     = 1e3;
-  Q.PPATH_STEP_AGENDA   = { 'ppath_stepRefractionBasic' };
+  Q.PPATH_STEP_AGENDA   = { 'ppath_step_agenda__RefractedPath'    };
   Q.REFR_INDEX_AGENDA   = { 'Ignore(f_grid)', ...
                             'Ignore(rte_pressure)', ...
                             'Ignore(rte_temperature)', ...
@@ -58,8 +58,7 @@ if do_refr
                             'NumericSet(refr_index,1.0)', ...
                             'NumericSet(refr_index_group,1.0)' };
 else
-  Q.WSMS_AT_START{end+1} = ...
-                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
+  Q.PPATH_STEP_AGENDA   = { 'ppath_step_agenda__GeometricPath'    };
 end
 
 Q.PPATH_LMAX            = 10e3;

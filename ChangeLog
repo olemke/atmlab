@@ -1,3 +1,23 @@
+2013-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-252
+
+	* demos/qarts_demo.m: agendas.arts now not included. All agendas
+	defined in the file.
+
+	* tests/test_arts_ppath.m:
+	* tests/test_arts_refraction.m: Updated to follow recent ARTS changes.
+
+	* demos/qarts_scattering_demo.m
+	* demos/qpack2_demo.m
+	* demos/qarts_demo2.m: Now using the new feature below.
+
+	* arts/qarts2cfile.m (add_agenda): Added a feature to more easily
+	use pre-defined agendas. If the agenda definition straing array
+	has length 1, and the string starts as name_of_agenda__, a call of
+	Copy is added instead of a definition of the agenda. That is, this
+	now works: Q.REFR_INDEX_AGENDA = { 'refr_index_agenda__GasThayer' };
+
 2013-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-251

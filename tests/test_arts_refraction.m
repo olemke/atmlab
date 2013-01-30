@@ -21,11 +21,16 @@ function test_arts_refraction( varargin )
 %- Fixed settings
 %
 Q = qarts;
-Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ) };
+Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
+                            fullfile( 'ARTS_INCLUDES', 'agendas.arts' ) };
+%
+Q.PPATH_AGENDA          = { 'ppath_agenda__FollowSensorLosPath'   };
+Q.PPATH_STEP_AGENDA     = { 'ppath_step_agenda__RefractedPath'    };
+Q.REFR_INDEX_AGENDA     = { 'refr_index_agenda__GasThayer'        };
+%
 Q.F_GRID                = 100e9;
 Q.CLOUDBOX_DO           = false;
 Q.ABS_SPECIES(1).TAG{1} = 'H2O';
-Q.PPATH_STEP_AGENDA     = { 'ppath_stepRefractionBasic' };
 refell                  = ellipsoidmodels( 'SphericalEarth' );
 re_string               = 'refellipsoidEarth( refellipsoid, "Sphere" )';
 
@@ -75,9 +80,8 @@ workfolder = create_tmpfolder;
 
 %- Define calculation part
 %
-Q.WSMS_AT_START       = { 'IndexSet(stokes_dim,1)' };
+Q.WSMS_AT_START       = { 'IndexSet(stokes_dim,1)', re_string };
 Q.WSMS_AT_END         = { 
-    re_string,  ...
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
     'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")', ...
     'VectorSet(rte_pos2,[])', ...
@@ -88,7 +92,7 @@ Q.WSMS_AT_END         = {
 %- Run ARTS for 1D, with short step length
 %
 Q.ATMOSPHERE_DIM      = 1;
-Q.PPATH_LRAYTRACE     = 10;
+Q.PPATH_LRAYTRACE     = 5;
 Q.PPATH_LMAX          = Q.PPATH_LRAYTRACE;
 %
 S = qarts2cfile( Q, { 'Generl', 'AtmSrf', 'AbsrptSave', 'CldBox', ...

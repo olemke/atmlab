@@ -1,6 +1,7 @@
 % QARTS_DEMO   A simple demonstration of Qarts
 %
-%    Gives an example on basic usage of Qarts.
+%    Gives an example on basic usage of Qarts. All agendas are defined in
+%    the file (agendas.arts not used).
 %
 %    The example simulated Odin-SMR observations around 501 GHz, but 
 %    with a simplified set-up. 
@@ -28,7 +29,6 @@ function [Q,f,y] = qarts_demo( varargin )
 Q  = qarts;
 %
 Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                            fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
                             fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
                             fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
 

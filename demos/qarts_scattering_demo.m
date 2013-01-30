@@ -68,28 +68,22 @@ Q.INCLUDES          = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 
 %= Set standard clear-sky agendas
 %
-Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
-Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
-Q.WSMS_AT_START{3} = ...
-         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
-Q.WSMS_AT_START{4} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
-Q.WSMS_AT_START{5} = ...
-                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+Q.PPATH_AGENDA               = { 'ppath_agenda__FollowSensorLosPath'   };
+Q.BLACKBODY_RADIATION_AGENDA = { 'blackbody_radiation_agenda__Planck'  };
+Q.IY_SPACE_AGENDA            = { 'iy_space_agenda__CosmicBackground'   };
+Q.IY_SURFACE_AGENDA          = { 'iy_surface_agenda__UseSurfaceRtprop' };
+Q.IY_MAIN_AGENDA             = { 'iy_main_agenda__Emission'            };
+%  
 if do_refr
-  Q.WSMS_AT_START{6} = ...
-                    'Copy(ppath_step_agenda,ppath_step_agenda__RefractedPath)';
-  Q.WSMS_AT_START{7} = 'Copy(refr_index_agenda,refr_index_agenda__GasThayer)';
+  Q.PPATH_STEP_AGENDA        = { 'ppath_step_agenda__RefractedPath'    };
+  Q.REFR_INDEX_AGENDA        = { 'refr_index_agenda__GasThayer'        };
 else
-  Q.WSMS_AT_START{6} = ...
-                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
+  Q.PPATH_STEP_AGENDA        = { 'ppath_step_agenda__GeometricPath'    };
 end
 
 %- Blackbody surface
-Q.SURFACE_RTPROP_AGENDA{1} = 'Ignore(rte_los)';
-Q.SURFACE_RTPROP_AGENDA{2} = 'InterpAtmFieldToRtePos(surface_skin_t,';
-Q.SURFACE_RTPROP_AGENDA{3} = '  atmosphere_dim,p_grid,lat_grid,lon_grid,'; 
-Q.SURFACE_RTPROP_AGENDA{4} = '  z_field,rte_pos,t_field)';
-Q.SURFACE_RTPROP_AGENDA{5} = 'surfaceBlackbody';
+Q.SURFACE_RTPROP_AGENDA      = ...
+                 { 'surface_rtprop_agenda__Blackbody_SurfTFromt_field' };
 
 
 %= General part

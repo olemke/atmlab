@@ -1815,11 +1815,15 @@ function T = add_agenda( T, agenda, strarray )
           'The agenda %s must be specified as cell array of strings.', ... %&%
                                                         upper(agenda) ) ); %&%
   end                                                                      %&%
-  T{end+1} = sprintf( 'AgendaSet(%s){', agenda );
-  for j = 1 : length(strarray)
-    T{end+1} = sprintf( '   %s', strarray{j} );
+  if length(strarray) == 1  &  ~isempty(strfind( strarray{1}, [agenda,'__'] ) )
+    T{end+1} = sprintf( 'Copy(%s,%s)', agenda, strarray{1} );  
+  else
+    T{end+1} = sprintf( 'AgendaSet(%s){', agenda );
+    for j = 1 : length(strarray)
+      T{end+1} = sprintf( '   %s', strarray{j} );
+    end
+    T{end+1} = '}';
   end
-  T{end+1} = '}';
 return
 
 
