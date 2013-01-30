@@ -1,5 +1,14 @@
 2013-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-253
+
+	* arts/arts.m: Added '-echo' to system call, in order to get the
+	output displayed directly, instead of first when the arts run is
+	completed.
+	Is this backward compatible? Tell me if you get an error due to this.
+
+2013-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-252
 
 	* demos/qarts_demo.m: agendas.arts now not included. All agendas

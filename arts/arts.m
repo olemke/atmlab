@@ -44,10 +44,11 @@ end                                                              %&%
 outdir = fileparts( cfile );
 
 if isempty( outdir )
-  [status,result] = system( sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+  [status,result] = system( ...
+                       sprintf('%s -r%d0 %s', exec, rlevel, cfile ), '-echo' );
 else
   [status,result] = system( ...
-             sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ), '-echo' );
 end
 
 
@@ -56,8 +57,5 @@ if status  &  ~errortol
   disp( result )
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')
-
-elseif nargout < 2
-  disp( result )
 end
 
