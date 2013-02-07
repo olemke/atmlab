@@ -922,7 +922,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 sat = spec;
             end
             
-            if isequal(self.firstlines, []) || ~isfield(self.firstlines, spec) || reload % load first
+            if isequal(self.firstlines, []) || ~isfield(self.firstlines, sat) || reload % load first
                 scanfile = datasets_config('firstline_data');
                 scanfile = strrep(scanfile, '$SAT', sat);
                 scanfile = strrep(scanfile, '$SENSOR', self.name);

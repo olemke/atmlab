@@ -138,16 +138,31 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                     catch ME
                         switch ME.identifier
                             case {'atmlab:invalid_data'}
-                                logtext(atmlab('ERR'), 'Unable to read %s data, skipping\n', ...
+                                logtext(atmlab('ERR'), 'Unable to read %s data, skipping and setting filler values\n', ...
                                     other_instrument);
                                 % return something of the right width
                                 flds = fieldnames(fc_other.(other_instrument).members);
-                                hasdim = structfun(@(x)(isfield(x, 'dims')), fc_other.(other_instrument).members);
-                                sz_singles = sum(~hasdim);
-                                sz_multid = sum(cellfun(@(x)(fc_other.(other_instrument).members.(x).dims{2}), flds(hasdim)));
-                                ncols = sz_singles + sz_multid;
                                 nrows = size(processed_core, 1);
-                                out_other{k}{i} = nan*zeros(nrows, ncols); %#ok<AGROW>
+
+                                for fi = 1:length(flds)
+                                    fld = flds{fi};
+                                    if ~isfield(fc_other.(other_instrument).members.(fld).atts, 'missing_value')
+                                        error(['atmlab:' mfilename ':missingmissing'], ...
+                                            ['Could not find %s.members.%s.atts.missing_value. ' ...
+                                             'Please define, I need this as a filler (see above).' ...
+                                             'Missing for the following fields: %s'], ...
+                                            fc_other.(other_instrument).name, fld, ...
+                                            sprintf('%s ', flds{cellfun(@(x) ~isfield(fc_other.(other_instrument).members.(x).atts, 'missing_value'), flds)}));
+                                    end
+                                    out_other{k}{i}(1:nrows, fc_other.(other_instrument).cols.(fld)) = ...
+                                        fc_other.(other_instrument).members.(fld).atts.missing_value;
+                                end
+%                                 hasdim = structfun(@(x)(isfield(x, 'dims')), fc_other.(other_instrument).members);
+%                                 sz_singles = sum(~hasdim);
+%                                 sz_multid = sum(cellfun(@(x)(fc_other.(other_instrument).members.(x).dims{2}), flds(hasdim)));
+%                                 ncols = sz_singles + sz_multid;
+                                %nrows = size(processed_core, 1);
+%                                 out_other{k}{i} = nan*zeros(nrows, ncols); %#ok<AGROW>
                                 continue;
                             otherwise
                                 ME.rethrow();

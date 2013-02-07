@@ -33,7 +33,8 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             %   f_cpr       struct      fields from CPR
             %
             % FIXME DOC
-            d = datasets;
+            
+            %d = datasets;
             self = self@FieldMultiInstrumentCopier(pparent, {}, varargin{:});
             
             self.parent = pparent;
@@ -41,9 +42,7 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             self.fieldcopier_other_primary.amsua = FieldCopier(self.parent, f_amsua, struct(), 'name', [self.name '_sub_amsua'], 'visible', false);
             self.fieldcopier_other_primary.hirs = FieldCopier(self.parent, f_hirs, struct(), 'name', [self.name '_sub_hirs'], 'visible', false);
 
-            self.members = catstruct(self.fieldcopier_core.members, ...
-                self.fieldcopier_other_primary.amsua.members, ...
-                self.fieldcopier_other_primary.hirs.members);
+            self.setmems();
             
             if length(fieldnames(self.members)) < (...
                     length(fieldnames(self.fieldcopier_other_primary.amsua.members)) + ...
@@ -55,6 +54,17 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             %            self.fieldstruct_mhs = f_mhs;
 %            self.fieldstruct_amsua = f_amsua;
 %            self.fieldstruct_hirs = f_hirs;
+        end
+        
+        function setmems(self)
+            self.members = catstruct(self.fieldcopier_core.members, ...
+                self.fieldcopier_other_primary.amsua.members, ...
+                self.fieldcopier_other_primary.hirs.members);
+        end
+        
+        function store(self, varargin)
+            self.setmems();
+            store@FieldMultiInstrumentCopier(self, varargin{:});
         end
         
         %% implementation of abstract methods
@@ -72,7 +82,7 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
 
             switch dsname
                 case 'amsua'
-                    [aah aaw] = size(data_other.lon);
+                    [aah, aaw] = size(data_other.lon);
                     newline = min(max(round(origline/3), 1), aah);            
                     newpos = min(max(round(origpos/3), 1), aaw);
                 case 'hirs'

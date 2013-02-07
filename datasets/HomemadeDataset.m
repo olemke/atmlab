@@ -127,6 +127,11 @@ classdef HomemadeDataset < SatDataset
             %
             % $Id$
             
+            if ~all(isfinite(data(:)))
+                warning(['atmlab:' mfilename ':format'], ...
+                    'Found nans or infs in data. Data should be finite. I''ll do my best.');
+            end
+            
             fn = self.find_granule_by_datetime(date, spec);
             
             info = optargs(varargin, {struct()});
@@ -239,6 +244,16 @@ classdef HomemadeDataset < SatDataset
                     fprintf(atmlab('OUT'), '%s ', varname);
                     
                     varid = varids(j);
+                    if any(any(~isfinite(data(:, self.cols.(varname)))))
+                        if ~isfield(self.members.(varname).atts, 'missing_value')
+                            error(['atmlab:' mfilename ':missingmissing'], ...
+                                ['I found nonfinite values for field %s, ' ...
+                                 'but no missing_value is defined for ' ...
+                                 '%s.members.%s.atts.missing_value. Please define.'], ...
+                                 varname, self.name, varname);
+                        end
+                        data(:, self.cols.(varname)) = self.members.(varname).atts.missing_value;
+                    end
                     netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
                 end
                 fprintf(atmlab('OUT'), '\n');
@@ -334,7 +349,60 @@ classdef HomemadeDataset < SatDataset
                 %n_local_cols = length(self.cols.(fld));
                 n_local_cols = size(data.(fld), 2);
                 range_local_cols = n:(n+n_local_cols-1);
-                M(:, range_local_cols) = data.(fld);
+                D = data.(fld);
+                
+                M(:, range_local_cols) = D;
+
+                % verify data validity; should be done on writing but
+                % wasn't always in the past, so still needed here
+                if any(isfield(self.members.(fld).atts, {'valid_range', 'valid_min', 'valid_max'}))
+                    if isfield(self.members.(fld).atts, 'valid_range')
+                        lo = self.members.(fld).atts.valid_range(1);
+                        hi = self.members.(fld).atts.valid_range(2);
+                    else
+                        % fallbacks
+                        if isinteger(D)
+                            getlow = @intmin;
+                            gethi = @intmax;
+                        elseif isfloat(D)
+                            getlow = @realmin;
+                            gethi = @realmax;
+                        else
+                            error(['atmlab:' mfilename ':unknown'], ...
+                                'Non-numeric type unsupported, %s is %s', fld, class(fld));
+                        end
+                        lo = getlow(class(data.(fld)));
+                        hi = gethi(class(data.(fld)));
+                        if isfield(self.members.(fld).atts, 'valid_min')
+                            lo = self.members.(fld).atts.valid_min;
+                        end
+                        if isfield(self.members.(fld).atts, 'valid_max')
+                            hi = self.members.(fld).atts.valid_max;
+                        end
+                    end
+                    % 
+                    % FIXME: test that lo < data < hi || data==missing
+                    wrong = (D < lo | D > hi);
+                    if isfield(self.members.(fld).atts, 'missing_value')
+                        wrong = wrong & (D ~= self.members.(fld).atts.missing_value);
+                    end
+                    if any(wrong)
+                        error(['atmlab:' mfilename ':invalid'], ...
+                            ['Encountered invalid data for %s at %s. Data for field %s ' ...
+                             'must be in range %g -- %g or flagged. Found ' ...
+                             'value %g instead. Perhaps an artefact from before ' ...
+                             'the proper use of flags. Suggest to recollocate.'], ...
+                             self.name, datestr(datenum(date), 'yyyy-mm-dd'), ...
+                                fld, lo, hi, D(find(wrong, 1)));
+                    end
+                end
+                    
+                % set flagged to nan
+                if isfield(self.members.(fld).atts, 'missing_value')
+                    flagged = M(:, range_local_cols) == self.members.(fld).atts.missing_value;
+                    M(all(flagged, 2), range_local_cols) = nan;
+                end
+                    
                 localcols.(fld) = range_local_cols;
                 n = n + n_local_cols;
             end

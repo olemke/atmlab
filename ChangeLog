@@ -1,3 +1,68 @@
+2013-02-07  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-258
+
+	* datasets/SatDataset.m(granule_first_line): Bugfix
+
+	* datasets/HomemadeDataset.m:
+
+	(store):
+
+	- Warn if nonfinite values are found
+	- Flag any nonfinite values with missing_value is provided
+	- Give helpful error message if missing_value needed but not given
+
+	(read_single_day):
+
+	- Check that all stored values are in [lo, hi]; if not, throw error
+
+	- Check for flagged values. Set those to nan.
+
+	* datasets/define_datasets.m:
+
+	- More conservative granule_duration for ssmt2
+
+	- Added missing_value for all HIRS fields and some others
+
+	- Increased distance for SSMT2-collocations
+
+	- Fixed valid_range for solar angles
+
+	- Adapted AssociatedPOESPlusCPR definitions using getSelection
+
+	* datasets/define_c2dp.m:
+
+	- Define more sensible valid_range for c2dp
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Look for missing_value attribute, give nice error message if not
+	there
+
+	* collocations/FieldMultiInstrumentCopier.m(process_granule):
+
+	- When an associated-dataset does not exist, set filler values. If no
+	filler value defined, give a helpful error message.
+
+	* collocations/AssociatedPOESPlusCPR.m:
+
+	(AssociatedPoesPlusCPR):
+	
+	- Use self.setmems() to set members-field, because this needs to be
+	recalculated when either of the sub-fieldcopier properties are
+	updated, e.g. to set a missing_value attribute.
+
+	(setmems):
+
+	- Update the members-field from the sub-fieldcopier members fields.
+	
+	(translate): Cosmetic change
+
+	* handy/exec_system_cmd.m:
+
+	- Do not always write to stream 1, use atmlab('OUT') instead.
+
+
 2013-02-07  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-257
