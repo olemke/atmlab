@@ -24,7 +24,7 @@ function result = xmlReadCIARecord(fid, attrlist, itype, ftype, binary, fid2)
           'Wrong number of attributes in CIARecord tag. Should be 2.');
   end
 
-  result.molecule1 = attrlist(1, 2);
-  result.molecule2 = attrlist(2, 2);
+  result.molecule1 = attrlist{1, 2};
+  result.molecule2 = attrlist{2, 2};
   result.data = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 

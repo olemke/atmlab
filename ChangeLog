@@ -1,5 +1,13 @@
 2013-02-07  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-1-255
+
+	* arts/xml/xmlWriteCIARecord.m: Add writing routine for CIARecord.
+
+	* arts/xml/xmlReadCIARecord.m: Jailbreak! Free strings from their cells.
+
+2013-02-07  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-1-254
 
 	* arts/xml/xmlReadCIARecord.m: Add reading routine for CIARecord.
