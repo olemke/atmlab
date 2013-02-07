@@ -104,6 +104,8 @@ if noStatistics
     data = tmpdata;
     return    
 end
+data.lat = lat;
+data.lon = lon;
 for F = func
     logtext(1,'Getting the statistic called "%s" within each gridcell\n',func2str(F{1}))
 end

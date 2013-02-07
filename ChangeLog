@@ -1,5 +1,14 @@
 2013-02-07  Salomon Eliasson  <seliasson@ManUtd>
 
+	* atmlab-2-1-257
+
+	* geoplots/gmt/gmt_plot.m: fixed bug is the data is gridded
+
+	* geographical/ungridded2gridded.m: Forgot to include lat and lon in the data struct
+
+
+2013-02-07  Salomon Eliasson  <seliasson@ManUtd>
+
 	* atmlab-2-1-256
 
 	* geographical/ungridded2gridded.m: 

@@ -716,14 +716,15 @@ end
 
 % DODGY GEODATA
 % make sure nothing is outside the extreme values
-index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
-if any(~index)
-    logtext(1,'Data with dodgy geodata will be ignored\n')
-    in.lat = in.lat(index);
-    in.lon = in.lon(index);
-    in.(field) = in.(field)(index);
+if ~in.gridded
+    index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
+    if any(~index)
+        logtext(1,'Data with dodgy geodata will be ignored\n')
+        in.lat = in.lat(index);
+        in.lon = in.lon(index);
+        in.(field) = in.(field)(index);
+    end
 end
-
 
 % REGION
 if ~isfield(in,'region')
