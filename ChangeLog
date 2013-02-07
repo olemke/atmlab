@@ -1,3 +1,9 @@
+2013-02-07  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-254
+
+	* arts/xml/xmlReadCIARecord.m: Add reading routine for CIARecord.
+
 2013-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-253
