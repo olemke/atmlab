@@ -714,6 +714,17 @@ if in.gridded
 
 end
 
+% DODGY GEODATA
+% make sure nothing is outside the extreme values
+index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
+if any(~index)
+    logtext(1,'Data with dodgy geodata will be ignored\n')
+    in.lat = in.lat(index);
+    in.lon = in.lon(index);
+    in.(field) = in.(field)(index);
+end
+
+
 % REGION
 if ~isfield(in,'region')
     if in.gridded
@@ -836,7 +847,7 @@ if ~isfield(in.legend,'position')
         v = [9.8 2.25-f*0.75 4.4-f*1.5 .2];
     else v = [];
     end
-    factors = {v/9 ,[4.5 -0.4 7.1 .2]/9}; %empirically good defaults for inch
+    factors = {v/9 ,[4.5 -0.2 7.1 .2]/9}; %empirically good defaults for inch
     % this is based on in.mapwidth in inches !
     default.xpos   = sprintf('%.2fi',factors{o+1}(1)*in.map_width);
     default.ypos   = sprintf('%.2fi',factors{o+1}(2)*in.map_width);

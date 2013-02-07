@@ -1,3 +1,18 @@
+2013-02-07  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-256
+
+	* geographical/ungridded2gridded.m: 
+	- Improved function by better defaults
+	- Added more options
+	-	like a user defined masking fhandle
+	-       Possibility to just return a grid of cells containing all of the original measurements in vectors after allocating them to a grid box.
+	- Better documentation
+
+	* math/binned_statistics.m: Fixed bug if you want to replace empty cells with something (e.g., NaN)
+
+	* geoplots/gmt/gmt_plot.m: Now automatically internally skips data that has dodgy lat-lons before plotting 
+
 2013-02-07  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-255

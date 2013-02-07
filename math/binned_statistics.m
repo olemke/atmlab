@@ -65,8 +65,7 @@ if exist('replace','var')
                     ['replace  value "%f" is not the same class as data_bins\n',...
                     'E.g. this means you cannot call cell2mat without an error'],replace)
             end
-            % this still won't work for [0xn] cells
-            out.(F{1}){test}=replace;
+            out.(F{1})(test)={replace};
         end
     end
 end
