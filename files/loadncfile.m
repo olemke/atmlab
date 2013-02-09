@@ -12,7 +12,7 @@
 % OUT   ret        Loaded NetCDF file structure.
 % IN    filename   Name of NetCDF file. (can be gzipped)
 
-% 2012-04-10   Updated by Salomon
+% 2013-02-08   Updated by Salomon
 % 2010-02-10   Created by Oliver Lemke.
 
 function ret = loadncfile( filename )
@@ -30,13 +30,9 @@ ncid = netcdf.open (filename, 'NOWRITE');
 
 cleanupObject = onCleanup(@() netcdf.close (ncid));
 
-[~,nvars,ngatts] = netcdf.inq(ncid);
+ret.global_attributes =  loadncglobalattr( ncid );
 
-for i = 0:ngatts-1
-   attname = netcdf.inqAttName (ncid, -1, i);
-   ret.global_attributes.(genvarname(attname)) = ...
-       netcdf.getAtt (ncid, -1, attname);
-end
+[~,nvars] = netcdf.inq(ncid);
 
 for i = 0:nvars-1
    [varname, ~, ~, natts] = netcdf.inqVar (ncid, i);

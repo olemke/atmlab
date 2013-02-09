@@ -43,6 +43,10 @@ SatDataset('name', 'calipso', ...
     'reader', @common_read_calipso, ...
     'granule_duration', 5932);
 
+SatDataset('name','cloud_cci',...
+    'reader', @common_read_cloud_cci, ...
+    'granule_duration',7200);
+
 SatDataset('name', 'cpr', ...
     'satname', 'cloudsat', ...
     'reader', @common_read_cpr, ...
@@ -450,21 +454,27 @@ CollocatedDataset(D.avhrr_cmsaf_gac, D.dardarsub,...
     'distance', 5, ...
     'interval', 300);
 
+% calipso is a 5km product and must therefore be the primary dataset
+CollocatedDataset(D.calipso, D.dardarsub,...
+    'name', 'CollocatedDataset_calipso_dardarsub', ...
+    'distance', 5, ...
+    'interval',180);
+
 CollocatedDataset(D.cmoiwp_v0_6, D.dardarsub,...
     'name','CollocatedDataset_cmoiwp_v0_6_dardarsub',...
     'distance', 15, ...
     'interval', 900);
+
+CollocatedDataset(D.cloud_cci, D.dardarsub,...
+    'name','CollocatedDataset_cloud_cci_dardarsub',...
+    'distance', 5, ...
+    'interval', 300);
 
 CollocatedDataset(D.cmoiwp_v0_4, D.dardarsub,...
     'name','CollocatedDataset_cmoiwp_v0_4_dardarsub',...
     'distance', 15, ...
     'interval', 900);
 
-% calipso is a 5km product and must therefore be the primary dataset
-CollocatedDataset(D.calipso, D.dardarsub,...
-    'name', 'CollocatedDataset_calipso_dardarsub', ...
-    'distance', 5, ...
-    'interval',180);
 
 CollocatedDataset(D.dardarsub, D.modis_aqua_L2,...
     'name', 'CollocatedDataset_dardarsub_modis', ...
@@ -664,6 +674,29 @@ f_cpr.RVOD_ice_water_path.atts.missing_value = -3333;
 % dependencies
 f_cpr.Cloud_Types.dependenacies     = getSelection(f_cpr,fieldnames(f_cpr),{'cloud_scenario'});
 
+% ----------
+% cloud_cci
+% ----------
+f_cloud_cci.cwp.type               = 'short'; % int16
+f_cloud_cci.cwp.atts.long_name     = 'cloud liquid water path';
+f_cloud_cci.cwp.atts.units         = 'g/m2';
+f_cloud_cci.cwp.atts.description   = 'atmosphere_mass_content_of_cloud_liquid_water';
+f_cloud_cci.cwp.atts.missing_value = -32767;
+f_cloud_cci.phase.type                 = 'byte'; %int8
+f_cloud_cci.phase.atts.long_name       = 'cloud phase flag';
+f_cloud_cci.phase.atts.units           = '';
+f_cloud_cci.phase.atts.missing_value   =-127;
+f_cloud_cci.phase.atts.description     = ['thermodynamic_phase_of_cloud_water_particles_at_cloud_top'...
+                                    '[0 1 2] means clear/unknown liquid ice'];
+f_cloud_cci.iwp.type               = 'short';
+f_cloud_cci.iwp.atts.long_name      = 'ice water path';
+f_cloud_cci.iwp.atts.units         = 'g/m^2';
+f_cloud_cci.iwp.atts.description   = ['cloud ice water path from AVHRR ' ...
+                                      'solar reflectance channels'];
+f_cloud_cci.iwp.atts.missing_value = -32767;
+f_cloud_cci.iwp.dependenacies      = ...
+    catstruct(getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'cwp'}),...
+    getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'phase'}));
 
 % -----------
 % DARDAR_SUB
@@ -706,7 +739,7 @@ f_dardarsub.VOD_ERROR.type              = 'float';
 f_dardarsub.VOD_ERROR.atts.long_name    = 'visible optical depth error';
 f_dardarsub.VOD_ERROR.atts.unit         = 'dimless';
 f_dardarsub.VOD_ERROR.atts.description  = 'Visible optical depth error';
-% for theose that have dependencies
+% for those that have dependencies
 f_dardarsub.dardar_IWP.dependenacies            = ...
     catstruct(getSelection(f_dardarsub,fieldnames(f_dardarsub),{'IWC'}),...
     getSelection(f_dardarsub,fieldnames(f_dardarsub),{'HEIGHT'}));
@@ -975,6 +1008,11 @@ FieldCopier(D.collocation_ssmt2_amsub, f_ssmt2, f_amsub, ...
 FieldCopier(D.collocation_ssmt2_mhs, f_ssmt2_1, f_ssmt2_2, ...
     'name', 'associated_ssmt2_ssmt2');
 
+FieldCopier(D.CollocatedDataset_cloud_cci_dardarsub, ...
+    getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'iwp'}),...
+    getSelection(f_dardarsub,fieldnames(f_dardarsub),{'dardar_IWP'}),...
+    'name','cloud_cci_dardarsub');
+
 FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
     getSelection(f_cpr,fieldnames(f_cpr),{'Cloud_Types'}),struct(),...
     'name','cpr_dardarsub_cloudTypes');
@@ -1015,10 +1053,15 @@ D = datasets;
 % --------------
 % LIMITERS
 % ------------ 
-global_lims = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
+           
+limitators = {@(X)(X>=0)};    
+
+% ----------
+% MHS -CPR
+% ----------
+mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
                @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
 
-limitators = {@(X)(X>=0)};           
 appccs.ROIWP.limitators = limitators; % not flagged
 appccs.ROIWP.processors.NO = @length;
 appccs.ROIWP.stored.NO.type = 'int';
@@ -1050,31 +1093,78 @@ closest.fn = @(x)(x); %workaround, see this collapser
 closest.ln = 'Only the closest modis pixel';
 closest.ty = 'double';
 modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)==min(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)))};
-modis.modis_IWP.processors.CLOSEST          = closest.fn;
-modis.modis_IWP.stored.CLOSEST.long_name    = closest.ln;
-modis.modis_IWP.stored.CLOSEST.type         = closest.ty;
-modis.modis_IWP.limitators                  = limitators;
-modis.Re_ice.processors.CLOSEST         = closest.fn;
-modis.Re_ice.stored.CLOSEST.long_name   = closest.ln;
-modis.Re_ice.stored.CLOSEST.type        = closest.ty;
-modis.Re_ice.limitators                 = limitators;
-modis.Tau_ice.processors.CLOSEST        = closest.fn;
-modis.Tau_ice.stored.CLOSEST.long_name  = closest.ln;
-modis.Tau_ice.stored.CLOSEST.type       = closest.ty;
-modis.Tau_ice.limitators                = limitators;
+modis.modis_IWP.atts = f_modis.modis_IWP.atts;
+modis.modis_IWP.processors.CLOSEST               = closest.fn;
+modis.modis_IWP.stored.CLOSEST.atts.long_name    = closest.ln;
+modis.modis_IWP.stored.CLOSEST.atts.unit         = 'g/m^2';
+modis.modis_IWP.stored.CLOSEST.type              = closest.ty;
+modis.modis_IWP.limitators                       = limitators;
+modis.Re_ice.atts = f_modis.Re_ice.atts;
+modis.Re_ice.processors.CLOSEST                  = closest.fn;
+modis.Re_ice.stored.CLOSEST.atts.long_name       = closest.ln;
+modis.Re_ice.stored.CLOSEST.atts.unit            = 'micron';
+modis.Re_ice.stored.CLOSEST.type                 = closest.ty;
+modis.Re_ice.limitators                          = limitators;
+modis.Tau_ice.atts = f_modis.Tau_ice.atts;
+modis.Tau_ice.processors.CLOSEST                 = closest.fn;
+modis.Tau_ice.stored.CLOSEST.atts.long_name      = closest.ln;
+modis.Tau_ice.stored.CLOSEST.atts.unit           = 'none';
+modis.Tau_ice.stored.CLOSEST.type                = closest.ty;
+modis.Tau_ice.limitators                         = limitators;
+
+% -------
+% cloud_cci
+% -------
+NO.fn       = @length;
+NO.ln       = 'number of small footprints associated with big footprint';
+NO.ty       = 'byte'; % so not more than 127 footprints
+MEAN.fn     = @mean;
+MEAN.ln     = 'mean of small footprints inside large';
+MEAN.ty     = 'double';
+STD.fn      = @std;
+STD.ln      = 'std of small footprints inside large';
+STD.ty      = 'double';
+CF.fn       = @(x)(sum(x>0)/length(x));
+CF.ln       = 'Fraction of non-zero small footprint measurements in large footprint';
+CF.ty       = 'double';
+gac_global = {@(X)(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)==min(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)))};
+
+cloud_cci.iwp.atts = f_cloud_cci.iwp.atts;
+cloud_cci.iwp.limitators            = limitators;
+cloud_cci.iwp.processors.NO         = NO.fn;
+cloud_cci.iwp.NO.atts.long_name     = NO.ln;
+cloud_cci.iwp.NO.type               = NO.ty;
+cloud_cci.iwp.processors.MEAN       = MEAN.fn;
+cloud_cci.iwp.MEAN.atts.long_name   = MEAN.ln;
+cloud_cci.iwp.MEAN.atts.unit        = 'g/m^2';
+cloud_cci.iwp.MEAN.type             = MEAN.ty;
+cloud_cci.iwp.processors.STD        = STD.fn;
+cloud_cci.iwp.STD.atts.long_name    = STD.ln;
+cloud_cci.iwp.STD.atts.unit         = 'g/m^2';
+cloud_cci.iwp.STD.type              = STD.ty;
+cloud_cci.iwp.processors.CF         = CF.fn;
+cloud_cci.iwp.CF.atts.long_name     = CF.ln;
+cloud_cci.iwp.CF.atts.unit          = 'g/m^2';
+cloud_cci.iwp.CF.type               = CF.ty;
+
+
+
 % -------------------
 % COLLAPSED DATASETS
 % --------------------
 D = datasets;
 
-Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, global_lims, ...
+Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, mw_global, ...
     'name', 'collapsed_associated_CPR_MHS_AMSU_HIRS');
 
-Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, global_lims, ...
+Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, mw_global, ...
     'name', 'collapsed_associated_CPR_AMSUB_AMSUA_HIRS');
 
 Collapser(D.dardarsub_modis_IWP,modis,modis_global, ...
     'name','dardarsub_modis_IWP_mean');
+
+Collapser(D.cloud_cci_dardarsub,cloud_cci,gac_global, ...
+    'name','cloud_cci_dardarsub_collapsed');
 
 % this one uses some subfunctions, so is defined in its own file
 define_c2dp();

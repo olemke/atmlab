@@ -16,16 +16,15 @@
 % FORMAT   [ret, attr] = loadncvar( filename, varname )
 %
 % OUT   ret        Loaded variable.
-% OUT   attr       Global attributes.
+% OUT   attr       structure containting attributes of the read data.
 % IN    filename   Name of NetCDF file.
 %       varname    Name of variable.
 
 % 2010-02-02   Created by Oliver Lemke.
 % 2010-10-11   Modified by Gerrit Holl.
-% 2010-11-22   Modified by Salomon Eliasson.
 % 2012-01-30   Modified by Gerrit Holl.
 % 2012-02-23   Modified by Gerrit Holl.
-% 2012-10-18   Modified by Salomon Eliasson.
+% 2013-02-08   Modified by Salomon Eliasson.
 
 function [ret, attr] = loadncvar( filename, varname )
 
@@ -43,7 +42,7 @@ ncid = netcdf.open (filename, 'NOWRITE');
 cleanupObject = onCleanup( @() netcdf.close (ncid) );
 
 if (nargout>1)
-    attr = getncattributes (ncid);
+    attr = loadncattr (ncid, varname);
 else
     attr = [];
 end

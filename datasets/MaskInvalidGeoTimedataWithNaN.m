@@ -43,7 +43,8 @@ if any(~(index(:))) || any(~tindex)
             'Removing %d data values (%.2f%%) due to invalid (lat, lon, or time) \n',...
             sum(~index(:)),100*sum(~index(:))/length(index(:)))
     end
-    for F = fieldnames(S)'
+    %for F = fieldnames(S)'
+    for F = {'time','lat','lon'} % I can't be garanteed that the data is atleast single (to fit NaN)
         if strcmp(F{1},'time')
             S.time(~tindex)     = NaN;
             continue

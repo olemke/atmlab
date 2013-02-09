@@ -1,3 +1,34 @@
+2013-02-09  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-259
+
+	* files/loadncattr.m: Added function dedicated for extracting
+	only the attributes for the variables you are interested in. if
+	no variable names are given, the attributes of all the variables
+	in the netcdf file are retrieved.
+
+	* files/loadncglobalattr.m: Added function dedicated for extracting
+	only the global attributes of a netcdf file. This is very similar to
+       getncattributes.m that may or may not disappear as a consequence.
+
+	* files/loadncfile.m: use the newly created loadncglobalattr.m to
+	load the global attributes
+
+	* files/loadncvar.m: Output the attributes for the read variables
+	instead of the global attributes if nargout ==2
+
+	* handy/sanitise.m: Added "&" to list of symbols to be sanitised
+
+	* datasets/common_read_cloud_cci.m: Added reader for new dataset.
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m: Only put the NaNs in
+	the time, lat, lon data fields since the other fields may have data
+       types might not support NaNs
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m:
+	Added cloud_cci, a fieldcopier and a collapser. Added attributes to the old modis collapser
+
 2013-02-07  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-258
@@ -76,16 +107,19 @@
 
 	* atmlab-2-1-256
 
-	* geographical/ungridded2gridded.m: 
+	* geographical/ungridded2gridded.m:
 	- Improved function by better defaults
 	- Added more options
 	-	like a user defined masking fhandle
-	-       Possibility to just return a grid of cells containing all of the original measurements in vectors after allocating them to a grid box.
+	-       Possibility to just return a grid of cells containing all
+	of the original measurements in vectors after allocating them to a
+	grid box.
 	- Better documentation
 
 	* math/binned_statistics.m: Fixed bug if you want to replace empty cells with something (e.g., NaN)
 
-	* geoplots/gmt/gmt_plot.m: Now automatically internally skips data that has dodgy lat-lons before plotting 
+	* geoplots/gmt/gmt_plot.m: Now automatically internally skips data
+	that has dodgy lat-lons before plotting
 
 2013-02-07  Oliver Lemke  <olemke@core-dump.info>
 
