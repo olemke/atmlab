@@ -15,7 +15,7 @@ function [ret, gattr] = arts_nc_read_arrayofmatrix (filename)
 
 ncid = netcdf.open (filename, 'NOWRITE');
 
-gattr = getncattributes (ncid);
+gattr = loadncglobalattr (filename);
 
 varid = netcdf.inqVarId (ncid, 'Matrix_nrows');
 nr = netcdf.getVar (ncid, varid);

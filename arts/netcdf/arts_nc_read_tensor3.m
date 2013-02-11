@@ -13,5 +13,7 @@
 
 function [ret, gattr] = arts_nc_read_tensor3 (filename)
 
-[v, gattr] = loadncvar (filename, 'Tensor3', true);
+gattr = loadncglobalattr2cell (ncid);
+
+v = loadncvar (filename, 'Tensor3');
 ret = permute (v, [3 2 1]);

@@ -42,6 +42,7 @@ end
 isstr=~iscell(inVars); % if only one varname is given
 if isstr, inVars={inVars}; end
 
+attributes = struct();
 for i = 0:nvars-1
     [varname, ~, ~, natts] = netcdf.inqVar (ncid, i);
     svarname = genvarname(varname);

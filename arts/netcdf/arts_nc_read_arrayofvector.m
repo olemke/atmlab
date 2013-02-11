@@ -15,7 +15,7 @@ function [ret, gattr] = arts_nc_read_arrayofvector (filename)
 
 ncid = netcdf.open (filename, 'NOWRITE');
 
-gattr = getncattributes (ncid);
+gattr = loadncglobalattr (filename);
 
 varid = netcdf.inqVarId (ncid, 'Vector_nelem');
 nv = netcdf.getVar (ncid, varid);

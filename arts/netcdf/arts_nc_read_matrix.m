@@ -13,5 +13,8 @@
 
 function [ret, gattr] = arts_nc_read_matrix (filename)
 
-[v, gattr] =loadncvar (filename, 'Matrix', true);
+gattr = loadncglobalattr (filename);
+
+v = loadncvar (filename, 'Matrix');
+
 ret = v';

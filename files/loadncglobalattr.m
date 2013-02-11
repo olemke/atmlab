@@ -34,8 +34,10 @@ end
 
 [~,nvars,ngatts] = netcdf.inq(ncid);
 
+global_attributes = struct();
 for i = 0:ngatts-1
-   attname = netcdf.inqAttName (ncid, -1, i);
+   attname = netcdf.inqAttName (ncid, netcdf.getConstant('GLOBAL'), i);
    global_attributes.(genvarname(attname)) = ...
-       netcdf.getAtt (ncid, -1, attname);
+       netcdf.getAtt (ncid, netcdf.getConstant('GLOBAL'), attname);
 end
+

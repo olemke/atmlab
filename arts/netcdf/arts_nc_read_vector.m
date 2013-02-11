@@ -13,4 +13,6 @@
 
 function [ret, gattr] = arts_nc_read_vector (filename)
 
-[ret, gattr] = loadncvar (filename, 'Vector', true);
+gattr = loadncglobalattr (filename);
+
+ret = loadncvar (filename, 'Vector');

@@ -13,6 +13,8 @@
 
 function [ret, gattr] = arts_nc_read_tensor4 (filename)
 
-[v, gattr] = loadncvar (filename, 'Tensor4', true);
+gattr = loadncglobalattr (filename);
+
+v = loadncvar (filename, 'Tensor4');
 d = size(v);
 ret = permute (reshape (v, [d(2) d(3) d(4) d(1)]), [4 3 2 1]);
