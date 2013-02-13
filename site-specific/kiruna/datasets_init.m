@@ -38,12 +38,16 @@ D.cpr.subdir = '$YEAR4/$DOY';
 D.cpr.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_(?<granule_number>\d{5})_CS_(?<product_name>[\dA-Z\-]*)_(?<subset>[A-Z]*)_(?<id>[A-Z])_(?<release>R[0-9]{2})_(?<epoch>E\d{2})(?<end>\.hdf.zip)';
 
 D.CPR_RVOD.basedir = '/storage3/data/cloudsat/2B-CWC-RVOD.R04';
-D.CPR_RVOD.subdir = '$YEAR4/$DOY';
+D.CPR_RVOD.subdir = D.cpr.subdir;
 D.CPR_RVOD.re = D.cpr.re;
 
 D.cprCldclass.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
-D.cprCldclass.subdir = '$YEAR4/$DOY';
+D.cprCldclass.subdir = D.cpr.subdir;
 D.cprCldclass.re = D.cpr.re;
+
+D.CPR_2C_ICE.basedir = '/storage5/data/cloudsat/2C-ICE.R04';
+D.CPR_2C_ICE.subdir = D.cpr.subdir;
+D.CPR_2C_ICE.re = D.cpr.re;
 
 D.dardar.basedir = '/storage3/data/dardar';
 D.dardar.subdir = '$YEAR4/$YEAR4_$MONTH_$DAY';
@@ -347,6 +351,10 @@ D.cpr_dardarsub_IWP.subdir      = '$YEAR4/$MONTH/$DAY';
 D.cpr_dardarsub_cloudTypes.basedir  = strrep(D.cpr_dardarsub_IWP.basedir,'IWP','cloudTypes');
 D.cpr_dardarsub_cloudTypes.filename = D.cpr_dardarsub_IWP.filename;
 D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
+
+D.fields_2C_ice_dardarsub.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/2C-ICE_dardarsub';
+D.fields_2C_ice_dardarsub.filename = 'fieldcopier_2C-ICE_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
+D.fields_2C_ice_dardarsub.subdir   = D.cpr_dardarsub_IWP.subdir;
 
 D.mhs_dardarsub.basedir    = strrep(D.CollocatedDataset_mhs_dardarsub.basedir,'core',D.mhs_dardarsub.name);
 D.mhs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';

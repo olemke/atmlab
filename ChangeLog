@@ -1,3 +1,10 @@
+2013-02-13  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-262
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m: Added CPR_2C-ICE and a fieldcopier
+
 2013-02-13  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-261
