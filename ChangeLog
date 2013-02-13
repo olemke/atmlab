@@ -1,3 +1,13 @@
+2013-02-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-263
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Fixed bug related to reflat. Coincidentally, the code is simplified
+	too. Should now treat all combinations of core and additional existing
+	or not for either primary or secondary.
+
 2013-02-13  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-262

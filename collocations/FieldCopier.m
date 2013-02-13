@@ -203,8 +203,12 @@ classdef FieldCopier < AssociatedDataset
             dimsizes = struct();
             % other datasets that may be required (structs filled as needed)
             D = datasets();
+            % `also_read` keeps track of fields that need to be read from
+            % sibling-datasets for the primary and the secondary,
+            % respectively
             also_read = {struct(), struct()};
             dat_other = {struct(), struct()};
+            reflat = {[], []};
             % will loop through all the names in total 3 times...
             % in the first loop, check:
             % - what names should be used to read
@@ -216,6 +220,8 @@ classdef FieldCopier < AssociatedDataset
                 if ~isfield(self.members.(fieldnam), 'realname')
                     self.members.(fieldnam).realname = fieldnam;
                 end
+                % if it has a 'dataset' defined, the field may be from a
+                % sibling-dataset
                 if isfield(self.members.(fieldnam), 'dataset')
                     ds = self.members.(fieldnam).dataset;
                     if i <= n_inprim
@@ -240,20 +246,32 @@ classdef FieldCopier < AssociatedDataset
                             fieldnam, self.members.(fieldnam).realname, ds.name);
                         also_read{j}.(ds.name) = [also_read{j}.(ds.name) self.members.(fieldnam).realname];
                     end
-                end
-            end
-            % read what shall also be read
+                end % end of `if field from sibling`
+            end % end of loop through all fields
+            
+            % Loop through primary, secondary to do two things:
+            % - read siblings, if any
+            % - set reflat:
+            % Later, we may need to reshape some fields, for example if
+            % they have more than one measurement per footprint. Therefore,
+            % we need to know the number of scanlines and the number of
+            % measurements per scanline. For this, we use the field `lat`
+            % because it should always be there and have exactly one value
+            % per footprint.
+
             for j = 1:2
                 if j == 1
                     dt = date1;
                     spc = spec1;
+                    dat = data1; % for setting reflat
                 else
                     dt = date2;
                     spc = spec2;
+                    dat = data2;
                 end
-                dsets_to_read = fieldnames(also_read{j});
-                for k = 1:length(dsets_to_read)
-                    dsnm = dsets_to_read{k};
+                siblings_to_read = fieldnames(also_read{j});
+                for k = 1:length(siblings_to_read)
+                    dsnm = siblings_to_read{k};
                     % read fields from this dataset as indicated by
                     % also_read{j}.(dataset_name)
                     logtext(atmlab('OUT'), ...
@@ -296,10 +314,35 @@ classdef FieldCopier < AssociatedDataset
                                 ME.rethrow();
                         end
                     end
+                    % if this sibling has a reflat, store it in case we
+                    % need it later
+                    if isfield(dat_other{j}.(dsnm), 'lat')
+                        % verify that no different reflat already there
+                        if ~isempty(reflat{j}) && ~isequaln(reflat{j}, dat_other{j}.(dsnm).lat)
+                            error(['atmlab:' mfilename ':reflat'], ...
+                                ['Inconsistent latitude-fields between ' ...
+                                 'sibling-datasets!']);
+                        end
+                        reflat{j} = dat_other{j}.(dsnm).lat;
+                    end
+                end % loop through all siblings to read for prim or sec
+                
+                if isfield(dat, 'lat')
+                    if ~isempty(reflat{j}) && ~isequaln(reflat{j}, dat.lat)
+                        error(['atmlab:' mfilename ':reflat'], ...
+                            ['Inconsistent latitude-fields in core vs. ' ...
+                             'sibling-dataset!']);
+                    end
+                    reflat{j} = dat.lat;
                 end
-            end
-            % read all
-            % in the second loop, check sizes etc.
+            end % loop through primary, secondary
+            
+            % now all needed datasets have been read
+            
+            % In the second loop, we reshape data so that they all have
+            % a dimension equal to the number of scan positions, and we
+            % collect dimension data for other fields
+
             for i = 1:length(allnames)
                 fieldnam = allnames{i};
                 if i<=n_inprim
@@ -309,21 +352,21 @@ classdef FieldCopier < AssociatedDataset
                     dat = data2;
                     j = 2;
                 end
-                if isempty(fieldnames(dat))
-                    logtext(atmlab('OUT'), 'No fields from either primary or secondary, hopefully sibling has same number of lats\n');
-                    % test if they both are there. If there is no primary
-                    % or secondary dataset, on e will be empty
-                    testE = [~isempty(fieldnames(dat_other{1})) ~isempty(fieldnames(dat_other{2}))];
-                    if all(testE)
-                        reflat = cellfun(@(x) x.(self.members.(fieldnam).dataset.name).lat, dat_other, 'UniformOutput', false);
-                    else
-                        reflat = {dat_other{testE}.(self.members.(fieldnam).dataset.name).lat};
-                        % workaround since relat{2} is called for later on
-                        reflat(2) = reflat;
-                    end
-                else
-                    reflat = {data1.lat, data2.lat};
-                end
+%                 if isempty(fieldnames(dat))
+%                     logtext(atmlab('OUT'), 'No fields from either primary or secondary, hopefully sibling has same number of lats\n');
+%                     % test if they both are there. If there is no primary
+%                     % or secondary dataset, on e will be empty
+%                     testE = [~isempty(fieldnames(dat_other{1})) ~isempty(fieldnames(dat_other{2}))];
+%                     if all(testE)
+%                         reflat = cellfun(@(x) x.(self.members.(fieldnam).dataset.name).lat, dat_other, 'UniformOutput', false);
+%                     else
+%                         reflat = {dat_other{testE}.(self.members.(fieldnam).dataset.name).lat};
+%                         % workaround since relat{2} is called for later on
+%                         reflat(2) = reflat;
+%                     end
+%                 else
+%                     reflat = {data1.lat, data2.lat};
+%                 end
                 n_scanlines = size(reflat{j}, 1);
                 n_scanpos = size(reflat{j}, 2);
                 
@@ -393,10 +436,10 @@ classdef FieldCopier < AssociatedDataset
             r2 = processed_core(:, self.parent.cols.LINE2);
             c1 = processed_core(:, self.parent.cols.POS1);
             c2 = processed_core(:, self.parent.cols.POS2);
-            if (self.needs_primary_data() || ~isempty(fieldnames(dat_other{j})))
+            if (self.needs_primary_data() || ~isempty(fieldnames(dat_other{1})))
                 i1 = sub2ind(size(reflat{1}), r1, c1);
             end
-            if (self.needs_secondary_data() || ~isempty(fieldnames(dat_other{j})))
+            if (self.needs_secondary_data() || ~isempty(fieldnames(dat_other{2})))
                 i2 = sub2ind(size(reflat{2}), r2, c2);
             end
             
