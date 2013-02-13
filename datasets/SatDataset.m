@@ -297,6 +297,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % Database of starting times for datasets where those are not
         % clear from the filename.
         starttimes
+        
+        % Field that can be a structure for arbitrary metadata, such as
+        % height, channel definitions, or anything. This is not used within
+        % the framework of atmlab, but can be used by the user for
+        % anything.
+        metadata;
 
         % defaults cannot be set in any subclass, because re-defining a
         % property is not allowed except under special circumstances that

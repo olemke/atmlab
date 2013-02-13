@@ -1,5 +1,19 @@
 2013-02-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-264
+
+	* datasets/SatDataset.m:
+
+	- Add property `metadata`, that can be used for arbitrary information.
+	It's not used by the toolkit.
+
+	* datasets/common_read_netcdf_dataset.m:
+
+	- Make clear that this is only for reading *homegrown* netcdf
+	datasets.
+
+2013-02-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-263
 
 	* collocations/FieldCopier.m(process_granule):

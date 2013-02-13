@@ -1,5 +1,5 @@
 function S = common_read_netcdf_dataset(ds, file, varargin)
-    % read netcdf-stored dataset such as dardarsub, CMIWP, ...
+    % read homegrown netcdf-stored dataset such as dardarsub, CMIWP, ...
     %
     % format as other common_read_-functions.
     %
