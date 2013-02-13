@@ -1,3 +1,11 @@
+2013-02-13  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-261
+
+	* files/loadncvar.m: Un-broke backward compatibility for those
+	that want the global attributes as the second output argument.
+	new usage; [data,globalAtt,variableAtt] = loadncvar(file/ncid,varnames)
+
 2013-02-11  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-260

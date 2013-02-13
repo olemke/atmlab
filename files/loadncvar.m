@@ -4,8 +4,8 @@
 %    file. varname can be either a string to load one variable or a cell
 %    array of several variable names.
 %
-%    When multiple varnames are given the return value is a structure
-%    containing the loaded variables.
+%    When multiple varnames are given (or if a single varname is given in a cell)
+%    the return value is a structure containing the loaded variables.
 %
 %    lat = loadncvar( 'mydata.nc', 'lat');
 %    grid = loadncvar( 'mydata.nc', { 'lat', 'lon' } );
@@ -16,6 +16,7 @@
 % FORMAT   [ret, attr] = loadncvar( filename, varname )
 %
 % OUT   ret        Loaded variable.
+% OUT   glattr     structure containting attributes of the read data.
 % OUT   attr       structure containting attributes of the read data.
 % IN    filename   Name of NetCDF file.
 %       varname    Name of variable.
@@ -24,9 +25,9 @@
 % 2010-10-11   Modified by Gerrit Holl.
 % 2012-01-30   Modified by Gerrit Holl.
 % 2012-02-23   Modified by Gerrit Holl.
-% 2013-02-08   Modified by Salomon Eliasson.
+% 2013-02-13   Modified by Salomon Eliasson.
 
-function [ret, attr] = loadncvar( filename, varname )
+function [ret, glattr, attr] = loadncvar( filename, varname )
 
 errId = ['atmlab:' mfilename];
 % UNCOMPRESS if needed
@@ -39,13 +40,20 @@ end
 
 ncid = netcdf.open (filename, 'NOWRITE');
 
-cleanupObject = onCleanup( @() netcdf.close (ncid) );
+cleanupObject = onCleanup( @()netcdf.close(ncid) );
 
 if (nargout>1)
-    attr = loadncattr (ncid, varname);
+    glattr = loadncglobalattr(ncid);
+else
+    glattr = [];
+end
+
+if (nargout>2)
+    attr = loadncattr(ncid,varname);
 else
     attr = [];
 end
+
 
 if ischar(varname)
     varid = netcdf.inqVarID (ncid, varname);
