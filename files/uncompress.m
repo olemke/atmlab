@@ -17,7 +17,9 @@ function filename = uncompress(compfile,varargin)
 %                           Empty if the file was never uncompressed.
 %
 % NOTE
-%           Known compression formats are .gz, .zip, and .bz2
+%           - Known compression formats are .gz, .zip, and .bz2
+%           - BEWARE: If the input file "compfile" is not uncompressed by this
+%           function (not recognised as a compressed file), filename = compfile.
 %
 % Salomon Eliasson and others
 % $Id$

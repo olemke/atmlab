@@ -179,11 +179,7 @@ classdef HomemadeDataset < SatDataset
             warning('off', 'catstruct:DuplicatesFound');
             global_atts = catstruct(global_atts, info);
             warning('on', 'catstruct:DuplicatesFound');
-            % convert to cell-array
-            global_atts_cell = mat2cell([fieldnames(global_atts) struct2cell(global_atts)], ...
-                ones(1, length(fieldnames(global_atts))), 2).';
-            addncattributes(ncid, global_atts_cell);
-            
+
             %% define variables, variable attributes, additional dimensions
             
             vars = fieldnames(self.cols);
@@ -330,10 +326,6 @@ classdef HomemadeDataset < SatDataset
                 end
             else
                 [data, attr] = loadncvar(tmp, fields);
-                % convert from cell-array of 2x1 cells to struct...
-                if ~isstruct(attr)
-                    X = [attr{:}]; attr = struct(X{:});
-                end
             end
             
             % find n. of columns to allocate, keep order
@@ -424,10 +416,8 @@ classdef HomemadeDataset < SatDataset
             
             fields  = optargs(varargin, {{}});
             
-            [S, attr] = loadncvar(file, fields);
-            C(1:2*length(attr)) = deal([attr{:}]);
-            strattr = struct(C{:});
-            
+            [S, strattr] = loadncvar(file, fields);
+           
             % get additional stuff
             info = self.find_info_from_granule(file);
             

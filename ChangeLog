@@ -1,3 +1,19 @@
+2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-265
+
+	* files/uncompress.m: Added some more help text
+
+	* sensors/ssmt2_read_ngdc.m:
+	* datasets/HomemadeDataset.m:
+	Adapted to the ncattributes being structures and not cells
+
+	* datasets/define_datasets.m:
+	- Added height as metadata to dardar_subsel since this is the same
+	in all granules that I tested and therefore does not need to be
+	repeated.
+	- Added some missing_values
+
 2013-02-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-264

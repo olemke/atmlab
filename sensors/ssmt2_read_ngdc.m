@@ -61,11 +61,7 @@ switch nargin
     case 1
         S = loadncfile(ncfile);
     case 2
-        [S, attr] = loadncvar(ncfile, fields);
-        % add equivalent structure for compatibility
-        X = [attr{:}];
-        X(1:2:end) = cellfun(@genvarname, X(1:2:end), 'UniformOutput', false);
-        S.global_attributes = struct(X{:});
+        [S, S.global_attributes] = loadncvar(ncfile, fields);
     otherwise
         error(['atmlab:' mfilename], 'I can''t possibly be here!');
 end
