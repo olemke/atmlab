@@ -1,3 +1,18 @@
+2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-270
+
+	* datasets/common_read_dardarsub.m: Adapted to the height vector
+	no longer being included in the data, but instead a part of the
+	meta-data of the defined dataset.
+
+	* datasets/common_read_cloud_cci.m: Adapted to new loadncvar conventions
+
+	* datasets/define_datasets.m: Added missing attributes for all
+	considered variables.
+
+	* datasets/HomemadeDataset.m: Fixed error in last commit by me
+
 2013-02-14  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-269

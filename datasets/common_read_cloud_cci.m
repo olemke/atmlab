@@ -88,7 +88,8 @@ switch field
         dependent_fields = {'cwp','phase'};
         rmflag = ~ismember(dependent_fields,fieldnames(S));
         for F = dependent_fields
-            [S.(F{1}),attr] = loadncvar(file, F{1});
+            S.(F{1}) = loadncvar(file, F{1}); 
+            attr = loadncattr(file, F{1});
             S.(F{1}) = (S.(F{1})*double(attr.scale_factor))+double(attr.add_offset);
         end
 end

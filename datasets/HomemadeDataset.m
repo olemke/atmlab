@@ -179,7 +179,8 @@ classdef HomemadeDataset < SatDataset
             warning('off', 'catstruct:DuplicatesFound');
             global_atts = catstruct(global_atts, info);
             warning('on', 'catstruct:DuplicatesFound');
-
+            addncattributes(ncid, global_atts)
+            
             %% define variables, variable attributes, additional dimensions
             
             vars = fieldnames(self.cols);

@@ -58,19 +58,24 @@ function S = dealWithPseudoFields(S,field,file)
 % assumed to be frivolous and therefore removed afterwards, unless these
 % fields were already read before this function.
 % READ dependent fields
+
+D = datasets;
+height = D.dardarsub.metadata.height;
 switch field
     case 'dardar_IWP'
-        dependent_fields = {'iwc','height'};
+        dependent_fields = {'iwc'};
         rmflag = ~ismember(dependent_fields,fieldnames(S));
         for F = dependent_fields
-            S.(F{1}) = loadncvar(file, F{1});
+            S.(F{1}) = loadncvar(file,F{1});
         end
+        S.height = repmat(height,size(S.iwc,1),1);
     case 'dardar_ln_IWP_error'
-        dependent_fields = {'ln_iwc_error','iwc','height'};
+        dependent_fields = {'ln_iwc_error','iwc'};
         rmflag = ~ismember(dependent_fields,fieldnames(S));
         for F = dependent_fields
             S.(F{1}) = loadncvar(file, F{1});
         end
+        S.height = repmat(height,size(S.iwc,1),1);
 end
 
 % column integrate
