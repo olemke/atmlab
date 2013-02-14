@@ -1,7 +1,14 @@
+2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-267
+
+	* datasets/define_datasets.m: Fixed typo that was about to make it
+	into the saved datasets attributes
+
 2013-02-14  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-266
-	
+
 	* collocations/FieldCopier.m(process_granule):
 
 	- Bugfix when the primary core was not requested, the primary sibling

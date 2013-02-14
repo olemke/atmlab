@@ -638,7 +638,7 @@ f_cpr.Cloud_Types.dependenacies     = getSelection(f_cpr,fieldnames(f_cpr),{'clo
 f_cpr.IWP_2C.realname       = 'ice_water_path';
 f_cpr.IWP_2C.dataset        = D.CPR_2C_ICE;
 f_cpr.IWP_2C.type           = 'float';
-f_cpr.IWP_2C.atts.long_name = 'retreived IWP';
+f_cpr.IWP_2C.atts.long_name = 'retrieved IWP';
 f_cpr.IWP_2C.atts.units     = 'g/m^2';
 % f_cpr.IWP_2C_error.realname       = 'ice_water_path_uncertainty'; % Appears to
                                                                     % always be 0
@@ -649,7 +649,7 @@ f_cpr.IWP_2C.atts.units     = 'g/m^2';
 f_cpr.IWC_2C.realname       = 'IWC';
 f_cpr.IWC_2C.dataset        = D.CPR_2C_ICE;
 f_cpr.IWC_2C.type           = 'float';
-f_cpr.IWC_2C.atts.long_name = 'retreived IWC';
+f_cpr.IWC_2C.atts.long_name = 'retrieved IWC';
 f_cpr.IWC_2C.atts.units     = 'mg/m^3';
 f_cpr.IWC_2C_error.realname       = 'IWC_uncertainty';
 f_cpr.IWC_2C_error.dataset        = D.CPR_2C_ICE;
