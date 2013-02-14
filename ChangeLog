@@ -1,3 +1,12 @@
+2013-02-14  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-266
+	
+	* collocations/FieldCopier.m(process_granule):
+
+	- Bugfix when the primary core was not requested, the primary sibling
+	was not found, and a ref-lat was expected.
+
 2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-265

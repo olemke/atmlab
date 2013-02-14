@@ -436,10 +436,12 @@ classdef FieldCopier < AssociatedDataset
             r2 = processed_core(:, self.parent.cols.LINE2);
             c1 = processed_core(:, self.parent.cols.POS1);
             c2 = processed_core(:, self.parent.cols.POS2);
-            if (self.needs_primary_data() || ~isempty(fieldnames(dat_other{1})))
+%            if (self.needs_primary_data() || ~isempty(fieldnames(dat_other{1})))
+            if ~isempty(reflat{1})
                 i1 = sub2ind(size(reflat{1}), r1, c1);
             end
-            if (self.needs_secondary_data() || ~isempty(fieldnames(dat_other{2})))
+%            if (self.needs_secondary_data() || ~isempty(fieldnames(dat_other{2})))
+            if ~isempty(reflat{2})
                 i2 = sub2ind(size(reflat{2}), r2, c2);
             end
             
@@ -448,14 +450,19 @@ classdef FieldCopier < AssociatedDataset
             for i = 1:length(allnames)
                 field = allnames{i};
                 
-                
+                % an empty reflat means I couldn't read any core or
+                % sibling, so I won't need the indices either
                 if i <= n_inprim
-                    data = data1;
-                    ii = i1;
+                    if ~isempty(reflat{1})
+                        data = data1;
+                        ii = i1;
+                    end
                     j = 1;
                 else
-                    data = data2;
-                    ii = i2;
+                    if ~isempty(reflat{2})
+                        data = data2;
+                        ii = i2;
+                    end
                     j = 2;
                 end
                 
