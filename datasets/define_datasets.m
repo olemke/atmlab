@@ -182,11 +182,11 @@ HomemadeDataset('name', 'dardarsub', ...
                             '6 -> aerosol, 7 -> maybe insects, 8 -> stratospheric feature)'], ...
                             'units', 'dimensionless')), ...
                     'temperature', struct(...
-                        'type', 'short', ... % FIXME: WARNING: should get offset/factor
+                        'type', 'short', ...
                         'dims', {{'HEIGHT', 436}}, ...
                         'atts', struct(...
                             'long_name', 'temperature', ...
-                            'units', '?')), ...
+                            'units', 'K','scale_factor',.01,'add_offset',100)), ...
                     'time', struct(...
                         'type', 'float', ...
                         'atts', struct(...
@@ -635,11 +635,12 @@ f_cpr.Cloud_Types.atts.description  = ['A condensed version of cloud scenario, w
 f_cpr.Cloud_Types.dependenacies     = getSelection(f_cpr,fieldnames(f_cpr),{'cloud_scenario'});
 
 % 2C-ICE
-f_cpr.IWP_2C.realname       = 'ice_water_path';
-f_cpr.IWP_2C.dataset        = D.CPR_2C_ICE;
-f_cpr.IWP_2C.type           = 'float';
-f_cpr.IWP_2C.atts.long_name = 'retrieved IWP';
-f_cpr.IWP_2C.atts.units     = 'g/m^2';
+f_cpr.IWP_2C.realname           = 'ice_water_path';
+f_cpr.IWP_2C.dataset            = D.CPR_2C_ICE;
+f_cpr.IWP_2C.type               = 'float';
+f_cpr.IWP_2C.atts.long_name     = 'retrieved IWP';
+f_cpr.IWP_2C.atts.units         = 'g/m^2';
+f_cpr.IWP_2C.atts.missing_value = -7777;
 % f_cpr.IWP_2C_error.realname       = 'ice_water_path_uncertainty'; % Appears to
                                                                     % always be 0
 % f_cpr.IWP_2C_error.dataset        = D.CPR_2C_ICE;
@@ -732,7 +733,12 @@ f_cloud_cci.phase.atts.long_name       = 'cloud phase flag';
 f_cloud_cci.phase.atts.units           = '';
 f_cloud_cci.phase.atts.missing_value   =-127;
 f_cloud_cci.phase.atts.description     = ['thermodynamic_phase_of_cloud_water_particles_at_cloud_top'...
-                                    '[0 1 2] means clear/unknown liquid ice'];
+                                    '[0 1 2] means clear/unknown liquid ice. (use cc_total for cloud masking)'];
+
+% f_cloud_cci.cc_total.type = 'short';
+% f_cloud_cci.cc_total.atts.long_name = 
+
+
 f_cloud_cci.iwp.type               = 'short';
 f_cloud_cci.iwp.atts.long_name      = 'ice water path';
 f_cloud_cci.iwp.atts.units         = 'g/m^2';
@@ -743,6 +749,7 @@ f_cloud_cci.iwp.dependenacies      = ...
     catstruct(getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'cwp'}),...
     getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'phase'}));
 
+
 % -----------
 % DARDAR_SUB
 % -----------
@@ -752,13 +759,11 @@ f_dardarsub.dardar_IWP.atts.long_name    = 'DARDAR Ice Water Path';
 f_dardarsub.dardar_IWP.atts.unit         = 'kg/m^2';
 f_dardarsub.dardar_IWP.atts.missing_value= -999;
 f_dardarsub.dardar_IWP.atts.description='Column integrated ''iwc''';
-f_dardarsub.dardar_ln_IWP_error.realname          = 'dardar_ln_IWP_error';
 f_dardarsub.dardar_ln_IWP_error.type              = 'float';
 f_dardarsub.dardar_ln_IWP_error.atts.long_name    = 'DARDAR ln_IWP_error';
 f_dardarsub.dardar_ln_IWP_error.atts.unit         = 'ln(kg/m^2)';
 f_dardarsub.dardar_ln_IWP_error.atts.missing_value= -999;
 f_dardarsub.dardar_ln_IWP_error.atts.description  = 'Column integrated ''ln_iwc_error''';
-
 f_dardarsub.HEIGHT.realname         = 'height';
 f_dardarsub.HEIGHT.type             = 'float';
 f_dardarsub.HEIGHT.atts.long_name   = 'Height';
@@ -787,6 +792,17 @@ f_dardarsub.VOD_ERROR.type              = 'float';
 f_dardarsub.VOD_ERROR.atts.long_name    = 'visible optical depth error';
 f_dardarsub.VOD_ERROR.atts.unit         = 'dimless';
 f_dardarsub.VOD_ERROR.atts.description  = 'Visible optical depth error';
+f_dardarsub.RE.realname = 'effective_radius';
+f_dardarsub.RE.type = 'float';
+f_dardarsub.RE.atts.long_name = 'Retrieved effective radius';
+f_dardarsub.RE.atts.units = 'm';
+f_dardarsub.RE.atts.missing_value = -999;
+f_dardarsub.RE_error.realname = 'ln_effective_radius_error';
+f_dardarsub.RE_error.type = 'float';
+f_dardarsub.RE_error.atts.long_name = 'Fractional error in effective radius';
+f_dardarsub.RE_error.atts.units = 'ln(m)';
+f_dardarsub.RE_error.atts.missing_value = -999;                                
+
 % for those that have dependencies
 f_dardarsub.dardar_IWP.dependenacies            = ...
     catstruct(getSelection(f_dardarsub,fieldnames(f_dardarsub),{'IWC'}),...
@@ -1057,8 +1073,8 @@ FieldCopier(D.collocation_ssmt2_mhs, f_ssmt2_1, f_ssmt2_2, ...
     'name', 'associated_ssmt2_ssmt2');
 
 FieldCopier(D.CollocatedDataset_cloud_cci_dardarsub, ...
-    getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'iwp'}),...
-    getSelection(f_dardarsub,fieldnames(f_dardarsub),{'dardar_IWP'}),...
+    getSelection(f_cloud_cci,fieldnames(f_cloud_cci),{'iwp','iwp_uncertainty','cc_total','ref','ref_uncertainty'}),...
+    getSelection(f_dardarsub,fieldnames(f_dardarsub),{'dardar_IWP','RE','RE_error'}),...
     'name','cloud_cci_dardarsub');
 
 FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...

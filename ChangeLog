@@ -1,5 +1,12 @@
 2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
+	* atmlab-2-1-268
+
+	* datasets/define_datasets.m: Added missing missing_value for
+	2C-ICE.
+
+2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
+
 	* atmlab-2-1-267
 
 	* datasets/define_datasets.m: Fixed typo that was about to make it
