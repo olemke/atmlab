@@ -1,3 +1,18 @@
+2013-02-14  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-269
+
+	* datasets/convert_dardar.m:
+
+	- Get rid of height
+	- Apply factor, offset, missing_value for temperature
+
+	* datasets/define_datasets:
+
+	- For dardarsub, add 'dims' for effective_radius and
+	ln_effective_radius_error. Also add missing_value and valid_range for
+ 	temperature.
+
 2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-268

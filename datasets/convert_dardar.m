@@ -30,7 +30,7 @@ function convert_dardar(dt1, dt2)
         [~, bs] = fileparts(paths{i});
         dd_sub.filename = [bs '_selection.nc.gz'];
         ff = fullfile(dd_sub.find_datadir_by_date(dt), dd_sub.filename);
-        if exist(ff, 'file')
+        if exist(ff, 'file') && ~dd_sub.overwrite
             logtext(atmlab('OUT'), 'Already exists, skipping: %s\n', ff);
             continue
         end
@@ -40,7 +40,13 @@ function convert_dardar(dt1, dt2)
         
         ncols = sum(cellfun(@(f) size(data.(f), 2), tostore));
         nrows = size(data.time, 1);
-        data.height = repmat(data.height, [nrows 1]);
+%         data.height = repmat(data.height, [nrows 1]);
+        % Apply factor and offset where appropriate. So far hardcoded for
+        % temperature only, if more fields should then systematic searching
+        % ought to be implemented
+        data.temperature = int16(round(...
+            (data.temperature - dd_sub.members.temperature.atts.add_offset)/(dd_sub.members.temperature.atts.scale_factor)));
+        data.temperature(data.temperature<0) = dd_sub.members.temperature.atts.missing_value;
 
         M = zeros(nrows, ncols);
         nc = 1;
