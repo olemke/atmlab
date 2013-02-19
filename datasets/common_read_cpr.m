@@ -32,13 +32,14 @@ all_fields = [core_fields(:); extra_fields(:)];
 pseudo_fields = {'Cloud_Types'}; % pseudo fields that are not in the original data but are built
 % on fields from the existing data fields
 
-try 
+% try 
     S = cloudsat_read_zipped(file, all_fields(~ismember(all_fields,pseudo_fields)));
-catch ME
-    if strcmp(ME.identifier,'atmlab:exec_system_cmd:shell')
-       error('atmlab:invalid_data','problem executing system command:\n%s',ME.message)
-    end
-end    
+% catch ME
+%     if strcmp(ME.identifier,'atmlab:exec_system_cmd:shell')
+%        error('atmlab:invalid_data','problem executing system command:\n%s',ME.message)
+%     end
+% end
+
 % rename some fields
 S.lon = double(S.Longitude);
 S.lat = double(S.Latitude);

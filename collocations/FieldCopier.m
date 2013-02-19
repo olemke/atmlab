@@ -284,7 +284,7 @@ classdef FieldCopier < AssociatedDataset
                         dat_other{j}.(dsnm) = D.(dsnm).read_granule(dt, spc, also_read{j}.(dsnm), false, false);
                     catch ME
                         switch ME.identifier
-                            case 'atmlab:find_granule_by_datetime'
+                            case {'atmlab:find_granule_by_datetime', 'atmlab:exec_system_cmd:shell'}
 %                                 logtext(atmlab('ERR'), ...
 %                                     'I tried to collect fields from dataset %s, but failed: %s\n', ...
 %                                     dsnm, ME.message);
@@ -429,7 +429,7 @@ classdef FieldCopier < AssociatedDataset
             ncollocs = size(processed_core, 1);
             nfields = max(cell2mat(struct2cell(self.cols).'));
             %fields = fieldnames(self.cols);
-            result = nan*zeros(ncollocs, nfields);
+            result = nan*zeros(ncollocs, nfields, self.mattype);
             n_inprim = length(fieldnames(self.fieldstruct_primary));
             
             r1 = processed_core(:, self.parent.cols.LINE1);

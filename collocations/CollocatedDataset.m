@@ -463,7 +463,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             %% pre-allocate
             
-            result = zeros(0, length(fieldnames(self.cols)));
+            result = zeros(0, length(fieldnames(self.cols)), self.mattype);
             
             %% read data for sat1/sensor1
             % Here, I decide to keep the duplicates for now. Simple is better than
@@ -701,7 +701,7 @@ classdef CollocatedDataset < HomemadeDataset
             % pre-allocate; I know 'result's right size, but do not know
             % the right size for additional_results because I don't know
             % the sizes of the involved fields
-            result = zeros(0, length(fieldnames(self.cols)));
+            result = zeros(0, length(fieldnames(self.cols)), self.mattype);
             additional_results = cell(size(additionals));
             
             anysuccess = false;
@@ -1079,7 +1079,7 @@ classdef CollocatedDataset < HomemadeDataset
             
             c = self.cols;
             nfields = length(fieldnames(c));
-            M = nan*zeros(n, nfields);
+            M = nan*zeros(n, nfields, self.mattype);
             [line1, pos1, line2, pos2] = X{:};
             
             % index for direct addressing

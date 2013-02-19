@@ -1,3 +1,23 @@
+2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-272
+
+	* datasets/HomemadeDataset.m:
+
+	- Added property 'mattype', defaults to 'double', can be set to
+	'single' as for the type used internally for the collocations. Saves
+	50% memory but may lead to loss of precision.
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Catch case when sibling was found, but cannot be read.
+
+	- Use self.mattype
+
+	* collocations/CollocatedDataset.m: Use self.mattype
+
+	* datasets/common_read_cpr.m: Don't overcatch
+	
 2013-02-19  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-271

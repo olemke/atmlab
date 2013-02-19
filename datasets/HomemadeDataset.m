@@ -69,7 +69,17 @@ classdef HomemadeDataset < SatDataset
         % (later)
         % >> [M, c] = d.collocation_mhs_amsub.read([2006 4 25], [2006 4 26], {'noaa18', 'noaa16'}, {'LAT1', 'LAT2', 'BT1'});
         % 14-May-2012 11:37:33.707:PersistentCachedData.get_entry:54:Reading from persistent cache: /local/gerrit/cache/aff3735816ae90b11a4ddfd571f88e3b.mat
-        pcd;        
+        pcd;
+        
+        % Type to use for internal storage
+        %
+        % Internally, the collocation toolkit passes around collocations as
+        % matrices.  To be on the safe side, this normally uses the type
+        % 'double'.  If you are low on memory, or trying to store a lot of
+        % data and/or have a lot of collocations, you can set this to
+        % 'single'.  Do not set it to any non-floating point type unless
+        % you want severe loss of precision and crashing code.
+        mattype = 'double';
     end    
     
     methods
