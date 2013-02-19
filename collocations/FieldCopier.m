@@ -30,7 +30,8 @@ classdef FieldCopier < AssociatedDataset
     %
     %   fieldstruct_primary -   Describes what is copied from primary
     %   fieldstruct_secondary - Describes what is copied from secondary
-    %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>)
+    %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
+    %   Use <a href="matlab:properties FieldCopier">properties</a> for a complete listing)
     %
     % FieldCopier Methods:
     %
@@ -69,6 +70,8 @@ classdef FieldCopier < AssociatedDataset
     %  - set some (but not all!!) clever properties for NetCDF
     %
     % See also: AssociatedDataset (abstract superclass), CollocatedDataset, SatDataset, Collapser, datasets
+    %
+    % See also the Collocation User's Guide.
     %
     % $Id$
     

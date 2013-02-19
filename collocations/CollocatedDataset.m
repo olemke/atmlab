@@ -6,6 +6,10 @@ classdef CollocatedDataset < HomemadeDataset
     % objects and define all required properties there. Predefined datasets
     % are defined in <a href="matlab:help define_datasets">define_datasets</a>. Then <a href="matlab:help CollocatedDataset/CollocatedDataset">create</a> a CollocatedDataset.
     % To list existing datasets, use <a href="matlab:help datasets">datasets</a>.
+    % Remember that CollocatedDataset inherits from <a href="matlab: help
+    % HomemadeDataset">HomemadeDataset</a>,
+    % so it has all capabilities that HomemadeDataset has. You may also
+    % want to look at the Collocation User's Guide.
     %
     % CollocatedDataset Properties:
     %
@@ -16,6 +20,7 @@ classdef CollocatedDataset < HomemadeDataset
     %   members -   structure containing full info on how data are stored
     %               (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> properties)
     %   pcd -       if set, cache <a href="matlab:help CollocatedDataset/read">read</a> results to disk
+    %   (see <a href="matlab:properties CollocatedDataset">properties</a> for a complete listing)
     %
     % CollocatedDataset methods:
     %
@@ -46,7 +51,9 @@ classdef CollocatedDataset < HomemadeDataset
     %   >> mhscpr = CollocatedDataset(D.mhs, D.cpr, 'distance', 10, 'interval', 300, 'name', 'NarrowCPRMHSCollocs');
     %
     % See also: SatDataset (grandparent), HomemadeDataset (superclass), AssociatedDataset,
-    %           FieldCopier, Collapser
+    %           FieldCopier, Collapser,
+    %
+    % Don't forget the Collocation User's Guide
     %
     % $Id$
     properties

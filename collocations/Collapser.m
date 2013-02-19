@@ -36,7 +36,8 @@ classdef Collapser < AssociatedDataset
     %
     %   fieldstruct -           Structure with complete field information
     %   overall_limitators -    Limitations applied to all fields
-    %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>)
+    %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
+    %   Use <a href="matlab:properties Collapser">properties</a> for a complete listing)
     %
     % Collapser Methods:
     %
@@ -56,7 +57,9 @@ classdef Collapser < AssociatedDataset
     %           'filename', 'mean_collocations_$SAT.nc.gz');
     %
     % See also: AssociatedDataset (abstract superclass), FieldCopier,
-    %           CollocatedDataset, SatDataset, Collapser (constructor)
+    %           CollocatedDataset, SatDataset, Collapser (constructor).
+    %
+    % Don't forget the Collocation User's Guide
     
     % TODO:
     %  - store result of limitators as bitfield?

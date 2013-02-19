@@ -33,6 +33,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %
     % A number of datasets are pre-defined in <a href="matlab:help define_datasets">define_datasets</a>.
     % All registered datasets can be listed with <a href="matlab:help datasets">datasets</a>.
+    %
     % 
     % SatDataset properties:
     %
@@ -54,6 +55,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %   satname -   Name for a single-satellite dataset
     %   collocated_datasets - Read-only prop. listing <a href="matlab:help CollocatedDataset">CollocatedDatasets</a>.
     %   starttimesfile - Name for filename containing start times if not in filename
+    %   (Use <a href="matlab:properties SatDataset">properties</a> for a complete listing)
     %
     % SatDataset methods:
     %
@@ -89,7 +91,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     %   find_info_from_granule -    Get information from granule filename
     %
     % See also: CollocatedDataset, HomemadeDataset (child), AssociatedDataset, FieldCopier, Collapser
-    % 
+    %
+    % Don't forget the Collocation User's Guide.
+
     % $Id$
     
     % read/write props
@@ -328,7 +332,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     % flags
-    properties (Constant)
+    properties (Constant, GetAccess = protected)
         FL_INITIAL = -5;
         FL_NOTFOUND = -2;
         FL_ALLDUPL = typecast(int32(-1), 'uint32');

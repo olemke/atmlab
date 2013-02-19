@@ -1,5 +1,17 @@
 2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-273
+	
+	* datasets/SatDataset.m, collocations/FieldCopier.m,
+	collocations/CollocatedDataset.m, datasets/HomemadeDataset.m: More
+	cross-pointers between different types of documentation.
+
+	* documentation/collocations.tex:
+
+	Started on expanding this.
+
+2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-272
 
 	* datasets/HomemadeDataset.m:

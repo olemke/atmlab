@@ -94,7 +94,9 @@ refereed articles \citet{holl10:_collocating_amt} and
 This is an introductory document.
 For full information on all classes and methods, please refer to the online
 documentation in Matlab (best accessed with the help browser, e.g.\
-type \lstinline!doc SatDataset! on the Matlab commandline)
+type \lstinline!doc SatDataset! on the Matlab commandline).
+This also contains more examples than are provided in this document.
+
 \section{Getting started}
 
 To get started with collocations:
@@ -116,21 +118,18 @@ This involves:
 \item Define what additional data shall be processed.
 \begin{itemize}
 \item The easy way: via predefined-classes such as FieldCopier
-and Collector (\autoref{sec:simple}).
+and Collapser (\autoref{sec:simple}).
 FieldCopiers are to copy fields from the original data to a collocated
-dataset, whereas Collectors can be used e.g.\ for averaging a small-footprint
+dataset, whereas Collapsers can be used e.g.\ for averaging a small-footprint
 over a large-footprint dataset, or perform another task where the data are
 reduced (``collapsed'').
 \item The advanced way: via user-defined subclasses of AssociatedDataset
 (\autoref{sec:advanced}).
 \end{itemize}
+\item Perferm the collocations with
+\lstinline|CollocatedDataset.collocate_and_store_date_range|. 
+\item Read the collocations with \lstinline|CollocatedDataset.read|.
 \end{itemize}
-
-% Currently, some settings are still defined in the global-structure obtained
-% via \lstinline|colloc_config|.
-% Most notably, this is the case for the maximum distance and maximum time
-% interval considered a collocation (all measurements are treated as points).
-% This is to change soon.
 
 \autoref{fig:cd} shows the most important classes and methods that together
 form the \collocs.
@@ -144,8 +143,143 @@ A SatDataset object contains all information needed to find granules on the
 file-system given a particular date and time, to read the granule (while
 removing duplicates) and to return it in a format that a CollocatedDataset object can
 work with.
-See the class diagram in \autoref{fig:cd} for a list of attributes and
+See the class diagram in \autoref{fig:cd} for a partial list of attributes and
 methods.
+For a complete list of properties, type \lstinline|properties SatDataset|
+in Matlab.
+For a complete list of methods, type \lstinline|methods SatDataset|.
+
+Perhaps your dataset is already defined in Atmlab.
+To check this, call \lstinline|D = datasets()|:
+
+\begin{lstlisting}
+>> D.amsub
+
+ans = 
+
+  SatDataset handle
+
+  Properties:
+                    name: 'amsub'
+                 basedir: '/storage3/data/amsu'
+                  subdir: '$SAT_amsub_$YEAR4/$MONTH/$DAY'
+                      re: [1x165 char]
+                filename: []
+                  reader: @common_read_poes_radiometer
+        granule_duration: 6130
+                 satname: []
+                   cache: [1x1 CachedData]
+                 visible: 1
+                    sats: {'noaa15'  'noaa16'  'noaa17'}
+                   tryre: 1
+    needs_starttimesfile: 0
+          starttimesfile: 'granule_start_times.mat'
+              starttimes: []
+                metadata: []
+     collocated_datasets: [1x7 CollocatedDataset]
+     starttimes_fullpath: '/storage3/data/amsu/granule_start_times.mat'
+
+  Methods, Events, Superclasses
+
+\end{lstlisting}
+
+This shows the properties with their associated values.
+Some properties must be defined for any dataset.
+Those include in particular the name, the location where the data are
+stored, and the reading routine.
+If you want to collocate data, you also need to define
+\lstinline|granule_duration|.
+For details on what every property means, check \lstinline|help SatDataset|.
+The dataset \lstinline|amsub| is already defined, as are many others.
+However, you may need to define a new dataset.
+
+\subsection{Defining a new \lstinline|SatDataset|}
+
+If your dataset is already in Atmlab and configured for your system, you
+can skip this step.
+To check this, call the \lstinline|find_granules_by_date| method for a
+date where you expect to have granules.
+If it returns a matrix with start times, you can skip this subsection.
+
+Defining a new \lstinline|SatDataset| is done by calling the constructor,
+i.e.\ calling the class:
+
+\begin{lstlisting}
+  >> spam = SatDataset('name', 'MyDataset', 'granule_duration', '3600', ...
+                       'satname', 'SpamSat', 'reader', @my_reading_routine);
+\end{lstlisting}
+
+Only the name you need to pass when you are creating the dataset.
+Note that the name must be unique.
+For all other properties, you can define them in two ways:
+
+\begin{itemize}
+\item Immediately upon creation.
+This is done by passing property names and values in pairs to
+\lstinline|SatDataset|, exactly as when you would create a structure.
+\item After creation.
+For this, the syntax is again like for structures:
+\lstinline|spam.basedir = '/path/to/file'|.
+\end{itemize}
+
+Datasets that are built-in in Atmlab define dataset properties in two
+steps.
+In \lstinline|define_datasets|, the universal properties are defined;
+those that are the same no matter what machine one runs on.
+This includes the name, the reading routine, and some other properties.
+In \lstinline|datasets_init|, the site-specific properties are defined;
+those that differ based on the site, such as the path to the data.
+You may wish to follow a similar pattern.
+
+Now suppose we have a new dataset called \lstinline|ssmt2|\footnote{In
+reality, this too comes with Atmlab; but let's pretend it doesn't}.
+This we can do in the following steps:
+
+\begin{enumerate}
+\item Define the dataset:
+
+\begin{lstlisting}
+SatDataset('name', 'ssmt2', ...
+    'needs_starttimesfile', false, ...
+    'reader', @common_read_ssmt2, ...
+    'granule_duration', 7000);
+\end{lstlisting}
+
+For the meaning of each of the properties, please refer to the in-Matlab
+documentation, i.e.\ \lstinline|help SatDataset/granule_duration|.
+
+\item
+One property however, is of particular importance, and that is the
+\lstinline|reader|.
+This points to a reading routine with a prescribed interface: input and
+output arguments \emph{must} match a particular pattern that is documented
+by \lstinline|help SatDataset/reader|.
+
+If there is no appropriate reading routine, create it.
+Use \lstinline|help SatDataset/reader| and existing
+\lstinline|common_read_*| routines as an example.
+\item
+Define where the data are:
+
+\begin{lstlisting}
+D.ssmt2.basedir = '/storage3/data/ssmt_ngdc';
+D.ssmt2.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
+D.ssmt2.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
+D.ssmt2.re = '(?<satname>F[0-9]{2})(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})\.T2\.gz';
+\end{lstlisting}
+ 
+It is essential that you define at least \lstinline|basedir|,
+\lstinline|subdir|, and at least one of \lstinline|filename| and
+\lstinline|re|.
+Those properties are used to locate granules in a universal manner.
+Check the respective property documentation for details.
+\end{enumerate}
+
+Now you are reading to use the \lstinline|SatDataset| as documented in
+\autoref{sec:capa_sat}.
+
+\subsection{Capabilities of \lstinline|SatDataset|}
+\label{sec:capa_sat}.
 
 \begin{itemize}
 \item Find granules. The methods \lstinline!find_datadir_by_date!,
@@ -158,13 +292,50 @@ This functionality is essential for finding collocations, but also useful in
 its own right.
 For example, \lstinline|find_granules_for_period| is useful for time series
 analysis.
+An example of the capabilities of \lstinline|find_granules_by_date|:
+\begin{lstlisting}
+>> D.ssmt2.find_granules_by_date([2001, 1, 10], 'F12')
+
+ans =
+
+        2001           1           9          23          19          -1
+        2001           1          10           1           1          -1
+        2001           1          10           2          43          -1
+        2001           1          10           4          25          -1
+        2001           1          10           6           7          -1
+        2001           1          10           7          49          -1
+        2001           1          10           9          31          -1
+        2001           1          10          11          12          -1
+        2001           1          10          12          54          -1
+        2001           1          10          14          36          -1
+        2001           1          10          16          18          -1
+        2001           1          10          18           0          -1
+        2001           1          10          19          42          -1
+        2001           1          10          21          24          -1
+        2001           1          10          23           6          -1
+
+
+paths = 
+
+  Columns 1 through 12
+
+    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]
+
+  Columns 13 through 15
+
+    [1x61 char]    [1x61 char]    [1x61 char]
+
+\end{lstlisting}
 \item Collect and find information on duplicates.
+Before you can actually read any data, a database needs to be created that
+documents the number of lines in a particular granule that are repetitions
+of the granule before.
 For many datasets, subsequent granules contain duplicates: a number of
 scanlines are repeated.
 The method \lstinline|find_granule_first_line| creates a hashtable describing
 for each granule what the first scanline is that does not occur in the
 previous scanline, and stores this to a file.
-Then, \lstinline|granule_first_line| looks this up from the hashtable.
+%Then, \lstinline|granule_first_line| looks this up from the hashtable.
 Reading routines in the \collocs\ use this information by default to guarantee
 no duplicates occur in final products.
 \item Actually read the data.
@@ -175,11 +346,33 @@ This routine provides the interface between the data as stored on disc (which
 can be in an arbitrary format) and the data as represented inside the
 \collocs.
 Detailed documentation can be found with \lstinline|help SatDataset/reader|.
+An example:
+\begin{lstlisting}
+>> data = D.ssmt2.read_granule(grans(1, :), 'F12')
+19-Feb-2013 11:57:24.809:SatDataset.read_granule:818:Reading /storage3/data/ssmt_ngdc/F12/2001/01/09/F12200101092319.T2.gz
+19-Feb-2013 11:57:24.864:exec_system_cmd:64:/local/gerrit/python2.7/bin/python2.7 /storage4/home/gerrit/checkouts/atmlab/sensors/ssmt2_reader_netcdf.py /local/ramdisk/gerrit/F12200101092319.T2 /local/ramdisk/gerrit/tp4d2a7ee8_74a4_4070_91e3_9673628956d8.nc
+19-Feb-2013 11:57:25.608:exec_system_cmd:69:Warning: didn't find number of data records directly.
+Using number of records - number of header records (764 - 1) instead
+19-Feb-2013 11:57:25.640:SatDataset.granule_first_line:940:Reading /storage3/data/granules_firstline/firstline_F12_ssmt2.mat. (If this fails, run self.find_granule_first_line (SatDataset.find_granule_first_line)).
+19-Feb-2013 11:57:25.813:CachedData.set_entry:78:Setting cache entry: ssmt2F120109_TueJan231810 (new size: 4 entries, 4.913 MiB)
+
+data = 
+
+                  lat: [763x28 single]
+                  lon: [763x28 single]
+           ancil_data: [763x10 double]
+    global_attributes: [1x1 struct]
+                 time: [763x1 double]
+                epoch: 978998400
+              version: 'v2.1b'
+      scanline_number: [763x28 double]
+    scanline_position: [763x28 double]
+\end{lstlisting}
 \end{itemize}
 
-Unless you want to re-implement the collocation algorithm, there is no need
-to subclass SatDataset; all the functionality you will need is contained in
-the class.
+% Unless you want to re-implement the collocation algorithm, there is no need
+% to subclass SatDataset; all the functionality you will need is contained in
+% the class.
 
 \section{Defining the collocated datasets}
 \label{sec:CollocatedDataset}

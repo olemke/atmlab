@@ -10,10 +10,13 @@ classdef HomemadeDataset < SatDataset
     % again from disk. It inherits from <a href="matlab:help SatDataset">SatDataset</a> and is parent to
     % <a href="matlab:help CollocatedDataset">CollocatedDataset</a> and <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
     %
+    %
     % HomemadeDataset Properties:
     %
     %   cols -  Structure describing columns for matrix-stored data
-    %  (remaining properties inherited from <a href="matlab:help SatDataset">SatDataset</a>)
+    %   mattype - Type to use internally. Normally 'double'.
+    %  (remaining properties inherited from <a href="matlab:help SatDataset">SatDataset</a>.
+    %   Use <a href="matlab:properties HomemadeDataset">properties</a> for a complete listing)
     % 
     % HomemadeDataset Methods:
     %
@@ -29,7 +32,9 @@ classdef HomemadeDataset < SatDataset
     %
     % See also: SatDataset (superclass), CollocatedDataset (subclass),
     %           AssociatedDataset (abstract subclass)
-    
+    %
+    % Don't forget the Collocation's User Guide.
+
     % Note on implicit and explicit constructor calling:
     % http://www.mathworks.se/help/matlab/matlab_oop/creating-subclasses--syntax-and-techniques.html
     
