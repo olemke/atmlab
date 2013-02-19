@@ -1,5 +1,13 @@
 2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-274
+
+	* documentation/collocations.tex:
+
+	Expanded significantly.
+
+2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-273
 	
 	* datasets/SatDataset.m, collocations/FieldCopier.m,
