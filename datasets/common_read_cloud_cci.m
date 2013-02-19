@@ -39,6 +39,15 @@ all_fields    = [core_fields(:); extra_fields(:)];
 pseudo_fields = {'iwp'};
 
 S = loadncvar(file, all_fields(~ismember(all_fields,pseudo_fields)) );
+attr = loadncattr(file, all_fields(~ismember(all_fields,pseudo_fields)));
+
+% Add offsets and scale the data if this is provided
+for F = fieldnames(S)'
+    if isfield(attr.(F{1}),'scale_factor')
+        S.(F{1}) = (S.(F{1})*double(attr.(F{1}).scale_factor))+ ...
+            double(attr.(F{1}).add_offset);
+    end
+end
 
 % is saved as column major. flip the data.
 refsz = size(S.lat);

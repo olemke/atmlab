@@ -1,3 +1,12 @@
+2013-02-19  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-271
+
+	* datasets/common_read_cpr.m: intermediate commit for error handling 
+
+	* datasets/common_read_cloud_cci.m: Fix bug of not always look for
+	scale_factor and add_offset
+
 2013-02-14  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-270
