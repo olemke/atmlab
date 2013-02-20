@@ -11,6 +11,7 @@ ${TARGET}.pdf: ${TARGET}.tex
 	pdflatex -shell-escape -halt-on-error ${TARGET}
 	pdflatex -shell-escape -halt-on-error ${TARGET}
 clean:
-	rm -f ${TARGET}.pdf ${TARGET}.aux ${TARGET}.log ${TARGET}.blg ${TARGET}.bbl ${TARGET}.nav ${TARGET}.snm ${TARGET}.toc ${TARGET}.out ${TARGET}.log
+	rm -f ${TARGET}.acr ${TARGET}.acn ${TARGET}.alg ${TARGET}.aux ${TARGET}.bbl ${TARGET}.blg ${TARGET}.glo ${TARGET}.glg ${TARGET}.gls ${TARGET}.ist ${TARGET}.lof ${TARGET}.log  ${TARGET}.lot ${TARGET}.out ${TARGET}.pdf ${TARGET}.toc
+
 
 

@@ -1,3 +1,10 @@
+2013-02-20  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-275
+
+	* documentation/Makefile (clean): Added all the things that should
+	be included in clean
+
 2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-274
