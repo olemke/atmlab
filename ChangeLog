@@ -1,3 +1,15 @@
+2013-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-276
+
+	* demos/qarts_scattering_demo.m
+	* demos/qarts_demo.m (qarts_demo): Updated to "rtp".
+
+	* arts/qarts2cfile.m: Changed some hard-coded settings related to
+	rte -> rtp changes. 
+
+	* arts/arts.m: ARTS errors were printed twice.
+
 2013-02-20  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-275

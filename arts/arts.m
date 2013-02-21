@@ -54,7 +54,7 @@ end
 
 
 if status  &  ~errortol
-  disp( result )
+  %disp( result )
   fprintf('\n');
   error('An error occured while executing ARTS. See above.')
 end
