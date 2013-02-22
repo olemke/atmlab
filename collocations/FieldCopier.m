@@ -287,7 +287,7 @@ classdef FieldCopier < AssociatedDataset
                         dat_other{j}.(dsnm) = D.(dsnm).read_granule(dt, spc, also_read{j}.(dsnm), false, false);
                     catch ME
                         switch ME.identifier
-                            case {'atmlab:find_granule_by_datetime', 'atmlab:exec_system_cmd:shell'}
+                            case {'atmlab:find_granule_by_datetime', 'atmlab:exec_system_cmd:shell', 'MATLAB:imagesci:validate:fileOpen'}
 %                                 logtext(atmlab('ERR'), ...
 %                                     'I tried to collect fields from dataset %s, but failed: %s\n', ...
 %                                     dsnm, ME.message);

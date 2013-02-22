@@ -1,3 +1,12 @@
+2013-02-22  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-277
+
+	* collocations/FieldCopier.m (process_granule):
+
+	- Added one more error-identifier to list of error-identifiers that
+	are expected if sibling can't be read.
+
 2013-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-276
