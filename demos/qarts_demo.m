@@ -147,6 +147,7 @@ else
   %
   Q.ANTENNA_DIM         = 1;
   Q.MBLOCK_ZA_GRID      = [-0.04:0.02:0.04]';
+  H.ANTENNA_DO          = true;
   H.ANTENNA_LOS         = 0;
   H.ANTENNA_RESPONSE    = fullfile( atmlab_example_data, 'antenna.xml' );
   %

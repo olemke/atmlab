@@ -1,3 +1,13 @@
+2013-02-22  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-1-278
+
+	* demos/qarts_demo2.m: Added ANTENNA_DO = true so that the antenna 
+	pattern calculation is perfomed.
+
+	* demos/qarts_demo.m: Added ANTENNA_DO = true so that the antenna 
+	pattern calculation is perfomed.
+
 2013-02-22  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-277
