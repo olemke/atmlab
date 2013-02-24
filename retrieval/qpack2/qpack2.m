@@ -10,13 +10,13 @@
 %    The data fields of the output structure L2 depends on selected retrieval
 %    quantities and settings in Q. See further *qp2_l2*.
 %
-% FORMAT   L2 = qpack2(Q,O,Y)
+% FORMAT   [L2,X] = qpack2(Q,O,Y)
 %
 % IN    Q        Qarts setting structure. See *qarts*.
 %       O        OEM settings. See *oem*.
 %       Y        Measurement data. See *qp2_y*.
 % OUT   L2       Retrieved data. See *qp2_l2*.
-%
+%       X        As the output of *oem*, providing additional information.
 %
 %    The measurement matching the apriori conditions can be calculated through
 %    this function. This can be useful for test retrievals, or comparison with
@@ -32,7 +32,7 @@
 % 2010-05-10   Created by Patrick Eriksson.
 
 
-function L2 = qpack2(Q,O,Y)
+function [L2,X] = qpack2(Q,O,Y)
 
 
 %------------------------------------------------------------------------------

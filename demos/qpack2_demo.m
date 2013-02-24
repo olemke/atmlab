@@ -162,7 +162,7 @@ Q.ABS_NLS             = [];
 %
 z_toa                 = 95e3;
 %
-Q.P_GRID              = z2p_simple( Q.Z_SURFACE-1e3 : 250 : z_toa )';
+Q.P_GRID              = z2p_simple( Q.Z_SURFACE-1e3 : 2e3 : z_toa )';
 
 
 
@@ -235,7 +235,7 @@ Q.HSE.ACCURACY = 0.1;
 Q.ABS_SPECIES(1).TAG      = { 'O3' };
 Q.ABS_SPECIES(1).RETRIEVE = true;
 Q.ABS_SPECIES(1).L2       = true;
-Q.ABS_SPECIES(1).GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:2e3:z_toa)', [], [] };
+Q.ABS_SPECIES(1).GRIDS    = { Q.P_GRID, [], [] };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
       'midlatitude-winter', 'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
 % For demonstration, setting sfor several units are provided:
@@ -316,7 +316,7 @@ Q.WIND_V_FIELD    = [];      % This is a short-cut for zero wind.
 %
 Q.WIND_V.RETRIEVE = false;   % Set to true to activate retrieval
 Q.WIND_V.L2       = true;
-Q.WIND_V.GRIDS    = { z2p_simple(Q.Z_SURFACE+1e3:4e3:z_toa)', [], [] };
+Q.WIND_V.GRIDS    = { Q.P_GRID(1:2:end), [], [] };
 Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 40, ...
                                                     'lin', 0.5, 0.00, @log10 );
 

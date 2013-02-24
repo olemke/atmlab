@@ -1,11 +1,22 @@
+2013-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-279
+
+	* demos/qpack2_demo.m: Made P_GRID coarser. Retrieval grids are
+	now set based on P_GRID, that is beneficial to keep representation
+	errors low.
+
+	* retrieval/qpack2/qpack2.m: Added oem's X as output, to make it
+	possible to obtain e.g. Xiter.
+
 2013-02-22  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-1-278
 
-	* demos/qarts_demo2.m: Added ANTENNA_DO = true so that the antenna 
+	* demos/qarts_demo2.m: Added ANTENNA_DO = true so that the antenna
 	pattern calculation is perfomed.
 
-	* demos/qarts_demo.m: Added ANTENNA_DO = true so that the antenna 
+	* demos/qarts_demo.m: Added ANTENNA_DO = true so that the antenna
 	pattern calculation is perfomed.
 
 2013-02-22  Gerrit Holl  <gerrit.holl@ltu.se>
@@ -25,7 +36,7 @@
 	* demos/qarts_demo.m (qarts_demo): Updated to "rtp".
 
 	* arts/qarts2cfile.m: Changed some hard-coded settings related to
-	rte -> rtp changes. 
+	rte -> rtp changes.
 
 	* arts/arts.m: ARTS errors were printed twice.
 
@@ -47,7 +58,7 @@
 2013-02-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-273
-	
+
 	* datasets/SatDataset.m, collocations/FieldCopier.m,
 	collocations/CollocatedDataset.m, datasets/HomemadeDataset.m: More
 	cross-pointers between different types of documentation.
