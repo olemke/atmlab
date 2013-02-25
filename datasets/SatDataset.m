@@ -225,6 +225,60 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         % mhs.reader = '@<a href="matlab:help common_read_poes_radiometer">common_read_poes_radiometer</a>'
         reader = @(varargin)[];
         
+        % Function to post-process a single granule
+        %
+        % After a granule is read (see attribute reader), there might be
+        % dataset-specific post-processing to be done immediately after the
+        % reading.  For example, one may want to calculate pseudo-fields
+        % to get IWP when the data only have IWC, and one should save
+        % memory for later on. By default, this property is set to a no-op.
+        %
+        % Note that since this is a function implemented as an attribute
+        % and not as a method (so that redefining does not require
+        % subclassing), one needs to explicitly pass the dataset as a first
+        % argument (see below) when calling the function. However, calling
+        % this function is taken care of by read_granule, and normally the
+        % user does not need to call this function explicitly.
+        %
+        % The method read_granule takes care of removing ballast as
+        % indicated by the 'dependencies' fields.
+        %
+        % FORMAT
+        %
+        %   data = self.processor(self, data, fields)
+        %
+        % IN
+        %
+        %   self    SatDataset object
+        %   data    data as returned by self.reader
+        %   fields  fields as passed to self.reader
+        %
+        % OUT
+        %   data    altered data struct
+        %
+        % See also: SatDataset/pseudo_fields
+        reader_processor = @(self, data, fields)data;
+        
+        % Structure with pseudo-field information
+        %
+        % For some datasets, the user might want to acquire fields not
+        % actually in the data. For example, to save memory, one might want
+        % to get IWP when the data actually contain IWC. For this,
+        % read_granule needs some information on pseudo_fields,
+        % specifically, for each pseudo field a cell string with
+        % dependencies. The dependencies cellstr lists the real fields upon
+        % which the pseudo fields depend. These will be read, passed to
+        % reader_processor, and then thrown away.
+        %
+        % You may wish to add some attributes for user documentation.
+        %
+        % Note: every pseudo field MUST have a dependencies member that is
+        % a cellstr, but this cellstr may be empty.
+        %
+        % Note: Users choosing pseudo-field names equal to fields in the
+        % actual data will be sentenced to the Usenet Death Penalty.
+        pseudo_fields = struct();
+        
         % Granule duration in seconds (required)
         %
         % Describes the duration in seconds for a single granule. In case
@@ -769,12 +823,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % $Id$
              
             % optional arguments
-            [spec, extra, remdouble, force, reload] = optargs(varargin, {'', {}, true, false, false});
+            [spec, fields_asked, remdouble, force, reload] = optargs(varargin, {'', {}, true, false, false});
             
             % checks for earlier error detection
             rqre_datatype(date, @isnumeric);
             rqre_datatype(spec, {@ischar, @iscellstr});
-            rqre_datatype(extra, @iscell);
+            rqre_datatype(fields_asked, @iscell);
             rqre_datatype(remdouble, @islogical);
             rqre_datatype(force, @islogical);
             rqre_datatype(reload, @islogical);
@@ -783,8 +837,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % 'scanline_number' from 'extra'. Those are in reality always
             % returned, but readers do not necessarily understand them.
             
-            extra(strcmp(extra, 'scanline_number')) = [];
-            extra(strcmp(extra, 'scanline_position')) = [];
+            fields_asked(strcmp(fields_asked, 'scanline_number')) = [];
+            fields_asked(strcmp(fields_asked, 'scanline_position')) = [];
+            
+            % these must always be present in reader return
+            fields_always = {'time', 'lat', 'lon', 'epoch'};
             
             %% generate varname for caching
             X = date;
@@ -812,12 +869,32 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %% find datafile and function to read it
             datafile = self.find_granule_by_datetime(date, spec);
             
+            %% Split extras in fields in data and pseudo-fields
+%            pseudos = fieldnames(self.pseudo_fields);
+            fields_in_data = {};
+            fields_in_pseudo = {};
+            fields_in_deps = {}; % only in dependencies
+            for i = 1:length(fields_asked)
+                field = fields_asked{i};
+                if isfield(self.pseudo_fields, field)
+                    fields_in_pseudo = [fields_in_pseudo field]; %#ok<AGROW>
+                    deps = fieldnames(self.pseudo_fields.(field).dependencies);
+                    for j = 1:length(deps)
+                        if ~any(strcmp(dep, [fields_always fields_asked]))
+                            fields_in_deps = [fields_in_deps field]; %#ok<AGROW>
+                        end
+                    end
+                else
+                    fields_in_data = [fields_in_data field]; %#ok<AGROW>
+                end
+            end
+            
             %% read datafile
             %logtext(colloc_config('stdout'), '%s(''%s'')\n', ...
             %    func2str(reader), datafile);
             logtext(atmlab('OUT'), 'Reading %s\n', datafile);
             try
-                data = self.reader(datafile, extra);
+                data = self.reader(datafile, [fields_in_data fields_in_deps]);
             catch ME
                 if force
                     switch ME.identifier
@@ -833,13 +910,26 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
             end
             
+            %% do further processing
+            
+            data = self.reader_processor(self, data, fields_in_pseudo);
+            
             %% check/convert datafile contents
-            rqre_field(data, 'time');
-            rqre_field(data, 'lat');
-            rqre_field(data, 'lon');
-            rqre_field(data, 'epoch');
+            
+            data = rmfield(data, fields_in_deps);
+            
+            fields_expected = [fields_always fields_in_data fields_in_pseudo];
+            ffound = isfield(data, fields_expected);
+            if ~all(ffound);
+                error(['atmlab:' mfilename ':missingfield'], ...
+                    ['After reading with %s and processing with %s, ' ...
+                    'the following fields were expected but not found: %s'], ...
+                    func2str(self.reader), func2str(self.reader_processor), ...
+                    sprintf('%s ', fields_expected{ffound}));
+            end
             
             if isinteger(data.time)
+                % later functions will suffocate on non-double time
                 data.time = double(data.time);
             end
             nlines = size(data.time, 1);

@@ -1,3 +1,21 @@
+2013-02-25  Gerritr Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-280
+
+	* datasets/SatDataset.m:
+
+	- Added two new members: 'reader_processor' and 'pseudo_fields'.
+	  See documentation for details.
+
+	(read_granule):
+
+	- Allow for pseudo fields. For pseudo fields, the fields listed in the
+	dependencies are passed on to 'reader' whereas the pseudo fields are
+	passed on to 'reader_processor'. See documentation for the new members
+	for details.
+
+	- Verify that all expected fields are actually there.
+
 2013-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-279
