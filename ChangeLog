@@ -1,4 +1,13 @@
-2013-02-25  Gerritr Holl  <gerrit.holl@ltu.se>
+2013-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-281
+
+	* geodetic/r_crossing.m:Added two missing ;
+
+	* geodetic/geodetic2cart.m: Gave wrong result. DEG2RAD and RAD2DEG
+	was mixed up.
+
+2013-02-25  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-280
 

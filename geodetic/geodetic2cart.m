@@ -25,14 +25,12 @@ if nargin<4
   ellipsoid = ellipsoidmodels( 'WGS84' );
 end 
 
-deg2rad = constants( 'RAD2DEG' );
-
-a  = ellipsoid(1);
-e2 = ellipsoid(2) ^ 2;
-sinphi = sin(deg2rad*lat);
-cosphi = cos(deg2rad*lat);
-N  = a ./ sqrt(1 - e2 * sinphi.^2);
-x = (N + h) .* cosphi .* cosd(lon);
-y = (N + h) .* cosphi .* sind(lon);
-z = (N*(1 - e2) + h) .* sinphi;
+a      = ellipsoid(1);
+e2     = ellipsoid(2) ^ 2;
+sinphi = sind( lat );
+cosphi = cosd( lat );
+N      = a ./ sqrt(1 - e2 * sinphi.^2);
+x      = (N + h) .* cosphi .* cosd(lon);
+y      = (N + h) .* cosphi .* sind(lon);
+z      = (N*(1 - e2) + h) .* sinphi;
 

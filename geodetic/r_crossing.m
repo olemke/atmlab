@@ -55,8 +55,8 @@ else
   l1 = -p + sq;
   l2 = -p - sq;
 
-  lmin = min( l1, l2 )
-  lmax = max( l1, l2 )
+  lmin = min( l1, l2 );
+  lmax = max( l1, l2 );
 
   % If r0 equals r solutions just above zero can appear (that
   % shall be rejected). So we pick the biggest solution if lmin is
