@@ -23,16 +23,15 @@ end
 
 D = datasets;
 
+%% datasets generated elsewhere
 
-%% active
-
+% -------
+% active
+% -------
 D.calipso.basedir = '/storage3/data/calipso/CAL_LID_L2_05kmCLay-Prov-V3-01';
 D.calipso.subdir = '$YEAR4/$MONTH/$DAY';
 D.calipso.re = '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})T(?<hour>\d{2})-(?<minute>\d{2})-(?<second>\d{2})Z';
 
-% -------
-% CLOUDSAT
-% -------
 D.cpr.basedir = '/storage3/data/cloudsat/2B-CWC-RO.R04';
 D.cpr.subdir = '$YEAR4/$DOY';
 D.cpr.re = '(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})\d{2}_(?<granule_number>\d{5})_CS_(?<product_name>[\dA-Z\-]*)_(?<subset>[A-Z]*)_(?<id>[A-Z])_(?<release>R[0-9]{2})_(?<epoch>E\d{2})(?<end>\.hdf.zip)';
@@ -45,7 +44,11 @@ D.cprCldclass.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
 D.cprCldclass.subdir = D.cpr.subdir;
 D.cprCldclass.re = D.cpr.re;
 
-D.CPR_2C_ICE.basedir = '/storage5/data/cloudsat/2C-ICE.R04';
+D.cprCldclass_lidar.basedir = '/storage3/data/cloudsat/2B-CLDCLASS-LIDAR.R04';
+D.cprCldclass_lidar.subdir = D.cpr.subdir;
+D.cprCldclass_lidar.re = D.cpr.re;
+
+D.CPR_2C_ICE.basedir = '/storage3/data/cloudsat/2C-ICE.R04';
 D.CPR_2C_ICE.subdir = D.cpr.subdir;
 D.CPR_2C_ICE.re = D.cpr.re;
 
@@ -57,8 +60,9 @@ D.dardar.re = 'DARDAR-CLOUD_v(?<version>.+)_(?<year>\d{4})(?<doy>\d{3})(?<hour>\
 % |-approach instead. Same regexp works for all POES.
 poes_re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})';
 
-%% Passive
-
+% ---------
+% Passive
+% --------
 D.avhrr_cmsaf_gac.basedir = '/storage3/data/cmsaf_avhrr_gac_cwp/';
 D.avhrr_cmsaf_gac.subdir = '$YEAR4/$MONTH/$DAY';
 D.avhrr_cmsaf_gac.re = 'RR_AVHRR_L2_cp_(?<satname>[A-Z0-9]{6})_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})_(?<hour>\d{2})(?<minute>\d{2})_v(?<version>\d{1})';
@@ -72,7 +76,8 @@ D.amsub.subdir = '$SAT_amsub_$YEAR4/$MONTH/$DAY';
 D.amsub.re = poes_re;
 
 % ---------------
-% So far this dataset is local for salomon on ubuntu6
+% So far this dataset is local for salomon on ubuntu6. Will update when all the
+% data is in place
 D.cloud_cci.basedir = '/local/salomon/tmp/data/visitingScientist/cloud_cci';
 D.cloud_cci.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
 D.cloud_cci.re = '(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})';
@@ -148,7 +153,7 @@ D.patmosxL3.re        = 'patmosx_aft_mor_.+(?<year>\d{4})';
 
 %% COLLOCATION DATA SETS
 
-%% MW datasets
+% MW datasets
 
 D.collocation_mhs_mhs.basedir   = '/storage4/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
 D.collocation_mhs_mhs.subdir    = '$YEAR4/$MONTH/$DAY';
@@ -186,7 +191,7 @@ D.collocation_ssmt2_amsub.basedir = '/storage3/user_data/gerrit/collocated_datas
 D.collocation_ssmt2_amsub.subdir = '$YEAR4/$MONTH/$DAY';
 D.collocation_ssmt2_amsub.filename = 'collocations_$SAT1_$SAT2.nc.gz';
 
-%% CPR as reference
+% CPR as reference
 
 D.CollocatedDataset_avhrrCMSAF_cpr.basedir   = '/storage4/user_data/seliasson/collocations_avhrrCMSAF_cpr/core';
 D.CollocatedDataset_avhrrCMSAF_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
@@ -232,7 +237,7 @@ D.CollocatedDataset_patmosx_cpr.basedir   = '/storage4/user_data/seliasson/collo
 D.CollocatedDataset_patmosx_cpr.subdir    = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_patmosx_cpr.filename  = 'collocations_patmosx_cpr_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-%% DARDAR as reference
+% DARDAR as reference
 
 D.CollocatedDataset_avhrrCMSAF_dardarsub.basedir   = '/storage4/user_data/seliasson/collocations_avhrrCMSAF_dardarsub/core';
 D.CollocatedDataset_avhrrCMSAF_dardarsub.subdir    = '$YEAR4/$MONTH/$DAY';
@@ -282,15 +287,13 @@ D.CollocatedDataset_patmosx_dardarsub.filename  = 'collocations_patmosx_dardarsu
 % Collocated collocated datasets
 % -------------------------------
 
-D.dardarsub_modis_cldclass.basedir    = '/storage4/user_data/seliasson/collocations_dardarsub_modis_cldclass/core';
-D.dardarsub_modis_cldclass.subdir     = '$YEAR4/$MONTH/$DAY';
-D.dardarsub_modis_cldclass.filename   = 'collocations_dardarsub_modis_cldclass_$YEAR4_$MONTH_$DAY.nc.gz';
+D.CollocatedDataset_dardarsub_modis_cprCloud.basedir    = '/storage4/user_data/seliasson/dardarsub_modis_cprCloud/core';
+D.CollocatedDataset_dardarsub_modis_cprCloud.subdir     = '$YEAR4/$MONTH/$DAY';
+D.CollocatedDataset_dardarsub_modis_cprCloud.filename   = 'core_dardarsub_modis_cprCloud_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.dardarsub_modis_cprCldclass_cloudTypes.basedir  = '/storage4/user_data/seliasson/collocations_dardarsub_modis_cldclass/CollocatedDataset_dardarsub_modis_cprCldclass_cloudTypes';
-D.dardarsub_modis_cprCldclass_cloudTypes.subdir   = '$YEAR4/$MONTH/$DAY';
-D.dardarsub_modis_cprCldclass_cloudTypes.filename = 'collocations_CollocatedDataset_dardarsub_modis_cprCldclass_$YEAR4_$MONTH_$DAY.nc.gz';
-%     
-
+D.CollocatedDataset_dardarsub_modis_cprCloudLidar.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/core';
+D.CollocatedDataset_dardarsub_modis_cprCloudLidar.subdir   = '$YEAR4/$MONTH/$DAY'; 
+D.CollocatedDataset_dardarsub_modis_cprCloudLidar.filename = 'core_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 %% Associated datasets
 % ----------------------
@@ -351,6 +354,14 @@ D.cpr_dardarsub_IWP.subdir      = '$YEAR4/$MONTH/$DAY';
 D.cpr_dardarsub_cloudTypes.basedir  = strrep(D.cpr_dardarsub_IWP.basedir,'IWP','cloudTypes');
 D.cpr_dardarsub_cloudTypes.filename = D.cpr_dardarsub_IWP.filename;
 D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
+
+D.dardarsub_modis_cprCloud.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloud/fields';
+D.dardarsub_modis_cprCloud.subdir   = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_cprCloud.filename = 'fields_dardarsub_modis_cprCldclass_$YEAR4_$MONTH_$DAY.nc.gz';
+
+D.dardarsub_modis_cprCloudLidar.basedir = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/fields';
+D.dardarsub_modis_cprCloudLidar.subdir  = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_cprCloudLidar.filename= 'fields_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 D.fields_2C_ice_dardarsub.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/2C-ICE_dardarsub';
 D.fields_2C_ice_dardarsub.filename = 'fieldcopier_2C-ICE_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';

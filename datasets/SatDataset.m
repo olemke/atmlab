@@ -878,10 +878,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 field = fields_asked{i};
                 if isfield(self.pseudo_fields, field)
                     fields_in_pseudo = [fields_in_pseudo field]; %#ok<AGROW>
-                    deps = fieldnames(self.pseudo_fields.(field).dependencies);
+                    deps = self.pseudo_fields.(field).dependencies;
                     for j = 1:length(deps)
-                        if ~any(strcmp(dep, [fields_always fields_asked]))
-                            fields_in_deps = [fields_in_deps field]; %#ok<AGROW>
+                        dep = deps{j};
+                        if ~any(strcmp(dep, [fields_always fields_asked fields_in_deps]))
+                            fields_in_deps = [fields_in_deps dep]; %#ok<AGROW>
                         end
                     end
                 else

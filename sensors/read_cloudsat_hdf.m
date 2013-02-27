@@ -43,12 +43,20 @@ function [d, attr] = read_cloudsat_hdf(hdfFile, sdsName)
 % LAST MODIFICATION: "$Id$"
 
 % Error checking.
-error(nargchk(2, 2, nargin));
-error(nargoutchk(1, 2, nargout));
+narginchk(2, 2);
+nargoutchk(1, 2);
 
+errId = ['atmlab:' mfilename];
 assert(iscellstr(sdsName) || (ischar(sdsName) && size(sdsName, 1) == 1),...
-    ['atmlab:' mfilename ':badInput'],...
-    'Input argument SDSNAME must be a cell array of strings or a string!');
+    [errId ':badInput'],'Input argument SDSNAME must be a cell array of strings or a string!');
+
+% UNCOMPRESS if needed
+if any([strcmp(hdfFile(end-2:end),'.gz'),strcmp(hdfFile(end-3:end),{'.zip','.bz2'})])
+	tmpdir = create_tmpfolder;
+    c= onCleanup(@() rmdir(tmpdir,'s'));
+	hdfFile = uncompress(hdfFile,tmpdir);
+    if isempty(hdfFile), error(errId,'Uncompressing failed'); end
+end
 
 % Query the contents of the HDF file.
 s = hdfinfo(hdfFile);
@@ -92,8 +100,7 @@ for i = 1:length(sdsName)
     
     % Look for the SDS var using user-supplied name.
     assert(ismember(sdsName{i}, allfields),...
-        ['atmlab:' mfilename ':MissingFromFile'],...
-        'variable %s is missing in %s',sdsName{i}, hdfFile)
+        [errId ':MissingFromFile'],'variable %s is missing in %s',sdsName{i}, hdfFile)
     
     % READ the data.
     d.(sdsName{i}) = hdfread(hdfFile,sdsName{i});

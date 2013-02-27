@@ -1,3 +1,32 @@
+2013-02-27  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-283
+
+	* datasets/SatDataset.m: Fixed bug in determining the names of the
+	dependent fields belonging to pseudo_fields
+
+	* datasets/define_datasets.m:
+	* site-specific/kiruna/datasets_init.m:
+	Added quite a few new datasets, added pseudo_fields
+
+	* datasets/common_read_cpr.m:
+	Removed subfunction dealing with pseudo_fields. This is now taken
+	care of by the function to be used by the new SatDataset method
+	reader_processor. (e.g., self.reader_processor = @cpr_postprocessor)
+	* datasets/cpr_postprocessor.m: Added
+
+	* deprecated/common_read_cpr_2BCWCRO.m:
+	Moved to depricated. Deprecated since it is not general and
+	common_read_cpr.m  is a better suited to read all kinds of
+	cloudsat data.
+
+	* deprecated/cloudsat_read_zipped.m:
+	Moved to depricated. Deprecated by the change to read_cloudsat_hdf.m
+
+	* sensors/read_cloudsat_hdf.m: Added code to automatically
+	uncompress (and later delete the uncompressed) input file if it
+	ends in .gz,.zip, or .bz2
+
 2013-02-27  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-282
