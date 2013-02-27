@@ -432,6 +432,7 @@ classdef CollocatedDataset < HomemadeDataset
             %   mhscpr.collocate_granule([2010 9 8 8 8], 'noaa18', '', {fc}, true)
             
             [additionals, oneday] = optargs(varargin, {{}, false});
+            self.verify_addis(additionals);
             additional_results = cell(size(additionals));
             this_additional_result = cell(size(additionals));
             
@@ -690,6 +691,7 @@ classdef CollocatedDataset < HomemadeDataset
             %   mhscpr.collocate_date([2010 9 8], 'noaa18', '', {fc})
             
             additionals = optargs(varargin, {{}});
+            self.verify_addis(additionals);
             
             fid = atmlab('OUT');
             year = date(1);
@@ -826,6 +828,7 @@ classdef CollocatedDataset < HomemadeDataset
             % >> mhscpr.collocate_date([2010 9 8], 'noaa18', '', {fc})
             
             additionals = optargs(varargin, {{}});
+            self.verify_addis(additionals);
             % get filename
             
             if isempty(spec1)
@@ -1800,6 +1803,23 @@ classdef CollocatedDataset < HomemadeDataset
                 logtext(self.log, 'Collocations ended prematurely\n');
             end
             fclose(self.log);
+        end
+        
+        function verify_addis(self, addis)
+            % verify that all those additionals are actually known to me
+            
+            for i = 1:length(addis)
+                addi = addis{i};
+                knownnames = cellfun(@(x) x.name, self.associated, 'UniformOutput', false);
+                if ~any(strcmp(addi.name, knownnames))
+                    
+                    error(['atmlab:' mfilename ':invalid'], ...
+                        ['You asked to get %s %s as an AssociatedDataset, but you can only pass' ...
+                        ' AssociatedDatasets that were created in my honour.' ...
+                        ' As far as I know, those are: %s'], ...
+                        class(addi), addi.name, sprintf('%s ', knownnames{:}));
+                end
+            end
         end
     end
     

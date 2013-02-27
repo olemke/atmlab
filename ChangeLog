@@ -1,3 +1,18 @@
+2013-02-27  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-282
+
+	* collocations/CollocatedDataset.m:
+
+	(verify_addis):
+
+	- New private method that verifies that AssociatedDatasets are
+	actually registered with self.
+
+	(collocate_and_store_date) (collocate_date) (collocate_granule):
+
+	- Use self.verify_addis(...)
+
 2013-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-281
