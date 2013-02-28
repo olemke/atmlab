@@ -51,7 +51,7 @@ classdef HomemadeDataset < SatDataset
         % cols-member.
         cols = struct;
         
-        members;
+%        members;
         
         % write data even if data are already there
         overwrite = false;
@@ -85,7 +85,21 @@ classdef HomemadeDataset < SatDataset
         % 'single'.  Do not set it to any non-floating point type unless
         % you want severe loss of precision and crashing code.
         mattype = 'double';
-    end    
+
+    end
+    
+    properties (Dependent = true)
+        % contains detailed information on how data are stored etc.
+        %
+        % To be documented in more detail.
+        members;
+    end
+    
+    properties (Access = protected)
+        % for internal usage
+        ownmembers;
+        dynamic_members = false;
+    end
     
     methods
         
@@ -279,17 +293,13 @@ classdef HomemadeDataset < SatDataset
             logtext(atmlab('OUT'), 'Done\n');
             
         end
-        
-        function mem = getmembers(self)
-            mem = self.members;
-        end
-        
+                
         function fields = list_fields(self)
             % return valid fields in this dataset
             fields = fieldnames(self.getmembers());
         end
         
-        % protected, those are for internal use, user uses
+        % those are for internal use, user uses
         % CollocatedDataset.read
         function [M, localcols, attr] = read_single_day(self, date, spec, fields)
             % Read collocation 'fields' for 'date', 'spec'.
@@ -420,15 +430,9 @@ classdef HomemadeDataset < SatDataset
         end
         
         function [S, strattr] = read_homemade_granule(self, file, varargin)
-            % read netcdf-stored dataset such as dardarsub, CMIWP, ...
+            % internal usage, reader for any granule made by this toolkit
             %
-            % format as other common_read_-functions.
-            %
-            % Besides a simple loadncvar, this adds fields 'epoch', 'path'
-            % and 'version'.
-            %
-            % Method based on common_read_netcdf_dataset, which is in turn
-            % based on common_read_dardarsub
+            % hd.read_homemade_granule(file, [fields])
             
             fields  = optargs(varargin, {{}});
             
@@ -454,15 +458,41 @@ classdef HomemadeDataset < SatDataset
             if isfield(S, 'lat')
                 S = MaskInvalidGeoTimedataWithNaN(S);
             end
+        end   
+        
+        %% getters/setters
+        function mem = get.members(self)
+            % members getter, see doc for property members
+            
+            if self.dynamic_members
+                mem = self.dynamically_get_members();
+            else
+                mem = self.ownmembers;
+            end
         end
         
+        function set.members(self, val)
+            if self.dynamic_members
+                error(['atmlab:' mfilename ':readonly'], ...
+                    ['The property ''members'' for class %s is dynamically calculated. ' ...
+                     'Therefore, you cannot set the members property for %s.'], ...
+                     class(self), self.name);
+            else
+                self.ownmembers = val;
+            end
+        end
+        
+    end
+    
+    methods (Access = protected)
         function pos2re(self)
             % convert self.{basedir,subdir,filename} to self.re
             %
             % This method attempts to convert
-            % self.{basedir,subdir,filename) to self.re at a best-effert
+            % self.{basedir,subdir,filename) to self.re at a best-effort
             % basis.
-            r = fullfile(self.basedir, self.subdir, self.filename);
+            r = [fullfile(self.basedir, self.subdir, self.filename) ...
+                 '|' self.filename];
             self.re = strrep_multi(r, ...
                 '$YEAR4', '(?<year>\d{4})', ...
                 '$MONTH', '(?<month>\d{2})', ...
@@ -472,9 +502,14 @@ classdef HomemadeDataset < SatDataset
                 '$HOUR', '(?<hour>\d{2})', ...
                 '$MINUTE', '(?<minute>\d{2})', ...
                 '$SAT', '(?<satname>[a-z0-9]*)');
-            % but we don't need it, therefore don't use it
+            % However, we don't need it to locate granules. It's only used
+            % by find_info_from_granule.
             self.tryre = false;
         end
+                
+%         function mem = dynamically_get_members(self)
+%             mem = self.ownmembers;
+%         end
     end
         
     % static/private are used like subfunctions

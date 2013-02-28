@@ -86,6 +86,8 @@ classdef AssociatedDataset < HomemadeDataset
     end
     
     methods
+        %% constructor
+        
         function self = AssociatedDataset(varargin)
             % constructor for AssociatedDataset
             %
@@ -139,41 +141,11 @@ classdef AssociatedDataset < HomemadeDataset
                 self.parent.add_associated(self);
             end
         end
-        
-        function members2cols(self)
-            % converts self.members to corresponding self.cols
-            %
-            % Assumes sizes in self.members are correct. This may not
-            % always be the case before the first data is read!
-            % This has no input or output, because it operates entirely on
-            % the own object.
-            %
-            % FORMAT
-            %
-            %   ad.members2cols()
-            %
-            % IN
-            %
-            %   (none, but uses <a href="matlab:help AssociatedDataset.members">members</a>)
-            %
-            % OUT
-            %
-            %   (none, but sets <a href="matlab:help AssociatedDataset.cols">cols</a>)
-            allnames = fieldnames(self.members);
-            tot = 1;
-            for i = 1:length(allnames)
-                fname = allnames{i};
-                fl = self.members.(fname);
-                if isfield(fl, 'dims')
-                    no = self.members.(fname).dims{2};
-                else
-                    no = 1;
-                end
-                % self.cols is in HomemadeDataset
-                self.cols.(fname) = tot:(tot+no-1);
-                tot = tot + no;
-            end
-        end
+              
+    end
+    
+    methods (Access = {?SatDataset})
+        %% implement new methods
         
         function out = process_delayed(self, processed_core, spec1, spec2, varargin)
             % process associated data when core data is already there
@@ -378,11 +350,44 @@ classdef AssociatedDataset < HomemadeDataset
             end
         end
         
-
+        function members2cols(self)
+            % converts self.members to corresponding self.cols
+            %
+            % Assumes sizes in self.members are correct. This may not
+            % always be the case before the first data is read!
+            % This has no input or output, because it operates entirely on
+            % the own object.
+            %
+            % FORMAT
+            %
+            %   ad.members2cols()
+            %
+            % IN
+            %
+            %   (none, but uses <a href="matlab:help AssociatedDataset.members">members</a>)
+            %
+            % OUT
+            %
+            %   (none, but sets <a href="matlab:help AssociatedDataset.cols">cols</a>)
+            allnames = fieldnames(self.members);
+            tot = 1;
+            for i = 1:length(allnames)
+                fname = allnames{i};
+                fl = self.members.(fname);
+                if isfield(fl, 'dims')
+                    no = self.members.(fname).dims{2};
+                else
+                    no = 1;
+                end
+                % self.cols is in HomemadeDataset
+                self.cols.(fname) = tot:(tot+no-1);
+                tot = tot + no;
+            end
+        end
+        
     end
     
-    methods (Static)
-       
+    methods (Static, Access = protected)       
         function M_cols = merge_new_cols(M_core, cols_core, cols_self)
             % merge different cols-structures describing matrix of data
             %
@@ -409,7 +414,7 @@ classdef AssociatedDataset < HomemadeDataset
     end
     
     % those methods must be implemented by subclasses
-    methods (Abstract)
+    methods (Abstract, Access = {?SatDataset})
         % Arguments to pass on to primary reader
         %
         % This method returns a cell array with arguments that shall be

@@ -591,7 +591,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                             (isfield(nam, 'year') && ~isempty(nam.year) && str2double(nam.year)~=date(1)) || ...
                             (isfield(nam, 'month') && ~isempty(nam.month) && str2double(nam.month)~=date(2)) || ...
                             (isfield(nam, 'day') && ~isempty(nam.day) && str2double(nam.day)~=date(3)) || ...
-                            (isfield(nam, 'doy') && ~isempty(nam.doy) && str2double(nam.doy)~=dayofyear(date(1), date(2), date(3)));
+                            (isfield(nam, 'doy') && ~isempty(nam.doy) && str2double(nam.doy)~=dayofyear(date(1), date(2), date(3)) || ...
+                            (isfield(nam, 'satname') && ~isequal(nam.satname, spec)));
                         continue;
                     end
                     
@@ -1198,7 +1199,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             self.store_firstline(scanfile, sat);
                         
         end
-                
+      
+        %{
         function outer = find_extreme_granule(self, spec, mode, varargin)
             % find the earliest or latest granule for this dataset
             %
@@ -1270,7 +1272,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     outer = grans(end, :);
             end
         end
-
+%}
+        
         function start_unixsecs = get_starttime(self, datevec)
             % get starttime for granule/granules
             %
@@ -1430,16 +1433,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % calculate overall mean
             gridmean = bsxfun(@ldivide, totalcount, totalsum);
         end
-        
-        function pos2re(~)
-            error(['atmlab:' mfilename ':cannotconvert'], ...
-                ['The regular expression self.re was not defined, so ' ...
-                 'I tried to convert it automagically from location '...
-                 'information. However, I don''t know how to do this. ' ...
-                 'I give up. Please help me: either implement ' ...
-                 'a pos2re() method, or define a re member.']);
-        end
-        
+                
         %% getters and setters for properties
         
         function path = get.starttimes_fullpath(self)
@@ -1478,15 +1472,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             logtext(atmlab('OUT'), 'Writing %s\n', self.starttimes_fullpath);
             save(self.starttimes_fullpath, 'val');
         end
-
-        %% methods for internal use (not private, but from other classes)
-       
-        function add_collocated_dataset(ds, cd)
-            % Adds a collocated dataset. INTERNAL USE ONLY!
-            %
-            % This is called by the CollocatedDataset constructor.
-            ds.collocated_datasets = [ds.collocated_datasets cd];
-        end
         
         function set.name(self, value)
             % setter for 'name' property.
@@ -1497,9 +1482,28 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             self.name = value;
             datasets(self);
         end
+
+        %% methods for internal use (not private, but from other classes)
+       
+        function add_collocated_dataset(ds, cd)
+            % Adds a collocated dataset. INTERNAL USE ONLY!
+            %
+            % This is called by the CollocatedDataset constructor.
+            ds.collocated_datasets = [ds.collocated_datasets cd];
+        end
+        
     end
     
     methods (Access = protected)
+        function pos2re(~)
+            error(['atmlab:' mfilename ':cannotconvert'], ...
+                ['The regular expression self.re was not defined, so ' ...
+                 'I tried to convert it automagically from location '...
+                 'information. However, I don''t know how to do this. ' ...
+                 'I give up. Please help me: either implement ' ...
+                 'a pos2re() method, or define a re member.']);
+        end
+        
         function nm = calculate_name(self)
             % calculate_name Return automated name if name is not given
             %

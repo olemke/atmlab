@@ -16,6 +16,8 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
         %
         % FIXME DOC
         fieldcopier_other_secondary = struct();
+        
+%        members;
     end
     
     methods
@@ -37,12 +39,12 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             %d = datasets;
             self = self@FieldMultiInstrumentCopier(pparent, {}, varargin{:});
             
+            self.dynamic_members = true;
+            
             self.parent = pparent;
             self.fieldcopier_core = FieldCopier(self.parent, f_mhs, f_cpr, 'name', [self.name '_sub_mhs_cpr'], 'visible', false);
             self.fieldcopier_other_primary.amsua = FieldCopier(self.parent, f_amsua, struct(), 'name', [self.name '_sub_amsua'], 'visible', false);
             self.fieldcopier_other_primary.hirs = FieldCopier(self.parent, f_hirs, struct(), 'name', [self.name '_sub_hirs'], 'visible', false);
-
-            self.setmems();
             
             if length(fieldnames(self.members)) < (...
                     length(fieldnames(self.fieldcopier_other_primary.amsua.members)) + ...
@@ -54,19 +56,17 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             %            self.fieldstruct_mhs = f_mhs;
 %            self.fieldstruct_amsua = f_amsua;
 %            self.fieldstruct_hirs = f_hirs;
-        end
-        
-        function setmems(self)
-            self.members = catstruct(self.fieldcopier_core.members, ...
-                self.fieldcopier_other_primary.amsua.members, ...
-                self.fieldcopier_other_primary.hirs.members);
-        end
+        end               
+       
+        %% overload parent methods
         
         function store(self, varargin)
-            self.setmems();
             store@FieldMultiInstrumentCopier(self, varargin{:});
         end
         
+    end
+    
+    methods (Access = protected)
         %% implementation of abstract methods
                 
         function [newline, newpos] = translate(self, processed_core, data_orig, dsname, data_other)
@@ -100,7 +100,16 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
             end
 
         end
-        
+    end
+    
+    methods (Access = {?HomemadeDataset})
+        function mem = dynamically_get_members(self)
+%            logtext(atmlab('OUT'), 'Getting APPC-mems\n');
+            mem = catstruct(self.fieldcopier_core.members, ...
+                self.fieldcopier_other_primary.amsua.members, ...
+                self.fieldcopier_other_primary.hirs.members);
+%             mem = self.members;
+        end
     end
     
     methods (Static, Access = private)

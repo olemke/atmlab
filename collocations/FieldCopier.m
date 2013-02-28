@@ -142,6 +142,8 @@ classdef FieldCopier < AssociatedDataset
     end
     
     methods
+        %% constructor
+        
         function self = FieldCopier(cd, fieldstruct1, fieldstruct2, varargin)
             % Creates a FieldCopier object
             %
@@ -190,8 +192,11 @@ classdef FieldCopier < AssociatedDataset
             self.members = allfields;
             
         end
-        
+    end
+    
+    methods (Access = {?SatDataset})
         %% implementation of abstract methods
+        
         function args = primary_arguments(self)
             args = self.fieldargs(self.fieldstruct_primary, self.parent.primary);
         end

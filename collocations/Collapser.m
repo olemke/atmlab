@@ -230,8 +230,11 @@ classdef Collapser < AssociatedDataset
             self.members.LAST.atts.long_name = 'Last corresponding row in overlap';
             
         end
-                
-        %% implementation of abstract methods
+    end
+    
+    methods (Access = {?SatDataset})
+        %% implementation abstract methods
+        
         function args = primary_arguments(~)
             args = {};
         end
@@ -363,7 +366,8 @@ classdef Collapser < AssociatedDataset
             
         end
         
-        %% re-implementation of parents' methods
+        %% overload parent methods
+        
         function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
             M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);

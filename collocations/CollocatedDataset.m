@@ -217,6 +217,8 @@ classdef CollocatedDataset < HomemadeDataset
     end
     
     methods
+        %% constructor
+
         function self = CollocatedDataset(prim, sec, varargin)
             % Constructor for CollocatedDataset
             %
@@ -272,6 +274,8 @@ classdef CollocatedDataset < HomemadeDataset
             end
         end
                 
+        %% implement new methods
+        
         function secondary_granules = overlap_granule(self, date1, spec2)
             % secondary granules that, judging from filenames, might overlap
             %
@@ -1052,97 +1056,6 @@ classdef CollocatedDataset < HomemadeDataset
             %%%
         end
         
-        function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
-            % Process core collocations
-            %
-            % This method processes the output of <a href="matlab:help collocate">collocate</a>
-            % and converts it to a matrix that is passed on for further
-            % processing.
-            %
-            % This is an internal method not normally called by the end
-            % user.
-            %
-            % FORMAT
-            %
-            %    M = cd.process(collocs, data1, date1, spec1, ...
-            %                            data2, date2, spec2);
-            %
-            % IN
-            %
-            %   collocs     matrix      as output by <a href="matlab:help collocate</a>collocate</a>
-            %   data1       struct      as returned by primary <a href="matlab:help SatDataset/reader">reader</a>
-            %   date1       datevec     datevec for primary
-            %   spec1       various     spec for primary (sat, sat pair, ...)
-            %   data2       struct      as returned by secondary <a href="matlab:help SatDataset/reader">reader</a>
-            %   date2       datevec     datevec for secondary
-            %   spec2       various     spec for secondary
-            %
-            % OUT
-            %
-            %   M           matrix      collocations, columns described by
-            %                           <a href="matlab:help CollocatedDataset/cols">self.cols</a>
-            
-            % NOTE: time is assumed to be 1D
-            
-            n = size(collocations, 1);
-            X = mat2cell(collocations, size(collocations, 1), [1 1 1 1]);
-            
-            c = self.cols;
-            nfields = length(fieldnames(c));
-            M = nan*zeros(n, nfields, self.mattype);
-            [line1, pos1, line2, pos2] = X{:};
-            
-            % index for direct addressing
-            i1 = sub2ind(size(data1.lat), line1, pos1);
-            i2 = sub2ind(size(data2.lat), line2, pos2);
-            
-            M(:, c.LINE1) = line1;
-            M(:, c.LINE2) = line2;
-            
-            M(:, c.POS1) = pos1;
-            M(:, c.POS2) = pos2;
-            
-            M(:, c.LAT1) = data1.lat(i1);
-            M(:, c.LON1) = data1.lon(i1);
-            
-            M(:, c.LAT2) = data2.lat(i2);
-            M(:, c.LON2) = data2.lon(i2);
-            
-            M(:, c.START1) = self.primary.get_starttime(date1);
-            M(:, c.START2) = self.secondary.get_starttime(date2);
-            
-            M(:, c.TIME1) = double(data1.epoch) + double(data1.time(line1));
-            M(:, c.TIME2) = double(data2.epoch) + double(data2.time(line2));
-            
-            M(:, c.DIST) = sphdist(M(:, c.LAT1), M(:, c.LON1), ...
-                                   M(:, c.LAT2), M(:, c.LON2), ...
-                                   constants('EARTH_RADIUS')/1e3);
-            
-            M(:, c.INT) = M(:, c.TIME2) - M(:, c.TIME1);
-
-            %% sort, needed for averaging stuff later
-
-            M = sortrows(M, [c.START1 c.LINE1 c.POS1 c.START2 c.LINE2 c.POS2]);
-            
-            
-            %% remove duplicates
-            
-            first1 = self.primary.granule_first_line(date1, spec1);
-            first2 = self.secondary.granule_first_line(date2, spec2);
-            wrongrows = (M(:, c.LINE1) < first1) | ...
-                (M(:, c.LINE2) < first2);
-            logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
-                'or secondary before %d\n'], ...
-                sum(wrongrows), first1, first2);
-            M(wrongrows, :) = [];
-            
-            % add row-number after all else, here, but REDO just before
-            % storing!
-            if ~isempty(M)
-                M(:, c.INDEX) = 1:size(M, 1);
-            end
-        end
-        
         function varargout = read(self, date_start, date_end, spec, all_fields, varargin)
             % Read collocations for indicated period
             %
@@ -1452,17 +1365,37 @@ classdef CollocatedDataset < HomemadeDataset
             %%%
         end
         
-        % semi-internal use
-        
-        function add_associated(self, ad)
-            % Add an associated dataset INTERNAL USE ONLY
+        function varargout = list_fields(self)
+            % return struct with valid fields in this dataset + associated
             %
-            % FORMAT
-            %
-            %   cd.add_associated(ad);
+            % If called without output arguments, writes to atmlab('OUT') a
+            % pretty-printed list of all fields that are valid to pass on
+            % to self.read. With one output argument, return a structure
+            % with this information. No input arguments.
             
-            self.associated = {self.associated{:} ad}; %#ok<CCAT>
+            S.(self.name) = list_fields@HomemadeDataset(self);
+            for i = 1:length(self.associated)
+                S.(self.associated{i}.name) = self.associated{i}.list_fields();
+            end
+            switch nargout
+                case 0 % write it out nicely
+                    mems = fieldnames(S);
+                    for i = 1:length(mems)
+                        fprintf(atmlab('OUT'), '%s:\n', mems{i});
+                        fprintf(atmlab('OUT'), '    ');
+                        for k = 1:length(S.(mems{i}))
+                            fprintf(atmlab('OUT'), '%s ', S.(mems{i}){k});
+                        end
+                        fprintf(atmlab('OUT'), '\n\n');
+                    end
+                case 1
+                    varargout = {S};
+                otherwise
+                    error(['atmlab:' mfilename], 'Too many output arguments');
+            end
         end
+        
+        % low-level
         
         function collocations = collocate(self, t1, lat1, long1, t2, lat2, long2)
             % collocate Return collocations between matrices
@@ -1634,37 +1567,9 @@ classdef CollocatedDataset < HomemadeDataset
             % removing 0's
             collocations(collocations(:, 1)==0, :)=[];
         end
-        
-        function varargout = list_fields(self)
-            % return struct with valid fields in this dataset + associated
-            %
-            % If called without output arguments, writes to atmlab('OUT') a
-            % pretty-printed list of all fields that are valid to pass on
-            % to self.read. With one output argument, return a structure
-            % with this information. No input arguments.
-            
-            S.(self.name) = list_fields@HomemadeDataset(self);
-            for i = 1:length(self.associated)
-                S.(self.associated{i}.name) = self.associated{i}.list_fields();
-            end
-            switch nargout
-                case 0 % write it out nicely
-                    mems = fieldnames(S);
-                    for i = 1:length(mems)
-                        fprintf(atmlab('OUT'), '%s:\n', mems{i});
-                        fprintf(atmlab('OUT'), '    ');
-                        for k = 1:length(S.(mems{i}))
-                            fprintf(atmlab('OUT'), '%s ', S.(mems{i}){k});
-                        end
-                        fprintf(atmlab('OUT'), '\n\n');
-                    end
-                case 1
-                    varargout = {S};
-                otherwise
-                    error(['atmlab:' mfilename], 'Too many output arguments');
-            end
-        end
-        
+                        
+        %% overload parent methods
+
         function [data, attr] = read_homemade_granule(self, fullpath, fields)
             core_fields = {'LAT1', 'LON1', 'TIME1'};
 
@@ -1694,7 +1599,7 @@ classdef CollocatedDataset < HomemadeDataset
             data.version = ['COL(' attr.primary_version ', ' attr.secondary_version ')'];
             
         end
-
+        
         function line = granule_first_line(~, varargin)
             line = uint32(1); % collocated datasets do not contain duplicates
         end
@@ -1823,7 +1728,112 @@ classdef CollocatedDataset < HomemadeDataset
         end
     end
     
+    methods (Access = {?SatDataset})
+        function add_associated(self, ad)
+            % Add an associated dataset INTERNAL USE ONLY
+            %
+            % FORMAT
+            %
+            %   cd.add_associated(ad);
+            
+            self.associated = {self.associated{:} ad}; %#ok<CCAT>
+        end     
+    end
+    
     methods (Access = protected)
+        %% implement new methods
+        
+        function M = process(self, collocations, data1, date1, spec1, data2, date2, spec2)
+            % Process core collocations
+            %
+            % This method processes the output of <a href="matlab:help collocate">collocate</a>
+            % and converts it to a matrix that is passed on for further
+            % processing.
+            %
+            % This is an internal method not normally called by the end
+            % user.
+            %
+            % FORMAT
+            %
+            %    M = cd.process(collocs, data1, date1, spec1, ...
+            %                            data2, date2, spec2);
+            %
+            % IN
+            %
+            %   collocs     matrix      as output by <a href="matlab:help collocate</a>collocate</a>
+            %   data1       struct      as returned by primary <a href="matlab:help SatDataset/reader">reader</a>
+            %   date1       datevec     datevec for primary
+            %   spec1       various     spec for primary (sat, sat pair, ...)
+            %   data2       struct      as returned by secondary <a href="matlab:help SatDataset/reader">reader</a>
+            %   date2       datevec     datevec for secondary
+            %   spec2       various     spec for secondary
+            %
+            % OUT
+            %
+            %   M           matrix      collocations, columns described by
+            %                           <a href="matlab:help CollocatedDataset/cols">self.cols</a>
+            
+            % NOTE: time is assumed to be 1D
+            
+            n = size(collocations, 1);
+            X = mat2cell(collocations, size(collocations, 1), [1 1 1 1]);
+            
+            c = self.cols;
+            nfields = length(fieldnames(c));
+            M = nan*zeros(n, nfields, self.mattype);
+            [line1, pos1, line2, pos2] = X{:};
+            
+            % index for direct addressing
+            i1 = sub2ind(size(data1.lat), line1, pos1);
+            i2 = sub2ind(size(data2.lat), line2, pos2);
+            
+            M(:, c.LINE1) = line1;
+            M(:, c.LINE2) = line2;
+            
+            M(:, c.POS1) = pos1;
+            M(:, c.POS2) = pos2;
+            
+            M(:, c.LAT1) = data1.lat(i1);
+            M(:, c.LON1) = data1.lon(i1);
+            
+            M(:, c.LAT2) = data2.lat(i2);
+            M(:, c.LON2) = data2.lon(i2);
+            
+            M(:, c.START1) = self.primary.get_starttime(date1);
+            M(:, c.START2) = self.secondary.get_starttime(date2);
+            
+            M(:, c.TIME1) = double(data1.epoch) + double(data1.time(line1));
+            M(:, c.TIME2) = double(data2.epoch) + double(data2.time(line2));
+            
+            M(:, c.DIST) = sphdist(M(:, c.LAT1), M(:, c.LON1), ...
+                                   M(:, c.LAT2), M(:, c.LON2), ...
+                                   constants('EARTH_RADIUS')/1e3);
+            
+            M(:, c.INT) = M(:, c.TIME2) - M(:, c.TIME1);
+
+            %% sort, needed for averaging stuff later
+
+            M = sortrows(M, [c.START1 c.LINE1 c.POS1 c.START2 c.LINE2 c.POS2]);
+            
+            
+            %% remove duplicates
+            
+            first1 = self.primary.granule_first_line(date1, spec1);
+            first2 = self.secondary.granule_first_line(date2, spec2);
+            wrongrows = (M(:, c.LINE1) < first1) | ...
+                (M(:, c.LINE2) < first2);
+            logtext(atmlab('OUT'), ['Removing %d scanlines primary before %d, ', ...
+                'or secondary before %d\n'], ...
+                sum(wrongrows), first1, first2);
+            M(wrongrows, :) = [];
+            
+            % add row-number after all else, here, but REDO just before
+            % storing!
+            if ~isempty(M)
+                M(:, c.INDEX) = 1:size(M, 1);
+            end
+        end
+        
         function nm = calculate_name(self)
             nm = [class(self) '__1_' self.primary.name '__2_' self.secondary.name];
         end

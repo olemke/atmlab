@@ -47,7 +47,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
         dependencies
     end
         
-    methods (Abstract)
+    methods (Abstract, Access = protected)
         % FIXME DOC
         [newline, newpos] = translate(self, processed_core, data_orig, dsname, data_other)
     end
@@ -61,6 +61,9 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
 %                 self.members = struct(); % temporary default
 %             end
          end
+    end
+    
+    methods (Access = {?SatDataset})
         
         %% implementation of abstract methods
         

@@ -1,3 +1,28 @@
+2013-02-28  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-284
+
+	* collocations/Collapser.m, collocations/FieldCopier.m,
+	collocations/AssociatedDataset.m,
+	collocations/FieldMultiInstrumentCopier.m,
+	collocations/AssociatedPOESPlusCPR.m,
+	collocations/CollocatedDataset.m, datasets/SatDataset.m,
+	datasets/HomemadeDataset.m:
+
+	- Expose less methods to the public
+
+	* datasets/HomemadeDataset.m, collocations/AssociatedPOESPlusCPR.m:
+
+	- Make members a Dependent property
+
+	- Use getter and setter for members
+
+	- Get rid of setmems() and getmembers() hack, just use .members.
+
+	* datasets/HomemadeDataset.m(pos2re):
+
+	- Bugfix for certain homemade-datasets, more generous re now.
+
 2013-02-27  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-283
