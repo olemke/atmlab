@@ -1,3 +1,11 @@
+2013-02-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-285
+
+	* h2o/thermodynamics/spechum2e.m (spechum2e): New.
+
+	* h2o/thermodynamics/e2spechum.m (e2spechum): Polished the header.
+
 2013-02-28  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-284
