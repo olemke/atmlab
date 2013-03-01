@@ -194,7 +194,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
             for k = 1:length(modes)
                 m = modes{k};
                 for i = 1:length(out_other{k})
-                    [out, newcols] = self.merge(out, newcols, out_other{k}{i}, self.(['fieldcopier_other_' m]).(other_instruments{k}{i}).cols);
+                    [out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, self.(['fieldcopier_other_' m]).(other_instruments{k}{i}).cols);
                 end
             end
             self.cols = newcols;

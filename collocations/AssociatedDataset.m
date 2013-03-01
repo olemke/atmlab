@@ -267,7 +267,7 @@ classdef AssociatedDataset < HomemadeDataset
             end
         end
                 
-        function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
+        function [M, M_cols] = merge_matrix(self, M_core, cols_core, M_self, cols_self)
             % horizontally combine core and associated
             %
             % Combine core data, core 'cols', associated data and
@@ -277,7 +277,7 @@ classdef AssociatedDataset < HomemadeDataset
             %
             % FORMAT
             %
-            %   [M_new, M_cols] = ad.merge(M_core, cols_core, M_here, cols_here)
+            %   [M_new, M_cols] = ad.merge_matrix(M_core, cols_core, M_here, cols_here)
             %
             % IN
             %
@@ -293,6 +293,19 @@ classdef AssociatedDataset < HomemadeDataset
             
             M = [M_core M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
+        end
+        
+        function S = merge_struct(self, S_core, S_self)
+            % merge structures as obtained from read_homemade_granule
+            %
+            % In most cases this is a simple structure-concatenation, but
+            % for Collapsers and some other AssociatedDatasets it's more
+            % involved.
+            
+            % Note: this uses undocumented behaviour
+            status = warning('error', 'catstruct:DuplicatesFound');
+            S = catstruct(S_core, S_self);
+            warning(status);
         end
         
         function C = get_mergefields(self) %#ok<MANU>

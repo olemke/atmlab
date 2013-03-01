@@ -1,3 +1,63 @@
+2013-03-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-287
+
+	* collocations/AssociatedDataset.m:
+
+	(merge) → (merge_matrix):
+
+	- Rename. Now one can either merge them in matrix-form or in
+	struct-form.
+
+	- Adapted documentation accordingly
+
+	(merge_struct):
+
+	- New method for merging output from read_homemade_granule
+
+	* collocations/Collapser.m:
+
+	(merge) → (merge_matrix): Rename
+
+	(merge_struct): Added stub (not implemented)
+
+	* collocations/FieldMultiInstrumentCopier.m(process_granule):
+
+	- Adapted for merge → merge_matrix
+
+	* collocations/CollocatedDataset.m:
+
+	(verify_addi_granule_consistency):
+
+	- Check that additional granule was actually generated with relation
+	to core granule
+
+	(read):
+
+	- Use self.verify_addi_granule_consistency
+
+	(read_homemade_granule):
+
+	- Make protected
+
+	* datasets/convert_dardar.m: 
+	
+	- .getmembers() → .members
+
+	* datasets/SatDataset.m:
+	
+	(level3):
+	
+	- Added warning that this is not finished
+
+	(add_collocated_dataset):
+
+	- Make protected
+
+	* datasets/HomemadeDataset.m:
+
+	- Changed access of some methods
+
 2013-03-01  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-286

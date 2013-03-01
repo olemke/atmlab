@@ -19,7 +19,7 @@ function convert_dardar(dt1, dt2)
     dd_full = D.dardar;
     dd_sub = D.dardarsub;
     
-    tostore = fieldnames(dd_sub.getmembers());
+    tostore = fieldnames(dd_sub.members);
     [grans, paths] = dd_full.find_granules_for_period(dt1, dt2, '');
 
     builtins = {'time', 'lat', 'lon'};

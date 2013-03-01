@@ -103,6 +103,8 @@ classdef HomemadeDataset < SatDataset
     
     methods
         
+        %% overload parent methods
+        
         function self = HomemadeDataset(varargin)
             self = self@SatDataset(varargin{:});
             %{
@@ -129,7 +131,9 @@ classdef HomemadeDataset < SatDataset
              end
              
         end
-             
+        
+        %% implement new methods
+        
         function [fn, global_atts] = store(self, date, spec, data, varargin)
             % store Write collocation data to netcdf file
             %
@@ -296,8 +300,34 @@ classdef HomemadeDataset < SatDataset
                 
         function fields = list_fields(self)
             % return valid fields in this dataset
-            fields = fieldnames(self.getmembers());
+            fields = fieldnames(self.members);
         end
+             
+        %% getters/setters
+        function mem = get.members(self)
+            % members getter, see doc for property members
+            
+            if self.dynamic_members
+                mem = self.dynamically_get_members();
+            else
+                mem = self.ownmembers;
+            end
+        end
+        
+        function set.members(self, val)
+            if self.dynamic_members
+                error(['atmlab:' mfilename ':readonly'], ...
+                    ['The property ''members'' for class %s is dynamically calculated. ' ...
+                     'Therefore, you cannot set the members property for %s.'], ...
+                     class(self), self.name);
+            else
+                self.ownmembers = val;
+            end
+        end
+        
+    end
+    
+    methods (Access = protected)
         
         % those are for internal use, user uses
         % CollocatedDataset.read
@@ -428,7 +458,31 @@ classdef HomemadeDataset < SatDataset
                 localcols = struct();
             end
         end
-        
+               
+        function pos2re(self)
+            % convert self.{basedir,subdir,filename} to self.re
+            %
+            % This method attempts to convert
+            % self.{basedir,subdir,filename) to self.re at a best-effort
+            % basis.
+            r = [fullfile(self.basedir, self.subdir, self.filename) ...
+                 '|' self.filename];
+            self.re = strrep_multi(r, ...
+                '$YEAR4', '(?<year>\d{4})', ...
+                '$MONTH', '(?<month>\d{2})', ...
+                '$DAY', '(?<day>\d{2})', ...
+                '$YEAR2', '(?<year>\d{2})', ...
+                '$DOY', '(?<doy>\d{3})', ...
+                '$HOUR', '(?<hour>\d{2})', ...
+                '$MINUTE', '(?<minute>\d{2})', ...
+                '$SAT', '(?<satname>[a-z0-9]*)');
+            % However, we don't need it to locate granules. It's only used
+            % by find_info_from_granule.
+            self.tryre = false;
+        end           
+    end
+    
+    methods (Access = {?SatDataset})
         function [S, strattr] = read_homemade_granule(self, file, varargin)
             % internal usage, reader for any granule made by this toolkit
             %
@@ -460,56 +514,6 @@ classdef HomemadeDataset < SatDataset
             end
         end   
         
-        %% getters/setters
-        function mem = get.members(self)
-            % members getter, see doc for property members
-            
-            if self.dynamic_members
-                mem = self.dynamically_get_members();
-            else
-                mem = self.ownmembers;
-            end
-        end
-        
-        function set.members(self, val)
-            if self.dynamic_members
-                error(['atmlab:' mfilename ':readonly'], ...
-                    ['The property ''members'' for class %s is dynamically calculated. ' ...
-                     'Therefore, you cannot set the members property for %s.'], ...
-                     class(self), self.name);
-            else
-                self.ownmembers = val;
-            end
-        end
-        
-    end
-    
-    methods (Access = protected)
-        function pos2re(self)
-            % convert self.{basedir,subdir,filename} to self.re
-            %
-            % This method attempts to convert
-            % self.{basedir,subdir,filename) to self.re at a best-effort
-            % basis.
-            r = [fullfile(self.basedir, self.subdir, self.filename) ...
-                 '|' self.filename];
-            self.re = strrep_multi(r, ...
-                '$YEAR4', '(?<year>\d{4})', ...
-                '$MONTH', '(?<month>\d{2})', ...
-                '$DAY', '(?<day>\d{2})', ...
-                '$YEAR2', '(?<year>\d{2})', ...
-                '$DOY', '(?<doy>\d{3})', ...
-                '$HOUR', '(?<hour>\d{2})', ...
-                '$MINUTE', '(?<minute>\d{2})', ...
-                '$SAT', '(?<satname>[a-z0-9]*)');
-            % However, we don't need it to locate granules. It's only used
-            % by find_info_from_granule.
-            self.tryre = false;
-        end
-                
-%         function mem = dynamically_get_members(self)
-%             mem = self.ownmembers;
-%         end
     end
         
     % static/private are used like subfunctions

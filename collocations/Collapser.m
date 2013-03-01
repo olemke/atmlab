@@ -368,9 +368,14 @@ classdef Collapser < AssociatedDataset
         
         %% overload parent methods
         
-        function [M, M_cols] = merge(self, M_core, cols_core, M_self, cols_self)
+        function [M, M_cols] = merge_matrix(self, M_core, cols_core, M_self, cols_self)
             M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
             M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
+        end
+        
+        function S = merge_struct(varargin)
+            error(['atmlab:' mfilename ':notimplemented'], ...
+                'Collocating collapsed datasets is not implemented yet');
         end
         
         function C = get_mergefields(self) %#ok<MANU>

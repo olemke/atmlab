@@ -1250,7 +1250,7 @@ classdef CollocatedDataset < HomemadeDataset
                 %% read collocations for date
                                                 
                 try
-                    [collocations_day, M_cols_core_here] = self.read_single_day(date, spec, fields_core);
+                    [collocations_day, M_cols_core_here, attr_core] = self.read_single_day(date, spec, fields_core);
                     if numel(collocations_day)==0
                         logtext(atmlab('OUT'), 'no collocations\n');
                         continue
@@ -1259,7 +1259,10 @@ classdef CollocatedDataset < HomemadeDataset
                     %hitno = hitno + 1;
                     % also read for all additionals
                     for j = 1:length(additionals)
-                        [additionals_day{j}, addis_cols_here{j}] = additionals{j}.read_single_day(date, spec, additional_fields{j});
+                        [additionals_day{j}, addis_cols_here{j}, attr_addi] = additionals{j}.read_single_day(date, spec, additional_fields{j});
+                        % verify that AssociatedDataset was generated for
+                        % the same CollocatedDataset
+                        self.verify_addi_granule_consistency(attr_core, attr_addi, additionals{j});
                         if numel(additionals_day{j})>0
                             addis_cols{j} = addis_cols_here{j};
                         end
@@ -1268,7 +1271,7 @@ classdef CollocatedDataset < HomemadeDataset
                     if merge
                         M_cols_merged_here = M_cols_core_here;
                         for j = 1:length(additionals)
-                            [collocations_day, M_cols_merged_here] = additionals{j}.merge(collocations_day, M_cols_merged_here, additionals_day{j}, addis_cols_here{j});
+                            [collocations_day, M_cols_merged_here] = additionals{j}.merge_matrix(collocations_day, M_cols_merged_here, additionals_day{j}, addis_cols_here{j});
                         end
                         %M_cols = M_cols_here;
                         if numel(collocations_day)==0
@@ -1566,36 +1569,6 @@ classdef CollocatedDataset < HomemadeDataset
                         
         %% overload parent methods
 
-        function [data, attr] = read_homemade_granule(self, fullpath, fields)
-            core_fields = {'LAT1', 'LON1', 'TIME1'};
-
-            errID = ['atmlab:' mfilename ':error'];
-            % core
-            [data, attr] = read_homemade_granule@HomemadeDataset(self, fullpath, core_fields); % call parent constructor
-            
-            % FIXME: implement subset-ads
-            [~, additionals1, additional_fields1] = self.deal_fields(fields, self.associated);
-            info = self.find_info_from_granule(fullpath);
-            for i = 1:length(additionals1) % this is where the fieldCopiers are
-                tmppath = additionals1{i}.find_granule_by_datetime(...
-                    [str2double(info.year),str2double(info.month),str2double(info.day)],...
-                    info.satname);
-                 [tmpS, tmpA] = additionals1{i}.read_homemade_granule(tmppath, additional_fields1{i}); % call parent constructor
-                     attr.(self.associated{1}(i).name) = tmpA;
-                     tmpS.(['path_' self.associated{1}(i).name]) = tmpS.path;
-                     data = catstruct(data,rmfield(tmpS,{'path','epoch'}));
-            end
-            assert(all(ismember([core_fields(:);fields(:)],fieldnames(data))),errID,'Some field(s) is(are) missing')
-
-            % collocations have time in unixsecs, but datasets have time in
-            % seconds since start of day, which happens to equal data.epoch
-            data.time = data.TIME1 - data.epoch;
-            data.lat = data.LAT1;
-            data.lon = data.LON1;
-            data.version = ['COL(' attr.primary_version ', ' attr.secondary_version ')'];
-            
-        end
-        
         function line = granule_first_line(~, varargin)
             line = uint32(1); % collocated datasets do not contain duplicates
         end
@@ -1722,6 +1695,30 @@ classdef CollocatedDataset < HomemadeDataset
                 end
             end
         end
+        
+        function verify_addi_granule_consistency(self, attr_core, attr_addi, addi)
+            % verify consistency between addi granule and core granule
+            %
+            % Note that this is different from verify_addis. Verify_addis
+            % just checks the AssociatedDataset objects, whereas this one
+            % verifies that the actual AssociatedDataset granule is
+            % consistent with a CollocatedDataset granule
+            if ~strcmp(attr_core.id, attr_addi.parent_id)
+                error(['atmlab:' mfilename ':inconsistent'], ...
+                    ['Upon reading %s %s with %s %s for date %s, ' ...
+                    'found mismatch. %s %s was generated for ' ...
+                    '%s %s with id ''%s'', but %s %s has id ''%s'''], ...
+                    class(self), self.name, ...
+                    class(addi), addi.name, ...
+                    datestr(datenum(date)), ...
+                    class(addi), addi.name, ...
+                    class(self), self.name, ...
+                    attr_addi.parent_id, ...
+                    class(self), self.name, ...
+                    attr_core.id);
+            end
+        end
+        
     end
     
     methods (Access = {?SatDataset})
@@ -1733,7 +1730,40 @@ classdef CollocatedDataset < HomemadeDataset
             %   cd.add_associated(ad);
             
             self.associated = {self.associated{:} ad}; %#ok<CCAT>
-        end     
+        end
+        
+        %% overload parent methods
+        
+        function [data, attr] = read_homemade_granule(self, fullpath, fields)
+            core_fields = {'LAT1', 'LON1', 'TIME1'};
+            
+            errID = ['atmlab:' mfilename ':error'];
+            % core
+            [data, attr] = read_homemade_granule@HomemadeDataset(self, fullpath, core_fields);
+            
+            [~, additionals1, additional_fields1] = self.deal_fields(fields, self.associated);
+            info = self.find_info_from_granule(fullpath);
+            for i = 1:length(additionals1) % this is where the AssociatedDatasets are
+                tmppath = additionals1{i}.find_granule_by_datetime(...
+                    [str2double(info.year),str2double(info.month),str2double(info.day)],...
+                    info.satname);
+                [tmpS, tmpA] = additionals1{i}.read_homemade_granule(tmppath, additional_fields1{i});
+                self.verify_addi_granule_consistency(attr, tmpA, additionals1{i});
+                attr.(self.associated{1}(i).name) = tmpA;
+                tmpS.(['path_' self.associated{1}(i).name]) = tmpS.path;
+                data = additionals1{i}.merge_struct(data,rmfield(tmpS,{'path','epoch'}));
+            end
+            assert(all(ismember([core_fields(:);fields(:)],fieldnames(data))),errID,'Some field(s) is(are) missing')
+            
+            % collocations have time in unixsecs, but datasets have time in
+            % seconds since start of day, which happens to equal data.epoch
+            data.time = data.TIME1 - data.epoch;
+            data.lat = data.LAT1;
+            data.lon = data.LON1;
+            data.version = ['COL(' attr.primary_version ', ' attr.secondary_version ')'];
+            
+        end
+        
     end
     
     methods (Access = protected)
@@ -1865,6 +1895,7 @@ classdef CollocatedDataset < HomemadeDataset
             s = genvarname(sprintf('%02x', typecast(digest, 'uint8')));
 
         end
+         
     end
     
     methods (Static, Access = private)

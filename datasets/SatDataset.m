@@ -1352,6 +1352,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, varargin)
             % Calculate level3 (gridded mean) for period
             %
+            % NOTE: this is a work in progress, a quite quick piece of code
+            % not ready for production use. Feel free to read the source code
+            % and improve!
+            %
             % - data1
             % - data2
             % - spec
@@ -1483,15 +1487,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             datasets(self);
         end
 
-        %% methods for internal use (not private, but from other classes)
-       
-        function add_collocated_dataset(ds, cd)
-            % Adds a collocated dataset. INTERNAL USE ONLY!
-            %
-            % This is called by the CollocatedDataset constructor.
-            ds.collocated_datasets = [ds.collocated_datasets cd];
-        end
-        
     end
     
     methods (Access = protected)
@@ -1518,6 +1513,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
             end
         end
+        
+        function add_collocated_dataset(ds, cd)
+            % Adds a collocated dataset. INTERNAL USE ONLY!
+            %
+            % This is called by the CollocatedDataset constructor.
+            ds.collocated_datasets = [ds.collocated_datasets cd];
+        end
+        
     end
     
     methods (Access = private)
