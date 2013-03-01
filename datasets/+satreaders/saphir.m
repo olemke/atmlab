@@ -1,4 +1,4 @@
-function S = common_read_saphir(file, varargin)
+function S = saphir(file, varargin)
 
 % read saphir data in the common format
 %

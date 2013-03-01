@@ -1,9 +1,9 @@
-function [S,attr] = common_read_calipso(file, varargin)
+function [S,attr] = calipso(file, varargin)
 
-% COMMON_READ_CALIPSO reads calipso data
+% SATREADERS.CALIPSO reads calipso data
 %
 % Read calipso caliop data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 %
@@ -24,7 +24,7 @@ function [S,attr] = common_read_calipso(file, varargin)
 %
 % FORMAT
 %
-%   [S,attr] = common_read_calipso(file, varargin)
+%   [S,attr] = satreaders.calipso(file, varargin)
 
 % $Id$
 % Created by Salomon Eliasson

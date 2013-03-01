@@ -1,9 +1,9 @@
-function S = common_read_mspps(file, varargin)
+function S = mspps(file, varargin)
 
-% COMMON_READ_MSPPS reads mspps data
+% SATREADERS.MSPPS reads mspps data
 %
 % Read MSPPS data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 % IN
@@ -23,7 +23,7 @@ function S = common_read_mspps(file, varargin)
 %
 % FORMAT
 %
-%   [S,attr] = common_read_mspps(file, varargin)
+%   [S,attr] = satreaders.mspps(file, varargin)
 
 % $Id$
 % Created by Salomon Eliasson

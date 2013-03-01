@@ -1,6 +1,6 @@
-function data = common_read_collocation_cpr_mhs(file)
+function data = collocation_cpr_mhs(file)
 
-% common_read_collocation_cpr_mhs Read CPR/MHS collocation file
+% satreaders.collocation_cpr_mhs Read CPR/MHS collocation file
 %
 % Read a CPR/MHS collocation file and return things in the common format.
 % Additionally, all data from the collocation file are included.
@@ -37,7 +37,7 @@ data.lon = data.B_LONG(rows);
 % with meandata here
 [y, mo, d, ~, ~, ~] = unixsecs2date(double(data.C_TIME(rows)));
 data.epoch = round(unique(date2unixsecs(y, mo, d)));
-assert(isempty(data.epoch)||isscalar(data.epoch), 'atmlab:common_read_collocation_cpr_mhs', ...
+assert(isempty(data.epoch)||isscalar(data.epoch), 'atmlab:satreaders.collocation_cpr_mhs', ...
      'Data in %s appears to contain measurement from more than one day', ...
      file);
 [~, ~, ~, h, mi, s] = unixsecs2date(double(data.B_TIME(rows)));

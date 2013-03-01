@@ -1,13 +1,13 @@
-function data = common_read_hirscs(file)
+function data = hirscs(file)
 
-% common_read_hirscs Read HIRSCS data in the common format (see README)
+% satreaders.hirscs Read HIRSCS data in the common format (see README)
 %
 % This file reads data from a HIRSCS radiometer file and rearranges the
 % fields to the common format. See README.
 %
 % FORMAT
 %
-%   data = common_read_hirscs(file)
+%   data = satreaders.hirscs(file)
 %
 % IN
 %

@@ -1,14 +1,14 @@
-function S = common_read_cloud_cci( file, varargin )
-% COMMON_READ_CLOUD_CCI
+function S = cloud_cci( file, varargin )
+% SATREADERS.CLOUD_CCI
 %
 % Read cloud cci data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 %
 % FORMAT
 %
-%   S = common_read_cloud_cci(file,varargin)
+%   S = satreaders.cloud_cci(file,varargin)
 %
 % IN
 %

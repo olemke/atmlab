@@ -1,10 +1,10 @@
-function S = common_read_dardarsub(file, varargin)
+function S = dardarsub(file, varargin)
 % read dardarsub data
 %
-% format as other common_read_-functions.
+% format as other satreaders.-functions.
 %
 % NOTE: This function only reads the sub selected data saved as netcdf
-% on our servers. For regular DARDAR data use common_read_dardar
+% on our servers. For regular DARDAR data use satreaders.dardar
 %
 % $Id$
 % Salomon Eliasson

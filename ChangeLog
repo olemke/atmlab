@@ -1,5 +1,22 @@
 2013-03-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-288
+
+	* datasets/common_read_*.m -> datasets/+satreaders/*.m:
+
+	- Move all (not so) common_read_-functions to their own namespace.
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m,
+	datasets/datasets_constants.m, datasets/define_datasets.m:
+
+	- Update to reflect refactoring of common_read_-functions
+
+	* datasets/+satreaders/Contents.m:
+
+	- Write introduction + interface documentation
+
+2013-03-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-287
 
 	* collocations/AssociatedDataset.m:

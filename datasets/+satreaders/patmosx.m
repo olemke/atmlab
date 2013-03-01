@@ -1,9 +1,9 @@
-function [S,attr] = common_read_patmosx(file, varargin)
+function [S,attr] = patmosx(file, varargin)
 
-% COMMON_READ_PATMOSX reads patmosx data
+% SATREADERS.PATMOSX reads patmosx data
 %
 % Read PATMOS-x data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 % NOTE: This reader actually reads 2 files, one ascending, one descending
@@ -23,7 +23,7 @@ function [S,attr] = common_read_patmosx(file, varargin)
 %
 % FORMAT
 %
-%   S = common_read_patmosx(file, varargin)
+%   S = satreaders.patmosx(file, varargin)
 
 % $Id$
 % Salomon Eliasson

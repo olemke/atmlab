@@ -1,13 +1,13 @@
-function data = common_read_poes_radiometer(file, ~)
+function data = poes_radiometer(file, ~)
 
-% common_read_poes_radiometer Read POES data and arrange in the common format
+% satreaders.poes_radiometer Read POES data and arrange in the common format
 %
 % This file reads data from a POES l1b radiometer file and rearranges the
 % fields to the common format. See README.
 %
 % FORMAT
 %
-%   data = common_read_poes_radiometer(file)
+%   data = satreaders.poes_radiometer(file)
 %
 % IN
 %

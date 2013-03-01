@@ -1,9 +1,9 @@
-function S = common_read_netcdf_dataset(ds, file, varargin)
+function S = netcdf_dataset(ds, file, varargin)
     % read homegrown netcdf-stored dataset such as dardarsub, CMIWP, ...
     %
-    % format as other common_read_-functions.
+    % format as other satreaders.-functions.
     %
-    % $Id: common_read_dardarsub.m 7600 2012-05-14 13:21:10Z seliasson $
+    % $Id: satreaders.dardarsub.m 7600 2012-05-14 13:21:10Z seliasson $
 
     core_fields   = {'time','lat','lon'};
     extra_fields  = optargs(varargin, {{}});

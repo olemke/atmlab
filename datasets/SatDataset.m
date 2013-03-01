@@ -222,7 +222,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %   various datasets that come with atmlab. For example, for data
         %   stored in the same format as AMSU, MHS, HIRS, one can use:
         %
-        % mhs.reader = '@<a href="matlab:help common_read_poes_radiometer">common_read_poes_radiometer</a>'
+        % mhs.reader = '@<a href="matlab:help satreaders.poes_radiometer">satreaders.poes_radiometer</a>'
         reader = @(varargin)[];
         
         % Function to post-process a single granule

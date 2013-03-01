@@ -1,13 +1,13 @@
-function data = common_read_avhrr(file, channels)
+function data = avhrr(file, channels)
 
-% common_read_avhrr Read AVHRR l1b data and arrange in a common format
+% satreaders.avhrr Read AVHRR l1b data and arrange in a common format
 %
 % This file reads data from a AVHRR l1b radiometer file and rearranges the
 % fields to the common format, used by collocation codes.
 %
 % FORMAT
 %
-%   data = common_read_avhrr(file[, channels])
+%   data = satreaders.avhrr(file[, channels])
 %
 % IN
 %

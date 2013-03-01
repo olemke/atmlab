@@ -1,6 +1,6 @@
-function S = common_read_dardar(file, varargin)
+function S = dardar(file, varargin)
 
-% COMMON_READ_DARDAR Read DARDAR data in the common format
+% SATREADERS.DARDAR Read DARDAR data in the common format
 %
 % This file reads data from a DARDAR file and rearranges the fields to
 % the common format. Geodata and time data are always retrieved from the
@@ -20,7 +20,7 @@ function S = common_read_dardar(file, varargin)
 %
 % FORMAT
 %
-%   S = common_read_dardar(file, varargin)
+%   S = satreaders.dardar(file, varargin)
 
 % $Id$
 % Created by Salomon Eliasson

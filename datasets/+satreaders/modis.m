@@ -1,9 +1,9 @@
-function S = common_read_modis(file, varargin)
+function S = modis(file, varargin)
 
-% COMMON_READ_MODIS reads modis data
+% SATREADERS.MODIS reads modis data
 %
 % Read MODIS data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 %
@@ -21,7 +21,7 @@ function S = common_read_modis(file, varargin)
 %
 % FORMAT
 %
-%   S = common_read_modis(file, varargin)
+%   S = satreaders.modis(file, varargin)
 
 % $Id$
 % Created by Salomon Eliasson

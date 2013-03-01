@@ -1,6 +1,6 @@
-function S = common_read_avhrr_cmsaf_gac(file, varargin)
+function S = avhrr_cmsaf_gac(file, varargin)
 
-% COMMON_READ_AVHRR_CMSAF_GAC Read avhhrCMSAF data in the common format
+% SATREADERS.AVHRR_CMSAF_GAC Read avhhrCMSAF data in the common format
 %
 % This file reads data from a avhhrCMSAF file and rearranges the fields to
 % the common format. Geodata and time data are always retrieved from the
@@ -20,7 +20,7 @@ function S = common_read_avhrr_cmsaf_gac(file, varargin)
 %
 % FORMAT
 %
-%   S = common_read_cmsaf_gac(file, varargin)
+%   S = satreaders.cmsaf_gac(file, varargin)
 %
 % See also: SatDataset/reader
 

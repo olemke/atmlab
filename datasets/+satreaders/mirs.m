@@ -1,8 +1,8 @@
-function S = common_read_mirs(file, varargin)
-% COMMON_READ_MIRS reads MIRS data
+function S = mirs(file, varargin)
+% SATREADERS.MIRS reads MIRS data
 %
 % Read MIRS data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 % IN
@@ -19,7 +19,7 @@ function S = common_read_mirs(file, varargin)
 %
 % FORMAT
 %
-%   S = common_read_modis(file, varargin)
+%   S = satreaders.modis(file, varargin)
 
 % $Id$
 % Created by Salomon Eliasson

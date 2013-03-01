@@ -59,7 +59,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             self = self@HomemadeDataset(varargin{:});
             self.setcols();
             self.setmembers();
-            self.reader = @(varargin) (common_read_netcdf_dataset(self, varargin{:}));
+            self.reader = @(varargin) (satreaders.netcdf_dataset(self, varargin{:}));
             
         end
         

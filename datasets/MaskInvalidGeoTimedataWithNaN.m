@@ -3,7 +3,7 @@ function S = MaskInvalidGeoTimedataWithNaN(S)
 % Purpose: To remove invalid data that can't be used by the collocation
 % codes anyway.
 %
-% NOTE: This is an interal function to many of the common_read_<dataset>.m
+% NOTE: This is an interal function to many of the satreaders.<dataset>.m
 %       This means that the input data is assumed to follow the
 %       conventions set up in the collocatio toolbox (fields must be called
 %       'lat','lon','time'), i.e. -180<=lon<=180,  -90<=lat<=90,
@@ -12,7 +12,7 @@ function S = MaskInvalidGeoTimedataWithNaN(S)
 %
 % IN
 %     S         struct                  output structure from
-%                                       common_read_<datasets>
+%                                       satreaders.<datasets>
 %
 % OUT
 %     S         struct                  Same structure, but filtered

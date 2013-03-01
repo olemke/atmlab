@@ -1,15 +1,15 @@
-function S = common_read_cpr(file, varargin)
+function S = cpr(file, varargin)
 
-% COMMON_READ_CPR reads cloudsat data
+% SATREADERS.CPR reads cloudsat data
 %
 % Read CloudSat data and output the data in the format common to all
-% common_read_<dataset>.m readers in atmlab. Geodata and time data are
+% satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
 %
 % FORMAT
 %
-%   S = common_read_cpr(file,varargin)
+%   S = satreaders.cpr(file,varargin)
 %
 % IN
 %

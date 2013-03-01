@@ -35,15 +35,15 @@ A.DMSP_satellite_names = {'F11', 'F12', 'F14', 'F15'};
 
 %% define what reading function to use for what sensor
 
-A.read_cpr = @common_read_cpr_2BCWCRO;
-A.read_mhs = @common_read_poes_radiometer;
-A.read_amsua = @common_read_poes_radiometer;
-A.read_amsub = @common_read_poes_radiometer;
-A.read_hirs = @common_read_poes_radiometer;
-A.read_avhrr = @common_read_avhrr;
-A.read_hirscs = @common_read_hirscs;
-A.read_collocation_cpr_poes = @common_read_collocation_cpr_mhs;
-A.read_collocation_cpr_mhs = @common_read_collocation_cpr_mhs;
+A.read_cpr = @satreaders.cpr_2BCWCRO;
+A.read_mhs = @satreaders.poes_radiometer;
+A.read_amsua = @satreaders.poes_radiometer;
+A.read_amsub = @satreaders.poes_radiometer;
+A.read_hirs = @satreaders.poes_radiometer;
+A.read_avhrr = @satreaders.avhrr;
+A.read_hirscs = @satreaders.hirscs;
+A.read_collocation_cpr_poes = @satreaders.collocation_cpr_mhs;
+A.read_collocation_cpr_mhs = @satreaders.collocation_cpr_mhs;
 
 %% define approximate granule durations
 
