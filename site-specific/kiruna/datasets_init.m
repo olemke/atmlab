@@ -40,13 +40,13 @@ D.CPR_RVOD.basedir = '/storage3/data/cloudsat/2B-CWC-RVOD.R04';
 D.CPR_RVOD.subdir = D.cpr.subdir;
 D.CPR_RVOD.re = D.cpr.re;
 
-D.cprCldclass.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
-D.cprCldclass.subdir = D.cpr.subdir;
-D.cprCldclass.re = D.cpr.re;
+D.cprCloud.basedir = '/storage3/data/cloudsat/2B-CLDCLASS.R04';
+D.cprCloud.subdir = D.cpr.subdir;
+D.cprCloud.re = D.cpr.re;
 
-D.cprCldclass_lidar.basedir = '/storage3/data/cloudsat/2B-CLDCLASS-LIDAR.R04';
-D.cprCldclass_lidar.subdir = D.cpr.subdir;
-D.cprCldclass_lidar.re = D.cpr.re;
+D.cprCloudLidar.basedir = '/storage3/data/cloudsat/2B-CLDCLASS-LIDAR.R04';
+D.cprCloudLidar.subdir = D.cpr.subdir;
+D.cprCloudLidar.re = D.cpr.re;
 
 D.CPR_2C_ICE.basedir = '/storage3/data/cloudsat/2C-ICE.R04';
 D.CPR_2C_ICE.subdir = D.cpr.subdir;
@@ -357,7 +357,7 @@ D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
 
 D.dardarsub_modis_cprCloud.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloud/fields';
 D.dardarsub_modis_cprCloud.subdir   = '$YEAR4/$MONTH/$DAY';
-D.dardarsub_modis_cprCloud.filename = 'fields_dardarsub_modis_cprCldclass_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_cprCloud.filename = 'fields_dardarsub_modis_cprCloud_$YEAR4_$MONTH_$DAY.nc.gz';
 
 D.dardarsub_modis_cprCloudLidar.basedir = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/fields';
 D.dardarsub_modis_cprCloudLidar.subdir  = '$YEAR4/$MONTH/$DAY';
@@ -381,7 +381,7 @@ D.hirs_dardarsub.filename   = 'collocations_hirs_dardarsub_$SAT_$YEAR4_$MONTH_$D
 %Fc
 D.cloud_cci_dardarsub.basedir = strrep(D.CollocatedDataset_cloud_cci_dardarsub.basedir,'core',D.cloud_cci_dardarsub.name);
 D.cloud_cci_dardarsub.subdir = '$YEAR4/$MONTH/$DAY';
-D.cloud_cci_dardarsub.filename   = 'fieldcopier_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.cloud_cci_dardarsub.filename   = 'fields_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 %Co
 D.cloud_cci_dardarsub_collapsed.basedir = fullfile(D.cloud_cci_dardarsub.basedir,D.cloud_cci_dardarsub_collapsed.name);
 D.cloud_cci_dardarsub_collapsed.subdir = '$YEAR4/$MONTH/$DAY';

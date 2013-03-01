@@ -1,3 +1,30 @@
+2013-03-01  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-286
+
+	* collocations/CollocatedDataset.m: Removed unused error case:
+	'atmlab:FieldCopier:nosibling'
+
+	* site-specific/kiruna/datasets_init.m:
+	Changed name of cprCldclass to cprCloud for consistency
+
+	* datasets/common_read_cloud_cci.m:
+	* datasets/common_read_dardarsub.m:
+	Moved pseudo_fields part to postprocessor function.
+
+	* datasets/cloud_cci_postprocessor.m:
+	Added postprocessor to make pseudo fields for cloud_cci
+
+	* datasets/dardarsub_postprocessor.m:
+	Added postprocessor to make pseudo fields for dardar
+
+	* datasets/define_datasets.m:
+	- Fixed some issues with the pseudo_fields.
+	- Decided to restructure the funtion.
+	- getSelection is its own subfunction
+	- all the dataset fields are now gathered and listed in a
+	subfunction at the end of the file.
+
 2013-02-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-285
