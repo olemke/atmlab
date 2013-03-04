@@ -99,7 +99,7 @@ indata = in.data;
 
 %% GET COUNTS
 data = cell(length(lat), length(lon));
-counts = zeros (size(data), class(indata));
+counts = zeros (size(data), 'uint32');
 for i = 1:size(indata,1)
     ilat = latindex(i);
     ilon = lonindex(i);
@@ -120,7 +120,7 @@ for i = 1:size(indata,1)
     data{ilat, ilon}(counts(ilat, ilon),:) = indata(i,:);
     counts(ilat, ilon) = counts(ilat, ilon) - 1;
 end
-
+end
 %% Subfunctions
 % ||
 % VV
@@ -167,6 +167,7 @@ if isfield(in,'newlon')
     in.region = [min(in.newlat)-dlt,min(in.newlon)-dln,max(in.newlat)+dlt,max(in.newlon)+dln];
 end
 
+end
 function in = regionchop(in)
 % Get rid of all data outside of region
 
@@ -181,6 +182,7 @@ in.lat = in.lat(index);
 in.lon = in.lon(index);
 in.data = in.data(index,:);
 
+end
 function [in,lat,lon] = outputlatlons(in,lonspace)
 %% fix the latlons
 % Sets up lat lon and adjusts in.lon to the requested (if requested)
@@ -227,3 +229,5 @@ assert(isnumeric(in.region),errId,'in.region must be a numeric vector of coordin
 
 lat = in.region(1)+0.5*d(1):d(1):in.region(3)-0.5*d(1);
 lon = in.region(2)+0.5*d(2):d(2):in.region(4)-0.5*d(2);
+
+end

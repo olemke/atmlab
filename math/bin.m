@@ -37,3 +37,5 @@ for i = 1:length(xbin)
     inhere = y(bin==i);
     values{i} = inhere;
 end
+
+end

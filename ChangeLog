@@ -1,3 +1,15 @@
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-292
+
+	* math/bin_nd.m: Much faster binning function. For 200k elements, 20x
+	faster than binning_fast. Not ready for production-use yet, still
+	being tested, but promising results.
+
+	* math/binning_fast.m: Use uint32 not class(indata) for counts.
+
+	* datasets/SatDataset.m(find_granules_by_datetime): Bugfix
+
 2013-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-291
