@@ -1,5 +1,11 @@
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* math/vec2col.m:
+
+	- Define wid before use
+
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* math/bin_nd.m:
 
 	- Bugfix. Now it works correctly and fast! However, remains in β.

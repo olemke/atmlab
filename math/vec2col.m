@@ -14,7 +14,7 @@
 
 function v = vec2col(v)
 
-
+wid = ['atmlab:' mfilename ':zero'];
 [rows,cols] = size(v);
 
 if all(size(v)==0)
