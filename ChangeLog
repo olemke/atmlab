@@ -1,3 +1,18 @@
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-289
+
+	* collocations/CollocatedDataset.m, documentation/collocations.tex:
+
+	- Explained in various places why one might want to change the
+	gridsize
+
+	* datasets/README:
+
+	- Adapted for the new common_read replacements
+	- Refer to collocations user's guide.
+
+	
 2013-03-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-288

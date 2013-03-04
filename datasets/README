@@ -1,17 +1,9 @@
-This sub-system contains functions to search for granules and get their
-filenames, as well as functions to read particular datasets and rearrange the
-data is a predefined manner.
+For documentation on how to use this sub-system, see
+atmlab/documentation/collocations.pdf.
 
-This requires configurations and defaults via datasets_config and
-datasets_defaults.
-
-The files common_read_* have the task to read a particular granule from a
+The files in satreaders/ have the task to read a particular granule from a
 particular dataset and arrange it in a structure that contains at least lat,
 lon and time, where the number of rows in each three should be the same, and
 the number of columns in lat and lon should be equal, and the number of
 columns in time should be 1. This convention was initially designed for the
-portable use of collocation codes. E.g. if one wants to add a new dataset to
-be collocated with others, one needs to add a reader function in the same
-format and add the appropiate setting to datasets_constants.
-
-For instructions on adding new datasets, see the help of datasets_config.
+portable use of collocation codes.

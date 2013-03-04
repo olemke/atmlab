@@ -488,7 +488,12 @@ following tasks:
 \citet{holl10:_collocating_amt} and subsequent papers.
 To collocate single granules or days without storing the result, you can
 use \lstinline|collocate_granule| and \lstinline|collocate_date|.
-You will not need the low-level method \lstinline|collocate|.
+You will not need the low-level method \lstinline|collocate|, but you
+might want to tweak the value of the property \lstinline|gridsize|; see
+\lstinline|help CollocatedDataset/gridsize| depending on the expected
+number of collocations. As a rule of thumb: if you expect more collocations,
+choose a small gridsize; if you expect few, choose a large one.
+Note that this only affects the speed and not the results as such.
 \item Storing those collocations in an appropiate format\footnote{This is
 actually implemented in the parent-class HomemadeDataset, but as an end-user
 you don't need to worry about this}.

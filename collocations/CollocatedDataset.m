@@ -21,6 +21,8 @@ classdef CollocatedDataset < HomemadeDataset
     %               (as well as all <a href="matlab:help SatDataset">SatDataset</a> and <a href="matlab:help HomemadeDataset">HomemadeDataset</a> properties)
     %   pcd -       if set, cache <a href="matlab:help CollocatedDataset/read">read</a> results to disk
     %   (see <a href="matlab:properties CollocatedDataset">properties</a> for a complete listing)
+    %   gridsize -  parameter for calculating collocations. Set small if
+    %               you expect many collocations, large if you expect few.
     %
     % CollocatedDataset methods:
     %
@@ -50,10 +52,14 @@ classdef CollocatedDataset < HomemadeDataset
     %   >> D = datasets;
     %   >> mhscpr = CollocatedDataset(D.mhs, D.cpr, 'distance', 10, 'interval', 300, 'name', 'NarrowCPRMHSCollocs');
     %
+    % Hint: if the collocations are slow, try tweaking <a href="matlab:help
+    % CollocatedDataset/gridsize">gridsize</a>.
+    %
     % See also: SatDataset (grandparent), HomemadeDataset (superclass), AssociatedDataset,
     %           FieldCopier, Collapser,
     %
-    % Don't forget the Collocation User's Guide
+    %
+    % Don't forget the Collocation User's Guide.
     %
     % $Id$
     properties
@@ -93,10 +99,17 @@ classdef CollocatedDataset < HomemadeDataset
         % The size of the grid that is used inside the collocation
         % algorithm. The method <a href="matlab:help CollocatedDataset/collocate">collocate</a> works by gridding the
         % measurements on a equirectangular lat-lon grid (see algorithm
-        % description in John. et al (2012)). The grid size does not affect
-        % the final collocations, but it may affect the speed of the
-        % collocations. It has a default value of 2 (degrees), so there is
-        % no need to change this. Change at your own risk.
+        % description in John. et al (2012)), using <a href="matlab:help binning_fast">binning_fast</a>.
+        % The speed of binning_fast is a injective function of the gridsize
+        % with a strictly positive derivative. The speed does not depend on
+        % the number of collocations. In the next step, all distances
+        % between pairs within a grid-cell are calculated. This step
+        % strongly depends on the number of collocations. Therefore, to
+        % optimise the speed of calculating collocations, set the grid_size
+        % small if you expect many collocations and large if you expect
+        % very few.
+        %
+        % It has a default value of 2 (degrees).
         gridsize = 2;
         
         % Logfile for describing what collocations were performed
@@ -1423,6 +1436,9 @@ classdef CollocatedDataset < HomemadeDataset
             % IN  t2      Array of length L2 giving the times of the scanlines.
             % IN  lat2    Matrix L2xW2 with latitude, L2 scans, W2 scans/line.
             % IN  long2   Matrix L2xW2 with longitude (-180, 180), L2 scans, W2 scans/line.
+            %
+            % Hint: if the collocations are slow, try tweaking <a href="matlab:help
+            % CollocatedDataset/gridsize">gridsize</a>.
 
             %% data checks
 
