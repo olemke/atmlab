@@ -255,13 +255,13 @@ D.CollocatedDataset_cmoiwp_v0_4_dardarsub.basedir      = '/storage4/user_data/se
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.subdir       = '$YEAR4/$MONTH/$DAY';
 D.CollocatedDataset_cmoiwp_v0_4_dardarsub.filename     = 'collocations_cmoiwp_v0_4_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.CollocatedDataset_cloud_cci_dardarsub.basedir    = '/storage4/user_data/seliasson/collocations_cloud_cci_dardarsub/core';
+D.CollocatedDataset_cloud_cci_dardarsub.basedir    = '/storage4/user_data/seliasson/cloud_cci_dardarsub/core';
 D.CollocatedDataset_cloud_cci_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';
-D.CollocatedDataset_cloud_cci_dardarsub.filename   = 'collocations_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.CollocatedDataset_cloud_cci_dardarsub.filename   = 'core_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.CollocatedDataset_dardarsub_modis.basedir   = '/storage4/user_data/seliasson/collocations_dardarsub_modis/core';
+D.CollocatedDataset_dardarsub_modis.basedir   = '/storage4/user_data/seliasson/dardarsub_modis/core';
 D.CollocatedDataset_dardarsub_modis.subdir    = '$YEAR4/$MONTH/$DAY';
-D.CollocatedDataset_dardarsub_modis.filename  = 'collocations_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.CollocatedDataset_dardarsub_modis.filename  = 'core_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 D.CollocatedDataset_hirs_dardarsub.basedir   = '/storage4/user_data/seliasson/collocations_hirs_dardarsub/core';
 D.CollocatedDataset_hirs_dardarsub.subdir    = '$YEAR4/$MONTH/$DAY';
@@ -306,14 +306,6 @@ D.associated_CPR_AMSUB_AMSUA_HIRS.basedir = '/storage3/user_data/gerrit/collocat
 D.associated_CPR_AMSUB_AMSUA_HIRS.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_CPR_AMSUB_AMSUA_HIRS.filename = 'fulldata_$SAT.nc.gz';
 
-D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
-D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
-D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed_$SAT.nc.gz';
-
-D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.basedir = D.associated_CPR_AMSUB_AMSUA_HIRS.basedir;
-D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.subdir = D.associated_CPR_AMSUB_AMSUA_HIRS.subdir;
-D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.filename = D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename;
-
 D.associated_mhs_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/poes/mhs_mhs';
 D.associated_mhs_mhs.subdir = D.collocation_mhs_mhs.subdir;
 D.associated_mhs_mhs.filename = 'fulldata_$SAT1_$SAT2.nc.gz';
@@ -347,6 +339,22 @@ D.associated_amsub_saphir.basedir = '/storage3/user_data/gerrit/collocated_datas
 D.associated_amsub_saphir.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_amsub_saphir.filename = 'fulldata_$SAT.nc.gz';
 
+D.cloud_cci_dardarsub_IWP.basedir   = '/storage4/user_data/seliasson/cloud_cci_dardarsub/IWP';
+D.cloud_cci_dardarsub_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
+D.cloud_cci_dardarsub_IWP.filename  = 'fields_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
+D.cloud_cci_dardarsub_collapsedIWP.basedir  = '/storage4/user_data/seliasson/cloud_cci_dardarsub/collapsedIWP';
+D.cloud_cci_dardarsub_collapsedIWP.subdir   = '$YEAR4/$MONTH/$DAY';
+D.cloud_cci_dardarsub_collapsedIWP.filename = 'collapsed_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
+D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed_$SAT.nc.gz';
+
+D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.basedir = D.associated_CPR_AMSUB_AMSUA_HIRS.basedir;
+D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.subdir = D.associated_CPR_AMSUB_AMSUA_HIRS.subdir;
+D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.filename = D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename;
+
 D.cpr_dardarsub_IWP.basedir     = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/cpr_dardarsub_IWP';
 D.cpr_dardarsub_IWP.filename    = 'collocations_cpr_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
 D.cpr_dardarsub_IWP.subdir      = '$YEAR4/$MONTH/$DAY';
@@ -355,49 +363,33 @@ D.cpr_dardarsub_cloudTypes.basedir  = strrep(D.cpr_dardarsub_IWP.basedir,'IWP','
 D.cpr_dardarsub_cloudTypes.filename = D.cpr_dardarsub_IWP.filename;
 D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
 
-D.dardarsub_modis_cprCloud.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloud/fields';
+D.dardarsub_modis_IWP.basedir   = '/storage4/user_data/seliasson/dardarsub_modis/IWP';
+D.dardarsub_modis_IWP.filename  = 'fields_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
+
+D.dardarsub_modis_cprCloud.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloud/IWP_per_cloudType';
 D.dardarsub_modis_cprCloud.subdir   = '$YEAR4/$MONTH/$DAY';
 D.dardarsub_modis_cprCloud.filename = 'fields_dardarsub_modis_cprCloud_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.dardarsub_modis_cprCloudLidar.basedir = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/fields';
+D.dardarsub_modis_cprCloudLidar.basedir = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/IWP_per_cloudType-lidar';
 D.dardarsub_modis_cprCloudLidar.subdir  = '$YEAR4/$MONTH/$DAY';
 D.dardarsub_modis_cprCloudLidar.filename= 'fields_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.fields_2C_ice_dardarsub.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/2C-ICE_dardarsub';
-D.fields_2C_ice_dardarsub.filename = 'fieldcopier_2C-ICE_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
-D.fields_2C_ice_dardarsub.subdir   = D.cpr_dardarsub_IWP.subdir;
+D.dardarsub_modis_collapsedIWP.basedir  = '/storage4/user_data/seliasson/dardarsub_modis/collapsedIWP';
+D.dardarsub_modis_collapsedIWP.filename = 'collapsed_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_collapsedIWP.subdir   = '$YEAR4/$MONTH/$DAY';
 
-D.mhs_dardarsub.basedir    = strrep(D.CollocatedDataset_mhs_dardarsub.basedir,'core',D.mhs_dardarsub.name);
-D.mhs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';
-D.mhs_dardarsub.filename   = 'collocations_mhs_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.fields_2C_ice_dardarsub.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/2C-ICE_dardarsub';
+D.fields_2C_ice_dardarsub.filename = 'fields_2C-ICE_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
+D.fields_2C_ice_dardarsub.subdir   = D.cpr_dardarsub_IWP.subdir;
 
 D.hirs_dardarsub.basedir    = strrep(D.CollocatedDataset_hirs_dardarsub.basedir,'core',D.hirs_dardarsub.name);
 D.hirs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';
 D.hirs_dardarsub.filename   = 'collocations_hirs_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-% --------
-% cloud_cci
-% --------
-%Fc
-D.cloud_cci_dardarsub.basedir = strrep(D.CollocatedDataset_cloud_cci_dardarsub.basedir,'core',D.cloud_cci_dardarsub.name);
-D.cloud_cci_dardarsub.subdir = '$YEAR4/$MONTH/$DAY';
-D.cloud_cci_dardarsub.filename   = 'fields_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-%Co
-D.cloud_cci_dardarsub_collapsed.basedir = fullfile(D.cloud_cci_dardarsub.basedir,D.cloud_cci_dardarsub_collapsed.name);
-D.cloud_cci_dardarsub_collapsed.subdir = '$YEAR4/$MONTH/$DAY';
-D.cloud_cci_dardarsub_collapsed.filename   = 'collapsed_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-
-% --------
-% MODIS
-% --------
-% Fc
-D.dardarsub_modis_IWP.basedir = strrep(D.CollocatedDataset_dardarsub_modis.basedir,'core',D.dardarsub_modis_IWP.name);
-D.dardarsub_modis_IWP.filename  = 'collocations_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.dardarsub_modis_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
-% Co
-D.dardarsub_modis_IWP_mean.basedir  = fullfile(D.dardarsub_modis_IWP.basedir,'averaged2primary');
-D.dardarsub_modis_IWP_mean.filename = 'collocations_dardarsub_modis_averaged2primary_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.dardarsub_modis_IWP_mean.subdir   = '$YEAR4/$MONTH/$DAY';
+D.mhs_dardarsub.basedir    = strrep(D.CollocatedDataset_mhs_dardarsub.basedir,'core',D.mhs_dardarsub.name);
+D.mhs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';
+D.mhs_dardarsub.filename   = 'collocations_mhs_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 datasets_config('firstline_data', '/storage3/data/granules_firstline/firstline_$SAT_$SENSOR.mat');
 

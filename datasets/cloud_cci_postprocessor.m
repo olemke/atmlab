@@ -23,7 +23,7 @@ for F =fields
     field = F{1};
     mv = self.pseudo_fields.(field).atts.missing_value;
     switch field
-        case {'iwp','ref_ice','cot_ice'}
+        case {'iwp','ref_ice','cot_ice','iwp_uncertainty'}
             % Keeping record of the pixels that are deemed to be cloud free
             clearPixel = S.cc_total==0;
             
@@ -38,16 +38,22 @@ for F =fields
 
             S.cwp(~(clearPixel | icePhase)) = mv;
             S.iwp = S.cwp;
+            S.iwp(clearPixel) = 0; 
         case 'ref_ice'
             % depends on {'phase','ref','cc_total'}
             
             S.ref(~(clearPixel | icePhase)) = mv;
             S.ref_ice = S.ref;
+            S.ref_ice(clearPixel) = 0; 
         case 'cot_ice'
             % depends on {'phase','cot','cc_total'}
             
             S.cot(~(clearPixel | icePhase)) = mv;
             S.cot_ice = S.cot;
+            S.cot_ice(clearPixel) = 0; 
+            
+        case 'iwp_uncertainty'
+            S.iwp_uncertainty(~icePhase) = mv;
         otherwise
     end
     

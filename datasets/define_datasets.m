@@ -398,13 +398,13 @@ D.cprCloudLidar.pseudo_fields.Cloud_Types_Lidar                 = fields.cpr.Clo
 D.cprCloudLidar.pseudo_fields.Cloud_Types_Lidar.dependencies    = fieldnames(fields.cpr.Cloud_Types_Lidar.dependencies_struct)';
 D.cprCloudLidar.reader_processor                                = @cpr_postprocessor;
 
-D.cloud_cci.pseudo_fields.iwp               = fields.cloud_cci.iwp;
-D.cloud_cci.pseudo_fields.iwp.dependencies  = fieldnames(fields.cloud_cci.iwp.dependencies_struct)';
-D.cloud_cci.pseudo_fields.ref_ice              = fields.cloud_cci.ref_ice;
-D.cloud_cci.pseudo_fields.ref_ice.dependencies = fieldnames(fields.cloud_cci.ref_ice.dependencies_struct)';
-D.cloud_cci.pseudo_fields.cot_ice              = fields.cloud_cci.cot_ice;
-D.cloud_cci.pseudo_fields.cot_ice.dependencies = fieldnames(fields.cloud_cci.cot_ice.dependencies_struct)';
-D.cloud_cci.reader_processor = @cloud_cci_postprocessor;
+D.cloud_cci.pseudo_fields.iwp                   = fields.cloud_cci.iwp;
+D.cloud_cci.pseudo_fields.iwp.dependencies      = fieldnames(fields.cloud_cci.iwp.dependencies_struct)';
+D.cloud_cci.pseudo_fields.ref_ice               = fields.cloud_cci.ref_ice;
+D.cloud_cci.pseudo_fields.ref_ice.dependencies  = fieldnames(fields.cloud_cci.ref_ice.dependencies_struct)';
+D.cloud_cci.pseudo_fields.cot_ice               = fields.cloud_cci.cot_ice;
+D.cloud_cci.pseudo_fields.cot_ice.dependencies  = fieldnames(fields.cloud_cci.cot_ice.dependencies_struct)';
+D.cloud_cci.reader_processor                    = @cloud_cci_postprocessor;
 
 D.modis_aqua_L2.pseudo_fields.modis_IWP             = fields.modis.modis_IWP;
 D.modis_aqua_L2.pseudo_fields.modis_IWP.dependencies= fieldnames(fields.modis.modis_IWP.dependencies_struct)';
@@ -412,6 +412,7 @@ D.modis_aqua_L2.pseudo_fields.Re_ice                = fields.modis.Re_ice;
 D.modis_aqua_L2.pseudo_fields.Re_ice.dependencies   = fieldnames(fields.modis.Re_ice.dependencies_struct)';
 D.modis_aqua_L2.pseudo_fields.Tau_ice               = fields.modis.Tau_ice;
 D.modis_aqua_L2.pseudo_fields.Tau_ice.dependencies  = fieldnames(fields.modis.Tau_ice.dependencies_struct)';
+D.modis_aqua_L2.reader_processor                    = @modis_postprocessor;
 
 D.dardarsub.pseudo_fields.dardar_IWP              = fields.dardarsub.dardar_IWP;
 D.dardarsub.pseudo_fields.dardar_IWP.dependencies = fieldnames(fields.dardarsub.dardar_IWP.dependencies_struct)';
@@ -655,7 +656,7 @@ FieldCopier(D.collocation_ssmt2_mhs, fields.ssmt2_1, fields.ssmt2_2, ...
 FieldCopier(D.CollocatedDataset_cloud_cci_dardarsub, ...
     getSelection(fields.cloud_cci,{'iwp','cwp_uncertainty','ref_ice','ref_uncertainty','cot_ice','cot_uncertainty'}),...
      getSelection(fields.dardarsub,{'dardar_IWP','dardar_ln_IWP_error','dardar_Re'}),...
-     'name','cloud_cci_dardarsub');
+     'name','cloud_cci_dardarsub_IWP');
 
 FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
     getSelection(fields.cpr,{'Cloud_Types'}),struct(),...
@@ -670,7 +671,7 @@ FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
     'name','cpr_dardarsub_IWP');
 
 FieldCopier(D.CollocatedDataset_dardarsub_modis, ...
-    getSelection(fields.dardarsub,{'dardar_IWP'}),...
+    getSelection(fields.dardarsub,{'dardar_IWP','dardar_ln_IWP_error'}),...
     getSelection(fields.modis,{'modis_IWP','Re_ice','Tau_ice'}),...
     'name','dardarsub_modis_IWP');
 
@@ -811,10 +812,10 @@ Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, mw_global, ...
     'name', 'collapsed_associated_CPR_AMSUB_AMSUA_HIRS');
 
 Collapser(D.dardarsub_modis_IWP,modis,modis_global, ...
-    'name','dardarsub_modis_IWP_mean');
+    'name','dardarsub_modis_collapsedIWP');
  
-Collapser(D.cloud_cci_dardarsub,cloud_cci,gac_global, ...
-    'name','cloud_cci_dardarsub_collapsed');
+Collapser(D.cloud_cci_dardarsub_IWP,cloud_cci,gac_global, ...
+    'name','cloud_cci_dardarsub_collapsedIWP');
 
 % this one uses some subfunctions, so is defined in its own file
 define_c2dp();
@@ -862,9 +863,7 @@ laa.atts.missing_value = -9999;
 %% Fields for datasets
 D = datasets;
 
-% -------------
-% AMSU-A
-% -------------
+%% AMSU-A
 fields.amsua.A_LONG.type = 'float';
 fields.amsua.A_LONG.realname = 'lon';
 fields.amsua.A_LONG.atts.long_name = 'AMSU-A Longitude';
@@ -896,10 +895,7 @@ fields.amsua.A_POS.realname = 'scanline_position';
 fields.amsua.A_POS.atts.long_name = 'AMSU-A scanline position';
 fields.amsua.A_POS.atts.valid_range = [1 30];
 
-% --------
-% AMSU-B
-% --------
-
+%% AMSU-B
 fields.amsub.B_LZA = lza;
 fields.amsub.B_LAA = laa;
 fields.amsub.B_SZA = sza;
@@ -930,10 +926,7 @@ fields.amsub2.BT2.dims = {'AMSUB_CHANS', 5};
 fields.amsub2.BT2.atts.long_name = 'AMSU-B Brightness Temperature, primary';
 fields.amsub2.BT2.atts.units = 'Kelvin';
 
-% ----------
-% cloud_cci
-% ----------
-       
+%% cloud_cci
 fields.cloud_cci.cwp.type               = 'short'; % int16
 fields.cloud_cci.cwp.atts.long_name     = 'cloud liquid water path';
 fields.cloud_cci.cwp.atts.units         = 'g/m2';
@@ -1020,8 +1013,7 @@ fields.cloud_cci.cot_ice.dependencies_struct   = getSelection(fields.cloud_cci,{
 fields.cloud_cci.cot_ice.atts.description    = ...
     'atmosphere optical thickness due to ice cloud';
 
-% ---------
-% CLOUDSAT DATASETS
+%% CLOUDSAT DATASETS
 % ---------
 
 % CLD-CLASS-LIDAR
@@ -1182,10 +1174,7 @@ fields.cpr.RVOD_ice_water_path.atts.long_name    = 'RVOD ice water path';
 fields.cpr.RVOD_ice_water_path.atts.units        = 'g/m^2';
 fields.cpr.RVOD_ice_water_path.atts.missing_value = -3333;
 
-% -----------
-% DARDAR_SUB
-% ----------- 
-
+%% DARDAR_SUB
 fields.dardarsub.HEIGHT.realname         = 'height';
 fields.dardarsub.HEIGHT.type             = 'float';
 fields.dardarsub.HEIGHT.atts.long_name   = 'Height';
@@ -1207,7 +1196,7 @@ fields.dardarsub.dardar_IWP.atts.description    = ...
     'Column integrated ''iwc''';
 fields.dardarsub.dardar_ln_IWP_error.type                = 'float';
 fields.dardarsub.dardar_ln_IWP_error.atts.long_name      = 'DARDAR ln_IWP_error';
-fields.dardarsub.dardar_ln_IWP_error.atts.units          = 'ln(kg/m^2)';
+fields.dardarsub.dardar_ln_IWP_error.atts.units          = 'fractional error';%'ln(kg/m^2)';
 fields.dardarsub.dardar_ln_IWP_error.atts.missing_value  = -999;
 fields.dardarsub.dardar_ln_IWP_error.dependencies_struct = getSelection(fields.dardarsub,{'iwc','HEIGHT','ln_iwc_error'});
 fields.dardarsub.dardar_ln_IWP_error.atts.description    = ...
@@ -1239,9 +1228,7 @@ fields.dardarsub.dardar_Re_error.atts.long_name     = 'Fractional error in effec
 fields.dardarsub.dardar_Re_error.atts.units         = 'ln(m)';
 fields.dardarsub.dardar_Re_error.atts.missing_value = -999;
 
-% ---------
-% HIRS
-% ---------
+%% HIRS
 fields.hirs.H_LONG.type = 'float';
 fields.hirs.H_LONG.realname = 'lon';
 fields.hirs.H_LONG.atts.long_name = 'HIRS Longitude';
@@ -1280,9 +1267,7 @@ fields.hirs.H_POS.atts.long_name = 'HIRS scanline position';
 fields.hirs.H_POS.atts.missing_value = 0;
 fields.hirs.H_POS.atts.valid_range = [1 56];
 
-% --------
-% MHS
-% --------
+%% MHS
 % very similar to AMSU-B
 fields.mhs = fields.amsub;
 fields.mhs.B_BT.dims = {'MHS_CHANS', 5};
@@ -1296,83 +1281,81 @@ fields.mhs2 = fields.amsub2;
 fields.mhs2.BT2.dims = {'MHS_CHANS', 5};
 fields.mhs2.BT2.atts.long_name = 'MHS Brightness Temperature, secondary';
 
-% ---------
-% MODIS
-% ---------
-fields.modis.CWP.realname            = 'Cloud_Water_Path';
-fields.modis.CWP.type                = 'short';
-fields.modis.CWP.atts.long_name      = 'Column Cloud Water Path two-band retrieval using band 7 and either band 1, 2, or 5 .';
-fields.modis.CWP.atts.unit           = 'g/m^2';
-fields.modis.CWP.atts.description    = ...
+%% MODIS
+fields.modis.Cloud_Water_Path.type                = 'short';
+fields.modis.Cloud_Water_Path.atts.long_name      = 'Column Cloud Water Path two-band retrieval using band 7 and either band 1, 2, or 5 .';
+fields.modis.Cloud_Water_Path.atts.units          = 'g/m^2';
+fields.modis.Cloud_Water_Path.atts.valid_range    = [0 10000];
+fields.modis.Cloud_Water_Path.atts.missing_value  = -9999;
+fields.modis.Cloud_Water_Path.atts.description    = ...
     ['Daytime only: Source data at 1-km is subsampled at 5-km. Note that all cloud phases '...
     '(liquid water, ice, and undetermined phase) are represented in the parameter;'...
     'users must read the Cloud Phase (Retrieval Processing Path) Flag in the '...
     'Cloud_Quality_Assurance SDS to determine the cloud phase represented by each pixel.'];
-fields.modis.RE.realname             = 'Cloud_Effective_Radius';
-fields.modis.RE.type                 = 'short';
-fields.modis.RE.atts.long_name       = ['Cloud particle effective radius (µm) derived from a two-channel '...
+fields.modis.Cloud_Effective_Radius.type                = 'short'; % this field needs to be scaled by 0.01
+fields.modis.Cloud_Effective_Radius.atts.long_name      = ['Cloud particle effective radius (µm) derived from a two-channel '...
                                        'retrieval using MODIS band 7 and either band 1, 2, or 5'];
-fields.modis.RE.atts.unit            = 'micron';
-fields.modis.RE.atts.scale_factor    = '0.01';
-fields.modis.RE.atts.description     = ...
+fields.modis.Cloud_Effective_Radius.atts.units          = 'micron';
+fields.modis.Cloud_Effective_Radius.atts.valid_range    = [0 10000];
+fields.modis.Cloud_Effective_Radius.atts.missing_value  = -9999;
+fields.modis.Cloud_Effective_Radius.atts.description    = ...
     ['Source data at 1-km is subsampled at 5-km. Note that all cloud phases'...
     '(liquid water, ice, and undetermined phase) are represented in the parameter;'...
     'users must read the Cloud Phase (Retrieval Processing Path) Flag '...
     'in the Cloud_Quality_Assurance SDS to determine the cloud phase represented '...
     'by each pixel. SDS name changed to clarify application.'];
-fields.modis.Tau.realname            = 'Cloud_Optical_Depth';
-fields.modis.Tau.type                = 'short';
-fields.modis.Tau.atts.long_name      = ['Cloud optical thickness at 0.66 µm derived from a two-channel retrieval'...
+fields.modis.Cloud_Optical_Thickness.type                = 'short'; % this field needs to be scaled by 0.01
+fields.modis.Cloud_Optical_Thickness.atts.long_name      = ['Cloud optical thickness at 0.66 µm derived from a two-channel retrieval'...
                                        'using MODIS band 7 and either band 1, 2, or 5.'];
-fields.modis.Tau.atts.unit           = 'none';
-fields.modis.Tau.atts.scale_factor   = '0.01';
-fields.modis.Tau.atts.description    = ...
+fields.modis.Cloud_Optical_Thickness.atts.units          = '-';
+fields.modis.Cloud_Optical_Thickness.atts.valid_range    = [0 10000];
+fields.modis.Cloud_Optical_Thickness.atts.missing_value  = -9999;
+fields.modis.Cloud_Optical_Thickness.atts.description    = ...
     ['Source data at 1-km is subsampled at 5-km. Note that all cloud phases '...
     '(liquid water, ice, and undetermined phase) are represented in the parameter;'...
     'users must read the Cloud Phase (Retrieval Processing Path) Flag in the '...
     'Cloud_Quality_Assurance SDS to determine the cloud phase represented by each pixel.'];
 
-fields.modis.PhandQ.realname         = 'Cloud_Phase_Optical_Properties';
-fields.modis.PhandQ.type             = 'short';
-fields.modis.PhandQ.atts.long_name   = 'Cloud Phase Determination Used in Optical Thickness/Effective Radius Retrieval';
-fields.modis.PhandQ.atts.unit        = 'none';
-fields.modis.PhandQ.atts.description = ...
+fields.modis.Cloud_Phase_Optical_Properties.type                = 'byte';
+fields.modis.Cloud_Phase_Optical_Properties.atts.long_name      = 'Cloud Phase Determination Used in Optical Thickness/Effective Radius Retrieval';
+fields.modis.Cloud_Phase_Optical_Properties.atts.units          = '-';
+fields.modis.Cloud_Phase_Optical_Properties.atts.valid_range    = [0 4];
+fields.modis.Cloud_Phase_Optical_Properties.atts.missing_value  = 0;
+fields.modis.Cloud_Phase_Optical_Properties.atts.description = ...
     ['Daytime only. Cloud Phase as determined by the '...
      'Cloud Optical Property algorithm. Note that this phase flag is '...
      'identical for both the primary retrieval and the 1.6/2.1 µm retrieval.'...
      '[(0=fill, 1=clear, 2=liquid water cloud, 3=ice cloud,4=undetermined phase cloud)'];
                             
-fields.modis.QA.realname         = 'Quality_Assurance_1km';
-fields.modis.QA.type             = 'byte';
-fields.modis.QA.atts.long_name   = 'QA Flags at 1x1 km resolution';
-fields.modis.QA.description      = 'For details see http://modis-atmos.gsfc.nasa.gov/reference_atbd.html';
+fields.modis.Quality_Assurance_1km.type             = 'byte';
+fields.modis.Quality_Assurance_1km.atts.long_name   = 'QA Flags at 1x1 km resolution';
+fields.modis.Quality_Assurance_1km.description      = 'For details see http://modis-atmos.gsfc.nasa.gov/reference_atbd.html';
      
 fields.modis.modis_IWP.type                 = 'short';
 fields.modis.modis_IWP.atts.long_name       = 'MODIS IWP';
 fields.modis.modis_IWP.atts.units           = 'g/m^2';
-fields.modis.modis_IWP.dependencies_struct  = getSelection(fields.modis,{'PhandQ','CWP'});
+fields.modis.modis_IWP.atts.valid_range     = [0 10000];
+fields.modis.modis_IWP.atts.missing_value   = -9999;
+fields.modis.modis_IWP.dependencies_struct  = getSelection(fields.modis,{'Cloud_Water_Path','Quality_Assurance_1km','Cloud_Phase_Optical_Properties'});
 fields.modis.modis_IWP.atts.description     = ...
     ['''Cloud_Water_Path'' where the ''Cloud_Phase_Optical_Properties'''...
     'have the value ''3'' (ice clouds) and the ''Quality_Assurance_1km'' flag is set to good'];
 fields.modis.Re_ice.type                 = 'short';
 fields.modis.Re_ice.atts.long_name       = 'modis_Effective_Radius_ice';
 fields.modis.Re_ice.atts.units           = 'micron';
-fields.modis.Re_ice.dependencies_struct  = getSelection(fields.modis,{'PhandQ','RE'});
+fields.modis.Re_ice.dependencies_struct  = getSelection(fields.modis,{'Cloud_Effective_Radius','Quality_Assurance_1km','Cloud_Phase_Optical_Properties'});
 fields.modis.Re_ice.atts.description     = ...
     ['''Cloud_Effective_Radius'' where the ''Cloud_Phase_Optical_Properties'' '...
     'have the value ''3'' (ice clouds) and the ''Quality_Assurance_1km'' flag is set to good'];
 fields.modis.Tau_ice.type                = 'short';
 fields.modis.Tau_ice.atts.long_name      = 'modis Cloud Optical Depth';
 fields.modis.Tau_ice.atts.units          = 'none';
-fields.modis.Tau_ice.dependencies_struct = getSelection(fields.modis,{'PhandQ','Tau'});
+fields.modis.Tau_ice.dependencies_struct = getSelection(fields.modis,{'Cloud_Optical_Thickness','Quality_Assurance_1km','Cloud_Phase_Optical_Properties'});
 fields.modis.Tau_ice.atts.description    = ...
     ['''Cloud_Optical_Depth'' where the ''Cloud_Phase_Optical_Properties'' have the value '...
     '''3'' (ice clouds) and the ''Quality_Assurance_1km'' flag is set to good'];
 
-% --------
-% SAPHIR
-% --------
-
+%% SAPHIR
 for i = 1:6
     fn = sprintf('TB%d', i);
     fields.saphir.(fn).type = 'float';
@@ -1385,9 +1368,7 @@ fields.saphir.IncidencAngle.type = 'float';
 fields.saphir.IncidencAngle.atts.long_name = sprintf('SAPHIR incidence angle');
 
 % ---------
-% SSM/T-2
-% ---------
-
+%% SSM/T-2
 % (vs. others)
 
 fields.ssmt2.SSMT2_BT.type = 'float';

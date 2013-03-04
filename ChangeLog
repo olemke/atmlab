@@ -1,3 +1,21 @@
+2013-03-04  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-290
+
+	* collocations/CollocatedDataset.m: added a \n in a logtext.
+
+	* datasets/cloud_cci_postprocessor.m:
+	Added uncertainty fields
+
+	* datasets/define_datasets.m:
+	* site-specific/kiruna/datasets_init.m:
+	Changed the names of some of the fieldCopier datasets and fields
+	to be more consistent. Changed the paths for the same reason
+
+	* datasets/modis_postprocessor.m:
+	* datasets/+satreaders/modis.m:
+	Moved pseudo_field-stuff to its own postprocessor function
+
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-289
@@ -12,7 +30,6 @@
 	- Adapted for the new common_read replacements
 	- Refer to collocations user's guide.
 
-	
 2013-03-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-288

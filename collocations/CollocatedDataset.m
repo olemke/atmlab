@@ -1007,7 +1007,7 @@ classdef CollocatedDataset < HomemadeDataset
                 switch ME.identifier
                     case 'atmlab:fileopen:IOError'
                         logtext(atmlab('ERR'), ...
-                            'Unable to append to logfile at %s. Error message: %s. Not writing logfile', ...
+                            'Unable to append to logfile at %s. Error message: %s. Not writing logfile\n', ...
                             fullfile(self.basedir, self.logfile), ...
                             ME.message);
                         self.log = fileopen('/dev/null', 'w');
@@ -1478,7 +1478,7 @@ classdef CollocatedDataset < HomemadeDataset
             rows2f = reshape(repmat((1:nrows2)', [1 ncols2]), [1 nel2]);
             cols2f = reshape(repmat(1:ncols2, [nrows2 1]), [1 nel2]);
 
-            %% determine earth radius
+            % determine earth radius
 
             earth_radius = constants('EARTH_RADIUS_MEAN')/1e3; % m -> km
 
