@@ -1,5 +1,41 @@
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* math/bin_nd.m:
+
+	- Bugfix. Now it works correctly and fast! However, remains in β.
+
+	* math/vec2col.m, math/vec2row.m:
+
+	- Make sure return value is always a column/row vector, even if one
+	dimension is 0
+
+	- Issue a warning if all dimensions are 0, because then making it a
+	column/row vector is impossible.
+
+	* math/binned_statistics.m, math/binning.m:
+
+	- Link to related functions
+
+	* math/bin.m:
+
+	- Make sure one always returns a column vector, even in corner cases.
+
+	* collocations/CollocatedDataset.m:
+
+	- Added property 'binning', set by default to 'experimental' which
+	means 'collocate' uses bin_nd as opposed to binning_fast.
+	Alternatively set to 'classical' to use binning_fast.
+
+	- Set default gridsize to 1 to account for the faster binning.
+
+	(collocate):
+
+	- Optionally use bin_nd, much faster and same results as binning_fast.
+	Still experimental. If you run into trouble, set property 'binning'
+	back to 'classical'.
+
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-292
 
 	* math/bin_nd.m: Much faster binning function. For 200k elements, 20x

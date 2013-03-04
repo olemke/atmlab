@@ -28,6 +28,8 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 % * It's recommended to use binning_fast.m to set up the cell array from
 %   ungridded data.
 %
+% See also: bin, binning_fast, bin_nd
+%
 % modified by Salomon Eliasson
 % 2010-07-08 Oliver Lemke
 

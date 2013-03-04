@@ -19,6 +19,8 @@
 %       x       Original x-grid.
 %       Y       Data to be binned.
 %
+% See also: bin, binning_fast, bin_nd
+%
 % 2007-11-12   Created by Bengt Rydberg.
 
 function [Yb,dx] = binning( x_new, x,Y )

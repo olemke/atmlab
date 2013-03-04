@@ -10,14 +10,18 @@
 
 % 1993        Created by Patrick Eriksson. 
 % 2002-12-10  Adapted to Atmlab from arts/ami.
-
+% 2013-03-04  Bugfix by Gerrit Holl for empty vector + do not get conj
 
 function v = vec2col(v)
 
 
 [rows,cols] = size(v);
 
+if all(size(v)==0)
+    warning(wid, 'Cannot convert zero-sized vector to column');
+end
 
-if (cols > rows)
- v = v';
+if (isempty(v) && ~iscolumn(v)) || (~isempty(v) && cols > rows)
+    v = v.';
+end
 end

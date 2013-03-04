@@ -23,6 +23,8 @@ function values = bin(x, y, xbin)
 %   values  cell array
 %               Binned values.
 %
+% See also: binning_fast, bin_nd
+%
 % $Id$
 
 
@@ -35,7 +37,16 @@ y = vec2col(y);
 values = cell(size(xbin));
 for i = 1:length(xbin)
     inhere = y(bin==i);
-    values{i} = inhere;
+    values{i} = vec2col(inhere);
+    % need to treat scalar y as special case, because then bin==i has only
+    % one element and appears to be treated as empty index rather than
+    % logical array, resulting in 'inhere' having size (0, 0) instead of
+    % (0, 1)
+    if isscalar(y)
+        values{i} = zeros(0, 1);
+    else
+        values{i} = vec2col(inhere);
+    end
 end
 
 end

@@ -1,4 +1,4 @@
-function values = bin_nd(binners, bins)
+function values = bin_nd(binners, bins, varargin)
 % BIN_ND Bin data in arbitrary number of dimensions
 %
 % Generic function to bin data in any number of dimensions.
@@ -40,7 +40,7 @@ if length(binners) ~= length(bins)
 end
 
 
-data = uint32(1:length(binners{1}));
+data = optargs(varargin, {vec2col(uint32(1:length(binners{1})))});
 nd = length(binners);
 
 if nd > 1
@@ -48,7 +48,7 @@ if nd > 1
     values = cell(length(innerbinned), 1);
     for i = 1:length(innerbinned)
         binners_selection = cellfun(@(X)(X(innerbinned{i})), binners(1:end-1), 'UniformOutput', false);
-        values{i} = bin_nd(binners_selection, bins(1:end-1));
+        values{i} = bin_nd(binners_selection, bins(1:end-1), innerbinned{i});
     end
 else
     values = bin(binners{1}, data, bins{1});

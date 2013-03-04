@@ -109,8 +109,8 @@ classdef CollocatedDataset < HomemadeDataset
         % small if you expect many collocations and large if you expect
         % very few.
         %
-        % It has a default value of 2 (degrees).
-        gridsize = 2;
+        % It has a default value of 1 (degree).
+        gridsize = 1;
         
         % Logfile for describing what collocations were performed
         %
@@ -125,6 +125,10 @@ classdef CollocatedDataset < HomemadeDataset
         % Marker to seperate between different logfile entries
         marker = [repmat('-', [1 72]) '\n'];
 
+        % Collocation method: classical or experimental
+        %
+        % If things go wrong in 'collocate', set to 'classical'.
+        binning = 'experimental'
     end
     
     % read-only props (may be alterable with methods)
@@ -1493,21 +1497,45 @@ classdef CollocatedDataset < HomemadeDataset
             % - instrument 2 has any mearurements in the cell or a nearby cell
             % "Nearby" cell means a neighbouring cell, except near the poles, where it
             % can be much further away (because the cells are equirectangular)
-
-            [grid1, lat_grid1, lon_grid1] = binning_fast(...
-                struct(...
+            
+            % NB! New method as per 2013-03-04!
+            logtext(atmlab('OUT'), 'Gridding...\n');
+            if isequal(self.binning, 'classical')
+                [grid1, lat_grid1, lon_grid1] = binning_fast(...
+                    struct(...
                     'lat', lat1(:), ...
                     'lon', long1(:), ...
                     'data', uint32(1:numel(lat1)).', ...
                     'gridsize', self.gridsize));
-            n_grid_lats = length(lat_grid1);
-            n_grid_lons = length(lon_grid1);
-            grid2 = binning_fast(...
-                struct(...
+                
+                grid2 = binning_fast(...
+                    struct(...
                     'lat', lat2(:), ...
                     'lon', long2(:), ...
                     'data', uint32(1:numel(lat2)).', ...
                     'gridsize', self.gridsize));
+                
+            elseif isequal(self.binning, 'experimental')
+                lat_grid1 = -90:self.gridsize:90;
+                lon_grid1 = -180:self.gridsize:180;
+                grid1 = bin_nd({lat1(:), long1(:)}, {lat_grid1, lon_grid1});
+                
+                lat_grid2 = lat_grid1;
+                lon_grid2 = lon_grid1;
+                grid2 = bin_nd({lat2(:), long2(:)}, {lat_grid2, lon_grid2});
+                % throw away exactly-polar values (should be extremely
+                % rare). FIXME: should add to last gridcell instead,
+                % preferably inside bin_nd, not implemented
+%                 grid1 = grid1(1:end-1, 1:end-1);
+%                 grid2 = grid2(1:end-1, 1:end-1);
+            else
+                error(['atmlab:' mfilename ':unknownmethod'], ...
+                    '%s.binning must be ''experimental'' or ''classical'', got ''%s''', ...
+                    self.name, self.binning);
+            end
+            
+            n_grid_lats = length(lat_grid1);
+            n_grid_lons = length(lon_grid1);
 
             % Check each cell where there is data for grid1 AND at least one
             % neighbouring cell, or the cell itself, has data for grid2
@@ -1522,6 +1550,7 @@ classdef CollocatedDataset < HomemadeDataset
             cells_in_lat_range = ceil(self.distance ./ cell_width);
             c_lon = ceil(self.distance ./ cell_height);
 
+            logtext(atmlab('OUT'), 'Searching for collocations per grid-point...\n');
             for i = 1:size(grid1, 1) % latitude
                 c_lat = cells_in_lat_range(i);
                 for j = 1:size(grid1, 2) % longitude

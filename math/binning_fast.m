@@ -69,6 +69,7 @@ function [data,lat,lon] = binning_fast(in,lonspace)
 %       2) A useful function to get statistics (e.g numel, mean, sum, etc) on
 %       the binned data is binned_statistics.
 %
+% See also: bin, bin_nd, binned_statistics
 %
 % Created by Oliver Lemke and Salomon Eliasson
 % $Id$
