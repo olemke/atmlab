@@ -1,5 +1,15 @@
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* math/bin.m:
+
+	- Oops, don't do the same work twice.
+
+	* collocations/CollocatedDataset.m(collocate):
+
+	- Be more verbose in informing user what I'm gridding and how
+
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* math/vec2col.m:
 
 	- Define wid before use

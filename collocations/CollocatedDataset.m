@@ -1499,7 +1499,8 @@ classdef CollocatedDataset < HomemadeDataset
             % can be much further away (because the cells are equirectangular)
             
             % NB! New method as per 2013-03-04!
-            logtext(atmlab('OUT'), 'Gridding...\n');
+            logtext(atmlab('OUT'), 'Gridding %d + %d = %d points using %s method...\n', ...
+                numel(lat1), numel(lat2), numel(lat1)+numel(lat2), self.binning);
             if isequal(self.binning, 'classical')
                 [grid1, lat_grid1, lon_grid1] = binning_fast(...
                     struct(...
