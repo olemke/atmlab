@@ -350,7 +350,16 @@ classdef Collapser < AssociatedDataset
                         for pi = 1:length(procnames)
                             procname = procnames{pi};
                             proccer = self.fieldstruct.(fname).processors.(procname);
-                            M(j, self.cols.([procname '_' fname])) = proccer(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
+                            capsed = proccer(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
+                            if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
+                                error(['atmlab:' mfilename ':mismatch'], ...
+                                ['Error in collapsing %s %s %s. Processor ', ...
+                                 'returned wrongly-sized field. Got [%d, %d]. ', ...
+                                 'Expected [%d, %d].'], ...
+                                self.name, fname, procname, size(capsed, 1), ...
+                                size(capsed, 2), 1, length(self.cols.([procname '_' fname])));
+                            end
+                            M(j, self.cols.([procname '_' fname])) = capsed;
                         end
                     end
                 end

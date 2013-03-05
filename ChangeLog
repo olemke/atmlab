@@ -1,5 +1,17 @@
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-297
+
+	* collocations/Collapser.m(process_granule):
+
+	- Give an understandable error message if the processor does not
+	return a correctly sized bit of data to fit into the collapsed
+	dataset (basically [1 ncol]).
+
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-296
+
 	* math/bin.m:
 
 	- Reïmplemented. Sorting the data first yields a much faster
@@ -17,6 +29,8 @@
 
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-295
+
 	* math/bin.m:
 
 	- Oops, don't do the same work twice.
@@ -27,11 +41,15 @@
 
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-294
+
 	* math/vec2col.m:
 
 	- Define wid before use
 
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-293
 
 	* math/bin_nd.m:
 
