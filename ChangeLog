@@ -2,6 +2,23 @@
 
 	* math/bin.m:
 
+	- Reïmplemented. Sorting the data first yields a much faster
+	algorithm.
+
+	* collocations/CollocatedDataset.m(collocate):
+
+	- Use self.cache for the gridding, because subsequent pairs often
+	share at least one granule.
+
+	* handy/CachedData.m(evaluate):
+
+	- Improve documentation
+	- Improve verbosity
+
+2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* math/bin.m:
+
 	- Oops, don't do the same work twice.
 
 	* collocations/CollocatedDataset.m(collocate):

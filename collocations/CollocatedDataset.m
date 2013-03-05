@@ -1519,24 +1519,27 @@ classdef CollocatedDataset < HomemadeDataset
             elseif isequal(self.binning, 'experimental')
                 lat_grid1 = -90:self.gridsize:90;
                 lon_grid1 = -180:self.gridsize:180;
-                grid1 = bin_nd({lat1(:), long1(:)}, {lat_grid1, lon_grid1});
+                % cache result because same binning happens repeatedly if
+                % collocating one primary granule with many secondary
+                % granules
+                grid1 = self.cache.evaluate(1, @bin_nd, {lat1(:), long1(:)}, {lat_grid1, lon_grid1});
                 
                 lat_grid2 = lat_grid1;
                 lon_grid2 = lon_grid1;
-                grid2 = bin_nd({lat2(:), long2(:)}, {lat_grid2, lon_grid2});
+                grid2 = self.cache.evaluate(1, @bin_nd, {lat2(:), long2(:)}, {lat_grid2, lon_grid2});
                 % throw away exactly-polar values (should be extremely
                 % rare). FIXME: should add to last gridcell instead,
                 % preferably inside bin_nd, not implemented
-%                 grid1 = grid1(1:end-1, 1:end-1);
-%                 grid2 = grid2(1:end-1, 1:end-1);
+                grid1 = grid1(1:end-1, 1:end-1);
+                grid2 = grid2(1:end-1, 1:end-1);
             else
                 error(['atmlab:' mfilename ':unknownmethod'], ...
                     '%s.binning must be ''experimental'' or ''classical'', got ''%s''', ...
                     self.name, self.binning);
             end
             
-            n_grid_lats = length(lat_grid1);
-            n_grid_lons = length(lon_grid1);
+            n_grid_lats = size(grid1, 1);
+            n_grid_lons = size(grid1, 2);
 
             % Check each cell where there is data for grid1 AND at least one
             % neighbouring cell, or the cell itself, has data for grid2

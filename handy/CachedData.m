@@ -108,12 +108,39 @@ classdef CachedData < handle
             %
             % FORMAT
             %
-            %   out = cd.evaluane(no, @func, arg1, arg2, ...)
+            %   out = cd.evaluate(no, @func, arg1, arg2, ...)
+            %
+            % IN
+            %
+            %   no      number of output arguments. Needed because
+            %           there may be a difference between y = foo(...)
+            %           and [y, z] = foo(...)
+            %
+            %   func    function handle to function to be evaluated
+            %   arg1    1st argument passed to function
+            %    ...
+            %   argN    nth argument passed to function
+            %
+            % OUT
+            %
+            %   output is as for func(arg1, ..., argN).
+            %
+            % EXAMPLE
+            %
+            %   If you have an expensive function 'y = ackermann(m, n)', 
+            %   then you can cache as follows:
+            %
+            %   >> c = CachedData(); % create cache object
+            %   >> y = c.evaluate(1, @ackermann, 4, 4) % come back a few million years later
+            %   >> y = c.evaluate(1, @ackermann, 4, 4) % get result immediately
+            %
 
             % generate a unique (?) string
             nm = genvarname(DataHash([{no, func}, varargin]));
             
             if self.has_entry(nm)
+                logtext(atmlab('OUT'), 'getting %s([%d arguments]) from cache\n', ...
+                    func2str(func), length(varargin));
                 varargout = self.get_entry(nm);
             else
                 logtext(atmlab('OUT'), 'executing, then caching %s([%d arguments])\n', ...
