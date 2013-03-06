@@ -1,3 +1,11 @@
+2013-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-298
+
+	* math/DataHash.m: Added
+
+	- Actually been using this one for months, but never added, oops.
+
 2013-03-04  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-297
