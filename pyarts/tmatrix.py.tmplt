@@ -13,4 +13,6 @@ scat_params={
     'za_grid':[$Q.ZA$],
     'aa_grid':[$Q.AA$]}
 
-arts_scat.SingleScatteringData(scat_params).calc().file_gen('$Q.OUTFILE$')
+ssd = arts_scat.arts_types.SingleScatteringData(scat_params)
+ssd.calc()
+ssd.save('$Q.OUTFILE$')
