@@ -86,7 +86,7 @@ Q.WSMS_AT_START{end+1} = sprintf('ReadXML(surface_reflectivity,"%s")',fname);
 Q.SURFACE_RTPROP_AGENDA{1} = 'specular_losCalc';
 Q.SURFACE_RTPROP_AGENDA{2} = 'InterpAtmFieldToRtePos(surface_skin_t,';
 Q.SURFACE_RTPROP_AGENDA{3} = '  atmosphere_dim, p_grid, lat_grid,';
-Q.SURFACE_RTPROP_AGENDA{4} = '  lon_grid, z_field, rte_pos, t_field )';
+Q.SURFACE_RTPROP_AGENDA{4} = '  lon_grid, z_field, rtp_pos, t_field )';
 Q.SURFACE_RTPROP_AGENDA{5} = 'surfaceFlatReflectivity';
 
 
