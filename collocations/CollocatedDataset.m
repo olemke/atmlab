@@ -1550,8 +1550,13 @@ classdef CollocatedDataset < HomemadeDataset
             cell_width = 2 * pi * earth_radius * cosd(lat_grid1) / 360;
             cell_height = 2 * pi * earth_radius / 360;
 
-            % how many cells of latitude to check for collocations
+            % how many cells of longitude to check for particular latitude
             cells_in_lat_range = ceil(self.distance ./ cell_width);
+            
+            % very close to the poles, cells_in_lat_range may go to
+            % infinity, but we never need more than the number of lats.
+            cells_in_lat_range(cells_in_lat_range>n_grid_lats) = n_grid_lons;
+            
             c_lon = ceil(self.distance ./ cell_height);
 
             logtext(atmlab('OUT'), 'Searching for collocations per grid-point...\n');
@@ -1567,7 +1572,7 @@ classdef CollocatedDataset < HomemadeDataset
                         
                         % for longitude (cols), depends on cells_in_range
                         cols = j-c_lat:j+c_lat;
-                        cols = mod(cols, n_grid_lons);
+                        cols = unique(mod(cols, n_grid_lons));
                         cols(cols==0) = n_grid_lons;
 
                         % for latitude (rows), no dependence on lat

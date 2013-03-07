@@ -1,3 +1,13 @@
+2013-03-07  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-300
+
+	* collocations/CollocatedDataset.m(collocate):
+
+	- Bugfix: if grids extend to the poles, no. of lon-cells to check for
+	particular lat becomes infinite. Explicitly maximize to total no. of
+	lons.
+
 2013-03-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-299
