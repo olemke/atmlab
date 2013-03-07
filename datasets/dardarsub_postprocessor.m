@@ -29,12 +29,12 @@ end
     
 for F = fields
     field = F{1};
-    
+    mv = self.pseudo_fields.(field).atts.missing_value;
     switch field
         case 'dardar_IWP'
             
             S.dardar_IWP = column_integrate(S,{'iwc','HEIGHT'})';
-            
+            S.dardar_IWP(isnan(S.dardar_IWP))=mv;
         case 'dardar_ln_IWP_error'
             
             % iwc_max = exp(ln(iwc)+ln_iwc_error)
@@ -53,7 +53,7 @@ for F = fields
             IWP_minus = column_integrate(catstruct(S,struct('minError',S.iwc.*exp(-S.ln_iwc_error))),{'minError','HEIGHT'})';
             
             S.dardar_ln_IWP_error = log(IWP_plus./IWP_minus)/2;
-            
+            S.dardar_ln_IWP_error(isnan(S.dardar_ln_IWP_error))=mv;
     end
 end
 

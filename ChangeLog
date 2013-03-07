@@ -1,3 +1,21 @@
+2013-03-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-299
+
+	* math/column_integrate.m: Made a message clearer
+
+	* geographical/resample_geodata.m: Esthetics
+
+	* datasets/define_datasets.m:
+	- Fixed bug in a pseudo field (atts wrong level)
+	- Fixed unlikely bug in one of my collapsers
+	- Update valid ranges for the new cloud_cci data
+
+	* datasets/dardarsub_postprocessor.m: Assigning missing_value
+	instead of allowing the data to be NaN;
+
+	* site-specific/kiruna/datasets_init.m: updated paths
+
 2013-03-06  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-298

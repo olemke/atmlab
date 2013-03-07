@@ -78,7 +78,7 @@ D.amsub.re = poes_re;
 % ---------------
 % So far this dataset is local for salomon on ubuntu6. Will update when all the
 % data is in place
-D.cloud_cci.basedir = '/local/salomon/tmp/data/visitingScientist/cloud_cci';
+D.cloud_cci.basedir = '/storage3/data/cloud_cci/ESACCI-L2_CLOUD-CLD_PRODUCTS-AVHRRGAC-NOAA18-fv1.0_cutout';
 D.cloud_cci.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
 D.cloud_cci.re = '(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})';
 % ------

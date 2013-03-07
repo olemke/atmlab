@@ -202,19 +202,14 @@ if iscell(newgrid)
 end
 
 assert(~any(~isfield(in,{'lat','lon'})),errID,'"lat,lon" are required fields')
-
 assert(all(ismember(field,fieldnames(in))),errID,'One or more of the specified data fields is missing');
-
 assert(~isequal([size(in.(field{1}),1),size(in.(field{1}),2)],size(in.lat),size(in.lon)),...
     errID,'function only works on regular grids, i.e. data(lat,lon,...) or data(lon,lat,...)')
-
 assert(max(diff(in.lat))-min(diff(in.lat))<0.1&&max(diff(in.lon))-min(diff(in.lon))<0.1,...
     errID,'The input data must be equidegree (constant spacing)')
-
 assert( (isequal(in.lat,sort(in.lat)) || isequal(in.lat,sort(in.lat,'descend')) ) && ...
     (isequal(in.lon,sort(in.lon)) || isequal(in.lon,sort(in.lon,'descend')) ),...
     errID,'both lat & lon must be ascending or descending')
-
 sz = size(in.(field{1}));
 assert(isequal([length(in.lat),length(in.lon)],[sz(1),sz(2)]) || ...
     isequal([length(in.lat),length(in.lon)],[sz(2),sz(1)]),...

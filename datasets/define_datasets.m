@@ -416,7 +416,7 @@ D.modis_aqua_L2.reader_processor                    = @modis_postprocessor;
 
 D.dardarsub.pseudo_fields.dardar_IWP              = fields.dardarsub.dardar_IWP;
 D.dardarsub.pseudo_fields.dardar_IWP.dependencies = fieldnames(fields.dardarsub.dardar_IWP.dependencies_struct)';
-D.dardarsub.pseudo_fields.dardar_ln_IWP_error              = fields.dardarsub.dardar_ln_IWP_error.atts;
+D.dardarsub.pseudo_fields.dardar_ln_IWP_error              = fields.dardarsub.dardar_ln_IWP_error;
 D.dardarsub.pseudo_fields.dardar_ln_IWP_error.dependencies = fieldnames(fields.dardarsub.dardar_ln_IWP_error.dependencies_struct)';
 D.dardarsub.reader_processor = @dardarsub_postprocessor;
 
@@ -738,7 +738,8 @@ end
 % ----------
 % Collapsed MODIS
 % ----------
-closest.fn = @(x)(x); %workaround, see this collapser
+closest.fn = @(x)(x(1)); %workaround, see this collapser
+                         %closest.fn = @(x)(x);
 closest.ln = 'Only the closest modis pixel';
 closest.ty = 'double';
 modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)==min(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)))};
@@ -776,8 +777,7 @@ STD.ty      = 'double';
 CF.fn       = @(x)(sum(x>0)/length(x));
 CF.ln       = 'Fraction of non-zero small footprint measurements in large footprint';
 CF.ty       = 'double';
-gac_global = {@(X)(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)==min(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)))};
-
+gac_global = {};
 cloud_cci.iwp.atts = fields.cloud_cci.iwp.atts;
 cloud_cci.iwp.limitators            = limitators;
 cloud_cci.iwp.processors.NO         = NO.fn;
@@ -927,21 +927,21 @@ fields.cloud_cci.cwp.type               = 'short'; % int16
 fields.cloud_cci.cwp.atts.long_name     = 'cloud liquid water path';
 fields.cloud_cci.cwp.atts.units         = 'g/m2';
 fields.cloud_cci.cwp.atts.missing_value = -32767;
-fields.cloud_cci.cwp.atts.valid_range   = [0 3200];
+fields.cloud_cci.cwp.atts.valid_range   = [0 20000];
 fields.cloud_cci.cwp.atts.description   = ...
     'Atmosphere mass content of cloud liquid water';
 fields.cloud_cci.cwp_uncertainty.type               = 'short'; % int16
 fields.cloud_cci.cwp_uncertainty.atts.long_name     = 'CWP uncertainty';
 fields.cloud_cci.cwp_uncertainty.atts.units         = 'g/m2';
 fields.cloud_cci.cwp_uncertainty.atts.missing_value = -32767;
-fields.cloud_cci.cwp_uncertainty.atts.valid_range   = [0 3200];
+fields.cloud_cci.cwp_uncertainty.atts.valid_range   = [0 40000];
 fields.cloud_cci.cwp_uncertainty.atts.description   = ...
     ['Uncertainty of atmospheric mass content of cloud liquid water. '...
      'If iwp>0 then cwp_uncertainty = iwp_uncertianty'];
 fields.cloud_cci.phase.type                 = 'byte'; %int8
 fields.cloud_cci.phase.atts.long_name       = 'cloud phase flag';
 fields.cloud_cci.phase.atts.units           = '';
-fields.cloud_cci.phase.atts.missing_value   = -128;
+fields.cloud_cci.phase.atts.missing_value   = -127;
 fields.cloud_cci.phase.atts.valid_range     = [0 2];
 fields.cloud_cci.phase.atts.description     = ...
     ['thermodynamic_phase_ofields.cloud_water_particles_at_cloud_top'...
@@ -1364,6 +1364,7 @@ fields.saphir.IncidencAngle.type = 'float';
 fields.saphir.IncidencAngle.atts.long_name = sprintf('SAPHIR incidence angle');
 
 % ---------
+
 %% SSM/T-2
 % (vs. others)
 
