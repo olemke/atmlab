@@ -1,3 +1,30 @@
+2013-03-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-303
+
+	* Note compatibility braking change in atmlab and prstnt_struct !!!
+
+	* arts/qarts_atm_field.m:
+	* arts/qarts_vmr_field.m: Header was vague regarding  input time
+	arguments. Variables also renamed for clarity.
+
+	* gformat/isatmdata.m: Description of hour-dimension slightly
+	extended.
+
+	* gformat/atmdata_regrid.m: Minimal change of header.
+
+	* atmlab/atmlab.m: No active change, but note that the change
+	below affects this function. Now this
+	  v = atmlab( 'VERBOSITY', 2 );
+	      atmlab( 'VERBOSITY', v );
+	gives no change. The VERBOSITY at end the original value, while
+	before this would set VERBOSITY to 2.
+
+	* handy/prstnt_struct.m: Changed behaviour when setting a field.
+	The returned value is now the old value. Before it was the new.
+	This is more consistent with similar matlab functions, as pointed
+	out by Gerrit.
+
 2013-03-07  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-302

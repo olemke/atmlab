@@ -115,9 +115,10 @@ switch length( varg )
               'The field %s is not defined.', varg{1} );
       end
 
+      value = getfield( A, varg{1} );
+      
       A = setfield( A, varg{1}, varg{2} );
 
-      value = varg{2};
     end
 
   otherwise

@@ -27,8 +27,8 @@
 %       vstring     The variable for which ATMDATA shall be interpolated.
 %                   Case of strong is ignored. Examples: 't', 'T', 'z', 
 %                   'wind_u' and 'WIND_w'.
-% OPT   day         Day. A scalar.
-%       hour        Hour. A scalar.
+% OPT   mjd         Date as MJD. A scalar.
+%       ltime       Local (solar) time, in hours. A scalar.
 
 % 2010-01-09   Created by Patrick Eriksson.
 
@@ -58,7 +58,7 @@ end
 %
 for i = 1 : length( varargin )
   rqre_datatype( varargin{i}, @istensor0, ...                               %&%
-                                       'Optional arguments day and hour' ); %&%
+                                 'Optional arguments *mjd* and *ltime*.' ); %&%
   grids{3+i} = varargin{i};
 end
 

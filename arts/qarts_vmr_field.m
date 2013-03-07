@@ -11,7 +11,7 @@
 %   singleton dimensions. The grid for empty/singleton dimensions can be empty
 %   or a scalar.
 %
-%   It is also possible to handle atmdata having day and hour dimensions. The
+%   It is also possible to handle atmdata having date and hour dimensions. The
 %   optional arguments must then be set.
 %
 %   The following fields must always be set:
@@ -19,12 +19,12 @@
 %      Q.P_GRID
 %      Q.ABS_SPECIES
 %
-% FORMAT   vmr_field = qarts_vmr_field( Q [, day, hour] )
+% FORMAT   vmr_field = qarts_vmr_field( Q [, mjd, ltime] )
 %        
 % OUT   vmr_field   Obtained vmr field.
 % IN    Q           Qarts setting structure.
-% OPT   day         Day. A scalar.
-%       hour        Hour. A scalar.
+% OPT   mjd         Date as MJD. A scalar.
+%       ltime       Local (solar) time, in hours. A scalar.
 
 % 2010-01-09   Created by Patrick Eriksson.
 
@@ -56,7 +56,7 @@ end
 %
 for i = 1 : length( varargin )
   rqre_datatype( varargin{i}, @istensor0, ...                               %&%
-                                       'Optional arguments day and hour' ); %&%
+                                 'Optional arguments *mjd* and *ltime*.' ); %&%
   grids{3+i} = varargin{i};
 end
 

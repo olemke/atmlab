@@ -7,7 +7,6 @@
 %    be given as MJD. These dates are translated to the date format used in 
 %    *G* by the function. If *G* is an array, the same time format is assumed
 %    for all elements.
-%    
 %
 % FORMAT   G = atmdata_regrid( G, grids [, nonstdname] )
 %        

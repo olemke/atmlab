@@ -9,7 +9,8 @@
 %      'doy'     : Day of the year. Valid range is [1,367[. See also *mjd2doy*.
 %      'datenum' : Matlab's datenum (with default pivot year).
 %
-%   The valid range for hour is [0,24].
+%   The valid range for hour is [0,24]. This dimesion refers to local
+%   (solar) time.
 %
 %   The identification of atmdata is performed by checking the TYPE field and
 %   grid names. These fields of G must be set as follows: TYPE = 'atmdata',
