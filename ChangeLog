@@ -1,3 +1,13 @@
+2013-03-11  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-304
+
+	* handy/freeRAM.m: Slight update in header and error message
+
+	* datasets/modis_postprocessor.m: Added more pseudo_fields
+
+	* site-specific/kiruna/datasets_init.m: Updated some paths
+
 2013-03-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-303

@@ -1,8 +1,9 @@
 function freeMB = freeRAM()
 %% freeRAM
 % 
-% function that checks how much RAM is available on your computer.
-%
+% PURPOSE: 
+%        Checks how much RAM is available on your computer.
+% 
 % OUT:    freeRAM [MB]
 %
 %
@@ -24,5 +25,5 @@ elseif isunix
         freeMB = 3000-usedMB; 
     end
 elseif ispc
-    error(['atmlab:' mfilename ':Platform'],'Function isn''t setup for pc')
+    error(['atmlab:' mfilename ':Platform'],'Function isn''t setup for pc (windows)')
 end
