@@ -1,3 +1,9 @@
+2013-03-12  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-305
+
+	* handy/freeRAM.m: Output on Mac was GB instead of MB.
+
 2013-03-11  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-304

@@ -13,7 +13,7 @@ function freeMB = freeRAM()
 %find how much RAM is left
 if ismac
     x=regexp(exec_system_cmd('vm_stat | grep -e free -e inactive | sed s/[^0-9]//g'),'\n','split');
-    freeMB = (str2double(x{1}{1})+str2double(x{1}{2}))*4096/1024/1024/1024;
+    freeMB = (str2double(x{1}{1})+str2double(x{1}{2}))*4096/1024/1024;
 elseif isunix
     x = regexp(exec_system_cmd('free -m'),'\n','split');%MB
     [notUsed,free] = regexp(x{1}{1},'free');
