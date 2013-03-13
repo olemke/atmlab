@@ -1,5 +1,11 @@
 2013-03-13  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-1-307
+
+	* arts/qarts2cfile.m (cfile_Absrpt): Initialize abs_xsec_agenda.
+
+2013-03-13  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-1-306
 
 	* arts/qarts2cfile.m:

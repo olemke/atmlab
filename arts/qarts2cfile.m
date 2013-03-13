@@ -467,6 +467,7 @@ return
 %    basic absorption variables, such as abs_lines (if used)
 %    abs_lookup  (if used)
 %    propmat_clearsky_agenda
+%    abs_xsec_agenda
 %    blackbody_radiation_agenda
 %
 function T = cfile_Absrpt( Q, partname, workfolder )
@@ -545,6 +546,11 @@ function T = cfile_Absrpt( Q, partname, workfolder )
         T = add_wsms( T, 'ABS_WSMS', Q.ABS_WSMS );
       end
     end
+    %
+    T = add_agenda( T, 'abs_xsec_agenda', { ...
+                       'abs_xsec_per_speciesInit', ...
+                       'abs_xsec_per_speciesAddLines', ...
+                       'abs_xsec_per_speciesAddConts' } );
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
