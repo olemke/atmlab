@@ -466,7 +466,7 @@ return
 %
 %    basic absorption variables, such as abs_lines (if used)
 %    abs_lookup  (if used)
-%    abs_mat_per_species_agenda
+%    propmat_clearsky_agenda
 %    blackbody_radiation_agenda
 %
 function T = cfile_Absrpt( Q, partname, workfolder )
@@ -548,9 +548,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
-      T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
+      T = add_agenda( T, 'propmat_clearsky_agenda', { ...
                 'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-                'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddOnTheFly' } );
+                'propmat_clearskyInit', 'propmat_clearskyAddOnTheFly' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -585,9 +585,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       end
       %
       T{end+1} = 'abs_lookupCalc'; 
-      T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
+      T = add_agenda( T, 'propmat_clearsky_agenda', { ...
           'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-          'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
+          'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       %
       abstable = true;
       %   
@@ -596,9 +596,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
-      T = add_agenda( T, 'abs_mat_per_species_agenda', { ...
+      T = add_agenda( T, 'propmat_clearsky_agenda', { ...
            'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-           'abs_mat_per_speciesInit', 'abs_mat_per_speciesAddFromLookup' } );
+           'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       %
       abstable = true;
       %

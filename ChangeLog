@@ -1,3 +1,12 @@
+2013-03-13  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-306
+
+	* arts/qarts2cfile.m:
+
+	Adapt for change in arts-2-1-549 abs_mat_per_species renamed to
+	propmat_clearsky.
+
 2013-03-12  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-305
