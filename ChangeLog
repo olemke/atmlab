@@ -1,3 +1,17 @@
+2013-03-14  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-308
+
+	* graphs/save_figure_multi.m: Added
+
+	- Helper function to store a figure in multiple formats, e.g.
+	eps/png/fig
+
+	* datasets/SatDataset.m(find_granule_first_line):
+
+	- If no granules found, simply return after reporting so, don't
+	subsequently crash.
+
 2013-03-13  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-307

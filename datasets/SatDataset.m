@@ -1119,6 +1119,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             allgrans = self.find_granules_for_period(startdate, enddate, spec);
             ngrans = size(allgrans, 1);
             logtext(atmlab('OUT'), 'Found %d granules\n', ngrans);
+            if ngrans == 0
+                return
+            end
             
             if exist(scanfile, 'file')
                 tm = load(scanfile);
