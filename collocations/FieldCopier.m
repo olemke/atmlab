@@ -75,7 +75,7 @@ classdef FieldCopier < AssociatedDataset
     %
     % $Id$
     
-    properties (SetAccess = protected)
+    properties (Transient, SetAccess = protected)
         
         % Structure with fields corresponding to primary
         %

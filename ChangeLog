@@ -1,3 +1,22 @@
+2013-03-18  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-309
+
+	* collocations/Collapser.m, collocations/FieldCopier.m,
+	collocations/AssociatedDataset.m,
+	collocations/FieldMultiInstrumentCopier.m,
+	collocations/AssociatedPOESPlusCPR.m,
+	collocations/CollocatedDataset.m, datasets/HomemadeDataset.m,
+	datasets/SatDataset.m, datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- Make all properties transient, effectively prohibiting
+	serialisation.
+
+	* collocations/SatDataset(saveobj):
+
+	- Issue a warning (errors don't work) when trying to serialise data,
+	pointing out that it's not going to work.
+
 2013-03-14  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-308

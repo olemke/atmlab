@@ -59,7 +59,7 @@ classdef AssociatedDataset < HomemadeDataset
     % - additional arguments to reader primary
     % - additional arguments to reader secondary
             
-    properties (Abstract, SetAccess = protected)
+    properties (Transient, Abstract, SetAccess = protected)
         % Describes how data are stored in NetCDF files
         %
         % This property gives a full description of how data are stored in
@@ -80,7 +80,7 @@ classdef AssociatedDataset < HomemadeDataset
         dependencies;
     end
     
-    properties
+    properties (Transient)
         % priority is dynamically set when sorting for dependencies
         priority = 0;
     end

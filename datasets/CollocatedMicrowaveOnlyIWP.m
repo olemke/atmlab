@@ -18,14 +18,14 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     
     % $Id$
     
-    properties
+    properties (Transient)
         nets = struct();
         nchannels = 3;
         data;
         localcols;
     end
        
-    properties (GetAccess = private, SetAccess = private)
+    properties (Transient, GetAccess = private, SetAccess = private)
        selection; 
        maxsize = 20000; % max number of entries for neural net
        retrieval_limits;
@@ -41,7 +41,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
        fromfile;
     end
     
-    properties (Constant)
+    properties (Transient, Constant)
         version = 0.6;
         changelog = sprintf([...
             'version 0.0: initial version, negative IWP, linear all\n' ...

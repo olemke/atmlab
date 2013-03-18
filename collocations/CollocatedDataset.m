@@ -62,7 +62,7 @@ classdef CollocatedDataset < HomemadeDataset
     % Don't forget the Collocation User's Guide.
     %
     % $Id$
-    properties
+    properties (Transient)
         % Primary dataset
         %
         % When collocating, there are some considerations as to chosing
@@ -132,7 +132,7 @@ classdef CollocatedDataset < HomemadeDataset
     end
     
     % read-only props (may be alterable with methods)
-    properties (SetAccess = protected)
+    properties (Transient, SetAccess = protected)
         % Cell array of <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
         %
         % This automatically-filled cell-array contains all datasets that
@@ -141,7 +141,7 @@ classdef CollocatedDataset < HomemadeDataset
         associated = {};
     end
     
-    properties (Constant)
+    properties (Transient, Constant)
         
         % Structure describing layout of NetCDF files storing collocations
         %
@@ -228,7 +228,7 @@ classdef CollocatedDataset < HomemadeDataset
         
     end
     
-    properties (GetAccess = private, SetAccess = private)
+    properties (Transient, GetAccess = private, SetAccess = private)
         log;
         success = false;
     end

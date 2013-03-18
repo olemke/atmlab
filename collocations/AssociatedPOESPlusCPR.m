@@ -5,7 +5,7 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
     
     % $Id$
     
-    properties
+    properties (Transient)
                 
         % For instruments sharing a platform with the primary
         %

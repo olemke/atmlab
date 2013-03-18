@@ -65,7 +65,7 @@ classdef Collapser < AssociatedDataset
     %  - store result of limitators as bitfield?
     %  - store limitators in NetCDF props
     
-    properties (SetAccess = protected)
+    properties (Transient, SetAccess = protected)
         %members = []; % See <a href="matlab:help AssociatedDataset.members">AssociatedDataset.members</a>
         parent = []; % See <a href="matlab:help AssociatedDataset.parent">AssociatedDataset.parent</a>
         dependencies = {}; % See <a href="matlab:help AssociatedDataset.dependencies">AssociatedDataset.dependencies</a>

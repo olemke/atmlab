@@ -41,7 +41,7 @@ classdef HomemadeDataset < SatDataset
     % $Id$
     
     
-    properties
+    properties (Transient)
         % structure describing columns of (internally) stored data
         %
         % The cols-structure describes columns of data passed around
@@ -88,14 +88,14 @@ classdef HomemadeDataset < SatDataset
 
     end
     
-    properties (Dependent = true)
+    properties (Transient, Dependent = true)
         % contains detailed information on how data are stored etc.
         %
         % To be documented in more detail.
         members;
     end
     
-    properties (Access = protected)
+    properties (Transient, Access = protected)
         % for internal usage
         ownmembers;
         dynamic_members = false;

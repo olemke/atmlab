@@ -14,7 +14,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
     
     % $Id$
     
-    properties (Abstract)
+    properties (Transient, Abstract)
                 
         % For instruments sharing a platform with the primary
         %
@@ -29,7 +29,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
     end
     
     
-    properties
+    properties (Transient)
         % This is for fields that are copied from the core
         %
         % FIXME DOC
@@ -41,7 +41,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
     end
     
     
-    properties (SetAccess = protected)
+    properties (Transient, SetAccess = protected)
         %members
         parent
         dependencies

@@ -97,7 +97,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     % $Id$
     
     % read/write props
-    properties
+    properties (Transient)
         % Name of the dataset (pseudo-required).
         %
         % If not given, a name will be automatically calculated. This name
@@ -371,7 +371,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     % read-only props (alterable with methods)
-    properties (SetAccess = protected)
+    properties (Transient, SetAccess = protected)
         % list of CollocatedDatasets using this SatDataset (read-only)
         %
         % This property, which is read-only and automatically filled,
@@ -386,7 +386,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     % flags
-    properties (Constant, GetAccess = protected)
+    properties (Transient, Constant, GetAccess = protected)
         FL_INITIAL = -5;
         FL_NOTFOUND = -2;
         FL_ALLDUPL = typecast(int32(-1), 'uint32');
@@ -395,7 +395,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     % internally used properties
-    properties (GetAccess = private, SetAccess = private)
+    properties (Transient, GetAccess = private, SetAccess = private)
         firstlines;
         cachedstarttimes;
     end
@@ -717,11 +717,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %   unixsecs    time in seconds since 1970-01-01T00:00:00Z
             %
             % ...remaining arguments passed on to <a href="matlab:help SatDataset/find_granule_by_datetime">find_granule_by_datetime</a>
-            
 
-            [year month day hour minute second] = unixsecs2date(unixsecs);
+            [year, month, day, hour, minute, second] = unixsecs2date(unixsecs);
             datafile = self.find_granule_by_datetime([year month day hour minute second], varargin{:});
-
         end
         
         function [allgrans, allpaths] = find_granules_for_period(self, date1, date2, spec)            
@@ -1471,7 +1469,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         end
 
         function set.starttimes(self, val)
-            if ~isa(val, containers.Map)
+            if ~isa(val, class(containers.Map))
                 error(['atmlab:' mfilename ':invalid'], ...
                     'starttimes should be a containers.Map, found %s', ...
                     class(val));
@@ -1490,6 +1488,16 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             datasets(self);
         end
 
+        %% overloading stuff
+        
+        function sobj = saveobj(self)
+%             sobj = saveobj@handle(self); 
+             warning(['atmlab:' mfilename ':nostoring'], ...
+                ['You tried to store %s %s, but serialisation is not implemented. ' ...
+                 'Attempts to load will not yield a valid object.  Sorry.'], ...
+                 class(self), self.name);
+             sobj = [];
+        end
     end
     
     methods (Access = protected)
