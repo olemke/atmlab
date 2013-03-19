@@ -1,3 +1,15 @@
+2013-03-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-310
+
+	* retrieval/mci.m: Mofified header to make clear the p is optional
+	input argument. Introduced M.norm_w (default keeps old behaviour).
+
+	Changed the normalisation to use the median of the PDF (instead of
+	mean), small impact but keep the mean of w a bit closer to
+	1. Note that the mean of w tend to be above 1, from 1.2 for m=3 to
+	3.3 for m=10 (assuming perfect knowledge of S).
+
 2013-03-18  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-309

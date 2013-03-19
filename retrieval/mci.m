@@ -21,24 +21,29 @@
 %
 %   Some details of the inversion is controled by the structure M. Fields
 %   can be left out. Defined fields are
-%      use_all : If set to 1 all cases in database are weighted together.
-%                If 0, only cases with a weight > w_limit are considered.
-%                Default is 1.                
-%      w_limit : Threshold level for what is considered as an OK databse hit.
-%                Used by *use_all* and controls D.n_hit. Default is 0.01.
-%      verb    : If set to 1 some text output is generated. Default
-%                is 0
-%      sum_w_thresh : Threshold for sum_w for which retrieval is
-%      		      performed. If the sum_w is smaller or equal
-%      		      to the treshold, a value of NaN is
-%      		      assigned for that retrieval case. Default
-%      		      value is 0 to avoid division by zero.
+%      use_all :      If set to 1 all cases in database are weighted together.
+%                     If 0, only cases with a weight > w_limit are considered.
+%                     Default is true.                
+%      norm_w  :      If set to false, the normalisation of weights by 
+%                     exp(-m/2) is NOT applied. This makes the weights to 
+%                     depend more strongly on m, but allows to be consistent
+%                     with how the weights are normally defined. Limit and
+%                     sum threshold must be adopted if this field is changed.
+%                     Default is true.
+%      w_limit :      Threshold level for what is considered as an OK
+%                     databse hit. Used by *use_all* and controls D.n_hit. 
+%                     Default is 0.01.
+%      verb    :      If set to 1 some text output is generated. 
+%                     Default is false
+%      sum_w_thresh : Threshold for sum_w for which retrieval is performed. 
+%                     If the sum_w is smaller or equal to the treshold, a 
+%                     value of NaN is assigned for that retrieval case. 
+%                     Default value is 0 (to avoid division by zero).
 %      n_hit_thresh : Threshold for number of database hits (weight
-%                     exceeding w_limit) for which retrieval is
-%      		      performed. If the number is smaller than the
-%      		      treshold, a value of NaN is 
-%      		      assigned for that retrieval case. Default
-%      		      value is 0.
+%                     exceeding w_limit) for which retrieval is performed. 
+%                     If the number is smaller than the treshold, a value 
+%                     of NaN is assigned for that retrieval case. 
+%                     Default value is 0.
 %
 %    MCI specific retrieval diagnostics is given in the structure array D, 
 %    having the fields
@@ -48,7 +53,7 @@
 %      max_w : Maximum weight value
 %    To plot e.g. n_hit: plot([D(:).n_hit])
 %
-% FORMAT   [Xh,E,D,W] = mci(M,Xb,Yb,Se,Y,p)
+% FORMAT   [Xh,E,D,W] = mci(M,Xb,Yb,Se,Y[,p])
 %        
 % OUT   Xh   Retrieved states (that is, x-hat).
 %       E    Retrieval error.
@@ -59,7 +64,7 @@
 %       Yb   Measurements corresponding to Xb.
 %       Se   Observation unvertainty covariance matrix.
 %       Y    Measurements to be inverted.
-%       p    prior weight of given training point.
+% OPT   p    Prior weight of given training point. Default is 1.
 
 % 2005-11-23   Created by Patrick Eriksson.
 % 2006-03-28   Extended to use prior weights and for more
@@ -69,6 +74,9 @@ function [Xh,E,D,W] = mci(M,Xb,Yb,Se,Y,p)
 
 if ~isfield( M, 'use_all' )
   M.use_all = 1;
+end
+if ~isfield( M, 'norm_w' )
+  M.norm_w = true;
 end
 if ~isfield( M, 'w_limit' )
   M.w_limit = 0.01;
@@ -111,8 +119,12 @@ end
 
 for i = 1 : ny
 
-  w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) ) / exp(-m/2);
+  w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) );
 
+  if M.norm_w 
+    w = w /  exp(-m*(1-2/9/m)^3/2);
+  end
+  
   ind_hit = find( w >= M.w_limit );    
   
   if M.use_all
