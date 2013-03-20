@@ -1,9 +1,17 @@
-function define_c2dp
+function define_c2dp(tp)
 % Define CloudSat-2D-POES collapsed dataset
 
-d = datasets;
-global_lims = {@(X)(select_closest(X, d.CollocatedDataset_mhs_cpr.cols, 15))};
-c2d.LINE2.processors.RANGE = @(x)(x([1 end]));
+D = datasets();
+if isequal(tp, 'amsub')
+    core = D.CollocatedDataset_amsub_cpr;
+    add = D.associated_CPR_AMSUB_AMSUA_HIRS;
+else
+    core = D.CollocatedDataset_mhs_cpr;
+    add = D.associated_CPR_MHS_AMSU_HIRS;
+end
+
+global_lims = {@(X)(select_closest(X, core.cols, 15))};
+c2d.LINE2.processors.RANGE = @(x)(vec2row(x([1 end])));
 c2d.LINE2.incore = true;
 c2d.LINE2.dims = {'NO_CS', 2};
 c2d.LINE2.stored.RANGE.type = 'int'; % CS-granule 37081, too large for 'short'
@@ -31,8 +39,8 @@ c2d.INT.stored.MAX.type = 'short';
 c2d.INT.stored.MAX.atts.long_name = 'Longest time-interval CloudSat AMSU-B/MHS';
 c2d.INT.stored.MAX.atts.units = 'seconds';
 c2d.INT.stored.MAX.atts.valid_range = [0 900];
-Collapser(d.associated_CPR_MHS_AMSU_HIRS, c2d, global_lims, ...
-    'name', 'c2dp');
+Collapser(add, c2d, global_lims, ...
+    'name', ['c2dp_' tp]);
 
 
 end

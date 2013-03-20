@@ -1,3 +1,33 @@
+2013-03-20  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-311
+
+	* datasets/SatDataset.m:
+	
+	(read_granule):
+
+	- Bugfix, use datahash for correct generation of cache
+
+	(find_granule_first_line): nano-change
+
+	* collocations/AssociatedDataset.m(process_delayed):
+
+	- Improve error message when data are not properly sorted.
+
+	* collocations/CollocatedDataset.m:
+	
+	(collocate_and_store_date), (collocate_date):
+
+	- Added flag 'autofix', if data are b0rked it will try to fix it by
+	recollocating immediately.
+
+	* datasets/define_c2dp.m, datasets/define_datasets.m,
+	site-specific/kiruna/datasets_init.m:
+
+	- Split c2dp into mhs/amsub
+
+	* datasets/define_datasets.m: Bugfix for amsub
+
 2013-03-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-310

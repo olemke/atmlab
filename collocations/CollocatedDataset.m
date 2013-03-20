@@ -837,7 +837,14 @@ classdef CollocatedDataset < HomemadeDataset
             %
             % IN
             %
-            %   Input arguments as for <a href="matlab:help CollocatedDataset/collocate_date">CollocatedDataset.collocate_date</a>
+            %   Input arguments as for <a href="matlab:help CollocatedDataset/collocate_date">CollocatedDataset.collocate_date</a>.
+            %   However, if the last argument is a structure, this is not
+            %   passed on to collocate_date, but instead interpreted as
+            %   instructions to collocate_and_store_date.  Currently, a
+            %   single flag is recognised:
+            %
+            %       autofix     When reading b0rked data, try to fix it by
+            %                   recollocating
             %
             % OUT
             %
@@ -847,6 +854,14 @@ classdef CollocatedDataset < HomemadeDataset
             %
             % (example assumes fc is a <a href="matlab:help FieldCopier">FieldCopier</a>)
             % >> mhscpr.collocate_date([2010 9 8], 'noaa18', '', {fc})
+            
+            default_flags = struct('autofix', false);
+            if ~isempty(varargin) && isa(varargin{end}, 'struct')
+                flags = optargs_struct(varargin{end}, default_flags);
+                varargin = varargin(1:end-1);
+            else
+                flags = default_flags;
+            end
             
             additionals = optargs(varargin, {{}});
             self.verify_addis(additionals);
@@ -863,6 +878,7 @@ classdef CollocatedDataset < HomemadeDataset
             fn = self.find_granule_by_datetime(date, spec);
             mainfileexists = exist(fn, 'file') && ~self.overwrite;
             addisexist = false(size(additionals));
+            addisvalid = false(size(additionals));
             for i = 1:length(additionals)
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
                 addisexist(i) = exist(fna, 'file') && ~additionals{i}.overwrite;
@@ -877,9 +893,9 @@ classdef CollocatedDataset < HomemadeDataset
                 for i = 1:length(additionals)
                     logtext(atmlab('OUT'), '    %s\n', additionals{i}.find_granule_by_datetime(date, spec));
                 end
-                if ~isempty(self.log)
-                    logtext(self.log, '%s %s %s nothing to be done\n', mat2str(date), spec1, spec2);
-                end
+%                 if ~isempty(self.log)
+%                     logtext(self.log, '%s %s %s nothing to be done\n', mat2str(date), spec1, spec2);
+%                 end
                 return
             end
                             
@@ -904,19 +920,39 @@ classdef CollocatedDataset < HomemadeDataset
                 end
                 info_addi.parent_id = attr.id;
                 
-                if ~isempty(self.log)
-                    logtext(self.log, '%s %s %s Collocations present, regenerate additionals\n', mat2str(date), spec1, spec2);
-                end
+%                 if ~isempty(self.log)
+%                     logtext(self.log, '%s %s %s Collocations present, regenerate additionals\n', mat2str(date), spec1, spec2);
+%                 end
                 addi = {};
                 for i = 1:length(additionals)
                     if addisexist(i)
-                        logtext(atmlab('OUT'), 'Reading additionals for ''%s''\n', additionals{i}.name);
-                        [addi{i}, cc] = additionals{i}.read_single_day(date, spec, 'all');
-                        if isempty(fieldnames(additionals{i}.cols))
+                        logtext(atmlab('OUT'), 'Reading additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
+                        try
+                            [addi{i}, cc] = additionals{i}.read_single_day(date, spec, 'all');
+                            addisvalid(i) = true;
+                        catch ME
+                            switch ME.identifier
+                                case {'atmlab:HomemadeDataset:invalid'}
+                                    if flags.autofix
+                                        addisvalid(i) = false;
+                                        logtext(atmlab('OUT'), ...
+                                            'Encountered problem: %s.  I''l try to fix that.', ...
+                                            ME.message);
+                                    else
+                                        ME.rethrow();
+                                    end
+                                otherwise
+                                    ME.rethrow();
+                            end
+                        end
+                                
+                        if addisvalid(i) && isempty(fieldnames(additionals{i}.cols))
                             additionals{i}.cols = cc;
                         end
-                    else
-                        logtext(atmlab('OUT'), 'Collecting additionals for ''%s''\n', additionals{i}.name);
+                    end
+                    
+                    if ~addisexist(i) || ~addisvalid(i)
+                        logtext(atmlab('OUT'), 'Collecting additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
                         depdata = self.fix_dependencies(additionals{i}, additionals, addi);
                         addi{i} = additionals{i}.process_delayed(result, spec1, spec2, depdata);
                         additionals{i}.store(date, spec, addi{i}, info_addi);
@@ -927,9 +963,9 @@ classdef CollocatedDataset < HomemadeDataset
                 % assumption:
                 % if the main file does not exist, associated don't either
                 
-                if ~isempty(self.log)
-                    logtext(self.log, '%s %s %s Generating collocations\n', mat2str(date), spec1, spec2);
-                end
+%                 if ~isempty(self.log)
+%                     logtext(self.log, '%s %s %s Generating collocations\n', mat2str(date), spec1, spec2);
+%                 end
                 try
                     [result, addis, also] = ...
                         self.collocate_date(date, spec1, spec2, additionals);
@@ -992,7 +1028,10 @@ classdef CollocatedDataset < HomemadeDataset
             %   date_end        datevec     ending date
             %   spec1           various     sat or sat pair or empty
             %   spec2           various     sat or sat pair or empty
-            %   additionals     cell-arary  (optional) <a href="matlab:help AssociatedDataset">AssociatedDataset</a>s, if any
+            %   additionals     cell-array  (optional) <a href="matlab:help AssociatedDataset">AssociatedDataset</a>s, if any
+            %   flags           struct      (optional) flags as for <a
+            %   href="matlab:help
+            %   CollocatedDataset/collocate_and_store_date">collocate_and_store_date</a>.
             %
             % OUT
             %

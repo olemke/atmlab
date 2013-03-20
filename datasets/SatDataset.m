@@ -843,19 +843,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             fields_always = {'time', 'lat', 'lon', 'epoch'};
             
             %% generate varname for caching
-            X = date;
-            X(end+1:6) = 0;
-            dtstr = datestr(datenum(X), 'yydd_dddmmmHHMM');
-            if isempty(spec)
-                spstr = 'X';
-            elseif ischar(spec)
-                spstr = spec;
-            else
-                XX = char(spec);
-                spstr = XX(:).';
-            end
             
-            vn = genvarname([self.name spstr dtstr num2str(remdouble) num2str(force)]);
+            vn = genvarname(DataHash([self.name, date, varargin]));
             
             %% read cached if appropiate
             if ~reload && self.cache.has_entry(vn)
@@ -1145,7 +1134,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     ddv{1}, ddv{2}, ddv{3}, ddv{4}, ddv{5});
 
                 if self.firstlines.(sat).isKey(uni) && ...
-                        ~any(self.firstlines.(sat)(uni) == ...
+                   ~any(self.firstlines.(sat)(uni) == ...
                             cellfun(@int64, {self.FL_INITIAL self.FL_NOTFOUND self.FL_ALLDUPL self.FL_NONEXT self.FL_NOCUR}))
                     logtext(atmlab('OUT'), 'Already exists (%d:%d)\n', uint32(uni), self.firstlines.(sat)(uni));
                     continue

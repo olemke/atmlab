@@ -135,9 +135,13 @@ for v = {'v0_0', 'v0_1', 'v0_2', 'v0_3', 'v0_4', 'v0_5', 'v0_6'}
     ds.re = D.cmoiwp.re;
 end
 
-D.c2dp.basedir = '/storage3/user_data/gerrit/collocated_datasets/c2dp';
-D.c2dp.subdir = '$YEAR4/$MONTH/$DAY';
-D.c2dp.filename = 'c2dp_fullday_$SAT.nc.gz';
+D.c2dp_mhs.basedir = '/storage3/user_data/gerrit/collocated_datasets/c2dp';
+D.c2dp_mhs.subdir = '$YEAR4/$MONTH/$DAY';
+D.c2dp_mhs.filename = 'c2dp_fullday_$SAT.nc.gz';
+
+D.c2dp_amsub.basedir = D.c2dp_mhs.basedir;
+D.c2dp_amsub.subdir = D.c2dp_mhs.subdir;
+D.c2dp_amsub.filename = D.c2dp_mhs.filename;
 
 D.cdpc_2dcp.basedir = '/storage3/user_data/gerrit/collocated_datasets/cdpc_2dcp';
 D.cdpc_2dcp.subdir = '$YEAR4/$DOY';
