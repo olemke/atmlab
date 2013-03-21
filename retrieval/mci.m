@@ -113,6 +113,9 @@ end
 
 Xh = zeros( lx, ny );
 
+if nargout > 1
+  E  = zeros( lx, ny );
+end
 if nargout > 3
   W  = zeros( nb, ny );
 end
@@ -163,9 +166,9 @@ for i = 1 : ny
 
     if nargout > 1
       E(:,i) = sqrt( sum( ...
-	  (Xb(:,ind)-repmat(Xh(:,i),1,D(i).n_con)).^2.*Wi, 2 ) ./ D(i).sum_w );
+	    (Xb(:,ind)-repmat(Xh(:,i),1,D(i).n_con)).^2.*Wi, 2 ) ./ D(i).sum_w );
       if nargout > 3
-	W(:,i) = w;
+        W(:,i) = w;
       end
     end  
   else
@@ -174,7 +177,7 @@ for i = 1 : ny
     if nargout > 1
       E(:,i) = NaN;
       if nargout > 3
-	W(:,i) = w;
+        W(:,i) = w;
       end
     end  
   end

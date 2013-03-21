@@ -269,7 +269,7 @@ function T = cfile_Generl( Q, partname, workfolder )
   if qarts_isset( Q.ABS_SPECIES )
     rqre_datatype( Q.ABS_SPECIES, @isstruct, 'Q.ABS_SPECIES' );             %&%
     rqre_field( Q.ABS_SPECIES, 'TAG', 'Q.ABS_SPECIES' );                    %&%
-    T{end+1} = sprintf( 'SpeciesSet(abs_species,[%s])', ...
+    T{end+1} = sprintf( 'abs_speciesSet(species=[%s])', ...
                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
   end
   %
@@ -399,11 +399,6 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end      
   if qarts_isset( Q.MAG_W_FIELD )
     T{end+1} = file_or_data( 'mag_w_field', 'Tensor3', Q.MAG_W_FIELD, ...
-                                             workfolder, Q.INPUT_FILE_FORMAT );
-  end
-  %
-  if qarts_isset( Q.EDENSITY_FIELD )
-    T{end+1} = file_or_data( 'edensity_field', 'Tensor3', Q.EDENSITY_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
@@ -579,9 +574,10 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       if qarts_isset( Q.ABS_NLS )
         rqre_datatype( Q.ABS_NLS, {@isempty,@iscellstr}, 'Q.ABS_NLS' );     %&%
         if isempty( Q.ABS_NLS )
-          T{end+1} = 'SpeciesSet(abs_nls,[])';
+          T{end+1} = 'abs_speciesSet(abs_species=abs_nls,species=[])';
         else
-          T{end+1} = sprintf( 'SpeciesSet(abs_nls,[%s])', ...
+          T{end+1} = sprintf( ...
+              'abs_speciesSet(abs_species=abs_nls,species=[%s])', ...
                                                    arts_tgs_cnvrt(Q.ABS_NLS) );
         end
       end
@@ -590,6 +586,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       end
       %
+      T{end+1} = 'abs_xsec_agenda_checkedCalc';
       T{end+1} = 'abs_lookupCalc'; 
       T = add_agenda( T, 'propmat_clearsky_agenda', { ...
           'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
@@ -730,6 +727,8 @@ function T = cfile_RteExe( Q, partname, workfolder )
   %
   T = add_rtecalcstart( Q );
   %       
+  T{end+1} = 'abs_xsec_agenda_checkedCalc';
+  T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
   T{end+1} = 'sensor_checkedCalc';
   %
   if qarts_isset( Q.YCALC_WSMS )

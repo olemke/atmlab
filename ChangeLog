@@ -1,9 +1,22 @@
+2013-03-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-312
+
+	* arts/qarts2cfile.m: Adopted to new abs_speciesSet.
+	abs_xsec_agenda_checkedCalc and
+	propmat_clearsky_agenda_checkedCalc included automatically for
+	standard usage.
+
+	* demos/qarts_demo.m:
+	* arts/qarts2cfile.m (cfile_AtmSrf):
+	* arts/qarts.m (qarts): Removed EDENSITY_FIELD, as done in arts.
+
 2013-03-20  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-311
 
 	* datasets/SatDataset.m:
-	
+
 	(read_granule):
 
 	- Bugfix, use datahash for correct generation of cache
@@ -15,7 +28,7 @@
 	- Improve error message when data are not properly sorted.
 
 	* collocations/CollocatedDataset.m:
-	
+
 	(collocate_and_store_date), (collocate_date):
 
 	- Added flag 'autofix', if data are b0rked it will try to fix it by

@@ -65,7 +65,6 @@ Q.WIND_W_FIELD          = [];
 Q.MAG_U_FIELD           = [];
 Q.MAG_V_FIELD           = [];
 Q.MAG_W_FIELD           = [];
-Q.EDENSITY_FIELD        = [];
 %
 Q.REFELLIPSOID          = ellipsoidmodels( 'SphericalEarth' );
 Q.Z_SURFACE             = 500;
@@ -118,7 +117,7 @@ Q.YCALC_WSMS            = { 'yCalc' };
 %
 Q.PPATH_LMAX            = 10e3;
 Q.PPATH_STEP_AGENDA     = { 'Ignore(t_field)', 'Ignore(vmr_field)', ... 
-                            'Ignore(edensity_field)', 'Ignore(f_grid)', ... 
+                            'Ignore(f_grid)', ... 
                             'Ignore(ppath_lraytrace)', 'ppath_stepGeometric' };
 Q.PPATH_AGENDA          = { 'Ignore(rte_pos2)', 'ppathStepByStep' };
 Q.WSMS_AT_START{end+1}  = 'FlagOff( ppath_inside_cloudbox_do )';
