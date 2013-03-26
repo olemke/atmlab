@@ -1,3 +1,13 @@
+2013-03-26  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-314
+
+	* handy/exec_system_cmd.m: Commented out previous change.
+
+	exec_system_cmd must not call atmlab() because it is itself
+	called by atmlab() -> booom!!!. Leads to endless recursion in
+	startup.m. 
+
 2013-03-26  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-313
