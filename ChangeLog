@@ -1,3 +1,23 @@
+2013-03-26  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-313
+
+	* datasets/cpr_postprocessor.m:
+	- Cleaned up a little, and implemented a new behaviour with the
+	cloud types
+
+	* datasets/cloud_cci_postprocessor.m:
+	- Updated for new field names
+
+	* handy/combine_pdfs.m (combine_pdfs):
+	- Added input option 'display'. If true it will try to open the
+	final output .pdf-file
+
+	* handy/exec_system_cmd.m:
+	- Internally set atmlab('VERBOSITY') to
+	verbose (2nd input argument). This is later reset to the initial
+	atmlab('VERBOSITY') value when the function is exited
+
 2013-03-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-312

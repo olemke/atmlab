@@ -29,6 +29,9 @@ function outfile = combine_pdfs(pdffiles, options)
 %                     |      m = middle, b = bottom      |
 %       scale         |[%d,%d; etc] scale individual figures
 %                      [filenumber,scale]                | 1
+%       display       | tries to open pdf file           | false
+%                     | if your viewer is not listed it  |
+%                     | will not try to display anything |
 %
 % OUT:      outfile             string; the fullpath to the pdffile created
 %
@@ -51,6 +54,7 @@ default.valign   = 'm';
 default.filename = 'out.pdf';
 default.outdir   = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
+default.display  = false;
 
 options = optargs_struct(options, default);
 
@@ -97,8 +101,23 @@ create_pdf_from_layout_with_latex(layout, options);
 
 outfile = fullfile(options.outdir, options.filename);
 
+%% Display output
+% This only works for the following pre-programmed options
+if options.display
+    if ismac
+        exec_system_cmd(sprintf('open %s',outfile));
+    elseif isunix
+        [~,b1]=system('which evince');
+        [~,b2]=system('which okular');
+        if ~isempty(b1)
+            exec_system_cmd(sprintf('evince %s &',outfile));
+        elseif ~isempty(b2)
+            exec_system_cmd(sprintf('okular %s &',outfile));
+        end
+    end
 end
 
+end
 
 
 %% Only subfunctions allowed after this point!!!

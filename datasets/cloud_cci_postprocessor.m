@@ -23,14 +23,15 @@ for F =fields
     field = F{1};
     mv = self.pseudo_fields.(field).atts.missing_value;
     switch field
-        case {'iwp','ref_ice','cot_ice','iwp_uncertainty'}
+        case {'iwp','ref_ice','cot_ice','iwp_error'}
             % Keeping record of the pixels that are deemed to be cloud free
             clearPixel = S.cc_total==0;
             
             % grab values flagged as ice phase
             icePhase = S.phase==2;
 
-        otherwise
+      otherwise
+        error(['atmlab:' mfilename],'field: %s not found',field)
     end
     switch field
         case 'iwp'
@@ -52,9 +53,11 @@ for F =fields
             S.cot_ice = S.cot;
             S.cot_ice(clearPixel) = 0; 
             
-        case 'iwp_uncertainty'
-            S.iwp_uncertainty(~icePhase) = mv;
+        case 'iwp_error'
+            S.iwp_error = S.cwp_uncertainty;
+            S.iwp_error(~icePhase) = mv;
         otherwise
+            error(['atmlab:' mfilename],'field: %s not found',field)
     end
     
 end
