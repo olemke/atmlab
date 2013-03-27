@@ -15,5 +15,8 @@ rqre_nargin( 2, nargin );                                          %&%
 rqre_datatype( G, @isgformat );                                    %&%
 rqre_datatype( file, @ischar );                                    %&%
 
-
-save( file, 'G' );
+if nversion>=7.03
+    save( file, 'G' ,'-v7.3');
+else
+    save( file, 'G' );
+end

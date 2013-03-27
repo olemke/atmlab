@@ -1,3 +1,10 @@
+2013-03-27  Ole Martin Christensen  <olem@chalmers.se>
+	* atmlab-2-1
+
+	* gformat/gf_save.m: Added check for matlabversion and if version
+	> 7.3 then save with the option '-v7.3' to accomodate files greater
+	than 2 GB.
+
 2013-03-27  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-315
