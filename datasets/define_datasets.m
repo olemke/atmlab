@@ -726,6 +726,7 @@ appccs.ROIWP.stored.STD.atts.units = fields.cpr.ROIWP.atts.units;
 appccs.ROIWP.processors.CV = @(X)(std(X) ./ mean(X));
 appccs.ROIWP.stored.CV.type = 'int';
 appccs.ROIWP.stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.ROIWP.atts.long_name];
+appccs.ROIWP.stored.CV.atts.missing_value = 0;
 
 for iwp = [1 10 100 1000]
     fn = sprintf('FRAC%d', iwp);

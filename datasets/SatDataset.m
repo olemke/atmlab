@@ -847,7 +847,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             vn = genvarname(DataHash([self.name, date, varargin]));
             
             %% read cached if appropiate
-            if ~reload && self.cache.has_entry(vn)
+            if ~reload && ~isempty(self.cache) && self.cache.has_entry(vn)
                 logtext(atmlab('OUT'), 'Reading %s from cache (entry %s)\n', ...
                     self.name, vn);
                 data = self.cache.get_entry(vn);
@@ -887,7 +887,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             catch ME
                 if force
                     switch ME.identifier
-                        case 'atmlab:invalid_data'
+                        case {'atmlab:invalid_data', 'atmlab:exec_system_cmd:shell'}
                             logtext(atmlab('ERR'), ...
                                 'Unable to read: %s\n', ME.message);
                             return
@@ -956,7 +956,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             end
             
             %% cache results
-            self.cache.set_entry(vn, data);
+            if ~isempty(self.cache)
+                self.cache.set_entry(vn, data);
+            end
         end
                 
         function first = granule_first_line(self, d, varargin)

@@ -999,9 +999,9 @@ classdef CollocatedDataset < HomemadeDataset
                 logtext(atmlab('OUT'), 'Storing %d collocations\n', size(result, 1));
                 [~, attr] = self.store(date, spec, result, info_core);
                 
-                if ~isempty(additionals) && ~isempty(self.log)
-                        logtext(self.log, '%s Generating additionals\n', mat2str(date));
-                end
+%                 if ~isempty(additionals) && ~isempty(self.log)
+%                         logtext(self.log, '%s Generating additionals\n', mat2str(date));
+%                 end
                 info_addi.parent_id = attr.id;
                 for i = 1:length(additionals)
                     additionals{i}.store(date, spec, addis{i}, info_addi);

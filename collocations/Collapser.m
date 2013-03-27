@@ -282,10 +282,17 @@ classdef Collapser < AssociatedDataset
                     continue
                 end
                 mem = self.members.(memname);
-                warning('off', 'catstruct:DuplicatesFound');
-                self.members.(memname) = catstruct(...
-                    self.members.(memname).origin.members.(mem.orig_name), ...
-                    self.members.(memname));
+                origmem = mem.origin.members.(mem.orig_name);
+                if isfield(origmem, 'dims') && ~isfield(mem, 'dims')
+                    mem.dims = origmem.dims;
+                end
+                % NB: commented out this 2013-03-25 as it caused flag
+                % CV_ROIWP.atts.missing_value to be reset.
+%                 w = warning('off', 'catstruct:DuplicatesFound');
+%                 self.members.(memname) = catstruct(...
+%                     self.members.(memname).origin.members.(mem.orig_name), ...
+%                     self.members.(memname));
+%                 warning(w);
             end
             self.members2cols();
             

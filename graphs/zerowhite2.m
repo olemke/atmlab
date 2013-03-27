@@ -30,6 +30,8 @@
 %                completely black. Default is 0.5.
 %       nbl      Level of blackness on negative side. As *pbl* but for
 %                negative values.
+%
+% See also: zerowhite, zerobright
 
 % 2007-03-12   Created by Patrick Eriksson.
 

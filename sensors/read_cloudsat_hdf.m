@@ -53,9 +53,22 @@ assert(iscellstr(sdsName) || (ischar(sdsName) && size(sdsName, 1) == 1),...
 % UNCOMPRESS if needed
 if any([strcmp(hdfFile(end-2:end),'.gz'),strcmp(hdfFile(end-3:end),{'.zip','.bz2'})])
 	tmpdir = create_tmpfolder;
-    c= onCleanup(@() rmdir(tmpdir,'s'));
-	hdfFile = uncompress(hdfFile,tmpdir);
-    if isempty(hdfFile), error(errId,'Uncompressing failed'); end
+    c = onCleanup(@() rmdir(tmpdir,'s'));
+    % use a try-catch clause; in some rare cases, the shell unzip cannot
+    % unzip but the Matlab built-in unzip can.
+    try 
+        hdfFile = uncompress(hdfFile, tmpdir);
+    catch ME
+        switch ME.identifier
+            case 'atmlab:exec_system_cmd:shell'
+                hdfFile = uncompress(hdfFile, tmpdir, struct('tool', 'builtin'));
+            otherwise
+                ME.rethrow();
+        end
+    end
+    if isempty(hdfFile)
+        error(errId,'Uncompressing failed');
+    end
 end
 
 % Query the contents of the HDF file.

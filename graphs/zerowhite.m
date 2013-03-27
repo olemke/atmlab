@@ -40,6 +40,8 @@
 %                that no black is blended in for high value, and 1 means
 %                that max absolute value will be completely black.  
 %                Default is 0.5.
+%
+% See also: zerowhite2, zerobright
 
 % 2003-12-06   Patrick Eriksson: Created.
 % 2004-04-07   Stefan Buehler and Patrick Eriksson: Added the option to have 

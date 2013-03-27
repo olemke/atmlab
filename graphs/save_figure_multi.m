@@ -26,6 +26,9 @@ function save_figure_multi(fig, pathbase, varargin)
 %   >> save_figure_multi(gcf(), 'plots/this_plot', 'png', 'eps', 'fig');
 
 formats = varargin;
+if isempty(formats)
+    logtext(atmlab('OUT'), 'No formats specified, not writing any files\n');
+end
 for i = 1:length(formats)
     format = formats{i};
     outname = [pathbase '.' format];

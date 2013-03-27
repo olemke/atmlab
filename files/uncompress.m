@@ -6,12 +6,14 @@ function filename = uncompress(compfile,varargin)
 % IN        compfile        full path to compressed file
 %           tmpdir          The directory you want to uncompress it into
 %                           (optional, defaults to atmlab('WORK_AREA'))
-%           flags           structure with additional flags, so far one
-%                           field:
+%           flags           structure with additional flags:
 %               unidentified --- what to do if compressed file not recognised?
 %                   'ignore'    default, do nothing
 %                   'warn'      write a message
 %                   'error'     issue an error
+%               tool --- what to use for uncompressing?
+%                   'shell'     default, use a shell call. Fastest.
+%                   'builtin'   Matlab builtin. May work when shell fails.
 %
 % OUT       filename        The fullpath to the uncompressed filename.
 %                           Empty if the file was never uncompressed.
@@ -25,14 +27,21 @@ function filename = uncompress(compfile,varargin)
 % $Id$
 
 [tmpdir, flags] = optargs(varargin, {atmlab('WORK_AREA'), struct()});
-flags = optargs_struct(flags, struct('unidentified', 'ignore'));
+flags = optargs_struct(flags, struct('unidentified', 'ignore', 'tool', 'shell'));
 
 [~,tmpfile,fend] = fileparts(compfile);
 
 switch fend
     case '.zip'
-        out = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('DEBUG'));
-        filename =  strtrim(out{1}(strfind(out{1}, 'inflating:')+length('inflating:')+1:end));
+        switch flags.tool
+            case 'shell'
+                out = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('DEBUG'));
+                filename = strtrim(out{1}(strfind(out{1}, 'inflating:')+length('inflating:')+1:end));
+            case 'builtin'
+                filename = c(unzip(compfile, tmpdir), 1);
+            otherwise
+                dunno(tool)
+        end
     case '.gz'
         filename = fullfile(tmpdir,tmpfile);
         exec_system_cmd(sprintf('gunzip -c %s > %s',compfile,filename),atmlab('DEBUG'));
@@ -58,4 +67,11 @@ switch fend
         filename = compfile;
 end
 
+end
+
+function dunno(tool)
+% issue error
+ME = MException(['atmlab:' mfilename ':unknown'], ...
+    'Unknown tool: %s.  Read help.', tool);
+ME.throwAsCaller();
 end

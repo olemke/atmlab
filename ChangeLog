@@ -1,5 +1,85 @@
+2013-03-27  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-317
+
+	* handy/p.m: Added
+
+	- Function equivalent of parenthesis, allowing for more compact code
+
+	* handy/c.m: Added
+
+	- Function equivalent of curly braces, allowing for more compact code
+
+	* graphs/fill_between.m: Added
+
+	- Analogue to matplotlibs fill_between, for filling an area between
+	two lines
+
+	* graphs/zerowhite.m, graphs/zerowhite2.m: Small change
+
+	- In documentation added "see also" pointing to zerowhite, zerowhite2,
+	and zerobright.
+
+	* graphs/sanepcolor.m: Added
+
+	- From Matlab file exchange.  Like pcolor, but values relate to edges,
+	not vertices.
+
+	* graphs/drywet.m: Added
+
+	- Colourmap ranging from field drab via white to midnight blue
+
+	* graphs/zerobright.m: Added
+
+	- Scale, stretch and centre colourmap so that the brightest colour,
+	for example white, gets assigned to white.
+
+	* graphs/save_figure_multi.m:
+
+	- Added check if no figures are asked to be written at all.
+
+	* collocations/Collapser.m(process_granule): Bugfix
+
+	- Members-struct was "smartly" overwritten causing information on
+	flags to be lost for collapsed fields.
+
+	* collocations/CollocatedDataset.m(collocate_and_store_date_range):
+
+	- For some reason logtext(self.log) occasionally fails.  Comment out
+	until I know why.
+
+	* files/uncompress.m:
+
+	- Added option to specify tool to uncompress with (shell or builtin).
+	Defaults to old behaviour.
+
+	* sensors/read_cloudsat_hdf.m:
+
+	- Added try-catch in case uncompress fails, as sometimes it succeeds
+	with the builtin tool even if it fails with 'unzip'.
+
+	* datasets/HomemadeDataset.m(read_single_day):
+
+	- Adapt error text if invalid data are found
+
+	* datasets/SatDataset.m(read_granule):
+
+	- Do not try to read/write cache if cache is not setup
+
+	- Gracefully handle if data cannot be read due to shell-reported error
+
+	* datasets/+satreaders/cpr.m:
+
+	- Added workaround for missing attributes in E05/E06, set
+	product_version to dummy
+
+	* datasets/define_datasets.m:
+
+	- Define missing_value for CV_ROIWP
+
 2013-03-27  Ole Martin Christensen  <olem@chalmers.se>
-	* atmlab-2-1
+
+	* atmlab-2-1-316
 
 	* gformat/gf_save.m: Added check for matlabversion and if version
 	> 7.3 then save with the option '-v7.3' to accomodate files greater

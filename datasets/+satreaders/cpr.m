@@ -26,11 +26,36 @@ function S = cpr(file, varargin)
 % $Id$
 % Gerrit Holl
 
-core_fields = {'Longitude'; 'Latitude'; 'UTC_start'; 'Profile_time'; 'product_version'};
+% NB: CloudSat appears not to have attributes in E05 and E06, implement a
+% workaround for that...
+
+% get info from filename
+D = datasets;
+info = D.cpr.find_info_from_granule(file);
+date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
+
+switch info.epoch
+    case {'E00', 'E01', 'E02', 'E03', 'E04'}
+        haspv = false;
+    case {'E05', 'E06'}
+        haspv = true;
+    otherwise
+        error(['atmlab:' mfilename ':unkownepoch'], ...
+            'Got epoch %s, I don''t like that :(', info.epoch);
+end
+
+core_fields = {'Longitude'; 'Latitude'; 'UTC_start'; 'Profile_time'};
+
+if haspv
+    core_fields = [core_fields; 'product_version'];
+end
+
 extra_fields = optargs(varargin, {{}});
 all_fields = [core_fields(:); extra_fields(:)];
 
 S = read_cloudsat_hdf(file, all_fields);
+
+S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 % rename some fields
 S.lon = double(S.Longitude);
@@ -39,17 +64,16 @@ S.lat = double(S.Latitude);
 % otherwise unixsecstodate will give the wrong time.
 S.time = double( S.UTC_start + S.Profile_time);
 
-% get epoch
-D = datasets;
-info = D.cpr.find_info_from_granule(file);
-date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
-S.epoch = round(date2unixsecs(date.year, date.month, date.day));
 
 S.path = file;
-S.version = S.product_version;
+if haspv
+    S.version = S.product_version;
+else
+    S.version = 'not_given';
+end
 
 % remove redundant fields
-S = rmfield(S,core_fields);
+S = rmfield(S, core_fields);
 
 % convert 1-D fields into column vectors. This is required for processing.
 flds = fieldnames(S);
