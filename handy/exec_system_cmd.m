@@ -55,9 +55,9 @@ cmd = cmd(:);
 
 [verbose,continueOnError] = optargs(varargin, {false,false});
 
-%v = atmlab('VERBOSITY');  
-%atmlab('VERBOSITY',verbose);
-%vObj=onCleanup(@()(atmlab('VERBOSITY',v)));
+v = atmlab('VERBOSITY');  
+atmlab('VERBOSITY',verbose);
+vObj=onCleanup(@()(atmlab('VERBOSITY',v)));
 
 errID = 'atmlab:exec_system_cmd:shell';
 out = cell(1,length(cmd)); i = 1; % keep track of output messages

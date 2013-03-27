@@ -1,3 +1,22 @@
+2013-03-27  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-315
+
+	* atmlab/atmlab.m:
+
+	Use system instead of exec_system_cmd. There are more risks to run
+	into the recursion bug in the future. E.g. if the default verbosity
+	of exec_system_cmd would be changed to 1 for some reason, the
+	recursion would be triggered by exec_system_cmd's call to logtext.
+	It also depends on atmlab().
+
+	This function is so essential and at the core of atmlab that it should
+	not call other atmlab functions itself.
+
+	* handy/exec_system_cmd.m:
+
+	Put back stuff I commented out in previous commit.
+
 2013-03-26  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-314
