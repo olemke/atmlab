@@ -1,3 +1,9 @@
+2013-04-08  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-319
+	
+	* lineshape/faddeeva/: Ignore *\.mex*64
+
 2013-03-28  Richard Larsson  <ric.larsson@gmail.com>
 
 	* atmlab-2-1-318
