@@ -297,6 +297,17 @@ classdef Collapser < AssociatedDataset
             self.members2cols();
             
             nfields = max(cell2mat(struct2cell(self.cols).'));
+            
+            % this flag is only used until the end of the function.  It signals
+            % that the collapser gave no data for a particular footprint, but
+            % only when this is due to the global limitator.  This data is
+            % then removed, so this flag should never be exposed to the calling
+            % function.
+            %
+            % When the footprint itself is valid (i.e. global limitator returns
+            % some valid footprints) but the data are not (i.e. individual
+            % limitators return nothing or data are flagged to begin with), data
+            % are set to missing_value.
             flag = -realmax(); % hopefully, no real data has this value!
             M = flag*ones(size(uniques, 1), nfields);
             
@@ -309,8 +320,6 @@ classdef Collapser < AssociatedDataset
                 M_data_part = M_data(first:last, :);
                 
                 j = j + 1;
-                M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
-                M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
                 
                 % limitation to all, e.g. for distances
                 if isempty(self.overall_limitators)
@@ -323,8 +332,13 @@ classdef Collapser < AssociatedDataset
                     end
                 end
                 
+                M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
+                M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
+               
                 % for each field, apply limitations and call processing
                 % function on sub-limited set, if any are actually left
+                % also keep track if we had any valid fields here
+                anyvalidfields = false;
                 for k = 1:length(fields)
                     fname = fields{k};
                     if self.fieldstruct.(fname).incore
@@ -349,9 +363,9 @@ classdef Collapser < AssociatedDataset
                             limsel = limsel(:) & limhere(:);
                         end
                     end
-                        
+      
+                    procnames = fieldnames(self.fieldstruct.(fname).processors);
                     if any(limsel)
-                        procnames = fieldnames(self.fieldstruct.(fname).processors);
                         % apply all processors and store in appropiate
                         % place
                         for pi = 1:length(procnames)
@@ -367,14 +381,26 @@ classdef Collapser < AssociatedDataset
                                 size(capsed, 2), 1, length(self.cols.([procname '_' fname])));
                             end
                             M(j, self.cols.([procname '_' fname])) = capsed;
+                            anyvalidfields = true;
                         end
+                    else
+                        % set all processors for this field to missing_val
+                        for pi = 1:length(procnames)
+                            procname = procnames{pi};
+                            M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).atts.missing_value;
+                        end                        
                     end
+                end
+                % remove if any are valid at all
+                % FIXME: make this optional
+                if ~anyvalidfields
+                    M(j, :) = flag;
                 end
             end
             
             % remove remaining part of M, e.g. where I did too much
             % pre-allocation or no relevant data was found
-            rest = M(:, 1)==flag;
+            rest = all(M==flag, 2);
             M(rest, :) = [];
             logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
                 size(processed_core, 1), size(M, 1));

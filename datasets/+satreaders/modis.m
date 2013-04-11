@@ -22,7 +22,7 @@ function S = modis(file, varargin)
 % FORMAT
 %
 %   S = satreaders.modis(file, varargin)
-
+ 
 % $Id$
 % Created by Salomon Eliasson
 

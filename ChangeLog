@@ -1,3 +1,31 @@
+2013-04-11  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-320
+
+	* collocations/Collapser.m: Added Gerrit's fixes that he did
+	locally to not throw away valid footprints where one or some
+	limiters return a missing value
+
+	* geographical/ungridded2gridded.m:
+	- More descriptive header.
+	- Some more defaults.
+
+	* site-specific/kiruna/datasets_init.m: Added ISCCP dx dataset
+
+	* datasets/cpr_postprocessor.m: Adapted for multiLayer cloud Types
+
+	* datasets/define_datasets.m:
+	- Added ISCCP datasets.
+	- Added for more pseudo_fields for cpr and MODIS datasets
+	- read iwp_error instead of cwp_uncertainty in cloud_cci - dardar
+	fieldcopier
+	- setup to read cloud_types_multilayer instead for
+	modisdarar_cloudtypes collocated dataset.
+	- Adapted multilayer cloud types product
+
+	* handy/combine_pdfs.m: Added capability to add a title and adjust
+	its font size.
+
 2013-04-08  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-319

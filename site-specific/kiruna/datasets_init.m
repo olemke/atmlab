@@ -83,6 +83,10 @@ D.hirs.basedir = '/storage3/data/hirs';
 D.hirs.subdir = '$SAT_hirs_$YEAR4/$MONTH/$DAY';
 D.hirs.re = poes_re;
 
+D.isccp_dx.basedir = '/storage3/data/isccp/dx/';
+D.isccp_dx.subdir = '$YEAR4/$MONTH/$DAY';
+D.isccp_dx.re = 'ISCCP\.DX\.[0-2]\.(?<satname>.+)\.(?<year>\d{4})\.(?<month>\d{2})\.(?<day>\d{2})\.zip';
+
 D.mirs.basedir = '/storage3/data/mirs/';
 D.mirs.subdir = '$SAT_$YEAR4/$MONTH/$DAY';
 D.mirs.re = '\.D(?<year02>\d{2})(?<doy>\d{3})\.S(?<hour>\d{2})(?<minute>\d{2})\.E';

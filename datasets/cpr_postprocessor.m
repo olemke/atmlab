@@ -25,11 +25,13 @@ function S = cpr_postprocessor(self,S,flds)
 
 for F =flds
     field = F{1};
+    % get the missing value
+    mv = self.pseudo_fields.(field).atts.missing_value;
     switch field
-        case 'Cloud_Types'
-            
+        case {'Cloud_Types','Cloud_Types_multiLayer'}
+
             % preallocate
-            x.cloudy = false(size(tmp.cloud_scenario));
+            x.cloudy = false(size(S.cloud_scenario));
             x.Ci = x.cloudy; x.As = x.cloudy; x.Ac = x.cloudy;
             x.St = x.cloudy; x.Sc = x.cloudy; x.Cu = x.cloudy;
             x.Ns = x.cloudy; x.DC = x.cloudy;
@@ -38,10 +40,11 @@ for F =flds
             % extract clouds
             % -----------------------
             CS = sum(2.^(1:4)); %scenario mask
-            Nprof = size(tmp.cloud_scenario,1);
+            Nprof = size(S.cloud_scenario,1);
+            ph=mv*ones(1,10);%placeholder
             for i = 1:Nprof
-                determined = bitand(typecast(tmp.cloud_scenario(i,:),'uint16'),2^0)==2^0;
-                cloudScenario = bitand(typecast(tmp.cloud_scenario(i,:),'uint16'),CS);
+                determined = bitand(typecast(S.cloud_scenario(i,:),'uint16'),2^0)==2^0;
+                cloudScenario = bitand(typecast(S.cloud_scenario(i,:),'uint16'),CS);
                 x.cloudy(i,:) = determined & cloudScenario > 0;
                 x.Ci(i,:) = determined & cloudScenario == 2;
                 x.As(i,:) = determined & cloudScenario == 2^2;
@@ -51,10 +54,15 @@ for F =flds
                 x.Cu(i,:) = determined & cloudScenario == 2^2+2^3;
                 x.Ns(i,:) = determined & cloudScenario == 2^1+2^2+2^3;
                 x.DC(i,:) = determined & cloudScenario == 2^4;
+                if strcmp(field,'Cloud_Types_multiLayer')
+                    singleThings = (1:8).*(any([x.Ci(i,:);x.As(i,:);x.Ac(i,:);x.St(i,:);x.Sc(i,:);x.Cu(i,:);x.Ns(i,:);x.DC(i,:)],2))';
+                    singleThings=singleThings(singleThings~=0); if isempty(singleThings), singleThings=0;end
+                    S.Cloud_Types_multiLayer(i,:) = ph;
+                    S.Cloud_Types_multiLayer(i,1:length(singleThings)) = singleThings;
+                end
+
                 
-            end
-            
-            
+            end            
             % -------------------------
             % Make logical true if all
             % clouds in profile are the same type
@@ -63,10 +71,10 @@ for F =flds
             cloudfree = ~any(x.cloudy,2);
             cloudTypes = {'Ci','As','Ac','St','Sc','Cu','Ns','DC'};
             for i = 1:length(cloudTypes)
-                F = cloudTypes{i};
+                CT = cloudTypes{i};
                 % in profile: sum(cloudtype) = sum(cloudy vertical bins)
-                singleType.(F) = sum(x.(F),2)==sum(x.cloudy,2);
-                singleType.(F)(cloudfree) = false;
+                singleType.(CT) = sum(x.(CT),2)==sum(x.cloudy,2);
+                singleType.(CT)(cloudfree) = false;
             end
             
             % mixed clouds is where the profile is not cloudfree nor does it contain only one cloud type (=9)
@@ -76,9 +84,6 @@ for F =flds
             end
             S.Cloud_Types(cloudfree) = 0;
         case {'Cloud_Types_Lidar','Cloud_Types_Lidar_multiLayer'}
-            
-            % get the missing value
-            mv = self.pseudo_fields.(field).atts.missing_value;
             
             % The main data
             clouds = S.CloudLayerType;
@@ -161,12 +166,11 @@ for F =flds
                 % only count clouds covering consecutive bins once.
                 
                 if strcmp(field,'Cloud_Types_Lidar_multiLayer')
-                    base=mv*ones(1,10);
                     singleThings = S.(field)(i,diff(S.(field)(i,:))~=0);
                     if isempty(singleThings) % if not every box has a cloud in it
                         singleThings = 0; % i.e, cloud free
                     end
-                    S.(field)(i,:) = base; % put missing values as fillers
+                    S.(field)(i,:) = mv*ones(1,10); % put missing values as fillers
                     S.(field)(i,1:length(singleThings)) = singleThings;
                 end
             end
@@ -176,8 +180,5 @@ for F =flds
             
     end
 end
-% D = datasets;
-% col=D.cprCloudLidar;
-% x = col.read_granule([2007 1 1 2 30],'',{col.pseudo_fields.Cloud_Types_Lidar_multiLayer.dependencies});
-% x = col.reader_processor(col,x,{'Cloud_Types_Lidar_multiLayer'})
+
 end

@@ -29,6 +29,9 @@ function outfile = combine_pdfs(pdffiles, options)
 %                     |      m = middle, b = bottom      |
 %       scale         |[%d,%d; etc] scale individual figures
 %                      [filenumber,scale]                | 1
+%       title         | %s   title to be displayed above |
+%                            the combined pdfs,          | <none>
+%       fontsize      | %s   e.g. '4cm' or '40pt'        | 1/22 * rowwidth (only relevent if title is given)
 %       display       | tries to open pdf file           | false
 %                     | if your viewer is not listed it  |
 %                     | will not try to display anything |
@@ -41,9 +44,9 @@ function outfile = combine_pdfs(pdffiles, options)
 %               with the number of columns for each row. In that case, the
 %               sum of this vector must match the number of pdf files.
 
-% 2011-04-11 Created by Oliver Lemke based on an idea by Salomon.
+% 2013-04-10 Oliver Lemke and Salomon Eliasson.
 
-if ~nargin, error('atmlab:combine_pdfs','Needs input. See help.'); end
+if ~nargin, error(['atmlab:' mfilename],'Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
@@ -84,7 +87,7 @@ assert(~isempty(pdffiles), 'atmlab:combine_pdfs', 'List of input pdf files is em
 
 %% We trust that the user can count! Not really, better double check here
 if (length(options.cols) ~= 1 && sum(options.cols) ~= length(pdffiles))
-    error ('atmlab:combine_pdfs', ...
+    error (['atmlab:' mfilename]', ...
         'Number of plots (%d) doesn''t match sum of columns (%d)', ...
         length(pdffiles), sum(options.cols));
 end
@@ -182,24 +185,37 @@ fid = fopen(file,'w');
 fprintf(fid,'\\documentclass[a4paper,10pt]{report}\n');
 
 margin=0.1;
+if ~isempty(options.title) % not ready for this
+    options = optargs_struct(options,struct('fontsize',sprintf('%.0fcm',1/20 * max(layout.rowwidth)))); % cm
+    tmp=regexp(options.fontsize,'(?<fz>\d+)(?<unit>.+)','names'); fz=str2double(tmp.fz);unit=tmp.unit;
+else
+    fz=0;
+end
+
 fprintf(fid,['\\usepackage[margin=%.2fcm,paperwidth=%.2fcm,' ...
     'paperheight=%.2fcm]{geometry}\n'], ...
     margin, ...
     max(layout.rowwidth) + 2*margin, ...
-    sum(layout.rowheight) + 2*margin ...
+    sum(layout.rowheight) + 2*margin + fz ...
     + options.vspace*(length(layout.rowheight)-1) ...
     + options.secret_latex_spacing_tweak*length(layout.rowheight));
+
 fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
+fprintf(fid,'\\usepackage{anyfontsize}\n');
 fprintf(fid,'\\setlength{\\parindent}{0in}\n');
 fprintf(fid,'\\begin{document}\n');
-% if ~isempty(options.title) % not ready for this
-%     % centering, huge hardcoded
-%     fprintf(fid,'\\begin{center}\n');
-%     fprintf(fid,'{\\Huge %s}\n',strrep(options.title,'_','\_'));
-%     fprintf(fid,'\\end{center}\n');
-% end
 fprintf(fid,'\\centering\n');
+if ~isempty(options.title)
+    if ~any(ismember(unit,{'cm','mm','pt'})), error(['atmlab:' mfilename],'Don''t know fontsize unit "%s"',unit),end
+    fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}\n', options.valign, max(layout.rowwidth));
+    fprintf(fid,'\\begin{center}\n');
+    fprintf(fid,'{\\fontsize{%.0f%s}{%.0f%s}\\selectfont %s}\n',...
+        fz,unit,1.2*fz,unit,strrep(options.title,'_','\_'));
+    fprintf(fid,'\\end{center}\n');
+    fprintf(fid,'\\end{minipage}\n');
+    fprintf(fid, '\\vspace{%.2fcm}\\\\\n', options.vspace);
+end
 
 row = 1; filenum = 1;
 for R = layout.plotsbyrow

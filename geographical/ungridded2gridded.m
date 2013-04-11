@@ -1,4 +1,4 @@
-function [data,lat,lon] = ungridded2gridded(in,varargin)
+function [data,lat,lon] = ungridded2gridded(in,opt)
 %% ungridded2gridded
 %
 % PURPOSE
@@ -10,26 +10,21 @@ function [data,lat,lon] = ungridded2gridded(in,varargin)
 %       in      struct      containing 
 %                                       in.lat 
 %                                       in.lon
-%                                       in.data or in.field = 'stringname of datafield'                                      
-%                                                   e.g. if in.field = 'uth',
-%                                                   then in.uth is the data
-%                                                   field to grid
+%                                       in.(field)
+%                                       e.g. if in.field = 'uth',
+%                                       then in.uth is the data
+%                                       field to grid
 %
-%                                      data,lat,lon, must be the same size
+%                                       data,lat,lon, must be the same size
 %
 %
-%                            usefull extra option
-%                                      in.region = [blcorner,trcorner] (lat1,lon1,lat2,lon2)
-%                                      This limits the gridding to area of
-%                                      interest. If this is not given the
-%                                      gridding is global (slower if unnecessary)
 %
-%               Note:  structure "in" is also passed to binning_fast(). See
-%               that function for its options.
-% OPT
+%      opt   structure 
+%
+%       field   string      'stringname of datafield'
 %
 %       grid    cell        containing either
-%                           one (degree) scalar or vector to be applies in both
+%                           one (degree) scalar or vector to be applied in both
 %                           directions {[%f]} or {[%f %f]}
 %                                              or
 %                           two (degree) scalars or vectors to be appllied
@@ -42,16 +37,26 @@ function [data,lat,lon] = ungridded2gridded(in,varargin)
 %                               to calculate within each grid box. default =
 %                               {@mean,@numel}
 %
-%       valid   @fhandle    Throws away all invalid values before apply statistics. This function handle
-%                           toggles what you mean by that. To keep all values
+%       valid   @fhandle    Throws away all invalid values before apply
+%                           statistics. This function handle 
+%                           toggles what you mean by "valid". To keep all values
 %                           valid = ''; By default only keep positive values
 %                           i.e., valid = @(x)(x(x>=0))
+%         
 %
 %       noStatistics        If you only want to bin the data and return a 2D
 %                           grid cell that contains all the original values
 %                           as vectors in the grid boxes, set noStatistics=true;
 %                           this also implies that arguments "func" and "valid"
 %                           are not used
+%
+%      region               [blcorner,trcorner] (lat1,lon1,lat2,lon2)
+%                           This limits the gridding to area of
+%                           interest. If this is not given the
+%                           gridding is global (slower if unnecessary)
+%
+%      replace              val (e.g., NaN) 
+%                           replace empty cells with in.replace
 %
 % OUT   
 %      
@@ -64,32 +69,41 @@ function [data,lat,lon] = ungridded2gridded(in,varargin)
 %                          (if it is a structure)
 %
 %
-% USAGE  e.g., grid = {[2.5],[1]}; func = @sum; valid = @(x)(x(x>=0));
-%        [data,lat,lon] = ungridded2gridded(in,grid,func,valid);    creates rectangular grid with sum per grid of
-%                                                                   the values (>0) that were binned into that grid
+% USAGE  e.g., [data,lat,lon] = ungridded2gridded(in,struct('field','something','grid',1,'func',@sum,'valid',@(x)(x(x>0)));
+%              %creates rectangular grid with sum per grid of the values (>0) that were binned into that grid
 %
 % $Id$
 % Salomon Eliasson
 
 errId = ['atmlab:' mfilename,':badInput'];
-[grid, func, valid, noStatistics] = optargs(varargin, {{1}, {@mean,@numel},@(x)(x(x>=0)), false});
-assert(~isempty(in),errId,'No input')
-assert(any(isfield(in,{'data','field'})),errId,'need some way of knowing what "field" to do the gridding on.\nSee doc %s.m\n',mfilename)
-if ~isfield(in,'field')
-    field = 'data';
-else
-    field = in.field;
-end
-assert(isequal(size(in.(field)(:)),size(in.lat(:)),size(in.lon(:))),errId,'data, lat, lon must be the same size')
+
+if nargin==1, opt = struct(); end
+
+assert(any([isfield(in,'data'),isfield(opt,'field')]),...
+    errId,'need some way of knowing what "field" to do the gridding on.\nSee doc %s.m\n',mfilename)
+
+
+default.grid            = {1};
+default.func            = {@mean,@numel};
+default.valid           = @(x)(x(x>=0));
+default.noStatistics    = false;
+default.field           = 'data';
+default.replace         = NaN;
+opt = optargs_struct(opt,default);
+
+if ~iscell(opt.func), opt.func={opt.func}; end
+
+assert(isequal(size(in.(opt.field)(:)),size(in.lat(:)),size(in.lon(:))),...
+        errId,'data, lat, lon must be the same size')
 
 % ---------------
 % Grid
-if isscalar(grid{1})
-    in.grid = grid{1};
+if isscalar(opt.grid{1})
+    in.gridsize = opt.grid{1};
     
 elseif isvector(grid)
-    in.newlat = grid{1};
-    in.newlat = grid{2};
+    in.newlat = opt.grid{1};
+    in.newlat = opt.grid{2};
 else
     error(errId,'grid is incorrect. See doc %s',mfilename)
 end
@@ -97,16 +111,16 @@ end
 % ----------------
 % BIN THE DATA
 logtext(1,'Binning the data\n')
-[tmpdata,lat,lon] = binning_fast(catstruct(in,struct('data',in.(field),'lat',in.lat,'lon',in.lon,'gridsize',grid)));
+[tmpdata,lat,lon] = binning_fast(catstruct(in,struct('data',in.(opt.field))));
 
-if noStatistics
+if opt.noStatistics
     % Leave after this if you want
     data = tmpdata;
     return    
 end
 data.lat = lat;
 data.lon = lon;
-for F = func
+for F = opt.func
     logtext(1,'Getting the statistic called "%s" within each gridcell\n',func2str(F{1}))
 end
 % --------------------
@@ -120,14 +134,14 @@ if any(cellfun('isempty',tmpdata(:))),
   tmpdata = cellfun(@(x)(cast(x,'double')),tmpdata,'uniformOutput',0);
 end
 
-out = binned_statistics(tmpdata, func , valid, NaN); % The NaN is to be put in place of empty grids
+out = binned_statistics(tmpdata, opt.func , opt.valid, opt.replace); % The NaN is to be put in place of empty grids
 
 flds = fieldnames(out);
 for i = 1: length(flds)
     % check that the cells only contain scalars
-    data.fhandle2fieldname{i} = sprintf('%s = %s',flds{i},func2str(func{i}));
+    data.fhandle2fieldname{i} = sprintf('%s = %s',flds{i},func2str(opt.func{i}));
     if any(~cellfun(@isscalar,out.(flds{i})(:)))
-        logtext(2,'cell2mat only works on scalars. data.%s will remain a cell\n',flds{i})
+        logtext(atmlab('OUT'),'Not doing cell2mat(x) since it only works on scalars. data.%s will remain a cell\n',flds{i})
         data.(flds{i}) = out.(flds{i});
         continue
     end    
