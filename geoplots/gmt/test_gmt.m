@@ -148,8 +148,8 @@ if ~ismember(t,in.test), return, end %then don't do this test
 
 in.display = false; % just put them all in one pdf using conbine_pdfs
 %% Test 1a
-test.title        = 'gridded: title²  * @~D@~r@+-2@~g@~@+ (offset), unit';
-test.unit         = 'kg/m²';
+test.title        = 'gridded: title * @~D@~r@+-2@~g@~@+ (offset), unit';
+test.unit         = 'kg/m@+2';
 test.basemap_axis = 'neSW'; 
 test.header_offset = -.3; %move the header down a bit because of smaller header size
 test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
@@ -219,7 +219,7 @@ in.display = false; % put them all in one pdf using conbine_pdfs
 %% test 2a
 r = 1;
 test.nearneighbor.resolution = r;
-test.unit            = 'kg/m²';
+test.unit            = 'kg/m@+2';
 test.basemap_axis    = 'neSW'; 
 test.title           = sprintf('ungridded: resolution = %.0f [deg]',r);
 test.coast.width     = 1;

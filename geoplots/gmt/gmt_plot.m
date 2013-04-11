@@ -525,7 +525,7 @@ function filename = gmt_plot(in,field)
 % in.pstext           |%s|
 %                     E.g. 'pstext OPT > filename.ps', explicitly sets
 %                     the pstext GMT command directly. If in.pstext is a
-%                     structure, it'll use the structure arguments to 
+%                     structure, it'll use the structure arguments to
 %                     generate the command.
 %                     | [] |
 %                     ----------------------
@@ -551,7 +551,7 @@ function filename = gmt_plot(in,field)
 %  justify            |%f| sets the alignment                         |6|
 %
 %  color              |%s| text color                             |'0/0/0'|
-%  
+%
 %--------------------------------------------------------------------------
 %
 % QUICK TEST
@@ -597,7 +597,7 @@ if out.gridded
 else
     if ~out.nodata
         out.ungriddedfile = [out.filename '.nc'];
-        gmt_nc_save_ungridded(out.ungriddedfile,out.(field),out.lat,out.lon);
+        gmt_nc_save_ungridded(out.ungriddedfile,double(out.(field)),out.lat,out.lon);
     end
 end
 
@@ -711,7 +711,7 @@ if in.gridded
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
     [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
-
+    
 end
 
 % DODGY GEODATA
@@ -719,7 +719,7 @@ end
 if ~in.gridded
     index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
     if any(~index)
-        logtext(1,'Data with dodgy geodata will be ignored\n')
+        logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(index)/numel(index))
         in.lat = in.lat(index);
         in.lon = in.lon(index);
         in.(field) = in.(field)(index);
@@ -745,7 +745,7 @@ if ~isfield(in,'region')
         cond2 = 180-in.lon(end) <= dn(end);
         cond3 = abs(-90-in.lat(1)) <= dt(1);
         cond4 = 90-in.lat(end) <= dt(end);
-
+        
         af = annot_format{1};
         if cond1 && cond2 && cond3 && cond4
             in.region = '-180/180/-90/90';
@@ -787,12 +787,12 @@ end
 if in.gridded
     % DO some special treatment of data crossing the dateline that is not continuous
     % after changing to -180:180 regime OR if in.region is in 0:360 mode
-
+    
     if max(diff(in.lon))>5*min(diff(in.lon)) || ...
             structfun(@str2double,regexp(in.region,'.+/(?<lnmax>.+)/.+/.+','names')) > 180 % this is a 360 test
         
-       in.lon = in.lon+(in.lon < 0)*360;
-       [in.lon,lnindex] = sort(in.lon);
+        in.lon = in.lon+(in.lon < 0)*360;
+        [in.lon,lnindex] = sort(in.lon);
         in.(field) = in.(field)(:,lnindex);
     end
     
@@ -833,27 +833,39 @@ if ~isfield(in.legend,'position')
     % ORIENTATION
     
     x = sscanf(in.region,'%f/%f/%f/%f');
-    myHcondition = ( x(2)-x(1) )/( x(4)-x(3) ) > 3; tmp = ['v','h']; %vertical,horisontal
+    aspectR = ( x(2)-x(1) )/( x(4)-x(3) );
+    myHcondition = aspectR > 3; tmp = ['v','h']; %vertical,horisontal
     default.orientation = tmp(myHcondition+1);
     
     in.legend           = optargs_struct(in.legend,default); %need orientation now
     
-    o = strcmp(in.legend.orientation,'h'); %logical ishorizontal
-    
-    if strcmp(in.legend.orientation,'v')
-        % vertical
-        % fullheight vertical            9.8 2.25 4.5 .2
-        % min height (good for 20 lvls)  9.8  1.5   3 .2
-        f = 2- ( x(2)-x(1) )/( x(4)-x(3) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
-        v = [9.8 2.25-f*0.75 4.4-f*1.5 .2];
-    else v = [];
+    %aspect ratio
+    f = 2- ( x(2)-x(1) )/( x(4)-x(3) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons    
+    defThick=.2; %thickness of legend bar
+    switch in.legend.orientation
+        %empirically good defaults for inch
+        % this is based on in.mapwidth in inches !
+        case 'v'
+            % vertical
+            % fullheight vertical            9.8 2.25 4.5 .2
+            % min height (good for 20 lvls)  9.8  1.5   3 .2
+
+            v = [9.5 2.25-f*0.75 4.4-f*1.5 defThick]/9;
+            default.xpos   = sprintf('%.2fi',v(1)*in.map_width);
+            default.ypos   = sprintf('%.2fi',v(2)*in.map_width);
+            default.length = sprintf('%.2fi',v(3)*in.map_width);
+            default.width  = sprintf('%.2fi',v(4)*in.map_width);
+        case 'h'
+            
+            h = [4.5 -2*defThick 7.1 defThick]/9; % divided by 9 is from the default map width
+            default.xpos   = sprintf('%.2fi',h(1)*in.map_width);
+            default.ypos   = sprintf('%.2fi',h(2)*in.map_width);
+            default.length = sprintf('%.2fi',h(3)*in.map_width);
+            default.width  = sprintf('%.2fi',h(4)*in.map_width);
+            
+        otherwise
+            error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)
     end
-    factors = {v/9 ,[4.5 -0.2 7.1 .2]/9}; %empirically good defaults for inch
-    % this is based on in.mapwidth in inches !
-    default.xpos   = sprintf('%.2fi',factors{o+1}(1)*in.map_width);
-    default.ypos   = sprintf('%.2fi',factors{o+1}(2)*in.map_width);
-    default.length = sprintf('%.2fi',factors{o+1}(3)*in.map_width);
-    default.width  = sprintf('%.2fi',factors{o+1}(4)*in.map_width);
     
 else
     default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
@@ -1207,7 +1219,7 @@ for F = Fields
 end
 
 function gmtcleanup(tmpdir,curdir,keepfiles,V)
-%% cleanUp 
+%% cleanUp
 
 if keepfiles
     logtext(1,'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)

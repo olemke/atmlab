@@ -2,6 +2,13 @@
 
 	* atmlab-2-1-321
 
+	* geoplots/gmt/gmt_plot.m:
+	- Fixed bug for horisontal legends.
+	- ensure that the data input to the netcdf save is double
+	* geoplots/gmt/create_gmt_earth.m: Fixed bug in header_offset
+
+	* geoplots/gmt/test_gmt.m: Removed utf-8 stuff because Mac can't handle it
+
 	* handy/combine_pdfs.m: forgot to have a default title (title='')
 
 2013-04-11  Salomon Eliasson  <s.eliasson@ltu.se>

@@ -29,7 +29,7 @@ end
 
 % Verticle distance from plot to title
 if isfield(in,'header_offset')
-    commands{end+1} = sprintf('gmtset HEADER_OFFSET %c',in.header_offset);
+    commands{end+1} = sprintf('gmtset HEADER_OFFSET=%gc',in.header_offset);
 end
 
 % Size of title
