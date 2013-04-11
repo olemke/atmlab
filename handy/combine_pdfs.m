@@ -58,7 +58,7 @@ default.filename = 'out.pdf';
 default.outdir   = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
 default.display  = false;
-
+default.title    = ''; 
 options = optargs_struct(options, default);
 
 %% Convert outdir to fullpath
@@ -185,7 +185,7 @@ fid = fopen(file,'w');
 fprintf(fid,'\\documentclass[a4paper,10pt]{report}\n');
 
 margin=0.1;
-if ~isempty(options.title) % not ready for this
+if ~isempty(options.title)
     options = optargs_struct(options,struct('fontsize',sprintf('%.0fcm',1/20 * max(layout.rowwidth)))); % cm
     tmp=regexp(options.fontsize,'(?<fz>\d+)(?<unit>.+)','names'); fz=str2double(tmp.fz);unit=tmp.unit;
 else

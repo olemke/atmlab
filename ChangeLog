@@ -1,3 +1,9 @@
+2013-04-11  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-321
+
+	* handy/combine_pdfs.m: forgot to have a default title (title='')
+
 2013-04-11  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-320
