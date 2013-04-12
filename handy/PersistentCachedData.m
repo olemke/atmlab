@@ -79,7 +79,8 @@ classdef PersistentCachedData < CachedData
             logtext(atmlab('OUT'), 'New size: %s\n', ...
                 nbytes2string(self.disk_cachesize()));
             if self.disk_free() + self.disk_cachesize() < self.minFreeSpace
-                error(['atmlab:' mfilename ':noSpace'],'df + du < minFreeCache')
+                error(['atmlab:' mfilename ':noSpace'],'df + du = %d + %d < minFreeCache = %d', ...
+                    self.disk_free(), self.disk_cachesize(), self.minFreeSpace);
             end
             if self.disk_toolarge()
                 self.del_old_disk_entry()

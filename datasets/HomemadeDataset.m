@@ -390,6 +390,10 @@ classdef HomemadeDataset < SatDataset
             n_columns = sum(cellfun(@(ff) size(data.(ff), 2),  data_fields));
             n_rows = max(cellfun(@(ff) size(data.(ff), 1), fields));
             M = nan*zeros(n_rows, n_columns);
+            if isempty(M)
+                localcols = struct();
+                return;
+            end
             n = 1;
             % copy data to matrix
             for i = 1:length(data_fields)

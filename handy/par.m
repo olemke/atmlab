@@ -1,5 +1,5 @@
-function y = p(x, varargin)
-% P function equivalent of parenthesis
+function y = par(x, varargin)
+% PAR function equivalent of parenthesis
 %
 % Circumvent Matlabs syntactic limitation on indexing directly on the
 % result of an expression.  If an expression ends in round or curly braces,
@@ -27,7 +27,7 @@ function y = p(x, varargin)
 %
 % FORMAT
 %
-%   y = c(x, a, b, ...)
+%   y = par(x, a, b, ...)
 %
 % IN
 %
@@ -40,7 +40,7 @@ function y = p(x, varargin)
 %
 % By Gerrit Holl, inspired by http://is.gd/b3MkRf
 %
-% See also: c
+% See also: cur
 
 % $Id$
 y = x(varargin{:});

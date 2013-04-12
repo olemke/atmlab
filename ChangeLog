@@ -1,3 +1,57 @@
+2013-04-12  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-322
+	
+	* sensors/atovs/avhrr_gac_read.m: Added
+
+	- Major progress toward a reading routine for AVHRR GAC.  Current
+	status: reading and calibrating the thermal channels appears to work.
+	Geolocation and solar channels still to be done.
+
+	* sensors/atovs/unpack_bip.m:
+
+	- Added FIXME that this function should be vectorised.
+
+	* sensors/atovs/avhrr_gac_read_raw.m:
+
+	- Change default behaviour.  By default, read all lines rather than
+	none.
+
+	* handy/c.m -> handy/cur.m, handy/p.m -> handy/par.m: Renamed.
+
+	* datasets/HomemadeDataset.m(read_single_day):
+
+	- Graciously handle dataless day
+
+	* datasets/+satreaders/cpr.m:
+
+	- Bugfix as to for what epochs we have version numbers.  This is a
+	temporary solution until the reading routines are adapted.
+
+	* handy/PersistentCachedData.m:
+
+	- Actually convey some facts in the error message
+
+	* collocations/CollocatedDataset.m:
+
+	(read):
+	
+	- When verifying addi granule consistency, also pass date
+
+	- Build a try/catch around the attempts to store a cache entry.  If I
+	can't store a cache entry, simply go on and don't crash, as caching is
+	a luxury anyway.
+
+	(verify_addi_granule_consistency):
+
+	- Take the date as an argument (was erroneously writing the current
+	date in the error message).
+
+	* sensors/atovs/avhrr_gac_read_data.m: Nanochanges.
+
+
+	
+
 2013-04-11  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-321

@@ -17,7 +17,7 @@ function varargout = avhrr_gac_read_raw(fn, varargin)
 %   filename    string      Path to file to read data from
 %   fields_head cell-string Fields from header to return
 %   fields_line cell-string Fields from each line to return
-%   lines       array       Lines to return (-1=all, 0=none)
+%   lines       array       Lines to return (0=none).  Default all.
 %
 % OUT
 %
@@ -36,12 +36,20 @@ function varargout = avhrr_gac_read_raw(fn, varargin)
 %       avh_h_dataname: [42x1 char]
 %          avh_h_satid: 7
 %
+% See also: avhrr_define_gac_l1b, avhrr_gac_read_data, avhrr_gac_read_raw
+
+%
 % $Id$
 
-[fields_head, fields_line, lines] = optargs(varargin, {struct, struct, 0});
-record_size = 4608;
+record_size = 4608; % KLM Guide, Section 8.3.1.4.3.2
 
-[def_head, def_line] = avhrr_define_gac_l1b;
+% get total no. of records
+S = dir(fn);
+nrecords = S.bytes/record_size-1;
+
+[fields_head, fields_line, lines] = optargs(varargin, {{}, {}, nrecords});
+
+[def_head, def_line] = avhrr_define_gac_l1b();
 
 fp = fopen(fn, 'r', 'b'); % b=big-endian
 c = onCleanup(@()fclose(fp));
@@ -77,7 +85,10 @@ function val = readfield(fp, f, def, varargin)
 %
 % 
 offset = optargs(varargin, {0});
-fseek(fp, offset+def.(f).Start_Octet-1, 'bof');
+code = fseek(fp, offset+uint32(def.(f).Start_Octet)-1, 'bof');
+if code ~= 0
+    error(['atmlab:' mfilename ':fileerror'], ferror(fp));
+end
 ws = def.(f).Word_Size;
 nw = def.(f).Number_of_Words;
 skip = 0;
@@ -98,4 +109,8 @@ switch def.(f).Data_Type
             f, def.(f).Data_Type);
 end
 val = fread(fp, sz, type, skip);
+% Scale factor from 8.3.1.1 Data Set Structure
+if def.(f).Scale_Factor ~= 0
+    val = single(val) / 10.^single(def.(f).Scale_Factor);
+end
 end

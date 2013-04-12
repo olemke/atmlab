@@ -20,6 +20,8 @@ function out = unpack_bip(in)
 %
 % $Id$
 
+% FIXME: make this function vectorised
+
 words = uint32([...
                 bin2dec('00000000000000000000001111111111'), ...
                 bin2dec('00000000000011111111110000000000'), ...
@@ -42,3 +44,4 @@ ch3 = backsorted(3:5:end);
 ch4 = backsorted(4:5:end);
 ch5 = backsorted(5:5:end);
 out = [ch1 ch2 ch3 ch4 ch5];
+end

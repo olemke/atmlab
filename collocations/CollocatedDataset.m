@@ -1318,7 +1318,7 @@ classdef CollocatedDataset < HomemadeDataset
                         [additionals_day{j}, addis_cols_here{j}, attr_addi] = additionals{j}.read_single_day(date, spec, additional_fields{j});
                         % verify that AssociatedDataset was generated for
                         % the same CollocatedDataset
-                        self.verify_addi_granule_consistency(attr_core, attr_addi, additionals{j});
+                        self.verify_addi_granule_consistency(attr_core, attr_addi, additionals{j}, date);
                         if numel(additionals_day{j})>0
                             addis_cols{j} = addis_cols_here{j};
                         end
@@ -1413,8 +1413,17 @@ classdef CollocatedDataset < HomemadeDataset
             % possibly cache result
             if ~isempty(self.pcd)
                 logtext(atmlab('OUT'), 'Storing result in cache\n');
-                self.pcd.set_entry(cachestr, varargout, ...
-                    {self.name, date_start, date_end, spec, all_fields, limits, evalc('disp(filters_by_name)')}); % OUCH! :(
+                try
+                    self.pcd.set_entry(cachestr, varargout, ...
+                        {self.name, date_start, date_end, spec, all_fields, limits, evalc('disp(filters_by_name)')}); % OUCH! :(
+                catch ME
+                    switch ME.identifier
+                        case 'atmlab:PersistentCachedData:noSpace'
+                            logtext(atmlab('ERR'), 'Not storing, no space: %s', ME.message);
+                        otherwise
+                            ME.rethrow();
+                    end
+                end
             end
             
             %%%
@@ -1789,7 +1798,7 @@ classdef CollocatedDataset < HomemadeDataset
             end
         end
         
-        function verify_addi_granule_consistency(self, attr_core, attr_addi, addi)
+        function verify_addi_granule_consistency(self, attr_core, attr_addi, addi, date)
             % verify consistency between addi granule and core granule
             %
             % Note that this is different from verify_addis. Verify_addis

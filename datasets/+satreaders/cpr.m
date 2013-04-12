@@ -36,9 +36,9 @@ date = dayofyear_inverse(str2double(info.year), str2double(info.doy));
 
 switch info.epoch
     case {'E00', 'E01', 'E02', 'E03', 'E04'}
-        haspv = false;
-    case {'E05', 'E06'}
         haspv = true;
+    case {'E05', 'E06'}
+        haspv = false;
     otherwise
         error(['atmlab:' mfilename ':unkownepoch'], ...
             'Got epoch %s, I don''t like that :(', info.epoch);

@@ -1,9 +1,9 @@
-function y = c(x, varargin)
-% C function equivalent of curly braces
+function y = cur(x, varargin)
+% CUR function equivalent of curly braces
 %
 % For a discussion on the thoughts behind this function, see <a
-% href="matlab:help p">p</a>.
-% C is the equivalent but with curly braces.
+% href="matlab:help par">par</a>.
+% CUR is the equivalent but with curly braces.
 %
 % FORMAT
 %
@@ -20,7 +20,7 @@ function y = c(x, varargin)
 %
 % By Gerrit Holl, inspired by http://is.gd/b3MkRf
 %
-% See also: p
+% See also: par
 
 % $Id$
 y = x{varargin{:}};

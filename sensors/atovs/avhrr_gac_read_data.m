@@ -3,9 +3,9 @@ function data = avhrr_gac_read_data(filename)
 % avhrr_gac_read_data Read AVHRR GAC l1b data (incomplete)
 %
 % Read data directly from AVHRR GAC l1b. Note that l1b is uncalibrated and that
-% this function does not read actual measurements. To read actual AVHRR GAC
+% this function does not read actual measurements.  To read actual AVHRR GAC
 % measurements, use sat2netcdf to convert to netcdf and use a netcdf
-% reading routine. However, this does not include all information, and in
+% reading routine.  However, this does not include all information, and in
 % the long run it would be good to read it directly.
 %
 % FORMAT
@@ -48,3 +48,4 @@ for i = 1:n_records
     data.raa(i, :) = angles(raa_pos)/100;
 end
 fclose(fp);
+end
