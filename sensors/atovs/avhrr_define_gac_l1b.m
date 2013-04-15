@@ -21,6 +21,39 @@ function [head, line] = avhrr_define_gac_l1b
 
 matfile = fullfile(atmlab('ATMLAB_DATA_PATH'), 'sensors', 'avhrr', 'gac_version4.mat');
 S = load(matfile);
+
+% add reading information to structure so this need not be done on reading
+% (every microsecond counts there because the function is called for every
+% scanline, for every field)
+for cat = {'head', 'line'}
+    flds = fieldnames(S.(cat{1}));
+    for fld = flds.';
+        ws = S.(cat{1}).(fld{1}).Word_Size;
+        nw = S.(cat{1}).(fld{1}).Number_of_Words;
+        nbits = num2str(ws*8);
+        switch S.(cat{1}).(fld{1}).Data_Type
+            
+            case 'i'
+                S.(cat{1}).(fld{1}).read_type = ['int' nbits '=>int' nbits];
+                S.(cat{1}).(fld{1}).read_size = nw;
+            case 'u'
+                S.(cat{1}).(fld{1}).read_type = ['uint' nbits '=>uint' nbits];
+                S.(cat{1}).(fld{1}).read_size = nw;
+            case 'c'
+                S.(cat{1}).(fld{1}).read_type = 'uint8=>char';
+                S.(cat{1}).(fld{1}).read_size = uint16(ws)*nw;
+            case ''
+                % should not be read
+                S.(cat{1}).(fld{1}).read_type = 'uint8=>uint8';
+                S.(cat{1}).(fld{1}).read_size = 1;
+            otherwise
+                error('atmlab:avhrr_define_gac_l1b', ...
+                    'Field %s has unknown data type: %s', ...
+                    fld{1}, S.(cat{1}).(fld{1}).Data_Type);
+        end
+    end
+end
+
 head = S.head;
 line = S.line;
 

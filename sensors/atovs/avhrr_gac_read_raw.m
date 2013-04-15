@@ -38,6 +38,10 @@ function varargout = avhrr_gac_read_raw(fn, varargin)
 %
 % See also: avhrr_define_gac_l1b, avhrr_gac_read_data, avhrr_gac_read_raw
 
+% Format is defined in NOAA KLM User's Guide, section 8.3.1.4.3.2, in
+% particular in Table 8.3.1.4.3.2-1.  Page 8-79 or page 363.
+% http://www.ncdc.noaa.gov/oa/pod-guide/ncdc/docs/klm/html/c8/sec83143-2.htm
+
 %
 % $Id$
 
@@ -56,7 +60,7 @@ c = onCleanup(@()fclose(fp));
 
 %% read header fields
 
-data_head = cell2struct(cellfun(@(v) readfield(fp, v, def_head), fields_head, 'UniformOutput', false), fields_head, 2);
+data_head = cell2struct(cellfun(@(v) readfield(fp, v, def_head, 0), fields_head, 'UniformOutput', false), fields_head, 2);
 
 %% read data fields
 
@@ -70,7 +74,10 @@ end
 i = 0;
 for lineno = lines
     i = i + 1;
-    data_line(i) = cell2struct(cellfun(@(v) readfield(fp, v, def_line, record_size*lineno), fields_line, 'UniformOutput', false), fields_line, 2);
+    for field = fields_line
+        data_line(i).(field{1}) = readfield(fp, field{1}, def_line, record_size*lineno);
+    end
+    %data_line(i) = cell2struct(cellfun(@(v) readfield(fp, v, def_line, record_size*lineno), fields_line, 'UniformOutput', false), fields_line, 2);
 end
 
 if exist('data_line', 'var')
@@ -80,35 +87,16 @@ else
 end
 
 end
-function val = readfield(fp, f, def, varargin)
+function val = readfield(fp, f, def, offset)
 % readfield Reads field from AVHRR GAC
 %
-% 
-offset = optargs(varargin, {0});
+
 code = fseek(fp, offset+uint32(def.(f).Start_Octet)-1, 'bof');
 if code ~= 0
     error(['atmlab:' mfilename ':fileerror'], ferror(fp));
 end
-ws = def.(f).Word_Size;
-nw = def.(f).Number_of_Words;
-skip = 0;
-nbits = num2str(ws*8);
-switch def.(f).Data_Type
-    case 'i'
-        type = ['int' nbits '=>int' nbits];
-        sz = nw;
-    case 'u'
-        type = ['uint' nbits '=>uint' nbits];
-        sz = nw;
-    case 'c'
-        type = 'uint8=>char';
-        sz = uint16(ws)*nw;
-    otherwise
-        error('atmlab:avhrr_gac_read_raw', ...
-            'Field %s has unknown data type: %s', ...
-            f, def.(f).Data_Type);
-end
-val = fread(fp, sz, type, skip);
+%skip = 0;
+val = fread(fp, def.(f).read_size, def.(f).read_type, 0);
 % Scale factor from 8.3.1.1 Data Set Structure
 if def.(f).Scale_Factor ~= 0
     val = single(val) / 10.^single(def.(f).Scale_Factor);

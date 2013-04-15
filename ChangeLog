@@ -1,3 +1,35 @@
+2013-04-15  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-323
+
+	* sensors/atovs/avhrr_define_gac_l1b.m:
+
+	- Moved code to calculate types and sizes for reading here, it needs
+	to be done only once per field after all.
+
+	* sensors/atovs/avhrr_gac_read.m:
+
+	(avhrr_gac_read.m):
+
+	- Also read avh_sclintime and avh_pos
+	- Call measurement 'y' because it's either Tb or albedo
+
+	(calibrate_avhrr):
+
+	- Add visible channels
+	- Warn on negative radiances but don't crash on them, just set them to 0
+	- More commenting
+
+	(navigate_avhrr):
+
+	- Started work on navigation part.  Unfinished.
+
+	* sensors/atovs/avhrr_gac_read_raw.m:
+
+	- Various speedups, twice as fast now, mainly by moving things out of
+	loops, and by replacing cellfun with explicit loop.  Should still be
+	improvable (single file takes 30 seconds...).
+	
 2013-04-12  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-322
