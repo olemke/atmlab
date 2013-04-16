@@ -18,7 +18,6 @@
 % 2005-01-26   Sensor part added by Mattias Ekstrom.
 % 2004-??-??   Created by Patrick Eriksson.
 
-
 function [Q,f,y] = qarts_demo( varargin )
 %
 [ztan] = optargs( varargin, { 30e3 } );

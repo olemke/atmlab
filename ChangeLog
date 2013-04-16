@@ -1,3 +1,11 @@
+2013-04-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-324
+
+	* demos/qarts_ppath_demo.m (qarts_ppath_demo): New.
+
+	* demos/qarts_demo.m: Fixed comment typo.
+
 2013-04-15  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-323
