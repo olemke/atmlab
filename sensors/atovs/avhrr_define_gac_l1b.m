@@ -36,9 +36,11 @@ for cat = {'head', 'line'}
             case 'i'
                 S.(cat{1}).(fld{1}).read_type = ['int' nbits '=>int' nbits];
                 S.(cat{1}).(fld{1}).read_size = nw;
+                S.(cat{1}).(fld{1}).cast_type = ['int' nbits];
             case 'u'
                 S.(cat{1}).(fld{1}).read_type = ['uint' nbits '=>uint' nbits];
                 S.(cat{1}).(fld{1}).read_size = nw;
+                S.(cat{1}).(fld{1}).cast_type = ['uint' nbits];                
             case 'c'
                 S.(cat{1}).(fld{1}).read_type = 'uint8=>char';
                 S.(cat{1}).(fld{1}).read_size = uint16(ws)*nw;

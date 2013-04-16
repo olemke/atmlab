@@ -1,31 +1,66 @@
-function S = avhrr_gac_read(filename)
+function S = avhrr_gac_read(filename, varargin)
 
-% AVHRR_GAC_READ Read and calibrate AVHRR GAC L1B data.
+% AVHRR_GAC_READ Read, calibrate, geolocate AVHRR GAC L1B data.
 %
-% Work in progress.  Implemented thermal channels.  Not yet implemented
-% solar channels.  So far returns ONLY brightness temperatures, no
-% geolocation or anything else.
+% Read a AVHRR GAC L1B file, apply calibration and geolocation.  The actual
+% reading is done in avhrr_gac_read_raw.  Structures of valid header fields
+% can be obtained with avhrr_define_gac_l1b.  By default, it returns
+% measurements (y), time, lat, lon, epoch.  All other fields that may be
+% requested are returned as-is.
 %
+% FORMAT
+%
+%   S = avhrr_gac_read(filename, header_fields, data_fields)
+%
+% IN
+%
+%       filename    
+%
+%           String, path to file to be read (AVHRR L1B file).  Required.
+%
+%       extra_header_fields
+%
+%           Cell array of strings.  Fields will be copied from the L1B
+%           header.  Call avhrr_define_gac_l1b for valid fields.
+%           Optional, defaults to {}.
+%
+%       extra_data_fields
+%
+%           Cell array of strings.  Arrays will be build by copying data
+%           from the L1B line records.  Call avhrr_define_gac_l1b for valid
+%           fields.
+%           Optional, defaults to {}.
+%
+% OUT
+%
+%   Structure with at least 'time', 'lat', 'lon', 'y', 'epoch'.  Otherwise
+%   fields copied from data as described above.
+%
+% See also: avhrr_gac_define_l1b, avhrr_gac_read_raw
+
 % TODO:
 %
-% - verify data integrity
-% - look at quality flags etc.
-% - geolocate data
 % - read arbitrary fields
 % - write documentation
 % - verify correctness
-% - read entire files
 % - finalise
+
+% Questions:
+%
+% - AVHRR 3A/3B, FRAME TELEMETRY avh_telem_id or SCAN LINE INFORMATION
+% avh_scnlinbin?
+% - Should I care about a TIP parity error?
 
 % $Id$
 
-%limit = 500; % while still in progress
-[data_head, data_line] = avhrr_gac_read_raw(filename, ...
-    {'avh_h_satid', 'avh_h_siteid', 'avh_h_hdrcnt', ...
+[extra_header_fields, extra_data_fields] = optargs(varargin, {{}, {}});
+
+core_header_fields = {'avh_h_satid', 'avh_h_siteid', 'avh_h_hdrcnt', ...
     'avh_h_radtempcnv3b1', 'avh_h_radtempcnv3b2', 'avh_h_radtempcnv3bc', ...
     'avh_h_radtempcnv41', 'avh_h_radtempcnv42', 'avh_h_radtempcnv4c', ...
-    'avh_h_radtempcnv51', 'avh_h_radtempcnv52', 'avh_h_radtempcnv5c'}, ...
-    {'avh_calvis_os11', 'avh_calvis_oi11', ...
+    'avh_h_radtempcnv51', 'avh_h_radtempcnv52', 'avh_h_radtempcnv5c'};
+
+core_data_fields = {'avh_calvis_os11', 'avh_calvis_oi11', ...
      'avh_calvis_os12', 'avh_calvis_oi12', ...
      'avh_calvis_oi1', ...
      'avh_calvis_os21', 'avh_calvis_oi21', ...
@@ -39,11 +74,33 @@ function S = avhrr_gac_read(filename)
      'avh_calir_o51', 'avh_calir_o52', 'avh_calir_o53', ...
      'avh_video', 'avh_scnlin', 'avh_scnlinyr', ...
      'avh_telem_id', ...
-     'avh_scnlintime', 'avh_pos'});
+     'avh_scnlintime', 'avh_pos', 'avh_scnlindy', ...
+     'avh_scnlinbit', 'avh_calqual', 'avh_qualind', 'avh_scnlinqual_c', 'avh_scnlinqual_t', 'avh_scnlinqual_e', 'avh_navstat'};
+
+ 
+all_header_fields = vec2row(union(core_header_fields, extra_header_fields));
+all_data_fields = vec2row(union(core_data_fields, extra_data_fields));
+ 
+%limit = 500; % while still in progress
+[data_head, data_line] = avhrr_gac_read_raw(filename, ...
+    all_header_fields, all_data_fields);
 
 S.y = calibrate_avhrr(data_head, data_line);
-S.time = compensate_wraparound([data_line.avh_scnlintime]/1000);
+S.time = compensate_wraparound(single(data_line.avh_scnlintime)/1000);
 [S.lat, S.lon] = navigate_avhrr(data_head, data_line);
+doys = dayofyear_inverse(data_line.avh_scnlinyr(1), data_line.avh_scnlindy(1));
+S.epoch = date2unixsecs(doys.year, doys.month, doys.day);
+
+% copy over remaining fields
+
+for hfield = extra_header_fields
+    S.(hfield{1}) = data_head.(hfield{1});
+end
+
+for dfield = extra_data_fields
+    S.(dfield{1}) = data_line.(dfield{1});
+end
+
 end
 
 function y = calibrate_avhrr(data_head, data_line)
@@ -54,12 +111,28 @@ function y = calibrate_avhrr(data_head, data_line)
 %
 %   calib = calibrated_avhrr(data_head, data_line)
 
-N_lines = length(data_line); % while still in progress
+N_lines = length(data_line.avh_scnlin);
 
 % Field avh_telem_id contains bit flags (Scan Line Bit Field).
 % The first 2 bits specify "channel 3 select (0=3B; 1=3A; 2=transition)".
 
-chan3_is_3a = logical(bitand(par([data_line.avh_telem_id], 1, ':'), 1));
+chan3_is_3a_alt = logical(bitand(par(data_line.avh_scnlinbit, 1, ':'), 1));
+chan3_is_3a = logical(bitand(data_line.avh_scnlinbit, bitshift(1, 0)));
+
+if ~isequal(chan3_is_3a, chan3_is_3a_alt)
+    error(['atmlab:' mfilename ':ambiguity'], ...
+        'Different filds give different into as to 3A/3B status.  Investigate!');
+end
+
+% look at various flags.  See NOAA KLM User's Guide, Table 8.3.1.4.3.2-1
+do_not_use = logical(bitand(data_line.avh_qualind, bitshift(1, 31)));
+% FIXME: should I care about a tip_parity_error?
+%tip_parity_error = logical(bitand(data_line.avh_qualind, bitshift(1, 8)));
+cannot_calibrate = logical(bitand(data_line.avh_qualind, bitshift(1, 28)));
+bad_calibration = logical(data_line.avh_calqual); % any bit on means bad
+bad_calibration2 = logical(data_line.avh_scnlinqual_c);
+bad_geolocation = logical(data_line.avh_scnlinqual_e); % any bit on means bad
+bad_time = logical(data_line.avh_scnlinqual_t);
 
 % Unpack 10-bit data into 16-bits for easier handling
 %
@@ -67,7 +140,7 @@ chan3_is_3a = logical(bitand(par([data_line.avh_telem_id], 1, ':'), 1));
 % calibrate_avhrr
 % (but calibrate_avhrr consumes only 17% of avhrr_gac_read)
 %ce = par(unpack_bip(data_line(1).avh_video), ':', 4);
-X = arrayfun(@(i) unpack_bip(data_line(i).avh_video), 1:N_lines, 'UniformOutput', false);
+X = arrayfun(@(i) unpack_bip(data_line.avh_video(:, i)), 1:N_lines, 'UniformOutput', false);
 ce = reshape(vertcat(X{:}), [409, N_lines, 5]);
 
 % pre-allocate calibrated radiance array
@@ -158,8 +231,8 @@ Ne(:, :, 4:5) = bsxfun(@plus, ...
                        bsxfun(@plus, term2, term3));
 
 if any(any(any(Ne<0)))                  
-    logtext(atmlab('ERR'), 'Setting %d negative radiances to 0!\n', ...
-        length(find(Ne<0)));
+%    logtext(atmlab('ERR'), 'Setting %d negative radiances to 0!\n', ...
+%        length(find(Ne<0)));
     Ne(Ne<0) = 0;
 end
 % now Ne contains radiance in mW/(m2-sr-cm-1) 
@@ -222,9 +295,12 @@ y(:, ~chan3_is_3a, 3) = Tb(:, ~chan3_is_3a, 3);
 
 y(:, :, 4:5) = Tb(:, :, 4:5);
 
+wrong = do_not_use | bad_geolocation | bad_time | bad_calibration2 | any(bad_calibration, 1) | cannot_calibrate;
+y(:, wrong, :) = -9999.99;
+
 end
 
-function [lat, lon] = navigate_avhrr(data_head, data_line)
+function [lat, lon] = navigate_avhrr(~, data_line)
 % Calculate lan/lon for each observation
 %
 % From NOAA KLM User's Guide, Table 8.3.1.4.3.2 (page 8-79 / 363)
@@ -234,14 +310,27 @@ function [lat, lon] = navigate_avhrr(data_head, data_line)
 %
 % Distance between anchorpoints is 30–150 km
 %
-% UNFINISHED!
+% Implementation inspired by IDL function by Nigel Atkinson
 
-loc = reshape([data_line.avh_pos], [2, 51, 9320]);
-nlines = length(data_line);
-lat = zeros(409, nlines);
-lon = zeros(409, nlines);
+nlines = size(data_line.avh_pos, 2);
+loc = reshape(data_line.avh_pos, [2, 51, nlines]);
+lat = zeros(409, nlines, 'single');
+lon = zeros(409, nlines, 'single');
 
 pos_given = 5:8:405;
+lat_in = squeeze(loc(1, :, :));
+lon_in = squeeze(loc(2, :, :));
+
+x_in = cosd(lon_in).*cosd(lat_in);
+y_in = sind(lon_in).*cosd(lat_in);
+z_in = sind(lat_in);
+
+xf = spline(pos_given, x_in.', 1:409).';
+yf = spline(pos_given, y_in.', 1:409).';
+zf = spline(pos_given, z_in.', 1:409).';
+lon(:, :) = atan2(yf, xf) .* constants('RAD2DEG');
+lat(:, :) = atan2(zf, sqrt(xf.^2 + yf.^2)) .* constants('RAD2DEG');
+
 %{
 IDL code
 
@@ -273,8 +362,8 @@ endfor
 
 %}
 
-
 end
+%{
 function [vc, A, B] = avhrr_coef_therm2rad(satid)
 % get coefficients for thermal channel temperature-to-radiance
 %
@@ -332,3 +421,4 @@ switch satid
             'Unknown satellite id: %d', id);
 end
 end
+%}

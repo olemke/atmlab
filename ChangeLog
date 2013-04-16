@@ -1,3 +1,42 @@
+2013-04-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* sensors/atovs/avhrr_gac_read.m:
+
+	(avhrr_gat_read):
+
+	- Added documentation
+	- Added capability to read arbitrary fields
+	- Define epoch appropriately
+
+	(calibrate_avhrr):
+
+	- Adapt to data_line being scalar structure with vector members
+	- Flag data if particular bits are set (bad calibration,
+	geolocation...)
+
+	(navigate_avhrr):
+
+	- Added routine to 'navigate', that is get lat/lon per footprint.
+	Uses spline interpolation "inspired" by IDL code from Nigel Atkinson.
+
+	* sensors/atovs/avhrr_gac_read_raw.m:
+
+	- Check data integrity before proceeding to read binary data (quite
+	basic check)
+
+	- Vectorise reading by reading all data, then typecasting in a clever
+	way.  Much faster (>factor 10) now.
+
+	* sensors/atovs/unpack_bip.m:
+
+	- Speedup by "caching" words.
+
+	* sensors/atovs/avhrr_define_gac_l1b.m:
+
+	- Add 'cast_type' for new direct-casting usage
+
+	* sensors/atovs/avhrr_gac_read_data.m: Deleted, obsolete.
+
 2013-04-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-324
