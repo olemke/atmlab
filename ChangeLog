@@ -1,3 +1,15 @@
+2013-04-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-329
+
+	* demos/qarts_backend_demo.m (qarts_backend_demo): New.
+
+	* h2o/thermodynamics/spechum2e.m: Function name was wrong in header.
+
+	* atmlab/atmlab.m: Replaced an ~ with a dummy variable (u) on
+	output side. The ~ feature is quite new and can cause problems,
+	such as for version 7.8 that I have on my laptop.
+
 2013-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-328
@@ -262,24 +274,24 @@
 2013-04-08  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-319
-	
+
 	* lineshape/faddeeva/: Ignore *\.mex*64
 
 2013-03-28  Richard Larsson  <ric.larsson@gmail.com>
 
 	* atmlab-2-1-318
-	
+
 	* atmlab/atmlab_mex.m: Added
-	
+
 	This file is infrastructure for the compilation of non-matlab code. Assumes
 	the user has set up their mex compiler themselves already.
-	
+
 	* atmlab/atmlab_init.m: Changed
-	
+
 	Added path to the faddeeva function.
-	
+
 	* lineshape/faddeeva/*: New functionality
-	
+
 	Allows the user to call Faddeeva* functions. For mor information see the
 	included README. This is exactly the same file and functionality that is
 	included in ARTS presently.

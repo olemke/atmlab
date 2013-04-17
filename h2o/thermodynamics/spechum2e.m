@@ -4,7 +4,7 @@
 %  equation 3.57 and 3.59 on page 80 of Atmospheric Science An Introductory 
 %  Survey. John M. Wallace & Peter V. hobbs 2nd Edition 
 %
-%  FORMAT [e] = e2spechum(q,P)
+%  FORMAT [e] = spechum2e(q,P)
 %
 %  OUT	   e = vapor pressure of water [Pa]
 %  IN      q = specific humidity [kg/kg].
