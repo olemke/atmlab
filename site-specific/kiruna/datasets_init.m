@@ -379,6 +379,10 @@ D.dardarsub_modis_cprCloudLidar.basedir = '/storage4/user_data/seliasson/dardars
 D.dardarsub_modis_cprCloudLidar.subdir  = '$YEAR4/$MONTH/$DAY';
 D.dardarsub_modis_cprCloudLidar.filename= 'fields_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
+D.dardarsub_modis_cprCloudLidar_closest.basedir = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/closest';
+D.dardarsub_modis_cprCloudLidar_closest.subdir  = '$YEAR4/$MONTH/$DAY';
+D.dardarsub_modis_cprCloudLidar_closest.filename= 'closest_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
 D.dardarsub_modis_collapsedIWP.basedir  = '/storage4/user_data/seliasson/dardarsub_modis/collapsedIWP';
 D.dardarsub_modis_collapsedIWP.filename = 'collapsed_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 D.dardarsub_modis_collapsedIWP.subdir   = '$YEAR4/$MONTH/$DAY';

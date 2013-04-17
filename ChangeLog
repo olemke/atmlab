@@ -1,4 +1,21 @@
+2013-04-17  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-326
+
+	* geoplots/gmt/test_gmt.m: Added back the utf-8 characters
+
+	* handy/PersistentCachedData.m: Added workaround alternative way
+	to find the free disk space if you are on a Mac
+
+	* site-specific/kiruna/datasets_init.m:
+	* datasets/define_datasets.m:
+	Added Collapser: dardar_modis_cprLidar_closest
+
+	* graphs/scatter_density_plot.m: bugfix: use paddedx and paddedy in plot_medians() call
+
 2013-04-16  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-325
 
 	* sensors/atovs/avhrr_gac_read.m:
 
@@ -76,11 +93,11 @@
 	- Various speedups, twice as fast now, mainly by moving things out of
 	loops, and by replacing cellfun with explicit loop.  Should still be
 	improvable (single file takes 30 seconds...).
-	
+
 2013-04-12  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-322
-	
+
 	* sensors/atovs/avhrr_gac_read.m: Added
 
 	- Major progress toward a reading routine for AVHRR GAC.  Current
@@ -114,7 +131,7 @@
 	* collocations/CollocatedDataset.m:
 
 	(read):
-	
+
 	- When verifying addi granule consistency, also pass date
 
 	- Build a try/catch around the attempts to store a cache entry.  If I
@@ -128,8 +145,6 @@
 
 	* sensors/atovs/avhrr_gac_read_data.m: Nanochanges.
 
-
-	
 
 2013-04-11  Salomon Eliasson  <seliasson@ManUtd>
 

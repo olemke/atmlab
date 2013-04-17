@@ -106,7 +106,7 @@ end
 
 
 % create the actual 2-d histogram. Apply forward transformation upon data,
-% then inverse transformation upon plotting. This allows for e.g.
+% then inverse transformation upon plotting. This allows for, e.g.
 % logarithmic representations.
 [N, BX, BY] = hist2d(opts.transx(x), opts.transy(y), opts.xbins, opts.ybins);
 xbins = BX(1, :);
@@ -143,7 +143,7 @@ set(gcf(), 'colormap', largecolour);
 %plot_quantiles();
 hold('on');
 if ~isempty(opts.medprops)
-    plot_medians(x, y, xbins, ybins, opts);
+    plot_medians(x, y, paddedx, paddedy, opts);
 end
 
 %% plot actual measurements
