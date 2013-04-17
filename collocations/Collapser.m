@@ -311,7 +311,31 @@ classdef Collapser < AssociatedDataset
             flag = -realmax(); % hopefully, no real data has this value!
             M = flag*ones(size(uniques, 1), nfields);
             
+            % cache some things outside the loops to speed it up a bit
+            % (done with profiler; code in this loop may be executed
+            % millions of types for processing a single day)
+            
             fields = fieldnames(self.fieldstruct);
+            n_overall_limitators = length(self.overall_limitators);
+            has_overall_limitators = n_overall_limitators>0;
+            answers = cell(1, n_overall_limitators);
+%             field_has_limitators = cellfun(@(fname)~isempty(self.fieldstruct.(fname).limitators), fields);
+%             field_limitators = cellfun(@(fname) self.fieldstruct.(fname).limitators, fields, 'UniformOutput', false);
+            
+            for k = 1:length(fields)
+                fname = fields{k};
+                procnames = fieldnames(self.fieldstruct.(fname).processors);
+                
+                field_limitators{k} = self.fieldstruct.(fname).limitators;
+                field_has_limitators(k) = ~isempty(self.fieldstruct.(fname).limitators);
+                all_procnames{k} = procnames;
+                for pi = 1:length(procnames)
+                    procname = procnames{pi};
+                    proccers{k}{pi} =  self.fieldstruct.(fname).processors.(procname); 
+                end
+            end
+            
+            logtext(atmlab('OUT'), 'Processing %d primary footprints\n', size(uniques, 1));
             j = 0; % counter increases only when there is data
             for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
                 first = firsts(i);
@@ -322,10 +346,17 @@ classdef Collapser < AssociatedDataset
                 j = j + 1;
                 
                 % limitation to all, e.g. for distances
-                if isempty(self.overall_limitators)
+                if ~has_overall_limitators;
                     lim_for_all_fields = true(size(M_data_part, 1), 1);
                 else
-                    answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
+                    % 2nd version is much faster.  This is still often the
+                    % slowest part of the function, applying the overall
+                    % limitators.
+                    %answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
+                    for ii = 1:n_overall_limitators
+                        answers{ii} = flat(self.overall_limitators{ii}(M_coll_part));
+                    end
+
                     lim_for_all_fields = all(horzcat(answers{:}), 2);
                     if ~any(lim_for_all_fields)
                         continue
@@ -351,11 +382,11 @@ classdef Collapser < AssociatedDataset
                     % limitations return true (including
                     % lim_for_all_fields) the collocation is selected for
                     % further average-processing
-                    if isempty(self.fieldstruct.(fname).limitators);
+                    if ~field_has_limitators(k)
                         limsel = true(size(M_source, 1), 1);
                     else
                         limsel = lim_for_all_fields;
-                        limmers = self.fieldstruct.(fname).limitators;
+                        limmers = field_limitators{k};
                         
                         for li = 1:length(limmers)
                             limmer = limmers{li};
@@ -364,14 +395,14 @@ classdef Collapser < AssociatedDataset
                         end
                     end
       
-                    procnames = fieldnames(self.fieldstruct.(fname).processors);
+                    procnames = all_procnames{k};
                     if any(limsel)
                         % apply all processors and store in appropiate
                         % place
                         for pi = 1:length(procnames)
                             procname = procnames{pi};
-                            proccer = self.fieldstruct.(fname).processors.(procname);
-                            capsed = proccer(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
+                            %proccer = self.fieldstruct.(fname).processors.(procname);
+                            capsed = proccers{k}{pi}(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
                             if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
                                 error(['atmlab:' mfilename ':mismatch'], ...
                                 ['Error in collapsing %s %s %s. Processor ', ...

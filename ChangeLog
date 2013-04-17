@@ -1,3 +1,19 @@
+2013-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-327
+
+	* collocations/Collapser.m(process_granule):
+
+	- Big speedup by simply caching some function calls outside the loop,
+	even simple ones like ~isempty.  Now spends most of the time in
+	essential parts.
+
+	* collocations/AssociatedDataset.m(process_delayed):
+
+	- Inform on how many segments are to be processed.
+
+	* handy/flat.m: Helper to flatten array in-place
+
 2013-04-17  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-326
