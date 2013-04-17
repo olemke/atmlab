@@ -55,10 +55,11 @@ function S = avhrr_gac_read(filename, varargin)
 
 [extra_header_fields, extra_data_fields] = optargs(varargin, {{}, {}});
 
-core_header_fields = {'avh_h_satid', 'avh_h_siteid', 'avh_h_hdrcnt', ...
+core_header_fields = {'avh_h_satid', 'avh_h_instid', 'avh_h_siteid', 'avh_h_hdrcnt', ...
     'avh_h_radtempcnv3b1', 'avh_h_radtempcnv3b2', 'avh_h_radtempcnv3bc', ...
     'avh_h_radtempcnv41', 'avh_h_radtempcnv42', 'avh_h_radtempcnv4c', ...
-    'avh_h_radtempcnv51', 'avh_h_radtempcnv52', 'avh_h_radtempcnv5c'};
+    'avh_h_radtempcnv51', 'avh_h_radtempcnv52', 'avh_h_radtempcnv5c', ...
+    'avh_h_scnlin'};
 
 core_data_fields = {'avh_calvis_os11', 'avh_calvis_oi11', ...
      'avh_calvis_os12', 'avh_calvis_oi12', ...
@@ -85,9 +86,11 @@ all_data_fields = vec2row(union(core_data_fields, extra_data_fields));
 [data_head, data_line] = avhrr_gac_read_raw(filename, ...
     all_header_fields, all_data_fields);
 
-S.y = calibrate_avhrr(data_head, data_line);
-S.time = compensate_wraparound(single(data_line.avh_scnlintime)/1000);
+S.y = permute(calibrate_avhrr(data_head, data_line), [2, 1, 3]);
+S.time = compensate_wraparound(single(data_line.avh_scnlintime)/1000).';
 [S.lat, S.lon] = navigate_avhrr(data_head, data_line);
+S.lat = S.lat.';
+S.lon = S.lon.';
 doys = dayofyear_inverse(data_line.avh_scnlinyr(1), data_line.avh_scnlindy(1));
 S.epoch = date2unixsecs(doys.year, doys.month, doys.day);
 
@@ -98,7 +101,7 @@ for hfield = extra_header_fields
 end
 
 for dfield = extra_data_fields
-    S.(dfield{1}) = data_line.(dfield{1});
+    S.(dfield{1}) = data_line.(dfield{1}).';
 end
 
 end

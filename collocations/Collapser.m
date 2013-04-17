@@ -230,6 +230,7 @@ classdef Collapser < AssociatedDataset
             self.members.LAST.atts.long_name = 'Last corresponding row in overlap';
             
         end
+        
     end
     
     methods (Access = {?SatDataset})
@@ -472,7 +473,38 @@ classdef Collapser < AssociatedDataset
             else
                 new = [old_additional_result; new_additional_result];
             end
-        end    
+        end
+        
+        function [S, strattr] = read_homemade_granule(self, file, varargin)
+            info = self.find_info_from_granule(file);
+            dt = [str2double(info.year), str2double(info.month), str2double(info.day)];
+            [M, c] = self.parent.read(dt, dt, info.satname, ...
+                {'LAT1', 'LON1', 'TIME1', 'FIRST', 'LAST'}, ...
+                struct(), ...
+                {}, ...
+                {self});
+            %self.parent.read_homemade_granule(self.parent.find_granule_by_datetime([2007, 1, 1], 'noaa18'), {})
+            if isempty(M)
+                S.lat = [];
+                S.lon = [];
+                S.epoch = [];
+                S.time = [];
+                S.version = 0;
+                return
+            end
+            S1 = self.parent.cast_fields_back(M, ...
+                                              getfields(c, 'LAT1', 'LON1', 'TIME1'));
+            S2 = self.cast_fields_back(M, ...
+                                       getfields(c, 'FIRST', 'LAST'));
+            S = catstruct(S1, S2);
+            S.lat = S.LAT1;
+            S.lon = S.LON1;
+            [year, month, day, hour, minute, second] = unixsecs2date(S.TIME1);
+            S.epoch = min(date2unixsecs(year, month, day));
+            S.time = S.TIME1 - S.epoch;
+            S.version = 0;
+            %error('Not implemented');
+        end
     end
     
 end

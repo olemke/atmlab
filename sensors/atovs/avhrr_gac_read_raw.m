@@ -49,10 +49,10 @@ record_size = 4608; % KLM Guide, Section 8.3.1.4.3.2
 %n_scanpos = 682;
 
 % get total no. of records
-S = dir(fn);
-nrecords = S.bytes/record_size-1;
+% S = dir(fn);
+% nrecords = S.bytes/record_size-1;
 
-[fields_head, fields_line, lines] = optargs(varargin, {{}, {}, nrecords});
+[fields_head, fields_line, lines] = optargs(varargin, {{}, {}, -1});
 
 [def_head, def_line] = avhrr_define_gac_l1b();
 
@@ -80,6 +80,11 @@ if typecode ~= 512
 end
 
 %% read data fields
+
+nrecords = single(data_head.avh_h_scnlin);
+if lines == -1
+    lines = nrecords;
+end
 
 if isscalar(lines) % interpret as 1,...,lines
     lines = 1:lines;

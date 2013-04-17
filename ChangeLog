@@ -1,5 +1,61 @@
 2013-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-328
+
+	* collocations/Collapser.m(read_homemade_granule):
+
+	- Added.  Calls self.parent.read, so now we can collocate collapsed
+	datasets correctly.
+
+	* sensors/atovs/avhrr_gac_read.m:
+
+	- Fix order of dimensions
+	- Read header to determine no. scanlines
+
+	* sensors/atovs/avhrr_gac_read_raw.m:
+
+	- Read header to determine no. scanlines
+
+	* time/unixsecs2date.m:
+
+	- Semi-revert previous edit.  Previous edit fixed one bug (loss of
+	precision), but doesn't work for vectorised input.  Now check for
+	vectorisation and choose based on that.
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Added avhrr and Collocated_cacmah_avhrr
+
+	* handy/getfields.m: Added.  Get multiple fields from struct.
+
+	* handy/get_columns.m: Added.  Get 'named' columns from matrix.
+
+	* datasets/HomemadeDataset.m:
+
+	(HomemadeDataset): Define granule_duration
+
+	(cast_fields_back): Added.  Cast fields from matrix back to struct.
+
+	* datasets/SatDataset.m:
+	
+	(read_granule):
+
+	- Various fixes
+
+	(find_granule_first_line):
+
+	- Don't crash if data are empty
+
+	* datasets/+satreaders/avhrr.m:
+
+	- Adapted to new in-house avhrr reading routine
+
+	* datasets/define_datasets.m:
+
+	- Added avhrr and cacmah_avhrr.  Rewrote subfunction getSelection.
+
+2013-04-17  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-327
 
 	* collocations/Collapser.m(process_granule):

@@ -126,10 +126,14 @@ classdef HomemadeDataset < SatDataset
             end
             %}
                    
-             if ~any(strcmp(varargin, 'reader')) % set reader
-                 self.reader = @self.read_homemade_granule;
-             end
+            
+            if ~any(strcmp(varargin, 'reader')) % set reader
+                self.reader = @self.read_homemade_granule;
+            end
              
+            if isequal(self.granule_duration, [])
+                self.granule_duration = 86400;
+            end
         end
         
         %% implement new methods
@@ -303,6 +307,37 @@ classdef HomemadeDataset < SatDataset
             fields = fieldnames(self.members);
         end
              
+        function S = cast_fields_back(self, M, c)
+            % Cast columns from data-matrix to 'stored' types
+            % 
+            % The collocation toolkit internally passes around data in a
+            % matrix.  To be on the safe side, this uses double, because
+            % all other types (except (u)int64) fit.  However, sometimes
+            % this is not desirable, and this method can be used to cast
+            % types back to their types, based on the type to which they
+            % should be stored.
+            %
+            % FORMAT
+            %
+            %   varargout = hd.cast_fields_back(M, c,)
+            %
+            % IN
+            %
+            %   M   matrix containing data
+            %   c   structure describing columns by name
+            %
+            % OUT
+            %
+            %   S   structure with data in smaller type
+            
+            S = struct();
+            fields = fieldnames(c);
+            for i = 1:length(fields)
+                field = fields{i};
+                newtype = type_nc2ml(self.members.(field).type);
+                S.(field) = cast(M(:, c.(field)), newtype);
+            end
+        end
         %% getters/setters
         function mem = get.members(self)
             % members getter, see doc for property members

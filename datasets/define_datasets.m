@@ -39,6 +39,10 @@ SatDataset('name','avhrr_cmsaf_gac',...
     'reader', @satreaders.avhrr_cmsaf_gac, ...
     'granule_duration',7200);
 
+SatDataset('name', 'avhrr', ...
+    'reader', @satreaders.avhrr, ...
+    'granule_duration', 6130);
+
 SatDataset('name', 'calipso', ...
     'satname', 'calipso', ...
     'reader', @satreaders.calipso, ...
@@ -621,6 +625,9 @@ CollocatedDataset(D.CollocatedDataset_dardarsub_modis,D.cprCloudLidar,...
     'distance', 1,...
     'interval', 1);
 
+% NB: one collocated dataset uses a collapser as a reference and follows
+% further down
+
 %% AssociatedDatasets (FieldCopier, Collapser, etc.)
  
 D = datasets; % reload
@@ -835,6 +842,19 @@ Collapser(D.cloud_cci_dardarsub_IWP,cloud_cci,cloud_cci_global, ...
 % this one uses some subfunctions, so is defined in its own file
 define_c2dp('mhs');
 define_c2dp('amsub');
+
+%% CollocatedDatasets depending on Collapsers
+
+D = datasets();
+
+% name 'cacmah' short for collapsed_associated_CPR_MHS_AMSU_HIRS
+
+CollocatedDataset(...
+    D.collapsed_associated_CPR_MHS_AMSU_HIRS, ...
+    D.avhrr, ...
+    'name', 'Collocated_cacmah_avhrr', ...
+    'distance', 10, ...
+    'interval', 30);
 
 %% 
 defined = true;
@@ -1533,13 +1553,10 @@ function S = getSelection(S,desired)
 %
 % Salomon Eliasson
 
-all_fields = fieldnames(S);
+if ~iscell(desired)
+    desired = {desired};
+end
 
-x = cellstr(desired(~ismember(desired,all_fields)));
-assert(all(ismember(desired,all_fields)),...
-    ['atmlab:' mfilename],'field is unavailable %s\n',x{:})
-
-S = rmfield(S,all_fields(~ismember(all_fields,desired)));
-
+S = getfields(S, desired{:});
 
 end

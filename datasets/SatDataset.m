@@ -840,7 +840,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             fields_asked(strcmp(fields_asked, 'scanline_position')) = [];
             
             % these must always be present in reader return
-            fields_always = {'time', 'lat', 'lon', 'epoch'};
+            fields_always = {'time', 'lat', 'lon', 'epoch', 'version'};
             
             %% generate varname for caching
             
@@ -914,7 +914,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     ['After reading with %s and processing with %s, ' ...
                     'the following fields were expected but not found: %s'], ...
                     func2str(self.reader), func2str(self.reader_processor), ...
-                    sprintf('%s ', fields_expected{ffound}));
+                    strjoin(fields_expected(~ffound), ', '));
             end
             
             if isinteger(data.time)
@@ -927,8 +927,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % add scanline_number and scanline_position (before removing
             % duplicates!)
             
-            data.scanline_number = repmat((1:nlines).', [1 npos]);
-            data.scanline_position = repmat(1:npos, [nlines 1]);
+            data.scanline_number = uint32(repmat((1:nlines).', [1 npos]));
+            data.scanline_position = uint16(repmat(1:npos, [nlines 1]));
             
             if ~isfield(data, 'version') % try from filename
                 fileinfo = self.find_info_from_granule(datafile);
@@ -1167,7 +1167,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     t_cur = cur.epoch + cur.time;
                     t_next = next.epoch + next.time;
                     %[t_cur, t_next] = unify_time_axis(cur.time, next.time);
-                    firstline = find(t_next > t_cur(end), 1, 'first');
+                    if isempty(t_next) || isempty(t_cur)
+                        firstline = 0;
+                    else
+                        firstline = find(t_next > t_cur(end), 1, 'first');
+                    end
                     if ~isempty(firstline)
                         logtext(atmlab('OUT'), 'First line: %d\n', firstline);
                         self.firstlines.(sat)(uni) = firstline;

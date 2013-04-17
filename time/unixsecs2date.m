@@ -28,8 +28,13 @@ function [year, month, day, hour, minute, second] = unixsecs2date(secs)
 
    narginchk(1, 1);
 
+if isscalar(secs)
    dv = datevec(addtodate(datenum(1970, 1, 1, 0, 0, 0), secs, 'second'));
    C = num2cell(dv);
    [year, month, day, hour, minute, second] = deal(C{:});
+else
+   [year, month, day, hour, minute, second] ... 
+	 	      = jd2date(double(secs) / 86400 + date2jd(1970, 1, 1)); 
+end
 
 end

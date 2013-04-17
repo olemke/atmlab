@@ -6,7 +6,7 @@ function datasets_init
 % Created by Gerrit Holl
 % $Id$
 
-datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/2010/05/sat2netcdf-0.4.jar');
+%datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/2010/05/sat2netcdf-0.4.jar');
 
 % to find a datafile: search in basedir/subdir, first try filename with string
 % substitution, otherwise list all and try to match regexp.
@@ -63,6 +63,11 @@ poes_re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d
 % ---------
 % Passive
 % --------
+
+D.avhrr.basedir = '/storage3/data/avhrr';
+D.avhrr.subdir = '$SAT_gac_$YEAR4/$MONTH/$DAY';
+D.avhrr.re = poes_re;
+
 D.avhrr_cmsaf_gac.basedir = '/storage3/data/cmsaf_avhrr_gac_cwp/';
 D.avhrr_cmsaf_gac.subdir = '$YEAR4/$MONTH/$DAY';
 D.avhrr_cmsaf_gac.re = 'RR_AVHRR_L2_cp_(?<satname>[A-Z0-9]{6})_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})_(?<hour>\d{2})(?<minute>\d{2})_v(?<version>\d{1})';
@@ -298,6 +303,10 @@ D.CollocatedDataset_dardarsub_modis_cprCloud.filename   = 'core_dardarsub_modis_
 D.CollocatedDataset_dardarsub_modis_cprCloudLidar.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloudLidar/core';
 D.CollocatedDataset_dardarsub_modis_cprCloudLidar.subdir   = '$YEAR4/$MONTH/$DAY'; 
 D.CollocatedDataset_dardarsub_modis_cprCloudLidar.filename = 'core_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+
+D.Collocated_cacmah_avhrr.basedir = '/storage4/user_data/gerrit/collocated_datasets/cacmah_avhrr';
+D.Collocated_cacmah_avhrr.subdir = '$YEAR4/$MONTH/$DAY';
+D.Collocated_cacmah_avhrr.filename = 'cacmah_avhrr_$SAT1_$SAT2.nc.gz';
 
 %% Associated datasets
 % ----------------------
