@@ -392,12 +392,10 @@ HomemadeDataset('name', 'cdpc_2dcp', ...
                             'units', 'seconds', ...
                             'valid_range', [0 900]))));
                         
-%{'START1', 'START2', 'LAT1', 'LON1', 'TIME1', 'B_BT', 'RANGE_LINE2', 'MIN_DIST', 'MAX_DIST', 'MIN_INT', 'MAX_INT'});
-
 %% Pseudo fields (fields created by postprocessing)
 % 
 
-D = datasets;
+D = datasets();
 
 fields = listOfDatasetsFields();
 
@@ -552,7 +550,6 @@ CollocatedDataset(D.patmosx, D.cpr,...
 
 % DARDAR as reference
 
-D = datasets;
 CollocatedDataset(D.avhrr_cmsaf_gac, D.dardarsub,...
     'name','CollocatedDataset_avhrrCMSAF_dardarsub', ...
     'distance', 5, ...
@@ -613,7 +610,6 @@ CollocatedDataset(D.patmosx, D.dardarsub,...
 % ---------------------------------
 % Collocated collocated datasets
 % ---------------------------------
-D = datasets;
 
 CollocatedDataset(D.CollocatedDataset_dardarsub_modis,D.cprCloud,...
     'name', 'CollocatedDataset_dardarsub_modis_cprCloud', ...
@@ -630,18 +626,20 @@ CollocatedDataset(D.CollocatedDataset_dardarsub_modis,D.cprCloudLidar,...
 
 %% AssociatedDatasets (FieldCopier, Collapser, etc.)
  
-D = datasets; % reload
-
 % ------
 % POES
 % ------
 
 AssociatedPOESPlusCPR(D.CollocatedDataset_mhs_cpr, fields.mhs, fields.amsua, fields.hirs, ...
-    getSelection(fields.cpr,{'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP'}), ...
+    getSelection(fields.cpr, ...
+                 {'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP', ...
+                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error'}), ...
     'name', 'associated_CPR_MHS_AMSU_HIRS');
 
 AssociatedPOESPlusCPR(D.CollocatedDataset_amsub_cpr, fields.amsub, fields.amsua, fields.hirs, ...
-    getSelection(fields.cpr,{'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP'}), ...
+    getSelection(fields.cpr, ...
+                 {'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP', ...
+                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error'}), ...
     'name', 'associated_CPR_AMSUB_AMSUA_HIRS');
 
 % -----------------------
@@ -711,8 +709,6 @@ FieldCopier(D.CollocatedDataset_hirs_dardarsub, ...
 % FieldCopiers for collocated collocated datasets
 % ----------------------------
 
-D = datasets;
-
 FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloud,...
      D.dardarsub_modis_IWP.members, getSelection(fields.cpr,{'Cloud_Types'}),...
     'name','dardarsub_modis_cprCloud');
@@ -724,8 +720,6 @@ FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloudLidar, ...
 % -----------------------
 % Collapser datasets
 % -----------------------
-
-D = datasets;
 
 
 % LIMITERS
@@ -739,30 +733,63 @@ closest.ty = 'double';
 mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
                @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
 
-appccs.ROIWP.limitators = limitators; % not flagged
-appccs.ROIWP.processors.NO = @length;
-appccs.ROIWP.stored.NO.type = 'int';
-appccs.ROIWP.stored.NO.atts.long_name = 'Number of CloudSat footprints used for statistics inside AMSU-B/MHS';
-appccs.ROIWP.processors.MEAN = @mean;
-appccs.ROIWP.stored.MEAN.type = 'float';
-appccs.ROIWP.stored.MEAN.atts.long_name = ['MHS-averaged ' fields.cpr.ROIWP.atts.long_name];
-appccs.ROIWP.stored.MEAN.atts.units = fields.cpr.ROIWP.atts.units;
-appccs.ROIWP.processors.STD = @std;
-appccs.ROIWP.stored.STD.type = 'float';
-appccs.ROIWP.stored.STD.atts.long_name = ['CPR-in-MHS standard deviation for ' fields.cpr.ROIWP.atts.long_name];
-appccs.ROIWP.stored.STD.atts.units = fields.cpr.ROIWP.atts.units;
-appccs.ROIWP.processors.CV = @(X)(std(X) ./ mean(X));
-appccs.ROIWP.stored.CV.type = 'int';
-appccs.ROIWP.stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.ROIWP.atts.long_name];
-appccs.ROIWP.stored.CV.atts.missing_value = 0;
+cpr_fc_fields = vec2row({'ROIWP', 'IOROIWP', 'IWP_2C', 'dardar_IWP'});
+for cprf = cpr_fc_fields
+    f = cprf{1};
+    appccs.(f).limitators = limitators;
+    appccs.(f).processors.NO = @length;
+    appccs.(f).stored.NO.type = 'short';
+    appccs.(f).stored.NO.atts.long_name = 'Number of CloudSat footprints used for statistics inside AMSU-B/MHS';
+    appccs.(f).stored.NO.atts.missing_value = 0;
+    appccs.(f).processors.MEAN = @mean;
+    appccs.(f).stored.MEAN.type = 'float';
+    appccs.(f).stored.MEAN.atts.long_name = ['MHS-averaged ' fields.cpr.(f).atts.long_name];
+    appccs.(f).stored.MEAN.atts.units = fields.cpr.(f).atts.units;
+    appccs.(f).stored.MEAN.atts.missing_value = -1;
+    appccs.(f).processors.STD = @std;
+    appccs.(f).stored.STD.type = 'float';
+    appccs.(f).stored.STD.atts.long_name = ['CPR-in-MHS standard deviation for ' fields.cpr.(f).atts.long_name];
+    appccs.(f).stored.STD.atts.units = fields.cpr.(f).atts.units;
+    appccs.(f).stored.STD.atts.missing_value = -1;
+    appccs.(f).processors.CV = @(X)(std(X) ./ mean(X));
+    appccs.(f).stored.CV.type = 'float';
+    appccs.(f).stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.(f).atts.long_name];
+    appccs.(f).stored.CV.atts.missing_value = 0;
 
-for iwp = [1 10 100 1000]
-    fn = sprintf('FRAC%d', iwp);
-    appccs.ROIWP.processors.(fn) = @(X)(sum(X>=iwp) / length(X));
-    appccs.ROIWP.stored.(fn).type = 'float';
-    appccs.ROIWP.stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
-        fields.cpr.ROIWP.atts.long_name, iwp, fields.cpr.ROIWP.atts.units);
+    for iwp = [1 10 100 1000]
+        fn = sprintf('FRAC%d', iwp);
+        appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
+        appccs.(f).stored.(fn).type = 'float';
+        appccs.(f).stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
+            fields.cpr.(f).atts.long_name, iwp, fields.cpr.(f).atts.units);
+        appccs.(f).stored.(fn).atts.missing_value = -1;
+    end
 end
+
+%appccs.ROIWP.limitators = limitators; % not flagged
+%appccs.ROIWP.processors.NO = @length;
+%appccs.ROIWP.stored.NO.type = 'int';
+%appccs.ROIWP.stored.NO.atts.long_name = 'Number of CloudSat footprints used for statistics inside AMSU-B/MHS';
+%appccs.ROIWP.processors.MEAN = @mean;
+%appccs.ROIWP.stored.MEAN.type = 'float';
+%appccs.ROIWP.stored.MEAN.atts.long_name = ['MHS-averaged ' fields.cpr.ROIWP.atts.long_name];
+%appccs.ROIWP.stored.MEAN.atts.units = fields.cpr.ROIWP.atts.units;
+%appccs.ROIWP.processors.STD = @std;
+%appccs.ROIWP.stored.STD.type = 'float';
+%appccs.ROIWP.stored.STD.atts.long_name = ['CPR-in-MHS standard deviation for ' fields.cpr.ROIWP.atts.long_name];
+%appccs.ROIWP.stored.STD.atts.units = fields.cpr.ROIWP.atts.units;
+%appccs.ROIWP.processors.CV = @(X)(std(X) ./ mean(X));
+%appccs.ROIWP.stored.CV.type = 'int';
+%appccs.ROIWP.stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.ROIWP.atts.long_name];
+%appccs.ROIWP.stored.CV.atts.missing_value = 0;
+%
+%for iwp = [1 10 100 1000]
+%    fn = sprintf('FRAC%d', iwp);
+%    appccs.ROIWP.processors.(fn) = @(X)(sum(X>=iwp) / length(X));
+%    appccs.ROIWP.stored.(fn).type = 'float';
+%    appccs.ROIWP.stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
+%        fields.cpr.ROIWP.atts.long_name, iwp, fields.cpr.ROIWP.atts.units);
+%end
 
 % ----------
 % Collapsed MODIS
@@ -822,7 +849,6 @@ cloud_cci.cot_ice.limitators                       = limitators;
 % -------------------
 % COLLAPSED DATASETS
 % --------------------
-D = datasets;
 
 Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, mw_global, ...
     'name', 'collapsed_associated_CPR_MHS_AMSU_HIRS');
@@ -843,9 +869,7 @@ Collapser(D.cloud_cci_dardarsub_IWP,cloud_cci,cloud_cci_global, ...
 define_c2dp('mhs');
 define_c2dp('amsub');
 
-%% CollocatedDatasets depending on Collapsers
-
-D = datasets();
+%% CollocatedDatasets (and their AssociatedDatasets) depending on Collapsers
 
 % name 'cacmah' short for collapsed_associated_CPR_MHS_AMSU_HIRS
 
@@ -855,6 +879,15 @@ CollocatedDataset(...
     'name', 'Collocated_cacmah_avhrr', ...
     'distance', 10, ...
     'interval', 30);
+
+% for fields, I want ROIWP_NO, ROIWP_MEAN, ...
+% for field in fieldnames(appccs)
+%     for proccer in fieldnames(thisfield.stored):
+%          fieldname_proccer: copied from
+%          appccs.(fieldname).stored.(proccer)
+%FieldCopier(...
+    %D.Collocated_cacmah_avhrr, ...
+    
 
 %% 
 defined = true;
@@ -867,6 +900,8 @@ function fields = listOfDatasetsFields()
 %
 % Purpose: List fields belonging to satDatasets in here. This fields are to be
 % used in the fieldCopiers
+
+D = datasets();
 
 %% helpers for AssociatedDataset definitions
 
@@ -897,7 +932,6 @@ laa.atts.valid_range = [0 360];
 laa.atts.missing_value = -9999;
 
 %% Fields for datasets
-D = datasets;
 
 %% AMSU-A
 fields.amsua.A_LONG.type = 'float';
@@ -1248,6 +1282,8 @@ fields.cpr.RVOD_ice_water_path.atts.long_name    = 'RVOD ice water path';
 fields.cpr.RVOD_ice_water_path.atts.units        = 'g/m^2';
 fields.cpr.RVOD_ice_water_path.atts.missing_value = -3333;
 
+% dardarsub as sibling for cpr defined AFTER dardar_sub
+
 %% DARDAR_SUB
 fields.dardarsub.HEIGHT.realname         = 'height';
 fields.dardarsub.HEIGHT.type             = 'float';
@@ -1301,6 +1337,19 @@ fields.dardarsub.dardar_Re_error.type               = 'float';
 fields.dardarsub.dardar_Re_error.atts.long_name     = 'Fractional error in effective radius';
 fields.dardarsub.dardar_Re_error.atts.units         = 'ln(m)';
 fields.dardarsub.dardar_Re_error.atts.missing_value = -999;
+
+%% CPR siblingfields from dardarsub
+
+ddfields = fieldnames(fields.dardarsub);
+for ddfield = vec2row(ddfields)
+    if strncmpi(ddfield{1}, 'dardar', 6)
+        fname = ddfield{1};
+    else
+        fname = ['dardar_' ddfield{1}];
+    end
+    fields.cpr.(fname) = fields.dardarsub.(ddfield{1});
+    fields.cpr.(fname).dataset = D.dardarsub;
+end
 
 %% HIRS
 fields.hirs.H_LONG.type = 'float';
@@ -1532,6 +1581,28 @@ for i = 1:length(fn)
     fields.ssmt2_2.([fn{i} '_2']) = fields.ssmt2.(fn{i});
 end
 
+%% Collocated datasets
+
+% CACMEH = collapsed_associated_CPR_MHS_AMSU_HIRS, its parent, and the
+% other fieldcopiers belonging to its parent
+%
+% Note that fieldnames here belong to the fields as returned by
+% 
+
+fields.cacmeh.MHS_LAT = CollocatedDataset.members_const.LAT1;
+fields.cacmeh.MHS_LAT.realname = 'LAT1';
+fields.cacmeh.MHS_LAT.atts.long_name = 'MHS Latitude';
+fields.cacmeh.MHS_LON = CollocatedDataset.members_const.LON1;
+fields.cacmeh.MHS_LON.realname = 'LON1';
+fields.cacmeh.MHS_LON.atts.long_name = 'MHS Latitude';
+fields.cacmeh.MHS_START = CollocatedDataset.members_const.START1;
+fields.cacmeh.MHS_START.realname = 'START1';
+fields.cacmeh.MHS_START.atts.long_name = 'MHS starting time';
+fields.cacmeh.MHS_BT = fields.mhs.B_BT;
+fields.cacmeh.MHS_BT.realname = 'B_BT';
+
+% NOTE: unfinished.
+
 end
 
 function S = getSelection(S,desired)
@@ -1559,4 +1630,13 @@ end
 
 S = getfields(S, desired{:});
 
+end
+
+function S = collapse2fc(S)
+% convert a structure prepared for a collapser back to one for fieldcopier
+%
+% useful if fields from a collapser are to be fieldcopied when the
+% collapser is used as a base for a new collocated dataset
+
+error('Not implemented yet');
 end

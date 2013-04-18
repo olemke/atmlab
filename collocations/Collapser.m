@@ -419,7 +419,7 @@ classdef Collapser < AssociatedDataset
                         % set all processors for this field to missing_val
                         for pi = 1:length(procnames)
                             procname = procnames{pi};
-                            M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).atts.missing_value;
+                            M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
                         end                        
                     end
                 end
@@ -428,6 +428,7 @@ classdef Collapser < AssociatedDataset
                 if ~anyvalidfields
                     M(j, :) = flag;
                 end
+                
             end
             
             % remove remaining part of M, e.g. where I did too much

@@ -911,7 +911,7 @@ classdef CollocatedDataset < HomemadeDataset
             end
             
             if mainfileexists && ~colloc_config('overwrite')
-                logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete\n');
+                logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete or to be overwritten\n');
                 logtext(atmlab('OUT'), 'I will reprocess some additionals\n');
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 if isempty(result)

@@ -1,3 +1,34 @@
+2013-04-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-330
+
+	* datasets/dsmagic.m: Added
+
+	- Looks like a structure, feels like a structure, but secretly
+	communicates with datasets() so that it gets updated whenever a
+	dataset is added.
+
+	* datasets/datasets.m:
+
+	- Use dsmagic, refactored code.
+
+	* datasets/define_datasets.m:
+
+	- No need to recall datasets() so often anymore.  Started work toward
+	adding AVHRR to the collocations.  Still in progress.
+
+	* documentation/collocations.tex:
+
+	- Write a bit more about the FieldCopier capabilities
+
+	* collocations/Collapser.m(process_granule):
+
+	- Fixed bug when using missing_value for collapsed statistic
+
+	* collocations/CollocatedDataset.m(collocate_and_store_date):
+
+	- Small correction in text written to stdout
+
 2013-04-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-329
