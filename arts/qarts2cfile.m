@@ -606,6 +606,9 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       abstable = true;
       %
     end
+    
+    T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
+    
   end %  qarts_isset( Q.ABSORPTION )
 
   
@@ -728,7 +731,6 @@ function T = cfile_RteExe( Q, partname, workfolder )
   T = add_rtecalcstart( Q );
   %       
   T{end+1} = 'abs_xsec_agenda_checkedCalc';
-  T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
   T{end+1} = 'sensor_checkedCalc';
   %
   if qarts_isset( Q.YCALC_WSMS )

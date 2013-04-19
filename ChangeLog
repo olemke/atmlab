@@ -1,3 +1,12 @@
+2013-04-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-331
+
+	* demos/qarts_scattering_demo.m: Restart for FOS ...
+
+	* arts/qarts2cfile.m (cfile_Absrpt): The call of
+	propmat_clearsky_agenda_checkedCalc now in this sub-function.
+
 2013-04-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-330
