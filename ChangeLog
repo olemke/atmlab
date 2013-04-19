@@ -1,3 +1,56 @@
+2013-04-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-332
+
+	* collocations/Collapser.m:
+
+	(fieldstruct): Document new '.profile' setting.
+
+	(process_granule):
+
+	- Add capability to correctly collapse profiles.  
+	- Keep track of time to inform user how much progress is being made.
+
+	(set_cols_from_bro): Added
+
+	- For a collapsed dataset, derive cols-structure not from
+	members-structure, but from the corresponding AssociatedDataset, so
+	that users don't need to specify dimensions by hand.
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Flood the screen less when many sibling-fields are being read.
+
+	* collocations/CollocatedDataset.m(list_fields):
+
+	- Added warning to documentation, informing on limitations
+
+	* datasets/define_datasets.m:
+
+	- Added CPR_ECMWF
+	- Include several ECMWF fields in associated_CPR_MHS_AMSU_HIRS
+	- Updated associated collapser
+	- Added AVHRR
+	- Still working on cacmeh-fieldcopier
+	- Added subfunction collapsed2fc
+
+	* documentation/collocations.tex:
+
+	- Started section on features.  Work in progress.
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Added CPR_ECMWF
+
+	* datasets/HomemadeDataset.m:
+	
+	(store):
+
+	- Before writing, estimate future size
+
+	(linesize):
+
+	- Return the size (on disk) of a single collocation
 2013-04-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-331

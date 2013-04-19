@@ -118,6 +118,12 @@ classdef Collapser < AssociatedDataset
         %       the CollocatedDataset or the core. This can be used to e.g.
         %       calculate an average position or to store a vector of
         %       line-numbers in the collapsed dataset.
+        %
+        % It is assumed that additional dimensions (no. channels, profile
+        % height, etc.) for the collapsed field corresponds to the one for
+        % the original field, which makes sense for mean, std, etc.  It
+        % might not always be so; if it is not, one should explicitly set
+        % (field).stored.(processor).profile = false
         fieldstruct = []; 
         % Cell array of global limitators.
         %
@@ -295,7 +301,8 @@ classdef Collapser < AssociatedDataset
 %                     self.members.(memname));
 %                 warning(w);
             end
-            self.members2cols();
+            %self.members2cols();
+            self.set_cols_from_bro();
             
             nfields = max(cell2mat(struct2cell(self.cols).'));
             
@@ -336,9 +343,12 @@ classdef Collapser < AssociatedDataset
                 end
             end
             
+            % keep track of time for logging purposes (progress etc.)
+            t = 0;
             logtext(atmlab('OUT'), 'Processing %d primary footprints\n', size(uniques, 1));
             j = 0; % counter increases only when there is data
             for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
+                tic;
                 first = firsts(i);
                 last = lasts(i);
                 M_coll_part = processed_core(first:last, :);
@@ -428,7 +438,12 @@ classdef Collapser < AssociatedDataset
                 if ~anyvalidfields
                     M(j, :) = flag;
                 end
-                
+                t = t + toc;
+                if t > 120
+                    logtext(atmlab('OUT'), 'Done %d/%d\n', ...
+                        i, size(uniques, 1));
+                    t = 0;
+                end
             end
             
             % remove remaining part of M, e.g. where I did too much
@@ -505,6 +520,29 @@ classdef Collapser < AssociatedDataset
             S.time = S.TIME1 - S.epoch;
             S.version = 0;
             %error('Not implemented');
+        end
+        
+        function set_cols_from_bro(self)
+            % Set cols-structure based on brothers cols
+            %
+            % When a collapsed dataset is processed, the AssociatedDataset
+            % it belongs to has always been processed already, so from its
+            % cols-structure can be inferred all the expected sizes.  Use
+            % this to set or update the local cols-structure.
+            n = 1;
+            fields = fieldnames(self.members);
+            for i = 1:length(fields)
+                field = fields{i};
+                if isfield(self.members.(field), 'origin') && ...
+                  ~(isfield(self.members.(field), 'profile') && self.members.(field).profile==false)
+                    % if it has an origin, it should have an orig_name
+                    ncols = length(self.members.(field).origin.cols.(self.members.(field).orig_name));
+                else % should be FIRST, LAST... ncols==1
+                    ncols = 1;
+                end
+                self.cols.(field) = n:(n+ncols-1);
+                n = n + ncols;
+            end
         end
     end
     

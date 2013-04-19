@@ -1436,6 +1436,12 @@ classdef CollocatedDataset < HomemadeDataset
             % pretty-printed list of all fields that are valid to pass on
             % to self.read. With one output argument, return a structure
             % with this information. No input arguments.
+            %
+            % WARNING: this lists the fields as defined in the core and
+            % associated datasets.  It is possible that some collocations
+            % were generated with older versions of those datasets.
+            % Therefore, it is NOT guaranteed that all those fields can be
+            % read for all granules!
             
             S.(self.name) = list_fields@HomemadeDataset(self);
             for i = 1:length(self.associated)

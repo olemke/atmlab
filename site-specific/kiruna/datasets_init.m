@@ -52,6 +52,10 @@ D.CPR_2C_ICE.basedir = '/storage3/data/cloudsat/2C-ICE.R04';
 D.CPR_2C_ICE.subdir = D.cpr.subdir;
 D.CPR_2C_ICE.re = D.cpr.re;
 
+D.CPR_ECMWF.basedir = '/storage3/data/cloudsat/ECMWF-AUX.R04';
+D.CPR_ECMWF.subdir = D.cpr.subdir;
+D.CPR_ECMWF.re = D.cpr.re;
+
 D.dardar.basedir = '/storage3/data/dardar';
 D.dardar.subdir = '$YEAR4/$YEAR4_$MONTH_$DAY';
 D.dardar.re = 'DARDAR-CLOUD_v(?<version>.+)_(?<year>\d{4})(?<doy>\d{3})(?<hour>\d{2})(?<minute>\d{2})';

@@ -189,6 +189,12 @@ classdef HomemadeDataset < SatDataset
                 mkdir(outdir);
             end
             
+            %% Estimate size
+            
+            ncollocs = size(data, 1);            
+            nbytes = self.linesize() * ncollocs;
+            logtext(atmlab('OUT'), 'Will write %s of uncompressed data\n', nbytes2string(nbytes));
+            
             %% create the file
             
             logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
@@ -197,7 +203,6 @@ classdef HomemadeDataset < SatDataset
             
             %% define the dimensions
             
-            ncollocs = size(data, 1);
             dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
             
             %% put global attributes
@@ -338,6 +343,24 @@ classdef HomemadeDataset < SatDataset
                 S.(field) = cast(M(:, c.(field)), newtype);
             end
         end
+        
+        function nbytes = linesize(self)
+            % Calculate the stored size (in bytes) per collocation
+            nbytes = 0;
+            sizes = struct(...
+                'float', 4, ...
+                'double', 8, ...
+                'short', 2, ...
+                'int', 4, ...
+                'byte', 1);
+            fields = fieldnames(self.cols);
+            for f = vec2row(fields)
+                tp = self.members.(f{1}).type;
+                width = length(self.cols.(f{1}));
+                nbytes = nbytes + sizes.(tp) * width;
+            end
+        end
+        
         %% getters/setters
         function mem = get.members(self)
             % members getter, see doc for property members

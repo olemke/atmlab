@@ -99,6 +99,19 @@ documentation in Matlab (best accessed with the help browser, e.g.\
 type \lstinline!doc SatDataset! on the Matlab commandline).
 This also contains more examples than are provided in this document.
 
+\subsection{Overview of features}
+
+This subsection is a work in progress.
+
+\begin{itemize}
+\item Automatically take care of duplicates between subsequent granules
+through a database describing the first scanline not contained in the
+previous granule.
+\item Split collocations between core, fieldcopier, collapsed, where the
+latter can be generated at the same time or later.
+\item Cached function evaluation
+\end{itemize}
+
 \section{Getting started}
 
 To get started with collocations:

@@ -82,6 +82,11 @@ SatDataset('name', 'CPR_2C_ICE', ...
     'reader', @satreaders.cpr, ...
     'granule_duration', 5932);
 
+SatDataset('name', 'CPR_ECMWF', ...
+    'satname', 'cloudsat', ...
+    'reader', @satreaders.cpr, ...
+    'granule_duration', 5932);
+
 SatDataset('name','dardar',...
     'satname', 'atrain', ...
     'reader', @satreaders.dardar, ...
@@ -633,14 +638,21 @@ CollocatedDataset(D.CollocatedDataset_dardarsub_modis,D.cprCloudLidar,...
 AssociatedPOESPlusCPR(D.CollocatedDataset_mhs_cpr, fields.mhs, fields.amsua, fields.hirs, ...
     getSelection(fields.cpr, ...
                  {'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP', ...
-                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error'}), ...
+                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error', ...
+                  'ECMWF_Temperature', 'ECMWF_Surface_pressure', ...
+                  'ECMWF_Skin_temperature', 'ECMWF_Temperature_2m', ...
+                  'ECMWF_elevation'}), ...
     'name', 'associated_CPR_MHS_AMSU_HIRS');
 
 AssociatedPOESPlusCPR(D.CollocatedDataset_amsub_cpr, fields.amsub, fields.amsua, fields.hirs, ...
     getSelection(fields.cpr, ...
                  {'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP', ...
-                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error'}), ...
+                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error', ...
+                  'ECMWF_Temperature', 'ECMWF_Surface_pressure', ...
+                  'ECMWF_Skin_temperature', 'ECMWF_Temperature_2m', ...
+                  'ECMWF_elevation'}), ...
     'name', 'associated_CPR_AMSUB_AMSUA_HIRS');
+% not including due to memory: 'ECMWF_Pressure', 'ECMWF_Specific_humidity', 
 
 % -----------------------
 % define FieldCopiers 
@@ -723,7 +735,8 @@ FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloudLidar, ...
 
 
 % LIMITERS
-limitators = {@(X)(X>=0)};    
+limitators_scalar = {@(X)(X>=0)}; % meaning not flagged
+limitators_profile = {@(X)(true(size(X, 1), 1))};
 closest.fn = @(x)(x(1)); %workaround, see this collapser
 closest.ln = 'Only the closest measurement pair';
 closest.ty = 'double';
@@ -733,38 +746,58 @@ closest.ty = 'double';
 mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
                @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
 
-cpr_fc_fields = vec2row({'ROIWP', 'IOROIWP', 'IWP_2C', 'dardar_IWP'});
-for cprf = cpr_fc_fields
+cpr_iwp_fields = vec2row({'ROIWP', 'IOROIWP', 'IWP_2C', 'dardar_IWP'});
+%cpr_ecmwf_prof_fields = vec2row({'ECMWF_Temperature', 'ECMWF_Pressure', 'ECMWF_Specific_humidity'});
+cpr_ecmwf_prof_fields = vec2row({'ECMWF_Temperature'});
+cpr_ecmwf_scal_fields = vec2row({'ECMWF_Surface_pressure', 'ECMWF_Skin_temperature', 'ECMWF_Temperature_2m', 'ECMWF_elevation'});
+for cprf = union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_scal_fields))
     f = cprf{1};
-    appccs.(f).limitators = limitators;
-    appccs.(f).processors.NO = @length;
+    appccs.(f).limitators = limitators_scalar;
+    if ismember(f, union(cpr_iwp_fields, cpr_ecmwf_scal_fields))
+        appccs.(f).limitators = limitators_scalar;
+        len = @length;
+        mn = @mean;
+        st = @std;
+        cv = @(X)(std(X) ./ mean(X));
+    elseif ismember(f, cpr_ecmwf_prof_fields)
+        appccs.(f).limitators = limitators_profile;
+        len = @(X)(size(X, 1));
+        mn = @(X)(mean(X, 1));
+        st = @(X)(std(X, 0, 1));
+        cv = @(X)(std(X, 0, 1) ./ mean(X, 1));
+    end
+    
+    appccs.(f).processors.NO = len;
     appccs.(f).stored.NO.type = 'short';
     appccs.(f).stored.NO.atts.long_name = 'Number of CloudSat footprints used for statistics inside AMSU-B/MHS';
     appccs.(f).stored.NO.atts.missing_value = 0;
-    appccs.(f).processors.MEAN = @mean;
+    appccs.(f).processors.MEAN = mn;
     appccs.(f).stored.MEAN.type = 'float';
     appccs.(f).stored.MEAN.atts.long_name = ['MHS-averaged ' fields.cpr.(f).atts.long_name];
     appccs.(f).stored.MEAN.atts.units = fields.cpr.(f).atts.units;
     appccs.(f).stored.MEAN.atts.missing_value = -1;
-    appccs.(f).processors.STD = @std;
+    appccs.(f).processors.STD = st;
     appccs.(f).stored.STD.type = 'float';
     appccs.(f).stored.STD.atts.long_name = ['CPR-in-MHS standard deviation for ' fields.cpr.(f).atts.long_name];
     appccs.(f).stored.STD.atts.units = fields.cpr.(f).atts.units;
     appccs.(f).stored.STD.atts.missing_value = -1;
-    appccs.(f).processors.CV = @(X)(std(X) ./ mean(X));
+    appccs.(f).processors.CV = cv;
     appccs.(f).stored.CV.type = 'float';
     appccs.(f).stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.(f).atts.long_name];
     appccs.(f).stored.CV.atts.missing_value = 0;
-
-    for iwp = [1 10 100 1000]
-        fn = sprintf('FRAC%d', iwp);
-        appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
-        appccs.(f).stored.(fn).type = 'float';
-        appccs.(f).stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
-            fields.cpr.(f).atts.long_name, iwp, fields.cpr.(f).atts.units);
-        appccs.(f).stored.(fn).atts.missing_value = -1;
+    
+    if ismember(f, cpr_iwp_fields)
+        for iwp = [1 10 100 1000]
+            fn = sprintf('FRAC%d', iwp);
+            appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
+            appccs.(f).stored.(fn).type = 'float';
+            appccs.(f).stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
+                fields.cpr.(f).atts.long_name, iwp, fields.cpr.(f).atts.units);
+            appccs.(f).stored.(fn).atts.missing_value = -1;
+        end
     end
 end
+appccs.ECMWF_Temperature.stored.NO.profile = false;
 
 %appccs.ROIWP.limitators = limitators; % not flagged
 %appccs.ROIWP.processors.NO = @length;
@@ -801,19 +834,19 @@ modis.modis_IWP.processors.CLOSEST               = closest.fn;
 modis.modis_IWP.stored.CLOSEST.atts.long_name    = closest.ln;
 modis.modis_IWP.stored.CLOSEST.atts.unit         = 'g/m^2';
 modis.modis_IWP.stored.CLOSEST.type              = closest.ty;
-modis.modis_IWP.limitators                       = limitators;
+modis.modis_IWP.limitators                       = limitators_scalar;
 modis.Re_ice.atts = fields.modis.Re_ice.atts;
 modis.Re_ice.processors.CLOSEST                  = closest.fn;
 modis.Re_ice.stored.CLOSEST.atts.long_name       = closest.ln;
 modis.Re_ice.stored.CLOSEST.atts.unit            = 'micron';
 modis.Re_ice.stored.CLOSEST.type                 = closest.ty;
-modis.Re_ice.limitators                          = limitators;
+modis.Re_ice.limitators                          = limitators_scalar;
 modis.Tau_ice.atts = fields.modis.Tau_ice.atts;
 modis.Tau_ice.processors.CLOSEST                 = closest.fn;
 modis.Tau_ice.stored.CLOSEST.atts.long_name      = closest.ln;
 modis.Tau_ice.stored.CLOSEST.atts.unit           = 'none';
 modis.Tau_ice.stored.CLOSEST.type                = closest.ty;
-modis.Tau_ice.limitators                         = limitators;
+modis.Tau_ice.limitators                         = limitators_scalar;
 
 % -------
 % cloud_cci
@@ -826,25 +859,25 @@ cloud_cci.iwp.processors.CLOSEST               = closest.fn;
 cloud_cci.iwp.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.iwp.stored.CLOSEST.atts.unit         = 'g/m^2';
 cloud_cci.iwp.stored.CLOSEST.type              = closest.ty;
-cloud_cci.iwp.limitators                       = limitators;
+cloud_cci.iwp.limitators                       = limitators_scalar;
 cloud_cci.iwp_error.atts = fields.cloud_cci.iwp_error.atts;
 cloud_cci.iwp_error.processors.CLOSEST               = closest.fn;
 cloud_cci.iwp_error.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.iwp_error.stored.CLOSEST.atts.unit         = 'g/m^2';
 cloud_cci.iwp_error.stored.CLOSEST.type              = closest.ty;
-cloud_cci.iwp_error.limitators                       = limitators;
+cloud_cci.iwp_error.limitators                       = limitators_scalar;
 cloud_cci.ref_ice.atts = fields.cloud_cci.ref_ice.atts;
 cloud_cci.ref_ice.processors.CLOSEST               = closest.fn;
 cloud_cci.ref_ice.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.ref_ice.stored.CLOSEST.atts.unit         = 'micron';
 cloud_cci.ref_ice.stored.CLOSEST.type              = closest.ty;
-cloud_cci.ref_ice.limitators                       = limitators;
+cloud_cci.ref_ice.limitators                       = limitators_scalar;
 cloud_cci.cot_ice.atts = fields.cloud_cci.cot_ice.atts;
 cloud_cci.cot_ice.processors.CLOSEST               = closest.fn;
 cloud_cci.cot_ice.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.cot_ice.stored.CLOSEST.atts.unit         = '-';
 cloud_cci.cot_ice.stored.CLOSEST.type              = closest.ty;
-cloud_cci.cot_ice.limitators                       = limitators;
+cloud_cci.cot_ice.limitators                       = limitators_scalar;
 
 % -------------------
 % COLLAPSED DATASETS
@@ -881,12 +914,15 @@ CollocatedDataset(...
     'interval', 30);
 
 % for fields, I want ROIWP_NO, ROIWP_MEAN, ...
-% for field in fieldnames(appccs)
-%     for proccer in fieldnames(thisfield.stored):
-%          fieldname_proccer: copied from
-%          appccs.(fieldname).stored.(proccer)
-%FieldCopier(...
-    %D.Collocated_cacmah_avhrr, ...
+
+% fields for fieldcopier cacmah avhrr, defined here because relies on other
+% things defined in this namespace
+
+FieldCopier(...
+    D.Collocated_cacmah_avhrr, ...
+    collapsed2fc(appccs), ...
+    getfields(fields.avhrr, 'AVHRR_Y', 'AVHRR_FLAG_3AB'), ...
+    'name', 'associated_cacmah_avhrr');
     
 
 %% 
@@ -995,6 +1031,17 @@ fields.amsub2.BT2.realname = 'tb';
 fields.amsub2.BT2.dims = {'AMSUB_CHANS', 5};
 fields.amsub2.BT2.atts.long_name = 'AMSU-B Brightness Temperature, primary';
 fields.amsub2.BT2.atts.units = 'Kelvin';
+
+%% AVHRR
+
+fields.avhrr.AVHRR_Y.type = 'float';
+fields.avhrr.AVHRR_Y.realname = 'y';
+fields.avhrr.AVHRR_Y.dims = {'AVHRR_CHANS', 5};
+fields.avhrr.AVHRR_Y.atts.long_name = 'AMSU-B measurement';
+fields.avhrr.AVHRR_Y.atts.units = 'Albedo or Kelvin';
+fields.avhrr.AVHRR_FLAG_3AB.type = 'byte';
+fields.avhrr.AVHRR_FLAG_3AB.realname = 'flag_3_is_3A';
+fields.avhrr.AVHRR_FLAG_3AB.atts.long_name = 'Channel 3 flag; 1=3A, 0=3B';
 
 %% cloud_cci
 fields.cloud_cci.cwp.type               = 'short'; % int16
@@ -1281,6 +1328,57 @@ fields.cpr.RVOD_ice_water_path.dataset           = D.CPR_RVOD;
 fields.cpr.RVOD_ice_water_path.atts.long_name    = 'RVOD ice water path';
 fields.cpr.RVOD_ice_water_path.atts.units        = 'g/m^2';
 fields.cpr.RVOD_ice_water_path.atts.missing_value = -3333;
+
+% ECMWF_AUX
+fields.cpr.ECMWF_Temperature.type = 'float';
+fields.cpr.ECMWF_Temperature.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_Temperature.realname = 'Temperature';
+fields.cpr.ECMWF_Temperature.atts.long_name = 'ECMWF temperature';
+fields.cpr.ECMWF_Temperature.atts.units = 'K';
+fields.cpr.ECMWF_Temperature.atts.missing_value = -999;
+%fields.cpr.ECMWF_Temperature.atts
+fields.cpr.ECMWF_Pressure.type = 'float';
+fields.cpr.ECMWF_Pressure.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_Pressure.realname = 'Pressure';
+fields.cpr.ECMWF_Pressure.atts.long_name = 'ECMWF pressure';
+fields.cpr.ECMWF_Pressure.atts.units = 'Pa';
+fields.cpr.ECMWF_Pressure.atts.missing_value = -999;
+%fields.cpr.ECMWF_Pressure.atts
+fields.cpr.ECMWF_Specific_humidity.type = 'float';
+fields.cpr.ECMWF_Specific_humidity.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_Specific_humidity.realname = 'Specific_humidity';
+fields.cpr.ECMWF_Specific_humidity.atts.long_name = 'ECMWF Specific humidity';
+fields.cpr.ECMWF_Specific_humidity.atts.units = 'kg/kg';
+fields.cpr.ECMWF_Specific_humidity.atts.missing_value = -999;
+%fields.cpr.ECMWF_Specific_humidity.atts
+fields.cpr.ECMWF_Surface_pressure.type = 'float';
+fields.cpr.ECMWF_Surface_pressure.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_Surface_pressure.realname = 'Surface_pressure';
+fields.cpr.ECMWF_Surface_pressure.atts.long_name = 'ECMWF surface pressure';
+fields.cpr.ECMWF_Surface_pressure.atts.units = 'Pa';
+fields.cpr.ECMWF_Surface_pressure.atts.missing_value = -999;
+%fields.cpr.ECMWF_Surface_pressure.atts
+fields.cpr.ECMWF_Skin_temperature.type = 'float';
+fields.cpr.ECMWF_Skin_temperature.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_Skin_temperature.realname = 'Skin_temperature';
+fields.cpr.ECMWF_Skin_temperature.atts.long_name = 'ECMWF skin temperature';
+fields.cpr.ECMWF_Skin_temperature.atts.units = 'K';
+fields.cpr.ECMWF_Skin_temperature.atts.missing_value = -999;
+%fields.cpr.ECMWF_Skin_temperature.atts
+fields.cpr.ECMWF_Temperature_2m.type = 'float';
+fields.cpr.ECMWF_Temperature_2m.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_Temperature_2m.realname = 'Temperature_2m';
+fields.cpr.ECMWF_Temperature_2m.atts.long_name = 'ECMWF 2m temperature';
+fields.cpr.ECMWF_Temperature_2m.atts.units = 'K';
+fields.cpr.ECMWF_Temperature_2m.atts.missing_value = -999;
+%fields.cpr.ECMWF_Temperature_2m.atts
+fields.cpr.ECMWF_elevation.type = 'short';
+fields.cpr.ECMWF_elevation.dataset = D.CPR_ECMWF;
+fields.cpr.ECMWF_elevation.realname = 'DEM_elevation';
+fields.cpr.ECMWF_elevation.atts.long_name = 'ECMWF DEM surface elevation';
+fields.cpr.ECMWF_elevation.atts.units = 'm';
+fields.cpr.ECMWF_elevation.atts.missing_value = 9999;
+%fields.cpr.ECMWF_elevation.atts
 
 % dardarsub as sibling for cpr defined AFTER dardar_sub
 
@@ -1632,11 +1730,22 @@ S = getfields(S, desired{:});
 
 end
 
-function S = collapse2fc(S)
+function S = collapsed2fc(S)
 % convert a structure prepared for a collapser back to one for fieldcopier
 %
 % useful if fields from a collapser are to be fieldcopied when the
 % collapser is used as a base for a new collocated dataset
 
-error('Not implemented yet');
+C = cellfun(...
+    @(fn) ...
+            cellfun(@(procn) {[procn '_' fn], S.(fn).stored.(procn)}, ...
+                    fieldnames(S.(fn).stored), ...
+                    'UniformOutput', false), ...
+            fieldnames(S), ...
+            'UniformOutput', false);
+% convert nested cell to flat input for struct
+C = vertcat(C{:});
+C = vertcat(C{:});
+C = flat(C.');
+S = struct(C{:});
 end
