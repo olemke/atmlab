@@ -17,15 +17,15 @@ grdcontour = sprintf('grdcontour %s -R -J',in.grdfile);
 grdcontour = sprintf('%s %s',grdcontour,in.plotPlacement);
 
 if isfield(in,'spacing')
-    grdcontour = sprintf('%s -A%f',grdcontour,in.spacing);
+    grdcontour = sprintf('%s -A%g',grdcontour,in.spacing);
 end
 
 if isfield(in,'fontsize')
-    grdcontour = sprintf('%s+s%f',grdcontour,in.fontsize);
+    grdcontour = sprintf('%s+s%g',grdcontour,num2str(in.fontsize));
 end
 
 if isfield(in,'range')
-    grdcontour = sprintf('%s -L%f-%f',grdcontour,in.range(1),in.range(2));
+    grdcontour = sprintf('%s -L%g-%g',grdcontour,in.range(1),in.range(2));
 end
 
 if isfield(in,'label_placement')

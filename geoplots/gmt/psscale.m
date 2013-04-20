@@ -72,12 +72,12 @@ if isfield(in,'shift_tick_annotations')
     psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%s',psscale,in.shift_tick_annotations);
 end
 
-if isfield(in,'annot_font_size_primary')
-    psscale = sprintf('%s --ANNOT_FONT_SIZE_PRIMARY=%d',psscale,in.annot_font_size_primary);
+if isfield(in,'font_size')
+    psscale = sprintf('%s --ANNOT_FONT_SIZE_PRIMARY=%s',psscale,num2str(in.font_size));
 end
 
 if isfield(in,'tick_length')
-    psscale = sprintf('%s --TICK_LENGTH=%dc',psscale,in.tick_length);
+    psscale = sprintf('%s --TICK_LENGTH %s',psscale,num2str(in.tick_length));
 end
 if isfield(in,'tick_annotation_format')
     psscale = sprintf('%s --D_FORMAT=%s',psscale,in.tick_annotation_format);

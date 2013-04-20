@@ -16,31 +16,19 @@ in = setup_create_gmt_earth(in);
 F = in.filename;
 
 % Remove earlier .ps and gmt residules
-commands{1} = sprintf('rm -f %s.{ps,eps}',F);
+commands{1} = sprintf('rm -f %s.ps',F);
 %commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
 
 % Set paper size
 commands{end+1} = 'gmtset PAPER_MEDIA A0+';
 
 % Annotations of axis
-if isfield(in,'basemap_axis')
-    commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
-end
-
-% Verticle distance from plot to title
-if isfield(in,'header_offset')
-    commands{end+1} = sprintf('gmtset HEADER_OFFSET=%gc',in.header_offset);
-end
-
-% Size of title
-if isfield(in,'header_size')
-    commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %fp',in.header_size);
-end
-
-% Default unit to use
-if isfield(in,'measure_unit')
-    commands{end+1} = sprintf('gmtset MEASURE_UNIT=%s',in.measure_unit);
-end
+commands{end+1} = sprintf('gmtset ANNOT_FONT_SIZE_PRIMARY %s',num2str(in.annot_font_size_primary));
+commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
+commands{end+1} = sprintf('gmtset HEADER_OFFSET=%s',num2str(in.header_offset));
+commands{end+1} = sprintf('gmtset HEADER_FONT %s',num2str(in.header_font));
+commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %s',num2str(in.header_fontsize));
+commands{end+1} = sprintf('gmtset MEASURE_UNIT=%s',in.measure_unit);
 
 % other gmtset-commands you might have
 if isfield(in,'gmtset')
@@ -187,14 +175,14 @@ if isempty(in.center) || ~strcmp(in.plot.region(1:9),'-180/180/')
 else C = in.center;
 end
 
-proj = sprintf('%s%f/%fi',in.projection,C,in.map_width);
+proj = sprintf('%s%g/%s',in.projection,C,num2str(in.map_width));
 
 function basemap = setupbasemap(in)
 %% setupbasemap
 
-if ~isempty(in.title)
+if ~isempty(in.header)
     basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K --COLOR_FOREGROUND=%s --COLOR_BACKGROUND=%s -B:."%s": > %s.ps',...
-        in.plot.region,in.plot.proj,in.plotPlacement,in.color_foreground,in.color_background,gmt_unicode_converter(in.title),in.filename);
+        in.plot.region,in.plot.proj,in.plotPlacement,in.color_foreground,in.color_background,gmt_unicode_converter(in.header),in.filename);
     
 else
     basemap = sprintf('psbasemap -R%s -J%s %s -G -P -K > %s.ps',...
@@ -222,7 +210,7 @@ oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );
 
 
 % ---------------------
-% Maximum resolution 
+% Maximum resolution
 
 % memGB = freeRAM()/1024; % How much RAM is available? TO LARGE
 % some reasonable maximum default
@@ -303,7 +291,7 @@ switch in.ctable
             a.cptfile = makecpt(in);
         elseif isfield(in.colorrange,'discrete_colors')
             a.cptfile = cpt_discrete_colors(in);
-         end
+        end
         
     otherwise
         logtext(1,'Processing makecpt\n')
@@ -380,64 +368,56 @@ default.fontnum = 1;       % sets the font type
 default.justify = 6;       % sets the alignment
 default.color   = '0/0/0'; % textcolor (black)
 for i = 1:length(in)
-   out(i) = optargs_struct(in(i),default);
+    out(i) = optargs_struct(in(i),default);
 end
 
 function [a,b] = mklegend(in)
 %% mklegend
 
 if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
-    % get what is already in the in-structure
-    F = {'xunit','unit','cptfile'};
+    a = in.legend;
+    % get what is in the in-structure, i.e one level up from in.legend
+    % structure where they really belong
+    F = {'xunit','unit','cptfile','plotPlacement'};
     for f = F(ismember(F,fieldnames(in)))
-        if any(strcmp(f{1},{'unit','xunit'}))
-            a.(f{1}) = gmt_unicode_converter(in.(f{1}));
-        else
-            a.(f{1}) = in.(f{1});
+        switch f{1}
+            case {'unit','xunit'}
+                a.(f{1}) = gmt_unicode_converter(in.(f{1}));
+            otherwise
+                a.(f{1}) = in.(f{1});
         end
     end
-    a.plotPlacement = in.plotPlacement;
+    % Also needed
+    a.cptfile = in.plot.color.cptfile;
     if isfield(in,'extra_legend')
         if ~isfield(in.extra_legend,'position')
-            def = {[str2double(in.legend.xpos(1:end-1)),...
-                -.2, .2, .2],...
-                [.4, str2double(in.legend.ypos(1:end-1)), .2, .2]};
-            tmp = sprintf('%.2fi/',def{1}*in.map_width/9); nsz{1} = tmp(1:end-1);
-            tmp = sprintf('%.2fi/',def{2}*in.map_width/9); nsz{2} = [tmp(1:end-1) 'h'];
-            lsize = nsz{ strcmp(in.legend.orientation,'h') +1 };
+            [w,wu]=separate_integer_and_unit(in.legend.width); %thickness of legend bar
+            [x,xu]=separate_integer_and_unit(in.legend.xpos);
+            [y,yu]=separate_integer_and_unit(in.legend.ypos);
+            [l,~]=separate_integer_and_unit(in.legend.length);
+            if ~isequal(wu,yu,wu,xu),warning('miss-matching units will cause strange default placements of extra_legend');end
+            if strcmp(in.legend.orientation,'v')
+                vec = [x, y-0.5*l-2*w, w, w];
+                lsize = sprintf('%g%s/%g%s/%g%s/%g%s',...
+                    vec(1),xu,vec(2),wu,vec(3),wu,vec(3),wu);
+            elseif strcmp(in.legend.orientation,'h')
+                vec = [x+0.5*l+2*w, y, w, w];
+                lsize = sprintf('%g%s/%g%s/%g%s/%g%s',...
+                    vec(1),wu,vec(2),yu,vec(3),wu,vec(3),wu);
+            end
         else
             lsize = in.extra_legend.position;
         end
         if isfield(in.extra_legend,'fontsize')
-            b = sprintf('psscale -D%s -Xa5 -Ya5 -Li -O -K -C%s --ANNOT_FONT_SIZE_PRIMARY=%d >> %s.ps',...
-                lsize,in.plot.color.cptextra,in.extra_legend.fontsize,in.filename);
-            
-        else
-            b = sprintf('psscale -D%s -Xa5 -Ya5 -Li -O -K -C%s  >> %s.ps',...
-                lsize,in.plot.color.cptextra,in.filename);
+            fz = in.extra_legend.fontsize;
+        else fz = in.annot_font_size_primary;
         end
+        b = sprintf('psscale -D%s -Xa5 -Ya5 -Li -O -K -C%s --ANNOT_FONT_SIZE_PRIMARY=%s >> %s.ps',...
+            lsize,in.plot.color.cptextra,fz,in.filename);
     end
-    
-    % get xtra options
-    fields ={'annot_font_size_primary','box_spacing','equalboxwidth','length',...
-        'orientation','position','shift_tick_annotations','sidebar',...
-        'tick_annotations','tick_annotation_format','tick_centering','tick_length',...
-        'tick_spacing','width','xpos','ypos'};
-    
-    for F = fields
-        if isfield(in.legend,F{1})
-            a.(F{1}) = in.legend.(F{1});
-        end
-    end
-    
     if isfield(in.legend,'tick_annotations')
         append_tickannotations(in.plot.color.cptfile,in.legend.tick_annotations);
     end
-    
-    % fixed vaules
-    a.cptfile = in.plot.color.cptfile;
-    a.sidebar = in.legend.sidebar;
-    
 end
 if ~exist('b','var'), b = struct([]);end
 if ~exist('a','var'), a = struct([]);end
@@ -499,7 +479,7 @@ step = [60 40 30 20 10 5 2.5];
 b = step(~(bs>lat));
 if isempty(b), b = lat/3; end
 
-default.ticks = sprintf('%.2fg%.2f/%.2fg%.2f',a(1),b(1),a(1)/2,b(1)/2);
+default.ticks = sprintf('%gg%g/%gg%g',a(1),b(1),a(1)/2,b(1)/2);
 in = optargs_struct(in,default);
 
 basemap = sprintf('psbasemap -B%s',in.ticks);

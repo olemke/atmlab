@@ -17,6 +17,7 @@ if ~isstruct(in.extra_legend)
     return
 end
 X = in.extra_legend;
+assert(all(isfield(X,{'name','type'})),['atmlab:' mfilename],'Must have fields ''name'' and ''type''')
 %create nan.cpt for NaN colorbox
 switch X.type
     case 'nan'

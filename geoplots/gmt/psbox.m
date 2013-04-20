@@ -23,12 +23,12 @@ for i = 1:size(pb,1)
     
     %stdin
     %% get full coordinates
-    a{1}=sprintf('%d %d',b(1),b(2));
-    a{2}=sprintf('%d %d',b(1),t(2));
-    a{3}=sprintf('%d %d',(t(1)+b(1))/2,t(2));
-    a{4}=sprintf('%d %d',t(1),t(2));
-    a{5}=sprintf('%d %d',t(1),b(2));
-    a{6}=sprintf('%d %d',(t(1)+b(1))/2,b(2));
+    a{1}=sprintf('%g %g',b(1),b(2));
+    a{2}=sprintf('%g %g',b(1),t(2));
+    a{3}=sprintf('%g %g',(t(1)+b(1))/2,t(2));
+    a{4}=sprintf('%g %g',t(1),t(2));
+    a{5}=sprintf('%g %g',t(1),b(2));
+    a{6}=sprintf('%g %g',(t(1)+b(1))/2,b(2));
     a{7}=a{1};
 
     stdin=[a{1},' M\n',a{2},' D\n',a{3},' D\n',a{4},' D\n',a{5},' D\n',a{6},' D\n',a{7},' D'];
@@ -40,7 +40,7 @@ for i = 1:size(pb,1)
     
     c = colors{i};
     s = thick{i};
-    box = sprintf('%s -W%d/%d/%d/%d',box,s,c(1),c(2),c(3));
+    box = sprintf('%s -W%g/%g/%g/%g',box,s,c(1),c(2),c(3));
     
     % selects Overlay plot mode and assume more pscode will be appended later
     box = sprintf('%s -K -O >> %s.ps',box,file);

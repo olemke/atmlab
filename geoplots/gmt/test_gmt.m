@@ -84,7 +84,7 @@ info = info(~cellfun('isempty',info));
 
 % PUT all figure in one pdf
 files{end+1} = combine_pdfs(files,...
-    struct('filename',[in.filename,'.pdf'],'cols',in.cols,'valign','b','outdir',in.outdir));
+    struct('title','GMT plots: testing its functionslity','fontsize','2cm','filename',[in.filename,'.pdf'],'cols',in.cols,'valign','b','outdir',in.outdir,'display',in.display));
 
 
 % DISPLAY information about the tests
@@ -99,42 +99,18 @@ disp('All the tests where merged onto one pdf using combine_pdfs.m.')
 
 warning('on','gmtcatstruct:DuplicatesFound')
 
-% DISPLAY combined plot
-if in.display
-    v = gmtlab('pdfviewer');
-    if isnan(v), v = gmtlab('open_command');end
-    if ~isnan(v)
-        exec_system_cmd(sprintf('%s %s&',v,files{end}),0);
-    else
-        a = 'No viewer defined. ';
-        b = 'Define gmtlab(''pdfviewer'') or gmtlab(''open_command''),';
-        c = 'or type ''help gmtlab'' to learn more';
-        logtext(2,'%s\n%s\n%s\n',a,b,c)
-        if ~system('which xpdf')
-            openwith = 'xpdf';
-        elseif ~system('which evince')
-            openwith = 'evince'; % for gnome users
-        elseif ~system('which okular')
-            openwith  = 'okular'; % for kde users
-        end
-        if exist('openwith','var')
-            exec_system_cmd(sprintf('%s %s&',openwith,files{end}),1);
-        end
-    end
-end
 if ~od && ~ischar(gmtlab('OUTDIR'))
     a = sprintf('Files are saved in your tempdir (%s)',in.outdir);
     in.outdir = in.outdir(1:end-1);
     b = 'It is better to set a default directory.';
     c = 'I.e by setting gmtlab(''OUTDIR'',''<Somewhere>''), e.g. in startup.m';
     d = 'Setting this, or inputting a valid directory: in.outdir will suppress this message.';
-    fprintf(2,'Warning: %s\n%s\n%s\n%s',a,b,c,d)
+    fprintf(2,'Warning: %s\n%s\n%s\n%s',a,b,c,d);
 end
 
-if nargout == 0
-    clear files info
+if nargout==0
+    clear info files
 end
-
 fprintf('Output file saved at: %s/%s.pdf\n',in.outdir,in.filename)
 %%%%%%%%%%%%%%%%%
 % SUB FUNCTIONS
@@ -148,33 +124,32 @@ if ~ismember(t,in.test), return, end %then don't do this test
 
 in.display = false; % just put them all in one pdf using conbine_pdfs
 %% Test 1a
-test.title        = 'gridded: title² * @~D@~r@+-2@~g@~@+ (offset), unit';
+test.header        = 'gridded: title² * @~D@~r@+-2@~g@~@+, unit';
 test.unit         = 'kg/m²';
 test.basemap_axis = 'neSW'; 
-test.header_offset = -.3; %move the header down a bit because of smaller header size
-test.legend.position = '9.35i/2i/3i/.5i'; %('x-displacement/y-displacement/height/width')
 test.legend.tick_spacing = 25;
 
 in.filename = sprintf('Test%.0fa',t);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
 x = {'Test 1a demonstrates that you can include some special',...
-'characters in in.title and in.unit. This test uses ',...
+'characters in in.header and in.unit. This test uses ',...
 'gridded data, where size(data) = [length(lat),length(lon)]',...
 'Use in.header_offset my shift the title wrt the plot',...
 'You can also change the size and position of the legend',...
-'(here in.legend.position = ''9.35i/2i/3i/.5i''; %(''x-displacement/y-displacement/height/width''))',...
+'(''x-displacement/y-displacement/height/width''))',...
 'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25'};
 info{end+1} = sprintf('%s\n',x{:});
 
 %% Test 1b
 gridded.data = gridded.data-200;  % for difference 
+test.unit='';
+test.xunit='kg/m@+2';
 test.ctable = 'mypolar';
 test.reference = 0;
 test.legend.sidebar = 3; % both above and below
-test = rmfield(test,'header_offset'); %move the header down a bit because of smaller header size
 test.basemap_axis = 'neSW';
-test.title = 'Diff plot,ref=0,sidebar=3 (above and below)';
+test.header = 'Diff plot,ref=0,sidebar=3 (above & below)';
 in.filename = sprintf('Test%.0fb',t);
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
@@ -193,8 +168,8 @@ test.legend.sidebar = 2; % above only
 test.basemap_axis = 'Nesw';
 test.nlevels = 15; 
 test.nwhite = 6;
-test.header_size = 20;
-test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
+test.header_fontsize = '20p';
+test.header = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
 in.filename = sprintf('Test%.0fc',t);
  
 %this puts standardize_geodata.m to the test
@@ -220,10 +195,12 @@ in.display = false; % put them all in one pdf using conbine_pdfs
 r = 1;
 test.nearneighbor.resolution = r;
 test.unit            = 'kg/m@+2';
-test.basemap_axis    = 'neSW'; 
-test.title           = sprintf('ungridded: resolution = %.0f [deg]',r);
+test.basemap_axis    = 'nEsW'; 
+test.header          = sprintf('Font: ''Courier'': ungridded: %.0f [deg]',r);
+test.header_font     = 'Courier';
 test.coast.width     = 1;
 test.coast.color     = '255/255/255';
+test.legend.orientation  = 'h';
 a0 = sprintf('Test%.0fa',t);
 in.filename          = a0;
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
@@ -241,7 +218,8 @@ info{end+1} = sprintf('%s\n',x{:});
 %% test 2b
 r = 10;
 test.nearneighbor.resolution = r;
-test.title         = sprintf('ungridded: resolution = %.0f [deg]',r);
+test.header_font     = 8;
+test.header        = sprintf('Font: 8. ungridded: %.0f [deg]',r);
 in.filename        = sprintf('Test%.0fb',t);
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
@@ -257,7 +235,10 @@ info{end+1} = sprintf('%s\n',x{:});
 %% test 2c
 r = 60;
 test.nearneighbor.resolution = r;
-test.title         = sprintf('ungridded: resolution = %.0f [deg]',r);
+test.header_font   = 'Times-Roman';
+test.basemap_axis    = 'neSW';
+test.header        = sprintf('ungridded: resolution = %.0f [deg]',r);
+test.legend.orientation  = 'v';
 in.filename        = sprintf('Test%.0fc',t);
 files{end+1} = gmt_plot(catstruct(ungridded,test,in),'data');
 
@@ -278,8 +259,8 @@ if ~ismember(t,in.test),return, end %then don't do this test
 in.display = false; % put them all in one pdf using conbine_pdfs
 gridded.data(20:40,20:80) = NaN;
 test.datarange = [160,250];
-test.nlevels   = 18;
-test.title      = 'upper sidebar, NaN, Hammer projection, center=180';
+test.nlevels        = 18;
+test.header         = 'upper sidebar, NaN, Hammer projection, center=180';
 test.legend.orientation = 'h';
 test.projection         =  'H';
 test.center             = 180;      % Center map at given center longitude
@@ -289,20 +270,20 @@ in.filename             = sprintf('Test%.0fa',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-test.title               = 'Robinsson projection, center = 0 ';
+test.header               = 'Robinsson projection, center = 0 ';
 test.projection          = 'N';
 test.center              = 0;
 test.legend.tick_spacing = 10;
-test.extra_legend        = struct('name','nan','type','nan','position','7.85i/0i/.8c/0.8c');
+test.extra_legend        = struct('name','nan','type','nan');
 in.filename              = sprintf('Test%.0fb',t);
 
 files{end+1} = gmt_plot(catstruct(gridded,test,in),'data');
 
-test.extra_legend           = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize',25);
+test.extra_legend           = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize','25p');
 test.legend.position        = '12c/0c/20c/2ch';
-test.legend.annot_font_size_primary = 20;
+test.legend.font_size       = '20p';
 test.legend.tick_spacing    = 15;
-test.title                  = 'Sinusoidal projection, center = 90';
+test.header                 = 'Sinusoidal projection, center = 90';
 test.projection             = 'I';
 test.center                 = 90;
 in.filename                 = sprintf('Test%.0fc',t);
@@ -339,12 +320,12 @@ for j = test.lat
     end
 end
 
-test.title = 'contours, HSV colours, horiz. legend';
+test.header = 'contours, HSV colours, horiz. legend';
 test.unit = 'No unit';
 test.xunit = 'No unit either';
 test.projection = 'H';
 test.nlevels = 10;
-test.tick_annotation_format = '%.1f';
+test.tick_annotation_format = '%g';
 test.legend.orientation = 'h';
 test.contourline.spacing=0.1;
 test.contourline.range=[0 1];
@@ -389,11 +370,11 @@ if ~isfield(in,{'stepsize','nlevels'})
     tmp{1} = 'blue'; tmp{6} = 'light blue'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
     test.legend.tick_annotations = tmp; 
 end
-test.title = 'custom legend and sub-region';
+test.header = 'custom legend and sub-region';
 test.ticks = '30g30/15g15'; % annotations (deg) on major lines (e.g 40 xaxis,20 yaxis)
                             % and plot minor lines (e.g 20 xaxis & yaxis)
 test.head_size = 20;              % (GMT default = 36p)
-test.map_width = 17;              % (default is 9 inches)
+test.map_width = '17i';              % (default is 9 inches)
 test.region    = '-130/130/-30/30'; % 'lonmin/lonmax/latmin/latmax'
 test.basemap_axis = 'NeSW';
 test.legend.tick_centering = true;
@@ -456,7 +437,7 @@ for i = 1:length(names)
     test.locations(i).textalign = textalign{i};
 end
 test.basemap_axis = 'neSW';
-test.title = 'SatGroup locations';
+test.header = 'SatGroup locations';
 test.nodata = true;
 test.region = '-20/160/-30/70';
 in.filename = sprintf('Test%.0fa',t);
@@ -467,13 +448,13 @@ for i = 1:length(names)
     test.locations(i).textsize = 15;
 end
 test.region     = '-10/30/45/70';
-test.title      = 'Europe';
+test.header      = 'Europe';
 test.coast.rivers = 'r';
 in.filename = sprintf('Test%.0fb',t);
 files{end+1}    = gmt_plot(catstruct(test,in));
 
 % TEST: smallregion
-% test.title = 'Kiruna (high details)';
+% test.header = 'Kiruna (high details)';
 % test.region = '16/22/66.2/70';
 % test.coast.rivers = 'a';
 % in.filename = sprintf('Test%.0fc',t);
@@ -527,7 +508,7 @@ test.pspoly = reg;
 test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g','g','g','g','g','g','g','g','g','g','g'};
 test.nodata=true;
 test.basemap_axis='nWeS';
-in.filename = sprintf('Test%.0f',t);
+in.filename = sprintf('Test%d',t);
 files{end+1} = gmt_plot(catstruct(test,in));
 
 x = {'Test7 demonstrates that you can draw polygons on a map, using in.pspoly.',...

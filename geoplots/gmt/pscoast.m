@@ -20,7 +20,7 @@ pscoast = sprintf('%s -O -K',pscoast);
 
 % set the minimal area of features to plot
 if isfield(in,'features')
-    pscoast = sprintf('%s -A%f',pscoast,in.features);
+    pscoast = sprintf('%s -A%g',pscoast,in.features);
 end
 
 if isfield(in,'resolution')
@@ -36,7 +36,7 @@ end
 
 %Draw coastlines. Append attributes [Defaults: width = 1, color = black, texture = solid].
 if isfield(in,'width')
-    pscoast = sprintf('%s -W%fp',pscoast,in.width);
+    pscoast = sprintf('%s -W%gp',pscoast,in.width);
 else pscoast = sprintf('%s -W',pscoast);
 end
 if isfield(in,'color') %for coast

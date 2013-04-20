@@ -1,3 +1,82 @@
+2013-04-20  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-333
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- Filename handling a bit smarter. Now looks for a suffix that
+	indicates the type of file you want (e.g, pdf,jpg,png, etc), and
+	will then create an output file in that format. If no suffix is
+	present (or it's not a valid file type for gmt), then the output
+	file is .pdf
+
+	- supported figure types are: 'eps','pdf','BMP','jpg','PNG','PPM' (not recommended), or 'tif'
+
+	- Added the fields:
+	in.annot_font_size_primaty: sets the font size of primary annotations
+	in.header_font: there are 35 fonts to choose from.
+
+	- Changed the input type expected of a few variables.
+
+	The fields: in.map_width,in.extra_legend.fontsize, and
+	in.legend.{fontsize,length,width,xpos,ypos}, all changed their
+	expected input from [%f] to [%s or %f]. The reason for this is
+	increased flexibility. With a string, both the interger and unit
+	are given
+	(e.g. '17c'=17cm). Earlier the input %f was assumed to be a
+	certain unit, often inches. If the input is %f, the globally set
+	in.measure_unit is used for the unit
+
+	- Renamed some fields.
+
+	in.title => in.header
+	in.headersize => in,header_font_size
+	in.legend.annot_font_size_primary => in.legend.fontsize
+
+	Some fields that have changed are still backwards compatible, some
+	not. However, all input variables and fields are firstly checked
+	to make sure they are the right type, and if not, the error
+	message indicates what variable type is expected.
+
+	- Much better default handling of the legends.
+
+	- Restructured the help section so that it is easier to follow
+
+	* geoplots/gmt/psscale.m:
+	* geoplots/gmt/test_gmt.m:
+	* geoplots/gmt/gmt_inputs.m :
+	Adapted to new variable types.
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	- Added some more gmtdefaults.
+	- Much improved handling of default legend options
+
+	* geoplots/gmt/extra_legend.m:
+
+	added error is mandatory input fields are missing
+
+	* geoplots/gmt/separate_integer_and_unit.m:
+
+	Added a little function that separates the integer and unit from a
+	string. I use this a lot for options in gmt. e.g., '9i',
+	'-23.534cm' gives [9,'i'], and [-23.534,'cm'] respectively. If
+	the input is scalar, the unit is ''
+
+	* geoplots/gmt/grdcontour.m:
+	* geoplots/gmt/psbox.m:
+	* geoplots/gmt/pslocations.m:
+	* geoplots/gmt/pscoast.m:
+
+	Small update for cleaner output
+
+	* handy/combine_pdfs.m:
+
+	Added a little extra room at the top of the pdf if you have a
+	title
+
+	* datasets/+satreaders/isccp_dx.m : Added reader satreader for isccp_dx
+
 2013-04-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-332
@@ -51,6 +130,7 @@
 	(linesize):
 
 	- Return the size (on disk) of a single collocation
+
 2013-04-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-331

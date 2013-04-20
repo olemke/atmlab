@@ -40,7 +40,7 @@ h = 1:size(in.(D),2)-1;
 INT = nansum(abs((in.(H)(:,h)-in.(H)(:,h+1))).*(in.(D)(:,h)+in.(D)(:,h+1))/2,2)';
 
 
-%% See bellow for expanded loops
+%% See below for expanded loops
 % for i = 1:size(in.(D),1)
 %     %% In the dimension along the swath/ day
 %     for h = 1:size(in.(D),2)-1

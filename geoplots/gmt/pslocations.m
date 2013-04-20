@@ -11,7 +11,7 @@ function command = pslocations(file,in,command)
 % $Id$
 
 for loc = in.locations
-    psloc = sprintf('echo "%f %f" | psxy ', loc.lon, loc.lat);
+    psloc = sprintf('echo "%g %g" | psxy ', loc.lon, loc.lat);
     psloc = sprintf('%s -R -J',psloc);
     psloc = sprintf('%s %s',psloc,in.plotPlacement);
     
@@ -54,7 +54,7 @@ for loc = in.locations
         if isfield(loc,'textalign') && ~isempty(loc.textalign)
             talign = loc.textalign;
         end
-        pstxt = sprintf('echo "%f %f %d 0 1 %s %s" | pstext ', ...
+        pstxt = sprintf('echo "%g %g %g 0 1 %s %s" | pstext ', ...
             loc.lon, loc.lat, tsize, talign, loc.name);
         
         % Offset text from data point
