@@ -1,3 +1,57 @@
+2013-04-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* datasets/define_datasets.m:
+
+	- Added avhrr_capsed
+
+	- Added some more fields for CPR (progress in progress)
+
+	(mem2fc): Prepare fc members field for a fc's input field
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Added associated_cacmah_avhrr and collapsed_cacmah_avhrr
+
+	* handy/get_columns:
+
+	- Expanded, now takes either cell array or structure
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Bugfix: do not flag ALL data if some are invalid, only those that
+	are invalid
+
+	- Small wording change
+
+	* datasets/+satreaders/avhrr.m:
+
+	- Temporary solution for flag_3_is_3A.
+
+	* math/column_integrate.m: Write to atmlab('OUT'), not to 1
+
+	* collocations/Collapser.m:
+
+	(process_granule):
+
+	- When collapsing and it takes a long time, post some progress info
+	every 10 minutes
+
+	(read_homemade_granule):
+
+	- Bugfixes, now correctly reading scalar and non-scalar fields
+
+	* collocations/AssociatedDataset.m(process_delayed):
+
+	- Keep user informed of progress
+
+	* collocations/CollocatedDataset.m(deal_fields):
+
+	- Change access permissions
+
+	* files/uncompress.m: Bugfix (c -> cur)
+
+
+
 2013-04-20  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-333

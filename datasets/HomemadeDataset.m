@@ -193,7 +193,7 @@ classdef HomemadeDataset < SatDataset
             
             ncollocs = size(data, 1);            
             nbytes = self.linesize() * ncollocs;
-            logtext(atmlab('OUT'), 'Will write %s of uncompressed data\n', nbytes2string(nbytes));
+            logtext(atmlab('OUT'), 'Will write %s of uncompressed data (not including header)\n', nbytes2string(nbytes));
             
             %% create the file
             
@@ -291,7 +291,7 @@ classdef HomemadeDataset < SatDataset
                                  '%s.members.%s.atts.missing_value. Please define.'], ...
                                  varname, self.name, varname);
                         end
-                        data(:, self.cols.(varname)) = self.members.(varname).atts.missing_value;
+                        data(any(~isfinite(data(:, self.cols.(varname)))), self.cols.(varname)) = self.members.(varname).atts.missing_value;
                     end
                     netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
                 end

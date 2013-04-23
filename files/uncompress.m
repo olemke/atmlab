@@ -38,7 +38,7 @@ switch fend
                 out = exec_system_cmd(sprintf('unzip %s -d %s',compfile,tmpdir),atmlab('DEBUG'));
                 filename = strtrim(out{1}(strfind(out{1}, 'inflating:')+length('inflating:')+1:end));
             case 'builtin'
-                filename = c(unzip(compfile, tmpdir), 1);
+                filename = cur(unzip(compfile, tmpdir), 1);
             otherwise
                 dunno(tool)
         end

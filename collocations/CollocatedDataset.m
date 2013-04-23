@@ -1683,7 +1683,7 @@ classdef CollocatedDataset < HomemadeDataset
 
     end
     
-    methods (Access = private)
+    methods (Access = {?SatDataset})
         function [fields, additionals, additional_fields, deal_index] = deal_fields(self, all_fields, ads)
             % deal fields over core, additionals, etc.
             %

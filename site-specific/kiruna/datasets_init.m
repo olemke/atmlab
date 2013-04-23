@@ -312,6 +312,14 @@ D.Collocated_cacmah_avhrr.basedir = '/storage4/user_data/gerrit/collocated_datas
 D.Collocated_cacmah_avhrr.subdir = '$YEAR4/$MONTH/$DAY';
 D.Collocated_cacmah_avhrr.filename = 'cacmah_avhrr_$SAT1_$SAT2.nc.gz';
 
+D.associated_cacmah_avhrr.basedir = '/storage4/user_data/gerrit/collocated_datasets/cacmah_avhrr';
+D.associated_cacmah_avhrr.subdir = '$YEAR4/$MONTH/$DAY';
+D.associated_cacmah_avhrr.filename = 'cacmah_avhrr_fulldata_$SAT1_$SAT2.nc.gz';
+
+D.collapsed_cacmah_avhrr.basedir = '/storage4/user_data/gerrit/collocated_datasets/cacmah_avhrr';
+D.collapsed_cacmah_avhrr.subdir = '$YEAR4/$MONTH/$DAY';
+D.collapsed_cacmah_avhrr.filename = 'cacmah_avhrr_collapsed_$SAT1_$SAT2.nc.gz';
+
 %% Associated datasets
 % ----------------------
 

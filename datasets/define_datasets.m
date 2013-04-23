@@ -879,6 +879,36 @@ cloud_cci.cot_ice.stored.CLOSEST.atts.unit         = '-';
 cloud_cci.cot_ice.stored.CLOSEST.type              = closest.ty;
 cloud_cci.cot_ice.limitators                       = limitators_scalar;
 
+% ------
+% avhrr
+% ------
+
+avhrr_capsed.AVHRR_Y.processors.NO = @(X)(size(X, 1));
+avhrr_capsed.AVHRR_Y.stored.NO.type = 'short';
+avhrr_capsed.AVHRR_Y.stored.NO.atts.long_name = 'Number of AVHRR footprints used for statistics inside AMSU-B/MHS';
+avhrr_capsed.AVHRR_Y.stored.NO.atts.missing_value = 0;
+avhrr_capsed.AVHRR_Y.stored.NO.profile = false;
+avhrr_capsed.AVHRR_Y.processors.MEAN = @(X)(mean(X, 1));
+avhrr_capsed.AVHRR_Y.stored.MEAN.type = 'float';
+avhrr_capsed.AVHRR_Y.stored.MEAN.atts.long_name = 'MHS-averaged AVHRR BT';
+avhrr_capsed.AVHRR_Y.stored.MEAN.atts.units = 'albedo or BT';
+avhrr_capsed.AVHRR_Y.stored.MEAN.atts.missing_value = -1;
+avhrr_capsed.AVHRR_Y.processors.STD = @(X)(std(X, 0, 1));
+avhrr_capsed.AVHRR_Y.stored.STD.type = 'float';
+avhrr_capsed.AVHRR_Y.stored.STD.atts.long_name = 'AVHRR-in-MHS standard deviation';
+avhrr_capsed.AVHRR_Y.stored.STD.atts.units = avhrr_capsed.AVHRR_Y.stored.MEAN.atts.units;
+avhrr_capsed.AVHRR_Y.stored.STD.atts.missing_value = -1;
+avhrr_capsed.AVHRR_Y.processors.CV = @(X)(std(X, 0, 1) ./ mean(X, 1));
+avhrr_capsed.AVHRR_Y.stored.CV.type = 'float';
+avhrr_capsed.AVHRR_Y.stored.CV.atts.long_name = 'Coefficient of variation of AVHRR in MHS';
+avhrr_capsed.AVHRR_Y.stored.CV.atts.missing_value = 0;
+avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = mn;
+avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.type = 'float';
+avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.long_name = 'MHS-averaged AVHRR BT';
+avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.units = 'albedo or BT';
+avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.missing_value = -1;
+    
+
 % -------------------
 % COLLAPSED DATASETS
 % --------------------
@@ -917,12 +947,42 @@ CollocatedDataset(...
 
 % fields for fieldcopier cacmah avhrr, defined here because relies on other
 % things defined in this namespace
+%
+% In this fieldcopier, I have:
+% - fields from CollocatedDataset_mhs_cpr
+% - fields from associated_CPR_MHS_AMSU_HIRS
+% - fields from collapser
+% total 73 fields!
+
+fc1 = catstruct(...
+        struct(...
+            'MHS_START', D.CollocatedDataset_mhs_cpr.members.START1, ...
+            'MHS_LINE', D.CollocatedDataset_mhs_cpr.members.LINE1, ...
+            'MHS_POS', D.CollocatedDataset_mhs_cpr.members.POS1, ...
+            'MHS_TIME', D.CollocatedDataset_mhs_cpr.members.TIME1, ...
+            'MHS_LAT', D.CollocatedDataset_mhs_cpr.members.LAT1, ...
+            'MHS_LON', D.CollocatedDataset_mhs_cpr.members.LON1), ...
+        getfields(mem2fc(D.associated_CPR_MHS_AMSU_HIRS.members), ...
+                  'B_LZA', 'B_LAA', 'B_SZA', 'B_SAA', 'B_BT', 'A_LONG', ...
+                  'A_LAT', 'A_BT', 'A_POS', 'A_LINE', 'H_LONG', 'H_LAT', 'H_BT', 'H_POS', 'H_LINE'), ...
+        collapsed2fc(appccs));
+
+fc1.MHS_START.realname = 'START1';
+fc1.MHS_LINE.realname = 'LINE1';
+fc1.MHS_POS.realname = 'POS1';
+fc1.MHS_TIME.realname = 'TIME1';
+fc1.MHS_LAT.realname = 'LAT1';
+fc1.MHS_LON.realname = 'LON1';
+
+% FIXME: more from fc2?
+fc2 = getfields(fields.avhrr, 'AVHRR_Y', 'AVHRR_FLAG_3AB');
 
 FieldCopier(...
     D.Collocated_cacmah_avhrr, ...
-    collapsed2fc(appccs), ...
-    getfields(fields.avhrr, 'AVHRR_Y', 'AVHRR_FLAG_3AB'), ...
-    'name', 'associated_cacmah_avhrr');
+    fc1, fc2, 'name', 'associated_cacmah_avhrr');
+    
+Collapser(D.associated_cacmah_avhrr, avhrr_capsed, mw_global, ...
+    'name', 'collapsed_cacmah_avhrr');
     
 
 %% 
@@ -1321,6 +1381,12 @@ fields.cpr.ROIWP.atts.long_name      = 'CloudSat Radar-Only CPR IWP';
 fields.cpr.ROIWP.atts.units          = 'g/m^2';
 fields.cpr.RO_ice_water_path         = fields.cpr.ROIWP;
 fields.cpr.RO_ice_water_path.type    = 'short'; %int16
+fields.cpr.RO_liq_water_path.type    = 'short';
+fields.cpr.RO_liq_water_path.atts.long_name = 'Radar-only liquid water path';
+fields.cpr.RO_liq_water_path.atts.units = 'g/m^2';
+fields.cpr.LO_RO_liquid_water_path.type = 'short';
+fields.cpr.LO_RO_liquid_water_path.atts.long_name = 'Radar-only liquid-only liquid water path';
+fields.cpr.LO_RO_liquid_water_path.atts.units = 'g/m^2';
 
 % 2B-CWC-RVOD
 fields.cpr.RVOD_ice_water_path.type              = 'int';
@@ -1328,6 +1394,11 @@ fields.cpr.RVOD_ice_water_path.dataset           = D.CPR_RVOD;
 fields.cpr.RVOD_ice_water_path.atts.long_name    = 'RVOD ice water path';
 fields.cpr.RVOD_ice_water_path.atts.units        = 'g/m^2';
 fields.cpr.RVOD_ice_water_path.atts.missing_value = -3333;
+fields.cpr.RVOD_liq_water_path.type              = 'int';
+fields.cpr.RVOD_liq_water_path.dataset           = D.CPR_RVOD;
+fields.cpr.RVOD_liq_water_path.atts.long_name    = 'Radar Visible Opticle Depth liquid water path';
+fields.cpr.RVOD_liq_water_path.atts.units        = 'g/m^2';
+fields.cpr.RVOD_liq_water_path.atts.missing_value = -3333;
 
 % ECMWF_AUX
 fields.cpr.ECMWF_Temperature.type = 'float';
@@ -1748,4 +1819,20 @@ C = vertcat(C{:});
 C = vertcat(C{:});
 C = flat(C.');
 S = struct(C{:});
+end
+
+function S = mem2fc(S)
+% prepare a fc members-field for another fc's input-field
+%
+% In practice, this means removing 'realname' and 'dataset'
+%
+% IN
+%
+%   S   input structure
+
+S = structfun(...
+    @(X) rmfield(X, intersect({'realname', 'dataset'}, fieldnames(X))), ...
+    S, ...
+    'UniformOutput', false);
+
 end

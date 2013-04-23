@@ -228,6 +228,7 @@ classdef AssociatedDataset < HomemadeDataset
             
             logtext(atmlab('OUT'), 'Processing %d segments\n', length(newseg));
             for segcount = 1:length(newseg)
+                logtext(atmlab('OUT'), 'Processing segment %d/%d\n', segcount, length(newseg));
                 segstart = newseg(segcount);
                 % end of segment: either beginning of next, or end of data
                 if segcount < length(newseg)

@@ -439,7 +439,7 @@ classdef Collapser < AssociatedDataset
                     M(j, :) = flag;
                 end
                 t = t + toc;
-                if t > 120
+                if t > 600
                     logtext(atmlab('OUT'), 'Done %d/%d\n', ...
                         i, size(uniques, 1));
                     t = 0;
@@ -494,13 +494,17 @@ classdef Collapser < AssociatedDataset
         function [S, strattr] = read_homemade_granule(self, file, varargin)
             info = self.find_info_from_granule(file);
             dt = [str2double(info.year), str2double(info.month), str2double(info.day)];
+            extra_fields = optargs(varargin, {{}});
+            core_fields = {'LAT1', 'LON1', 'TIME1'};%, 'FIRST', 'LAST'};
+            all_fields = union(extra_fields, core_fields);
             [M, c] = self.parent.read(dt, dt, info.satname, ...
-                {'LAT1', 'LON1', 'TIME1', 'FIRST', 'LAST'}, ...
+                all_fields, ...
                 struct(), ...
                 {}, ...
-                {self});
+                [self.dependencies, {self}]);
             %self.parent.read_homemade_granule(self.parent.find_granule_by_datetime([2007, 1, 1], 'noaa18'), {})
             if isempty(M)
+                S = cell2struct(repmat({[]}, [1, length(all_fields)]), all_fields, 2);
                 S.lat = [];
                 S.lon = [];
                 S.epoch = [];
@@ -508,11 +512,22 @@ classdef Collapser < AssociatedDataset
                 S.version = 0;
                 return
             end
-            S1 = self.parent.cast_fields_back(M, ...
-                                              getfields(c, 'LAT1', 'LON1', 'TIME1'));
-            S2 = self.cast_fields_back(M, ...
-                                       getfields(c, 'FIRST', 'LAST'));
-            S = catstruct(S1, S2);
+            % need to call cast_fields_back for each dataset-type
+            % individually
+            [fields_core, additionals, additional_fields] = self.parent.deal_fields(all_fields, self.parent.associated);
+            S = self.parent.cast_fields_back(M, getfields(c, fields_core{:}));
+            for i = 1:length(additionals)
+                S = catstruct(S, ...
+                              additionals{i}.cast_fields_back(M, ...
+                                                              getfields(c, ...
+                                                              additional_fields{i}{:})));
+            end
+%            from_parents = intersect(all_fields, fieldnames(self.parent.members));
+%            from_self = intersect(all_fields, fieldnames(self.members));
+%            S1 = self.parent.cast_fields_back(M, getfields(c, from_parents{:}));
+%            S2 = self.cast_fields_back(M, getfields(c, from_self{:}));
+%            S = catstruct(S1, S2);
+%            S = self.cast_fields_back(M, getfields(c, all_fields{:}));
             S.lat = S.LAT1;
             S.lon = S.LON1;
             [year, month, day, hour, minute, second] = unixsecs2date(S.TIME1);
@@ -537,6 +552,8 @@ classdef Collapser < AssociatedDataset
                   ~(isfield(self.members.(field), 'profile') && self.members.(field).profile==false)
                     % if it has an origin, it should have an orig_name
                     ncols = length(self.members.(field).origin.cols.(self.members.(field).orig_name));
+                    % FIXME/TODO: should reuse existing dimension names...
+                    self.members.(field).dims = {sprintf('HEIGHT_%s', field), ncols};
                 else % should be FIRST, LAST... ncols==1
                     ncols = 1;
                 end

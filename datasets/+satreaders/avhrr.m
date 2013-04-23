@@ -29,6 +29,8 @@ function data = avhrr(file, varargin)
 % $Id$
 
 extra_fields = optargs(varargin, {{}});
+% this should actually be implemented as a pseudo-field...
+extra_fields = setdiff(extra_fields, {'flag_3_is_3A', 'y'});
 
 newfile = uncompress(file, atmlab('WORK_AREA'), struct('unidentified', 'error'));
 c = onCleanup(@()delete(newfile));
