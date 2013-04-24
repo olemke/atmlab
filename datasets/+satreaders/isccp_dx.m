@@ -31,7 +31,7 @@ core_fields   = {'global_attributes','lon','lat'};
 extra_fields  = optargs(varargin, {{}});
 all_fields    = [core_fields(:); extra_fields(:)];
 
-S = isccpreadnative(file,struct('dataset','dx'));
+S = read_isccp(file,struct('dataset','dx'));
 
 % all available fields are read from the binary file, so remove all fields,
 % but all_fields.

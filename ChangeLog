@@ -1,4 +1,31 @@
+2013-04-24  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-335
+
+	* datasets/read_isccp.m:
+
+	# Added generic ISCCP reading routine that can:
+
+	- Read DX data (15km, 3rly) and output the results into a nice structure
+	- Cannot not yet read the D1 dataset (250*250km,3hrly). Have put a
+	placeholder for future implementation.
+	- Can read the D2 dataset (250*250km, monthly mean). Currently the
+	output format is in a legacy format and therefore doesn't match the
+	function documentation (will be fixed when there is time).
+
+	* datasets/+satreaders/isccp_dx.m:
+	- updated to read read_isccp()
+
+	* math/hist2d.m:
+
+	- Added missing function. This function is called
+	by scatter_density_plot but only existed locally on Gerrits and my
+	computers.
+
+
 2013-04-23  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-334
 
 	* datasets/define_datasets.m:
 
@@ -64,7 +91,8 @@
 	present (or it's not a valid file type for gmt), then the output
 	file is .pdf
 
-	- supported figure types are: 'eps','pdf','BMP','jpg','PNG','PPM' (not recommended), or 'tif'
+	- supported figure types are: 'eps','pdf','BMP','jpg','PNG','PPM'
+	(not recommended), or 'tif'
 
 	- Added the fields:
 	in.annot_font_size_primaty: sets the font size of primary annotations
