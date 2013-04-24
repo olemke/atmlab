@@ -1,3 +1,9 @@
+2013-04-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-336
+
+	* files/type_nc2ml.m: Added, convert from nc-type to matlab-type
+
 2013-04-24  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-335
