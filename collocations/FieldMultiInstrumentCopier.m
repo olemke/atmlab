@@ -4,6 +4,10 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
     % This class is for getting fields from other instruments on the same
     % satellite that do not have the same resolution but do have a 1-to-1
     % relation with the instrument originally used for collocating.
+    % An example is to collocate with mhs, then get hirs and amsu-a.
+    % This does not apply if there are several instruments or datasets
+    % with exactly the same footprints; in this case, one should use an
+    % ordinary FieldCopier and use siblings instead.
     %
     % This is an abstract class. One implementation is
     % <a href="matlab:help AssociatedPOESPlus">AssociatedPOESPlus</a>.
@@ -67,28 +71,44 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
         
         %% implementation of abstract methods
         
-        function args = primary_arguments(self)
-            args = self.fieldcopier_core.primary_arguments();
+        function args = primary_arguments(self, varargin)
+            args = self.fieldcopier_core.primary_arguments(varargin{:});
         end
         
-        function args = secondary_arguments(self)
-            args = self.fieldcopier_core.secondary_arguments();
+        function args = secondary_arguments(self, varargin)
+            args = self.fieldcopier_core.secondary_arguments(varargin{:});
         end
         
-        function bool = needs_primary_data(self)
-            bool = self.fieldcopier_core.needs_primary_data();
+        function bool = needs_primary_data(self, varargin)
+            bool = self.fieldcopier_core.needs_primary_data(varargin{:});
         end
         
-        function bool = needs_secondary_data(self)
-            bool = self.fieldcopier_core.needs_secondary_data();
+        function bool = needs_secondary_data(self, varargin)
+            bool = self.fieldcopier_core.needs_secondary_data(varargin{:});
         end
         
-        function out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
-            d = datasets;
+        function fields = fields_needed_for_dependency(~, ~, ~)
+            fields = {}; % no dependencies
+        end
+        
+        function [out, localcols] = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies, depcols, fields)
+            D = datasets();
             
             %% copy fields for original instruments
             
-            out_core = self.fieldcopier_core.process_granule(processed_core, data1, date1, spec1, data2, date2, spec2, dependencies);
+            if isequal(fields, 'all')
+                fields_core = fieldnames(self.fieldcopier_core.members);
+            else
+                fields_core = intersect(fieldnames(self.fieldcopier_core.members), fields);
+            end
+            [out_core, core_fc_cols] = self.fieldcopier_core.process_granule(...
+                processed_core, data1, date1, spec1, data2, date2, spec2, ...
+                dependencies, depcols, fields_core);
+            if isequal(fields, 'all')
+                assert(isequal(self.fieldcopier_core.cols, core_fc_cols), ...
+                    ['atmlab:' mfilename ':wrongcols'], ...
+                    'Bug in cols :(');
+            end
             allmembers = self.fieldcopier_core.members;
             
             %% get fields for other instruments on primary
@@ -134,10 +154,16 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                 
                 for i = 1:length(other_instruments{k})
                     other_instrument = other_instruments{k}{i};
+                    fields_from_other_instrument = intersect(fields, fieldnames(fc_other.(other_instrument).members));
+                    if isempty(fields_from_other_instrument)
+                        logtext(atmlab('OUT'), 'No need for %s this time\n', other_instrument);
+                        continue
+                    end
                     logtext(atmlab('OUT'), 'Also taking same-satellite instrument %s\n', ...
                         other_instrument);
                     try
-                        data_other = d.(other_instrument).read_granule(date, spec, {}, false);
+                        % do not remove duplicates
+                        data_other = D.(other_instrument).read_granule(date, spec, fields_from_other_instrument, false);
                     catch ME
                         switch ME.identifier
                             case {'atmlab:invalid_data'}
@@ -180,9 +206,9 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                     pc_other(:, pos_i) = other_pos;
        
                     % FieldCopier's process_granule also sets 'cols'-structure
-                    args = {pc_other, data1, date1, spec1, data2, spec2, dependencies};
+                    args = {pc_other, data1, date1, spec1, data2, spec2, dependencies, depcols, fields_from_other_instrument};
                     args{arg_i_other} = data_other;
-                    out_other{k}{i} = fc_other.(other_instrument).process_granule(args{:}); %#ok<AGROW>
+                    [out_other{k}{i}, cols_other{m}{k}{i}] = fc_other.(other_instrument).process_granule(args{:}); %#ok<AGROW>
                    
 %                    allmembers = catstruct(allmembers, fc_other.(other_instrument).members);
                 end
@@ -190,16 +216,18 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                    
             % merge matrices and cols-structures appropiately
             out = out_core;
-            newcols = self.fieldcopier_core.cols;
+            newcols = core_fc_cols;
             for k = 1:length(modes)
                 m = modes{k};
                 for i = 1:length(out_other{k})
-                    [out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, self.(['fieldcopier_other_' m]).(other_instruments{k}{i}).cols);
+                    %[out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, self.(['fieldcopier_other_' m]).(other_instruments{k}{i}).cols);
+                    [out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, cols_other{m}{k}{i});
+
                 end
             end
-            self.cols = newcols;
+%            self.cols = newcols;
 %            self.members = allmembers;
-            
+            localcols = newcols;
         end
     end
 end

@@ -803,7 +803,10 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %       position in the scanline and the scanline number,
             %       accordingly.
             %
-            %   remdouble   logical     (optional) Remove doubles or not? Default true.
+            %   remdouble   logical     (optional) Remove duplicates or not? Default true.
+            %                           One reason to pass 'false' might be
+            %                           when searching for data according
+            %                           to line/pos.
             %   force       logical     (optional) rather than throwing an error,
             %                           return [] in case of error. Default false.
             %   reload      logical     (optional) Do not use caching, but

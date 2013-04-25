@@ -197,17 +197,29 @@ classdef FieldCopier < AssociatedDataset
     methods (Access = {?SatDataset})
         %% implementation of abstract methods
         
-        function args = primary_arguments(self)
-            args = self.fieldargs(self.fieldstruct_primary, self.parent.primary);
+        function args = primary_arguments(self, varargin)
+            fields = optargs(varargin, {'all'});
+            args = self.arguments(self.fieldstruct_primary, self.parent.primary, fields);
         end
         
-        function args = secondary_arguments(self)
-            args = self.fieldargs(self.fieldstruct_secondary, self.parent.secondary);
+        function args = secondary_arguments(self, varargin)
+            fields = optargs(varargin, {'all'});
+            args = self.arguments(self.fieldstruct_secondary, self.parent.secondary, fields);
         end
         
-        function result = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~)
+        function fields = fields_needed_for_dependency(~, ~, ~)
+            fields = {}; % no dependencies
+        end
+        
+        function [result, localcols] = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~, ~, fields)
             allnames = fieldnames(self.members);
-            n_inprim = length(fieldnames(self.fieldstruct_primary));
+            if isequal(fields, 'all')
+                localnames = allnames;
+            else
+                localnames = intersect(allnames, fields);
+                rqre_subset(fields, allnames); % if this fails, some fields do not exist
+            end
+            n_inprim = length(intersect(fieldnames(self.fieldstruct_primary), localnames));
             dimsizes = struct();
             % other datasets that may be required (structs filled as needed)
             D = datasets();
@@ -223,8 +235,8 @@ classdef FieldCopier < AssociatedDataset
             % - if data should be from
             % sibling-datasets, i.e. datasets not occuring in the original
             % collocation, but on the same size (e.g. CPR RO or RVOD)
-            for i = 1:length(allnames)
-                fieldnam = allnames{i};
+            for i = 1:length(localnames)
+                fieldnam = localnames{i};
                 if ~isfield(self.members.(fieldnam), 'realname')
                     self.members.(fieldnam).realname = fieldnam;
                 end
@@ -349,10 +361,15 @@ classdef FieldCopier < AssociatedDataset
             
             % In the second loop, we reshape data so that they all have
             % a dimension equal to the number of scan positions, and we
-            % collect dimension data for other fields
+            % collect dimension data for other fields.  We also define the
+            % localcols structure used to address the columns in 'result'
+            % (note that this should be equal to self.cols if getting all
+            % fields)
 
-            for i = 1:length(allnames)
-                fieldnam = allnames{i};
+            localcols = struct();
+            n_tot = 0;
+            for i = 1:length(localnames)
+                fieldnam = localnames{i};
                 if i<=n_inprim
                     j = 1;
                     dat = data1;
@@ -429,16 +446,22 @@ classdef FieldCopier < AssociatedDataset
                     end
                     
                 end
-                
+                localcols.(fieldnam) = (n_tot+1):(n_tot+n);
+                n_tot = n_tot + n;
             end
             
             self.members2cols();
+            if isequal(fields, 'all')
+                assert(isequal(localcols, self.cols), ...
+                    ['atmlab:' mfilename ':wrongcols'], ...
+                    'Ambiguity in cols-structure.  This is a bug.  Stop');
+            end
             
             ncollocs = size(processed_core, 1);
-            nfields = max(cell2mat(struct2cell(self.cols).'));
+            nfields = max(cell2mat(struct2cell(localcols).'));
             %fields = fieldnames(self.cols);
             result = nan*zeros(ncollocs, nfields, self.mattype);
-            n_inprim = length(fieldnames(self.fieldstruct_primary));
+            %n_inprim = length(fieldnames(self.fieldstruct_primary));
             
             r1 = processed_core(:, self.parent.cols.LINE1);
             r2 = processed_core(:, self.parent.cols.LINE2);
@@ -455,8 +478,8 @@ classdef FieldCopier < AssociatedDataset
             
             % in the third loop, collect the data
             
-            for i = 1:length(allnames)
-                field = allnames{i};
+            for i = 1:length(localnames)
+                field = localnames{i};
                 
                 % an empty reflat means I couldn't read any core or
                 % sibling, so I won't need the indices either
@@ -495,7 +518,8 @@ classdef FieldCopier < AssociatedDataset
                                 field, self.members.(field).dataset.name, ...
                                 self.name, field, self.name, field);
                         end
-                        result(:, self.cols.(field)) = self.members.(field).atts.missing_value;
+                        result(:, localcols.(field)) = self.members.(field).atts.missing_value;
+                        %result(:, self.cols.(field)) = self.members.(field).atts.missing_value;
                         continue
                     end
                     fdata = dat_other{j}.(self.members.(field).dataset.name).(self.members.(field).realname);
@@ -514,17 +538,20 @@ classdef FieldCopier < AssociatedDataset
                 else % multi-point per lat/lon
                     DD = reshape(fdata, prod(sz(1:end-1)), sz(end));
                 end
-                result(:, self.cols.(field)) = DD(ii, :);
+                result(:, localcols.(field)) = DD(ii, :);
+                %result(:, self.cols.(field)) = DD(ii, :);
                 %result(:, self.cols.(field)) = data.(field)(ii, :);
             end
         end
         
-        function out = needs_primary_data(self)
-            out = ~isempty(self.fieldargs(self.fieldstruct_primary, self.parent.primary));
+        function out = needs_primary_data(self, varargin)
+            fields = optargs(varargin, {'all'});
+            out = self.needs_data(self.fieldstruct_primary, self.parent.primary, fields);            
         end
         
-        function out = needs_secondary_data(self)
-            out = ~isempty(self.fieldargs(self.fieldstruct_secondary, self.parent.secondary));
+        function out = needs_secondary_data(self, varargin)
+            fields = optargs(varargin, {'all'});
+            out = self.needs_data(self.fieldstruct_secondary, self.parent.secondary, fields);            
         end
         
     end
@@ -550,6 +577,28 @@ classdef FieldCopier < AssociatedDataset
         
         function nm = get_realname_from_fieldstruct(nm)
             
+        end
+    end
+    
+    methods (Access = private)
+        function out = needs_data(self, fs, parent, fields)
+            % helper for needs_primary_data, needs_secondary_data
+            all_fields = self.fieldargs(fs, parent);
+            if isequal(fields, 'all')
+                fields = all_fields;
+            end
+            out = ~isempty(intersect(all_fields, fields));
+        end           
+            
+        function args = arguments(self, fs, parent, fields)
+                        
+            fargs = self.fieldargs(fs, parent);
+            if isequal(fields, 'all')
+                args = fargs;
+            else
+                args = intersect(fields, fargs);
+            end
+
         end
     end
 end

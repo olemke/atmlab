@@ -635,24 +635,20 @@ CollocatedDataset(D.CollocatedDataset_dardarsub_modis,D.cprCloudLidar,...
 % POES
 % ------
 
-AssociatedPOESPlusCPR(D.CollocatedDataset_mhs_cpr, fields.mhs, fields.amsua, fields.hirs, ...
-    getSelection(fields.cpr, ...
+poes_cpr_selection = getSelection(fields.cpr, ...
                  {'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP', ...
                   'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error', ...
-                  'ECMWF_Temperature', 'ECMWF_Surface_pressure', ...
+                  'RO_liq_water_path', 'LO_RO_liquid_water_path', ...
+                  'ECMWF_Surface_pressure', ...
                   'ECMWF_Skin_temperature', 'ECMWF_Temperature_2m', ...
-                  'ECMWF_elevation'}), ...
-    'name', 'associated_CPR_MHS_AMSU_HIRS');
+                  'ECMWF_elevation'});
+% not including due to memory: 'ECMWF_Pressure', 'ECMWF_Specific_humidity', 
+
+AssociatedPOESPlusCPR(D.CollocatedDataset_mhs_cpr, fields.mhs, fields.amsua, fields.hirs, ...
+    poes_cpr_selection, 'name', 'associated_CPR_MHS_AMSU_HIRS');
 
 AssociatedPOESPlusCPR(D.CollocatedDataset_amsub_cpr, fields.amsub, fields.amsua, fields.hirs, ...
-    getSelection(fields.cpr, ...
-                 {'ROIWP', 'dROIWP', 'IOROIWP', 'dIOROIWP', ...
-                  'IWP_2C', 'dardar_IWP', 'dardar_ln_IWP_error', ...
-                  'ECMWF_Temperature', 'ECMWF_Surface_pressure', ...
-                  'ECMWF_Skin_temperature', 'ECMWF_Temperature_2m', ...
-                  'ECMWF_elevation'}), ...
-    'name', 'associated_CPR_AMSUB_AMSUA_HIRS');
-% not including due to memory: 'ECMWF_Pressure', 'ECMWF_Specific_humidity', 
+    poes_cpr_selection, 'name', 'associated_CPR_AMSUB_AMSUA_HIRS');
 
 % -----------------------
 % define FieldCopiers 
@@ -746,11 +742,13 @@ closest.ty = 'double';
 mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
                @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
 
-cpr_iwp_fields = vec2row({'ROIWP', 'IOROIWP', 'IWP_2C', 'dardar_IWP'});
+% FIXME: put those back after bugfix
+cpr_iwp_fields = vec2row({'ROIWP', 'IOROIWP', 'IWP_2C', 'dardar_IWP', 'RO_liq_water_path', 'LO_RO_liquid_water_path'});
 %cpr_ecmwf_prof_fields = vec2row({'ECMWF_Temperature', 'ECMWF_Pressure', 'ECMWF_Specific_humidity'});
-cpr_ecmwf_prof_fields = vec2row({'ECMWF_Temperature'});
+%cpr_ecmwf_prof_fields = vec2row({'ECMWF_Temperature'});
+cpr_ecmwf_prof_fields = {};
 cpr_ecmwf_scal_fields = vec2row({'ECMWF_Surface_pressure', 'ECMWF_Skin_temperature', 'ECMWF_Temperature_2m', 'ECMWF_elevation'});
-for cprf = union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_scal_fields))
+for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_scal_fields)))
     f = cprf{1};
     appccs.(f).limitators = limitators_scalar;
     if ismember(f, union(cpr_iwp_fields, cpr_ecmwf_scal_fields))
@@ -758,13 +756,13 @@ for cprf = union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_scal_fie
         len = @length;
         mn = @mean;
         st = @std;
-        cv = @(X)(std(X) ./ mean(X));
+        %cv = @(X)(std(X) ./ mean(X));
     elseif ismember(f, cpr_ecmwf_prof_fields)
         appccs.(f).limitators = limitators_profile;
         len = @(X)(size(X, 1));
         mn = @(X)(mean(X, 1));
         st = @(X)(std(X, 0, 1));
-        cv = @(X)(std(X, 0, 1) ./ mean(X, 1));
+        %cv = @(X)(std(X, 0, 1) ./ mean(X, 1));
     end
     
     appccs.(f).processors.NO = len;
@@ -781,13 +779,13 @@ for cprf = union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_scal_fie
     appccs.(f).stored.STD.atts.long_name = ['CPR-in-MHS standard deviation for ' fields.cpr.(f).atts.long_name];
     appccs.(f).stored.STD.atts.units = fields.cpr.(f).atts.units;
     appccs.(f).stored.STD.atts.missing_value = -1;
-    appccs.(f).processors.CV = cv;
-    appccs.(f).stored.CV.type = 'float';
-    appccs.(f).stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.(f).atts.long_name];
-    appccs.(f).stored.CV.atts.missing_value = 0;
+%     appccs.(f).processors.CV = cv;
+%     appccs.(f).stored.CV.type = 'float';
+%     appccs.(f).stored.CV.atts.long_name = ['Coefficient of variation of CPR ' fields.cpr.(f).atts.long_name];
+%     appccs.(f).stored.CV.atts.missing_value = 0;
     
     if ismember(f, cpr_iwp_fields)
-        for iwp = [1 10 100 1000]
+        for iwp = [1, 10, 40, 1000]
             fn = sprintf('FRAC%d', iwp);
             appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
             appccs.(f).stored.(fn).type = 'float';
@@ -797,7 +795,7 @@ for cprf = union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_scal_fie
         end
     end
 end
-appccs.ECMWF_Temperature.stored.NO.profile = false;
+%appccs.ECMWF_Temperature.stored.NO.profile = false;
 
 %appccs.ROIWP.limitators = limitators; % not flagged
 %appccs.ROIWP.processors.NO = @length;

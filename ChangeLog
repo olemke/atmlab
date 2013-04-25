@@ -1,3 +1,183 @@
+2013-04-25	Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-337
+
+	* New feature in collocation toolkit.  In addition to fully
+	over-writing collocations (overwrite = 1) or skipping any cases where
+	files already exist (overwrite = 0), one can can 'extend' any
+	AssociatedDataset (at least FieldCopier, FieldMultiInstrumentCopier,
+	Collapser, and their implementations).  In this case, ONLY fields that
+	are not already in the resulting file will be processed.
+
+	* WARNING — change in collapser can cause inconsistencies with
+	previously collapsed data!  See below.
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_and_store_date):
+
+	- In additional to "do not overwrite" and "do overwrite", implement
+	"extend", triggered by overwrite = 2.  
+
+	(collocate_and_store_date_range): Tiny change
+
+	(read): Ignore unused deal_index
+
+	(collocate):
+	
+	- Ignore unused lon_grid1
+
+	- %#OK<AGROW> where I'm actually pre-allocating in a smart way.
+
+	(deal_fields):
+
+	- Pre-allocate cell array to shut up mlint.
+
+	(fix_dependencies):
+
+	- Adapt for new way of treating some fields only.  Takes an additional
+	argument describing the columns, and returns an additional one
+	describing the columns.
+
+	(meet_dependencies):
+
+	- For the various additional datasets, make sure at least the fields
+	within dependencies are read therefrom.
+
+	* collocations/AssociatedDataset.m:
+
+	(primary_arguments) (secondary_arguments) (needs_primary_data)
+	(needs_secondary_data): 
+
+	- Changed abstract method signature.  Now implementations must accept
+	an input 'fields'.
+
+	(process_granule):
+
+	- Changed abstract method signature.  Now implementations must accept
+	additional inputs 'depcols', describing the columns in the
+	dependencies, and 'fields', describing what fields are to be
+	processed.  Implementations should also output a second argument,
+	'localcols', describing the columns of the first one 'out'.
+
+	(fields_needed_for_dependency): Added
+
+	- New abstract method.  For a certain dependency, describe what fields
+	are needed.
+
+	(process_delayed):
+
+	- Added two new inputs and one new output.  Since depies might no
+	longer contain all fields, depcols now describes its columns.  The 2nd
+	new input 'fields' instructs what fields to process.  The new output
+	argument is a structure describing the columns of the 1st output.
+
+	- Adapt for self.needs_primary_data, self.needs_secondary_data,
+	self.primary_arguments, self.secondary_arguments, self.process_granule
+	which all now take a 'fields' argument, and process_granule returns a
+	localcols structure.
+	
+	* collocations/FieldCopier.m:
+
+	(process_granule):
+
+	- Improved.  Only process fields that are asked to be processed.
+
+	(primary_arguments) (secondary_arguments) (needs_primary_data)
+	(needs_secondary_data):
+
+	- Adapt for new signature, consider what fields are to be processed.
+	Uses private methods 'arguments' and 'needs_data', respectively.
+
+	(fields_needed_for_dependency):
+
+	- Dummy implementation; FieldCopiers have no dependencies on other
+	AssociatedDatasets.
+
+	* collocations/Collapser.m:
+
+	(process_granule):
+
+	- Improved.  Only process fields that are asked to be processed.  This
+	is a major change and might introduce bugs.
+
+	- Do not remove collapsed fields just because all values happen to be
+	flagged; this causes problems if such is different for subsequent
+	collapsers of other fields based on the same original.  Therefore,
+	only remove if the global limitators say so.  THIS CAN CAUSE
+	INCONSISTENCIES WITH PREVIOUSLY COLLAPSED DATA!
+
+	- Be more verbose in saying what is to be collapsed.
+
+	(primary_arguments) (secondary_arguments) (needs_primary_data)
+	(needs_secondary_data):
+
+	- Adapt for new signature (but still all N/A).
+
+	(get_cols_from_bro) (set_cols_from_bro): Helpers for new localcols.
+
+	* collocations/FieldMultiInstrumentCopier.m:
+
+	- Improved class documentation a bit
+
+	(primary_arguments) (secondary_arguments) (needs_primary_data)
+	(needs_secondary_data):
+
+	- Adapted to changed signature.  Mostly delegate everything to the
+	'child' FieldCopiers.
+
+	(process_granule):
+
+	- Now handles selective fields, outputs localcols.  Mostly relies on
+	changes in FieldCopier.
+
+	* datasets/HomemadeDataset.m:
+
+	(overwrite): Document new behaviour of property
+
+	(store):
+
+	- Implement new system of writing only some fields.  If
+	self.overwrite=2, the netcdf file is opened for appending, it is not
+	overwritten.  In this case, no global attributes are written (although
+	they should, there's a FIXME).  Variables that are already there are
+	also not written (this should be improved).
+
+	(linesize):
+
+	- When estimating linesize, consider localcols.
+
+	* datasets/SatDataset.m:
+
+	(read_granule): Small doc improvement
+
+	* datasets/define_datasets.m:
+
+	- Adapt fields for associated_CPR_MHS_AMSU_HIRS and its collapser.
+	No more profiles, but add liquid.  No more coefficienc of variation,
+	change frac100 to frac40 to correspond to result in Eliasson et al.
+	(2013).
+
+	* files/quickly_read_gzipped_netcdf_header.m: Added
+
+	- Risky little function that unpacks the first couple of kB for a
+	NetCDF file and tries to read it in order to return a cell array of
+	contained variables.  This allows te quickly look what names exist,
+	without having to read a possibly huge file or even to gunzip it
+	completely.  This is risky because premature truncation of a NetCDF
+	header crashes Matlab completely.  Use at your own risk.Z
+
+	* handy/safegetfield.m: Added
+
+	- safegetfield(S, field, alt) returns S.(field) if field exists, alt
+	otherwise.
+
+	* handy/rqre_subset.m: Added
+
+	- For two cell arrays, assert that one is a subset of the other.
+
+	* collocations/colloc_config.m: Deprecate.
+
 2013-04-24  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-336

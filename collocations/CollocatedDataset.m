@@ -876,31 +876,59 @@ classdef CollocatedDataset < HomemadeDataset
             end
             
             fn = self.find_granule_by_datetime(date, spec);
-            mainfileexists = exist(fn, 'file') && ~self.overwrite;
+            mainfileexists = exist(fn, 'file');
             addisexist = false(size(additionals));
             addisvalid = false(size(additionals));
+            addisread = cell(size(additionals));
+            addisprocess = cell(size(additionals));
+            addishas = cell(size(additionals));
             for i = 1:length(additionals)
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
-                addisexist(i) = exist(fna, 'file') && ~additionals{i}.overwrite;
+                addisexist(i) = exist(fna, 'file');
+                if addisexist(i)
+                    switch additionals{i}.overwrite
+                        case 0
+                            addisread{i} = {};
+                            addisprocess{i} = {};
+                        case 1
+                            addisread{i} = {};
+                            addisprocess{i} = fieldnames(additionals{i}.members);
+                        case 2
+                            addisread{i} = {};
+                            addishas{i} = quickly_read_gzipped_netcdf_header(additionals{i}.find_granule_by_datetime(date, spec));
+                            addisprocess{i} = setdiff(...
+                                fieldnames(additionals{i}.members), ...
+                                addishas{i});
+                        otherwise
+                            addisread{i} = 'all';
+                            if iscell(additionals{i}.overwrite)
+                                addisprocess{i} = additionals{i}.overwrite;
+                            else
+                                error(['atmlab:' mfilename ':invalid'], ...
+                                    '%s %s has invalid value for overwrite', ...
+                                    class(self), self.name);
+                            end
+                    end
+                else
+                    addisread{i} = {};
+                    addisprocess{i} = fieldnames(additionals{i}.members);
+                end
             end
-                        
+            [addisread, addisprocess] = self.meet_dependencies(additionals, addisread, addisprocess, addishas);
+            
             % if everything is already there, do nothing
-            if mainfileexists && all(addisexist) && ~colloc_config('overwrite')
-                logtext(atmlab('OUT'), 'All output files already exist.\n');
-                logtext(atmlab('OUT'), 'I did not read them --- I assume their contents are as expected.\n');
+            if mainfileexists && all(cellfun(@isempty, addisprocess))
+                logtext(atmlab('OUT'), 'All output files already exist and contain the requested fields.  None are to be processed.\n');
                 logtext(atmlab('OUT'), 'I found the following files:\n');
                 logtext(atmlab('OUT'), '    %s\n', fn);
                 for i = 1:length(additionals)
                     logtext(atmlab('OUT'), '    %s\n', additionals{i}.find_granule_by_datetime(date, spec));
                 end
-%                 if ~isempty(self.log)
-%                     logtext(self.log, '%s %s %s nothing to be done\n', mat2str(date), spec1, spec2);
-%                 end
                 return
             end
-                            
+
             % so SOME work is to be done, at least
-                           
+
             info_addi = struct();
             info_addi.history = [datestr(now, 'YYYY-mm-dd') ' Obtained additionals from collocs'];
             info_addi.parent_dataset = self.name;
@@ -910,12 +938,12 @@ classdef CollocatedDataset < HomemadeDataset
                 info_addi.parent_spec = spec;
             end
             
-            if mainfileexists && ~colloc_config('overwrite')
-                logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete or to be overwritten\n');
+            if mainfileexists && ~self.overwrite
+                logtext(atmlab('OUT'), 'Collocations exist, but additionals incomplete or to be overwritten or complemented\n');
                 logtext(atmlab('OUT'), 'I will reprocess some additionals\n');
                 [result, ~, attr] = self.read_single_day(date, spec, fieldnames(self.cols));
                 if isempty(result)
-                    logtext(atmlab('OUT'), 'Upon reading collocations, appears there are none, skipping\n');
+                    logtext(atmlab('OUT'), 'Upon reading collocations, appears there are none, nothing to be done for today\n');
                     return
                 end
                 info_addi.parent_id = attr.id;
@@ -923,12 +951,12 @@ classdef CollocatedDataset < HomemadeDataset
 %                 if ~isempty(self.log)
 %                     logtext(self.log, '%s %s %s Collocations present, regenerate additionals\n', mat2str(date), spec1, spec2);
 %                 end
-                addi = {};
+                addi = cell(size(additionals));
                 for i = 1:length(additionals)
-                    if addisexist(i)
+                    if ~isempty(addisread{i})
                         logtext(atmlab('OUT'), 'Reading additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
                         try
-                            [addi{i}, cc] = additionals{i}.read_single_day(date, spec, 'all');
+                            [addi{i}, cc{i}] = additionals{i}.read_single_day(date, spec, addisread{i});
                             addisvalid(i) = true;
                         catch ME
                             switch ME.identifier
@@ -946,22 +974,29 @@ classdef CollocatedDataset < HomemadeDataset
                             end
                         end
                                 
-                        if addisvalid(i) && isempty(fieldnames(additionals{i}.cols))
-                            additionals{i}.cols = cc;
-                        end
+%                         if addisvalid(i) && isempty(fieldnames(additionals{i}.cols))
+%                             additionals{i}.cols = cc;
+%                         end
+                    else
+                        addi{i} = [];
+                        cc{i} = struct();
                     end
                     
-                    if ~addisexist(i) || ~addisvalid(i)
+                    if ~isempty(addisprocess{i}) || ~addisvalid(i)
                         logtext(atmlab('OUT'), 'Collecting additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
-                        depdata = self.fix_dependencies(additionals{i}, additionals, addi);
-                        addi{i} = additionals{i}.process_delayed(result, spec1, spec2, depdata);
-                        additionals{i}.store(date, spec, addi{i}, info_addi);
+                        [depdata, depcols] = self.fix_dependencies(additionals{i}, additionals, addi, cc);
+                        
+                        logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
+
+                        [addi{i}, localcols{i}] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
+                        additionals{i}.store(date, spec, addi{i}, info_addi, localcols{i});
                     end
                 end
 
             else
                 % assumption:
-                % if the main file does not exist, associated don't either
+                % if the main file needs reprocessing, so do all
+                % additionals
                 
 %                 if ~isempty(self.log)
 %                     logtext(self.log, '%s %s %s Generating collocations\n', mat2str(date), spec1, spec2);
@@ -1077,7 +1112,7 @@ classdef CollocatedDataset < HomemadeDataset
                     self.collocate_and_store_date([year, month, day], spec1, spec2, varargin{:});
                     i = i + 1;
                 catch ME
-                    X = ME.getReport();
+                    [~] = ME.getReport();
                     switch ME.identifier
                         case {'atmlab:SatDataset:missing_firstline'}
                             % run firstline-thingies
@@ -1246,7 +1281,7 @@ classdef CollocatedDataset < HomemadeDataset
             end
             
             % distribute fields, limits, etc. over core, additionals
-            [fields_core, additionals, additional_fields, deal_index] = self.deal_fields(all_fields, ads);
+            [fields_core, additionals, additional_fields, ~] = self.deal_fields(all_fields, ads);
 
             additionals_day = cell(size(additional_fields));
             addis_cols = cell(size(additional_fields));
@@ -1556,7 +1591,7 @@ classdef CollocatedDataset < HomemadeDataset
             logtext(atmlab('OUT'), 'Gridding %d + %d = %d points using %s method...\n', ...
                 numel(lat1), numel(lat2), numel(lat1)+numel(lat2), self.binning);
             if isequal(self.binning, 'classical')
-                [grid1, lat_grid1, lon_grid1] = binning_fast(...
+                [grid1, lat_grid1, ~] = binning_fast(...
                     struct(...
                     'lat', lat1(:), ...
                     'lon', long1(:), ...
@@ -1664,7 +1699,7 @@ classdef CollocatedDataset < HomemadeDataset
                             end
                             if count > .8*size(collocations, 1) % pre-allocate more
                                 collocations = [collocations; ...
-                                    zeros(size(collocations, 1), 4, 'uint32')];
+                                    zeros(size(collocations, 1), 4, 'uint32')]; %#ok<AGROW>
                             end
                         end
                     end
@@ -1710,7 +1745,7 @@ classdef CollocatedDataset < HomemadeDataset
             fields = {};
             additionals = {};
             additional_fields = {};
-            existing_names = {};
+            %existing_names = {};
             % pre-allocate so that every field is at least an empty
             % cell-array
             %additional_fields = cell(size(self.associated));
@@ -1728,6 +1763,8 @@ classdef CollocatedDataset < HomemadeDataset
                 else
                     % check if it belongs to any associated
                     found = false;
+                    additionals = cell(size(ads));
+                    existing_names = cell(size(ads));
                     for j = 1:length(ads)
                         asso = ads{j};
                         if any(strcmp(fieldnames(asso.members), field))
@@ -2046,7 +2083,7 @@ classdef CollocatedDataset < HomemadeDataset
             sorted = additionals(idx);
         end
         
-        function depdata = fix_dependencies(additional_current, additional_all, results_so_far)
+        function [depdata, depcols] = fix_dependencies(additional_current, additional_all, results_so_far, cc)
             % put data in cell array for dependencies
             %
             % This static method assures that requirements for additional X
@@ -2063,19 +2100,26 @@ classdef CollocatedDataset < HomemadeDataset
             %   all_additionanls  cell array of all <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
             %   result_so_far     cell array with results of <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
             %                     already processed
+            %   cc                cell array with cols structures
+            %                     describing results_so_far
             %
             % OUT
             %
             %   depdata           cell array with results to be passed on
             %                     to the <a href="matlab:help AdditionalDataset">AdditionalDataset</a>
             %                     under consideration
+            %
+            %   depcols           cell array with cols structures belonging
+            %                     to depdata
             
             if isempty(additional_current.dependencies)
                 depdata = {};
+                depcols = struct();
             else
                 % for each dependency, find out what data to put in
                 % depdata
                 depdata = cell(size(additional_current.dependencies));
+                depcols = cell(size(depdata));
                 for di = 1:length(additional_current.dependencies)
                     depcy = additional_current.dependencies{di};
                     % dependency should match exactly one
@@ -2086,9 +2130,50 @@ classdef CollocatedDataset < HomemadeDataset
                     % went wrong when sorting the additionals
                     % according to their dependencies
                     depdata{di} = results_so_far{nm_match};
+                    depcols{di} = cc{nm_match};
                 end
             end
         end
         
+        function [addisread, addisprocess] = meet_dependencies(additionals, addisread, addisprocess, addishas)
+            % adapt addisread, addisprocess so that dependencies read at
+            % least the fields they should.
+            
+
+            % FIXME: should consider the fields that are wanted
+            for i = 1:length(additionals)
+                if isempty(addisprocess{i})
+                    continue
+                end
+                %addi = additionals{i};
+                for j = 1:length(additionals{i}.dependencies)
+                    met = false;
+                    for k = 1:(i-1)
+                        if isequal(additionals{k}.name, additionals{i}.dependencies{j}.name)
+                            met = true;
+                            needs = additionals{i}.fields_needed_for_dependency(addisprocess{i}, additionals{i}.dependencies{j});
+                            % make sure it reads what it has and processes
+                            % what it doesn't have
+                            has_needed = ismember(needs, addishas{k});
+                            proc_needed = ismember(needs, addisprocess{k});
+                            if ~all(has_needed | proc_needed)
+                                error(['atmlab:' mfilename ':missing'], ...
+                                    '%s %s needs fields %s from %s %s, but those seem absent', ...
+                                    class(additionals{i}), additionals{i}.name, ...
+                                    class(additionals{k}), additionals{k}.name);
+                            end
+                            addisread{k} = union(addisread{k}, needs(has_needed));
+                            addisprocess{k} = union(addisprocess{k}, needs(~has_needed));
+                        end
+                    end
+                    if ~met
+                        error(['atmlab:' mfilename ':unsatisfied_dependency'], ...
+                            '%s %s depends on %s %s, but the latter was not requested :(', ...
+                            class(additionals{i}), additionals{i}.name, ...
+                            class(additionals{i}.dependencies{j}), additionals{i}.dependencies{j}.name);
+                    end
+                end
+            end
+        end
     end
 end

@@ -53,7 +53,31 @@ classdef HomemadeDataset < SatDataset
         
 %        members;
         
-        % write data even if data are already there
+        % flag controlling how to consider granules already existing
+        %
+        % This flag, defaulting to 'false', controls how the toolkit treats
+        % files that are already there.  For example, by default,
+        % collocations are not rerun and associateddatasets are not
+        % recalculated if files already exist.  The exact behaviour depends
+        % on the class.  Usually, the meaning is straightforward: false
+        % means do not overwrite, true means do so.  This can be set per
+        % dataset, so if one wants to use the core but regenerate
+        % additionals, one can set the property for the additionals to
+        % true.
+        %
+        % Since atmlab-2-1-334, the value for FieldCopier and Collapser
+        % (NOTE: FIXME, ALL AssociatedDataset?) can have other values.
+        % Note that these work ONLY when processing is delayed; when
+        % processing is done along with the CollocatedDataset, the system
+        % will always regenerate additionals.
+        %
+        % overwrite = 2     read original files, and check per field, i.e.
+        %                   extend them without changing existing fields
+        %
+        % overwrite = {'cell', 'array', 'of', 'fields'}
+        %
+        %                   read original files, redo all fields in the
+        %                   cell array, keep others untouched.
         overwrite = false;
         
         % Set diskcache to store results of '.read' or others to disk.
@@ -155,7 +179,9 @@ classdef HomemadeDataset < SatDataset
             %   date        vector [year month day] to which data corresponds
             %   spec        string / cellstr, satellite (or so)
             %   data        actual data, columns described by <a href="matlab:help HomemadeDataset/cols">self.cols</a>
+            %               unless 'localcols' argument is given
             %   info        (optional) struct with more info to put in NetCDF
+            %   localcols   structure describing columns of data
             %
             % OUT
             %
@@ -171,19 +197,36 @@ classdef HomemadeDataset < SatDataset
             
             fn = self.find_granule_by_datetime(date, spec);
             
-            info = optargs(varargin, {struct()});
+            [info, localcols] = optargs(varargin, {struct(), self.cols});
             
             %year = date(1);
             %month = date(2);
             %day = date(3);
             
-            if strcmp(fn(end-1:end), 'gz') % take off this part
-                fn(end-2:end) = '';
+            % create or append to the file
+            
+            if exist(fn, 'file')
+                switch self.overwrite
+                    case 0
+                        error(['atmlab:' mfilename ':fileexists'], ...
+                            ['You really shouldn''t tell me not to overwrite ' ...
+                             'and then tell me to store data where a file already exists.']);
+                    case 1
+                        newfile = true;
+                    otherwise
+                        % FIXME: should add a line to 'history' global
+                        % attribute
+                        newfile = false;
+                end
+            else
+                newfile = true;
             end
             
+%             if strcmp(fn(end-1:end), 'gz') % take off this part
+%                 fn(end-2:end) = '';
+%             end
+            
             outdir = fileparts(fn);
-            % temporary filename, later compressed written to final place
-            temp_out = tempname(atmlab('WORK_AREA'));
             if ~exist(outdir, 'dir')
                 logtext(atmlab('OUT'), 'Creating %s\n', outdir);
                 mkdir(outdir);
@@ -192,40 +235,53 @@ classdef HomemadeDataset < SatDataset
             %% Estimate size
             
             ncollocs = size(data, 1);            
-            nbytes = self.linesize() * ncollocs;
+            nbytes = self.linesize(localcols) * ncollocs;
             logtext(atmlab('OUT'), 'Will write %s of uncompressed data (not including header)\n', nbytes2string(nbytes));
             
-            %% create the file
             
-            logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
-            ncid = netcdf.create(temp_out, 'NC_CLOBBER'); % overwrite existing
+            
+            if newfile
+                % temporary filename, later compressed written to final place
+                temp_out = tempname(atmlab('WORK_AREA'));                
+                logtext(atmlab('OUT'), 'Writing %s\n', temp_out);
+                ncid = netcdf.create(temp_out, 'NC_CLOBBER'); % overwrite existing
+            else
+                logtext(atmlab('OUT'), 'Appending to %s\n', fn);
+                temp_out = uncompress(fn, atmlab('WORK_AREA'), struct('unidentified', 'error'));
+                ncid = netcdf.open(temp_out, 'WRITE');
+                netcdf.reDef(ncid); % put in header define mode
+            end
             cleanupObj = onCleanup(@() self.cleanup(temp_out, ncid));
             
-            %% define the dimensions
-            
-            dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
-            
-            %% put global attributes
-            
-            global_atts = struct();
-            global_atts.Conventions = 'CF-1.4';
-            global_atts.title = 'Collocations';
-            global_atts.date = iso_timestamp();
-            global_atts.institution = ['Department of Computer Science, Electrical and Space Engineering, Division of Space Technology, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden'];
-            global_atts.source = 'Collocation codes, part of atmlab';
-            global_atts.references = 'Holl et al.  (2010); John et al. (2012)';
-            global_atts.software_version = atmlab_version;
-            global_atts.id = [atmlab_version() ' -- ' iso_timestamp() ' -- ' fn];
-
-            % add caller-contributed ones
-            warning('off', 'catstruct:DuplicatesFound');
-            global_atts = catstruct(global_atts, info);
-            warning('on', 'catstruct:DuplicatesFound');
-            addncattributes(ncid, global_atts)
+            if newfile
+                % define the dimensions
+                
+                dim_collocs = netcdf.defDim(ncid, 'Collocations', ncollocs);
+                
+                % put global attributes
+                
+                global_atts = struct();
+                global_atts.Conventions = 'CF-1.4';
+                global_atts.title = 'Collocations';
+                global_atts.date = iso_timestamp();
+                global_atts.institution = ['Department of Computer Science, Electrical and Space Engineering, Division of Space Technology, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden'];
+                global_atts.source = 'Collocation codes, part of atmlab';
+                global_atts.references = 'Holl et al.  (2010); John et al. (2012)';
+                global_atts.software_version = atmlab_version;
+                global_atts.id = [atmlab_version() ' -- ' iso_timestamp() ' -- ' fn];
+                
+                % add caller-contributed ones
+                warning('off', 'catstruct:DuplicatesFound');
+                global_atts = catstruct(global_atts, info);
+                warning('on', 'catstruct:DuplicatesFound');
+                addncattributes(ncid, global_atts)
+            else
+                dim_collocs = netcdf.inqDimID(ncid, 'Collocations');
+            end
             
             %% define variables, variable attributes, additional dimensions
             
-            vars = fieldnames(self.cols);
+            vars = fieldnames(localcols);
             
             varids = zeros(size(vars));
             dims = struct();
@@ -259,11 +315,24 @@ classdef HomemadeDataset < SatDataset
                     thisdim = dim_collocs;
                 end
                 % define variable and put attributes
-                varid = netcdf.defVar(ncid, varname, type, thisdim);
-                varids(j) = varid;
-                for k = fieldnames(atts)'
-                    netcdf.putAtt(ncid, varid, k{1}, atts.(k{1}));
+                try
+                    % if this doesn't fail, the variable already exists
+                    [~] = netcdf.inqVarID(ncid, varname);
+                    varids(j) = -1;
+                catch ME
+                    switch ME.identifier
+                        case 'MATLAB:imagesci:netcdf:libraryFailure'
+                            varid = netcdf.defVar(ncid, varname, type, thisdim);
+                            varids(j) = varid;
+                            for k = fieldnames(atts)'
+                                netcdf.putAtt(ncid, varid, k{1}, atts.(k{1}));
+                            end
+                            
+                        otherwise
+                            ME.rethrow();
+                    end
                 end
+
             end
             
             %% write data
@@ -280,29 +349,36 @@ classdef HomemadeDataset < SatDataset
                 
                 for j = 1:length(vars(:).')
                     varname = vars{j};
-                    fprintf(atmlab('OUT'), '%s ', varname);
                     
                     varid = varids(j);
-                    if any(any(~isfinite(data(:, self.cols.(varname)))))
+                    if varid == -1
+                        fprintf(atmlab('OUT'), '(not: %s) ', varname);
+                        continue
+                    end
+                    
+                    fprintf(atmlab('OUT'), '%s ', varname);
+                    if any(any(~isfinite(data(:, localcols.(varname)))))
                         if ~isfield(self.members.(varname).atts, 'missing_value')
                             error(['atmlab:' mfilename ':missingmissing'], ...
                                 ['I found nonfinite values for field %s, ' ...
-                                 'but no missing_value is defined for ' ...
-                                 '%s.members.%s.atts.missing_value. Please define.'], ...
-                                 varname, self.name, varname);
+                                'but no missing_value is defined for ' ...
+                                '%s.members.%s.atts.missing_value. Please define.'], ...
+                                varname, self.name, varname);
                         end
-                        data(any(~isfinite(data(:, self.cols.(varname)))), self.cols.(varname)) = self.members.(varname).atts.missing_value;
+                        data(any(~isfinite(data(:, localcols.(varname)))), localcols.(varname)) = self.members.(varname).atts.missing_value;
                     end
-                    netcdf.putVar(ncid, varid, data(:, self.cols.(varname)));
+                    netcdf.putVar(ncid, varid, data(:, localcols.(varname)));
                 end
                 fprintf(atmlab('OUT'), '\n');
             end
             
             logtext(atmlab('OUT'), 'Finalising\n');
-            logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', [fn '.gz']);
+            logtext(atmlab('OUT'), 'Gzipping to %s and removing uncompressed\n', fn);
             netcdf.close(ncid);
             gzipped_filename = gzip(temp_out, outdir);
-            movefile(gzipped_filename{1}, [fn '.gz']);
+            if ~isequal(gzipped_filename{1}, fn)
+                movefile(gzipped_filename{1}, fn);
+            end
             logtext(atmlab('OUT'), 'Done\n');
             
         end
@@ -344,7 +420,7 @@ classdef HomemadeDataset < SatDataset
             end
         end
         
-        function nbytes = linesize(self)
+        function nbytes = linesize(self, localcols)
             % Calculate the stored size (in bytes) per collocation
             nbytes = 0;
             sizes = struct(...
@@ -353,10 +429,10 @@ classdef HomemadeDataset < SatDataset
                 'short', 2, ...
                 'int', 4, ...
                 'byte', 1);
-            fields = fieldnames(self.cols);
+            fields = fieldnames(localcols);
             for f = vec2row(fields)
                 tp = self.members.(f{1}).type;
-                width = length(self.cols.(f{1}));
+                width = length(localcols.(f{1}));
                 nbytes = nbytes + sizes.(tp) * width;
             end
         end

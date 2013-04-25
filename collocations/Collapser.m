@@ -242,29 +242,43 @@ classdef Collapser < AssociatedDataset
     methods (Access = {?SatDataset})
         %% implementation abstract methods
         
-        function args = primary_arguments(~)
+        function args = primary_arguments(~, ~)
             args = {};
         end
         
-        function args = secondary_arguments(~)
+        function args = secondary_arguments(~, ~)
             args = {};
         end
         
-        function bool = needs_primary_data(~)
+        function bool = needs_primary_data(~, ~)
             bool = false;
         end
         
-        function bool = needs_secondary_data(~)
+        function bool = needs_secondary_data(~, ~)
             bool = false;
         end
         
-        function M = process_granule(self, processed_core, ~, ~, ~, ~, ~, ~, deps)
+        function fields = fields_needed_for_dependency(self, fields, ~)
+            fields = unique(struct2cell(structfun(@(e) safegetfield(e, 'orig_name', ''), getfields(self.members, fields{:}), 'UniformOutput', false)));
+            fields = fields(~cellfun(@isempty, fields));
+        end
+        
+        function [M, localcols] = process_granule(self, processed_core, ~, ~, ~, ~, ~, ~, deps, deps_cols, memnames)
             
             
             M_data = deps{1};
-                        
+%             deps_cols = cell2struct(deps_cols, cellfun(@(X) X.name, self.dependencies, 'UniformOutput', false), 2);
+%            deps_cols = deps_cols{1};
+            cols_data = deps_cols{1};
+            
             %%%
-
+            
+            % Nomenclature note:
+            %
+            % - member is one geophysical quantity, e.g. IWP, LWP, etc.
+            % - field is a resulting collapsed quantity, e.g. MEAN_IWP,
+            % NO_LWP, etc.
+            
             % check that sizes are the same
             assert(size(processed_core, 1)==size(M_data, 1), ...
                 ['atmlab:' mfilename ':SizeError'], ...
@@ -279,7 +293,14 @@ classdef Collapser < AssociatedDataset
             lasts = [firsts(2:end)-1; size(processed_core, 1)];
             
             % put sizes in self.members in order to get self.cols
-            memnames = fieldnames(self.members);
+            rqre_subset(memnames, fieldnames(self.members));
+            if isequal(memnames, 'all')
+                memnames = fieldnames(self.members);
+            else
+                memnames = intersect(fieldnames(self.members), memnames);
+                memnames = union(memnames, {'FIRST', 'LAST'});
+            end
+            
             for mi = 1:length(memnames)
                 memname = memnames{mi};
                 % special cases 'FIRST' and 'LAST' don't have any
@@ -300,11 +321,20 @@ classdef Collapser < AssociatedDataset
 %                     self.members.(memname).origin.members.(mem.orig_name), ...
 %                     self.members.(memname));
 %                 warning(w);
+                fields{mi} = self.members.(memname).orig_name;
             end
             %self.members2cols();
-            self.set_cols_from_bro();
+            fields = unique(fields(~cellfun(@isempty, fields)));
+            localcols = self.get_cols_from_bro(memnames, deps_cols);
+%             if isequal(fields, 'all');
+%                 fields = fieldnames(self.fieldstruct);
+%                 self.set_cols_from_bro();
+%                 localcols = self.cols;
+%             else
+%                 localcols = self.get_cols_from_bro(fields, deps_cols);
+%             end
             
-            nfields = max(cell2mat(struct2cell(self.cols).'));
+            nfields = max(cell2mat(struct2cell(localcols).'));
             
             % this flag is only used until the end of the function.  It signals
             % that the collapser gave no data for a particular footprint, but
@@ -316,14 +346,16 @@ classdef Collapser < AssociatedDataset
             % some valid footprints) but the data are not (i.e. individual
             % limitators return nothing or data are flagged to begin with), data
             % are set to missing_value.
-            flag = -realmax(); % hopefully, no real data has this value!
-            M = flag*ones(size(uniques, 1), nfields);
+            flag_notset = -realmax(); % hopefully, no real data has this value!
+            flag_globlimfailed = .9*-realmax();
+            flag_allflagged = +realmax();
+            M = flag_notset*ones(size(uniques, 1), nfields);
             
             % cache some things outside the loops to speed it up a bit
             % (done with profiler; code in this loop may be executed
             % millions of types for processing a single day)
             
-            fields = fieldnames(self.fieldstruct);
+            %fields = fieldnames(self.fieldstruct);
             n_overall_limitators = length(self.overall_limitators);
             has_overall_limitators = n_overall_limitators>0;
             answers = cell(1, n_overall_limitators);
@@ -345,7 +377,8 @@ classdef Collapser < AssociatedDataset
             
             % keep track of time for logging purposes (progress etc.)
             t = 0;
-            logtext(atmlab('OUT'), 'Processing %d primary footprints\n', size(uniques, 1));
+            logtext(atmlab('OUT'), 'Processing %d primary footprints, %d fields, %d total stats, %d values/collocation\n', ...
+                size(uniques, 1), length(fields), length(memnames), nfields);
             j = 0; % counter increases only when there is data
             for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
                 tic;
@@ -360,9 +393,9 @@ classdef Collapser < AssociatedDataset
                 if ~has_overall_limitators;
                     lim_for_all_fields = true(size(M_data_part, 1), 1);
                 else
-                    % 2nd version is much faster.  This is still often the
+                    % 2nd version is much faster.  This was still often the
                     % slowest part of the function, applying the overall
-                    % limitators.
+                    % limitators, for cases with few fields.
                     %answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
                     for ii = 1:n_overall_limitators
                         answers{ii} = flat(self.overall_limitators{ii}(M_coll_part));
@@ -370,12 +403,15 @@ classdef Collapser < AssociatedDataset
 
                     lim_for_all_fields = all(horzcat(answers{:}), 2);
                     if ~any(lim_for_all_fields)
+                        M(j, :) = flag_globlimfailed;
                         continue
                     end
                 end
                 
-                M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
-                M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
+%                 M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
+%                 M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
+                M(j, localcols.FIRST) = processed_core(first, cd.cols.INDEX);
+                M(j, localcols.LAST) = processed_core(last, cd.cols.INDEX);
                
                 % for each field, apply limitations and call processing
                 % function on sub-limited set, if any are actually left
@@ -401,7 +437,8 @@ classdef Collapser < AssociatedDataset
                         
                         for li = 1:length(limmers)
                             limmer = limmers{li};
-                            limhere = limmer(M_source(:, self.fieldstruct.(fname).origin.cols.(fname)));
+%                             limhere = limmer(M_source(:, self.fieldstruct.(fname).origin.cols.(fname)));
+                            limhere = limmer(M_source(:, cols_data.(fname)));                            
                             limsel = limsel(:) & limhere(:);
                         end
                     end
@@ -412,31 +449,44 @@ classdef Collapser < AssociatedDataset
                         % place
                         for pi = 1:length(procnames)
                             procname = procnames{pi};
+                            if ~isfield(localcols, [procname '_' fname])
+                                % probably processor is already there; in
+                                % any case, it was not asked for
+                                continue
+                            end
                             %proccer = self.fieldstruct.(fname).processors.(procname);
-                            capsed = proccers{k}{pi}(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
-                            if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
+%                             capsed = proccers{k}{pi}(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
+                            capsed = proccers{k}{pi}(M_source(limsel, cols_data.(fname)));
+                         
+                            %if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
+                            if ~isequal(size(capsed), [1, length(localcols.([procname '_' fname]))])                                
                                 error(['atmlab:' mfilename ':mismatch'], ...
                                 ['Error in collapsing %s %s %s. Processor ', ...
                                  'returned wrongly-sized field. Got [%d, %d]. ', ...
                                  'Expected [%d, %d].'], ...
                                 self.name, fname, procname, size(capsed, 1), ...
-                                size(capsed, 2), 1, length(self.cols.([procname '_' fname])));
+                                size(capsed, 2), 1, length(localcols.([procname '_' fname])));
+%                                size(capsed, 2), 1, length(self.cols.([procname '_' fname])));                            
                             end
-                            M(j, self.cols.([procname '_' fname])) = capsed;
+                            M(j, localcols.([procname '_' fname])) = capsed;
+%                            M(j, self.cols.([procname '_' fname])) = capsed;                            
                             anyvalidfields = true;
                         end
                     else
                         % set all processors for this field to missing_val
                         for pi = 1:length(procnames)
                             procname = procnames{pi};
-                            M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
-                        end                        
+                            if isfield(localcols, [procname '_' fname])
+                                %M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
+                                M(j, localcols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
+                            end
+                        end
                     end
                 end
                 % remove if any are valid at all
                 % FIXME: make this optional
                 if ~anyvalidfields
-                    M(j, :) = flag;
+                    M(j, :) = flag_allflagged;
                 end
                 t = t + toc;
                 if t > 600
@@ -448,7 +498,8 @@ classdef Collapser < AssociatedDataset
             
             % remove remaining part of M, e.g. where I did too much
             % pre-allocation or no relevant data was found
-            rest = all(M==flag, 2);
+            rest = all(M==flag_globlimfailed, 2);
+            % FIXME: what to do with the other flags?
             M(rest, :) = [];
             logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
                 size(processed_core, 1), size(M, 1));
@@ -544,23 +595,41 @@ classdef Collapser < AssociatedDataset
             % it belongs to has always been processed already, so from its
             % cols-structure can be inferred all the expected sizes.  Use
             % this to set or update the local cols-structure.
+            self.cols = self.get_cols_from_bro(self, fieldnames(self.members));
+        end
+        
+        function cc = get_cols_from_bro(self, members, deps_cols)
+            % get cols-structure based on brothers cols
+            %
+            % When a collapsed dataset is processed, the AssociatedDataset
+            % it belongs to has always been processed already, so from its
+            % cols-structure can be inferred all the expected sizes.  Use
+            % this to set or update the local cols-structure.
             n = 1;
-            fields = fieldnames(self.members);
-            for i = 1:length(fields)
-                field = fields{i};
+            for i = 1:length(members)
+                field = members{i};
                 if isfield(self.members.(field), 'origin') && ...
-                  ~(isfield(self.members.(field), 'profile') && self.members.(field).profile==false)
+                        ~(isfield(self.members.(field), 'profile') && self.members.(field).profile==false)
                     % if it has an origin, it should have an orig_name
-                    ncols = length(self.members.(field).origin.cols.(self.members.(field).orig_name));
+                    if isempty(fieldnames(self.members.(field).origin.cols))
+                        ncols = length(deps_cols{...
+                            strcmp(self.members.(field).origin.name, ...
+                                cellfun(@(X) X.name, ...
+                                    self.dependencies, ...
+                                    'UniformOutput', false))}.(self.members.(field).orig_name));
+                    else
+                        ncols = length(self.members.(field).origin.cols.(self.members.(field).orig_name));
+                    end
                     % FIXME/TODO: should reuse existing dimension names...
                     self.members.(field).dims = {sprintf('HEIGHT_%s', field), ncols};
                 else % should be FIRST, LAST... ncols==1
                     ncols = 1;
                 end
-                self.cols.(field) = n:(n+ncols-1);
+                cc.(field) = n:(n+ncols-1);
                 n = n + ncols;
             end
         end
+        
     end
     
 end

@@ -77,6 +77,8 @@ classdef AssociatedDataset < HomemadeDataset
         % Contains a collection of other AssociatedDataset objects that
         % need to be considered first. For example, to process a
         % <a href="matlab:help Collapser">Collapser</a>, one first needs a <a href="matlab:help FieldCopier">FieldCopier</a>.
+        %
+        % See also method fields_needed_for_dependency.
         dependencies;
     end
     
@@ -147,7 +149,7 @@ classdef AssociatedDataset < HomemadeDataset
     methods (Access = {?SatDataset})
         %% implement new methods
         
-        function out = process_delayed(self, processed_core, spec1, spec2, varargin)
+        function [out, localcols] = process_delayed(self, processed_core, spec1, spec2, varargin)
             % process associated data when core data is already there
             %
             % Sometimes, core collocations already exist, but one or more
@@ -178,13 +180,23 @@ classdef AssociatedDataset < HomemadeDataset
             %
             %       Contains output for all previous dependencies.
             %
+            %   depcols             cell array
+            %
+            %       Contains column-descriptions for depies
+            %
+            %   fields              cell array or 'all'
+            %
+            %       Contains fields that are to be processed.
+            %
             % OUT
             %
             %   out                 matrix
             %
             %       Data matrix with columns described by self.cols
+            %
+            %   localcols           structure, describes columns of 'out'
  
-            depies = optargs(varargin, {{}});
+            [depies, depcols, fields] = optargs(varargin, {{}, {}, 'all'});
             % data checks
             errid = ['atmlab:' mfilename ':InvalidFormat'];
             errmes = ['Data are not properly sorted: %s %s field %s has descending elements.  ' ...
@@ -242,51 +254,32 @@ classdef AssociatedDataset < HomemadeDataset
                     primseg = primseg + 1;
                     [dv{1:6}] = unixsecs2date(processed_core(newprim(primseg), self.parent.cols.START1));
                     date1 = cell2mat(dv);
-                    if self.needs_primary_data()
-                        data1 = self.parent.primary.read_granule(date1, spec1, self.primary_arguments(), false, false);
+                    if self.needs_primary_data(fields)
+                        data1 = self.parent.primary.read_granule(date1, spec1, self.primary_arguments(fields), false, false);
                     end
                 end
                 if seconseg<length(newsec) && segstart == newsec(seconseg+1)
                     seconseg = seconseg + 1;
                     [dv{1:6}] = unixsecs2date(processed_core(newsec(seconseg), self.parent.cols.START2));
                     date2 = cell2mat(dv);
-                    if self.needs_secondary_data()
-%                         try
-                            data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(), false, false);
-%                             local_success = true;
-%                         catch ME
-%                             switch ME.identifier
-%                                 case 'atmlab:find_granule_by_datetime'
-%                                     logtext(atmlab('ERR'), ...
-%                                         'Problem finding associated %s %s %s: %s\n', ...
-%                                         self.parent.secondary.name, ...
-%                                         mat2str(date2), ...
-%                                         spec2, ...
-%                                         ME.message);
-%                                     error('ERROR ERROR'); % temporarily here
-%                                     % fill with nans
-%                                     local_success = false;
-%                                     rows = segstart:segend;
-%                                     cls = 1:max(structfun(@max, self.cols));
-%                                 otherwise
-%                                     ME.rethrow();
-%                             end
-%                         end
-                                        
+                    if self.needs_secondary_data(fields)
+                        data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(fields), false, false);
                     end
                 end
-%                 if local_success
-                    depies_seg = cellfun(@(X)X(segstart:segend, :), depies, 'UniformOutput', false);
-                    new_out = self.process_granule(processed_core(segstart:segend, :), data1, date1, spec1, data2, date2, spec2, depies_seg);
-%                 else
-%                     new_out = nan * zeros(length(rows), length(cls));
-%                 end
+                %                 if local_success
+                depies_seg = cellfun(@(X)X(segstart:segend, :), depies, 'UniformOutput', false);
+                [new_out, localcols] = self.process_granule(...
+                    processed_core(segstart:segend, :), data1, date1, ...
+                    spec1, data2, date2, spec2, depies_seg, depcols, ...
+                    fields);
+                %                 else
+                %                     new_out = nan * zeros(length(rows), length(cls));
+                %                 end
                 if isempty(out)
                     out = new_out;
                 else
                     out = [out; new_out]; %#ok<AGROW>
                 end
-                % reset data1/data2 to empty structs to be sure not to
             end
         end
                 
@@ -458,21 +451,21 @@ classdef AssociatedDataset < HomemadeDataset
         %
         % FORMAT
         %
-        %   args = ad.primary_arguments()
+        %   args = ad.primary_arguments(fields)
         %
         % IN
         %
-        %   nothing
+        %   cell array of strings with fields or 'all' (default)
         %
         % OUT
         %
         %   cell array with arguments passed on to primary reader.
-        args = primary_arguments(self)
+        args = primary_arguments(self, varargin)
         
         % Arguments to pass on to secondary reader
         %
         % See <a href="matlab:help AssociatedDataset/primary_arguments">primary_arguments</a>.
-        args = secondary_arguments(self)
+        args = secondary_arguments(self, varargin)
         
         % Whether primary data is used at all.
         %
@@ -483,21 +476,22 @@ classdef AssociatedDataset < HomemadeDataset
         %
         % FORMAT
         %
-        %   reread = ad.needs_primary_data()
+        %   reread = ad.needs_primary_data('all')
         %
         % IN
         %
-        %   nothing
+        %   optionally, cell array of strings with fields; defaults to
+        %   'all'
         %
         % OUT
         %
         %   logical scalar (boolean), true if data must be reread
-        bool = needs_primary_data(self)
+        bool = needs_primary_data(self, varargin)
         
         % Whether secondary data is used at all
         %
         % See <a href="matlab:help AssociatedDataset/needs_primary_data">needs_primary_data</a>.
-        bool = needs_secondary_data(self)
+        bool = needs_secondary_data(self, varargin)
 
         % Process a single granule
         %
@@ -547,8 +541,25 @@ classdef AssociatedDataset < HomemadeDataset
         %       <a href="matlab:help AssociatedDataset">AssociatedDataset</a>. For example, for a <a href="matlab:help Collapser">Collapser</a>
         %       it will contain a single element with the output of
         %       FieldCopier.process_granule.
-        out = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies)
+        %
+        %   depcols         cell array of structures describing columns of
+        %                   dependencies
+        %
+        %   fields          cell array
+        %
+        %       Fields to process.  'all' for all fields (only way until
+        %       recently)
+        %
+        %  OUT
+        %
+        %   data        Matrix containing data
+        %
+        %   localcols   Cols describing columns.  If all fields, this is
+        %               simply self.cols.
+        [out, localcols] = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, dependencies, depcols, fields)
         %store(self, date, spec, result)
+        
+        fields = fields_needed_for_dependency(self, fields, dependency)
     end
     
 end
