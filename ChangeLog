@@ -1,5 +1,14 @@
 2013-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-339
+
+	* arts/qarts2cfile.m: Changed to use named version for GIN
+	variables, for some WSM calls.
+
+	(cfile_Absrpt): Added Ignore(rtp_pnd) to propmat_clearsky_agenda.
+
+2013-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-338
 
 	* atmlab/atmlab_init.m: Added new folder.
@@ -28,14 +37,14 @@
 	(collocate_and_store_date):
 
 	- In additional to "do not overwrite" and "do overwrite", implement
-	"extend", triggered by overwrite = 2.  
+	"extend", triggered by overwrite = 2.
 
 	(collocate_and_store_date_range): Tiny change
 
 	(read): Ignore unused deal_index
 
 	(collocate):
-	
+
 	- Ignore unused lon_grid1
 
 	- %#OK<AGROW> where I'm actually pre-allocating in a smart way.

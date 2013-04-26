@@ -353,9 +353,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
       rqre_datatype( Q.RAW_ATM_EXPAND_1D, @isboolean, ...                   %&%
                                                    'Q.RAW_ATM_EXPAND_1D' ); %&%
     end                                                                     %&%
-    T{end+1} = sprintf( ...
-       'AtmRawRead(t_field_raw,z_field_raw,vmr_field_raw,abs_species,"%s")',...
-                                                        Q.RAW_ATMOSPHERE );
+    T{end+1} = sprintf( 'AtmRawRead(basename="%s")', Q.RAW_ATMOSPHERE );
     if qarts_isset( Q.RAW_ATM_EXPAND_1D ) & Q.RAW_ATM_EXPAND_1D
       T{end+1} = 'AtmFieldsCalcExpand1D';
     else
@@ -550,7 +548,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
       T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-                'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+                'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_pnd)', ...
                 'propmat_clearskyInit', 'propmat_clearskyAddOnTheFly' } );
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
@@ -589,7 +587,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       T{end+1} = 'abs_xsec_agenda_checkedCalc';
       T{end+1} = 'abs_lookupCalc'; 
       T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-          'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+          'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_pnd)', ...
           'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       %
       abstable = true;
@@ -600,7 +598,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
       T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-           'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+           'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_pnd)',...
            'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       %
       abstable = true;
@@ -917,12 +915,8 @@ function T = cfile_Sensor( Q, partname, workfolder )
         if ~( isnumeric(v) & isvector(v) & length(v) == 2 )                 %&%
           error( 'The sensor *FILL_FGRID* must be a vector of length 2.' ); %&%
         end                                                                 %&%
-        U{end+1} = 'sensor_responseFillFgrid( sensor_response,'; 
-        U{end+1} = '   sensor_response_f,sensor_response_pol,';
-        U{end+1} = '   sensor_response_za, sensor_response_aa,';
-        U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
-        U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
-        U{end+1} = sprintf( '   %d,%d)', v(1), v(2) );
+        U{end+1} = sprintf( ...
+           'sensor_responseFillFgrid(polyorder=%d,nfill=%d)', v(1), v(2) );
        
       case 'polarisation'
         if qarts_isset( H.SENSOR_POL )
@@ -978,13 +972,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
           error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );%&%
           end                                                               %&%
           U{end+1} = 'sensor_responseBackendFrequencySwitching(';
-          U{end+1} = '   sensor_response,'; 
-          U{end+1} = '   sensor_response_f,sensor_response_pol,';
-          U{end+1} = '   sensor_response_za,sensor_response_aa,';
-          U{end+1} = '   sensor_response_f_grid,sensor_response_pol_grid,';
-          U{end+1} = '   sensor_response_za_grid,sensor_response_aa_grid,';
-          U{end+1} = '   f_backend,backend_channel_response,sensor_norm,';
-          U{end+1} = sprintf( '   %.6e,%.6e)', df(1), df(2) );
+          U{end+1} = sprintf( '   df1=%.6e, df2=%.6e)', df(1), df(2) );
         end
         
        case 'multimixer'
@@ -1480,10 +1468,8 @@ function T = cfile_CldBox( Q, partname, workfolder )
       end
       %
       T{end+1} = 'ParticleTypeAdd(';
-      T{end+1} = '   scat_data_raw,pnd_field_raw,atmosphere_dim,f_grid,';
-      T{end+1} = '   p_grid,lat_grid,lon_grid,cloudbox_limits,';
-      T{end+1} = sprintf('   "%s","%s"', sfile, pfile );
-      T{end+1} = ')';
+      T{end+1} = sprintf('   filename_scat_data="%s",',sfile );
+      T{end+1} = sprintf('   filename_pnd_field="%s")',pfile );
     end
     %
     if do_pfCALC 
