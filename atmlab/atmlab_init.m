@@ -48,6 +48,7 @@ addpath( fullfile( toppath, 'math' ) );
 addpath( fullfile( toppath, 'handy' ) ); 
 addpath( fullfile( toppath, 'h2o', 'parametrisations' ) ); 
 addpath( fullfile( toppath, 'h2o', 'thermodynamics' ) ); 
+addpath( fullfile( toppath, 'gridcreation', 'uniformsphere' ) ); 
 addpath( fullfile( toppath, 'gridcreation', 'annealing' ) ); 
 addpath( fullfile( toppath, 'gridcreation' ) ); 
 addpath( fullfile( toppath, 'graphs' ) );

@@ -236,7 +236,7 @@ elseif strcmp( lower(method), 'doit' )
 elseif strcmp( lower(method), 'fos' )
   %
   C.METHOD                        = 'FOS';
-  Q.IY_MAIN_AGENDA                = { 'iyFOS', 'Touch(ppath)' };
+  Q.IY_MAIN_AGENDA                = { 'iyFOS(fos_n=0)' };
 
 elseif strcmp( lower(method), 'tr' )
   %

@@ -1,3 +1,14 @@
+2013-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-338
+
+	* atmlab/atmlab_init.m: Added new folder.
+
+	* gridcreation/uniformsphere: Added this folder, with a set of
+	functions to generate points giving an uniform sampling of a
+	sphere. The functions are taken from the Matlab central. See
+	Contents.m.
+
 2013-04-25	Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-337
