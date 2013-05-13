@@ -1,9 +1,15 @@
+2013-05-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* h2o/parametrisations/eps_water_liebe93.m: Removed alternative,
+	inactive, version. Added comment explaining why result deviates
+	slightly from epswater93.
+
 2013-04-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-340
 
 	* arts/qarts2cfile.m: Partly reverted last commit, following
-	changes in arts. 
+	changes in arts.
 
 2013-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 

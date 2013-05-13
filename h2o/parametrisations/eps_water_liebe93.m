@@ -21,41 +21,19 @@
 
 function e = eps_water_liebe93( f, t )
 
-source = 'paper';
+% Expressions directly from the Liebe 93 paper
 
-switch source
+theta = 300 ./ t;
+fghz  = f/1e9;
 
-  % Expressions directly from the Liebe 93 paper
-  case 'paper'
-    %
-    theta = 300 ./ t;
-    fghz  = f/1e9;
-    %
-    e0 = 77.66 + 103.3 * ( theta - 1 );
-    e1 = 0.0671 * e0;
-    e2 = 3.52;
-    %
-    g1 = 20.2 - 146 * ( theta -1 ) + 316 * ( theta -1 ).^2;
-    g2 = 39.8 * g1;
-    %
-    e  = e0 - fghz .* ( (e0-e1)./(fghz+i*g1) + (e1-e2)./(fghz+i*g2) );
+e0 = 77.66 + 103.3 * ( theta - 1 );
+e1 = 0.0671 * e0;
+e2 = 3.52;
 
+g1 = 20.2 - 146 * ( theta -1 ) + 316 * ( theta -1 ).^2;
+g2 = 39.8 * g1;
 
-  % Corrected expressions from the WATS report, provided by T. Kuhn
-  case 'wats'
-    %  
-    theta = 300 ./ t;
-    fghz  = f/1e9;
-    %
-    e0 = 77.66 + 103.3 * ( theta - 1 );
-    e1 = 0.0671 * e0;
-    e2 = 3.52;
-    %
-    g1 = 20.2 - 146 * ( theta -1 ) + 316 * ( theta -1 ).^2;
-    g2 = 39.8 * g1;
-    %
-    a  = (e0-e1)./(fghz.^2+g1.^2);
-    b  = (e1-e2)./(fghz.^2+g2.^2);   % The report says g1 here. Wrong!
-    %
-    e  = e0 - fghz.^2 .* ( a +b ) + i * fghz .* ( g1*a + g2*b );
-end
+% epswater93 uses 146.4, but the 1993 paper says just 146
+% With 146.4 exactly the same results are obtained.
+
+e  = e0 - fghz .* ( (e0-e1)./(fghz+i*g1) + (e1-e2)./(fghz+i*g2) );
