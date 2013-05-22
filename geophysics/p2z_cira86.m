@@ -28,15 +28,18 @@ if any(lat)>90 | any(lat<-90)                                      %&%
    error('latitude range is -90 to 90')                            %&%
 end                                                                %&%
 
+% Create a a mjd matching the given doy (ie. the inverse of mjd2doy)
+mjd = date2mjd( 2000, 1, 1, 0, 0, 0 ) + doy - 1;
+
 
 cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
                                                                'cira86.z.xml' );
 
 G = gf_artsxml( cira86, 'CIRA86', 'z_field' );
 
-G = atmdata_regrid( G, { p, lat, 0, doy } );
+G = atmdata_regrid( G, { p, lat, 0, mjd } );
 
-if length(doy) > 1
+if length(mjd) > 1
   z = reshape( G.DATA, [size(G.DATA,1), size(G.DATA,2), size(G.DATA,4)] );
 else
   z = G.DATA;
@@ -47,9 +50,9 @@ if nargout > 1
                                                                'cira86.t.xml' );
   G = gf_artsxml( cira86, 'CIRA86', 't_field' );
 
-  G = atmdata_regrid( G, { p, lat, 0, doy } );
+  G = atmdata_regrid( G, { p, lat, 0, mjd } );
 
-  if length(doy) > 1
+  if length(mjd) > 1
     t = reshape( G.DATA, [size(G.DATA,1), size(G.DATA,2), size(G.DATA,4)] );
   else
     t = G.DATA;

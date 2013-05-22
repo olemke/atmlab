@@ -1,3 +1,22 @@
+2013-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-345
+
+	* Yes, there was a bug, but in a different way. atmdata_regrid
+	takes only MJD is input date format (actually mentioned in
+	header). The problem was that the cira86 functions sent in doy.
+	Fixed and added a warning that hopefully shall catch bad usage in
+	the future. (Discussed with Salomon before committing.)
+
+	To be clear, the cira functions returned before data for doy-44.
+	Sorry about that.
+
+	* geophysics/z2p_cira86.m:
+	* geophysics/p2z_cira86.m: MJD now sent to atmdata_regrid.m.
+
+	* gformat/atmdata_regrid.m: Reverted Salomon's change. Added a
+	warning, triggered if input days appear strange.
+
 2013-05-22  Mathias Milz  <mathias.milz@ltu.se>
 
 	* atmlab-2-1-344 
@@ -17,17 +36,18 @@
 	output from mjd2doy(doy) appears to be always doy-44, i.e. the day
 	was silently shifted. I sent an email to atmlab_dev about this
 
-	* time/mjd2doy.m: Make sure the input date is always double 
+	* time/mjd2doy.m: Make sure the input date is always double
 
 	* geoplots/gmt/create_gmt_earth.m: small update
 
 	* geoplots/gmt/test_gmt.m: Added another test and completely
 	restructured function to make it easier to add new tests.
 
-	* geoplots/gmt/gmt_plot.m:
-	- Rearranged order of subfunctions. Made some other changes to the defaults
+	* geoplots/gmt/gmt_plot.m: - Rearranged order of subfunctions.
+	Made some other changes to the defaults
 
-	* datasets/define_datasets.m: explictly set types for cloud_cci fieldcopiers
+	* datasets/define_datasets.m: explictly set types for cloud_cci
+	fieldcopiers
 
 	* datasets/dardarsub_postprocessor.m: Added narginck
 

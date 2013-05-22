@@ -28,12 +28,14 @@ if any(lat)>90 || any(lat<-90)                                     %&%
    error(['atmlab:' mfilename],'latitude range is -90 to 90')      %&%
 end                                                                %&%
 
+% Create a a mjd matching the given doy (ie. the inverse of mjd2doy)
+mjd = date2mjd( 2000, 1, 1, 0, 0, 0 ) + doy - 1;
 
 cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
                                                                'cira86.z.xml' );
 
 G    = gf_artsxml( cira86, 'CIRA86', 'z_field' );
-G    = atmdata_regrid( G, { G.GRID1, lat, 0, doy } );
+G    = atmdata_regrid( G, { G.GRID1, lat, 0, mjd } );
 Z    = G.DATA;
 p    = zeros( length(z), size(Z,2), size(Z,4) );
 logp = log( G.GRID1 );
@@ -43,19 +45,19 @@ if nargout > 1
   cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
                                                                'cira86.t.xml' );
   G = gf_artsxml( cira86, 'CIRA86', 't_field' );
-  G = atmdata_regrid( G, { G.GRID1, lat, 0, doy } );
+  G = atmdata_regrid( G, { G.GRID1, lat, 0, mjd } );
   T = G.DATA;
   t = zeros( length(z), size(T,2), size(T,4) );
 end
 
 for ilat = 1 : size(Z,2)
-  for idoy = 1 : size(Z,4)
+  for imjd = 1 : size(Z,4)
     if nargout < 2
-      p(:,ilat,idoy) = exp( interp1( Z(:,ilat,1,idoy), logp, z ) );  
+      p(:,ilat,imjd) = exp( interp1( Z(:,ilat,1,imjd), logp, z ) );  
     else
-      pnew           = interp1( Z(:,ilat,1,idoy), logp, z );  
-      t(:,ilat,idoy) = interp1( logp, T(:,ilat,1,idoy), pnew );  
-      p(:,ilat,idoy) = exp( pnew );  
+      pnew           = interp1( Z(:,ilat,1,imjd), logp, z );  
+      t(:,ilat,imjd) = interp1( logp, T(:,ilat,1,imjd), pnew );  
+      p(:,ilat,imjd) = exp( pnew );  
     end
   end
 end

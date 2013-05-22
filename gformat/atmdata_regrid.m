@@ -47,12 +47,17 @@ end
 %- Handle day formats
 %
 if length(grids) >= 4 
+  % Trigger warning if doy or datenum (with std. pivot year) are used
+  if min(grids{4}) < 370 |  max(grids{4}) > 250e3                           %&%
+    warning('Suspicious day data found! Dates (in *grids*) should use MJD.')%&%
+  end                                                                       %&%
+  %
   [maxdim,i] = max( [G.DIM] );
   if maxdim >= 4
     tformat = lower( G(i).GRID4_NAME );
-    if strcmp( tformat, 'doy' )
+    if strcmp( tformat, 'mjd' )
       %
-    elseif strcmp( tformat, 'mjd' )
+    elseif strcmp( tformat, 'doy' ) 
       grids{4} = mjd2doy( grids{4} );
     elseif strcmp( tformat, 'datenum' )
       [ye,mo,da,ho,mi,se] = mjd2date( grids{4} );
