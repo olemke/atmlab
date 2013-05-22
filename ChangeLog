@@ -1,3 +1,12 @@
+2013-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-346
+
+	* datasets/+satreaders/grasdir.m: Added
+
+	- Read full directory of GRAS occultations as if it were a single
+	granule.  First version, work in progress but basics appear to work.
+
 2013-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-345
