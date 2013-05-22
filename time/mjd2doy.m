@@ -17,6 +17,9 @@ function d = mjd2doy(mjd)
                                                                             %&%
 rqre_datatype( mjd, @isnumeric );                                           %&%
 
+%make sure the data is double
+mjd = double(mjd);
+
 [year, month, day, hour, minute, second] = mjd2date( mjd(:) );
 
 %= *dayofyear* does not handle column vectors

@@ -50,9 +50,9 @@ if length(grids) >= 4
   [maxdim,i] = max( [G.DIM] );
   if maxdim >= 4
     tformat = lower( G(i).GRID4_NAME );
-    if strcmp( tformat, 'mjd' )
+    if strcmp( tformat, 'doy' )
       %
-    elseif strcmp( tformat, 'doy' )
+    elseif strcmp( tformat, 'mjd' )
       grids{4} = mjd2doy( grids{4} );
     elseif strcmp( tformat, 'datenum' )
       [ye,mo,da,ho,mi,se] = mjd2date( grids{4} );

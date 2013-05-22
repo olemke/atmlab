@@ -213,7 +213,11 @@ classdef Collapser < AssociatedDataset
                     newfield = rmfield(newfield, 'processors');
                     newfield = rmfield(newfield, 'limitators');
                     newfield.orig_name = field;
-                    newfield.type = 'float';
+                    if isfield(newfield.stored.(procname), 'type')
+                        newfield.type = newfield.stored.(procname).type;
+                    else
+                        newfield.type = 'float';
+                    end
                     if (isfield(fieldstruct, field) && ...
                         isfield(fieldstruct.(field), 'stored') && ...
                         isfield(fieldstruct.(field).stored, procname))

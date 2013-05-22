@@ -146,6 +146,10 @@ if ismember(ref,tickval) && mod(nw,2)
 end
 
 % ADJUST nwhite if ref is inbetween contour lines
+if ref < tickval(1) || ref > tickval(end)
+    error(['gmtlab:' mfilename ':badInput'],'Reference value is outside the range of tick values')
+end
+
 if ~ismember(ref,tickval) && ~mod(nw,2) 
     % if ref is in between the edges and nwhite is even, decrease by 1
     nw = nw-1;

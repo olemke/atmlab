@@ -23,6 +23,8 @@ function S = dardarsub_postprocessor(self,S,fields)
 % use dependent fields to BUILD the pseudo field. maybe transpose to get
 % the right orientation
 
+narginchk(3,3)
+
 if isfield(S,'HEIGHT')
     S.HEIGHT = repmat(S.HEIGHT,size(S.iwc,1),1);
 end

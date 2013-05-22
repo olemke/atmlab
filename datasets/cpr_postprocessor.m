@@ -112,7 +112,7 @@ for F =flds
                         % undetermined]). I set "clear" explicitly using the
                         % CloudFraction field
                         S.(field)(i) = 10;
-                    elseif length(unique(cloudColumn))==1
+                    elseif length(unique(cloudColumn))==1 % this only works since, if it is clear, all values are 0
                         % column with a single cloud type
                         S.(field)(i) = unique(cloudColumn);
                     else
@@ -174,7 +174,6 @@ for F =flds
                     S.(field)(i,1:length(singleThings)) = singleThings;
                 end
             end
-            
         otherwise
             error(['atmlab:' mfilename],'field: "%s" is not listed here',field)
             

@@ -395,7 +395,7 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
             [x,xu]=separate_integer_and_unit(in.legend.xpos);
             [y,yu]=separate_integer_and_unit(in.legend.ypos);
             [l,~]=separate_integer_and_unit(in.legend.length);
-            if ~isequal(wu,yu,wu,xu),warning('miss-matching units will cause strange default placements of extra_legend');end
+            if ~isequal(wu,yu,wu,xu),warning(['atmlab:' mfilename],'miss-matching units will cause strange default placements of extra_legend');end
             if strcmp(in.legend.orientation,'v')
                 vec = [x, y-0.5*l-2*w, w, w];
                 lsize = sprintf('%g%s/%g%s/%g%s/%g%s',...
@@ -434,19 +434,19 @@ tickval = minn:in.stepsize:maxx;
 function out = setup_psboxpoly(in, field)
 %% ps box
 
-l = size(in.(field),1);
+el = size(in.(field),1);
 if isfield(in,[field 'color'])
-    if length(in.([field 'color']))~=l
-        error('Need same number of colors as boxes')
+    if length(in.([field 'color']))~=el
+        error(['atmlab:' mfilename],'Need same number of colors as boxes')
     end
 else in.([field 'color'])(1:l) = {'k'}; %default is black
 end
 
 if isfield(in,([field 'thick']))
-    if length(in.([field 'thick']))~=l
-        error('Need same number of sizes as boxes')
+    if length(in.([field 'thick']))~=el
+        error(['atmlab:' mfilename],'Need same number of sizes as boxes')
     end
-else out.thick(1:l)={10}; %default size=10
+else out.thick(1:el)={10}; %default size=10
 end
 c = list_colors('colors',in.([field 'color']));
 colors = cell(length(c),1);

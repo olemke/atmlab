@@ -21,11 +21,11 @@ function [p,t]=z2p_cira86(z,lat,doy)
 rqre_datatype( z, @istensor1 );                                    %&%
 rqre_datatype( lat, @istensor1 );                                  %&%
 rqre_datatype( doy, @istensor1 );                                  %&%
-if any(doy)>367 | any(doy<1)                                       %&%
-  error('doy range is [1,367]')                                    %&%
+if any(doy)>367 || any(doy<1)                                      %&%
+  error(['atmlab:' mfilename],'doy range is [1,367]')              %&%
 end                                                                %&%
-if any(lat)>90 | any(lat<-90)                                      %&%
-   error('latitude range is -90 to 90')                            %&%
+if any(lat)>90 || any(lat<-90)                                     %&%
+   error(['atmlab:' mfilename],'latitude range is -90 to 90')      %&%
 end                                                                %&%
 
 

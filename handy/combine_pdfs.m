@@ -182,22 +182,26 @@ c = onCleanup(@() delete_tmpfolder(tmpfolder));
 %% Assemble our pretty tex file
 file = fullfile(tmpfolder, 'out.tex');
 fid = fopen(file,'w');
+Cob = onCleanup(@(x) fclose(fid));
+
 fprintf(fid,'\\documentclass[a4paper,10pt]{report}\n');
 
-margin=0.1;
+margin=0.1; %cm
 if ~isempty(options.title)
-    options = optargs_struct(options,struct('fontsize',sprintf('%.0fcm',1/20 * max(layout.rowwidth)))); % cm
-    tmp=regexp(options.fontsize,'(?<fz>\d+)(?<unit>.+)','names'); fz=str2double(tmp.fz);unit=tmp.unit;
+    options = optargs_struct(options,struct('fontsize',sprintf('%gcm',1/20 * max(layout.rowwidth)))); % cm
+    tmp=regexp(options.fontsize,'(?<fz>\d+)(?<unit>.+)','names');
+    fz=str2double(tmp.fz);
+    unit=tmp.unit;
 else
     fz=0;
 end
 
-fprintf(fid,['\\usepackage[margin=%.2fcm,paperwidth=%.2fcm,' ...
-    'paperheight=%.2fcm]{geometry}\n'], ...
+fprintf(fid,['\\usepackage[margin=%.2gcm,paperwidth=%gcm,' ...
+    'paperheight=%gcm]{geometry}\n'], ...
     margin, ...
     max(layout.rowwidth) + 2*margin, ...
     sum(layout.rowheight) + 2*margin + 2*fz ...
-    + options.vspace*(length(layout.rowheight)-1) ...
+    + options.vspace*(length(layout.rowheight)) ...
     + options.secret_latex_spacing_tweak*length(layout.rowheight));
 
 fprintf(fid,'\\pagestyle{empty}\n');
@@ -243,7 +247,6 @@ for R = layout.plotsbyrow
     row = row+1;
 end
 fprintf(fid,'\\end{document}\n');
-fclose(fid);
 
 %% Hand the TeX file over to pdflatex
 exec_system_cmd(mvplotcmd, gmtlab('verbosity'));

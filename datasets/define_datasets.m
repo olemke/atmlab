@@ -735,7 +735,6 @@ limitators_scalar = {@(X)(X>=0)}; % meaning not flagged
 limitators_profile = {@(X)(true(size(X, 1), 1))};
 closest.fn = @(x)(x(1)); %workaround, see this collapser
 closest.ln = 'Only the closest measurement pair';
-closest.ty = 'double';
 % ----------
 % MHS -CPR
 % ----------
@@ -831,19 +830,19 @@ modis.modis_IWP.atts = fields.modis.modis_IWP.atts;
 modis.modis_IWP.processors.CLOSEST               = closest.fn;
 modis.modis_IWP.stored.CLOSEST.atts.long_name    = closest.ln;
 modis.modis_IWP.stored.CLOSEST.atts.unit         = 'g/m^2';
-modis.modis_IWP.stored.CLOSEST.type              = closest.ty;
+modis.modis_IWP.stored.CLOSEST.type              = D.modis_aqua_L2.pseudo_fields.modis_IWP.type;
 modis.modis_IWP.limitators                       = limitators_scalar;
 modis.Re_ice.atts = fields.modis.Re_ice.atts;
 modis.Re_ice.processors.CLOSEST                  = closest.fn;
 modis.Re_ice.stored.CLOSEST.atts.long_name       = closest.ln;
 modis.Re_ice.stored.CLOSEST.atts.unit            = 'micron';
-modis.Re_ice.stored.CLOSEST.type                 = closest.ty;
+modis.Re_ice.stored.CLOSEST.type                 = D.modis_aqua_L2.pseudo_fields.Re_ice.type;
 modis.Re_ice.limitators                          = limitators_scalar;
 modis.Tau_ice.atts = fields.modis.Tau_ice.atts;
 modis.Tau_ice.processors.CLOSEST                 = closest.fn;
 modis.Tau_ice.stored.CLOSEST.atts.long_name      = closest.ln;
 modis.Tau_ice.stored.CLOSEST.atts.unit           = 'none';
-modis.Tau_ice.stored.CLOSEST.type                = closest.ty;
+modis.Tau_ice.stored.CLOSEST.type                = D.modis_aqua_L2.pseudo_fields.Tau_ice.type;
 modis.Tau_ice.limitators                         = limitators_scalar;
 
 % -------
@@ -856,25 +855,25 @@ cloud_cci.iwp.atts = fields.cloud_cci.iwp.atts;
 cloud_cci.iwp.processors.CLOSEST               = closest.fn;
 cloud_cci.iwp.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.iwp.stored.CLOSEST.atts.unit         = 'g/m^2';
-cloud_cci.iwp.stored.CLOSEST.type              = closest.ty;
+cloud_cci.iwp.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.iwp.type;
 cloud_cci.iwp.limitators                       = limitators_scalar;
 cloud_cci.iwp_error.atts = fields.cloud_cci.iwp_error.atts;
 cloud_cci.iwp_error.processors.CLOSEST               = closest.fn;
 cloud_cci.iwp_error.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.iwp_error.stored.CLOSEST.atts.unit         = 'g/m^2';
-cloud_cci.iwp_error.stored.CLOSEST.type              = closest.ty;
+cloud_cci.iwp_error.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.iwp_error.type;
 cloud_cci.iwp_error.limitators                       = limitators_scalar;
 cloud_cci.ref_ice.atts = fields.cloud_cci.ref_ice.atts;
 cloud_cci.ref_ice.processors.CLOSEST               = closest.fn;
 cloud_cci.ref_ice.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.ref_ice.stored.CLOSEST.atts.unit         = 'micron';
-cloud_cci.ref_ice.stored.CLOSEST.type              = closest.ty;
+cloud_cci.ref_ice.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.ref_ice.type;
 cloud_cci.ref_ice.limitators                       = limitators_scalar;
 cloud_cci.cot_ice.atts = fields.cloud_cci.cot_ice.atts;
 cloud_cci.cot_ice.processors.CLOSEST               = closest.fn;
 cloud_cci.cot_ice.stored.CLOSEST.atts.long_name    = closest.ln;
 cloud_cci.cot_ice.stored.CLOSEST.atts.unit         = '-';
-cloud_cci.cot_ice.stored.CLOSEST.type              = closest.ty;
+cloud_cci.cot_ice.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.cot_ice.type;
 cloud_cci.cot_ice.limitators                       = limitators_scalar;
 
 % ------

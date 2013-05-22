@@ -417,7 +417,7 @@ function filename = gmt_plot(in,field)
 %                           below range only, above range, or both
 %                   def:    Determined from data
 %                     ------------
-%  tick_annotations 
+%  tick_annotations
 %                   in:     {%s,%s,...}
 %                   ex:     {'','','middle','',''}. Number of annotations must be = nlevels, and all
 %                           cell elements must be strings (or empty strings)
@@ -448,7 +448,7 @@ function filename = gmt_plot(in,field)
 %                     ------------
 %  xpos             in:     %s or %f (if %f, unit is assumed from in.measure_unit)
 %                   ex:     Toggle the x-position of the center of the
-%                           legend bar. See also length,width,ypos, orientation for legend 
+%                           legend bar. See also length,width,ypos, orientation for legend
 %                   def:    '9.8i' for verticle
 %                     ------------
 %  ypos             in:     %s or %f (if %f, unit is assumed from in.measure_unit)
@@ -671,6 +671,7 @@ commands = create_gmt_earth(out);
 
 filename=sort_figures(out,commands);
 
+end
 %%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTIONS
 %     ||||
@@ -678,7 +679,6 @@ filename=sort_figures(out,commands);
 function in = set_GMT_plot(in,field)
 %% SETUP %%
 
-errId = ['gmtlab:' mfilename ':badInput']; % common error ID
 
 % Test is GMT is installed and in the path
 [a,b] = system('which gmtset');
@@ -705,7 +705,7 @@ default.header_font     = 'Helvetica';      % one of 35 available fonts
 default.header_fontsize = '36p';
 in = optargs_struct(in,default);
 % how far the title is removed from the top of the map (depends on 'N' or 'n')
-default.header_offset   = [num2str(-0.5+0.6*ismember('N',in.basemap_axis)) 'c'];
+default.header_offset   = [num2str(-0.4+0.6*ismember('N',in.basemap_axis)) 'c'];
 default.keep_files      = false;            % keep intermediate files (debugging)
 default.map_width       = 20;
 default.measure_unit    = 'cm';             % Choose between cm, inch, m, and point.
@@ -734,11 +734,11 @@ end
 
 % backward compatibility
 if isfield(in,'header_size')
-    warning('in.header_size has been renamed to in.header_fontsize. in.header_size will be removed in future releases')
+    warning('atmlab:temporary','in.header_size has been renamed to in.header_fontsize. in.header_size will be removed in future releases')
     in.header_fontsize = in.header_size; in=rmfield(in,'header_size');
 end
 if isfield(in,'title')
-    warning('in.title has been renamed to in.header. in.title will be removed in future releases')
+    warning('atmlab:temporary','in.title has been renamed to in.header. in.title will be removed in future releases')
     in.header = in.title; in=rmfield(in,'title');
 end
 
@@ -752,16 +752,16 @@ in = optargs_struct(in,default);
 % find default figuretype
 b = regexp(in.filename,'\.');
 if ~isempty(b)
-     ft = in.filename(b(end)+1:end);
-     if ismember(lower(ft),lower({'eps','pdf','BMP','JPEG','jpg','PNG','PPM','tif'}))
+    ft = in.filename(b(end)+1:end);
+    if ismember(lower(ft),lower({'eps','pdf','BMP','JPEG','jpg','PNG','PPM','tif'}))
         default.figuretype = ft;
-     else
-         logtext(1,'figuretype: %s is not an available type. Will produce .pdf',ft);
-         default.figuretype = 'pdf';
-     end
-     if ~isfield(in,'figuretype')
+    else
+        logtext(1,'figuretype: %s is not an available type. Will produce .pdf',ft);
+        default.figuretype = 'pdf';
+    end
+    if ~isfield(in,'figuretype')
         in.filename=in.filename(1:b(end)-1);
-     end
+    end
 else
     default.figuretype = 'pdf';
 end
@@ -801,29 +801,91 @@ in = isdata(in,field);
 in = isgridded(in,field);
 
 % Also get rid of NaNs in the geodata (This only applies to ungridded data)
-in = rmNaNsGeo(in,field);
+in = rmNaNsGeo_and_standardize_geodata(in,field);
 
-% make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
-if in.gridded
-    assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
-        errId,'numel(data) must length(lat)*length(lon)')
-    [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
-    
+% REGION
+in = assign_region(in,field);
+
+in = specialregion(in,field); %in case the region covers the dateline and is not continuous
+
+
+% DATARANGE
+if ~in.nodata
+    default.datarange     = getdatarange(in,field); %
+    if any(isnan(in.(field)(:)))
+        default.extra_legend = struct('name','NaN','type','nan'); % include NaNs in the legend
+    end
+end
+in = optargs_struct(in,default);
+in.datarange = double(in.datarange);
+
+% COLORS & DATA REPRESENTATION
+default.ctable      = 'rainbow';          % color palette
+[default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
+in = optargs_struct(in,default); clear default
+
+% LEGEND
+in = setupLegend(in);
+
 end
 
-% DODGY GEODATA
-% make sure nothing is outside the extreme values
-if ~in.gridded
-    index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
-    if any(~index)
-        logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(index)/numel(index))
-        in.lat = in.lat(index);
-        in.lon = in.lon(index);
-        in.(field) = in.(field)(index);
+
+%% SUBFUNCTIONS FOR SETUP
+%      ||||||
+%      VVVVVV
+
+function check_input(in)
+%% CheckInput
+% Checks the input type of all options. If the field is in the list of
+% available options, it will be tested against a anomynous function (e.g.
+% in.region should pass @(x)(ischar(x)) ). The field names and their
+% corresponding test functions are listed in gmt_inputs.
+
+errID = ['gmtlab:' mfilename ':BadInput'];
+assert(isstruct(in),errID,'"in" must be a structure')
+
+[GSE,GSSE] = gmt_inputs;
+
+Fields = fieldnames(in)';
+
+for F = Fields
+    % See if the in.(field) is a listed option
+    test = GSE(ismember(GSE(:,2),F{1}),:);
+    
+    if ~isempty(test)
+        % corresponding test function
+        fun = test{1};
+        strfun = func2str(fun);
+        
+        assert(fun(in.(test{2})),errID,...
+            'Input type is incorrect. in.%s should pass test: %s',test{2},strfun);
+        
+        % If in.(field) is itself a structure, do it again (more or less)
+        if isstruct(in.(test{2})) && ismember(test{2},fieldnames(GSSE))
+            Fields2 = fieldnames(in.(test{2}))';
+            for F2 = Fields2
+                test2 = GSSE.(test{2})(ismember(GSSE.(test{2})(:,2),F2{1}),:);
+                if ~isempty(test2)
+                    fun = test2{1};
+                    strfun = char(fun);
+                    assert(fun(in.(test{2})(1).(test2{2})),errID,...
+                        'Input type is incorrect. in.%s.%s should pass the test: @%s',...
+                        test{2},test2{2},strfun);
+                else
+                    warning(errID,'in.%s.%s is not a valid field in in.%s ',...
+                        test{2},F2{1},test{2})
+                end
+            end
+        end
     end
 end
 
-% REGION
+end
+
+function in = assign_region(in,field)
+
+errId = ['gmtlab:' mfilename ':badInput']; % common error ID
+
 if ~isfield(in,'region')
     if in.gridded
         % check if the data is probably global
@@ -864,6 +926,7 @@ if ~isfield(in,'region')
             min(in.lat(:)),max(in.lat(:)));
     end
 else
+    in.userDefinedRegion = true;
     % remove frivolous data for memory and speed performance in that case
     x = sscanf(in.region,'%f/%f/%f/%f');
     lt = in.lat >= x(3) & in.lat <=x(4); %logical vector
@@ -880,6 +943,231 @@ else
     assert(~isempty(in.lat) && ~isempty(in.lon),...
         errId,'lat or lon are empty')
 end
+
+end
+
+function datarange = getdatarange(in,field)
+%% getdatarange
+
+tmp = in.(field)(:);
+d = double([min(tmp) max(tmp(~isinf(tmp)))]);
+
+% Do some tricks to get the most useful datarange. (rounded, but preserve precision)
+x = log10(d(2)-d(1));
+
+datarange = [10^(round(x)-1) * round(d(1) * (1/10^(round(x)-1))),...
+    10^(round(x)-1) * round(d(2) * (1/10^(round(x)-1)))];
+
+
+end
+
+function [stepsize,annot_format] = getstepsize(in,field)
+%% getstepsize
+
+if in.nodata
+    stepsize = 0;
+    annot_format='';
+    return
+end
+
+% default number of levels
+if length(unique(in.(field)))<in.nlevels
+    logtext(1,'unique values < %d\n',in.nlevels)
+    in.nlevels = length(unique(in.(field)));
+    logtext(1,'setting in.nlevels =  length(unique(in.(field)) (%d)\n',...
+        length(unique(in.(field))))
+end
+
+if isfield(in,'stepsize')
+    % warning('gmtlab:input','in.stepsize overrides in.nlevels')
+    stepsize = in.stepsize;
+elseif ~isfield(in,'stepsize')
+    stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
+end
+annot_format = getAnnotFormat(stepsize);
+
+end
+
+function in = nodata(in)
+%% NODATA
+% if you want to only plot coastlines
+
+in.sidebar = false;
+in.legend  = false;
+in.gridded = false;
+in.nlevels = 1;
+if isfield(in,'region')
+elseif ~isfield(in,'region') && all(isfield(in,{'lat','lon'}))
+    in.region = sprintf('%g/%g/%g/%g/%g',...
+        min(in.lon(:)),max(in.lon(:)),...
+        min(in.lat(:)),max(in.lat(:)));
+else
+    in.region='-180/180/-90/90';
+end
+
+end
+
+function in = isdata(in,field)
+%% is there any useable data?
+
+Id  = ['gmtlab:' mfilename ':badInput'];
+Eps = 1e-10;
+
+assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
+assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
+    '%s%s','Data does not contain any valid',...
+    ' values for contour levels to be based on...')
+assert(~(~ismatrix(squeeze(in.(field)))),Id,'in.%s must not be more than 2 dimensional',field)
+assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
+    'min(data) must not be equal to max(data)')
+
+% check for lat and lons
+if ~isfield(in,'lat')
+    l = {'Latitude','latitude'};
+    assert(any(isfield(in,l)),Id,'No latitudes present')
+    in.lat = in.(l{isfield(in,l)});
+elseif any(isfield(in,{'Latitude','latitude'}))
+    disp('Several latitude vectors present. Using in.lat')
+end
+if ~isfield(in,'lon')
+    l = {'Longitude','longitude','long'};
+    assert(any(isfield(in,l)),Id,'No longitudes present')
+    in.lon = in.(l{isfield(in,l)});
+elseif any(isfield(in,{'Longitude','longitude','long'}))
+    disp('Several longitude vectors present. Using in.lon')
+end
+
+end
+
+function in = isgridded(in,field)
+%% ISGRIDDED: Test if the data is gridded
+%  If it is not gridded, flatten the data
+
+if isempty(in.(field))
+    error(['gmtlab:' mfilename ':BadInput'],....
+        'The data variable: in.%s is empty',field)
+end
+
+if ndims(in.(field))==3
+    in.(field) = squeeze(in.(field));
+end
+
+[a,b]=size(in.(field));
+pos1 = a==length(in.lat)&b==length(in.lon); %(lat,lon)
+pos2 = b==length(in.lat)&a==length(in.lon); %(lon,lat)
+
+% if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
+% assume it's not.
+if ~isfield(in,'gridded')
+    ig = ~ (isequal(size(in.(field)(:)),size(in.lat(:)),size(in.lon(:))));
+    if ~ig
+        in.(field) = in.(field)(:);
+        in.lat     = in.lat(:);
+        in.lon     = in.lon(:);
+        in.gridded = false;
+    else
+        if pos2 && (pos2 ~= pos1)
+            % want it in (lat,lon)
+            in.(field)=in.(field)';
+        end
+        in.gridded = true;
+    end
+end
+
+end
+
+function in = rmNaNsGeo_and_standardize_geodata(in,field)
+%% rmNaNsGeo
+% Also get rid of NaNs in the geodata
+% This only applies to ungridded data
+
+errId = ['gmtlab:' mfilename ':badInput']; % common error ID
+
+if ~in.gridded
+
+index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
+if any(~index)
+    logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(index)/numel(index))
+    in.lat = in.lat(index);
+    in.lon = in.lon(index);
+    in.(field) = in.(field)(index);
+end
+
+else
+    % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
+    assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
+        errId,'numel(data) must length(lat)*length(lon)')
+    [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
+    
+end
+
+end
+
+function in = setupLegend(in)
+% SETUP LEGEND
+
+errId = ['gmtlab:' mfilename ':badInput']; % common error ID
+if isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend)
+    % If in.legend = false, do nothing
+    return
+end
+if ~isfield(in,'legend') || ~isstruct(in.legend)
+    in.legend=struct([]);
+end
+
+% apply defaults to legend
+if ~isfield(in.legend,'position')
+    % ORIENTATION
+    
+    x = sscanf(in.region,'%f/%f/%f/%f');
+    f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
+    myHcondition = f < 0.5; tmp = ['v','h']; %vertical,horisontal
+    default.orientation = tmp(myHcondition+1);
+    defThick=.2; %thickness of legend bar
+    
+    % I use map_width to find the defaults.
+    [mw,mwu] = separate_integer_and_unit(in.map_width);
+    in.legend           = optargs_struct(in.legend,default); %need orientation now
+    switch in.legend.orientation
+        case 'v'
+            vec = [10.11+(.5*defThick+0.44*ismember('E',in.basemap_axis)) ... % could use annot_font_size_primary for better precision
+                2.44*f ...
+                5.22*f ...
+                defThick]/10;
+            
+        case 'h'
+            
+            vec = [5 ...
+                -0.1-(0.5*defThick+0.4*ismember('S',in.basemap_axis))...
+                10.55 ...
+                defThick]/10;
+            
+        otherwise
+            error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)
+    end
+    default.xpos   = sprintf('%.2f%s',vec(1)*mw,mwu);
+    default.ypos   = sprintf('%.2f%s',vec(2)*mw,mwu);
+    default.length = sprintf('%.2f%s',vec(3)*mw,mwu);
+    default.width  = sprintf('%.2f%s',vec(4)*mw,mwu);
+else
+    default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
+end
+default.tick_annotion_format = in.tick_annotation_format;
+default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
+in.legend           = optargs_struct(in.legend,default);
+
+end
+
+function sidebar = getsidebar(in)
+%% color level datastep interval
+% sidebar can have the values 0,1,2,3 (none, bellow only, above only, both).
+
+sidebar =  ( min(in.(in.fieldname)(:))<in.datarange(1) ) + ...
+    2* ( max(in.(in.fieldname)(:))>in.datarange(2) );
+
+end
+
+function in = specialregion(in,field)
 
 if in.gridded
     % DO some special treatment of data crossing the dateline that is not continuous
@@ -902,6 +1190,11 @@ if in.gridded
                 error(['atmlab:' mfilename],'Same longitudes are repreated but the data are not the same there')
             end
         end
+        % Do the region part again
+        if ~isfield(in,'userDefinedRegion') || ~in.userDefinedRegion
+            in = rmfield(in,'region');
+            in = assign_region(in,field);
+        end
     end
     
     
@@ -913,69 +1206,12 @@ if in.gridded
         in = centerGeoData(in,field);
     end
 end
-% DATARANGE
-if ~in.nodata
-    default.datarange     = getdatarange(in,field); %
-    if any(isnan(in.(field)(:)))
-        default.extra_legend = struct('name','NaN','type','nan'); % include NaNs in the legend
-    end
-end
-in = optargs_struct(in,default);
-in.datarange = double(in.datarange);
 
-% COLORS & DATA REPRESENTATION
-default.ctable      = 'rainbow';          % color palette
-[default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
-in = optargs_struct(in,default); clear default
-
-% LEGEND
-if isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend)
-    % If in.legend = false, do nothing
-    return
 end
-if ~isfield(in,'legend') || ~isstruct(in.legend)
-    in.legend=struct([]);
-end
-% apply defaults to legend
-if ~isfield(in.legend,'position')
-    % ORIENTATION
-    
-    x = sscanf(in.region,'%f/%f/%f/%f');
-    f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
-    myHcondition = f < 0.5; tmp = ['v','h']; %vertical,horisontal
-    default.orientation = tmp(myHcondition+1);
-    defThick=.2; %thickness of legend bar
 
-    % I use map_width to find the defaults.
-    [mw,mwu] = separate_integer_and_unit(in.map_width);
-    in.legend           = optargs_struct(in.legend,default); %need orientation now
-    switch in.legend.orientation
-        case 'v'
-            vec = [10.11+(.5*defThick+0.44*ismember('E',in.basemap_axis)) ... % could use annot_font_size_primary for better precision
-                2.44*f ...
-                5.22*f ...
-                defThick]/10;
-
-        case 'h'
-            
-            vec = [5 ...
-                -0.1-(0.5*defThick+0.4*ismember('S',in.basemap_axis))...
-                10.55 ...
-                defThick]/10;
-            
-        otherwise
-            error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)
-    end
-    default.xpos   = sprintf('%.2f%s',vec(1)*mw,mwu);
-    default.ypos   = sprintf('%.2f%s',vec(2)*mw,mwu);
-    default.length = sprintf('%.2f%s',vec(3)*mw,mwu);
-    default.width  = sprintf('%.2f%s',vec(4)*mw,mwu);
-else
-    default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
-end
-default.tick_annotion_format = in.tick_annotation_format;
-default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
-in.legend           = optargs_struct(in.legend,default);
+% ----------------
+% Other subfunctions
+%
 
 function filename = sort_figures(in,command)
 %% SORT FIGURES
@@ -1060,6 +1296,8 @@ hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
 fprintf('GMT plot stored at:  %s\n',filename)
 
+end
+
 function file = makelegendpdf(command)
 %% Make a separate pdf for the legend
 % Only allowed to have 1 or 2 psscale commands in the commad list. the first one
@@ -1092,152 +1330,6 @@ end
 command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
 exec_system_cmd(command,gmtlab('verbosity'));
 
-%% SUBFUNCTIONS FOR SETUP
-%      ||||||
-%      VVVVVV
-
-function datarange = getdatarange(in,field)
-%% getdatarange
-
-tmp = in.(field)(:);
-d = double([min(tmp) max(tmp(~isinf(tmp)))]);
-
-% Do some tricks to get the most useful datarange. (rounded, but preserve precision)
-x = log10(d(2)-d(1));
-
-datarange = [10^(round(x)-1) * round(d(1) * (1/10^(round(x)-1))),...
-    10^(round(x)-1) * round(d(2) * (1/10^(round(x)-1)))];
-
-
-
-function [stepsize,annot_format] = getstepsize(in,field)
-%% getstepsize
-
-if in.nodata
-    stepsize = 0;
-    annot_format='';
-    return
-end
-
-% default number of levels
-if length(unique(in.(field)))<in.nlevels
-    logtext(1,'unique values < %d\n',in.nlevels)
-    in.nlevels = length(unique(in.(field)));
-    logtext(1,'setting in.nlevels =  length(unique(in.(field)) (%d)\n',...
-        length(unique(in.(field))))
-end
-
-if isfield(in,'stepsize')
-    % warning('gmtlab:input','in.stepsize overrides in.nlevels')
-    stepsize = in.stepsize;
-elseif ~isfield(in,'stepsize')
-    stepsize = (in.datarange(2)-in.datarange(1))/in.nlevels;
-end
-annot_format = getAnnotFormat(stepsize);
-
-function sidebar = getsidebar(in)
-%% color level datastep interval
-% sidebar can have the values 0,1,2,3 (none, bellow only, above only, both).
-
-sidebar =  ( min(in.(in.fieldname)(:))<in.datarange(1) ) + ...
-    2* ( max(in.(in.fieldname)(:))>in.datarange(2) );
-
-
-function in = nodata(in)                                                        %% NODATA %%
-%% NODATA
-% if you want to only plot coastlines
-
-in.sidebar = false;
-in.legend  = false;
-in.gridded = false;
-in.nlevels = 1;
-if isfield(in,'region')
-elseif ~isfield(in,'region') && all(isfield(in,{'lat','lon'}))
-    in.region = sprintf('%g/%g/%g/%g/%g',...
-        min(in.lon(:)),max(in.lon(:)),...
-        min(in.lat(:)),max(in.lat(:)));
-else
-    in.region='-180/180/-90/90';
-end
-
-function in = isdata(in,field)
-%% is there any useable data?
-
-Id  = ['gmtlab:' mfilename ':badInput'];
-Eps = 1e-10;
-
-assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
-assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
-    '%s%s','Data does not contain any valid',...
-    ' values for contour levels to be based on...')
-assert(~(~ismatrix(squeeze(in.(field)))),Id,'in.%s must not be more than 2 dimensional',field)
-assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
-    'min(data) must not be equal to max(data)')
-
-% check for lat and lons
-if ~isfield(in,'lat')
-    l = {'Latitude','latitude'};
-    assert(any(isfield(in,l)),Id,'No latitudes present')
-    in.lat = in.(l{isfield(in,l)});
-elseif any(isfield(in,{'Latitude','latitude'}))
-    disp('Several latitude vectors present. Using in.lat')
-end
-if ~isfield(in,'lon')
-    l = {'Longitude','longitude','long'};
-    assert(any(isfield(in,l)),Id,'No longitudes present')
-    in.lon = in.(l{isfield(in,l)});
-elseif any(isfield(in,{'Longitude','longitude','long'}))
-    disp('Several longitude vectors present. Using in.lon')
-end
-
-function in = isgridded(in,field)
-%% ISGRIDDED: Test if the data is gridded
-%  If it is not gridded, flatten the data
-
-if isempty(in.(field))
-    error(['gmtlab:' mfilename ':BadInput'],....
-        'The data variable: in.%s is empty',field)
-end
-
-if ndims(in.(field))==3
-    in.(field) = squeeze(in.(field));
-end
-
-[a,b]=size(in.(field));
-pos1 = a==length(in.lat)&b==length(in.lon); %(lat,lon)
-pos2 = b==length(in.lat)&a==length(in.lon); %(lon,lat)
-
-% if (pos1 && pos2) && (pos1 || pos2), then we dont know if it gridded, but
-% assume it's not.
-if ~isfield(in,'gridded')
-    ig = ~ (isequal(size(in.(field)(:)),size(in.lat(:)),size(in.lon(:))));
-    if ~ig
-        in.(field) = in.(field)(:);
-        in.lat     = in.lat(:);
-        in.lon     = in.lon(:);
-        in.gridded = false;
-    else
-        if pos2 && (pos2 ~= pos1)
-            % want it in (lat,lon)
-            in.(field)=in.(field)';
-        end
-        in.gridded = true;
-    end
-end
-
-function in = rmNaNsGeo(in,field)
-%% rmNaNsGeo
-% Also get rid of NaNs in the geodata
-% This only applies to ungridded data
-
-if in.gridded, return; end
-
-index = isnan(in.lat)|isnan(in.lon);
-if any(index)
-    fprintf('Removing %.f values since the correspoding lat/lons are NaN\n',sum(index))
-    in.lat     =  in.lat(~index);
-    in.lon     =  in.lon(~index);
-    in.(field) = in.(field)(~index);
 end
 
 function hunt_down_errors(command,errors)
@@ -1275,50 +1367,6 @@ if ~isempty(Errors)
         'GMT encountered the following errors:\n%s',[tmp{:}])
 end
 
-function check_input(in)
-%% CheckInput
-% Checks the input type of all options. If the field is in the list of
-% available options, it will be tested against a anomynous function (e.g.
-% in.region should pass @(x)(ischar(x)) ). The field names and their
-% corresponding test functions are listed in gmt_inputs.
-
-errID = ['gmtlab:' mfilename ':BadInput'];
-assert(isstruct(in),errID,'"in" must be a structure')
-
-[GSE,GSSE] = gmt_inputs;
-
-Fields = fieldnames(in)';
-
-for F = Fields
-    % See if the in.(field) is a listed option
-    test = GSE(ismember(GSE(:,2),F{1}),:);
-    
-    if ~isempty(test)
-        % corresponding test function
-        fun = test{1};
-        strfun = func2str(fun);
-        
-        assert(fun(in.(test{2})),errID,...
-            'Input type is incorrect. in.%s should pass test: %s',test{2},strfun);
-        
-        % If in.(field) is itself a structure, do it again (more or less)
-        if isstruct(in.(test{2})) && ismember(test{2},fieldnames(GSSE))
-            Fields2 = fieldnames(in.(test{2}))';
-            for F2 = Fields2
-                test2 = GSSE.(test{2})(ismember(GSSE.(test{2})(:,2),F2{1}),:);
-                if ~isempty(test2)
-                    fun = test2{1};
-                    strfun = char(fun);
-                    assert(fun(in.(test{2})(1).(test2{2})),errID,...
-                        'Input type is incorrect. in.%s.%s should pass the test: @%s',...
-                        test{2},test2{2},strfun);
-                else
-                    warning(errID,'in.%s.%s is not a valid field in in.%s ',...
-                        test{2},F2{1},test{2})
-                end
-            end
-        end
-    end
 end
 
 function gmtcleanup(tmpdir,curdir,keepfiles,V)
@@ -1333,4 +1381,6 @@ else
     rmdir(tmpdir,'s')
     logtext(1,'%s is now removed\n',tmpdir)
     atmlab('VERBOSITY',V);
+end
+
 end
