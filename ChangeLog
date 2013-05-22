@@ -1,3 +1,13 @@
+2013-05-22  Mathias Milz  <mathias.milz@ltu.se>
+
+	* atmlab-2-1-344 
+
+	* gridcreation/annealing/join_fast_f_grid.m: Added
+	  join_fast_f_grid: Reads the f_grid from the individual channels
+          which should be combined together with the annealing results of 
+	  these channels and combines them to one long f_grid with the 
+	  according weights in a sparse matrix
+
 2013-05-22  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-343
