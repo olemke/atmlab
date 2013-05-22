@@ -66,7 +66,7 @@ def = struct(...
     'Nblock', 10000, ...       % Maximum number of cases in one block.
     'Nsucc',  100, ...         % Desired number of successfull cases in one block.
     'Tfact',  0.9, ...         % Temperature reduction factor.
-    'verb',   2, ...           % Verbosity.
+    'verb',   1, ...           % Verbosity.
     'use_rel_error', false ... % Use absolute error by default.
     );        
 
@@ -122,6 +122,20 @@ x = size(y_mono);
 n_views = x(1)/n_fmono;
 n_cases = x(2);
 
+if verb>0
+    disp(sprintf('==================================================='));
+    disp(sprintf('Dimensions of the input fields \n'));
+    disp(sprintf('==================================================='));
+    disp(sprintf('H:      n_channels: %d, n_fmono %d\n',n_channels,n_fmono));...
+    disp(sprintf('y_mono: n_cases: %d, n_y_mono: %d n_views: %d\n',n_cases,x(1),n_views));
+    disp(sprintf('==================================================='));
+end
+    
+
+if(mod(x(1),n_fmono) ~= 0)
+    error('check dimensions/size of ''y_mono''!');
+end
+% FIXME: check orientation of y_mono
 clear x;
 
 % Carrying the view dimension through the entire calculation would

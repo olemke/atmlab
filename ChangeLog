@@ -1,3 +1,16 @@
+2013-05-22  Mathias Milz  <mathias.milz@ltu.se>
+
+	* atmlab-2-1-342
+
+	* gridcreation/annealing/loop_anneal.m: updated documentation
+
+	* gridcreation/annealing/apply_annealing.m: Added.
+	  apply_annealing reads the required input from xml files (ARTS
+          output), and uses the provided accuracy to initiate the loop to
+          obtain the simulated annealing grid. The loop continues until the
+          desired accuracy is reached. This run should be applied for each
+          individual channel
+
 2013-05-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-341

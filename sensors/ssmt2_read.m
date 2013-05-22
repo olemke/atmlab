@@ -80,6 +80,11 @@ if strcmp( filename(length(filename)-2:end), '.gz')
   filename = uncompressed_filename;
 end
 
+% times of known switches in datasets
+%dateswitch1 = datenum(1999, 2, 8, 17, 2, 00); %1,59.9808);
+%dateswitch2 = datenum(2001, 9, 18, 14, 44, 0);% 44, 0096);
+
+
 experimental_offset_calibration_xx = [0.2815 0.2915 0.2782 0.3762 1.1355];
 experimental_offset_calibration_20 = [1 1 1 1 1];
 experimental_offset_calibration_100 = [0.2 0.2 0.2 0.2 0.2];
@@ -192,9 +197,12 @@ while (~feof (fid) && recn < S.nscan)
     %
     if (apply_calibration)
         if  firsttimestamp < 730159.709722
+      % if  firsttimestamp < dateswitch1
             experimental_offset_calibration=experimental_offset_calibration_100;
         elseif firsttimestamp >= 730159.709722  && ...
                 firsttimestamp < 731112.613889
+%        elseif firsttimestamp >= dateswitch1  && ...
+%                firsttimestamp < dateswitch2
             experimental_offset_calibration=experimental_offset_calibration_20;
         else
             experimental_offset_calibration=experimental_offset_calibration_xx;
