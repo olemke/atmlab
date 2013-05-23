@@ -1,3 +1,14 @@
+2013-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-348
+
+	* demos/qarts_demo2.m: Ah, warning added yeasterday works. DOY was
+	given to qarts_atm_field, instead of MJD.
+
+	* files/create_tmpfolder.m: Added a line removing whitespace from
+	generated folder name. Needed as, for unknown reason, my user name
+	now comes out with a leading space!
+
 2013-05-23  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-347

@@ -125,14 +125,15 @@ else
 end
 
 %= Set-up VMR_FIELD, T_FIELD and Z_FIELD
+% A dummy date
+mjd = date2mjd( 2008, 2, 15 );
 %
 Q.VMR_FIELD              = qarts_vmr_field( Q );
-Q.T_FIELD                = qarts_atm_field( Q, 't', 45 );% Note interp.
-Q.Z_FIELD                = qarts_atm_field( Q, 'z', 45 );% to DOY 45
+Q.T_FIELD                = qarts_atm_field( Q, 't', mjd );
+Q.Z_FIELD                = qarts_atm_field( Q, 'z', mjd );
 
 
 %= Absorption
-%
 %
 Q.F_GRID                 = linspace( 501.18e9, 501.58e9, 201 )';
 Q.STOKES_DIM             = 1;

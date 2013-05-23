@@ -54,6 +54,9 @@ tmpfolderparts = regexp(tempname(workarea), ...
     'names');
 tmpfolder = [tmpfolderparts.dirname 'atmlab-' username tmpfolderparts.basename];
 
+% Has happened that whitespace has entered, at least from username
+tmpfolder = tmpfolder( ~isspace(tmpfolder) );
+
 while count && ~ready
   if ~exist( tmpfolder, 'dir' )
     [a,b] = mkdir(tmpfolder);      %#ok<ASGLU>
