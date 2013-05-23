@@ -1,3 +1,10 @@
+2013-05-23  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-347
+
+	* arts/xml/xmlLoad.m: Added cobj = onCleanup(@()fclose(fid)); to
+	make sure the fid is closed even if the code crashes later on
+
 2013-05-22  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-346

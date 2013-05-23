@@ -28,6 +28,7 @@ if strcmp( filename(length(filename)-2:end), '.gz')
 end
 
 fid = fopen (filename,'rt');
+cobj = onCleanup(@()fclose(fid));
 
 if fid == -1
   if ~strcmp (uncompressed_filename, '')
@@ -53,8 +54,6 @@ end
 
 %=== Parsing data tag
 result = xmlReadTag(fid, filename, '', '', 0, 0);
-
-fclose (fid);
 
 if ~strcmp (uncompressed_filename, '')
   delete (uncompressed_filename);
