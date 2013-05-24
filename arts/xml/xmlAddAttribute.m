@@ -20,5 +20,3 @@ na = na + 1;
 attrlist{na,1} = name;
 attrlist{na,2} = value;
 
-clear na j;
-

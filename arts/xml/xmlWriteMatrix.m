@@ -43,7 +43,7 @@ else
     for i = 1:(nc-1)
       form = sprintf ('%s %s', form, format);
     end
-    form = strcat (form, '\n');
+    form = [form '\n'];
 
     fprintf (fid, form, data);
 end

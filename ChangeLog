@@ -1,3 +1,38 @@
+2013-05-24  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-349
+
+	* arts/xml/xml*:
+
+	strcat is evilly slow in Matlab. Replaced all occurrences with []
+	concatenation. Let me know if this breaks anything for you.
+	Thanks to Salomon for making me aware it!
+
+	Some before/after benchmarks:
+
+	GriddedField4:
+	>> tic, for i = 1:100, x = xmlLoad('cira86.z.xml'); end; toc
+	Elapsed time is 4.657738 seconds.
+	Elapsed time is 2.293827 seconds.
+
+	ArrayOfIndex with 1000 elements:
+	>> tic, for i = 1:10, x = xmlLoad('ai.xml'); end; toc
+	Elapsed time is 14.921013 seconds.
+	Elapsed time is 3.197786 seconds.
+
+	ArrayOfString with 1000 elements:
+	>> tic, for i = 1:10, x = xmlLoad('as.xml'); end; toc
+	Elapsed time is 30.530031 seconds.
+	Elapsed time is 6.121586 seconds.
+
+	>> tic, qarts_demo2, toc
+	Elapsed time is 3.432350 seconds.
+	Elapsed time is 2.842945 seconds.
+
+	>> tic, qpack2_demo, toc
+	Elapsed time is 5.098557 seconds.
+	Elapsed time is 4.428762 seconds. 
+
 2013-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-348

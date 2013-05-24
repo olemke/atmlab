@@ -42,8 +42,10 @@ c = fgets (fid, 1);
 s = c;
 while ~feof (fid) && c ~= '>'
   c = fgets (fid, 1);
-  s = strcat (s, c);
+  s = [s c];
 end
+
+s = s(s ~= ' ');
 
 if ~strcmp (s, '<?xmlversion="1.0"?>')
   if ~strcmp (uncompressed_filename, '')

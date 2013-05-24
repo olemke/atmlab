@@ -45,16 +45,16 @@ end
 fid = xmlOpenOutputFile (filename);
 xmlWriteHeader (fid, fidb);
 
-if length (comment) > 0
+if ~isempty(comment)
   xmlWritecomment (fid, comment);
 end
 
-if length (type) > 14 & type (1:14) == 'ArrayOfArrayOf'
+if length (type) > 14 && strcmp(type (1:14), 'ArrayOfArrayOf')
   xmlWriteArrayOfArrayOf (fid, fidb, data, type(15:length(type)), precision);
-elseif length (type) > 7 & type (1:7) == 'ArrayOf'
+elseif length (type) > 7 && strcmp(type (1:7), 'ArrayOf')
   xmlWriteArrayOf (fid, fidb, data, type (8:length(type)), precision);
 else
-  func = str2func (strcat ('xmlWrite', type));
+  func = str2func (['xmlWrite' type]);
   feval (func, fid, fidb, data, precision);
 end
 

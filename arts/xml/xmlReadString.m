@@ -18,12 +18,12 @@
 function result = xmlReadString(fid, attrlist, itype, ftype, binary, fid2)
 
 c = fgets (fid, 1);
-while ~feof (fid) & (c == 10 | c == 32)
+while ~feof (fid) && (c == 10 || c == 32)
   c = fgets (fid, 1);
 end
 
 if c ~= '"'
-  error (sprintf ('Invalid string: Not starting with "'));
+  error ('Invalid string: Not starting with "');
 end
 
 % Read the string charwise from input file
@@ -31,24 +31,15 @@ end
 % it becomes a bit more complicated.
 result = '';
 c = fgets (fid, 1);
-whitespace_count = 0;
-while ~feof (fid) & c ~= '"'
-  if c == 32
-    whitespace_count = whitespace_count + 1;
-  else
-    if whitespace_count
-      form = sprintf ('%%s%%%ds%%s', whitespace_count);
-      result = sprintf (form, result, ' ', c);
-      whitespace_count = 0;
-    else
-      result = strcat (result, c);
-    end
-  end
+while ~feof (fid) && c ~= '"'
+  result = [result c];
   c = fgets (fid, 1);
 end
 
+result = strtrim(result);
+
 if c ~= '"'
-  error (sprintf ('Invalid string: Not ending with "'));
+  error ('Invalid string: Not ending with "');
 end
 
 clear whitespace_count c

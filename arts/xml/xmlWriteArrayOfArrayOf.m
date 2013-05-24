@@ -18,13 +18,12 @@ function xmlWriteArrayOfArrayOf(fid, fidb, data, type, precision)
 nrows = size (data, 1);
 ncols = size (data, 2);
 
-if nrows ~= 0 & ncols ~=0 & nrows ~= 1 & ncols ~= 1
+if nrows ~= 0 && ncols ~=0 && nrows ~= 1 && ncols ~= 1
   error ('Either columns or rows must have size 1 or both must be zero');
 end
 
 nelem = length (data);
 
-attrlist = [];
 attrlist = xmlAddAttribute ([], 'type', sprintf ('ArrayOf%s', type));
 attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);

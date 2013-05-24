@@ -17,7 +17,7 @@ function xmlWriteSparseData(fid, fidb, data, precision)
 nrows = size (data, 1);
 ncols = size (data, 2);
 
-if nrows ~= 0 & ncols ~=0 & nrows ~= 1 & ncols ~= 1
+if nrows ~= 0 && ncols ~=0 && nrows ~= 1 && ncols ~= 1
   error ('Either columns or rows must have size 1 or both must be zero');
 end
 
@@ -29,7 +29,7 @@ xmlWriteTag (fid, 'SparseData', ...
 if (strcmp(precision, 'BINARY'))
     fwrite (fidb, data, 'double');
 else
-    fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+    fprintf (fid, [xmlGetPrecisionFormatString (precision) '\n'], data);
 end
 
 xmlWriteCloseTag (fid, 'SparseData');

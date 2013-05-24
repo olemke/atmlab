@@ -19,7 +19,7 @@ xmlWriteTag (fid, 'Numeric', []);
 if (strcmp(precision, 'BINARY'))
     fwrite (fidb, data, 'double');
 else
-    fprintf (fid, strcat (xmlGetPrecisionFormatString (precision), '\n'), data);
+    fprintf (fid, [xmlGetPrecisionFormatString (precision) '\n'], data);
 end
 
 xmlWriteCloseTag (fid, 'Numeric');

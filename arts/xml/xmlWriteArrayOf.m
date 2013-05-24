@@ -19,7 +19,7 @@ function xmlWriteArrayOf(fid, fidb, data, type, precision, attrlist)
 nrows = size (data, 1);
 ncols = size (data, 2);
 
-if nrows ~= 0 & ncols ~=0 & nrows ~= 1 & ncols ~= 1
+if nrows ~= 0 && ncols ~=0 && nrows ~= 1 && ncols ~= 1
   error ('Either columns or rows must have size 1 or both must be zero');
 end
 
@@ -31,8 +31,8 @@ end
 attrlist = xmlAddAttribute (attrlist, 'type', type);
 attrlist = xmlAddAttribute (attrlist, 'nelem', sprintf ('%d', nelem));
 xmlWriteTag (fid, 'Array', attrlist);
+func = str2func (['xmlWrite' type]);
 for i = 1:nelem
-  func = str2func (strcat ('xmlWrite', type));
   feval (func, fid, fidb, data{i}, precision);
 end
 xmlWriteCloseTag (fid, 'Array');

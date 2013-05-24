@@ -18,23 +18,25 @@
 function result = xmlReadSpeciesTag(fid, attrlist, itype, ftype, binary, fid2)
 
 c = fgets (fid, 1);
-while ~feof (fid) & (c == 10 | c == 32)
+while ~feof (fid) && (c == 10 || c == 32)
   c = fgets (fid, 1);
 end
 
 if c ~= '"'
-  error (sprintf ('Invalid species tag: Not starting with "'));
+  error ('Invalid species tag: Not starting with "');
 end
 
 result = '';
 c = fgets (fid, 1);
-while ~feof (fid) & c ~= '"'
-  result = strcat (result, c);
+while ~feof (fid) && c ~= '"'
+  result = [result c];
   c = fgets (fid, 1);
 end
 
+result = strtrim(result);
+
 if c ~= '"'
-  error (sprintf ('Invalid species tag: Not ending with "'));
+  error ('Invalid species tag: Not ending with "');
 end
 
 

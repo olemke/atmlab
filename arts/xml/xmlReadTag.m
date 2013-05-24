@@ -22,10 +22,10 @@ exit_loop = 0;
 result = 'error';
 
 %=== Parsing tags
-while ~feof (fid) & ~exit_loop
+while ~feof (fid) && ~exit_loop
 
   c = fgets (fid, 1);
-  while ~feof (fid) & (c == 10 | c == 13 | c == 32)
+  while ~feof (fid) && (c == 10 || c == 13 || c == 32)
     c = fgets (fid, 1);
   end
 
@@ -40,15 +40,16 @@ while ~feof (fid) & ~exit_loop
       tag = c;
 
       c = fgets (fid, 1);
-      while ~feof (fid) & c ~= ' ' & c ~= '>'
-        tag = strcat (tag, c);
+      while ~feof (fid) && c ~= ' ' && c ~= '>'
+        tag = [tag c];
         c = fgets (fid, 1);
       end
+      
+      tag = strtrim(tag);
 
       attrlist = {};
       if feof (fid)
         error ('Unexpected end of file');
-        break;
       elseif c ~= '>'
         % Tag with attributes
         attrlist = xmlReadAttributes (fid);
@@ -60,28 +61,28 @@ while ~feof (fid) & ~exit_loop
          format = xmlGetAttrValue (attrlist, 'format');
          if strcmp (format, 'binary')
              binary = 1;
-             fid2 = fopen (strcat (filename, '.bin'), 'rb');
+             fid2 = fopen ([filename '.bin'], 'rb');
          end
          fsize = xmlGetAttrValue (attrlist, 'fsize');
-         if ~length (fsize)
+         if isempty(fsize)
            ftype = 'double';
          end
          isize = xmlGetAttrValue (attrlist, 'isize');
-         if ~length (isize)
+         if isempty(isize)
            itype = 'long';
          end
        case 'comment'
          buf = '';
          c = fgets (fid, 1);
-         while ~feof (fid) & c ~= '>'
+         while ~feof (fid) && c ~= '>'
            c = fgets (fid, 1);
-           buf = strcat (buf, c);
+           buf = [buf c];
          end
          valid = 0;
          if (length(buf) > 9)
            p1 = length(buf)-8;
            p2 = length(buf)-1;
-           if buf(p1:p2) == '/comment'
+           if strcmp(buf(p1:p2), '/comment')
              valid = 1;
            end
          end
@@ -94,7 +95,7 @@ while ~feof (fid) & ~exit_loop
                error ('Wrong tag, expected "%s", but got "%s"', ...
                       expected_tag, tag);
            end
-         func = str2func (strcat ('xmlRead', tag));
+         func = str2func (['xmlRead', tag]);
          result = feval (func, fid, attrlist, itype, ftype, binary, fid2);
       end
     else %=== or is it a closing tag
@@ -102,7 +103,7 @@ while ~feof (fid) & ~exit_loop
       s = c;
       while ~feof (fid) && c ~= '>'
         c = fgets (fid, 1);
-        s = strcat (s, c);
+        s = [s c];
       end
       if (~toplevel)
         exit_loop = 1;

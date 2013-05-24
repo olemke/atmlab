@@ -14,24 +14,26 @@ function attrlist = xmlReadAttributes(fid)
 attrlist={};
 na = 0;
 c = fgets (fid, 1);
-while ~feof (fid) & c ~= '>'
-  attr = '';
-  while ~feof (fid) & c ~= '=' & c ~= '>'
-    attr = strcat(attr, c);
+while ~feof (fid) && c ~= '>'
+  attr = [];
+  while ~feof (fid) && c ~= '=' && c ~= '>'
+    attr = [attr c];
     c = fgets (fid, 1);
   end
+  
+  attr = strtrim(attr);
 
   if c == '>', break, end;
 
   c = fgets (fid, 1);
-  while ~feof (fid) & c == ' '
+  while ~feof (fid) && c == ' '
     c = fgets (fid, 1);
   end
 
   value = '';
   c = fgets (fid, 1);
-  while ~feof (fid) & c ~= '"'
-    value = [ value c ];
+  while ~feof (fid) && c ~= '"'
+    value = [value c];
     c = fgets (fid, 1);
   end
 
