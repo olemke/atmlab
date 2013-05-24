@@ -13,6 +13,4 @@
 
 function bool = istensor1( a )
 
-bool = isnumeric( a )  &&  dimens(a) <= 1;
-
-
+bool = isempty(a) || (isnumeric(a) && size(a,1) >=0 && size(a,2) <= 1 && ndims(a)==2);

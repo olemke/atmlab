@@ -1,5 +1,13 @@
 2013-05-24  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-1-350
+
+	* math/istensor0.m: Speed up by factor 10 by using isscalar.
+
+	* math/istensor1.m: Speed up by factor 3-11 depending on input data.
+
+2013-05-24  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-1-349
 
 	* arts/xml/xml*:

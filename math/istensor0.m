@@ -12,6 +12,4 @@
 
 function bool = istensor0( a )
 
-bool = isnumeric( a )  &&  dimens(a) == 0;
-
-
+bool = isnumeric( a )  &&  isscalar(a);
