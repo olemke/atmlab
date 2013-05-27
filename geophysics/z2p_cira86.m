@@ -42,7 +42,7 @@ end                                                                %&%
 % Create a a mjd matching the given doy (ie. the inverse of mjd2doy)
 mjd = date2mjd( 2000, 1, 1, 0, 0, 0 ) + doy - 1;
 
-if (nargin < 4)
+if (nargin < 4 || isempty(Gc86z))
   cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', ...
                             'cira86', 'cira86.z.xml' );
   Gc86z = gf_artsxml( cira86, 'CIRA86', 'z_field' );
@@ -53,7 +53,7 @@ p    = zeros( length(z), size(Z,2), size(Z,4) );
 logp = log( G.GRID1 );
 
 if nargout > 1
-  if (nargin < 5)
+  if (nargin < 5 || isempty(Gc86t))
     cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', ...
                               'cira86', 'cira86.t.xml' );
     Gc86t = gf_artsxml( cira86, 'CIRA86', 't_field' );

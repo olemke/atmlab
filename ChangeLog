@@ -1,5 +1,18 @@
 2013-05-27  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-1-352
+
+	* geophysics/z2p_cira86.m:
+
+	Slight tweak. Allow empty Gc86z and Gc86t input to allow same call
+	signature on first and following calls:
+
+	cz=[]; ct=[];
+	[p,t,cz,ct]=z2p_cira86(     2000,80,100,cz,ct);
+	[p,t,cz,ct]=z2p_cira86([1:1000]',45,100,cz,ct);
+
+2013-05-27  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-1-351
 
 	* geophysics/z2p_cira86.m:
