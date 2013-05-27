@@ -188,7 +188,7 @@ fprintf(fid,'\\documentclass[a4paper,10pt]{report}\n');
 margin=0.1; %cm
 if ~isempty(options.title)
     options = optargs_struct(options,struct('fontsize',sprintf('%gcm',1/20 * max(layout.rowwidth)))); % cm
-    tmp=regexp(options.fontsize,'(?<fz>\d+)(?<unit>.+)','names');
+    tmp=regexp(options.fontsize,'(?<fz>\d+.\d+)(?<unit>.+)','names');
     fz=str2double(tmp.fz);
     unit=tmp.unit;
 else

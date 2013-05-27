@@ -1,5 +1,11 @@
 2013-05-27  Salomon Eliasson  <seliasson@ManUtd>
 
+	* atmlab-2-1-354
+
+	* handy/combine_pdfs.m: Fixed bad regular expression
+
+2013-05-27  Salomon Eliasson  <seliasson@ManUtd>
+
 	* atmlab-2-1-353
 
 	* geoplots/gmt/psscale.m: exchanged %.0f with %g, because it's
