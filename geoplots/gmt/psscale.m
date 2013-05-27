@@ -33,7 +33,7 @@ if ( isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) ) || ...
     
     if isfield(in,'box_spacing')
         % tickspacing (annotation every xth contour), unit (dispay with legend)
-        psscale = sprintf('%s%.2f',psscale,in.box_spacing);
+        psscale = sprintf('%s%g',psscale,in.box_spacing);
     end
     if isfield(in,'tick_centering')
         psscale = sprintf('%si',psscale);
@@ -61,7 +61,7 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
 end
 
 if isfield(in,'tick_spacing')
-    psscale = sprintf('%s -B%.0f:"%s":/:"%s":',psscale,in.tick_spacing,in.xunit,in.unit);
+    psscale = sprintf('%s -B%g:"%s":/:"%s":',psscale,in.tick_spacing,in.xunit,in.unit);
 else
     psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
 end

@@ -68,8 +68,7 @@ if (isempty(options.outdir) || options.outdir(1) ~= filesep())
 end
 
 %% Sanity checks
-assert(options.vspace >= 0, 'atmlab:combine_pdfs', 'Vertical spacing must be >= 0');
-assert(options.hspace >= 0, 'atmlab:combine_pdfs', 'Horizontal spacing must be >= 0');
+
 assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
     'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
 assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
