@@ -1,3 +1,17 @@
+2013-05-27  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-351
+
+	* geophysics/z2p_cira86.m:
+
+	Optionally return the original cira86 z_field and t_field. If the user
+	has to call this function very often, he can cache the cira86 data and
+	pass it in on following calls. This avoids reading the xml files over
+	and over again.
+
+	[p,t,cz,ct]=z2p_cira86(1000,45,100);
+	[p,t]      =z2p_cira86(2000,80,100,cz,ct); end
+
 2013-05-24  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-350

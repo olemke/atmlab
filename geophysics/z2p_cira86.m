@@ -4,19 +4,30 @@
 %    climataology. Linear interpolation between log(pressure),
 %    latitude, and day of year is performed.
 %
-% FORMAT   [P,T] = p2z_cira86( Z , LAT , DOY )
+%    The function optionally returns the gridded fields for cira 86z and t.
+%    This is useful if you need to call Z2P_CIRA86 very often.
+%    Store Gc86z and G86t on the first call, then pass them in with every
+%    following call. This avoids reading the XML data over and over again.
+%
+% FORMAT   [P,T,Gc86z,Gc86t] = p2z_cira86( Z , LAT , DOY, Gc86z, Gc86t )
 %        
 % OUT   P     Pressure in pascal, for all combinations of Z, LAT, DOY 
 %             Size is [np,nlat,ndoy]
+%   OPTIONAL
 %       T     Temperature in kelvin, for all combinations of Z, LAT, DOY 
 %             Size is [nz,nlat,ndoy]
+%       Gc86z Original cira86 z_field
+%       Gc86t Original cira86 t_field
 % IN    Z     Altitude in meter. Can be a scalar or column vector
 %       LAT   Latitude. Can be a scalar or column vector [-90 to 90].
 %       DOY   Day of year. Can be a scalar or column vector
+%   OPTIONAL
+%       Gc86z Original cira86 z_field
+%       Gc86t Original cira86 t_field
 
 % 2007-11-01   Created by Bengt Rydberg
 
-function [p,t]=z2p_cira86(z,lat,doy)
+function [p,t,Gc86z,Gc86t]=z2p_cira86(z,lat,doy,Gc86z,Gc86t)
                                                                    %&%
 rqre_datatype( z, @istensor1 );                                    %&%
 rqre_datatype( lat, @istensor1 );                                  %&%
@@ -31,21 +42,23 @@ end                                                                %&%
 % Create a a mjd matching the given doy (ie. the inverse of mjd2doy)
 mjd = date2mjd( 2000, 1, 1, 0, 0, 0 ) + doy - 1;
 
-cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
-                                                               'cira86.z.xml' );
-
-G    = gf_artsxml( cira86, 'CIRA86', 'z_field' );
-G    = atmdata_regrid( G, { G.GRID1, lat, 0, mjd } );
+if (nargin < 4)
+  cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', ...
+                            'cira86', 'cira86.z.xml' );
+  Gc86z = gf_artsxml( cira86, 'CIRA86', 'z_field' );
+end
+G    = atmdata_regrid( Gc86z, { Gc86z.GRID1, lat, 0, mjd } );
 Z    = G.DATA;
 p    = zeros( length(z), size(Z,2), size(Z,4) );
 logp = log( G.GRID1 );
 
-
 if nargout > 1
-  cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
-                                                               'cira86.t.xml' );
-  G = gf_artsxml( cira86, 'CIRA86', 't_field' );
-  G = atmdata_regrid( G, { G.GRID1, lat, 0, mjd } );
+  if (nargin < 5)
+    cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', ...
+                              'cira86', 'cira86.t.xml' );
+    Gc86t = gf_artsxml( cira86, 'CIRA86', 't_field' );
+  end
+  G = atmdata_regrid( Gc86t, { Gc86t.GRID1, lat, 0, mjd } );
   T = G.DATA;
   t = zeros( length(z), size(T,2), size(T,4) );
 end
@@ -61,4 +74,3 @@ for ilat = 1 : size(Z,2)
     end
   end
 end
-
