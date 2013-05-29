@@ -2,6 +2,10 @@
 
 	* atmlab-2-1-355
 
+	* gformat/gf_set_grid.m: Since this function may be called very
+	many times, I sped this function up by a factor 2-3 by using
+	assertions directly instead of the rqre_* functions
+
 	* handy/combine_pdfs.m: Exchanged all the %f's with %g since there
 	is no need to truncate values and the loss of precision was
 	causing problems.
