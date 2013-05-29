@@ -1,3 +1,11 @@
+2013-05-29  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-355
+
+	* handy/combine_pdfs.m: Exchanged all the %f's with %g since there
+	is no need to truncate values and the loss of precision was
+	causing problems.
+
 2013-05-27  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-354

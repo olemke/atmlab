@@ -168,7 +168,6 @@ end
 
 end
 
-
 function file = create_pdf_from_layout_with_latex(layout, options)
 
 tmpfolder = create_tmpfolder();
@@ -188,7 +187,7 @@ fprintf(fid,'\\documentclass[a4paper,10pt]{report}\n');
 margin=0.1; %cm
 if ~isempty(options.title)
     options = optargs_struct(options,struct('fontsize',sprintf('%gcm',1/20 * max(layout.rowwidth)))); % cm
-    tmp=regexp(options.fontsize,'(?<fz>\d+.\d+)(?<unit>.+)','names');
+    tmp=regexp(options.fontsize,'(?<fz>\d+\.?\d*)(?<unit>.+)','names');
     fz=str2double(tmp.fz);
     unit=tmp.unit;
 else
@@ -199,9 +198,8 @@ fprintf(fid,['\\usepackage[margin=%.2gcm,paperwidth=%gcm,' ...
     'paperheight=%gcm]{geometry}\n'], ...
     margin, ...
     max(layout.rowwidth) + 2*margin, ...
-    sum(layout.rowheight) + 2*margin + 2*fz ...
-    + options.vspace*(length(layout.rowheight)) ...
-    + options.secret_latex_spacing_tweak*length(layout.rowheight));
+    sum(layout.rowheight) + 2*margin + fz ...
+    + options.vspace*(length(layout.rowheight)));
 
 fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
@@ -211,20 +209,20 @@ fprintf(fid,'\\begin{document}\n');
 fprintf(fid,'\\centering\n');
 if ~isempty(options.title)
     if ~any(ismember(unit,{'cm','mm','pt'})), error(['atmlab:' mfilename],'Don''t know fontsize unit "%s"',unit),end
-    fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}\n', options.valign, max(layout.rowwidth));
+    fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, max(layout.rowwidth));
     fprintf(fid,'\\begin{center}\n');
-    fprintf(fid,'{\\fontsize{%.0f%s}{%.0f%s}\\selectfont %s}\n',...
+    fprintf(fid,'{\\fontsize{%g%s}{%g%s}\\selectfont %s}\n',...
         fz,unit,1.2*fz,unit,strrep(options.title,'_','\_'));
     fprintf(fid,'\\end{center}\n');
     fprintf(fid,'\\end{minipage}\n');
-    fprintf(fid, '\\vspace{%.2fcm}\\\\\n', options.vspace);
+    fprintf(fid, '\\vspace{%gcm}\\\\\n', options.vspace);
 end
 
 row = 1; filenum = 1;
 for R = layout.plotsbyrow
     col=1;
     for P = R{:}
-        fprintf(fid,'\\begin{minipage}[%s]{%.2fcm}\n', options.valign, P.width);
+        fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, P.width);
         tmpplotname=sprintf('plot%d.pdf', filenum);
         mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
         if isfield(options,'scale') && ~isempty(options.scale(options.scale(:,1)==filenum,2))
@@ -235,13 +233,13 @@ for R = layout.plotsbyrow
         fprintf(fid,'\\includegraphics[scale=%s]{%s}\n', strscale,tmpplotname);
         fprintf(fid,'\\end{minipage}\n');
         if (col ~= length(R{:}))
-            fprintf(fid,'\\hspace{%.2fcm}\n', options.hspace);
+            fprintf(fid,'\\hspace{%gcm}\n', options.hspace);
         end
         col = col+1;
         filenum=filenum+1;
     end
     if (row ~= length(layout.rowheight))
-        fprintf(fid, '\\vspace{%.2fcm}\\\\\n', options.vspace);
+        fprintf(fid, '\\vspace{%gcm}\\\\\n', options.vspace);
     end
     row = row+1;
 end
