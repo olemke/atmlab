@@ -97,6 +97,11 @@ SatDataset('name', 'hirs', ...
     'granule_duration', 6130, ...
     'sats', {'noaa15', 'noaa16', 'noaa17', 'noaa18', 'noaa19', 'metopa'});
 
+SatDataset('name', 'gras_per_day', ...
+    'reader', @satreaders.grasdir, ...
+    'satname', 'any', ...
+    'granule_duration', 86400);
+
 SatDataset('name','isccp_dx',...
     'reader',@satreaders.isscp_dx,...
     'granule_duration',3*60); %data var 3:de timme och var 15:de km
@@ -495,6 +500,11 @@ CollocatedDataset(D.ssmt2, D.amsub, ...
     'distance', 40, ...
     'interval', 900);
 
+CollocatedDataset(D.gras_per_day, D.amsua, ...
+    'name', 'collocation_gras_amsua', ...
+    'distance', 150, ...
+    'interval', 3600);
+
 % CPR as reference
 
 CollocatedDataset(D.avhrr_cmsaf_gac, D.cpr,...
@@ -681,6 +691,9 @@ FieldCopier(D.collocation_ssmt2_amsub, fields.ssmt2, fields.amsub, ...
 FieldCopier(D.collocation_ssmt2_mhs, fields.ssmt2_1, fields.ssmt2_2, ...
     'name', 'associated_ssmt2_ssmt2');
 
+FieldCopier(D.collocation_gras_amsua, fields.gras, fields.amsua, ...
+    'name', 'associated_gras_amsua');
+
 FieldCopier(D.CollocatedDataset_cloud_cci_dardarsub, ...
     getSelection(fields.cloud_cci,{'iwp','iwp_error','ref_ice','ref_uncertainty','cot_ice','cot_uncertainty'}),...
      getSelection(fields.dardarsub,{'dardar_IWP','dardar_ln_IWP_error','dardar_Re'}),...
@@ -846,6 +859,28 @@ modis.Tau_ice.stored.CLOSEST.type                = D.modis_aqua_L2.pseudo_fields
 modis.Tau_ice.limitators                         = limitators_scalar;
 
 % -------
+% amsua over gras
+% -------
+
+amsua_global_lim =  {@(X)(X(:, D.collocation_gras_amsua.cols.DIST)<100), ...
+                 @(X)(abs(X(:, D.collocation_gras_amsua.cols.INT))<3600)};
+
+capsed_amsua.A_BT.processors.NO = @(X)(size(X, 1));
+capsed_amsua.A_BT.stored.NO.type = 'int';
+capsed_amsua.A_BT.stored.NO.atts.long_name = 'Number of AMSU-A used for stats within GRAS';
+capsed_amsua.A_BT.stored.NO.atts.valid_min = 0;
+capsed_amsua.A_BT.stored.NO.profile = false;
+capsed_amsua.A_BT.processors.MEAN = @(X)(mean(X, 1));
+capsed_amsua.A_BT.stored.MEAN.type = 'float';
+capsed_amsua.A_BT.stored.MEAN.atts.units = fields.amsua.A_BT.atts.units;
+capsed_amsua.A_BT.stored.MEAN.atts.long_name = ['Mean ' fields.amsua.A_BT.atts.long_name];
+capsed_amsua.A_BT.stored.MEAN.atts.valid_range = [150, 350];
+capsed_amsua.A_BT.processors.STD = @(X)(std(X, 0, 1));
+capsed_amsua.A_BT.stored.STD.type = 'float';
+capsed_amsua.A_BT.stored.STD.atts.units = fields.amsua.A_BT.atts.units;
+capsed_amsua.A_BT.stored.STD.atts.long_name = ['Std. of ' fields.amsua.A_BT.atts.long_name];
+capsed_amsua.A_BT.stored.STD.atts.valid_min = 0;
+% -------
 % cloud_cci
 % -------
 
@@ -924,6 +959,9 @@ Collapser(D.dardarsub_modis_cprCloudLidar,getSelection(modis,'modis_IWP'),modis_
 
 Collapser(D.cloud_cci_dardarsub_IWP,cloud_cci,cloud_cci_global, ...
     'name','cloud_cci_dardarsub_collapsedIWP');
+
+Collapser(D.associated_gras_amsua, capsed_amsua, amsua_global_lim, ...
+    'name', 'collapsed_gras_amsua');
 
 % this one uses some subfunctions, so is defined in its own file
 define_c2dp('mhs');
@@ -1516,6 +1554,51 @@ for ddfield = vec2row(ddfields)
     fields.cpr.(fname) = fields.dardarsub.(ddfield{1});
     fields.cpr.(fname).dataset = D.dardarsub;
 end
+
+%% GRAS
+%  We will need (at least) the following parameters from the netCDF file:
+% - temp
+% - temp_sigma
+% - shum  (specific humidity)
+% - geop (geopotential height)
+
+fields.gras.G_TEMP.type = 'float';
+fields.gras.G_TEMP.realname = 'temp';
+fields.gras.G_TEMP.atts.long_name = 'GRAS Temperature';
+fields.gras.G_TEMP.atts.units = 'Kelvin';
+fields.gras.G_TEMP.atts.valid_range = [150, 350];
+fields.gras.G_TEMP.atts.note = 'Attributes copied from original';
+fields.gras.G_TEMP_SIGMA.type = 'float';
+fields.gras.G_TEMP_SIGMA.realname = 'temp_sigma';
+fields.gras.G_TEMP_SIGMA.atts.long_name = 'GRAS Estimated error (1-sigma) for temperature';
+fields.gras.G_TEMP_SIGMA.atts.units = 'kelvin';
+fields.gras.G_TEMP_SIGMA.atts.valid_range = [0, 5];
+fields.gras.G_TEMP_SIGMA.atts.note = 'Attributes copied from original';
+fields.gras.G_SHUM.type = 'float';
+fields.gras.G_SHUM.realname = 'shum';
+fields.gras.G_SHUM.atts.long_name = 'GRAS Specific humidity';
+fields.gras.G_SHUM.atts.units = 'gram / kilogram';
+fields.gras.G_SHUM.atts.valid_range = [0, 50];
+fields.gras.G_SHUM.atts.note = 'Attributes copied from original';
+fields.gras.G_SHUM_SIGMA.type = 'float';
+fields.gras.G_SHUM_SIGMA.realname = 'shum_sigma';
+fields.gras.G_SHUM_SIGMA.atts.long_name = 'GRAS Estimated  error (1-sigma) in specific humidity';
+fields.gras.G_SHUM_SIGMA.atts.units = 'gram / kilogram';
+fields.gras.G_SHUM_SIGMA.atts.valid_range = [0, 5];
+fields.gras.G_SHUM_SIGMA.atts.note = 'Attributes copied from original'; 
+fields.gras.G_GEOP.type = 'float';
+fields.gras.G_GEOP.realname = 'geop';
+fields.gras.G_GEOP.atts.long_name = 'GRAS Geopotential height above geoid for P,T,H';
+fields.gras.G_GEOP.atts.units = 'geopotential metres';
+fields.gras.G_GEOP.atts.valid_range = [-1000, 100000];
+fields.gras.G_GEOP.atts.note = 'Attributes copied from original';
+fields.gras.G_GEOP_SIGMA.type = 'float';
+fields.gras.G_GEOP_SIGMA.realname = 'geop_sigma';
+fields.gras.G_GEOP_SIGMA.atts.long_name = 'GRAS Estimated error (1-sigma) for geopotential height';
+fields.gras.G_GEOP_SIGMA.atts.units = 'geopotential metres';
+fields.gras.G_GEOP_SIGMA.atts.valid_range = [0, 500];
+fields.gras.G_GEOP_SIGMA.atts.note = 'Attributes copied from original';
+
 
 %% HIRS
 fields.hirs.H_LONG.type = 'float';

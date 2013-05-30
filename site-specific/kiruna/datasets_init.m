@@ -88,6 +88,11 @@ D.cloud_cci.basedir = '/storage3/data/cloud_cci/ESACCI-L2_CLOUD-CLD_PRODUCTS-AVH
 D.cloud_cci.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
 D.cloud_cci.re = '(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})';
 
+D.gras_per_day.basedir = '/storage5/data/gras';
+D.gras_per_day.subdir = ''; % subdirs are the actual 'granules'
+D.gras_per_day.filename = '$YEAR4-$MONTH-$DAY';
+D.gras_per_day.re = '(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})';
+
 D.hirs.basedir = '/storage3/data/hirs';
 D.hirs.subdir = '$SAT_hirs_$YEAR4/$MONTH/$DAY';
 D.hirs.re = poes_re;
@@ -203,6 +208,10 @@ D.collocation_ssmt2_mhs.filename = 'collocations_$SAT1_$SAT2.nc.gz';
 D.collocation_ssmt2_amsub.basedir = '/storage3/user_data/gerrit/collocated_datasets/ssmt2_amsub';
 D.collocation_ssmt2_amsub.subdir = '$YEAR4/$MONTH/$DAY';
 D.collocation_ssmt2_amsub.filename = 'collocations_$SAT1_$SAT2.nc.gz';
+
+D.collocation_gras_amsua.basedir = '/storage3/user_data/gerrit/collocated_datasets/gras_amsua';
+D.collocation_gras_amsua.subdir = '$YEAR4/$MONTH/$DAY';
+D.collocation_gras_amsua.filename = 'collocations_$SAT.nc.gz';
 
 % CPR as reference
 
@@ -360,6 +369,10 @@ D.associated_mhs_saphir.basedir = '/storage3/user_data/gerrit/collocated_dataset
 D.associated_mhs_saphir.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_mhs_saphir.filename = 'fulldata_$SAT.nc.gz';
 
+D.associated_gras_amsua.basedir = D.collocation_gras_amsua.basedir;
+D.associated_gras_amsua.subdir = D.collocation_gras_amsua.subdir;
+D.associated_gras_amsua.filename = 'fulldata_$SAT.nc.gz';
+
 D.associated_amsub_saphir.basedir = '/storage3/user_data/gerrit/collocated_datasets/amsub_saphir';
 D.associated_amsub_saphir.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_amsub_saphir.filename = 'fulldata_$SAT.nc.gz';
@@ -379,6 +392,10 @@ D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename = 'collapsed_$SAT.nc.gz';
 D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.basedir = D.associated_CPR_AMSUB_AMSUA_HIRS.basedir;
 D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.subdir = D.associated_CPR_AMSUB_AMSUA_HIRS.subdir;
 D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.filename = D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename;
+
+D.collapsed_gras_amsua.basedir = D.associated_gras_amsua.basedir;
+D.collapsed_gras_amsua.subdir = D.associated_gras_amsua.basedir;
+D.collapsed_gras_amsua.filename = 'collapsed_$SAT.nc.gz';
 
 D.cpr_dardarsub_IWP.basedir     = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/cpr_dardarsub_IWP';
 D.cpr_dardarsub_IWP.filename    = 'collocations_cpr_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';

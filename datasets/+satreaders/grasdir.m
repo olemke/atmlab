@@ -39,7 +39,7 @@ alldata = cellfun(@(f) loadncvar(f, all_fields), ...
 S = horzcat(alldata{:});
 flds = fieldnames(S(1));
 varying_size = cellfun(@(fn) length(unique(cellfun(@length, {S.(fn)}))), flds)>1;
-vals = cellfun(@(f) [S.(f)], flds(~varying_size), 'UniformOutput', false);
+vals = cellfun(@(f) [S.(f)].', flds(~varying_size), 'UniformOutput', false);
 S_res = cell2struct(vals.', flds(~varying_size).', 2);
 
 if length(find(varying_size)) > 0
@@ -55,8 +55,10 @@ info = regexp({cont(path_is_gran).name}, f_re, 'names');
 % str to double and cell array to struct array
 info = cellfun(@(S) structfun(@str2double, S, 'UniformOutput', false), info, 'UniformOutput', false);
 info = horzcat(info{:});
-S_res.time = [info.hour] * 3600 + [info.minute] * 60 + [info.second];
+S_res.time = vec2col([info.hour] * 3600 + [info.minute] * 60 + [info.second]);
 S_res.epoch = date2unixsecs(info(1).year, info(1).month, info(1).day);
 assert(length(unique([info.day]))==1, ['atmlab:' mfilename ':multi-day'], ...
     'Data appear to span multiple days, I did not expect that');
+
+S_res.version = '?';
 end

@@ -1,3 +1,19 @@
+2013-05-30  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-356
+
+	* datasets/+satreaders/grasdir.m: 
+
+	- Fix dimensions, add version (unknown).
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Added material for gras-amsua collocations
+
+	* datasets/+satreaders/netcdf_dataset.m:
+
+	- Adapt to changed behaviour in loadncvar
+
 2013-05-29  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-355

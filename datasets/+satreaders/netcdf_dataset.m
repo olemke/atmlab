@@ -10,8 +10,9 @@ function S = netcdf_dataset(ds, file, varargin)
     all_fields    = [core_fields(:); extra_fields(:)];
 
     [S, attr] = loadncvar(file, all_fields);
-    C(1:2*length(attr)) = deal([attr{:}]);
-    strattr = struct(C{:});
+    %C(1:2*length(attr)) = deal([attr{:}]);
+    %strattr = struct(C{:});
+    strattr = attr;
     
     % get additional stuff
     info = ds.find_info_from_granule(file);
