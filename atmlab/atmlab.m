@@ -109,12 +109,14 @@
 % STRICT_ASSERT
 % 
 % Some parts of atmlab performs quite strict checks of input arguments and
-% data. Such asserts and checks can in some cases take a significant
-% fraction of the calculation time in a function (or even dominate the
-% time) and, to allow faster calculations, some functions use this flag to
-% possibly deactivate the checks. Default is true and the checks are
-% performed. If you have a stable set-up, you can set this field to false
-% and potentially improve the calculation speed.
+% data. Such asserts and checks can in some cases take a significant fraction
+% of the calculation time in a function (or even dominate the time) and, to
+% allow faster calculations, some functions use this flag to possibly
+% deactivate the checks. Default is true and the checks are performed. If you
+% have a stable set-up, you can set this field to false and potentially improve
+% the calculation speed. That is, if you are sure that the assertions
+% are not needed (only applies to assertions in "if amtlab('STRICT_ASSERT')"
+% environments), then set atmlab('STRICT_ASSERT')=false;
 %----------------------------------------------------------------------------
 % VERBOSITY
 % 
@@ -137,16 +139,6 @@
 % platforms is '/tmp'. The work area is primarily used for forward model
 % calculations, but there could be other applications.
 % ----------------------------------------------------------------------------
-% STRICT_ASSERT
-%
-% Means more assertions if true (default). Although safer, the
-% downside is that the run time is longer. So if you are sure that the
-% certain assertions are not needed (only applies to assertions in "if
-% amtlab('STRICT_ASSERT')" environments), then set
-% atmlab('STRICT_ASSERT')=false;
-%
-%
-%
 
 % 2003-07-06   Created by Patrick Eriksson.
 

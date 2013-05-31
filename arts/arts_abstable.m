@@ -67,10 +67,16 @@ strs2file( cfile, S );
 arts( cfile );
 
 
+fname = fullfile( workfolder, 'abs_lookup.xml' );
+
+if ~exist( fname )                                                       %&%
+  error( 'No absorption table generated. Forgot to set Q.ABSORPTION?' ); %&%
+end                                                                      %&%
+
 if folder_created  |  do_load
-  A = xmlLoad( fullfile( workfolder, 'abs_lookup.xml' ) );
+  A = xmlLoad( fname );
 else
-  A = fullfile( workfolder, 'abs_lookup.xml' );  
+  A = fname;
 end
 
 
