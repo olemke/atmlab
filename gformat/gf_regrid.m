@@ -13,41 +13,45 @@
 %      G(2:3) = gf_regrid( G(2:3), ...
 %
 % FORMAT   G = gf_regrid( G, grids, iopt )
-%        
+%
 % OUT   G      Re-grided gformat data.
 % IN    G      Original gformat data.
 %       grids  New grids. An array of vectors.
 % OPT   iopt   Interpolation option. See *regrid*.
+%
 
 % 2007-10-17   Created by Patrick Eriksson.
 
 
 function G = gf_regrid( G, grids, iopt )
 %
-if nargin < 3                                            
-  iopt = 'linear';
+if nargin < 3
+    iopt = 'linear';
 end
-                                                                   %&%
-                                                                   %&%
-%- Check input                                                     %&%
-%                                                                  %&%
-rqre_datatype( G, @isgformat );                                    %&%
-% Grids of G are checked inside *gridinterp*                       %&%
-rqre_datatype( grids, @iscell );                                   %&%
-rqre_datatype( iopt, @ischar );                                    %&%
 
+if atmlab('STRICT_ASSERT')
+    %&%
+    %&%
+    %- Check input                                                     %&%
+    %                                                                  %&%
+    rqre_datatype( G, @isgformat );                                    %&%
+    % Grids of G are checked inside *gridinterp*                       %&%
+    rqre_datatype( grids, @iscell );                                   %&%
+    rqre_datatype( iopt, @ischar );                                    %&%
+    
+end
 
+agrids = cell(length(G));
 for i = 1 : length( G )
-  %
-  agrids = {};
-  %
-  for d = 1  : G(i).DIM
-    gname        = sprintf('GRID%d',d);
-    agrids{d}    = G(i).(gname);
-    G(i).(gname) = grids{d};
-  end
-  %
-  G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt, true );  
-  %
+    %
+    %agrids = {};
+    %
+    for d = 1  : G(i).DIM
+        gname        = sprintf('GRID%d',d);
+        agrids{d}    = G(i).(gname);
+        G(i).(gname) = grids{d};
+    end
+    %
+    G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt, true );
+    %
 end
-

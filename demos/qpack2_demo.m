@@ -18,7 +18,8 @@
 
 function L2 = qpack2_demo
   
-  
+errid = ['atmlab:' mfilename]; 
+
 %- Qarts settings
 %
 Q    = q_demo;           % Local file, found below
@@ -32,7 +33,7 @@ Y = y_demo( Q );         % Local file, found below
 %- Check that all frequencies are OK
 %
 if ~qp2_check_f( Q, Y, 1e3 );
-  error( 'Some mismatch between Q.F_BACKEND and frequencies of spectra.' );
+  error(errid, 'Some mismatch between Q.F_BACKEND and frequencies of spectra.' );
 end
 %
 [Y.F] = deal( {} );      % The field F is now obselete. {} is used inside 
@@ -93,15 +94,16 @@ return
 
 function Q = q_demo
  
+errid = ['atmlab:' mfilename];
 %- Atmlab settings
 %
 arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
 arts_includes     = atmlab( 'ARTS_INCLUDES' );
 if isnan( arts_xmldata_path ) 
-  error( 'You need to set ARTS_XMLDATA_PATH to run this exmaple.' );
+  error( errid,'You need to set ARTS_XMLDATA_PATH to run this exmaple.' );
 end
 if isnan( arts_includes )
-  error( 'You need to ARTS_INCLUDES to run this example.' );
+  error( erird,'You need to ARTS_INCLUDES to run this example.' );
 end                                                      
 %
 fascod = fullfile( arts_xmldata_path, 'planets', 'Earth', 'Fascod' );
@@ -179,7 +181,7 @@ H.SENSOR_NORM         = true;
 %
 H.BACKEND_DO          = true;
 df                    = 0.5e6;
-H.F_BACKEND           = [ min(Q.F_GRID)+df : df : max(Q.F_GRID)-df ]';
+H.F_BACKEND           = ( min(Q.F_GRID)+df : df : max(Q.F_GRID)-df )';
 %
 B.name                = 'Spectrometer channel response function';
 B.gridnames           = { 'Frequency' };

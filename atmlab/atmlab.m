@@ -136,7 +136,17 @@
 % The full path shall be given. A normal choice for work area on Unix type
 % platforms is '/tmp'. The work area is primarily used for forward model
 % calculations, but there could be other applications.
-
+% ----------------------------------------------------------------------------
+% STRICT_ASSERT
+%
+% Means more assertions if true (default). Although safer, the
+% downside is that the run time is longer. So if you are sure that the
+% certain assertions are not needed (only applies to assertions in "if
+% amtlab('STRICT_ASSERT')" environments), then set
+% atmlab('STRICT_ASSERT')=false;
+%
+%
+%
 
 % 2003-07-06   Created by Patrick Eriksson.
 
@@ -166,7 +176,7 @@ if length(varargin) == 2
       if isempty(nr)
         nr = 0;
       else
-        nr = str2num( nr );
+        nr = str2double( nr );
       end
       %
       rand( 'state', sum(100*clock) + nr );
@@ -209,5 +219,6 @@ A.SITE              = NaN;
 A.STRICT_ASSERT     = true;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = tempdir();
+A.STRICT_ASSERT     = true;
 
 end

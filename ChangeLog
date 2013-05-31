@@ -1,3 +1,37 @@
+2013-05-31  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-359
+
+	* atmlab/atmlab.m: Added description about the new option (STRICT_ASSERT) in atmlab
+
+	* geophysics/z2p_cira86.m: Use atmlab('STRICT_ASSERT') to skip the assertions.
+
+	* gformat/gf_artsxml.m
+	* gformat/gf_set_grid.m:
+	* gformat/atmdata_regrid.m:
+	* gformat/gf_regrid.m:
+	* math/gridinterp.m:
+	Put atmlab('STRICT_ASSERT') around assertions.
+
+	* retrieval/qpack2/qpack2.m:
+	* demos/qpack2_demo.m: 
+	Added some error identifiers and
+	changed some & to &&, | to ||, and some length(x)>0 to ~isempty(x)
+	to speed things up (probably slightly).
+
+	* gformat/gf_empty.m:
+	changed:
+	rqre_alltypes( dim, {@istensor0,@iswhole} );
+	rqre_in_range( dim, 0 );
+
+	to
+
+	assert(isnumeric(dim) && isscalar(dim) &&  all( dim - round(dim) == 0 )&& dim>0,...
+	 errid,'*dim* did not pass the test: @istensor0 && @iswhole')
+
+	since it's the same and tic, toc says it's 1000x faster
+
+
 2013-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-358

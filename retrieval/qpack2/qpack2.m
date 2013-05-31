@@ -35,6 +35,7 @@
 function [L2,X] = qpack2(Q,O,Y)
 
 
+
 %------------------------------------------------------------------------------
 %- Check input
 %------------------------------------------------------------------------------
@@ -137,13 +138,14 @@ return
 %
 function empty_y = checkY( Y )
 
+errid = ['atmlab:' mfilename];
   empty_y = isempty( Y(1).Y );
   
   if atmlab( 'STRICT_ASSERT' )
     if empty_y
       for i = 2 : length(Y)                                          
-        if length(Y(i).Y) > 0                                        
-          error( ['First spectrum in Y is empty. Then all other '... 
+        if ~isempty(Y(i).Y)                                        
+          error(errid, ['First spectrum in Y is empty. Then all other '... 
                   'spectra must also be empty.'] );                  
         end                                                          
       end                                                            
@@ -154,7 +156,7 @@ function empty_y = checkY( Y )
       for i = 2 : length(Y)                                          
         rqre_datatype( Y(i).Y, @istensor1, sprintf('Y(%d).Y',i) );   
         if length(Y(i).Y) ~= n                                       
-          error( 'All spectra must have the same length.' );         
+          error( errid,'All spectra must have the same length.' );         
         end                                                          
       end                                                            
     end
@@ -165,11 +167,11 @@ return
 
 
 
-function  [Q,Se] = qp2_y2Q( Q, Y, m );
+function  [Q,Se] = qp2_y2Q( Q, Y, m )
 
   % If output does not include Se, it assumed that no retrieval will 
   % be performed (for all m). 
-  
+  errid = ['atmlab:' mfilename];
   do_checks = atmlab( 'STRICT_ASSERT' );
 
     
@@ -183,31 +185,31 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
 
     if do_checks
       if ~qarts_isset(Q.ATMOSPHERE_DIM)                                       
-        error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set.' );             
+        error(errid, 'Qpack2 requires that Q.ATMOSPHERE_DIM is set.' );             
       end                                                                     
       rqre_datatype( Q.ATMOSPHERE_DIM, @istensor0, Q.ATMOSPHERE_DIM );         
       if Q.ATMOSPHERE_DIM ~= 1                                                
-        error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' );        
+        error( errid,'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' );        
       end                                                                     
       if qarts_isset(Q.RAW_ATMOSPHERE)                                        
-        error( 'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' );           
+        error( errid,'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' );           
       end                                                                     
       if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    
-        error( 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;
+        error( errid,'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;
       end                                                                     
       if ~qarts_isset(Q.T.ATMDATA)                                            
-        error( 'Qpack2 requires that Q.T.ATMDATA is set.' );                  
+        error( errid,'Qpack2 requires that Q.T.ATMDATA is set.' );                  
       end                                                                     
       % The details of the ATMDATA fields are checked in qarts_vmr_field etc  
       if ~qarts_isset(Q.ABSORPTION)                                           
-        error( 'Qpack2 requires that Q.ABSORPTION is set.' );                 
+        error( errid,'Qpack2 requires that Q.ABSORPTION is set.' );                 
       end                                                                     
       rqre_datatype( Q.ABSORPTION, @ischar, Q.ABSORPTION );                   
       if strcmp( Q.ABSORPTION, 'CalcTable' )                                  
-        error( 'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     
+        error( errid,'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     
       end                                                                     
       if ~qarts_isset(Q.HSE)                                                  
-        error( 'Qpack2 requires that Q.HSE is set.' );                        
+        error( errid,'Qpack2 requires that Q.HSE is set.' );                        
       end                                                                     
       rqre_datatype( Q.HSE.ON, @isboolean, Q.HSE.ON );                        
     end
@@ -219,14 +221,14 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
       Q.TNOISE_C = qarts_get( Q.TNOISE_C ); 
       if do_checks
         if ~qarts_isset(Q.TNOISE_C)                                          
-          error( 'Qpack2 requires that Q.TNOISE_C is set.' );                
+          error( errid,'Qpack2 requires that Q.TNOISE_C is set.' );                
         end                                                                  
         if ~issparse(Q.TNOISE_C)                                             
-          error( 'Q.TNOISE_C is required to be sparse (to save memory).' );  
-        elseif dimens(Q.TNOISE_C)~=2 | size(Q.TNOISE_C,1)~=size(Q.TNOISE_C,2)
-          error( 'Q.TNOISE_C must be square.' );                             
+          error( errid,'Q.TNOISE_C is required to be sparse (to save memory).' );  
+        elseif dimens(Q.TNOISE_C)~=2 || size(Q.TNOISE_C,1)~=size(Q.TNOISE_C,2)
+          error( errid,'Q.TNOISE_C must be square.' );                             
         elseif size(Q.TNOISE_C,1) ~= length(Y(m).Y)                          
-          error( 'Mismatch in size between Q.TNOISE_C and Y.Y.' );           
+          error( errid,'Mismatch in size between Q.TNOISE_C and Y.Y.' );           
         end                                                                 
       end  
     end % nargout < 2
@@ -283,7 +285,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
     Q.Z_FIELD   = qarts_atm_field( Q, 'z', mjd, ho );
   else
     if ~Q.HSE.ON
-      error( 'If Q.Z_FIELD* shall be set by HSE, Q.HSE.ON must be true.' );
+      error( errid,'If Q.Z_FIELD* shall be set by HSE, Q.HSE.ON must be true.' );
     end
     Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
   end
@@ -306,9 +308,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
 
     if do_checks
       rqre_datatype( Y(m).TNOISE, @istensor1, sprintf('Y(%d).TNOISE',m) );
-      if n ~= 1 & n ~= length( Y(m).Y ) 
-        error( sprintf( ...
-           'Length of Y(%d).TNOISE must be 1 or equal to length of Y.Y.',m) );
+      if n ~= 1 && n ~= length( Y(m).Y ) 
+        error( errid, 'Length of Y(%d).TNOISE must be 1 or equal to length of Y.Y.',m)
       end
     end
     
