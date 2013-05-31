@@ -135,7 +135,9 @@ end
 
 %--- Version returning string struture ----------------------------------------
 
-qcheck( @qarts, Q );
+if atmlab( 'STRICT_ASSERT' )
+  qcheck( @qarts, Q );
+end
 
 S    = {};
 

@@ -1,8 +1,19 @@
+2013-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-357
+
+	* arts/qarts2cfile.m: Added STRICT_ASSERT in one place.
+
+	* retrieval/qpack2/qpack2.m: Now using STRICT_ASSERT.
+
+	* atmlab/atmlab.m: Added STRICT_ASSERT. Will maybe be renamed.
+	More information later. Updated text for WORK_AREA.
+
 2013-05-30  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-356
 
-	* datasets/+satreaders/grasdir.m: 
+	* datasets/+satreaders/grasdir.m:
 
 	- Fix dimensions, add version (unknown).
 

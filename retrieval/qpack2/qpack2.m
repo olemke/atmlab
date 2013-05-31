@@ -38,15 +38,16 @@ function [L2,X] = qpack2(Q,O,Y)
 %------------------------------------------------------------------------------
 %- Check input
 %------------------------------------------------------------------------------
-                                                                            %&%
-rqre_nargin( 3, nargin );                                                   %&%
-rqre_datatype( Q, @isstruct );                                              %&%
-rqre_datatype( O, @isstruct );                                              %&%
-rqre_datatype( Y, @isstruct );                                              %&%
-qcheck( @qarts, Q );                                                        %&%
-qcheck( @oem, O );                                                          %&%
-qcheck( @qp2_y, Y );                                                        %&%
-%                                                                           %&%
+if atmlab( 'STRICT_ASSERT' )
+  rqre_nargin( 3, nargin );
+  rqre_datatype( Q, @isstruct );
+  rqre_datatype( O, @isstruct );
+  rqre_datatype( Y, @isstruct );
+  qcheck( @qarts, Q );
+  qcheck( @oem, O );
+  qcheck( @qp2_y, Y );
+end
+%
 empty_y = checkY( Y );
 
 
@@ -136,27 +137,27 @@ return
 %
 function empty_y = checkY( Y )
 
-  % All y empty 
-  if isempty( Y(1).Y )
-    for i = 2 : length(Y)                                                   %&%
-      if length(Y(i).Y) > 0                                                 %&%
-        error( ['First spectrum in Y is empty. Then all other '...          %&%
-                'spectra must also be empty.'] );                           %&%
-      end                                                                   %&%
-    end                                                                     %&%
-    empty_y = true;
-    
-  % Standard case 
-  else            
-    rqre_datatype( Y(1).Y, @istensor1, 'Y(1).Y' );                          %&%
-    n = length( Y(1).Y );                                                   %&%
-    for i = 2 : length(Y)                                                   %&%
-      rqre_datatype( Y(i).Y, @istensor1, sprintf('Y(%d).Y',i) );            %&%
-      if length(Y(i).Y) ~= n                                                %&%
-        error( 'All spectra must have the same length.' );                  %&%
-      end                                                                   %&%
-    end                                                                     %&%
-    empty_y = false;
+  empty_y = isempty( Y(1).Y );
+  
+  if atmlab( 'STRICT_ASSERT' )
+    if empty_y
+      for i = 2 : length(Y)                                          
+        if length(Y(i).Y) > 0                                        
+          error( ['First spectrum in Y is empty. Then all other '... 
+                  'spectra must also be empty.'] );                  
+        end                                                          
+      end                                                            
+      
+    else            
+      rqre_datatype( Y(1).Y, @istensor1, 'Y(1).Y' );                 
+      n = length( Y(1).Y );                                          
+      for i = 2 : length(Y)                                          
+        rqre_datatype( Y(i).Y, @istensor1, sprintf('Y(%d).Y',i) );   
+        if length(Y(i).Y) ~= n                                       
+          error( 'All spectra must have the same length.' );         
+        end                                                          
+      end                                                            
+    end
   end
 return      
 
@@ -169,73 +170,83 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   % If output does not include Se, it assumed that no retrieval will 
   % be performed (for all m). 
   
+  do_checks = atmlab( 'STRICT_ASSERT' );
+
+    
   %- Stuff only done for first measurement
   %
   if m == 1
-    % 1. Make sure that some fields are set as demanded                     %&%
-    % 2. "Load" data into Q to avoid repated reading of files               %&%
-    if ~qarts_isset(Q.ATMOSPHERE_DIM)                                       %&%
-      error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set.' );             %&%
-    end                                                                     %&%
-    Q.ATMOSPHERE_DIM = qarts_get( Q.ATMOSPHERE_DIM ); 
-    rqre_datatype( Q.ATMOSPHERE_DIM, @istensor0, Q.ATMOSPHERE_DIM );        %&% 
-    if Q.ATMOSPHERE_DIM ~= 1                                                %&%
-      error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' );        %&%
-    end                                                                     %&%
-    if qarts_isset(Q.RAW_ATMOSPHERE)                                        %&%
-      error( 'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' );           %&%
-    end                                                                     %&%
-    if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    %&%
-      error( 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;%&%
-    end                                                                     %&%
-    if ~qarts_isset(Q.T.ATMDATA)                                            %&%
-      error( 'Qpack2 requires that Q.T.ATMDATA is set.' );                  %&%
-    end                                                                     %&%
-    % The details of the ATMDATA fields are checked in qarts_vmr_field etc  %&%
-    if ~qarts_isset(Q.ABSORPTION)                                           %&%
-      error( 'Qpack2 requires that Q.ABSORPTION is set.' );                 %&%
-    end                                                                     %&%
-    rqre_datatype( Q.ABSORPTION, @ischar, Q.ABSORPTION );                   %&%
-    if strcmp( Q.ABSORPTION, 'CalcTable' )                                  %&%
-      error( 'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     %&%
-    end                                                                     %&%
-    if ~qarts_isset(Q.HSE)                                                  %&%
-      error( 'Qpack2 requires that Q.HSE is set.' );                        %&%
-    end                                                                     %&%
-    rqre_datatype( Q.HSE.ON, @isboolean, Q.HSE.ON );                        %&%
+    % 1. Make sure that some fields are set as demanded
+    % 2. "Load" data into Q to avoid repated reading of files 
+
+    Q.ATMOSPHERE_DIM = qarts_get( Q.ATMOSPHERE_DIM );  
+
+    if do_checks
+      if ~qarts_isset(Q.ATMOSPHERE_DIM)                                       
+        error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set.' );             
+      end                                                                     
+      rqre_datatype( Q.ATMOSPHERE_DIM, @istensor0, Q.ATMOSPHERE_DIM );         
+      if Q.ATMOSPHERE_DIM ~= 1                                                
+        error( 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' );        
+      end                                                                     
+      if qarts_isset(Q.RAW_ATMOSPHERE)                                        
+        error( 'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' );           
+      end                                                                     
+      if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    
+        error( 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' ) ;
+      end                                                                     
+      if ~qarts_isset(Q.T.ATMDATA)                                            
+        error( 'Qpack2 requires that Q.T.ATMDATA is set.' );                  
+      end                                                                     
+      % The details of the ATMDATA fields are checked in qarts_vmr_field etc  
+      if ~qarts_isset(Q.ABSORPTION)                                           
+        error( 'Qpack2 requires that Q.ABSORPTION is set.' );                 
+      end                                                                     
+      rqre_datatype( Q.ABSORPTION, @ischar, Q.ABSORPTION );                   
+      if strcmp( Q.ABSORPTION, 'CalcTable' )                                  
+        error( 'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );     
+      end                                                                     
+      if ~qarts_isset(Q.HSE)                                                  
+        error( 'Qpack2 requires that Q.HSE is set.' );                        
+      end                                                                     
+      rqre_datatype( Q.HSE.ON, @isboolean, Q.HSE.ON );                        
+    end
     
     if nargout < 2
       Q.J_DO = 0;
     else
       Q.J_DO = 1;
-      if ~qarts_isset(Q.TNOISE_C)                                           %&%
-        error( 'Qpack2 requires that Q.TNOISE_C is set.' );                 %&%
-      end                                                                   %&%
       Q.TNOISE_C = qarts_get( Q.TNOISE_C ); 
-      if ~issparse(Q.TNOISE_C)                                              %&%
-        error( 'Q.TNOISE_C is required to be sparse (to save memory).' );   %&%
-      elseif dimens(Q.TNOISE_C)~=2 | size(Q.TNOISE_C,1)~=size(Q.TNOISE_C,2) %&%
-        error( 'Q.TNOISE_C must be square.' );                              %&%
-      elseif size(Q.TNOISE_C,1) ~= length(Y(m).Y)                           %&%
-        error( 'Mismatch in size between Q.TNOISE_C and Y.Y.' );            %&%
-      end                                                                   %&%
+      if do_checks
+        if ~qarts_isset(Q.TNOISE_C)                                          
+          error( 'Qpack2 requires that Q.TNOISE_C is set.' );                
+        end                                                                  
+        if ~issparse(Q.TNOISE_C)                                             
+          error( 'Q.TNOISE_C is required to be sparse (to save memory).' );  
+        elseif dimens(Q.TNOISE_C)~=2 | size(Q.TNOISE_C,1)~=size(Q.TNOISE_C,2)
+          error( 'Q.TNOISE_C must be square.' );                             
+        elseif size(Q.TNOISE_C,1) ~= length(Y(m).Y)                          
+          error( 'Mismatch in size between Q.TNOISE_C and Y.Y.' );           
+        end                                                                 
+      end  
     end % nargout < 2
   end % if m==1
 
   
-  % Checks of Y(m)                                                          %&%
-  %                                                                         %&%
-  rqre_datatype( Y(m).LATITUDE, @istensor0, sprintf('Y(%d).LATITUDE',m) );  %&%
-  rqre_datatype( Y(m).LONGITUDE, @istensor0, sprintf('Y(%d).LONGITUDE',m) );%&%
-  rqre_datatype( Y(m).HSE_P, @istensor0, sprintf('Y(%d).HSE_P',m) );        %&%
-  rqre_datatype( Y(m).HSE_Z, @istensor0, sprintf('Y(%d).HSE_Z',m) );        %&%
-  rqre_datatype( Y(m).YEAR, @istensor0, sprintf('Y(%d).YEAR',m) );          %&%
-  rqre_datatype( Y(m).MONTH, @istensor0, sprintf('Y(%d).MONTH',m) );        %&%
-  rqre_datatype( Y(m).DAY, @istensor0, sprintf('Y(%d).DAY',m) );            %&%
-  rqre_datatype( Y(m).Z_PLATFORM, @istensor0, ...                           %&%
-                                           sprintf('Y(%d).Z_PLATFORM',m) ); %&%
-  rqre_datatype( Y(m).ZA, @istensor0, sprintf('Y(%d).ZA',m) );              %&%
-
+  % Checks of Y(m)                                                          
+  %                                                                         
+  if do_checks
+    rqre_datatype( Y(m).LATITUDE, @istensor0, sprintf('Y(%d).LATITUDE',m) );  
+    rqre_datatype( Y(m).LONGITUDE, @istensor0, sprintf('Y(%d).LONGITUDE',m) );
+    rqre_datatype( Y(m).HSE_P, @istensor0, sprintf('Y(%d).HSE_P',m) );        
+    rqre_datatype( Y(m).HSE_Z, @istensor0, sprintf('Y(%d).HSE_Z',m) );        
+    rqre_datatype( Y(m).YEAR, @istensor0, sprintf('Y(%d).YEAR',m) );          
+    rqre_datatype( Y(m).MONTH, @istensor0, sprintf('Y(%d).MONTH',m) );        
+    rqre_datatype( Y(m).DAY, @istensor0, sprintf('Y(%d).DAY',m) );            
+    rqre_datatype( Y(m).Z_PLATFORM, @istensor0, ...                           
+                                             sprintf('Y(%d).Z_PLATFORM',m) ); 
+    rqre_datatype( Y(m).ZA, @istensor0, sprintf('Y(%d).ZA',m) );              
+  end
 
   %- Map ATMDATA to VMR_FIELD, Z_FIELD and T_FIELD 
   %
@@ -243,22 +254,25 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   Q.LON_TRUE  = Y(m).LONGITUDE;
   %
   if qarts_isset( Y(m).HOUR )
-    rqre_datatype( Y(m).HOUR, @istensor0, sprintf('Y(%d).HOUR',m) );        %&%
     ho = Y(m).HOUR;
   else
     ho = 12;
   end
   if qarts_isset( Y(m).MINUTE )
-    rqre_datatype( Y(m).MINUTE, @istensor0, sprintf('Y(%d).MINUTE',m) );    %&%
     mi = Y(m).MINUTE;
   else
     mi = 0;
   end
   if qarts_isset( Y(m).SECOND )
-    rqre_datatype( Y(m).SECOND, @istensor0, sprintf('Y(%d).SECOND',m) );    %&%
     se = Y(m).SECOND;
   else
     se = 0;
+  end
+  %
+  if do_checks
+    rqre_datatype( ho, @istensor0, sprintf('Y(%d).HOUR',m) );
+    rqre_datatype( mi, @istensor0, sprintf('Y(%d).MINUTE',m) );
+    rqre_datatype( se, @istensor0, sprintf('Y(%d).SECOND',m) );
   end
   %
   mjd = date2mjd( Y(m).YEAR, Y(m).MONTH, Y(m).DAY, ho, mi, se );
@@ -287,12 +301,16 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m );
   %- Se
   %
   if nargout == 2
-    rqre_datatype( Y(m).TNOISE, @istensor1, sprintf('Y(%d).TNOISE',m) );   %&%
+    
     n  = length( Y(m).TNOISE );
-    if n ~= 1 & n ~= length( Y(m).Y )                                      %&%
-      error( sprintf( ...                                                  %&%
-      'Length of Y(%d).TNOISE must be 1 or equal to length of Y.Y.',m)  ); %&%
-    end                                                                    %&%
+
+    if do_checks
+      rqre_datatype( Y(m).TNOISE, @istensor1, sprintf('Y(%d).TNOISE',m) );
+      if n ~= 1 & n ~= length( Y(m).Y ) 
+        error( sprintf( ...
+           'Length of Y(%d).TNOISE must be 1 or equal to length of Y.Y.',m) );
+      end
+    end
     
     if n == 1
       Se = (Y(m).TNOISE^2) .* Q.TNOISE_C;

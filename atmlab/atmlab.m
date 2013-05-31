@@ -106,6 +106,16 @@
 % The width, in number of characters, of the Matlab window.
 % Used by the function *out* to make a frame around screen output.
 %----------------------------------------------------------------------------
+% STRICT_ASSERT
+% 
+% Some parts of atmlab performs quite strict checks of input arguments and
+% data. Such asserts and checks can in some cases take a significant
+% fraction of the calculation time in a function (or even dominate the
+% time) and, to allow faster calculations, some functions use this flag to
+% possibly deactivate the checks. Default is true and the checks are
+% performed. If you have a stable set-up, you can set this field to false
+% and potentially improve the calculation speed.
+%----------------------------------------------------------------------------
 % VERBOSITY
 % 
 % The verbosity of Atmlab functions.  
@@ -118,17 +128,14 @@
 % WORK_AREA
 % 
 % A folder to be used for calculations outside Matlab. For each calculation
-% session, a folder is created in the given folder with name TmpXXXXXX where
-% XXXXXX is an integer with up to 6 digits. Atmlab tries to keep the given
-% folder clean by removing the temporary folders when ready, but if there
-% is a crash the temporary folder will not be removed. The temporary folders
-% are not re-used and before the debugging is finished a high number of
-% folders can be created in the work area and it can be a good idea to remove
-% old temporary folders.
-%    The full path shall be given. A normal choice for work area on Unix type 
-% platforms is '/tmp'.
-%    The work area is primarily used for forward model calculations, but
-% there could be other applications.
+% session, a temporary folder is created in the given folder. Atmlab tries to
+% keep the given folder clean by removing the temporary folders when ready, but
+% if there is a crash the temporary folder can occasionaly be left. The
+% temporary folders are not re-used and it can be a good idea to now and then
+% remove old temporary folders. 
+% The full path shall be given. A normal choice for work area on Unix type
+% platforms is '/tmp'. The work area is primarily used for forward model
+% calculations, but there could be other applications.
 
 
 % 2003-07-06   Created by Patrick Eriksson.
@@ -199,6 +206,7 @@ A.PYTHON            = strtrim(X);
 A.RAND_STATE        = NaN;
 A.SCREEN_WIDTH      = 70;
 A.SITE              = NaN;
+A.STRICT_ASSERT     = true;
 A.VERBOSITY         = 1;
 A.WORK_AREA         = tempdir();
 
