@@ -413,7 +413,11 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
-  T{end+1} = 'basics_checkedCalc';
+  if qarts_isset(Q.VMR_NEGATIVE_OK) & Q.VMR_NEGATIVE_OK 
+    T{end+1} = 'basics_checkedCalc(negative_vmr_ok=1)';
+  else
+    T{end+1} = 'basics_checkedCalc';
+  end
   %
   if qarts_isset( Q.HSE )
     if ~isfield( Q.HSE, 'ON' ) & ~isbool( Q.HSE.ON )                        %&%

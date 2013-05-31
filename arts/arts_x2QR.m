@@ -33,6 +33,14 @@ j_loaded = false;                           % To avoid repeated loading of J
 do_sensor = false;                          % Recalculation of sensor needed
 
 
+%- Limit to set min and max values
+%
+ind    = find( x < R.minmax(:,1) );
+x(ind) = R.minmax(ind,1);
+ind    = find( x > R.minmax(:,2) );
+x(ind) = R.minmax(ind,2);
+  
+
 %- Loop retrieval quantities
 %
 for i = 1 : nq
@@ -61,8 +69,8 @@ for i = 1 : nq
                              qarts_get(fullfile(R.workfolder,'t_field.xml')) );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       vmr(ig,:,:,:) = getdims( vmr(ig,:,:,:), 2:Q.ATMOSPHERE_DIM+1 ) .* exp(X);
-    else                                                                    %&%
-      assert( false );                                                      %&%
+    else 
+      assert( false );
     end
     %
     clear X
@@ -85,24 +93,22 @@ for i = 1 : nq
       xmlStore( fullfile(R.workfolder,'wind_v_field.xml'), X, 'Tensor3' );
     elseif strcmp( R.jq{i}.subtag, 'w' )
       xmlStore( fullfile(R.workfolder,'wind_w_field.xml'), X, 'Tensor3' );
-    else                                                                    %&%
-      error( 'Unknown wind subtag.' );                                      %&%
+    else
+      assert( false );
     end
     %
     clear X
     
    case 'Sensor pointing'   %-------------------------------------------------
     %
-    if ~strcmp( R.jq{i}.subtag, 'Zenith angle off-set' )                    %&%
-      error( 'Unknown pointing subtag.' );                                  %&%
-    end                                                                     %&%
+    assert( strcmp( R.jq{i}.subtag, 'Zenith angle off-set' ) );
     %
     Q.SENSOR_LOS(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
                                                     R.jq{i}.grids{1} )* x(ind);
     
    case 'Frequency'   %-------------------------------------------------------
     %
-    assert( length(ind) == 1 );                                             %&%
+    assert( length(ind) == 1 );
     if ~do_sensor
       Q.SENSOR_RESPONSE = R.sensor_response;
     end    
@@ -113,8 +119,8 @@ for i = 1 : nq
       df = x(ind(1));
     elseif strcmp( R.jq{i}.subtag, 'Stretch' )
       df = arts_polybasis_func( fb, 1 ) * x(ind(1));
-    else                                                                    %&%
-      error( 'Unknown frequency subtag' );                                  %&%
+    else
+      assert( false );
     end
     %
     Q.SENSOR_RESPONSE.F_BACKEND = fb + df;

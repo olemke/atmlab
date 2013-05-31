@@ -1,5 +1,24 @@
 2013-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-358
+
+	* arts/qarts2cfile.m (cfile_AtmSrf): Added handling of
+	VMR_NEGATIVE_OK.
+
+	* demos/qpack2_demo.m: Min values defined for O3 retrieval.
+	Comment around Q.VMR_NEGATIVE_OK added.
+
+	* arts/arts_x2QR.m: R.minmax applied here.
+
+	* arts/arts_oem_init.m: Now setting up a variable, R.minmax, that
+	reflects ABS_SPECIES and T MINMAX, and allows that MINMAX is
+	introduced also for other quantities.
+
+	* arts/qarts.m: Added ABS_SPECIES.MINMAX, T.MINMAX and
+	VMR_NEGATIVE_OK.
+
+2013-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-357
 
 	* arts/qarts2cfile.m: Added STRICT_ASSERT in one place.

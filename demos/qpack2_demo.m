@@ -238,7 +238,11 @@ Q.ABS_SPECIES(1).L2       = true;
 Q.ABS_SPECIES(1).GRIDS    = { Q.P_GRID, [], [] };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
       'midlatitude-winter', 'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
-% For demonstration, setting sfor several units are provided:
+%
+% If you don't apply a min value (by MINMAX), you could need to active this:
+%Q.VMR_NEGATIVE_OK = true;
+%
+% For demonstration, setting for several units are provided:
 switch 1
  case 1  % Constant VMR
   Q.ABS_SPECIES(1).UNIT     = 'vmr';
@@ -247,6 +251,7 @@ switch 1
                                                'lin', 0.2, 0.00, @log10 ) + ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.3e-6, ...
                                                'lin', 0.5, 0.00, @log10 );
+   Q.ABS_SPECIES(1).MINMAX  = 1e-12;
  case 2 % Constant rel
   Q.ABS_SPECIES(1).UNIT     = 'rel';
   Q.ABS_SPECIES(1).SX       = ...
@@ -254,6 +259,7 @@ switch 1
                                                'lin', 0.2, 0.00, @log10 ) + ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.1, ...
                                                'lin', 0.5, 0.00, @log10 );
+  Q.ABS_SPECIES(1).MINMAX  = 1e-6;
  case 3 % Mimic case 2 in vmr
   Q.ABS_SPECIES(1).UNIT     = 'vmr';
   Q.ABS_SPECIES(1).SX       = ...
@@ -266,6 +272,7 @@ switch 1
                                    0.1 * Q.ABS_SPECIES(1).ATMDATA.DATA ],...
                                                'lin', 0.5, 0.00, @log10 );
 
+  Q.ABS_SPECIES(1).MINMAX  = 1e-12;
  case 4 % Constant logrel
   Q.ABS_SPECIES(1).UNIT     = 'logrel';
   Q.ABS_SPECIES(1).SX       = ...
@@ -273,6 +280,7 @@ switch 1
                                                'lin', 0.2, 0.00, @log10 ) + ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.1, ...
                                                'lin', 0.5, 0.00, @log10 );
+  Q.ABS_SPECIES(1).MINMAX  = 1e-6;
 end  
   
   

@@ -38,6 +38,7 @@
 %       p_grid    : As the ARTS WSM with same name.
 %       lat_grid  : As the ARTS WSM with same name.
 %       lon_grid  : As the ARTS WSM with same name.
+%       minmax    : A matrix with min and mix limits. 
 %
 %    R can further contain these fields, depending on retrieval settings:
 %       vmr_field0      : A priori vmr field
@@ -90,8 +91,12 @@ store_vmr0  = false;
 
 %- xa
 %
-xa = zeros( nx, 1 );
+xa       = zeros( nx, 1 );
 
+
+%- R.minmax
+%
+R.minmax = repmat( [-Inf Inf], nx, 1 );
 
 
 
@@ -131,11 +136,33 @@ for i = 1 : nq
       error( sprintf('Unknown gas species retrieval unit (%s).', ...        %&%
                                                          R.jq{i}.mode ) );  %&%
     end
+    % Min and max values
+    if isfield( Q.ABS_SPECIES(ig), 'MINMAX' )
+      rqre_datatype( Q.ABS_SPECIES(ig).MINMAX, @istensor1 );
+      R.minmax(ind,1) = Q.ABS_SPECIES(ig).MINMAX(1);
+      if length( Q.ABS_SPECIES(ig).MINMAX(1) ) > 1
+        R.minmax(ind,2) = Q.ABS_SPECIES(ig).MINMAX(2);
+        if length( Q.ABS_SPECIES(ig).MINMAX(1) ) > 2
+          error( 'Max allowed length of Q.ABS_SPECIES.MINMAX is 2.' );
+        end
+      end
+    end
     
   case 'Atmospheric temperatures'   %-----------------------------------------
     %
     xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
+    % Min and max values
+    if isfield( Q.T, 'MINMAX' )
+      rqre_datatype( Q.T.MINMAX, @istensor1 );
+      R.minmax(ind,1) = Q.T.MINMAX(1);
+      if length( Q.T.MINMAX(1) ) > 1
+        R.minmax(ind,2) = Q.T.MINMAX(2);
+        if length( Q.T.MINMAX(1) ) > 2
+          error( 'Max allowed length of Q.T.MINMAX is 2.' );
+        end
+      end
+    end
 
   case 'Wind'   %-------------------------------------------------------------
     %
