@@ -665,6 +665,9 @@ classdef CollocatedDataset < HomemadeDataset
                 % to process data and knowing how to store it, how to deal
                 % with it, etc.
                 % For copying, there is FieldCopier.
+                %
+                % Note that in collocate_granule, we always overwrite
+                % everything.
                 for j = 1:length(additionals)
                     additional = additionals{j};
                     % Get data that this additional depends upon
@@ -879,9 +882,9 @@ classdef CollocatedDataset < HomemadeDataset
             mainfileexists = exist(fn, 'file');
             addisexist = false(size(additionals));
             addisvalid = false(size(additionals));
-            addisread = cell(size(additionals));
-            addisprocess = cell(size(additionals));
-            addishas = cell(size(additionals));
+            addisread = repmat({{}}, size(additionals));
+            addisprocess = repmat({{}}, size(additionals));
+            addishas = repmat({{}}, size(additionals));
             for i = 1:length(additionals)
                 fna = additionals{i}.find_granule_by_datetime(date, spec);
                 addisexist(i) = exist(fna, 'file');
@@ -988,8 +991,15 @@ classdef CollocatedDataset < HomemadeDataset
                         
                         logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
 
-                        [addi{i}, localcols{i}] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
-                        additionals{i}.store(date, spec, addi{i}, info_addi, localcols{i});
+                        [addii, cci] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
+                        additionals{i}.store(date, spec, addii, info_addi, cci);
+                        if isempty(addi{i})
+                            addi{i} = addii;
+                            cc{i} = cci;
+                        else
+                            addi{i} = [addi{i}, addii];
+                            cc{i} = catstruct(cc{i}, structfun(@(X)X+max(cellfun(@(X)X, struct2cell(cc{i}))), cci, 'UniformOutput', false));
+                        end
                     end
                 end
 
@@ -1270,7 +1280,8 @@ classdef CollocatedDataset < HomemadeDataset
             if ~isempty(self.pcd)
                 cachestr = self.calc_cache_key(date_start, date_end, spec, all_fields, limits, filters_by_name, ads, nargout);
                 if self.pcd.has_entry(cachestr)
-                    logtext(atmlab('OUT'), 'Reading from cache entry %s\n', cachestr)
+                    logtext(atmlab('OUT'), 'Reading from cache entry %s %s.%s\n', ...
+                        class(self), self.name, cachestr)
                     varargout = self.pcd.get_entry(cachestr);
                     return
                 else
@@ -1342,7 +1353,7 @@ classdef CollocatedDataset < HomemadeDataset
                                                 
                 try
                     [collocations_day, M_cols_core_here, attr_core] = self.read_single_day(date, spec, fields_core);
-                    if numel(collocations_day)==0
+                    if numel(collocations_day)==0 && length(fields_core) ~= 0
                         logtext(atmlab('OUT'), 'no collocations\n');
                         continue
                     end
@@ -1736,7 +1747,8 @@ classdef CollocatedDataset < HomemadeDataset
             % OUT
             %
             %   fields_core         cell array  fields in core
-            %   additionals         cell array  <a href="matlab:help AdditionalDataset">AdditionalDataset</a>s
+            %   additionals         cell array  <a href="matlab:help
+            %                       AssociatedDataset">AssociatedDataset</a>s
             %   additional_fields   cell array of cell array of fields
             %   deal_index          vector          
             
@@ -1745,7 +1757,7 @@ classdef CollocatedDataset < HomemadeDataset
             fields = {};
             additionals = {};
             additional_fields = {};
-            %existing_names = {};
+            existing_names = {};
             % pre-allocate so that every field is at least an empty
             % cell-array
             %additional_fields = cell(size(self.associated));
@@ -1763,8 +1775,8 @@ classdef CollocatedDataset < HomemadeDataset
                 else
                     % check if it belongs to any associated
                     found = false;
-                    additionals = cell(size(ads));
-                    existing_names = cell(size(ads));
+%                    additionals = cell(size(ads));
+%                    existing_names = cell(size(ads));
                     for j = 1:length(ads)
                         asso = ads{j};
                         if any(strcmp(fieldnames(asso.members), field))
@@ -2083,7 +2095,7 @@ classdef CollocatedDataset < HomemadeDataset
             sorted = additionals(idx);
         end
         
-        function [depdata, depcols] = fix_dependencies(additional_current, additional_all, results_so_far, cc)
+        function [depdata, depcols] = fix_dependencies(additional_current, additional_all, results_so_far, varargin)
             % put data in cell array for dependencies
             %
             % This static method assures that requirements for additional X
@@ -2112,6 +2124,7 @@ classdef CollocatedDataset < HomemadeDataset
             %   depcols           cell array with cols structures belonging
             %                     to depdata
             
+            cc = optargs(varargin, {cellfun(@(X) X.cols, additional_current.dependencies, 'UniformOutput', false)});
             if isempty(additional_current.dependencies)
                 depdata = {};
                 depcols = struct();
@@ -2160,6 +2173,7 @@ classdef CollocatedDataset < HomemadeDataset
                                 error(['atmlab:' mfilename ':missing'], ...
                                     '%s %s needs fields %s from %s %s, but those seem absent', ...
                                     class(additionals{i}), additionals{i}.name, ...
+                                    strjoin(needs, ', '), ...
                                     class(additionals{k}), additionals{k}.name);
                             end
                             addisread{k} = union(addisread{k}, needs(has_needed));

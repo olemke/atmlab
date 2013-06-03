@@ -267,9 +267,10 @@ classdef Collapser < AssociatedDataset
             fields = fields(~cellfun(@isempty, fields));
         end
         
-        function [M, localcols] = process_granule(self, processed_core, ~, ~, ~, ~, ~, ~, deps, deps_cols, memnames)
+        function [M, localcols] = process_granule(self, processed_core, ~, ~, ~, ~, ~, ~, deps, varargin)
             
             
+            [deps_cols, memnames] = optargs(varargin, {{self.dependencies{1}.cols}, 'all'});
             M_data = deps{1};
 %             deps_cols = cell2struct(deps_cols, cellfun(@(X) X.name, self.dependencies, 'UniformOutput', false), 2);
 %            deps_cols = deps_cols{1};
@@ -297,10 +298,10 @@ classdef Collapser < AssociatedDataset
             lasts = [firsts(2:end)-1; size(processed_core, 1)];
             
             % put sizes in self.members in order to get self.cols
-            rqre_subset(memnames, fieldnames(self.members));
             if isequal(memnames, 'all')
                 memnames = fieldnames(self.members);
             else
+                rqre_subset(memnames, fieldnames(self.members));
                 memnames = intersect(fieldnames(self.members), memnames);
                 memnames = union(memnames, {'FIRST', 'LAST'});
             end
@@ -327,7 +328,7 @@ classdef Collapser < AssociatedDataset
 %                 warning(w);
                 fields{mi} = self.members.(memname).orig_name;
             end
-            %self.members2cols();
+            self.members2cols();
             fields = unique(fields(~cellfun(@isempty, fields)));
             localcols = self.get_cols_from_bro(memnames, deps_cols);
 %             if isequal(fields, 'all');

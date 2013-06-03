@@ -236,7 +236,7 @@ classdef HomemadeDataset < SatDataset
             
             ncollocs = size(data, 1);            
             nbytes = self.linesize(localcols) * ncollocs;
-            logtext(atmlab('OUT'), 'Will write %s of uncompressed data (not including header)\n', nbytes2string(nbytes));
+            logtext(atmlab('OUT'), 'Will write %d collocations, %s of uncompressed data (not including header)\n', ncollocs, nbytes2string(nbytes));
             
             
             

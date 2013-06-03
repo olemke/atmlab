@@ -80,11 +80,23 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
         end
         
         function bool = needs_primary_data(self, varargin)
-            bool = self.fieldcopier_core.needs_primary_data(varargin{:});
+            fields = optargs(varargin, {'all'});
+            if isequal(fields, 'all')
+                bool = self.fieldcopier_core.needs_primary_data(fields);
+            else
+                bool = self.fieldcopier_core.needs_primary_data(...
+                    intersect(fieldnames(self.fieldcopier_core.members), fields));
+            end
         end
         
         function bool = needs_secondary_data(self, varargin)
-            bool = self.fieldcopier_core.needs_secondary_data(varargin{:});
+            fields = optargs(varargin, {'all'});
+            if isequal(fields, 'all')
+                bool = self.fieldcopier_core.needs_secondary_data(fields);
+            else
+                bool = self.fieldcopier_core.needs_secondary_data(...
+                    intersect(fieldnames(self.fieldcopier_core.members), fields));
+            end
         end
         
         function fields = fields_needed_for_dependency(~, ~, ~)

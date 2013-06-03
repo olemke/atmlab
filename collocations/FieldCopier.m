@@ -141,6 +141,10 @@ classdef FieldCopier < AssociatedDataset
         dependencies = {};
     end
     
+    properties (Access = private)
+        oldlocalcols;
+    end
+    
     methods
         %% constructor
         
@@ -211,12 +215,15 @@ classdef FieldCopier < AssociatedDataset
             fields = {}; % no dependencies
         end
         
-        function [result, localcols] = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~, ~, fields)
+        function [result, localcols] = process_granule(self, processed_core, data1, date1, spec1, data2, date2, spec2, ~, ~, varargin)
+            fields = optargs(varargin, {'all'});
             allnames = fieldnames(self.members);
             if isequal(fields, 'all')
                 localnames = allnames;
             else
-                localnames = intersect(allnames, fields);
+                %localnames = intersect(allnames, fields);
+                % intersect destroys order, order is important...
+                localnames = allnames(cellfun(@(X)ismember(X, fields), allnames));
                 rqre_subset(fields, allnames); % if this fails, some fields do not exist
             end
             n_inprim = length(intersect(fieldnames(self.fieldstruct_primary), localnames));
@@ -402,6 +409,25 @@ classdef FieldCopier < AssociatedDataset
                         % remainder of loop is only used to enlarge fdata
                         % or set NetCDF props, problem persists further down
                         % when collecting data.
+                        % Need to set localcols before proceeding.
+                        % Alternative would be to look into persistency,
+                        % did we have a previous localcols?
+                        if isfield(self.members,  fieldnam) && isfield(self.members.(fieldnam), 'dims')
+                            n = self.members.(fieldnam).dims{2};
+                        elseif ~isempty(self.oldlocalcols)
+                            n = length(self.oldlocalcols.(fieldnam));
+                        else
+                            warning(['atmlab:' mfilename ':unknownsize'], ...
+                                ['I couldn''t find field %s and ' ...
+                                 'I''m not sure about it''s size. ' ...
+                                 'I''ll guess 1 per measurement. ' ...
+                                 'If I''m wrong, you''ll get trouble. ' ...
+                                 'Consider defining %s.members.%s.dims.'], ...
+                                 self.name, fieldnam);
+                            n = 1;
+                        end
+                        localcols.(fieldnam) = (n_tot+1):(n_tot+n);
+                        n_tot = n_tot + n;
                         continue
                     else
                         fdata = dat_other{j}.(self.members.(fieldnam).dataset.name).(self.members.(fieldnam).realname);
@@ -456,6 +482,7 @@ classdef FieldCopier < AssociatedDataset
                     ['atmlab:' mfilename ':wrongcols'], ...
                     'Ambiguity in cols-structure.  This is a bug.  Stop');
             end
+            self.oldlocalcols = localcols;
             
             ncollocs = size(processed_core, 1);
             nfields = max(cell2mat(struct2cell(localcols).'));
@@ -587,7 +614,7 @@ classdef FieldCopier < AssociatedDataset
             if isequal(fields, 'all')
                 fields = all_fields;
             end
-            out = ~isempty(intersect(all_fields, fields));
+            out = ~isempty(intersect(all_fields, cellfun(@(X) safegetfield(self.members.(X), 'realname', X), fields, 'UniformOutput', false)));
         end           
             
         function args = arguments(self, fs, parent, fields)
@@ -598,7 +625,7 @@ classdef FieldCopier < AssociatedDataset
             else
                 args = intersect(fields, fargs);
             end
-
+        % cellfun(@(X) safegetfield(self.members.(X), 'realname', X), intersect(fields, fieldnames(self.members)), 'UniformOutput', false)
         end
     end
 end

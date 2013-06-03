@@ -1,3 +1,76 @@
+2013-06-03  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-361
+
+	* collocations/Collapser.m:
+
+	(process_granule):
+
+	- for the classical collocation situation (all or nothing), give
+	deps_cols and memnames sensible defaults and make no. of arguments
+	optional
+
+	* collocations/FieldCopier.m:
+
+	- add a private property oldlocalcols for internal use
+
+	(process_granule):
+
+	- for the classical collocation situation (all or nothing), give
+	fields a sensible default and handle this properly.  When reading
+	a sibling failed, try to guess the width for the fields based on
+	either previous experience, but preferably on a dims-field.  Will
+	give a warning if neither are found.  Use oldlocalcols to communicate
+	between subsequent calls.
+
+	(needs_data):
+
+	- Use 'realname' fields to determine if reading or not
+
+	* collocations/FieldMultiInstrumentCopier.m:
+
+	(needs_primary_data) (needs_secondary_data):
+
+	- Handle properly the case where 'all' fields are requested.
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule):
+	
+	- Small addition to comments
+
+	(collocate_and_store_date):
+
+	- Fix allocation of addisread, addisprocess, addishas.  Properly keep
+	track of localcols (don't remember why exactly the change I did here).
+
+	(read):
+
+	- Be a little more verbose when reading from cache
+
+	(deal_fields):
+
+	- small fix
+
+	(fix_dependencies):
+
+	- Revert to old default if new argument not given
+
+	* datasets/HomemadeDataset.m:
+	
+	(store): 
+
+	- Tell user how many collocs are written
+
+	* datasets/dsmagic.m:
+
+	- Properly relay isfield
+
+	* datasets/define_datasets.m:
+
+	- Expand valid_range for A_BT.  Probably in error and actually a bug
+	somewhere.
+
 2013-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-360

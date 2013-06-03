@@ -37,5 +37,11 @@ classdef dsmagic < dynamicprops
                     'Warning: due to Gerrits laziness, tab completion on datasets will henceforth contain false politives');
             end
         end
+
+        function tf = isfield(self, f)
+            D = datasets('*');
+            tf = isfield(D, f);
+        end
+
     end
 end
