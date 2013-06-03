@@ -21,10 +21,10 @@ end
 
 %rqre_alltypes( dim, {@istensor0,@iswhole} );                    %&%
 %rqre_in_range( dim, 0 );                                        %&%
-
+  
 % the following assertion is 1000x faster than the above checks
-assert(isnumeric(dim) && isscalar(dim) &&  all( dim - round(dim) == 0 )&& dim>0,...
-    errid,'*dim* did not pass the test: @istensor0 && @iswhole')
+assert( isnumeric(dim) && isscalar(dim) && all( dim - round(dim) == 0 ) && ...
+        dim>=0, errid, '*dim* did not pass the test: @istensor0 && @iswhole')
 
 G.TYPE      = 'basic';
 G.NAME      = [];

@@ -28,9 +28,10 @@
 %                 ABS_VMRS 
 %                 ABS_NLS_PERT
 % IN    Q      Original qarts settings.
-% OPT   nt     Number of temperature variations. Default is 3.
+% OPT   nt     Number of temperature variations. Default is 1.
 %       dt     Maximum size of temperature variation. If set to be empty,
-%              an automatic selection is made. Default is [].
+%              an automatic selection is made. Default is 50. This value 
+%              has no impact if *dt* < 2.
 %       dnls   Relative disturbances for "non-linear" species.
 %              Default is [], that signifies no disturbances.
 %              Otherwise required to be a vector, the vector values are used 
@@ -41,7 +42,7 @@
 
 function Q = qarts_abstable( Q, varargin )
 %
-[nt,dt,dnls] = optargs( varargin, { 3, [], 3 } );
+[nt,dt,dnls] = optargs( varargin, { 1, 50, [] } );
                                                                            %&%
 %= Check input                                                             %&%
 %                                                                          %&%
@@ -62,7 +63,7 @@ if ~qarts_isset( Q.ABS_NLS )                                               %&%
 end                                                                        %&%
 rqre_alltypes( nt, {@istensor0,@iswhole} );                                %&%
 rqre_datatype( dt, {@istensor0} );                                         %&%
-rqre_datatype( dnls, {@istensor1} );                                       %&%
+rqre_datatype( dnls, {@isempty,@istensor1} );                              %&%
 
 
 %- Obtain atmospheric profiles
