@@ -1,3 +1,10 @@
+2013-06-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-363
+
+	* demos/qarts_scattering_demo.m: FOS was in an intermediate state.
+	Now error if trying to use FOS.
+
 2013-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-362

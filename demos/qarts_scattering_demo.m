@@ -233,10 +233,10 @@ elseif strcmp( lower(method), 'doit' )
                                                            'abs_vecAddPart' };
   C.SPT_CALC_AGENDA = { 'opt_prop_sptFromMonoData' };
 
-elseif strcmp( lower(method), 'fos' )
-  %
-  C.METHOD                        = 'FOS';
-  Q.IY_MAIN_AGENDA                = { 'iyFOS(fos_n=0)' };
+%elseif strcmp( lower(method), 'fos' )
+%  %
+%  C.METHOD                        = 'FOS';
+%  Q.IY_MAIN_AGENDA                = { 'iyFOS(fos_n=0)' };
 
 elseif strcmp( lower(method), 'tr' )
   %
