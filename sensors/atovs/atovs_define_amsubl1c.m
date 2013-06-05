@@ -28,6 +28,9 @@ rec_len = 1152;
 rec_format.time     = 4;
 rec_format.lat = 13 + 2 * (1:nfovs);
 rec_format.lon = 14 + 2 * (1:nfovs);
+
+% NWPSAP-MF-UD-003_Formats.pdf page 106, field amb1c_angles
+
 rec_format.lza = 195 + 4 * (0:(nfovs-1));
 rec_format.laa = 196 + 4 * (0:(nfovs-1));
 rec_format.sza = 197 + 4 * (0:(nfovs-1));
@@ -38,3 +41,4 @@ for ichan = 1 : nchan
 end
 
 return
+end

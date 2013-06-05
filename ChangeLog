@@ -1,3 +1,24 @@
+2013-06-05  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* collocations/CollocatedDataset.m:
+	
+	(verify_addis):
+
+	- More informative error message
+
+	(fix_dependencies):
+
+	- Bugfix in error message generation
+
+	* sensors/atovs/atovs_define_amsubl1c.m:
+
+	- Added reference to docs in comment to reduce change of ambiguity
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Check correct sizes, and if not found, give a helpful, informative
+	error message.
+
 2013-06-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-363
