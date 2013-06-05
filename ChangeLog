@@ -1,7 +1,16 @@
+2013-06-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-365
+
+	* demos/qpack2_demo.m: Now abs_f_interp_order defined if wind
+	retrieval, required due to change in arts.
+
 2013-06-05  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-364
+
 	* collocations/CollocatedDataset.m:
-	
+
 	(verify_addis):
 
 	- More informative error message

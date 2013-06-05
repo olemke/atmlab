@@ -329,6 +329,9 @@ Q.WIND_V.L2       = true;
 Q.WIND_V.GRIDS    = { Q.P_GRID(1:2:end), [], [] };
 Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 40, ...
                                                     'lin', 0.5, 0.00, @log10 );
+if Q.WIND_V.RETRIEVE
+  Q.WSMS_AT_START{end+1} = 'IndexSet(abs_f_interp_order,3)';
+end
 
 
 
