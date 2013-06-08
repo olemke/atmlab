@@ -98,19 +98,30 @@ assert(isequal(size(in.(opt.field)(:)),size(in.lat(:)),size(in.lon(:))),...
 
 % ---------------
 % Grid
-if isscalar(opt.grid{1})
+assert(~isfield(in,'gridsize'),errId,'input in.gridsize will be ignored as this is set in this function using in.grid (see help section)')
+assert(~isfield(opt,'gridsize'),errId,'input opt.gridsize will be ignored as this is set in this function using in.grid (see help section)')
+assert(iscell(opt.grid),errId,'in.grid must be a one or two element cell')
+
+if length(opt.grid)==1 && isscalar(opt.grid{1})
     in.gridsize = opt.grid{1};
-    
-elseif isvector(grid)
+    logtext(1,'Binning the data to a %gx%g grid\n',in.gridsize,in.gridsize)
+elseif length(opt.grid)==1
     in.newlat = opt.grid{1};
-    in.newlat = opt.grid{2};
+    in.newlon = opt.grid{1};
+    logtext(1,'Binning the data to a cutom square grid\n')
+elseif length(opt.grid)==2 && isscalar(opt.grid{1})
+    in.gridsize = [opt.grid{1},opt.grid{2}];
+elseif length(opt.grid)==2
+    in.newlat = opt.grid{1};
+    in.newlon = opt.grid{2};
+    logtext(1,'Binning the data to a cutom rectangular grid\n')
 else
     error(errId,'grid is incorrect. See doc %s',mfilename)
 end
 
 % ----------------
 % BIN THE DATA
-logtext(1,'Binning the data\n')
+
 [tmpdata,lat,lon] = binning_fast(catstruct(in,struct('data',in.(opt.field))));
 
 if opt.noStatistics
