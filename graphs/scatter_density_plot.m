@@ -1,8 +1,8 @@
 function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 
-%% scatter_density_plot Create scatter density plot in style of Eliasson et. al (2012)
+%% scatter_density_plot Create scatter density plot in style of Eliasson et. al (2013)
 %
-% Create a scatter-density plot in the style of Eliasson et. al (2012).
+% Create a scatter-density plot in the style of Eliasson et. al (2013).
 % This routine plots a 2-dimensional histogram between the provided
 % variables, optionally plotting median y(x), median x(y) and the actual
 % measurement points in the same graph.

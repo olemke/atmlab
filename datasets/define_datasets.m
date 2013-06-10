@@ -735,7 +735,7 @@ FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloud,...
     'name','dardarsub_modis_cprCloud');
 
 FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloudLidar, ...
-    getSelection(D.dardarsub_modis_IWP.members,{'dardar_IWP','modis_IWP'}),getSelection(fields.cpr,{'Cloud_Types_Lidar_multiLayer'}),...
+    getSelection(D.dardarsub_modis_IWP.members,{'dardar_IWP','modis_IWP'}),getSelection(fields.cpr,{'Cloud_Types_Lidar_multiLayer','CloudPhase'}),...
     'name','dardarsub_modis_cprCloudLidar');
 
 % -----------------------
@@ -840,11 +840,12 @@ end
 
 modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)==min(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)))};
 modis.modis_IWP.atts = fields.modis.modis_IWP.atts;
-modis.modis_IWP.processors.CLOSEST               = closest.fn;
-modis.modis_IWP.stored.CLOSEST.atts.long_name    = closest.ln;
+modis.modis_IWP.processors.CLOSEST                      = closest.fn;
+modis.modis_IWP.stored.CLOSEST.atts.long_name   = closest.ln;
 modis.modis_IWP.stored.CLOSEST.atts.unit         = 'g/m^2';
+modis.modis_IWP.stored.CLOSEST.atts.missing_value = D.modis_aqua_L2.pseudo_fields.modis_IWP.atts.missing_value;
 modis.modis_IWP.stored.CLOSEST.type              = D.modis_aqua_L2.pseudo_fields.modis_IWP.type;
-modis.modis_IWP.limitators                       = limitators_scalar;
+modis.modis_IWP.limitators                                 = limitators_scalar;
 modis.Re_ice.atts = fields.modis.Re_ice.atts;
 modis.Re_ice.processors.CLOSEST                  = closest.fn;
 modis.Re_ice.stored.CLOSEST.atts.long_name       = closest.ln;
@@ -1251,7 +1252,7 @@ fields.cpr.CloudPhase.dataset            = D.cprCloudLidar;
 fields.cpr.CloudPhase.atts.long_name     = 'Cloud Phase';
 fields.cpr.CloudPhase.atts.units         = 'none';
 fields.cpr.CloudPhase.atts.missing_value = -9;
-fields.cpr.CloudPhase.atts.valid_range   = [0 2];
+fields.cpr.CloudPhase.atts.valid_range   = [0 3];
 fields.cpr.CloudPhase.atts.description   = ...
     'Cloud phase identified by using CALIPSO feature, temperature, and radar reflectivity 1-ice, 2-mixed, 3-water';
 fields.cpr.CloudPhaseConfidenceLevel.type                = 'byte';

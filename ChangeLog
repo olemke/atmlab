@@ -1,3 +1,16 @@
+2013-06-10  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-367
+
+	* datasets/define_datasets.m: Added cloudPhase field to a fieldcopier
+
+	* datasets/SatDataset.m: Slight fix to if statement to avoid an unnecessary error
+
+	* collocations/CollocatedDataset.m: Very slight edit to avoid a
+	warning produced using vec2col
+
+	* graphs/scatter_density_plot.m: Changed the article reference in the header
+
 2013-06-08  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-366

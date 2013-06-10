@@ -872,7 +872,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     deps = self.pseudo_fields.(field).dependencies;
                     for j = 1:length(deps)
                         dep = deps{j};
-                        if ~any(strcmp(dep, [fields_always fields_asked fields_in_deps]))
+                        if ~any(strcmp(dep, [fields_always(:)' fields_asked(:)' fields_in_deps(:)']))
                             fields_in_deps = [fields_in_deps dep]; %#ok<AGROW>
                         end
                     end

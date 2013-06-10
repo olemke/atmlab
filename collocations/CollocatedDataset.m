@@ -989,8 +989,8 @@ classdef CollocatedDataset < HomemadeDataset
                         logtext(atmlab('OUT'), 'Collecting additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
                         [depdata, depcols] = self.fix_dependencies(additionals{i}, additionals, addi, cc);
                         
-                        logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
-
+                        %logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
+                        logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(addisprocess{i}(:)', ', ')); % much quicker and to avoid "Warning: Cannot convert zero-sized vector to row "
                         [addii, cci] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
                         additionals{i}.store(date, spec, addii, info_addi, cci);
                         if isempty(addi{i})
