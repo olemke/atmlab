@@ -319,8 +319,8 @@ end
 %
 % Here demonstrated for v-component, that should the component of main
 % concern for ground-based instruments. This component can be seen as the
-% part of the horisontal wind going along the viewing direction, where
-% postive values mean a movement away from the sensor.
+% part of the horizontal wind going along the viewing direction, where
+% positive values mean a movement away from the sensor.
 %
 Q.WIND_V_FIELD    = [];      % This is a short-cut for zero wind.
 %

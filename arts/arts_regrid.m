@@ -5,11 +5,15 @@
 %
 %   There are two options to specify grids, valid for both Q1 and Q2.
 %   The first option is that Q is a structure, including the fields 
-%   P_GRID, LAT_GRID and LON_GRID.
+%   P_GRID, LAT_GRID and LON_GRID. 
 %   The second option is that Q is an ArrayOfGrids, where the first
 %   grid is taken as p_grid etc.
 %
 %   Grids for dimensions not used can be left out.
+%
+%   This function operates just with the internal grids (P_GRID, LAT_GRID and
+%   LON_GRID), and can not be used to for interpolation considering LAT_TRUE
+%   and LON_TRUE.
 %
 %   The actual interpolation is made by gridinterp, with *extrap* set to
 %   true. That is, "extrapolation" following arts retrieval grids is applied
@@ -59,7 +63,7 @@ elseif isstruct(Q)
 
   if dim == 2
     %                                                           %&%
-    rqre_field( Q, {'LAT_TRUE'}, qname );                       %&%
+    rqre_field( Q, {'LAT_GRID'}, qname );                       %&%
     %
     grids{2} = qarts_get( Q.LAT_TRUE );
 
