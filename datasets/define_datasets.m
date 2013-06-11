@@ -866,21 +866,30 @@ modis.Tau_ice.limitators                         = limitators_scalar;
 amsua_global_lim =  {@(X)(X(:, D.collocation_gras_amsua.cols.DIST)<100), ...
                  @(X)(abs(X(:, D.collocation_gras_amsua.cols.INT))<3600)};
 
-capsed_amsua.A_BT.processors.NO = @(X)(size(X, 1));
+            
+% comment out, because I have no good way to handle the case where some
+% channels are flagged but others are not; I don't want to skip an entire
+% primary footprint because ONE of the channels is flagged, but I still
+% need a value for each channel; handle this in the processors instead
+%capsed_amsua.A_BT.limitators = limitators_scalar;
+capsed_amsua.A_BT.processors.NO = @(X)(sum(X>0, 1));
 capsed_amsua.A_BT.stored.NO.type = 'int';
 capsed_amsua.A_BT.stored.NO.atts.long_name = 'Number of AMSU-A used for stats within GRAS';
 capsed_amsua.A_BT.stored.NO.atts.valid_min = 0;
-capsed_amsua.A_BT.stored.NO.profile = false;
-capsed_amsua.A_BT.processors.MEAN = @(X)(mean(X, 1));
+%capsed_amsua.A_BT.stored.NO.profile = false;
+capsed_amsua.A_BT.processors.MEAN = @(X)(ignoreNeG(X, @mean, 1));
 capsed_amsua.A_BT.stored.MEAN.type = 'float';
 capsed_amsua.A_BT.stored.MEAN.atts.units = fields.amsua.A_BT.atts.units;
 capsed_amsua.A_BT.stored.MEAN.atts.long_name = ['Mean ' fields.amsua.A_BT.atts.long_name];
-capsed_amsua.A_BT.stored.MEAN.atts.valid_range = [100, 350];
-capsed_amsua.A_BT.processors.STD = @(X)(std(X, 0, 1));
+capsed_amsua.A_BT.stored.MEAN.atts.valid_range = [200, 350];
+capsed_amsua.A_BT.stored.MEAN.atts.missing_value = -9999;
+capsed_amsua.A_BT.processors.STD = @(X)(ignoreNeG(X, @std, 1));
 capsed_amsua.A_BT.stored.STD.type = 'float';
 capsed_amsua.A_BT.stored.STD.atts.units = fields.amsua.A_BT.atts.units;
 capsed_amsua.A_BT.stored.STD.atts.long_name = ['Std. of ' fields.amsua.A_BT.atts.long_name];
 capsed_amsua.A_BT.stored.STD.atts.valid_min = 0;
+capsed_amsua.A_BT.stored.STD.atts.missing_value = -9999;
+
 % -------
 % cloud_cci
 % -------
@@ -1916,4 +1925,10 @@ S = structfun(...
     S, ...
     'UniformOutput', false);
 
+end
+
+function stat = ignoreNeG(M, func, dim)
+% like ignoreNaN, but ignores where data are negative
+M(M<0) = nan;
+stat = ignoreNaN(M, func, dim);
 end

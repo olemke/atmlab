@@ -957,7 +957,7 @@ classdef CollocatedDataset < HomemadeDataset
                 addi = cell(size(additionals));
                 for i = 1:length(additionals)
                     if ~isempty(addisread{i})
-                        logtext(atmlab('OUT'), 'Reading additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
+                        logtext(atmlab('OUT'), 'Reading additionals for %s %s: %s\n', class(additionals{i}), additionals{i}.name, strjoin(vec2row(addisread{i}), ', '));
                         try
                             [addi{i}, cc{i}] = additionals{i}.read_single_day(date, spec, addisread{i});
                             addisvalid(i) = true;
@@ -1139,7 +1139,10 @@ classdef CollocatedDataset < HomemadeDataset
                                      'The message was: ' ME.message]);
                             end
                             logtext(atmlab('ERR'), 'Warning: I don''t have firstline-data for today for %s. I''ll try to get some! (todays collocation will be redone)\n', again.name);
-                            again.find_granule_first_line(alldates(i, :), alldates(end, :), spec);
+                            again.find_granule_first_line(...
+                                par(datevec(datenum(alldates(1, :))-1), 1:3), ...
+                                par(datevec(datenum(alldates(end, :))+1), 1:3), ...
+                                spec);
                             again.granule_first_line(0, spec, true, true); % force reload
 
                         otherwise
@@ -2171,19 +2174,27 @@ classdef CollocatedDataset < HomemadeDataset
                         if isequal(additionals{k}.name, additionals{i}.dependencies{j}.name)
                             met = true;
                             needs = additionals{i}.fields_needed_for_dependency(addisprocess{i}, additionals{i}.dependencies{j});
-                            % make sure it reads what it has and processes
-                            % what it doesn't have
-                            has_needed = ismember(needs, addishas{k});
-                            proc_needed = ismember(needs, addisprocess{k});
-                            if ~all(has_needed | proc_needed)
-                                error(['atmlab:' mfilename ':missing'], ...
-                                    '%s %s needs fields %s from %s %s, but those seem absent', ...
-                                    class(additionals{i}), additionals{i}.name, ...
-                                    strjoin(vec2row(needs), ', '), ...
-                                    class(additionals{k}), additionals{k}.name);
-                            end
-                            addisread{k} = union(addisread{k}, needs(has_needed));
-                            addisprocess{k} = union(addisprocess{k}, needs(~has_needed));
+                            % make sure it reads what it has to read
+                            
+                            % FIXME 2013-06-11: should I be reading the
+                            % netcdf header here to see what is already
+                            % present?  Changing to simply put in
+                            % addisread{k} what it needs.  What if a
+                            % dependency is not yet there, but still to be
+                            % processed?  Will this work out?
+                            
+%                             has_needed = ismember(needs, addishas{k});
+%                             proc_needed = ismember(needs, addisprocess{k});
+%                             if ~all(has_needed | proc_needed)
+%                                 error(['atmlab:' mfilename ':missing'], ...
+%                                     '%s %s needs fields %s from %s %s, but those seem absent', ...
+%                                     class(additionals{i}), additionals{i}.name, ...
+%                                     strjoin(vec2row(needs), ', '), ...
+%                                     class(additionals{k}), additionals{k}.name);
+%                             end
+                            %addisread{k} = union(addisread{k}, needs(has_needed));
+                            addisread{k} = union(addisread{k}, needs);
+%                             addisprocess{k} = union(addisprocess{k}, needs(~has_needed));
                         end
                     end
                     if ~met

@@ -394,7 +394,7 @@ D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.subdir = D.associated_CPR_AMSUB_AMSU
 D.collapsed_associated_CPR_AMSUB_AMSUA_HIRS.filename = D.collapsed_associated_CPR_MHS_AMSU_HIRS.filename;
 
 D.collapsed_gras_amsua.basedir = D.associated_gras_amsua.basedir;
-D.collapsed_gras_amsua.subdir = D.associated_gras_amsua.basedir;
+D.collapsed_gras_amsua.subdir = D.associated_gras_amsua.subdir;
 D.collapsed_gras_amsua.filename = 'collapsed_$SAT.nc.gz';
 
 D.cpr_dardarsub_IWP.basedir     = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/cpr_dardarsub_IWP';

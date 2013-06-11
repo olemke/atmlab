@@ -1,3 +1,37 @@
+2013-06-11  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-369
+
+	* collocations/CollocatedDataset.m:
+
+	(read):
+
+	- Be more verbose when reading additionals
+
+	(collocate_and_store_date_range):
+
+	- Bugfix, also get duplicate-db (granule_first_line) for previous
+	day, because last granule there is read.  Prevent infinite loop.
+
+	(meet_dependencies):
+
+	- Bugfix, at the risk of introducing a new bug, do not wrongly
+	complain that certain fields are missing if they aren't to be
+	processed.  Simply add all dependencies to the reading and if the
+	reading fails, I'll find out later.
+
+	* datasets/define_datasets.m:
+
+	- For amsua, get rid of limitator, because sometimes, only some
+	channels, not all, are flagged.  Also take care of this situation when
+	calculating the average and so.  Involves new subfunction ignoreNeG.
+
+	(ignoreNeG): Like ignoreNaN but ignoring negative values (flagged)
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Fix subdir for collapsed_gras_amsua (was set to basedir)
+
 2013-06-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-368
