@@ -1,3 +1,34 @@
+2013-06-13  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-370
+
+	* collocations/Collapser.m:
+
+	(vectorised):
+
+	- New property, defaults to 'false'.  If set to true, then the
+	processors, global limitators, and local limitators, operate on
+	vectorised input with nans.  This can speed up processing by a
+	factor 100 to 1000, but reduces flexibility and requires rewrites.
+	Therefore, despite the huge speed increase, it is by default disabled.
+
+	(fieldstruct), (overall_limitators):
+
+	- Adapt documentation based on new vectorised technique.
+
+	(process_granule):
+
+	- Expanded.  Can now handle either unvectorised or vectorised
+	processing.  Solution for vectorised processing is rather
+	sophisticated and likely contains bugs.  See new documentation and
+	code for details.
+
+	* datasets/define_datasets.m:
+
+	- Add collocation_mhs_avhrr.  The data are so huge, I won't be storing
+	it.  Also added fieldcopier and collapser.  The collapser works in a
+	vectorised way.
+
 2013-06-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-369

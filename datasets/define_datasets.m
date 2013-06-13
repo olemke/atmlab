@@ -505,6 +505,14 @@ CollocatedDataset(D.gras_per_day, D.amsua, ...
     'distance', 150, ...
     'interval', 3600);
 
+% NB: not intended to be stored, only used on-the-fly; storing will explode
+% storage requirements, repeating each AVHRR footprint many times!
+CollocatedDataset(D.mhs, D.avhrr, ...
+    'name', 'collocation_mhs_avhrr', ...
+    'distance', 15, ...
+    'interval', 30, ...
+    'gridsize', 0.2); % for sure very many collocations -> smaller gridsize.  Should consider special algorithm or different solution altogether
+
 % CPR as reference
 
 CollocatedDataset(D.avhrr_cmsaf_gac, D.cpr,...
@@ -726,6 +734,12 @@ FieldCopier(D.CollocatedDataset_hirs_dardarsub, ...
     getSelection(fields.dardarsub,{'iwc'}),...
     'name','hirs_dardarsub');
 
+% NB: do not try to store, too large
+FieldCopier(D.collocation_mhs_avhrr, ...
+    getfields(fields.mhs, 'B_BT', 'B_LZA', 'B_LAA', 'B_SZA', 'B_SAA'), ...
+    getfields(fields.avhrr, 'AVHRR_Y', 'AVHRR_FLAG_3AB'), ...
+    'name', 'associated_mhs_avhrr');
+
 % ----------------------------
 % FieldCopiers for collocated collocated datasets
 % ----------------------------
@@ -925,26 +939,30 @@ cloud_cci.cot_ice.limitators                       = limitators_scalar;
 % avhrr
 % ------
 
-avhrr_capsed.AVHRR_Y.processors.NO = @(X)(size(X, 1));
+%avhrr_capsed.AVHRR_Y.processors.NO = @(X)(size(X, 1));
+avhrr_capsed.AVHRR_Y.processors.NO = @(X)(vec2col(par(sum(~isnan(X), 1), ':', ':', 3)));
 avhrr_capsed.AVHRR_Y.stored.NO.type = 'short';
 avhrr_capsed.AVHRR_Y.stored.NO.atts.long_name = 'Number of AVHRR footprints used for statistics inside AMSU-B/MHS';
 avhrr_capsed.AVHRR_Y.stored.NO.atts.missing_value = 0;
 avhrr_capsed.AVHRR_Y.stored.NO.profile = false;
-avhrr_capsed.AVHRR_Y.processors.MEAN = @(X)(mean(X, 1));
+%avhrr_capsed.AVHRR_Y.processors.MEAN = @(X)(mean(X, 1));
+avhrr_capsed.AVHRR_Y.processors.MEAN = @(X)(squeeze(nanmean(X, 1)));
 avhrr_capsed.AVHRR_Y.stored.MEAN.type = 'float';
 avhrr_capsed.AVHRR_Y.stored.MEAN.atts.long_name = 'MHS-averaged AVHRR BT';
 avhrr_capsed.AVHRR_Y.stored.MEAN.atts.units = 'albedo or BT';
 avhrr_capsed.AVHRR_Y.stored.MEAN.atts.missing_value = -1;
-avhrr_capsed.AVHRR_Y.processors.STD = @(X)(std(X, 0, 1));
+%avhrr_capsed.AVHRR_Y.processors.STD = @(X)(std(X, 0, 1));
+avhrr_capsed.AVHRR_Y.processors.STD = @(X)(squeeze(nanstd(X, 0, 1)));
 avhrr_capsed.AVHRR_Y.stored.STD.type = 'float';
 avhrr_capsed.AVHRR_Y.stored.STD.atts.long_name = 'AVHRR-in-MHS standard deviation';
 avhrr_capsed.AVHRR_Y.stored.STD.atts.units = avhrr_capsed.AVHRR_Y.stored.MEAN.atts.units;
 avhrr_capsed.AVHRR_Y.stored.STD.atts.missing_value = -1;
-avhrr_capsed.AVHRR_Y.processors.CV = @(X)(std(X, 0, 1) ./ mean(X, 1));
-avhrr_capsed.AVHRR_Y.stored.CV.type = 'float';
-avhrr_capsed.AVHRR_Y.stored.CV.atts.long_name = 'Coefficient of variation of AVHRR in MHS';
-avhrr_capsed.AVHRR_Y.stored.CV.atts.missing_value = 0;
-avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = mn;
+% avhrr_capsed.AVHRR_Y.processors.CV = @(X)(std(X, 0, 1) ./ mean(X, 1));
+% avhrr_capsed.AVHRR_Y.stored.CV.type = 'float';
+% avhrr_capsed.AVHRR_Y.stored.CV.atts.long_name = 'Coefficient of variation of AVHRR in MHS';
+% avhrr_capsed.AVHRR_Y.stored.CV.atts.missing_value = 0;
+% avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = mn;
+avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = @(X)vec2col(nanmean(X, 1));
 avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.type = 'float';
 avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.long_name = 'MHS-averaged AVHRR BT';
 avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.units = 'albedo or BT';
@@ -972,6 +990,12 @@ Collapser(D.cloud_cci_dardarsub_IWP,cloud_cci,cloud_cci_global, ...
 
 Collapser(D.associated_gras_amsua, capsed_amsua, amsua_global_lim, ...
     'name', 'collapsed_gras_amsua');
+
+Collapser(D.associated_mhs_avhrr, avhrr_capsed, ...
+    {{{'DIST'}, @(X)(X<7.5)}, ...
+     {{'INT'}, @(X)(abs(X)<60)}}, ...
+     'vectorised', true, ...
+     'name', 'collapsed_mhs_avhrr');
 
 % this one uses some subfunctions, so is defined in its own file
 define_c2dp('mhs');

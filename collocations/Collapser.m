@@ -38,6 +38,8 @@ classdef Collapser < AssociatedDataset
     %   overall_limitators -    Limitations applied to all fields
     %  (remaining properties inherited from <a href="matlab:help AssociatedDataset">AssociatedDataset</a>.
     %   Use <a href="matlab:properties Collapser">properties</a> for a complete listing)
+    %   vectorised -            Determine if processors/limitators can be
+    %                           vectorised
     %
     % Collapser Methods:
     %
@@ -80,24 +82,54 @@ classdef Collapser < AssociatedDataset
         %
         %   limitators  cell-array of function_handle
         %
-        %       Each limitator receives as input the subset of secondary
+        %       Depending on the value of the collapser property
+        %       'vectorised' (defaults to false), this is either in
+        %       non-vectorised or in vectorised form.
+        %
+        %       In non-vectorised form, each limitator is called for every
+        %       primary footprint. It receives as input the subset of secondary
         %       footprints that fall within the primary footprint. Each
         %       limitator must return a logical 1-D vector with the same
         %       length as the number of footprints in the input. Any later
         %       processing functions are applied only to those collocations
         %       for which ALL limitators return true.
         %
+        %       In vectorised form, each limitator is called once per
+        %       granule.  As an argument, it receives a p*N*q ndarray,
+        %       where p is the maximum number of secondaries to ever
+        %       occur inside a primary, N is the number of primaries, and q
+        %       is the number of values per measurement for this field.  Note that for each primary with
+        %       s<p secondaries, the last p-s values will be masked with
+        %       nans.  The limitator shall return a logical ndarray of the
+        %       same size as its input, with true for values to be used for
+        %       the processing.
+        %
         %   processors  structure
         %
         %       A structure with a field for each processing.
         %       The field is the processors name, such as MEAN,
-        %       STD, etc. The value is a function handle. This
-        %       function handle takes as input the secondary
+        %       STD, etc. The value is a function handle.
+        %
+        %       The function handle can be either in vectorised or
+        %       non-vectorised form, depending on the value of the
+        %       collapser property 'vectorised', which defaults to false
+        %       (behaviour prior to atmlab-2-1-370).
+        %
+        %       In non-vectorised form, the function is called once for
+        %       each primary footprint. It takes as input the secondary
         %       footprints corresponding to the primary
         %       footprint, after global and local limitators
         %       are applied. The function handle must return a
-        %       single, scalar value, or a single row of values
+        %       single, scalar value, or a single vector of values
         %       if the input data are 2-D.
+        %
+        %       In vectorised form, the function handle is called once for
+        %       each granule.  It receives as input a p*N*q ndarray,
+        %       as for the limitators above.  Beyond data that were already
+        %       masked to begin with (again, see description at
+        %       limitators), data are masked where any limitator has
+        %       returned false.  The function shall return a N*q array (for
+        %       scalar input data, q=1).
         %
         %       The final members field will prepend each field
         %       with the name of its processor, e.g.
@@ -124,9 +156,16 @@ classdef Collapser < AssociatedDataset
         % the original field, which makes sense for mean, std, etc.  It
         % might not always be so; if it is not, one should explicitly set
         % (field).stored.(processor).profile = false
+        %
+        % For examples, see the definitions in define_datasets and/or
+        % explore the various collapsed datasets defined in atmlab.
         fieldstruct = []; 
         % Cell array of global limitators.
         %
+        % These can work either in vectorised or non-vectorised form,
+        % depending on the value of the 'vectorised' property.
+        %
+        % In non-vectorised form (the default),
         % Global limitators are applied to the subset of secondary
         % footprints corresponding to a shared primary footprint before
         % going into any field-specific processing. It is suitable to use
@@ -137,7 +176,33 @@ classdef Collapser < AssociatedDataset
         % return a logical of Nx1. All limitators are
         % processed sequentially and are applied to
         % all fields.
-        overall_limitators = []; % List of global limitators
+        %
+        % In vectorised form, each global limitator is called exactly once
+        % for each granule.  It receives a p*N*q ndarray, where p is the
+        % maximum number of secondaries ever inside a primary, N is the
+        % number of primaries for the granule, and q corresponds to
+        % fields (usually q=1).  To conserve memory, global limitators in
+        % vectorised form must indicate what fields they shall be using, as
+        % a subset from fields in the core (CollocatedDataset.cols).  Thus,
+        % rather than a simple cell array of function handles, it's a cell
+        % array of 2-element cell arrays, such as {{{'DIST'}, @(X)(X<7.5)}}.
+        % The function handles shall return a logical of
+        % size pxNx1 instructing what primaries to use, and what primaries to
+        % skip altogether.
+        overall_limitators = {}; % List of global limitators
+    end
+    
+    properties (Transient)
+        % Determine if processors and limitators can be vectorised
+        %
+        % Collapsers can be very slow, because user-provided,
+        % Matlab-written functions are called for every primary footprint.
+        % For example, processing a single granule of MHS/AVHRR
+        % collocations can take more than an hour.  In some - but not all -
+        % cases, limitators and processors can be vectorised, and
+        % processing speed can be increased by several orders of magnitude.
+        % This requires 
+        vectorised = false;
     end
         
     % $Id$
@@ -272,6 +337,7 @@ classdef Collapser < AssociatedDataset
             
             [deps_cols, memnames] = optargs(varargin, {{self.dependencies{1}.cols}, 'all'});
             M_data = deps{1};
+            clear deps; % otherwise duplicating potentially a lot of data
 %             deps_cols = cell2struct(deps_cols, cellfun(@(X) X.name, self.dependencies, 'UniformOutput', false), 2);
 %            deps_cols = deps_cols{1};
             cols_data = deps_cols{1};
@@ -380,136 +446,266 @@ classdef Collapser < AssociatedDataset
                 end
             end
             
-            % keep track of time for logging purposes (progress etc.)
-            t = 0;
-            logtext(atmlab('OUT'), 'Processing %d primary footprints, %d fields, %d total stats, %d values/collocation\n', ...
-                size(uniques, 1), length(fields), length(memnames), nfields);
-            j = 0; % counter increases only when there is data
-            for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
-                tic;
-                first = firsts(i);
-                last = lasts(i);
-                M_coll_part = processed_core(first:last, :);
-                M_data_part = M_data(first:last, :);
+            if self.vectorised
                 
-                j = j + 1;
+                % start with the easy bit
+                                    
+                M(:, localcols.FIRST) = processed_core(firsts, cd.cols.INDEX);
+                M(:, localcols.LAST) = processed_core(lasts, cd.cols.INDEX);
+                    
+                %% Sophisticated vectorisation...
                 
-                % limitation to all, e.g. for distances
-                if ~has_overall_limitators;
-                    lim_for_all_fields = true(size(M_data_part, 1), 1);
-                else
-                    % 2nd version is much faster.  This was still often the
-                    % slowest part of the function, applying the overall
-                    % limitators, for cases with few fields.
-                    %answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
-                    for ii = 1:n_overall_limitators
-                        answers{ii} = flat(self.overall_limitators{ii}(M_coll_part));
+                % create a matrix where each column contains the indices
+                % corresponding to one of the primaries; no. of rows
+                % corresponds to the largest occurding no. of secondaries in a
+                % primary, so most columns will have lots of data flagged
+                max_no_prim_in_sec = max(firsts(2:end)-firsts(1:end-1));
+                % use a signed int for rarr; double is too large, single too
+                % imprecise, but I need negatives for flagged data
+                % NB: rarr stands for Re-ARRanged
+                rarr = bsxfun(@plus, vec2row(int32(firsts)), vec2col(int32(0:max_no_prim_in_sec-1)));
+                % flag data that shouldn't be there
+                rarrgt = bsxfun(@gt, rarr, vec2row(lasts));
+                rarr(rarrgt) = -1;
+                % now we have the array with indices in 'rarr'.  Get
+                % corresponding data from data matrix, i.e. like this:
+                %  1           2           3           4           6           8          10          12          13          15
+                % -1          -1          -1           5           7           9          11          -1          14          16
+                % -1          -1          -1          -1          -1          -1          -1          -1          -1          17
+                % -1          -1          -1          -1          -1          -1          -1          -1          -1          -1
+                % -1          -1          -1          -1          -1          -1          -1          -1          -1          -1
+                
+                % we will arrange two 3-D data matrices in this style: one
+                % for the core, one for the data.  The core contains fields
+                % needed by global limitators and fields needed by
+                % processors.  The data contains only fields needed by
+                % processors.
+                core_fields_needed_by_limitators = cellfun(@(X) X{1}, self.overall_limitators, 'UniformOutput', false);
+                proc_field_is_in_core = cellfun(@(X) self.fieldstruct.(X).incore, fields);
+                core_fields_needed_by_proccers = fields(proc_field_is_in_core);
+                core_fields_needed = union([core_fields_needed_by_limitators{:}], ...
+                                           core_fields_needed_by_proccers);
+                data_fields_needed = fields(~proc_field_is_in_core);
+                Mrar_core = nan(max_no_prim_in_sec, length(firsts), length(core_fields_needed), 'single');
+                Mrar_data = nan(max_no_prim_in_sec, length(firsts), sum(cellfun(@(f) length(cols_data.(f)), data_fields_needed)), 'single');
+                % we can afford to loop to max_no_prim_in_sec because it's only
+                % a few dozen at most.  This loop takes 9.4 seconds for a 56 x
+                % 228391 x 15 array...
+                for i = 1:max_no_prim_in_sec
+                    % copy over where 'rarr' is not flagged.  FIXME: this
+                    % should of course be properly selected
+                    n = 1;
+                    for k = 1:length(data_fields_needed)
+                        field = data_fields_needed{k};
+                        fieldsize = length(cols_data.(field));
+                        Mrar_data(i, rarr(i, :)>0, n:(n+fieldsize-1)) = M_data(rarr(i, rarr(i, :)>0), cols_data.(field));
+                        Mrar_data_cols.(field) = n:(n+fieldsize-1);
+                        n = n + fieldsize;
                     end
-
-                    lim_for_all_fields = all(horzcat(answers{:}), 2);
-                    if ~any(lim_for_all_fields)
-                        M(j, :) = flag_globlimfailed;
-                        continue
+                    for k = 1:length(core_fields_needed)
+                        field = core_fields_needed{k};
+                        Mrar_core(i, rarr(i, :)>0, k) = processed_core(rarr(i, rarr(i, :)>0), self.parent.cols.(field));
+                        Mrar_core_cols.(field) = k;
                     end
+                    %                 Mrar(i, rarr(i, :)>0, 1:5) = M_data(rarr(i, rarr(i, :)>0), cols_data.AVHRR_Y);
+                    %                 Mrar(i, rarr(i, :)>0, 6) = M_data(rarr(i, rarr(i, :)>0), cols_data.AVHRR_FLAG_3AB);
+                    %Mrar(i, rarr(i, :)>0, :) = processed_core(rarr(i, rarr(i, :)>0), :);
                 end
+                % now we have a p*N*q ndarray, with p the max. no. of
+                % secondary in primary, N the no. of primaries, and q the
+                % no. of fields.  This replaces M_data that we clear for
+                % memory reasons.
+                clear M_data;
+                clear processed_core;
+                % go through the global limitators:
+                overall_global_lim = true(max_no_prim_in_sec, length(firsts));
+                for ii = 1:n_overall_limitators
+                    lim_inp_fields = self.overall_limitators{ii}{1};
+                    limitator = self.overall_limitators{ii}{2};
+                    coreplanes = cell2mat(struct2cell(getfields(Mrar_core_cols, lim_inp_fields{:})));
+                    this_global_lim = limitator(Mrar_core(:, :, coreplanes));
+                    if ~isequal(size(this_global_lim), size(overall_global_lim))
+                        error(['atmlab:' mfilename ':wrongsize'], ...
+                            ['This is %s %s speaking.  I was processing vectorised ' ...
+                             'data when I received a wrongly-sized logical from global ' ...
+                             'limitator %s.  I got: %s.  But I wanted: %s.  Giving up!'], ...
+                             class(self), self.name, func2str(limitator), ...
+                             num2str(size(this_global_lim)), num2str(size(overall_global_lim)));
+                    end
+                    overall_global_lim = overall_global_lim & this_global_lim;
+                end
+                % mask those data out of Mrar_data.  overall_global_lim is
+                % just a logical so hopefully I can get away with repmat
+                overall_global_lim = repmat(overall_global_lim, [1, 1, size(Mrar_data, 3)]);
+                Mrar_data(~overall_global_lim) = NaN;
+                %clear overall_global_lim;
                 
-%                 M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
-%                 M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
-                M(j, localcols.FIRST) = processed_core(first, cd.cols.INDEX);
-                M(j, localcols.LAST) = processed_core(last, cd.cols.INDEX);
-               
-                % for each field, apply limitations and call processing
-                % function on sub-limited set, if any are actually left
-                % also keep track if we had any valid fields here
-                anyvalidfields = false;
                 for k = 1:length(fields)
                     fname = fields{k};
                     if self.fieldstruct.(fname).incore
-                        M_source = M_coll_part;
+                        M_source = Mrar_core(:, :, Mrar_core_cols.(fname));
                     else
-                        M_source = M_data_part;
+                        M_source = Mrar_data(:, :, Mrar_data_cols.(fname));
+                    end
+                    for pi = 1:length(all_procnames{k})
+                        procname = all_procnames{k}{pi};
+                        procfname = [procname '_' fname];
+                        if ~isfield(localcols, procfname)
+                            % probably processor is already there; in
+                            % any case, it was not asked for
+                            continue
+                        end
+
+                        capsed = proccers{k}{pi}(M_source);
+                        expsize = [length(uniques), length(localcols.(procfname))];
+                        if ~isequal(size(capsed), expsize)
+                            error(['atmlab:' mfilename ':wrongsize'], ...
+                                ['This is %s %s speaking.  I was processing vectorised ' ...
+                                 'data when I received wrongly sized data from processor ' ...
+                                 '%s for field %s.  I expected %s, but received %s.  Giving up!'], ...
+                                 class(self), self.name, procname, fname, num2str(expsize), num2str(size(capsed)));
+                        end
+                        M(:, localcols.(procfname)) = capsed;
+                    end
+                end
+
+                % for consistency with old method, remove completely
+                % instances where the overall global limitators prevented
+                % data
+                M(all(all(~overall_global_lim, 1), 3), :) = []; 
+            else
+                %% proceed the old, slow way (OK for small data amounts)
+                
+                % keep track of time for logging purposes (progress etc.)
+                t = 0;
+                logtext(atmlab('OUT'), 'Processing %d primary footprints, %d fields, %d total stats, %d values/collocation\n', ...
+                    size(uniques, 1), length(fields), length(memnames), nfields);
+                j = 0; % counter increases only when there is data
+                for i = 1:size(uniques, 1) % need to be done in loop due to mean/std/etc.
+                    tic;
+                    first = firsts(i);
+                    last = lasts(i);
+                    M_coll_part = processed_core(first:last, :);
+                    M_data_part = M_data(first:last, :);
+                    
+                    j = j + 1;
+                    
+                    % limitation to all, e.g. for distances
+                    if ~has_overall_limitators;
+                        lim_for_all_fields = true(size(M_data_part, 1), 1);
+                    else
+                        % 2nd version is much faster.  This was still often the
+                        % slowest part of the function, applying the overall
+                        % limitators, for cases with few fields.
+                        %answers = cellfun(@(X)(X(:)), cellfun(@(f)f(M_coll_part), self.overall_limitators, 'UniformOutput', false), 'UniformOutput', false);
+                        for ii = 1:n_overall_limitators
+                            answers{ii} = flat(self.overall_limitators{ii}(M_coll_part));
+                        end
+                        
+                        lim_for_all_fields = all(horzcat(answers{:}), 2);
+                        if ~any(lim_for_all_fields)
+                            M(j, :) = flag_globlimfailed;
+                            continue
+                        end
                     end
                     
-                    % iteratively apply limitations, only if all
-                    % limitations return true (including
-                    % lim_for_all_fields) the collocation is selected for
-                    % further average-processing
-                    if ~field_has_limitators(k)
-                        limsel = true(size(M_source, 1), 1);
-                    else
-                        limsel = lim_for_all_fields;
-                        limmers = field_limitators{k};
+                    %                 M(j, self.cols.FIRST) = processed_core(first, cd.cols.INDEX);
+                    %                 M(j, self.cols.LAST) = processed_core(last, cd.cols.INDEX);
+                    M(j, localcols.FIRST) = processed_core(first, cd.cols.INDEX);
+                    M(j, localcols.LAST) = processed_core(last, cd.cols.INDEX);
+                    
+                    % for each field, apply limitations and call processing
+                    % function on sub-limited set, if any are actually left
+                    % also keep track if we had any valid fields here
+                    anyvalidfields = false;
+                    for k = 1:length(fields)
+                        fname = fields{k};
+                        if self.fieldstruct.(fname).incore
+                            M_source = M_coll_part;
+                        else
+                            M_source = M_data_part;
+                        end
                         
-                        for li = 1:length(limmers)
-                            limmer = limmers{li};
-%                             limhere = limmer(M_source(:, self.fieldstruct.(fname).origin.cols.(fname)));
-                            limhere = limmer(M_source(:, cols_data.(fname)));                            
-                            limsel = limsel(:) & limhere(:);
+                        % iteratively apply limitations, only if all
+                        % limitations return true (including
+                        % lim_for_all_fields) the collocation is selected for
+                        % further average-processing
+                        if ~field_has_limitators(k)
+                            limsel = true(size(M_source, 1), 1);
+                        else
+                            limsel = lim_for_all_fields;
+                            limmers = field_limitators{k};
+                            
+                            for li = 1:length(limmers)
+                                limmer = limmers{li};
+                                %                             limhere = limmer(M_source(:, self.fieldstruct.(fname).origin.cols.(fname)));
+                                limhere = limmer(M_source(:, cols_data.(fname)));
+                                limsel = limsel(:) & limhere(:);
+                            end
+                        end
+                        
+                        procnames = all_procnames{k};
+                        if any(limsel)
+                            % apply all processors and store in appropiate
+                            % place
+                            for pi = 1:length(procnames)
+                                procname = procnames{pi};
+                                if ~isfield(localcols, [procname '_' fname])
+                                    % probably processor is already there; in
+                                    % any case, it was not asked for
+                                    continue
+                                end
+                                %proccer = self.fieldstruct.(fname).processors.(procname);
+                                %                             capsed = proccers{k}{pi}(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
+                                capsed = proccers{k}{pi}(M_source(limsel, cols_data.(fname)));
+                                
+                                %if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
+                                if ~isequal(size(capsed), [1, length(localcols.([procname '_' fname]))])
+                                    error(['atmlab:' mfilename ':mismatch'], ...
+                                        ['Error in collapsing %s %s %s. Processor ', ...
+                                        'returned wrongly-sized field. Got [%d, %d]. ', ...
+                                        'Expected [%d, %d].'], ...
+                                        self.name, fname, procname, size(capsed, 1), ...
+                                        size(capsed, 2), 1, length(localcols.([procname '_' fname])));
+                                    %                                size(capsed, 2), 1, length(self.cols.([procname '_' fname])));
+                                end
+                                M(j, localcols.([procname '_' fname])) = capsed;
+                                %                            M(j, self.cols.([procname '_' fname])) = capsed;
+                                anyvalidfields = true;
+                            end
+                        else
+                            % set all processors for this field to missing_val
+                            for pi = 1:length(procnames)
+                                procname = procnames{pi};
+                                if isfield(localcols, [procname '_' fname])
+                                    %M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
+                                    M(j, localcols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
+                                end
+                            end
                         end
                     end
-      
-                    procnames = all_procnames{k};
-                    if any(limsel)
-                        % apply all processors and store in appropiate
-                        % place
-                        for pi = 1:length(procnames)
-                            procname = procnames{pi};
-                            if ~isfield(localcols, [procname '_' fname])
-                                % probably processor is already there; in
-                                % any case, it was not asked for
-                                continue
-                            end
-                            %proccer = self.fieldstruct.(fname).processors.(procname);
-%                             capsed = proccers{k}{pi}(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
-                            capsed = proccers{k}{pi}(M_source(limsel, cols_data.(fname)));
-                         
-                            %if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
-                            if ~isequal(size(capsed), [1, length(localcols.([procname '_' fname]))])                                
-                                error(['atmlab:' mfilename ':mismatch'], ...
-                                ['Error in collapsing %s %s %s. Processor ', ...
-                                 'returned wrongly-sized field. Got [%d, %d]. ', ...
-                                 'Expected [%d, %d].'], ...
-                                self.name, fname, procname, size(capsed, 1), ...
-                                size(capsed, 2), 1, length(localcols.([procname '_' fname])));
-%                                size(capsed, 2), 1, length(self.cols.([procname '_' fname])));                            
-                            end
-                            M(j, localcols.([procname '_' fname])) = capsed;
-%                            M(j, self.cols.([procname '_' fname])) = capsed;                            
-                            anyvalidfields = true;
-                        end
-                    else
-                        % set all processors for this field to missing_val
-                        for pi = 1:length(procnames)
-                            procname = procnames{pi};
-                            if isfield(localcols, [procname '_' fname])
-                                %M(j, self.cols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
-                                M(j, localcols.([procname '_' fname])) = self.fieldstruct.(fname).stored.(procname).atts.missing_value;
-                            end
-                        end
+                    % remove if any are valid at all
+                    % FIXME: make this optional
+                    if ~anyvalidfields
+                        M(j, :) = flag_allflagged;
+                    end
+                    t = t + toc;
+                    if t > 600
+                        logtext(atmlab('OUT'), 'Done %d/%d\n', ...
+                            i, size(uniques, 1));
+                        t = 0;
                     end
                 end
-                % remove if any are valid at all
-                % FIXME: make this optional
-                if ~anyvalidfields
-                    M(j, :) = flag_allflagged;
-                end
-                t = t + toc;
-                if t > 600
-                    logtext(atmlab('OUT'), 'Done %d/%d\n', ...
-                        i, size(uniques, 1));
-                    t = 0;
-                end
+                
+                % remove remaining part of M, e.g. where I did too much
+                % pre-allocation or no relevant data was found
+                rest = all(M==flag_globlimfailed, 2);
+                % FIXME: what to do with the other flags?
+                M(rest, :) = [];
+                logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
+                    size(processed_core, 1), size(M, 1));
+                %%%
             end
-            
-            % remove remaining part of M, e.g. where I did too much
-            % pre-allocation or no relevant data was found
-            rest = all(M==flag_globlimfailed, 2);
-            % FIXME: what to do with the other flags?
-            M(rest, :) = [];
-            logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
-                size(processed_core, 1), size(M, 1));
-            %%%
-            
         end
         
         %% overload parent methods
