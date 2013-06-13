@@ -1,3 +1,23 @@
+2013-06-13  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-371
+
+	* handy/combine_pdfs.m: Added extra tweak option
+	"rightPadding". It does padding to the right of a row. Right now
+	it needs one value per row. e.g., for 4 rows something like
+	options.rightPadding=[1.7,1.7,0,0]. default is for this to not be
+	set at all. Could be implemented nicer, but I was in a rush.
+
+	* handy/catstruct.m: Fixed an error message
+
+	* geoplots/gmt/create_gmt_earth.m:
+	* geoplots/gmt/gmt_inputs.m: in.extra_legend can now also be set
+	to false if you don't want it. Normally this legend is used to
+	display the color of NaNs
+
+	* geoplots/gmt/gmt_plot.m: Fixed typo. Fixed so that daterange
+          doesn't get confused by -inf
+
 2013-06-13  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-370

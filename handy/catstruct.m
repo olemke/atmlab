@@ -49,7 +49,7 @@ function A = catstruct(varargin)
 
 N = nargin ;
 
-error(nargchk(1,Inf,N)) ;
+narginchk(1,Inf) ;
 
 if ~isstruct(varargin{end}),
     if isequal(varargin{end},'sorted'),
@@ -60,7 +60,7 @@ if ~isstruct(varargin{end}),
             return
         end
     else
-        error('catstruct:InvalidArgument',...
+        error(['atmlab:' mfilename, ':badInput'],...
             'Last argument should be a structure, or the string "sorted".') ;
     end
 else

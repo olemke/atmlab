@@ -25,6 +25,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %       outdir        |%s    directory for output        | gmtlab('outdir')
 %       vspace        |%f    space between rows          | 1 (cm)
 %       hspace        |%f    space between columns       | 1 (cm)
+%       rightPadding | %f  padding to the right of a row | 1(cm) %need one value per row. e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
 %       valign        |%s    vertical alignment          | m
 %                     |      m = middle, b = bottom      |
 %       scale         |[%d,%d; etc] scale individual figures
@@ -234,6 +235,9 @@ for R = layout.plotsbyrow
         fprintf(fid,'\\end{minipage}\n');
         if (col ~= length(R{:}))
             fprintf(fid,'\\hspace{%gcm}\n', options.hspace);
+        %end
+        elseif isfield(options,'rightPadding')
+            fprintf(fid,'\\hspace{%gcm}\n', options.rightPadding(row));
         end
         col = col+1;
         filenum=filenum+1;

@@ -245,7 +245,7 @@ function filename = gmt_plot(in,field)
 %  color            in:     %s
 %                   ex:     Color of coast and rivers in rgb e.g. '255/255/255'
 %                           gives white coastlines
-%                   def:    COLOR_BAGROUND
+%                   def:    COLOR_BACKGROUND
 %                     ----------------------
 %
 % (for grid, see in.ticks)
@@ -737,10 +737,6 @@ if isfield(in,'header_size')
     warning('atmlab:temporary','in.header_size has been renamed to in.header_fontsize. in.header_size will be removed in future releases')
     in.header_fontsize = in.header_size; in=rmfield(in,'header_size');
 end
-if isfield(in,'title')
-    warning('atmlab:temporary','in.title has been renamed to in.header. in.title will be removed in future releases')
-    in.header = in.title; in=rmfield(in,'title');
-end
 
 % replace bad symbols (for gmt system call) for filename and mask them for the title
 if ~isempty(in.header)
@@ -950,7 +946,7 @@ function datarange = getdatarange(in,field)
 %% getdatarange
 
 tmp = in.(field)(:);
-d = double([min(tmp) max(tmp(~isinf(tmp)))]);
+d = double([min(tmp(~isinf(tmp))) max(tmp(~isinf(tmp)))]);
 
 % Do some tricks to get the most useful datarange. (rounded, but preserve precision)
 x = log10(d(2)-d(1));

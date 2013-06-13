@@ -389,7 +389,7 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
     end
     % Also needed
     a.cptfile = in.plot.color.cptfile;
-    if isfield(in,'extra_legend')
+    if isfield(in,'extra_legend') && isstruct(in.extra_legend)
         if ~isfield(in.extra_legend,'position')
             [w,wu]=separate_integer_and_unit(in.legend.width); %thickness of legend bar
             [x,xu]=separate_integer_and_unit(in.legend.xpos);
