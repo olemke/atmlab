@@ -41,7 +41,9 @@ function [data,lat,lon] = ungridded2gridded(in,opt)
 %                           statistics. This function handle 
 %                           toggles what you mean by "valid". To keep all values
 %                           valid = ''; By default only keep positive values
-%                           i.e., valid = @(x)(x(x>=0))
+%                           i.e., valid = @(x)(x(x>=0)). WARNING: but if you input a
+%                           matrix per cell be aware that the above example will
+%                           collapse your data to a vector
 %         
 %
 %       noStatistics        If you only want to bin the data and return a 2D
@@ -55,8 +57,11 @@ function [data,lat,lon] = ungridded2gridded(in,opt)
 %                           interest. If this is not given the
 %                           gridding is global (slower if unnecessary)
 %
-%      replace              val (e.g., NaN) 
-%                           replace empty cells with in.replace
+%      replace         val (e.g., NaN, or {NaN,0} 
+%                           replace empty cells with in.replace. Make it a cell
+%                           if you want difference replace values for the
+%                           function handles. NaN is default
+%                           
 %
 % OUT   
 %      
@@ -83,18 +88,19 @@ assert(any([isfield(in,'data'),isfield(opt,'field')]),...
     errId,'need some way of knowing what "field" to do the gridding on.\nSee doc %s.m\n',mfilename)
 
 
-default.grid            = {1};
-default.func            = {@mean,@numel};
-default.valid           = @(x)(x(x>=0));
-default.noStatistics    = false;
-default.field           = 'data';
-default.replace         = NaN;
+default.grid                 = {1};
+default.func                = {@mean,@numel};
+default.valid                = '';
+default.noStatistics     = false;
+default.field                 = 'data';
+default.replace            = NaN;
+default.ensureDouble = false;
 opt = optargs_struct(opt,default);
 
 if ~iscell(opt.func), opt.func={opt.func}; end
 
-assert(isequal(size(in.(opt.field)(:)),size(in.lat(:)),size(in.lon(:))),...
-        errId,'data, lat, lon must be the same size')
+assert(isequal(size(in.(opt.field)(:)),size(in.lat(:)),size(in.lon(:)))|isequal(size(in.(opt.field),1),size(in.lat(:),1),size(in.lon(:),1)),...
+        errId,'"%s" lat, lon must be the same size, or the first dimension of "%s" is the same size as lat lon',opt.field,opt.field)
 
 % ---------------
 % Grid
@@ -138,9 +144,10 @@ end
 % APPLY STATISTICS
 
 
-if any(cellfun('isempty',tmpdata(:))), 
+if opt.ensureDouble || (any(cell2mat(cellfun(@(x)(isscalar(x)&&isnan(x)),opt.replace,'uniformoutput',0))) && any(cellfun('isempty',tmpdata(:)))), 
 % If there are empty cells the cell2mat function will fail. Therefore NaNs will
-% be put in there place. For this the type of the data is turned to double
+% be put in there place. For this the type of the data is turned to double. This
+% is done for convenience
 
   tmpdata = cellfun(@(x)(cast(x,'double')),tmpdata,'uniformOutput',0);
 end
@@ -152,7 +159,7 @@ for i = 1: length(flds)
     % check that the cells only contain scalars
     data.fhandle2fieldname{i} = sprintf('%s = %s',flds{i},func2str(opt.func{i}));
     if any(~cellfun(@isscalar,out.(flds{i})(:)))
-        logtext(atmlab('OUT'),'Not doing cell2mat(x) since it only works on scalars. data.%s will remain a cell\n',flds{i})
+        logtext(atmlab('OUT'),'Not doing cell2mat(x) since it only works on scalars. Statistic: "%s" that saved in data.%s will remain a cell\n',data.fhandle2fieldname{i} ,flds{i})
         data.(flds{i}) = out.(flds{i});
         continue
     end    

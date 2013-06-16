@@ -14,7 +14,12 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 % IN    data_bins    Cell of gridded vectors of data.
 %       statistics   Cell array of statistic function references.
 %       filter       Function to filter the binned data.
-%       replace      replace empty cells with <replace> (optional argument, default=don't)
+%       replace      replace empty cells with <replace> (optional argument).
+%                         "replace" may also be a cell with as many elements as there are function
+%                         handles that you plan to use, 
+%                         e.g., replace = {[0 0 0],NaN,-9} for 3 suitable
+%                         function handles. If "replace" is not a cell, the same
+%                         entry will be used for each function handle
 %
 % EXAMPLES
 % * Calculate number of elements per bin, mean value for each bin:
@@ -35,13 +40,13 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 
 assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
 if exist('filter','var') && ~isempty(filter)
-    assert(isfunction_handle(filter),'atmlab:BadInput','filter must be a function handle')
+    assert( isa( a, 'function_handle' ),['atmlab:' mfilename ':BadInput'],'filter must be a function handle')
     data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
 end
 
 for i = 1:length(statistics)
     try
-        A.(func2str(statistics{i}))=0;
+        A.(func2str(statistics{i}))=0; %#ok<STRNU> % it like a "isvalidfieldname" test
         statname= func2str(statistics{i});
     catch ME
         if strcmp(ME.identifier,'MATLAB:AddField:InvalidFieldName')
@@ -56,18 +61,22 @@ end
 %% - Replace empty cells with something (e.g. NaN). put the data array must have the same class as "replace"
 %
 if exist('replace','var')
-    for F = fieldnames(out)'
+    F = fieldnames(out)';
+    if ~iscell(replace), replace=repmat({replace},1,length(F));end
+    for i = 1:length(F)
         % putting back [] if the input was empty to begin with would be desirable, since e.g. nansum([])=0,
         % 
-        test =  cellfun('isempty',data_bins) | cellfun('isempty',out.(F{1}));
+        test =  cellfun('isempty',data_bins) | cellfun('isempty',out.(F{i}));
         if any(test(:))
             
-            if ~strcmp(class(replace),class(data_bins{1,1}))
+            if ~strcmp(class(replace{i}),class(data_bins{1,1}))
                 warning(['atmlab:' mfilename ':dataClass'],...
-                    ['replace  value "%f" is not the same class as data_bins\n',...
-                    'E.g. this means you cannot call cell2mat without an error'],replace)
+                    ['replace  value/s is not the same class as data_bins\n'...
+                    'E.g. this means you cannot call cell2mat without an error\n'...
+                    'replace value/s is/are class: "%s". data class is: "%s"'],...
+                    class(replace{i}),class(data_bins{1,1}))
             end
-            out.(F{1})(test)={replace};
+            out.(F{i})(test)=replace(i);
         end
     end
 end
