@@ -19,23 +19,24 @@ function outfile = combine_pdfs(pdffiles, options)
 %                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
 %
 %       options.            structure; contains the following options:
-%   KEY:fieldname     |type |description                 | default
-%       cols          |%d [] number of columns per row   | 2
-%       filename      |%s    name of output file         | 'out.pdf'
-%       outdir        |%s    directory for output        | gmtlab('outdir')
-%       vspace        |%f    space between rows          | 1 (cm)
-%       hspace        |%f    space between columns       | 1 (cm)
+%       fieldname      |type   description                            | default
+%       cols                |%d [] number of columns per row | 2
+%       filename        |%s    name of output file                | 'out.pdf'
+%       outdir            |%s    directory for output               |  gmtlab('outdir')
+%       vspace           |%f    space between rows               | 1 (cm)
+%       hspace           |%f    space between columns         | 1 (cm)
 %       rightPadding | %f  padding to the right of a row | 1(cm) %need one value per row. e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
-%       valign        |%s    vertical alignment          | m
-%                     |      m = middle, b = bottom      |
-%       scale         |[%d,%d; etc] scale individual figures
-%                      [filenumber,scale]                | 1
-%       title         | %s   title to be displayed above |
-%                            the combined pdfs,          | <none>
-%       fontsize      | %s   e.g. '4cm' or '40pt'        | 1/22 * rowwidth (only relevent if title is given)
-%       display       | tries to open pdf file           | false
-%                     | if your viewer is not listed it  |
-%                     | will not try to display anything |
+%       valign             |%s    vertical alignment               | m
+%                              |      m = middle, b = bottom      |
+%       scale              |[%d,%d; etc] scale individual figures
+%                             [filenumber,scale]                          | 1
+%       title                | %s   title to be displayed above  |
+%                             the combined pdfs,                        | <none>
+%       fontsize        | %s   e.g. '4cm' or '40pt'                 | 1/22 * rowwidth (only relevent if title is given)
+%       display          | tries to open pdf file                    | false
+%                             | if your viewer is not listed it       |
+%                             | will not try to display anything   |
+%       pdfcrop        | do a pdfcrop                                 | false
 %
 % OUT:      outfile             string; the fullpath to the pdffile created
 %
@@ -51,15 +52,16 @@ if ~nargin, error(['atmlab:' mfilename],'Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
-default.cols     = 2;
+default.cols        = 2;
 default.vspace   = 1;
 default.hspace   = 1;
-default.valign   = 'm';
+default.valign     = 'm';
 default.filename = 'out.pdf';
-default.outdir   = gmtlab('outdir');
+default.outdir     = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
-default.display  = false;
-default.title    = ''; 
+default.display    = false;
+default.title         = ''; 
+default.pdfcrop   = false;
 options = optargs_struct(options, default);
 
 %% Convert outdir to fullpath
@@ -132,7 +134,7 @@ regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 
 col = 1; row = 1;filenum=1;
 for P = pdffiles
-    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('verbosity'));
+    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('VERBOSITY'));
     
     % Great, pdfinfo uses BigPoints as a unit. Let's throw in some fancy
     % numbers and hope we end up with centimeters after that (DPI*INCH).
@@ -195,7 +197,7 @@ else
     fz=0;
 end
 
-fprintf(fid,['\\usepackage[margin=%.2gcm,paperwidth=%gcm,' ...
+fprintf(fid,['\\usepackage[margin=%gcm,paperwidth=%gcm,' ...
     'paperheight=%gcm]{geometry}\n'], ...
     margin, ...
     max(layout.rowwidth) + 2*margin, ...
@@ -235,7 +237,6 @@ for R = layout.plotsbyrow
         fprintf(fid,'\\end{minipage}\n');
         if (col ~= length(R{:}))
             fprintf(fid,'\\hspace{%gcm}\n', options.hspace);
-        %end
         elseif isfield(options,'rightPadding')
             fprintf(fid,'\\hspace{%gcm}\n', options.rightPadding(row));
         end
@@ -250,14 +251,22 @@ end
 fprintf(fid,'\\end{document}\n');
 
 %% Hand the TeX file over to pdflatex
-exec_system_cmd(mvplotcmd, gmtlab('verbosity'));
+exec_system_cmd(mvplotcmd, gmtlab('VERBOSITY'));
 exec_system_cmd(sprintf('cd %s && pdflatex -interaction batchmode out.tex', ...
     tmpfolder), ...
-    gmtlab('verbosity'));
+    gmtlab('VERBOSITY'));
 
+file = fullfile(options.outdir, options.filename); 
 exec_system_cmd(sprintf('cd %s && mv -f out.pdf ''%s''', ...
-    tmpfolder, ...
-    fullfile(options.outdir, options.filename)), ...
-    gmtlab('verbosity'));
+    tmpfolder, file), ...
+    gmtlab('VERBOSITY'));
+
+if options.pdfcrop
+    [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),gmtlab('VERBOSITY'));
+    if logical(test)
+        error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
+    end
+    exec_system_cmd(sprintf('mv %s-crop.pdf %s',file(1:end-4),file),gmtlab('VERBOSITY'));
+end
 
 end

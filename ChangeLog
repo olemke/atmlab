@@ -1,3 +1,11 @@
+2013-06-17  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-373
+
+	* handy/combine_pdfs.m: Added option pdfcrop (default=false) if
+	you want to crop the output pdf. Works only if pdfcrop is
+	installed
+
 2013-06-16  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-372
