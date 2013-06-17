@@ -10,7 +10,7 @@
 %       Grid names and grid units are set as described in *isatmadata*,
 %       beside GRID4_NAME that is set to '?'.
 %
-% FORMAT   G = gf_empty( [ dim ] )
+% FORMAT   G = atmdata_empty( [ dim ] )
 %        
 % OUT   G     Created atmlab structure.
 % OPT   dim   Dimensionality. Default is 0. Max is 5.

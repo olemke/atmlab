@@ -1,3 +1,17 @@
+2013-06-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-374
+
+	* demos/qpack2_demo2.m: A version of qpack2_demo, including
+	tropospheric attenuation.
+
+	* gformat/atmdata_empty.m: Name of function wrong in header.
+
+	* demos/qpack2_demo.m: Header slightly extended.
+
+	* arts/arts_oem_init.m (arts_oem_init): Improved error message
+	for check of MINMAX datatype.
+
 2013-06-17  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-373

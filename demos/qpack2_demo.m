@@ -10,6 +10,9 @@
 %    measurement data into the "Y format" (see *qp2_y*) is needed. The
 %    retrieval result is returned in the L2 format produced by *qp2_l2*.
 %
+%    This script focuses on giving an introduction, indicating different
+%    retrieval units and retrieval of other variables. See also *qpack2_demo2*.
+%
 % FORMAT   L2 = qpack2_demo
 %        
 % OUT      L2   L2 data output from *qpack2*.
@@ -296,23 +299,6 @@ Q.ABS_SPECIES(2).RETRIEVE = false;
 Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
     'midlatitude-winter', 'midlatitude-winter.H2O.xml' ), 'H2O', 'vmr_field' );
 
-% O2 and N2 not active, to make example somewhat faster
-if 0
-%- Oxygen
-%
-Q.ABS_SPECIES(3).TAG      = { 'O2-PWR93' };
-Q.ABS_SPECIES(3).RETRIEVE = false;
-Q.ABS_SPECIES(3).ATMDATA  = gf_artsxml( fullfile( fascod, ...
-                            'midlatitude-winter.O2.xml' ), 'O2', 'vmr_field' );
-
-%- Nitrogen
-%
-Q.ABS_SPECIES(4).TAG      = { 'N2-SelfContStandardType' };
-Q.ABS_SPECIES(4).RETRIEVE = false;
-Q.ABS_SPECIES(4).ATMDATA  = gf_artsxml( fullfile( fascod, ...
-                            'midlatitude-winter.N2.xml' ), 'N2', 'vmr_field' );
-end
-
 
 
 %- Wind
@@ -340,12 +326,12 @@ end
 % Here just included for testing purposes, of little interest for ground-based
 % spectrometers. 
 %
-%Q.POINTING.RETRIEVE       = true;
-%Q.POINTING.DZA            = 0.1; 
-%Q.POINTING.POLY_ORDER     = 0;
-%Q.POINTING.CALCMODE       = 'recalc';
-%Q.POINTING.SX             = 1;  
-%Q.POINTING.L2             = true;
+Q.POINTING.RETRIEVE       = false;
+Q.POINTING.DZA            = 0.1; 
+Q.POINTING.POLY_ORDER     = 0;
+Q.POINTING.CALCMODE       = 'recalc';
+Q.POINTING.SX             = 1;  
+Q.POINTING.L2             = true;
 
 
 %- Frequency shift
@@ -357,10 +343,10 @@ Q.FSHIFTFIT.L2            = true;
 
 %- Frequency stretch
 %
-Q.FSTRETCHFIT.RETRIEVE     = false;   % Set to true to activate retrieval
-Q.FSTRETCHFIT.DF           = 25e3; 
-Q.FSTRETCHFIT.SX           = 50e3^2;  
-Q.FSTRETCHFIT.L2           = true;
+Q.FSTRETCHFIT.RETRIEVE    = false;   % Set to true to activate retrieval
+Q.FSTRETCHFIT.DF          = 25e3; 
+Q.FSTRETCHFIT.SX          = 50e3^2;  
+Q.FSTRETCHFIT.L2          = true;
 
 
 %- Polyfit

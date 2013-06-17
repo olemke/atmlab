@@ -138,7 +138,8 @@ for i = 1 : nq
     end
     % Min and max values
     if isfield( Q.ABS_SPECIES(ig), 'MINMAX' )
-      rqre_datatype( Q.ABS_SPECIES(ig).MINMAX, @istensor1 );
+      rqre_datatype( Q.ABS_SPECIES(ig).MINMAX, @istensor1, ...
+                                                      'Q.ABS_SPECIES.MINMAX' );
       R.minmax(ind,1) = Q.ABS_SPECIES(ig).MINMAX(1);
       if length( Q.ABS_SPECIES(ig).MINMAX(1) ) > 1
         R.minmax(ind,2) = Q.ABS_SPECIES(ig).MINMAX(2);
@@ -154,7 +155,7 @@ for i = 1 : nq
                                                              R.jq{i}.grids ) );
     % Min and max values
     if isfield( Q.T, 'MINMAX' )
-      rqre_datatype( Q.T.MINMAX, @istensor1 );
+      rqre_datatype( Q.T.MINMAX, @istensor1, 'Q.T.MINMAX' );
       R.minmax(ind,1) = Q.T.MINMAX(1);
       if length( Q.T.MINMAX(1) ) > 1
         R.minmax(ind,2) = Q.T.MINMAX(2);
