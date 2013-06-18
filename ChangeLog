@@ -1,3 +1,10 @@
+2013-06-18  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-375
+
+	* handy/catstruct.m: fixed bug.
+	vargin = cell(length(structs_index),1); should be vargin = cell(sum(structs_index),1);
+
 2013-06-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-374

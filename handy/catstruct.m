@@ -145,7 +145,7 @@ for f = F'
     % do another catstruct
     
     fnd = 1:length(structs_index);
-    vargin = cell(length(structs_index),1);
+    vargin = cell(sum(structs_index),1);
     for loop = fnd(structs_index)
         vargin{loop} = VAL{loop}{ismember(FN{loop},f)}; % this is the low level struct
     end
