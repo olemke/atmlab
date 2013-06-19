@@ -1,3 +1,27 @@
+2013-06-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-376
+
+	* demos/qarts_zeeman_demo.m (qarts_zeeman_demo): Started.
+
+	* arts/qarts_abstable.m: Spelling mistake in header.
+
+	* arts/qarts2cfile.m: Added handling of ABS_XSEC_AGENDA and
+	PROPMAT_CLEARSKY_AGENDA.
+	Changed sub-function where blackbody_radiation_agenda is set.
+	Removed some repeated call of Checked-methods.
+
+	* arts/qarts.m: More strict alphabetical ordering. Added fields
+	ABS_XSEC_AGENDA and PROPMAT_CLEARSKY_AGENDA.
+
+	* demos/arts_oem_demo.m: Did not work due to some more recent arts
+	changes. Increased max iterations to ensure that convergence
+	always reached.
+
+	* tests/make_check_qarts.m (make_check_qarts): Renamed make_check,
+	to stress that only the qarts part is considered. Now running of
+	several more demos included.
+
 2013-06-18  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-375

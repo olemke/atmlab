@@ -19,7 +19,7 @@
 %
 % FORMAT   Q = qarts_abstable( Q [, nt, dt, dnls ] )
 %        
-% OUT   Q      Q structure wth some fields automatically set. These fields
+% OUT   Q      Q structure with some fields automatically set. These fields
 %              are:
 %                 ABSORPTION
 %                 ABS_P

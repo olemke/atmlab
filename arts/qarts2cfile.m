@@ -467,7 +467,6 @@ return
 %    abs_lookup  (if used)
 %    propmat_clearsky_agenda
 %    abs_xsec_agenda
-%    blackbody_radiation_agenda
 %
 function T = cfile_Absrpt( Q, partname, workfolder )
   %
@@ -545,17 +544,27 @@ function T = cfile_Absrpt( Q, partname, workfolder )
         T = add_wsms( T, 'ABS_WSMS', Q.ABS_WSMS );
       end
     end
-    %
-    T = add_agenda( T, 'abs_xsec_agenda', { ...
-                       'abs_xsec_per_speciesInit', ...
-                       'abs_xsec_per_speciesAddLines', ...
-                       'abs_xsec_per_speciesAddConts' } );
-    %
+        
+    if qarts_isset( Q.ABS_XSEC_AGENDA )
+      T = add_agenda( T, 'abs_xsec_agenda', Q.ABS_XSEC_AGENDA );
+    else      
+      T = add_agenda( T, 'abs_xsec_agenda', { ...
+                         'abs_xsec_per_speciesInit', ...
+                         'abs_xsec_per_speciesAddLines', ...
+                         'abs_xsec_per_speciesAddConts' } );
+    end
+    T{end+1} = 'abs_xsec_agenda_checkedCalc';
+
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
-      T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-                'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-                'propmat_clearskyInit', 'propmat_clearskyAddOnTheFly' } );
+      if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
+        T = add_agenda( T, 'propmat_clearsky_agenda', ...
+                                                Q.PROPMAT_CLEARSKY_AGENDA );
+      else      
+        T = add_agenda( T, 'propmat_clearsky_agenda', { ...
+                  'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+                  'propmat_clearskyInit', 'propmat_clearskyAddOnTheFly' } );
+      end
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
       %
@@ -584,17 +593,23 @@ function T = cfile_Absrpt( Q, partname, workfolder )
               'abs_speciesSet(abs_species=abs_nls,species=[%s])', ...
                                                    arts_tgs_cnvrt(Q.ABS_NLS) );
         end
+        % As abs_species changed, this must be repeated:
+        T{end+1} = 'abs_xsec_agenda_checkedCalc'; 
       end
       if qarts_isset( Q.ABS_NLS_PERT )
         T{end+1} = file_or_data( 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
       end
       %
-      T{end+1} = 'abs_xsec_agenda_checkedCalc';
       T{end+1} = 'abs_lookupCalc'; 
-      T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-          'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-          'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
+      if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
+        T = add_agenda( T, 'propmat_clearsky_agenda', ...
+                                                Q.PROPMAT_CLEARSKY_AGENDA );
+      else      
+        T = add_agenda( T, 'propmat_clearsky_agenda', { ...
+            'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+            'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
+      end 
       %
       abstable = true;
       %   
@@ -603,9 +618,14 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       T{end+1} = file_or_data( 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
       T{end+1} = 'abs_lookupAdapt';
-      T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-           'Ignore(rtp_mag)', 'Ignore(rtp_los)',...
-           'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
+      if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
+        T = add_agenda( T, 'propmat_clearsky_agenda', ...
+                                                Q.PROPMAT_CLEARSKY_AGENDA );
+      else      
+        T = add_agenda( T, 'propmat_clearsky_agenda', { ...
+                'Ignore(rtp_mag)', 'Ignore(rtp_los)',...
+                'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
+      end
       %
       abstable = true;
       %
@@ -616,11 +636,6 @@ function T = cfile_Absrpt( Q, partname, workfolder )
   end %  qarts_isset( Q.ABSORPTION )
 
   
-  if qarts_isset( Q.BLACKBODY_RADIATION_AGENDA )
-    T = add_agenda( T, 'blackbody_radiation_agenda', ...
-                                                Q.BLACKBODY_RADIATION_AGENDA );
-  end
-
   if abstable  &  strcmp( partname, 'AbsrptSave' )
     T{end+1} = add_savefile( 'abs_lookup', workfolder );
   end
@@ -631,6 +646,7 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
+%    blackbody_radiation_agenda
 %    surface_rtprop_agenda
 %    iy_surface_agenda
 %    iy_space_agenda
@@ -653,6 +669,10 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T = {};
   %
+  if qarts_isset( Q.BLACKBODY_RADIATION_AGENDA )
+    T = add_agenda( T, 'blackbody_radiation_agenda', ...
+                                                Q.BLACKBODY_RADIATION_AGENDA );
+  end    
   if qarts_isset( Q.SURFACE_RTPROP_AGENDA )
     T = add_agenda( T, 'surface_rtprop_agenda', Q.SURFACE_RTPROP_AGENDA );
   end
@@ -734,7 +754,6 @@ function T = cfile_RteExe( Q, partname, workfolder )
   %
   T = add_rtecalcstart( Q );
   %       
-  T{end+1} = 'abs_xsec_agenda_checkedCalc';
   T{end+1} = 'sensor_checkedCalc';
   %
   if qarts_isset( Q.YCALC_WSMS )

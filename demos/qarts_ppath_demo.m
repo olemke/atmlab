@@ -3,7 +3,7 @@
 %    Calculates the (main) propagation path, using ARTS.
 %
 %    The atmosphere is set to be 1D, with the surface at 0 m. The Fascod
-%    tropical scnario is used.
+%    tropical scenario is used.
 %
 % FORMAT   ppath = qarts_ppath_demo( zplat, za [, refr, lmax, lraytrace] )
 %        

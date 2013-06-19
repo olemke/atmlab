@@ -45,7 +45,7 @@ O      = oem;
 %
 O.itermethod = 'GN';
 O.stop_dx    = 0.01;
-O.maxiter    = 10;
+O.maxiter    = 20;
 %
 O.cost       = true;
 O.e          = true; 
@@ -80,17 +80,21 @@ Q.CLOUDBOX_DO         = false;
 
 %= Define agendas
 %
-% Here we do it by using the predefined agenda templates
+Q.PPATH_AGENDA               = { 'ppath_agenda__FollowSensorLosPath'   };
+Q.PPATH_STEP_AGENDA          = { 'ppath_step_agenda__GeometricPath'    };
+Q.BLACKBODY_RADIATION_AGENDA = { 'blackbody_radiation_agenda__Planck'  };
+Q.IY_SURFACE_AGENDA          = { 'iy_surface_agenda__UseSurfaceRtprop' };
+Q.IY_MAIN_AGENDA             = { 'iy_main_agenda__Emission'            };
+
+
+%- Exclude cosmic background radiation. A relative change of the spectrum
+%- corresponds then to a relative change of the ozone profile.
 %
-Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
-Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
-Q.WSMS_AT_START{3} = ...
-                    'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
-Q.WSMS_AT_START{4} = ...
-         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
-Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
-Q.WSMS_AT_START{6} = ...
-                 'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
+Q.IY_SPACE_AGENDA     = { 'Ignore(rtp_los)',  'Ignore(rtp_pos)', ...
+                          'nelemGet(nrows,f_grid)', ...
+                          'Copy(ncols,stokes_dim)', ...
+                          'MatrixSetConstant(iy,nrows,ncols,0)' };
+
 
 %- RTE
 %
@@ -101,14 +105,6 @@ Q.IY_UNIT              = 'RJBT';
 %
 Q.SENSOR_LOS          = 70;
 Q.SENSOR_POS          = Q.Z_SURFACE;
-
-%- Exclude cosmic background radiation. A relative change of the spectrum
-%- corresponds then to a relative change of the ozone profile.
-%
-Q.IY_SPACE_AGENDA     = { 'Ignore(rte_los)',  'Ignore(rte_pos)', ...
-                          'nelemGet(nrows,f_grid)', ...
-                          'Copy(ncols,stokes_dim)', ...
-                          'MatrixSetConstant(iy,nrows,ncols,0)' };
 
 
 %- Frequency, spectrometer and pencil beam antenna
@@ -158,23 +154,11 @@ Q.ABS_SPECIES(2).TAG      = { 'O3' };
 Q.ABS_SPECIES(2).RETRIEVE = true;
 Q.ABS_SPECIES(2).GRIDS    = { z2p_simple( 0e3:1e3:90e3 )', [], [] };
 Q.ABS_SPECIES(2).UNIT     = 'vmr';
-if 1
-  Q.ABS_SPECIES(2).SX     = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
+Q.ABS_SPECIES(2).MINMAX   = 1e-12;
+Q.ABS_SPECIES(2).SX       = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
                                     2e-6, 'lin', 0.2, 0.00, @log10 ) + ...
                             covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
                                   0.5e-6, 'lin', 0.5, 0.00, @log10 );
-else
-  arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
-  O3 = xmlLoad( fullfile( arts_xmldata_path, 'atmosphere', 'fascod', ...
-                                                         'tropical.O3.xml' ) );
-  Q.ABS_SPECIES(2).SX     = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
-                            [ O3.grids{1}, 0.5*O3.data ], ...
-                                              'lin', 0.2, 0.00, @log10 ) + ...
-                            covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
-                            [ O3.grids{1}, 0.1*O3.data ], ...
-                                              'lin', 0.5, 0.00, @log10 );
-end
-
 
 
 %----------------------------------------------------------------------------
