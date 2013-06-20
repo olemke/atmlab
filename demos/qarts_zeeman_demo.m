@@ -143,16 +143,17 @@ return
 
 % Repeat with Zeeman activated
 %
-Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
+%Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
 %
-Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
+%Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
 %
 afolder                   = fileparts( atmlab('ARTS_INCLUDES' ) );
 Q.WSMS_AT_START{end+1}    = [ 'ReadXML( isotopologue_quantum, "', ...
                      fullfile(afolder,'testdata','isoquantum.xml'), '")' ];
 %
-y=y0;
-%y = arts_y( Q );
+% Set magnetic field components  
+%
+y = arts_y( Q );
   
 
 

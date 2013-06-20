@@ -1,5 +1,14 @@
 2013-06-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-378
+
+	* Started some work but got stuck when noticing inconsistency in
+	how ATMDATA is used. Some thinking needed before attacking this ...
+
+	* arts/qarts.m: Just introduced MAG_U, MAG_V and MAG_W. 
+
+2013-06-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-377
 
 	* demos/data/line118ghz.hit: A linefile based in HITRAN2008.
