@@ -1,26 +1,17 @@
-% QARTS_DEMO2   A demonstration of Qarts
+% QARTS_ZEEMAN_DEMO   A demonstration of including Zeeman in Qarts
 %
-%    As *qarts_demo*, but with more advanced calculation options.
-%    Pre-calculation of absorption and sensor characteristics is 
-%    exemplified. VMR_FIELD is set through ABS_SPECIES.ATMDATA.
-%    Further, pre-defined agendas are used.
+%    ....
 %
-%    Input temperature data are 2D, and it can not be expected that 
-%    1D results shall be identical to 2D and 3D.
-%
-% FORMAT   [Q,f,y] = qarts_demo2( [ ztan, atmdim ] )
+% FORMAT   [Q,f,y] = qarts_zeeman_demo( [ ztan ] )
 %        
-% OUT   Q          Qarts setting structure.
-%       f          Frequency grid
-%       y          Calculated spectrum
-% OPT   ztan       Tangent altitude. Default is 30 km.
-%       atmdim     Atmospheric dimensionality. Default is 1.
+% OUT   f          Frequency grid
+%       y0         Calculated spectrum without activating Zeeman.
+% OPT   ztan       Tangent altitude. Default is 95 km.
 
-% 2008-05-27   Updated to ARTS2 by Patrick Eriksson.
-% 2007-08-23   Created by Patrick Eriksson (based qarts_demo).
+% 2013-06-20   ...
 
 
-function [f,y0,y] = qarts_zeeman_demo( varargin )
+function [f,y0] = qarts_zeeman_demo( varargin )
 %
 [ztan] = optargs( varargin, { 95e3 } );
 
@@ -103,10 +94,20 @@ Q.Z_FIELD              = qarts_atm_field( Q, 'z', mjd );
 
 %= Absorption
 %
-Q.F_GRID               = 1.187503430e+11 + linspace( -5e6, 5e6, 201 )';
+%Q.F_GRID               = 1.187503430e+11 + linspace( -5e6, 5e6, 201 )';
+Q.F_GRID               = 61.15e9 + linspace( -50e6, 50e6, 201 )';
 %
-Q.ABS_LINES_FORMAT     = 'Arts';
-Q.ABS_LINES            = fullfile( atmlab_example_data , 'line118ghz.ac' );
+if 0
+  Q.ABS_LINES_FORMAT     = 'Arts';
+  Q.ABS_LINES            = fullfile( atmlab_example_data , 'line118ghz.ac' );
+else
+  Q.ABS_WSMS{1} = 'StringCreate(hitranfile)';
+  Q.ABS_WSMS{2} = [ 'StringSet(hitranfile,', ...
+                    '"/home/patrick/Data/HITRAN_2008/HITRAN08.par")' ];
+  Q.ABS_WSMS{3} = ...
+                'abs_linesReadFromHitran(abs_lines,hitranfile,61.1e9, 61.2e9)';
+  Q.ABS_WSMS{4} = 'abs_lines_per_speciesCreateFromLines';
+end
 %                                                   
 Q.ABSORPTION           = 'OnTheFly';
 
@@ -138,6 +139,7 @@ Q.MAG_W_FIELD          = [];
 %
 f = ydata.f;
 
+return
 
 % Repeat with Zeeman activated
 %
@@ -145,11 +147,12 @@ Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
 %
 Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
 %
-afolder                   = fileparts( atmlab('ARTS_INCLUDES' ) )
+afolder                   = fileparts( atmlab('ARTS_INCLUDES' ) );
 Q.WSMS_AT_START{end+1}    = [ 'ReadXML( isotopologue_quantum, "', ...
                      fullfile(afolder,'testdata','isoquantum.xml'), '")' ];
 %
-y = arts_y( Q );
+y=y0;
+%y = arts_y( Q );
   
 
 
