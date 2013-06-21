@@ -207,7 +207,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
       end                                                                     
       rqre_datatype( Q.ABSORPTION, @ischar, Q.ABSORPTION );                   
       if strcmp( Q.ABSORPTION, 'CalcTable' )                                  
-        error( errid,
+        error( errid, ...
                      'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );
       end                                                                     
       if ~qarts_isset(Q.HSE)                                                  

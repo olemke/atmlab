@@ -1,5 +1,12 @@
 2013-06-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-380
+
+	* retrieval/qpack2/qpack2.m: Had missed to add ... when baraking a
+	line.
+
+2013-06-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-379
 
 	* arts/qarts.m (qarts): Commited with a typo causing error.
@@ -12,7 +19,7 @@
 	* Started some work but got stuck when noticing inconsistency in
 	how ATMDATA is used. Some thinking needed before attacking this ...
 
-	* arts/qarts.m: Just introduced MAG_U, MAG_V and MAG_W. 
+	* arts/qarts.m: Just introduced MAG_U, MAG_V and MAG_W.
 
 2013-06-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
