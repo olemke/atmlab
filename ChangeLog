@@ -1,3 +1,10 @@
+2013-06-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-379
+
+	* arts/qarts.m (qarts): Commited with a typo causing error.
+	And added missing empty line for I of T.
+
 2013-06-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-378
