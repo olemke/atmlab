@@ -1,3 +1,14 @@
+2013-06-24  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-383
+
+	* files/loadncvar.m:
+
+	- Fixed extremely dangerous bug where all unidentified errors were
+	silently ignored.  Please, when cathing an error and conditionally
+	doing something, PLEASE add 'else, ME.rethrow()' to prevent errors
+	from being silently ignored!
+
 2013-06-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-382

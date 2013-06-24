@@ -68,6 +68,8 @@ elseif iscell(varname)
         catch ME
             if ~isempty(regexp(ME.message,'Variable not found', 'once'))
                 error(errId,'Variable ''%s'' not found in file',v{1})
+            else
+                ME.rethrow();
             end
         end
         ret.(genvarname(v{1})) = nc_read_varid(ncid, varid);
