@@ -36,11 +36,9 @@ Y = y_demo( Q );         % Local file, found below
 %- Check that all frequencies are OK
 %
 if ~qp2_check_f( Q, Y, 1e3 );
-  error(errid, 'Some mismatch between Q.F_BACKEND and frequencies of spectra.' );
+  error( errid, ...
+            'Some mismatch between Q.F_BACKEND and frequencies of spectra.' );
 end
-%
-[Y.F] = deal( {} );      % The field F is now obselete. {} is used inside 
-                         % qarts and qpack2 to flag undefined fields
 
 
 %- OEM variables

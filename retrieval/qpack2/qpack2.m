@@ -235,8 +235,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
                      'Q.TNOISE_C is required to be sparse (to save memory).' );
         elseif dimens(Q.TNOISE_C)~=2 || size(Q.TNOISE_C,1)~=size(Q.TNOISE_C,2)
           error( errid, 'Q.TNOISE_C must be square.' );
-        elseif size(Q.TNOISE_C,1) ~= length(Y(m).Y)                          
-          error( errid, 'Mismatch in size between Q.TNOISE_C and Y.Y.' );
+        elseif size(Q.TNOISE_C,1) ~= length(Y(m).F) 
+          error( errid, 'Mismatch in size between Q.TNOISE_C and Y.F.' );
         end                                                                 
       end  
     end % nargout < 2
@@ -253,9 +253,13 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
     rqre_datatype( Y(m).YEAR, @istensor0, sprintf('Y(%d).YEAR',m) );          
     rqre_datatype( Y(m).MONTH, @istensor0, sprintf('Y(%d).MONTH',m) );        
     rqre_datatype( Y(m).DAY, @istensor0, sprintf('Y(%d).DAY',m) );            
-    rqre_datatype( Y(m).Z_PLATFORM, @istensor0, ...                           
+    rqre_datatype( Y(m).Z_PLATFORM, @istensor1, ...                           
                                              sprintf('Y(%d).Z_PLATFORM',m) ); 
-    rqre_datatype( Y(m).ZA, @istensor0, sprintf('Y(%d).ZA',m) );              
+    rqre_datatype( Y(m).ZA, @istensor1, sprintf('Y(%d).ZA',m) );
+    if length(Y(m).ZA) ~= length(Y(m).Z_PLATFORM)
+      error( 'Y(%d).ZA and Y(%d).Z_PLATFORM must have the same length', m, m );
+    end
+    rqre_datatype( Y(m).F, @istensor1, sprintf('Y(%d).F',m) ); 
   end
 
   %- Map ATMDATA (if set) to VMR_FIELD, Z_FIELD and T_FIELD, and apply HSE
@@ -331,35 +335,51 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
   
   %- Sensor pos, los and time
   %
-  Q.SENSOR_POS = Y(m).Z_PLATFORM;
-  Q.SENSOR_LOS = Y(m).ZA;
-  Q.SENSOR_TIME = 0;     % Dummy value can be used as only single spectra used
+  Q.SENSOR_POS  = Y(m).Z_PLATFORM;
+  Q.SENSOR_LOS  = Y(m).ZA;
+  Q.SENSOR_TIME = [ 1 : length( Y(m).ZA ) ]';
 
   
   %- Se
   %
   if nargout == 2
     
-    n  = length( Y(m).TNOISE );
-
+    nnv = size( Y(m).TNOISE, 1 );  % Number of noise values
+    nza = length( Y(m).ZA );
+    nf  = length( Y(m).F );
+    
     if do_checks
-      rqre_datatype( Y(m).TNOISE, @istensor1, sprintf('Y(%d).TNOISE',m) );
-      if n ~= 1 && n ~= length( Y(m).Y ) 
+      rqre_datatype( Y(m).TNOISE, @istensor2, sprintf('Y(%d).TNOISE',m) );
+      if nnv ~= 1  &&  nnv ~= nf
         error( errid, ...
-           'Length of Y(%d).TNOISE must be 1 or equal to length of Y.Y.', m );
+         'Row size of Y(%d).TNOISE must be 1 or equal to length of Y.F.', m );
+      end
+      if size( Y(m).TNOISE, 2 ) ~= nza
+        error( errid, ...
+         'Column size of Y(%d).TNOISE must maych length of Y(%d).ZA.', m, m );
       end
     end
     
-    if n == 1
-      Se = (Y(m).TNOISE^2) .* Q.TNOISE_C;
-    else
-      % Avoid to generate full matrix that is n x n:
-      [i,j,s] = find( Q.TNOISE_C );
-      for k = 1 : length(i)
-        s(k) = prod( Y(m).TNOISE([i(k) j(k)]) ) * s(k);
+    [i,j,s] = find( Q.TNOISE_C );
+    ni      = length( i );
+    [i2,j2,s2] = deal( zeros( ni*nza, 1 ) );
+
+    for z = 1 : nza
+      ind     = (z-1)*ni + (1:ni);
+      i2(ind) = (z-1)*nf + i;
+      j2(ind) = (z-1)*nf + j;
+      %
+      if nnv == 1
+        s2(ind) = Y(m).TNOISE(1,z)^2 * s; 
+      else
+        for k = 1 : length(i)
+          s2(i0+k) = prod( Y(m).TNOISE([i(k) j(k)],z) ) * s(k);
+        end
       end
-      Se = sparse(i,j,s);
     end
+    %
+    Se = sparse(i2,j2,s2);  
   end 
+  
 return
 

@@ -1,3 +1,18 @@
+2013-06-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-384
+
+	* demos/qpack2_demo.m: Y.F now kept.
+
+	* demos/qpack2_wind3d_demo.m: Just started.
+
+	* retrieval/qpack2/qpack2.m: Started on extension, to handle
+	multiple spectra observations. Y.F is now required to e set.
+
+	* retrieval/qpack2/qp2_y.m: Added field AA. New text to describe
+	size demands for ZA, Z_PLATFORM, AA and T_NOISE when measurement
+	consist of several spectra.
+
 2013-06-24  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-383
