@@ -97,13 +97,14 @@ atmlab settings is obtained by:
 >> help atmlab
 \end{verbatim}
 At least the following atmlab settings are used: \verb|ARTS_PATH|,
-\verb|ARTS_INCLUDES|, \verb|VERBOSITY|, \verb|FMODEL_VERBOSITY|
-and \verb|WORK_AREA|. Some example settings:
+\verb|ARTS_INCLUDES|, \verb|VERBOSITY|, \verb|FMODEL_VERBOSITY|,
+\verb|STRICT_ASSERT| and \verb|WORK_AREA|. Some example settings:
 \begin{verbatim}
 atmlab( 'ARTS_PATH',          fullfile(homedir,'ARTS/arts/src/arts') );
 atmlab( 'ARTS_INCLUDES',      fullfile(homedir,'ARTS/arts/includes') );
 atmlab( 'FMODEL_VERBOSITY',   0                                      ); 
 atmlab( 'VERBOSITY',          1                                      );
+atmlab( 'STRICT_ASSERT',      true                                   );
 atmlab( 'WORK_AREA',          '/tmp'                                 );
 \end{verbatim}
 The standard choice is to place these calls of \verb|atmlab| in
@@ -196,13 +197,13 @@ The output is a copy of \verb|Ye|, with the field \verb|Ysim.Y| set to the
 result of the forward model run. The simulated data match the a priori state of
 the retrieval set-up.
 
-A full example is found in the file \verb|qpack2_demo| (placed in the folder
-\verb|demos|). The example works with simulated data, created by \verb|qpack2|
-itself. The example file is also appended to this document as Appendix
-\ref{app:qfun}. A related example is \verb|arts_oem_demo|. It does not use
-Qpack2, but shows how an OEM inversion is performed with ARTS as the forward
-model, and the calculation steps in this example gives a good view of the
-interior of Qpack2.
+Several full examples are found in Atmlab's folder \verb|demos|, such as
+\verb|qpack2_demo.m|. The examples work with simulated data, created by
+\verb|qpack2| itself. The \verb|qpack2_demo.m| example file is also appended to
+this document as Appendix \ref{app:qfun}. A related example is
+\verb|arts_oem_demo|. It does not use Qpack2, but shows how an OEM inversion is
+performed with ARTS as the forward model, and the calculation steps in this
+example gives a good view of the interior of Qpack2.
 
 
 \subsection{Units}
@@ -303,9 +304,9 @@ or from within Matlab as
 See the documentation of ARTS for more in-depth documentation. 
 
 The best introduction to the practical usage of ARTS is obtained through the
-control file examples found in ARTS's folder \verb|tests|. For an introduction
-of the usage of ARTS through Qarts, there are several example scripts in
-Atmlab's folder \verb|demos|, such as \verb|qarts_demo|. 
+control file examples found in ARTS's folder \verb|controlfiles|. For an
+introduction of the usage of ARTS through Qarts, there are several example
+scripts in Atmlab's folder \verb|demos|, such as \verb|qarts_demo|.
 
 
 \subsubsection{Qpack2 specifics}
@@ -315,15 +316,18 @@ fields in special way:
 \begin{itemize}
 \item \verb|Q.ATMOSPHERE_DIM| must be set to 1.
 \item \verb|Q.RAW_ATMOSPHERE| must be unset (\verb|{}|).
-\item The fields \verb|T_FIELD|, \verb|VMR_FIELD| and \verb|Z_FIELD| are
-  ignored. These fields are set by Qpack2 by the corresponding
-  ``atmdata''-fields.
-\item \verb|Q.ABS_SPECIES.ATMDATA| must be set.
-\item \verb|Q.T.ATMDATA| must be set. 
-\item \verb|Q.Z_ATMDATA| is optional. If not set, geometrical altitudes of the
-  pressure levels (the WSV \verb|z_field|) are found by applying hydrostatic
-  equilibrium using \verb|Y.HSE_P| and \verb|Y.HSE_Z| (Sec.~\ref{sec:Y}). This
-  later option demands that \verb|Q.HSE.ON| is true.
+\item All existing ``atmdata''-fields are considered and are given highest
+  priority. That is, if such a field is set, any setting of the corresponding
+  field will be overwritten. For example, if \verb|Q.T.ATMDATA| is set, any
+  existing values in \verb|T_FIELD| will have no effect.
+\item The fields \verb|T_FIELD|, \verb|VMR_FIELD| and \verb|Z_FIELD| must
+  be defined directly in \verb|Q|, possibly through the corresponding atmdata
+  fields (see point above). That is, these workspace variables can not
+  be set by an include file. 
+\item In the case of \verb|Z_FIELD| there is another option, this field can be
+  set by applying hydrostatic equilibrium, then activated by setting
+  \verb|Q.HSE.ON| to true. The reference point for hydrostatic equilibrium is
+  specified by \verb|Y.HSE_P| and \verb|Y.HSE_Z| (Sec.~\ref{sec:Y}). 
 \item \verb|Q.HSE_P| is set to \verb|Y.HSE_P|. Other fields of \verb|Q.HSE|
   must be set by the user, thus including an active choice for \verb|Q.HSE.ON|.
 \item \verb|Q.ABSORPTION| must be set. The option 'CalcTable' is not allowed
@@ -749,6 +753,11 @@ ARTS, the atmospheric radiative transfer simulator, Version 2,
 \section{The fields of Q}
 \label{app:q}
 %
+The information below is obtained in Atmlab by typing:
+\begin{verbatim}
+>> qinfo( @qarts )
+\end{verbatim}
+\vspace{2ex}
 \verbatiminput{qarts.txt}
 
 
@@ -756,6 +765,11 @@ ARTS, the atmospheric radiative transfer simulator, Version 2,
 \section{The fields of O}
 \label{app:o}
 %
+The information below is obtained in Atmlab by typing:
+\begin{verbatim}
+>> qinfo( @oem )
+\end{verbatim}
+\vspace{2ex}
 \verbatiminput{oem.txt}
 
 
@@ -763,6 +777,11 @@ ARTS, the atmospheric radiative transfer simulator, Version 2,
 \section{The fields of Y}
 \label{app:y}
 %
+The information below is obtained in Atmlab by typing:
+\begin{verbatim}
+>> qinfo( @qp2_y )
+\end{verbatim}
+\vspace{2ex}
 \verbatiminput{qp2_y.txt}
 
 

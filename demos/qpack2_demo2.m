@@ -245,7 +245,7 @@ Q.ABS_SPECIES(2).UNIT     = 'rel';
 Q.ABS_SPECIES(2).SX       = ...
                    covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, 0.5, ...
                                              'lin', 0.5, 0.00, @log10 );
-Q.ABS_SPECIES(2).MINMAX  = [1e-6 3]';
+Q.ABS_SPECIES(2).MINMAX  = [1e-6 10]';
 
 
 %- Liquid clouds (non-precip)

@@ -1,7 +1,7 @@
 % QARTS_ATM_FIELD   Extracts a basic atmospheric field from e.g. Q.T_ATMDATA
 %
 %   Performs an interpolation of ATMDATA, for those variables having such a
-%   sub-field. Those variables include: T, Z, WIND_U, WIND_V and WIND_W.
+%   sub-field. Those variables include: T, Z, WIND_U, WIND_V and MAG_U.
 %
 %   The field ATMDATA must be set. For 3D cases, P_GRID, LAT_GRID and LON_GRID
 %   are used as interpolation grids. For 1D and 2D, LAT_TRUE and LON_TRUE
@@ -25,7 +25,7 @@
 % OUT   atmfield    Obtained data field.
 % IN    Q           Qarts setting structure.
 %       vstring     The variable for which ATMDATA shall be interpolated.
-%                   Case of strong is ignored. Examples: 't', 'T', 'z', 
+%                   Case of vstring is ignored. Examples: 't', 'T', 'z', 
 %                   'wind_u' and 'WIND_w'.
 % OPT   mjd         Date as MJD. A scalar.
 %       ltime       Local (solar) time, in hours. A scalar.
@@ -67,7 +67,7 @@ end
 %- Get data to interpolate
 %
 VNAME = upper( vstring );
-astr  = sprintf( 'Q.%c.ATMDATA', VNAME );
+astr  = sprintf( 'Q.%s.ATMDATA', VNAME );
 %
 if ~isfield( Q.(VNAME), 'ATMDATA' ) | ~qarts_isset( Q.(VNAME).ATMDATA )   %&%
   error( sprintf( '%s must be set when using this function', astr ) );    %&%

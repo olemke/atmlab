@@ -11,7 +11,7 @@
 % 2013-06-20   ...
 
 
-function [f,y0] = qarts_zeeman_demo( varargin )
+function [f,y0,y] = qarts_zeeman_demo( varargin )
 %
 [ztan] = optargs( varargin, { 95e3 } );
 
@@ -94,20 +94,10 @@ Q.Z_FIELD              = qarts_atm_field( Q, 'z', mjd );
 
 %= Absorption
 %
-%Q.F_GRID               = 1.187503430e+11 + linspace( -5e6, 5e6, 201 )';
-Q.F_GRID               = 61.15e9 + linspace( -50e6, 50e6, 201 )';
+Q.F_GRID               = 1.187503430e+11 + linspace( -5e6, 5e6, 201 )';
 %
-if 0
-  Q.ABS_LINES_FORMAT     = 'Arts';
-  Q.ABS_LINES            = fullfile( atmlab_example_data , 'line118ghz.ac' );
-else
-  Q.ABS_WSMS{1} = 'StringCreate(hitranfile)';
-  Q.ABS_WSMS{2} = [ 'StringSet(hitranfile,', ...
-                    '"/home/patrick/Data/HITRAN_2008/HITRAN08.par")' ];
-  Q.ABS_WSMS{3} = ...
-                'abs_linesReadFromHitran(abs_lines,hitranfile,61.1e9, 61.2e9)';
-  Q.ABS_WSMS{4} = 'abs_lines_per_speciesCreateFromLines';
-end
+Q.ABS_LINES_FORMAT     = 'Hitran';
+Q.ABS_LINES            = fullfile( atmlab_example_data , 'line118ghz.hit' );
 %                                                   
 Q.ABSORPTION           = 'OnTheFly';
 
@@ -139,30 +129,44 @@ Q.MAG_W_FIELD          = [];
 %
 f = ydata.f;
 
-return
 
 % Repeat with Zeeman activated
 %
+testdatafolder = fullfile( fileparts(atmlab('ARTS_INCLUDES')), 'testdata' );
+magdatafolder  = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
+                                                          'Earth', 'IGRF' );
+
 %Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
 %
 %Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
 %
-afolder                   = fileparts( atmlab('ARTS_INCLUDES' ) );
-Q.WSMS_AT_START{end+1}    = [ 'ReadXML( isotopologue_quantum, "', ...
-                     fullfile(afolder,'testdata','isoquantum.xml'), '")' ];
+Q.WSMS_AT_START{end+1} = [ 'ReadXML( isotopologue_quantum, "', ...
+                          fullfile(testdatafolder,'isoquantum.xml'), '")' ];
 %
-% Set magnetic field components  
+Q.MAG_U.ATMDATA        = gf_artsxml( fullfile( magdatafolder, ...
+                                'IGRF11_2010_200km-5deg-5deg.B_u.xml.gz' ),...
+                                     'Magnetic u-component', 'mag_field' ); 
+Q.MAG_V.ATMDATA        = gf_artsxml( fullfile( magdatafolder, ...
+                                'IGRF11_2010_200km-5deg-5deg.B_v.xml.gz' ),...
+                                     'Magnetic v-component', 'mag_field' ); 
+Q.MAG_W.ATMDATA        = gf_artsxml( fullfile( magdatafolder, ...
+                                'IGRF11_2010_200km-5deg-5deg.B_w.xml.gz' ),...
+                                     'Magnetic w-component', 'mag_field' ); 
+% Qpack2 makes this automatically:
+Q.MAG_U_FIELD          = qarts_atm_field( Q, 'mag_u', mjd );
+Q.MAG_V_FIELD          = qarts_atm_field( Q, 'mag_v', mjd );
+Q.MAG_W_FIELD          = qarts_atm_field( Q, 'mag_w', mjd );
 %
 y = arts_y( Q );
   
 
-
 %= Plot
 %
 if ~nargout
-  plot( Q.F_GRID/1e9, y, 'LineWidth', 2 );
+  i = 1 : Q.STOKES_DIM : length(y0);
+  plot( Q.F_GRID/1e9, y0(i), Q.F_GRID/1e9, y(i) );
   xlabel( 'Frequency [GHz]' )
   ylabel( 'Brightness temperature [K]' )
-  title( sprintf( 'Odin-SMR ClO band (tangent altitude = %.1f km)', ztan/1e3));
+  legend( 'I without Zeeman', 'I with Zeeman' )
 end
 

@@ -138,7 +138,7 @@ return
 %
 function empty_y = checkY( Y )
 
-errid = ['atmlab:' mfilename];
+  errid = ['atmlab:' mfilename];
   empty_y = isempty( Y(1).Y );
   
   if atmlab( 'STRICT_ASSERT' )
@@ -171,15 +171,13 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
 
   % If output does not include Se, it assumed that no retrieval will 
   % be performed (for all m). 
-  errid = ['atmlab:' mfilename];
-  do_checks = atmlab( 'STRICT_ASSERT' );
-
     
   %- Stuff only done for first measurement
   %
+  errid = ['atmlab:' mfilename];
+  do_checks = atmlab( 'STRICT_ASSERT' );
+  %    
   if m == 1
-    % 1. Make sure that some fields are set as demanded
-    % 2. "Load" data into Q to avoid repated reading of files 
 
     Q.ATMOSPHERE_DIM = qarts_get( Q.ATMOSPHERE_DIM );  
 
@@ -190,18 +188,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
       rqre_datatype( Q.ATMOSPHERE_DIM, @istensor0, Q.ATMOSPHERE_DIM );         
       if Q.ATMOSPHERE_DIM ~= 1                                                
         error( errid, 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' ); 
-      end                                                                     
-      if qarts_isset(Q.RAW_ATMOSPHERE)                                        
-        error( errid, 'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' ); 
-      end                                                                     
-      if ~isfield(Q.ABS_SPECIES,'ATMDATA')                                    
-        error( errid,...
-                 'Qpack2 requires that Q.ABS_SPECIES has the field ATMDATA.' );
-      end                                                                     
-      if ~qarts_isset(Q.T.ATMDATA)                                            
-        error( errid, 'Qpack2 requires that Q.T.ATMDATA is set.' ); 
-      end                                                                     
-      % The details of the ATMDATA fields are checked in qarts_vmr_field etc  
+      end 
+      %
       if ~qarts_isset(Q.ABSORPTION)                                           
         error( errid, 'Qpack2 requires that Q.ABSORPTION is set.' ); 
       end                                                                     
@@ -209,11 +197,28 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
       if strcmp( Q.ABSORPTION, 'CalcTable' )                                  
         error( errid, ...
                      'Qpack2 is not handling Q.ABSORPTION == ''CalcTable''.' );
-      end                                                                     
+      end
+      %
       if ~qarts_isset(Q.HSE)                                                  
         error( errid, 'Qpack2 requires that Q.HSE is set.' ); 
       end                                                                     
       rqre_datatype( Q.HSE.ON, @isboolean, Q.HSE.ON );                        
+      %
+      if qarts_isset(Q.RAW_ATMOSPHERE)                                        
+        error( errid, 'Qpack2 requires that Q.RAW_ATMOSPHERE is unset.' ); 
+      end                                                                     
+      if ~( isfield(Q.ABS_SPECIES,'ATMDATA') | qarts_isset(Q.VMR_FIELD) )
+        error( errid, ['Qpack2 requires that Q.VMR_FIELD is set or ',...
+                       'Q.ABS_SPECIES has the field ATMDATA.'] );
+      end                                                                     
+      if ~( isfield(Q.T,'ATMDATA') | qarts_isset(Q.T_FIELD) )
+        error( errid, ['Qpack2 requires that Q.T_FIELD is set or ',...
+                       'Q.T has the field ATMDATA.'] );
+      end                                                                     
+      if ~( Q.HSE.ON | isfield(Q.Z,'ATMDATA') | qarts_isset(Q.Z_FIELD) )
+        error( errid, ['Qpack2 requires that either Q.Z_FIELD is set, ',...
+                       'Q.HSE.ON is true or Q.Z has the field ATMDATA.'] );
+      end
     end
     
     if nargout < 2
@@ -253,7 +258,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
     rqre_datatype( Y(m).ZA, @istensor0, sprintf('Y(%d).ZA',m) );              
   end
 
-  %- Map ATMDATA to VMR_FIELD, Z_FIELD and T_FIELD 
+  %- Map ATMDATA (if set) to VMR_FIELD, Z_FIELD and T_FIELD, and apply HSE
   %
   Q.LAT_TRUE  = Y(m).LATITUDE;
   Q.LON_TRUE  = Y(m).LONGITUDE;
@@ -282,19 +287,46 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
   %
   mjd = date2mjd( Y(m).YEAR, Y(m).MONTH, Y(m).DAY, ho, mi, se );
   %
-  Q.VMR_FIELD = qarts_vmr_field( Q, mjd, ho );
-  Q.T_FIELD   = qarts_atm_field( Q, 't', mjd, ho );
-  if  qarts_isset(Q.Z)
+  if isfield( Q.ABS_SPECIES, 'ATMDATA' )
+    Q.VMR_FIELD = qarts_vmr_field( Q, mjd, ho );
+  end
+  if isfield( Q.T, 'ATMDATA' )
+    Q.T_FIELD   = qarts_atm_field( Q, 't', mjd, ho );
+  end
+  if isfield( Q.Z, 'ATMDATA' )
     Q.Z_FIELD   = qarts_atm_field( Q, 'z', mjd, ho );
-  else
-    if ~Q.HSE.ON
-      error( errid, ...
-                 'If Q.Z_FIELD* shall be set by HSE, Q.HSE.ON must be true.' );
-    end
+  end
+  if Q.HSE.ON
     Q.Z_FIELD   = qarts_hse( Q, Y(m).HSE_P, Y(m).HSE_Z );
   end
   %
   Q.HSE.P = Y(m).HSE_P;
+
+  
+  %- Wind components
+  %
+  if isfield( Q.WIND_U, 'ATMDATA' )
+    Q.WIND_U_FIELD   = qarts_atm_field( Q, 'wind_u', mjd, ho );
+  end
+  if isfield( Q.WIND_V, 'ATMDATA' )
+    Q.WIND_V_FIELD   = qarts_atm_field( Q, 'wind_v', mjd, ho );
+  end
+  if isfield( Q.WIND_W, 'ATMDATA' )
+    Q.WIND_W_FIELD   = qarts_atm_field( Q, 'wind_w', mjd, ho );
+  end
+
+
+  %- Magnetic field
+  %
+  if isfield( Q.MAG_U, 'ATMDATA' )
+    Q.MAG_U_FIELD   = qarts_atm_field( Q, 'mag_u', mjd, ho );
+  end
+  if isfield( Q.MAG_V, 'ATMDATA' )
+    Q.MAG_V_FIELD   = qarts_atm_field( Q, 'mag_v', mjd, ho );
+  end
+  if isfield( Q.MAG_W, 'ATMDATA' )
+    Q.MAG_W_FIELD   = qarts_atm_field( Q, 'mag_w', mjd, ho );
+  end
 
   
   %- Sensor pos, los and time

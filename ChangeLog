@@ -1,8 +1,46 @@
+2013-06-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-381
+
+	* tests/make_check_qarts.m (make_check_qarts): For arts_oem_demo,
+	now just demanding no error. The convergence can occasionally be
+	poor and then a cost below 1.2 is not reached.
+
+	* retrieval/qpack2/qpack2.tex: Updated with respect to changes
+	below.
+
+	* arts/qarts.m: Typo and spelling fixes. Added ATMDATA to
+	WIND_U/V/W.
+
+	* demos/qarts_zeeman_demo.m: Now also magnetic field set. Not
+	ready, Zeeman still not active.
+
+	* gformat/gf_artsxml.m: Added handling of mag and wind fields.
+
+	* retrieval/qpack2/qpack2.m: Changes around ATMDATA. This field is
+	now not required for ABS_SPECIES and T, if VMR_FIELD or T_FIELD
+	is set, respectively. Added handling of ATMDATA for MAG and WIND
+	quantities. In all cases, if ATMDATA is set, the corresponding
+	FIELD is overwritten. For example, if T.ATMDATA is set, any
+	setting of T_FIELD will be replaced.
+
+	* arts/qarts_atm_field.m: Corrected header text. And %c changed to
+	%s when creating astr.
+
+	* demos/qpack2_demo2.m: Had to increase max of MINMAX for H2O. Old
+	value was too low, but had no effect due to bug commented below.
+
+	* arts/arts_oem_init.m: Gathered all input checks at start of
+	function, to make good use of STRICT_ASSERT and make code below
+	less messy. Improved check of wind fields. Extended header to make
+	clear that the function does NOT consider ATMDATA. Max value of
+	MINMAX was not applied due to a typo.
+
 2013-06-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-380
 
-	* retrieval/qpack2/qpack2.m: Had missed to add ... when baraking a
+	* retrieval/qpack2/qpack2.m: Had missed to add ... when breaking a
 	line.
 
 2013-06-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>

@@ -276,7 +276,6 @@ switch 1
                                        [ Q.ABS_SPECIES(1).ATMDATA.GRID1, ...
                                    0.1 * Q.ABS_SPECIES(1).ATMDATA.DATA ],...
                                                'lin', 0.5, 0.00, @log10 );
-
   Q.ABS_SPECIES(1).MINMAX  = 1e-12;
  case 4 % Constant logrel
   Q.ABS_SPECIES(1).UNIT     = 'logrel';

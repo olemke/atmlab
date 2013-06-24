@@ -5,6 +5,9 @@
 %    retrieval set-ups are handled. However, it should be possible to apply
 %    this function for most cases, while *arts_oem* is less general (where
 %    handling of "non-standard" sensor retrievals are most problematic).
+%    The function ignores any ATMDATA, and atmospheric input shall be
+%    provided by RAW_ATMOSPHERE and/or ready fields (such as T_FIELD and
+%    WIND_V_FIELD).
 %
 %    The standard sequence of function calls is:
 %
@@ -15,7 +18,7 @@
 %       %
 %       clear Qoem
 %
-%    Fo "non-standard" cases, you have to make a function that can replace
+%    For "non-standard" cases, you have to make a function that can replace
 %    *arts_oem* and give its function handle as input to *oem*.
 %
 %    Note that *arts_oem_init* can modify Q in such way that it can not be
@@ -59,15 +62,93 @@
 function [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
 
 
-%--- Start part --------------------------------------------------------------
-                                                                           %&%
-%- Check input                                                             %&%
-%                                                                          %&%
-rqre_nargin( 2, nargin );                                                  %&%
-if ~qarts_isset( Q.J_DO) | ~Q.J_DO                                         %&%
-  error( 'Q.J_DO must be set to true.' );                                  %&%
-end                                                                        %&%
-rqre_datatype( workfolder, @ischar );                                      %&%
+%-----------------------------------------------------------------------------
+%--- Checks of input and settings --------------------------------------------
+%-----------------------------------------------------------------------------
+if atmlab( 'STRICT_ASSERT' )
+
+  % Input
+  rqre_nargin( 3, nargin );
+  rqre_datatype( Q, @isstruct ); 
+  rqre_datatype( O, @isstruct ); 
+  rqre_datatype( workfolder, @ischar ); 
+
+  % These checks are of course not complete. They focus on demands of
+  % arts_oem, mainly to make sure that iteration results can be mapped back
+  % to arts correctly. Other stuff expected to be captured by qarts2cfile
+  % and arts itself.
+  
+  % General settings
+  if ~qarts_isset( Q.J_DO) | ~Q.J_DO
+    error( 'Q.J_DO must be set to true.' );
+  end
+  
+  % t_field and vmr_field
+  if ~qarts_isset( Q.RAW_ATMOSPHERE ) | ~Q.RAW_ATMOSPHERE
+    if isfield( Q, 'T.RETRIEVE' ) & Q.T.RETRIEVE & ~qarts_isset( Q.T_FIELD )
+      error( ['If temperature is retrieved, T_FIELD or RAW_ATMOSPHERE ',...
+                                                           'must be set.'] );
+    end
+    if isfield( Q.T, 'MINMAX' )
+      rqre_datatype( Q.T.MINMAX, @istensor1, 'Q.T.MINMAX' );
+      if length( Q.T.MINMAX ) > 2
+        error( 'Max allowed length of Q.T.MINMAX is 2.' );
+      end
+    end
+    %
+    if isfield( Q, 'ABS_SPECIES.RETRIEVE' ) & ...
+                 any([Q.ABS_SPECIES.RETRIEVE]) & ~qarts_isset( Q.VMR_FIELD )
+      error( ['If any absorption species is retrieved, VMR_FIELD or ',...
+                                          'RAW_ATMOSPHERE must be set.'] );
+    end
+    for i = 1 : length(Q.ABS_SPECIES)
+      if isfield( Q.ABS_SPECIES(i), 'MINMAX' )
+        rqre_datatype( Q.ABS_SPECIES(i).MINMAX, @istensor1, ...
+                                     sprintf('Q.ABS_SPECIES(%d).MINMAX',i) );
+        if length( Q.ABS_SPECIES(i).MINMAX ) > 2
+          error( 'Max allowed length of Q.ABS_SPECIES(%d).MINMAX is 2.', i );
+        end
+      end 
+    end 
+  end  
+
+  % vind fields
+  if isfield( Q, 'WIND_U.RETRIEVE' ) & Q.WIND_U.RETRIEVE & ...
+                                              ~qarts_isset( Q.WIND_U_FIELD )
+    error( 'If wind u-component is retrieved, WIND_U_FIELD must be set.' );
+  end  
+  if isfield( Q, 'WIND_V.RETRIEVE' ) & Q.WIND_V.RETRIEVE & ...
+                                              ~qarts_isset( Q.WIND_V_FIELD )
+    error( 'If wind v-component is retrieved, WIND_V_FIELD must be set.' );
+  end  
+  if isfield( Q, 'WIND_W.RETRIEVE' ) & Q.WIND_W.RETRIEVE & ...
+                                              ~qarts_isset( Q.WIND_W_FIELD )
+    error( 'If wind w-component is retrieved, WIND_W_FIELD must be set.' );
+  end  
+  
+  % Sensor stuff
+  if qarts_isset(Q.POINTING) & Q.POINTING.RETRIEVE
+    if ~qarts_isset( Q.SENSOR_LOS )
+      error( ['When any pointing retrieval is performed, Q.SENSOR_LOS ',...
+              'must be set.'] );
+    end
+    if ~qarts_isset( Q.SENSOR_TIME )
+      error( ['When any pointing retrieval is performed, Q.SENSOR_TIME ',...
+              'must be set.'] );
+    end
+  end
+  % 
+  if ( qarts_isset(Q.FSHIFTFIT)   & Q.FSHIFTFIT.RETRIEVE )  | ...
+     ( qarts_isset(Q.FSTRETCHFIT) & Q.FSTRETCHFIT.RETRIEVE )
+    if ~isstruct( Q.SENSOR_RESPONSE )
+      error( ['When any frequency fit is performed Q.SENSOR_RESPONSE ',...
+              'must follow qartsSensor (i.e. be a structure).'] );
+    end
+  end
+end
+%-----------------------------------------------------------------------------
+%--- End checks --------------------------------------------------------------
+%-----------------------------------------------------------------------------
 
 
 
@@ -132,45 +213,27 @@ for i = 1 : nq
                    );
     elseif strcmp( R.jq{i}.mode, 'logrel' )
       xa(ind)    = 0;
-    else                                                                    %&%
-      error( sprintf('Unknown gas species retrieval unit (%s).', ...        %&%
-                                                         R.jq{i}.mode ) );  %&%
+    else
+      error( sprintf('Unknown gas species retrieval unit (%s).', ...
+                                                              R.jq{i}.mode ) ); 
     end
-    % Min and max values
     if isfield( Q.ABS_SPECIES(ig), 'MINMAX' )
-      rqre_datatype( Q.ABS_SPECIES(ig).MINMAX, @istensor1, ...
-                                                      'Q.ABS_SPECIES.MINMAX' );
-      R.minmax(ind,1) = Q.ABS_SPECIES(ig).MINMAX(1);
-      if length( Q.ABS_SPECIES(ig).MINMAX(1) ) > 1
-        R.minmax(ind,2) = Q.ABS_SPECIES(ig).MINMAX(2);
-        if length( Q.ABS_SPECIES(ig).MINMAX(1) ) > 2
-          error( 'Max allowed length of Q.ABS_SPECIES.MINMAX is 2.' );
-        end
-      end
+      R.minmax(ind,1:length(Q.ABS_SPECIES(ig).MINMAX)) = ...
+                           repmat( Q.ABS_SPECIES(ig).MINMAX', length(ind), 1 );
     end
     
   case 'Atmospheric temperatures'   %-----------------------------------------
     %
     xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
-    % Min and max values
     if isfield( Q.T, 'MINMAX' )
-      rqre_datatype( Q.T.MINMAX, @istensor1, 'Q.T.MINMAX' );
-      R.minmax(ind,1) = Q.T.MINMAX(1);
-      if length( Q.T.MINMAX(1) ) > 1
-        R.minmax(ind,2) = Q.T.MINMAX(2);
-        if length( Q.T.MINMAX(1) ) > 2
-          error( 'Max allowed length of Q.T.MINMAX is 2.' );
-        end
-      end
+      R.minmax(ind,1:length(Q.T.MINMAX)) = ...
+                                         repmat( Q.T.MINMAX', length(ind), 1 );
     end
 
   case 'Wind'   %-------------------------------------------------------------
     %
     if strcmp( R.jq{i}.subtag, 'u' )
-      if isnan( wind_u )                                                    %&%
-        error( 'If u-wind is retrieved, *WIND_U_FIELD* must be set.' );     %&%
-      end                                                                   %&%
       Q = force_file_local( Q, 'WIND_U_FIELD', 'Tensor3', R );
       if isempty( wind_u )
         wind_u = zeros( size( t_field ) );
@@ -178,9 +241,6 @@ for i = 1 : nq
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_u, ...
                                                              R.jq{i}.grids ) );
     elseif strcmp( R.jq{i}.subtag, 'v' )
-      if isnan( wind_v )                                                    %&%
-        error( 'If v-wind is retrieved, *WIND_V_FIELD* must be set.' );     %&%
-      end                                                                   %&%
       Q = force_file_local( Q, 'WIND_V_FIELD', 'Tensor3', R );
       if isempty( wind_v )
         wind_v = zeros( size( t_field ) );
@@ -188,17 +248,14 @@ for i = 1 : nq
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_v, ...
                                                              R.jq{i}.grids ) );
     elseif strcmp( R.jq{i}.subtag, 'w' )
-      if isnan( wind_w )                                                    %&%
-        error( 'If w-wind is retrieved, *WIND_W_FIELD* must be set.' );     %&%
-      end                                                                   %&%
       Q = force_file_local( Q, 'WIND_W_FIELD', 'Tensor3', R );
       if isempty( wind_w )
         wind_w = zeros( size( t_field ) );
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_w, ...
                                                              R.jq{i}.grids ) );
-    else                                                                    %&%
-      error( 'Unknown wind subtag.' );                                      %&%
+    else
+      error( 'Unknown wind subtag.' );
     end
     
    %---------------------------------------------------------------------------
@@ -301,9 +358,7 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
 
   %- Atmospheric fields
   %
-  % We do not want the option RAW_ATMOSPHERE here
-  %
-  if qarts_isset( Q.RAW_ATMOSPHERE )
+  if qarts_isset( Q.RAW_ATMOSPHERE )  &  Q.RAW_ATMOSPHERE
     [t_field,z_field,vmr_field]       = arts_atmfields( Q );
     [Q.T_FIELD,Q.Z_FIELD,Q.VMR_FIELD] = deal( t_field, z_field, vmr_field );   
     Q.RAW_ATMOSPHERE                  = {};
@@ -357,11 +412,10 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
   %
   R.jq = xmlLoad( fullfile( R.workfolder, 'jacobian_quantities.xml' ) );
   R.ji = xmlLoad( fullfile( R.workfolder, 'jacobian_indices.xml' ) );
-  %                                                                         %&%
-  if length( R.jq ) == 0                                                    %&%
-    % Ending up here means probably a bug!                                  %&%
-    error( 'No retrieval quantities defined!?' );                           %&%
-  end                                                                       %&%
+  % 
+  if length( R.jq ) == 0
+    error( 'No retrieval quantities defined!?' );
+  end
   %
   for i = 1 : length(R.ji)           % Fix different indexing
     for j = 1 : length(R.ji{i})
@@ -371,26 +425,12 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
 
   %- Sensor
   %
-  %- Check special cases                                                    %&%
-  %                                                                         %&%
   if qarts_isset(Q.POINTING) & Q.POINTING.RETRIEVE
-    if ~qarts_isset( Q.SENSOR_LOS )                                         %&%
-      error( ['When any pointing retrieval is performed, Q.SENSOR_LOS ',... %&%
-              'must be set.'] );                                            %&%
-    end                                                                     %&%
-    if ~qarts_isset( Q.SENSOR_TIME )                                        %&%
-      error( ['When any pointing retrieval is performed, Q.SENSOR_TIME ',...%&%
-              'must be set.'] );                                            %&%
-    end
     R.los = qarts_get( Q.SENSOR_LOS );
   end
   % 
   if ( qarts_isset(Q.FSHIFTFIT)   & Q.FSHIFTFIT.RETRIEVE )  | ...
      ( qarts_isset(Q.FSTRETCHFIT) & Q.FSTRETCHFIT.RETRIEVE )
-    if ~isstruct( Q.SENSOR_RESPONSE )                                       %&%
-      error( ['When any frequency fit is performed Q.SENSOR_RESPONSE ',...  %&%
-              'must follow qartsSensor (i.e. be a structure).'] );          %&%
-    end                                                                     %&% 
     %- A copy of Q.SENSOR_RESPONSE is needed here
     R.sensor_response = Q.SENSOR_RESPONSE;
   end
@@ -413,7 +453,3 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
   Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
   Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
 return
-
-
-
-
