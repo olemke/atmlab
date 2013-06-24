@@ -1,5 +1,11 @@
 2013-06-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-382
+
+	* sensors/amsua_apply_polarisation.m: New function.
+
+2013-06-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-381
 
 	* tests/make_check_qarts.m (make_check_qarts): For arts_oem_demo,
