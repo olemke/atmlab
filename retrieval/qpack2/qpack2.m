@@ -145,8 +145,8 @@ function empty_y = checkY( Y )
     if empty_y
       for i = 2 : length(Y)                                          
         if ~isempty(Y(i).Y)                                        
-          error(errid, ['First spectrum in Y is empty. Then all other '... 
-                        'spectra must also be empty.'] );                  
+          error( errid, ['First spectrum in Y is empty. Then all other '... 
+                         'spectra must also be empty.'] );                  
         end                                                          
       end                                                            
       
@@ -186,9 +186,9 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
         error( errid, 'Qpack2 requires that Q.ATMOSPHERE_DIM is set.' );
       end                                                                     
       rqre_datatype( Q.ATMOSPHERE_DIM, @istensor0, Q.ATMOSPHERE_DIM );         
-      if Q.ATMOSPHERE_DIM ~= 1                                                
-        error( errid, 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' ); 
-      end 
+     %if Q.ATMOSPHERE_DIM ~= 1                                                
+     %   error( errid, 'Qpack2 requires that Q.ATMOSPHERE_DIM is set to 1.' ); 
+     % end 
       %
       if ~qarts_isset(Q.ABSORPTION)                                           
         error( errid, 'Qpack2 requires that Q.ABSORPTION is set.' ); 
@@ -257,9 +257,17 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
                                              sprintf('Y(%d).Z_PLATFORM',m) ); 
     rqre_datatype( Y(m).ZA, @istensor1, sprintf('Y(%d).ZA',m) );
     if length(Y(m).ZA) ~= length(Y(m).Z_PLATFORM)
-      error( 'Y(%d).ZA and Y(%d).Z_PLATFORM must have the same length', m, m );
+      error( errid, ...
+             'Y(%d).ZA and Y(%d).Z_PLATFORM must have the same length', m, m );
     end
     rqre_datatype( Y(m).F, @istensor1, sprintf('Y(%d).F',m) ); 
+    if Q.ATMOSPHERE_DIM == 3
+      rqre_datatype( Y(m).AA, @istensor1, sprintf('Y(%d).AA',m) );
+      if length(Y(m).ZA) ~= length(Y(m).AA) 
+        error( errid, ...
+                     'Y(%d).AA and Y(%d).ZA must have the same length', m, m );
+      end 
+    end
   end
 
   %- Map ATMDATA (if set) to VMR_FIELD, Z_FIELD and T_FIELD, and apply HSE
@@ -333,19 +341,34 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
   end
 
   
-  %- Sensor pos, los and time
+  %- Sensor pos and los
   %
-  Q.SENSOR_POS  = Y(m).Z_PLATFORM;
-  Q.SENSOR_LOS  = Y(m).ZA;
-  Q.SENSOR_TIME = [ 1 : length( Y(m).ZA ) ]';
+  nza = length( Y(m).ZA );
+  %
+  if Q.ATMOSPHERE_DIM == 1
+    Q.SENSOR_POS  = Y(m).Z_PLATFORM;
+    Q.SENSOR_LOS  = Y(m).ZA;
+  elseif Q.ATMOSPHERE_DIM == 2
+    Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, repmat( [Y(m).LATITUDE], nza, 1 ) ];
+    Q.SENSOR_LOS  = [ Y(m).ZA ];
+  elseif Q.ATMOSPHERE_DIM == 3
+    Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, ...
+                      repmat( [Y(m).LATITUDE,Y(m).LONGITUDE], nza, 1 ) ];
+    Q.SENSOR_LOS  = [ Y(m).ZA, Y(m).AA ];
+  end
 
+
+  %- Set a dummy sensor_time, if not already defined
+  %
+  if ~qarts_isset( Q.SENSOR_TIME )
+    Q.SENSOR_TIME = [ 1 : nza ]';
+  end
   
   %- Se
   %
   if nargout == 2
     
     nnv = size( Y(m).TNOISE, 1 );  % Number of noise values
-    nza = length( Y(m).ZA );
     nf  = length( Y(m).F );
     
     if do_checks

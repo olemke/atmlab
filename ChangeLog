@@ -1,3 +1,15 @@
+2013-06-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-385
+
+	* retrieval/qpack2/qpack2.m: Started on allowing 3D observation
+	geometry.
+
+	* arts/qarts_hse.m: Did just work for 1D. Z was set to result for
+	last ilat/ilon combination.
+
+	* demos/qpack2_wind3d_demo.m: Extended. Now operating in 3D.
+
 2013-06-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-384

@@ -30,7 +30,10 @@ Q    = q_demo;           % Local file, found below
 
 %- Measurement data
 %
-Y = y_demo( Q );         % Local file, found below
+u_wind = 60;
+v_wind = -40;
+%
+Y = y_demo( Q, u_wind, v_wind );
 
 
 %- Check that all frequencies are OK
@@ -62,28 +65,42 @@ L2 = qpack2( Q, O, Y );
 %- Plot, if no output argument
 %
 if ~nargout
-  
-  % Profiles
-  figure(1),clf
+
+  % Wind profiles
+  figure(1),clf  
+  plot( [0 0], [10 90], 'k-', ...
+        L2(1).wind_u_x, p2z_simple(L2(1).wind_u_p)/1e3, 'b', ...
+        u_wind*[1 1], [10 90], 'm', ...
+        L2(1).wind_v_x, p2z_simple(L2(1).wind_v_p)/1e3, 'r', ...
+        v_wind*[1 1], [10 90], 'c' );
+  xlabel( 'Wind components [m/s]' );
+  ylabel( 'Approximate altitude [km]' );
+  axis( [ -80 80 10 90 ] )
+  legend( 'A priori, U and V', 'Retrieved U', 'True U', ...
+                               'Retrieved V', 'True V' );
+
+  % Ozone profile
+  figure(2),clf
   plot( L2(1).species1_x*1e6, p2z_simple(L2(1).species1_p)/1e3, 'b', ...
-        L2(2).species1_x*1e6, p2z_simple(L2(2).species1_p)/1e3, 'r', ...
         L2(1).species1_xa*1e6, p2z_simple(L2(1).species1_p)/1e3, 'k-' );
   xlabel( 'Ozone [VMR]' );
   ylabel( 'Approximate altitude [km]' );
   axis( [ 0 8 10 90 ] )
-  legend( 'Retrieval 1', 'Retrieval 2', 'True and a priori' );
+  legend( 'Retrieval', 'True and a priori' );
 
   % Spectra
-  figure(2),clf
-  h=plot( L2(1).f/1e9, L2(1).y, 'k.', L2(2).f/1e9, L2(2).y, 'k.', ...
-          L2(1).f/1e9, L2(1).yf, 'b-', L2(2).f/1e9, L2(2).yf, 'r-', ...
-          L2(1).f/1e9, L2(1).bl, 'b-.', L2(2).f/1e9, L2(2).bl, 'r-.' );
-  xlabel( 'Frequency [GHz]' );
+  figure(3),clf
+  plot( L2(1).y, 'k.' );
+  hold on
+  h(1) = plot( L2(1).yf, 'b-' );
+  h(2) = plot( L2(1).bl, 'b-.');
+  xlabel( 'Data index' );
   ylabel( 'Tb [K]' );
-  axis( [ min(L2(1).f/1e9) max(L2(1).f/1e9) 0 18 ] )
-  legend( h(3:end), 'Fitted 1', 'Fitted 2', 'Baseline 1', 'Baseline 2' );
+%  axis( [ min(L2(1).f/1e9) max(L2(1).f/1e9) 0 18 ] )
+  legend( h, 'Fitted', 'Baseline' );
 end
 
+keyboard
 return
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
@@ -118,7 +135,7 @@ Q.INCLUDES            = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
                           fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
                           fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
                           fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
-Q.ATMOSPHERE_DIM      = 1;
+Q.ATMOSPHERE_DIM      = 3;
 Q.STOKES_DIM          = 1;
 Q.J_DO                = true;
 Q.CLOUDBOX_DO         = false;
@@ -147,12 +164,6 @@ Q.YCALC_WSMS          = { 'yCalc' };
 Q.PPATH_LMAX          = 250;
 
 
-%- Surface
-%
-Q.Z_SURFACE           = 1e3;          % Just a dummy value. A 10 km
-                                      % observation altitude is assumed here
-
-
 %- Absorption
 %
 Q.ABS_LINES           = fullfile( atmlab_example_data, 'o3line111ghz' );
@@ -161,12 +172,20 @@ Q.ABS_LINES_FORMAT    = 'Arts';
 Q.ABSORPTION          = 'OnTheFly';
 Q.ABS_NLS             = [];
 
-%- Pressure grid
+%- Atmospheric grids
 %
 z_toa                 = 95e3;
+z_surf                = 1e3;
 %
-Q.P_GRID              = z2p_simple( Q.Z_SURFACE-1e3 : 2e3 : z_toa )';
+Q.P_GRID              = z2p_simple( z_surf-1e3 : 2e3 : z_toa )';
+Q.LAT_GRID            = [ 30 : 10 : 60 ]';
+Q.LON_GRID            = [ -20 : 20 : 20 ]';
 
+
+%- Surface
+%
+Q.Z_SURFACE           = repmat( z_surf, length(Q.LAT_GRID), ...
+                                        length(Q.LON_GRID) );
 
 
 %- Frequency, spectrometer and pencil beam antenna
@@ -238,53 +257,17 @@ Q.HSE.ACCURACY = 0.1;
 Q.ABS_SPECIES(1).TAG      = { 'O3' };
 Q.ABS_SPECIES(1).RETRIEVE = true;
 Q.ABS_SPECIES(1).L2       = true;
-Q.ABS_SPECIES(1).GRIDS    = { Q.P_GRID, [], [] };
+Q.ABS_SPECIES(1).GRIDS    = { Q.P_GRID, mean(Q.LAT_GRID), mean(Q.LON_GRID) };
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
       'midlatitude-winter', 'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
 %
-% If you don't apply a min value (by MINMAX), you could need to active this:
-%Q.VMR_NEGATIVE_OK = true;
-%
-% For demonstration, setting for several units are provided:
-switch 1
- case 1  % Constant VMR
-  Q.ABS_SPECIES(1).UNIT     = 'vmr';
-  Q.ABS_SPECIES(1).SX       = ...
-                     covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 1.5e-6, ...
-                                               'lin', 0.2, 0.00, @log10 ) + ...
-                     covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.3e-6, ...
-                                               'lin', 0.5, 0.00, @log10 );
-   Q.ABS_SPECIES(1).MINMAX  = 1e-12;
- case 2 % Constant rel
-  Q.ABS_SPECIES(1).UNIT     = 'rel';
-  Q.ABS_SPECIES(1).SX       = ...
+Q.ABS_SPECIES(1).UNIT     = 'rel';
+Q.ABS_SPECIES(1).SX       = ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.5, ...
                                                'lin', 0.2, 0.00, @log10 ) + ...
                      covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.1, ...
                                                'lin', 0.5, 0.00, @log10 );
-  Q.ABS_SPECIES(1).MINMAX  = 1e-6;
- case 3 % Mimic case 2 in vmr
-  Q.ABS_SPECIES(1).UNIT     = 'vmr';
-  Q.ABS_SPECIES(1).SX       = ...
-                     covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, ...
-                                       [ Q.ABS_SPECIES(1).ATMDATA.GRID1,...
-                                   0.5 * Q.ABS_SPECIES(1).ATMDATA.DATA ],...
-                                               'lin', 0.2, 0.00, @log10 ) + ...
-                     covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, ...
-                                       [ Q.ABS_SPECIES(1).ATMDATA.GRID1, ...
-                                   0.1 * Q.ABS_SPECIES(1).ATMDATA.DATA ],...
-                                               'lin', 0.5, 0.00, @log10 );
-  Q.ABS_SPECIES(1).MINMAX  = 1e-12;
- case 4 % Constant logrel
-  Q.ABS_SPECIES(1).UNIT     = 'logrel';
-  Q.ABS_SPECIES(1).SX       = ...
-                     covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.5, ...
-                                               'lin', 0.2, 0.00, @log10 ) + ...
-                     covmat1d_from_cfun( Q.ABS_SPECIES(1).GRIDS{1}, 0.1, ...
-                                               'lin', 0.5, 0.00, @log10 );
-  Q.ABS_SPECIES(1).MINMAX  = 1e-6;
-end  
-  
+Q.ABS_SPECIES(1).MINMAX  = 1e-6;
   
   
 %- Water 
@@ -298,29 +281,27 @@ Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
 
 
 
-%- Wind
-%
-% Here demonstrated for v-component, that should the component of main
-% concern for ground-based instruments. This component can be seen as the
-% part of the horizontal wind going along the viewing direction, where
-% positive values mean a movement away from the sensor.
+%- Horsontal wind components vind
 %
 Q.WIND_V_FIELD    = [];      % This is a short-cut for zero wind.
 %
-Q.WIND_V.RETRIEVE = false;   % Set to true to activate retrieval
+Q.WIND_V.RETRIEVE = true;   % Set to true to activate retrieval
 Q.WIND_V.L2       = true;
-Q.WIND_V.GRIDS    = { Q.P_GRID(1:2:end), [], [] };
-Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 40, ...
-                                                    'lin', 0.5, 0.00, @log10 );
+Q.WIND_V.GRIDS    = { Q.P_GRID(1:2:end), mean(Q.LAT_GRID), mean(Q.LON_GRID) };
+Q.WIND_V.SX       = covmat1d_from_cfun( Q.WIND_V(1).GRIDS{1}, 50, ...
+                                                    'lin', 0.8, 0.00, @log10 );
 if Q.WIND_V.RETRIEVE
   Q.WSMS_AT_START{end+1} = 'IndexSet(abs_f_interp_order,3)';
 end
-
+%
+% Exactly same for u-component
+Q.WIND_U_FIELD    = Q.WIND_V_FIELD;
+Q.WIND_U          = Q.WIND_V;
 
 
 %- Frequency shift
 %
-Q.FSHIFTFIT.RETRIEVE      = true;
+Q.FSHIFTFIT.RETRIEVE      = false;
 Q.FSHIFTFIT.DF            = 25e3; 
 Q.FSHIFTFIT.SX            = 50e3^2;  
 Q.FSHIFTFIT.L2            = true;
@@ -330,13 +311,13 @@ Q.FSHIFTFIT.L2            = true;
 %
 % A polynomial of order 3 is used for "baseline fit".
 %
-Q.POLYFIT.RETRIEVE        = true;
+Q.POLYFIT.RETRIEVE        = false;
 Q.POLYFIT.ORDER           = 3;
 Q.POLYFIT.L2              = true;
-Q.POLYFIT.SX0             = 1^2; 
-Q.POLYFIT.SX1             = 0.5^2; 
-Q.POLYFIT.SX2             = 0.2^2;
-Q.POLYFIT.SX3             = 0.1^2; 
+Q.POLYFIT.SX0             = 1.0^2 * speye(2); 
+Q.POLYFIT.SX1             = 0.5^2 * speye(2); 
+Q.POLYFIT.SX2             = 0.2^2 * speye(2);
+Q.POLYFIT.SX3             = 0.1^2 * speye(2); 
 
 
 return
@@ -348,7 +329,7 @@ return
 
 
 
-function Y = y_demo(Q)
+function Y = y_demo(Q,u_wind,v_wind)
 
 % The data should be loaded from one or several files, but are here genereted
 % by a forward model call to show how qpack2 can also be used to generate
@@ -374,7 +355,7 @@ Y.LONGITUDE = exp(1);
 
 % An airborn measurement assumed here
 %
-Y.AA         = [0  90];
+Y.AA         = [0  90]';
 naa          = length( Y.AA );
 Y.Z_PLATFORM = repmat( 10.5e3, naa, 1 );
 Y.ZA         = repmat( 70, naa, 1 );
@@ -391,9 +372,17 @@ nf  = length( Q.SENSOR_RESPONSE.F_BACKEND );
 
 % Thermal noise standard deviation
 %
-Y.TNOISE = repmat( 0.1, 1, naa );
+Y.TNOISE = repmat( 0.05, 1, naa );
 % To test varying noise
 %Y.TNOISE = repmat( linspace( 0.03, 0.07, length(Y.F) )', 1, naa );
+
+
+% Include winds, constant with altitude
+%
+Q.WIND_U_FIELD = repmat( u_wind, [ length(Q.P_GRID), length(Q.LAT_GRID), ...
+                                                     length(Q.LON_GRID) ] );
+Q.WIND_V_FIELD = repmat( v_wind, [ length(Q.P_GRID), length(Q.LAT_GRID), ...
+                                                     length(Q.LON_GRID) ] );
 
 % Simulate a measurement
 %
@@ -404,14 +393,17 @@ Y.Y = [];                           % A flag to tell qpack2 to calculate the
 %
 Y = qpack2( Q, oem, Y );            % Dummy oem structure OK here 
 
-% Add thermal noise
+
+% Add thermal noise and baseline off-set
 %
 % The correlation specified in Q is included
 %
 for i = 1 : length(Y)
   for j = 1 : length( Y.ZA )
     ind = (j-1)*nf + [1:nf];
-    Y(i).Y(ind) = Y(i).Y(ind) + Y(i).TNOISE(:,j) .* make_noise(1,Q.TNOISE_C);
+    Y(i).Y(ind) = Y(i).Y(ind) + ...   % Noise free spectrum
+                  Y(i).TNOISE(:,j) .* make_noise(1,Q.TNOISE_C); % Thermal noise
+%                  2*randn(1)  + ...   % A constant off-set
   end
 end
 

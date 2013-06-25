@@ -79,8 +79,8 @@ Z = zeros( size( T ) );
 for ilon = 1 : size( T, 3 )
   for ilat = 1 : size( T, 2 )
 
-    Z = pt2z( p_grid, T(:,ilat,ilon), getdims(VMR(ih2o,:,ilat,ilon),2), ...
-                                                hse_p, hse_z, lat_grid(ilat) );
-  
+    Z(:,ilat,ilon) = pt2z( p_grid, T(:,ilat,ilon), ...
+                           getdims(VMR(ih2o,:,ilat,ilon),2), ...
+                           hse_p, hse_z, lat_grid(ilat) );  
   end
 end
