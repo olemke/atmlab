@@ -1,5 +1,13 @@
 2013-06-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-386
+
+	* retrieval/qpack2/qpack2.tex: Adopted and extended to new features.
+
+	* demos/qpack2_wind3d_demo.m: Settings improved.
+
+2013-06-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-385
 
 	* retrieval/qpack2/qpack2.m: Started on allowing 3D observation

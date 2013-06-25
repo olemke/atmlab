@@ -33,17 +33,20 @@
 %---
 Qpack2 is a retrieval system, implemented in Matlab, for performing inversions
 of atmospheric observations inside the framework of ``optimal estimation''
-(OEM). Only cases where the aim is to retrieve vertical profiles of atmospheric
-quantities (1D cases) are handled. Accordingly, the main application areas of
-Qpack2 are ground-based observations and inversion of individual satellite
-spectra.
+(OEM). With good knowledge of the background systems a wide range of retrievals
+can potentially be handled, but the primary aim is to provide relatively
+straightforward retrievals of vertical profiles of atmospheric quantities. That
+is, the atmosphere is treated to be of ``1D type'' during the retrieval.
+Accordingly, a main application areas of Qpack2 is ground-based observations.
 
 The package should be general and flexible for covered measurements. For
-example, there is basically no limitations regarding observation geometry.
-Further, Qpack2 has been developed to be suitable for operational inversions,
-as long as not most extreme calculation speed is required. Some important
-aspects here are that batch calculations are allowed and atmospheric a priori
-profiles can automatically be extracted from climatology data.
+example, there is basically no limitations regarding observation geometry. Each
+measurement can consist of several spectra, obtained by some scanning procedure
+in zenith and/or azimuth direction. Further, Qpack2 has been developed to be
+suitable for operational inversions, as long as not most extreme calculation
+speed is required. Some important aspects here are that batch calculations are
+allowed and atmospheric a priori profiles can automatically be extracted from
+climatology data.
 
 
 
@@ -314,7 +317,6 @@ scripts in Atmlab's folder \verb|demos|, such as \verb|qarts_demo|.
 Most fields of \verb|Q| can be unspecified (\verb|{}|), but Qpack2 handles some
 fields in special way:
 \begin{itemize}
-\item \verb|Q.ATMOSPHERE_DIM| must be set to 1.
 \item \verb|Q.RAW_ATMOSPHERE| must be unset (\verb|{}|).
 \item All existing ``atmdata''-fields are considered and are given highest
   priority. That is, if such a field is set, any setting of the corresponding
@@ -721,6 +723,61 @@ from ARTS (through \verb|WriteXML|). If ARTS is compiled with support for
 NetCDF, that format can also be used (\verb|arts_nc_write_|{\it datatype} and
 \verb|WriteNetCDF|, respectively).
 
+
+
+\section{Single and multiple spectra measurements}
+\label{sec:scanning}
+%
+As long as each measurement consists of a single spectrum, Qpack2 should be
+quite flexible in treating sensor aspects. For some conditions, it should also
+be straightforward to handle measurements consisting of multiple spectra. A
+first constrain is that the sensor characteristics (not including thermal
+noise) are common for the spectra. Hence, if the same sensor is moved
+vertically, or rotated to measure at different zenith angles, can be treated.
+Requirements and considerations to handle a multiple-spectrum measurement
+include:
+\begin{itemize}
+\item The fields \verb|Y.Z_PLATFORM| and \verb|Y.ZA| shall give the altitude
+  and zenith angle of each spectrum, and are accordingly (column) vectors
+  instead of scalar values for single-spectra cases. 
+\item \verb|Y.LATITUDE| and \verb|Y.LONGITUDE| are kept as scalar values, the
+  same geographical position is assumed for all spectra.
+\item \verb|Y.T_NOISE| must be extended where each column describes the noise
+  of the corresponding spectrum. Hence, the noise level can vary between the
+  spectra.
+\item If a baseline fit is performed, the corresponding \verb|SX|-fields must
+  be extended. These fields are scalar values for single-spectrum
+  observations. With multiple spectra, the covariance matrices can include an
+  expected correlation between the baseline coefficient for different spectra.
+  For example, if the zero-order \verb|POLYFIT| coefficient is expected to have
+  a standard deviation of 2\,K and has a correlation of 0.9 between two
+  spectra, these assumptions are included as
+\begin{verbatim}
+Q.POLYFIT.SX0 = 2.0^2 * [ 1 0.9; 0.9 1 ];
+\end{verbatim}
+\end{itemize}
+It is also possible to describe the scanning in a 3D atmosphere, that should be
+of interest if the azimuth angle matters. This option should be of interest for
+cases including a Zeeman influence or wind retrievals. Additional
+considerations are then:
+\begin{itemize}
+\item \verb|Q.ATMOSPHERE_DIM| shall be set to 3.
+\item \verb|Q.LAT_GRID| and \verb|Q.LON_GRID| must be specified.
+\item Atmospheric fields, such as \verb|Q.T_FIELD|, must be 3D. The standard
+  choice should be to set the fields to be constant in latitude and longitude
+  directions. Using the \verb|ATMDATA| feature with an input 1D atmosphere
+  handles this automatically.
+\item The field \verb|Y.AA| shall be set, and match \verb|Y.ZA| in length.
+\item Latitude and longitude retrieval grids, such in
+  \verb|Q.ABS_SPECIES.GRIDS|, must be specified, but must have length one. Any
+  value should work. One example:
+\begin{verbatim}
+Q.ABS_SPECIES(1).GRIDS = { Q.P_GRID, mean(Q.LAT_GRID), mean(Q.LON_GRID)};
+\end{verbatim}
+Retrieved atmospheric data will effectively have no latitude and longitude
+dimension and be of 1D type.
+\end{itemize}
+The file \verb|qpack2_wind3d_demo| exemplifies retrievals of this type.
 
 
 

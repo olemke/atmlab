@@ -1,19 +1,10 @@
-% QPACK2_DEMO   Demonstration of the Qpack2 retrieval system
+% QPACK2_WIND3D_DEMO   Demonstration of Qpack2 with scanning in azimuth
 %
-%    The main features of Qpack2 are demonstrated. The example case is airborne
-%    measurements of ozone at 110.8 GHz. Synthetic measurement data are
-%    generated internally. See the code and internal comments for details.
+%    This file exemplifies how to set Qpack2 for an instrument scanning in
+%    azimuth (and azimuth angle matters). The example treats a measurement
+%    aimimg at retrieving both horisontal wind components.
 %
-%    Everything is here put into a single file. For practical retrievals it
-%    is probably better to put the definitions of Q (together with O?) in a
-%    separate function (i.e. [Q,O] = q_mycase). A function to import
-%    measurement data into the "Y format" (see *qp2_y*) is needed. The
-%    retrieval result is returned in the L2 format produced by *qp2_l2*.
-%
-%    This script focuses on giving an introduction, indicating different
-%    retrieval units and retrieval of other variables. See also *qpack2_demo2*.
-%
-% FORMAT   L2 = qpack2_demo
+% FORMAT   L2 = qpack2_wind3d_demo
 %        
 % OUT      L2   L2 data output from *qpack2*.
 
@@ -48,7 +39,7 @@ end
 %
 O = qp2_l2( Q );         % This ensures that OEM returns the variables needed 
 %                          to fill the L2 structure, as defined in Q
-O.linear = false;
+O.linear = true;
 %
 if ~O.linear 
   O.itermethod = 'GN';
@@ -81,11 +72,11 @@ if ~nargout
 
   % Ozone profile
   figure(2),clf
-  plot( L2(1).species1_x*1e6, p2z_simple(L2(1).species1_p)/1e3, 'b', ...
-        L2(1).species1_xa*1e6, p2z_simple(L2(1).species1_p)/1e3, 'k-' );
-  xlabel( 'Ozone [VMR]' );
+  plot( L2(1).species1_x*1e2, p2z_simple(L2(1).species1_p)/1e3, 'b', ...
+        L2(1).species1_xa*1e2, p2z_simple(L2(1).species1_p)/1e3, 'k-' );
+  xlabel( 'Ozone compared to a priori [%]' );
   ylabel( 'Approximate altitude [km]' );
-  axis( [ 0 8 10 90 ] )
+  axis( [ 0 130 10 90 ] )
   legend( 'Retrieval', 'True and a priori' );
 
   % Spectra
@@ -100,7 +91,7 @@ if ~nargout
   legend( h, 'Fitted', 'Baseline' );
 end
 
-keyboard
+
 return
 %-----------------------------------------------------------------------------
 %-----------------------------------------------------------------------------
@@ -200,7 +191,7 @@ H                     = qartsSensor;
 H.SENSOR_NORM         = true;
 %
 H.BACKEND_DO          = true;
-df                    = 0.5e6;
+df                    = 0.05e6;
 H.F_BACKEND           = ( min(Q.F_GRID)+df : df : max(Q.F_GRID)-df )';
 %
 B.name                = 'Spectrometer channel response function';
@@ -222,14 +213,9 @@ Q.MBLOCK_ZA_GRID      = 0;
 
 %- Correlation of thermal noise 
 %
-f              = H.F_BACKEND;
-cl             = 1.4 * ( f(2) - f(1) );
-cfun           = 'gau';
-cco            = 0.05;
+Q.TNOISE_C = speye( length(H.F_BACKEND) );
 %
-Q.TNOISE_C     = covmat1d_from_cfun( f, [], cfun, cl, cco );
-%
-clear H f
+clear H 
 
 
 %- Define L2 structure (beside retrieval quantities below)
@@ -257,7 +243,7 @@ Q.HSE.ACCURACY = 0.1;
 Q.ABS_SPECIES(1).TAG      = { 'O3' };
 Q.ABS_SPECIES(1).RETRIEVE = true;
 Q.ABS_SPECIES(1).L2       = true;
-Q.ABS_SPECIES(1).GRIDS    = { Q.P_GRID, mean(Q.LAT_GRID), mean(Q.LON_GRID) };
+Q.ABS_SPECIES(1).GRIDS    = { Q.P_GRID, mean(Q.LAT_GRID), mean(Q.LON_GRID)};
 Q.ABS_SPECIES(1).ATMDATA  = gf_artsxml( fullfile( fascod, ...
       'midlatitude-winter', 'midlatitude-winter.O3.xml' ), 'O3', 'vmr_field' );
 %
@@ -301,7 +287,7 @@ Q.WIND_U          = Q.WIND_V;
 
 %- Frequency shift
 %
-Q.FSHIFTFIT.RETRIEVE      = false;
+Q.FSHIFTFIT.RETRIEVE      = true;
 Q.FSHIFTFIT.DF            = 25e3; 
 Q.FSHIFTFIT.SX            = 50e3^2;  
 Q.FSHIFTFIT.L2            = true;
@@ -309,15 +295,10 @@ Q.FSHIFTFIT.L2            = true;
 
 %- Polyfit
 %
-% A polynomial of order 3 is used for "baseline fit".
-%
-Q.POLYFIT.RETRIEVE        = false;
-Q.POLYFIT.ORDER           = 3;
+Q.POLYFIT.RETRIEVE        = true;
+Q.POLYFIT.ORDER           = 0;
 Q.POLYFIT.L2              = true;
-Q.POLYFIT.SX0             = 1.0^2 * speye(2); 
-Q.POLYFIT.SX1             = 0.5^2 * speye(2); 
-Q.POLYFIT.SX2             = 0.2^2 * speye(2);
-Q.POLYFIT.SX3             = 0.1^2 * speye(2); 
+Q.POLYFIT.SX0             = 1.0^2 * speye(5); 
 
 
 return
@@ -355,10 +336,10 @@ Y.LONGITUDE = exp(1);
 
 % An airborn measurement assumed here
 %
-Y.AA         = [0  90]';
+Y.AA         = [ 0 -135 -45 45  135 ]';
 naa          = length( Y.AA );
 Y.Z_PLATFORM = repmat( 10.5e3, naa, 1 );
-Y.ZA         = repmat( 70, naa, 1 );
+Y.ZA         = [ 0; repmat( 70, naa-1, 1 ) ];
 
 % Reference point for hydrostatic equilibrium
 %
@@ -402,8 +383,8 @@ for i = 1 : length(Y)
   for j = 1 : length( Y.ZA )
     ind = (j-1)*nf + [1:nf];
     Y(i).Y(ind) = Y(i).Y(ind) + ...   % Noise free spectrum
+                  2*randn(1)  + ...   % A constant off-set
                   Y(i).TNOISE(:,j) .* make_noise(1,Q.TNOISE_C); % Thermal noise
-%                  2*randn(1)  + ...   % A constant off-set
   end
 end
 
