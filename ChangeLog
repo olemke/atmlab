@@ -1,3 +1,260 @@
+2013-06-26  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-387
+
+	* WARNING! Error identifier changed in SatDataset.read_granule.  See
+	below!
+
+	* collocations/Collapser.m:
+
+	(merge_matrix): changed flags, should be accessible from other classes
+
+	(process_granule):
+
+	- Bugfix in vectorised collapsing when core is empty
+	- Be a little bit more verbose in vectorised collapsing
+	- Set self.cols appropiately in vectorised collapsing
+
+	(redo_all):
+
+	- New protected method, overloaded from AssociatedDataset.  See
+	description there.  Here, returns true if version that collapsed data
+	were generated with is from before 2-1-337.
+
+	* collocations/FieldCopier.m:
+
+	(needs_data):
+
+	- Bugfix when not 'all' fields are asked for appending and some have
+	'realname' members.
+
+	* collocations/AssociatedDataset.m:
+
+	(merge_matrix): 
+	
+	- changed flags (see note at Collapser)
+
+	(process_delayed):
+
+	- catch the situation where the secondary could not be read, even
+	though it was read at the time of the original collocations.
+	Unfortunately, this happens from time to time.  Generate a special
+	exception for this case, and add the original as a 'cause'.  This
+	permits the parent to catch this particular case, and perhaps redo
+	collocations for the entire day (which is probably needed :().
+
+	(redo_all):
+
+	- New protected method.  To be overloaded by subclasses.  If there is
+	a change that makes appending impossible, this one can return 'true'
+	so that instead, everything is over-written.
+
+	* collocations/FieldMultiInstrumentCopier.m:
+
+	(process_granule):
+
+	- Bugfix in situation where 'all' fields were processed
+
+	- Bugfix in situation where some fields had 'realname' members
+
+	- Bugfix related to collection of cols-structures
+
+	* collocations/AssociatedPOESPlusCPR.m:
+
+	(dynamically_get_members):
+
+	- Remind myself to improve this one.  It's extremely slow because it's
+	called very many times!
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule):
+
+	- Add new 'atmlab:SatDataset:cannotread' identifier when trying to
+	read secondary granule (see note at SatDataset(read_granule).
+
+	- Implement locking mechanism using get_lock around most
+	memory-intensive part... I might remove it again though
+
+	- Clear big variables when no longer needed to save memory
+
+	- Also collect cols, as not all fields may be asked nowadays
+
+	(collocate_and_store_date):
+
+	- Use AssociatedDataset.redo_all to check if I should redo all fields,
+	e.g. due to changed algorithms or so, see note at (redo_all) above.
+
+	- When primary is overwritten, also overwrite all associateds
+
+	- When some fields are processed, some are read, do the processing
+	first so all can be read at once
+
+	(collocate_and_store_date_range):
+
+	- If I occur the case where I could previosuly read a file, but not
+	anymore, redo collocations for the entire day (communicated via
+	errorid atmlab:AssociatedDataset:cannolongerread).
+
+	(fill_addi):
+
+	- Private method.  Move some of the collocate_and_store_date
+	functionality here because I need to call it in two different cases.
+
+	* atmlab/atmlab_version.m:
+
+	- Expanded.  When 3 output arguments, return major, minor, micro as
+	numbers, rather than as a single string.  Useful for checking version
+	numbers.
+
+	* files/get_lock.m:
+	
+	- Added.  Creates lockfile if possible, otherwise waits until it's
+	possible.  Uses moving to minimise/prevent race conditions.  Thanks
+	Oliver for the algorithm idea.
+
+	* files/quickly_read_gzipped_netcdf_header.m:
+
+	- Also return global attributes
+
+	* files/create_tmpfolder.m:
+
+	- Added note in documentation to use onCleanup
+
+	* site-specific/kiruna/datasets_init.m:
+
+	- Added modis_L3
+
+	* handy/logtext.m:
+
+	- When used inside parallel toolbox, also add task-id.  Does not
+	affect people without the toolbox.
+
+	- When called from a SatDataset method, also output the class and the
+	object 'name'.
+
+	* handy/combine_pdfs.m:
+
+	- Use a sans-serif font for the title.  This should be the default.
+
+	* handy/exec_system_cmd.m:
+
+	- In case of an error, tell user what the command was that caused the
+	error.
+
+	* handy/cached_evaluation.m:
+
+	- Small wrapper around CachedData.evaluate to prevent the need to
+	create a CachedData object and stick it around somewhere persistent
+
+	* handy/CachedData.m:
+
+	- added evaluate to documentation method list
+
+	* handy/sanitise.m:
+
+	- Add '$' character to dangerous character list
+
+	* datasets/HomemadeDataset.m:
+
+	- Added 'version' member that can be used for various purposes
+
+	(store):
+
+	- Not sure when NetCDF library raises
+	MATLAB:netcdf:defDim:nameIsAlreadyInUse and when
+	MATLAB:imagesci:netcdf:libraryFailure.  Just catch both.
+
+	- Be a little bit more verbose if wrongyl sized data is being stored.
+
+	(granule_first_line):
+
+	- Always return 1, eliminating need for databases for homemade
+	datasets, that anyway never should have duplicates.
+
+	(repvars):
+
+	- Compared to parent, also replace $VERSION.  See also note at
+	SatDataset(repvars).
+
+	(infofit):
+
+	- Compared to parent, also check is.version.  See also note at
+	SatDataset(infofit).
+
+	(pos2re):
+
+	- Also consider $VERSION
+
+	* datasets/SatDataset.m:
+
+	- Expand documentation a little bit
+
+	(find_datadir_by_date):
+
+	- Be a little bit more informative if no basedir initialised
+
+	- Use self.repvars, supersedes stringrep_variables
+
+	(find_granules_by_date):
+
+	- Use self.repvars, supersedes stringrep_variables
+
+	- Move find_info_from_granule matching to new method infofit (see
+	below)
+
+	(find_granule_by_datetime):
+
+	- Allow to pass datevecs less than 5 elems (i.e. for
+	one-granule-per-day sets)
+
+	- Use self.repvars, supersedes stringrep_variables, see below
+
+	(read_granule):
+
+	- CHANGED ERROR IDENTIFIER!  Now, catches any errors happening during
+	reading, add those errors as the cause to a new exception, that is
+	raised with err-identifier 'atmlab:SatDataset:cannotread'.  Then,
+	callers can catch all reading-related errors at once and don't rely on
+	catching different error-ids based on hdf-library, netcdf-library,
+	etc.  This information is still available via the 'cause' member in
+	the generated MException.
+
+	(level3):
+
+	- Take custom gridsize
+	- use bin_nd instead of binning_fast therefore killing custom
+	gridsize; in other words, method still work in progress
+
+	(repvars):
+
+	- New method, replaces strrep_variables.  This one can be overloaded
+	by subclasses that want more vars than the standard ones to be
+	replaced; for example, HomemadeDatasets also replace $VERSION.
+
+	(infofit):
+
+	- New method, replaces functionality previously coded inside
+	find_granules_by_date.  Matches the output of find_info_from_granule
+	to meta-information.  Can be subclassed for more specific matching,
+	such as HomemadeDataset, which also looks at version.
+
+	* datasets/strrep_variables.m:
+
+	- Added deprecation note in documentation.
+
+	* datasets/CollocatedMicrowaveOnlyIWP.m:
+
+	- No longer hardcode version here, this is now in HomemadeDataset.
+
+	* datasets/define_datasets.m: 
+
+	- Added modis_L3 (no reader yet)
+
+	- Changed more collapsers to be vectorised
+
+	- Added G_PRESSURE to GRAS
+
 2013-06-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-386

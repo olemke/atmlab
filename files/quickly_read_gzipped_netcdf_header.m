@@ -1,4 +1,4 @@
-function varnames = quickly_read_gzipped_netcdf_header(file)
+function [varnames, globattr] = quickly_read_gzipped_netcdf_header(file)
 
 % Quickly read a gzipped netcdf header
 %
@@ -37,6 +37,7 @@ outfile = fullfile(d, 'temp.nc');
 exec_system_cmd(sprintf('gunzip -c %s | head -c %d > %s', ...
                         file, header_estimate, outfile));
 
+globattr = loadncglobalattr(outfile);
                     
 ncid = netcdf.open(outfile, 'NOWRITE');
 c2 = onCleanup(@() netcdf.close (ncid));
@@ -46,5 +47,6 @@ varnames = cell(1, nvars);
 for i = 0:nvars-1
     varnames{i+1} = netcdf.inqVar(ncid, i);
 end
+
 
 end

@@ -42,7 +42,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
     end
     
     properties (Transient, Constant)
-        version = 0.6;
+        %version = 0.6;
         changelog = sprintf([...
             'version 0.0: initial version, negative IWP, linear all\n' ...
             'version 0.1: cf [0, 1], log-IWP retrieved, more descriptive atts\n', ...
@@ -60,7 +60,7 @@ classdef CollocatedMicrowaveOnlyIWP < HomemadeDataset
             self.setcols();
             self.setmembers();
             self.reader = @(varargin) (satreaders.netcdf_dataset(self, varargin{:}));
-            
+            self.version = 0.6;
         end
         
         function getdata(self, start_date, end_date)

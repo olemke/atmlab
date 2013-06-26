@@ -2,6 +2,9 @@ function s_out = strrep_variables(s, satname, datevec)
 
 % strrep_variables Replace 'magic' variables
 %
+% NOTE: DEPRECATED!  Inside SatDataset, use self.repvar.
+
+%
 % Replace the 'magic' variables:
 %
 % $YEAR4

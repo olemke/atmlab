@@ -41,7 +41,7 @@ classdef HomemadeDataset < SatDataset
     % $Id$
     
     
-    properties (Transient)
+    properties
         % structure describing columns of (internally) stored data
         %
         % The cols-structure describes columns of data passed around
@@ -110,16 +110,19 @@ classdef HomemadeDataset < SatDataset
         % you want severe loss of precision and crashing code.
         mattype = 'double';
 
+        % Users may set this for various purposes.  Among others, it's used
+        % by strrep.
+        version;
     end
     
-    properties (Transient, Dependent = true)
+    properties (Dependent = true)
         % contains detailed information on how data are stored etc.
         %
         % To be documented in more detail.
         members;
     end
     
-    properties (Transient, Access = protected)
+    properties (Access = protected)
         % for internal usage
         ownmembers;
         dynamic_members = false;
@@ -304,8 +307,9 @@ classdef HomemadeDataset < SatDataset
                         end
                     catch ME
                         switch ME.identifier
-                            case 'MATLAB:netcdf:defDim:nameIsAlreadyInUse'
+                            case {'MATLAB:netcdf:defDim:nameIsAlreadyInUse', 'MATLAB:imagesci:netcdf:libraryFailure'}
                                 % no problem
+                                dims.(dimname) = netcdf.inqDimID(ncid, dimname);
                             otherwise
                                 ME.rethrow();
                         end
@@ -323,8 +327,9 @@ classdef HomemadeDataset < SatDataset
                     [~, stored_n_collocs] = netcdf.inqDim(ncid, dids(1));
                     if size(data, 1) ~= stored_n_collocs
                         errstr = sprintf(['NetCDF file contains data for variable %s ' ...
-                            'with a different size than the data I''m trying to store. '], ...
-                            varname);
+                            'with a different size than the data I''m trying to store. ' ...
+                            ' Stored no. of entries is %d, whereas new size is %d entries. '], ...
+                            varname, stored_n_collocs, size(data, 1));
                         if self.overwrite == 2 && isa(self, 'Collapser')
                             errstr = [errstr, ...
                                 sprintf([' Probably the original collapsing ' ...
@@ -463,6 +468,10 @@ classdef HomemadeDataset < SatDataset
             end
         end
         
+        function first = granule_first_line(varargin)
+            first = int32(1);
+        end
+        
         %% getters/setters
         function mem = get.members(self)
             % members getter, see doc for property members
@@ -489,6 +498,29 @@ classdef HomemadeDataset < SatDataset
     
     methods (Access = protected)
         
+        %% overload parent methods
+        function s_out = repvars(self, s, datevec, spec)
+            s = repvars@SatDataset(self, s, datevec, spec);
+            if isempty(self.version)
+                s_out = s;
+            else
+                s_out = strrep_multi(s, ...
+                    '$VERSION', strrep(self.version, '.', '_'));
+            end
+        end
+                    
+        function matches = infofit(self, is, datevec, spec)
+            matches = infofit@SatDataset(self, is, datevec, spec);
+            if isfield(is, 'version') && ~isempty(self.version)
+                matches = matches && isequal(is.version, strrep(self.version, '.', '_'));
+            elseif isempty(self.version)
+                matches = true;
+            else
+                matches = false;
+            end
+        end
+
+        %% implement new methods
         % those are for internal use, user uses
         % CollocatedDataset.read
         function [M, localcols, attr] = read_single_day(self, date, spec, fields)
@@ -640,7 +672,8 @@ classdef HomemadeDataset < SatDataset
                 '$DOY', '(?<doy>\d{3})', ...
                 '$HOUR', '(?<hour>\d{2})', ...
                 '$MINUTE', '(?<minute>\d{2})', ...
-                '$SAT', '(?<satname>[a-z0-9]*)');
+                '$SAT', '(?<satname>[a-z0-9]*)', ...
+                '$VERSION', '(?<version>[0-9_]{3})');
             % However, we don't need it to locate granules. It's only used
             % by find_info_from_granule.
             self.tryre = false;

@@ -120,6 +120,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                 assert(isequal(self.fieldcopier_core.cols, core_fc_cols), ...
                     ['atmlab:' mfilename ':wrongcols'], ...
                     'Bug in cols :(');
+                fields = fieldnames(self.members);
             end
             allmembers = self.fieldcopier_core.members;
             
@@ -166,7 +167,8 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                 
                 for i = 1:length(other_instruments{k})
                     other_instrument = other_instruments{k}{i};
-                    fields_from_other_instrument = intersect(fields, fieldnames(fc_other.(other_instrument).members));
+                    %fields_from_other_instrument = intersect(fields, fieldnames(fc_other.(other_instrument).members));
+                    fields_from_other_instrument = cellfun(@(X) safegetfield(fc_other.(other_instrument).members.(X), 'realname', X), intersect(fields, fieldnames(fc_other.(other_instrument).members)), 'UniformOutput', false);
                     if isempty(fields_from_other_instrument)
                         logtext(atmlab('OUT'), 'No need for %s this time\n', other_instrument);
                         continue
@@ -220,7 +222,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
                     % FieldCopier's process_granule also sets 'cols'-structure
                     args = {pc_other, data1, date1, spec1, data2, spec2, dependencies, depcols, fields_from_other_instrument};
                     args{arg_i_other} = data_other;
-                    [out_other{k}{i}, cols_other{m}{k}{i}] = fc_other.(other_instrument).process_granule(args{:}); %#ok<AGROW>
+                    [out_other{k}{i}, cols_other{k}{i}] = fc_other.(other_instrument).process_granule(args{:}); %#ok<AGROW>
                    
 %                    allmembers = catstruct(allmembers, fc_other.(other_instrument).members);
                 end
@@ -230,10 +232,10 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
             out = out_core;
             newcols = core_fc_cols;
             for k = 1:length(modes)
-                m = modes{k};
+                %m = modes{k};
                 for i = 1:length(out_other{k})
                     %[out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, self.(['fieldcopier_other_' m]).(other_instruments{k}{i}).cols);
-                    [out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, cols_other{m}{k}{i});
+                    [out, newcols] = self.merge_matrix(out, newcols, out_other{k}{i}, cols_other{k}{i});
 
                 end
             end

@@ -122,6 +122,8 @@ SatDataset('name', 'modis_aqua_L2', ...
     'reader', @satreaders.modis, ...
     'granule_duration', 300);
 
+SatDataset('name', 'modis_L3'); % no reader defined yet
+
 SatDataset('name', 'mspps', ...
     'reader', @satreaders.mspps, ...
     'granule_duration', 6130);
@@ -759,7 +761,9 @@ FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloudLidar, ...
 
 % LIMITERS
 limitators_scalar = {@(X)(X>=0)}; % meaning not flagged
+limitators_scalar_vectorised = {@(x)x};
 limitators_profile = {@(X)(true(size(X, 1), 1))};
+limitators_profile_vectorised = {@(x)true(size(X))};
 closest.fn = @(x)(x(1)); %workaround, see this collapser
 closest.ln = 'Only the closest measurement pair';
 % ----------
@@ -767,6 +771,8 @@ closest.ln = 'Only the closest measurement pair';
 % ----------
 mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
                @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
+mw_global_vec = {{{'DIST'}, @(X)(X<7.5)}, ...
+                 {{'INT'}, @(X)(abs(X)<600)}};
 
 % FIXME: put those back after bugfix
 cpr_iwp_fields = vec2row({'ROIWP', 'IOROIWP', 'IWP_2C', 'dardar_IWP', 'RO_liq_water_path', 'LO_RO_liquid_water_path'});
@@ -780,27 +786,33 @@ for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_
     if ismember(f, union(cpr_iwp_fields, cpr_ecmwf_scal_fields))
         appccs.(f).limitators = limitators_scalar;
         len = @length;
-        mn = @mean;
+        len_vec = @(X)(vec2col(sum(~isnan(X), 1)));
+        mn = @mean;        
+        mn_vec = @(X)(vec2col(nanmean(X, 1)));
         st = @std;
+        st_vec = @(X)(vec2col(nanstd(X, 0, 1)));
         %cv = @(X)(std(X) ./ mean(X));
     elseif ismember(f, cpr_ecmwf_prof_fields)
         appccs.(f).limitators = limitators_profile;
         len = @(X)(size(X, 1));
+        len_vec = len;
         mn = @(X)(mean(X, 1));
+        mn_vec = mn;
         st = @(X)(std(X, 0, 1));
+        st_vec = st;
         %cv = @(X)(std(X, 0, 1) ./ mean(X, 1));
     end
     
-    appccs.(f).processors.NO = len;
+    appccs.(f).processors.NO = len_vec;
     appccs.(f).stored.NO.type = 'short';
     appccs.(f).stored.NO.atts.long_name = 'Number of CloudSat footprints used for statistics inside AMSU-B/MHS';
     appccs.(f).stored.NO.atts.missing_value = 0;
-    appccs.(f).processors.MEAN = mn;
+    appccs.(f).processors.MEAN = mn_vec;
     appccs.(f).stored.MEAN.type = 'float';
     appccs.(f).stored.MEAN.atts.long_name = ['MHS-averaged ' fields.cpr.(f).atts.long_name];
     appccs.(f).stored.MEAN.atts.units = fields.cpr.(f).atts.units;
     appccs.(f).stored.MEAN.atts.missing_value = -1;
-    appccs.(f).processors.STD = st;
+    appccs.(f).processors.STD = st_vec;
     appccs.(f).stored.STD.type = 'float';
     appccs.(f).stored.STD.atts.long_name = ['CPR-in-MHS standard deviation for ' fields.cpr.(f).atts.long_name];
     appccs.(f).stored.STD.atts.units = fields.cpr.(f).atts.units;
@@ -813,7 +825,8 @@ for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_
     if ismember(f, cpr_iwp_fields)
         for iwp = [1, 10, 40, 1000]
             fn = sprintf('FRAC%d', iwp);
-            appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
+            %appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
+            appccs.(f).processors.(fn) = @(X)vec2col(sum(X>=iwp, 1) ./ sum(~isnan(X), 1));
             appccs.(f).stored.(fn).type = 'float';
             appccs.(f).stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
                 fields.cpr.(f).atts.long_name, iwp, fields.cpr.(f).atts.units);
@@ -973,11 +986,13 @@ avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.missing_value = -1;
 % COLLAPSED DATASETS
 % --------------------
 
-Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, mw_global, ...
-    'name', 'collapsed_associated_CPR_MHS_AMSU_HIRS');
+Collapser(D.associated_CPR_MHS_AMSU_HIRS, appccs, mw_global_vec, ...
+    'name', 'collapsed_associated_CPR_MHS_AMSU_HIRS', ...
+    'vectorised', true);
 
-Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, mw_global, ...
-    'name', 'collapsed_associated_CPR_AMSUB_AMSUA_HIRS');
+Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, mw_global_vec, ...
+    'name', 'collapsed_associated_CPR_AMSUB_AMSUA_HIRS', ...
+    'vectorised', true);
 
 Collapser(D.dardarsub_modis_IWP,modis,modis_global, ...
     'name','dardarsub_modis_collapsedIWP');
@@ -1050,8 +1065,9 @@ FieldCopier(...
     D.Collocated_cacmah_avhrr, ...
     fc1, fc2, 'name', 'associated_cacmah_avhrr');
     
-Collapser(D.associated_cacmah_avhrr, avhrr_capsed, mw_global, ...
-    'name', 'collapsed_cacmah_avhrr');
+Collapser(D.associated_cacmah_avhrr, avhrr_capsed, mw_global_vec, ...
+    'name', 'collapsed_cacmah_avhrr', ...
+    'vectorised', true);
     
 
 %% 
@@ -1632,7 +1648,18 @@ fields.gras.G_GEOP_SIGMA.atts.long_name = 'GRAS Estimated error (1-sigma) for ge
 fields.gras.G_GEOP_SIGMA.atts.units = 'geopotential metres';
 fields.gras.G_GEOP_SIGMA.atts.valid_range = [0, 500];
 fields.gras.G_GEOP_SIGMA.atts.note = 'Attributes copied from original';
-
+fields.gras.G_PRESSURE.type = 'float';
+fields.gras.G_PRESSURE.realname ='press';
+fields.gras.G_PRESSURE.atts.long_name ='Pressure';
+fields.gras.G_PRESSURE.atts.units = 'hPa';
+fields.gras.G_PRESSURE.atts.valid_range =[1.0e-4, 1100.0];
+fields.gras.G_PRESSURE.atts.note = 'Attributes copied from original';
+fields.gras.G_PRESSURE_SIGMA.type = 'float';
+fields.gras.G_PRESSURE_SIGMA.realname ='press_sigma';
+fields.gras.G_PRESSURE_SIGMA.atts.long_name ='Estimated error (1-sigma) for pressure';
+fields.gras.G_PRESSURE_SIGMA.atts.units = 'hPa';
+fields.gras.G_PRESSURE_SIGMA.atts.valid_range =[0.0, 5.0];
+fields.gras.G_PRESSURE_SIGMA.atts.note = 'Attributes copied from original';
 
 %% HIRS
 fields.hirs.H_LONG.type = 'float';

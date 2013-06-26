@@ -143,7 +143,37 @@ classdef AssociatedDataset < HomemadeDataset
                 self.parent.add_associated(self);
             end
         end
-              
+        
+        %% implement new methods
+        
+        function [M, M_cols] = merge_matrix(self, M_core, cols_core, M_self, cols_self)
+            % horizontally combine core and associated
+            %
+            % Combine core data, core 'cols', associated data and
+            % associated 'cols'.  This may or may not be trivial depending
+            % on the actual data.  If more than two matrices need to be
+            % merged, apply this method iteratively.
+            %
+            % FORMAT
+            %
+            %   [M_new, M_cols] = ad.merge_matrix(M_core, cols_core, M_here, cols_here)
+            %
+            % IN
+            %
+            %   M_core      matrix      selection from core collocations
+            %   cols_core   structure   structure describing M_core
+            %   M_here      matrix      selection of associated data
+            %   cols_here   structure   structure describing M_here
+            %
+            % OUT
+            %
+            %   M_new       matrix      combination M_core, M_here
+            %   cols_new    structure   structure describing M_new
+            
+            M = [M_core M_self];
+            M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
+        end
+        
     end
     
     methods (Access = {?SatDataset})
@@ -263,7 +293,22 @@ classdef AssociatedDataset < HomemadeDataset
                     [dv{1:6}] = unixsecs2date(processed_core(newsec(seconseg), self.parent.cols.START2));
                     date2 = cell2mat(dv);
                     if self.needs_secondary_data(fields)
-                        data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(fields), false, false);
+                        try
+                            data2 = self.parent.secondary.read_granule(date2, spec2, self.secondary_arguments(fields), false, false);
+                        catch ME
+                            switch ME.identifier
+                                case {'atmlab:SatDataset:cannotread', 'atmlab:find_granule_by_datetime'}
+                                    ME2 = MException('atmlab:AssociatedDataset:cannolongerread', ...
+                                        ['%s %s trying to postprocess %s %s, in the past could read ' ...
+                                         '%s %s, but no longer :('], ...
+                                         class(self), self.name, class(self.parent.secondary), self.parent.secondary.name, ...
+                                         num2str(date2), spec2);
+                                    ME2 = ME2.addCause(ME);
+                                    ME2.throw();
+                                otherwise
+                                    ME.rethrow();
+                            end
+                        end
                     end
                 end
                 %                 if local_success
@@ -283,33 +328,6 @@ classdef AssociatedDataset < HomemadeDataset
             end
         end
                 
-        function [M, M_cols] = merge_matrix(self, M_core, cols_core, M_self, cols_self)
-            % horizontally combine core and associated
-            %
-            % Combine core data, core 'cols', associated data and
-            % associated 'cols'. This may or may not be trivial depending
-            % on the actual data. If more than two matrices need to be
-            % merged, apply this method iteratively.
-            %
-            % FORMAT
-            %
-            %   [M_new, M_cols] = ad.merge_matrix(M_core, cols_core, M_here, cols_here)
-            %
-            % IN
-            %
-            %   M_core      matrix      selection from core collocations
-            %   cols_core   structure   structure describing M_core
-            %   M_here      matrix      selection of associated data
-            %   cols_here   structure   structure describing M_here
-            %
-            % OUT
-            %
-            %   M_new       matrix      combination M_core, M_here
-            %   cols_new    structure   structure describing M_new
-            
-            M = [M_core M_self];
-            M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
-        end
         
         function S = merge_struct(self, S_core, S_self)
             % merge structures as obtained from read_homemade_granule
@@ -416,7 +434,7 @@ classdef AssociatedDataset < HomemadeDataset
         
     end
     
-    methods (Static, Access = protected)       
+    methods (Static, Access = {?SatDataset})       
         function M_cols = merge_new_cols(M_core, cols_core, cols_self)
             % merge different cols-structures describing matrix of data
             %
@@ -439,6 +457,15 @@ classdef AssociatedDataset < HomemadeDataset
             
             M_cols = catstruct(cols_core, ...
                 structfun(@(x)x+size(M_core, 2), cols_self, 'UniformOutput', false));
+        end
+        
+        function do = redo_all(~)
+            % redo_all(software_version)
+            %
+            % overload and return true if some changes require that a
+            % dataset must be overwritten (overwrite=1) even if requested
+            % to be appended (overwrite=2)
+            do = false;
         end
     end
     

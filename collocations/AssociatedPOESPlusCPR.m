@@ -105,6 +105,8 @@ classdef AssociatedPOESPlusCPR < FieldMultiInstrumentCopier
     methods (Access = {?HomemadeDataset})
         function mem = dynamically_get_members(self)
 %            logtext(atmlab('OUT'), 'Getting APPC-mems\n');
+            % FIXME! This should be better implemented.  This wastes a HUGE
+            % amount of time!
             mem = catstruct(self.fieldcopier_core.members, ...
                 self.fieldcopier_other_primary.amsua.members, ...
                 self.fieldcopier_other_primary.hirs.members);

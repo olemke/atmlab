@@ -27,6 +27,8 @@ if ~atmlab('VERBOSITY')
     return
 end
 
+haspar = ~isempty(ver('distcomp')) && ~isempty(getCurrentTask());
+
 ST = dbstack;
 if length(ST) < 2
     lineno = -1;
@@ -37,10 +39,27 @@ else
     name = ST(2).name;
 end
 
+% ugliness: try to get class/self.name in caller
+try
+    cl = evalin('caller', 'class(self)');
+    nm = evalin('caller', 'self.name');
+    showcls = true;
+catch ME % never mind
+    showcls = false;
+end   
+
 fprintf(fid, '%s:', datestr(now, 'dd-mmm-yyyy HH:MM:SS.FFF'));
 if fid<3 && usejava('desktop') && ~strcmp(name(1), '@') && ~strcmp(name, '(none)') % assume stdout/stderr
-    fprintf(fid, '<a href="matlab:opentoline(''%s'', %d, 1)">%s:%d</a>:', ...
-        which(f), lineno, name, lineno);
+    if showcls
+        fprintf(fid, '<a href="matlab:opentoline(''%s'', %d, 1)">%s:%d:%s:%s</a>:', ...
+            which(f), lineno, name, lineno, cl, nm);
+    else
+        fprintf(fid, '<a href="matlab:opentoline(''%s'', %d, 1)">%s:%d</a>:', ...
+            which(f), lineno, name, lineno);
+    end
+elseif haspar % if really par, usejava-desktop is false anyway
+    t = getCurrentTask();
+    fprintf(fid, '%s:%d:%d:', name, lineno, t.ID);
 else
     fprintf(fid, '%s:%d:', name, lineno);
 end

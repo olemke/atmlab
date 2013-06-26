@@ -214,7 +214,7 @@ if ~isempty(options.title)
     if ~any(ismember(unit,{'cm','mm','pt'})), error(['atmlab:' mfilename],'Don''t know fontsize unit "%s"',unit),end
     fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, max(layout.rowwidth));
     fprintf(fid,'\\begin{center}\n');
-    fprintf(fid,'{\\fontsize{%g%s}{%g%s}\\selectfont %s}\n',...
+    fprintf(fid,'{\\fontsize{%g%s}{%g%s}\\selectfont \\sffamily %s}\n',...
         fz,unit,1.2*fz,unit,strrep(options.title,'_','\_'));
     fprintf(fid,'\\end{center}\n');
     fprintf(fid,'\\end{minipage}\n');

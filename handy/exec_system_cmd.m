@@ -88,7 +88,7 @@ for x = cmd'
         else
             if continueOnError, retvals(i) = ret;
             else
-                error(errID,'Command returned error %d: "%s"', ret, out{i})
+                error(errID,'Command ''%s'' returned error %d: "%s"', fullcmd, ret, out{i})
             end
         end
     end

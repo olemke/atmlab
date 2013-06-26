@@ -4,13 +4,23 @@
 %
 %    If there is no output argument, a message is printed to the screen.
 %
+%    If there is a single output argument, a string is returned.
+%
+%    If there are three outputs, [major, minor, micro] are returned.
+%
 % FORMAT   s = atmlab_version
 %        
-% OUT   s   Version string
+% OUT (1 output argument mode)
+%
+%   s   Version string
+%
+% OUT (3 output arguments mode)
+%
+%   major, minor, micro   Version numbers 
 
 % 2002-12-09   Created by Patrick Eriksson.
 
-function s = atmlab_version
+function varargout = atmlab_version
 
 % Version information now taken from ChangeLog   
 
@@ -43,10 +53,15 @@ ind = find( s == '-' );
 
 s(ind(2:end)) = '.';
 
-if ~nargout
+if nargout==0
   
   fprintf('This is %s\n',s);
   clear s
 
+elseif nargout == 1
+    varargout{1} = s;
+elseif nargout == 3
+    varargout = cellfun(@str2num, strsplit(s(8:end), '.'), 'UniformOutput', false);
 end
 
+end

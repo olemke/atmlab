@@ -455,7 +455,6 @@ classdef CollocatedDataset < HomemadeDataset
             [additionals, oneday] = optargs(varargin, {{}, false});
             self.verify_addis(additionals);
             additional_results = cell(size(additionals));
-            this_additional_result = cell(size(additionals));
             
             additionals = self.sort_additionals(additionals);
             
@@ -567,7 +566,8 @@ classdef CollocatedDataset < HomemadeDataset
                                 'atmlab:invalid_data', ...
                                 'atmlab:find_granule_by_datetime', ...
                                 'atmlab:exec_system_cmd:shell', ...
-                                'atmlab:rqre_in_range:invalid'}
+                                'atmlab:rqre_in_range:invalid', ...
+                                'atmlab:SatDataset:cannotread'}
                             logtext(eid, 'Error in reading datafile %4d-%02d-%02d %02d:%02d: %s. SKIPPING\n', ...
                                 datecell{:}, ME.message);
                             continue
@@ -649,9 +649,12 @@ classdef CollocatedDataset < HomemadeDataset
                 end
                 %% process core
                 % should return a matrix with info
+                lockfile = get_lock(atmlab('WORK_AREA'), 'collocations.lock');
+
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
                 this_result = self.process(collocations, data1, date1, spec1, data2, secondary_granules(i, :), spec2);
+                clear collocations;
                 old_result = result;
                 result = [result; this_result]; %#ok<AGROW>
                 % correct INDEX
@@ -668,18 +671,33 @@ classdef CollocatedDataset < HomemadeDataset
                 %
                 % Note that in collocate_granule, we always overwrite
                 % everything.
+                
+                % this might be memory-intensive, make sure to get a lock
+                cl1 = onCleanup(@()delete(lockfile));
+                this_additional_result = cell(size(additionals));
+                cc = cell(size(additionals));
                 for j = 1:length(additionals)
                     additional = additionals{j};
                     % Get data that this additional depends upon
-                    depdata = self.fix_dependencies(additional, additionals, this_additional_result);
                     
-                    this_additional_result{j} = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2, depdata);
+                    %depdata = self.fix_dependencies(additional, additionals, this_additional_result);                    
+                    [depdata, depcols] = self.fix_dependencies(additional, additionals, this_additional_result, cc);
+                    [this_additional_result{j}, cc{j}] = additional.process_granule(this_result, data1, date1, spec1, data2, secondary_granules(i, :), spec2, ...
+                        depdata, depcols, 'all');
+                        %depdata);
+                    clear depdata
+                    %clear this_result
                     % use special method to concatenate, sometimes need to
                     % correct values, e.g. FIRST, LAST in case of meandata
                     additional_results{j} = additional.concatenate(old_result, additional_results{j}, this_additional_result{j});
+                    %clear this_additional_result;
                 end
+                clear old_result this_additional_result this_result data2
+                logtext(atmlab('OUT'), 'Clearing lockfile\n');
+                delete(lockfile);
                 logtext(fid, 'Info collected\n');
             end
+            % return: result, additional_results, also
         end
         
         function [result, additional_results, also] = collocate_date(self, date, spec1, spec2, varargin)           
@@ -881,7 +899,7 @@ classdef CollocatedDataset < HomemadeDataset
             fn = self.find_granule_by_datetime(date, spec);
             mainfileexists = exist(fn, 'file');
             addisexist = false(size(additionals));
-            addisvalid = false(size(additionals));
+            addisvalid = true(size(additionals));
             addisread = repmat({{}}, size(additionals));
             addisprocess = repmat({{}}, size(additionals));
             addishas = repmat({{}}, size(additionals));
@@ -898,10 +916,15 @@ classdef CollocatedDataset < HomemadeDataset
                             addisprocess{i} = fieldnames(additionals{i}.members);
                         case 2
                             addisread{i} = {};
-                            addishas{i} = quickly_read_gzipped_netcdf_header(additionals{i}.find_granule_by_datetime(date, spec));
-                            addisprocess{i} = setdiff(...
-                                fieldnames(additionals{i}.members), ...
-                                addishas{i});
+                            [addishas{i}, globattr] = quickly_read_gzipped_netcdf_header(additionals{i}.find_granule_by_datetime(date, spec));
+                            if additionals{i}.redo_all(globattr.software_version)
+                                addisprocess{i} = fieldnames(additionals{i}.members);
+                                addisvalid(i) = false;
+                            else
+                                addisprocess{i} = setdiff(...
+                                    fieldnames(additionals{i}.members), ...
+                                    addishas{i});
+                            end
                         otherwise
                             addisread{i} = 'all';
                             if iscell(additionals{i}.overwrite)
@@ -955,7 +978,17 @@ classdef CollocatedDataset < HomemadeDataset
 %                     logtext(self.log, '%s %s %s Collocations present, regenerate additionals\n', mat2str(date), spec1, spec2);
 %                 end
                 addi = cell(size(additionals));
+                cc = repmat({struct()}, size(additionals));
                 for i = 1:length(additionals)
+                    % step 1: add fields that must be processed
+                    % step 2: read fields needed for later additionals
+                    % step 3: possibly try to fix if broken
+                    if ~isempty(addisprocess{i})
+                        [addi, cc] = self.fill_addi(result, date, spec, spec1, spec2, additionals, i, addi, info_addi, cc, addisprocess, addisvalid);
+                        addisprocess{i} = cell(0, 1);
+                        addisvalid(i) = true;
+                    end
+                    
                     if ~isempty(addisread{i})
                         logtext(atmlab('OUT'), 'Reading additionals for %s %s: %s\n', class(additionals{i}), additionals{i}.name, strjoin(vec2row(addisread{i}), ', '));
                         try
@@ -985,21 +1018,23 @@ classdef CollocatedDataset < HomemadeDataset
                         cc{i} = struct();
                     end
                     
-                    if ~isempty(addisprocess{i}) || ~addisvalid(i)
-                        logtext(atmlab('OUT'), 'Collecting additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
-                        [depdata, depcols] = self.fix_dependencies(additionals{i}, additionals, addi, cc);
-                        
-                        %logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
-                        logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(addisprocess{i}(:)', ', ')); % much quicker and to avoid "Warning: Cannot convert zero-sized vector to row "
-                        [addii, cci] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
-                        additionals{i}.store(date, spec, addii, info_addi, cci);
-                        if isempty(addi{i})
-                            addi{i} = addii;
-                            cc{i} = cci;
-                        else
-                            addi{i} = [addi{i}, addii];
-                            cc{i} = catstruct(cc{i}, structfun(@(X)X+max(cellfun(@(X)X, struct2cell(cc{i}))), cci, 'UniformOutput', false));
-                        end
+                    if ~addisvalid(i)
+                        logtext(atmlab(out), 'Redoing %s %s completely!', class(additionals{i}), additionals{i}.name);
+                        [addi, cc] = self.fill_addi(result, date, spec, spec1, spec2, additionals, i, addi, info_addi, cc, fieldnames(additionals{i}.members), addisvalid);
+%                         logtext(atmlab('OUT'), 'Collecting additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
+%                         [depdata, depcols] = self.fix_dependencies(additionals{i}, additionals, addi, cc);
+%                         
+%                         %logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
+%                         logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(addisprocess{i}(:)', ', ')); % much quicker and to avoid "Warning: Cannot convert zero-sized vector to row "
+%                         [addii, cci] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
+%                         additionals{i}.store(date, spec, addii, info_addi, cci);
+%                         if isempty(addi{i})
+%                             addi{i} = addii;
+%                             cc{i} = cci;
+%                         else
+%                             addi{i} = [addi{i}, addii];
+%                             cc{i} = catstruct(cc{i}, structfun(@(X)X+max(cellfun(@(X)X, struct2cell(cc{i}))), cci, 'UniformOutput', false));
+%                         end
                     end
                 end
 
@@ -1007,6 +1042,16 @@ classdef CollocatedDataset < HomemadeDataset
                 % assumption:
                 % if the main file needs reprocessing, so do all
                 % additionals
+                
+                % therefore, set those 'overwrite' attributes temporarily
+                % to 1
+                clobjs = cell(size(additionals));
+                owst = zeros(size(additionals));
+                for i = 1:length(additionals)
+                    owst(i) = additionals{i}.overwrite;
+                    clobjs{i} = onCleanup(@()setfield(additionals{i}, 'overwrite', owst(i)));
+                    additionals{i}.overwrite = 1;
+                end
                 
 %                 if ~isempty(self.log)
 %                     logtext(self.log, '%s %s %s Generating collocations\n', mat2str(date), spec1, spec2);
@@ -1050,7 +1095,9 @@ classdef CollocatedDataset < HomemadeDataset
                 info_addi.parent_id = attr.id;
                 for i = 1:length(additionals)
                     additionals{i}.store(date, spec, addis{i}, info_addi);
+                    additionals{i}.overwrite = owst(i);
                 end
+
             end
         end
         
@@ -1144,7 +1191,30 @@ classdef CollocatedDataset < HomemadeDataset
                                 par(datevec(datenum(alldates(end, :))+1), 1:3), ...
                                 spec);
                             again.granule_first_line(0, spec, true, true); % force reload
-
+                        case {'atmlab:AssociatedDataset:cannolongerread'}
+                            logtext(atmlab('ERR'), ...
+                                'Oddly, I can no longer read a file I could read in the past.  The full problem is:\n');
+                            if isempty(ME.cause{1}.cause)
+                                rep1 = [];
+                            else
+                                rep1 = ME.cause{1}.cause{1}.getReport();
+                            end
+                            rep2 = ME.cause{1}.getReport();
+                            rep3 = ME.getReport();
+                            if ~isequal(rep1, [])
+                                fprintf(atmlab('ERR'), rep1);
+                            end
+                            fprintf(atmlab('ERR'), rep2);
+                            fprintf(atmlab('ERR'), rep3);
+                            logtext(atmlab('ERR'), ...
+                                'I''ll redo the entire day completely...\n');
+                            ovr = self.overwrite;
+                            clo = onCleanup(@()setfield(self, 'overwrite', ovr));
+                            self.overwrite = true;
+                            self.collocate_and_store_date([year, month, day], spec1, spec2, varargin{:});
+                            i = i + 1;
+                            self.overwrite = ovr;
+                            
                         otherwise
                             ME.rethrow();
                     end
@@ -2064,6 +2134,36 @@ classdef CollocatedDataset < HomemadeDataset
          
     end
     
+    methods (Access = private)
+         function [addi, cc] = fill_addi(self, result, date, spec, spec1, spec2, additionals, i, addi, info_addi, cc, addisprocess, addisvalid)
+            % fill up additional no. i.
+            logtext(atmlab('OUT'), 'Collecting additionals for %s %s\n', class(additionals{i}), additionals{i}.name);
+            [depdata, depcols] = self.fix_dependencies(additionals{i}, additionals, addi, cc);
+            
+            %logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(vec2row(addisprocess{i}), ', '));
+            if isequal(addisprocess, 'all')
+                logtext(atmlab('OUT'), 'Processing all fields\n');
+            else
+                logtext(atmlab('OUT'), 'Fields to process: %s\n', strjoin(addisprocess{i}(:)', ', ')); % much quicker and to avoid "Warning: Cannot convert zero-sized vector to row "
+            end
+            [addii, cci] = additionals{i}.process_delayed(result, spec1, spec2, depdata, cc, addisprocess{i});
+            curstate = additionals{i}.overwrite;
+            if ~addisvalid(i)
+                additionals{i}.overwrite = 1;
+            end
+            additionals{i}.store(date, spec, addii, info_addi, cci);
+            additionals{i}.overwrite = curstate; %#ok<NASGU> M-Lint is simply wrong here.
+            if isempty(addi{i})
+                addi{i} = addii;
+                cc{i} = cci;
+            else
+                addi{i} = [addi{i}, addii];
+                cc{i} = catstruct(cc{i}, structfun(@(X)X+max(cellfun(@(X)X, struct2cell(cc{i}))), cci, 'UniformOutput', false));
+            end
+            
+         end
+    end
+   
     methods (Static, Access = private)
         function sorted = sort_additionals(additionals)
             % sort additionals per dependencies
@@ -2206,5 +2306,6 @@ classdef CollocatedDataset < HomemadeDataset
                 end
             end
         end
+        
     end
 end

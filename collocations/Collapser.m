@@ -306,6 +306,13 @@ classdef Collapser < AssociatedDataset
             
         end
         
+        %% overload parent methods
+        
+        function [M, M_cols] = merge_matrix(self, M_core, cols_core, M_self, cols_self)
+            M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
+            M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
+        end
+        
     end
     
     methods (Access = {?SatDataset})
@@ -446,7 +453,11 @@ classdef Collapser < AssociatedDataset
                 end
             end
             
-            if self.vectorised
+            n_orig = size(processed_core, 1);
+            if isempty(processed_core)
+                logtext(atmlab('OUT'), 'core seems empty, nothing to do!\n');
+                M = zeros(0, nfields);
+            elseif self.vectorised
                 
                 % start with the easy bit
                                     
@@ -460,6 +471,11 @@ classdef Collapser < AssociatedDataset
                 % corresponds to the largest occurding no. of secondaries in a
                 % primary, so most columns will have lots of data flagged
                 max_no_prim_in_sec = max(firsts(2:end)-firsts(1:end-1));
+                
+                logtext(atmlab('OUT'), ...
+                    ['%s %s Commencing vectorised collapsing. ' ...
+                     ' %d primaries with up to %d secondaries per primary.\n'], ...
+                     class(self), self.name, length(uniques), max_no_prim_in_sec);
                 % use a signed int for rarr; double is too large, single too
                 % imprecise, but I need negatives for flagged data
                 % NB: rarr stands for Re-ARRanged
@@ -573,6 +589,7 @@ classdef Collapser < AssociatedDataset
                 % instances where the overall global limitators prevented
                 % data
                 M(all(all(~overall_global_lim, 1), 3), :) = []; 
+                self.cols = localcols;
             else
                 %% proceed the old, slow way (OK for small data amounts)
                 
@@ -702,18 +719,14 @@ classdef Collapser < AssociatedDataset
                 rest = all(M==flag_globlimfailed, 2);
                 % FIXME: what to do with the other flags?
                 M(rest, :) = [];
-                logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
-                    size(processed_core, 1), size(M, 1));
                 %%%
             end
+            logtext(atmlab('OUT'), '%d collocations -> %d collapsed and valid collocations\n', ...
+                n_orig, size(M, 1));
+
         end
         
         %% overload parent methods
-        
-        function [M, M_cols] = merge_matrix(self, M_core, cols_core, M_self, cols_self)
-            M = [M_core(M_self(:, cols_self.FIRST), :) M_self];
-            M_cols = self.merge_new_cols(M_core, cols_core, cols_self);
-        end
         
         function S = merge_struct(varargin)
             error(['atmlab:' mfilename ':notimplemented'], ...
@@ -831,6 +844,34 @@ classdef Collapser < AssociatedDataset
             end
         end
         
+    end
+    
+    methods (Static, Access = {?SatDataset})
+                
+        function do = redo_all(software_version)
+            % redo_all(software_version)
+            %
+            % overload and return true if some changes require that a
+            % dataset must be overwritten (overwrite=1) even if requested
+            % to be appended (overwrite=2)
+            vers = cellfun(@str2num, strsplit(software_version(8:end), '.'));
+            if length(vers) < 3 % shouldn't happen but redo
+                do = true;
+                return
+            end
+            major = vers(1);
+            minor = vers(2);
+            micro = vers(3);
+            if (major < 2) || ...
+                    (major == 2 && minor < 1) || ...
+                    (major == 2 && minor == 1 && micro < 337)
+                logtext(atmlab('OUT'), ...
+                    'Found pre-fix collapsed granule, overwriting completely\n');
+                do = true;
+            else
+                do = false;
+            end
+        end
     end
     
 end

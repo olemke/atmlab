@@ -113,6 +113,10 @@ D.modis_aqua_L2.basedir = '/storage3/data/modis/MYD06_L2/';
 D.modis_aqua_L2.subdir = '$YEAR4/$MONTH/$DAY';
 D.modis_aqua_L2.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})\.(?<version>\d{3})';
 
+D.modis_L3.basedir = '/storage3/data/modis/$SAT08_M3';
+D.modis_L3.subdir = '$YEAR4';
+D.modis_L3.re = '(?<satname>[A-Z]{3})08_M3.A(?<year>\d{4})(?<doy>\d{3})\.(?<version>\d{3})';
+
 D.mspps.basedir = '/storage3/data/mspps/';
 D.mspps.subdir = '$SAT_orbital_$YEAR4/$MONTH/$DAY';
 D.mspps.re = '(?<satname>[a-z0-9]{6})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})';

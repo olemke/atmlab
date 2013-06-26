@@ -21,6 +21,8 @@ classdef CachedData < handle
     %   set_entry -     Set new entry and, if needed, remove old
     %   clear -         Completely clear the cache
     %   cachesize -     Get current cache-size in bytes
+    %   evaluate -      Evaluate expression and cache result, or read
+    %                   result from cache
     
     % $Id$
     properties

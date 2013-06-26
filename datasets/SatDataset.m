@@ -97,7 +97,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     % $Id$
     
     % read/write props
-    properties (Transient)
+    properties
         % Name of the dataset (pseudo-required).
         %
         % If not given, a name will be automatically calculated. This name
@@ -277,6 +277,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         %
         % Note: Users choosing pseudo-field names equal to fields in the
         % actual data will be sentenced to the Usenet Death Penalty.
+        %
+        % See also: SatDataset/reader_processor
         pseudo_fields = struct();
         
         % Granule duration in seconds (required)
@@ -371,7 +373,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     % read-only props (alterable with methods)
-    properties (Transient, SetAccess = protected)
+    properties (SetAccess = protected)
         % list of CollocatedDatasets using this SatDataset (read-only)
         %
         % This property, which is read-only and automatically filled,
@@ -386,7 +388,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
     end
     
     % flags
-    properties (Transient, Constant, GetAccess = protected)
+    properties (Constant, GetAccess = protected)
         FL_INITIAL = -5;
         FL_NOTFOUND = -2;
         FL_ALLDUPL = typecast(int32(-1), 'uint32');
@@ -482,7 +484,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             spec = optargs(varargin, {''});
             errid = ['atmlab:' mfilename]; %find_datadir_by_date';
             
-            assert(any(self.basedir), errid, 'No basedir initialised for %s', char(self.name));
+            assert(any(self.basedir), errid, 'No basedir initialised for %s %s', class(self), char(self.name));
             assert(exist(self.basedir, 'dir')~=0, errid, ...
                 ['Configured data directory for %s is %s, ' ...
                 'but this does not exist or is not a directory. ' ...
@@ -492,7 +494,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             fulldir = fullfile(self.basedir, self.subdir);
             
-            fulldir = strrep_variables(fulldir, spec, date);
+            fulldir = self.repvars(fulldir, date, spec);
    
         end
         
@@ -567,7 +569,6 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             [spec, with_yesterday] = optargs(varargin, {'', true});
             
             datadir = self.find_datadir_by_date(date, spec);
-            yearstr = num2str(date(1), '%04d'); % for comparing easily with 2digit years
             
             if self.tryre && ~isequaln(self.re, nan) && ~isempty(self.re)
                 matchy = self.re;
@@ -575,7 +576,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 matchy = self.filename; % exact match only
             end
             
-            matchy = strrep_variables(matchy, spec, date);
+            matchy = self.repvars(matchy, date, spec);
             
             files = dir(datadir);
             nfiles = length(files);
@@ -586,13 +587,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 nam = self.find_info_from_granule(fname);
                 if ~isempty(nam)
                     % if present, year/month/day should be the same
-                    if (isfield(nam, 'year02') && ~isempty(nam.year02) && ~strcmp(nam.year02, yearstr(3:4))) || ...
-                            (isfield(nam, 'year04') && ~isempty(nam.year04) && str2double(nam.year04)~=date(1)) || ...
-                            (isfield(nam, 'year') && ~isempty(nam.year) && str2double(nam.year)~=date(1)) || ...
-                            (isfield(nam, 'month') && ~isempty(nam.month) && str2double(nam.month)~=date(2)) || ...
-                            (isfield(nam, 'day') && ~isempty(nam.day) && str2double(nam.day)~=date(3)) || ...
-                            (isfield(nam, 'doy') && ~isempty(nam.doy) && str2double(nam.doy)~=dayofyear(date(1), date(2), date(3)) || ...
-                            (isfield(nam, 'satname') && ~isempty(nam.satname) && ~isequal(nam.satname, spec)));
+                    if ~self.infofit(nam, date, spec)
                         continue;
                     end
                     
@@ -681,10 +676,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % 2. if possible, calculate the filename directly
             % 3. otherwise, list all files and match with regexp+tolerance
             
+            datevec(end+1:5) = 0;
+            
             fulldir = self.find_datadir_by_date(datevec, spec);
             
             if (nargin() <= 3 && ~isequaln(self.filename, nan) && ~isempty(self.filename)) || ~self.tryre % calculate directly
-                fn = strrep_variables(self.filename, spec, datevec);
+                fn = self.repvars(self.filename, datevec, spec);
                 datafile = fullfile(fulldir, fn);
             else % will search through all granules with find_granules_by_date
                 [granules, paths] = self.find_granules_by_date(datevec, spec, false);
@@ -898,7 +895,14 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                             ME.rethrow();
                     end
                 else
-                    ME.rethrow();
+                    % deciding to create a new exception, so that readers
+                    % further down than catch all
+                    ME2 = MException('atmlab:SatDataset:cannotread', ...
+                        ['Failure while %s %s was reading %s.  Original error had ' ...
+                         'id ''%s'', message ''%s''.  See ''cause'' for details.'], ...
+                         class(self), self.name, datafile, ME.identifier, ME.message);
+                    ME2 = ME2.addCause(ME);
+                    ME2.throw();
                 end
             end
             
@@ -1348,17 +1352,18 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % might add a conditional here?
         end
 
-        function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, varargin)
+        function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, gridsize, varargin)
             % Calculate level3 (gridded mean) for period
             %
             % NOTE: this is a work in progress, a quite quick piece of code
             % not ready for production use. Feel free to read the source code
             % and improve!
             %
-            % - data1
-            % - data2
+            % - date1
+            % - date2
             % - spec
             % - fields
+            % - gridsize
             % - (optional) limiters
             % - (optional) struct with options to binning_fast
             %
@@ -1369,6 +1374,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % FIXME DOC
             
             [limiters, data] = optargs(varargin, {{}, struct()});
+            data.gridsize = gridsize;
             allgrans = self.find_granules_for_period(date1, date2, spec);
             allstats = {};
             i = 0;
@@ -1412,7 +1418,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
 %                 C = cellfun(@(f) double(grandata.(f)), fields, 'UniformOutput', false);
 %                 data.data = horzcat(C{:});
                 logtext(atmlab('OUT'), 'Binning\n');
-                [binned, lat, lon] = binning_fast(data);
+                %[binned, lat, lon] = binning_fast(data);
+                indces = bin_nd({data.lat, data.lon}, {-90:1:90, -180:1:180});
+                binned = cellfun(@(ii) data.data(ii), indces, 'UniformOutput', false);
                 stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limiters);
                 logtext(atmlab('OUT'), 'Calculating statistics\n');
                 stats.statistic1 = cell2mat(stats.statistic1);
@@ -1530,6 +1538,84 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             ds.collocated_datasets = [ds.collocated_datasets cd];
         end
         
+        function s_out = repvars(self, s, datevec, spec)
+            % repvars Replace 'magic' variables
+            %
+            % Replace the 'magic' variables:
+            %
+            % $YEAR4
+            % $YEAR2
+            % $MONTH
+            % $DAY
+            % $DOY
+            % $SAT  or  $SAT1 and $SAT2
+            % $HOUR
+            % $MINUTE
+            %
+            % For more replacements, overload this function.
+            %
+            % FORMAT
+            %
+            %   s_out = self.repvars(s, datevec, satname)
+            %
+            % IN
+            %
+            %   s       string  where magic is replaced
+            %   datevec vector  date-vector [year month day]
+            %   spec    string/ name of satellite/satellites
+            %           cellstr
+            %
+            % OUT
+            %
+            %   s_out   string  with magic replaced
+            
+            year = num2str(datevec(1), '%04d');
+            month = num2str(datevec(2), '%02d');
+            day = num2str(datevec(3), '%02d');
+            if length(datevec)>3
+                hour = num2str(datevec(4), '%02d');
+                minute = num2str(datevec(5), '%02d');
+            else
+                hour = '0';
+                minute = '0';
+            end
+            year02 = year(3:4);
+            doy = num2str(round(dayofyear(datevec(1), datevec(2), datevec(3))), '%03d');
+            
+            to_replace = {'$YEAR4', year, '$MONTH', month, '$DAY', day, ...
+                '$YEAR2', year02, '$DOY', doy, '$HOUR', hour, '$MINUTE', minute};
+            
+            if iscellstr(spec)
+                to_replace = [to_replace {'$SAT1', spec{1}, '$SAT2', spec{2}}];
+            else
+                if strfind(s, '$SAT1')
+                    warning('atmlab:strrep_variables', ...
+                        ['replacing $SAT, but having $SAT1; are you sure you don''t ' ...
+                        'want to pass TWO satellites?']);
+                end
+                to_replace = [to_replace {'$SAT', spec}];
+            end
+            
+            s_out = strrep_multi(s, to_replace{:});
+            
+        end
+        
+        function matches = infofit(self, is, datevec, spec)
+            yearstr = num2str(datevec(1), '%04d'); % for comparing easily with 2digit years
+            
+            if (isfield(is, 'year02') && ~isempty(is.year02) && ~strcmp(is.year02, yearstr(3:4))) || ...
+                    (isfield(is, 'year04') && ~isempty(is.year04) && str2double(is.year04)~=datevec(1)) || ...
+                    (isfield(is, 'year') && ~isempty(is.year) && str2double(is.year)~=datevec(1)) || ...
+                    (isfield(is, 'month') && ~isempty(is.month) && str2double(is.month)~=datevec(2)) || ...
+                    (isfield(is, 'day') && ~isempty(is.day) && str2double(is.day)~=datevec(3)) || ...
+                    (isfield(is, 'doy') && ~isempty(is.doy) && str2double(is.doy)~=dayofyear(datevec(1), datevec(2), datevec(3)) || ...
+                    (isfield(is, 'satname') && ~isempty(is.satname) && ~isequal(is.satname, spec)));
+                matches = false;
+            else
+                matches = true;
+            end
+        end
+
     end
     
     methods (Access = private)
