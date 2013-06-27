@@ -1,14 +1,16 @@
 % QARTS_ZEEMAN_DEMO   A demonstration of including Zeeman in Qarts
 %
-%    ....
+%    Calculates a limb sounding spectrum at 118.75 GHz, with and without
+%    activating the Zeeman part.
 %
-% FORMAT   [Q,f,y] = qarts_zeeman_demo( [ ztan ] )
+% FORMAT   [f,y0,y] = qarts_zeeman_demo( [ ztan ] )
 %        
 % OUT   f          Frequency grid
 %       y0         Calculated spectrum without activating Zeeman.
+%       y          Calculated spectrum with Zeeman.
 % OPT   ztan       Tangent altitude. Default is 95 km.
 
-% 2013-06-20   ...
+% 2013-06-27   Created by Patrick Eriksson.
 
 
 function [f,y0,y] = qarts_zeeman_demo( varargin )
@@ -136,9 +138,9 @@ testdatafolder = fullfile( fileparts(atmlab('ARTS_INCLUDES')), 'testdata' );
 magdatafolder  = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
                                                           'Earth', 'IGRF' );
 
-%Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
+Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
 %
-%Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
+Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
 %
 Q.WSMS_AT_START{end+1} = [ 'ReadXML( isotopologue_quantum, "', ...
                           fullfile(testdatafolder,'isoquantum.xml'), '")' ];

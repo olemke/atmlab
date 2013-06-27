@@ -1,3 +1,10 @@
+2013-06-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-388
+
+	* demos/qarts_zeeman_demo.m: Zeeman calcualtions now activated.
+	Finished header info.
+
 2013-06-26  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-387
@@ -247,7 +254,7 @@
 
 	- No longer hardcode version here, this is now in HomemadeDataset.
 
-	* datasets/define_datasets.m: 
+	* datasets/define_datasets.m:
 
 	- Added modis_L3 (no reader yet)
 
