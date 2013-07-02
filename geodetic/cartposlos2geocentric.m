@@ -63,12 +63,15 @@ else
   za = rad2deg * asin( ppc ./ r );
 end
 
+aa = zeros(size(za));
+
+% FIXME: surely at least some (if not all) cases here can be vectorised
 
 for i = 1 : length(za)
 
   % Fixes for za with optional input
   if nargin > 6
-    if za0(i) < 1e-6  |  za0(i) > 180-1e-6    % Nadir or zenith
+    if za0(i) < 1e-6  ||  za0(i) > 180-1e-6    % Nadir or zenith
       za(i) = za0(i);
     elseif isnan(za(i))
       za(i) = 90;
@@ -80,7 +83,7 @@ for i = 1 : length(za)
   % Azimuth angle:
     
   % Take original value if N-S
-  if nargin > 6  &  ( abs(aa0(i)) < 1e-6  |  abs(aa0(i)-180) < 1e-6 )
+  if nargin > 6  &&  ( abs(aa0(i)) < 1e-6  ||  abs(aa0(i)-180) < 1e-6 )
     % Check that not lon changed with 180 deg
     if lon(i) == lon0(i)
       aa(i) = aa0(i);
@@ -93,7 +96,7 @@ for i = 1 : length(za)
     end
   
   % Set to zero for nadir and zenith
-  elseif za(i) < 1e-6  |  za(i) > 180-1e-6 
+  elseif za(i) < 1e-6  ||  za(i) > 180-1e-6 
     aa(i) = 0;
     
   
@@ -108,16 +111,18 @@ for i = 1 : length(za)
     dlat  = -sinlat(i)*coslon(i)/r(i)*dx(i) + coslat(i)/r(i)*dz(i) - ...
              sinlat(i)*sinlon(i)/r(i)*dy(i);
     dlon  = -sinlon(i)/coslat(i)/r(i)*dx(i) + coslon(i)/coslat(i)/r(i)*dy(i);
-    aa(i) = rad2deg * acos( r(i) * dlat(i) / sin( deg2rad * za(i) ) );
+    aa(i) = rad2deg * acos( r(i) * dlat / sin( deg2rad * za(i) ) );
     %
-    if isnan( aa(i) ) |  ~isreal( aa(i) )
+    if isnan( aa(i) ) ||  ~isreal( aa(i) )
       if dlat >= 0
         aa(i) = 0;
       else
         aa(i) = 180;
       end
-    elseif dlon(i) < 0
+    elseif dlon < 0
       aa(i) = -aa(i);
     end
   end
+end
+
 end

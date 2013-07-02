@@ -1131,6 +1131,8 @@ fields.amsua.A_TIME.atts.long_name = 'AMSU-A measurement time';
 fields.amsua.A_TIME.atts.units = 'seconds since 1970-01-01 00:00:00';
 fields.amsua.A_LZA = lza;
 fields.amsua.A_LAA = laa;
+fields.amsua.A_SAA = saa;
+fields.amsua.A_SZA = sza;
 fields.amsua.A_BT.type = 'float';
 fields.amsua.A_BT.realname = 'tb';
 fields.amsua.A_BT.dims = {'AMSUA_CHANS', 15};
@@ -1145,6 +1147,11 @@ fields.amsua.A_POS.type = 'byte';
 fields.amsua.A_POS.realname = 'scanline_position';
 fields.amsua.A_POS.atts.long_name = 'AMSU-A scanline position';
 fields.amsua.A_POS.atts.valid_range = [1 30];
+fields.amsua.A_ELEV.type = 'int';
+fields.amsua.A_ELEV.realname = 'elev';
+fields.amsua.A_ELEV.atts.long_name = 'AMSU-A satellite elevation';
+fields.amsua.A_ELEV.atts.units = 'km';
+fields.amsua.A_ELEV.atts.valid_min = 0;
 
 %% AMSU-B
 fields.amsub.B_LZA = lza;

@@ -104,6 +104,7 @@ data.lza = record(rec_format.lza, :) * .01;
 data.laa = record(rec_format.laa, :) * .01;
 data.sza = record(rec_format.sza, :) * .01;
 data.saa = record(rec_format.saa, :) * .01;
+data.elev = record(rec_format.elev, :) * .1;
 data.tb = reshape( record( rec_format.tb', : ) * .01, nfovs, nchan, nlines_read );
 
-return
+end

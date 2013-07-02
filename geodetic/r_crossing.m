@@ -48,9 +48,9 @@ if ( r0 >= r  &  za0 <= 90 )  |  r0*sind(za0) > r
 
 else
 
-  p  = x*dx + y*dy + z*dz;
-  pp = p * p;
-  q  = x*x + y*y + z*z - r*r;
+  p  = x.*dx + y.*dy + z.*dz;
+  pp = p .* p;
+  q  = x.*x + y.*y + z.*z - r.*r;
   sq = sqrt( pp - q );
   l1 = -p + sq;
   l2 = -p - sq;
@@ -61,20 +61,19 @@ else
   % If r0 equals r solutions just above zero can appear (that
   % shall be rejected). So we pick the biggest solution if lmin is
   % negative or just above zero. 
-  if( lmin < 1e-6 )
-    l = lmax;
-  else
-    l = lmin;
-  end
-  assert( l > 0 );  
+  l = zeros(size(lmax));
+  l(lmin < 1e-6) = lmax(lmin < 1e-6);
+  l(lmin >= 1e-6) = lmin(lmin >= 1e-6);
+  assert(all(l > 0));  
  
   if nargout <= 3
     RAD2DEG = constants( 'RAD2DEG' );
-    lat     = RAD2DEG * asin( ( z+dz*l ) / r );
-    lon     = RAD2DEG * atan2( y+dy*l, x+dx*l );
+    lat     = RAD2DEG .* asin( ( z+dz.*l ) ./ r );
+    lon     = RAD2DEG .* atan2( y+dy.*l, x+dx.*l );
   else
-    [r2,lat,lon,za,aa] = cartposlos2geocentric(x+l*dx,y+l*dy,z+l*dz,dx,dy,dz);
-    assert( abs(r2-r) < 1e-6 );
+    [r2,lat,lon,za,aa] = cartposlos2geocentric(x+l.*dx,y+l.*dy,z+l.*dz,dx,dy,dz);
+    assert( all(abs(r2-r) < 1e-6) );
   end
 
 end   
+end

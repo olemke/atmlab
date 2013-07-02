@@ -312,31 +312,10 @@ classdef FieldCopier < AssociatedDataset
                     catch ME
                         switch ME.identifier
                             case {'atmlab:find_granule_by_datetime', 'atmlab:exec_system_cmd:shell', 'MATLAB:imagesci:validate:fileOpen'}
-%                                 logtext(atmlab('ERR'), ...
-%                                     'I tried to collect fields from dataset %s, but failed: %s\n', ...
-%                                     dsnm, ME.message);
                                 warning(['atmlab:' mfilename ':nosibling'], ...
                                     'I tried to collect fields from dataset %s, but failed: %s\n', ...
                                     dsnm, ME.message);
                                 dat_other{j}.(dsnm) = 'failed';    
-                                % HORRIBLE workaround in place
-%                                 if ~isempty(regexp(ME.message,'No datafile found for cprCldclass','once'))
-                                    % I will find the dimensions of a samesized variable and set Cloud_Types to 127 (int8).
-                                    %I can't have the code crash because
-                                    %data from the sibling dataset is
-                                    %missing. Use D.cpr Latitude to get the
-                                    %dimensions
-%                                     logtext(2,['See commented out workaround ' ...
-%                                                'below in FieldCopier\n'])
-                                    % logtext(atmlab('ERR'), ...
-                                    %     'Horrible workaround in place for ''Cloud_types'' because of missing file in sibling dataset\n')
-                                    % logtext(atmlab('ERR'), ...
-                                    %     'Getting dimesions for ''Cloud_Types'' (sibling) from ''lat'' in 2B-CWC-RO (big brother) instead\n')                                    
-                                    % dat_other{j}.(dsnm) = D.cpr.read_granule(dt, spc, {}, false, false);
-                                    % dat_other{j}.(dsnm).Cloud_Types = 127*ones(size(dat_other{j}.(dsnm).lat)); % flag value of 127
-%                                 end
-                                
-%                                 continue
                             otherwise
                                 ME.rethrow();
                         end
@@ -345,22 +324,27 @@ classdef FieldCopier < AssociatedDataset
                     % need it later
                     if isfield(dat_other{j}.(dsnm), 'lat')
                         % verify that no different reflat already there
-                        if ~isempty(reflat{j}) && ~isequaln(reflat{j}, dat_other{j}.(dsnm).lat)
-                            error(['atmlab:' mfilename ':reflat'], ...
+                        if ~isempty(reflat{j}) && nanmax(abs(reflat{j} - dat_other{j}.(dsnm).lat)) > 0.01
+                            logtext(atmlab('ERR'), ...
                                 ['Inconsistent latitude-fields between ' ...
-                                 'sibling-datasets!']);
+                                 'sibling-datasets!  Up to %f different...\n'], ...
+                                nanmax(abs(reflat{j} - dat_other{j}.(dsnm).lat)));
+                            dat_other{j}.(dsnm) = 'failed';
+                        else
+                            reflat{j} = dat_other{j}.(dsnm).lat;
                         end
-                        reflat{j} = dat_other{j}.(dsnm).lat;
                     end
                 end % loop through all siblings to read for prim or sec
                 
                 if isfield(dat, 'lat')
-                    if ~isempty(reflat{j}) && ~isequaln(reflat{j}, dat.lat)
-                        error(['atmlab:' mfilename ':reflat'], ...
+                    if ~isempty(reflat{j}) && nanmax(abs(reflat{j} - dat.lat)) > 0.01
+                        logtext(atmlab('ERR'), ...
                             ['Inconsistent latitude-fields in core vs. ' ...
-                             'sibling-dataset!']);
+                             'sibling-dataset!\n']);
+                        dat_other{j}.(dsnm) = 'failed';
+                    else
+                        reflat{j} = dat.lat;
                     end
-                    reflat{j} = dat.lat;
                 end
             end % loop through primary, secondary
             

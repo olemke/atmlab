@@ -686,6 +686,9 @@ classdef CollocatedDataset < HomemadeDataset
                         depdata, depcols, 'all');
                         %depdata);
                     clear depdata
+                    % since we use 'all', we can safely set
+                    % additional.cols
+                    additional.cols = cc{j};
                     %clear this_result
                     % use special method to concatenate, sometimes need to
                     % correct values, e.g. FIRST, LAST in case of meandata
@@ -898,6 +901,25 @@ classdef CollocatedDataset < HomemadeDataset
             
             fn = self.find_granule_by_datetime(date, spec);
             mainfileexists = exist(fn, 'file');
+            if ~mainfileexists || self.overwrite == 1
+                % assumption:
+                % if the main file needs reprocessing, so do all
+                % additionals
+                
+                do_all_main = true;
+                % therefore, set those 'overwrite' attributes temporarily
+                % to 1
+                clobjs = cell(size(additionals));
+                owst = zeros(size(additionals));
+                for i = 1:length(additionals)
+                    owst(i) = additionals{i}.overwrite;
+                    clobjs{i} = onCleanup(@()setfield(additionals{i}, 'overwrite', owst(i)));
+                    additionals{i}.overwrite = 1;
+                end
+            else
+                do_all_main = false;
+            end
+
             addisexist = false(size(additionals));
             addisvalid = true(size(additionals));
             addisread = repmat({{}}, size(additionals));
@@ -1039,19 +1061,7 @@ classdef CollocatedDataset < HomemadeDataset
                 end
 
             else
-                % assumption:
-                % if the main file needs reprocessing, so do all
-                % additionals
-                
-                % therefore, set those 'overwrite' attributes temporarily
-                % to 1
-                clobjs = cell(size(additionals));
-                owst = zeros(size(additionals));
-                for i = 1:length(additionals)
-                    owst(i) = additionals{i}.overwrite;
-                    clobjs{i} = onCleanup(@()setfield(additionals{i}, 'overwrite', owst(i)));
-                    additionals{i}.overwrite = 1;
-                end
+                % So, we redo everything then
                 
 %                 if ~isempty(self.log)
 %                     logtext(self.log, '%s %s %s Generating collocations\n', mat2str(date), spec1, spec2);
@@ -1093,11 +1103,14 @@ classdef CollocatedDataset < HomemadeDataset
 %                         logtext(self.log, '%s Generating additionals\n', mat2str(date));
 %                 end
                 info_addi.parent_id = attr.id;
-                for i = 1:length(additionals)
-                    additionals{i}.store(date, spec, addis{i}, info_addi);
-                    additionals{i}.overwrite = owst(i);
-                end
 
+                if do_all_main
+                    for i = 1:length(additionals)
+                        additionals{i}.store(date, spec, addis{i}, info_addi);
+                        additionals{i}.overwrite = owst(i);
+                    end
+
+                end
             end
         end
         

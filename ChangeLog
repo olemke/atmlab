@@ -1,3 +1,55 @@
+2013-07-02  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-389
+
+	* geodetic/r_crossing.m:
+
+	- Vectorised
+
+	* geodetic/cartposlos2geocentric.m:
+
+	- Pre-allocate vector.  It should be vectorisable but for now this
+	factor-20 speedup is sufficient for me
+
+	* geodetic/geocentricposlos2cart.m:
+
+	- Save memory by clearing variables as soon as they're no longer
+	needed.
+
+	* collocations/FieldCopier.m(process_granule):
+
+	- Cleanup some old, commented out workaround no longer needed
+
+	- There are some cases where sibling datasets, all from CloudSat, have
+	numerically inequal but still very close latitude fields.  Allow some
+	margin in lat-differences before complaining latitude-fields are
+	inconsistent.
+
+	* collocations/Collapser.m(process_granule):
+
+	- Bugfix if no. of uniques is very small in vectorised case (use
+	size(...) instead of length(...))
+
+	* collocations/CollocatedDataset.m:
+
+	(collocate_granule):
+
+	- Bugfix, properly set cols structure
+
+	(collocate_and_store_date):
+
+	- Fix the logic in the circumstances under which to redo all because
+	the main is redone.
+
+	* sensors/atovs/atovs_read_data.m,
+	datasets/+satreaders/poes_radiometer.m:
+
+	- Also read satellite elevation
+
+	* datasets/define_datasets.m:
+
+	- Added saa, sza, and satellite elevation, for amsua.
+
 2013-06-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-388

@@ -573,7 +573,7 @@ classdef Collapser < AssociatedDataset
                         end
 
                         capsed = proccers{k}{pi}(M_source);
-                        expsize = [length(uniques), length(localcols.(procfname))];
+                        expsize = [size(uniques, 1), length(localcols.(procfname))];
                         if ~isequal(size(capsed), expsize)
                             error(['atmlab:' mfilename ':wrongsize'], ...
                                 ['This is %s %s speaking.  I was processing vectorised ' ...

@@ -32,6 +32,7 @@ rec_format.lza = 86 + 4 * (0:nfovs-1);
 rec_format.laa = 87 + 4 * (0:nfovs-1);
 rec_format.sza = 88 + 4 * (0:nfovs-1);
 rec_format.saa = 89 + 4 * (0:nfovs-1);
+rec_format.elev = 206;
 
 for ichan = 1 : nchan
   rec_format.tb( ichan, : ) = 193 + ichan + nchan * (1:nfovs);
