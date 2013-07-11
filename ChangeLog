@@ -1,3 +1,23 @@
+2013-07-11  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-390
+
+	* geoplots/gmt/gmt_plot.m, geoplots/gmt/gmt_inputs.m:
+
+	- Changed behaviour for in.savelegend in order to behave as specified
+	by the documentation.  Documentation said, "If you want to have a
+	separate pdf for the legend".  Behaviour was to store only the legend,
+	i.e. the actual map was lost!  New behaviour is to store both.
+	Additionally, the old behaviour was to still have the legend in BOTH
+	the file containing the map AND in a separate file.  Now one can set
+	in.savelegend==2 to make sure that, if you store the legend to a
+	separate file, it will not also be stored to the file containing the
+	map.  I'm not sure why would anyone would want that, but if one does,
+	in.savelegend==1 still does that.
+
+	- Changed hardcoded name for legend from 'legend' to [in.filename
+	'_legend'].
+
 2013-07-02  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-389

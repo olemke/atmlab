@@ -369,7 +369,15 @@ function filename = gmt_plot(in,field)
 %                           psscale GMT command for the extra legend directly.
 %                     ------------
 % in.savelegend     in:     %f
-%                   ex:     If you want to have a separate pdf for the legend
+%                   ex:     Controls separate PDF for the legend.  If value
+%                           is 0, only 1 file will be generated containing
+%                           map+legend.  If value is 1, one file will be
+%                           generated for map+legend and one file for
+%                           legend only.  If value is 2, one file will be
+%                           generated containing ONLY the map, and one
+%                           containing ONLY the legend.  The legend will be
+%                           stored in [in.filename '_legend.' extension] in
+%                           the output directory.
 %                   def:    false
 %                     ------------
 % in.legend         in:     %f
@@ -1212,6 +1220,30 @@ end
 function filename = sort_figures(in,command)
 %% SORT FIGURES
 
+
+%'eps','pdf','BMP','jpg','PNG','PPM','TIFF', ot 'tif'
+switch lower(in.figuretype)
+    case 'pdf'
+        T = '-Tf';
+    case 'bmp'
+        T = '-Tb -Qg -Qt';
+    case 'eps'
+        T = '-Te';
+    case 'jpg'
+        T = '-Tj -Qg -Qt';
+    case 'png'
+        T = '-Tg -Qg -Qt'; %-Q is for no antialiaing 'g'raphics and 't'ext
+    case 'tif'
+        T = '-Tt -Qg -Qt';
+    case 'ppm' % is not recommended
+        T = '-Tm -Qg -Qt';
+    otherwise
+        error(['gmtlab:' mfilename ':FigureType'],...
+            '%s: not supported',in.figuretype)
+end
+command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
+command{end+1} = sprintf('mv %s.%s %s',in.filename,in.figuretype,in.outdir);
+
 if in.savelegend
     % MAKE a separate file for the legend
     findPsScale = ~cellfun('isempty',regexp(command,'psscale'));
@@ -1224,33 +1256,12 @@ if in.savelegend
         
         return
     end
-    in.filename = makelegendpdf(command(findPsScale));
-    command{end+1} = sprintf('mv %s.%s %s',in.filename,in.figuretype,in.outdir);
-else
-    %'eps','pdf','BMP','jpg','PNG','PPM','TIFF', ot 'tif'
-    switch lower(in.figuretype)
-        case 'pdf'
-            T = '-Tf';
-        case 'bmp'
-            T = '-Tb -Qg -Qt';
-        case 'eps'
-            T = '-Te';
-        case 'jpg'
-            T = '-Tj -Qg -Qt';
-        case 'png'
-            T = '-Tg -Qg -Qt'; %-Q is for no antialiaing 'g'raphics and 't'ext
-        case 'tif'
-            T = '-Tt -Qg -Qt';
-        case 'ppm' % is not recommended
-            T = '-Tm -Qg -Qt';
-        otherwise
-            error(['gmtlab:' mfilename ':FigureType'],...
-                '%s: not supported',in.figuretype)
+    in.filename_legend = makelegendpdf(in.filename, command(findPsScale));
+    if in.savelegend==2 % store legend ONLY in external file
+        command = command(~findPsScale);
     end
-    command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
-    command{end+1} = sprintf('mv %s.%s %s',in.filename,in.figuretype,in.outdir);
+    command{end+1} = sprintf('mv %s.%s %s',in.filename_legend,in.figuretype,in.outdir);
 end
-
 
 % Assemble open command
 openwith = NaN;
@@ -1294,12 +1305,12 @@ fprintf('GMT plot stored at:  %s\n',filename)
 
 end
 
-function file = makelegendpdf(command)
+function file = makelegendpdf(basename, command)
 %% Make a separate pdf for the legend
 % Only allowed to have 1 or 2 psscale commands in the commad list. the first one
 % is the regular legend. The second is for the nan legend (if it exists)
 
-file ='legend';
+file = [basename '_legend'];
 
 %make sure it's not here
 exec_system_cmd(sprintf('rm -f %s.ps',file),gmtlab('verbosity'));
