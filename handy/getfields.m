@@ -14,8 +14,14 @@ function S = getfields(S, varargin)
 
 % $Id$
 
-S = cell2struct(cellfun(@(field) S.(field), varargin, 'UniformOutput', false), ...
-                varargin, ...
+if iscell(varargin{1})
+    fields = varargin{1};
+else
+    fields = varargin;
+end
+
+S = cell2struct(cellfun(@(field) S.(field), vec2row(fields), 'UniformOutput', false), ...
+                vec2row(fields), ...
                 2);
 
 end

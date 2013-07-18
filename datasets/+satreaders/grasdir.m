@@ -37,6 +37,13 @@ alldata = cellfun(@(f) loadncvar(f, all_fields), ...
 % set to true, but I cannot assume this if some fields have non-constant
 % data sizes
 S = horzcat(alldata{:});
+if isempty(alldata)
+    S_res = cell2struct(repmat({[]}, size(all_fields)), all_fields);
+    S_res.epoch = 0;
+    S_res.time = [];
+    S_res.version = '?';
+    return;
+end
 flds = fieldnames(S(1));
 varying_size = cellfun(@(fn) length(unique(cellfun(@length, {S.(fn)}))), flds)>1;
 vals = cellfun(@(f) [S.(f)].', flds(~varying_size), 'UniformOutput', false);

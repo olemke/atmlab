@@ -27,5 +27,7 @@ try
     end
     data = atovs_read_data( atovs_file );
 catch ME
-    error('atmlab:atovs_get_l1c:zamsu2l1c', ME.message);
+    ME2 = MException('atmlab:atovs_get_l1c:zamsu2l1c', ME.message);
+    ME2 = ME2.addCause(ME);
+    ME2.throw();
 end

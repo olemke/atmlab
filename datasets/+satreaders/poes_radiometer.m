@@ -49,7 +49,9 @@ assert(all(diff(data.time)>0), ...
 % shift dimensions so that it's [row col (channel)]
 
 for field = {'lat', 'lon', 'lza', 'laa', 'sza', 'saa', 'elev'}
-    data.(field{1}) = shiftdim(data.(field{1}), 1);
+    if isfield(data, field)
+        data.(field{1}) = shiftdim(data.(field{1}), 1);
+    end
 end
 data.tb = shiftdim(data.tb, 2);
 

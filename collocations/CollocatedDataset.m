@@ -1653,13 +1653,15 @@ classdef CollocatedDataset < HomemadeDataset
             assert(max(abs(lat1(:)))<=90, errid, 'Invalid data in lat1');
             assert(max(abs(long2(:)))<=180, errid, 'Invalid data in long2');
             assert(max(abs(lat2(:)))<=180, errid, 'Invalid data in lat2');
-            assert(max(lat1(:))~=min(lat1(:)), errid, 'lat1 constant');
-            assert(max(lat2(:))~=min(lat2(:)), errid, 'lat2 constant');
-            assert(max(long1(:))~=min(long1(:)), errid, 'lon1 constant');
-            assert(max(long2(:))~=min(long2(:)), errid, 'lon2 constant');
-
+            if length(lat1) > 1 && length(lat2) > 1
+                assert(max(lat1(:))~=min(lat1(:)), errid, 'lat1 constant');
+                assert(max(lat2(:))~=min(lat2(:)), errid, 'lat2 constant');
+                assert(max(long1(:))~=min(long1(:)), errid, 'lon1 constant');
+                assert(max(long2(:))~=min(long2(:)), errid, 'lon2 constant');
+            end
+            
             %% make t, rows, cols at the same grid --> no need for ind2sub
-
+            
             t1f = reshape(repmat(t1, [1 ncols1]), [1 nel1]);
             rows1f = reshape(repmat((1:nrows1)', [1 ncols1]), [1 nel1]);
             cols1f = reshape(repmat(1:ncols1, [nrows1 1]), [1 nel1]);

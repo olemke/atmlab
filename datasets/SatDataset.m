@@ -771,6 +771,25 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             allpaths = allpaths(I);
         end
         
+        function [gran, path] = find_granule_covering_instant(self, datevec, varargin)
+            % For datevec/spec, find granule covering this moment
+            %
+            % For a combination of a date-vector and a specification
+            % (satellite), get the granule that covers this instant.  Note
+            % that this method does NOT verify that the instant is really
+            % covered, but rather returns the granule that started most
+            % recently before the considered moment.
+            
+            spec = optargs(varargin, {''});
+            [grans, paths] = self.find_granules_by_date(datevec(1:3), spec, true);
+            grans_unisecs = date2unixsecs(grans(:, 1), grans(:, 2), grans(:, 3), grans(:, 4), grans(:, 5));
+            dv_unisecs = date2unixsecs(datevec(1), datevec(2), datevec(3), datevec(4), datevec(5));
+            last_i = find(dv_unisecs >= grans_unisecs, 1, 'last');
+            gran = grans(last_i, :);
+            path = paths(last_i);
+            % Not implemented yet.
+        end
+        
         function data = read_granule(self, date, varargin)
             % read_granule Read any granule
             %
@@ -1163,7 +1182,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     switch ME.identifier
                         case {'atmlab:find_datafile_by_date', 'atmlab:atovs_get_l1c:zamsu2l1c',...
                                 'atmlab:invalid_data','atmlab:find_granule_by_datetime',...
-                                'MATLAB:imagesci:hdfinfo:invalidFile', 'MATLAB:imagesci:validate:fileOpen', 'atmlab:exec_system_cmd:shell'}
+                                'MATLAB:imagesci:hdfinfo:invalidFile', 'MATLAB:imagesci:validate:fileOpen', 'atmlab:exec_system_cmd:shell', 'atmlab:SatDataset:cannotread'}
                             logtext(atmlab('ERR'), 'Problem: %s\n', ME.message);
                         otherwise
                             ME.rethrow();
@@ -1177,7 +1196,11 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     if isempty(t_next) || isempty(t_cur)
                         firstline = 0;
                     else
-                        firstline = find(t_next > t_cur(end), 1, 'first');
+                        % Replaced former by latter because modis L2 can
+                        % have nans for time/lat/lon due to the flagging in
+                        % the reading routine
+                        %firstline = find(t_next > t_cur(end), 1, 'first');
+                        firstline = find(t_next > t_cur(find(~isnan(t_cur), 1, 'last')), 1, 'first');
                     end
                     if ~isempty(firstline)
                         logtext(atmlab('OUT'), 'First line: %d\n', firstline);

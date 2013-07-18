@@ -307,6 +307,13 @@ function filename = gmt_plot(in,field)
 %                           stepsize using datarange)
 %                       def:    20
 %                     ------------
+% in.force_nlevels      in:     (logical)
+%                       ex:     If set to true, keep nlevels even if it
+%                               exceeds  the number of unique values.  If
+%                               set to false, nlevels is reduced to the
+%                               number of unique values if it exceeds it.
+%                       def:    false
+%                      ------------
 % in.stepsize           in:     %f
 %                       ex:     The stepsize between data values. This overrides
 %                               nlevels (-T/min/max/stepsize in makecpt)
@@ -718,6 +725,7 @@ default.keep_files      = false;            % keep intermediate files (debugging
 default.map_width       = 20;
 default.measure_unit    = 'cm';             % Choose between cm, inch, m, and point.
 default.nlevels         = 20;               % Use 20 color levels by default
+default.force_nlevels   = false;            % do not force, e.g. reduce if uniques are less
 default.nodata          = false;            % true if you only want the map
 default.outdir          = gmtlab('OUTDIR'); % where to put the figure
 default.plotPlacement   = '-Xa5 -Ya5';      % String of global plotPlacements
@@ -760,7 +768,7 @@ if ~isempty(b)
     if ismember(lower(ft),lower({'eps','pdf','BMP','JPEG','jpg','PNG','PPM','tif'}))
         default.figuretype = ft;
     else
-        logtext(1,'figuretype: %s is not an available type. Will produce .pdf',ft);
+        logtext(atmlab('OUT'),'figuretype: %s is not an available type. Will produce .pdf\n',ft);
         default.figuretype = 'pdf';
     end
     if ~isfield(in,'figuretype')
@@ -975,10 +983,10 @@ if in.nodata
 end
 
 % default number of levels
-if length(unique(in.(field)))<in.nlevels
-    logtext(1,'unique values < %d\n',in.nlevels)
+if length(unique(in.(field)))<in.nlevels && ~in.force_nlevels
+    logtext(atmlab('OUT'),'unique values < %d\n',in.nlevels)
     in.nlevels = length(unique(in.(field)));
-    logtext(1,'setting in.nlevels =  length(unique(in.(field)) (%d)\n',...
+    logtext(atmlab('OUT'),'setting in.nlevels =  length(unique(in.(field)) (%d)\n',...
         length(unique(in.(field))))
 end
 
@@ -1091,7 +1099,7 @@ if ~in.gridded
 
 index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
 if any(~index)
-    logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(index)/numel(index))
+    logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(~index)/numel(index))
     in.lat = in.lat(index);
     in.lon = in.lon(index);
     in.(field) = in.(field)(index);
@@ -1301,7 +1309,7 @@ end
 
 hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
-fprintf('GMT plot stored at:  %s\n',filename)
+logtext(atmlab('OUT'), 'GMT plot stored at:  %s\n',filename)
 
 end
 
@@ -1361,9 +1369,9 @@ associated_w_errors  = command(eindex);
 % display GMT calls containing warning
 if ~isempty(Warnings)
     V = atmlab('VERBOSITY'); atmlab('VERBOSITY',1);
-    logtext(1,'\nGMT completed with the following warning messages:\n')
+    logtext(atmlab('OUT'),'GMT completed with the following warning messages:\n')
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_warning,Warnings,'UniformOutput',0);
-    logtext(1,'%s\n',[tmp{:}])
+    logtext(atmlab('OUT'),'%s\n',[tmp{:}])
     atmlab('VERBOSITY',V);
 end
 

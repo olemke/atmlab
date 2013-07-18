@@ -235,11 +235,11 @@ end
 
 % check if res is acceptable
 if res < maxres
-    fprintf(['Automatically picked the maximum resolution of: ',...
+    logtext(atmlab('OUT'), ['Automatically picked the maximum resolution of: ',...
         '%.4fdeg instead of %.4fdeg defined by measurement density\n'],maxres,res)
     res = maxres;
 else
-    logtext(1,'Plot resolution: %.4f Deg\n',res)
+    logtext(atmlab('OUT'), 'Plot resolution: %.4f Deg\n',res)
 end
 a.increment = sprintf('%fm',60*res); % 60min x resolution
 

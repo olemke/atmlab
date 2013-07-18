@@ -1,3 +1,74 @@
+2013-07-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-391
+
+	* collocations/CollocatedDataset.m(collocate):
+
+	- Permit situation where primary or secondary has only one
+	measurement.
+
+	* sensors/atovs/atovs_get_l1c.m:
+
+	- When replacing one error by another, add the original one to the
+	cause field, so that no information is lost.
+
+	* sensors/atovs/atovs_read_data.m:
+
+	- Only add elevation if available.
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- New option: 'force_nlevels'.  Until now, gmt always reduced nlevels
+	to the number of unique values.  This is not always desirable, so it
+	is now possible to switch this behaviour off by setting this flag to
+	true.
+
+	- In several places, replace hardcoded logtext(1, ...) by
+	logtext(atmlab('OUT'), ...).  Also replaced some fprintfs by
+	logtexts.
+
+	(rmNaNsGeo_and_standardize_geodata):
+
+	- Amended log message.  Was "dodgy geodata will be ignored (99%)",
+	changed this to "dodgy geodata will be ignored (1%)", as this is what
+	actually happened.
+
+	* geoplots/gmt/create_gmt_earth.m: 
+
+	- Here too some fprintf/logtext changes.
+
+	* handy/getfields.m:
+
+	- Permit to pass all fields as a single cellstr
+
+	* datasets/HomemadeDataset.m:
+
+	(pos2re): New re, permit letters in version
+
+	* datasets/SatDataset.m(find_granule_covering_instant):
+
+	- New method.  For a particular instant, return granule that should
+	contain data for this moment.
+
+	(find_granule_first_line):
+
+	- Consider errid 'atmlab:SatDataset:cannotread'.
+
+	- Adapt for situation where reading routine actually has nans in
+	positions and times (happens with modis L2).
+
+	* datasets/MaskInvalidGeoTimedataWithNaN.m:
+
+	- Changed lying logging message to speak the truth.
+
+	* datasets/+satreaders/grasdir.m:
+
+	- Sensibly handle case with no data.
+
+	* datasets/+satreaders/poes_radiometer.m:
+
+	- Handle case with or without elevation
+
 2013-07-11  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-390
