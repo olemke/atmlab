@@ -1,3 +1,16 @@
+2013-07-23  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-392
+
+	* geoplots/gmt/gmt_plot.m: Fixed an old lying error message
+
+	* geoplots/gmt/gmt_inputs.m: Corrected an input test
+
+	* handy/combine_pdfs.m: Changed pdflatex call option from
+	-interaction batchmode to -interaction nonstopmode to make sure
+	that the whole output message is passed to exec_system_cmd if
+	there is an error
+
 2013-07-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-391

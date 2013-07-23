@@ -1258,7 +1258,7 @@ if in.savelegend
     if ~any(findPsScale)
         v = atmlab('VERBOSITY');
         atmlab('VERBOSITY',1);
-        logtext(atmlab('ERR'),'There is no data to make a legend of\n')
+        logtext(atmlab('ERR'),'psscale, which is used to make the legend was never called. Maybe legend=0 or there was no input data?\n')
         atmlab('VERBOSITY',v);
         filename = '';
         
