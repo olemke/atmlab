@@ -1,3 +1,30 @@
+2013-08-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-393
+
+	* collocations/CollocatedDataset.m(collocate_granule):
+
+	- Catch the new "catch-all" error identifier
+
+	* sensors/read_saphir_l1.m:
+
+	- Read either l1a or l1a2.  Should be passed by 3rd argument 'mode'.
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Add saphir l1a2, and use it for collocated saphir.  Also add
+	missing_value.
+
+	* datasets/SatDataset.m(read_granule):
+
+	- Set version info from filename if possible and not already set by
+	reader or reader-processor
+
+	* datasets/+satreaders/saphir.m:
+
+	- Also rotate IncidencAngle
+
+
 2013-07-23  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-392

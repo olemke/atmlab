@@ -929,6 +929,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             
             data = self.reader_processor(self, data, fields_in_pseudo);
             
+            %% set version from info if not already set
+            
+            if ~isfield(data, 'version')
+                info = self.find_info_from_granule(datafile);
+                if isfield(info, 'version')
+                    data.version = info.version;
+                end
+            end
+            
             %% check/convert datafile contents
             
             data = rmfield(data, fields_in_deps);

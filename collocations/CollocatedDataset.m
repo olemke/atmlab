@@ -503,7 +503,7 @@ classdef CollocatedDataset < HomemadeDataset
                 data1 = self.primary.read_granule(date1, spec1, extra_args_primary, false, false); % keep duplicates for now
             catch ME
                 switch ME.identifier
-                    case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data'}
+                    case {'MATLAB:load:couldNotReadFile', 'atmlab:invalid_data', 'atmlab:SatDataset:cannotread'}
                         logtext(eid, 'Collocating failed: %s\n', ME.message);
                         also = struct('version', {{'?', '?'}});
                         return

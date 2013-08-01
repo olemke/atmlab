@@ -129,6 +129,10 @@ D.saphir_l1a.basedir = '/storage3/data/meghatropiques/saphir_l1a';
 D.saphir_l1a.subdir = '$YEAR4/$MONTH/$DAY';
 D.saphir_l1a.re = 'MT1SAPSL1A__(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno>\d{5})_(?<orbitno2>\d{5})_00\.h5\.gz$';
 
+D.saphir_l1a2.basedir = '/storage3/data/meghatropiques/saphir_l1a2';
+D.saphir_l1a2.subdir = '$YEAR4/$MONTH/$DAY';
+D.saphir_l1a2.re = 'MT1SAPSL1A2_(?<version>\d\.\d{2})_\d\d\d_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<hour>\d\d)_(?<minute>\d\d)_(?<second>\d\d)_(?<year2>\d{4})_(?<month2>\d\d)_(?<day2>\d\d)_(?<hour2>\d\d)_(?<minute2>\d\d)_(?<second2>\d\d)_(?<orbitno>\d{5})_(?<orbitno2>\d{5})_\d\d\d_\d\d_\d\d_.{3}_\d\d\.h5\.gz$';
+
 D.saphir_l2a.basedir = '/storage3/data/meghatropiques/saphir_l2a';
 D.saphir_l2a.subdir = '$YEAR4/$MONTH/$DAY';
 D.saphir_l2a.re = 'MT1SAPS_(?<version>\d\.\d{2})_\d_\d\d_I_(?<year>\d{4})_(?<month>\d\d)_(?<day>\d\d)_(?<orbitno>\d{5})_(?<orbitno2>\d{5})_00_GP_\d\.\d\d_L2A\.h5';

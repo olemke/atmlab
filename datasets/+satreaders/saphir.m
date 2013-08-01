@@ -10,7 +10,7 @@ core_fields = {'ScanTimestart', 'LatScan', 'LonScan'};
 extra_fields  = optargs(varargin, {{}});
 all_fields    = [core_fields(:); extra_fields(:)];
 
-data = read_saphir_l1(file, all_fields);
+data = read_saphir_l1(file, all_fields, 'l1a2');
 
 % need to rotate lat and lon
 S.lat = data.data.LatScan.';
@@ -29,7 +29,7 @@ S.epoch = round(date2unixsecs(dv(1, 1), dv(1, 2), dv(1, 3), ...
 S.time = date2unixsecs(dv(:, 1), dv(:, 2), dv(:, 3), ...
             dv(:, 4), dv(:, 5), dv(:, 6)) - S.epoch;
 
-wrong_way = {'TbCh1', 'TbCh2', 'TbCh3', 'TbCh4', 'TbCh5', 'TbCh6'};
+wrong_way = {'TbCh1', 'TbCh2', 'TbCh3', 'TbCh4', 'TbCh5', 'TbCh6', 'IncidencAngle'};
 % copy over extra fields
 for i = 1:length(extra_fields)
     S.(extra_fields{i}) = data.data.(extra_fields{i});

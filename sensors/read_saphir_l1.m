@@ -1,8 +1,8 @@
-function saphirL1=read_saphir_l1(filename,selected_entries)
+function saphirL1=read_saphir_l1(filename,selected_entries, mode)
 % function read_saphir_l1: reads HDF5 files with SAPHIR leve1 1 data and
 % provides a structure containing the useful L1 data and attributes
 %
-% call: dataL1 = read_saphir(L1(filename,[selected_entries])
+% call: dataL1 = read_saphir(L1(filename,[selected_entries, mode])
 %
 % filename is the name of the hdf5 file or a gzipped version thereof
 % desired_entries is optional if you do not want to extract all variables
@@ -11,6 +11,8 @@ function saphirL1=read_saphir_l1(filename,selected_entries)
 % relate variable names structure vs hdf5
 %
 % Initial version mostly by Mathias Milz, adapted by Gerrit Holl
+%
+% 'mode' can be 'l1a1' or 'l1a2'.
 
 % $Id$
 
@@ -65,15 +67,29 @@ h5member= {'/ScienceData/IncidenceAngle_Samples',...
     '/ScienceData/TB_Samples_S4',...
     '/ScienceData/TB_Samples_S5',...
     '/ScienceData/TB_Samples_S6'};
+switch mode
+    case 'l1a1'
+        % above is good
+    case 'l1a2'
+        h5member = strrep(h5member, 'IncidenceAngle_Samples', 'Incidence_Angle');
+        h5member = strrep(h5member, 'TB_Samples', 'TB_Pixels');
+        h5member = strrep(h5member, 'QF_Samples', 'QF_Pixels');
+        h5member = strrep(h5member, 'Samples', 'pixels');
+        h5member = strrep(h5member, 'Sample', 'Pixel');
+    otherwise
+        error(['atmlab:' mfilename ':invalidmode'], ...
+            'Expected mode ''l1a1'' or ''l1a2'', got %s', mode);
+end
 
-if (nargin == 0)
-    error(errorid,'You need at least Filename as input');
-elseif(nargin == 1)
-    % read all variables
-    useentries = 1:length(strmember);
-elseif(nargin == 2)
-    %read only selected variables given in 'selected_entries'
-    [~,useentries] = ismember(selected_entries,strmember);
+switch nargin
+    case 0
+        error(errorid,'You need at least Filename as input');
+    case 1
+        % read all variables
+        useentries = 1:length(strmember);
+    case {2, 3}
+        %read only selected variables given in 'selected_entries'
+        [~,useentries] = ismember(selected_entries,strmember);
 end
 
 % uncompress file if necessary
