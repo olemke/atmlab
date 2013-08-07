@@ -830,9 +830,16 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %
             % OUT
             %
-            %   data        struct  Contains at least lat, lon, time and one or more
-            %                       data fields. Exact results depend on the particular
-            %                       satellite/sensor-pair.
+            %   data        struct  Contains at least:
+            %
+            %       - lat       Latitude in degrees
+            %       - lon       Longitude in degrees [-180, 180]
+            %       - time      Time in seconds since 'epoch'
+            %       - epoch     Time in seconds since 1970-01-01
+            %       - version   String or float.
+            %       
+            %       Further fields should be returned depending on
+            %       arguments passed to 'extra' and the particular dataset.
             %
             % EXAMPLE
             %

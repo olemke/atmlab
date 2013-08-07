@@ -649,7 +649,7 @@ classdef CollocatedDataset < HomemadeDataset
                 end
                 %% process core
                 % should return a matrix with info
-                lockfile = get_lock(atmlab('WORK_AREA'), 'collocations.lock');
+%                 lockfile = get_lock(atmlab('WORK_AREA'), 'collocations.lock');
 
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
@@ -696,8 +696,8 @@ classdef CollocatedDataset < HomemadeDataset
                     %clear this_additional_result;
                 end
                 clear old_result this_additional_result this_result data2
-                logtext(atmlab('OUT'), 'Clearing lockfile\n');
-                delete(lockfile);
+                %4logtext(atmlab('OUT'), 'Clearing lockfile\n');
+                %delete(lockfile);
                 logtext(fid, 'Info collected\n');
             end
             % return: result, additional_results, also
@@ -885,6 +885,11 @@ classdef CollocatedDataset < HomemadeDataset
                 varargin = varargin(1:end-1);
             else
                 flags = default_flags;
+            end
+            
+            if self.overwrite==2
+                error(['atmlab:' mfilename ':invalid'], ...
+                    'You set %s %s.overwrite=2.  This is meaningless for core datasets.', class(self), self.name);
             end
             
             additionals = optargs(varargin, {{}});
@@ -1521,6 +1526,7 @@ classdef CollocatedDataset < HomemadeDataset
                     L = size(M, 1);
                     N = size(collocations_day, 1);
                     M((L+1):(L+N), :) = collocations_day;
+                    logtext(atmlab('OUT'), '%d + %d = %d collocations so far\n', L, N, L+N);
                     for j = 1:length(additional_fields)
                         N_a = size(additionals_day{j}, 1);
                         if ~isempty(additionals_day{j})

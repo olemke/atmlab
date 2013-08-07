@@ -128,6 +128,9 @@ then
 fi
 
 ATOV_ERROR=yes
+export GFORTRAN_STDIN_UNIT=5 
+export GFORTRAN_STDOUT_UNIT=6 
+export GFORTRAN_STDERR_UNIT=0
 # first try
 atovin $FORMAT 2>&1 && ATOV_ERROR=no
 

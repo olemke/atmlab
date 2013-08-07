@@ -1,3 +1,42 @@
+2013-08-08  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-395
+
+	* datasets/SatDataset.m(read_granule):
+
+	- Point out what units the always-returned stuff is in.  In
+	particular, that 'time' is in seconds since 'epoch'.  Pointed out by
+	Ajil that this was dangerously undocumented.
+
+	* math/binned_statistics.m:
+
+	- Enhance documentation, what in/out args the filter expects
+	- Fix a bug in the usage of the filter (was unconditionally failing,
+	nobody ever used this?!)
+
+	* collocations/CollocatedDataset.m:
+	
+	(collocate_granule):
+
+	- Disable locking
+
+	(collocate_and_store_date):
+
+	- Throw error if overwrite=2 for CollocatedDataset, this is
+	meaningless, only meaningful for AssociatedDatasets.  Will only
+	confuse upon writing, actually resulting in confusing errors later on.
+
+	(read):
+
+	- After popular request (;-), indicate how many collocations are being
+	read in the process.
+
+	* sensors/atovs/zamsu2l1c.sh:
+
+	- set GFORTRAN_STDIN_UNIT=5 GFORTRAN_STDOUT_UNIT=6
+	GFORTRAN_STDERR_UNIT=0.  Change actually by Oliver.  Needed to read
+	metop-b with AAPP7.  Don't aks me why please.
+
 2013-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-394
