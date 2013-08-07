@@ -1,7 +1,8 @@
 % QPACK2_DEMO2   Another demonstration of the Qpack2 retrieval system
 %
 %    Similar to *qpack2_demo*, but illustrates rudimentary treatment
-%    tropospheric attenuation.
+%    tropospheric attenuation and shows how the polarisation response of the
+%    sensor is included.
 %
 % FORMAT   L2 = qpack2_demo2
 %        
@@ -106,7 +107,7 @@ Q.INCLUDES            = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
                           fullfile( 'ARTS_INCLUDES', 'continua.arts' ), ...
                           fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
 Q.ATMOSPHERE_DIM      = 1;
-Q.STOKES_DIM          = 1;
+Q.STOKES_DIM          = 4;
 Q.J_DO                = true;
 Q.CLOUDBOX_DO         = false;
 
@@ -150,7 +151,7 @@ Q.P_GRID              = z2p_simple( Q.Z_SURFACE-500 : 500 : z_toa )';
 
 
 
-%- Frequency, spectrometer and pencil beam antenna
+%- Frequency, polarisation, spectrometer and pencil beam antenna
 %
 % The hypothetical spectrometer has rectangular response functions
 %
@@ -173,6 +174,10 @@ B.data                = [1 1];
 %
 H.BACKEND_CHANNEL_RESPONSE{1} = B;
 clear B
+%
+% We assume a H polarisation response. A number coding is applied, see:
+% arts -d sensor_pol 
+H.SENSOR_POL          = { 6 };
 %
 Q.SENSOR_DO           = true;
 Q.SENSOR_RESPONSE     = H;
@@ -291,6 +296,18 @@ Q.ABS_SPECIES(5).TAG      = { 'N2-SelfContStandardType' };
 Q.ABS_SPECIES(5).RETRIEVE = false;
 Q.ABS_SPECIES(5).ATMDATA  = gf_artsxml( fullfile( fascod, ...
       'midlatitude-winter', 'midlatitude-winter.N2.xml' ), 'N2', 'vmr_field' ); 
+
+
+
+%- Polyfit
+%
+% Not active, but if you want to test ...
+%
+Q.POLYFIT.RETRIEVE        = false;
+Q.POLYFIT.ORDER           = 1;
+Q.POLYFIT.L2              = true;
+Q.POLYFIT.SX0             = 1^2; 
+Q.POLYFIT.SX1             = 0.5^2; 
 
 return
 %-----------------------------------------------------------------------------

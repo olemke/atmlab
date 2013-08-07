@@ -235,8 +235,6 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
                      'Q.TNOISE_C is required to be sparse (to save memory).' );
         elseif dimens(Q.TNOISE_C)~=2 || size(Q.TNOISE_C,1)~=size(Q.TNOISE_C,2)
           error( errid, 'Q.TNOISE_C must be square.' );
-        elseif size(Q.TNOISE_C,1) ~= length(Y(m).F) 
-          error( errid, 'Mismatch in size between Q.TNOISE_C and Y.F.' );
         end                                                                 
       end  
     end % nargout < 2

@@ -1,3 +1,14 @@
+2013-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-394
+
+	* demos/qpack2_demo2.m: Slightly extended to have a demo case
+	operating with STOKES_DIM > 1.
+
+	* retrieval/qpack2/qpack2.m (qp2_y2Q): Removed demand that
+	size(Q.TNOISE_C,1) == length(Y(m).F). Not true if several
+	polarisations measured.
+
 2013-08-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-393
