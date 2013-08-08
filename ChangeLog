@@ -1,3 +1,10 @@
+2013-08-08  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
+
+	* atmlab-2-1-396
+
+	* scattering/Maxwell_Gar_mix_rule.m: New. A function to calculte
+	refractive index by a mixing rule.
+
 2013-08-08  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-395
