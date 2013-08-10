@@ -58,9 +58,7 @@ end
 warning('off','catstruct:DuplicatesFound') %I'm intentially doing this often
 
 % PUT all figure in one pdf
-files{end+1} = combine_pdfs(files,...
-    struct('title','GMT plots: testing its functionality','fontsize','2cm','filename',[in.filename,'.pdf'],'cols',in.cols,'valign','b','outdir',in.outdir,'display',in.display));
-
+files{end+1} = combine_pdfs(files,struct('title','GMT plots: testing its functionality','fontsize','1cm','filename',[in.filename,'.pdf'],'cols',in.cols,'valign','b','outdir',in.outdir,'display',in.display));
 
 % DISPLAY information about the tests
 disp(' ')
@@ -372,9 +370,9 @@ for T = sort(in.test)
             test.data       = gridded.data(...
                 gridded.lat>=test.lat(1)&gridded.lat<=test.lat(end),...
                 (gridded.lon+180)>=test.lon(1)&(gridded.lon+180)<=test.lon(end));
-            in.filename     = sprintf('Test%g',T);
-            in.header       = 'Region that spans the dateline';
-            in.legend.xpos  = 20.7;
+            test.filename     = sprintf('Test%g',T);
+            test.header       = 'Region that spans the dateline';
+            test.legend.xpos= 20.7;
             files{ind}      = gmt_plot (catstruct(test,in), 'data');
             info{ind}       = ['Test:' num2str(T) ' demonstrates data that crosses the dateline, but is not global\n\n'];
             

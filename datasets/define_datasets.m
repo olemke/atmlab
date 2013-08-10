@@ -599,8 +599,8 @@ CollocatedDataset(D.cmoiwp_v0_6, D.dardarsub,...
 
 CollocatedDataset(D.cloud_cci, D.dardarsub,...
     'name','CollocatedDataset_cloud_cci_dardarsub',...
-    'distance', 2.5, ...
-    'interval', 150);
+    'distance', 2, ...
+    'interval', 120); % same limits as for MODIS for better comparison of like-datasets
 
 CollocatedDataset(D.cmoiwp_v0_4, D.dardarsub,...
     'name','CollocatedDataset_cmoiwp_v0_4_dardarsub',...
@@ -713,7 +713,7 @@ FieldCopier(D.collocation_gras_amsua, fields.gras, fields.amsua, ...
 FieldCopier(D.CollocatedDataset_cloud_cci_dardarsub, ...
     getSelection(fields.cloud_cci,{'iwp','iwp_error','ref_ice','ref_uncertainty','cot_ice','cot_uncertainty'}),...
      getSelection(fields.dardarsub,{'dardar_IWP','dardar_ln_IWP_error','dardar_Re'}),...
-     'name','cloud_cci_dardarsub_IWP');
+     'name','cloud_cci_dardarsub_ice_clouds');
 
 FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
     getSelection(fields.cpr,{'Cloud_Types'}),struct(),...
@@ -729,8 +729,13 @@ FieldCopier(D.CollocatedDataset_cpr_dardarsub, ...
 
 FieldCopier(D.CollocatedDataset_dardarsub_modis, ...
     getSelection(fields.dardarsub,{'dardar_IWP','dardar_ln_IWP_error'}),...
+    getSelection(fields.modis,{'modis_IWP','Re_ice','Tau_ice'}),...
+    'name','dardarsub_modis_IWP'); % this will be deprecated when 'dardarsub_modis_ice_clouds' is fully run
+
+FieldCopier(D.CollocatedDataset_dardarsub_modis, ...
+    getSelection(fields.dardarsub,{'dardar_IWP','dardar_ln_IWP_error'}),...
     getSelection(fields.modis,{'modis_IWP','modis_IWP_uncertainty','Re_ice','Tau_ice'}),...
-    'name','dardarsub_modis_IWP');
+    'name','dardarsub_modis_ice_clouds'); % this will be deprecated
 
 FieldCopier(D.CollocatedDataset_mhs_dardarsub, ...
     getSelection(fields.mhs,{'B_LZA','B_BT'}),...
@@ -767,16 +772,16 @@ FieldCopier(D.CollocatedDataset_dardarsub_modis_cprCloudLidar, ...
 
 % LIMITERS
 limitators_scalar = {@(X)(X>=0)}; % meaning not flagged
-limitators_scalar_vectorised = {@(x)x};
+%limitators_scalar_vectorised = {@(x)x};
 limitators_profile = {@(X)(true(size(X, 1), 1))};
-limitators_profile_vectorised = {@(x)true(size(X))};
+%limitators_profile_vectorised = {@(x)true(size(X))};
 closest.fn = @(x)(x(1)); %workaround, see this collapser
 closest.ln = 'Only the closest measurement pair';
 % ----------
 % MHS -CPR
 % ----------
-mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
-               @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
+%mw_global = {@(X)(X(:, D.CollocatedDataset_mhs_cpr.cols.DIST)<7.5), ...
+%               @(X)(abs(X(:, D.CollocatedDataset_mhs_cpr.cols.INT))<600)};
 mw_global_vec = {{{'DIST'}, @(X)(X<7.5)}, ...
                  {{'INT'}, @(X)(abs(X)<600)}};
 
@@ -791,11 +796,11 @@ for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_
     appccs.(f).limitators = limitators_scalar;
     if ismember(f, union(cpr_iwp_fields, cpr_ecmwf_scal_fields))
         appccs.(f).limitators = limitators_scalar;
-        len = @length;
+        %len = @length;
         len_vec = @(X)(vec2col(sum(~isnan(X), 1)));
-        mn = @mean;        
+        %mn = @mean;        
         mn_vec = @(X)(vec2col(nanmean(X, 1)));
-        st = @std;
+        %st = @std;
         st_vec = @(X)(vec2col(nanstd(X, 0, 1)));
         %cv = @(X)(std(X) ./ mean(X));
     elseif ismember(f, cpr_ecmwf_prof_fields)
@@ -867,30 +872,46 @@ end
 %        fields.cpr.ROIWP.atts.long_name, iwp, fields.cpr.ROIWP.atts.units);
 %end
 
+% -------
+% cloud_cci
+% -------
+cloud_cci_global = {@(X)(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)==min(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)))};
+vars = {'iwp','iwp_error','ref_ice','cot_ice'};
+for V = vars
+    cloud_cci.(V{1}).atts = fields.cloud_cci.(V{1}).atts;
+    cloud_cci.(V{1}).processors.CLOSEST = closest.fn;
+    cloud_cci.(V{1}).stored.CLOSEST.atts = fields.cloud_cci.(V{1}).atts;
+    cloud_cci.(V{1}).stored.CLOSEST.atts.long_name  = [V{1} ': ' closest.ln];
+    cloud_cci.(V{1}).stored.CLOSEST.type = D.cloud_cci.pseudo_fields.(V{1}).type;
+    cloud_cci.(V{1}).limitators = limitators_scalar;
+end
+
+% ----------
+% Collapsed MODIS (will be depricated)
+% ----------
+modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)==min(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)))};
+vars={'modis_IWP','Re_ice','Tau_ice'};
+for V = vars
+    modis.(V{1}).atts = fields.modis.(V{1}).atts;
+    modis.(V{1}).processors.CLOSEST = closest.fn;
+    modis.(V{1}).stored.CLOSEST.atts = fields.modis.(V{1}).atts;
+    modis.(V{1}).stored.CLOSEST.atts.long_name  = [V{1} ': ' closest.ln];
+    modis.(V{1}).stored.CLOSEST.type = D.modis_aqua_L2.pseudo_fields.(V{1}).type;
+    modis.(V{1}).limitators = limitators_scalar;
+end
+
 % ----------
 % Collapsed MODIS
 % ----------
-
-modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)==min(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)))};
-modis.modis_IWP.atts = fields.modis.modis_IWP.atts;
-modis.modis_IWP.processors.CLOSEST                      = closest.fn;
-modis.modis_IWP.stored.CLOSEST.atts.long_name   = closest.ln;
-modis.modis_IWP.stored.CLOSEST.atts.unit         = 'g/m^2';
-modis.modis_IWP.stored.CLOSEST.atts.missing_value = D.modis_aqua_L2.pseudo_fields.modis_IWP.atts.missing_value;
-modis.modis_IWP.stored.CLOSEST.type              = D.modis_aqua_L2.pseudo_fields.modis_IWP.type;
-modis.modis_IWP.limitators                                 = limitators_scalar;
-modis.Re_ice.atts = fields.modis.Re_ice.atts;
-modis.Re_ice.processors.CLOSEST                  = closest.fn;
-modis.Re_ice.stored.CLOSEST.atts.long_name       = closest.ln;
-modis.Re_ice.stored.CLOSEST.atts.unit            = 'micron';
-modis.Re_ice.stored.CLOSEST.type                 = D.modis_aqua_L2.pseudo_fields.Re_ice.type;
-modis.Re_ice.limitators                          = limitators_scalar;
-modis.Tau_ice.atts = fields.modis.Tau_ice.atts;
-modis.Tau_ice.processors.CLOSEST                 = closest.fn;
-modis.Tau_ice.stored.CLOSEST.atts.long_name      = closest.ln;
-modis.Tau_ice.stored.CLOSEST.atts.unit           = 'none';
-modis.Tau_ice.stored.CLOSEST.type                = D.modis_aqua_L2.pseudo_fields.Tau_ice.type;
-modis.Tau_ice.limitators                         = limitators_scalar;
+additionalvars={'modis_IWP_uncertainty','modis_IWP','Re_ice','Tau_ice'};
+for V = additionalvars
+    modis2.(V{1}).atts = fields.modis.(V{1}).atts;
+    modis2.(V{1}).processors.CLOSEST = closest.fn;
+    modis2.(V{1}).stored.CLOSEST.atts = fields.modis.(V{1}).atts;
+    modis2.(V{1}).stored.CLOSEST.atts.long_name  = [V{1} ': ' closest.ln];
+    modis2.(V{1}).stored.CLOSEST.type = D.modis_aqua_L2.pseudo_fields.(V{1}).type;
+    modis2.(V{1}).limitators = limitators_scalar;
+end
 
 % -------
 % amsua over gras
@@ -923,36 +944,6 @@ capsed_amsua.A_BT.stored.STD.atts.long_name = ['Std. of ' fields.amsua.A_BT.atts
 capsed_amsua.A_BT.stored.STD.atts.valid_min = 0;
 capsed_amsua.A_BT.stored.STD.atts.missing_value = -9999;
 
-% -------
-% cloud_cci
-% -------
-
-
-cloud_cci_global = {@(X)(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)==min(X(:,D.CollocatedDataset_cloud_cci_dardarsub.cols.DIST)))};
-cloud_cci.iwp.atts = fields.cloud_cci.iwp.atts;
-cloud_cci.iwp.processors.CLOSEST               = closest.fn;
-cloud_cci.iwp.stored.CLOSEST.atts.long_name    = closest.ln;
-cloud_cci.iwp.stored.CLOSEST.atts.unit         = 'g/m^2';
-cloud_cci.iwp.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.iwp.type;
-cloud_cci.iwp.limitators                       = limitators_scalar;
-cloud_cci.iwp_error.atts = fields.cloud_cci.iwp_error.atts;
-cloud_cci.iwp_error.processors.CLOSEST               = closest.fn;
-cloud_cci.iwp_error.stored.CLOSEST.atts.long_name    = closest.ln;
-cloud_cci.iwp_error.stored.CLOSEST.atts.unit         = 'g/m^2';
-cloud_cci.iwp_error.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.iwp_error.type;
-cloud_cci.iwp_error.limitators                       = limitators_scalar;
-cloud_cci.ref_ice.atts = fields.cloud_cci.ref_ice.atts;
-cloud_cci.ref_ice.processors.CLOSEST               = closest.fn;
-cloud_cci.ref_ice.stored.CLOSEST.atts.long_name    = closest.ln;
-cloud_cci.ref_ice.stored.CLOSEST.atts.unit         = 'micron';
-cloud_cci.ref_ice.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.ref_ice.type;
-cloud_cci.ref_ice.limitators                       = limitators_scalar;
-cloud_cci.cot_ice.atts = fields.cloud_cci.cot_ice.atts;
-cloud_cci.cot_ice.processors.CLOSEST               = closest.fn;
-cloud_cci.cot_ice.stored.CLOSEST.atts.long_name    = closest.ln;
-cloud_cci.cot_ice.stored.CLOSEST.atts.unit         = '-';
-cloud_cci.cot_ice.stored.CLOSEST.type              = D.cloud_cci.pseudo_fields.cot_ice.type;
-cloud_cci.cot_ice.limitators                       = limitators_scalar;
 
 % ------
 % avhrr
@@ -1001,13 +992,16 @@ Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, mw_global_vec, ...
     'vectorised', true);
 
 Collapser(D.dardarsub_modis_IWP,modis,modis_global, ...
-    'name','dardarsub_modis_collapsedIWP');
+    'name','dardarsub_modis_collapsedIWP'); % will be depricated by 'dardarsub_modis_closest_ice_clouds' in the future
  
+Collapser(D.dardarsub_modis_ice_clouds,modis2,modis_global, ...
+    'name','dardarsub_modis_closest_ice_clouds');
+
 Collapser(D.dardarsub_modis_cprCloudLidar,getSelection(modis,'modis_IWP'),modis_global, ...
     'name','dardarsub_modis_cprCloudLidar_closest');
 
-Collapser(D.cloud_cci_dardarsub_IWP,cloud_cci,cloud_cci_global, ...
-    'name','cloud_cci_dardarsub_collapsedIWP');
+Collapser(D.cloud_cci_dardarsub_ice_clouds,cloud_cci,cloud_cci_global, ...
+    'name','cloud_cci_dardarsub_closest_ice_clouds');
 
 Collapser(D.associated_gras_amsua, capsed_amsua, amsua_global_lim, ...
     'name', 'collapsed_gras_amsua');
@@ -1743,8 +1737,7 @@ fields.modis.Cloud_Water_Path_Uncertainty.atts.long_name      = 'Cloud Water Pat
 fields.modis.Cloud_Water_Path_Uncertainty.atts.units          = '%';
 fields.modis.Cloud_Water_Path_Uncertainty.atts.valid_range    = [0 20000];
 fields.modis.Cloud_Water_Path_Uncertainty.atts.missing_value  = -9999;
-fields.modis.Cloud_Water_Path_Uncertainty.atts.description    = ...
-    ['Relative uncertainty of Cloud_Water_Path'];
+fields.modis.Cloud_Water_Path_Uncertainty.atts.description    = 'Relative uncertainty of Cloud_Water_Path';
 fields.modis.Cloud_Effective_Radius.type                = 'short'; % this field needs to be scaled by 0.01
 fields.modis.Cloud_Effective_Radius.atts.long_name      = ['Cloud particle effective radius (??m) derived from a two-channel '...
                                        'retrieval using MODIS band 7 and either band 1, 2, or 5'];

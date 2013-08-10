@@ -385,13 +385,13 @@ D.associated_amsub_saphir.basedir = '/storage3/user_data/gerrit/collocated_datas
 D.associated_amsub_saphir.subdir = '$YEAR4/$MONTH/$DAY';
 D.associated_amsub_saphir.filename = 'fulldata_$SAT.nc.gz';
 
-D.cloud_cci_dardarsub_IWP.basedir   = '/storage4/user_data/seliasson/cloud_cci_dardarsub/IWP';
-D.cloud_cci_dardarsub_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
-D.cloud_cci_dardarsub_IWP.filename  = 'fields_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.cloud_cci_dardarsub_ice_clouds.basedir   = '/storage4/user_data/seliasson/cloud_cci_dardarsub/ice_clouds';
+D.cloud_cci_dardarsub_ice_clouds.subdir    = '$YEAR4/$MONTH/$DAY';
+D.cloud_cci_dardarsub_ice_clouds.filename  = 'fields_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.cloud_cci_dardarsub_collapsedIWP.basedir  = '/storage4/user_data/seliasson/cloud_cci_dardarsub/collapsedIWP';
-D.cloud_cci_dardarsub_collapsedIWP.subdir   = '$YEAR4/$MONTH/$DAY';
-D.cloud_cci_dardarsub_collapsedIWP.filename = 'collapsed_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.cloud_cci_dardarsub_closest_ice_clouds.basedir  = '/storage4/user_data/seliasson/cloud_cci_dardarsub/closest_ice_clouds';
+D.cloud_cci_dardarsub_closest_ice_clouds.subdir   = '$YEAR4/$MONTH/$DAY';
+D.cloud_cci_dardarsub_closest_ice_clouds.filename = 'collapsed_cloud_cci_dardarsub_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.basedir = D.associated_CPR_MHS_AMSU_HIRS.basedir;
 D.collapsed_associated_CPR_MHS_AMSU_HIRS.subdir = D.associated_CPR_MHS_AMSU_HIRS.subdir;
@@ -413,9 +413,23 @@ D.cpr_dardarsub_cloudTypes.basedir  = strrep(D.cpr_dardarsub_IWP.basedir,'IWP','
 D.cpr_dardarsub_cloudTypes.filename = D.cpr_dardarsub_IWP.filename;
 D.cpr_dardarsub_cloudTypes.subdir   = D.cpr_dardarsub_IWP.subdir;
 
+% -  this will be deprecated when 'dardarsub_modis_ice_clouds' is fully run
 D.dardarsub_modis_IWP.basedir   = '/storage4/user_data/seliasson/dardarsub_modis/IWP';
 D.dardarsub_modis_IWP.filename  = 'fields_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 D.dardarsub_modis_IWP.subdir    = '$YEAR4/$MONTH/$DAY';
+
+D.dardarsub_modis_collapsedIWP.basedir  = '/storage4/user_data/seliasson/dardarsub_modis/collapsedIWP';
+D.dardarsub_modis_collapsedIWP.filename = 'collapsed_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_collapsedIWP.subdir   = '$YEAR4/$MONTH/$DAY';
+% --
+
+D.dardarsub_modis_ice_clouds.basedir   = '/storage4/user_data/seliasson/dardarsub_modis/ice_clouds';
+D.dardarsub_modis_ice_clouds.filename  = 'fields_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_ice_clouds.subdir    = '$YEAR4/$MONTH/$DAY';
+
+D.dardarsub_modis_closest_ice_clouds.basedir  = '/storage4/user_data/seliasson/dardarsub_modis/closest_ice_clouds';
+D.dardarsub_modis_closest_ice_clouds.filename = 'collapsed_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
+D.dardarsub_modis_closest_ice_clouds.subdir   = '$YEAR4/$MONTH/$DAY';
 
 D.dardarsub_modis_cprCloud.basedir  = '/storage4/user_data/seliasson/dardarsub_modis_cprCloud/IWP_per_cloudType';
 D.dardarsub_modis_cprCloud.subdir   = '$YEAR4/$MONTH/$DAY';
@@ -429,9 +443,7 @@ D.dardarsub_modis_cprCloudLidar_closest.basedir = '/storage4/user_data/seliasson
 D.dardarsub_modis_cprCloudLidar_closest.subdir  = '$YEAR4/$MONTH/$DAY';
 D.dardarsub_modis_cprCloudLidar_closest.filename= 'closest_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-D.dardarsub_modis_collapsedIWP.basedir  = '/storage4/user_data/seliasson/dardarsub_modis/collapsedIWP';
-D.dardarsub_modis_collapsedIWP.filename = 'collapsed_dardarsub_modis_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
-D.dardarsub_modis_collapsedIWP.subdir   = '$YEAR4/$MONTH/$DAY';
+
 
 D.fields_2C_ice_dardarsub.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/2C-ICE_dardarsub';
 D.fields_2C_ice_dardarsub.filename = 'fields_2C-ICE_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';

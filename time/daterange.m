@@ -25,12 +25,17 @@ function dates = daterange(date1, date2)
 %
 %
 % $Id$
+
 errId = ['atmlab' mfilename ':badInput'];
 assert(length(date1)==length(date2),errId,...
     'length(date1)~=length(date2)')
 
 dl = length(date1);
 
+if dl ==2
+    date1(3) = 1;
+    date2(3) = 1;
+end
 % datenum wants length(date) ==3 or ==6
 if dl > 3
     % fill missing with 0
@@ -41,6 +46,9 @@ dn1 = datenum(date1);
 dn2 = datenum(date2);
 
 switch dl
+    case 2
+        dates = datevec(dn1:dn2);
+        dates = unique(dates(:, 1:2),'rows'); % only year/month/day part
     case 3
         dates = datevec(dn1:dn2);
         dates = dates(:, 1:3); % only year/month/day part

@@ -1,3 +1,40 @@
+2013-08-10  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-399
+
+	* datasets/define_datasets.m:
+	- Renamed some of my datasets.
+	- Made cloud_cci and modis have the same default interval and distance
+	- Shorted the code a bit by removing from repetitiveness
+
+	* handy/PersistentCachedData.m: Out put a message telling the user
+	how long ago the cached datafile was created
+
+	* handy/combine_pdfs.m:  Account for the added space needed
+	between the title and the underlynig pdf's
+
+	* geoplots/gmt/separate_integer_and_unit.m: Fixed regular expression
+
+	* geoplots/gmt/create_gmt_earth.m: fixed small bug
+
+	* geoplots/gmt/test_gmt.m: made title a bit smaller
+
+	* geoplots/gmt/gmt_plot.m: Fixed a never-trigged bug. Made the
+	default legend orientation horisontal if you want to save the
+	legend to a separate file
+
+	* site-specific/kiruna/datasets_init.m: Changed the name of some of my datasets
+
+	* time/daterange.m: Added capability to deal with 2 element dates ([yr,mn])
+
+	* math/land_sea_mask.m: Fixed broken function due to external changes
+
+	* geographical/ungridded2gridded.m
+	* math/binned_statistics.m:
+	Using opt.dataClass='some class' the user can make sure that all
+	the data in the cells have the same class.  This is essential if
+	you are later planning on doing a cell2mat on this output.
+
 2013-08-08  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-398

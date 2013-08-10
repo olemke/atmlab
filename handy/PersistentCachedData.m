@@ -56,6 +56,13 @@ classdef PersistentCachedData < CachedData
             end
             ldfl = fullfile(self.cachedir, [s '.mat']);
             logtext(atmlab('OUT'), 'Reading from persistent cache: %s\n', ldfl);
+            
+            % Make the user aware of the age of this file
+            [text] = exec_system_cmd(sprintf('ls -l %s',ldfl));
+            x = textscan(text{1},'%s');
+            % note: this is completely dependent on 'ls -l' being the same on
+            % all systems.
+            logtext(atmlab('OUT'),'Be aware that this read file was originally created: %s\n',sprintf('%s %s %s',x{1}{6},x{1}{7},x{1}{8}))
             data = loadvar(ldfl, 'data');
         end
         

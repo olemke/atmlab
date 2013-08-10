@@ -1,4 +1,4 @@
-function out = binned_statistics(data_bins, statistics, filter, replace)
+function out = binned_statistics(data_bins, statistics, filter, replace, opt)
 %% BINNED_STATISTICS Calculate statistics for a cell array of binned data.
 %
 % This functions calculates statistics for binned data. data_bins has to
@@ -18,10 +18,13 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 %                    @(X)X(X>0).
 %       replace      replace empty cells with <replace> (optional argument).
 %                         "replace" may also be a cell with as many elements as there are function
-%                         handles that you plan to use, 
+%                         handles that you plan to use,
 %                         e.g., replace = {[0 0 0],NaN,-9} for 3 suitable
 %                         function handles. If "replace" is not a cell, the same
 %                         entry will be used for each function handle
+% OPT         structure of extra options:
+%       opt.dataClass = 'class' (e.g., 'single'); This ensures
+%                   that all the data in the cell is your class of choosing
 %
 % EXAMPLES
 % * Calculate number of elements per bin, mean value for each bin:
@@ -42,7 +45,7 @@ function out = binned_statistics(data_bins, statistics, filter, replace)
 
 assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
 if exist('filter','var') && ~isempty(filter)
-    assert( isa(filter, 'function_handle' ),['atmlab:' mfilename ':BadInput'],'filter must be a function handle')
+    assert( isa( filter, 'function_handle' ),['atmlab:' mfilename ':BadInput'],'filter must be a function handle')
     data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
 end
 
@@ -57,21 +60,31 @@ for i = 1:length(statistics)
             ME.rethrow();
         end
     end
+    
     out.(statname) = cellfun(statistics{i}, data_bins, 'UniformOutput', false);
+
 end
 
-%% - Replace empty cells with something (e.g. NaN). put the data array must have the same class as "replace"
-%
-if exist('replace','var')
-    F = fieldnames(out)';
-    if ~iscell(replace), replace=repmat({replace},1,length(F));end
-    for i = 1:length(F)
+F = fieldnames(out)';
+for i = 1:length(F)
+    
+    % ---------------
+    % assign relace values to empty cells
+    if exist('replace','var')
+        
+        if ~iscell(replace), replace={replace};end
+        if length(replace)==1, replace=repmat(replace,1,length(F));end
+        
+        
         % putting back [] if the input was empty to begin with would be desirable, since e.g. nansum([])=0,
-        % 
+        %
         test =  cellfun('isempty',data_bins) | cellfun('isempty',out.(F{i}));
-        if any(test(:))
-            
-            if ~strcmp(class(replace{i}),class(data_bins{1,1}))
+        if any(test(:)) && ~all(test(:))
+            % find a cell that is not empty and check if the class matches the
+            % class of the replace value
+            x = cellfun(@isempty,data_bins);
+            x = data_bins(~x);
+            if ~strcmp(class(replace{i}),class(x{1})) && ~isfield(opt,'dataClass')
                 warning(['atmlab:' mfilename ':dataClass'],...
                     ['replace  value/s is not the same class as data_bins\n'...
                     'E.g. this means you cannot call cell2mat without an error\n'...
@@ -79,6 +92,16 @@ if exist('replace','var')
                     class(replace{i}),class(data_bins{1,1}))
             end
             out.(F{i})(test)=replace(i);
+        elseif all(test(:))
+            logtext(atmlab('OUT'),'Data is empty')
+        end
+    end
+    
+    % -------------------
+    % Make sure all the data is the same class
+    if isfield(opt,'dataClass')
+        if any(~cellfun(@(x)(strcmp(class(x),opt.dataClass)),out.(F{i})(:)))
+            out.(F{i}) = cellfun(@(x)(cast(x,opt.dataClass)), out.(F{i}), 'UniformOutput', false);
         end
     end
 end

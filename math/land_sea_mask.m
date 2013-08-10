@@ -23,7 +23,7 @@
 %
 % IN
 %
-%   gridsize    string      size of the grid (e.g. '5min')
+%   gridsize    string      size of the grid (The available grids are '1min','5min','60min','1deg')
 %        
 % OUT   lat   Latitude grid for M.
 %       lon   Longitude grid for M.
@@ -69,8 +69,15 @@ function [lat, lon, M] = land_sea_mask_new(gridsize)
 
 atmlab('require', {'ATMLAB_DATA_PATH'});
 maskdir = fullfile(atmlab('ATMLAB_DATA_PATH'), 'land_water_mask');
-maskfile = fullfile(maskdir, sprintf('land_water_mask_%s.png', gridsize));
-latlon = fullfile(maskdir, sprintf('land_water_mask_%s_latlon.nc', gridsize));
+maskfile = fullfile(maskdir, sprintf('land_water_mask_%s.png', strrep(gridsize,'60min','1deg')));
+latlon = fullfile(maskdir, sprintf('land_water_mask_%s_latlon.nc', strrep(gridsize,'60min','1deg')));
+
+% since strjoin only comes to matlab in 2013, I do it by hand here
+x = land_sea_mask('?');
+y = cellfun(@(x)(['"' x '", ']),x,'uniformoutput',0); y=[y{:}];
+
+assert(any(strcmp(gridsize,{'1min','5min','60min','1deg'})),['atmlab:' mfilename],...
+    'Grid="%s" is not available\nThe available gridsizes are %s',gridsize,y(1:end-2))
 nc = loadncfile(latlon);
 lat = nc.lat;
 lon = nc.lon;
@@ -78,15 +85,16 @@ M = imread(maskfile);
 
 end
 
-function [lat, lon, M] = land_sea_mask_old
+function [lat, lon, data] = land_sea_mask_old
 
 atmlab( 'require', {'ARTS_XMLDATA_PATH'} );
 
-lat = -90:90;
-lon = 0:359;
+logtext(atmlab('OUT'),['Loading 1 degree landmask from ARTS_XML_DATA. '...
+    'If you want another gridsize input e.g., gridsize = ''5min''\n'])
+M = xmlLoad( fullfile(atmlab('ARTS_XMLDATA_PATH'), 'planets','Earth', ...
+    'ERA40', sprintf('LandSeaMask_ERA40_1.0Degree.xml.gz') ) );
 
-M = xmlLoad( fullfile(atmlab('ARTS_XMLDATA_PATH'), 'earth', ...
-                    'land_sea_mask', 'land_sea_mask_360x181.xml.gz' ) );
-
-M = logical( M' );
+lat = M.grids{1};
+lon = M.grids{2};
+data = 255 * cast( M.data, 'uint8' );
 end

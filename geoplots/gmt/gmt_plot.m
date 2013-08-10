@@ -1134,7 +1134,11 @@ if ~isfield(in.legend,'position')
     x = sscanf(in.region,'%f/%f/%f/%f');
     f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
     myHcondition = f < 0.5; tmp = ['v','h']; %vertical,horisontal
-    default.orientation = tmp(myHcondition+1);
+    if in.savelegend
+        default.orientation = 'h'; % because usually you want this.
+    else
+        default.orientation = tmp(myHcondition+1);
+    end
     defThick=.2; %thickness of legend bar
     
     % I use map_width to find the defaults.
@@ -1185,6 +1189,13 @@ if in.gridded
     % DO some special treatment of data crossing the dateline that is not continuous
     % after changing to -180:180 regime OR if in.region is in 0:360 mode
     
+    if any(diff(in.lon)==0)
+        % in case a longitude appears twice. e.g., if the grid was originally
+        % lon = 0:360
+        cond = diff(in.lon)~=0;
+        in.lon = in.lon(cond);
+        in.(field) = in.(field)(:,cond);
+    end
     if max(diff(in.lon))>5*min(diff(in.lon)) || ...
             structfun(@str2double,regexp(in.region,'.+/(?<lnmax>.+)/.+/.+','names')) > 180 % this is a 360 test
         
@@ -1196,8 +1207,8 @@ if in.gridded
         if any(diff(in.lon)==0)
             if isequal(in.(field)(:,find(diff(in.lon)==0)),in.(field)(:,find(diff(in.lon)==0)+1)) %#ok<FNDSB>
                 % then remove duplicate line
-                in.lon      = in.lon(in.diff~=0);
-                in.(field)  = in.field(:,in.diff~=0);
+                in.lon      = in.lon(diff(in.lon)~=0);
+                in.(field)  = in.(field)(:,diff(in.lon)~=0);
             else
                 error(['atmlab:' mfilename],'Same longitudes are repreated but the data are not the same there')
             end

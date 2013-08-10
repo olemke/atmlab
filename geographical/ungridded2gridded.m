@@ -19,7 +19,7 @@ function [data,lat,lon] = ungridded2gridded(in,opt)
 %
 %
 %
-%      opt   structure 
+% OPT   structure 
 %
 %       field   string      'stringname of datafield'
 %
@@ -57,12 +57,15 @@ function [data,lat,lon] = ungridded2gridded(in,opt)
 %                           interest. If this is not given the
 %                           gridding is global (slower if unnecessary)
 %
-%      replace         val (e.g., NaN, or {NaN,0} 
+%      replace              value (e.g., NaN, or {NaN,0} 
 %                           replace empty cells with in.replace. Make it a cell
 %                           if you want difference replace values for the
 %                           function handles. NaN is default
 %                           
-%
+%      dataClass           'class' (default='double'). Ensures that the data in
+%                          the cell matrix from binned_statistics is all your
+%                          class of choosing. This is necessary if you want to
+%                          use cell2mat on your data.
 % OUT   
 %      
 %      data                Structure containing the gridded statistics, and the
@@ -87,17 +90,17 @@ if nargin==1, opt = struct(); end
 assert(any([isfield(in,'data'),isfield(opt,'field')]),...
     errId,'need some way of knowing what "field" to do the gridding on.\nSee doc %s.m\n',mfilename)
 
-
-default.grid                 = {1};
+default.grid                = {1};
 default.func                = {@mean,@numel};
-default.valid                = '';
-default.noStatistics     = false;
-default.field                 = 'data';
-default.replace            = NaN;
-default.ensureDouble = false;
+default.valid               = '';
+default.noStatistics        = false;
+default.field               = 'data';
+default.replace             = NaN;
+default.dataClass           = 'double';
 opt = optargs_struct(opt,default);
-
 if ~iscell(opt.func), opt.func={opt.func}; end
+if ~iscell(opt.grid), opt.grid={opt.grid};end
+if ~iscell(opt.replace), opt.replace={opt.replace};end
 
 assert(isequal(size(in.(opt.field)(:)),size(in.lat(:)),size(in.lon(:)))|isequal(size(in.(opt.field),1),size(in.lat(:),1),size(in.lon(:),1)),...
         errId,'"%s" lat, lon must be the same size, or the first dimension of "%s" is the same size as lat lon',opt.field,opt.field)
@@ -140,19 +143,11 @@ data.lon = lon;
 for F = opt.func
     logtext(1,'Getting the statistic called "%s" within each gridcell\n',func2str(F{1}))
 end
+
 % --------------------
 % APPLY STATISTICS
 
-
-if opt.ensureDouble || (any(cell2mat(cellfun(@(x)(isscalar(x)&&isnan(x)),opt.replace,'uniformoutput',0))) && any(cellfun('isempty',tmpdata(:)))), 
-% If there are empty cells the cell2mat function will fail. Therefore NaNs will
-% be put in there place. For this the type of the data is turned to double. This
-% is done for convenience
-
-  tmpdata = cellfun(@(x)(cast(x,'double')),tmpdata,'uniformOutput',0);
-end
-
-out = binned_statistics(tmpdata, opt.func , opt.valid, opt.replace); % The NaN is to be put in place of empty grids
+out = binned_statistics(tmpdata, opt.func , opt.valid, opt.replace, opt); % The NaN is to be put in place of empty grids
 
 flds = fieldnames(out);
 for i = 1: length(flds)
@@ -164,9 +159,6 @@ for i = 1: length(flds)
         continue
     end    
     data.(flds{i}) = cell2mat(out.(flds{i}));
-    % Make some key to tie the allocated statistic name to the original function
-    % handle
-
 end
 
 end

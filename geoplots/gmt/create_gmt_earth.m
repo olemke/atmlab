@@ -395,7 +395,7 @@ if isfield(in,'fieldname') && isstruct(in.legend) %if not field then nodata.
             [x,xu]=separate_integer_and_unit(in.legend.xpos);
             [y,yu]=separate_integer_and_unit(in.legend.ypos);
             [l,~]=separate_integer_and_unit(in.legend.length);
-            if ~isequal(wu,yu,wu,xu),warning(['atmlab:' mfilename],'miss-matching units will cause strange default placements of extra_legend');end
+            if ~isequal(wu,xu,yu),warning(['atmlab:' mfilename],'miss-matching units will cause strange default placements of extra_legend');end
             if strcmp(in.legend.orientation,'v')
                 vec = [x, y-0.5*l-2*w, w, w];
                 lsize = sprintf('%g%s/%g%s/%g%s/%g%s',...
