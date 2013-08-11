@@ -1,3 +1,9 @@
+2013-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-400
+
+	* demos/qpack2_t_demo.m: New demo/test file.
+
 2013-08-10  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-399
