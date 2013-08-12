@@ -28,7 +28,7 @@ Y = y_demo( Q );
 %
 O              = qp2_l2( Q );
 %
-O.linear       = true;
+O.linear       = false;
 %
 if ~O.linear 
   O.itermethod = 'GN';
@@ -273,7 +273,7 @@ Y = qpack2( Q, oem, Y0 );
 
 % Add thermal noise
 %
-%Y.Y = Y.Y + Y.TNOISE .* make_noise( 1, Q.TNOISE_C );
+Y.Y = Y.Y + Y.TNOISE .* make_noise( 1, Q.TNOISE_C );
 
 
 

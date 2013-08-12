@@ -1,3 +1,10 @@
+2013-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-401
+
+	* demos/qpack2_t_demo.m: Now commited with noise added and
+	non-linear retrieval.
+
 2013-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-400
