@@ -1,3 +1,12 @@
+<<<<<<< .mine
+2013-08-13  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
+
+	* atmlab-2-1-402
+
+	* h2o/parametrisations/ice_particleshape_Hogan2012.m: Retuns parameters        		  (long and short diameters) and density of a non-spherical and 
+	  non-solid ice particle that composes ice matrix with air inclusion.
+
+=======
 2013-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-401
@@ -48,6 +57,7 @@
 	the data in the cells have the same class.  This is essential if
 	you are later planning on doing a cell2mat on this output.
 
+>>>>>>> .r8578
 2013-08-08  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-398
