@@ -3,8 +3,8 @@
 
 	* atmlab-2-1-402
 
-	* h2o/parametrisations/ice_particleshape_Hogan2012.m: Retuns parameters        		  (long and short diameters) and density of a non-spherical and 
-	  non-solid ice particle that composes ice matrix with air inclusion.
+	* h2o/parametrisations/ice_particleshape_Hogan2012.m: Non-spherical and 
+	  non-solid ice particle dimensions.
 
 =======
 2013-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
