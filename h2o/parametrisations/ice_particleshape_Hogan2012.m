@@ -19,53 +19,53 @@
 %             
 %                        
 % 
-% FORMAT     [d_max d_short axratio mixfrac rho]= ice_particleshape_Hogan2012(d)
+% FORMAT         [diameter_max diameter_short aspect_ratio mixfrac rho]= ice_particleshape_Hogan2012(d)
 %        
-% OUT  d_max      longest diameter of an aligned oblate spheroid particle  [m]      
-%      d_short    shortest diameter of an aligned oblate spheroid particle [m]  
-%      axratio    d_short / d_long
-%      mixfrac    Fraction of inclusion media (air) in ice matrix.
-%      rho        Density of a sheroid of non-solid ice particle      [kg/m^3]
-%                 (mixture of ice and air)               
+% OUT  diameter_max   longest diameter of an aligned oblate spheroid particle  [m]      
+%      diameter_short shortest diameter of an aligned oblate spheroid particle [m]  
+%      aspect_ratio   d_short / d_long
+%      mixfrac        Fraction of inclusion media (air) in ice matrix.
+%      rho            Density of a sheroid of non-solid ice particle      [kg/m^3]
+%                     (mixture of ice and air)               
 %
-% IN   d          mass equivalent diameter       [m]     
+% IN   d              mass equivalent diameter       [m]     
        
-% 2013-08-09      Created by Maryam Jamali
+% 2013-08-09    Created by Maryam Jamali
 
 
-function  [d_max d_short axratio mixfrac rho]= ice_particleshape_Hogan2012(d)
+function  [diameter_max diameter_short aspect_ratio mixfrac rho]= ice_particleshape_Hogan2012(d)
 
 
 rhoice=0.917*1e3;     % kg/m^3
 
-%To calculate d_max and d_short :
+%To calculate diameter_max and diameter_short :
 for i=1:length(d)
     m=(power(d(i),3)*pi*rhoice)/6;   %kg 
     D_0=power((m./(pi*rhoice/6)),(1/3));
     
     if D_0 < 97e-6
-    d_mean(i)=D_0;
+    diameter_mean(i)=D_0;
     else
-    d_mean(i)=power((m./0.0185), (1/1.9));
+    diameter_mean(i)=power((m./0.0185), (1/1.9));
     end
 
     if  D_0 < 66e-6
-    d_max(i)=D_0;
+    diameter_max(i)=D_0;
     else
-    d_max(i)=power((m./0.0121), (1/1.9));
+    diameter_max(i)=power((m./0.0121), (1/1.9));
     end
     
-    d_long(i) =d_max(i);
-    d_short(i)=(2*d_mean(i))-d_max(i);
-    axratio(i)=d_short(i)./d_long(i);
+    diameter_long(i) =diameter_max(i);
+    diameter_short(i)=(2*diameter_mean(i))-diameter_max(i);
+    aspect_ratio(i)=diameter_short(i)./diameter_long(i);
     
     volume_ice(i)= (pi/6).* power(d(i),3);
     
-    if d_short(i)==d_long(i)
+    if diameter_short(i)==diameter_long(i)
     rho(i)=rhoice;
     volume_spheroid(i)=volume_ice(i);
     else
-    volume_spheroid(i)=(pi/6).*power(d_long(i),2).*d_short(i);
+    volume_spheroid(i)=(pi/6).*power(diameter_long(i),2).*diameter_short(i);
     rho(i)=m./volume_spheroid(i); % kg/m^3
     end
 end
