@@ -50,7 +50,7 @@ Q.F_GRID                = 100e9;  % Here a dummy value
 Q.PPATH_AGENDA               = { 'ppath_agenda__FollowSensorLosPath' };
 if refr
   Q.PPATH_STEP_AGENDA        = { 'ppath_step_agenda__RefractedPath'   };
-  Q.REFR_INDEX_AGENDA        = { 'refr_index_agenda__GasThayer'      };
+  Q.REFR_INDEX_AIR_AGENDA    = { 'refr_index_air_agenda__GasThayer'      };
 else
   Q.PPATH_STEP_AGENDA        = { 'ppath_step_agenda__GeometricPath'  };
 end

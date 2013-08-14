@@ -700,8 +700,8 @@ function T = cfile_RteSet( Q, partname, workfolder )
   if qarts_isset( Q.PPATH_STEP_AGENDA )
     T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
   end
-  if qarts_isset( Q.REFR_INDEX_AGENDA )
-    T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AGENDA );
+  if qarts_isset( Q.REFR_INDEX_AIR_AGENDA )
+    T = add_agenda( T, 'refr_index_agenda', Q.REFR_INDEX_AIR_AGENDA );
   end
   if qarts_isset( Q.SENSOR_POS )
     T{end+1} = file_or_data( 'sensor_pos', 'Matrix', Q.SENSOR_POS,...

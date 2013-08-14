@@ -1,26 +1,44 @@
+2013-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-404
+
+	* tests/test_arts_ppath.m:
+	* arts/qarts2cfile.m:
+	* demos/qarts_ppath_demo.m:
+	* demos/qarts_scattering_demo.m:
+	* arts/qarts.m: Changed REFR_INDEX_AGENDA to REFR_INDEX_AIR_AGENDA.
+
 2013-08-14  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-403
 
 	* scattering/Three_phase_Maxwell_Gar.m: A function to calculate
-	  refractive index and density of a three-phase mixture by Maxwell Garnett 		  mixing rule.
+	refractive index and density of a three-phase mixture by Maxwell
+	Garnett mixing rule.
 
         * scattering/Three_phase_Debye.m: A function to calculate
-	  refractive index and density of a three-phase mixture by Debye 		  mixing rule.
+	refractive index and density of a three-phase mixture by Debye
+	mixing rule.
 
 	* scattering/Three_phase_Bruggeman.m: A function to calculate
-	  refractive index and density of a three-phase mixture by Bruggeman 		  mixing rule.
+	refractive index and density of a three-phase mixture by Bruggeman
+	mixing rule.
 
-	*According to Galligani et al (2013), in snow (ice+water+air) a model which 		literature has shown to agree with the average characteristics of the melting 		layer for logterm observation is described as a two phase mixture of ice-air 		(dry snow) and water. This model first calculates dry snow (ice inclusions in 		an air matrix) and a second time to mix dry snow and water (water inclusion in 		a dry snow matrix environment).
+	* According to Galligani et al (2013), in snow (ice+water+air) a
+	model which literature has shown to agree with the average
+	characteristics of the melting layer for logterm observation is
+	described as a two phase mixture of ice-air (dry snow) and water.
+	This model first calculates dry snow (ice inclusions in an air
+	matrix) and a second time to mix dry snow and water (water
+	inclusion in a dry snow matrix environment).
 
 2013-08-13  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-402
 
-	* h2o/parametrisations/ice_particleshape_Hogan2012.m: Non-spherical and 
-	  non-solid ice particle dimensions.
+	* h2o/parametrisations/ice_particleshape_Hogan2012.m:
+	Non-spherical and non-solid ice particle dimensions.
 
-=======
 2013-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-401
@@ -59,9 +77,11 @@
 	default legend orientation horisontal if you want to save the
 	legend to a separate file
 
-	* site-specific/kiruna/datasets_init.m: Changed the name of some of my datasets
+	* site-specific/kiruna/datasets_init.m: Changed the name of some
+	of my datasets
 
-	* time/daterange.m: Added capability to deal with 2 element dates ([yr,mn])
+	* time/daterange.m: Added capability to deal with 2 element dates
+	([yr,mn])
 
 	* math/land_sea_mask.m: Fixed broken function due to external changes
 
@@ -71,21 +91,20 @@
 	the data in the cells have the same class.  This is essential if
 	you are later planning on doing a cell2mat on this output.
 
->>>>>>> .r8578
 2013-08-08  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-398
 
 	* scattering/Bruggeman_mix_rule.m: New. Afunction to calculate
 	refractive index by a mixing rule.
-	
+
 2013-08-08  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-397
 
-	* scattering/Debye_mix_rule.m: New. A function to calculate refractive 
+	* scattering/Debye_mix_rule.m: New. A function to calculate refractive
 	index by a mixing rule.
-	
+
 2013-08-08  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-396

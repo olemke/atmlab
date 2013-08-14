@@ -638,8 +638,8 @@ I.REFELLIPSOID = [ ...
 'Reference ellipsoid. As the arts WSV with the same name .'
 ];
 %-----------------------------------------------------------------------------
-Q.REFR_INDEX_AGENDA = {};
-I.REFR_INDEX_AGENDA = [ ...
+Q.REFR_INDEX_AIR_AGENDA = {};
+I.REFR_INDEX_AIR_AGENDA = [ ...
 'As the arts WSV with the same name. WSMs are listed as an array of strings.'
 ];
 %-----------------------------------------------------------------------------
