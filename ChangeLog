@@ -1,4 +1,18 @@
-<<<<<<< .mine
+2013-08-14  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
+
+	* atmlab-2-1-403
+
+	* scattering/Three_phase_Maxwell_Gar.m: A function to calculate
+	  refractive index and density of a three-phase mixture by Maxwell Garnett 		  mixing rule.
+
+        * scattering/Three_phase_Debye.m: A function to calculate
+	  refractive index and density of a three-phase mixture by Debye 		  mixing rule.
+
+	* scattering/Three_phase_Bruggeman.m: A function to calculate
+	  refractive index and density of a three-phase mixture by Bruggeman 		  mixing rule.
+
+	*According to Galligani et al (2013), in snow (ice+water+air) a model which 		literature has shown to agree with the average characteristics of the melting 		layer for logterm observation is described as a two phase mixture of ice-air 		(dry snow) and water. This model first calculates dry snow (ice inclusions in 		an air matrix) and a second time to mix dry snow and water (water inclusion in 		a dry snow matrix environment).
+
 2013-08-13  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-402
