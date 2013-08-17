@@ -1,10 +1,20 @@
+2013-08-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-406
+
+	* tests/test_arts_ppath.m: Updates to follow changes in arts were
+	requirted when running with refraction.
+
+	* arts/qarts2cfile.m (cfile_RteSet): Was not completely adopted to
+	refr_index_air_agenda.
+
 2013-08-14  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 
 	* atmlab-2-1-405
-	
+
 	* h2o/parametrisations/ice_particleshape_Hogan2012.m:
-	* Changed: d_max to diameter_max, d_short to diameter_short and 
-	axratio to aspect_ratio. 
+	* Changed: d_max to diameter_max, d_short to diameter_short and
+	axratio to aspect_ratio.
 
 2013-08-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
