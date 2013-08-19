@@ -1,9 +1,19 @@
+2013-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-407
+
+	* scattering/tmatrix.m: An interface towards ARTS to obtain
+	T-matrix data.
+
+	* arts/complex_refr_indexFromFunc.m: New. Sets up
+	complex_refr_index using Atmlab's functions retirning n or eps.
+
 2013-08-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-406
 
 	* tests/test_arts_ppath.m: Updates to follow changes in arts were
-	requirted when running with refraction.
+	required when running with refraction.
 
 	* arts/qarts2cfile.m (cfile_RteSet): Was not completely adopted to
 	refr_index_air_agenda.
