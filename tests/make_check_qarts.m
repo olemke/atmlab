@@ -3,12 +3,17 @@
 %    The function runs some of the scripts in atmlab/demo, including in some
 %    cases a comparsion to older results. The tests cover also Qpack2.
 %
-% FORMAT   make_check_qarts
+% FORMAT   make_check_qarts( [do_fortran] )
+%
+% OPT   do_fortran   Performs checks requiring compilation of ARTS
+%                    with Fortran support. Default is false.
 
-% 2005-06-21   Created by Patrick Erikssom.
+% 2005-06-21   Created by Patrick Eriksson.
 
 
-function make_check_qarts
+function make_check_qarts( do_fortran )
+%
+if nargin == 0, do_fortran = false; end
 
 
 %= Handle verbosity
@@ -173,6 +178,27 @@ else
   disp( 'Done: qpack2_demo2')
 end
 
+
+%= T-matrix
+%
+if do_fortran
+try
+  f_grid  = [ 100e9; 200e9 ];
+  t_grid  = [ 275 : 25 : 350 ]';
+  za_grid = [ 0 : 20 : 180 ]';
+  aa_grid = [ 0 : 60 : 360 ]';
+  N       = complex_refr_indexFromFunc( f_grid, t_grid, ...
+                                        @eps_water_liebe93, @sqrt);  
+  D = tmatrix( [], f_grid, t_grid, za_grid, aa_grid, N, ...
+               'spheroidal', {'horizontally_aligned'}, 150e-6, [1.001;2] );
+catch 
+  reset_verbosity( va, vf );
+  fprintf('\n=== Error while running *qpack2_demo2* ===\n\n');
+  rethrow(lasterror);
+end
+%
+disp( 'Done: Call of tmatrix.m')
+end
 
 
 %== Finished

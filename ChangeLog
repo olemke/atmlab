@@ -1,5 +1,16 @@
 2013-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-408
+
+	* tests/make_check_qarts.m: Added a test call of tmatrix.m. Set
+	new input argument do_fortran to include this check in the run.
+
+	* scattering/tmatrix.m: Had to introduce a temporary variable when
+	converting char input to cellstr. Worked on another matlab
+	version!!!
+
+2013-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-407
 
 	* scattering/tmatrix.m: An interface towards ARTS to obtain

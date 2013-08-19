@@ -56,8 +56,18 @@ rqre_datatype( aspect_ratio, @istensor1 );
 
 %- Convert char inpout to cellstrs
 %
-if ischar( pshape ), pshape{1} = pshape; end
-if ischar( ptype  ), ptype{1}  = ptype;  end
+if ischar( pshape ) 
+  dummy = pshape;
+  clear pshape;
+  pshape{1} = dummy; 
+  clear dummy;
+end
+if ischar( ptype )
+  dummy = ptype;
+  clear pshape;
+  ptype{1} = dummy;  
+  clear dummy;
+end
 
 %- How many particle types?
 %
