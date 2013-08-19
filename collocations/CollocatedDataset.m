@@ -63,15 +63,16 @@ classdef CollocatedDataset < HomemadeDataset
     %
     % $Id$
     properties (Transient)
-        % Primary dataset
+        % Primary dataset.
+        %
+        % This is usually a <a href="matlab:help SatDataset">SatDataset</a>.
         %
         % When collocating, there are some considerations as to chosing
         % the primary vs. the secondary dataset:
         % 
         %   - Choose the dataset with the largest footprint as the primary.
         %     This becomes particularly important when the secondary is
-        %     averaged over the primary using <a href="matlab:help Collapser</a>Collapser</a>
-        %     or a similar class.
+        %     averaged over the primary using <a href="matlab:help Collapser"</a>Collapser</a> or a similar class.
         %
         %   - Choose the dataset with the largest granule as the primary.
         %     As long as there is no caching implemented in <a href="matlab: help SatDataset/read_granule">SatDataset.read_granule</a>,
@@ -1444,9 +1445,22 @@ classdef CollocatedDataset < HomemadeDataset
                                                 
                 try
                     [collocations_day, M_cols_core_here, attr_core] = self.read_single_day(date, spec, fields_core);
-                    if numel(collocations_day)==0 && length(fields_core) ~= 0
-                        logtext(atmlab('OUT'), 'no collocations\n');
-                        continue
+                    if numel(collocations_day)==0
+                        if length(fields_core) == 0
+                            % ugly hack, will secretly read core ANYWAY
+                            % because I need to tell if there are
+                            % collocations
+                            collocations_day = self.read_single_day(date, spec, {'LAT1'});
+                            if numel(collocations_day) == 0
+                                logtext(atmlab('OUT'), 'really no collocations\n');
+                                continue
+                            else
+                                logtext(atmlab('OUT'), 'no fields asked from core\n');
+                            end
+                        else
+                            logtext(atmlab('OUT'), 'no collocations\n');
+                            continue
+                        end
                     end
                     M_cols_core = M_cols_core_here;
                     %hitno = hitno + 1;
@@ -1615,12 +1629,14 @@ classdef CollocatedDataset < HomemadeDataset
             % The maximum time to consider a collocation is in 'maxtime' and should be in
             % the same unit as t1 and t2.
             %
+            % The maximum distance and time are defined by the properties
+            % <a href="matlab:help CollocatedDataset/distance">distance</a> and <a href="matlab:help CollocatedDataset/interval">interval</a>.
+            %
             % This is a low-level method that is not usually called
             % directly. Rather call <a href="matlab:help CollocatedDataset/collocate_granule">collocate_granule</a> or
             % <a href="matlab:help CollocatedDataset/collocate_and_store_date_range">collocate_and_store_date_range</a> or so.
             %
-            % FORMAT collocations = cd.collocate(t1, lat1, long1, t2, lat2, long2, ...
-            %               maxdist, maxtime)
+            % FORMAT collocations = cd.collocate(t1, lat1, long1, t2, lat2, long2)
             %
             % OUT M       Nx4 matrix. Each row corresponds to a collocation, and has the
             %             rows and columns of the 1st and 2nd dataset respectively. 

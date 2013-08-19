@@ -1,3 +1,23 @@
+2013-08-19  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-410
+
+	* collocations/CollocatedDataset.m:
+
+	- Expand documentation on primary dataset
+
+	(read):
+
+	- Fix bug if no collocations exist AND no core fields are asked
+
+	(collocate):
+
+	- Expand docs
+
+	* datasets/HomemadeDataset.m:
+
+	- Odc-By v1.0 license by default
+
 2013-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-409
