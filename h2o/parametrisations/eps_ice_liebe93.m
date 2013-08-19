@@ -3,6 +3,11 @@
 %    Provides the complex dielectric constant following the Liebe 1993
 %    paper.
 %
+%    The actual limits of the parameterisation are not known. The following
+%    limits are here applied:
+%      f: [ 10 MHz, 1000 GHz] 
+%      t: [ 20 K, 280 K ] 
+%
 %    Another parameterisation is provided by *epsice*.
 %
 % FORMAT    e = eps_ice_liebe93( f, t )
@@ -20,12 +25,12 @@ function e = eps_ice_liebe93( f, t )
 theta = 300 ./ t;
 fghz  = f/1e9;
 
-    if fghz<0.01  |  fghz>1000
-      error('Valid range for frequency is 0.01-1000 GHz'); 
-    end
-    if t<20  |  t>273.15
-      error('Valid range for temperature is 20-273.15 K'); 
-    end
+if fghz<0.01  |  fghz>1000
+  error('Valid range for frequency is 0.01-1000 GHz'); 
+end
+if t<20  |  t>280
+  error('Valid range for temperature is 20-280 K'); 
+end
 
 
 a     = ( theta - 1 ) * exp( 17 - 22.1*theta );
