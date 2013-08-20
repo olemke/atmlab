@@ -1,3 +1,11 @@
+2013-08-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-412
+
+	* arts/qarts.m:
+	* arts/qarts2cfile.m: Adopted to changes in ARTS regarding checked
+	WSMs and WSVs.
+
 2013-08-20  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-411
