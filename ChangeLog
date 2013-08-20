@@ -1,3 +1,12 @@
+2013-08-20  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-411
+
+	* arts/qarts2cfile.m, scattering/tmatrix.m:
+
+	scat_data_raw -> scat_data_array
+	scat_data_meta -> scat_meta_array
+
 2013-08-19  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-410

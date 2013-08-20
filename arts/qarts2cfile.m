@@ -1394,7 +1394,7 @@ return
 %    cloudbox_on
 %    cloudbox_limits
 %    pnd_field
-%    scat_data_raw
+%    scat_data_array
 %    spt_calc_agenda
 %    opt_prop_gas_agenda
 %
@@ -1476,7 +1476,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
       if isstr( Q.CLOUDBOX.SCAT_DATA{i} )
         sfile = Q.CLOUDBOX.SCAT_DATA{i};
       else
-        sfile = fullfile( workfolder, sprintf( 'scat_data_raw_%d.xml', i ) );
+        sfile = fullfile( workfolder, sprintf( 'scat_data_array_%d.xml', i ) );
         xmlStore( sfile, Q.CLOUDBOX.SCAT_DATA{i}, 'SingleScatteringData',...
                                                        Q.INPUT_FILE_FORMAT );
       end
@@ -1519,7 +1519,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
     T{end+1} = add_savefile( 'cloudbox_on', workfolder );
     T{end+1} = add_savefile( 'cloudbox_limits', workfolder );
     T{end+1} = add_savefile( 'pnd_field', workfolder );
-    T{end+1} = add_savefile( 'scat_data_raw', workfolder );
+    T{end+1} = add_savefile( 'scat_data_array', workfolder );
   end
 return
 

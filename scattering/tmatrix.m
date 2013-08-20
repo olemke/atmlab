@@ -2,10 +2,10 @@
 %
 %    Basically an interface to ARTS for obtaining T-matrix data. 
 %    For detailed information, such as options for *pshape* see: 
-%       arts -d scat_data_meta_arrayAddTmatrix
+%       arts -d scat_meta_arrayAddTmatrix
 %    
 %    This function can handle combinations of shapes, types and sizes
-%    (and then differs a bit from scat_data_meta_arrayAddTmatrix).
+%    (and then differs a bit from scat_meta_arrayAddTmatrix).
 %    The variables that can be varied are N, pshape, ptype, pdiameter
 %    and aspect_ratio. These variables must have length 1 or *np*, 
 %    where *np* is the number of particles considered. If one or 
@@ -129,7 +129,7 @@ S{end+1} = sprintf( 'ReadXML(scat_aa_grid,"%s")', filename );
 
 %- Create meta data
 %
-S{end+1} = 'scat_data_meta_arrayInit';
+S{end+1} = 'scat_meta_arrayInit';
 %
 for i = 1 : np
   
@@ -142,7 +142,7 @@ for i = 1 : np
   end
   
   % Expand meta data
-  S{end+1} = 'scat_data_meta_arrayAddTmatrix(';
+  S{end+1} = 'scat_meta_arrayAddTmatrix(';
   if length(pshape) > 1
     S{end+1} = sprintf( '  shape              = "%s",', pshape{i} );
     desc{i}  = sprintf( '%s', pshape{i} );
@@ -179,12 +179,12 @@ end
 
 %- T-matrix part and save
 %
-S{end+1} = 'scat_data_rawFromMeta(';
+S{end+1} = 'scat_data_arrayFromMeta(';
 S{end+1} = '  za_grid   = scat_za_grid,';
 S{end+1} = '  aa_grid   = scat_aa_grid,';
 S{end+1} = '  precision = 0.001 )';
-S{end+1} = 'WriteXML( "ascii", scat_data_meta_array )';
-S{end+1} = 'WriteXML( "ascii", scat_data_raw )';
+S{end+1} = 'WriteXML( "ascii", scat_meta_array )';
+S{end+1} = 'WriteXML( "ascii", scat_data_array )';
 
 
 %- Create cfile
@@ -198,7 +198,7 @@ strs2file( cfile, S );
 %
 arts( cfile );
 %
-D = xmlLoad( fullfile( workfolder, 'cfile.scat_data_raw.xml' ) );
+D = xmlLoad( fullfile( workfolder, 'cfile.scat_data_array.xml' ) );
 %
 for i = 1 : np
   D{i}.description = desc{i};
@@ -207,5 +207,5 @@ end
 
 %if nargout > 2
 %  M = xmlLoad( fullfile( workfolder, ...
-%                            'cfile.scat_data_meta_array.xml' ) );
+%                            'cfile.scat_meta_array.xml' ) );
 %end
