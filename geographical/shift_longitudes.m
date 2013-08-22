@@ -1,15 +1,18 @@
 % SHIFT_LONGITUDES   Ensures that longitudes are inside defined range
 %
-%    The function shifts longitudes to match expected longitude range.
-%    Longitudes are expected to be in range [lonlow,lonhigh], that must
-%    be 360 degrees wide.
+%    The function shifts longitudes to match the defined longitude range.
+%    Longitudes will end up in therange [lonlow,lonhigh], that must
+%    be 360 degrees wide. 
+%
+%    There is no demand on input longitudes (except not beig NaN), the
+%    function shifts n*360, where n is the suitable integer.
 %
 % FORMAT   lon = shift_longitudes(lon,lonlow,lonhigh)
 %        
 % OUT   lon       Longitudes, restricted to defined range.
 % IN    lon       Original longitudes.
-%       lonlow    Lower limit for expected longitude range.
-%       lonhigh   Upper limit for expected longitude range.
+% OPT   lonlow    Lower limit for expected longitude range. Default is 0.
+%       lonhigh   Upper limit for expected longitude range. Default is 360.
 
 % 2008-03-17   Created by Patrick Eriksson.
 
@@ -17,23 +20,19 @@
 function lon = shift_longitudes(lon,varargin)
 %
 [lonlow,lonhigh] = optargs( varargin, { 0, 360 } );
-                                                                         %&%
-                                                                         %&%
-if lonhigh - lonlow ~= 360                                               %&%
-  error(['atmlab:' mfilename], ...
-      'Longitude range (lonhigh-lonlow) must be 360 degrees.' );      %&%
-end                                                                      %&%
 
-if any(isnan(lon(:)))
+if atmlab( 'STRICT_ASSERT' )
+  if lonhigh - lonlow ~= 360   
+    error(['atmlab:' mfilename], ...
+      'Longitude range (lonhigh-lonlow) must be 360 degrees.' );  
+  end 
+
+  if any(isnan(lon(:)))
     warning(['atmlab:' mfilename], ...
         'Found nans in longitude!');
+  end
 end
 
-if nanmax(lon(:)) - nanmin(lon(:)) > 360
-    error('atmlab:invalid_data', ...
-        'Range in longitudes exceeds 360. Differences up to %g found.', ...
-        nanmax(lon(:)) - nanmin(lon(:)));
-end
 
 ind = find( lon < lonlow );
 %

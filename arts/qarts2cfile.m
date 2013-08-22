@@ -633,7 +633,6 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     end
     
     T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
-    T{end+1} = 'abs_checkedCalc';
     
   end %  qarts_isset( Q.ABSORPTION )
 

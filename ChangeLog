@@ -1,3 +1,13 @@
+2013-08-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-413
+
+	* arts/qarts2cfile.m (cfile_Absrpt): Removed inclusion of
+	abs_checkedCalc.
+
+	* geographical/shift_longitudes.m: Default for lonlow/high was not
+	stated in header. And now using atmlab( 'STRICT_ASSERT' ).
+
 2013-08-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-412
