@@ -103,6 +103,7 @@ for i = 1 : nq
     %
     assert( strcmp( R.jq{i}.subtag, 'Zenith angle off-set' ) );
     %
+    Q.SENSOR_LOS = R.los;
     Q.SENSOR_LOS(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
                                                     R.jq{i}.grids{1} )* x(ind);
     

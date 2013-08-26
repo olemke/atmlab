@@ -1,3 +1,7 @@
+2013-08-26  Ole Martin Christensen  <olem@chalmers.se>
+
+	* arts/qarts_atm_field.m: fixed bug for 2d regridding
+
 2013-08-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-413

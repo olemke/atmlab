@@ -1,7 +1,7 @@
 % QARTS_ATM_FIELD   Extracts a basic atmospheric field from e.g. Q.T_ATMDATA
 %
 %   Performs an interpolation of ATMDATA, for those variables having such a
-%   sub-field. Those variables include: T, Z, WIND_U, WIND_V and MAG_U.
+%   sub-field. Those variables include: T, Z, WIND_U, WIND_V and WIND_W.
 %
 %   The field ATMDATA must be set. For 3D cases, P_GRID, LAT_GRID and LON_GRID
 %   are used as interpolation grids. For 1D and 2D, LAT_TRUE and LON_TRUE
@@ -25,7 +25,7 @@
 % OUT   atmfield    Obtained data field.
 % IN    Q           Qarts setting structure.
 %       vstring     The variable for which ATMDATA shall be interpolated.
-%                   Case of vstring is ignored. Examples: 't', 'T', 'z', 
+%                   Case of strong is ignored. Examples: 't', 'T', 'z', 
 %                   'wind_u' and 'WIND_w'.
 % OPT   mjd         Date as MJD. A scalar.
 %       ltime       Local (solar) time, in hours. A scalar.
@@ -41,6 +41,19 @@ if ~qarts_isset( Q.ATMOSPHERE_DIM )                                         %&%
 end                                                                         %&%
 
 
+%- Get data to interpolate
+%
+VNAME = upper( vstring );
+astr  = sprintf( 'Q.%c.ATMDATA', VNAME );
+%
+if ~isfield( Q.(VNAME), 'ATMDATA' ) | ~qarts_isset( Q.(VNAME).ATMDATA )   %&%
+  error( sprintf( '%s must be set when using this function', astr ) );    %&%
+end                                                                       %&%
+G = qarts_get_gformat( Q.(VNAME).ATMDATA );
+rqre_datatype( G, @isatmdata, astr );                                     %&%
+
+
+
 %- Set interpolation grids
 %
 if ~qarts_isset( Q.P_GRID )                                                 %&%
@@ -48,9 +61,15 @@ if ~qarts_isset( Q.P_GRID )                                                 %&%
 end                                                                         %&%
 grids{1} = qarts_get( Q.P_GRID );
 %
-if Q.ATMOSPHERE_DIM < 3
+if Q.ATMOSPHERE_DIM == 1
   grids{2} = qarts_get( Q.LAT_TRUE );
   grids{3} = qarts_get( Q.LON_TRUE );
+elseif Q.ATMOSPHERE_DIM == 2
+  if length(Q.LAT_GRID) ~=  length(Q.LAT_TRUE)                              %&%
+      error( 'Q.LAT_GRID must be of same length as Q.LAT_TRUE' );           %&%
+  end                                                                       %&%
+  grids{2} = G.GRID2;
+  grids{3} = G.GRID3;
 else
   grids{2} = qarts_get( Q.LAT_GRID );
   grids{3} = qarts_get( Q.LON_GRID );
@@ -63,19 +82,6 @@ for i = 1 : length( varargin )
 end
 
 
-
-%- Get data to interpolate
-%
-VNAME = upper( vstring );
-astr  = sprintf( 'Q.%s.ATMDATA', VNAME );
-%
-if ~isfield( Q.(VNAME), 'ATMDATA' ) | ~qarts_isset( Q.(VNAME).ATMDATA )   %&%
-  error( sprintf( '%s must be set when using this function', astr ) );    %&%
-end                                                                       %&%
-G = qarts_get_gformat( Q.(VNAME).ATMDATA );
-rqre_datatype( G, @isatmdata, astr );                                     %&%
-
-
 %- Interpolation
 %
 % Minimum dimension for interpolation is Q.ATMOSPHERE_DIM
@@ -83,4 +89,20 @@ dim = max( [ G.DIM Q.ATMOSPHERE_DIM ] );
 %
 G = atmdata_regrid( G, {grids{1:dim}}, astr );
 %
+
+%For two dimensional retrievals the atmdata must be interpolated along the
+%orbit track given by lat_true and lon_true
+
+if Q.ATMOSPHERE_DIM == 2
+    atmdata = zeros(length(grids{1}), length(Q.LAT_GRID));
+    for i = 1:length(grids{1})
+        atmdata(i,:) = pointinterp({grids{2:3}},squeeze(G.DATA(i,:,:)),[qarts_get( Q.LAT_TRUE ) qarts_get( Q.LON_TRUE )]);
+    end
+    G.DATA = atmdata;
+    G.GRID2 = qarts_get( Q.LAT_GRID );
+    G.GRID3 = [];    
+end
+
 atmfield = G.DATA;
+
+
