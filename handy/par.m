@@ -16,7 +16,7 @@ function y = par(x, varargin)
 %
 % this function allows you to write instead:
 %
-%   i = p(magic(3), 1, 2);
+%   i = par(magic(3), 1, 2);
 %
 % It works for either arrays or function calls, so it allows for
 % arbitrarily deep function chaining if you call p recursively.
