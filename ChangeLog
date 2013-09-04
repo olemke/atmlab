@@ -1,9 +1,24 @@
+2013-09-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-416
+
+	* graphs/new_figure.m: New. Useful if you want your new figures to
+	be appended instead of put in first free slot, which is the option
+	of the standard figure function.
+
+	* scattering/mie_arts_scat_data.m: Changed 'size' to 'radius' in
+	header text for r, for extra clarity.
+
 2013-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-415
 
 	* handy/par.m: Small correction of header. By the way, this an
 	excellent function.
 
 2013-08-26  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-1-414
 
 	* arts/qarts_atm_field.m: fixed bug for 2d regridding
 

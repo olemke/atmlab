@@ -15,7 +15,7 @@
 %   IN      rfr_ind  refractive indices, matrix with dimension
 %                    [f_grid, T_grid] 
 %   IN      theta    scattering angle grid [deg]
-%   IN      r        particle size [m]
+%   IN      r        particle radius [m]
 
 %    Created by Claudia Emde.
 
