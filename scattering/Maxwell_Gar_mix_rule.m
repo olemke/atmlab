@@ -30,4 +30,4 @@ einc=power(n2,2);
 eeff=emat+3.*fraction2.*emat.*(einc-emat)./(einc+2.*emat-(fraction2.*(einc-emat)));
 n=power(eeff,.5);
 
-rho=(rho2.*rho1)./((fraction2.*rho1)+((1-fraction2).*rho2));
+rho=(1-fraction2)*rho1+fraction2*rho2;

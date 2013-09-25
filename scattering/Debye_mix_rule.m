@@ -34,4 +34,4 @@ x=(fraction2.*(einc-1)./(einc+2))+(((1-fraction2).*(emat-1))./(emat+2));
 eeff=(2.*x+1)./(1-x);
 n=power(eeff,.5);
 
-rho=(rho2.*rho1)./((fraction2.*rho1)+((1-fraction2).*rho2));
+rho=(1-fraction2)*rho1+fraction2*rho2;

@@ -1,3 +1,13 @@
+
+2013-09-25  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
+
+	*  atmlab-2-1-417
+
+	* scattering/Maxwell_Gar_mix_rule.m
+        * scattering/Debye_mix_rule.m
+	* scattering/Bruggeman_mix_rule.m:
+	 A modification of density calculations of a two-media mixture.
+	
 2013-09-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-416

@@ -40,4 +40,4 @@ eeff=emat./2 - einc./4 + (3.*einc.*fraction2)./4 - (3.*emat.*fraction2)./4 +...
 
 n=power(eeff,.5);
 
-rho=(rho2.*rho1)./((fraction2.*rho1)+((1-fraction2).*rho2));
+rho=(1-fraction2)*rho1+fraction2*rho2;
