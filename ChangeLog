@@ -1,3 +1,29 @@
+2013-09-26  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-418
+
+	- BREAKING BACKWARD COMPATIBILITY!  From now on, in the Collapser, the
+	processor function handles must take TWO arguments.  The first one is
+	the data to be collapsed, while the second one is the core.  Of course
+	the second one need not be used, but it is passed on so it should be
+	ignored if not used.
+
+	* collocations/Collapser.m:
+
+	- Adapt documentation and call to proccers{k}{pi} for the new
+	processor methodology
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Bugfix in concatenating structures, make sure it's the newest one
+	that gets stored if the user explicitly passes something on.  Also add
+	my e-mail as a default contact.
+
+	* datasets/define_datasets.m:
+
+	- Adapt all listed processors for the aforementioned change
+	- Add amsua CLOSEST for  use in gras-amsua
+
 
 2013-09-25  Maryam Jamali  <maryamj@feldspar.rss.chalmers.se>
 

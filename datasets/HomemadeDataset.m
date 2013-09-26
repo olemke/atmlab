@@ -270,6 +270,7 @@ classdef HomemadeDataset < SatDataset
                 global_atts.institution = ['Department of Computer Science, Electrical and Space Engineering, Division of Space Technology, Lule' char(unicode2native('å')) ' University of Technology, Kiruna, Sweden'];
                 global_atts.source = 'Collocation codes, part of atmlab';
                 global_atts.references = 'Holl et al.  (2010); John et al. (2012)';
+                global_atts.contact = 'gerrit.holl@gmail.com';
                 global_atts.software_version = atmlab_version;
                 global_atts.id = [atmlab_version() ' -- ' iso_timestamp() ' -- ' fn];
                 global_atts.license = ...
@@ -282,9 +283,14 @@ classdef HomemadeDataset < SatDataset
                      'whose text can be found at http://opendatacommons.org/licenses/by/1.0/.'];
                 
                 % add caller-contributed ones
-                warning('off', 'catstruct:DuplicatesFound');
-                global_atts = catstruct(global_atts, info);
-                warning('on', 'catstruct:DuplicatesFound');
+                %warning('off', 'catstruct:DuplicatesFound');
+                inf_fields = fieldnames(info);
+                for i = 1:length(inf_fields)
+                    fldnm = inf_fields{i};
+                    global_atts.(fldnm) = info.(fldnm);
+                end
+                %global_atts = catstruct(global_atts, info);
+                %warning('on', 'catstruct:DuplicatesFound');
                 addncattributes(ncid, global_atts)
             else
                 dim_collocs = netcdf.inqDimID(ncid, 'Collocations');

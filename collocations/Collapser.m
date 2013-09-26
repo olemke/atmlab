@@ -113,19 +113,22 @@ classdef Collapser < AssociatedDataset
         %       The function handle can be either in vectorised or
         %       non-vectorised form, depending on the value of the
         %       collapser property 'vectorised', which defaults to false
-        %       (behaviour prior to atmlab-2-1-370).
+        %       (behaviour prior to atmlab-2-1-370).  In both cases,  it
+        %       receives two inputs.  The first input relates only to the
+        %       data that is to be collapsed, while the second input
+        %       provides the 'core', with all fields.
         %
         %       In non-vectorised form, the function is called once for
-        %       each primary footprint. It takes as input the secondary
+        %       each primary footprint. It takes as input (1) the secondary
         %       footprints corresponding to the primary
         %       footprint, after global and local limitators
-        %       are applied. The function handle must return a
+        %       are applied, and (2) corresponding core data. The function handle must return a
         %       single, scalar value, or a single vector of values
         %       if the input data are 2-D.
         %
         %       In vectorised form, the function handle is called once for
-        %       each granule.  It receives as input a p*N*q ndarray,
-        %       as for the limitators above.  Beyond data that were already
+        %       each granule.  It receives as input (1) a p*N*q ndarray,
+        %       as for the limitators above, and (2) corresponding core.  Beyond data that were already
         %       masked to begin with (again, see description at
         %       limitators), data are masked where any limitator has
         %       returned false.  The function shall return a N*q array (for
@@ -674,7 +677,7 @@ classdef Collapser < AssociatedDataset
                                 end
                                 %proccer = self.fieldstruct.(fname).processors.(procname);
                                 %                             capsed = proccers{k}{pi}(M_source(limsel, self.fieldstruct.(fname).origin.cols.(fname)));
-                                capsed = proccers{k}{pi}(M_source(limsel, cols_data.(fname)));
+                                capsed = proccers{k}{pi}(M_source(limsel, cols_data.(fname)), M_coll_part(limsel, :));
                                 
                                 %if ~isequal(size(capsed), [1 length(self.cols.([procname '_' fname]))])
                                 if ~isequal(size(capsed), [1, length(localcols.([procname '_' fname]))])

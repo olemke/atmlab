@@ -775,7 +775,7 @@ limitators_scalar = {@(X)(X>=0)}; % meaning not flagged
 %limitators_scalar_vectorised = {@(x)x};
 limitators_profile = {@(X)(true(size(X, 1), 1))};
 %limitators_profile_vectorised = {@(x)true(size(X))};
-closest.fn = @(x)(x(1)); %workaround, see this collapser
+closest.fn = @(x, ~)(x(1)); %workaround, see this collapser
 closest.ln = 'Only the closest measurement pair';
 % ----------
 % MHS -CPR
@@ -797,19 +797,19 @@ for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_
     if ismember(f, union(cpr_iwp_fields, cpr_ecmwf_scal_fields))
         appccs.(f).limitators = limitators_scalar;
         %len = @length;
-        len_vec = @(X)(vec2col(sum(~isnan(X), 1)));
+        len_vec = @(X, ~)(vec2col(sum(~isnan(X), 1)));
         %mn = @mean;        
-        mn_vec = @(X)(vec2col(nanmean(X, 1)));
+        mn_vec = @(X, ~)(vec2col(nanmean(X, 1)));
         %st = @std;
-        st_vec = @(X)(vec2col(nanstd(X, 0, 1)));
+        st_vec = @(X, ~)(vec2col(nanstd(X, 0, 1)));
         %cv = @(X)(std(X) ./ mean(X));
     elseif ismember(f, cpr_ecmwf_prof_fields)
         appccs.(f).limitators = limitators_profile;
-        len = @(X)(size(X, 1));
+        len = @(X, ~)(size(X, 1));
         len_vec = len;
-        mn = @(X)(mean(X, 1));
+        mn = @(X, ~)(mean(X, 1));
         mn_vec = mn;
-        st = @(X)(std(X, 0, 1));
+        st = @(X, ~)(std(X, 0, 1));
         st_vec = st;
         %cv = @(X)(std(X, 0, 1) ./ mean(X, 1));
     end
@@ -837,7 +837,7 @@ for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_
         for iwp = [1, 10, 40, 1000]
             fn = sprintf('FRAC%d', iwp);
             %appccs.(f).processors.(fn) = @(X)(sum(X>=iwp) / length(X));
-            appccs.(f).processors.(fn) = @(X)vec2col(sum(X>=iwp, 1) ./ sum(~isnan(X), 1));
+            appccs.(f).processors.(fn) = @(X, ~)vec2col(sum(X>=iwp, 1) ./ sum(~isnan(X), 1));
             appccs.(f).stored.(fn).type = 'float';
             appccs.(f).stored.(fn).atts.long_name = sprintf('Cloud fraction according to %s >= %d %s', ...
                 fields.cpr.(f).atts.long_name, iwp, fields.cpr.(f).atts.units);
@@ -926,43 +926,49 @@ amsua_global_lim =  {@(X)(X(:, D.collocation_gras_amsua.cols.DIST)<100), ...
 % primary footprint because ONE of the channels is flagged, but I still
 % need a value for each channel; handle this in the processors instead
 %capsed_amsua.A_BT.limitators = limitators_scalar;
-capsed_amsua.A_BT.processors.NO = @(X)(sum(X>0, 1));
+capsed_amsua.A_BT.processors.NO = @(X, ~)(sum(X>0, 1));
 capsed_amsua.A_BT.stored.NO.type = 'int';
 capsed_amsua.A_BT.stored.NO.atts.long_name = 'Number of AMSU-A used for stats within GRAS';
 capsed_amsua.A_BT.stored.NO.atts.valid_min = 0;
 %capsed_amsua.A_BT.stored.NO.profile = false;
-capsed_amsua.A_BT.processors.MEAN = @(X)(ignoreNeG(X, @mean, 1));
+capsed_amsua.A_BT.processors.MEAN = @(X, ~)(ignoreNeG(X, @mean, 1));
 capsed_amsua.A_BT.stored.MEAN.type = 'float';
 capsed_amsua.A_BT.stored.MEAN.atts.units = fields.amsua.A_BT.atts.units;
 capsed_amsua.A_BT.stored.MEAN.atts.long_name = ['Mean ' fields.amsua.A_BT.atts.long_name];
 capsed_amsua.A_BT.stored.MEAN.atts.valid_range = [200, 350];
 capsed_amsua.A_BT.stored.MEAN.atts.missing_value = -9999;
-capsed_amsua.A_BT.processors.STD = @(X)(ignoreNeG(X, @std, 1));
+capsed_amsua.A_BT.processors.STD = @(X, ~)(ignoreNeG(X, @std, 1));
 capsed_amsua.A_BT.stored.STD.type = 'float';
 capsed_amsua.A_BT.stored.STD.atts.units = fields.amsua.A_BT.atts.units;
 capsed_amsua.A_BT.stored.STD.atts.long_name = ['Std. of ' fields.amsua.A_BT.atts.long_name];
 capsed_amsua.A_BT.stored.STD.atts.valid_min = 0;
 capsed_amsua.A_BT.stored.STD.atts.missing_value = -9999;
-
+%capsed_amsua.A_BT.limitators.CLOSEST = {@(X)(X(:, D.collocation_gras_amsua.cols.DIST)==min(X(:, D.collocation_gras_amsua.cols.DIST)))};
+capsed_amsua.A_BT.processors.CLOSEST = @(X, Y)(X(Y(:, D.collocation_gras_amsua.cols.DIST)==min(Y(:, D.collocation_gras_amsua.cols.DIST)), :));
+capsed_amsua.A_BT.stored.CLOSEST.type = 'float';
+capsed_amsua.A_BT.stored.CLOSEST.atts.units = fields.amsua.A_BT.atts.units;
+capsed_amsua.A_BT.stored.CLOSEST.atts.long_name = ['Closest ' fields.amsua.A_BT.atts.long_name];
+capsed_amsua.A_BT.stored.CLOSEST.atts.valid_range = capsed_amsua.A_BT.stored.MEAN.atts.valid_range;
+capsed_amsua.A_BT.stored.CLOSEST.atts.missing_value = capsed_amsua.A_BT.stored.MEAN.atts.missing_value;
 
 % ------
 % avhrr
 % ------
 
 %avhrr_capsed.AVHRR_Y.processors.NO = @(X)(size(X, 1));
-avhrr_capsed.AVHRR_Y.processors.NO = @(X)(vec2col(par(sum(~isnan(X), 1), ':', ':', 3)));
+avhrr_capsed.AVHRR_Y.processors.NO = @(X, ~)(vec2col(par(sum(~isnan(X), 1), ':', ':', 3)));
 avhrr_capsed.AVHRR_Y.stored.NO.type = 'short';
 avhrr_capsed.AVHRR_Y.stored.NO.atts.long_name = 'Number of AVHRR footprints used for statistics inside AMSU-B/MHS';
 avhrr_capsed.AVHRR_Y.stored.NO.atts.missing_value = 0;
 avhrr_capsed.AVHRR_Y.stored.NO.profile = false;
 %avhrr_capsed.AVHRR_Y.processors.MEAN = @(X)(mean(X, 1));
-avhrr_capsed.AVHRR_Y.processors.MEAN = @(X)(squeeze(nanmean(X, 1)));
+avhrr_capsed.AVHRR_Y.processors.MEAN = @(X, ~)(squeeze(nanmean(X, 1)));
 avhrr_capsed.AVHRR_Y.stored.MEAN.type = 'float';
 avhrr_capsed.AVHRR_Y.stored.MEAN.atts.long_name = 'MHS-averaged AVHRR BT';
 avhrr_capsed.AVHRR_Y.stored.MEAN.atts.units = 'albedo or BT';
 avhrr_capsed.AVHRR_Y.stored.MEAN.atts.missing_value = -1;
 %avhrr_capsed.AVHRR_Y.processors.STD = @(X)(std(X, 0, 1));
-avhrr_capsed.AVHRR_Y.processors.STD = @(X)(squeeze(nanstd(X, 0, 1)));
+avhrr_capsed.AVHRR_Y.processors.STD = @(X, ~)(squeeze(nanstd(X, 0, 1)));
 avhrr_capsed.AVHRR_Y.stored.STD.type = 'float';
 avhrr_capsed.AVHRR_Y.stored.STD.atts.long_name = 'AVHRR-in-MHS standard deviation';
 avhrr_capsed.AVHRR_Y.stored.STD.atts.units = avhrr_capsed.AVHRR_Y.stored.MEAN.atts.units;
@@ -972,7 +978,7 @@ avhrr_capsed.AVHRR_Y.stored.STD.atts.missing_value = -1;
 % avhrr_capsed.AVHRR_Y.stored.CV.atts.long_name = 'Coefficient of variation of AVHRR in MHS';
 % avhrr_capsed.AVHRR_Y.stored.CV.atts.missing_value = 0;
 % avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = mn;
-avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = @(X)vec2col(nanmean(X, 1));
+avhrr_capsed.AVHRR_FLAG_3AB.processors.MEAN = @(X, ~)vec2col(nanmean(X, 1));
 avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.type = 'float';
 avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.long_name = 'MHS-averaged AVHRR BT';
 avhrr_capsed.AVHRR_FLAG_3AB.stored.MEAN.atts.units = 'albedo or BT';
