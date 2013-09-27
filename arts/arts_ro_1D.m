@@ -1,14 +1,18 @@
-function [t,impa,bean,sltz] = arts_ro_1D
+function [t] = arts_ro_1D
   
 O.leo_altitude = 820e3;
 O.gps_altitude = 20200e3;
 O.frequency    = 1575.42e6;
-O.max_impa     = 30e3;
 O.lmax         = 5e3;
 O.lraytrace    = 100;
+O.z_surface    = 0;
+
+O.zimp_max     = 30e3;
+O.zimp_dz      = 1e3;
+
+
 
 A.planet       = 'earth';
-
 A.atmfunc      = @arts_include_fascode;
 A.fascode_atm  = 'tropical';
 
@@ -16,6 +20,8 @@ A.fascode_atm  = 'tropical';
 %
 workfolder = create_tmpfolder;
 cu = onCleanup( @()delete_tmpfolder( workfolder ) );
+%
+cfile = fullfile( workfolder, 'cfile.arts' );
 
 
 %- Set basic and observation related fields of Q
@@ -28,10 +34,22 @@ Q = q_basic_local( O, workfolder );
 Q = q_planet_local( Q, A, workfolder );
 
 
-cfile = fullfile( workfolder, 'cfile.arts' );
+%- Impact heights to consider
+%
 
 
-  Q.SENSOR_LOS = geomztan2za( Q.REFELLIPSOID(1), O.leo_altitude, 10e3 );
+%- Allocate variables for key variables
+%
+zimp0 = [ O.zimp_max : -O.zimp_dz : O.z_surface ]';
+n0    = length( zimp0 );
+%
+[ztan0,lattan0] = deal( repmat( NaN, n0, 1 ) );
+
+%- Run ARTS
+%
+for i = 1 : n0
+
+  Q.SENSOR_LOS = geomztan2za( Q.REFELLIPSOID(1), O.leo_altitude, zimp0(i) );
 
   % Run ARTS
   %
@@ -45,6 +63,15 @@ cfile = fullfile( workfolder, 'cfile.arts' );
   end
 
   ppath = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );   
+
+  if strcmp( ppath.background, 'space' )
+  
+    % Extract tangent point
+    [u,j]      = min( ppath.pos(:,1) );
+    ztan0(i)   = ppath.pos(j,1);
+    lattan0(i) = ppath.pos(j,2);
+  end
+end
 
 keyboard
 
@@ -76,10 +103,10 @@ function Q = q_basic_local(O,workfolder)
   %
   Q.PPATH_AGENDA          = { 'ppath_agenda__FollowSensorLosPath'   };
   Q.PPATH_STEP_AGENDA     = { 'ppath_step_agenda__RefractedPath'    };
-  Q.REFR_INDEX_AIR_AGENDA = { ...
-                           'refr_index_air_agenda__GasMWgeneralAndElectrons' };
   %
   Q.SENSOR_POS            = O.leo_altitude;
+  %
+  Q.Z_SURFACE             = O.z_surface;
   %
   Q.WSMS_AT_END         = { 
     'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
@@ -115,13 +142,20 @@ function Q = q_planet_local(Q,A,workfolder)
     Q.ABS_SPECIES(1).TAG{1} = 'N2';
     Q.ABS_SPECIES(2).TAG{1} = 'O2';
     Q.ABS_SPECIES(3).TAG{1} = 'H2O';
-    Q.ABS_SPECIES(4).TAG{1} = 'free_electrons';
-      
+    if A.atmfunc( Q, 'query', 'free_electrons_supported' );
+      Q.ABS_SPECIES(4).TAG{1} = 'free_electrons';
+      Q.REFR_INDEX_AIR_AGENDA = { ...
+                           'refr_index_air_agenda__GasMWgeneralAndElectrons' };
+    else
+      Q.REFR_INDEX_AIR_AGENDA = { ...
+                                       'refr_index_air_agenda__GasMWgeneral' };
+    end
+    
    otherwise
     error( 'Unrecognised choice for A.planet (%s).', A.planet );
   end
   %
   % Include atmospheric specific data
-  Q = A.atmfunc( Q, A, workfolder );
+  Q = A.atmfunc( A, Q, workfolder );
   %  
 return
