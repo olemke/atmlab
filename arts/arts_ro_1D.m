@@ -8,8 +8,9 @@ O.lmax         = 5e3;
 O.lraytrace    = 100;
 
 A.planet       = 'earth';
-A.atmfunc      = @arts_include_fascode;
 
+A.atmfunc      = @arts_include_fascode;
+A.fascode_atm  = 'tropical';
 
 %- Create a temporary workfolder
 %
@@ -24,11 +25,13 @@ Q = q_basic_local( O, workfolder );
 
 %- Set basic and ppath parts of Q
 %
-Q = q_planet_local( Q, A );
+Q = q_planet_local( Q, A, workfolder );
 
 
+cfile = fullfile( workfolder, 'cfile.arts' );
 
-  Q.SENSOR_LOS = geomztan2za( Q.REFELLIPSOID(1), z_plat, 10e3 );
+
+  Q.SENSOR_LOS = geomztan2za( Q.REFELLIPSOID(1), O.leo_altitude, 10e3 );
 
   % Run ARTS
   %
@@ -89,7 +92,7 @@ return
 
 
 %----------------------------------------------------------------------------
-function Q = q_planet_local(Q,A)
+function Q = q_planet_local(Q,A,workfolder)
   %
   rqre_field( A, 'planet' );
   rqre_field( A, 'atmfunc' );
@@ -119,6 +122,6 @@ function Q = q_planet_local(Q,A)
   end
   %
   % Include atmospheric specific data
-  Q = A.funchandle( Q, A, workfolder );
+  Q = A.atmfunc( Q, A, workfolder );
   %  
 return

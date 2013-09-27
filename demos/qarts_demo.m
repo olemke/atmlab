@@ -51,7 +51,7 @@ Q.P_GRID                = z2p_simple( [0:500:45e3 46e3:1e3:95e3]' );
 %
 arts_xmldata_path       = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
+  error('You need ARTS_XMLDATA_PATH to run this example.');
 end
 %
 Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
