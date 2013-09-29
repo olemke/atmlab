@@ -11,6 +11,7 @@
 %       CBGR                       [K] Temperature of cosmic background 
 %                                      radiation 
 %       DEG2RAD                    [rad] Conversion from degrees to radians
+%       EARTH_MASS                 [kg] Mass of the earth.
 %       EARTH_RADIUS               [m] Equatorial radius of the earth.
 %       EARTH_RADIUS_MEAN          [m] Mean radius of the earth.
 %       EARTH_STANDARD_GRAVITY     [m/s^2] As defined from CGPM in m/s^2
@@ -19,6 +20,7 @@
 %       GAS_CONST_DRY_AIR          [J.kg-1e4.K-1] Gas constant for dry air
 %     
 %       GAS_CONST_WATER_VAPOR      [J.kg-1.K-1] Gas constant for water vapor
+%       GRAVITATIONAL_CONSTANT     [m3.kg-1.s-3] The gravitational constant, G
 %       LATENT_HEAT_VAPORIZATION   [J.kg-1] Latent heat of vaporization of
 %                                           water vapor (at 373.15K)
 %
@@ -113,7 +115,12 @@ case 'DEG2RAD'
     const = pi/180;
     unit = 'rad';
     
-case 'EARTH_RADIUS'
+case 'EARTH_MASS'
+    %ref: http://en.wikipedia.org/wiki/Earth_mass
+    const = 5.97219e24;
+    unit  = 'kg';
+ 
+ case 'EARTH_RADIUS'
     %ref: http://en.wikipedia.org/wiki/Earth (equatorial radius)
     const = 6.3781e6;
     unit  = 'm';
@@ -148,7 +155,14 @@ case 'GAS_CONST_WATER_VAPOR'
     const = 461.5; 
     unit  = 'Jkg^{-1}K^{-1}';
     
-case 'LATENT_HEAT_VAPORIZATION'
+ case 'GRAVITATIONAL_CONSTANT'
+    % ref: http://prl.aps.org/abstract/PRL/v111/i10/e101102
+    % (This value is slightly higher than te ne given by eg. Wikipedia, but
+    % is a new measurement (2013) that should be more accurate.)
+    const = 6.67545e-11;
+    unit  = 'm^3kg^{-1}s^{-2}';
+ 
+ case 'LATENT_HEAT_VAPORIZATION'
     % ref: http://en.wikipedia.org/wiki/Enthalpy_of_vaporization
     error(['atmlab:' mfilename ':notConstant'],....
         ['The latent heat vaporization is a strong function of temperature.\n',...
@@ -214,9 +228,11 @@ function const_struct = get_constants_struct
 % A structure with the same information as the switch case (+units)
 
 name  = { ...
-    'AVOGADRO', 'BOLTZMANN_CONST', 'CBGR', 'DEG2RAD', 'EARTH_RADIUS', ...
-    'EARTH_RADIUS_MEAN', 'EARTH_STANDARD_GRAVITY', 'EARTHORBIT_RADIUS',...
+    'AVOGADRO', 'BOLTZMANN_CONST', 'CBGR', 'DEG2RAD', ...
+    'EARTH_MASS', 'EARTH_RADIUS', 'EARTH_RADIUS_MEAN', ...
+    'EARTH_STANDARD_GRAVITY', 'EARTHORBIT_RADIUS',...
     'GAS_CONST', 'GAS_CONST_DRY_AIR', 'GAS_CONST_WATER_VAPOR', ...
+    'GRAVITATIONAL_CONSTANT', ...
     'LATENT_HEAT_VAPORIZATION_273', 'NAUTICAL_MILE', 'PLANCK_CONST', 'RAD2DEG',...
     'SPECIFIC_HEAT_CP_DRY_AIR', 'SPECIFIC_HEAT_CV_DRY_AIR', ...
     'SPEED_OF_LIGHT', 'STEFANBOLTZMANN', 'SUN_RADIUS' ...

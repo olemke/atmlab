@@ -1,3 +1,19 @@
+2013-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-422
+
+	* arts/arts_ro_1D.m: A basic version is ready.
+
+	* arts/arts_include_fascode.m: Wrote header.
+
+	* physics/constants.m: Added GRAVITATIONAL_CONSTANT and
+	EARTH_MASS.
+	(A fun coincidence here. For the gravitational constant, I first
+	put in the value from Wikipedia. 30 min later I read Ny teknik
+	from this week, and found out that a new measurement just has been
+	published, 0.02% higher. I selected the new one. For link to
+	abstract, see the file. Or see http://www.sciencenews.org/view/generic/id/353215/description/Notorious_Big_G_gets_a_little_larger).
+
 2013-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-421
