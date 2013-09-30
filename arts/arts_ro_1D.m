@@ -16,21 +16,25 @@
 %       lat_distance: The latitude distance between the satellites.
 %       bangle      : Bending angle.
 %       slta        : Straight line tangent altitude.
-%       l_excess    : The excess propagation length (optical path -
-%                     geometrical distance between the satellites).
-%       l_optpath   : The optical path.
-%       defocus     : Defocusing factor (1 = no defocusing).
+%       l_geometric : The (straight line) geometrical distance between the 
+%                     satellites.
+%       l_optpath   : The optical path length.
 %       t           : Time relative to the occultation with max z_impact.
 %   Hence, R holds data as a function of *z_impact*.
 %
-%   The results are also returned as a function of time in the structure T.
-%   This structure contains exactly the same fields as R. The field T.t is
-%   the time grid used. The spacing of this grid follows O.f_sampling. The
-%   remaining fields of T are matrices (in contrast to R only having vector
-%   fields), where the columns represent "multi-pathing". That is, each
-%   column represents a path (not to be confused with the pencil beam paths
-%   used i ARTS). The limit between these paths correspond to
-%   discontinuities in the arrival time (for pencil beam paths).
+%   The results are also returned as a function of time in the structure T. 
+%   The field T.t is the time grid used. The spacing of this grid follows
+%   O.f_sampling. The remaining fields of T are matrices (in contrast to R 
+%   only having vector fields), where the columns represent "multi-pathing". 
+%   That is, each column represents a path (not to be confused with the 
+%   pencil beam paths used i ARTS). The limit between these paths correspond 
+%   to discontinuities in the arrival time (for pencil beam paths).
+%   This structure T contains mainly the same fields as R. Additional fields
+%   are
+%       defocus     : Defocusing factor (1 = no defocusing). Calculation
+%                     inaccuracy can give negative values. Such values are
+%                     kept to indicate possibly problematic data, but should
+%                     be set to zero if actually used.
 %
 %   The occultation is specified by the structure O having the fields
 %      leo_altitude : Altitude of LEO orbit.
@@ -115,8 +119,8 @@ Q = q_planet_local( Q, A, workfolder );
 R.z_impact = [ O.z_impact_max : -O.z_impact_dz : O.z_surface ]';
 n0         = length( R.z_impact );
 %
-[R.z_tan,R.lat_tan,R.bangle,R.lat_distance]     = deal( repmat( NaN, n0, 1 ) );
-[R.slta,R.l_excess,R.l_optpath,R.defocus,lr,lt] = deal( repmat( NaN, n0, 1 ) );
+[R.z_tan,R.lat_tan,R.bangle,R.lat_distance]  = deal( repmat( NaN, n0, 1 ) );
+[R.slta,R.l_geometric,R.l_optpath,R.defocus] = deal( repmat( NaN, n0, 1 ) );
 
 
 %- Radiii
@@ -173,13 +177,13 @@ for i = 1 : n0
                                                      cosd(R.lat_distance(i)) );
     R.slta(i)    = r_leo * r_gps * sind(R.lat_distance(i)) / lgeom - ...
                                                              Q.REFELLIPSOID(1);
-    R.l_optpath(i) = lopt;
-    R.l_excess(i)  = lopt - lgeom;
+    R.l_optpath(i)   = lopt;
+    R.l_geometric(i) = lgeom;
     
     % Defocusing
-    r_tan2 = Q.REFELLIPSOID(1) + R.z_tan(i);
-    lr(i)  = sqrt( r_leo^2 + r_tan2 ); 
-    lt(i)  = sqrt( r_gps^2 + r_tan2 ); 
+    %r_tan2 = Q.REFELLIPSOID(1) + R.z_tan(i);
+    %lr(i)  = sqrt( r_leo^2 + r_tan2 ); 
+    %lt(i)  = sqrt( r_gps^2 + r_tan2 ); 
 
   end
 end
@@ -209,27 +213,6 @@ end
 % Relative arrival time
 %
 R.t = ( R.lat_distance - R.lat_distance(1) ) / degpersec;
-
-
-% Defocusing
-%
-for i = 1 : n0
-  if ~isnan( lr(i) )
-    
-    fac = (pi/180) * (lr(i)*lt(i)) / (lr(i)+lt(i));
-
-    if i == 1
-      R.defocus(i) = 1 / ( 1 - fac*(  R.bangle(i+1)  -  R.bangle(i)  ) /  ...
-                                   ( R.z_impact(i+1) - R.z_impact(i) ) );
-    elseif i == n0
-      R.defocus(i) = 1 / ( 1 - fac*(  R.bangle(i)  -  R.bangle(i-1)  ) /  ...
-                                   ( R.z_impact(i) - R.z_impact(i-1) ) );
-    else
-      R.defocus(i) = 1 / ( 1 - fac*(  R.bangle(i+1)  -  R.bangle(i-1)  ) /  ...
-                                   ( R.z_impact(i+1) - R.z_impact(i-1) ) );
-    end
-  end
-end
 
 
 % Create T
@@ -274,9 +257,9 @@ end
 np    = length( istart );
 nt    = length( T.t );
 %  
-[T.z_tan,T.lat_tan,T.bangle,T.lat_distance] = deal( repmat( NaN, nt, np ) );
-[T.slta,T.l_excess,T.l_optpath,T.defocus]   = deal( repmat( NaN, nt, np ) );
-[T.z_impact]                                = deal( repmat( NaN, nt, np ) );
+[T.z_tan,T.lat_tan,T.bangle,T.lat_distance]  = deal( repmat( NaN, nt, np ) );
+[T.slta,T.l_geometric,T.l_optpath,T.defocus] = deal( repmat( NaN, nt, np ) );
+[T.z_impact]                                 = deal( repmat( NaN, nt, np ) );
 %
 for i = 1 : np
 
@@ -291,20 +274,45 @@ for i = 1 : np
   T.lat_distance(it,i) = interp1( R.t(ir), R.lat_distance(ir), T.t(it) );
   T.bangle(it,i)       = interp1( R.t(ir), R.bangle(ir),       T.t(it) );
   T.slta(it,i)         = interp1( R.t(ir), R.slta(ir),         T.t(it) );
+  T.l_geomtric(it,i)   = interp1( R.t(ir), R.l_geometric(ir),  T.t(it) );
   T.l_optpath(it,i)    = interp1( R.t(ir), R.l_optpath(ir),    T.t(it) );
-  T.l_excess(it,i)     = interp1( R.t(ir), R.l_excess(ir),     T.t(it) );
   T.z_impact(it,i)     = interp1( R.t(ir), R.z_impact(ir),     T.t(it) );
 
-  % Defocusing needs special attention is a bit more NaN in this var.
-  % (The above works, but gives a warning)
-  ir = ir( find( ~isnan(R.defocus(ir) ) ) );
-  if ~isempty(ir)
-    it = find( T.t >= R.t(ir(1))  &  T.t < R.t(ir(end)) );  
-  
-    T.defocus(it,i)    = interp1( R.t(ir), R.defocus(ir),      T.t(it) );
+end
+
+
+% Defocusing
+%
+for ip = 1 : np
+  for it = 1 : nt
+    
+    if ~isnan( T.bangle(it,ip) )
+      
+      r_tan2 = ( Q.REFELLIPSOID(1) + T.z_tan(it,ip) )^2;
+      lr     = sqrt( r_leo^2 + r_tan2 ); 
+      lt     = sqrt( r_gps^2 + r_tan2 ); 
+      
+      fac = (pi/180) * (lr*lt) / (lr+lt);
+
+      if it == 1  |  isnan(T.bangle(it-1,ip))
+        T.defocus(it,ip) = 1 / ( 1 - fac * ...
+                            (  T.bangle(it+1,ip)  -  T.bangle(it,ip)  ) /  ...
+                            ( T.z_impact(it+1,ip) - T.z_impact(it,ip) ) );
+      elseif it == nt  |  isnan(T.bangle(it+1,ip))
+        T.defocus(it,ip) = 1 / ( 1 - fac * ...
+                            (  T.bangle(it,ip)  -  T.bangle(it-1,ip)  ) /  ...
+                            ( T.z_impact(it,ip) - T.z_impact(it-1,ip) ) );
+      else
+        T.defocus(it,ip) = 1 / ( 1 - fac * ...
+                          (  T.bangle(it+1,ip)  -  T.bangle(it-1,ip)  ) /  ...
+                          ( T.z_impact(it+1,ip) - T.z_impact(it-1,ip) ) );
+      end
+    end
   end
 end
-  
+
+
+
 return
 
 

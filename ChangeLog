@@ -1,10 +1,17 @@
 2013-09-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-425
+
+	* arts/arts_ro_1D.m (arts_ro_1D): Defocusing now calculated
+	on time sampled data. Much more stable results.
+
+2013-09-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-424
 
 	* arts/arts_ro_1D.m: Now also returning time sampled data.
 	Defocusing results very unstable (for both R and T) and a fix is
-	needed. Otherwise it looks good. 
+	needed. Otherwise it looks good.
 
 2013-09-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
