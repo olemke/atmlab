@@ -10,23 +10,23 @@
 %
 %    The results are gathered into the structure R having the fields
 %       z_impact : The impact altitude, ie. the non-refracted tangent 
-%                  altitude. Returned as monotonously descreasing values.
+%                  altitude. Returned as monotonously decreasing values.
 %       z_tan    : Tangent altitude.
 %       lat_tan  : Latitude of tangent point.
 %       lat_distance: The latitude distance between the satellites.
 %       bangle   : Bending angle.
-%       slta     : Stright line tangent altitude.
-%       l_excess : The excess propgation length (optical path - geometrical
+%       slta     : Straight line tangent altitude.
+%       l_excess : The excess propagation length (optical path - geometrical
 %                  distance between the satellites).
 %       defocus  : Defocusing factor (1 = no defocusing).
-%       t        : Time relative to the occulation with max z_impact.
-%   Hence, R haolds data as a function *z_impact*.
+%       t        : Time relative to the occultation with max z_impact.
+%   Hence, R holds data as a function *z_impact*.
 %
-%   The occultation is specied by the structure O having the fields
+%   The occultation is specified by the structure O having the fields
 %      leo_altitude : Altitude of LEO orbit.
 %      gps_altitude : Altitude of GPS orbit.
 %      gps_movement : String describing movement. Options are 'none',
-%                     'approaching' or 'disappering'.
+%                     'approaching' or 'disappearing'.
 %      frequency    : Frequency of signal.
 %      lmax         : As ARTS WSV *lmax*. This setting affects here mainly
 %                     accuracy of tangent point.
@@ -49,13 +49,13 @@
 %        
 % OUT   R   Result structure, see above.
 % IN    O   Occultation structure, see above. If empty, some default 
-%           values used.
+%           values set that work as demonstration.
 %       A   Atmospheric structure, see above. If empty, Fascode tropical 
 %           is selected.
 
 % 2013-09-29   Created by Patrick Eriksson.
 
-function R = arts_ro_1D(O,A)
+function [R,T] = arts_ro_1D(O,A)
 %
 if isempty(O)
   O.leo_altitude = 820e3;
@@ -68,6 +68,7 @@ if isempty(O)
 
   O.z_impact_max = 30e3;
   O.z_impact_dz  = 100;
+  O.f_sampling   = 4;
 end
 %
 if isempty(A)
@@ -217,12 +218,69 @@ for i = 1 : n0
   end
 end
 
+
+% Create T
+%
+T.t   = min(R.t) : 1/O.f_sampling : max(R.t);
+%
+i1    = NaN; i2 = 0;  % Start and end index of path chunk
+%
+istart = [];
+iend   = [];
+ready  = false;
+%
+while ~ready
+  
+  % Next start is next non-NaN
+  ind = i2+1 : n0;
+  i1  = i2 + min( find( ~isnan( R.t(ind) ) ) );
+  
+  if isempty(i1)
+    ready = true;
+  
+  else
+    % Next end is set by NaN, decreasing t or end of data
+    ind = i1 : n0;
+    i2  = i1-2 + min( [ find(isnan(R.t(ind)));  
+                        find(diff(R.t(ind))<0)+1;
+                        n0 ] );
+  
+    istart = [ istart i1 ];
+    iend   = [ iend   i2 ];
+  end
+end
+%
+np    = length( istart );
+nt    = length( T.t );
+%  
+[T.z_tan,T.lat_tan,T.bangle,T.lat_distance] = deal( repmat( NaN, nt, np ) );
+[T.slta,T.l_excess,T.defocus,T.z_impact]    = deal( repmat( NaN, nt, np ) );
+%
+for i = 1 : np
+
+  % Interpolate over time of chunk
+  ir = istart(i) : iend(i);
+  it = find( T.t >= R.t(ir(1))  &  T.t < R.t(ir(end)) );  
+
+  T.z_tan(it,i)        = interp1( R.t(ir), R.z_tan(ir),        T.t(it) );
+  T.lat_tan(it,i)      = interp1( R.t(ir), R.lat_tan(ir),      T.t(it) );
+  T.lat_distance(it,i) = interp1( R.t(ir), R.lat_distance(ir), T.t(it) );
+  T.bangle(it,i)       = interp1( R.t(ir), R.bangle(ir),       T.t(it) );
+  T.slta(it,i)         = interp1( R.t(ir), R.slta(ir),         T.t(it) );
+  T.l_excess(it,i)     = interp1( R.t(ir), R.l_excess(ir),     T.t(it) );
+  T.z_impact(it,i)     = interp1( R.t(ir), R.z_impact(ir),     T.t(it) );
+
+  % Defocusing needs special attention is a bit more NaN in this var.
+  % (The above works, but gives a warning)
+  ir = ir( find( ~isnan(R.defocus(ir) ) ) );
+  if ~isempty(ir)
+    it = find( T.t >= R.t(ir(1))  &  T.t < R.t(ir(end)) );  
+  
+    T.defocus(it,i)    = interp1( R.t(ir), R.defocus(ir),      T.t(it) );
+  end
+end
+  
 return
-
-
-
-
-
 
 
 %----------------------------------------------------------------------------
