@@ -8,19 +8,29 @@
 %    following the ARTS nomenclature. The latitude gives here the angular
 %    distance from the GPS satellite. 
 %
-%    The results are gathered into the structure R having the fields
-%       z_impact : The impact altitude, ie. the non-refracted tangent 
-%                  altitude. Returned as monotonously decreasing values.
-%       z_tan    : Tangent altitude.
-%       lat_tan  : Latitude of tangent point.
+%    The basic results are gathered into the structure R having the fields
+%       z_impact    : The impact altitude, ie. the non-refracted tangent 
+%                     altitude. Returned as monotonously decreasing values.
+%       z_tan       : Tangent altitude.
+%       lat_tan     : Latitude of tangent point.
 %       lat_distance: The latitude distance between the satellites.
-%       bangle   : Bending angle.
-%       slta     : Straight line tangent altitude.
-%       l_excess : The excess propagation length (optical path - geometrical
-%                  distance between the satellites).
-%       defocus  : Defocusing factor (1 = no defocusing).
-%       t        : Time relative to the occultation with max z_impact.
-%   Hence, R holds data as a function *z_impact*.
+%       bangle      : Bending angle.
+%       slta        : Straight line tangent altitude.
+%       l_excess    : The excess propagation length (optical path -
+%                     geometrical distance between the satellites).
+%       l_optpath   : The optical path.
+%       defocus     : Defocusing factor (1 = no defocusing).
+%       t           : Time relative to the occultation with max z_impact.
+%   Hence, R holds data as a function of *z_impact*.
+%
+%   The results are also returned as a function of time in the structure T.
+%   This structure contains exactly the same fields as R. The field T.t is
+%   the time grid used. The spacing of this grid follows O.f_sampling. The
+%   remaining fields of T are matrices (in contrast to R only having vector
+%   fields), where the columns represent "multi-pathing". That is, each
+%   column represents a path (not to be confused with the pencil beam paths
+%   used i ARTS). The limit between these paths correspond to
+%   discontinuities in the arrival time (for pencil beam paths).
 %
 %   The occultation is specified by the structure O having the fields
 %      leo_altitude : Altitude of LEO orbit.
@@ -35,6 +45,7 @@
 %      z_surface    : Surface altitude.
 %      z_impact_max : Start altitude of occultation.
 %      z_impact_dz  : Vertical spacing between path calculations.
+%      f_sampling   : Sampling frequency for data in T.
 %
 %   Finally, the atmosphere is specified by the structure A having at least
 %   these fields
@@ -62,12 +73,12 @@ if isempty(O)
   O.gps_altitude = 20200e3;
   O.gps_movement = 'disappearing';
   O.frequency    = 1575.42e6;
-  O.lmax         = 1e3;
+  O.lmax         = 2e3;
   O.lraytrace    = 100;
   O.z_surface    = 0;
 
   O.z_impact_max = 30e3;
-  O.z_impact_dz  = 100;
+  O.z_impact_dz  = 200;
   O.f_sampling   = 4;
 end
 %
@@ -104,8 +115,8 @@ Q = q_planet_local( Q, A, workfolder );
 R.z_impact = [ O.z_impact_max : -O.z_impact_dz : O.z_surface ]';
 n0         = length( R.z_impact );
 %
-[R.z_tan,R.lat_tan,R.bangle,R.lat_distance] = deal( repmat( NaN, n0, 1 ) );
-[R.slta,R.l_excess,R.defocus,lr,lt]         = deal( repmat( NaN, n0, 1 ) );
+[R.z_tan,R.lat_tan,R.bangle,R.lat_distance]     = deal( repmat( NaN, n0, 1 ) );
+[R.slta,R.l_excess,R.l_optpath,R.defocus,lr,lt] = deal( repmat( NaN, n0, 1 ) );
 
 
 %- Radiii
@@ -162,7 +173,8 @@ for i = 1 : n0
                                                      cosd(R.lat_distance(i)) );
     R.slta(i)    = r_leo * r_gps * sind(R.lat_distance(i)) / lgeom - ...
                                                              Q.REFELLIPSOID(1);
-    R.l_excess(i) = lopt - lgeom;
+    R.l_optpath(i) = lopt;
+    R.l_excess(i)  = lopt - lgeom;
     
     % Defocusing
     r_tan2 = Q.REFELLIPSOID(1) + R.z_tan(i);
@@ -198,13 +210,14 @@ end
 %
 R.t = ( R.lat_distance - R.lat_distance(1) ) / degpersec;
 
+
 % Defocusing
 %
 for i = 1 : n0
   if ~isnan( lr(i) )
     
     fac = (pi/180) * (lr(i)*lt(i)) / (lr(i)+lt(i));
-    
+
     if i == 1
       R.defocus(i) = 1 / ( 1 - fac*(  R.bangle(i+1)  -  R.bangle(i)  ) /  ...
                                    ( R.z_impact(i+1) - R.z_impact(i) ) );
@@ -221,32 +234,40 @@ end
 
 % Create T
 %
+% Time grid to use
 T.t   = min(R.t) : 1/O.f_sampling : max(R.t);
 %
-i1    = NaN; i2 = 0;  % Start and end index of path chunk
-%
+% Find start and end of each time chunck
 istart = [];
 iend   = [];
-ready  = false;
-%
-while ~ready
-  
-  % Next start is next non-NaN
-  ind = i2+1 : n0;
-  i1  = i2 + min( find( ~isnan( R.t(ind) ) ) );
-  
-  if isempty(i1)
-    ready = true;
-  
+i1     = NaN; % Start of present chunck%
+
+for i = 1 : n0
+  % If Nan, then we are inbetween chuncks
+  if isnan( R.t(i) )
+    i1 = NaN;
+
   else
-    % Next end is set by NaN, decreasing t or end of data
-    ind = i1 : n0;
-    i2  = i1-2 + min( [ find(isnan(R.t(ind)));  
-                        find(diff(R.t(ind))<0)+1;
-                        n0 ] );
-  
-    istart = [ istart i1 ];
-    iend   = [ iend   i2 ];
+    % If i1==NaN, this is the start of a new chunck
+    if isnan(i1)
+      i1 = i;
+    end
+    
+    % End point if last point or next is NaN
+    if i == n0 | isnan(R.t(i+1))
+      if i > i1 % Ignore length-1 chuncks
+        istart = [ istart i1 ];
+        iend   = [ iend   i  ];
+      end
+      i1     = NaN;
+    
+    % Also end point if sign change of t-derivate
+    elseif i>1  &  ~isnan(R.t(i-1))  &  ...
+          sign(R.t(i+1)-R.t(i)) ~= sign(R.t(i)-R.t(i-1))
+      istart = [ istart i1 ];
+      iend   = [ iend   i  ];
+      i1     = i;      
+    end    
   end
 end
 %
@@ -254,19 +275,23 @@ np    = length( istart );
 nt    = length( T.t );
 %  
 [T.z_tan,T.lat_tan,T.bangle,T.lat_distance] = deal( repmat( NaN, nt, np ) );
-[T.slta,T.l_excess,T.defocus,T.z_impact]    = deal( repmat( NaN, nt, np ) );
+[T.slta,T.l_excess,T.l_optpath,T.defocus]   = deal( repmat( NaN, nt, np ) );
+[T.z_impact]                                = deal( repmat( NaN, nt, np ) );
 %
 for i = 1 : np
 
   % Interpolate over time of chunk
   ir = istart(i) : iend(i);
-  it = find( T.t >= R.t(ir(1))  &  T.t < R.t(ir(end)) );  
-
+  tmin = min( [ R.t(ir([1,end])) ] );
+  tmax = max( [ R.t(ir([1,end])) ] );
+  it = find( T.t >= tmin  &  T.t < tmax );  
+  
   T.z_tan(it,i)        = interp1( R.t(ir), R.z_tan(ir),        T.t(it) );
   T.lat_tan(it,i)      = interp1( R.t(ir), R.lat_tan(ir),      T.t(it) );
   T.lat_distance(it,i) = interp1( R.t(ir), R.lat_distance(ir), T.t(it) );
   T.bangle(it,i)       = interp1( R.t(ir), R.bangle(ir),       T.t(it) );
   T.slta(it,i)         = interp1( R.t(ir), R.slta(ir),         T.t(it) );
+  T.l_optpath(it,i)    = interp1( R.t(ir), R.l_optpath(ir),    T.t(it) );
   T.l_excess(it,i)     = interp1( R.t(ir), R.l_excess(ir),     T.t(it) );
   T.z_impact(it,i)     = interp1( R.t(ir), R.z_impact(ir),     T.t(it) );
 
@@ -331,7 +356,7 @@ function Q = q_planet_local(Q,A,workfolder)
     error( 'The function *%s* is not found (selected by A.atmfunc).', ...
                                                         func2str(A.atmfunc) ); 
   end
-  %
+
   switch upper( A.planet )
 
    case 'EARTH'
@@ -345,10 +370,9 @@ function Q = q_planet_local(Q,A,workfolder)
     if A.atmfunc( Q, 'query', 'free_electrons_supported' );
       Q.ABS_SPECIES(4).TAG{1} = 'free_electrons';
       Q.REFR_INDEX_AIR_AGENDA = { ...
-                           'refr_index_air_agenda__GasMWgeneralAndElectrons' };
+                             'refr_index_air_agenda__GasThayerAndElectrons' };
     else
-      Q.REFR_INDEX_AIR_AGENDA = { ...
-                                       'refr_index_air_agenda__GasMWgeneral' };
+      Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__GasThayer'};
     end
     
    otherwise
