@@ -1,3 +1,10 @@
+2013-10-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-427
+
+	* arts/arts_ro_1D.m (arts_ro_1D): Defocusing calculation could
+	crash for point it= 1 and nt.
+
 2013-10-01  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-426
