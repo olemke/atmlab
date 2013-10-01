@@ -409,7 +409,14 @@ classdef HomemadeDataset < SatDataset
                                 '%s.members.%s.atts.missing_value. Please define.'], ...
                                 varname, self.name, varname);
                         end
-                        data(any(~isfinite(data(:, localcols.(varname)))), localcols.(varname)) = self.members.(varname).atts.missing_value;
+                        % need to flag only the relevant channels.  Matlabs
+                        % lacks views, so I have to do this in a really
+                        % cumbersome way.
+                        chanmask = false(size(data));
+                        chanmask(:, localcols.(varname)) = true;
+                        invmask = ~isfinite(data);
+                        data(chanmask&invmask) = self.members.(varname).atts.missing_value;
+                        %data(any(~isfinite(data(:, localcols.(varname)))), localcols.(varname)) = self.members.(varname).atts.missing_value;
                     end
                     
                     netcdf.putVar(ncid, varid, data(:, localcols.(varname)));

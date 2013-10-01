@@ -1,3 +1,13 @@
+2013-10-01  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-426
+
+	* datasets/HomemadeDataset.m(store):
+
+	- Bugfix in flagging data. Was flagging too much in case of
+	multi-channel instruments, and was causing complete failure in case of
+	a very low number of collocs.
+
 2013-09-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-425
