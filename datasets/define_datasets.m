@@ -944,7 +944,8 @@ capsed_amsua.A_BT.stored.STD.atts.long_name = ['Std. of ' fields.amsua.A_BT.atts
 capsed_amsua.A_BT.stored.STD.atts.valid_min = 0;
 capsed_amsua.A_BT.stored.STD.atts.missing_value = -9999;
 %capsed_amsua.A_BT.limitators.CLOSEST = {@(X)(X(:, D.collocation_gras_amsua.cols.DIST)==min(X(:, D.collocation_gras_amsua.cols.DIST)))};
-capsed_amsua.A_BT.processors.CLOSEST = @(X, Y)(X(Y(:, D.collocation_gras_amsua.cols.DIST)==min(Y(:, D.collocation_gras_amsua.cols.DIST)), :));
+capsed_amsua.A_BT.processors.CLOSEST = @(X, Y)(flagneg(X(Y(:, D.collocation_gras_amsua.cols.DIST)==min(Y(:, D.collocation_gras_amsua.cols.DIST)), :)));
+%capsed_amsua.A_BT.processors.CLOSEST = @closest_nonneg;
 capsed_amsua.A_BT.stored.CLOSEST.type = 'float';
 capsed_amsua.A_BT.stored.CLOSEST.atts.units = fields.amsua.A_BT.atts.units;
 capsed_amsua.A_BT.stored.CLOSEST.atts.long_name = ['Closest ' fields.amsua.A_BT.atts.long_name];
@@ -1995,4 +1996,9 @@ function stat = ignoreNeG(M, func, dim)
 % like ignoreNaN, but ignores where data are negative
 M(M<0) = nan;
 stat = ignoreNaN(M, func, dim);
+end
+
+function C = flagneg(C)
+% flag negative data
+C(C<0) = nan;
 end
