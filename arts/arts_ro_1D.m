@@ -274,7 +274,7 @@ for i = 1 : np
   T.lat_distance(it,i) = interp1( R.t(ir), R.lat_distance(ir), T.t(it) );
   T.bangle(it,i)       = interp1( R.t(ir), R.bangle(ir),       T.t(it) );
   T.slta(it,i)         = interp1( R.t(ir), R.slta(ir),         T.t(it) );
-  T.l_geomtric(it,i)   = interp1( R.t(ir), R.l_geometric(ir),  T.t(it) );
+  T.l_geometric(it,i)  = interp1( R.t(ir), R.l_geometric(ir),  T.t(it) );
   T.l_optpath(it,i)    = interp1( R.t(ir), R.l_optpath(ir),    T.t(it) );
   T.z_impact(it,i)     = interp1( R.t(ir), R.z_impact(ir),     T.t(it) );
 
