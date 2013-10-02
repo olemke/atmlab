@@ -1,3 +1,23 @@
+2013-10-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-430
+
+	* atmlab/atmlab_init.m (atmlab_init): Added arts_usage. Commented
+	out the arts/scenegen folders as the stuff is not working.
+
+	* h2o/parametrisations/complex_refr_indexFromFunc.m: Moved to this
+	folder, from the arts folder. And improved spelling in header.
+
+	* arts_usage/arts_ro_1D.m: Moved to this new folder.
+	* arts_usage/arts_include_fascode.m:
+
+	* arts_usage/Contents.m: New folder. The idea is to place more
+	"high level" stuff here, and reserve the arts folder for core
+	functions. (The scenegen stuff should be placed here, but better
+	"hidden" in its present place until the system is updated).
+
+	* arts/Contents.m: Updated.
+
 2013-10-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-429

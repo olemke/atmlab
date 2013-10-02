@@ -67,9 +67,10 @@ addpath( fullfile( toppath, 'covmat' ) );
 addpath( fullfile( toppath, 'collocations' ) ); 
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts', 'netcdf' ) ); 
-addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
-addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
+%addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
+%addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
 addpath( fullfile( toppath, 'arts', 'xml' ) ); 
+addpath( fullfile( toppath, 'arts_usage' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
 %
 if nversion < 7.04

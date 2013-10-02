@@ -1,11 +1,11 @@
 % COMPLEX_REFR_INFDEXFROMFUN   Sets up complex_refr_index 
 %
-%    The function creates avaraible matching ARTS's definition of
+%    The function creates a variable matching ARTS's definition of
 %    complex_refr_index. That is, data of complex refractive index is
-%    compiled in to a single varaible, of type GriddedField3.
+%    compiled in to a single variable, of type GriddedField3.
 %
 %    The function to be used for calculating refractive index is 
-%    specified as a function handle (nfun). For higfher flexibility, 
+%    specified as a function handle (nfun). For higher flexibility, 
 %    the data returned by this function can be modified further by 
 %    setting *mapfun*. The standard usage of *mapfun* should be to
 %    convert dielectric constant data to refractive index, by setting

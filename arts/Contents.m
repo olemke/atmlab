@@ -1,5 +1,5 @@
-% Functions connected to the ARTS forward model.
+% Functions connected to the ARTS forward model, of basic character.
 %
 %    This folder contains functions related to the ARTS forward model.
-%    Examples are interface functions, Matlab version of internal ARTS
-%    functions and functions to plot ARTS output.
+%    The main content is related to the qarts system. The ARTS OEM interface
+%    functions are also placed in this folder.
