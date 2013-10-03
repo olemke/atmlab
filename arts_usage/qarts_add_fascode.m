@@ -29,6 +29,8 @@
 %   'lon0'    : Focus LON_GRID on this value, ie. LON_GRID = 
 %               A.lon0 + [-180,180] 
 %
+% FORMAT Q = qarts_add_fascode( A, Q, workfolder )
+%
 % OUT   Q          Modified Q
 % IN    A          Atmosphere structure, see above.
 %       Q          Original Q

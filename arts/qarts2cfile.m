@@ -326,6 +326,10 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   %
   T = [];
   %
+  if qarts_isset( Q.WSMS_BEFORE_ATMSURF )
+    T = add_wsms( T, 'Q.WSMS_BEFORE_ATMSURF', Q.WSMS_BEFORE_ATMSURF );
+  end
+  %
   if qarts_isset( Q.P_GRID )
     T{end+1} = file_or_data( 'p_grid', 'Vector', Q.P_GRID, workfolder, ...
                                                      Q.INPUT_FILE_FORMAT );

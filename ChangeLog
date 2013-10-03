@@ -1,5 +1,17 @@
 2013-10-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-433
+
+	* arts_usage/qarts_add_mars_planettbox.m: A first working version.
+
+	* arts_usage/qarts_add_fascode.m: FORMAT line was missing.
+
+	* arts/qarts2cfile.m: Added handling of Q.WSMS_BEFORE_ATMSURF.
+
+	* arts/qarts.m: Added Q.WSMS_BEFORE_ATMSURF.
+
+2013-10-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-432
 
 	* Quick commit as missed to do svn add on new files.

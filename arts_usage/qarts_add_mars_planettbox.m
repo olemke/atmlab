@@ -1,3 +1,32 @@
+% QARTS_ADD_MARS_PLANETTBOX   Includes planet toolbox study data for Mars
+%
+%  Work in progress !!!  So far, see getatmo_mars.arts for definition of
+%  control variables.
+%
+%   Winds are not yet treated.
+%
+%  Mandatory fields are
+%    A.Ls
+%    A.daytime
+%    A.dust
+%    A.solar
+%    A.interp_order
+%    A.zeropad
+%    A.vmr_zeropad
+%    A.basespecies
+%    A.ch4species
+%    A.h2ospecies
+%    A.Necase
+%
+% FORMAT Q = qarts_add_mars_planettbox( A, Q, workfolder )
+%
+% OUT   Q          Modified Q
+% IN    A          Atmosphere structure, see above.
+%       Q          Original Q
+%       workfolder Path to workfolder (not used, but an input is demanded)
+
+% 2013-10-03   Created by Patrick Eriksson.
+
 function Q = qarts_add_mars_planettbox( A, Q, workfolder )
 %
 rqre_datatype( A, { @isstruct } );
@@ -13,50 +42,63 @@ end
 
 % Create the variables used by getatmo_mars.arts
 %
-Q.WSMS_AT_START{end+1} = 'IndexCreate( Ls )';
-Q.WSMS_AT_START{end+1} = 'IndexCreate( daytime )';
-Q.WSMS_AT_START{end+1} = 'IndexCreate( dust )';
-Q.WSMS_AT_START{end+1} = 'IndexCreate( solar )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( basespecies )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( h2ospecies )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( ch4species )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( Necase )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( vertwind )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( NSwind )';
-Q.WSMS_AT_START{end+1} = 'ArrayOfIndexCreate( EWwind )';
-Q.WSMS_AT_START{end+1} = 'IndexCreate( zeropad )';
-Q.WSMS_AT_START{end+1} = 'IndexCreate( vmr_zeropad )';
-Q.WSMS_AT_START{end+1} = 'IndexCreate( interp_order )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( Ls )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( daytime )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( dust )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( solar )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( basespecies )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( h2ospecies )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( ch4species )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( Necase )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( vertwind )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( NSwind )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( EWwind )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( zeropad )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( vmr_zeropad )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( interp_order )';
 
 
 % Set the variables above
 %
-Q.WSMS_AT_START{end+1} = sprintf( 'IndexSet( Ls, %d )',      A.Ls      );
-Q.WSMS_AT_START{end+1} = sprintf( 'IndexSet( daytime, %d )', A.daytime );
-Q.WSMS_AT_START{end+1} = sprintf( 'IndexSet( dust, %d )',    A.dust    );
-Q.WSMS_AT_START{end+1} = sprintf( 'IndexSet( solar, %d )',   A.solar   );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( Ls, %d )',      A.Ls      );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( daytime, %d )', A.daytime );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( dust, %d )',    A.dust    );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( solar, %d )',   A.solar   );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( interp_order, %d )',  ...
+                                                              A.interp_order );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( zeropad, %d )', A.zeropad );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( vmr_zeropad, %d )', ...
+                                                               A.vmr_zeropad );
 %
-Q.WSMS_AT_START{end+1} = sprintf( 'ArrayOfIndexSet( basespecies, [%s] )', ...
-                                vector2commalist( A.basespecies ) );
-Q.WSMS_AT_START{end+1} = sprintf( 'ArrayOfIndexSet( ch4species, [%s] )', ...
-                                vector2commalist( A.h2ospecies ) );
-Q.WSMS_AT_START{end+1} = sprintf( 'ArrayOfIndexSet( ch4species, [%s] )', ...
-                                vector2commalist( A.h2ospecies ) );
-Q.WSMS_AT_START{end+1} = sprintf( 'ArrayOfIndexSet( Necase, [%s] )', ...
-                                vector2commalist( A.Necase ) );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
+   'ArrayOfIndexSet( basespecies, [%s] )', vector2commalist( A.basespecies ) );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
+     'ArrayOfIndexSet( ch4species, [%s] )', vector2commalist( A.ch4species ) );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
+     'ArrayOfIndexSet( h2ospecies, [%s] )', vector2commalist( A.h2ospecies ) );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
+             'ArrayOfIndexSet( Necase, [%s] )', vector2commalist( A.Necase ) );
 
 
-Q.WSMS_BEFORE_RTE{end+1} = ...
-               'INCLUDE "planetary_toolbox/includes/mars/getatmo_mars.arts"';
-Q.WSMS_BEFORE_RTE{end+1} = ...
-               'INCLUDE "planetary_toolbox/includes/common/makeatmo1D.arts"';
+Q.WSMS_BEFORE_ATMSURF{end+1} = ...
+                    'INCLUDE "planetary_toolbox/includes/mars/atmo_mars.arts"';
+Q.WSMS_BEFORE_ATMSURF{end+1} = ...
+                 'INCLUDE "planetary_toolbox/includes/common/createvars.arts"';
+Q.WSMS_BEFORE_ATMSURF{end+1} = ...
+                 'INCLUDE "planetary_toolbox/includes/mars/getatmo_mars.arts"';
 
 
+if Q.ATMOSPHERE_DIM == 1
+  Q.WSMS_BEFORE_ATMSURF{end+1} = ...
+                 'INCLUDE "planetary_toolbox/includes/common/makeatmo1D.arts"';
+elseif Q.ATMOSPHERE_DIM == 3
+  Q.WSMS_BEFORE_ATMSURF{end+1} = ...
+                 'INCLUDE "planetary_toolbox/includes/common/makeatmo3D.arts"';
+else
+  error( 'Only 1D and 3D atmosphere can be generated.' );
+end
 
-% Check limits and number of points needed:
-Q.P_GRID = logspace( log10(7e2), log10(7e-7), 100 )';
 
-Q.HSE.ON = false;
 
 
 
