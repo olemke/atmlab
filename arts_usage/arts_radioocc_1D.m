@@ -1,4 +1,4 @@
-% ARTS_RO_1D   Simulation of 1D radio occultation
+% ARTS_RADIOOCC_1D   Simulation of 1D radio occultation
 %
 %    The function simulates an occultation measurement between two
 %    satellites, denoted as GPS and LEO, respectively. The occultation is
@@ -8,7 +8,7 @@
 %    following the ARTS nomenclature. The latitude gives here the angular
 %    distance from the GPS satellite. 
 %
-%    The basic results are gathered into the structure R having the fields
+%    The basic results are gathered into the structure R having fields
 %       z_impact    : The impact altitude, ie. the non-refracted tangent 
 %                     altitude. Returned as monotonously decreasing values.
 %       z_tan       : Tangent altitude.
@@ -57,20 +57,21 @@
 %      atmfunc : Handle to function inserting an atmosphere, such as
 %                @arts_include_fascode.
 %   The structure A is passed on to the atmosphere function. That is, A
-%   likely also includes fields demanded of the "atmfunc". See
+%   likely also includes fields required by the "atmfunc". See
 %   *arts_include_fascode* for how such a function is assumed to work
 %
-% FORMAT   R = arts_ro_1D(O,A)
+% FORMAT   R = arts_radioocc_1D(O,A)
 %        
 % OUT   R   Result structure, see above.
 % IN    O   Occultation structure, see above. If empty, some default 
 %           values set that work as demonstration.
-%       A   Atmospheric structure, see above. If empty, Fascode tropical 
-%           is selected.
+%       A   Atmospheric structure, see above. If empty, some planet specific
+%           settings are applied. For example, for Earth Fascode tropical is
+%           used. Free electrons are not included automatically for any planet.
 
 % 2013-09-29   Created by Patrick Eriksson.
 
-function [R,T] = arts_ro_1D(O,A)
+function [R,T] = arts_radioocc_1D(O,A)
 %
 if isempty(O)
   O.leo_altitude = 820e3;
@@ -88,8 +89,10 @@ end
 %
 if isempty(A)
   A.planet       = 'earth';
-  A.atmfunc      = @arts_include_fascode;
+  A.atmfunc      = @qarts_add_fascode;
   A.fascode_atm  = 'tropical';
+  % 
+  % A.ABS_SPECIES set below, adopted to planet. Free electrons NOT included.
 end
 
 
@@ -362,13 +365,15 @@ function Q = q_planet_local(Q,A,workfolder)
   rqre_field( A, 'atmfunc' );
   %
   if ~isa( A.atmfunc, 'function_handle' )
-    error( 'The field A.atmfunc must be a function handle' ); 
+    error( 'The field *A.atmfunc* must be a function handle' ); 
   end
   if ~exist( func2str(A.atmfunc), 'file' )
     error( 'The function *%s* is not found (selected by A.atmfunc).', ...
                                                         func2str(A.atmfunc) ); 
   end
 
+  % Set basics and default for planet:
+  %
   switch upper( A.planet )
 
    case 'EARTH'
@@ -376,26 +381,43 @@ function Q = q_planet_local(Q,A,workfolder)
     Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' );
     Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
     %
-    Q.ABS_SPECIES(1).TAG{1} = 'N2';
-    Q.ABS_SPECIES(2).TAG{1} = 'O2';
-    Q.ABS_SPECIES(3).TAG{1} = 'H2O';
-    if A.atmfunc( Q, 'query', 'free_electrons_supported' );
-      Q.ABS_SPECIES(4).TAG{1} = 'free_electrons';
-      Q.REFR_INDEX_AIR_AGENDA = { ...
-                             'refr_index_air_agenda__GasThayerAndElectrons' };
-    else
-      Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__GasThayer'};
+    if ~isfield( A, 'ABS_SPECIES' )
+      A.ABS_SPECIES(1).TAG{1} = 'N2';
+      A.ABS_SPECIES(2).TAG{1} = 'O2';
+      A.ABS_SPECIES(3).TAG{1} = 'H2O';
     end
     
    otherwise
     error( 'Unrecognised choice for A.planet (%s).', A.planet );
   end
 
+  % Include atmospheric specific data
+  Q = A.atmfunc( A, Q, workfolder );
+
+  % Set stuff dependent on call above
+  switch upper( A.planet )
+
+   case 'EARTH'
+    %
+    i = 0; ne_found = false;
+    while i <  length(Q.ABS_SPECIES) &  ~ne_found
+      i        = i + 1;
+      ne_found = strcmp( arts_tgs2species( Q.ABS_SPECIES(i).TAG{1} ), ...
+                                                  'free_electrons' );
+    end
+    if ne_found
+      Q.REFR_INDEX_AIR_AGENDA = { ...
+                             'refr_index_air_agenda__GasThayerAndElectrons' };
+    else
+      Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__GasThayer'};
+    end
+   
+   otherwise
+    error( 'Unrecognised choice for A.planet (%s).', A.planet );
+  end
+  
   if 0   % Set to 1 if you want to test without refraction
     Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__NoRefrac' };
   end
-  
-  % Include atmospheric specific data
-  Q = A.atmfunc( A, Q, workfolder );
-  %  
+    
 return

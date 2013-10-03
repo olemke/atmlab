@@ -1,3 +1,20 @@
+2013-10-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-431
+
+	* arts_usage/qarts_add_mars_planettbox.m: Just started. 
+
+	* Somewhat changed strategy for the "atmospheric include" system.
+	ABS_SPECIES now set by the atmfunc. Also LAT/LON_GRID are set by
+	the function. Introduced features to fine-adjust P/LAT/LON_GRID.
+
+	* arts_usage/arts_radioocc_1D.m: Extended name of function, for
+	better clarity. Adopted to changes in function below.
+
+	* arts_usage/qarts_add_fascode.m: Added q to the name, to be
+	consistent with the naming pattern that functions just modifying Q
+	start with qarts. Changed as described above.
+
 2013-10-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-430
