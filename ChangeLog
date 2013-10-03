@@ -1,8 +1,17 @@
 2013-10-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-432
+
+	* Quick commit as missed to do svn add on new files.
+
+	* geodetic/ellipsoidmodels.m: Added SphericalVenus, SphericalMars
+	and SphericalJupiter.
+
+2013-10-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-431
 
-	* arts_usage/qarts_add_mars_planettbox.m: Just started. 
+	* arts_usage/qarts_add_mars_planettbox.m: Just started.
 
 	* Somewhat changed strategy for the "atmospheric include" system.
 	ABS_SPECIES now set by the atmfunc. Also LAT/LON_GRID are set by

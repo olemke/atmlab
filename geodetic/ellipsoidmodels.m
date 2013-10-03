@@ -2,8 +2,11 @@
 %
 %    Returns data for a number of geodetic reference ellipsoids. The
 %    following models are covered:
-%       'SphericalEarth'  (radius set as constants('EARTH_RADIUS'))
+%       'SphericalEarth'     (radius set as constants('EARTH_RADIUS'))
 %       'WGS84'
+%       'SphericalVenus'     (radius same as used in ARTS)
+%       'SphericalMars'      (radius same as used in ARTS)
+%       'SphericalJupiter'   (radius same as used in ARTS)
 %
 %    The reference ellipsoid is returned as [equatorial radius; eccentricity].
 %
@@ -33,6 +36,15 @@ switch lower(model)
   % f=1/298.257223563;
   % e=sqrt(f*(2-f)) ];  
   ellipsoid = [ 6378137, 0.081819190842621 ]'; 
+
+ case 'sphericalvenus'
+  ellipsoid = [ 6051.8e3 0 ]';
+ 
+ case 'sphericalmars'
+  ellipsoid = [ 3389.5e3 0 ]';
+
+ case 'sphericaljupiter'
+  ellipsoid = [ 69911e3 0 ]';
   
  otherwise
   error( 'Unknown selection of *model*.' );

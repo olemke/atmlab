@@ -386,6 +386,11 @@ function Q = q_planet_local(Q,A,workfolder)
       A.ABS_SPECIES(2).TAG{1} = 'O2';
       A.ABS_SPECIES(3).TAG{1} = 'H2O';
     end
+
+   case 'MARS'
+    %
+    Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_mars.arts' );
+    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
     
    otherwise
     error( 'Unrecognised choice for A.planet (%s).', A.planet );
@@ -399,21 +404,27 @@ function Q = q_planet_local(Q,A,workfolder)
 
    case 'EARTH'
     %
-    i = 0; ne_found = false;
-    while i <  length(Q.ABS_SPECIES) &  ~ne_found
-      i        = i + 1;
-      ne_found = strcmp( arts_tgs2species( Q.ABS_SPECIES(i).TAG{1} ), ...
-                                                  'free_electrons' );
-    end
-    if ne_found
-      Q.REFR_INDEX_AIR_AGENDA = { ...
-                             'refr_index_air_agenda__GasThayerAndElectrons' };
-    else
-      Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__GasThayer'};
-    end
+    nofreee_agenda = 'refr_index_air_agenda__GasThayer';
+    general_agenda = 'refr_index_air_agenda__GasThayerAndElectrons';
    
    otherwise
-    error( 'Unrecognised choice for A.planet (%s).', A.planet );
+    %
+    nofreee_agenda = 'refr_index_air_agenda__GasMWgeneral';
+    general_agenda = 'refr_index_air_agenda__GasMWgeneralAndElectrons';
+  
+  end
+
+  i = 0; fe_found = false;
+  while i <  length(Q.ABS_SPECIES) &  ~fe_found
+    i        = i + 1;
+    fe_found = strcmp( arts_tgs2species( Q.ABS_SPECIES(i).TAG{1} ), ...
+                                                          'free_electrons' );
+  end
+  
+  if fe_found
+    Q.REFR_INDEX_AIR_AGENDA = { general_agenda };
+  else
+    Q.REFR_INDEX_AIR_AGENDA = { nofreee_agenda };
   end
   
   if 0   % Set to 1 if you want to test without refraction
