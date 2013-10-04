@@ -10,33 +10,52 @@
 %    results. This function uses just SI units for input arguments, in 
 %    contrast to *epswater93*.
 %
-%    The actual limits of the parameterisation are not known. The following
+%    The actual limits of the parameterisation are not known. Studies
+%    indicated that it degenerates for T<248K (T. Kuhn, WATS study;
+%    J.Mendrok, ESA planet toolbox study). Hence, the following
 %    limits are here applied:
 %      f: [ 10 MHz, 1000 GHz] 
-%      t: [ -40 C, 100 C ] 
+%      t: [ 248 K, 374 K ]
+%    The modT flags allows a workaround at lower temperatures. Then, epsilon is
+%    set to the one of the lowest allowed temperature (T=248K), i.e. assuming
+%    epsilon to be constant below 248K. 
 %
-% FORMAT    e = eps_water_liebe93( f, t )
+% FORMAT    e = eps_water_liebe93( f, t, modT )
 %        
 % OUT   e   Complex dielectric constant
 % IN    f   Frequency
 %       t   Temperature
+%    modT   flag, whether to use modified t if t<248K (liebe formula degenerates
+%            at these temperatures)
 
 % 2004-10-22   Created by Patrick Eriksson
+% 2013-10-04   Jana Mendrok introduced modT flag
 
 
-function e = eps_water_liebe93( f, t )
+function e = eps_water_liebe93( f, t, modT )
 
 % Expressions directly from the Liebe 93 paper
 
-theta = 300 ./ t;
-fghz  = f/1e9;
+if ~exist('modT', 'var') || isempty(modT); modT=0; end
 
+fghz  = f/1e9;
 if fghz<0.01  |  fghz>1000
   error('Valid range for frequency is 0.01-1000 GHz'); 
 end
-if t<233  |  t>374
-  error('Valid range for temperature is 233-374 K'); 
+
+if t>374
+  error('Temperature above valid range (248-374 K)'); 
 end
+if t<248
+  if modT
+    theta = 300 ./ 248.;
+  else
+    error('Temperature below valid range (248-374 K)');
+  end
+else
+  theta = 300 ./ t;
+end
+
 
 e0 = 77.66 + 103.3 * ( theta - 1 );
 e1 = 0.0671 * e0;
