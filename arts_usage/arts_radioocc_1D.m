@@ -19,6 +19,7 @@
 %       l_geometric : The (straight line) geometrical distance between the 
 %                     satellites.
 %       l_optpath   : The optical path length.
+%       l_proppath  : The propagation path length.
 %       t           : Time relative to the occultation with max z_impact.
 %   Hence, R holds data as a function of *z_impact*.
 %
@@ -122,8 +123,8 @@ Q = q_planet_local( Q, A, workfolder );
 R.z_impact = [ O.z_impact_max : -O.z_impact_dz : O.z_surface ]';
 n0         = length( R.z_impact );
 %
-[R.z_tan,R.lat_tan,R.bangle,R.lat_distance]  = deal( repmat( NaN, n0, 1 ) );
-[R.slta,R.l_geometric,R.l_optpath,R.defocus] = deal( repmat( NaN, n0, 1 ) );
+[R.z_tan,R.lat_tan,R.bangle,R.lat_distance]     = deal( repmat( NaN, n0, 1 ) );
+[R.slta,R.l_geometric,R.l_optpath,R.l_proppath] = deal( repmat( NaN, n0, 1 ) );
 
 
 %- Radiii
@@ -168,18 +169,22 @@ for i = 1 : n0
     dlat              = ppath.start_los - za_leo;
     R.lat_distance(i) = ppath.start_pos(2) + dlat;
 
-    % Optical path 
+    % Path lenghts 
     % Part covered by ppath
-    lopt = ppath.end_lstep + sum( ppath.lstep .* ( 0.5 * ...
+    lppath = ppath.end_lstep + sum( ppath.lstep );
+    lopt   = ppath.end_lstep + sum( ppath.lstep .* ( 0.5 * ...
                                (ppath.ngroup(1:end-1)+ppath.ngroup(2:end)) ) );
     % Add remaining part
-    lopt = lopt + r_leo * sind(dlat) / sind(ppath.start_los); 
+    lext   = r_leo * sind(dlat) / sind(ppath.start_los); 
+    lppath = lppath + lext;
+    lopt   = lopt   + lext;
     
     % SLTA and geometrical distance
     lgeom        = sqrt( r_leo^2 + r_gps^2 - 2*r_leo*r_gps*...
                                                      cosd(R.lat_distance(i)) );
     R.slta(i)    = r_leo * r_gps * sind(R.lat_distance(i)) / lgeom - ...
                                                              Q.REFELLIPSOID(1);
+    R.l_proppath(i)  = lppath;
     R.l_optpath(i)   = lopt;
     R.l_geometric(i) = lgeom;
     
@@ -261,8 +266,8 @@ np    = length( istart );
 nt    = length( T.t );
 %  
 [T.z_tan,T.lat_tan,T.bangle,T.lat_distance]  = deal( repmat( NaN, nt, np ) );
-[T.slta,T.l_geometric,T.l_optpath,T.defocus] = deal( repmat( NaN, nt, np ) );
-[T.z_impact]                                 = deal( repmat( NaN, nt, np ) );
+[T.slta,T.l_geometric,T.l_proppath]          = deal( repmat( NaN, nt, np ) );
+[T.l_optpath,T.defocus,T.z_impact]           = deal( repmat( NaN, nt, np ) );
 %
 for i = 1 : np
 
@@ -278,6 +283,7 @@ for i = 1 : np
   T.bangle(it,i)       = interp1( R.t(ir), R.bangle(ir),       T.t(it) );
   T.slta(it,i)         = interp1( R.t(ir), R.slta(ir),         T.t(it) );
   T.l_geometric(it,i)  = interp1( R.t(ir), R.l_geometric(ir),  T.t(it) );
+  T.l_proppath(it,i)   = interp1( R.t(ir), R.l_proppath(ir),   T.t(it) );
   T.l_optpath(it,i)    = interp1( R.t(ir), R.l_optpath(ir),    T.t(it) );
   T.z_impact(it,i)     = interp1( R.t(ir), R.z_impact(ir),     T.t(it) );
 
