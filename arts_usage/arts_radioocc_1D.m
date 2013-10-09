@@ -61,10 +61,11 @@
 %   likely also includes fields required by the "atmfunc". See
 %   *arts_include_fascode* for how such a function is assumed to work
 %
-% FORMAT   R = arts_radioocc_1D(O,A)
+% FORMAT   R = arts_radioocc_1D(Q,O,A)
 %        
 % OUT   R   Result structure, see above.
-% IN    O   Occultation structure, see above. If empty, some default 
+% IN    Q   Initial settings of Q. If empty: Q = qarts;   
+%       O   Occultation structure, see above. If empty, some default 
 %           values set that work as demonstration.
 %       A   Atmospheric structure, see above. If empty, some planet specific
 %           settings are applied. For example, for Earth Fascode tropical is
@@ -72,7 +73,11 @@
 
 % 2013-09-29   Created by Patrick Eriksson.
 
-function [R,T] = arts_radioocc_1D(O,A)
+function [R,T] = arts_radioocc_1D(Q,O,A)
+%
+if isempty(Q)
+  Q = qarts;
+end
 %
 if isempty(O)
   O.leo_altitude = 820e3;
@@ -107,7 +112,7 @@ cfile = fullfile( workfolder, 'cfile.arts' );
 
 %- Set basic and observation related fields of Q
 %
-Q = q_basic_local( O, workfolder );
+Q = q_basic_local( Q, O, workfolder );
 
 
 %- Set basic and ppath parts of Q
@@ -330,13 +335,11 @@ return
 
 
 %----------------------------------------------------------------------------
-function Q = q_basic_local(O,workfolder)
+function Q = q_basic_local(Q,O,workfolder)
   %
-  Q  = qarts;
-  %
-  Q.INCLUDES            = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
-                            fullfile( 'ARTS_INCLUDES', 'agendas.arts' ), ...
-                            fullfile( 'ARTS_INCLUDES', 'continua.arts' ) };
+  Q.INCLUDES{end+1}       = fullfile( 'ARTS_INCLUDES', 'general.arts' );
+  Q.INCLUDES{end+1}       = fullfile( 'ARTS_INCLUDES', 'agendas.arts' ); 
+  Q.INCLUDES{end+1}       = fullfile( 'ARTS_INCLUDES', 'continua.arts' );
   %
   Q.ATMOSPHERE_DIM        = 1;
   Q.STOKES_DIM            = 1;

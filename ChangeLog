@@ -1,3 +1,14 @@
+2013-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-436
+
+	* arts_usage/qarts_add_mars_planettbox.m: Updated to Jana's
+	changes in ARTS. Extended to handle grid cropping and winds.
+	Should be ready. Tested to work with the function below.
+
+	* arts_usage/arts_radioocc_1D.m: An initial Q can
+	now be set.
+
 2013-10-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-435
