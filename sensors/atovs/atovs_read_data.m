@@ -7,6 +7,9 @@
 % IN    file_name   File name.
 % OUT   data        Data structure with the following fields:
 %           time    Vector of scanline time stamps in UTC [msec].
+%           elev    Vector of satellite elevations [km]
+%           satlat  Vector of satellite latitude* [degrees]
+%           satlon  Vector of satellite longinude* [degrees]
 %           lon     2D matrix (fov,scanline) of longitudes in [degrees].
 %           lat     2D matrix (fov,scanline) of latitudes in [degrees].
 %           lza     2D matrix (fov,scanline) of local zenith angle in
@@ -21,6 +24,10 @@
 %                   temperatures in [K].
 %           
 %       err         Error flag. 0 - no error, 1 - error.
+%
+% * Satellite latitude and longitude is approximated by assuming the
+% average position between the two footprints closest to nadir.  L1C data
+% does not contain the position explicitly.
 
 % 2004-06-29   Created by Mashrab Kuvatov.
 % 2010-11-11   Adapted by Gerrit Holl (also return angles)
@@ -108,5 +115,9 @@ if isfield(rec_format, 'elev')
     data.elev = record(rec_format.elev, :) * .1;
 end
 data.tb = reshape( record( rec_format.tb', : ) * .01, nfovs, nchan, nlines_read );
+
+% approximate satellite position
+ind = floor(size(data.lat, 1)/2);
+[data.satlat, data.satlon] = geographic_mean(data.lat(ind:ind+1, :).', data.lon(ind:ind+1, :).');
 
 end

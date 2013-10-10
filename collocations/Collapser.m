@@ -340,6 +340,22 @@ classdef Collapser < AssociatedDataset
         function fields = fields_needed_for_dependency(self, fields, ~)
             fields = unique(struct2cell(structfun(@(e) safegetfield(e, 'orig_name', ''), getfields(self.members, fields{:}), 'UniformOutput', false)));
             fields = fields(~cellfun(@isempty, fields));
+            % FIXME: the above is insufficient in case the collapser is
+            % extended with fields from the core.  Consider something like
+            % below, although this does not yet work.  Comment out for now.
+            %{
+            fields_needed = {};
+            for i = 1:length(fields_considered)
+                field = fields_considered{i};
+                if isfield(self.members.(field), 'orig_name') % FIRST, LAST etc. don't have this
+                    orig_name = self.members.(field).orig_name;
+                    if ~isfield(self.members.(field), 'incore') || ~self.members.(field).incore
+                        fields_needed = [fields_needed orig_name]; %#ok<AGROW>
+                    end
+                end
+            end
+            fields_needed = unique(fields_needed);
+            %}
         end
         
         function [M, localcols] = process_granule(self, processed_core, ~, ~, ~, ~, ~, ~, deps, varargin)

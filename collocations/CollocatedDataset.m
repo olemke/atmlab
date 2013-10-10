@@ -1251,7 +1251,13 @@ classdef CollocatedDataset < HomemadeDataset
             % This method reads all or a selection of the collocations for
             % the indicated period, between date_start and date_end.
             % If less than two output arguments are requested, additionals will
-            % be merged with the core.
+            % be merged with the core.  Note that this means that only a
+            % fraction of the stored 'core' information will be returned.
+            % From each set of secondaries sharing the same primary, only
+            % one piece of information will be returned.  It is not defined
+            % to what core collocation this belongs.  Therefore, it is not
+            % meaningful to both merge, *and* obtain fields from the
+            % secondary.
             % Merging is required in the presence of limitations.
             %
             % FORMAT
@@ -1323,8 +1329,11 @@ classdef CollocatedDataset < HomemadeDataset
             %
             % More than 2 output arguments will change the behaviour; if
             % you have at most 2 output arguments, the result will be
-            % merged; if not, the result will be separate for each
-            % AdditionalDataset, and limitations will not work!
+            % merged; i.e. only one piece of information per primary is
+            % returned, yielding information from the secondary potentially
+            % meaningless.  With more than 2 output arguments, the result
+            % will be separate for each AdditionalDataset, and limitations
+            % will not work.
             %
             %   addis   cell-array  Cell array of matrices similar to 'M',
             %                       one for each additional dataset for

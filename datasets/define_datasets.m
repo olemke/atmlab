@@ -951,6 +951,21 @@ capsed_amsua.A_BT.stored.CLOSEST.atts.units = fields.amsua.A_BT.atts.units;
 capsed_amsua.A_BT.stored.CLOSEST.atts.long_name = ['Closest ' fields.amsua.A_BT.atts.long_name];
 capsed_amsua.A_BT.stored.CLOSEST.atts.valid_range = capsed_amsua.A_BT.stored.MEAN.atts.valid_range;
 capsed_amsua.A_BT.stored.CLOSEST.atts.missing_value = capsed_amsua.A_BT.stored.MEAN.atts.missing_value;
+% FIXME: this one for use in gras/amsua.  Does not work yet.
+% capsed_amsua.LAT2.incore = true;
+% capsed_amsua.LAT2.processors.CLOSEST = capsed_amsua.A_BT.processors.CLOSEST;
+% capsed_amsua.LAT2.stored.CLOSEST.type = D.collocation_gras_amsua.members.LAT2.type;
+% capsed_amsua.LAT2.stored.CLOSEST.atts.units = D.collocation_gras_amsua.members.LAT2.atts.units;
+% capsed_amsua.LAT2.stored.CLOSEST.atts.long_name = ['Closest ' D.collocation_gras_amsua.members.LAT2.atts.long_name];
+% capsed_amsua.LAT2.stored.CLOSEST.atts.valid_range = D.collocation_gras_amsua.members.LAT2.atts.valid_range;
+% capsed_amsua.LAT2.stored.CLOSEST.atts.missing_value = -9999;
+% capsed_amsua.LON2.incore = true;
+% capsed_amsua.LON2.processors.CLOSEST = capsed_amsua.A_BT.processors.CLOSEST;
+% capsed_amsua.LON2.stored.CLOSEST.type = D.collocation_gras_amsua.members.LON2.type;
+% capsed_amsua.LON2.stored.CLOSEST.atts.units = D.collocation_gras_amsua.members.LON2.atts.units;
+% capsed_amsua.LON2.stored.CLOSEST.atts.long_name = ['Closest ' D.collocation_gras_amsua.members.LON2.atts.long_name];
+% capsed_amsua.LON2.stored.CLOSEST.atts.valid_range = D.collocation_gras_amsua.members.LON2.atts.valid_range;
+% capsed_amsua.LON2.stored.CLOSEST.atts.missing_value = -9999;
 
 % ------
 % avhrr
@@ -1159,6 +1174,16 @@ fields.amsua.A_ELEV.realname = 'elev';
 fields.amsua.A_ELEV.atts.long_name = 'AMSU-A satellite elevation';
 fields.amsua.A_ELEV.atts.units = 'km';
 fields.amsua.A_ELEV.atts.valid_min = 0;
+fields.amsua.A_SATLAT.type = 'float';
+fields.amsua.A_SATLAT.realname = 'satlat';
+fields.amsua.A_SATLAT.atts.long_name = 'AMSU-A satellite latitude';
+fields.amusa.A_SATLAT.atts.units = 'degrees_north';
+fields.amsua.A_SATLAT.atts.valid_range = [-90, 90];
+fields.amsua.A_SATLON.type = 'float';
+fields.amsua.A_SATLON.realname = 'satlon';
+fields.amsua.A_SATLAT.atts.long_name = 'AMSU-A satellite longitude';
+fields.amusa.A_SATLAT.atts.units = 'degrees_east';
+fields.amsua.A_SATLAT.atts.valid_range = [-180, 180];
 
 %% AMSU-B
 fields.amsub.B_LZA = lza;

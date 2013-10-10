@@ -1,3 +1,30 @@
+2013-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-437
+
+	* collocations/Collapser.m(fields_needed_for_dependency):
+
+	- Added note that this method is insufficient in certain conditions.
+	Started code to take care of those, but commented it out as it's not
+	done yet.
+
+	* collocations/CollocatedDataset.m(read):
+
+	- Clarified in documentation that, when output is being merged,
+	information from the secondary (core or associated) may be
+	meaningless.
+
+	* sensors/atovs/atovs_read_data.m:
+
+	- Added possibility to read satellite latitude, longitude, elevation.
+
+	* datasets/define_datasets.m:
+
+	- Add satlat, satlon to assocated_gras_amsua
+
+	- Started to get capsed lat2/lon2 for gras_amsua closest.  Remains
+	unfinished and commented out.
+
 2013-10-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-436
