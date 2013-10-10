@@ -22,8 +22,8 @@
 %
 %  All "zeropadding" variables are hard-coded to 1.
 %
-%  Wind fields are included by setting A.wind_u, A.wind_v and A.wind_w,
-%  respectively, to true. Default is false.
+%  Wind fields are included by setting A.wind_u, A.wind_v and A.wind_w
+%  to true, respectively. Default is false.
 %  
 %  The atmospheric grids can be cropped by the following fields:
 %    A.pmin
@@ -69,16 +69,15 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( Necase )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( vertwind )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( NSwind )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( EWwind )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( zeropad )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( vmr_zeropad )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( auxfield_zeropad )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( interp_order )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( pmin )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( pmax )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( latmin )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( latmax )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( lonmin )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( lonmax )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( auxfield_zeropad )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( vmr_zeropad )';
+Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( interp_order )';
 
 
 % Set the variables above
@@ -89,7 +88,6 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( dust, %d )',    A.dust    );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( solar, %d )',   A.solar   );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( interp_order, %d )',  ...
                                                               A.interp_order );
-Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( zeropad, %d )', 1 );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( vmr_zeropad, %d )', 1 );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( auxfield_zeropad, %d )', 1 );
 %
@@ -104,14 +102,11 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
      'ArrayOfIndexSet( h2ospecies, [%s] )', vector2commalist( A.h2ospecies ) );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
              'ArrayOfIndexSet( Necase, [%s] )', vector2commalist( A.Necase ) );
-Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
-             'ArrayOfIndexSet( Necase, [%s] )', vector2commalist( A.Necase ) );
 
-
-Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                    'INCLUDE "planetary_toolbox/includes/mars/atmo_mars.arts"';
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                  'INCLUDE "planetary_toolbox/includes/common/createvars.arts"';
+Q.WSMS_BEFORE_ATMSURF{end+1} = ...
+                    'INCLUDE "planetary_toolbox/includes/mars/atmo_mars.arts"';
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                  'INCLUDE "planetary_toolbox/includes/mars/getatmo_mars.arts"';
 
@@ -138,7 +133,6 @@ else
   error( 'Only 1D and 3D atmosphere can be generated.' );
 end
 
-any_wind = false;
 
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexSet( vertwind, [0] )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexSet( EWwind, [0] )';

@@ -1,5 +1,17 @@
 2013-10-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-440
+
+	* arts_usage/arts_radioocc_1D.m: Planet specific mass introduced
+	(to get correct satellite velocities).
+
+	* arts_usage/qarts_add_venus_planettbox.m: New. Complete but not
+	tested.
+
+	* arts_usage/qarts_add_mars_planettbox.m: Polishing.
+
+2013-10-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-439
 
 	* arts_usage/qarts_add_fascode.m: Basically reimplemented from

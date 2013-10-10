@@ -114,9 +114,9 @@ cfile = fullfile( workfolder, 'cfile.arts' );
 Q = q_basic_local( Q, O, workfolder );
 
 
-%- Set basic and ppath parts of Q
+%- Set basic and ppath parts of Q, and get mass of planet
 %
-Q = q_planet_local( Q, A, workfolder );
+[Q,M] = q_planet_local( Q, A, workfolder );
 
 
 %- Set up z_impact grid and R
@@ -195,7 +195,6 @@ end
 % Speed of increase in angular distance 
 %
 G         = constants( 'GRAVITATIONAL_CONSTANT' );
-M         = constants( 'EARTH_MASS' );
 t_leo     = sqrt( (4*pi^2*r_leo^3) / (G*M) );
 degpersec = 360 / t_leo;
 %
@@ -332,7 +331,7 @@ return
 
 
 %----------------------------------------------------------------------------
-function Q = q_planet_local(Q,A,workfolder)
+function [Q,M] = q_planet_local(Q,A,workfolder)
   %
   rqre_field( A, 'planet' );
   rqre_field( A, 'atmfunc' );
@@ -351,6 +350,8 @@ function Q = q_planet_local(Q,A,workfolder)
 
    case 'EARTH'
     %
+    M = constants( 'EARTH_MASS' );
+    %
     Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' );
     Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
     %
@@ -361,6 +362,8 @@ function Q = q_planet_local(Q,A,workfolder)
     end
 
    case 'MARS'
+    %
+    M = 6.4185e23;
     %
     Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_mars.arts' );
     Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
