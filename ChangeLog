@@ -1,3 +1,21 @@
+2013-10-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-439
+
+	* arts_usage/qarts_add_fascode.m: Basically reimplemented from
+	scratch. This to allow inclusion of ionospheric data from IRI and
+	IGRF. Complete, but more testing would be good ...
+
+	* arts/qarts2cfile.m (cfile_AtmSrf): Started to include
+	vmr_zeropadding but realised that it should not help me now.
+	But present changes make this addition simple in the future.
+
+	* arts_usage/arts_radioocc_1D.m: Several smaller fixes. Introduced
+	a reference point for t.
+
+	* arts_usage/arts_radioocc_1D_power.m: A second version, also
+	covering attenuation quantities (but much slower).
+
 2013-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-438

@@ -361,10 +361,11 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     end                                                                     %&%
     T{end+1} = sprintf( 'AtmRawRead(basename="%s")', Q.RAW_ATMOSPHERE );
     if qarts_isset( Q.RAW_ATM_EXPAND_1D ) & Q.RAW_ATM_EXPAND_1D
-      T{end+1} = 'AtmFieldsCalcExpand1D';
+      wsm = 'AtmFieldsCalcExpand1D';
     else
-      T{end+1} = 'AtmFieldsCalc';
+      wsm = 'AtmFieldsCalc';
     end
+    T{end+1} = sprintf( '%s(vmr_zeropadding=%d)', wsm, 0 );
   end
   %
   if qarts_isset( Q.T_FIELD )

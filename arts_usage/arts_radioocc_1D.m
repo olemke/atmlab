@@ -1,12 +1,15 @@
-% ARTS_RADIOOCC_1D   Simulation of 1D radio occultation
+% ARTS_RADIOOCC_1D   Simulation of 1D radio occultation, no power
 %
 %    The function simulates an occultation measurement between two
-%    satellites, denoted as GPS and LEO, respectively. The occultation is
+%    satellites, denoted as GPS and LEO, respectively.  The occultation is
 %    considered to take place exactly in the LEO orbit plane. The GPS
 %    satellite can be be assumed to be static or moving (inside the LEO
 %    plane), see further below. Angular distances are denoted as "latitude"
 %    following the ARTS nomenclature. The latitude gives here the angular
 %    distance from the GPS satellite. 
+%
+%    This function does not cover attenuation, use *arts_radioocc_1D_power* if
+%    such quantities are needed.
 %
 %    The basic results are gathered into the structure R having fields
 %       z_impact    : The impact altitude, ie. the non-refracted tangent 
@@ -21,7 +24,7 @@
 %       l_optpath   : The optical path length.
 %       l_proppath  : The propagation path length.
 %       t           : Time relative to the occultation with max z_impact.
-%   Hence, R holds data as a function of *z_impact*.
+%   The data in *R* are for an equidistant *R.z_impact*.
 %
 %   The results are also returned as a function of time in the structure T. 
 %   The field T.t is the time grid used. The spacing of this grid follows
@@ -30,12 +33,7 @@
 %   That is, each column represents a path (not to be confused with the 
 %   pencil beam paths used i ARTS). The limit between these paths correspond 
 %   to discontinuities in the arrival time (for pencil beam paths).
-%   This structure T contains mainly the same fields as R. Additional fields
-%   are
-%       defocus     : Defocusing factor (1 = no defocusing). Calculation
-%                     inaccuracy can give negative values. Such values are
-%                     kept to indicate possibly problematic data, but should
-%                     be set to zero if actually used.
+%   This structure T contains the same fields as R. 
 %
 %   The occultation is specified by the structure O having the fields
 %      leo_altitude : Altitude of LEO orbit.
@@ -50,6 +48,7 @@
 %      z_surface    : Surface altitude.
 %      z_impact_max : Start altitude of occultation.
 %      z_impact_dz  : Vertical spacing between path calculations.
+%      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
 %
 %   Finally, the atmosphere is specified by the structure A having at least
@@ -90,15 +89,15 @@ if isempty(O)
 
   O.z_impact_max = 30e3;
   O.z_impact_dz  = 200;
+  O.z_impact4t0  = 20e3;
   O.f_sampling   = 4;
+
 end
 %
 if isempty(A)
   A.planet       = 'earth';
   A.atmfunc      = @qarts_add_fascode;
   A.fascode_atm  = 'tropical';
-  % 
-  % A.ABS_SPECIES set below, adopted to planet. Free electrons NOT included.
 end
 
 
@@ -120,17 +119,13 @@ Q = q_basic_local( Q, O, workfolder );
 Q = q_planet_local( Q, A, workfolder );
 
 
-%- Relate LEO position to time
-%
-% SLTA = 0m is usefd as reference point
-%- Allocate variables for key variables
+%- Set up z_impact grid and R
 %
 R.z_impact = [ O.z_impact_max : -O.z_impact_dz : O.z_surface ]';
 n0         = length( R.z_impact );
 %
 [R.z_tan,R.lat_tan,R.bangle,R.lat_distance]     = deal( repmat( NaN, n0, 1 ) );
 [R.slta,R.l_geometric,R.l_optpath,R.l_proppath] = deal( repmat( NaN, n0, 1 ) );
-
 
 %- Radiii
 %
@@ -143,7 +138,7 @@ r_gps     = Q.REFELLIPSOID(1) + O.gps_altitude;
 for i = 1 : n0
 
   Q.SENSOR_LOS = geomztan2za( Q.REFELLIPSOID(1), O.gps_altitude, ...
-                                                           R.z_impact(i) );
+                                                               R.z_impact(i) );
 
   % Run ARTS
   %
@@ -158,7 +153,7 @@ for i = 1 : n0
 
   ppath = xmlLoad( fullfile( workfolder, 'ppath.xml' ) );   
 
-  if strcmp( ppath.background, 'space' )
+  if strcmp( ppath.background, 'space' )  &  ppath.np > 1
   
     % Extract tangent point
     [u,j]        = min( ppath.pos(:,1) );
@@ -170,7 +165,7 @@ for i = 1 : n0
 
     % Calculate angular distance between transmitter and receiver
     c                 = ppath.r(end) * sind(ppath.start_los);
-    za_leo            = asind(c/r_leo);  % Here for true ppath
+    za_leo            = asind(c/r_leo); 
     dlat              = ppath.start_los - za_leo;
     R.lat_distance(i) = ppath.start_pos(2) + dlat;
 
@@ -178,7 +173,7 @@ for i = 1 : n0
     % Part covered by ppath
     lppath = ppath.end_lstep + sum( ppath.lstep );
     lopt   = ppath.end_lstep + sum( ppath.lstep .* ( 0.5 * ...
-                               (ppath.ngroup(1:end-1)+ppath.ngroup(2:end)) ) );
+                               (ppath.nreal(1:end-1)+ppath.nreal(2:end)) ) );
     % Add remaining part
     lext   = r_leo * sind(dlat) / sind(ppath.start_los); 
     lppath = lppath + lext;
@@ -192,11 +187,6 @@ for i = 1 : n0
     R.l_proppath(i)  = lppath;
     R.l_optpath(i)   = lopt;
     R.l_geometric(i) = lgeom;
-    
-    % Defocusing
-    %r_tan2 = Q.REFELLIPSOID(1) + R.z_tan(i);
-    %lr(i)  = sqrt( r_leo^2 + r_tan2 ); 
-    %lt(i)  = sqrt( r_gps^2 + r_tan2 ); 
 
   end
 end
@@ -225,8 +215,14 @@ end
 
 % Relative arrival time
 %
-R.t = ( R.lat_distance - R.lat_distance(1) ) / degpersec;
+ind = find( ~isnan( R.lat_distance ) );
+%
+R.t = ( R.lat_distance - interp1( R.z_impact(ind), R.lat_distance(ind), ...
+                                                O.z_impact4t0 ) ) / degpersec;
 
+if nargout == 1
+  return;   % --->
+end
 
 % Create T
 %
@@ -295,41 +291,8 @@ for i = 1 : np
 end
 
 
-% Defocusing
-%
-for ip = 1 : np
-  for it = 1 : nt
-    
-    if ~isnan( T.bangle(it,ip) )
-      
-      r_tan2 = ( Q.REFELLIPSOID(1) + T.z_tan(it,ip) )^2;
-      lr     = sqrt( r_leo^2 + r_tan2 ); 
-      lt     = sqrt( r_gps^2 + r_tan2 ); 
-      
-      fac = (pi/180) * (lr*lt) / (lr+lt);
-
-      if it == 1  |  isnan(T.bangle(it-1,ip))
-        if it < nt   % If at upper end, we have to leave a NaN
-          T.defocus(it,ip) = 1 / ( 1 - fac * ...
-                            (  T.bangle(it+1,ip)  -  T.bangle(it,ip)  ) /  ...
-                            ( T.z_impact(it+1,ip) - T.z_impact(it,ip) ) );
-        end
-      elseif it == nt  |  isnan(T.bangle(it+1,ip))
-        if it > 1  % If at lower end, we have to leave a NaN
-          T.defocus(it,ip) = 1 / ( 1 - fac * ...
-                            (  T.bangle(it,ip)  -  T.bangle(it-1,ip)  ) /  ...
-                            ( T.z_impact(it,ip) - T.z_impact(it-1,ip) ) );
-        end
-      else
-        T.defocus(it,ip) = 1 / ( 1 - fac * ...
-                          (  T.bangle(it+1,ip)  -  T.bangle(it-1,ip)  ) /  ...
-                          ( T.z_impact(it+1,ip) - T.z_impact(it-1,ip) ) );
-      end
-    end
-  end
-end
-
-
+R = orderfields( R );
+T = orderfields( T );
 
 return
 
@@ -357,12 +320,13 @@ function Q = q_basic_local(Q,O,workfolder)
   %
   Q.Z_SURFACE             = O.z_surface;
   %
-  Q.WSMS_AT_END         = { 
-    'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")', ...
-    'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")', ...
-    'VectorSet(rte_pos2,[])', ...
-    'ppathCalc', ...
-    sprintf('ppathWriteXMLPartial("ascii",ppath,"%s/ppath.xml")',workfolder) };
+  Q.WSMS_AT_END{end+1} = 'VectorExtractFromMatrix(rte_pos,sensor_pos,0,"row")';
+  Q.WSMS_AT_END{end+1} = 'VectorExtractFromMatrix(rte_los,sensor_los,0,"row")';
+  Q.WSMS_AT_END{end+1} = 'VectorSet(rte_pos2,[])';
+  %
+  Q.WSMS_AT_END{end+1} = 'ppathCalc';
+  Q.WSMS_AT_END{end+1} = ...
+      sprintf('ppathWriteXMLPartial("ascii",ppath,"%s/ppath.xml")',workfolder);
   %
 return
 
