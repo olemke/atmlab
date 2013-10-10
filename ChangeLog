@@ -1,5 +1,13 @@
 2013-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
 
+	* atmlab-2-1-438
+
+	* datasets/define_datasets.m:
+
+	- Fixed bug for A_SATLON atts.
+
+2013-10-10  Gerrit Holl  <gerrit.holl@ltu.se>
+
 	* atmlab-2-1-437
 
 	* collocations/Collapser.m(fields_needed_for_dependency):

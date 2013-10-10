@@ -1181,9 +1181,9 @@ fields.amusa.A_SATLAT.atts.units = 'degrees_north';
 fields.amsua.A_SATLAT.atts.valid_range = [-90, 90];
 fields.amsua.A_SATLON.type = 'float';
 fields.amsua.A_SATLON.realname = 'satlon';
-fields.amsua.A_SATLAT.atts.long_name = 'AMSU-A satellite longitude';
-fields.amusa.A_SATLAT.atts.units = 'degrees_east';
-fields.amsua.A_SATLAT.atts.valid_range = [-180, 180];
+fields.amsua.A_SATLON.atts.long_name = 'AMSU-A satellite longitude';
+fields.amusa.A_SATLON.atts.units = 'degrees_east';
+fields.amsua.A_SATLON.atts.valid_range = [-180, 180];
 
 %% AMSU-B
 fields.amsub.B_LZA = lza;
