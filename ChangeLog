@@ -4,7 +4,7 @@
 
 	* arts_usage/qarts_add_fascode.m: Basically reimplemented from
 	scratch. This to allow inclusion of ionospheric data from IRI and
-	IGRF. Complete, but more testing would be good ...
+	IGRF. Completed, but more testing would be good ...
 
 	* arts/qarts2cfile.m (cfile_AtmSrf): Started to include
 	vmr_zeropadding but realised that it should not help me now.
