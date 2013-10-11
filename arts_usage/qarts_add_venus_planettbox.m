@@ -21,12 +21,13 @@
 %  Wind fields are included by setting A.wind_u and A.wind_v to true,
 %  respectively. Default is false. Vertical winds are not handled.
 %  
-%  The atmospheric grids can be cropped by the following fields:
+%  The atmospheric grids can be cropped by the following (also mandatory) 
+%  fields:
 %    A.pmin
 %    A.latmin   (not needed for 1D)
 %    A.latmax   (not needed for 1D)
 %    A.lonmin   (not needed for 1D)
-%    A.latmax   (not needed for 1D)
+%    A.lonmax   (not needed for 1D)
 %  Grid points outside these values are removed (pmax hard-coded to a very
 %  high value). Longitude limits can be inside [-360,360].
 %
@@ -52,7 +53,7 @@ if isnan( arts_xmldata_path )
 end
 
 
-% Create the variables used by getatmo_mars.arts
+% Create the variables used by getatmo_venus.arts
 %
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'IndexCreate( atmo )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( basespecies )';
@@ -95,9 +96,9 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                  'INCLUDE "planetary_toolbox/includes/common/createvars.arts"';
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                   'INCLUDE "planetary_toolbox/includes/mars/atmo_venus.arts"';
+                  'INCLUDE "planetary_toolbox/includes/venus/atmo_venus.arts"';
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                'INCLUDE "planetary_toolbox/includes/mars/getatmo_venus.arts"';
+               'INCLUDE "planetary_toolbox/includes/venus/getatmo_venus.arts"';
 
 
 if Q.ATMOSPHERE_DIM == 1
@@ -115,7 +116,7 @@ elseif Q.ATMOSPHERE_DIM == 3
   Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( lonmax, %d )', ...
                                                                    A.lonmax );
   Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                 'INCLUDE "planetary_toolbox/includes/common/getgrids_3D.arts"';
+                'INCLUDE "planetary_toolbox/includes/common/getgrids_3D.arts"';
   Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                  'INCLUDE "planetary_toolbox/includes/common/makeatmo3D.arts"';
 else
@@ -131,7 +132,7 @@ v_wind = safegetfield( A, 'wind_v', 0 );
 
 if u_wind | v_wind
   Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                'INCLUDE "planetary_toolbox/includes/mars/getwind_venus.arts"';
+               'INCLUDE "planetary_toolbox/includes/venus/getwind_venus.arts"';
   if u_wind 
     Q.WSMS_BEFORE_ATMSURF{end+1} = 'Copy( rawfield, wind_u_raw )';
     if Q.ATMOSPHERE_DIM == 1

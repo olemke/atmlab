@@ -348,6 +348,13 @@ function [Q,M] = q_planet_local(Q,A,workfolder)
   %
   switch upper( A.planet )
 
+   case 'VENUS'
+    %
+    M = 4.8676e24;
+    %
+    Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_venus.arts' );
+    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalVenus' );
+   
    case 'EARTH'
     %
     M = constants( 'EARTH_MASS' );
@@ -366,8 +373,15 @@ function [Q,M] = q_planet_local(Q,A,workfolder)
     M = 6.4185e23;
     %
     Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_mars.arts' );
-    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
+    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalMars' );
     
+   case 'JUPITER'
+    %
+    M = 1.8986e27;
+    %
+    Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_jupiter.arts' );
+    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalJupiter' );
+   
    otherwise
     error( 'Unrecognised choice for A.planet (%s).', A.planet );
   end

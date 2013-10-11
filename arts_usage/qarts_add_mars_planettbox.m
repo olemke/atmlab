@@ -25,14 +25,15 @@
 %  Wind fields are included by setting A.wind_u, A.wind_v and A.wind_w
 %  to true, respectively. Default is false.
 %  
-%  The atmospheric grids can be cropped by the following fields:
+%  The atmospheric grids can be cropped by the following (also mandatory) 
+%  fields:
 %    A.pmin
 %    A.latmin   (not needed for 1D)
 %    A.latmax   (not needed for 1D)
 %    A.lonmin   (not needed for 1D)
-%    A.latmax   (not needed for 1D)
+%    A.lonmax   (not needed for 1D)
 %  Grid points outside these values are removed (pmax hard-coded to a very
-%  high value). Longitude limits can be inside [-360,360].
+%  high value). Longitude limits can be inside [-360,360]. 
 %
 % FORMAT Q = qarts_add_mars_planettbox( A, Q, workfolder )
 %
