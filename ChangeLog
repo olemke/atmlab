@@ -2,6 +2,16 @@
 
 	* atmlab-2-1-441
 
+	* arts_usage/arts_radioocc_1D_power.m: Copied changes in function
+	below.
+
+	* arts_usage/arts_radioocc_1D.m: Now free electrons included
+	always in refr_index_air agenda.
+
+2013-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-441
+
 	* arts_usage/qarts_add_mars_planettbox.m: A bit improved header.
 
 	* arts_usage/qarts_add_venus_planettbox.m: Some mars stuff

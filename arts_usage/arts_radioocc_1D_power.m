@@ -108,7 +108,7 @@ Q = q_basic_local( Q, O, workfolder );
 
 %- Set basic and ppath parts of Q
 %
-Q = q_planet_local( Q, A, workfolder );
+[Q,M] = q_planet_local( Q, A, workfolder );
 
 
 %- Radiii
@@ -193,7 +193,6 @@ end
 % Speed of increase in angular distance 
 %
 G         = constants( 'GRAVITATIONAL_CONSTANT' );
-M         = constants( 'EARTH_MASS' );
 t_leo     = sqrt( (4*pi^2*r_leo^3) / (G*M) );
 degpersec = 360 / t_leo;
 %
@@ -388,7 +387,7 @@ return
 
 
 %----------------------------------------------------------------------------
-function Q = q_planet_local(Q,A,workfolder)
+function [Q,M] = q_planet_local(Q,A,workfolder)
   %
   rqre_field( A, 'planet' );
   rqre_field( A, 'atmfunc' );
@@ -405,7 +404,16 @@ function Q = q_planet_local(Q,A,workfolder)
   %
   switch upper( A.planet )
 
+   case 'VENUS'
+    %
+    M = 4.8676e24;
+    %
+    Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_venus.arts' );
+    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalVenus' );
+   
    case 'EARTH'
+    %
+    M = constants( 'EARTH_MASS' );
     %
     Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' );
     Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
@@ -414,47 +422,48 @@ function Q = q_planet_local(Q,A,workfolder)
       A.ABS_SPECIES(1).TAG{1} = 'N2-SelfContStandardType';
       A.ABS_SPECIES(2).TAG{1} = 'O2-PWR98';
       A.ABS_SPECIES(3).TAG{1} = 'H2O-PWR98';
+      A.ABS_SPECIES(4).TAG{1} = 'free_electrons';
     end
 
    case 'MARS'
     %
+    M = 6.4185e23;
+    %
     Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_mars.arts' );
     Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalEarth' );
     
+   case 'JUPITER'
+    %
+    M = 1.8986e27;
+    %
+    Q.INCLUDES{end+1} = fullfile( 'ARTS_INCLUDES', 'planet_jupiter.arts' );
+    Q.REFELLIPSOID    = ellipsoidmodels( 'SphericalJupiter' );
+   
    otherwise
     error( 'Unrecognised choice for A.planet (%s).', A.planet );
   end
 
-  % Include atmospheric specific data
-  Q = A.atmfunc( A, Q, workfolder );
-
-  % Set stuff dependent on call above
   switch upper( A.planet )
-
    case 'EARTH'
     %
-    nofreee_agenda = 'refr_index_air_agenda__GasThayer';
-    general_agenda = 'refr_index_air_agenda__GasThayerAndElectrons';
-   
-   otherwise
+    Q.REFR_INDEX_AIR_AGENDA = { 
+        'NumericSet( refr_index_air, 1.0 )', ...
+        'NumericSet( refr_index_air_group, 1.0 )',...
+        'refr_index_airThayer', ...
+        'refr_index_airFreeElectrons( demand_vmr_value = 0 )' };
     %
-    nofreee_agenda = 'refr_index_air_agenda__GasMWgeneral';
-    general_agenda = 'refr_index_air_agenda__GasMWgeneralAndElectrons';
-  
-  end
-
-  i = 0; fe_found = false;
-  while i <  length(Q.ABS_SPECIES) &  ~fe_found
-    i        = i + 1;
-    fe_found = strcmp( arts_tgs2species( Q.ABS_SPECIES(i).TAG{1} ), ...
-                                                          'free_electrons' );
+   otherwise 
+    %
+    Q.REFR_INDEX_AIR_AGENDA = { 
+        'NumericSet( refr_index_air, 1.0 )', ...
+        'NumericSet( refr_index_air_group, 1.0 )',...
+        'refr_index_airMWgeneral', ...
+        'refr_index_airFreeElectrons( demand_vmr_value = 0 )' };
+    %
   end
   
-  if fe_found
-    Q.REFR_INDEX_AIR_AGENDA = { general_agenda };
-  else
-    Q.REFR_INDEX_AIR_AGENDA = { nofreee_agenda };
-  end
+  % Include atmospheric specific data
+  Q = A.atmfunc( A, Q, workfolder );
   
   if 0   % Set to 1 if you want to test without refraction
     Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__NoRefrac' };

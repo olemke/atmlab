@@ -366,6 +366,7 @@ function [Q,M] = q_planet_local(Q,A,workfolder)
       A.ABS_SPECIES(1).TAG{1} = 'N2';
       A.ABS_SPECIES(2).TAG{1} = 'O2';
       A.ABS_SPECIES(3).TAG{1} = 'H2O';
+      A.ABS_SPECIES(4).TAG{1} = 'free_electrons';
     end
 
    case 'MARS'
@@ -386,36 +387,27 @@ function [Q,M] = q_planet_local(Q,A,workfolder)
     error( 'Unrecognised choice for A.planet (%s).', A.planet );
   end
 
-  % Include atmospheric specific data
-  Q = A.atmfunc( A, Q, workfolder );
-
-  % Set stuff dependent on call above
   switch upper( A.planet )
-
    case 'EARTH'
     %
-    nofreee_agenda = 'refr_index_air_agenda__GasThayer';
-    general_agenda = 'refr_index_air_agenda__GasThayerAndElectrons';
-   
-   otherwise
+    Q.REFR_INDEX_AIR_AGENDA = { 
+        'NumericSet( refr_index_air, 1.0 )', ...
+        'NumericSet( refr_index_air_group, 1.0 )',...
+        'refr_index_airThayer', ...
+        'refr_index_airFreeElectrons( demand_vmr_value = 0 )' };
     %
-    nofreee_agenda = 'refr_index_air_agenda__GasMWgeneral';
-    general_agenda = 'refr_index_air_agenda__GasMWgeneralAndElectrons';
-  
-  end
-
-  i = 0; fe_found = false;
-  while i <  length(Q.ABS_SPECIES) &  ~fe_found
-    i        = i + 1;
-    fe_found = strcmp( arts_tgs2species( Q.ABS_SPECIES(i).TAG{1} ), ...
-                                                          'free_electrons' );
+   otherwise 
+    %
+    Q.REFR_INDEX_AIR_AGENDA = { 
+        'NumericSet( refr_index_air, 1.0 )', ...
+        'NumericSet( refr_index_air_group, 1.0 )',...
+        'refr_index_airMWgeneral', ...
+        'refr_index_airFreeElectrons( demand_vmr_value = 0 )' };
+    %
   end
   
-  if fe_found
-    Q.REFR_INDEX_AIR_AGENDA = { general_agenda };
-  else
-    Q.REFR_INDEX_AIR_AGENDA = { nofreee_agenda };
-  end
+  % Include atmospheric specific data
+  Q = A.atmfunc( A, Q, workfolder );
   
   if 0   % Set to 1 if you want to test without refraction
     Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__NoRefrac' };
