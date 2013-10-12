@@ -2,12 +2,12 @@
 %
 %    This function is very similar to *arts_radioocc_1d*, but considers also
 %    attenuation quantitities, and can thus be used to estimate recieved power.
-%    The drawback is that this function is (much) slower and can fail to
-%    provide results for impact heights. The drawbacks come from the fact that
-%    here the path between two specified positions are determined, that is
-%    handled by slow and not completly stable algorithm. In *arts_radioocc_1d*
-%    the calculations are performed for a set of precalculated viewing
-%    directions.
+%    The function can also return Fardaay rotation. The drawback is that this
+%    function is (much) slower and can fail to provide results for impact
+%    heights. The drawbacks come from the fact that here the path between two
+%    specified positions are determined, that is handled by slow and not
+%    completly stable algorithm. In *arts_radioocc_1d* the calculations are
+%    performed for a set of precalculated viewing directions.
 %
 %    See *arts_radioocc_1d* for overall nomenclature, the basic geometry
 %    assumed, comments around *A* and the purpose of the structure *T*. Note
@@ -32,6 +32,8 @@
 %       tr_space    : Transmission due to free space loss alone.
 %       tr_atmos    : Transmission due to atmospheric attenuation  alone.
 %       tr_space    : Transmission due to defocusing alone.
+%       faraday     : Faraday rotation [deg]. Only included if O.do_faraday
+%                     is true.
 %   The data in *R* are for an equidistant *R.lat_distance*.
 %
 %   The occultation is specified by the structure O having the fields
@@ -50,6 +52,8 @@
 %      slta_n       : Number of SLTA to include.
 %      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
+%      do_faraday   : Flag to also calculate Faraday rotation. Not a 
+%                     mandatory field. Default is false.
 %
 % FORMAT   R = arts_radioocc_1D(Q,O,A)
 %        
@@ -130,7 +134,12 @@ n0             = length( R.lat_distance );
 [R.z_tan,R.lat_tan,R.bangle,R.z_impact]         = deal( repmat( NaN, n0, 1 ) );
 [R.slta,R.l_geometric,R.l_optpath,R.l_proppath] = deal( repmat( NaN, n0, 1 ) );
 [R.tr_total,R.tr_space,R.tr_atmos,R.tr_defoc]   = deal( repmat( NaN, n0, 1 ) );
-
+%
+do_faraday = safegetfield( O, 'do_faraday', false );
+%
+if do_faraday
+  R.faraday = deal( repmat( NaN, n0, 1 ) );
+end
 
 
 %- Run ARTS
@@ -185,7 +194,10 @@ for i = 1 : n0
     R.tr_space(i)  = iy_aux{1};
     R.tr_atmos(i)  = iy_aux{2};
     R.tr_defoc(i)  = iy_aux{3}; 
-    
+
+    if do_faraday
+      R.faraday(i) = iy_aux{4}; 
+    end
   end
 end
 
@@ -266,7 +278,10 @@ nt    = length( T.t );
 [T.z_tan,T.lat_tan,T.bangle,T.lat_distance]   = deal( repmat( NaN, nt, np ) );
 [T.slta,T.l_geometric,T.l_proppath]           = deal( repmat( NaN, nt, np ) );
 [T.l_optpath,T.defocus,T.z_impact]            = deal( repmat( NaN, nt, np ) );
-[T.tr_total,T.tr_space,T.tr_atmos,T.tr_defoc] = deal( repmat( NaN, n0, 1 ) );
+[T.tr_total,T.tr_space,T.tr_atmos,T.tr_defoc] = deal( repmat( NaN, nt, np ) );
+if do_faraday
+  T.faraday = deal( repmat( NaN, nt, np ) );
+end
 %
 for i = 1 : np
 
@@ -290,7 +305,10 @@ for i = 1 : np
   T.tr_space(it,i)     = interp1( R.t(ir), R.tr_space(ir),     T.t(it) );
   T.tr_atmos(it,i)     = interp1( R.t(ir), R.tr_atmos(ir),     T.t(it) );
   T.tr_defoc(it,i)     = interp1( R.t(ir), R.tr_defoc(ir),     T.t(it) );
-  
+
+  if do_faraday
+    T.faraday(it,i)    = interp1( R.t(ir), R.faraday(ir),      T.t(it) );
+  end
 end
 
 
@@ -338,12 +356,18 @@ return
 %----------------------------------------------------------------------------
 function Q = q_basic_local(Q,O,workfolder)
   %
+  do_faraday = safegetfield( O, 'do_faraday', false );
+  %
   Q.INCLUDES{end+1}       = fullfile( 'ARTS_INCLUDES', 'general.arts' );
   Q.INCLUDES{end+1}       = fullfile( 'ARTS_INCLUDES', 'agendas.arts' ); 
   Q.INCLUDES{end+1}       = fullfile( 'ARTS_INCLUDES', 'continua.arts' );
   %
   Q.ATMOSPHERE_DIM        = 1;
-  Q.STOKES_DIM            = 1;
+  if do_faraday
+    Q.STOKES_DIM          = 3;
+  else
+    Q.STOKES_DIM          = 1;
+  end
   Q.F_GRID                = O.frequency;
   Q.PPATH_LMAX            = O.lmax;
   Q.PPATH_LRAYTRACE       = O.lraytrace;
@@ -367,14 +391,27 @@ function Q = q_basic_local(Q,O,workfolder)
   Q.ABSORPTION         = 'OnTheFly';
   Q.ABS_LINES_FORMAT   = 'None';
   %
+  if do_faraday
+    Q.PROPMAT_CLEARSKY_AGENDA = { ...
+                                 'propmat_clearsky_agenda__OnTheFly_Faraday' };
+  else
+    Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly' };
+  end
+  %
   Q.IY_TRANSMITTER_AGENDA = { 'iy_transmitter_agenda__UnitUnpolIntensity' };
   %
   Q.WSMS_AT_END{end+1} = 'AgendaSet( iy_main_agenda ){';
   
   Q.WSMS_AT_END{end+1} = sprintf('  iyRadioLink( defocus_method = %d ) }',...
                                     safegetfield( O, 'defocus_method', 2 ) );
-  Q.WSMS_AT_END{end+1} = [ 'ArrayOfStringSet(iy_aux_vars,[',...
-                '"Free space loss","Atmospheric loss","Defocusing loss"])' ];
+                      
+  saux = '"Free space loss","Atmospheric loss","Defocusing loss"';
+  %
+  if do_faraday
+    saux = [ saux, ',"Faraday rotation"' ];
+  end
+  Q.WSMS_AT_END{end+1} = [ 'ArrayOfStringSet(iy_aux_vars,[',saux,'])' ];
+  %
   Q.WSMS_AT_END{end+1} = 'iyCalc';
   Q.WSMS_AT_END{end+1} = ...
                       sprintf('WriteXML("ascii",iy,"%s/iy.xml")',workfolder);
