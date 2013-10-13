@@ -1,8 +1,15 @@
+2013-10-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-443
+
+	* arts_usage/arts_radioocc_1D.m: Added O.z_impact_min.
+
 2013-10-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-442
 
-	* arts_usage/arts_radioocc_1D_power.m: Now also handling Faraday rotation.
+	* arts_usage/arts_radioocc_1D_power.m: Now also handling Faraday
+	rotation.
 
 2013-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 

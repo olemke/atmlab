@@ -47,6 +47,8 @@
 %                     accuracy. A value in the order of 100 m should be OK.
 %      z_surface    : Surface altitude.
 %      z_impact_max : Start altitude of occultation.
+%      z_impact_min : End altitude of occultation. Not mandatory. Default is
+%                     to use z_surface.
 %      z_impact_dz  : Vertical spacing between path calculations.
 %      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
@@ -121,11 +123,13 @@ Q = q_basic_local( Q, O, workfolder );
 
 %- Set up z_impact grid and R
 %
-R.z_impact = [ O.z_impact_max : -O.z_impact_dz : O.z_surface ]';
+R.z_impact = [ O.z_impact_max : -O.z_impact_dz : ...
+                             safegetfield( O, 'z_impact_min', O.z_surface ) ]';
 n0         = length( R.z_impact );
 %
 [R.z_tan,R.lat_tan,R.bangle,R.lat_distance]     = deal( repmat( NaN, n0, 1 ) );
 [R.slta,R.l_geometric,R.l_optpath,R.l_proppath] = deal( repmat( NaN, n0, 1 ) );
+
 
 %- Radiii
 %
