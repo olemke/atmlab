@@ -36,7 +36,7 @@
 %                     is true.
 %   The data in *R* are for an equidistant *R.lat_distance*.
 %
-%   The occultation is specified by the structure O having the fields
+%   The occultation is specified by the structure O having mandatory fields
 %      leo_altitude : Altitude of LEO orbit.
 %      gps_altitude : Altitude of GPS orbit.
 %      gps_movement : String describing movement. Options are 'none',
@@ -52,8 +52,13 @@
 %      slta_n       : Number of SLTA to include.
 %      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
-%      do_faraday   : Flag to also calculate Faraday rotation. Not a 
-%                     mandatory field. Default is false.
+%   And optional fields
+%      do_faraday   : Flag to also calculate Faraday rotation. 
+%                     Default is false.
+%      defoc_method : Method to calculated defocusing. See iyRadioLInk.
+%                     Default is 2.
+%      defoc_shift  : Angular shift for defocusing. See iyRadioLInk.
+%                     Default is 1e-3.
 %
 % FORMAT   R = arts_radioocc_1D(Q,O,A)
 %        
@@ -401,10 +406,13 @@ function Q = q_basic_local(Q,O,workfolder)
   Q.IY_TRANSMITTER_AGENDA = { 'iy_transmitter_agenda__UnitUnpolIntensity' };
   %
   Q.WSMS_AT_END{end+1} = 'AgendaSet( iy_main_agenda ){';
-  
-  Q.WSMS_AT_END{end+1} = sprintf('  iyRadioLink( defocus_method = %d ) }',...
-                                    safegetfield( O, 'defocus_method', 2 ) );
-                      
+  dmethod = safegetfield( O, 'defoc_method', 1 );
+  dshift  = safegetfield( O, 'defoc_shift', 3e-3 );
+  Q.WSMS_AT_END{end+1} = sprintf(...
+      '  iyRadioLink( defocus_method = %d, defocus_shift = %.3e )',...
+                                                             dmethod, dshift );
+  Q.WSMS_AT_END{end+1} = '}';
+  %                    
   saux = '"Free space loss","Atmospheric loss","Defocusing loss"';
   %
   if do_faraday
