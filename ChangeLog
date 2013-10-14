@@ -1,5 +1,11 @@
 2013-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-445
+
+	* graphs/clonefig.m: New. Taken from Matlab file exchange.
+
+2013-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-444
 
 	* arts_usage/arts_radioocc_1D_power.m: Added optional fields
