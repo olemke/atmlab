@@ -39,8 +39,6 @@
 %   The occultation is specified by the structure O having mandatory fields
 %      leo_altitude : Altitude of LEO orbit.
 %      gps_altitude : Altitude of GPS orbit.
-%      gps_movement : String describing movement. Options are 'none',
-%                     'approaching' or 'disappearing'.
 %      frequency    : Frequency of signal.
 %      lmax         : As ARTS WSV *lmax*. This setting affects here mainly
 %                     accuracy of tangent point.
@@ -53,12 +51,16 @@
 %      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
 %   And optional fields
+%      leo_movement : String describing movement. Options are 'none',
+%                     'approaching' or 'disappearing'. The last is default.
+%      gps_movement : String describing movement. Options are 'none',
+%                     'approaching' or 'disappearing'. The last is default.
 %      do_faraday   : Flag to also calculate Faraday rotation. 
 %                     Default is false.
 %      defoc_method : Method to calculated defocusing. See iyRadioLInk.
 %                     Default is 2.
 %      defoc_shift  : Angular shift for defocusing. See iyRadioLInk.
-%                     Default is 1e-3.
+%                     Default is 3e-3.
 %
 % FORMAT   R = arts_radioocc_1D(Q,O,A)
 %        
@@ -81,7 +83,6 @@ end
 if isempty(O)
   O.leo_altitude = 820e3;
   O.gps_altitude = 20200e3;
-  O.gps_movement = 'disappearing';
   O.frequency    = 1575.42e6;
   O.lmax         = 2e3;
   O.lraytrace    = 100;
@@ -99,6 +100,16 @@ if isempty(A)
   A.planet       = 'earth';
   A.atmfunc      = @qarts_add_fascode;
   A.fascode_atm  = 'tropical';
+end
+
+
+% Check movements
+%
+leo_movement = safegetfield( O, 'leo_movement', 'disappearing' );
+gps_movement = safegetfield( O, 'gps_movement', 'disappearing' );
+%
+if strcmp( leo_movement, 'none' )  &  strcmp( gps_movement, 'none' )
+  error( 'Both O.leo_movement and O.gps_movement can not be ''none'',' );
 end
 
 
@@ -211,16 +222,26 @@ end
 %
 G         = constants( 'GRAVITATIONAL_CONSTANT' );
 t_leo     = sqrt( (4*pi^2*r_leo^3) / (G*M) );
-degpersec = 360 / t_leo;
+%
+switch lower(O.gps_movement)
+ case 'none'
+  degpersec = 0;
+ case 'approaching'
+  degpersec = - 360 / t_leo;
+ case 'disappearing'
+  degpersec = + 360 / t_leo;
+ otherwise
+  error( 'Unrecognised choice for *O.leo_movement* (%s).', O.gps_movement );
+end
+%
+t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
 %
 switch lower(O.gps_movement)
  case 'none'
   ;
  case 'approaching'
-  t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
   degpersec = degpersec - 360 / t_gps;
  case 'disappearing'
-  t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
   degpersec = degpersec + 360 / t_gps;
  otherwise
   error( 'Unrecognised choice for *O.gps_movement* (%s).', O.gps_movement );
@@ -406,7 +427,7 @@ function Q = q_basic_local(Q,O,workfolder)
   Q.IY_TRANSMITTER_AGENDA = { 'iy_transmitter_agenda__UnitUnpolIntensity' };
   %
   Q.WSMS_AT_END{end+1} = 'AgendaSet( iy_main_agenda ){';
-  dmethod = safegetfield( O, 'defoc_method', 1 );
+  dmethod = safegetfield( O, 'defoc_method', 2 );
   dshift  = safegetfield( O, 'defoc_shift', 3e-3 );
   Q.WSMS_AT_END{end+1} = sprintf(...
       '  iyRadioLink( defocus_method = %d, defocus_shift = %.3e )',...

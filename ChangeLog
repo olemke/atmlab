@@ -1,3 +1,11 @@
+2013-10-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-446
+
+	* arts_usage/arts_radioocc_1D_power.m:
+	* arts_usage/arts_radioocc_1D.m: Added O.leo_movement as optional
+	argument for both functions.
+
 2013-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-445

@@ -8,6 +8,10 @@
 %    following the ARTS nomenclature. The latitude gives here the angular
 %    distance from the GPS satellite. 
 %
+%    The function was developed for simulating NWP radio occultations.
+%    However, also other occultations can be simulated, where then "GPS"
+%    shall be considered as the transmitter and "LEO" as the reciever.
+%
 %    This function does not cover attenuation, use *arts_radioocc_1D_power* if
 %    such quantities are needed.
 %
@@ -38,8 +42,6 @@
 %   The occultation is specified by the structure O having the fields
 %      leo_altitude : Altitude of LEO orbit.
 %      gps_altitude : Altitude of GPS orbit.
-%      gps_movement : String describing movement. Options are 'none',
-%                     'approaching' or 'disappearing'.
 %      frequency    : Frequency of signal.
 %      lmax         : As ARTS WSV *lmax*. This setting affects here mainly
 %                     accuracy of tangent point.
@@ -52,6 +54,11 @@
 %      z_impact_dz  : Vertical spacing between path calculations.
 %      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
+%   And optional fields
+%      leo_movement : String describing movement. Options are 'none',
+%                     'approaching' or 'disappearing'. The last is default.
+%      gps_movement : String describing movement. Options are 'none',
+%                     'approaching' or 'disappearing'. The last is default.
 %
 %   Finally, the atmosphere is specified by the structure A having at least
 %   these fields
@@ -100,6 +107,16 @@ if isempty(A)
   A.planet       = 'earth';
   A.atmfunc      = @qarts_add_fascode;
   A.fascode_atm  = 'tropical';
+end
+
+
+% Check movements
+%
+leo_movement = safegetfield( O, 'leo_movement', 'disappearing' );
+gps_movement = safegetfield( O, 'gps_movement', 'disappearing' );
+%
+if strcmp( leo_movement, 'none' )  &  strcmp( gps_movement, 'none' )
+  error( 'Both O.leo_movement and O.gps_movement can not be ''none'',' );
 end
 
 
@@ -200,16 +217,26 @@ end
 %
 G         = constants( 'GRAVITATIONAL_CONSTANT' );
 t_leo     = sqrt( (4*pi^2*r_leo^3) / (G*M) );
-degpersec = 360 / t_leo;
+%
+switch lower(O.gps_movement)
+ case 'none'
+  degpersec = 0;
+ case 'approaching'
+  degpersec = - 360 / t_leo;
+ case 'disappearing'
+  degpersec = + 360 / t_leo;
+ otherwise
+  error( 'Unrecognised choice for *O.leo_movement* (%s).', O.gps_movement );
+end
+%
+t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
 %
 switch lower(O.gps_movement)
  case 'none'
   ;
  case 'approaching'
-  t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
   degpersec = degpersec - 360 / t_gps;
  case 'disappearing'
-  t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
   degpersec = degpersec + 360 / t_gps;
  otherwise
   error( 'Unrecognised choice for *O.gps_movement* (%s).', O.gps_movement );
