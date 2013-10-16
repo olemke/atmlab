@@ -1,13 +1,9 @@
-% ARTS_RADIOOCC_1D_POWER   Simulation of 1D radio occultation
+% ARTS_RADIOOCC_1D_SLTA   Simulation of 1D radio occultation
 %
-%    This function is very similar to *arts_radioocc_1d*, but considers also
-%    attenuation quantitities, and can thus be used to estimate recieved power.
-%    The function can also return Fardaay rotation. The drawback is that this
-%    function is (much) slower and can fail to provide results for impact
-%    heights. The drawbacks come from the fact that here the path between two
-%    specified positions are determined, that is handled by slow and not
-%    completly stable algorithm. In *arts_radioocc_1d* the calculations are
-%    performed for a set of precalculated viewing directions.
+%    This function is very similar to *arts_radioocc_1d*, but here more of
+%    the calculations are done inside ARTS. The ARTS calculations involve to
+%    determine exact paths between fixed transmitter and reciever positions,
+%    and this function is slower than *arts_radioocc_1d*. 
 %
 %    See *arts_radioocc_1d* for overall nomenclature, the basic geometry
 %    assumed, comments around *A* and the purpose of the structure *T*. Note
@@ -62,7 +58,7 @@
 %      defoc_shift  : Angular shift for defocusing. See iyRadioLInk.
 %                     Default is 3e-3.
 %
-% FORMAT   R = arts_radioocc_1D(Q,O,A)
+% FORMAT   R = arts_radioocc_1D_slta(Q,O,A)
 %        
 % OUT   R   Result structure, see above.
 % IN    Q   Initial settings of Q. If empty: Q = qarts;   
@@ -74,7 +70,7 @@
 
 % 2013-09-29   Created by Patrick Eriksson.
 
-function [R,T] = arts_radioocc_1D_power(Q,O,A)
+function [R,T] = arts_radioocc_1D_slta(Q,O,A)
 %
 if isempty(Q)
   Q = qarts;
@@ -223,7 +219,7 @@ end
 G         = constants( 'GRAVITATIONAL_CONSTANT' );
 t_leo     = sqrt( (4*pi^2*r_leo^3) / (G*M) );
 %
-switch lower(O.gps_movement)
+switch lower(leo_movement)
  case 'none'
   degpersec = 0;
  case 'approaching'
@@ -231,12 +227,12 @@ switch lower(O.gps_movement)
  case 'disappearing'
   degpersec = + 360 / t_leo;
  otherwise
-  error( 'Unrecognised choice for *O.leo_movement* (%s).', O.gps_movement );
+  error( 'Unrecognised choice for *O.leo_movement* (%s).', leo_movement );
 end
 %
 t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
 %
-switch lower(O.gps_movement)
+switch lower(gps_movement)
  case 'none'
   ;
  case 'approaching'
@@ -244,7 +240,7 @@ switch lower(O.gps_movement)
  case 'disappearing'
   degpersec = degpersec + 360 / t_gps;
  otherwise
-  error( 'Unrecognised choice for *O.gps_movement* (%s).', O.gps_movement );
+  error( 'Unrecognised choice for *O.gps_movement* (%s).', gps_movement );
 end
 
 
