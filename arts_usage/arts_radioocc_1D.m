@@ -91,6 +91,8 @@
 %        
 % OUT   R   Result structure, see above.
 % IN    Q   Initial settings of Q. If empty: Q = qarts;   
+%           Note that not all feilds are considered, this including
+%           WSMS_BEFORE_RTE and YCALC_WSMS.
 %       O   Occultation structure, see above. If empty, some default 
 %           values set that work as demonstration.
 %       A   Atmospheric structure, see above. If empty, some planet specific

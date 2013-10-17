@@ -1,3 +1,9 @@
+2013-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-448
+
+	* arts_usage/arts_radioocc_1D.m: Added text in header about Q.
+
 2013-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-447
