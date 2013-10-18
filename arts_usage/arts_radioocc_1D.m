@@ -14,6 +14,10 @@
 %    but for example placed on Earth, use then the option for 'none'
 %    movement. 
 %
+%    Defocusing is calculated inside the function (ie. not inside ARTS),
+%    where in the ARTS nomenclature "method 2" is used (note the field
+%    O.defoc_shift, that influences the result obtained). 
+%
 %    Settings and output are first described assuming that attenuation
 %    variables are not considered.
 %

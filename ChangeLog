@@ -1,3 +1,10 @@
+2013-10-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-449
+
+	* arts_usage/arts_radioocc_1D.m: Expanded header to make clear how
+	defocusing is obtained.
+
 2013-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-448
