@@ -5,6 +5,7 @@ function data = collocation_cpr_mhs(file)
 % Read a CPR/MHS collocation file and return things in the common format.
 % Additionally, all data from the collocation file are included.
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
 % IN
 %
 %   file        string      path to collocations file

@@ -382,9 +382,17 @@ function FuncKey = ConvertFuncHandle(FuncH)
 % 2. The full paths of toolbox function e.g. for @mean differ.
 FuncKey = functions(FuncH);
 
+% don't try to go into entire workspace, this is asking for trouble
+if isfield(FuncKey, 'workspace')
+    logtext(atmlab('ERR'), ['Warning: not considering workspace for ' ...
+        'function %s.  Risk of non-unique hash!\n'], FuncKey.function);
+    FuncKey = rmfield(FuncKey, 'workspace');
+end
+
 % ALTERNATIVE: Use name and path. The <matlabroot> part of the toolbox functions
 % is replaced such that the hash for @mean does not depend on the Matlab
 % version.
+
 % Drawbacks: Anonymous functions, nested functions...
 % funcStruct = functions(FuncH);
 % funcfile   = strrep(funcStruct.file, matlabroot, '<MATLAB>');

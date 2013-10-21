@@ -142,6 +142,11 @@ D.ssmt2.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
 D.ssmt2.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
 D.ssmt2.re = '(?<satname>F[0-9]{2})(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})\.T2\.gz';
 
+D.CFSR.basedir = '/storage3/user_data/gerrit/reanalysis_per_day';
+D.CFSR.subdir = '$YEAR4/$MONTH/$DAY';
+D.CFSR.filename = 'T_surf.nc';
+D.CFSR.re = D.CFSR.filename;
+
 %% Non-collocated home-made
 
 D.dardarsub.basedir = '/storage3/data/dardar_subsel';

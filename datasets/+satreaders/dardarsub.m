@@ -2,6 +2,7 @@ function S = dardarsub(file, varargin)
 % read dardarsub data
 %
 % format as other satreaders.-functions.
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
 %
 % NOTE: This function only reads the sub selected data saved as netcdf
 % on our servers. For regular DARDAR data use satreaders.dardar

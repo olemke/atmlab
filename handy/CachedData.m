@@ -122,6 +122,10 @@ classdef CachedData < handle
             %   arg1    1st argument passed to function
             %    ...
             %   argN    nth argument passed to function
+            %   'EXTRA' literal string 'EXTRA'.  The remaining arguments
+            %   WILL be used to calculate the hash, but WON'T be passed on
+            %   to others.  Use this e.g. when calculating obj.meth(args)
+            %   for different objects (pass obj.name or so).
             %
             % OUT
             %
@@ -140,14 +144,24 @@ classdef CachedData < handle
             % generate a unique (?) string
             nm = genvarname(DataHash([{no, func}, varargin]));
             
+            extra = 0;
+            args = varargin;
+            % check if any equal to 'EXTRA'
+            for i = 1:length(varargin)
+                if isequal(varargin{i}, 'EXTRA')
+                    extra = i;
+                    args = varargin(1:extra-1);
+                    break;
+                end
+            end
             if self.has_entry(nm)
-                logtext(atmlab('OUT'), 'getting %s([%d arguments]) from cache\n', ...
-                    func2str(func), length(varargin));
+                logtext(atmlab('OUT'), 'getting %s([%d arguments]) from cache (%s)\n', ...
+                    func2str(func), length(args), nm);
                 varargout = self.get_entry(nm);
             else
                 logtext(atmlab('OUT'), 'executing, then caching %s([%d arguments])\n', ...
-                    func2str(func), length(varargin));
-                [varargout{1:no}] = func(varargin{:});
+                    func2str(func), length(args));
+                [varargout{1:no}] = func(args{:});
                 self.set_entry(nm, varargout);
             end
         end

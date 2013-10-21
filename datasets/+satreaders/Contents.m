@@ -1,5 +1,7 @@
 % Function shells around reading routines for SatDataset framework.
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
+%
 % For the collocation toolkit, "common" reading routines are needed that
 % fulfill a prescribed interface. The interface is as follows:
 %
@@ -23,5 +25,4 @@
 %
 % For examples, see existing implementations.
 %
-% For a complete list of existing data, see <a href="matlab:what %
-% satreaders">what satreaders</a>.
+% For a complete list of existing data, see <a href="matlab:what satreaders">what satreaders</a>.

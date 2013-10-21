@@ -10,6 +10,8 @@ function S_res = grasdir(file, varargin)
 %
 % For calling format, see Contents.m.  Note that you should pass a
 % directory, not a file!
+%
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
 
 % $Id$
 

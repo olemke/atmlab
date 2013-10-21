@@ -7,6 +7,8 @@ function data = avhrr(file, varargin)
 % not meant to be called directly; use either the 'read_granule' method on
 % the SatDataset avhrr, or use avhrr_gac_read.
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
+%
 % FORMAT
 %
 %   data = satreaders.avhrr(file)

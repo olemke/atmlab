@@ -3,6 +3,8 @@ function S = netcdf_dataset(ds, file, varargin)
     %
     % format as other satreaders.-functions.
     %
+    % For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
+    %
     % $Id: satreaders.dardarsub.m 7600 2012-05-14 13:21:10Z seliasson $
 
     core_fields   = {'time','lat','lon'};

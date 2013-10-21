@@ -2,6 +2,8 @@ function S = saphir(file, varargin)
 
 % read saphir data in the common format
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
+%
 % FIXME DOC
 %
 % See also: SatDataset/reader

@@ -8,6 +8,7 @@ function [S,attr] = patmosx(file, varargin)
 %
 % NOTE: This reader actually reads 2 files, one ascending, one descending
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
 %
 % IN
 %

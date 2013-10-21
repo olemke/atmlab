@@ -5,6 +5,8 @@ function data = poes_radiometer(file, ~)
 % This file reads data from a POES l1b radiometer file and rearranges the
 % fields to the common format. See README.
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
+%
 % FORMAT
 %
 %   data = satreaders.poes_radiometer(file)

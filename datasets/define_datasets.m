@@ -159,6 +159,9 @@ SatDataset('name', 'ssmt2', ...
     'reader', @satreaders.ssmt2, ...
     'granule_duration', 7000); % FIXME: verify granule_duration
 
+GriddedDataset('name', 'CFSR', ...
+    'reader', @satreaders.ncep_cfsr_day);
+
 %% datasets generated here (non-collocated)
 
 % dardarsub

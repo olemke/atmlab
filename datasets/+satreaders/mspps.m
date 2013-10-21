@@ -6,6 +6,8 @@ function S = mspps(file, varargin)
 % satreaders.<dataset>.m readers in atmlab. Geodata and time data are
 % always retrieved from the data file.
 %
+% For info on the common format, see <a href="matlab:help SatDataset/reader">SatDataset/reader</a>.
+%
 % IN
 %
 %   file    string      Path to hdf-file

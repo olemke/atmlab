@@ -1,3 +1,52 @@
+2013-10-21  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-450
+
+	* datasets/GriddedDataset.m:
+
+	- Added.  First working functionality is here.  For a gridded dataset,
+	i.e. time/lat/lon stored per day, obtain data purely based on
+	time/lat/lon.  Will be needed to add reanalysis data to SPARE-ICE.
+
+	* datasets/+satreaders/*:
+
+	- Add notice on where to read help on the common format
+
+	* math/binned_statistics.m:
+
+	- Bugfix, have default option for non-mandatory argument 'opt'
+
+	* math/DataHash.m:
+
+	- Prevent infinite loop in case of function handles in workspace.
+	This infinite loop is replaced by the new problem that non-unique hash
+	can be generated, but I think this is less bad (one anyway shouldn't
+	use DataHash for safety-critical situations, nor Matlab at all).
+
+	* collocations/FieldMultiInstrumentCopier.m:
+
+	- Fix typo in documentations
+
+	* datasets/define_datasets.m, site-specific/kiruna/datasets_init.m:
+
+	- Add CFSR
+
+	* datasets/+satreaders/ncep_cfsr_day.m:
+
+	- Add reading routine for NCEP CFSR reanalysis data sorted per day by
+	Python script commited seperately in gerrits internal svn (ask if
+	interested).
+
+	* handy/CachedData.m(cached_evaluation):
+
+	- Bugfix, if calling same method on different objects.  Workaround:
+	able to pass additional stuff that's taken into the hash-calculations
+	but not passed on to the called function.
+
+	* datasets/SatDataset.m:
+
+	- Microscopic change
+
 2013-10-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-449

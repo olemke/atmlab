@@ -43,6 +43,10 @@ function out = binned_statistics(data_bins, statistics, filter, replace, opt)
 % modified by Salomon Eliasson
 % 2010-07-08 Oliver Lemke
 
+if ~exist('opt', 'var')
+    opt = struct();
+end
+
 assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
 if exist('filter','var') && ~isempty(filter)
     assert( isa( filter, 'function_handle' ),['atmlab:' mfilename ':BadInput'],'filter must be a function handle')

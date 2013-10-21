@@ -10,7 +10,7 @@ classdef FieldMultiInstrumentCopier < AssociatedDataset
     % ordinary FieldCopier and use siblings instead.
     %
     % This is an abstract class. One implementation is
-    % <a href="matlab:help AssociatedPOESPlus">AssociatedPOESPlus</a>.
+    % <a href="matlab:help AssociatedPOESPlusCPR">AssociatedPOESPlusCPR</a>.
     %
     % WORK IN PROGRESS
     %
