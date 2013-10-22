@@ -1,3 +1,10 @@
+2013-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-451
+
+	* arts_usage/qarts_add_jupiter_planettbox.m: Just started. Handles
+	the basic atmosphere, but not winds etc. And header text not completed.
+
 2013-10-21  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-450
