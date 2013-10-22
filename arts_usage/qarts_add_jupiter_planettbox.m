@@ -11,15 +11,16 @@
 %    A.atmo
 %    A.basespecies
 %    A.h2ospecies
-%    A.hdospecies
+%    A.nh3species
+%    A.ch4species
+%    A.h2species
 %    A.Necase
 %  These variables and possible settings are described in the file 
 %  arts/controlfiles/planetary_toolbox/DemoJupiterAtmo1D.arts.
 %
 %  All "zeropadding" variables are hard-coded to 1.
 %
-%  Wind fields are included by setting A.wind_u and A.wind_v to true,
-%  respectively. Default is false. Vertical winds are not handled.
+%  Wind and magnetic field parts are not yet handled by this function.
 %  
 %  The atmospheric grids can be cropped by the following (also mandatory) 
 %  fields:
@@ -128,43 +129,6 @@ elseif Q.ATMOSPHERE_DIM == 3
 else
   error( 'Only 1D and 3D atmosphere can be generated.' );
 end
-
-
-return
-
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexSet( EWwind, [0] )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexSet( NSwind, [0] )';
-
-u_wind = safegetfield( A, 'wind_u', 0 );
-v_wind = safegetfield( A, 'wind_v', 0 );
-
-if u_wind | v_wind
-  Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-               'INCLUDE "planetary_toolbox/includes/jupiter/getwind_jupiter.arts"';
-  if u_wind 
-    Q.WSMS_BEFORE_ATMSURF{end+1} = 'Copy( rawfield, wind_u_raw )';
-    if Q.ATMOSPHERE_DIM == 1
-      Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                'INCLUDE "planetary_toolbox/includes/common/makefield1D.arts"';
-    else
-      Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                'INCLUDE "planetary_toolbox/includes/common/makefield3D.arts"';
-    end
-    Q.WSMS_BEFORE_ATMSURF{end+1} = 'Copy( wind_u_field, finalfield )';
-  end
-  if v_wind 
-    Q.WSMS_BEFORE_ATMSURF{end+1} = 'Copy( rawfield, wind_v_raw )';
-    if Q.ATMOSPHERE_DIM == 1
-      Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                'INCLUDE "planetary_toolbox/includes/common/makefield1D.arts"';
-    else
-      Q.WSMS_BEFORE_ATMSURF{end+1} = ...
-                'INCLUDE "planetary_toolbox/includes/common/makefield3D.arts"';
-    end
-    Q.WSMS_BEFORE_ATMSURF{end+1} = 'Copy( wind_v_field, finalfield )';
-  end
-end
-
 
 
 

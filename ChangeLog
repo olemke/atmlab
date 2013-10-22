@@ -1,5 +1,13 @@
 2013-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-452
+
+	* arts_usage/qarts_add_jupiter_planettbox.m: Quickly fixed header.
+	Wind and magnetic field parts are not handled, but no time to
+	fix those parts now.
+
+2013-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-451
 
 	* arts_usage/qarts_add_jupiter_planettbox.m: Just started. Handles
