@@ -1,3 +1,9 @@
+2013-10-25  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-454
+
+	* geodetic/geographic_mean.m: Added, forgot to add earlier!
+
 2013-10-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-453
