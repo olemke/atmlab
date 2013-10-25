@@ -117,7 +117,7 @@ end
 data.tb = reshape( record( rec_format.tb', : ) * .01, nfovs, nchan, nlines_read );
 
 % approximate satellite position
-ind = floor(size(data.lat, 1)/2);
-[data.satlat, data.satlon] = geographic_mean(data.lat(ind:ind+1, :).', data.lon(ind:ind+1, :).');
+%ind = floor(size(data.lat, 1)/2);
+%[data.satlat, data.satlon] = geographic_mean(data.lat(ind:ind+1, :).', data.lon(ind:ind+1, :).');
 
 end

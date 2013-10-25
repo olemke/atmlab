@@ -20,13 +20,13 @@
 %    set to the one of the lowest allowed temperature (T=248K), i.e. assuming
 %    epsilon to be constant below 248K. 
 %
-% FORMAT    e = eps_water_liebe93( f, t, modT )
+% FORMAT    e = eps_water_liebe93( f, t [, modT] )
 %        
-% OUT   e   Complex dielectric constant
-% IN    f   Frequency
-%       t   Temperature
-%    modT   flag, whether to use modified t if t<248K (liebe formula degenerates
-%            at these temperatures)
+% OUT   e    Complex dielectric constant
+% IN    f    Frequency
+%       t    Temperature
+% OPT   modT flag, whether to use modified t if t<248K (liebe formula 
+%            degenerates at these temperatures). Default is false.
 
 % 2004-10-22   Created by Patrick Eriksson
 % 2013-10-04   Jana Mendrok introduced modT flag
