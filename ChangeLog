@@ -1,3 +1,9 @@
+2013-10-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-456
+
+	* demos/qarts_demo.m: Updated setting of SURFACE_RTPROP_AGENDA
+
 2013-10-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-455
