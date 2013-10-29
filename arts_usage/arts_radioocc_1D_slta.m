@@ -33,8 +33,8 @@
 %   The data in *R* are for an equidistant *R.lat_distance*.
 %
 %   The occultation is specified by the structure O having mandatory fields
-%      leo_altitude : Altitude of LEO orbit.
-%      gps_altitude : Altitude of GPS orbit.
+%      rec_altitude : Altitude of receiver orbit.
+%      tra_altitude : Altitude of transmitter orbit.
 %      frequency    : Frequency of signal.
 %      lmax         : As ARTS WSV *lmax*. This setting affects here mainly
 %                     accuracy of tangent point.
@@ -47,9 +47,9 @@
 %      z_impact4t0  : The impact height used as time reference (t=0 here).
 %      f_sampling   : Sampling frequency for data in T.
 %   And optional fields
-%      leo_movement : String describing movement. Options are 'none',
+%      rec_movement : String describing movement. Options are 'none',
 %                     'approaching' or 'disappearing'. The last is default.
-%      gps_movement : String describing movement. Options are 'none',
+%      tra_movement : String describing movement. Options are 'none',
 %                     'approaching' or 'disappearing'. The last is default.
 %      do_faraday   : Flag to also calculate Faraday rotation. 
 %                     Default is false.
@@ -77,8 +77,8 @@ if isempty(Q)
 end
 %
 if isempty(O)
-  O.leo_altitude = 820e3;
-  O.gps_altitude = 20200e3;
+  O.rec_altitude = 820e3;
+  O.tra_altitude = 20200e3;
   O.frequency    = 1575.42e6;
   O.lmax         = 2e3;
   O.lraytrace    = 100;
@@ -101,11 +101,11 @@ end
 
 % Check movements
 %
-leo_movement = safegetfield( O, 'leo_movement', 'disappearing' );
-gps_movement = safegetfield( O, 'gps_movement', 'disappearing' );
+rec_movement = safegetfield( O, 'rec_movement', 'disappearing' );
+tra_movement = safegetfield( O, 'tra_movement', 'disappearing' );
 %
-if strcmp( leo_movement, 'none' )  &  strcmp( gps_movement, 'none' )
-  error( 'Both O.leo_movement and O.gps_movement can not be ''none'',' );
+if strcmp( rec_movement, 'none' )  &  strcmp( tra_movement, 'none' )
+  error( 'Both O.rec_movement and O.tra_movement can not be ''none'',' );
 end
 
 
@@ -129,16 +129,16 @@ Q = q_basic_local( Q, O, workfolder );
 
 %- Radiii
 %
-r_leo     = Q.REFELLIPSOID(1) + O.leo_altitude;
-r_gps     = Q.REFELLIPSOID(1) + O.gps_altitude;
+r_rec     = Q.REFELLIPSOID(1) + O.rec_altitude;
+r_tra     = Q.REFELLIPSOID(1) + O.tra_altitude;
 
 
 %- Determine latitude distances to use and set-up R
 %
-dlat_min = acosd( (Q.REFELLIPSOID(1)+O.slta_max) / r_gps ) + ...
-           acosd( (Q.REFELLIPSOID(1)+O.slta_max) / r_leo );
-dlat_max = acosd( (Q.REFELLIPSOID(1)+O.slta_min) / r_gps ) + ...
-           acosd( (Q.REFELLIPSOID(1)+O.slta_min) / r_leo );
+dlat_min = acosd( (Q.REFELLIPSOID(1)+O.slta_max) / r_tra ) + ...
+           acosd( (Q.REFELLIPSOID(1)+O.slta_max) / r_rec );
+dlat_max = acosd( (Q.REFELLIPSOID(1)+O.slta_min) / r_tra ) + ...
+           acosd( (Q.REFELLIPSOID(1)+O.slta_min) / r_rec );
 %
 R.lat_distance = linspace( dlat_min, dlat_max, O.slta_n );
 n0             = length( R.lat_distance );
@@ -158,7 +158,7 @@ end
 %
 for i = 1 : n0
 
-  Q.TRANSMITTER_POS = [ O.leo_altitude, R.lat_distance(i) ];
+  Q.TRANSMITTER_POS = [ O.rec_altitude, R.lat_distance(i) ];
 
   % Run ARTS
   %
@@ -194,9 +194,9 @@ for i = 1 : n0
                        ( 0.5 * (ppath.ngroup(1:end-1)+ppath.ngroup(2:end)) ) );
 
     % SLTA and geometrical distance
-    lgeom        = sqrt( r_leo^2 + r_gps^2 - 2*r_leo*r_gps*...
+    lgeom        = sqrt( r_rec^2 + r_tra^2 - 2*r_rec*r_tra*...
                                                      cosd(R.lat_distance(i)) );
-    R.slta(i)    = r_leo * r_gps * sind(R.lat_distance(i)) / lgeom - ...
+    R.slta(i)    = r_rec * r_tra * sind(R.lat_distance(i)) / lgeom - ...
                                                              Q.REFELLIPSOID(1);
     R.l_proppath(i)  = lppath;
     R.l_optpath(i)   = lopt;
@@ -217,30 +217,30 @@ end
 % Speed of increase in angular distance 
 %
 G         = constants( 'GRAVITATIONAL_CONSTANT' );
-t_leo     = sqrt( (4*pi^2*r_leo^3) / (G*M) );
+t_rec     = sqrt( (4*pi^2*r_rec^3) / (G*M) );
 %
-switch lower(leo_movement)
+switch lower(rec_movement)
  case 'none'
   degpersec = 0;
  case 'approaching'
-  degpersec = - 360 / t_leo;
+  degpersec = - 360 / t_rec;
  case 'disappearing'
-  degpersec = + 360 / t_leo;
+  degpersec = + 360 / t_rec;
  otherwise
-  error( 'Unrecognised choice for *O.leo_movement* (%s).', leo_movement );
+  error( 'Unrecognised choice for *O.rec_movement* (%s).', rec_movement );
 end
 %
-t_gps     = sqrt( (4*pi^2*r_gps^3) / (G*M) );
+t_tra     = sqrt( (4*pi^2*r_tra^3) / (G*M) );
 %
-switch lower(gps_movement)
+switch lower(tra_movement)
  case 'none'
   ;
  case 'approaching'
-  degpersec = degpersec - 360 / t_gps;
+  degpersec = degpersec - 360 / t_tra;
  case 'disappearing'
-  degpersec = degpersec + 360 / t_gps;
+  degpersec = degpersec + 360 / t_tra;
  otherwise
-  error( 'Unrecognised choice for *O.gps_movement* (%s).', gps_movement );
+  error( 'Unrecognised choice for *O.tra_movement* (%s).', tra_movement );
 end
 
 
@@ -342,8 +342,8 @@ for ip = 1 : np
     if ~isnan( T.bangle(it,ip) )
       
       r_tan2 = ( Q.REFELLIPSOID(1) + T.z_tan(it,ip) )^2;
-      lr     = sqrt( r_leo^2 - r_tan2 ); 
-      lt     = sqrt( r_gps^2 - r_tan2 ); 
+      lr     = sqrt( r_rec^2 - r_tan2 ); 
+      lt     = sqrt( r_tra^2 - r_tan2 ); 
       
       fac = (pi/180) * (lr*lt) / (lr+lt);
 
@@ -400,7 +400,7 @@ function Q = q_basic_local(Q,O,workfolder)
   Q.PPATH_AGENDA          = { 'ppath_agenda__TransmitterReceiverPath'   };
   Q.PPATH_STEP_AGENDA     = { 'ppath_step_agenda__RefractedPath'    };
   %
-  Q.SENSOR_POS            = O.gps_altitude;
+  Q.SENSOR_POS            = O.tra_altitude;
   Q.SENSOR_LOS            = [];
   %
   Q.Z_SURFACE             = O.z_surface;

@@ -91,7 +91,7 @@
 %   likely also includes fields required by the "atmfunc". See
 %   *arts_include_fascode* for how such a function is assumed to work
 %
-% FORMAT   R = arts_radioocc_1D(Q,O,A)
+% FORMAT   R = arts_radioocc_1D(Q,O,A[,workfolder])
 %        
 % OUT   R   Result structure, see above.
 % IN    Q   Initial settings of Q. If empty: Q = qarts;   
@@ -102,10 +102,13 @@
 %       A   Atmospheric structure, see above. If empty, some planet specific
 %           settings are applied. For example, for Earth Fascode tropical is
 %           used. Free electrons are not included automatically for any planet.
+% OPT   workfolder   Path to a folder where to place all files generated.
+%                    Default is to create a temporary folder, following the
+%                    general atmlab settings.
 
 % 2013-10-16   Created by Patrick Eriksson.
 
-function [R,T] = arts_radioocc_1D(Q,O,A)
+function [R,T] = arts_radioocc_1D(Q,O,A,workfolder)
 %
 if isempty(Q)
   Q = qarts;
@@ -132,6 +135,8 @@ if isempty(A)
   A.atmfunc      = @qarts_add_fascode;
   A.fascode_atm  = 'tropical';
 end
+%
+if nargin < 4, workfolder = []; end
 
 
 % Check movements
@@ -153,8 +158,10 @@ do_faraday    = safegetfield( O, 'do_faraday', false );
 
 %- Create a temporary workfolder
 %
-workfolder = create_tmpfolder;
-cu = onCleanup( @()delete_tmpfolder( workfolder ) );
+if isempty( workfolder )
+  workfolder = create_tmpfolder;
+  cu = onCleanup( @()delete_tmpfolder( workfolder ) );
+end
 %
 cfile = fullfile( workfolder, 'cfile.arts' );
 

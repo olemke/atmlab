@@ -1,3 +1,13 @@
+2013-10-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-457
+
+	* arts_usage/arts_radioocc_1D_slta.m: Changed gps/leo to rec/tra,
+	as earlier done in function below.
+
+	* arts_usage/arts_radioocc_1D.m: Added workfolder as optional
+	argument.
+
 2013-10-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-456
