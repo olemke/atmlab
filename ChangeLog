@@ -1,3 +1,10 @@
+2013-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-458
+
+	* scattering/tmatrix.m: Changed to use the temporary method
+	scat_meta_arrayAddTmatrixOldVersion.
+
 2013-10-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-457

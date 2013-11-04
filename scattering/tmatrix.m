@@ -142,7 +142,8 @@ for i = 1 : np
   end
   
   % Expand meta data
-  S{end+1} = 'scat_meta_arrayAddTmatrix(';
+  S{end+1} = 'scat_meta_arrayAddTmatrixOldVersion(';
+  S{end+1} = '  complex_refr_index = complex_refr_index,';  
   if length(pshape) > 1
     S{end+1} = sprintf( '  shape              = "%s",', pshape{i} );
     desc{i}  = sprintf( '%s', pshape{i} );
@@ -154,13 +155,6 @@ for i = 1 : np
     S{end+1} = sprintf( '  particle_type      = "%s",', ptype{i} );
   else
     S{end+1} = sprintf( '  particle_type      = "%s",', ptype{1} );
-  end    
-  if length(pdiameter) > 1
-    S{end+1} = sprintf( '  diameter_grid      = [%.6e],', pdiameter(i) );
-    desc{i}  = sprintf( '%s, %.3f um', desc{i}, 1e6*pdiameter(i) );
-  else
-    S{end+1} = sprintf( '  diameter_grid      = [%.6e],', pdiameter(1) );
-    desc{i}  = sprintf( '%s, %.3f um', desc{i}, 1e6*pdiameter(1) );
   end
   if length(aspect_ratio) > 1
     S{end+1} = sprintf( '  aspect_ratio       = %.6d,', aspect_ratio(i) );
@@ -168,12 +162,16 @@ for i = 1 : np
   else
     S{end+1} = sprintf( '  aspect_ratio       = %.6d,', aspect_ratio(1) );
     desc{i}  = sprintf( '%s, aspect ratio %.3f', desc{i}, aspect_ratio(1) );
+  end  
+  if length(pdiameter) > 1
+    S{end+1} = sprintf( '  diameter_grid      = [%.6e],', pdiameter(i) );
+    desc{i}  = sprintf( '%s, %.3f um', desc{i}, 1e6*pdiameter(i) );
+  else
+    S{end+1} = sprintf( '  diameter_grid      = [%.6e],', pdiameter(1) );
+    desc{i}  = sprintf( '%s, %.3f um', desc{i}, 1e6*pdiameter(1) );
   end
   S{end+1} = '  scat_f_grid        = scat_f_grid,';
-  S{end+1} = '  scat_T_grid        = scat_t_grid,';
-  S{end+1} = '  complex_refr_index = complex_refr_index,';
-  S{end+1} = '  material           = "undefined",';
-  S{end+1} = '  density            = -999 )';
+  S{end+1} = '  scat_T_grid        = scat_t_grid )';
 end
 
 
