@@ -1,3 +1,14 @@
+2013-11-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-459
+
+	* pyarts: Removed the folder and its content. As far as I know,
+	not used by anyone and probably not working. The same
+	functionality now exists inside ARTS, that can be used by
+	tmatrix.m.
+
+	* atmlab/atmlab_init.m: Removed adding of pyarts folder.
+
 2013-11-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-458

@@ -40,7 +40,6 @@ addpath( fullfile( toppath, 'retrieval','qpack2' ) );
 addpath( fullfile( toppath, 'retrieval' ) ); 
 addpath( fullfile( toppath, 'randomize','iaaft' ) ); 
 addpath( fullfile( toppath, 'randomize' ) ); 
-addpath( fullfile( toppath, 'pyarts' ) ); 
 addpath( fullfile( toppath, 'physics' ) );
 addpath( fullfile( toppath, 'lineshape', 'faddeeva' ) ); 
 addpath( fullfile( toppath, 'mie' ) ); 
