@@ -18,7 +18,7 @@ function [outdata,outlat,outlon,weights] = regionize(data,lat,lon,corner,trim)
 % OUT:    outdata
 %         outlat
 %         outlon
-%         weights
+%         weights % takes care of grids that are overlapping the edges
 %         flags = 
 %
 % USAGE: [data,lat,lon,weights,flags] = regionize(data,lat,lon,corner)
@@ -33,7 +33,7 @@ function [outdata,outlat,outlon,weights] = regionize(data,lat,lon,corner,trim)
 % Created by Salomon Eliasson
 % $Id$
 
-errID = 'atmlab:reginize:badInput';
+errID = 'atmlab:regionize:badInput';
 assert(nargin>=4,errID,'Not enought input arguments')
 
 % Default action is to trim away NaNs out side region

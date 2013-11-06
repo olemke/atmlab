@@ -720,7 +720,7 @@ classdef Collapser < AssociatedDataset
                             end
                         end
                     end
-                    % remove if any are valid at all
+                    % remove if any are valid at all % (do you mean "if none are valid?")
                     % FIXME: make this optional
                     if ~anyvalidfields
                         M(j, :) = flag_allflagged;
@@ -735,7 +735,7 @@ classdef Collapser < AssociatedDataset
                 
                 % remove remaining part of M, e.g. where I did too much
                 % pre-allocation or no relevant data was found
-                rest = all(M==flag_globlimfailed, 2);
+                rest = all(M==flag_globlimfailed | M==flag_allflagged, 2);
                 % FIXME: what to do with the other flags?
                 M(rest, :) = [];
                 %%%
