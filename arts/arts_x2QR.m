@@ -103,10 +103,11 @@ for i = 1 : nq
     %
     assert( strcmp( R.jq{i}.subtag, 'Zenith angle off-set' ) );
     %
-    Q.SENSOR_LOS = R.los;
-    Q.SENSOR_LOS(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
-                                                    R.jq{i}.grids{1} )* x(ind);
-    
+    sensor_los      = R.los;
+    sensor_los(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
+                                                    R.jq{i}.grids{1} )* x(ind); 
+    xmlStore( fullfile(R.workfolder,'sensor_los.xml'), sensor_los, 'Matrix' );
+   
    case 'Frequency'   %-------------------------------------------------------
     %
     assert( length(ind) == 1 );
@@ -161,7 +162,9 @@ end
 
 %- Update sensor characteristics
 %
-arts_sensor( Q, R.workfolder );
+if do_sensor
+  arts_sensor( Q, R.workfolder );
+end
 
 
 %- Total baseline

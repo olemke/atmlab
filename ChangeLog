@@ -1,3 +1,17 @@
+2013-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-461
+
+	* arts/arts_x2QR.m: Pointing off-set were put into Q.SENSOR_LOS,
+	but needs to be stored to used file to have an effect. This should
+	hopefully fix problem reported by Ole Martin.
+
+	Also added this if-statement:
+
+	if do_sensor
+	  arts_sensor( Q, R.workfolder );
+        end
+
 2013-11-06  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-460
