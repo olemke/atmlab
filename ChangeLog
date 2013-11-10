@@ -1,3 +1,11 @@
+2013-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-462
+
+	* retrieval/mci.m (mci): Added some comments. More importantly,
+	the function can now make use parallelisation. To make use of this
+	feature, first call matlabpool.
+
 2013-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-461

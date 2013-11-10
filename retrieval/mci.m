@@ -72,6 +72,7 @@
 
 function [Xh,E,D,W] = mci(M,Xb,Yb,Se,Y,p)
 
+% Check input
 if ~isfield( M, 'use_all' )
   M.use_all = 1;
 end
@@ -91,10 +92,13 @@ if ~isfield( M, 'n_hit_thresh' )
   M.n_hit_thresh = 0;
 end
 
+
+% Some sizes
 nb = size(Xb,2);
 m  = size(Y,1);
 ny = size(Y,2);
 lx = size(Xb,1);
+
 
 % If no prior weights p are given, we set all prior weights to 1:
 if nargin == 5
@@ -106,21 +110,28 @@ else
   end
 end
 
+
 % Check that dimensions of Xb and Yb are consistent:
 if size(Yb,2) ~= nb
     error('Dimensions of Xb and Yb do not match')
 end
 
-Xh = zeros( lx, ny );
 
+% Init output arguments
+%
+Xh = zeros( lx, ny );
+%
 if nargout > 1
   E  = zeros( lx, ny );
 end
 if nargout > 3
   W  = zeros( nb, ny );
 end
+%
+D(ny) = struct( 'sum_w',NaN, 'max_w',NaN, 'n_con',NaN, 'n_hit',NaN );
 
-for i = 1 : ny
+
+parfor i = 1 : ny
 
   w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) );
 
