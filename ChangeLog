@@ -1,3 +1,26 @@
+2013-11-27  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-463
+
+	* geoplots/gmt/makepolar.m:
+	-Fixed bug in number format string (small numbers are also allowed
+	now)
+	- Fixed bug if the reference value is at or outside the data range
+	edges.
+
+	* handy/combine_pdfs.m:
+	- Made help section human-readible
+
+	- default behaviour is now to name the outfile after the title (if
+	given) and if no in.filename is given
+
+	- fixed the default viewer to 'gnone-open' or 'kde-open' if on
+	linux, and 'open' if on a Mac
+
+	* handy/sanitise.m: silenced annoying warning about dangerous characters
+
+	* datasets/define_datasets.m: Added modis field
+
 2013-11-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-462

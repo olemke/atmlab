@@ -17,34 +17,82 @@ function outfile = combine_pdfs(pdffiles, options)
 %                           string: 'dir(<string>)' will get a list of files,
 %                                   globbing is allowed:
 %                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
+%¨
 %
-%       options.            structure; contains the following options:
-%       fieldname      |type   description                            | default
-%       cols                |%d [] number of columns per row | 2
-%       filename        |%s    name of output file                | 'out.pdf'
-%       outdir            |%s    directory for output               |  gmtlab('outdir')
-%       vspace           |%f    space between rows               | 1 (cm)
-%       hspace           |%f    space between columns         | 1 (cm)
-%       rightPadding | %f  padding to the right of a row | 1(cm) %need one value per row. e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
-%       valign             |%s    vertical alignment               | m
-%                              |      m = middle, b = bottom      |
-%       scale              |[%d,%d; etc] scale individual figures
-%                             [filenumber,scale]                          | 1
-%       title                | %s   title to be displayed above  |
-%                             the combined pdfs,                        | <none>
-%       fontsize        | %s   e.g. '4cm' or '40pt'                 | 1/22 * rowwidth (only relevent if title is given)
-%       display          | tries to open pdf file                    | false
-%                             | if your viewer is not listed it       |
-%                             | will not try to display anything   |
-%       pdfcrop        | do a pdfcrop                                 | false
+% OPT
+%       % HOW TO READ VARIABLE DESCRIPTION OF OPTIONAL VARIABLES:
+%         KEY:  in.variable   in: = expect input type, ex: = Explanation/Example, de: = Default value/behavior
+%         NOTE: If "def" is missing for a variable it means the variable is not used by default
 %
-% OUT:      outfile             string; the fullpath to the pdffile created
+%         types: %s=character or string
+%                %f=numeric/logical
+%                {}=cell
+
+%       Structure where the following fields are considered options:
+%
+%       options.cols
+%            in:  %d
+%            ex:  Number of columns per row. option.cols can also be a vector
+%                 containing the number of columns that should be on each each row.
+%                 In that case, the sum of this vector must match the number of pdf files.
+%            def: 2
+%       options.filename
+%            in:  %s
+%            ex:  name of output file
+%            def: 'out.pdf'
+%       options.outdir
+%            in:  %s
+%            ex:  directory for output
+%            def: gmtlab('outdir')
+%       options.vspace
+%            in:  %f
+%            ex:  space between rows in cm
+%            def: 1
+%       options.hspace
+%            in:  %f
+%            ex:  space between columns in cm
+%            def: 1
+%       options.rightPadding
+%            in:  %f
+%            ex:  padding to the right of a row in cm. Note: Needs one value per row.
+%                 e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
+%            def: 1 
+%       options.valign
+%            in:  %s
+%            ex:  vertical alignment. 'm' = middle, 'b' = bottom, 't'=top
+%            def: 'm'
+%       options.scale
+%            in:  [%d,%d; etc]
+%            ex:  scale individual figures. [filenumber,scale]
+%            def: 1
+%       options.title
+%            in:  %s
+%            ex:  title to be displayed above the combined pdfs
+%            def: <none>
+%       options.fontsize
+%            in:  %s
+%            ex:  E.g., '4cm' or '40pt'
+%            def: 1/22 * rowwidth (but only relevent if title is given)
+%       options.display
+%            in:  %f
+%            ex:  tries to open pdf file. If your viewer is not listed in atmlab('')it will not try to display anything
+%            def: false
+%       options.pdfviewer
+%            in:  %s
+%            ex:  Your pdf-viewing program of choice
+%            def: Mac: 'open'
+%                 Linux: 'gnome-open' or if that does work,
+%                        'kde-open'. If neither exists, nothing is displayed
+%       options.pdfcrop
+%            in:  %f
+%            ex:  Do a pdfcrop when finished putting everything together
+%            def: false
+%
+% OUT:      outfile = The fullpath to the created pdf-file
 %
 % NOTE: The files are appended left to right and from top to bottom.
 %       Arguments may be:
-%            1) option.cols can alternatively be a vector
-%               with the number of columns for each row. In that case, the
-%               sum of this vector must match the number of pdf files.
+%            1) 
 
 % 2013-04-10 Oliver Lemke and Salomon Eliasson.
 
@@ -56,12 +104,17 @@ default.cols        = 2;
 default.vspace   = 1;
 default.hspace   = 1;
 default.valign     = 'm';
-default.filename = 'out.pdf';
+if isfield(options,'title')
+    default.filename = [sanitise(options.title),'.pdf'];
+else
+    default.filename = 'out.pdf';
+end
 default.outdir     = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
 default.display    = false;
 default.title         = ''; 
 default.pdfcrop   = false;
+default.pdfviewer = '';
 options = optargs_struct(options, default);
 
 %% Convert outdir to fullpath
@@ -108,22 +161,23 @@ outfile = fullfile(options.outdir, options.filename);
 
 %% Display output
 % This only works for the following pre-programmed options
-if options.display
+if options.display && isempty(options.pdfviewer)
     if ismac
         exec_system_cmd(sprintf('open %s',outfile));
     elseif isunix
-        [~,b1]=system('which evince');
-        [~,b2]=system('which okular');
+        [~,b1]=system('which gnome-open');
+        [~,b2]=system('which kde-open');
         if ~isempty(b1)
-            exec_system_cmd(sprintf('evince %s &',outfile));
+            exec_system_cmd(sprintf('gnome-open %s &',outfile));
         elseif ~isempty(b2)
-            exec_system_cmd(sprintf('okular %s &',outfile));
+            exec_system_cmd(sprintf('kde-open %s &',outfile));
         end
     end
+elseif options.display
+    exec_system_cmd(sprintf('%s %s',options.pdfviewer,outfile));
 end
 
 end
-
 
 %% Only subfunctions allowed after this point!!!
 

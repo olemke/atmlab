@@ -29,7 +29,7 @@ while x < 0
     b = b+1;
     x = x*10^b;
 end
-prtstr=sprintf('%%.%df',b);
+prtstr=sprintf('%%g',b);
 strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
     prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
@@ -182,7 +182,13 @@ if BT < whitedomain || TT < whitedomain
         BT = BT + (whitedomain-TT);
         
     end
-    %nw = nw - mod(nw,2); %not sure why this is here
+
+end
+if TT==0
+    BT = BT-1;
+end
+if BT==0
+    TT = TT-1;
 end
 %special 
 assert(BT+TT+nw == length(tickval)-1,['gmtlab:' mfilename ':Bug'],...
