@@ -17,7 +17,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %                           string: 'dir(<string>)' will get a list of files,
 %                                   globbing is allowed:
 %                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
-%¨
+%
 %
 % OPT
 %       % HOW TO READ VARIABLE DESCRIPTION OF OPTIONAL VARIABLES:
@@ -27,7 +27,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %         types: %s=character or string
 %                %f=numeric/logical
 %                {}=cell
-
+%
 %       Structure where the following fields are considered options:
 %
 %       options.cols
@@ -75,7 +75,8 @@ function outfile = combine_pdfs(pdffiles, options)
 %            def: 1/22 * rowwidth (but only relevent if title is given)
 %       options.display
 %            in:  %f
-%            ex:  tries to open pdf file. If your viewer is not listed in atmlab('')it will not try to display anything
+%            ex:  tries to open pdf file with 'gnome-open' or 'kde-open'
+%                 if you are on a linux and 'open' if called from Mac
 %            def: false
 %       options.pdfviewer
 %            in:  %s
@@ -91,8 +92,7 @@ function outfile = combine_pdfs(pdffiles, options)
 % OUT:      outfile = The fullpath to the created pdf-file
 %
 % NOTE: The files are appended left to right and from top to bottom.
-%       Arguments may be:
-%            1) 
+
 
 % 2013-04-10 Oliver Lemke and Salomon Eliasson.
 
@@ -101,9 +101,9 @@ if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
 default.cols        = 2;
-default.vspace   = 1;
-default.hspace   = 1;
-default.valign     = 'm';
+default.vspace      = 1;
+default.hspace      = 1;
+default.valign      = 'm';
 if isfield(options,'title')
     default.filename = [sanitise(options.title),'.pdf'];
 else
@@ -112,9 +112,9 @@ end
 default.outdir     = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
 default.display    = false;
-default.title         = ''; 
-default.pdfcrop   = false;
-default.pdfviewer = '';
+default.title      = ''; 
+default.pdfcrop    = false;
+default.pdfviewer  = '';
 options = optargs_struct(options, default);
 
 %% Convert outdir to fullpath
