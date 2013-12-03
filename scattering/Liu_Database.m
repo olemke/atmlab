@@ -1,12 +1,13 @@
-%  Liu_Database extracts the DDA calculation for the some differents ice
-%  particle shapes, from the Liu Database.
+%  Liu_Database extracts the DDA calculations for randomly oriented ice
+%  particles with some different shapes which are defined in Liu Database ( Liu, G. (2008) ) 
+%  "A DATABASE OF MICROWAVE SINGLE-SCATTERING PROPERTIES FOR NONSPHERICAL ICE PARTICLES. Bulletin of the American Meteorological Society, 89(10), 1563-1570."
 %
-%  To use this function download the Liu database from http://cirrus.met.fsu.edu/research/scatdb.html                               
-%  , compile the scatdb, and then svae this function in the same path of the compiled scatdb file.  
-%  The rules and limits of the calculated DDA datas is explaind in the scatdb.c file. 
+%  To use this function download and compile the Liu database from http://cirrus.met.fsu.edu/research/scatdb.html                               
+%   
+%  The rules and limits of using the Database are explaind in the scatdb.c file. 
 %  For example the frequency shoud be between 3e9 and 340e9 Hz.
 %  
-%  The function takes a frequency (f), temperature (T), vector of shape id (nshape), and a
+%  The function takes frequency (f), temperature (T), vector of shape id (nshape),
 %  vector of maximum diameter (d_max), and returns an array of scattering properties. 
 %  
 %
@@ -17,7 +18,7 @@
 % IN       f             Frequency                        [Hz]
 %          T             Temperature                      [K]
 %          nshape        a vector of shape ids which its element should be an
-%                     integer number between 0 and 10
+%                        integer number between 0 and 10
 %          d_max         a vector of maximum diameters    [um]
 %
 %History: 2013-12-02  Created by Maryam Jamali
@@ -90,8 +91,8 @@ Data=cell(1,n);
 
 for  i = 1:n
     
-    Data{1,i}.pshape          =  shape{i};
-    Data{1,i}.frequency       =  f;
+    Data{1,i}.pshape            =  shape{i};
+    Data{1,i}.frequency         =  f;
     Data{1,i}.abs_cross(:,1)    =  Data_basic(2:13:end-11,1,i);
     Data{1,i}.sca_cross(:,1)    =  Data_basic(2:13:end-11,2,i);
     Data{1,i}.bac_cross(:,1)    =  Data_basic(2:13:end-11,3,i);
