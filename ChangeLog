@@ -1,10 +1,21 @@
+2013-12-07  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-1-468
+
+	* datasets/define_datasets.m:
+	* site-specific/kiruna/datasets_init.m: Added extra dataset LWP to
+	cpr-dardar dataset
+
+	* geoplots/gmt/gmt_plot.m: use squeeze on indata to remove
+	singleton dimensions hence avoiding a crash
+
 2013-12-03  Maryam Jamali  <maryamj@student.chalmers.se>
 
 	* atmlab-2-1-467
 
 	* scattering/Liu_Database.m
        Edit the description of the function.
-	
+
 2013-12-02  Maryam Jamali  <maryamj@student.chalmers.se>
 
 	* atmlab-2-1-466
@@ -12,7 +23,7 @@
 	* scattering/Liu_Database.m
        This function extracts the DDA calculation for the some differents ice
        particle shapes, from the Liu Database.
-	
+
 2013-11-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-465

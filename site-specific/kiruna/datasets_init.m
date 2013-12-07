@@ -448,11 +448,13 @@ D.dardarsub_modis_cprCloudLidar_closest.basedir = '/storage4/user_data/seliasson
 D.dardarsub_modis_cprCloudLidar_closest.subdir  = '$YEAR4/$MONTH/$DAY';
 D.dardarsub_modis_cprCloudLidar_closest.filename= 'closest_dardarsub_modis_cprCloudLidar_$SAT_$YEAR4_$MONTH_$DAY.nc.gz';
 
-
-
 D.fields_2C_ice_dardarsub.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/2C-ICE_dardarsub';
 D.fields_2C_ice_dardarsub.filename = 'fields_2C-ICE_dardarsub_$YEAR4_$MONTH_$DAY.nc.gz';
 D.fields_2C_ice_dardarsub.subdir   = D.cpr_dardarsub_IWP.subdir;
+
+D.fields_CPR_LWP_added_to_dardar.basedir  = '/storage4/user_data/seliasson/collocations_cpr_dardarsub/LWP';
+D.fields_CPR_LWP_added_to_dardar.subdir   = '$YEAR4/$MONTH/$DAY';
+D.fields_CPR_LWP_added_to_dardar.filename = 'LWP_$YEAR4_$MONTH_$DAY.nc.gz';
 
 D.hirs_dardarsub.basedir    = strrep(D.CollocatedDataset_hirs_dardarsub.basedir,'core',D.hirs_dardarsub.name);
 D.hirs_dardarsub.subdir     = '$YEAR4/$MONTH/$DAY';

@@ -1025,11 +1025,13 @@ function in = isdata(in,field)
 Id  = ['gmtlab:' mfilename ':badInput'];
 Eps = 1e-10;
 
+% silently squeeze the data
+in.(field)=squeeze(in.(field));
 assert(isfield(in,field), Id,'The field: "%s" is not in the structure',field)
 assert(any(~isnan(in.(field)(:))),'gmtlab:gmt_plot:noData',...
     '%s%s','Data does not contain any valid',...
     ' values for contour levels to be based on...')
-assert(~(~ismatrix(squeeze(in.(field)))),Id,'in.%s must not be more than 2 dimensional',field)
+assert(~(~ismatrix(in.(field))),Id,'in.%s must not be more than 2 dimensional',field)
 assert((max(in.(field)(:))-min(in.(field)(:))>Eps),Id,...
     'min(data) must not be equal to max(data)')
 
