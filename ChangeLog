@@ -1,3 +1,13 @@
+2013-12-07  Salomon Eliasson  <s.eliasson@ltu.se>
+
+	* atmlab-2-1-469
+
+	* collocations/CollocatedDataset.m:
+	* geoplots/gmt/gmt_plot.m:
+	* datasets/define_datasets.m:
+	* datasets/HomemadeDataset.m:
+	Puny insertions
+
 2013-12-07  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-1-468

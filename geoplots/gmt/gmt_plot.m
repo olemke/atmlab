@@ -1136,6 +1136,7 @@ if ~isfield(in.legend,'position')
     x = sscanf(in.region,'%f/%f/%f/%f');
     f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
     myHcondition = f < 0.5; tmp = ['v','h']; %vertical,horisontal
+
     if in.savelegend
         default.orientation = 'h'; % because usually you want this.
     else

@@ -803,6 +803,7 @@ for cprf = vec2row(union(cpr_iwp_fields, union(cpr_ecmwf_prof_fields, cpr_ecmwf_
     appccs.(f).limitators = limitators_scalar;
     if ismember(f, union(cpr_iwp_fields, cpr_ecmwf_scal_fields))
         appccs.(f).limitators = limitators_scalar;
+
         %len = @length;
         len_vec = @(X, ~)(vec2col(sum(~isnan(X), 1)));
         %mn = @mean;        
@@ -893,7 +894,6 @@ for V = vars
     cloud_cci.(V{1}).limitators = limitators_scalar;
 end
 
-% ----------
 % Collapsed MODIS (will be depricated)
 % ----------
 modis_global = {@(X)(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)==min(X(:,D.CollocatedDataset_dardarsub_modis.cols.DIST)))};
@@ -909,7 +909,7 @@ end
 
 % ----------
 % Collapsed MODIS
-% ----------
+
 additionalvars={'modis_IWP_uncertainty','Cloud_Multi_Layer_Flag','modis_IWP','Re_ice','Tau_ice'};
 for V = additionalvars
     modis2.(V{1}).atts = fields.modis.(V{1}).atts;
@@ -1023,6 +1023,7 @@ Collapser(D.associated_CPR_AMSUB_AMSUA_HIRS, appccs, mw_global_vec, ...
 Collapser(D.dardarsub_modis_IWP,modis,modis_global, ...
     'name','dardarsub_modis_collapsedIWP'); % will be depricated by 'dardarsub_modis_closest_ice_clouds' in the future
  
+
 Collapser(D.dardarsub_modis_ice_clouds,modis2,modis_global, ...
     'name','dardarsub_modis_closest_ice_clouds');
 

@@ -650,7 +650,9 @@ classdef CollocatedDataset < HomemadeDataset
                 end
                 %% process core
                 % should return a matrix with info
-%                 lockfile = get_lock(atmlab('WORK_AREA'), 'collocations.lock');
+
+                %lockfile = get_lock(atmlab('WORK_AREA'), 'collocations.lock');
+                %cl1 = onCleanup(@()delete(lockfile));
 
                 logtext(fid, 'Collecting info for %d collocations\n', size(collocations, 1));
                 
@@ -674,7 +676,7 @@ classdef CollocatedDataset < HomemadeDataset
                 % everything.
                 
                 % this might be memory-intensive, make sure to get a lock
-                cl1 = onCleanup(@()delete(lockfile));
+                
                 this_additional_result = cell(size(additionals));
                 cc = cell(size(additionals));
                 for j = 1:length(additionals)
@@ -697,8 +699,10 @@ classdef CollocatedDataset < HomemadeDataset
                     %clear this_additional_result;
                 end
                 clear old_result this_additional_result this_result data2
-                %4logtext(atmlab('OUT'), 'Clearing lockfile\n');
+
+                %logtext(atmlab('OUT'), 'Clearing lockfile\n');
                 %delete(lockfile);
+
                 logtext(fid, 'Info collected\n');
             end
             % return: result, additional_results, also
@@ -1454,6 +1458,7 @@ classdef CollocatedDataset < HomemadeDataset
                                                 
                 try
                     [collocations_day, M_cols_core_here, attr_core] = self.read_single_day(date, spec, fields_core);
+
                     if numel(collocations_day)==0
                         if length(fields_core) == 0
                             % ugly hack, will secretly read core ANYWAY
