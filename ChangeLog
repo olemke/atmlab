@@ -1,3 +1,10 @@
+2013-12-11  Carlos Jimenez    <carlos.jimenez@estellus.fr>
+
+	*atmlab-2-1-470
+
+	* geophysics/mixr2vmr.m: simple mscript to convert mass mixing
+	ratio to volume mixing ratio.
+
 2013-12-07  Salomon Eliasson  <s.eliasson@ltu.se>
 
 	* atmlab-2-1-469
