@@ -1,6 +1,13 @@
+2013-12-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-471
+
+	* retrieval/oem.m: Fixed small typo in header. Characterisation
+	option did not work, xa is needed!
+
 2013-12-11  Carlos Jimenez    <carlos.jimenez@estellus.fr>
 
-	*atmlab-2-1-470
+	* atmlab-2-1-470
 
 	* geophysics/mixr2vmr.m: simple mscript to convert mass mixing
 	ratio to volume mixing ratio.

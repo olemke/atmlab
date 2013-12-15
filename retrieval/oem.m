@@ -70,7 +70,7 @@
 %
 % FORMAT   O = oem
 %            or
-%          [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv)
+%          [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa)
 %            or
 %          [X,R] = oem(O,Q,R,comfun,Sx,Se,Sxinv,Seinv,xa,y)
 %        
@@ -85,7 +85,7 @@
 %       Se       Covariance matrix for observation uncertainties.
 %       Sxinv    The inverse of Sx. If set to [], the inverse is calculated 
 %                internally.
-%       Sxinv    The inverse of Se. If set to [], the inverse is calculated 
+%       Seinv    The inverse of Se. If set to [], the inverse is calculated 
 %                internally.
 %       xa       A priori profile.
 %       y        Measurement vector.
@@ -285,7 +285,7 @@ end
 
 %=== Check of input ===========================================================
                                                                             %&%
-  rqre_nargin( 6, nargin );                                                 %&%
+  rqre_nargin( 9, nargin );                                                 %&%
                                                                             %&%
   %- O                                                                      %&%
   %                                                                         %&%
@@ -302,7 +302,7 @@ end
     rqre_in_range( O.maxiter, 1, [], 'O.maxiter' );                         %&%
     rqre_in_range( O.stop_dx, 0, [], 'O.stop_dx' );                         %&%
     %                                                                       %&%
-    if strcmp( upper(O.itermethod), 'GN' )                                  %&% 
+    if strcmp( upper(O.itermethod), 'GN' )                                  %&%
     elseif strcmp( upper(O.itermethod), 'ML' )  |  ...                      %&%
            strcmp( upper(O.itermethod), 'LM' )                              %&%
       %                                                                     %&%
@@ -359,15 +359,21 @@ end
     end                                                                     %&%
   end                                                                       %&%
                                                                             %&%
-  if nargin == 9                                                            %&%
-    error( 'No need to specify *xa* if no *y* is given.' );                 %&%
-  end                                                                       %&%
-                                                                            %&%
-  if nargin >= 10                                                           %&%
+  if nargin >= 9                                                            %&%
     rqre_datatype( xa, @isvector );                                         %&%
     if size(xa,1) ~= size(Sx,1)                                             %&%
       error('Mismatch in size between *Sx* and *xa*.');                     %&%
     end                                                                     %&%
+  end                                                                       %&%
+                                                                            %&%
+  if nargin < 10                                                            %&%
+    if O.cost                                                               %&%
+      error('O.cost is not handled for characterisation.');                 %&%
+    end                                                                     %&%
+    if O.yf                                                                 %&%
+      error('O.yf is not handled for characterisation.');                   %&%
+    end                                                                     %&%
+  else                                                                      %&%
     rqre_datatype( y, @isvector );                                          %&%
     if size(y,1) ~= size(Se,1)                                              %&%
       error('Mismatch in size between *Se* and *y*.');                      %&%
@@ -376,13 +382,15 @@ end
 
   %- Some post-processing of input                                          
   %
-  if strcmp( upper(O.itermethod), 'GN' )
-    O.itermethod = 'GN';  
-  elseif strcmp( upper(O.itermethod), 'ML' )  |  ...
-         strcmp( upper(O.itermethod), 'LM' )
-      O.itermethod = 'ML';
-      O.cost       = true;  % Note default value here, cost must 
-      %                       anyhow be calculated
+  if ~O.linear
+    if strcmp( upper(O.itermethod), 'GN' )
+      O.itermethod = 'GN';  
+    elseif strcmp( upper(O.itermethod), 'ML' )  |  ...
+           strcmp( upper(O.itermethod), 'LM' )
+        O.itermethod = 'ML';
+        O.cost       = true;  % Note default value here, cost must 
+        %                       anyhow be calculated
+    end
   end
   %
   if O.sxnorm
@@ -451,9 +459,11 @@ end
   
 %=== Only characterisation ====================================================
 
-  if nargin < 8
-    % Nothing to do here
-      
+  if nargin < 10
+    %
+    out( 1, 'Performing linear characterisation ...' );
+    J = NaN;
+
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   
@@ -469,7 +479,6 @@ end
     % the calculations in most efficient way. The drawback is that more or less
     % the same code is found at several places.
     
-
     
     %=== Linear inversion =====================================================
     %
@@ -485,11 +494,13 @@ end
       %- Calculate Jacobian
       [R,yf,J] = calc_y_and_j( comfun, Q, R, O, xnorm, x, iter );
 
-      %- Calculate cost, if requested output
-      X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
-      nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
-                                                    X.cost_y(iter), dx );
-
+      %- Calculate cost
+      if O.cost
+        X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
+        nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
+                                                        X.cost_y(iter), dx );
+      end
+      
       %- Some matrix products (also used in common part below)
       JtSeinv = J' * Seinv;
       SJSJ    = Sxinv + JtSeinv * J;
@@ -777,8 +788,6 @@ end
 %=== Fill X ===================================================================
 
   X.x = x;
-
-  % Cost and yf are not calculated for linear and GN
     
   if O.cost  &  length(X.cost) < iter
     if isnan(yf)
