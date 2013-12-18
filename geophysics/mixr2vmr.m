@@ -16,9 +16,9 @@
 %
 %
 % Input:    mixr   mass mixing ratio vector of species [Kg/Kg]
-%           molm     species molecular mass  [Kg/mol]
+%           molm   species molecular mass  [Kg/mol]
 %
-% Output:   vmr vector of VMR-values [ppm]
+% Output:   vmr vector of VMR-values [m3/m3]
 %
 % Carlos Jimenez 2013
 %=============================================================
@@ -29,7 +29,7 @@ function vmr = mixr2vmr( mixr, molm )
 molmd = 28.9661e-3; 
 
 %= vmr
-vmr = 1e6 * mixr * ( molmd / molm );
+vmr = mixr * ( molmd / molm );
 
 return
 

@@ -1,3 +1,10 @@
+2013-12-18  Carlos Jimenez    <carlos.jimenez@estellus.fr>
+
+	* atmlab-2-1-472
+
+	* geophysics/mixr2vmr.m: small change of units, better to leave
+	the ppm conversion up tp the user, so units are now m3/m3.
+
 2013-12-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-471
