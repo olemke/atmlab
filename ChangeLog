@@ -1,3 +1,31 @@
+2014-01-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-473
+
+	* arts/qarts2cfile.m (cfile_RteExe): Commented out saving of y_f,
+	y_pol, y_pos and y_los.
+
+	* demos/qarts_zeeman_demo.m:
+	* demos/qarts_mcdoit_demo.m:
+	* demos/qarts_scattering_demo.m:
+	* demos/qarts_backend_demo.m:
+	* demos/qarts_demo2.m:
+	* demos/qarts_demo.m: Adopted call of arts_y.
+
+	* arts/arts_y.m (arts_y): Removed ydata as output. For larger
+	calculations, the reading of y_pol takes a lot of time, that should
+	be avoided. This information can be recreated in other ways. And I
+	assume that nobody is using ydata. If you do, tell me and I will
+	find some alternative solution.
+
+	* arts/qarts_vmr_field.m:
+	* arts/qarts_atm_field.m: Both functions restructured and partly
+	rewritten. Earlier version did not handle all 2D cases.
+
+	* gridcreation/grid_weightspaced.m: Changed from using cumsum to
+	cumtrapz. This gives a better treatment of end points, and also
+	allows handling of non-uniform grids.
+
 2013-12-18  Carlos Jimenez    <carlos.jimenez@estellus.fr>
 
 	* atmlab-2-1-472

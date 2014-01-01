@@ -6,12 +6,9 @@
 %    active selection through J_DO. Otherwise NaN is returned.
 %    variables.
 %
-% FORMAT   [y,ydata,y_aux,J,jq,ji] = arts_y( Q [, workfolder] )
+% FORMAT   [y,y_aux,J,jq,ji] = arts_y( Q [, workfolder] )
 %        
 % OUT   y            Spectrum vector.
-%       ydata        Data to determine frequency, position and LOS for each 
-%                    value of *y*. A structure with fields: 
-%                    'f', 'pol', 'pos' and 'los', corresponding to *y_f* etc.
 %       y_aux        Auxilary data (see *y_aux*).
 %       J            Jacobian. NaN returned if Q.J not defined.
 %       jq           Jacobian quantities. NaN returned if Q.J not defined.
@@ -27,23 +24,19 @@
 
 % 2004-09-17   Created by Patrick Eriksson.
 
-function [y,ydata,y_aux,J,jq,ji] = arts_y( Q, workfolder )
+function [y,y_aux,J,jq,ji] = arts_y( Q, workfolder )
 %
 if nargin < 2, workfolder = []; end
-                                                                         %&%
-                                                                         %&%
-%- Check input                                                           %&%
-%                                                                        %&%
-rqre_datatype( Q, @isstruct );                                           %&%
-rqre_datatype( workfolder, {@isempty,@ischar} );                         %&%
+%
+if atmlab( 'STRICT_ASSERT' )
+  rqre_datatype( Q, @isstruct );
+  rqre_datatype( workfolder, {@isempty,@ischar} );
+end
 
 
 %- Default output
 %
-y_aux   = NaN;
-J       = NaN;
-jq      = NaN;
-ji      = NaN;
+[y_aux,J,jq,ji] = deal( NaN );
 
 
 %- Create workfolder?
@@ -56,7 +49,7 @@ end
 
 %- Avoid unnecessary calculations
 %
-if nargout < 4
+if nargout < 3
   Q.J_DO = false;
 end
 
@@ -70,26 +63,21 @@ strs2file( cfile, S );
 arts( cfile );
 
 
+%- Load data
+
+  
 y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
 
 
 if nargout >= 2
-  ydata.f   = xmlLoad( fullfile( workfolder, 'y_f.xml' ) );
-  ydata.pol = xmlLoad( fullfile( workfolder, 'y_pol.xml' ) );
-  ydata.pos = xmlLoad( fullfile( workfolder, 'y_pos.xml' ) );
-  ydata.los = xmlLoad( fullfile( workfolder, 'y_los.xml' ) );
-end
-
-
-if nargout >= 3 
   y_aux = xmlLoad( fullfile( workfolder, 'y_aux.xml' ) );
 end
 
-if nargout >= 4  & qarts_isset( Q.J_DO ) &  Q.J_DO
+if nargout >= 3  & qarts_isset( Q.J_DO ) &  Q.J_DO
   %
   J = xmlLoad( fullfile( workfolder, 'jacobian.xml' ) );
   %
-  if nargout >= 6
+  if nargout >= 4
     jq = xmlLoad( fullfile( workfolder, 'jacobian_quantities.xml' ) );
     ji = xmlLoad( fullfile( workfolder, 'jacobian_indices.xml' ) );
     for i = 1 : length(ji)

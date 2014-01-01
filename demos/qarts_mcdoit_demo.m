@@ -227,6 +227,6 @@ Q.WSMS_BEFORE_RTE               = {};
   
 %= MC
 %
-[ym,ydata,y_aux] = arts_y( Q );
-ymerror = y_aux{1};
+[ym,y_aux] = arts_y( Q );
+ymerror    = y_aux{1};
 

@@ -91,7 +91,7 @@ Q.IY_UNIT           = 'RJBT';
 
 %= Define spectrometer passbands
 %
-fc                  = 1e9 * [ 51.26 52.28 53.86 54.94 56.66 57.3 58.0 ]';
+f                   = 1e9 * [ 51.26 52.28 53.86 54.94 56.66 57.3 58.0 ]';
 df                  = 1e6 * [   230   230   230   230   600 1000 2000 ]';
 
 
@@ -108,7 +108,7 @@ H.ANTENNA_DO        = false;
 %= Include spectrometer
 %
 H.BACKEND_DO        = true;
-H.F_BACKEND         = fc;
+H.F_BACKEND         = f;
 %
 B.name              = 'Spectrometer channel response function';
 B.gridnames         = {'Frequency'};
@@ -125,7 +125,7 @@ end
 
 %= Frequency grid 
 %
-Q.F_GRID            = linspace( fc(1)-df(1)*0.51, fc(end)+df(end)*0.51, 100 )';
+Q.F_GRID            = linspace( f(1)-df(1)*0.51, f(end)+df(end)*0.51, 100 )';
 
 
 %= One option to manage with a shorter F_GRID is to use "filling", but make
@@ -143,6 +143,4 @@ Q.SENSOR_DO         = true;
 
 %= Calculate spectrum/spectra
 %
-[y,ydata] = arts_y( Q );
-%
-f = ydata.f;
+y = arts_y( Q );

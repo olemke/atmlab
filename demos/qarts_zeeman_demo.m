@@ -127,9 +127,9 @@ Q.MAG_W_FIELD          = [];
 
 %= Calculate spectrum
 %
-[y0,ydata] = arts_y( Q );
+y0 = arts_y( Q );
 %
-f = ydata.f;
+f = Q.F_GRID;
 
 
 % Repeat with Zeeman activated

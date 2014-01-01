@@ -5,7 +5,7 @@
 %    is high. 
 %
 %    The end points of *g* equal the end points of *x*. The other points are
-%    determined by dividing the cumulative sum of *y* in equal steps. 
+%    determined by dividing the cumulative integral of *y* in equal steps. 
 %
 %    This approach makes sense if *y* is some response function and the
 %    representation error where *g* will be used increases linearly with
@@ -21,12 +21,13 @@
 % 2010-09-22   Created by Patrick Eriksson.
 
 function g = grid_weightspaced(x,y,n)
-%                                                                          %&%
-rqre_datatype( x, @istensor1 );                                            %&%
-rqre_datatype( y, @istensor1 );                                            %&%
-rqre_datatype( n, @istensor0 );                                            %&%
-  
+%
+if atmlab( 'STRICT_ASSERT' )
+  rqre_datatype( x, @istensor1 );
+  rqre_datatype( y, @istensor1 );
+  rqre_datatype( n, @istensor0 );
+end
 
-cs = cumsum( abs(y) );
+cs = cumtrapz( x, abs(y) );
 
 g = interp1( cs, x, linspace( cs(1), cs(end), n ) );

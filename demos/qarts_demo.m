@@ -160,9 +160,9 @@ end
 
 %= Calculate spectrum/spectra
 %
-[y,ydata] = arts_y( Q );
+y = arts_y( Q );
 %
-f = ydata.f;
+f = Q.F_GRID;
 
 
 %= Plot

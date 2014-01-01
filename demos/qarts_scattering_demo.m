@@ -309,7 +309,7 @@ Q.CLOUDBOX    = C;
 % Calculate radiances with scattering
 %
 if strcmp( lower(method), 'mc' )
-  [y,ydata,y_aux] = arts_y( Q );
+  [y,y_aux] = arts_y( Q );
   dy = y_aux{1};
 else
   y  = arts_y( Q );
