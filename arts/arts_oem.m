@@ -45,13 +45,23 @@ arts( cfile );
 y = xmlLoad( fullfile( R.workfolder, 'y.xml' ) );
 %
 if do_j  
+  
+  % Load Jacobian
   J = xmlLoad( fullfile( R.workfolder, 'jacobian.xml' ) );
-  %
+
   % Jacobian calculated for x, but for "rel" it should be with respect to xa:
-  % (as arts takes x as xa, no scaling needed for "logrel")
-  if ~isempty( R.i_rel )
-    J(:,R.i_rel) =  J(:,R.i_rel) ./ repmat( x(R.i_rel)', size(J,1), 1 );
-  end
+  % (as arts takes x as xa, no scaling needed for "logrel", and no scaling 
+  %  needed for first calculation)
+  if iter > 1 & ~isempty( R.i_rel )
+    % The solution below sets an upper limit on the size of J at roughly 33%
+    % of free memory. 
+    % J(:,R.i_rel) =  J(:,R.i_rel) ./ repmat( x(R.i_rel)', size(J,1), 1 );
+    % To avoid hitting the memory roof, we do this instead column-by-column.
+    % And this turned out to be a faster option, at least for large J!
+    for i = vec2row(R.i_rel)
+      J(:,i) = J(:,i) / x(i);
+    end
+  end  
 end
 
 

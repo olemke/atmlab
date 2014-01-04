@@ -262,7 +262,7 @@ Y.TNOISE = 0.1;
 fascod = fullfile( atmlab( 'ARTS_XMLDATA_PATH' ), ...
                                                 'planets', 'Earth', 'Fascod' );
 Q.T.ATMDATA  = gf_artsxml( fullfile( fascod, 'midlatitude-summer', ...
-                      'midlatitude-summer.T.xml' ), 'Temperature', 't_field' );
+                      'midlatitude-summer.t.xml' ), 'Temperature', 't_field' );
   
 % Simulate a measurement
 %

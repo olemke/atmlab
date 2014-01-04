@@ -394,19 +394,19 @@ end
   end
   %
   if O.sxnorm
-    xnorm = sqrt( diag( Sx ) );
-    Sx    = Sx ./ (xnorm*xnorm');
+    xnorm = full( sqrt( diag( Sx ) ) );  % Avoid that xnorm inherits sparse
+    Sx    = Sx ./ (xnorm*xnorm');        % from Sx!
     Sxinv = [];
   else
     xnorm = NaN;
   end
   %
   if nargin < 7  |  isempty(Sxinv)
-    Sxinv = Sx \ speye(size(Sx));
+    Sxinv = full_or_sparse( Sx \ speye(size(Sx)) );
   end
   %
   if nargin < 8  |  isempty(Seinv)
-    Seinv = Se \ speye(size(Se));
+    Seinv = full_or_sparse( Se \ speye(size(Se)) );
   end
 
     

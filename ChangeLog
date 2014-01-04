@@ -1,3 +1,22 @@
+2014-01-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-474
+
+	* demos/qpack2_t_demo.m (y_demo): Fixed typo.
+
+	* math/full_or_sparse.m: New.
+
+	* retrieval/oem.m: When calculated internally, Seinv and Sxinv are
+	passed through full_or_sparse.
+
+	xnorm is now ensured to be full. If sparse is inherited from Sx,
+	this gives an overhead further down. Pointed out by Ole Martin.
+
+	* arts/arts_oem.m: The rescaling of J for "rel" now done
+	column-by-column. The old version hit the memory roof for large J.
+	And new solution in fact faster (60% saving), at least for my test
+	with a J of 3.3 GB.
+
 2014-01-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-473
