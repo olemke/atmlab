@@ -117,21 +117,27 @@ if size(Yb,2) ~= nb
 end
 
 
+% Seems that nargout can get corrupted inside parfor! 
+% Use a local variable to be safe. 
+nout = nargout;
+
+
+
 % Init output arguments
 %
 Xh = zeros( lx, ny );
 %
-if nargout > 1
+if nout > 1
   E  = zeros( lx, ny );
 end
-if nargout > 3
+if nout > 3
   W  = zeros( nb, ny );
 end
 %
 D(ny) = struct( 'sum_w',NaN, 'max_w',NaN, 'n_con',NaN, 'n_hit',NaN );
 
 
-parfor i = 1 : ny
+for i = 1 : ny
 
   w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) );
 
@@ -170,24 +176,23 @@ parfor i = 1 : ny
   %
   % Likewise, or alternatively, the retrieval is only calculated if
   % the number of hits is larger than n_hit_thresh.
-  if ( D(i).sum_w > M.sum_w_thresh ) ...
-	&& ( D(i).n_hit >= M.n_hit_thresh )
+  if ( D(i).sum_w > M.sum_w_thresh )  &&  ( D(i).n_hit >= M.n_hit_thresh )
     
     Xh(:,i) = sum( Xb(:,ind).*Wi, 2 ) ./ D(i).sum_w;
 
-    if nargout > 1
+    if nout > 1
       E(:,i) = sqrt( sum( ...
 	    (Xb(:,ind)-repmat(Xh(:,i),1,D(i).n_con)).^2.*Wi, 2 ) ./ D(i).sum_w );
-      if nargout > 3
+      if nout > 3
         W(:,i) = w;
       end
     end  
   else
     Xh(:,i) = NaN;
   
-    if nargout > 1
+    if nout > 1
       E(:,i) = NaN;
-      if nargout > 3
+      if nout > 3
         W(:,i) = w;
       end
     end  

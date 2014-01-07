@@ -1,3 +1,13 @@
+2014-01-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-475
+
+	* retrieval/mci.m: Seems that nargout can be corrupted inside a
+	parfor loop. So now nargout copied to a local variable. But
+	removed parfor matlab anyhow goes beyond 100% with just a for
+	loop, and then did not bother to track down some other error just
+	occuring with parfor.
+
 2014-01-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-474
