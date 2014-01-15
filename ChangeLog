@@ -1,3 +1,10 @@
+2014-01-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-476
+
+	* math/step_transition.m:
+	* math/linear_transition.m: New. 
+
 2014-01-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-475
