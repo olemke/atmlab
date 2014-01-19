@@ -155,8 +155,8 @@ else
     for j = 1 : length( lat_true )
       grids{2}         = lat_true(j);
       grids{3}         = lon_true(j);
-      G                = atmdata_regrid( G, {grids{1:dim}}, vname );
-      vmr_field(i,:,j) = G.DATA;
+      Gtemp                = atmdata_regrid( G, {grids{1:dim}}, vname );
+      vmr_field(i,:,j) = Gtemp.DATA;
     end
   end
 end

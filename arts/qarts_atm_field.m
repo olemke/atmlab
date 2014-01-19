@@ -140,15 +140,15 @@ else
   end
   %  
   dim             = max( [ G.DIM Q.ATMOSPHERE_DIM ] );
-  G               = atmdata_regrid( G, {grids{1:dim}}, astr );
+  Gtemp               = atmdata_regrid( G, {grids{1:dim}}, astr );
   n               = length( lat_true );
-  atmfield        = zeros( size(G.DATA,1), n );
-  atmfield(:,1)   = G.DATA;  
+  atmfield        = zeros( size(Gtemp.DATA,1), n );
+  atmfield(:,1)   = Gtemp.DATA;  
   %
   for i = 2 : n
     grids{2}      = lat_true(i);
     grids{3}      = lon_true(i);
-    G             = atmdata_regrid( G, {grids{1:dim}}, astr );
-    atmfield(:,i) = G.DATA;  
+    Gtemp             = atmdata_regrid( G, {grids{1:dim}}, astr );
+    atmfield(:,i) = Gtemp.DATA;  
   end
 end
