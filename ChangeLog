@@ -1,3 +1,11 @@
+2013-12-18  Carlos Jimenez    <carlos.jimenez@estellus.fr>
+
+	* atmlab-2-1-477
+
+	* geophysics/mxr2masscon: very simple mscript to convert mass
+	mixing ratio (Kg/Kg) to mass concentration (Kg/m3), assuming a
+	mixture of species/hydrometeor in dry air.
+
 2014-01-19  Ole Martin Christensen  <olem@chalmers.se>
 
 	* arts/qarts_vmr_field.m: Fixed bug in the latest update made the atmdata (G) to continiously beeing overwrite.
