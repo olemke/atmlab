@@ -1,4 +1,13 @@
-2013-12-18  Carlos Jimenez    <carlos.jimenez@estellus.fr>
+2014-01-29  Carlos Jimenez    <carlos.jimenez@estellus.fr>
+
+	* atmlab-2-1-478
+
+	* geophysics/mxr2masscon: updating the mscript by using the
+	GAS_CONST_DRY_AIR from the atmlab constants, missed that in
+	previous commitment.
+
+
+2014-01-28  Carlos Jimenez    <carlos.jimenez@estellus.fr>
 
 	* atmlab-2-1-477
 

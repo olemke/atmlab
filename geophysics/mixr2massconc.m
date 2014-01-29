@@ -17,7 +17,7 @@
 function massconc = mixr2massconc( mixr, pressure, temp )
   
 %= specific gas constant for dry air 
-Re = 287.058; % Pa * m3 /(kg·K)
+Re = constants('GAS_CONST_DRY_AIR'); % Pa * m3 /(kg·K)
 
 %= density of dry air
 rho =  pressure ./ (Re * temp);   % Kg / m3
