@@ -49,6 +49,9 @@
 
 % 2002-12-12   Created by Claudia Emde and Patrick Eriksson.
 % 2011-12-7    modified by Salomon Eliasson
+% 2014-02-12   miodified by Carlos Jimenez
+%               'GAS_CONST_DRY_AIR' from 287.040 to 287.058
+
 % $Id$
 
 % constants that changed values since 2011-12-7
@@ -147,7 +150,7 @@ case 'GAS_CONST'
     
 case 'GAS_CONST_DRY_AIR'
     %ref: http://en.wikipedia.org/wiki/Gas_constant
-    const = 287.04;
+    const = 287.058;
     unit  = 'Jkg^{-1}K^{-1}';
     
 case 'GAS_CONST_WATER_VAPOR'

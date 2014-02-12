@@ -1,3 +1,16 @@
+2014-02-12  Carlos Jimenez    <carlos.jimenez@estellus.fr>
+
+	* atmlab-2-1-480
+
+	* physics/constants: updating 'GAS_CONST_DRY_AIR' from 287.04 to
+	287.058 (as given in the mentioned reference).
+	
+	* physics/airdensity.m: trivial mscript to calculate the dry air
+	density.
+	
+	* geophysics/mixra2massconc.m: Updating the description (wrong
+	units) and using the built-in mscript airdensity.
+
 2014-02-12  Gerrit Holl  <gerrit.holl@ltu.se>
 
 	* atmlab-2-1-479

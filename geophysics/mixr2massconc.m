@@ -5,22 +5,22 @@
 % a mixture of an atmospheric species and dry air.
 %  
 
-% Input:    mixr   mass mixing ratio vector of species [Kg/Kg]
-%           pres   atmopsheric pressures [Pa]
-%           temp   atmosphewric temperature [K]
+% Input:    mixr       mass mixing ratio vector of species [Kg/Kg]
+%           pres       atmopsheric pressures [Pa]
+%           temp       absolute temperature [K]
 %
-% Output:   mixr   vector of VMR-values [m3/m3]
+% Output:   massconc   mass concentration [Kg/m3]
 %
-% Carlos Jimenez 2014
+% Carlos Jimenez 2014-02-12
 %=============================================================
 
-function massconc = mixr2massconc( mixr, pressure, temp )
+function massconc = mixr2massconc( mixr, pres, temp )
   
 %= specific gas constant for dry air 
 Re = constants('GAS_CONST_DRY_AIR'); % Pa * m3 /(kg·K)
 
 %= density of dry air
-rho =  pressure ./ (Re * temp);   % Kg / m3
+rho =  airdensity( pres, temp ); % Kg / m3
 
 %= mass concentration
 massconc = rho .* mixr;  % Kg / m3
