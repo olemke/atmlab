@@ -41,7 +41,7 @@ S       = read_clavrx_hdf(file,all_fields);
 % rename some fields
 S.lon   = double(S.cell_longitude(:));
 S.lat   = double(S.cell_latitude(:));
-% S.time  = zeros(size(S.lat)); % since Gerrits codes require time
+S.time  = zeros(size(S.lat)); % since Gerrits codes require time
 D           = datasets;
 
 date        = D.patmosxL3.find_info_from_granule(file);

@@ -40,7 +40,7 @@ function y = par(x, varargin)
 %
 % By Gerrit Holl, inspired by http://is.gd/b3MkRf
 %
-% See also: cur
+% See also: cur, getfield
 
 % $Id$
 y = x(varargin{:});

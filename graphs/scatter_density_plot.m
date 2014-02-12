@@ -27,7 +27,11 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %       ncolour     number of unique colours
 %       scatprops   if defined, structure with props for scatter-points
 %       diagonal    if defined, structure with props for diag-line
-%       medprops    if defined, structure with props for median-lines, 
+%       medprops    if defined, structure or array of two structures
+%                   with props for median-lines.  If those are two
+%                   structures, the first is used for medians as a
+%                   function of x, the second for medians as a function
+%                   of y.
 %                   Additional fields that can be included in opts.medprops:
 %                   'atleastN'    Only calculate median where there are
 %                                 atleast N binned values. 

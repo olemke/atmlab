@@ -1394,17 +1394,23 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
         function [gridmean, lat, lon] = level3(self, date1, date2, spec, fields, gridsize, varargin)
             % Calculate level3 (gridded mean) for period
             %
-            % NOTE: this is a work in progress, a quite quick piece of code
-            % not ready for production use. Feel free to read the source code
-            % and improve!
             %
-            % - date1
-            % - date2
-            % - spec
-            % - fields
-            % - gridsize
-            % - (optional) limiters
-            % - (optional) struct with options to binning_fast
+            % IN
+            %
+            % date1
+            % date2
+            % spec
+            % fields
+            % gridsize
+            % (optional) limiters
+            %   Cell array.  Each element is either a function handle
+            %   (passed directly to binned_statistics, or a two-element
+            %   cell array with {{fields}, limiter} where gridded
+            %   data will be limited by calling limiter on {fields}.
+            %   Can be used e.g. to grid only day-time data with the help
+            %   of sun_angles.  In the latter case the limiter must take a
+            %   struct with {fields}.
+            % (optional) struct with options to binning_fast
             %
             % Returns:
             %
@@ -1413,9 +1419,29 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % FIXME DOC
             
             [limiters, data] = optargs(varargin, {{}, struct()});
-            data.gridsize = gridsize;
+            %data.gridsize = gridsize;
             allgrans = self.find_granules_for_period(date1, date2, spec);
             allstats = {};
+            % sort limiters
+            if ~iscell(limiters)
+                limiters = {limiters};
+            end
+            limit_binnedstats = {};
+            limit_other = {};
+            also_fields = {};
+            j = 1;
+            k = 1;
+            for i = 1:length(limiters)
+                limiter = limiters{i};
+                if isfunction_handle(limiter)
+                    limit_binnedstats{j} = limiter;
+                    j = j + 1;
+                elseif iscell(limiter)
+                    limit_other{k} = limiter;
+                    k = k + 1;
+                    also_fields = union(also_fields, setdiff(limiter{1}, {'lat', 'lon', 'time', 'epoch'}));
+                end
+            end
             i = 0;
             while i < size(allgrans, 1)
                 
@@ -1425,9 +1451,34 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 
                 N = 1;
                 X = whos('data');
-                while X.bytes < 1e9 && i < size(allgrans, 1)
+                while X.bytes < 2e8 && i < size(allgrans, 1)
                     i = i + 1;
-                    grandata = self.read_granule(allgrans(i, :), spec, fields);
+                    try
+                        grandata = self.read_granule(allgrans(i, :), spec, union(fields, also_fields));
+                    catch ME
+                        switch ME.identifier
+                            case 'atmlab:SatDataset:cannotread'
+                                logtext(atmlab('ERR'), ...
+                                    'Cannot read granule: %s', ...
+                                    ME.identifier);
+                                continue
+                            otherwise
+                                ME.rethrow();
+                        end
+                    end
+                    % apply limiters
+                    mask = true(size(grandata.lat));
+                    for k = 1:length(limit_other)
+                        lim = limit_other{k};
+                        mask = mask & lim{2}(getfields(grandata, lim{1}{:}));
+                    end
+                    grandata.lat = grandata.lat(mask);
+                    grandata.lon = grandata.lon(mask);
+                    for k = 1:length(fields)
+                        field = fields{k};
+                        grandata.(field) = grandata.(field)(mask);                    
+                    end
+                        
                     nnew = size(grandata.lat, 1);
                     new = N:(N+nnew-1);
                     if nnew==0 % no data
@@ -1448,9 +1499,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
 
                     X = whos('data');
                 end
-                data.lat(N:end, :) = [];
-                data.lon(N:end, :) = [];
-                data.data(N:end, :) = [];
+                data.lat = data.lat(1:N-1);
+                data.lon = data.lon(1:N-1);
+                data.data = data.data(1:N-1);
                 
 %                 data.lat = grandata.lat;
 %                 data.lon = grandata.lon;
@@ -1458,9 +1509,9 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
 %                 data.data = horzcat(C{:});
                 logtext(atmlab('OUT'), 'Binning\n');
                 %[binned, lat, lon] = binning_fast(data);
-                indces = bin_nd({data.lat, data.lon}, {-90:1:90, -180:1:180});
+                indces = bin_nd({data.lat, data.lon}, {-90:gridsize:90, -180:gridsize:180});
                 binned = cellfun(@(ii) data.data(ii), indces, 'UniformOutput', false);
-                stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limiters);
+                stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limit_binnedstats);
                 logtext(atmlab('OUT'), 'Calculating statistics\n');
                 stats.statistic1 = cell2mat(stats.statistic1);
                 % cell2mat on multi-dim will flatten 2nd dimension,

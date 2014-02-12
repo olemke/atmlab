@@ -5,6 +5,8 @@ function [sza,saa] = sun_angles(mjd,lat,lon)
 %   (see Michalsky, 1988).
 %
 %  Refraction is not considered.
+%
+% See also: mjd2localtime, date2mjd
 
 %----------------------------------------------------------------
 % Craig Haley 20/09/01

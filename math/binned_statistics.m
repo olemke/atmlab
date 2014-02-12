@@ -15,7 +15,7 @@ function out = binned_statistics(data_bins, statistics, filter, replace, opt)
 %       statistics   Cell array of statistic function references.
 %       filter       Function to filter the binned data.  Function is
 %                    expected to return a subset of the original data, i.e.
-%                    @(X)X(X>0).
+%                    @(X)X(X>0).  May also be cell thereof with multiple.
 %       replace      replace empty cells with <replace> (optional argument).
 %                         "replace" may also be a cell with as many elements as there are function
 %                         handles that you plan to use,
@@ -49,8 +49,14 @@ end
 
 assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
 if exist('filter','var') && ~isempty(filter)
-    assert( isa( filter, 'function_handle' ),['atmlab:' mfilename ':BadInput'],'filter must be a function handle')
-    data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
+    assert( isa( filter, 'function_handle' )||iscell(filter),['atmlab:' mfilename ':BadInput'],'filter must be a function handle or cell thereof')
+    if iscell(filter)
+        for i = 1:length(filter)
+            data_bins = cellfun(filter{i}, data_bins, 'UniformOutput', false);
+        end
+    else
+        data_bins = cellfun(filter, data_bins, 'UniformOutput', false);
+    end
 end
 
 for i = 1:length(statistics)

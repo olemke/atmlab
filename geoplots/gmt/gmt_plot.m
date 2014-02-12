@@ -745,7 +745,7 @@ end
 
 if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
     error(['gmtlab:' mfilename ':BadInput'],...
-        'Either %s doesn''t exist, or gmtlab does not have write access to %s',in.outdir,in.outdir)
+        'Either %s doesn''t exist, or atmlab does not have write access to %s',in.outdir,in.outdir)
 end
 
 % backward compatibility

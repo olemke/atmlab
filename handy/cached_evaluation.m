@@ -11,6 +11,8 @@ function varargout = cached_evaluation(func, varargin)
 %   [out1, out2, ...] = func(in1, in2, ...)
 %
 % except that the results are cached.
+%
+% For more information, see CachedData/evaluate.
 
 persistent cd
 

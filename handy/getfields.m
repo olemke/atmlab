@@ -14,6 +14,11 @@ function S = getfields(S, varargin)
 
 % $Id$
 
+if isempty(varargin)
+    S = struct();
+    return
+end
+
 if iscell(varargin{1})
     fields = varargin{1};
 else

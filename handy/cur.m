@@ -20,7 +20,7 @@ function y = cur(x, varargin)
 %
 % By Gerrit Holl, inspired by http://is.gd/b3MkRf
 %
-% See also: par
+% See also: par, getfield
 
 % $Id$
 y = x{varargin{:}};

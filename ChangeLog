@@ -1,3 +1,50 @@
+2014-02-12  Gerrit Holl  <gerrit.holl@ltu.se>
+
+	* atmlab-2-1-479
+
+	* graphs/scatter_density_plot.m:
+
+	- Update documentation for medprops to describe a feature that was
+	implemented a while ago (two medprops structs in an array)
+
+	* math/binned_statistics.m:
+
+	- Allow to pass more than one filter in a cell array, and they will
+	all be applied.
+
+	* geographical/sun_angles.m, handy/cur.m, handy/cached_evaluation.m,
+	handy/par.m:
+
+	- Added/expanded "See also" to documentation.
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- Fix typo in documentation
+
+	* handy/getfields.m:
+
+	- Don't crash if zero fields are requested
+
+	* handy/PersistentCachedData.m:
+
+	- Use Matlabs internal functions to get last-modified-date for
+	persistent cached file, no need to go through 'ls -l' unless I'm
+	missing something
+
+	* datasets/SatDataset.m(level3):
+
+	- Improved a lot, it could even possibly work now, if you're lucky and
+	circumstances are right and the moon is full and in the right
+	constellation.
+
+	* datasets/GriddedDataset.m(read_from_grid):
+
+	- Improved this quite a while ago, don't even remember what/why.
+
+	* datasets/+satreaders/patmosxL3.m:
+
+	- Uncomment time-setting
+
 2014-01-29  Carlos Jimenez    <carlos.jimenez@estellus.fr>
 
 	* atmlab-2-1-478
