@@ -1,3 +1,10 @@
+2014-02-17  Maryam Jamali    <maryamj@student.chalmers.se>
+
+	* atmlab-2-1-481
+
+	* scattering/Asymmetry_parameter.m: extracts the asymmetry parameter
+	from an array of ARTS single scattering data. 
+
 2014-02-12  Carlos Jimenez    <carlos.jimenez@estellus.fr>
 
 	* atmlab-2-1-480
