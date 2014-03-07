@@ -14,7 +14,7 @@ function saphirL1=read_saphir_l1(filename,selected_entries, mode)
 %
 % 'mode' can be 'l1a1' or 'l1a2'.
 
-% $Id$
+% $Id: read_saphir_l1.m 8552 2013-08-01 11:18:11Z gerrit $
 
 errorid = 'Function read_saphir_l1:';
 
@@ -67,6 +67,31 @@ h5member= {'/ScienceData/IncidenceAngle_Samples',...
     '/ScienceData/TB_Samples_S4',...
     '/ScienceData/TB_Samples_S5',...
     '/ScienceData/TB_Samples_S6'};
+
+switch nargin
+    case 0
+        error(errorid,'You need at least Filename as input');
+    case 1
+        % read all variables
+        useentries = 1:length(strmember);
+    case {2, 3}
+        %read only selected variables given in 'selected_entries'
+        [~,useentries] = ismember(selected_entries,strmember);
+end
+
+if nargin < 3
+    [~,name,~] = fileparts(filename);
+    switch name(8:11)
+        case 'L1A_'
+            mode = 'l1a1';
+        case 'L1A2'
+            mode = 'l1a2';
+        otherwise
+            error(['atmlab:' mfilename ':modeunknown'], ...
+                'Can''determine mode. Set mode manually to ''l1a1'' or ''l1a2''');
+    end
+end
+
 switch mode
     case 'l1a1'
         % above is good
@@ -79,17 +104,6 @@ switch mode
     otherwise
         error(['atmlab:' mfilename ':invalidmode'], ...
             'Expected mode ''l1a1'' or ''l1a2'', got %s', mode);
-end
-
-switch nargin
-    case 0
-        error(errorid,'You need at least Filename as input');
-    case 1
-        % read all variables
-        useentries = 1:length(strmember);
-    case {2, 3}
-        %read only selected variables given in 'selected_entries'
-        [~,useentries] = ismember(selected_entries,strmember);
 end
 
 % uncompress file if necessary
@@ -108,28 +122,49 @@ catch ME
             ME.rethrow();
     end
 end
+%Begin MMILZ
+% read version from info and adjust h5member names (Latitude_pixels -> Latitude_Pixels
+% (1.05->1.06))
+natt=length(info.Groups.Attributes);
+for iat=1:natt
+    if strcmp(info.Groups.Attributes(iat).Name,'Product_Identification')
+        fname=info.Groups.Attributes(iat).Value;
+        vers=fname(13:16);
+        if strcmp(vers,'1.06')
+            %fprintf(1,'Ping\n');
+            h5member = strrep(h5member, 'Latitude_pixels', 'Latitude_Pixels');
+            h5member = strrep(h5member, 'Longitude_pixels', 'Longitude_Pixels');
+        end
+    end
+end
+clear natt;
+clear iat;
+clear fname;
+clear vers;
+%END MMILZ
+
 
 for ie=1:length(useentries)
     % read data
     % use h5read, not hdf5read, as to not get annoying hdf5.h5string object
-%    saphirL1.data.(strmember{useentries(ie)}) =  hdf5read(filename,h5member{useentries(ie)});
-    saphirL1.data.(strmember{useentries(ie)}) =  h5read(filename,h5member{useentries(ie)});
+    %    saphirL1.data.(strmember{useentries(ie)}) = hdf5read(filename,h5member{useentries(ie)});
+    saphirL1.data.(strmember{useentries(ie)}) = h5read(filename,h5member{useentries(ie)});
     %fprintf(1,'Read Variable: %s\n',strmember{useentries(ie)});
     % read data attributes
     %fname={info.GroupHierarchy.Groups.Datasets(useentries(ie)).Attributes.Shortname};
     fname = {info.Groups.Datasets(useentries(ie)).Attributes.Name};
     for i =1:length(fname)
         %fprintf(1,'i: %g -- %s\n',i,fname{i});
-         try
+        try
             %val = info.GroupHierarchy.Groups.Datasets(useentries(ie)).Attributes(i).Value.Data;
             val = info.Groups.Datasets(useentries(ie)).Attributes(i).Value;
             
             saphirL1.attr.(strmember{useentries(ie)}).(strrep(fname{i},'_',''))= val;
-         catch ME
-             logtext(atmlab('ERR'), ...
-                 'Error in reading data attribute %s for field %s: %s\n', ...
-                 fname{i}, strmember{useentries(ie)}, ME.message);
-         end
+        catch ME
+            logtext(atmlab('ERR'), ...
+                'Error in reading data attribute %s for field %s: %s\n', ...
+                fname{i}, strmember{useentries(ie)}, ME.message);
+        end
     end
     % Get absolute values by applying offset and scale factor
     if isfield(saphirL1.attr.(strmember{useentries(ie)}),'scalefactor')
@@ -157,11 +192,11 @@ end
 for ie=6:11
     if isfield(saphirL1.data,strmember{ie+12})
         if ~isfield(saphirL1.data,strmember{ie})
-%            saphirL1.data.(strmember{ie})=  hdf5read(filename,h5member{ie});
-            saphirL1.data.(strmember{ie})=  h5read(filename,h5member{ie});            
+            %            saphirL1.data.(strmember{ie})=  hdf5read(filename,h5member{ie});
+            saphirL1.data.(strmember{ie})=  h5read(filename,h5member{ie});
         end
         [QFCh1validtmp,lsChtmp,lsmixChtmp]=getvalidpixels(saphirL1.data.(strmember{ie}));
-    % set invalid entries to NaN
+        % set invalid entries to NaN
         saphirL1.data.(strmember{ie+12})(~QFCh1validtmp) = NaN;
     end
 end
@@ -174,7 +209,7 @@ function [QFvalid,landsea,landseamix]=getvalidpixels(arrayQFCh)
 % valid pixel
 %
 % getvalidpixels extracts the individual bits from the uint16 Quality Flag
-% array of each channel and determines the validity of the pixels. 
+% array of each channel and determines the validity of the pixels.
 %
 % input: arrayQFCh: array with uint16 containing the bitwise quality information
 % output: QFvalid: array with true for valid bixels and false for invalid pixels, affected by any undesired error source.
@@ -189,37 +224,34 @@ function [QFvalid,landsea,landseamix]=getvalidpixels(arrayQFCh)
 % Bits 1, 2: Ice all values accepted
 flag1 = bitget(arrayQFCh,1) | ~bitget(arrayQFCh,1) | bitget(arrayQFCh,2)...
     | ~bitget(arrayQFCh,2);
-% Bits 3 = 0 blank 
+% Bits 3 = 0 blank
 flag2 = ~bitget(arrayQFCh,3);
-% BITS 4: Interpolation quality: should be 0 
+% BITS 4: Interpolation quality: should be 0
 flag3 = ~bitget(arrayQFCh,4);
-% BITS 5: ColdSky count error: should be 0 
+% BITS 5: ColdSky count error: should be 0
 flag4 = ~bitget(arrayQFCh,5);
-% BITS 6: Hoot Count error: should be 0 
+% BITS 6: Hoot Count error: should be 0
 flag5 = ~bitget(arrayQFCh,6);
-% BITS 7 and 8 : Calibration Flag: should be 0 
+% BITS 7 and 8 : Calibration Flag: should be 0
 flag6 = ~bitget(arrayQFCh,7) & ~bitget(arrayQFCh,8);
-% BITS 9: Geo-location stimaton should be 0 
+% BITS 9: Geo-location stimaton should be 0
 flag7 = ~bitget(arrayQFCh,9);
-% BITS 10: Level-0 Count poor value: should be 0 
+% BITS 10: Level-0 Count poor value: should be 0
 flag8 = ~bitget(arrayQFCh,10);
-% BITS 11: Level-0 Count saturated: should be 0 
+% BITS 11: Level-0 Count saturated: should be 0
 flag9 = ~bitget(arrayQFCh,11);
-% BITS 12: ON OFF Channel flag: should be 0 
+% BITS 12: ON OFF Channel flag: should be 0
 flag10 = ~bitget(arrayQFCh,12);
-% BITS 13: SurfaceType: 0 Sea, 1 Land, both accepted 
+% BITS 13: SurfaceType: 0 Sea, 1 Land, both accepted
 flag11 = ~bitget(arrayQFCh,13) | bitget(arrayQFCh,13);
 landsea = bitget(arrayQFCh,13);
-% BITS 14: LandSea contamination: 0 no contamination, 1 contamination, both accepted 
+% BITS 14: LandSea contamination: 0 no contamination, 1 contamination, both accepted
 flag12 = ~bitget(arrayQFCh,14) | bitget(arrayQFCh,14);
 landseamix = bitget(arrayQFCh,14);
 % BITS 15: Sun Glint: both accepted
 flag13 = ~bitget(arrayQFCh,15) | bitget(arrayQFCh,15);
-% BITS 16: TB validy: should be 0 
+% BITS 16: TB validy: should be 0
 flag14 = ~bitget(arrayQFCh,16);
 QFvalid = flag1 & flag2 & flag3 & flag4 & flag5 & flag6 & flag7 & flag8 & ...
     flag9 & flag10 & flag11 & flag12 & flag13 & flag14;
 end
-
-
-
