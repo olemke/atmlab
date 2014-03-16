@@ -1,3 +1,9 @@
+2014-03-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-483
+
+	* forwardmodel/n_air_thayer.m: New.
+
 2014-03-07  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-482
