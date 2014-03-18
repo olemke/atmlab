@@ -10,7 +10,7 @@
 %    nomenclature. The latitude gives here the angular distance from the GPS
 %    satellite. The flight direction of both satellites can be adjusted.
 %
-%    If either reciever or transmitter is not in orbit around the planet,
+%    If either receiver or transmitter is not in orbit around the planet,
 %    but for example placed on Earth, use then the option for 'none'
 %    movement. 
 %
@@ -64,6 +64,10 @@
 %                     'approaching' or 'disappearing'. The last is default.
 %      tra_movement : String describing movement. Options are 'none',
 %                     'approaching' or 'disappearing'. The last is default.
+%      r_planet     : Radius of reference ellipsoid. If set this replaces
+%                     the default value, that varies with planet.
+%      n_agenda     : Agenda for refractive index. If set this replaces
+%                     the default value, that varies with planet.
 %
 %   If O.do_atten is set to true, R also has these fields
 %      tr_atmos : Transmission due to attenuation of atmospheric
@@ -95,7 +99,7 @@
 %        
 % OUT   R   Result structure, see above.
 % IN    Q   Initial settings of Q. If empty: Q = qarts;   
-%           Note that not all feilds are considered, this including
+%           Note that not all fields are considered, this including
 %           WSMS_BEFORE_RTE and YCALC_WSMS.
 %       O   Occultation structure, see above. If empty, some default 
 %           values set that work as demonstration.
@@ -174,6 +178,14 @@ Q = q_basic_local( Q, O, workfolder, do_atten, do_faraday );
 %- Set basic and ppath parts of Q, and get mass of planet
 %
 [Q,M] = q_planet_local( Q, A, workfolder, do_atten, do_faraday, do_absspecies );
+%
+if isfield(O,'r_planet') & ~isempty(O.r_planet)
+  Q.REFELLIPSOID = [ O.r_planet, 0 ]';
+end
+%
+if isfield(O,'n_agenda') & ~isempty(O.n_agenda)
+  Q.REFR_INDEX_AIR_AGENDA = O.n_agenda;
+end
 
 
 %- Set up z_impact grid and R

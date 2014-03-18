@@ -2,12 +2,12 @@
 %
 %    This function is very similar to *arts_radioocc_1d*, but here more of
 %    the calculations are done inside ARTS. The ARTS calculations involve to
-%    determine exact paths between fixed transmitter and reciever positions,
+%    determine exact paths between fixed transmitter and receiver positions,
 %    and this function is slower than *arts_radioocc_1d*. 
 %
 %    See *arts_radioocc_1d* for overall nomenclature, the basic geometry
 %    assumed, comments around *A* and the purpose of the structure *T*. Note
-%    that the occultation here is specied by SLTA, while in *arts_radioocc_1d*
+%    that the occultation here is specified by SLTA, while in *arts_radioocc_1d*
 %    impact height is used.
 %
 %    The basic results are gathered into the structure R having fields
@@ -57,6 +57,10 @@
 %                     Default is 2.
 %      defoc_shift  : Angular shift for defocusing. See iyRadioLInk.
 %                     Default is 3e-3.
+%      r_planet     : Radius of reference ellipsoid. If set this replaces
+%                     the default value, that varies with planet.
+%      n_agenda     : Agenda for refractive index. If set this replaces
+%                     the default value, that varies with planet.
 %
 % FORMAT   R = arts_radioocc_1D_slta(Q,O,A)
 %        
@@ -125,6 +129,14 @@ Q = q_basic_local( Q, O, workfolder );
 %- Set basic and ppath parts of Q
 %
 [Q,M] = q_planet_local( Q, A, workfolder );
+%
+if isfield(O,'r_planet') & ~isempty(O.r_planet)
+  Q.REFELLIPSOID = [ O.r_planet, 0 ]';
+end
+%
+if isfield(O,'n_agenda') & ~isempty(O.n_agenda)
+  Q.REFR_INDEX_AIR_AGENDA = O.n_agenda;
+end
 
 
 %- Radiii
@@ -523,12 +535,12 @@ function [Q,M] = q_planet_local(Q,A,workfolder)
         'refr_index_airFreeElectrons( demand_vmr_value = 0 )' };
     %
   end
+  if 0   % Set to 1 if you want to test without refraction
+    Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__NoRefrac' };
+  end
   
   % Include atmospheric specific data
   Q = A.atmfunc( A, Q, workfolder );
   
-  if 0   % Set to 1 if you want to test without refraction
-    Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__NoRefrac' };
-  end
     
 return

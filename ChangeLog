@@ -1,3 +1,12 @@
+2014-03-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-484
+
+	* arts_usage/arts_radioocc_1D.m: Spell fixes of header. Planet
+	radius and refractive index now can be set by input arguments.
+
+	* arts_usage/arts_radioocc_1D_slta.m: As above.
+
 2014-03-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-483
