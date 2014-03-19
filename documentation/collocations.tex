@@ -603,8 +603,8 @@ A sibling dataset is a dataset for the same instrument but in different
 granules.
 For example, the different CPR products all have the same granules, with
 the same number of measurements in each granule.
-To get a field from a different dataset, set the structure member
-\lstinline|dataset|; see \lst|FieldCopier.fieldstruct_primary|.
+To get a field from a different dataset, set the structure member.
+\lstinline|dataset|; see \lstinline|FieldCopier.fieldstruct_primary|.
 \item Copy fields from a different instrument on the same dataset.
 For example, for the aforementioned collocations, one might want to obtain
 AMSU-A data.
@@ -614,8 +614,8 @@ This is a bit more involved, because the user has to define how to make
 the translation, for example, from MHS coordinates (scanline number,
 scanline position) to AMSU-A coordinates.
 This is implemented in the abstract class
-\lst|FieldMultiInstrumentCopier|.
-For example, see its implementation \lst|AssociatedPOESPlusCPR|.
+\lstinline|FieldMultiInstrumentCopier|.
+For example, see its implementation \lstinline|AssociatedPOESPlusCPR|.
 \end{itemize}
 
 For detailed information, consult the online documentation

@@ -29,7 +29,7 @@ xmlWriteTag (fid, 'SparseData', ...
 if (strcmp(precision, 'BINARY'))
     fwrite (fidb, data, 'double');
 else
-    fprintf (fid, [xmlGetPrecisionFormatString (precision) '\n'], data);
+    fprintf (fid, [xmlGetPrecisionFormatString(precision) '\n'], data);
 end
 
 xmlWriteCloseTag (fid, 'SparseData');

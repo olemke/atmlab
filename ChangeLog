@@ -1,3 +1,9 @@
+2014-03-19  Mathias Milz  <mathias.milz@ltu.se>
+
+	* arts/xml/xmlWriteSparseData.m: 
+	      removed blank between function name and bracket 
+	      in call to xmlGetPrecisionFormatString. This caused an error.
+
 2014-03-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-484
