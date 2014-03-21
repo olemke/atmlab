@@ -54,7 +54,7 @@ rqre_datatype( ptype, { @ischar, @iscellstr } );
 rqre_datatype( pdiameter, @istensor1 );
 rqre_datatype( aspect_ratio, @istensor1 );
 
-%- Convert char inpout to cellstrs
+%- Convert char input to cellstrs
 %
 if ischar( pshape ) 
   dummy = pshape;
@@ -64,7 +64,7 @@ if ischar( pshape )
 end
 if ischar( ptype )
   dummy = ptype;
-  clear pshape;
+  clear ptype;
   ptype{1} = dummy;  
   clear dummy;
 end
