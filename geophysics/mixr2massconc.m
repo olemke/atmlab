@@ -4,7 +4,6 @@
 % Calculates mass concentration from mass mixing ratio assuming
 % a mixture of an atmospheric species and dry air.
 %  
-
 % Input:    mixr       mass mixing ratio vector of species [Kg/Kg]
 %           pres       atmopsheric pressures [Pa]
 %           temp       absolute temperature [K]
