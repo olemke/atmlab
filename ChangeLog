@@ -1,3 +1,9 @@
+2014-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-489
+
+	* geophysics/z2p_cira86.m: Wrong function name in header. 
+
 2014-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-488

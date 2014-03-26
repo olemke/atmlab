@@ -9,7 +9,7 @@
 %    Store Gc86z and G86t on the first call, then pass them in with every
 %    following call. This avoids reading the XML data over and over again.
 %
-% FORMAT   [P,T,Gc86z,Gc86t] = p2z_cira86( Z , LAT , DOY, Gc86z, Gc86t )
+% FORMAT   [P,T,Gc86z,Gc86t] = z2p_cira86( Z , LAT , DOY, Gc86z, Gc86t )
 %
 % OUT   P     Pressure in pascal, for all combinations of Z, LAT, DOY
 %             Size is [np,nlat,ndoy]
