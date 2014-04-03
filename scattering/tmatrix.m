@@ -24,6 +24,7 @@
 %                       pshape,ptype,pdiameter,aspect_ratio)
 %        
 % OUT   D            Array of ARTS single scattering data
+%       M            The "meta data" corresponding to D.
 % IN    workfolder   A folder where temporary files can be stored.
 %                    If set to [], a temporary folder is created.
 %       f_grid       Frequency grid.
@@ -38,7 +39,7 @@
 
 % 2013-08-19   Created by Patrick Eriksson.
 
-function D = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
+function [D,M] = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
                       pshape,ptype,pdiameter,aspect_ratio)
 
 
@@ -203,7 +204,7 @@ for i = 1 : np
 end  
   
 
-%if nargout > 2
-%  M = xmlLoad( fullfile( workfolder, ...
-%                            'cfile.scat_meta_array.xml' ) );
-%end
+if nargout > 1
+  M = xmlLoad( fullfile( workfolder, ...
+                                  'cfile.scat_meta_array.xml' ) );
+end
