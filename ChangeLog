@@ -1,3 +1,9 @@
+2014-04-03  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-490
+
+	* arts/xml/xmlReadScatteringMetaData.m: Added.
+
 2014-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-489
