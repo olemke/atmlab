@@ -1,3 +1,11 @@
+2014-04-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-492
+
+	* arts/xml/xmlWriteScatteringMetaData.m: Added.
+
+	* arts/xml/xmlReadScatteringMetaData.m: Add unknown version error.
+
 2014-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-491

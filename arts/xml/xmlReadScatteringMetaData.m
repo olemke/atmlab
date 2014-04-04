@@ -20,20 +20,25 @@
 
 function result = xmlReadScatteringMetaData(fid, attrlist, itype, ftype, binary, fid2)
 
-  result.version = uint16(str2double (xmlGetAttrValue (attrlist, 'version')));
-  result.description    = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.material       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.shape          = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.density        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.diameter_max   = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.volume         = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.area_projected = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  result.aspect_ratio   = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  
-  if result.version == 2
-      result.scat_f_grid        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-      result.scat_T_grid        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-      result.particle_type      = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-      result.complex_refr_index = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
-  end
+result.version = uint16(str2double (xmlGetAttrValue (attrlist, 'version')));
+if result.version > 2
+    error('atmlab:xmlReadScatteringMetaData:UnsupportedVersion', ...
+        'Unsupported ScatteringMetaData version')
+end
+
+result.description    = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.material       = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.shape          = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.density        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.diameter_max   = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.volume         = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.area_projected = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+result.aspect_ratio   = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+
+if result.version == 2
+    result.scat_f_grid        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+    result.scat_T_grid        = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+    result.particle_type      = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+    result.complex_refr_index = xmlReadTag(fid, '', itype, ftype, binary, fid2 );
+end
 
