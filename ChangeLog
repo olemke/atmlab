@@ -1,3 +1,9 @@
+2014-04-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-493
+
+	* retrieval/oem.m: Improvements of the description of stop_dx. 
+
 2014-04-04  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-1-492
