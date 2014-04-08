@@ -7,7 +7,7 @@
 %
 %       TYPE is set to 'atmdata'.
 %    
-%       Grid names and grid units are set as described in *isatmadata*,
+%       Grid names and grid units are set as described in *isatmdata*,
 %       beside GRID4_NAME that is set to '?'.
 %
 % FORMAT   G = atmdata_empty( [ dim ] )

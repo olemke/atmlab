@@ -1,8 +1,16 @@
+2014-04-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-494
+
+	* gformat/atmdata_scalar.m: New.
+
+	* gformat/atmdata_empty.m: Fixed a spelling error in header.
+
 2014-04-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-493
 
-	* retrieval/oem.m: Improvements of the description of stop_dx. 
+	* retrieval/oem.m: Improvements of the description of stop_dx.
 
 2014-04-04  Oliver Lemke  <olemke@core-dump.info>
 
