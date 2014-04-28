@@ -70,8 +70,6 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( Necase )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( vertwind )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( NSwind )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( EWwind )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( pmin )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( pmax )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( latmin )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( latmax )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( lonmin )';
@@ -92,9 +90,6 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( interp_order, %d )',  ...
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( vmr_zeropad, %d )', 1 );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( auxfield_zeropad, %d )', 1 );
 %
-Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmin, %d )', A.pmin );
-Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmax, %d )', 1e99 );
-%
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
    'ArrayOfIndexSet( basespecies, [%s] )', vector2commalist( A.basespecies ) );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
@@ -110,6 +105,10 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                     'INCLUDE "planetary_toolbox/includes/mars/atmo_mars.arts"';
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                  'INCLUDE "planetary_toolbox/includes/mars/getatmo_mars.arts"';
+
+% Set pmin and pmax
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmin, %d )', A.pmin );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmax, %d )', 1e99 );
 
 
 if Q.ATMOSPHERE_DIM == 1

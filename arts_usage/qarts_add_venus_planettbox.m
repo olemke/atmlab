@@ -62,8 +62,6 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( hdospecies )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( Necase )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( NSwind )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'ArrayOfIndexCreate( EWwind )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( pmin )';
-Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( pmax )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( latmin )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( latmax )';
 Q.WSMS_BEFORE_ATMSURF{end+1} = 'NumericCreate( lonmin )';
@@ -81,8 +79,6 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( vmr_zeropad, %d )', 1 );
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'IndexSet( interp_order, %d )',  ...
                                                               A.interp_order );
 %
-Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmin, %d )', A.pmin );
-Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmax, %d )', 1e99 );
 %
 Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( ...
    'ArrayOfIndexSet( basespecies, [%s] )', vector2commalist( A.basespecies ) );
@@ -99,6 +95,11 @@ Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                   'INCLUDE "planetary_toolbox/includes/venus/atmo_venus.arts"';
 Q.WSMS_BEFORE_ATMSURF{end+1} = ...
                'INCLUDE "planetary_toolbox/includes/venus/getatmo_venus.arts"';
+
+
+% Set pmin and pmax
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmin, %d )', A.pmin );
+Q.WSMS_BEFORE_ATMSURF{end+1} = sprintf( 'NumericSet( pmax, %d )', 1e99 );
 
 
 if Q.ATMOSPHERE_DIM == 1

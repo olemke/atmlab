@@ -1,3 +1,11 @@
+2014-04-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-495
+
+	* arts_usage/qarts_add_venus_planettbox.m:
+	* arts_usage/qarts_add_mars_planettbox.m: Had to change how pmin
+	and pmax are set, due to changes in the planet toolbox.
+
 2014-04-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-494
