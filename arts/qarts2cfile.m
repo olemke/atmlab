@@ -1786,7 +1786,14 @@ function s = file_or_data(artsvar,datatype,qvalue,workfolder,dformat,...
     rqre_datatype( qvalue, {@ischar,@issparse}, ...                        %&%
                                     sprintf('The input for %s',artsvar) ); %&%
   elseif strcmp( datatype, 'String' )                                      %&%
-    rqre_datatype( qvalue, {@ischar}, ...                                  %&%
+    rqre_datatype( qvalue, {@ischar,@isempty}, ...                         %&%
+                                    sprintf('The input for %s',artsvar) ); %&%
+  elseif strcmp( datatype, 'ArrayOfString' )                               %&%
+    rqre_datatype( qvalue, {@ischar,@isempty,@iscellstr,}, ...             %&%
+                                    sprintf('The input for %s',artsvar) ); %&%
+  % A generic check for remaining array types                              %&%
+  elseif strncmp( datatype, 'ArrayOf', 7 )                                 %&%
+    rqre_datatype( qvalue, {@ischar,@isempty,@iscell}, ...                 %&%
                                     sprintf('The input for %s',artsvar) ); %&%
   end                                                                      %&%
   

@@ -1,3 +1,10 @@
+2014-05-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-496
+
+	* arts/qarts2cfile.m (file_or_data): Extended type checks of input.
+	Data of type ArrayOfXxx now also treated.
+
 2014-04-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-495
