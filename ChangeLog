@@ -1,5 +1,12 @@
 2014-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-498
+
+	* retrieval/qpack2/qpack2.m (qp2_y2Q): Code did not work for
+	vector Y(m).TNOISE.
+
+2014-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-497
 
 	* arts/arts_autoset_includes.m: New.

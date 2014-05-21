@@ -377,7 +377,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
       end
       if size( Y(m).TNOISE, 2 ) ~= nza
         error( errid, ...
-         'Column size of Y(%d).TNOISE must maych length of Y(%d).ZA.', m, m );
+         'Column size of Y(%d).TNOISE must match length of Y(%d).ZA.', m, m );
       end
     end
     
@@ -393,14 +393,13 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
       if nnv == 1
         s2(ind) = Y(m).TNOISE(1,z)^2 * s; 
       else
-        for k = 1 : length(i)
-          s2(i0+k) = prod( Y(m).TNOISE([i(k) j(k)],z) ) * s(k);
+        for k = 1 : ni
+          s2(ind(1)-1+k) = prod( Y(m).TNOISE([i(k) j(k)],z) ) * s(k);
         end
       end
     end
     %
     Se = sparse(i2,j2,s2);  
   end 
-  
 return
 
