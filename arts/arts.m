@@ -11,7 +11,7 @@
 %    all inside a string, as:
 %       arts '-w all';
 %
-% FORMAT   [status,result] = arts( cfile [,errortol] )
+% FORMAT   [status,result] = arts( cfile [,errortol,noecho] )
 %        
 % OUT   status     Status returned by ARTS. Is 0 if all OK.
 %       result     String containing messages to standard output.
@@ -19,16 +19,15 @@
 %                  '-h'.
 % OPT   errortol   Flag to tolerate error. If set to 0, an ARTS error gives
 %                  rise also to a Matlab error. Default is 0.
+%       noecho     Flag to suppress screen output. Default is false.
 
 % 2004-09-07   Created by Patrick Eriksson.
 
+function [status,result] = arts(cfile,varargin)
+%
+[errortol,noecho] = optargs( varargin, { 0, false } );
+                                                                
 
-function [status,result] = arts(cfile,errortol)
-
-if nargin < 2
-  errortol = 0;
-end
-                                                                 %&%
 atmlab( 'require', {'ARTS_PATH','FMODEL_VERBOSITY'} );           %&%
 
 exec   = atmlab( 'ARTS_PATH' );
@@ -43,14 +42,23 @@ end                                                              %&%
 
 outdir = fileparts( cfile );
 
-if isempty( outdir )
-  [status,result] = system( ...
-                       sprintf('%s -r%d0 %s', exec, rlevel, cfile ), '-echo' );
+if noecho
+  if isempty( outdir )
+    [status,result] = system( ...
+                       sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+  else
+    [status,result] = system( ...
+         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+  end  
 else
-  [status,result] = system( ...
+  if isempty( outdir )
+    [status,result] = system( ...
+                       sprintf('%s -r%d0 %s', exec, rlevel, cfile ), '-echo' );
+  else
+    [status,result] = system( ...
          sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ), '-echo' );
+  end
 end
-
 
 
 if status  &  ~errortol

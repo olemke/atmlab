@@ -1,3 +1,17 @@
+2014-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-497
+
+	* arts/arts_autoset_includes.m: New.
+
+	* arts/arts_absmodels.cfile: Removed this one. The options to
+	include files are now improved and this file should not be needed.
+
+	* arts/arts_version.m: Did not work due to changes in arts. And
+	now used noecho feature below.
+
+	* arts/arts.m: Added a noecho optional input argument.
+
 2014-05-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-496
