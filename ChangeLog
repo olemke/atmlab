@@ -1,8 +1,18 @@
 2014-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-1-500
+
+	* retrieval/qpack2/qpack2.pdf: Updated.
+
+	* retrieval/qpack2/qpack2.tex: A smaller revision and update.
+
+	* arts/qarts.m: Improved formatting for WSMS_AT_START.
+
+2014-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-1-499
 
-	* arts/arts_oem_init.m: Added handling of empty MINMAX. 
+	* arts/arts_oem_init.m: Added handling of empty MINMAX.
 
 	* arts/qarts.m: Added description of the new feature below.
 	Added that MINMAX can be empty.

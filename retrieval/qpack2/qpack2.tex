@@ -14,7 +14,8 @@
 \usepackage[top=30mm,left=30mm,right=30mm,bottom=30mm,nohead]{geometry}
 
 
-\title{Qpack2 -- atmospheric retrievals by OEM in Matlab}
+\title{Qpack2 -- a Matlab tool for performing\\atmospheric 
+       retrievals of OEM type}
 \author{Patrick Eriksson\\(\texttt{patrick.eriksson@chalmers.se})}
 \date{\today}
 
@@ -34,7 +35,7 @@
 Qpack2 is a retrieval system, implemented in Matlab, for performing inversions
 of atmospheric observations inside the framework of ``optimal estimation''
 (OEM). With good knowledge of the background systems a wide range of retrievals
-can potentially be handled, but the primary aim is to provide relatively
+can be handled, but the primary aim is to provide relatively
 straightforward retrievals of vertical profiles of atmospheric quantities. That
 is, the atmosphere is treated to be of ``1D type'' during the retrieval.
 Accordingly, a main application areas of Qpack2 is ground-based observations.
@@ -42,27 +43,28 @@ Accordingly, a main application areas of Qpack2 is ground-based observations.
 The package should be general and flexible for covered measurements. For
 example, there is basically no limitations regarding observation geometry. Each
 measurement can consist of several spectra, obtained by some scanning procedure
-in zenith and/or azimuth direction. Further, Qpack2 has been developed to be
-suitable for operational inversions, as long as not most extreme calculation
-speed is required. Some important aspects here are that batch calculations are
-allowed and atmospheric a priori profiles can automatically be extracted from
-climatology data.
+or different instruments. See Sec.~\ref{sec:scanning} for a discussion of
+possibilities and limitations when it comes to handle more complex
+measurements. Further, Qpack2 has been developed to be suitable for operational
+inversions, as long as not most extreme calculation speed is required. Some
+important aspects here are that batch calculations are allowed and atmospheric
+a priori profiles can automatically be extracted from climatology data.
 
 
 
 \section{Background and introduction}
 \label{sec:background}
 %---
-Qpack2 is part of the more general Atmlab package of Matlab functions. In fact,
-it is largely a merge of some of the systems in Atmlab. The computational
-engine, i.e.\ the forward model, of Qpack2 is ARTS-2 ({\it Eriksson et al.},
-2011). ARTS is a C++ program, downloaded separately (i.e.\ not part of Atmlab).
-The communication with ARTS-2 is made through the Qarts system. OEM inversions
-are performed by the function \verb|oem.m|. Climatology data are stored and
-interpolated through the atmdata format.
+Qpack2 is part of the Atmlab package of Matlab functions. In fact, it is
+largely a merge of some of the systems in Atmlab. The computational engine,
+i.e.\ the forward model, of Qpack2 is ARTS-2 ({\it Eriksson et al.}, 2011).
+ARTS is a C++ program, downloaded separately (i.e.\ not part of Atmlab). The
+communication with ARTS-2 is made through a systen denoted as Qarts. OEM
+inversions are performed by the function \verb|oem.m|. Climatology data are
+stored and interpolated through a data format called ``atmdata''.
 
 This can be seen as a direct successor of Qpack ({\it Eriksson et al.}, 2005),
-despite all code is written from scratch. However, for both Qpack versions the
+despite all code is written from scratch. For both Qpack versions the
 computations are controlled by a set of settings fields packed into a structure
 denoted as Q (though Qpack2 has also a structure O). Qpack was built around
 ARTS-1, this new Qpack version is mainly a consequence of that ARTS-2 is the
@@ -179,7 +181,7 @@ must be common for all the data cases in \verb|Y|. On the other hand, both
 observation position and direction can differ between the observations, and the
 data from e.g.\ an aircraft flight could be inverted in a single run.
 
-The usage of the (dummy) functions \verb|my_q_fun| and \verb|my_y_fun| in steps
+The usage of the functions \verb|my_q_fun| and \verb|my_y_fun| in steps
 1 and 2 is just a suggestion for how to organise the definition phase of the
 run, but it is probably a good idea to separate the inversion settings and the
 task of importing measurement data.
@@ -190,7 +192,7 @@ When \verb|Q|, \verb|O| and \verb|Y| are created, it is just to call
 is normally the result of the retrieval, packed as a ``level 2'' data
 structure (\verb|L2|). The function can also provide simulated measurements.
 This option is triggered by setting the spectrum field to be empty (if \verb|Y|
-is an array, this must be done for elements):
+is an array, this must be done for all elements):
 \begin{verbatim}
 ...
 Ye.Y = []; 
@@ -228,15 +230,15 @@ species values. For example, if z is a retrieved \verb|logrel| value and $v_a$
 is the a priori VMR, the retrieved volume mixing ratio is $v_a\exp(z)$,
 which always is greater than 0.
 
-The prescribed or selected unit is used for all related variables. Maybe most
-importantly, a priori covariance matrices must be specified correspondingly.
-For example, if the selected species unit is \verb|rel|, the 1 standard
-deviation a priori uncertainty should be in the order of 0.5 (that corresponds
-to a 50\% uncertainty). The same applies to output data. No automatic unit
-conversions are performed (in contrast to the earlier Qpack version), e.g. the
-returned a priori profile for \verb|logrel| retrievals is a vector of zeros.
-The basic idea is to return data that are fully consistent with the
-assumptions of the retrieval. 
+The prescribed or selected unit is used for all related variables. For example,
+a priori covariance matrices must be specified correspondingly. For example, if
+the selected species unit is \verb|rel|, the 1 standard deviation a priori
+uncertainty should be in the order of 0.5 (that corresponds to a 50\%
+uncertainty). The same applies to output data. No automatic unit conversions
+are performed (in contrast to the earlier Qpack version), e.g. the returned a
+priori profile for \verb|logrel| retrievals is a vector of zeros. The basic
+idea is to return data that are fully consistent with the assumptions of the
+retrieval.
 
 Data retrieved using the \verb|rel| and \verb|logrel| units can be converted to
 volume mixing ratio data by the function \verb|qp2_rel2vmr|. However, this
@@ -499,10 +501,6 @@ and \verb|P.second|:\\
 The time of the measurement.
 
 \newfield 
-\verb|P.latitude| and \verb|P.longitude|:\\
-The geographical position of the measurement.
-
-\newfield 
 \verb|tnoise|:\\
 Mean of assumed thermal noise. This is simple average, no weighting
 with channel widths is applied. This value has no direct physical
@@ -524,7 +522,7 @@ Measured spectrum.
 Fitted spectrum. That is, the spectrum matching retrieved state vector.
 
 \newfield
-\verb|baseline|:\\
+\verb|bl|:\\
 Retrieved ``baseline''. That is, retrieved spectrum distortion through
 e.g.\ polynomial fitting. A scalar 0 if no baseline retrieval is performed.
 
@@ -725,17 +723,20 @@ NetCDF, that format can also be used (\verb|arts_nc_write_|{\it datatype} and
 
 
 
-\section{Single and multiple spectra measurements}
+\section{Measurements consisting of multiple spectra}
 \label{sec:scanning}
 %
 As long as each measurement consists of a single spectrum, Qpack2 should be
-quite flexible in treating sensor aspects. For some conditions, it should also
-be straightforward to handle measurements consisting of multiple spectra. A
-first constrain is that the sensor characteristics (not including thermal
-noise) are common for the spectra. Hence, if the same sensor is moved
-vertically, or rotated to measure at different zenith angles, can be treated.
-Requirements and considerations to handle a multiple-spectrum measurement
-include:
+quite flexible in treating sensor aspects. For some conditions, it also
+possible to handle measurements consisting of multiple spectra. 
+
+\subsection{Common sensor characteristics}
+%
+If the sensor characteristics are common for all spectra involved (not
+including thermal noise) it is relatively straightforward to apply Qpack. For
+example, the same sensor is moved vertically, or rotated to measure at
+different zenith angles, can be treated. Requirements and considerations to
+handle such multiple-spectra measurements include:
 \begin{itemize}
 \item The fields \verb|Y.Z_PLATFORM| and \verb|Y.ZA| shall give the altitude
   and zenith angle of each spectrum, and are accordingly (column) vectors
@@ -778,6 +779,22 @@ Retrieved atmospheric data will effectively have no latitude and longitude
 dimension and be of 1D type.
 \end{itemize}
 The file \verb|qpack2_wind3d_demo| exemplifies retrievals of this type.
+
+
+\subsection{More complex set-ups}
+%
+It can be considered to append spectra from different instruments to perform a
+joint retrieval. In a few cases this can be handled as in the sub-section
+above, but would normally require a more complex set-up. Another more complex
+situation is when the sensor characteristics change during e.g.\ a limb
+scanning sequence. Both these examples can be handled by ARTS by making use of
+the \verb|yCalcAppend| workspace method.
+
+Using Qpack together with \verb|yCalcAppend| is not impossible but requires
+detailed knowledge of how both Qpack and ARTS work and far from all possible
+measurement scenarios can be treated. Hence, it is best to contact Patrick
+for advice before start trying to implement a set-up of this type.
+
 
 
 
