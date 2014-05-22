@@ -1,3 +1,15 @@
+2014-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-1-499
+
+	* arts/arts_oem_init.m: Added handling of empty MINMAX. 
+
+	* arts/qarts.m: Added description of the new feature below.
+	Added that MINMAX can be empty.
+
+	* arts/qarts2cfile.m (add_wsms): Added an if/else/end feature to
+	fields of WSMS type.
+
 2014-05-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-498

@@ -233,7 +233,7 @@ function T = cfile_Generl( Q, partname, workfolder )
   T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
   if qarts_isset( Q.WSMS_AT_START )
-    T = add_wsms( T, ' WSMS_AT_START', Q.WSMS_AT_START );
+    T = add_wsms( T, ' WSMS_AT_START', Q.WSMS_AT_START, Q );
   end
   %
   if qarts_isset( Q.OUTPUT_FILE_FORMAT )
@@ -296,7 +296,7 @@ function T = cfile_CloseF( Q, partname, workfolder )
   T = [];
   %
   if qarts_isset( Q.WSMS_AT_END )
-    T = add_wsms( T, ' WSMS_AT_END', Q.WSMS_AT_END );
+    T = add_wsms( T, ' WSMS_AT_END', Q.WSMS_AT_END, Q );
   end
   %
   T{end+1} = '}';
@@ -327,7 +327,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   T = [];
   %
   if qarts_isset( Q.WSMS_BEFORE_ATMSURF )
-    T = add_wsms( T, 'Q.WSMS_BEFORE_ATMSURF', Q.WSMS_BEFORE_ATMSURF );
+    T = add_wsms( T, 'Q.WSMS_BEFORE_ATMSURF', Q.WSMS_BEFORE_ATMSURF, Q );
   end
   %
   if qarts_isset( Q.P_GRID )
@@ -547,7 +547,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       T = add_includes( T, 'Q.ABS_MODELS', Q.ABS_MODELS );
       %
       if qarts_isset( Q.ABS_WSMS )
-        T = add_wsms( T, 'ABS_WSMS', Q.ABS_WSMS );
+        T = add_wsms( T, 'ABS_WSMS', Q.ABS_WSMS, Q );
       end
     end
         
@@ -763,7 +763,7 @@ function T = cfile_RteExe( Q, partname, workfolder )
   T{end+1} = 'sensor_checkedCalc';
   %
   if qarts_isset( Q.YCALC_WSMS )
-    T = add_wsms( T, 'YCALC_WSMS', Q.YCALC_WSMS );
+    T = add_wsms( T, 'YCALC_WSMS', Q.YCALC_WSMS, Q );
   end
   %
   T{end+1} = add_savefile( 'y',       workfolder );
@@ -1858,14 +1858,51 @@ function T = add_agenda( T, agenda, strarray )
 return
 
 
-function T = add_wsms( T, field, strarray )
+function T = add_wsms( T, field, strarray, Q )
   if ~iscellstr( strarray )                                                %&%
     error( sprintf( ...                                                    %&%
            'The field %s must be specified as cell array of strings.', ... %&%
                                                                 field ) ); %&%
   end                                                                      %&%
+  inif   = false;
+  insert = true;
   for j = 1 : length(strarray)
-    T{end+1} = sprintf( '%s', strarray{j} );
+    thisline = strarray{j};
+    if length(thisline) > 0  &  thisline(1) == '<' 
+      if strncmp( thisline, '<IF>', 4 )
+        if length(thisline) < 5
+          error( 'Empty <IF> found in %s.', field );
+        end
+        qfield = strtrim( thisline(5:end) );
+        if ~qarts_isset( Q.(qfield) ) | ~isboolean(Q.(qfield))
+          error( ['Incorrect usage of if-statement in %s. The argument (in ',...
+                  'this case %s) must be a field of Q that is set and is ',  ...
+                  'a boolean.'], field, qfield );
+        end
+        if Q.(qfield)
+          insert = true;
+        else
+          insert = false;        
+        end
+        inif = true;
+      elseif strncmp( thisline, '<ELSE>', 6 )
+        if length( deblank( thisline ) ) ~= 6
+          error( 'Incorrect line including <ELSE> found in %s.', field );
+        end
+        insert = ~insert;
+      elseif strncmp( thisline, '<END>', 5 )
+        if length( deblank( thisline ) ) ~= 5
+          error( 'Incorrect line including <END> found in %s.', field );
+        end
+        inif   = false;
+        insert = true;
+      else
+      end
+    else    
+      if insert
+        T{end+1} = sprintf( '%s', strarray{j} );
+      end
+    end
   end
 return
 

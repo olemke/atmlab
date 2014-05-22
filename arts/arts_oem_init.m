@@ -217,7 +217,9 @@ for i = 1 : nq
       error( sprintf('Unknown gas species retrieval unit (%s).', ...
                                                               R.jq{i}.mode ) ); 
     end
-    if isfield( Q.ABS_SPECIES(ig), 'MINMAX' )
+    if isfield( Q.ABS_SPECIES(ig), 'MINMAX' )  &  ...
+                                             ~isempty(Q.ABS_SPECIES(ig).MINMAX)
+      
       R.minmax(ind,1:length(Q.ABS_SPECIES(ig).MINMAX)) = ...
                            repmat( Q.ABS_SPECIES(ig).MINMAX', length(ind), 1 );
     end
@@ -226,7 +228,7 @@ for i = 1 : nq
     %
     xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, t_field, ...
                                                              R.jq{i}.grids ) );
-    if isfield( Q.T, 'MINMAX' )
+    if isfield( Q.T, 'MINMAX' )  & ~isempty(Q.T.MINMAX)
       R.minmax(ind,1:length(Q.T.MINMAX)) = ...
                                          repmat( Q.T.MINMAX', length(ind), 1 );
     end
