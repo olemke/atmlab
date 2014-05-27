@@ -1,3 +1,22 @@
+2014-05-27  Gerrit Holl  <gerrit.holl@utoronto.ca>
+
+	* atmlab-2-1-502
+
+	* datasets/GriddedDataset.m:
+
+	- Give a friendly error message on missing data (such as the case for
+	CFSR)
+
+	* retrieval/spareice/*:
+
+	- Copied codes from my personal svn repository.  Note that these codes
+	are raw and uncut and poorly documented and not up to atmlab
+	standards.  Use with extreme care.  See retrieval/spareice/Contents.m.
+	I purposefully did *not* include this directory in the atmlab path
+	through atmlab_init.  Do this by hand if you want to use the functions
+	and classes here.  They presently might or might not work.  I will
+	likely adapt this in the coming days.
+
 2014-05-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-1-501

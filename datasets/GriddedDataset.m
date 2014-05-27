@@ -57,7 +57,15 @@ classdef GriddedDataset < SatDataset
             uni_indices = [uni_indices; length(lat)+1]; % add length(lat)+1 because later I run slices to llat-1
             S = struct();
             for i = 1:length(uni_indices)-1;
-                SS = self.read_granule(self.find_granule_covering_instant(time_plus_30m(uni_indices(i), :), ''), '', fields);
+                gran = self.find_granule_covering_instant(time_plus_30m(uni_indices(i), :), '');
+                if isempty(gran)
+                    error(['atmlab:' mfilename ':nodata'], ...
+                        ['No gridded data found for time %s %s. ' ...
+                        'Please add to %s.'], ...
+                        self.name, num2str(time_plus_30m(uni_indices(i), :)), ...
+                        self.basedir);
+                end
+                SS = self.read_granule(gran, '', fields);
                 ustime = SS.epoch + SS.time;
                 assert(length(unique(sign(diff(SS.lat))))==1, ['atmlab:' mfilename ':invalid'], 'Weird lats came from source');
                 assert(length(unique(sign(diff(SS.lon))))==1, ['atmlab:' mfilename ':invalid'], 'Weird lons came from source');    
