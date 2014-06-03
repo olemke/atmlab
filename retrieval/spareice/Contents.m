@@ -36,7 +36,7 @@
 %   want "type of product" "all available" because the actual reanalysis
 %   is only every 6 hours and SPARE-ICE retrieval needs hourly data
 %   (reduces interpolation).  Choose the densest grid with all available
-%   data.
+%   data.  Do not forget to set "Output format" to "Converted to NetCDF".
 %
 %   I downloaded the 'pure' reanalysis data to
 %   /storage3/user_data/gerrit/reanalysis
@@ -44,6 +44,18 @@
 %   - The Python script to convert this to daily netcdf files to be used
 %   with the atmlab retrieval.  Resulting daily files at
 %   /storage3/user_data/gerrit/reanalysis_per_day but change source code
-%   as needed.
+%   as needed, in particular 'indir', 'infile', 'outdir', 'outfile',
+%   defined near the top of the source code.  Note that this is Python3
+%   code.
 %
-%   - The atmlab files in this directory
+%   - The atmlab files in this directory.
+%
+% To process SPARE-ICE data, call process_ccniwp_data, for example:
+%
+%   process_ccniwp_data([2013, 4, 2], [2013, 5, 30], 'noaa18');
+%
+% To read SPARE-ICE data:
+%
+%   define_local_datasets();
+%   D = datasets();
+%   D.col_syn_iwp.read_...  (see SatDataset and SatDataset.read for details)

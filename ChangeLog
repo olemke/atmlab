@@ -1,3 +1,28 @@
+2014-06-03  Gerrit Holl  <gerrit.holl@utoronto.ca>
+
+	* atmlab-2-1-503
+
+	* retrieval/spareice/Contents.m:
+
+	- Expanded explanations a bit
+
+	* retrieval/spareice/cfsr_month2day.py:
+
+	- Python script to convert CFSR data as downloaded from the archive,
+	to a format to be understood by the atmlab reading routine
+
+	* retrieval/spareice/compare_collocated_iwp_products.m:
+
+	- Do not call this function.  It is needed because of some oddities
+	with the storage of the neural nets (see function header for details).
+
+	* datasets/GriddedDataset.m:
+
+	- Bugfix when ttime_i gets negative. Not 100% sure why that happens
+	but chosen the least bad solution.  If anyone notices that the first
+	day of the month looks significantly worse than other days, please
+	look in this file around ttime_i<=0 and start debugging there.
+
 2014-05-27  Gerrit Holl  <gerrit.holl@utoronto.ca>
 
 	* atmlab-2-1-502

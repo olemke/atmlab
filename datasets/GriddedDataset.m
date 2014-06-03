@@ -74,14 +74,16 @@ classdef GriddedDataset < SatDataset
                 ttime = time(uni_indices(i):uni_indices(i+1)-1, :);
                 ttime_us = date2unixsecs(ttime(:, 1), ttime(:, 2), ttime(:, 3), ttime(:, 4), ttime(:, 5), ttime(:, 6));
                 llat_i = round(interp1(SS.lat, 1:length(SS.lat), llat, 'linear', 'extrap'));
+                % next line is an ugly hack, not 100% sure why this happens
+                llat_i(llat_i>length(SS.lat))=length(SS.lat);
                 llon_i = round(interp1(shift_longitudes(SS.lon, -180, 180), 1:length(SS.lon), shift_longitudes(llon, -180, 180), 'linear', 'extrap'));
                 ttime_i = round(interp1(ustime, 1:length(ustime), ttime_us, 'linear', 'extrap'));
-                if any(ttime_i==0)
+                if any(ttime_i<=0)
                     logtext(atmlab('ERR'), [...
                         'Warning: rounding %d timestamps in the first 30 minutes of the month up instead of down. ' ...
                         'This is because the first hour of a month is contained in the /previous/ month-file, ' ...
-                        'and I haven''t fixed the sorting-per-day for those instances.\n'], sum(ttime_i==0));
-                    ttime_i(ttime_i==0) = 1;
+                        'and I haven''t fixed the sorting-per-day for those instances.\n'], sum(ttime_i<=0));
+                    ttime_i(ttime_i<=0) = 1;
                 end
                 if any(llat_i==0)
                     logtext(atmlab('ERR'), [...
@@ -91,6 +93,7 @@ classdef GriddedDataset < SatDataset
                 end
                 mask = true(size(llat_i));
                 mask(ttime_i>length(SS.time)) = false;
+                clear ii;
                 ii(mask) = sub2ind(size(SS.(fields{1})), llon_i(mask), llat_i(mask), ttime_i(mask));
                 ii(~mask) = NaN;
                 for j = 1:length(fields)

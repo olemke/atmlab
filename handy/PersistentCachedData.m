@@ -146,7 +146,8 @@ classdef PersistentCachedData < CachedData
             for i = 1:length(d)
                 assert(any(strcmp(d(i).name, {'.', '..'})) || ...
                       ((length(d(i).name) >= 4) && strcmp(d(i).name(end-3:end), '.mat')), ...
-                      ['atmlab:' mfilename ':NotACacheDir']);
+                      ['atmlab:' mfilename ':NotACacheDir'], ...
+                      ['Not a cache directory: ' self.cachedir]);
             end
             while self.disk_toolarge()
                 d = dir(self.cachedir);
