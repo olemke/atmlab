@@ -1,3 +1,13 @@
+2014-06-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-1-504
+
+	* arts/netcdf/arts_nc_read_arrayofmatrix.m,
+	arts/netcdf/arts_nc_read_arrayofvector.m:
+
+	Replace obsolete inqVarId with 'new' inqVarID to fix reading of ARTS
+	arrays.
+
 2014-06-03  Gerrit Holl  <gerrit.holl@utoronto.ca>
 
 	* atmlab-2-1-503

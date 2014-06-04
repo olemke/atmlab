@@ -17,10 +17,10 @@ ncid = netcdf.open (filename, 'NOWRITE');
 
 gattr = loadncglobalattr (filename);
 
-varid = netcdf.inqVarId (ncid, 'Vector_nelem');
+varid = netcdf.inqVarID (ncid, 'Vector_nelem');
 nv = netcdf.getVar (ncid, varid);
 
-varid = netcdf.inqVarId (ncid, 'ArrayOfVector');
+varid = netcdf.inqVarID (ncid, 'ArrayOfVector');
 v = netcdf.getVar (ncid, varid);
 netcdf.close (ncid);
 

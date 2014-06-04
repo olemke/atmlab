@@ -17,13 +17,13 @@ ncid = netcdf.open (filename, 'NOWRITE');
 
 gattr = loadncglobalattr (filename);
 
-varid = netcdf.inqVarId (ncid, 'Matrix_nrows');
+varid = netcdf.inqVarID (ncid, 'Matrix_nrows');
 nr = netcdf.getVar (ncid, varid);
 
-varid = netcdf.inqVarId (ncid, 'Matrix_ncols');
+varid = netcdf.inqVarID (ncid, 'Matrix_ncols');
 nc = netcdf.getVar (ncid, varid);
 
-varid = netcdf.inqVarId (ncid, 'ArrayOfMatrix');
+varid = netcdf.inqVarID (ncid, 'ArrayOfMatrix');
 m = netcdf.getVar (ncid, varid);
 netcdf.close (ncid);
 
