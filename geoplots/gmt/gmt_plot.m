@@ -3,8 +3,7 @@ function filename = gmt_plot(in,field)
 %
 % The function is basically a wrapper that calls gmt shell commands using easy
 % to use matlab arguments. Try test_gmt.m for some examples on how to use the function.
-% Preferably, the data should be CENTERED if the data is gridded (fastest¨
-% performance).
+% Preferably, the data should be CENTERED if the data is gridded (fastest performance).
 %
 % OUT   filename  The filename of the figure.
 %
@@ -754,11 +753,11 @@ if isfield(in,'header_size')
     in.header_fontsize = in.header_size; in=rmfield(in,'header_size');
 end
 
-% replace bad symbols (for gmt system call) for filename and mask them for the title
 if ~isempty(in.header)
-    default.filename = [in.header '.pdf'];
+    default.filename = ['gmtfile_' in.header '.pdf'];
 else default.filename = 'default.pdf';
 end
+
 in = optargs_struct(in,default);
 
 % find default figuretype

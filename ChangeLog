@@ -1,3 +1,30 @@
+2014-06-19  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-2-1
+
+	* datasets/define_datasets.m: Added missing value definintion to some datasets
+
+	* geoplots/gmt/gmt_plot.m: Prepend "gmtfile_" to default filename
+	when using in.header to build filename
+
+	* handy/PersistentCachedData.m: Puny change in output text
+
+	* handy/combine_pdfs.m: No longer allow an empty title to be used as a filename
+
+	* math/binned_statistics.m: Fixed documentation
+
+	* math/binning_fast.m:
+
+	- Updated function to be general for most puposes and not just for
+	geographical data as the previous version.
+
+	- The function is still completey backward compatible but now one
+	can grid 'Z' with the coorinates 'X' and 'Y' into a grid with the
+	centers defined by 'newX' and 'newY'.
+
+	- If you data 'X','Y','Z' is used instead of 'data','lat','lon',
+	no geographical sanitity checks are performed
+
 2014-06-06  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-2-0
