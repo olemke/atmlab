@@ -37,6 +37,7 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %                  region        [blcorner,trcorner] (lat1,lon1,lat2,lon2)
 %
 %
+%
 %          If region is given, the function will only bin the data within the
 %          given region. Particularily useful if you have high resolution data
 %          in a region. The default grid domain is assumed to be global
@@ -52,14 +53,18 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %           (lon>180). This may be important if your input data does not cover both
 %           hemispheres.
 %
+%  counts   %f (e.g. true=1)
+%           Optional logical for if you only want the number of counts per bin, e.g. to see how
+%           often a certain combination of X-Y happens (numel per box).
+%
 % Out:
-%                   1) Z  ( cell (size(Y,X) ) %data
+%                   1) Z  ( cell (size(Y,X)) or counts) %data
 %                   2) Y  ( vector )          %lat
 %                   3) X  ( vector )          %lon
 %
 % USAGE: [Z,Y,X] = binning_fast(struct('data',data,'lat',lat,'lon',lon...
 %                             'newlat',[-80+.5:80-.5],'newlon',[-180+.5:180-.5]))
-%       
+%
 %        or
 %         [Z,Y,X] = binning_fast(struct('Z',data,'X',x,'Y',y,'newX',[1:10],'newX',[1:10]))
 %
@@ -81,9 +86,11 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 if nargin==1, lonspace=0;end
 [in,Y,X] = outputlatlons(in,lonspace,lonlat);
 
-% data might be 2D or more e.g. levels,etc
-sz = size(in.Z);
-in.Z = in.Z(:,:); %collapse data
+if ~in.counts
+    % data might be 2D or more e.g. levels,etc
+    sz = size(in.Z);
+    in.Z = in.Z(:,:); %collapse data
+end
 
 in = regionchop(in);
 
@@ -98,16 +105,24 @@ Xindex = floor( (in.X - (min(X)-d(2)/2)) /d(2) ) + 1;
 % make sure Xindex and Yindex don't exceed maximum
 Yindex(Yindex>length(Y))=length(Y);
 Xindex(Xindex>length(X))=length(X);
-indata = in.Z;
+
 
 %% GET COUNTS
 Z = cell(length(Y), length(X));
 counts = zeros (size(Z), 'uint32');
-for i = 1:size(indata,1)
+for i = 1:length(in.X)
     iY = Yindex(i);
     iX = Xindex(i);
     counts(iY, iX) = counts(iY, iX) + 1;
 end
+
+if in.counts
+    % If you only want the counts you can leave now
+    Z = counts;
+    return
+end
+
+indata = in.Z;
 
 %% PREALLOCATE DATA
 for i = 1:size(counts,1)
@@ -131,12 +146,18 @@ end
 function [in,lonlat] = check_input(in)
 
 lonlat = all(isfield(in,{'lat','lon'}));
+if ~isfield(in,'counts') % if you only want the counts
+    in.counts = 0;
+end
 
 if lonlat
     in.X = in.lon;
     in.Y = in.lat;
-    in.Z = in.data;
-    in = rmfield(in,{'lon','lat','data'});
+    in = rmfield(in,{'lon','lat'});
+    if ~in.counts
+        in.Z = in.data;
+        in = rmfield(in,'data');
+    end
     if isfield(in,'newlon')
         in.newX = in.newlon;
         in.newY = in.newlat;
@@ -145,19 +166,30 @@ if lonlat
 end
 
 errId = ['atmlab:' mfilename ':badInput'];
-assert(all(isfield(in,{'Y','X','Z'})),...
+assert(all(isfield(in,{'Y','X','Z'})) || all(isfield(in,{'Y','X','counts'})),...
     errId,'''lat'',''lon'',''data'' (or ''X'',''Y'',''Z'') are required input fields')
 
 assert(isfield(in,'gridsize') || all(isfield(in,{'newX','newY'})),...
     errId,'Either field ''gridsize'' or fields ''newY/newlat'' and ''newX/newlon'' are required' )
 
-if isequal(numel(in.Z),numel(in.Y),numel(in.X))
-    in.Z = in.Z(:); in.Y = in.Y(:); in.X = in.X(:);
-end
+if ~in.counts
+    if isequal(numel(in.Z),numel(in.Y),numel(in.X))
+        in.Z = in.Z(:); in.Y = in.Y(:); in.X = in.X(:);
+    end
 
-assert(isequal(size(in.X,1),size(in.Y,1),size(in.X,1)),...
+    assert(isequal(size(in.X,1),size(in.Y,1),size(in.Z,1)),...
     errId, ['data,Y,X must all have the same first dimension. Found: ' ...
     'data %d, Y %d, X %d'], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
+else
+    if isequal(numel(in.Y),numel(in.X))
+        in.Y = in.Y(:); in.X = in.X(:);
+    end
+    assert(isequal(size(in.X,1),size(in.Y,1)),...
+    errId, ['data,Y,X must all have the same first dimension. Found: ' ...
+    ' Y %d, X %d'], size(in.Y,1), size(in.X, 1));
+end
+
+
 
 if lonlat
     assert(~(any([in.newX(:)>360;in.newX(:)<-180;in.newY(:)>90;in.newY(:)<-90])),...
@@ -197,7 +229,10 @@ index = ln1 & ln2 & lt1 & lt2;
 
 in.Y = in.Y(index);
 in.X = in.X(index);
-in.Z = in.Z(index,:);
+
+if ~in.counts
+    in.Z = in.Z(index,:);
+end
 
 end
 function [in,Y,X] = outputlatlons(in,lonspace,lonlat)

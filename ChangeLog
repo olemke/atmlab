@@ -1,3 +1,14 @@
+2014-06-23  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-2-2
+
+	* math/binning_fast.m: Generalizing even more: Now you can pass
+	the argument in.counts = true, if you only want the number of hits
+	(numel) per grid, and don't want to actually grid any data. This
+	is much faster than binning the data and then getting the numel
+	from binned_statitics.m as before
+
+
 2014-06-19  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-2-1
