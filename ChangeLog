@@ -1,3 +1,10 @@
+2014-07-14  Maryam Jamali  <maryamj@student.chalmers.se>
+
+    * atmlab-2-2-3 
+
+    * h2o/parametrisations/eps_ice_Jiang_04.m
+        Provides the complex dielectric constant following the Jiang 2004 paper.
+	
 2014-06-23  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-2-2
