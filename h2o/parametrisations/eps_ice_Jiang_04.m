@@ -13,7 +13,7 @@
 % FORMAT    e = eps_ice_Jiang_04( f, t )
 %        
 % OUT   e   Complex dielectric constant
-% IN    f   Frequency                     [GHz]
+% IN    f   Frequency                     [Hz]
 %       t   Temperature                   [K]
 
 % 2014-06-19   Created by Maryam Jamali

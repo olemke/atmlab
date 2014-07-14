@@ -11,7 +11,7 @@
 %   the ARTS workspace method that is used by this Atmlab function:
 %      arts -d complex_refr_indexIceWarren84
 %
-% FORMAT   n = n_ice_warren08( f, t )
+% FORMAT   n = n_ice_warren84( f, t )
 %        
 % OUT   n   Complex refractive index, for each combination of f and t.
 % IN    f   Frequency

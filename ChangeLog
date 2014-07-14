@@ -1,9 +1,19 @@
+2014-07-14  Jana Mendrok  <jana.mendrok@ltu.se>
+
+	* atmlab-2-2-4
+
+	* h2o/parametrisations/n_ice_zhang01.m:
+	Complex refractive index according to Zhang et al, 2001.
+
+	* h2o/parametrisations/eps_ice_Jiang_04.m, eps_ice_liebe93.m,
+	n_ice_warren84.m: Fixed documentation.
+
 2014-07-14  Maryam Jamali  <maryamj@student.chalmers.se>
 
-    * atmlab-2-2-3 
+	* atmlab-2-2-3 
 
-    * h2o/parametrisations/eps_ice_Jiang_04.m
-        Provides the complex dielectric constant following the Jiang 2004 paper.
+	* h2o/parametrisations/eps_ice_Jiang_04.m:
+	Provides the complex dielectric constant following the Jiang 2004 paper.
 	
 2014-06-23  Salomon Eliasson  <seliasson@ManUtd>
 
