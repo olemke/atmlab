@@ -108,7 +108,7 @@ end
 
 % uncompress file if necessary
 try
-    info=h5info(filename);
+    info=hdf5info(filename);
 catch ME
     switch ME.identifier
         case 'MATLAB:imagesci:deprecatedHDF5:libraryError' % probably compressed
@@ -125,6 +125,7 @@ end
 %Begin MMILZ
 % read version from info and adjust h5member names (Latitude_pixels -> Latitude_Pixels
 % (1.05->1.06))
+info=h5info(filename); %Call necessary to enable the following tastks
 natt=length(info.Groups.Attributes);
 for iat=1:natt
     if strcmp(info.Groups.Attributes(iat).Name,'Product_Identification')
@@ -142,6 +143,19 @@ clear iat;
 clear fname;
 clear vers;
 %END MMILZ
+
+% Begin MMILZ 20140730
+% Catch the change in Variable naming Icidence_angle -->
+% IncidenceAngle_Pixels and adapt the fieldnames in
+ndatasets=length(info.Groups.Datasets);
+for idatas=1:ndatasets
+    if strcmp(info.Groups.Datasets(idatas).Name,'IncidenceAngle_Pixels')
+        h5member = strrep(h5member, 'Incidence_Angle', 'IncidenceAngle_Pixels');
+    end
+end
+clear ndatasets;
+clear idatas;
+%%MM %END MMILZ 20140730
 
 
 for ie=1:length(useentries)

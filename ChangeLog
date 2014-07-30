@@ -3,7 +3,12 @@
 	* atmlav-2-2-5
 
 	* sensors/read_saphir_l1.m
-	  fixes a small bug call hdff5info changed to h5info to be consistent.
+	  fixed the issue with changing Variable names within V1.06 
+	  Now the different Incidence_Angle Variable decriptions are both 
+	  possible 
+	  the  small bug call hdf5info was inverted as some other calls need 
+	  it but inreoduced another call to enable the reading of nionzipped 
+	  files which need the call.
           info=h5info(filename);
 
 2014-07-14  Jana Mendrok  <jana.mendrok@ltu.se>
