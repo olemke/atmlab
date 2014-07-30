@@ -2,7 +2,7 @@ function saphirL1=read_saphir_l1(filename,selected_entries, mode)
 % function read_saphir_l1: reads HDF5 files with SAPHIR leve1 1 data and
 % provides a structure containing the useful L1 data and attributes
 %
-% call: dataL1 = read_saphir(L1(filename,[selected_entries, mode])
+% call: dataL1 = read_saphir_l1(filename,[selected_entries, mode])
 %
 % filename is the name of the hdf5 file or a gzipped version thereof
 % desired_entries is optional if you do not want to extract all variables
@@ -14,7 +14,7 @@ function saphirL1=read_saphir_l1(filename,selected_entries, mode)
 %
 % 'mode' can be 'l1a1' or 'l1a2'.
 
-% $Id: read_saphir_l1.m 8552 2013-08-01 11:18:11Z gerrit $
+% $Id$
 
 errorid = 'Function read_saphir_l1:';
 
@@ -108,7 +108,7 @@ end
 
 % uncompress file if necessary
 try
-    info=hdf5info(filename);
+    info=h5info(filename);
 catch ME
     switch ME.identifier
         case 'MATLAB:imagesci:deprecatedHDF5:libraryError' % probably compressed
