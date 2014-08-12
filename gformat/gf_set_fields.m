@@ -13,16 +13,20 @@
 
 function G = gf_set_fields(G,varargin)
 
-%- Check input                                                             %&%
-%                                                                          %&%
-rqre_nargin( 1, nargin );                                                  %&%
-if ~iseven( length( varargin ) )                                           %&%
-  error( ['The number of input arguments must be an even number.'] );      %&%
-end                                                                        %&%
+strict_assert = atmlab('STRICT_ASSERT');
+
+if strict_assert
+  rqre_nargin( 1, nargin );
+  if ~iseven( length( varargin ) )
+    error( ['The number of input arguments must be an even number.'] );
+  end
+end
 
 for i = 1 : 2: length(varargin)
-  rqre_datatype( varargin{i}, {@ischar}, 'Field names' );                  %&%
-  rqre_datatype( varargin{i+1}, {@ischar,@isempty}, ...                    %&%
-                                   'An optional field argument' );         %&%
+  if strict_assert
+    rqre_datatype( varargin{i}, {@ischar}, 'Field names' );
+    rqre_datatype( varargin{i+1}, {@ischar,@isempty}, ... 
+                                               'An optional field argument' );
+  end
   G = setfield( G, varargin{i}, varargin{i+1} );
 end

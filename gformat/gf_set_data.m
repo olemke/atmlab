@@ -25,39 +25,44 @@ function G = gf_set_data(G,data,grids,grid_names)
 if nargin < 4, grid_names = []; end
 if nargin < 5, grid_units = []; end
 
-%- Check input                                                             %&%
-%                                                                          %&%
-rqre_nargin( 3, nargin );                                                  %&%
-rqre_datatype( data, @isnumeric );                                         %&%
-rqre_datatype( grids, {@isempty,@iscell} );                                %&%
-rqre_datatype( grid_names, {@isempty,@iscellstr} );                        %&%
-rqre_datatype( grid_units, {@isempty,@iscellstr} );                        %&%
 dim = length( grids );
-if length(grids) < dimens( data )                                          %&%
-  error( 'Dimensionality of *data* > than number of grids.' );             %&%
-end                                                                        %&%
+
+strict_assert = atmlab('STRICT_ASSERT');
+
+if strict_assert
+  rqre_nargin( 3, nargin );
+  rqre_datatype( data, @isnumeric );
+  rqre_datatype( grids, {@isempty,@iscell} );
+  rqre_datatype( grid_names, {@isempty,@iscellstr} );
+  rqre_datatype( grid_units, {@isempty,@iscellstr} );
+  if length(grids) < dimens( data )
+    error( 'Dimensionality of *data* > than number of grids.' );
+  end
+end
 
 G.DATA = data;
 G.DIM  = dim;
 
 if isempty( grid_names )
   grid_names = cell(dim,1);
-else                                                                       %&%
-  if length(grid_names) ~= dim                                             %&%
-    error('*grid_names* must be empty or have same length as *grids*');    %&%
-  end                                                                      %&%
+elseif strict_assert
+  if length(grid_names) ~= dim 
+    error('*grid_names* must be empty or have same length as *grids*');
+  end
 end
 
 if isempty( grid_units )
   grid_units = cell(dim,1);
-else                                                                       %&%
-  if length(grid_units) ~= dim                                             %&%
-    error('*grid_units* must be empty or have same length as *grids*');    %&%
-  end                                                                      %&%
+elseif strict_assert
+  if length(grid_units) ~= dim
+    error('*grid_units* must be empty or have same length as *grids*');
+  end
 end
 
 for d = 1 : dim
   G = gf_set_grid( G, d, grids{d}, grid_names{d}, grid_units{d} );
-  rqre_gridmatch( data, d, grids{d} );                                     %&%
+  if strict_assert
+    rqre_gridmatch( data, d, grids{d} );
+  end
 end
 

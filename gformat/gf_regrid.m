@@ -26,32 +26,26 @@
 function G = gf_regrid( G, grids, iopt )
 %
 if nargin < 3
-    iopt = 'linear';
+  iopt = 'linear';
 end
 
 if atmlab('STRICT_ASSERT')
-    %&%
-    %&%
-    %- Check input                                                     %&%
-    %                                                                  %&%
-    rqre_datatype( G, @isgformat );                                    %&%
-    % Grids of G are checked inside *gridinterp*                       %&%
-    rqre_datatype( grids, @iscell );                                   %&%
-    rqre_datatype( iopt, @ischar );                                    %&%
-    
+  %
+  rqre_datatype( G, @isgformat );
+  % Grids of G are checked inside *gridinterp*
+  rqre_datatype( grids, @iscell );
+  rqre_datatype( iopt, @ischar );
 end
 
 agrids = cell(length(G));
 for i = 1 : length( G )
-    %
-    %agrids = {};
-    %
-    for d = 1  : G(i).DIM
-        gname        = sprintf('GRID%d',d);
-        agrids{d}    = G(i).(gname);
-        G(i).(gname) = grids{d};
-    end
-    %
-    G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt, true );
-    %
+  %
+  for d = 1  : G(i).DIM
+      gname        = sprintf('GRID%d',d);
+      agrids{d}    = G(i).(gname);
+      G(i).(gname) = grids{d};
+  end
+  %
+  G(i).DATA = gridinterp( agrids, G(i).DATA, grids, iopt, true );
+  %
 end

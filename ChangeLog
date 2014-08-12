@@ -1,5 +1,41 @@
 2014-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-2-7
+
+	* A revision of the gformat related function. The only real change
+	is described in the two first bullets below.
+
+	* gformat/griddedfield2gf.m: Now only handling single G and GF.
+	All other code removed (not sure if it worked). This as
+	"vectorisation" has been removed from all other parts of gformat.
+
+	Copied the sub-function from gf_artsxml, as doing the same thing
+	but handles more forms of data.
+
+	* gformat/gf_artsxml.m: Now using griddedfield2gf. This to avoid
+	having duplicated code. That is, the sub-function is removed
+	(rather moved to griddedfield2gf).
+
+	* gformat/griddedfield2gf.m:
+	* gformat/gf2griddedfield.m:
+	* gformat/gf_set_grid.m:
+	* gformat/gf_set_fields.m:
+	* gformat/gf_set_data.m:
+	* gformat/gf_save.m:
+	* gformat/gf_load.m:
+	* gformat/gf_get_grid.m:
+	* gformat/gf_empty.m:
+	* gformat/atmdata_scalar.m:
+	* gformat/atmdata_empty.m (atmdata_empty): Removed %&% and
+	replaced with STRICT_ASSERT.
+
+	* gformat/gf_get_grid.m: Corrected format line in header.
+
+	* gformat/isatmdata.m: Fixed some types in header text. Also
+	some reformatting.
+
+2014-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-2-6
 
 	* arts/scenegen/asg_use_v2.m: Removed. Folder for V2 still empty!

@@ -3,23 +3,27 @@
 %    Converts data having the G format into data having the arts xml 
 %    GriddedField format to use with e.g. xmlStore.
 %
-% FORMAT   GF = gf2griddedfield( G )
+% FORMAT  [GF,type] = gf2griddedfield( G )
 %        
 % OUT   GF      GriddedField
+%       type    String diescribing the type.
 % IN    file    GFormat struckt
 
 % 2011-02-08   Created by Ole Martin Christensen.
 
-function [GF type] = gf2griddedfield(G)
-                                                                   %&%
-rqre_nargin( 1, nargin );                                          %&%
-%                                                                  %&%
-if ~isgformat(G)                                                   %&%
-  error('Input data must be a GFormat structure');                 %&%
-end                                                                %&%
-if G.DIM < 1 || G.DIM > 4                                          %&%
-  error('Input data must have atleast one and maximum four dimensions') %&%
-end                                                                %&%
+function [GF,type] = gf2griddedfield(G)
+
+if atmlab('STRICT_ASSERT')
+  rqre_nargin( 1, nargin );
+  %
+  if ~isgformat(G)
+    error('Input data must be a GFormat structure');
+  end
+  if G.DIM < 1 || G.DIM > 4
+    error('Input data must have atleast one and maximum four dimensions')
+  end
+end
+
 
 GF.name  = G.NAME;
 GF.data  = G.DATA;
@@ -31,4 +35,4 @@ for i = 1:G.DIM
 end
 type = ['GriddedField', num2str(G.DIM)];
 
-return
+

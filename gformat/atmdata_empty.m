@@ -22,13 +22,17 @@ function G = atmdata_empty( dim )
 if nargin < 1  |  isempty(dim)
   dim = 0;
 end
-                                                                %&%
-rqre_alltypes( dim, {@istensor0,@iswhole} );                    %&%
-rqre_in_range( dim, 0, 5 );                                     %&%
-
-
+ 
 G           = gf_empty( dim );
 G.TYPE      = 'atmdata';
+
+% If dim iswhole etc. is checked by gf_empty, but we need to check:
+if atmlab('STRICT_ASSERT') & ( dim<0 | dim>5 )
+  error( 'Input argument must be between 0 and 5.' );
+end
+
+
+
 
 % Any changes here must be described in header of *isatmdata* !!!
   
