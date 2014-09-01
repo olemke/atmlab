@@ -1,3 +1,7 @@
+2014-09-01  Ole Martin Christensen  <olem@chalmers.se>
+
+	* retrieval/oem.m: Added the possibility of outputting gamma to X.
+
 2014-08-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-2-8
