@@ -1,3 +1,12 @@
+2014-09-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-10
+
+	* retrieval/mci_max.m: New. A simple version of *mci* that finds
+	the case having highest a posterior probability.
+
+	* scattering/tmatrix.m: Small typo in header text.
+
 2014-09-01  Ole Martin Christensen  <olem@chalmers.se>
 
 	* retrieval/oem.m: Added the possibility of outputting gamma to X.
