@@ -5,7 +5,7 @@
 %
 % FORMAT   qp2_make_pdf( [clean_files] )
 %
-% OPT   clean_files   Flag to delete unnecessary files
+% OPT   clean_files   Flag to delete unnecessary files. Default is false.
 
 % 2009-08-10   Created by Patrick Eriksson.
 
@@ -16,7 +16,7 @@ function qp2_make_pdf(clean_files)
 wd = pwd;
 %
 if ~strcmp( wd(end+(-5:0)), 'qpack2' )
-  error( 'This function must be exucuted from the qpack2 sub-folder.' );
+  error( 'This function must be executed from the qpack2 sub-folder.' );
 end
 
 

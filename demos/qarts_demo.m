@@ -66,7 +66,7 @@ Q.MAG_V_FIELD           = [];
 Q.MAG_W_FIELD           = [];
 %
 Q.REFELLIPSOID          = ellipsoidmodels( 'SphericalEarth' );
-Q.Z_SURFACE             = 500;
+Q.Z_SURFACE             = { 'Arts2{', 'Extract( z_surface, z_field, 0 )', '}' };
 
 
 %= To enforce detailed hydrostatic equilibrium 

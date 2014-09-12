@@ -1,9 +1,39 @@
-% Work in progress !!!!
+% QARTS_MCDOIT_DEMO
+%
+%   A demenstration / test of setting up MC and DOIT 
+%
+%   A satellite measurement is simulated, from 830 km and a zenith angle of
+%   135 deg.
+%
+%   The frequency is set to 89 GHz. Cloud extends between zcloud +- 1km. 
+%   Particles are set to be (solid) ice spheres, all with the same 
+%   size (*dpart*).
+% 
+%   The surface reflectivi matrix is set to:
+%     rsurf*[  1  0.1 0 0 
+%             0.1  1  0 0   
+%              0   0  1 0   
+%              0   0  0 1 ]
+%
+% FORMAT [y0,yd,ym,ymerror] = qarts_mcdoit_demo( [mcprec,iwp,dpart,rsurf] )
+%
+% OUT   y0        Clear-sky brightness temperature [K]
+%       yd        DOIT result
+%       ym        MC result
+%       ymerror   Error estimate for *ym*
+% OPT   mcprec    MC target precision. Default is 1 K
+%       zcloud    Centre altitude of cloud. Default is 4 km, that is also
+%                 lowest allowed value
+%       iwp       IWP. Default is 0.5 kg/m2
+%       dpart     Particle diameter. Default is 1 mm
+%       rsurf     Surface reflectivity. Default is 0.1
 
 function [y0,yd,ym,ymerror] = qarts_mcdoit_demo( varargin )
 %
-[mcprec,iwp,dpart,rsurf] = optargs( varargin, { 1, 0.5, 1e-3, 0.1 } );
-
+[mcprec,iwp,zcloud,dpart,rsurf] = optargs( varargin, ...
+                                                 { 1, 0.5, 4e3, 1e-3, 0.1 } );
+%
+if zcloud<4e3, error( '*zcloud must be >= 4 km.' ); end
 
 
 %= Create a temporary workfolder
@@ -56,7 +86,7 @@ Q.ABS_SPECIES(3).TAG{1} = 'O2-PWR93';
 %
 Q.ATMOSPHERE_DIM      = 1;
 %
-Q.P_GRID              = z2p_simple( [-200:200:10e3 11e3:1e3:25e3] )';
+Q.P_GRID              = z2p_simple( [0:200:10e3 11e3:1e3:25e3] )';
 %
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )
@@ -71,7 +101,7 @@ Q.RAW_ATM_EXPAND_1D   = false;
 %= Surface
 %
 Q.REFELLIPSOID        = ellipsoidmodels( 'SphericalEarth' );
-Q.Z_SURFACE           = 0;
+Q.Z_SURFACE           = text2cfile( 'Extract( z_surface, z_field, 0 )' );
 %
 R        = zeros( 1, Q.STOKES_DIM, Q.STOKES_DIM ); 
 R(1,:,:) = rsurf*eye( Q.STOKES_DIM );
@@ -84,10 +114,9 @@ xmlStore( fname, R, 'Tensor3' );
 Q.WSMS_AT_START{end+1} = sprintf('ReadXML(surface_reflectivity,"%s")',fname);
 %
 Q.SURFACE_RTPROP_AGENDA{1} = 'specular_losCalc';
-Q.SURFACE_RTPROP_AGENDA{2} = 'InterpAtmFieldToRtePos(surface_skin_t,';
-Q.SURFACE_RTPROP_AGENDA{3} = '  atmosphere_dim, p_grid, lat_grid,';
-Q.SURFACE_RTPROP_AGENDA{4} = '  lon_grid, z_field, rtp_pos, t_field )';
-Q.SURFACE_RTPROP_AGENDA{5} = 'surfaceFlatReflectivity';
+Q.SURFACE_RTPROP_AGENDA{2} = 'InterpAtmFieldToPosition( out=surface_skin_t';
+Q.SURFACE_RTPROP_AGENDA{3} = '  , field=t_field )';
+Q.SURFACE_RTPROP_AGENDA{4} = 'surfaceFlatReflectivity';
 
 
 %= Create an absorption table
@@ -107,12 +136,14 @@ Q.YCALC_WSMS          = { 'yCalc' };
 Q.PPATH_LMAX          = 5e3/max([1,iwp/0.5]);
 %
 Q.SENSOR_POS          = 830e3;
-Q.SENSOR_LOS          = 145;
+Q.SENSOR_LOS          = 135;
 
 
 % Calculate clearsky
 %
 y0 = arts_y( Q, workfolder );
+%
+if nargout < 2, return, end
 
 
 %= Setting structure for cloudbox and scattering solution method
@@ -121,7 +152,7 @@ C               = qartsCloudbox;
 
 %- Define 1D cloudbox and particles
 
-C.LIMITS = [ 1e3 6e3 ];
+C.LIMITS = [ -1e3 zcloud+2e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
@@ -140,11 +171,11 @@ for i = 1 : length(T_grid)     % Note .' below. We do not want to conjugate
 end
 
 % Scattering angles
-theta = 0:10:180;
+theta = 0:2:180;
 % Particle size [m]
 r = dpart/2;
 % cloud altitude
-alt = [3e3 5e3];
+alt = zcloud + [-1e3 1e3];
 
 % Calculate scattering data using Mie
 C.SCAT_DATA{1} = mie_arts_scat_data( fgrid,  T_grid, rfr_index, theta, r );
@@ -161,8 +192,9 @@ Q.WSMS_BEFORE_RTE{1}            = 'StringSet(iy_unit,"RJBT")';
 % Angular grids
 C.METHOD_PRMTRS.N_ZA_GRID       =  19;
 C.METHOD_PRMTRS.N_AA_GRID       =  10;
-C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile( atmlab_example_data, ...
-                                                         'doit_za_grid.xml');
+C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = '';
+%C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile( atmlab_example_data, ...
+%                                                         'doit_za_grid.xml');
 C.METHOD_PRMTRS.EPSILON         = [ 0.1 0.01 0.01 0.01 ];
 C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
 C.METHOD_PRMTRS.ALL_F           = false;
@@ -181,7 +213,9 @@ Q.CLOUDBOX    = C;
 %= DOIT
 %
 yd = arts_y( Q, workfolder );
-
+%
+if nargout < 3, return, end
+  
 
 %= Expand to 3D
 %
@@ -191,8 +225,6 @@ Q.ATMOSPHERE_DIM                = 3;
 Q.RAW_ATM_EXPAND_1D             = true;
 Q.LAT_GRID                      = latlon_grid;
 Q.LON_GRID                      = latlon_grid;
-Q.Z_SURFACE                     = repmat( Q.Z_SURFACE, length(latlon_grid),...
-                                                       length(latlon_grid) );
 %
 C.LIMITS                        = [ C.LIMITS [-50 50 -50 50] ];
 C.PND_FIELD{1}.grids{2}         = [ -90 -50 -40 40 50 90 ];

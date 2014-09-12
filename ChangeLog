@@ -1,3 +1,41 @@
+2014-09-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-11
+
+	* demos/qarts_mcdoit_demo.m: Updated, improved and header written.
+
+	* arts/text2cfile.m: A help function for simpler usage of the new
+	feature below.
+
+	* demos/qarts_demo.m: Q.Z_SURFACE now set using new feature below.
+
+	* arts/qarts2cfile.m: Added features allowing Q fields matching
+	WSV to be include cfile text.
+
+	* arts/qarts.m: Updated with respect to extension above.
+
+	* retrieval/qpack2/qp2_y.m: Some type fixes.
+
+	* documentation/qarts/qarts.txt: A very basic qarts user guide. So
+	far just ascii.
+
+	* retrievals/ismar: Started this folder.
+	* retrievals/ismar/general: General stuff goes here, such as
+	calculating IWC on database cases.
+	* retrievals/ismar/hamburg: Scripts used in Hamburg to create
+	retrievalal databases.
+	* retrievals/ismar/chalmers: Scripts used at Chalmers to create
+	retrievalal databases.
+
+	* documentation/ismar: Started this folder, to hold documentation
+	around ISMAR database format and associated retrievals.
+
+	* documentation/qpack2: Moved everyting around
+	qpack2.tex to this new folder.
+
+	* documentation/collocations: Moved everyting around
+	collocations.tex to this new folder.
+
 2014-09-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-2-10
