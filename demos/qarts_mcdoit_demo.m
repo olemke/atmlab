@@ -5,7 +5,7 @@
 %   A satellite measurement is simulated, from 830 km and a zenith angle of
 %   135 deg.
 %
-%   The frequency is set to 89 GHz. Cloud extends between zcloud +- 1km. 
+%   The frequency is set by the user. Cloud extends between zcloud +- 1km. 
 %   Particles are set to be (solid) ice spheres, all with the same 
 %   size (*dpart*).
 % 
@@ -15,25 +15,49 @@
 %              0   0  1 0   
 %              0   0  0 1 ]
 %
-% FORMAT [y0,yd,ym,ymerror] = qarts_mcdoit_demo( [mcprec,iwp,dpart,rsurf] )
+% FORMAT [y0,yd,ym,ymerror] = qarts_mcdoit_demo( 
+%                                    [CMdu,CMmu,iwp,zcloud,freq,dpart,rsurf] )
 %
-% OUT   y0        Clear-sky brightness temperature [K]
-%       yd        DOIT result
-%       ym        MC result
-%       ymerror   Error estimate for *ym*
-% OPT   mcprec    MC target precision. Default is 1 K
-%       zcloud    Centre altitude of cloud. Default is 4 km, that is also
-%                 lowest allowed value
-%       iwp       IWP. Default is 0.5 kg/m2
-%       dpart     Particle diameter. Default is 1 mm
-%       rsurf     Surface reflectivity. Default is 0.1
+% OUT   y0           Clear-sky brightness temperature [K]
+%       yd           DOIT result
+%       ym           MC result
+%       ymerror      Error estimate for *ym*
+% OPT   CMdu         User DOIT settings for C.METHOD_PRMTRS. To see defaults
+%                    look into the function, the defaulrs are set a few
+%                    lines this text. CMd is the variable to check out.
+%       CMdm         As above but refers to MC.
+%       iwp          IWP. Default is 0.5 kg/m2
+%       zcloud       Centre altitude of cloud. Default is 4 km.
+%       freq         Frequency. Default is 89 GHz
+%       dpart        Particle diameter. Default is 1 mm
+%       rsurf        Surface reflectivity. Default is 0.1
 
 function [y0,yd,ym,ymerror] = qarts_mcdoit_demo( varargin )
 %
-[mcprec,iwp,zcloud,dpart,rsurf] = optargs( varargin, ...
-                                                 { 1, 0.5, 4e3, 1e-3, 0.1 } );
+% Defaults for DOIT and MC
+CMd.N_ZA_GRID            =  19;
+CMd.N_AA_GRID            =  10;
+CMd.ZA_GRID_OPT_FILE     = '';
+CMd.EPSILON              = [ 0.1 0.01 0.01 0.01 ];
+CMd.SCAT_ZA_INTERP       = 'polynomial';
+CMd.ALL_F                = true;
+CMd.NORMALIZE            = true;
+CMd.NORM_ERROR_THRESHOLD = 0.5;
 %
-if zcloud<4e3, error( '*zcloud must be >= 4 km.' ); end
+CMm.STD_ERR              = 1;
+CMm.MAX_TIME             = 20;
+CMm.MAX_ITER             = -1;
+CMm.MIN_ITER             = 100;
+%
+[CMdu,CMmu,iwp,zcloud,freq,dpart,rsurf] = optargs( varargin, ...
+                                       { [], [], 0.5, 4e3, 89e9, 1e-3, 0.1 } );
+%
+if zcloud<2e3, error( '*zcloud must be >= 2 km.' ); end
+
+% Move settings in CMdu and CMmu to Cmd and CMm,respectively
+%
+CMd = optargs_struct( CMdu, CMd );
+CMm = optargs_struct( CMmu, CMm );
 
 
 %= Create a temporary workfolder
@@ -74,7 +98,7 @@ Q.WSMS_AT_START{6} = ...
 
 %= General part
 %
-Q.F_GRID            = 89e9;
+Q.F_GRID            = freq;
 Q.STOKES_DIM        = 4;
 %
 Q.ABS_SPECIES(1).TAG{1} = 'H2O-PWR98';
@@ -156,7 +180,7 @@ C.LIMITS = [ -1e3 zcloud+2e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
-T_grid = [240 270];   % MC does not accept a single temperature!
+T_grid = [200 235 270];   % MC does not accept a single temperature!
 
 
 % Create scattering properties for a simple cloud assumption
@@ -186,19 +210,12 @@ C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, iwp/diff(alt), r );
 % Set up scattering method
 %
 C.METHOD                        = 'DOIT';
+C.METHOD_PRMTRS                 = CMd;
+
 % Need a trick here for setting RJ
 Q.IY_UNIT                       = '1';
 Q.WSMS_BEFORE_RTE{1}            = 'StringSet(iy_unit,"RJBT")';  
-% Angular grids
-C.METHOD_PRMTRS.N_ZA_GRID       =  19;
-C.METHOD_PRMTRS.N_AA_GRID       =  10;
-C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = '';
-%C.METHOD_PRMTRS.ZA_GRID_OPT_FILE = fullfile( atmlab_example_data, ...
-%                                                         'doit_za_grid.xml');
-C.METHOD_PRMTRS.EPSILON         = [ 0.1 0.01 0.01 0.01 ];
-C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
-C.METHOD_PRMTRS.ALL_F           = false;
-%
+
 C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
                                                          'abs_vecAddPart' };
 C.SPT_CALC_AGENDA = { 'opt_prop_sptFromMonoData' };
@@ -243,11 +260,7 @@ Q.SENSOR_LOS(:,2)               = 0;
 %- Change settings to fit MC
 %
 C.METHOD                        = 'MC';
-%
-C.METHOD_PRMTRS.STD_ERR         = mcprec;
-C.METHOD_PRMTRS.MAX_TIME        = -1;
-C.METHOD_PRMTRS.MAX_ITER        = -1;
-C.METHOD_PRMTRS.MIN_ITER        = 100;
+C.METHOD_PRMTRS                 = CMm;
 %
 Q.CLOUDBOX                      = C;
 Q.IY_MAIN_AGENDA                = { 'Ignore( rte_pos2 )', 'iyMC', ...

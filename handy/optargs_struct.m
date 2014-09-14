@@ -36,6 +36,12 @@ function out = optargs_struct(userin, defaults, varargin)
 
 recurse = optargs(varargin, {true});
 
+% If userin empty, out is simply set to default
+if isempty(userin)
+  out = defaults;
+  return;
+end
+  
 out = defaults;
 fields_userin = fieldnames(userin);
 for i = 1:length(fields_userin)
