@@ -30,6 +30,7 @@
 %      cost_x    : Cost corresponding to the state vector.
 %      dx        : Change in the state vector x between each iteration.
 %                  A normalisation to the length of x is applied.
+%      ga        : The Marquardt-Levenberg parameter for each iteration.
 %      e         : Total retrieval error (square root of diagonal elements 
 %                  of S).
 %      eo        : Observation error (square root of diagonal elements of So).
@@ -145,6 +146,11 @@ I.ex = [ ...
 O.G = false;
 I.G = [ ...
 'Flag to include gain matrix in X (alse denoted as Dy).'
+];
+%-----------------------------------------------------------------------------
+O.ga = false;
+I.ga = [ ...
+'Flag to include Marquardt-Levenberg parameter in X. Default is 0.'    
 ];
 %-----------------------------------------------------------------------------
 O.ga_factor_not_ok = 3;
@@ -636,6 +642,7 @@ end
             X.cost(iter)   = cost;
             X.cost_y(iter) = cost_y;
             X.cost_x(iter) = cost_x;
+            X.ga(iter) = NaN;
           end
           first_iter = 0;
         else
@@ -702,6 +709,7 @@ end
               X.cost(iter)   = cost;
               X.cost_y(iter) = cost_y;
               X.cost_x(iter) = cost_x;
+              X.ga(iter) = ga;       
             end
             if O.Xiter
               X.Xiter(:,iter) = xnew;
@@ -796,6 +804,8 @@ end
     X = calc_cost_for_X( y, yf, Seinv, xa, x, Sxinv, O, xnorm, X, iter );
     nlinprint( O.outfids, iter, ga, X.cost(iter), X.cost_x(iter), ...
                                                   X.cost_y(iter), dx );
+                                              
+    X.ga(iter) = ga;
   end
 
   if O.yf

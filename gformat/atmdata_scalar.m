@@ -21,7 +21,9 @@
 
 function G = atmdata_scalar( value )
 
-rqre_datatype( value, @istensor0 );
+if atmlab('STRICT_ASSERT'), 
+  rqre_datatype( value, @istensor0 );
+end
   
 G = atmdata_empty( 0 );
 

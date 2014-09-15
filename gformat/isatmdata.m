@@ -5,7 +5,7 @@
 %   hour. That is, up to five dimensions can be used.
 %
 %   Three options exist for the day dimension:
-%      'mjd'     : Modified julian data.
+%      'mjd'     : Modified julian date.
 %      'doy'     : Day of the year. Valid range is [1,367[. See also *mjd2doy*.
 %      'datenum' : Matlab's datenum (with default pivot year).
 %
@@ -13,16 +13,21 @@
 %   (solar) time.
 %
 %   The identification of atmdata is performed by checking the TYPE field and
-%   grid names. These fields of G must be set as follows: TYPE = 'atmdata',
-%   GRID1_NAME = 'pressure', GRID2_NAME = 'latitude', GRID3_NAME =longitude',
-%   GRID4_NAME = 'doy', 'mjd' or 'datenum', and GRID5_NAME = 'hour'. Only used
-%   grids are checked (determined by G(i).DIM). No distinction is made between
-%   lower- and upper-case letters.
+%   grid names. These fields of G must be set as follows: 
+%     TYPE = 'atmdata'
+%     GRID1_NAME = 'pressure'
+%     GRID2_NAME = 'latitude'
+%     GRID3_NAME = 'longitude'
+%     GRID4_NAME = 'doy', 'mjd' or 'datenum'
+%     GRID5_NAME = 'hour'. 
+  
+%   Only used grids are checked (determined by G(i).DIM). No distinction is 
+%   made between lower- and upper-case letters.
 %
 %   There is NO check of actual data beside the grid names.
 %
 %   Functions specific for atmdata are named as atmdata_xxx. MJD is expected
-%   when these functions have 'day' as input.
+%   when the input of these functions include any date.
 %
 % FORMAT   b = isatmdata( G )
 %        

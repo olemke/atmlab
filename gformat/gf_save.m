@@ -10,10 +10,12 @@
 % 2010-01-07   Created by Patrick Eriksson.
 
 function gf_save( G, file )
-                                                                   %&%
-rqre_nargin( 2, nargin );                                          %&%
-rqre_datatype( G, @isgformat );                                    %&%
-rqre_datatype( file, @ischar );                                    %&%
+
+if atmlab('STRICT_ASSERT')
+  rqre_nargin( 2, nargin );
+  rqre_datatype( G, @isgformat );
+  rqre_datatype( file, @ischar );
+end
 
 if nversion>=7.03
     save( file, 'G' ,'-v7.3');

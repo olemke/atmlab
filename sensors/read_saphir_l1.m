@@ -2,7 +2,7 @@ function saphirL1=read_saphir_l1(filename,selected_entries, mode)
 % function read_saphir_l1: reads HDF5 files with SAPHIR leve1 1 data and
 % provides a structure containing the useful L1 data and attributes
 %
-% call: dataL1 = read_saphir(L1(filename,[selected_entries, mode])
+% call: dataL1 = read_saphir_l1(filename,[selected_entries, mode])
 %
 % filename is the name of the hdf5 file or a gzipped version thereof
 % desired_entries is optional if you do not want to extract all variables
@@ -14,7 +14,7 @@ function saphirL1=read_saphir_l1(filename,selected_entries, mode)
 %
 % 'mode' can be 'l1a1' or 'l1a2'.
 
-% $Id: read_saphir_l1.m 8552 2013-08-01 11:18:11Z gerrit $
+% $Id$
 
 errorid = 'Function read_saphir_l1:';
 
@@ -125,6 +125,7 @@ end
 %Begin MMILZ
 % read version from info and adjust h5member names (Latitude_pixels -> Latitude_Pixels
 % (1.05->1.06))
+info=h5info(filename); %Call necessary to enable the following tastks
 natt=length(info.Groups.Attributes);
 for iat=1:natt
     if strcmp(info.Groups.Attributes(iat).Name,'Product_Identification')
@@ -142,6 +143,19 @@ clear iat;
 clear fname;
 clear vers;
 %END MMILZ
+
+% Begin MMILZ 20140730
+% Catch the change in Variable naming Icidence_angle -->
+% IncidenceAngle_Pixels and adapt the fieldnames in
+ndatasets=length(info.Groups.Datasets);
+for idatas=1:ndatasets
+    if strcmp(info.Groups.Datasets(idatas).Name,'IncidenceAngle_Pixels')
+        h5member = strrep(h5member, 'Incidence_Angle', 'IncidenceAngle_Pixels');
+    end
+end
+clear ndatasets;
+clear idatas;
+%%MM %END MMILZ 20140730
 
 
 for ie=1:length(useentries)

@@ -44,105 +44,10 @@ end
 %
 X = xmlLoad( file );
 %
-if strictAssert    
-  rqre_datatype( X, @isstruct, 'Data in *file*' );
-  rqre_field( X, {'name','grids','gridnames','data','dataname'}, ... 
-                                                      'Data in *file*' );
-end
-
-%- X is a struct array, not a cell array. The case length(X)==1 must then
-%- be handled separately
+G = griddedfield2gf( X, name, type );
 %
-G = [];
-%
-if length(X) == 1
-    G = gfin_artsxml_sub( G, file, X, name, type );
-else
-    for i = 1 : length(X)
-        G = gfin_artsxml_sub( G, file, X{i}, name, type );
-    end
-end
-
-
+G.SOURCE = file;
+ 
 return
 %-----------------------------------------------------------------------
 
-function G = gfin_artsxml_sub( G, file, X, name, type )
-
-%- Add user provided data (using some "false" fields)
-%
-if ~isempty( name )
-  X.name = name;
-end
-%
-if isempty( type )
-  T.TYPE       = 'unknown';
-  T.gridnames  = { [], [], [], [], [], [], [], [] };
-  T.GRIDUNITS  = { [], [], [], [], [], [], [], [] };
-  T.dataname   = [];
-  T.DATAUNIT   = [];
-elseif strcmpi( type, 'vmr_field' )
-  T.TYPE       = 'atmdata';
-  T.gridnames  = { 'Pressure', 'Latitude', 'Longitude', [], 'Hour' };
-  T.GRIDUNITS  = { 'Pa', 'deg', 'deg', '', '' };
-  T.dataname   = 'Volume mixing ratio';
-  T.DATAUNIT   = '-';
-elseif strcmpi( type, 't_field' )
-  T.TYPE       = 'atmdata';
-  T.gridnames  = { 'Pressure', 'Latitude', 'Longitude', [], 'Hour' };
-  T.GRIDUNITS  = { 'Pa', 'deg', 'deg', '', '' };
-  T.dataname   = 'Temperature';
-  T.DATAUNIT   = 'K';
-elseif strcmpi( type, 'z_field' )
-  T.TYPE       = 'atmdata';
-  T.gridnames  = { 'Pressure', 'Latitude', 'Longitude', [], 'Hour' };
-  T.GRIDUNITS  = { 'Pa', 'deg', 'deg', '', '' };
-  T.dataname   = 'Altitude';
-  T.DATAUNIT   = 'm';
-elseif strcmpi( type, 'mag_field' )
-  T.TYPE       = 'atmdata';
-  T.gridnames  = { 'Pressure', 'Latitude', 'Longitude', [], 'Hour' };
-  T.GRIDUNITS  = { 'Pa', 'deg', 'deg', '', '' };
-  T.dataname   = 'a magnetic component';
-  T.DATAUNIT   = 'T';
-elseif strcmpi( type, 'wind_field' )
-  T.TYPE       = 'atmdata';
-  T.gridnames  = { 'Pressure', 'Latitude', 'Longitude', [], 'Hour' };
-  T.GRIDUNITS  = { 'Pa', 'deg', 'deg', '', '' };
-  T.dataname   = 'A wind component';
-  T.DATAUNIT   = 'm/s';
-else 
-  error( ['atmlab:' mfilename], ' Unknown selection for *type*.' ); 
-end
-
-%- Transfer to G (set only up to max "active" dimension)
-%
-GG.TYPE      = T.TYPE;
-GG.NAME      = X.name;
-GG.SOURCE    = file;
-%
-GG.DIM       = max( find( size(X.data) > 1 ) );
-GG.DATA      = X.data;
-if isempty( X.dataname )
-  GG.DATA_NAME = T.dataname;
-else
-  GG.DATA_NAME = X.dataname;
-end
-GG.DATA_UNIT = T.DATAUNIT;
-%
-for d = 1 : GG.DIM
-  if length(X.gridnames) < d  ||  isempty( X.gridnames{d} )
-    GG = gf_set_grid( GG, d, vec2col(X.grids{d}), ...
-                      T.gridnames{d}, T.GRIDUNITS{d} );
-  else    
-    GG = gf_set_grid( GG, d, vec2col(X.grids{d}), ...
-                      X.gridnames{d}, T.GRIDUNITS{d} );
-  end
-end
-%
-if isempty( G )
-  G         = GG;
-else
-  G(end+1) = GG;
-end
-return

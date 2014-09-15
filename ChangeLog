@@ -1,3 +1,188 @@
+2014-09-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-12
+
+	* demos/qarts_mcdoit_demo.m: Added frequency as input argument, as
+	well as giving full control of DOIT and MC METHOD_PRMTRS settings.
+
+	* handy/optargs_struct.m: The case of userin=[] now handled.
+	Output is then simply the defaults.
+
+	* arts/qarts2cfile.m (cfile_SctMth): Added handling of the new
+	fields mentuioned below.
+
+	* arts/qartsCloudbox.m (qartsCloudbox): Added NORMALIZE and
+	NORM_ERROR_THRESHOLD.
+
+2014-09-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-11
+
+	* demos/qarts_mcdoit_demo.m: Updated, improved and header written.
+
+	* arts/text2cfile.m: A help function for simpler usage of the new
+	feature below.
+
+	* demos/qarts_demo.m: Q.Z_SURFACE now set using new feature below.
+
+	* arts/qarts2cfile.m: Added features allowing Q fields matching
+	WSV to be include cfile text.
+
+	* arts/qarts.m: Updated with respect to extension above.
+
+	* retrieval/qpack2/qp2_y.m: Some type fixes.
+
+	* documentation/qarts/qarts.txt: A very basic qarts user guide. So
+	far just ascii.
+
+	* retrievals/ismar: Started this folder.
+	* retrievals/ismar/general: General stuff goes here, such as
+	calculating IWC on database cases.
+	* retrievals/ismar/hamburg: Scripts used in Hamburg to create
+	retrievalal databases.
+	* retrievals/ismar/chalmers: Scripts used at Chalmers to create
+	retrievalal databases.
+
+	* documentation/ismar: Started this folder, to hold documentation
+	around ISMAR database format and associated retrievals.
+
+	* documentation/qpack2: Moved everyting around
+	qpack2.tex to this new folder.
+
+	* documentation/collocations: Moved everyting around
+	collocations.tex to this new folder.
+
+2014-09-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-10
+
+	* retrieval/mci_max.m: New. A simple version of *mci* that finds
+	the case having highest a posterior probability.
+
+	* scattering/tmatrix.m: Small typo in header text.
+
+2014-09-01  Ole Martin Christensen  <olem@chalmers.se>
+
+	* retrieval/oem.m: Added the possibility of outputting gamma to X.
+
+2014-08-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-8
+
+	* handy/folder_of_fun.m: New.
+
+2014-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-7
+
+	* A revision of the gformat related function. The only real change
+	is described in the two first bullets below.
+
+	* gformat/griddedfield2gf.m: Now only handling single G and GF.
+	All other code removed (not sure if it worked). This as
+	"vectorisation" has been removed from all other parts of gformat.
+
+	Copied the sub-function from gf_artsxml, as doing the same thing
+	but handles more forms of data.
+
+	* gformat/gf_artsxml.m: Now using griddedfield2gf. This to avoid
+	having duplicated code. That is, the sub-function is removed
+	(rather moved to griddedfield2gf).
+
+	* gformat/griddedfield2gf.m:
+	* gformat/gf2griddedfield.m:
+	* gformat/gf_set_grid.m:
+	* gformat/gf_set_fields.m:
+	* gformat/gf_set_data.m:
+	* gformat/gf_save.m:
+	* gformat/gf_load.m:
+	* gformat/gf_get_grid.m:
+	* gformat/gf_empty.m:
+	* gformat/atmdata_scalar.m:
+	* gformat/atmdata_empty.m (atmdata_empty): Removed %&% and
+	replaced with STRICT_ASSERT.
+
+	* gformat/gf_get_grid.m: Corrected format line in header.
+
+	* gformat/isatmdata.m: Fixed some types in header text. Also
+	some reformatting.
+
+2014-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-6
+
+	* arts/scenegen/asg_use_v2.m: Removed. Folder for V2 still empty!
+
+	* arts/scenegen2: Folder removed.
+
+2014-07-30  Mathias Milz  <mathias.milz@ltu.se>
+
+	* atmlav-2-2-5
+
+	* sensors/read_saphir_l1.m
+	  fixed the issue with changing Variable names within V1.06 
+	  Now the different Incidence_Angle Variable decriptions are both 
+	  possible 
+	  the  small bug call hdf5info was inverted as some other calls need 
+	  it but inreoduced another call to enable the reading of nionzipped 
+	  files which need the call.
+          info=h5info(filename);
+
+2014-07-14  Jana Mendrok  <jana.mendrok@ltu.se>
+
+	* atmlab-2-2-4
+
+	* h2o/parametrisations/n_ice_zhang01.m:
+	Complex refractive index according to Zhang et al, 2001.
+
+	* h2o/parametrisations/eps_ice_Jiang_04.m, eps_ice_liebe93.m,
+	n_ice_warren84.m: Fixed documentation.
+
+2014-07-14  Maryam Jamali  <maryamj@student.chalmers.se>
+
+	* atmlab-2-2-3 
+
+	* h2o/parametrisations/eps_ice_Jiang_04.m:
+	Provides the complex dielectric constant following the Jiang 2004 paper.
+	
+2014-06-23  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-2-2
+
+	* math/binning_fast.m: Generalizing even more: Now you can pass
+	the argument in.counts = true, if you only want the number of hits
+	(numel) per grid, and don't want to actually grid any data. This
+	is much faster than binning the data and then getting the numel
+	from binned_statitics.m as before
+
+
+2014-06-19  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-2-1
+
+	* datasets/define_datasets.m: Added missing value definintion to some datasets
+
+	* geoplots/gmt/gmt_plot.m: Prepend "gmtfile_" to default filename
+	when using in.header to build filename
+
+	* handy/PersistentCachedData.m: Puny change in output text
+
+	* handy/combine_pdfs.m: No longer allow an empty title to be used as a filename
+
+	* math/binned_statistics.m: Fixed documentation
+
+	* math/binning_fast.m:
+
+	- Updated function to be general for most puposes and not just for
+	geographical data as the previous version.
+
+	- The function is still completey backward compatible but now one
+	can grid 'Z' with the coorinates 'X' and 'Y' into a grid with the
+	centers defined by 'newX' and 'newY'.
+
+	- If you data 'X','Y','Z' is used instead of 'data','lat','lon',
+	no geographical sanitity checks are performed
+
 2014-06-06  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-2-0

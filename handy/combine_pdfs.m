@@ -104,7 +104,7 @@ default.cols        = 2;
 default.vspace      = 1;
 default.hspace      = 1;
 default.valign      = 'm';
-if isfield(options,'title')
+if isfield(options,'title') && ~isempty(options.title)
     default.filename = [sanitise(options.title),'.pdf'];
 else
     default.filename = 'out.pdf';

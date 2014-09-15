@@ -13,8 +13,8 @@
 % FORMAT    e = eps_ice_liebe93( f, t )
 %        
 % OUT   e   Complex dielectric constant
-% IN    f   Frequency
-%       t   Temperature
+% IN    f   Frequency [Hz]
+%       t   Temperature [K]
 
 % 2004-10-22   Created by Patrick Eriksson
 

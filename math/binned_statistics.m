@@ -7,7 +7,7 @@ function out = binned_statistics(data_bins, statistics, filter, replace, opt)
 % cell of data_bins. Optionally, a filter function can be passed which is
 % applied to the binned data.
 %
-% FORMAT   out = binned_statistics(data_bins, statistics, filter)
+% FORMAT   out = binned_statistics(data_bins, statistics, filter, replace, opt)
 %
 % OUT   out          Structure containing the results for each applied
 %                    statistics function.

@@ -20,7 +20,7 @@
 %    
 %    The grids are common for all particles.
 %
-% FORMAT   D = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
+% FORMAT   [D,M] = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
 %                       pshape,ptype,pdiameter,aspect_ratio)
 %        
 % OUT   D            Array of ARTS single scattering data

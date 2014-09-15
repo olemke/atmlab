@@ -13,18 +13,20 @@
 
 function G = gf_empty( dim )
 %
-errid=['atmlab:' mfilename, ':badInput'];
-
 if nargin < 1  ||  isempty(dim)
   dim = 0;
 end
 
-%rqre_alltypes( dim, {@istensor0,@iswhole} );                    %&%
-%rqre_in_range( dim, 0 );                                        %&%
+if atmlab('STRICT_ASSERT')
+  errid=['atmlab:' mfilename, ':badInput'];
   
-% the following assertion is 1000x faster than the above checks
-assert( isnumeric(dim) && isscalar(dim) && all( dim - round(dim) == 0 ) && ...
+  %rqre_alltypes( dim, {@istensor0,@iswhole} );                    %&%
+  %rqre_in_range( dim, 0 );                                        %&%
+  
+  % the following assertion is 1000x faster than the above checks
+  assert( isnumeric(dim) && isscalar(dim) && all( dim - round(dim) == 0 ) && ...
         dim>=0, errid, '*dim* did not pass the test: @istensor0 && @iswhole')
+end
 
 G.TYPE      = 'basic';
 G.NAME      = [];

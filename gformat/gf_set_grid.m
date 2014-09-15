@@ -17,42 +17,33 @@
 function G = gf_set_grid( G, dim, grid, name, unit )
 
 if atmlab('STRICT_ASSERT')
-    rqre_nargin( 3, nargin );                                      %&%
-    rqre_datatype( G, @isstruct );                                  %&%
-    rqre_alltypes( dim, {@istensor0,@iswhole} );                    %&%
-    rqre_in_range( dim, 1 );                                        %&%
-    rqre_datatype( grid, {@isempty,@istensor1} );                   %&%
-    if nargin>=4
-        rqre_datatype( name, {@isempty,@ischar} );                  %&%
-    end
+  rqre_nargin( 3, nargin );
+  rqre_datatype( G, @isstruct );
+  rqre_alltypes( dim, {@istensor0,@iswhole} );
+  rqre_in_range( dim, 1 );
+  rqre_datatype( grid, {@isempty,@istensor1} );
+  if nargin>=4
+    rqre_datatype( name, {@isempty,@ischar} );
     if nargin>=5
-        rqre_datatype( unit, {@isempty,@ischar} );                %&%
+      rqre_datatype( unit, {@isempty,@ischar} );
     end
+  end
 end
 
 
 bname = sprintf( 'GRID%d', dim );
 
+
 for i = 1 : length(G)
     
-    G(i).(bname) = grid;
+  G(i).(bname) = grid;
     
-    if nargin >= 4
-        G(i).([bname,'_NAME']) = name;
-        if nargin >= 5
-            G(i).([bname,'_UNIT']) = unit;
-        end
+  if nargin >= 4
+    G(i).([bname,'_NAME']) = name;
+    if nargin >= 5
+      G(i).([bname,'_UNIT']) = unit;
     end
+  end
 end
 
-end
-
-
-% assert(isnumeric(dim) && isscalar(dim)...   %istensor0
-%     &&  all( dim - round(dim) == 0 )...       %iswhole (-isnumeric whis is already called and for n and not n(:))
-%     && dim>0 ...                                      %rqre_in_range( dim, 1 );
-%     ,errid,'*dim* did not pass the test: @istensor0 && @iswhole')
-
-% assert( isempty(grid) ||  (isnumeric(grid) && size(grid,1) >=1 && size(grid,2) == 1 && ndims(grid)==2)),...
-%     errid, '*grid* must pass the test @isempty || @istensor1')
 
