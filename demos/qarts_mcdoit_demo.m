@@ -31,6 +31,8 @@
 %       freq         Frequency. Default is 89 GHz
 %       dpart        Particle diameter. Default is 1 mm
 %       rsurf        Surface reflectivity. Default is 0.1
+%       p_grid       Pressure grid to use. Default is a grid with 200 m
+%                    spacing up to 15 km, above 1 km spacing.
 
 function [y0,yd,ym,ymerror] = qarts_mcdoit_demo( varargin )
 %
@@ -49,8 +51,9 @@ CMm.MAX_TIME             = 20;
 CMm.MAX_ITER             = -1;
 CMm.MIN_ITER             = 100;
 %
-[CMdu,CMmu,iwp,zcloud,freq,dpart,rsurf] = optargs( varargin, ...
-                                       { [], [], 0.5, 4e3, 89e9, 1e-3, 0.1 } );
+[CMdu,CMmu,iwp,zcloud,freq,dpart,rsurf,p_grid] = optargs( varargin, ...
+                              { [], [], 0.5, 4e3, 89e9, 1e-3, 0.1, ...
+                                z2p_simple( [0:200:15e3 16e3:1e3:25e3] )' } );
 %
 if zcloud<2e3, error( '*zcloud must be >= 2 km.' ); end
 
@@ -110,7 +113,7 @@ Q.ABS_SPECIES(3).TAG{1} = 'O2-PWR93';
 %
 Q.ATMOSPHERE_DIM      = 1;
 %
-Q.P_GRID              = z2p_simple( [0:200:10e3 11e3:1e3:25e3] )';
+Q.P_GRID              = p_grid;
 %
 arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
 if isnan( arts_xmldata_path )

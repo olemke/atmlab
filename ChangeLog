@@ -1,3 +1,17 @@
+2014-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-1
+
+	* CHANGES-2.3: Added. Same role as same file in arts.
+
+	* demos/qarts_mcdoit_demo.m (qarts_mcdoit_demo): Added p_grid as
+	optional argument.
+
+	* arts/qarts2cfile.m (cfile_Absrpt): Added handling of
+	Q.ABS_LINES_FLIMS.
+
+	* arts/qarts.m (qarts): Added field Q.ABS_LINES_FLIMS.
+
 2014-09-15  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-0
