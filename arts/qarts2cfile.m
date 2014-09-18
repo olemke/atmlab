@@ -538,8 +538,19 @@ function T = cfile_Absrpt( Q, partname, workfolder )
             filename = Q.ABS_LINES;
           end
           %
-          T{end+1} = sprintf( 'abs_linesReadFrom%s(abs_lines,"%s",0,1e99)', ...
-                                                Q.ABS_LINES_FORMAT, filename );
+          if qarts_isset( Q.ABS_LINES_FLIMS )
+            if ~( isnumeric( Q.ABS_LINES_FLIMS )  &  ...                    %&%
+                  length( Q.ABS_LINES_FLIMS ) == 2 )                        %&%
+              error( ...                                                    %&%
+                 'If set, Q.ABS_LINES_FLIMS must be a vector of length 2' );%&%
+            end                                                             %&%
+            f1 = Q.ABS_LINES_FLIMS(1);   f2 = Q.ABS_LINES_FLIMS(2);
+          else
+            f1 = 0;                      f2 = 1e99;
+          end
+          T{end+1} = sprintf( ...
+                          'abs_linesReadFrom%s(abs_lines,"%s",%.3e,%.3e)', ...
+                                       Q.ABS_LINES_FORMAT, filename, f1, f2 );
           T{end+1} = 'abs_lines_per_speciesCreateFromLines';
         end
       end
