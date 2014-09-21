@@ -5,9 +5,10 @@
 %   A satellite measurement is simulated, from 830 km and a zenith angle of
 %   135 deg.
 %
-%   The frequency is set by the user. Cloud extends between zcloud +- 1km. 
-%   Particles are set to be (solid) ice spheres, all with the same 
-%   size (*dpart*).
+%   The frequency is set by the user. The cloud extends between zcloud +- 1km
+%   (with a 400 m "transition length" on both lower and upper side).
+%   Particles are set to be (solid) ice spheres, all with the same size 
+%   (*dpart*).
 % 
 %   The surface reflectivi matrix is set to:
 %     rsurf*[  1  0.1 0 0 
@@ -31,14 +32,14 @@
 %       freq         Frequency. Default is 89 GHz
 %       dpart        Particle diameter. Default is 1 mm
 %       rsurf        Surface reflectivity. Default is 0.1
-%       p_grid       Pressure grid to use. Default is a grid with 200 m
+%       p_grid       Pressure grid to use. Default is a grid with 100 m
 %                    spacing up to 15 km, above 1 km spacing.
 
 function [y0,yd,ym,ymerror] = qarts_mcdoit_demo( varargin )
 %
 % Defaults for DOIT and MC
 CMd.N_ZA_GRID            =  19;
-CMd.N_AA_GRID            =  10;
+CMd.N_AA_GRID            =  37;
 CMd.ZA_GRID_OPT_FILE     = '';
 CMd.EPSILON              = [ 0.1 0.01 0.01 0.01 ];
 CMd.SCAT_ZA_INTERP       = 'polynomial';
@@ -53,7 +54,7 @@ CMm.MIN_ITER             = 100;
 %
 [CMdu,CMmu,iwp,zcloud,freq,dpart,rsurf,p_grid] = optargs( varargin, ...
                               { [], [], 0.5, 4e3, 89e9, 1e-3, 0.1, ...
-                                z2p_simple( [0:200:15e3 16e3:1e3:25e3] )' } );
+                                z2p_simple( [0:100:15e3 16e3:1e3:25e3] )' } );
 %
 if zcloud<2e3, error( '*zcloud must be >= 2 km.' ); end
 
@@ -109,22 +110,6 @@ Q.ABS_SPECIES(2).TAG{1} = 'N2-SelfContStandardType';
 Q.ABS_SPECIES(3).TAG{1} = 'O2-PWR93';
 
 
-%= Define atmosphere
-%
-Q.ATMOSPHERE_DIM      = 1;
-%
-Q.P_GRID              = p_grid;
-%
-arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
-if isnan( arts_xmldata_path )
-  error('You need to ARTS_XMLDATA_PATH to run this example.');
-end
-%
-Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
-                     'Fascod', 'midlatitude-winter', 'midlatitude-winter' );
-Q.RAW_ATM_EXPAND_1D   = false;
-
-
 %= Surface
 %
 Q.REFELLIPSOID        = ellipsoidmodels( 'SphericalEarth' );
@@ -146,6 +131,24 @@ Q.SURFACE_RTPROP_AGENDA{3} = '  , field=t_field )';
 Q.SURFACE_RTPROP_AGENDA{4} = 'surfaceFlatReflectivity';
 
 
+%= Define atmosphere
+%
+Q.ATMOSPHERE_DIM      = 1;
+%
+Q.P_GRID              = p_grid;
+%
+arts_xmldata_path     = atmlab( 'ARTS_XMLDATA_PATH' );
+if isnan( arts_xmldata_path )
+  error('You need to ARTS_XMLDATA_PATH to run this example.');
+end
+%
+Q.RAW_ATMOSPHERE        = fullfile( arts_xmldata_path, 'planets', 'Earth', ...
+                     'Fascod', 'midlatitude-winter', 'midlatitude-winter' );
+Q.RAW_ATM_EXPAND_1D   = false;
+%
+[t,z] = arts_atmfields( Q );
+
+
 %= Create an absorption table
 %
 Q.ABS_LINES_FORMAT    = 'none';
@@ -160,7 +163,7 @@ arts_abstable( Q, workfolder );
 Q.IY_UNIT             = 'RJBT';
 Q.YCALC_WSMS          = { 'yCalc' };
 %
-Q.PPATH_LMAX          = 5e3/max([1,iwp/0.5]);
+Q.PPATH_LMAX          = 2e3/max([1,iwp/0.5]);
 %
 Q.SENSOR_POS          = 830e3;
 Q.SENSOR_LOS          = 135;
@@ -198,17 +201,40 @@ for i = 1 : length(T_grid)     % Note .' below. We do not want to conjugate
 end
 
 % Scattering angles
-theta = 0:2:180;
+theta = 0:1:180;
 % Particle size [m]
 r = dpart/2;
-% cloud altitude
-alt = zcloud + [-1e3 1e3];
 
 % Calculate scattering data using Mie
-C.SCAT_DATA{1} = mie_arts_scat_data( fgrid,  T_grid, rfr_index, theta, r );
+C.SCAT_DATA{1} = mie_arts_scat_data( fgrid, T_grid, rfr_index, theta, r );
 
-% Calculate a pnd field for a homogeneous cloud
-C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, iwp/diff(alt), r );
+
+% Mass of one particle
+m = 0.917e3 * 4 * pi * power(r,3) / 3;
+
+% Set up PND_FIELD
+%
+% Brake points for profile
+bpoints = zcloud + [ -1.2e3 -0.8e3 0.8e3 1.2e3 ];
+%  
+C.PND_FIELD{1}.grids     = { Q.P_GRID, 0, 0 };
+C.PND_FIELD{1}.gridnames = { 'Pressure', 'Latitude', 'Longitude'};
+C.PND_FIELD{1}.data      = zeros( size( z ) );
+%
+% Centre parts set to ones
+ind = find( z >= bpoints(2)  &  z <= bpoints(3) );
+C.PND_FIELD{1}.data(ind) = 1;
+%
+% Upper and lower transition regions
+ind = find( z > bpoints(1)  &  z < bpoints(2) );
+C.PND_FIELD{1}.data(ind) = (z(ind)-bpoints(1)) / diff(bpoints(1:2));
+ind = find( z > bpoints(3)  &  z < bpoints(4) );
+C.PND_FIELD{1}.data(ind) = (bpoints(4)-z(ind)) / diff(bpoints(3:4));
+%
+% Scale to match IWP
+iwp0 = m * trapz( z, C.PND_FIELD{1}.data );
+C.PND_FIELD{1}.data = C.PND_FIELD{1}.data * (iwp/iwp0);
+
 
 % Set up scattering method
 %
