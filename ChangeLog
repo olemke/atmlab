@@ -1,3 +1,10 @@
+2014-09-22  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-3
+
+        * arts/qarts2cfile.m: Added the possibility to numerically calculate
+        jacobians from abs species. 
+
 2014-09-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-2

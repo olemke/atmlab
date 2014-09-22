@@ -1143,12 +1143,27 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         T{end+1} = create_var( name3, 'Vector' );
         T = file_or_data( T, name3, 'Vector', Q.ABS_SPECIES(i).GRIDS{3},...
                                   workfolder, Q.INPUT_FILE_FORMAT, name3 );
+        method = 'analytical'; dx = 0;
+        if (isfield( Q.ABS_SPECIES(i), 'METHOD' ) & ...                     %&%
+           ~isempty( Q.ABS_SPECIES(i).METHOD )) & ...                    %&%
+           (~isfield( Q.ABS_SPECIES(i), 'DX' ) | isempty( Q.ABS_SPECIES(i).DX )) %&%
+                                                                            %&%
+           error( ['Q.ABS_SPECIES(%d).METHOD is set to pertubation, but '... %&%
+               'Q.ABS_SPECIES(%d).DX is not specified'], i ,i );            %&%
 
+            
+        end
+        if isfield( Q.ABS_SPECIES(i), 'METHOD' ) & ...
+           ~isempty( Q.ABS_SPECIES(i).METHOD ) & ...
+           isfield( Q.ABS_SPECIES(i), 'DX' ) & ~isempty( Q.ABS_SPECIES(i).DX ), 
+                method = Q.ABS_SPECIES(i).METHOD;
+                dx = Q.ABS_SPECIES(i).DX;
+        end
         T{end+1} ='jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,';
         T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
         T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
         T{end+1} = sprintf( '  %s,', arts_tgs_cnvrt(Q.ABS_SPECIES(i).TAG) );
-        T{end+1} = sprintf( '  "analytical","%s",0.0)', Q.ABS_SPECIES(i).UNIT);
+        T{end+1} = sprintf( '  "%s","%s",%.9g)', method,Q.ABS_SPECIES(i).UNIT,dx);
       end
     end % for
   end % if
