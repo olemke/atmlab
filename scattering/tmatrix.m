@@ -103,8 +103,7 @@ end
 
 
 %- Start defining cfile
-%
-S{1} = 'Arts2{';
+S{1} = '# Code defined in tmatrx.m';
 
 
 %- Grids
@@ -186,16 +185,9 @@ S{end+1} = 'WriteXML( "ascii", scat_meta_array )';
 S{end+1} = 'WriteXML( "ascii", scat_data_array )';
 
 
-%- Create cfile
-%
-S{end+1} = '}';
-cfile = fullfile( workfolder, 'cfile.arts' );
-strs2file( cfile, S );
-
-
 %- Run arts and load result
 %
-arts( cfile );
+arts_cfiletext( S, workfolder );
 %
 D = xmlLoad( fullfile( workfolder, 'cfile.scat_data_array.xml' ) );
 %

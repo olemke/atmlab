@@ -11,6 +11,8 @@
 %       CBGR                       [K] Temperature of cosmic background 
 %                                      radiation 
 %       DEG2RAD                    [rad] Conversion from degrees to radians
+%       DENSITY_OF_ICE             [kg/m3] Density of ice (H2O) at 0C
+%       DENSITY_OF_WATER           [kg/m3] Density of water at +4C
 %       EARTH_MASS                 [kg] Mass of the earth.
 %       EARTH_RADIUS               [m] Equatorial radius of the earth.
 %       EARTH_RADIUS_MEAN          [m] Mean radius of the earth.
@@ -117,7 +119,17 @@ case 'CBGR'
 case 'DEG2RAD'
     const = pi/180;
     unit = 'rad';
-    
+
+case 'DENSITY_OF_ICE'
+    %ref: http://en.wikipedia.org/wiki/Ice  
+    const = 0.9167e3;
+    unit = 'kgm^{-3}';
+
+case 'DENSITY_OF_WATER'
+    %ref: http://en.wikipedia.org/wiki/Water
+    const = 1e3;
+    unit = 'kgm^{-3}';
+
 case 'EARTH_MASS'
     %ref: http://en.wikipedia.org/wiki/Earth_mass
     const = 5.97219e24;
@@ -232,6 +244,7 @@ function const_struct = get_constants_struct
 
 name  = { ...
     'AVOGADRO', 'BOLTZMANN_CONST', 'CBGR', 'DEG2RAD', ...
+    'DENSITY_OF_ICE', 'DENSITY_OF_WATER', ...
     'EARTH_MASS', 'EARTH_RADIUS', 'EARTH_RADIUS_MEAN', ...
     'EARTH_STANDARD_GRAVITY', 'EARTHORBIT_RADIUS',...
     'GAS_CONST', 'GAS_CONST_DRY_AIR', 'GAS_CONST_WATER_VAPOR', ...
