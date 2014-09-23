@@ -1,9 +1,19 @@
+2014-09-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-4
+
+	* sensors/amsua_apply_polarisation.m: The function assumed
+	radiance input, which is not likely. Now changed to take Tb as
+	input. Added comment in header.
+	And it was somewhat incorrect for either H and V (don't remember
+	which), as the weight for Stokes U element got wrong sign.
+
 2014-09-22  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-3-3
 
         * arts/qarts2cfile.m: Added the possibility to numerically calculate
-        jacobians from abs species. 
+        jacobians from abs species.
 
 2014-09-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
