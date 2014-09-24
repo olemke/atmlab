@@ -34,7 +34,7 @@
 % OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
 % IN       T     Temperature [Kelvin]
-%          IWC   Ice water content [g/m^3]
+%          IWC   Ice water content [kg/m^3]
 %          D     the size vector of the ice particles,
 %                (the mass equivalent ellipsoid diameter [m]),
 %                where the concentration will be calculated        
@@ -57,6 +57,7 @@
 
 function [y]=ice_psd_ellipsoids(T,IWC,D,a,b,psd,mode);
 
+IWC = 1e3*IWC;
 
 if T>273.15
    error('Only temperatures smaller or equal to 273 K zero are allowed.')

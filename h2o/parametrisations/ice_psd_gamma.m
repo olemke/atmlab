@@ -12,8 +12,8 @@
 % OUT      y is a vector or matrix depending on input with the particle 
 %          size distribution calculated at D [#/m^3/m]
 %
-% IN       IWC1    Ice water content in mode 1 [g/m^3]
-%          IWC2    Ice water content in mode 2 [g/m^3]
+% IN       IWC1    Ice water content in mode 1 [kg/m^3]
+%          IWC2    Ice water content in mode 2 [kg/m^3]
 %          D       the size vector of the ice particles [m]
 %                  where the concentration will be calculated  
 %          mu1     gamma parameter mu1>=0 in mode 1
@@ -27,6 +27,10 @@
 
 function [y]=ice_psd_gamma(IWC1,IWC2,D,mu1,mu2,lambda1,lambda2,alfa,beta)
 
+IWC1 = 1e3*IWC1;
+IWC2 = 1e3*IWC2;
+
+  
 min_nargin( 9, nargin );       
 IWC1=vec2col(IWC1);
 D=vec2col(D);

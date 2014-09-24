@@ -9,7 +9,7 @@
 %
 % OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
-% IN       LWC     liquid water content [g/m^3]
+% IN       LWC     liquid water content [kg/m^3]
 %          r       the size vector of the ice particles [m]
 %          c1      psd parameter
 %          c2      psd parameter
@@ -20,6 +20,7 @@
 function [y]=water_psd(LWC,r,rc,c1,c2)
 
 %min_nargin( 5, nargin );       
+LWC = 1e3*LWC;
 
 B=c1/c2/rc^c2;
 A=3*LWC*c2*B^((c1+4)/c2)*1e12/4/pi/gamma((c1+4)/c2);

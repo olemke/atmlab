@@ -20,7 +20,7 @@
 % OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
 % IN       T     Temperature [Kelvin]
-%          IWC   Ice water content [g/m^3]
+%          IWC   Ice water content [kg/m^3]
 %          D     the vector with the maximum dimension of
 %                the ice particles [m],
 %                where the concentration will be calculated
@@ -36,7 +36,8 @@
 
 function [y]=ice_psd_Ivanova_01(T,IWC,D,shape,mode);
 
-T=T-273.15;
+T   = T-273.15;
+IWC = 1e3*IWC;
 
 if T>0
    error('Only temperatures smaller than 273.15 K are allowed.')

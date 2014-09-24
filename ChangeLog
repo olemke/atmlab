@@ -1,3 +1,22 @@
+2014-09-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-6
+
+	* Comment: If you want to make a direct interface to some ARTS
+	WSM, these new PSD functions show how this can be done.
+
+	* h2o/parametrisations/ice_psd_h11.m (ice_psd_h11): New.
+
+	* h2o/parametrisations/water_psd_h98.m: New.
+
+	* h2o/parametrisations/water_psd.m:
+	* h2o/parametrisations/ice_psd_gamma.m:
+	* h2o/parametrisations/ice_psd_ellipsoids.m:
+	* h2o/parametrisations/ice_psd_Mitchell_99.m:
+	* h2o/parametrisations/ice_psd_Ivanova_01.m:
+	* h2o/parametrisations/ice_psd_Donovan_03.m: Changed unit for IWC
+	and LWC to kg/m3 from g/m3. You need to adopt your input.
+
 2014-09-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-5
