@@ -42,8 +42,8 @@ CMd.N_ZA_GRID            =  19;
 CMd.N_AA_GRID            =  37;
 CMd.ZA_GRID_OPT_FILE     = '';
 CMd.EPSILON              = [ 0.1 0.01 0.01 0.01 ];
-CMd.SCAT_ZA_INTERP       = 'polynomial';
-CMd.ALL_F                = true;
+CMd.SCAT_ZA_INTERP       = 'linear';  % Here a dummy value, not used when
+CMd.ALL_F                = true;      % ZA_GRID_OPT_FILE is empty.
 CMd.NORMALIZE            = true;
 CMd.NORM_ERROR_THRESHOLD = 0.5;
 %

@@ -1,3 +1,18 @@
+2014-09-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-7
+
+	* demos/qarts_mcdoit_demo.m: Added a comment.
+
+	* arts/qarts2cfile.m (cfile_SctMth): Things around
+	ZA_GRID_OPT_FILE did not work as explained in qartsCloudbox.m. In
+	practice all accepted input triggered doit_scat_fieldCalcLimb.
+	Fixed and added some new options for flagging no ZA_GRID_OPT_FILE.
+
+	* arts/qartsCloudbox.m: Explained that now ZA_GRID_OPT_FILE can be
+	flagged in three different ways. Improved description of
+	SCAT_ZA_INTERP.
+
 2014-09-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-6

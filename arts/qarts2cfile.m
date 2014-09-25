@@ -1608,7 +1608,11 @@ function T = cfile_SctMth( Q, partname, workfolder )
     rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.ALL_F, @isboolean, ...          %&%
                                         'Q.CLOUDBOX.METHOD_PRMTRS.ALL_F' ); %&%
     
-    if isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )      
+    if isempty( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )  |  ...
+       ( ischar( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE ) & ...
+       strcmp( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, '""' ) )
+      optfile = '';
+    elseif isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )      
       optfile = fullfile( workfolder, 'scat_za_grid.xml' ); 
       xmlStore( filename, Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, ...
                                            'Vector', Q.INPUT_FILE_FORMAT );
@@ -1640,8 +1644,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     T = add_agenda( T, 'pha_mat_spt_agenda', { ...
         'pha_mat_sptFromDataDOITOpt' } );
     
-    if ischar( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )  &  ...
-       strcmp( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, '""' )
+    if isempty( optfile )
       T = add_agenda( T, 'doit_scat_field_agenda', ...
                                              { 'doit_scat_fieldCalc' } );
     else
