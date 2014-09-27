@@ -12,7 +12,7 @@
 %   OUT     ssp      single scattering data
 %   IN      f_grid   frequency grid [Hz]  (vector)
 %   IN      T_grid   temperature grid [K] (vector)
-%   IN      rfr_ind  refractive indices, matrix with dimension
+%   IN      rfr_ind  complex refractive index, matrix with dimension
 %                    [f_grid, T_grid] 
 %   IN      theta    scattering angle grid [deg]
 %   IN      r        particle radius [m]
@@ -54,6 +54,10 @@ ssp.aa_grid = [];
 
 c = constants('SPEED_OF_LIGHT');
 
+ssp.pha_mat_data = zeros( length(f_grid), length(T_grid), length(theta), ...
+                                                                   1,1,1, 6 );
+ssp.ext_mat_data = zeros( length(f_grid), length(T_grid) );
+ssp.abs_vec_data = zeros( length(f_grid), length(T_grid) );
 
 for i = 1:length(f_grid)
   for j = 1:length(T_grid)

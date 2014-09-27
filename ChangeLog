@@ -1,3 +1,16 @@
+2014-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-8
+
+	* scattering/tmatrix.m: Removed old code. Updated header.
+
+	* demos/qarts_mcdoit_demo.m (qarts_mcdoit_demo): Added an internal
+	switch to use T-matrix instead for Mie (for testing purposes).
+
+	* scattering/mie_arts_scat_data.m: ssp.pha_mat_data,
+	ssp.ext_mat_data and ssp.abs_vec_data are now sized outside loop,
+	to save a bit of time.
+
 2014-09-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-7

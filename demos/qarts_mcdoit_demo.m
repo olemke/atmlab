@@ -205,9 +205,14 @@ theta = 0:1:180;
 % Particle size [m]
 r = dpart/2;
 
-% Calculate scattering data using Mie
-C.SCAT_DATA{1} = mie_arts_scat_data( fgrid, T_grid, rfr_index, theta, r );
-
+% Calculate scattering data using Mie or T-matrix
+if 1
+  C.SCAT_DATA{1} = mie_arts_scat_data( fgrid, T_grid, rfr_index, theta, r );
+else
+  N = complex_refr_indexFromFunc( fgrid, T_grid', @eps_ice_matzler06, @sqrt );
+  C.SCAT_DATA{1} = tmatrix( [], fgrid, T_grid', theta', [], N, ...
+                     'spheroidal', 'macroscopically_isotropic', 2*r, 1.0001 );
+end
 
 % Mass of one particle
 m = 0.917e3 * 4 * pi * power(r,3) / 3;
