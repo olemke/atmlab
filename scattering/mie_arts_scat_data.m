@@ -35,11 +35,11 @@ if (size(rfr_ind,1)~=length(f_grid) | size(rfr_ind,2)~=length(T_grid))      %&%
 end                                                                         %&%
 
 % Particle type is 'p20' for spherical particles
-ssp.ptype = 20;
+ssp.ptype = arts_ptype2string( 20 );
 
-ssp.description = ['Spherical particles, generated using atmlab and ',...
-		           'the Mie program from C. Mätzler, particle size', ...
-		           ': ', num2str(r*1e6),' microns.']; 
+ssp.description = ['Spherical particle with D = ',num2str(r*2e6),'um, ', ...
+                   'generated using Atmlab and the Mie programs from ', ...
+                   'C. Mätzler.']; 
 
 ssp.f_grid = f_grid;
 

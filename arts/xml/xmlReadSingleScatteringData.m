@@ -19,8 +19,7 @@
 
 function result = xmlReadSingleScatteringData(fid, attrlist, itype, ftype, binary, fid2)
 
-  vstr = xmlGetAttrValue (attrlist, 'nshelves');
-  attrlist
+  vstr = xmlGetAttrValue (attrlist, 'version');
   if isempty(vstr)
       version = 1;
   else

@@ -1,3 +1,21 @@
+2014-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-12
+
+	* demos/qarts_mcdoit_demo.m: New option below used.
+
+	* scattering/tmatrix.m: Added outfile option, to make it possible
+	to leave calculated data be left as file.
+
+	* scattering/mie_arts_scat_data.m: ptype now set to a string, by
+	arts_ptype2string. And changed description string.
+
+	* arts/arts_ptype2string.m: Removed p40, as this option now
+	removed from arts.
+
+	* arts/xml/xmlReadSingleScatteringData.m: Second input to
+	xmlGetAttrValue was wrong.
+
 2014-09-29  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-11

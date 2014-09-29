@@ -11,16 +11,21 @@
 %    equivalent volume diameter (default or d_is_max=false), or as the
 %    maximum dimension (requires that d_is_max=true).
 %
+%    The default is to load the calculated data into Matlab. If *outfile*
+%    is not empty, that data will to stored into that file and *SC* is set to
+%    be equal to *outfile*.
+%
 % FORMAT   [SC,de] = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
 %                  pshape,ptype,pdiameter,aspect_ratio[,d_is_max,precision])
 %        
-% OUT   SC           ARTS single scattering data
+% OUT   SC           ARTS single scattering data, either as imported data or
+%                    set to a path (then equal to *outfile*).
 %       de           Equivalent diameter. If *d_is_max* is false, *de*
 %                    equals *pdiameter*, otherwise it is the equivalent
 %                    diamter calculated by ARTS.
 % IN    workfolder   A folder where temporary files can be stored.
 %                    If set to [], a temporary folder is created.
-%                    Note that an existing cfile.arts will be overwritten.
+%                    Note that e.g. an existing cfile.arts will be overwritten.
 %       f_grid       Frequency grid.
 %       t_grid       Temperature grid.
 %       za_grid      Zenith angle grid.
@@ -33,14 +38,16 @@
 % OPT   d_is_max     Default is that *pdiameter* is equivalent volume diameter
 %                    (De). Set this flag to true if *pdiameter* is instead
 %                    the maximum dimension (Dmax).
+%       outfile      Name of file if data shall be kept as a file. Default 
+%                    is [], that flags that data shall be imported into Matlab.
 %       precision    The T-matrix calculation precision.
 
 % 2014-09-27   Created by Patrick Eriksson.
 
-function [SC,de] = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
+function [SC,de] = tmatrix(workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
                           pshape,ptype,pdiameter,aspect_ratio,varargin)
 %
-[d_is_max,precision] = optargs( varargin, { false, 0.001 } );
+[d_is_max,outfile,precision] = optargs( varargin, { false, [], 0.001 } );
   
   
 %- Basic checks of input
@@ -123,17 +130,25 @@ S{end+1} = '  scat_za_grid = scat_za_grid,';
 S{end+1} = '  scat_aa_grid = scat_aa_grid,';
 S{end+1} = sprintf('  precision    = %.6e', precision );
 S{end+1} = ')';
-S{end+1} = 'WriteXML( "ascii", scat_data )';
-
+if isempty(outfile)
+  S{end+1} = 'WriteXML( "ascii", scat_data )';
+else
+  S{end+1} = sprintf( 'WriteXML( "ascii", scat_data, "%s" )', outfile );
+end
 
 %- Run arts
 arts_cfiletext( S, workfolder );
 
 
 %- Load result
-SC = xmlLoad( fullfile( workfolder, 'cfile.scat_data.xml' ) );
+if isempty(outfile)
+  SC = xmlLoad( fullfile( workfolder, 'cfile.scat_data.xml' ) );
+else
+  SC = outfile;
+end
 
 
+%- De
 if nargout
   if d_is_max
     de = xmlLoad( fullfile( workfolder, 'cfile.de.xml' ) );
