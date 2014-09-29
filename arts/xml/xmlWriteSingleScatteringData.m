@@ -14,9 +14,13 @@
 
 function xmlWriteSingleScatteringData(fid, fidb, data, precision)
 
-xmlWriteTag (fid, 'SingleScatteringData', []);
+xmlWriteTag (fid, 'SingleScatteringData', xmlAddAttribute([], 'version', '2'));
 
-xmlWriteIndex (fid, fidb, data.ptype, precision);
+if isnumeric(data.ptype)
+    data.ptype = arts_ptype2string(data.ptype);
+end
+
+xmlWriteString (fid, fidb, data.ptype, precision);
 xmlWriteString (fid, fidb, data.description, precision);
 xmlWriteVector (fid, fidb, data.f_grid, precision);
 xmlWriteVector (fid, fidb, data.T_grid, precision);

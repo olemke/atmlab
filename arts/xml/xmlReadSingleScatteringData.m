@@ -19,7 +19,17 @@
 
 function result = xmlReadSingleScatteringData(fid, attrlist, itype, ftype, binary, fid2)
 
+  vstr = xmlGetAttrValue (attrlist, 'nshelves');
+  attrlist
+  if isempty(vstr)
+      version = 1;
+  else
+      version = str2num(vstr);
+  end
   result.ptype            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  if (version == 1)
+      result.ptype = arts_ptype2string(result.ptype);
+  end
   result.description      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.f_grid           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
   result.T_grid           = xmlReadTag(fid, '', itype, ftype, binary, fid2);

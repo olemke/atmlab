@@ -1,3 +1,17 @@
+2014-09-29  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-10
+
+	* arts/xml/xmlWriteSingleScatteringData.m:
+
+	Always write SingleScatteringData version 2.
+
+	* arts/xml/xmlReadSingleScatteringData.m:
+
+	Add support for reading SingleScatteringData version 2.
+
+	* arts/arts_ptype2string.m: Add convenience function.
+
 2014-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-9
