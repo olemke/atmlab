@@ -1,3 +1,9 @@
+2014-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-9
+
+	* scattering/tmatrix.m: Added de as output. And some small fixes.
+
 2014-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-8
