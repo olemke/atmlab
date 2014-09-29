@@ -5,7 +5,7 @@
 %
 % FORMAT   s = arts_ptype2string( ptype )
 %        
-% IN    ptype     Number identifying the ptype (10, 20, 30)
+% IN    ptype     Number identifying the ptype (10, 20, 30, 40)
 % OUT   s         The string identifier for this ptype
 
 % 2014-09-29   Created by Oliver Lemke.
@@ -18,6 +18,8 @@ switch ptype
     case 20
         s = 'macroscopically_isotropic';
     case 30
+        s = 'horizontally_aligned';
+    case 40
         s = 'spherical';
     otherwise
         error(['atmlab:' mfilename], ...
