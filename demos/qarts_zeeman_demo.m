@@ -3,19 +3,23 @@
 %    Calculates a limb sounding spectrum at 118.75 GHz, with and without
 %    activating the Zeeman part.
 %
-% FORMAT   [f,y0,y] = qarts_zeeman_demo( [ ztan ] )
+% FORMAT   [f,y0,y] = qarts_zeeman_demo( [ ztan, stokes_rotation ] )
 %        
 % OUT   f          Frequency grid
 %       y0         Calculated spectrum without activating Zeeman.
 %       y          Calculated spectrum with Zeeman.
 % OPT   ztan       Tangent altitude. Default is 95 km.
+%       stokes_rotation As the ARTS WSV with same name. Default is [], which
+%                       means that the WSM sensor_responseStokeRotation not
+%                       is called att all. A value of 0, will include the
+%                       WSM but should not change the result.
 
 % 2013-06-27   Created by Patrick Eriksson.
 
 
 function [f,y0,y] = qarts_zeeman_demo( varargin )
 %
-[ztan] = optargs( varargin, { 95e3 } );
+[ztan,stokes_rotation] = optargs( varargin, { 95e3,[] } );
 
 
 %= Atmlab settings
@@ -43,7 +47,6 @@ Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 %
 Q.CLOUDBOX_DO           = false;
 Q.J_DO                  = false;
-Q.SENSOR_DO             = false;
 
 
 %= Define agendas
@@ -99,8 +102,13 @@ Q.Z_FIELD              = qarts_atm_field( Q, 'z', mjd );
 Q.F_GRID               = 1.187503430e+11 + linspace( -5e6, 5e6, 201 )';
 %
 Q.ABS_LINES_FORMAT     = 'Hitran';
-Q.ABS_LINES            = fullfile( atmlab_example_data , 'line118ghz.hit' );
-%                                                   
+Q.ABS_LINES            = fullfile( atmlab_example_data , ...
+                                              'line118ghzFromHITRAN2012.par' );
+%
+Q.ABS_LINESHAPE        = 'Faddeeva_Algorithm_916';
+Q.ABS_LINESHAPE_FACTOR = 'VVH';
+Q.ABS_LINESHAPE_CUTOFF = 750e9;
+%
 Q.ABSORPTION           = 'OnTheFly';
 
 
@@ -125,6 +133,23 @@ Q.MAG_V_FIELD          = [];
 Q.MAG_W_FIELD          = [];
 
 
+%= Some code for testing "Stokes rotation"
+%
+if isempty(stokes_rotation)
+  Q.SENSOR_DO            = false;
+else
+  H                      = qartsSensor;
+  %
+  H.STOKES_ROTATION      = stokes_rotation;
+  %
+  H.SENSOR_NORM          = true;
+  Q.ANTENNA_DIM          = 1;
+  Q.MBLOCK_ZA_GRID       = [0];    
+  Q.SENSOR_DO            = true;
+  Q.SENSOR_RESPONSE      = H;
+end
+  
+
 %= Calculate spectrum
 %
 y0 = arts_y( Q );
@@ -134,7 +159,6 @@ f = Q.F_GRID;
 
 % Repeat with Zeeman activated
 %
-testdatafolder = fullfile( fileparts(atmlab('ARTS_INCLUDES')), 'testdata' );
 magdatafolder  = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
                                                           'Earth', 'IGRF' );
 
@@ -143,7 +167,8 @@ Q.ABS_SPECIES(1).TAG{1}   = 'O2-Z-66';
 Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly_Zeeman' };
 %
 Q.WSMS_AT_START{end+1} = [ 'ReadXML( isotopologue_quantum, "', ...
-                          fullfile(testdatafolder,'isoquantum.xml'), '")' ];
+                    fullfile( atmlab('ARTS_XMLDATA_PATH'), 'spectroscopy',...
+                           'QuantumConstants', 'zeeman_constants.xml'), '")' ];
 %
 Q.MAG_U.ATMDATA        = gf_artsxml( fullfile( magdatafolder, ...
                                 'IGRF11_2010_200km-5deg-5deg.B_u.xml.gz' ),...

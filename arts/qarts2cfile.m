@@ -885,6 +885,9 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
     % Find out sensor structure
     parts{1} = 'init';
+    if qarts_isset( H.STOKES_ROTATION )
+      parts{end+1} = 'rotation';
+    end
     if qarts_isset( H.SENSOR_POL )
       parts{end+1} = 'polarisation';
     end
@@ -960,14 +963,17 @@ function T = cfile_Sensor( Q, partname, workfolder )
         U{end+1} = sprintf( ...
            'sensor_responseFillFgrid(polyorder=%d,nfill=%d)', v(1), v(2) );
        
-      case 'polarisation'
-        if qarts_isset( H.SENSOR_POL )
-          U = file_or_data( U, 'sensor_pol', 'ArrayOfIndex', ...
+      case 'rotation'
+        U = file_or_data( U, 'stokes_rotation', 'Matrix', ...
+                          H.STOKES_ROTATION, workfolder, Q.INPUT_FILE_FORMAT );
+        U{end+1} = 'sensor_responseStokesRotation';
+       
+       case 'polarisation'
+        U = file_or_data( U, 'sensor_pol', 'ArrayOfIndex', ...
                                H.SENSOR_POL, workfolder, Q.INPUT_FILE_FORMAT );
-        end
         U{end+1} = 'sensor_responsePolarisation';
        
-       case 'antenna'
+      case 'antenna'
         if qarts_isset( H.ANTENNA_LOS )
           U = file_or_data( U, 'antenna_los', 'Matrix', H.ANTENNA_LOS, ...
                                         workfolder, Q.INPUT_FILE_FORMAT );

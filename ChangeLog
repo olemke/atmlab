@@ -1,3 +1,20 @@
+2014-10-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-13
+
+	* demos/qarts_zeeman_demo.m: Updated to changes in ARTS. Now at
+	least runs, but not sure if all around Zeeman is actually OK.
+	Added an option to perform a "stokes rotation".
+
+	* demos/data/line118ghzHITRAN2012.par: Replaces the file below.
+	The content in the file is taken from HITRAN2012.
+
+	* demos/data/line118ghz.hit: Removed.
+
+	* arts/qarts2cfile.m: Added handling of STOKES_ROTATION.
+
+	* arts/qartsSensor.m (qartsSensor): Added STOKES_ROTATION.
+
 2014-09-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-12
