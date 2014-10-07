@@ -3,13 +3,10 @@
 %    Convert intensities to "Rayleigh-Jeans" temperatures using the
 %    Rayleigh-Jeans scaling factor.
 %
-%    The frequency and intensity vectors/matrices must have the 
-%    same size.
-%
 % FORMAT   i2rayjeanTb(i,f)
 %        
 % OUT   tb   brightness temperatures [K]
-% IN    i    intensities [W/m^2Hz]
+% IN    i    intensities [W/(m^2*Hz*sr)]
 %       f    frequencies [Hz]
 
 % 2002-12-12   Created by Claudia Emde.

@@ -13,7 +13,7 @@
 % OUT      tb    Brightness temperature for *i* [K].
 % OUT      dtb   Brightness temperature for *di*.
 % IN       f     Frequencies [Hz]. Must be a column vector.
-%          i     Intensities for spectrum [W/sr*m^2*Hz]. Must be a column 
+%          i     Intensities for spectrum [W/(sr*m^2*Hz)]. Must be a column 
 %                vector.
 %          di    Jacobian or higher Stokes components, in radiance. Can be a
 %                matrix, where each row corresponds to a frequency.

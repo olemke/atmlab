@@ -1,12 +1,11 @@
 % PLANCK  Planck function
 %
 % Calculates the Planck function (blackbody radiation) for given frequency 
-% and temperature.
-% 
+% and temperature. 
 %
 % FORMAT   BT = planck(f,T)
 %
-% OUT	   BT = Blackbody radiation.
+% OUT	   BT = Blackbody radiation [W/(m2*Hz*sr)].
 % IN       f  = frequency
 %          T  = Temperature in [K].
 %

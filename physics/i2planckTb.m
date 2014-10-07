@@ -3,13 +3,10 @@
 %          Convert intensities to brigthness temperatures by "inverting" the
 %          Planck function.
 %
-%          The frequency and intensity vectors/matrices must have the 
-%          same size.
-%
 % FORMAT   tb = i2planckTb(i,f)
 %
 % OUT      tb   brightness temperatures [K]
-% IN       i    intensities [W/m^2Hz]
+% IN       i    intensities [W/(m^2*Hz*sr)]
 %          f    frequencies [Hz]
 %
 % See also: planck, di2planckTb

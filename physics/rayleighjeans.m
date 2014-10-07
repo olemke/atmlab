@@ -5,7 +5,7 @@
 % 
 % FORMAT   i = rayleighjeans(f,T)
 %
-% OUT	   i = radiance
+% OUT	   i = radiance [W/(m2*Hz*sr)].
 % IN       f  = frequency
 %          T  = Temperature in [K].
 %

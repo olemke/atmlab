@@ -1,3 +1,16 @@
+2014-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-15
+
+	* physics/planck.m: Radiance unit was wrong.
+
+	* physics/rayleighjeans.m: Polishing of how unit is written.
+
+	* physics/i2planckTb.m:
+	* physics/i2rayjeanTb.m:
+	* physics/di2planckTb.m: Moved from /forwardmodel, to have all
+	Planck and RJ functions in the same folder. Header texts revised.
+
 2014-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-14
