@@ -1,3 +1,13 @@
+2014-10-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-16
+
+	* scattering/asymmetry_parameter.m: Replaces
+	Asymmetry_parameter.m. Some changes and polishing of the code.
+
+	* scattering/tmatrix.m (tmatrix): Adopted to renaming in arts,
+	scat_data -> scat_data_single.
+
 2014-10-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-15

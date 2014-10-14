@@ -119,7 +119,7 @@ end
 
 %- Add T-matrix call and saving
 %
-S{end+1} = 'scat_dataTmatrix(';
+S{end+1} = 'scat_data_singleTmatrix(';
 S{end+1} = sprintf('  shape        = "%s",', pshape );
 S{end+1} = '  de           = de,';
 S{end+1} = sprintf('  aratio       = %.6f,', aspect_ratio );
@@ -131,9 +131,9 @@ S{end+1} = '  scat_aa_grid = scat_aa_grid,';
 S{end+1} = sprintf('  precision    = %.6e', precision );
 S{end+1} = ')';
 if isempty(outfile)
-  S{end+1} = 'WriteXML( "ascii", scat_data )';
+  S{end+1} = 'WriteXML( "ascii", scat_data_single )';
 else
-  S{end+1} = sprintf( 'WriteXML( "ascii", scat_data, "%s" )', outfile );
+  S{end+1} = sprintf( 'WriteXML( "ascii", scat_data_single, "%s" )', outfile );
 end
 
 %- Run arts
@@ -142,7 +142,7 @@ arts_cfiletext( S, workfolder );
 
 %- Load result
 if isempty(outfile)
-  SC = xmlLoad( fullfile( workfolder, 'cfile.scat_data.xml' ) );
+  SC = xmlLoad( fullfile( workfolder, 'cfile.scat_data_single.xml' ) );
 else
   SC = outfile;
 end
