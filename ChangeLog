@@ -1,3 +1,11 @@
+2014-10-16  Manfred Brath  <manfred.brath@uni-hamburg.de>
+
+	* atmlab-2-2-14
+
+	* retrieval/ismar/hamburg/ismar_*.m: 
+
+	First version of ISMAR database generation toolbox.
+	
 2014-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-2-13
