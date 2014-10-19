@@ -16,13 +16,14 @@
 %    be equal to *outfile*.
 %
 % FORMAT   [SC,de] = tmatrix( workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
-%                  pshape,ptype,pdiameter,aspect_ratio[,d_is_max,precision])
+%                             pshape,ptype,pdiameter,aspect_ratio
+%                             [,d_is_max,precision] )
 %        
 % OUT   SC           ARTS single scattering data, either as imported data or
 %                    set to a path (then equal to *outfile*).
 %       de           Equivalent diameter. If *d_is_max* is false, *de*
 %                    equals *pdiameter*, otherwise it is the equivalent
-%                    diamter calculated by ARTS.
+%                    diameter calculated by ARTS.
 % IN    workfolder   A folder where temporary files can be stored.
 %                    If set to [], a temporary folder is created.
 %                    Note that e.g. an existing cfile.arts will be overwritten.
@@ -45,7 +46,7 @@
 % 2014-09-27   Created by Patrick Eriksson.
 
 function [SC,de] = tmatrix(workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
-                          pshape,ptype,pdiameter,aspect_ratio,varargin)
+                           pshape,ptype,pdiameter,aspect_ratio,varargin)
 %
 [d_is_max,outfile,precision] = optargs( varargin, { false, [], 0.001 } );
   
@@ -59,8 +60,8 @@ rqre_datatype( aa_grid, @istensor1 );
 rqre_datatype( N, @isstruct );
 rqre_datatype( pshape, @ischar );
 rqre_datatype( ptype, @ischar );
-rqre_datatype( pdiameter, @istensor1 );
-rqre_datatype( aspect_ratio, @istensor1 );
+rqre_datatype( pdiameter, @istensor0 );
+rqre_datatype( aspect_ratio, @istensor0 );
 
 
 %- Create workfolder
