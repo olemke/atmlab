@@ -1,3 +1,11 @@
+2014-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-19
+
+	* arts/xml/xmlWriteSingleScatteringData.m:
+	* arts/xml/xmlReadSingleScatteringData.m: Check of valid ptype now
+	made.
+
 2014-10-22  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-18

@@ -20,6 +20,15 @@ if isnumeric(data.ptype)
     data.ptype = arts_ptype2string(data.ptype);
 end
 
+valid_particle_types = { 'general', 'macroscopically_isotropic', ...
+                         'horizontally_aligned' };
+if ~any( ismember( valid_particle_types, data.ptype ) )
+  error('atmlab:xmlWriteScatteringMetaData:IllegalParticleType', ...
+        ['Illegal particle_type ' data.particle_type '\n' ...
+         'Valid types are: ' sprintf('%s ', valid_particle_types{:})])
+end
+
+
 xmlWriteString (fid, fidb, data.ptype, precision);
 xmlWriteString (fid, fidb, data.description, precision);
 xmlWriteVector (fid, fidb, data.f_grid, precision);

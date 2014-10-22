@@ -19,22 +19,31 @@
 
 function result = xmlReadSingleScatteringData(fid, attrlist, itype, ftype, binary, fid2)
 
-  vstr = xmlGetAttrValue (attrlist, 'version');
-  if isempty(vstr)
-      version = 1;
-  else
-      version = str2num(vstr);
-  end
-  result.ptype            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  if (version == 1)
-      result.ptype = arts_ptype2string(result.ptype);
-  end
-  result.description      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.f_grid           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.T_grid           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.za_grid          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.aa_grid          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.pha_mat_data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.ext_mat_data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.abs_vec_data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+vstr = xmlGetAttrValue (attrlist, 'version');
+if isempty(vstr)
+    version = 1;
+else
+    version = str2num(vstr);
+end
+result.ptype            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+if (version == 1)
+    result.ptype = arts_ptype2string(result.ptype);
+end
+
+valid_particle_types = { 'general', 'macroscopically_isotropic', ...
+                         'horizontally_aligned' };
+if ~any( ismember( valid_particle_types, result.ptype ) )
+  error('atmlab:xmlWriteScatteringMetaData:IllegalParticleType', ...
+        ['Illegal particle_type ' data.particle_type '\n' ...
+         'Valid types are: ' sprintf('%s ', valid_particle_types{:})])
+end
+
+result.description      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.f_grid           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.T_grid           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.za_grid          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.aa_grid          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.pha_mat_data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.ext_mat_data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+result.abs_vec_data     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 
