@@ -18,27 +18,28 @@ attrlist = [];
 % If data doesn't contain a version number, assume latest version
 if isfield(data, 'version')
     nversion = data.version;
-    if nversion > 2
+    if nversion > 3
         error('atmlab:xmlWriteScatteringMetaData:IllegalVersion', ...
             'Illegal ScatteringMetaData version number')
     end
 else
-    nversion = 2;
+    nversion = 3;
 end
 
 attrlist = xmlAddAttribute(attrlist, 'version', sprintf ('%d', nversion));
 xmlWriteTag (fid, 'ScatteringMetaData', attrlist);
 
-xmlWriteString (fid, fidb, data.description, precision);
-xmlWriteString (fid, fidb, data.material, precision);
-xmlWriteString (fid, fidb, data.shape, precision);
-xmlWriteNumeric (fid, fidb, data.density, precision);
-xmlWriteNumeric (fid, fidb, data.diameter_max, precision);
-xmlWriteNumeric (fid, fidb, data.volume, precision);
-xmlWriteNumeric (fid, fidb, data.area_projected, precision);
-xmlWriteNumeric (fid, fidb, data.aspect_ratio, precision);
 
-if nversion == 2
+if nversion < 3
+    xmlWriteString (fid, fidb, data.description, precision);
+    xmlWriteString (fid, fidb, data.material, precision);
+    xmlWriteString (fid, fidb, data.shape, precision);
+    xmlWriteNumeric (fid, fidb, data.density, precision);
+    xmlWriteNumeric (fid, fidb, data.diameter_max, precision);
+    xmlWriteNumeric (fid, fidb, data.volume, precision);
+    xmlWriteNumeric (fid, fidb, data.area_projected, precision);
+    xmlWriteNumeric (fid, fidb, data.aspect_ratio, precision);
+
     valid_particle_types = { ...
         'general', 'macroscopically_isotropic', ...
         'horizontally_aligned', 'spherical' };
@@ -52,6 +53,14 @@ if nversion == 2
     xmlWriteVector (fid, fidb, data.scat_T_grid, precision);
     xmlWriteString (fid, fidb, data.particle_type, precision);
     xmlWriteGriddedField3 (fid, fidb, data.complex_refr_index, precision);
+else
+    xmlWriteString (fid, fidb, data.description, precision);
+    xmlWriteString (fid, fidb, data.source, precision);
+    xmlWriteString (fid, fidb, data.refr_index, precision);
+    xmlWriteNumeric (fid, fidb, data.mass, precision);
+    xmlWriteNumeric (fid, fidb, data.diameter_max, precision);
+    xmlWriteNumeric (fid, fidb, data.diameter_volume_equ, precision);
+    xmlWriteNumeric (fid, fidb, data.diameter_area_equ_aerodynamical, precision);
 end
 
 xmlWriteCloseTag (fid, 'ScatteringMetaData');
