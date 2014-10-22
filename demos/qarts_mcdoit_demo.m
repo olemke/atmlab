@@ -215,11 +215,11 @@ else
   C.SCAT_DATA{1} = tmatrix( workfolder, fgrid, T_grid', theta', [], N, ...
                             'spheroidal', 'macroscopically_isotropic', ...
                             2*r, 1.0001, false, ...
-                            sprintf('%s/%s',workfolder,'scat_data.xml') );
+                            fullfile(workfolder,'scat_data') );
 end
 
 % Mass of one particle
-m = 0.917e3 * 4 * pi * power(r,3) / 3;
+m = constants('DENSITY_OF_ICE') * 4 * pi * power(r,3) / 3;
 
 % Set up PND_FIELD
 %
