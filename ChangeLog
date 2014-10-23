@@ -1,3 +1,12 @@
+2014-10-23  Ole Martin Christensen  <olem@chalmers.se>
+
+	* h2o/thermodynamics/kelvin_term.m: New function that calculates
+	the correction to the saturation vapour pressure to take into account
+	the effect of droplet/crystal curvature.
+
+	* h2o/thermodynamics/critical_radius_ice.m: New function that calculates
+	the critical radius for droplet formation. 
+
 2014-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-20
