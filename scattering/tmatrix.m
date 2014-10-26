@@ -17,7 +17,7 @@
 %    set to those filenames.
 %
 % FORMAT   [S,M,dveq] = tmatrix(workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
-%                               shape,ptype,diameter,axial_ratio
+%                               shape,ptype,diameter,aspect_ratio
 %                               [,d_is_max,precision,mass,cri_source] )
 %        
 % OUT   S            ARTS single scattering data, either as imported data or
@@ -37,7 +37,7 @@
 %       shape        Particle shape. 
 %       ptype        Particle type. 
 %       diameter     Particle diameter.
-%       axial_ratio  Particle axial ratio.
+%       aspect_ratio  Particle aspect ratio.
 % OPT   d_is_max     Default is that *diameter* is equivalent volume diameter
 %                    (Dveq). Set this flag to true if *diameter* is instead
 %                    the maximum dimension (Dmax).
@@ -52,7 +52,7 @@
 % 2014-09-27   Created by Patrick Eriksson.
 
 function [S,M,dveq] = tmatrix(workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
-                              shape,ptype,diameter,axial_ratio,varargin)
+                              shape,ptype,diameter,aspect_ratio,varargin)
 %
 [d_is_max,outfile,precision,mass,cri_source] = ...
                           optargs( varargin, { false, [], 0.001, NaN, [] } );
@@ -68,7 +68,7 @@ rqre_datatype( N, @isstruct );
 rqre_datatype( shape, @ischar );
 rqre_datatype( ptype, @ischar );
 rqre_datatype( diameter, @istensor0 );
-rqre_datatype( axial_ratio, @istensor0 );
+rqre_datatype( aspect_ratio, @istensor0 );
 
 
 %- Create workfolder
@@ -121,7 +121,7 @@ if d_is_max
   S{end+1} = sprintf( 'NumericSet(dmax,%.6e)', diameter );
   S{end+1} = sprintf( ...
       'diameter_volume_equFromDiameter_max(dveq,volume,"%s",dmax,%.6f)', ...
-                                                          shape, axial_ratio );
+                                                          shape, aspect_ratio );
   S{end+1} = 'WriteXML( "ascii", dveq )';
 else
   S{end+1} = sprintf( 'NumericSet(dveq,%.6e)', diameter );
@@ -133,7 +133,7 @@ end
 S{end+1} = 'scat_data_singleTmatrix(';
 S{end+1} = sprintf('  shape               = "%s",', shape );
 S{end+1} = '  diameter_volume_equ = dveq,';
-S{end+1} = sprintf('  axial_ratio         = %.6f,', axial_ratio );
+S{end+1} = sprintf('  aspect_ratio         = %.6f,', aspect_ratio );
 S{end+1} = sprintf('  ptype        = "%s",', ptype );
 S{end+1} = '  data_f_grid  = data_f_grid,';
 S{end+1} = '  data_t_grid  = data_t_grid,';
