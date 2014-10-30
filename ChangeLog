@@ -1,3 +1,14 @@
+2014-10-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-23
+
+	* h2o/parametrisations/ice_particleshape_Hogan2012.m: A
+	reimplementation of the function. Set of utput arguments changed.
+	There are some differences to old version for the 66-97 um range,
+	otherwise same results. However, the aspect ratio to aplly above
+	97 um is now an optional input. In order to make the function more
+	general.
+
 2014-10-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-22
