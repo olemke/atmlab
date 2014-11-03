@@ -1,3 +1,12 @@
+2014-11-03  Manfred Brath  <manfred.brath@uni-hamburg.de>
+	
+	* atmlab-2-2-15
+
+	* atmlab/atmlab_init.m:	Added ismar path.
+		
+	* retrieval/ismar/hamburg/ismar_*.m: bugfixes and performance
+	improvements
+
 2014-10-16  Manfred Brath  <manfred.brath@uni-hamburg.de>
 
 	* atmlab-2-2-14

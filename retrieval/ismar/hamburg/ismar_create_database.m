@@ -120,7 +120,7 @@ looking_direction=0:d_angle:180; %[°]
 
 
 %Sensor Properties
-[~,channel_def]=ISMAR_freq2ch_simple();
+[~,channel_def]=ismar_freq2ch_simple();
 channel_no=1:(size(channel_def,1)); %#ok<*NASGU>
 
 
@@ -258,7 +258,7 @@ for i=1:length(dlist) %Loop over the file list
     end  
     
     %Map brightness temperature to channels
-    [t_bch]=ISMAR_freq2ch_simple(t_b);
+    [t_bch]=ismar_freq2ch_simple(t_b);
     
     
     
@@ -329,7 +329,7 @@ for i=1:length(dlist) %Loop over the file list
     end
     
     %Map reflectivity to channels
-    reflectivity=ISMAR_freq2ch_simple(reflectivity);
+    reflectivity=ismar_freq2ch_simple(reflectivity);
     
     
     

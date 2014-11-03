@@ -149,6 +149,10 @@ if nargin<3
 end
 
 %% arts files are converted into matlab-files
+
+%Flaf, that scat_meta_array has been loaded
+flag_sma=0;
+
 for j=1:length(index)
     
     disp('   ')
@@ -174,7 +178,7 @@ for j=1:length(index)
         for i=1:length(dir_list)
 
             name=dir_list(i).name;
-            check=strfind(name,vid{ii,:});
+            check=strfind(name,['.',vid{ii,:}]);
 
             if ~isempty(check) 
 
@@ -183,8 +187,28 @@ for j=1:length(index)
                 mem(ii)=1;
                 
                 disp(vid{idx,1})
-                dummy=xmlLoad([directory,'/',name]); %#ok<NASGU>
-                eval([vid{idx,1},'=dummy;']);
+                disp(name)
+                disp('  ')
+                
+%                 dummy=xmlLoad([directory,'/',name]); %#ok<NASGU>
+%                 eval([vid{idx,1},'=dummy;']);
+
+                % To gain speed, it is not needed to always load the 
+                % scattering_meta_array, because it must not change for one 
+                % simulation run. Therefore just check if it is there and
+                % then use the already loeded version.              
+                if ii==6 && flag_sma==0
+                    sma_dummy=xmlLoad([directory,'/',name]); %#ok<NASGU>
+                    eval([vid{idx,1},'=sma_dummy;']);
+                    flag_sma=1;
+
+                elseif ii==6 && flag_sma==1
+                    eval([vid{idx,1},'=sma_dummy;']);
+                else
+                    dummy=xmlLoad([directory,'/',name]); %#ok<NASGU>
+                    eval([vid{idx,1},'=dummy;']);
+                end
+                
                 break
             end
 
@@ -244,9 +268,9 @@ for j=1:length(index)
     savename=[directory,'/',basename,'_combined_',num2str(index(j)),'.mat'];
     save(savename,variables{:})
 
-%     %%delete the single artsfiles
-%     for i=1:length(dir_list)
-%         delete([directory,'/',dir_list(i).name])
-%     end
+    %%delete the single artsfiles
+    for i=1:length(dir_list)
+        delete([directory,'/',dir_list(i).name])
+    end
 end
 
