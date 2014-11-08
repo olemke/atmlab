@@ -1,6 +1,6 @@
 % ICE_PSD_MH97   The PSD of McFarquhar&Heymsfield 1997
 %    
-%     This is an interface to the ARTS WSM dN_MH97. See that WSM for 
+%     This is an interface to the ARTS WSM dNdD_MH97. See that WSM for 
 %     further information. 
 %
 %     There exists also a pure atmlab version of the PSD: ice_psd_Mcfar_97
@@ -26,27 +26,19 @@ workfolder = create_tmpfolder;
 cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 
 
-% Create vector with densities
-density = repmat( constants('DENSITY_OF_ICE'), length(dme_grid), 1 );
-
 % Set up cfile
-S{1}     = 'VectorCreate(dN)';
+S{1}     = 'VectorCreate(dNdD)';
 %
 filename = fullfile( workfolder, 'Dme.xml' ); 
 xmlStore( filename, dme_grid, 'Vector' );
 S{end+1} = 'VectorCreate(Dme)';
 S{end+1} = sprintf( 'ReadXML(Dme,"%s")', filename );
 %
-filename = fullfile( workfolder, 'density.xml' ); 
-xmlStore( filename, density, 'Vector' );
-S{end+1} = 'VectorCreate(density)';
-S{end+1} = sprintf( 'ReadXML(density,"%s")', filename );
-%
-S{end+1} = sprintf('dN_MH97(dN,Dme,%.6e,%.3f,density,%d)', iwc, t, noisy );
-S{end+1} = 'WriteXML( "ascii", dN )';
+S{end+1} = sprintf('dNdD_MH97(dNdD,Dme,%.6e,%.3f,%d)', iwc, t, noisy );
+S{end+1} = 'WriteXML( "ascii", dNdD )';
 
 % Run arts
 arts_cfiletext( S, workfolder );
 
 % Load result
-n = xmlLoad( fullfile( workfolder, 'cfile.dN.xml' ) );
+n = xmlLoad( fullfile( workfolder, 'cfile.dNdD.xml' ) );

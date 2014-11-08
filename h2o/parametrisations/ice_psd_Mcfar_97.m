@@ -35,7 +35,7 @@ function [y]=ice_psd_Mcfar_97(T,IWC,D,mode);
 
 % Convert to C and g/m3
 T   = T - 273.15;
-IWC = 1e3*IWC
+IWC = 1e3*IWC;
 
 
 if T>0

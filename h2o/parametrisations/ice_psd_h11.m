@@ -1,6 +1,6 @@
 % ICE_PSD_H11   Unpublished PSD of Heymsfield 2011
 %    
-%     This is an interface to the ARTS WSM dN_H11. See that WSM for 
+%     This is an interface to the ARTS WSM dNdD_H11. See that WSM for 
 %     further information. 
 %
 % FORMAT   n = ice_psd_h11(dmax_grid,t)
@@ -22,18 +22,18 @@ cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 
 
 % Set up cfile
-S{1}     = 'VectorCreate(dN)';
+S{1}     = 'VectorCreate(dNdD)';
 %
 filename = fullfile( workfolder, 'Dmax.xml' ); 
 xmlStore( filename, dmax_grid, 'Vector' );
 S{end+1} = 'VectorCreate(Dmax)';
 S{end+1} = sprintf( 'ReadXML(Dmax,"%s")', filename );
 %
-S{end+1} = sprintf('dN_H11(dN,Dmax,%.3f)', t );
-S{end+1} = 'WriteXML( "ascii", dN )';
+S{end+1} = sprintf('dNdD_H11(dNdD,Dmax,%.3f)', t );
+S{end+1} = 'WriteXML( "ascii", dNdD )';
 
 % Run arts
 arts_cfiletext( S, workfolder );
 
 % Load result
-n = xmlLoad( fullfile( workfolder, 'cfile.dN.xml' ) );
+n = xmlLoad( fullfile( workfolder, 'cfile.dNdD.xml' ) );

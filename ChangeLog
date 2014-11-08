@@ -1,11 +1,27 @@
+2014-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-24
+
+	* h2o/parametrisations/particle_de2dmax.m:
+	* h2o/parametrisations/particle_dmax2de.m: New.
+
+	* h2o/parametrisations/snow_psd_field07.m: New.
+
+	* h2o/parametrisations/ice_psd_Mcfar_97.m: Line added recently for
+	g/m3 to kg/m3 was not silent.
+
+	* h2o/parametrisations/ice_psd_mh97.m:
+	* h2o/parametrisations/ice_psd_h11.m: Updated to match changes in
+	arts.
+
 2014-10-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-23
 
 	* h2o/parametrisations/ice_particleshape_Hogan2012.m: A
-	reimplementation of the function. Set of utput arguments changed.
+	reimplementation of the function. Set output arguments changed.
 	There are some differences to old version for the 66-97 um range,
-	otherwise same results. However, the aspect ratio to aplly above
+	otherwise same results. However, the aspect ratio to apply above
 	97 um is now an optional input. In order to make the function more
 	general.
 
