@@ -1,3 +1,10 @@
+2014-11-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-25
+
+	* h2o/parametrisations/snow_psd_field07.m: The allowed range set
+	for a was too narrow.
+
 2014-11-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-24

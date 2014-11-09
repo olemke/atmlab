@@ -35,7 +35,7 @@ if not( isvector( dmax) & issorted( dmax ) )
 end
 rqre_in_range( iwc, 0, 100e-3 );
 rqre_in_range( t, 150, 280 );
-rqre_in_range( a, 0.001, 1e3 );
+rqre_in_range( a, 0.0001, 1e3 );
 rqre_in_range( b, 1, 3 );
 rqre_datatype( lats, @ischar ); 
 
