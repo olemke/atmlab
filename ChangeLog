@@ -1,6 +1,6 @@
 2014-11-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-2-3-25
+	* atmlab-2-3-26
 
 	* h2o/parametrisations/particle_de2dmax.m:
 	* h2o/parametrisations/particle_dmax2de.m: Added mass and PSD
