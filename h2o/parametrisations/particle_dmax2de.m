@@ -5,14 +5,17 @@
 %       m = a * dmax^b. 
 %
 %    The mass effective size, de, is related to particle mass as 
-%       m = pi * de^3 / 6
+%       mass = pi * de^3 / 6
 %    
 %    The arguments *a* and *b* should be in SI units. For example, solid ice 
 %    has a = 480 and b = 3.
 %
-% FORMAT de = particle_dmax2de(dmax,a,b,rho)
+% FORMAT [de,mass,ddmax_dde] = particle_dmax2de(dmax,a,b,rho)
 % 
-% OUT   de      Mass equivalent diameters matching *dmax*
+% OUT   de      Mass equivalent diameters matching *dmax*.
+%       mass    Particle mass.
+%       ddmax_dde  Factor to convert PSDs from dmax to de base. This factor
+%                  is dDmax/dDe.  
 % IN    dmax    Values of maximum dimensions.
 %       a       Constant in Dmax-mass relationship, see above.
 %       b       Constant in Dmax-mass relationship, see above.
@@ -22,7 +25,7 @@
 % 2014-11-08 Patrick Eriksson
 
 
-function de = particle_dmax2de(dmax,a,b,rho)
+function [de,mass,ddmax_dde] = particle_dmax2de(dmax,a,b,rho)
 %
 if nargin < 4
   rho = constants( 'DENSITY_OF_ICE' );
@@ -31,3 +34,7 @@ end
 mass = a * dmax.^b;
 
 de = power( mass*6/(pi*rho), 1/3 );
+
+if nargout > 2
+  ddmax_dde = 1 ./ ( power( 6*a/(pi*rho), 1/3 ) * b/3 * power( dmax, b/3-1 ) );
+end
