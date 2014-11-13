@@ -3,10 +3,11 @@
 %   Hogan et al combines the Brown and Francis (1997) size-mass relationship
 %   with assumptions on shape to obtain a complete particle shape model.
 %   Particles up to 66 um are spherical, while particle having a Dmax above
-%   97 um are oblate spheroids with an aspect ratio of 0.6. Between 66 and
-%   97 um there is a gradual change of the aspect ratio. 
+%   97 um are oblate spheroids with an aspect ratio of 1.67. Between 66 and
+%   97 um there is a gradual change of the aspect ratio. Note that an
+%   "Tmatrix aspect ratio" equals an axis ratio of 0.6.
 %
-%   The aspect ratio of 0.6 can be changed with *aratio0*. This does not
+%   The aspect ratio of 1.67 can be changed with *aratio0*. This does not
 %   change the transition from spheres to spheroid, as a function of Dmax.
 %
 %   In the region 66 to 100 um the expressions can lead to densities above the
@@ -21,7 +22,7 @@
 %     rho       Density of the particle
 % IN  deq       Mass equivalent sphere diameter. Can be a vector. The output
 %               arguments have then the same size.
-% OPT aratio0   The aspect ration for particles above 97 um. Defualt is 0.6,
+% OPT aratio0   The aspect ration for particles above 97 um. Defualt is 1.67,
 %               the value suggest by Hogan et al 2012. A scalar, must be z<=1.
 
 % 2014 Maryam Jamali and Patrick Eriksson
@@ -29,7 +30,7 @@
 function [dmax,aratio,airfrac,mass,rho] = ice_particleshape_Hogan2012( ...
                                                                  deq,varargin)
 %
-[aratio0] = optargs( varargin, { 0.6 } );
+[aratio0] = optargs( varargin, { 1.67 } );
 
 rqre_datatype( deq, @isvector );
 rqre_datatype( aratio0, @istensor0 );

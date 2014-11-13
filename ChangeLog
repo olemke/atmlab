@@ -1,3 +1,10 @@
+2014-11-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-27
+
+	* h2o/parametrisations/ice_particleshape_Hogan2012.m: Header text
+	edited.
+
 2014-11-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-26
