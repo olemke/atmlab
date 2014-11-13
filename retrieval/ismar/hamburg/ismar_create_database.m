@@ -32,7 +32,7 @@
 %   surface_altitude(case_index)
 %   surface_temperature(case_index)
 %   surface_type(case_index), a cell array of strings
-%   surface_reflectivities(case_index,channel_no,looking_direction,
+%   surface_reflectivity(case_index,channel_no,looking_direction,
 %                     Dimension of polarization,Dimension of polarization),
 %                     the two last dimensions are the 2x2 reflection
 %                     matrices of a two dimensional stokes vector with the
@@ -108,7 +108,7 @@ disp('   ')
 %% Standard grids
 
 %pressuregrid for regridding according for flight altitude in pressure
-log_P=(linspace(5,3.5,75));
+log_P=(linspace(log10(105000),3.5,75));
 pressure=10.^log_P; %[Pa]
 
 

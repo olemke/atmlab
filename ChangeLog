@@ -1,5 +1,13 @@
 2014-11-03  Manfred Brath  <manfred.brath@uni-hamburg.de>
 	
+	* atmlab-2-2-16
+		
+	* retrieval/ismar/hamburg/ismar_*.m: bugfixes 
+	
+	* documentation/ismar/: added database documentation
+	
+2014-11-03  Manfred Brath  <manfred.brath@uni-hamburg.de>
+	
 	* atmlab-2-2-15
 
 	* atmlab/atmlab_init.m:	Added ismar path.
