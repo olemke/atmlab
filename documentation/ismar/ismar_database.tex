@@ -1,0 +1,203 @@
+%% LyX 2.0.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{scrreprt}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\usepackage{textcomp}
+\usepackage{amstext}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{ISMAR Retrieval Database}
+
+
+\author{Manfred Brath}
+
+\maketitle
+
+\addsec{Database description}
+
+The database consists of $6$ grids and $16$ state variables. By
+the matlab function {}``ismar\_create\_database'' all the different
+states will be regridded to common grids of pressure coordinates and
+looking direction, so that they all will be on the same grids.
+
+
+\subsubsection*{Grids }
+\begin{itemize}
+\item $case\_index$, an index that names a specific case with a number.
+\item $pressure$, the vertical grid. In the matlab function {}``ismar\_create\_database'',
+it is as first try defined from $1000\,\textrm{hPa}$ to $30\,\textrm{hPa}$
+with $75$ logarithmic distributed steps. %
+\footnote{In the discussion during the arts week in September 2014, we originally
+decided to have also an additional flight altitude grid in pressure
+units. I omitted the flight altitude grid here, because from my point
+of view we do not need it. Please correct me, if I am wrong. %
+}
+\item $channel\_no$, the index of the channel, see table \ref{tab:Channel-definition}
+for the definition.
+\item $looking\_direction$, the angular grid. In the matlab function {}``ismar\_create\_database'',
+it is as first try defined from $0\text{\textdegree}$ to $180\text{\textdegree}$
+in steps of $5\text{\textdegree}$ ($37$ steps)
+\item $scattering\_element\_index$, an index that names a specific scattering\_element
+with a number.
+\item $polarization$, the polarization grid (vertical, horizontal)
+\end{itemize}
+
+\subsubsection*{State variables}
+\begin{itemize}
+\item the channel definition, which consists of the center frequencies and
+the offsets of the sidebands, see table \ref{tab:Channel-definition}.
+\[
+channel\_def\left(channel\_no\right)
+\]
+\begin{table}
+\begin{centering}
+\begin{tabular}{c|r@{\extracolsep{0pt}.}l|r@{\extracolsep{0pt}.}l|c}
+ & \multicolumn{2}{c|}{Center fre- } & \multicolumn{2}{c|}{Side} & \tabularnewline
+$channel\_no$ & \multicolumn{2}{c|}{quency {[}$\text{GHz}${]}} & \multicolumn{2}{c|}{bands {[}$\text{GHz}${]}} & Instrument\tabularnewline
+\hline 
+1 & \multicolumn{2}{c|}{23.8} & \multicolumn{2}{c|}{$\ \pm$0.07} & Deimos\tabularnewline
+\hline 
+2 & \multicolumn{2}{c|}{50.1} & \multicolumn{2}{c|}{$\pm$0.08} & Deimos\tabularnewline
+\hline 
+3 & \multicolumn{2}{c|}{89.0} & \multicolumn{2}{c|}{$\pm$1.1} & MARSS\tabularnewline
+\hline 
+4 & \multicolumn{2}{c|}{118.75} & \multicolumn{2}{c|}{$\pm$1.1} & ISMAR\tabularnewline
+\hline 
+5 & \multicolumn{2}{c|}{$\ $118.75} & \multicolumn{2}{c|}{$\pm$1.5} & ISMAR\tabularnewline
+\hline 
+6 & \multicolumn{2}{c|}{118.75} & \multicolumn{2}{c|}{$\pm$2.1} & ISMAR\tabularnewline
+\hline 
+7 & \multicolumn{2}{c|}{118.75} & \multicolumn{2}{c|}{$\pm$3.0} & ISMAR\tabularnewline
+\hline 
+8 & \multicolumn{2}{c|}{118.75} & \multicolumn{2}{c|}{$\pm$5.0} & ISMAR\tabularnewline
+\hline 
+9 & \multicolumn{2}{c|}{157.05} & \multicolumn{2}{c|}{$\pm$2.6} & MARSS\tabularnewline
+\hline 
+10 & \multicolumn{2}{c|}{183.31} & \multicolumn{2}{c|}{$\pm$1.0} & MARSS\tabularnewline
+\hline 
+11 & \multicolumn{2}{c|}{183.31} & \multicolumn{2}{c|}{$\pm$3.0} & MARSS\tabularnewline
+\hline 
+12 & \multicolumn{2}{c|}{183.31} & \multicolumn{2}{c|}{$\pm$7.0} & MARSS\tabularnewline
+\hline 
+13 & \multicolumn{2}{c|}{243.20} & \multicolumn{2}{c|}{$\pm$2.5} & ISMAR\tabularnewline
+\hline 
+14 & \multicolumn{2}{c|}{325.15} & \multicolumn{2}{c|}{$\pm$1.5} & ISMAR\tabularnewline
+\hline 
+15 & \multicolumn{2}{c|}{325.15} & \multicolumn{2}{c|}{$\pm$3.5} & ISMAR\tabularnewline
+\hline 
+16 & \multicolumn{2}{c|}{325.15} & \multicolumn{2}{c|}{$\pm$9.5} & ISMAR\tabularnewline
+\hline 
+17 & \multicolumn{2}{c|}{424.70} & \multicolumn{2}{c|}{$\pm$1.0} & ISMAR\tabularnewline
+\hline 
+18 & \multicolumn{2}{c|}{424.70} & \multicolumn{2}{c|}{$\pm$1.5} & ISMAR\tabularnewline
+\hline 
+19 & \multicolumn{2}{c|}{424.70} & \multicolumn{2}{c|}{$\pm$4.0} & ISMAR\tabularnewline
+\hline 
+20 & \multicolumn{2}{c|}{448.0} & \multicolumn{2}{c|}{$\pm$1.4} & ISMAR\tabularnewline
+\hline 
+21 & \multicolumn{2}{c|}{448.0} & \multicolumn{2}{c|}{$\pm$3.0} & ISMAR\tabularnewline
+\hline 
+22 & \multicolumn{2}{c|}{448.0} & \multicolumn{2}{c|}{$\pm$7.2} & ISMAR\tabularnewline
+\hline 
+23 & \multicolumn{2}{c|}{664.0} & \multicolumn{2}{c|}{$\pm$4.2} & ISMAR\tabularnewline
+\hline 
+24 & \multicolumn{2}{c|}{874.4} & \multicolumn{2}{c|}{$\pm$6.0} & ISMAR\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{\label{tab:Channel-definition}Channel definition}
+\end{table}
+
+\item the properties of the scattering elements: 
+
+\begin{itemize}
+\item mass $mass(scattering\_element\_index)$ 
+\item maximum dimension $dmax(scattering\_element\_index)$
+\item volume $volume(scattering\_element\_index)$ 
+\item type of scattering scattering elemenent $scattering\_element\_type(scattering\_element\_index)$,
+an cell array with a tag according to the arts method \textquotedbl{}ParticleSpeciesSet\textquotedbl{}
+\end{itemize}
+\item the atmospheric data:
+
+\begin{itemize}
+\item temperature $temperature(case\_index,\, pressure)$ 
+\item altitude $atltitude(case\_index,\, pressure)$ 
+\item particle number density $pnd\_field(case\_index,\, pressure,\, scattering\_element\_index)$ 
+\item brightness temperature $t\_b(case\_index,\, pressure,\, channel\_no,\, looking\_direction,\, polarization)$
+\end{itemize}
+\item the surface properties 
+
+\begin{itemize}
+\item surface altitude $surface\_altitude(case\_index)$
+\item surface temperature $surface\_temperature(case\_index)$ 
+\item surface type $surface\_type(case\_index)$, a cell array of strings
+\item surface reflectivity $surface\_reflectivities(case\_index,\, channel\_no,\, looking\_direction,\, polarization,\, polarization)$,
+the two last dimensions are the $2\times2$ reflection matrices of
+a two dimensional stokes vector with the first component being the
+vertical and the second component being the horizontal polarization.
+\end{itemize}
+\item the simulated position in space and time 
+
+\begin{itemize}
+\item latittude $lat(case\_index)$ 
+\item longitude $lon(case\_index)$
+\item time $time(case\_index)$
+\end{itemize}
+\end{itemize}
+
+\addsec{Create database}
+
+To create the database, you can use the matlab function {}``ismar\_create\_database''
+within {}``atmlab/retrieval/ismar/hamburg/''. The database will
+be stored as mat-files. Of course, each single case (preprocessed
+ARTS-simulation) has to be a mat-file. The single preprocessed ARTS-simulations
+will be combined to one database and regridded to common grids of
+pressure coordinates and looking direction. Additionally, $doit\_i\_field1D\_spectrum$
+will be converted to brightness temperature (Planck Tb) and then mapped
+to the ISMAR channels, see also table \ref{tab:Channel-definition}.
+All simulations for the database must consist of the same scattering
+elements. This means all simulations to be put into the database must
+have the same scattering meta data and single scattering data. Each
+ARTS-simulation must consist of the into matlab converted workspace
+variables:
+\begin{itemize}
+\item $atm\_fields\_compact$ 
+\item $cloudbox\_limits$ 
+\item $f\_grid$ 
+\item $doit\_i\_field1D\_spectrum$ 
+\item $part\_species$ 
+\item $pnd\_field$ 
+\item $scat\_data\_per\_part\_species$
+\item $scat\_meta\_array$
+\item $scat\_za\_grid$
+\end{itemize}
+and three additional created variables:
+\begin{itemize}
+\item $lat\_lon\_time$, a vector consisting of the geographical position
+of the simulation (1st component is latitude, 2nd is longitude) and
+the simulated time (third component) in a numeric format 
+\item $surface\_properties$, an array of the two arts workspace variable
+$z\_surface$ and $t\_surface$. 1st component is $z\_surface$ and
+the 2nd is $t\_surface$
+\item $surface\_radiation\_parameter$, which is an empty array if the surface
+is a blackbody, or it is a structure of an gridded\_field6, if the
+reflectivities are given, or it is a structure of a gridded\_field3
+if the complex refraction indices are given. See for additional information
+the ARTS documentation. \end{itemize}
+
+\end{document}
