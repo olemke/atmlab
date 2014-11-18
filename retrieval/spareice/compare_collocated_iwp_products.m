@@ -1,13 +1,4 @@
 function compare_collocated_iwp_products
-
-% This function for backward-compatibility.  No need to call it.
-%
-% This funciton needs to be here because the neural networks as stored
-% contain references to required function handles of anonymous functions
-% or subfunctions defined herein.  Copying the functions to their own
-% files won't help because when the neural network was initially defined,
-% it was from this function.  There is no need to call this function.
-
 %
 % See also: CollocatedNNIWP, NNTrainedProduct, InstrumentVisualiser,
 %           CollocationRetrievalDatabaseProduct, compare_ice_retrievals
@@ -540,7 +531,8 @@ figs_filts_retr = struct();
 leg_filts_retr = struct();
 
 D = datasets();
-pcd = PersistentCachedData('/local/gerrit/cache');
+%pcd = PersistentCachedData('/scratch/uni/u237/users/gholl/cache');
+pcd = PersistentCachedData('/scratch/uni/u237/users/gholl/cache');
 for i = 1:length(inps)
     inp = inps{i};
     figs_inps_retr.(inp) = figure('visible', 'off');
@@ -865,7 +857,7 @@ D = datasets();
 dv = [ye, mo, da, ho, mi, se];
 [dv_sorted, I] = sortrows(dv);
 cf = D.CFSR;
-pcd = PersistentCachedData('/local/gerrit/cache');
+pcd = PersistentCachedData('/scratch/uni/u237/users/gholl/cache');
 S = pcd.evaluate(1, @cf.read_from_grid, lat(I), lon(I), dv(I, :), {'TMP_L1'});
 T(I) = S.TMP_L1;
 end

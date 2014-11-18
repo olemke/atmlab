@@ -464,6 +464,17 @@ classdef NNTrainedProduct < RetrievalDatabaseProduct
                 path);
             self.net = loadvar(path, 'nt');
             self.trdat = loadvar(path, 'tr');
+            ud = self.net.fit.userdata;
+            if isempty(fieldnames(self.inputs))
+                self.inputs = ud.inputs;
+                self.setmembers();
+                self.setcols();
+            else
+                if ~isequal(self.inputs, ud.inputs)
+                    error(['atmlab:' mfilename ':inconsistent'], ...
+                         'Inconsistent input matrices!');
+                end
+            end
         end
         
         function [best, perfs] = bestnet(self, noise_level)
@@ -859,7 +870,7 @@ classdef NNTrainedProduct < RetrievalDatabaseProduct
             else
                 noise_str = sprintf('%2f,', noise_level);
             end
-            nm = sprintf('/storage3/user_data/gerrit/neuralnets/%s_%s_to_%s_noise%s_v%s_%d.mat', ...
+            nm = sprintf('/scratch/uni/u237/user_data/gholl/neuralnets/%s_%s_to_%s_noise%s_v%s_%d.mat', ...
                 self.name, ...
                 sprintf('%s,', strjoin(vec2row(inpcell), ',')), ...
                 sprintf('%s,', strjoin(vec2row(tgtcell), ',')), ...
