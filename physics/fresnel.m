@@ -37,12 +37,14 @@
 
 
 function [Rv,Rh,theta2] = fresnel(n1,n2,theta1)
-%                                                                           %&%
-rqre_nargin( 3, nargin );                                                   %&%
-% Checks done in snell.m are not repeated                                   %&% 
-if imag(n1)<0 | imag(n2)<0                                                  %&%
-  error( 'The imaginary part of *n1* and *n2* can not be negative.' );      %&%
-end                                                                         %&%
+%
+if atmlab( 'STRICT_ASSERT' )
+  rqre_nargin( 3, nargin );
+  % Checks done in snell.m are not repeated 
+  if imag(n1)<0 | imag(n2)<0
+    error( 'The imaginary part of *n1* and *n2* can not be negative.' );
+  end
+end
 
 
 theta2    = snell( n1, n2, theta1 );

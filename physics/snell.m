@@ -30,17 +30,18 @@
 
 
 function theta2 = snell(n1,n2,theta1)
-%                                                                           %&%
-rqre_nargin( 3, nargin );                                                   %&%
-rqre_datatype( n1, @isnumeric );                                            %&%
-rqre_datatype( n2, @isnumeric );                                            %&%
-rqre_datatype( theta1, @isnumeric );                                        %&%
-rqre_element_math( n1, n2 );                                                %&%
-rqre_element_math( n1, theta1 );                                            %&%
-if real(n1)<=0 | real(n2)<=0                                                %&%
-  error( 'The real part of *n1* and *n2* can not be <= 0.' );               %&%
-end                                                                         %&%
-
+%
+if atmlab( 'STRICT_ASSERT' )
+  rqre_nargin( 3, nargin );           
+  rqre_datatype( n1, @isnumeric );    
+  rqre_datatype( n2, @isnumeric );    
+  rqre_datatype( theta1, @isnumeric );
+  rqre_element_math( n1, n2 );        
+  rqre_element_math( n1, theta1 );    
+  if real(n1)<=0 | real(n2)<=0        
+    error( 'The real part of *n1* and *n2* can not be <= 0.' );
+  end
+end
 
 isr1 = isreal( n1 );
 isr2 = isreal( n2 );
