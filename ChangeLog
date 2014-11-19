@@ -1,5 +1,7 @@
 2014-11-18  Gerrit Holl  <gerrit.holl@utoronto.ca>:
 
+	* atmlab-2-3-31
+
 	* retrieval/spareice/NNTrainedProduct.m:
 
 	- BUGFIX: when processing using a pre-existing neural network, this
