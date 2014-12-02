@@ -20,7 +20,7 @@ function S = modis_postprocessor(self,S,fields)
 
 
 % READ dependent fields
-% So far this function assumesa you always need cloud phase and quality
+% So far this function assumes you always need cloud phase and quality
 % flag
 % common_fields = {'Quality_Assurance_1km','Cloud_Phase_Optical_Properties'};
 % associatedFields = {'Cloud_Water_Path','Cloud_Effective_Radius','Cloud_Optical_Thickness'};

@@ -1,3 +1,32 @@
+2014-12-02  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-32
+
+	* collocations/CollocatedDataset.m: Fixed bug in size of n_add
+
+	* datasets/SatDataset.m:
+
+	- if ~reload, also check to see if we can read cached data stored in persitent
+	cached data (self.pcd.has_entry))(but first check cache directory)
+
+	* datasets/define_datasets.m: Added MODIS collection 6
+
+	* handy/PersistentCachedData.m: shorted std out a little
+
+	* handy/combine_pdfs.m:
+
+	- Added option to specify the number of rows of plots per page
+	(i.e. can now create pdfs containing several pages)
+
+	* handy/sanitise.m: Added another problematic character
+
+	* datasets/modis_postprocessor.m:
+	* files/getfiles_matching_regexp.m:
+	* math/bin.m:
+	edit to comments
+
+	* site-specific/hamburg/datasets_init.m: Merged my version of hamburgs dataset_init
+
 2014-11-18  Gerrit Holl  <gerrit.holl@utoronto.ca>:
 
 	* atmlab-2-3-31

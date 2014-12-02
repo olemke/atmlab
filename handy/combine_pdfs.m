@@ -56,7 +56,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %            in:  %f
 %            ex:  padding to the right of a row in cm. Note: Needs one value per row.
 %                 e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
-%            def: 1 
+%            def: 1
 %       options.valign
 %            in:  %s
 %            ex:  vertical alignment. 'm' = middle, 'b' = bottom, 't'=top
@@ -89,6 +89,16 @@ function outfile = combine_pdfs(pdffiles, options)
 %            ex:  Do a pdfcrop when finished putting everything together
 %            def: false
 %
+%       options.rowsPerPage
+%            This is good if you have many plots that are not suitable for just
+%            one page
+%
+%            in:  %d
+%            ex:  Number of rows per page. option.rowsPerPage can also be a vector
+%                 containing the number of rows that on page each each should have
+%                In that case, the sum of this vector must match the total
+%                number of rows (=n files / sum(in.cols)).
+%            def: all the rows on one page
 % OUT:      outfile = The fullpath to the created pdf-file
 %
 % NOTE: The files are appended left to right and from top to bottom.
@@ -112,18 +122,33 @@ end
 default.outdir     = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
 default.display    = false;
-default.title      = ''; 
+default.title      = '';
 default.pdfcrop    = false;
 default.pdfviewer  = '';
 options = optargs_struct(options, default);
 
-%% Convert outdir to fullpath
+% Default is one page for all the plots
+if length(options.cols)>1
+    default.rowsPerPage = length(options.cols);
+else default.rowsPerPage = floor(length(pdffiles)/options.cols);
+end
+
+
+options = optargs_struct(options, default);
+
+if options.rowsPerPage>4
+    logtext(2,['There will be more than 4 rows of plots on this page. ',...
+        'If the page is too long latex will crash. Consider limiting ',...
+        'the number of rows per page using options.rowPerPage = [%d, %d, etc]'])
+end
+
+% Convert outdir to fullpath
 options.outdir = path_replace_tilde(options.outdir);
 if (isempty(options.outdir) || options.outdir(1) ~= filesep())
     options.outdir = fullfile(pwd(), options.outdir);
 end
 
-%% Sanity checks
+% Sanity checks
 
 assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
     'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
@@ -131,25 +156,51 @@ assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
     '%s does not exist', options.outdir);
 
 
-%% If we got a regexp, use ls to get the file list
-if ischar(pdffiles), files = dir(pdffiles); pdffiles = {files.name}; end
+% If we got a regexp, use ls to get the file list
+if ischar(pdffiles)
+    direct = fileparts(pdffiles);
+    files = dir(pdffiles);
+    for i = 1:length(files)
+        tmp{i} = [direct,'/',files(i).name];
+        
+    end
+    pdffiles = tmp;
+end
 
-%% Make sure filenames are in a row vector and non-empty
+% Make sure filenames are in a row vector and non-empty
 pdffiles = pdffiles(:)';
 pdffiles = pdffiles(~cellfun('isempty',pdffiles));
 pdffiles = path_replace_tilde(pdffiles);
 assert(~isempty(pdffiles), 'atmlab:combine_pdfs', 'List of input pdf files is empty');
 
-%% We trust that the user can count! Not really, better double check here
-if (length(options.cols) ~= 1 && sum(options.cols) ~= length(pdffiles))
-    error (['atmlab:' mfilename]', ...
-        'Number of plots (%d) doesn''t match sum of columns (%d)', ...
-        length(pdffiles), sum(options.cols));
+% Check the number of columns verses the number of plots
+if (length(options.cols) ~= 1 ... %repeat column count for every row
+        && sum(options.cols) ~= length(pdffiles))
+    if length(pdffiles) > sum(options.cols)
+        error (['atmlab:' mfilename]', ...
+            'Number of plots (%d) doesn''t match sum of columns (%d)', ...
+            length(pdffiles), sum(options.cols));
+        pdffiles = pdffiles(1:sum(options.cols));
+    else
+        error (['atmlab:' mfilename]', ...
+            'Number of plots (%d) doesn''t match sum of columns (%d).', ...
+            length(pdffiles), sum(options.cols));
+    end
+    
 end
 
-%% If cols is only one number, replicate it to match the number files
+% If cols is only one number, replicate it to match the number files
 if (length(options.cols) == 1)
     options.cols = repmat(options.cols, ceil(length(pdffiles)/options.cols), 1);
+end
+
+if length(options.rowsPerPage)==1
+    options.rowsPerPage = repmat(options.rowsPerPage,1,length(options.cols));
+end
+
+if options.pdfcrop && length(options.rowsPerPage)<sum(options.cols)
+    logtext(2,'Cannot use pdfcrop if the output pdf has more than 1 page. Setting psdcrop to false\n')
+    options.pdfcrop=false;
 end
 
 %% Setup is complete, let's get cracking
@@ -190,9 +241,7 @@ col = 1; row = 1;filenum=1;
 for P = pdffiles
     info  = exec_system_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('VERBOSITY'));
     
-    % Great, pdfinfo uses BigPoints as a unit. Let's throw in some fancy
-    % numbers and hope we end up with centimeters after that (DPI*INCH).
-    % This might break for some PDFs, better keep your fingers crossed.
+    % pdfinfo uses BigPoints as a unit. Converting to cm.
     psize =  structfun(@(x) str2double(x)/72*2.54, ...
         regexp(info{1},regx, 'names'), ...
         'uniformoutput', 0);
@@ -219,7 +268,9 @@ for P = pdffiles
             + options.secret_latex_spacing_tweak*length(R{:});
         layout.rowheight(row) = max([R{:}.height]);
         row = row + 1;
+        
     end
+    
     filenum = filenum+1;
 end
 
@@ -251,12 +302,28 @@ else
     fz=0;
 end
 
+% find a good hieght
+k = 1;L = 1;height=zeros(1,length(options.rowsPerPage));
+for i = 1:length(options.rowsPerPage)
+   
+    height(i) = sum(layout.rowheight(k:k+options.rowsPerPage(i)-1)) ...
+       + 2*margin + 2*fz ...
+       + options.vspace*(length(layout.rowheight));
+   
+   k = k+options.rowsPerPage(i);
+   
+   if k>=length(options.cols)
+       break
+   end
+end
+height = max(height);
+
+logtext(2,'Fix so that rowsPerPage is a scaler!\n')
 fprintf(fid,['\\usepackage[margin=%gcm,paperwidth=%gcm,' ...
     'paperheight=%gcm]{geometry}\n'], ...
     margin, ...
     max(layout.rowwidth) + 2*margin, ...
-    sum(layout.rowheight) + 2*margin + 2*fz ...
-    + options.vspace*(length(layout.rowheight)));
+    height);
 
 fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
@@ -275,7 +342,7 @@ if ~isempty(options.title)
     fprintf(fid, '\\vspace{%gcm}\\\\\n', options.vspace);
 end
 
-row = 1; filenum = 1;
+row = 1; filenum = 1; page = 1;
 for R = layout.plotsbyrow
     col=1;
     for P = R{:}
@@ -300,20 +367,28 @@ for R = layout.plotsbyrow
     if (row ~= length(layout.rowheight))
         fprintf(fid, '\\vspace{%gcm}\\\\\n', options.vspace);
     end
-    row = row+1;
+    
+    % page break?
+    if row == options.rowsPerPage(page)
+        fprintf(fid,'\\newpage\n');
+        page = page+1;
+        row = 1;
+    else
+        row = row+1;
+    end
 end
 fprintf(fid,'\\end{document}\n');
 
 %% Hand the TeX file over to pdflatex
-exec_system_cmd(mvplotcmd, gmtlab('VERBOSITY'));
+exec_system_cmd(mvplotcmd, atmlab('VERBOSITY'));
 exec_system_cmd(sprintf('cd %s && pdflatex -interaction nonstopmode out.tex', ...
     tmpfolder), ...
-    gmtlab('VERBOSITY'));
+    atmlab('VERBOSITY'));
 
-file = fullfile(options.outdir, options.filename); 
+file = fullfile(options.outdir, options.filename);
 exec_system_cmd(sprintf('cd %s && mv -f out.pdf ''%s''', ...
     tmpfolder, file), ...
-    gmtlab('VERBOSITY'));
+    atmlab('VERBOSITY'));
 
 if options.pdfcrop
     [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),gmtlab('VERBOSITY'));

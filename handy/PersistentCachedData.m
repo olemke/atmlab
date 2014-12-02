@@ -56,7 +56,7 @@ classdef PersistentCachedData < CachedData
             end
             ldfl = fullfile(self.cachedir, [s '.mat']);
             d = dir(ldfl);
-            logtext(atmlab('OUT'), 'Reading from persistent cache: %s \n(which was created %s)\n', ldfl, d.date);
+            logtext(atmlab('OUT'), 'Reading from persistent cache: %s (created: %s)\n', ldfl, d.date);
             
 %             % Make the user aware of the age of this file
 %             [text] = exec_system_cmd(sprintf('ls -l %s',ldfl));

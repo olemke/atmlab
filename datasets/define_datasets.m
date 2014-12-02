@@ -118,7 +118,13 @@ SatDataset('name', 'mirs', ...
     'reader', @satreaders.mirs, ...
     'granule_duration', 7200);
                 
+% collection 5.1
 SatDataset('name', 'modis_aqua_L2', ...
+    'reader', @satreaders.modis, ...
+    'granule_duration', 300);
+
+% collection 6
+SatDataset('name', 'modis_aqua_L2_col6', ...
     'reader', @satreaders.modis, ...
     'granule_duration', 300);
 
@@ -442,24 +448,34 @@ D.cloud_cci.pseudo_fields.cot_ice               = fields.cloud_cci.cot_ice;
 D.cloud_cci.pseudo_fields.cot_ice.dependencies  = fieldnames(fields.cloud_cci.cot_ice.dependencies_struct)';
 D.cloud_cci.reader_processor                    = @cloud_cci_postprocessor;
 
-D.modis_aqua_L2.pseudo_fields.modis_IWP             = fields.modis.modis_IWP;
-D.modis_aqua_L2.pseudo_fields.modis_IWP.dependencies= fieldnames(fields.modis.modis_IWP.dependencies_struct)';
-D.modis_aqua_L2.pseudo_fields.modis_IWP_uncertainty             = fields.modis.modis_IWP_uncertainty;
-D.modis_aqua_L2.pseudo_fields.modis_IWP_uncertainty.dependencies= fieldnames(fields.modis.modis_IWP_uncertainty.dependencies_struct)';
-D.modis_aqua_L2.pseudo_fields.Re_ice                = fields.modis.Re_ice;
-D.modis_aqua_L2.pseudo_fields.Re_ice.dependencies   = fieldnames(fields.modis.Re_ice.dependencies_struct)';
-D.modis_aqua_L2.pseudo_fields.Re_ice_uncertainty                = fields.modis.Re_ice_uncertainty;
-D.modis_aqua_L2.pseudo_fields.Re_ice_uncertainty.dependencies   = fieldnames(fields.modis.Re_ice_uncertainty.dependencies_struct)';
-D.modis_aqua_L2.pseudo_fields.Tau_ice               = fields.modis.Tau_ice;
-D.modis_aqua_L2.pseudo_fields.Tau_ice.dependencies  = fieldnames(fields.modis.Tau_ice.dependencies_struct)';
-D.modis_aqua_L2.pseudo_fields.Tau_ice_uncertainty               = fields.modis.Tau_ice_uncertainty;
-D.modis_aqua_L2.pseudo_fields.Tau_ice_uncertainty.dependencies  = fieldnames(fields.modis.Tau_ice_uncertainty.dependencies_struct)';
-D.modis_aqua_L2.reader_processor                    = @modis_postprocessor;
+myd06.pseudo_fields.modis_IWP             = fields.modis.modis_IWP;
+myd06.pseudo_fields.modis_IWP.dependencies= fieldnames(fields.modis.modis_IWP.dependencies_struct)';
+myd06.pseudo_fields.modis_IWP_uncertainty             = fields.modis.modis_IWP_uncertainty;
+myd06.pseudo_fields.modis_IWP_uncertainty.dependencies= fieldnames(fields.modis.modis_IWP_uncertainty.dependencies_struct)';
+myd06.pseudo_fields.Re_ice                = fields.modis.Re_ice;
+myd06.pseudo_fields.Re_ice.dependencies   = fieldnames(fields.modis.Re_ice.dependencies_struct)';
+myd06.pseudo_fields.Re_ice_uncertainty                = fields.modis.Re_ice_uncertainty;
+myd06.pseudo_fields.Re_ice_uncertainty.dependencies   = fieldnames(fields.modis.Re_ice_uncertainty.dependencies_struct)';
+myd06.pseudo_fields.Tau_ice               = fields.modis.Tau_ice;
+myd06.pseudo_fields.Tau_ice.dependencies  = fieldnames(fields.modis.Tau_ice.dependencies_struct)';
+myd06.pseudo_fields.Tau_ice_uncertainty               = fields.modis.Tau_ice_uncertainty;
+myd06.pseudo_fields.Tau_ice_uncertainty.dependencies  = fieldnames(fields.modis.Tau_ice_uncertainty.dependencies_struct)';
+myd06.reader_processor                    = @modis_postprocessor;
+
+D.modis_aqua_L2.pseudo_fields = myd06.pseudo_fields;
+D.modis_aqua_L2.reader_processor = myd06.reader_processor;
+
+% everything should be the same for collection 6
+D.modis_aqua_L2_col6.pseudo_fields = myd06.pseudo_fields;
+D.modis_aqua_L2_col6.reader_processor = myd06.reader_processor;
+
 
 D.dardarsub.pseudo_fields.dardar_IWP              = fields.dardarsub.dardar_IWP;
 D.dardarsub.pseudo_fields.dardar_IWP.dependencies = fieldnames(fields.dardarsub.dardar_IWP.dependencies_struct)';
 D.dardarsub.pseudo_fields.dardar_ln_IWP_error              = fields.dardarsub.dardar_ln_IWP_error;
 D.dardarsub.pseudo_fields.dardar_ln_IWP_error.dependencies = fieldnames(fields.dardarsub.dardar_ln_IWP_error.dependencies_struct)';
+D.dardarsub.pseudo_fields.dardar_CTH              = fields.dardarsub.dardar_CTH;
+D.dardarsub.pseudo_fields.dardar_CTH.dependencies = fieldnames(fields.dardarsub.dardar_CTH.dependencies_struct)';
 D.dardarsub.reader_processor = @dardarsub_postprocessor;
 
 %% Collocated datasets (the core)
@@ -1619,18 +1635,18 @@ fields.dardarsub.INSTR_FLAG.realname         = 'instrument_flag';
 fields.dardarsub.INSTR_FLAG.type             = 'short';
 fields.dardarsub.INSTR_FLAG.atts.long_name   = 'Instrument flag (0==nothing/1==lidar/2==radar/3==radar+lidar)';
 fields.dardarsub.INSTR_FLAG.atts.units       = '-';
-fields.dardarsub.VOD.realname        = 'vis_optical_depth';
-fields.dardarsub.VOD.type            = 'float';
-fields.dardarsub.VOD.atts.long_name  = 'visible optical depth';
-fields.dardarsub.VOD.atts.unit       = 'dimless';
-fields.dardarsub.VOD.atts.description= ['Visible optical depth, defined as the (dimensionless) line ',...
+fields.dardarsub.vis_optical_depth.realname        = 'vis_optical_depth';
+fields.dardarsub.vis_optical_depth.type            = 'float';
+fields.dardarsub.vis_optical_depth.atts.long_name  = 'visible optical depth';
+fields.dardarsub.vis_optical_depth.atts.unit       = 'dimless';
+fields.dardarsub.vis_optical_depth.atts.description= ['Visible optical depth, defined as the (dimensionless) line ',...
                                     'integral of the ice cloud visible extinction along a vertical path ',...
                                     'through the entire atmosphere.'];
-fields.dardarsub.VOD_ERROR.realname         = 'vis_optical_depth_error';
-fields.dardarsub.VOD_ERROR.type             = 'float';
-fields.dardarsub.VOD_ERROR.atts.long_name   = 'visible optical depth error';
-fields.dardarsub.VOD_ERROR.atts.units       = '-';
-fields.dardarsub.VOD_ERROR.atts.description = 'Visible optical depth error';
+fields.dardarsub.vis_optical_depth_ERROR.realname         = 'vis_optical_depth_error';
+fields.dardarsub.vis_optical_depth_ERROR.type             = 'float';
+fields.dardarsub.vis_optical_depth_ERROR.atts.long_name   = 'visible optical depth error';
+fields.dardarsub.vis_optical_depth_ERROR.atts.units       = '-';
+fields.dardarsub.vis_optical_depth_ERROR.atts.description = 'Visible optical depth error';
 fields.dardarsub.dardar_Re.realname             = 'effective_radius';
 fields.dardarsub.dardar_Re.type                 = 'float';
 fields.dardarsub.dardar_Re.atts.long_name       = 'Retrieved effective radius';
@@ -1641,7 +1657,22 @@ fields.dardarsub.dardar_Re_error.type               = 'float';
 fields.dardarsub.dardar_Re_error.atts.long_name     = 'Fractional error in effective radius';
 fields.dardarsub.dardar_Re_error.atts.units         = 'ln(m)';
 fields.dardarsub.dardar_Re_error.atts.missing_value = -999;
-
+fields.dardarsub.dardar_CTH.type                = 'float';
+fields.dardarsub.dardar_CTH.atts.long_name      = 'DARDAR cloud top height';
+fields.dardarsub.dardar_CTH.atts.units          = 'm';
+fields.dardarsub.dardar_CTH.atts.missing_value  = -999;
+fields.dardarsub.dardar_CTH.dependencies_struct = getSelection(fields.dardarsub,{'dardar_Re','iwc','HEIGHT'});
+fields.dardarsub.dardar_CTH.atts.description    = ...
+    ['Find the cloud top height using CWC > 0. Three values per profile'...
+     ' tau = 0; corresponds to dardar cloud height'...
+     ' tau = 1; corresponds to cloud top height down 1 optical depth to'...
+     '          emulate modis CTH (Holz et al. 2006) '...
+     ' tau = 10; "opaque" cloud where, to a good approximation*, the'...
+     '           contamination from the surface contributes to about a'...
+     '           1K raise in "measured" temperature compared to the true'...
+     '           cloud temperature. *If the temperature difference between'...
+     '           the surface and cloud is about 100K, if tau_vis ='...
+     '           2*tau_IR, and if measuring the cloud brightness temperature from space'];
 %% CPR siblingfields from dardarsub
 
 ddfields = fieldnames(fields.dardarsub);

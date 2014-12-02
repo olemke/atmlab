@@ -57,7 +57,7 @@ if isempty(x)
 end
 
 % check that all x are in range of bins.
-% This guarantees the last bin to be empty.
+% This guarantees that the last bin is empty.
 if min(x) < min(xbin) || max(x) > max(xbin)
     error(['atmlab:' mfilename ':outofrange'], ...
         'x data (%g -- %g) out of range of x bins (%g -- %g)', ...

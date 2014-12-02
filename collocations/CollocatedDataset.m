@@ -1877,7 +1877,8 @@ classdef CollocatedDataset < HomemadeDataset
             %   deal_index          vector          
             
             n_f = 0;
-            n_add = zeros(size(self.associated));
+%            n_add = zeros(size(self.associated));
+            n_add = zeros(size(ads)); % SE: fix. looping over length ads
             fields = {};
             additionals = {};
             additional_fields = {};

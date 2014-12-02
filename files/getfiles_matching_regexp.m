@@ -22,12 +22,12 @@ function files = getfiles_matching_regexp(datadir,regularexp)
 assert(~isempty(dir(datadir)),['atmlab:' mfilename ':BadInput'],...
     'Directory: %s\nDoes not exist',datadir)
 
-%replace tildas as this doesn't work with the system command
+%replace tildas, since they don't work with the system command
 datadir = [strrep(datadir(1),'~',getenv('HOME')) datadir(2:end)];
 
 % MAKE a list of files using UNIX find (regular files only)
 command = sprintf('find ''%s'' -type f',datadir);
-files = exec_system_cmd(command,gmtlab('VERBOSITY'));
+files = exec_system_cmd(command,atmlab('VERBOSITY'));
 
 % use \n for one file per cell element from string output
 files = regexp(files{1},'\n','split');

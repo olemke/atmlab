@@ -30,7 +30,7 @@ function new = sanitise(old, varargin)
 WARN = 1;
 ERROR = 2;
 
-[repl, action, danger] = optargs(varargin, {'_', WARN, ':=, ()*<>!?%;&$'});
+[repl, action, danger] = optargs(varargin, {'_', WARN, ':=, ()*<>!?%;&$"'});
 
 new = regexprep(old,['[' danger ']'],repl);
 

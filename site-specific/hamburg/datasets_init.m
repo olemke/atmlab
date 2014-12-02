@@ -1,10 +1,12 @@
 function datasets_init
-% DATASETS_INIT define paths and regexp for datasets in Kiruna
+% DATASETS_INIT define paths and regexp for datasets in Hamburg
 %
 % 
 %
-% Created by Gerrit Holl
-% $Id: datasets_init.m 8749 2013-12-07 17:27:33Z seliasson $
+% Created by Salomon Eliasson based on Gerrit Holl's kiruna version
+% $Id$
+
+%datasets_config('sat2netcdf', '/storage4/home/gerrit/downloads/2010/05/sat2netcdf-0.4.jar');
 
 % to find a datafile: search in basedir/subdir, first try filename with string
 % substitution, otherwise list all and try to match regexp.
@@ -111,9 +113,15 @@ D.mhs.basedir = [data_base_dir 'mhs'];
 D.mhs.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
 D.mhs.re = poes_re;
 
-D.modis_aqua_L2.basedir = [data_base_dir 'modis/MYD06_L2/'];
-D.modis_aqua_L2.subdir = '$YEAR4/$MONTH/$DAY';
+% collection 5
+D.modis_aqua_L2.basedir = [data_base_dir 'modis/51/MYD06_L2'];
+D.modis_aqua_L2.subdir = '$YEAR4/$DOY';
 D.modis_aqua_L2.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})\.(?<version>\d{3})';
+
+% collection 6
+D.modis_aqua_L2_col6.basedir = [data_base_dir 'modis/6/MYD06_L2'];
+D.modis_aqua_L2_col6.subdir = '$YEAR4/$DOY';
+D.modis_aqua_L2_col6.re = 'MYD06_L2\.A(?<year>\d{4})(?<doy>\d{3})\.(?<hour>\d{2})(?<minute>\d{2})\.(?<version>\d{3})';
 
 D.modis_L3.basedir = [data_base_dir 'modis/$SAT08_M3'];
 D.modis_L3.subdir = '$YEAR4';

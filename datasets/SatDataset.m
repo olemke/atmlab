@@ -873,13 +873,20 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             vn = genvarname(DataHash([self.name, date, varargin]));
             
             %% read cached if appropiate
-            if ~reload && ~isempty(self.cache) && self.cache.has_entry(vn)
-                logtext(atmlab('OUT'), 'Reading %s from cache (entry %s)\n', ...
-                    self.name, vn);
-                data = self.cache.get_entry(vn);
-                return
+            if ~reload
+                if ~isempty(self.cache) && self.cache.has_entry(vn)
+                    logtext(atmlab('OUT'), 'Reading %s from cache (entry %s)\n', ...
+                        self.name, vn);
+                    data = self.cache.get_entry(vn);
+                    return
+                end
+                if isfield(self,'pcd') && ~isempty(self.pcd) && self.pcd.has_entry(vn)
+%                     logtext(atmlab('OUT'), 'Reading %s from cache (entry %s)\n', ...
+%                         self.name, vn);
+                    data = self.pcd.get_entry(vn);
+                    return
+                end
             end
-            
             %% find datafile and function to read it
             datafile = self.find_granule_by_datetime(date, spec);
             
@@ -928,6 +935,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                          'id ''%s'', message ''%s''.  See ''cause'' for details.'], ...
                          class(self), self.name, datafile, ME.identifier, ME.message);
                     ME2 = ME2.addCause(ME);
+%                    keyboard
                     ME2.throw();
                 end
             end
@@ -1000,6 +1008,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             %% cache results
             if ~isempty(self.cache)
                 self.cache.set_entry(vn, data);
+            elseif ~isempty(self.pcd)
+                self.pcd.set_entry(vn, data);
             end
         end
                 
