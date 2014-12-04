@@ -1,3 +1,10 @@
+2014-12-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-33
+
+	* demos/qarts_mcdoit_demo.m (qarts_mcdoit_demo): Just added some
+	inactive code to test using Hong DDA data.
+
 2014-12-02  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-32

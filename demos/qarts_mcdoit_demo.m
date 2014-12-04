@@ -210,12 +210,17 @@ r = dpart/2;
 % into Matlab.
 if 1
   C.SCAT_DATA{1} = mie_arts_scat_data( fgrid, T_grid, rfr_index, theta, r );
-else
+elseif 0
   N = complex_refr_indexFromFunc( fgrid, T_grid', @eps_ice_matzler06, @sqrt );
   C.SCAT_DATA{1} = tmatrix( workfolder, fgrid, T_grid', theta', [], N, ...
                             'spheroidal', 'macroscopically_isotropic', ...
                             2*r, 1.0001, false, ...
                             fullfile(workfolder,'scat_data') );
+else
+  if exist( 'hongdata_read' ) ~= 2
+    addpath( '/home/patrick/SVN/opengem/patrick/Data/HongLiuNowell/Mscripts' );
+  end
+  C.SCAT_DATA{1} = hongdda_read( hongdda_ptypes('droxtal'), dpart );
 end
 
 % Mass of one particle
