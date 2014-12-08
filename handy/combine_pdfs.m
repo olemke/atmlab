@@ -44,14 +44,23 @@ function outfile = combine_pdfs(pdffiles, options)
 %            in:  %s
 %            ex:  directory for output
 %            def: gmtlab('outdir')
+%       options.samesize
+%            in:   %f
+%            ex:   Whether or not to force the figures to have the same size on the page
+%            def:  false
+%            note: This can be useful to make sure your plots are nicely aligned
+%                  on the page,s especially if you have plots that are nearly the
+%                  same size
 %       options.vspace
 %            in:  %f
 %            ex:  space between rows in cm
 %            def: 1
 %       options.hspace
-%            in:  %f
-%            ex:  space between columns in cm
-%            def: 1
+%            in:   %f
+%            ex:   space between columns in cm 
+%            def:  1
+%            note: Provide vector, where length(opt.hspace)==length(n_pdfs/opt.cols [rows]))
+%                  if you want different spaces for different rows)
 %       options.rightPadding
 %            in:  %f
 %            ex:  padding to the right of a row in cm. Note: Needs one value per row.
@@ -119,6 +128,7 @@ if isfield(options,'title') && ~isempty(options.title)
 else
     default.filename = 'out.pdf';
 end
+default.samesize   = false;
 default.outdir     = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
 default.display    = false;
@@ -133,13 +143,17 @@ if length(options.cols)>1
 else default.rowsPerPage = floor(length(pdffiles)/options.cols);
 end
 
-
 options = optargs_struct(options, default);
 
 if options.rowsPerPage>4
-    logtext(2,['There will be more than 4 rows of plots on this page. ',...
-        'If the page is too long latex will crash. Consider limiting ',...
+    warning(['atmlab:',mfilename,':badInput'],...
+        ['There will be more than 4 rows of plots on this page. '...
+        'If the page is too long latex will crash. Consider limiting '...
         'the number of rows per page using options.rowPerPage = [%d, %d, etc]'])
+end
+
+if all(size(options.hspace) == [1,1])
+    options.hspace= repmat(options.hspace,1,round(length(pdffiles)/options.cols));
 end
 
 % Convert outdir to fullpath
@@ -149,7 +163,6 @@ if (isempty(options.outdir) || options.outdir(1) ~= filesep())
 end
 
 % Sanity checks
-
 assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
     'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
 assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
@@ -160,6 +173,7 @@ assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
 if ischar(pdffiles)
     direct = fileparts(pdffiles);
     files = dir(pdffiles);
+    tmp = cell(1,length(files));
     for i = 1:length(files)
         tmp{i} = [direct,'/',files(i).name];
         
@@ -195,11 +209,15 @@ if (length(options.cols) == 1)
 end
 
 if length(options.rowsPerPage)==1
-    options.rowsPerPage = repmat(options.rowsPerPage,1,length(options.cols));
+    len=options.rowsPerPage;
+    options.rowsPerPage = repmat(options.rowsPerPage,1,floor(length(options.cols)/len));
+    clear len
 end
 
 if options.pdfcrop && length(options.rowsPerPage)<sum(options.cols)
-    logtext(2,'Cannot use pdfcrop if the output pdf has more than 1 page. Setting psdcrop to false\n')
+    warning(['atmlab:',mfilename,':badInput'],...
+        ['Cannot use pdfcrop if the output pdf has more than 1 page. '...
+        'Setting psdcrop to false\n'])
     options.pdfcrop=false;
 end
 
@@ -230,22 +248,23 @@ end
 
 end
 
-%% Only subfunctions allowed after this point!!!
 
 function layout = create_layout_from_pdffiles(pdffiles, options)
 
-% Create a fancy regexp that gives us width and height from pdfinfo output
+% regexp that gives us width and height from pdfinfo output
 regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 
 col = 1; row = 1;filenum=1;
-for P = pdffiles
-    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', P{1}), gmtlab('VERBOSITY'));
+for i = 1:length(pdffiles)
+    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 1);
     
     % pdfinfo uses BigPoints as a unit. Converting to cm.
-    psize =  structfun(@(x) str2double(x)/72*2.54, ...
+    psize(i) =  structfun(@(x) str2double(x)/72*2.54, ...
         regexp(info{1},regx, 'names'), ...
         'uniformoutput', 0);
-    
+end
+
+for i = 1:length(pdffiles)
     % --------------
     % Apply scaling
     % --------------
@@ -254,9 +273,12 @@ for P = pdffiles
     else
         sc = 1;
     end
-    layout.plotsbyrow{row}(col) = struct('height', psize.height*sc, ...
-        'width', psize.width*sc, ...
-        'file', P{1});
+    
+    if options.samesize, width=max([psize.width]); else width=psize(i).width; end
+        
+    layout.plotsbyrow{row}(col) = struct('height', psize(i).height*sc, ...
+        'width', width*sc, ...
+        'file', pdffiles{i});
     
     col = col + 1;
     if (col > options.cols(row) ...
@@ -264,7 +286,7 @@ for P = pdffiles
         col = 1;
         R = layout.plotsbyrow(row);
         layout.rowwidth(row) = sum([R{:}.width]) ...
-            + options.hspace*(length(R{:})-1) ...
+            + options.hspace(row)*(length(R{:})-1) ...
             + options.secret_latex_spacing_tweak*length(R{:});
         layout.rowheight(row) = max([R{:}.height]);
         row = row + 1;
@@ -302,13 +324,13 @@ else
     fz=0;
 end
 
-% find a good hieght
-k = 1;L = 1;height=zeros(1,length(options.rowsPerPage));
+% find a good height
+k = 1;height=zeros(1,length(options.rowsPerPage));
 for i = 1:length(options.rowsPerPage)
    
     height(i) = sum(layout.rowheight(k:k+options.rowsPerPage(i)-1)) ...
        + 2*margin + 2*fz ...
-       + options.vspace*(length(layout.rowheight));
+       + options.vspace*options.rowsPerPage(i);
    
    k = k+options.rowsPerPage(i);
    
@@ -318,7 +340,7 @@ for i = 1:length(options.rowsPerPage)
 end
 height = max(height);
 
-logtext(2,'Fix so that rowsPerPage is a scaler!\n')
+fprintf(fid, '\n%s\n%s\n%s\n\n','%%%%%%%%','% Header','%%%%%%%%');
 fprintf(fid,['\\usepackage[margin=%gcm,paperwidth=%gcm,' ...
     'paperheight=%gcm]{geometry}\n'], ...
     margin, ...
@@ -329,8 +351,9 @@ fprintf(fid,'\\pagestyle{empty}\n');
 fprintf(fid,'\\usepackage{graphicx}\n');
 fprintf(fid,'\\usepackage{anyfontsize}\n');
 fprintf(fid,'\\setlength{\\parindent}{0in}\n');
-fprintf(fid,'\\begin{document}\n');
-fprintf(fid,'\\centering\n');
+fprintf(fid,'\n\n');
+fprintf(fid,'\\begin{document}\n\n');
+fprintf(fid,'\\centering\n\n');
 if ~isempty(options.title)
     if ~any(ismember(unit,{'cm','mm','pt'})), error(['atmlab:' mfilename],'Don''t know fontsize unit "%s"',unit),end
     fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, max(layout.rowwidth));
@@ -339,7 +362,7 @@ if ~isempty(options.title)
         fz,unit,1.2*fz,unit,strrep(options.title,'_','\_'));
     fprintf(fid,'\\end{center}\n');
     fprintf(fid,'\\end{minipage}\n');
-    fprintf(fid, '\\vspace{%gcm}\\\\\n', options.vspace);
+    fprintf(fid, '\\vspace{%gcm}\\\\\n\n', options.vspace);
 end
 
 row = 1; filenum = 1; page = 1;
@@ -357,7 +380,7 @@ for R = layout.plotsbyrow
         fprintf(fid,'\\includegraphics[scale=%s]{%s}\n', strscale,tmpplotname);
         fprintf(fid,'\\end{minipage}\n');
         if (col ~= length(R{:}))
-            fprintf(fid,'\\hspace{%gcm}\n', options.hspace);
+            fprintf(fid,'\\hspace{%gcm}\n', options.hspace(row));
         elseif isfield(options,'rightPadding')
             fprintf(fid,'\\hspace{%gcm}\n', options.rightPadding(row));
         end
@@ -365,10 +388,14 @@ for R = layout.plotsbyrow
         filenum=filenum+1;
     end
     if (row ~= length(layout.rowheight))
-        fprintf(fid, '\\vspace{%gcm}\\\\\n', options.vspace);
+        fprintf(fid, '\\vspace{%gcm}\\\\\n\n', options.vspace);
     end
     
-    % page break?
+    if page > length(options.rowsPerPage)
+        break
+    end
+    
+    % page break? allways putting a pagebreak at the end 
     if row == options.rowsPerPage(page)
         fprintf(fid,'\\newpage\n');
         page = page+1;
@@ -377,6 +404,7 @@ for R = layout.plotsbyrow
         row = row+1;
     end
 end
+fprintf(fid,'\n');
 fprintf(fid,'\\end{document}\n');
 
 %% Hand the TeX file over to pdflatex
@@ -391,11 +419,11 @@ exec_system_cmd(sprintf('cd %s && mv -f out.pdf ''%s''', ...
     atmlab('VERBOSITY'));
 
 if options.pdfcrop
-    [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),gmtlab('VERBOSITY'));
+    [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),atmlab('VERBOSITY'));
     if logical(test)
         error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
     end
-    exec_system_cmd(sprintf('mv %s-crop.pdf %s',file(1:end-4),file),gmtlab('VERBOSITY'));
+    exec_system_cmd(sprintf('mv %s-crop.pdf %s',file(1:end-4),file),atmlab('VERBOSITY'));
 end
 
 end
