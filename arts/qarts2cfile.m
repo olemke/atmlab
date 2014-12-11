@@ -1656,8 +1656,8 @@ function T = cfile_SctMth( Q, partname, workfolder )
 
     if ~strcmp( partname, 'SctMthBatch' )
       T{end+1} = 'sensor_checkedCalc';
-      T{end+1} = 'CloudboxGetIncoming';
       T{end+1} = 'DoitInit';
+      T{end+1} = 'CloudboxGetIncoming';
       T{end+1} = 'ScatteringDoit';
     end
     

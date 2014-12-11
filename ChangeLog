@@ -1,23 +1,31 @@
+2014-12-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-19
+
+	* arts/qarts2cfile.m (cfile_SctMth): Moved DoitInit to be called
+	before CloudboxGetIncoming, following change in ARTS.
+
 2014-12-10  Manfred Brath  <manfred.brath@uni-hamburg.de>
-	
+
 	* atmlab-2-2-18
-			
+
 	* documentation/ismar/: updated database documentation
-	
+
+
 2014-11-14  Manfred Brath  <manfred.brath@uni-hamburg.de>
-	
+
 	* atmlab-2-2-17
 
 	* ChangeLog: fixed previous entries.
 
 2014-11-13  Manfred Brath  <manfred.brath@uni-hamburg.de>
-	
+
 	* atmlab-2-2-16
 
-	* retrieval/ismar/hamburg/ismar_*.m: bugfixes 
-		
+	* retrieval/ismar/hamburg/ismar_*.m: bugfixes
+
 	* documentation/ismar/: added database documentation
-	
+
 2014-11-03  Manfred Brath  <manfred.brath@uni-hamburg.de>
 	
 	* atmlab-2-2-15
