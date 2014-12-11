@@ -1,5 +1,11 @@
 2014-12-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-36
+
+	* scattering/tmatrix.m: Small correction of header text.
+
+2014-12-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-35
 
 	* arts/qarts2cfile.m (cfile_SctMth): Moved DoitInit to be called

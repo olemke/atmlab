@@ -1,6 +1,6 @@
 % TMATRIX   T-matrix scattering data, following ARTS
 %
-%    Basically a direct interface to ARTS' WSM *scat_dataFromTmatrix*.
+%    Basically a direct interface to ARTS' WSM *scat_data_singleTmatrix*.
 %    For detailed information, such as options for *shape* see: 
 %       arts -d scat_data_singleTmatrix
 %
