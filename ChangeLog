@@ -1,3 +1,10 @@
+2014-12-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-39
+
+	* arts/qarts2cfile.m: Changed CloudboxGetIncomg to
+	DoitGetIncoming, folwoing change in arts.
+
 2014-12-12  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-38
@@ -5,16 +12,15 @@
         * h2o/parametrisations/ice_psd_Mcfar_97.m: modified so
         output not becomes nan for input diameter of 0.
         also changed back so input iwc unit is in kg/m3,
-        which was by mistake changed to g/m3 in last commit.  
+        which was by mistake changed to g/m3 in last commit.
 
 2014-12-12  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-37
 
-        * h2o/parametrisations/ice_psd_Mcfar_97.m: modified so 
+        * h2o/parametrisations/ice_psd_Mcfar_97.m: modified so
         output not becomes Nan for high and low input values of
-        iwc. 
- 
+        iwc.
 
 2014-12-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
