@@ -21,7 +21,7 @@
 % OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
 % IN       T     Temperature [Kelvin]
-%          IWC   Ice water content [g/m^3]
+%          IWC   Ice water content [kg/m^3]
 %          D     the size vector of the ice particles,
 %                (the mass equivalent sphere diameter [m]),
 %                where the concentration will be calculated  
@@ -34,7 +34,8 @@
 function [y]=ice_psd_Mcfar_97(T,IWC,D,mode);
 
 
-T=T-273.15;
+T   = T-273.15;
+IWC = IWC*1e3; % change unit to g/m^3 
 
 if T>0
    error('Only temperatures less than 273.15 K are allowed.')
@@ -96,11 +97,14 @@ sigmal100=asigma+bsigma*log10(IWCl100/IWC0);
 
 D0=1.0; %micron
 
-
 a1=6*IWCl100; %g/m^3
 a2=pi^(3/2)*rhoice*sqrt(2)*exp(3*mul100+9/2*sigmal100^(2))*sigmal100*D0^(3);
 %g/m^3/micron^3
 Nm2=a1/a2./D.*exp(-1/2*((log(D/D0)-mul100)/sigmal100).^(2)); %micron^-4
+
+%if D = 0 then Nm2 becomes Nan, set Nan to 0 
+ind = find(isnan(Nm2));
+Nm2(ind) = 0;
 
 %convert to m^-4
 Nm1=Nm1*1e24;
