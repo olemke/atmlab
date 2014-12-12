@@ -1,5 +1,12 @@
 2014-12-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+        * atmlab-2-3-40
+	
+	* h2o/parametrisations/snow_psd_field07.m: Added argument to
+	suppress warnings.
+
+2014-12-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
         * atmlab-2-3-39
 
 	* arts/qarts2cfile.m: Changed CloudboxGetIncomg to

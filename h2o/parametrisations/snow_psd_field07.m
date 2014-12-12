@@ -15,7 +15,7 @@
 %
 %    This function is based directly on the Fortran code provided by Field.
 %
-% FORMAT dNdD = snow_psd_field07(dmax,iwc,t,a,b,lats)
+% FORMAT dNdD = snow_psd_field07(dmax,iwc,t,a,b,lats[,nowarning])
 % 
 % OUT   dNdD    The PSD, at sizes speciefied by *max*, [m^-4].
 % IN    dmax    Vector with maximum dimensions, must be sorted.
@@ -24,10 +24,13 @@
 %       a       Constant in Dmax-mass relationship, see above.
 %       b       Constant in Dmax-mass relationship, see above.
 %       lats    Latitude range, 't' or 'm'. 
+% OPT   nowarning  Flag to suppres warnings from the function. Default is false.
 
 % 2014-11-08 Patrick Eriksson
 
-function dNdD = snow_psd_field07(dmax,iwc,t,a,b,lats)
+function dNdD = snow_psd_field07(dmax,iwc,t,a,b,lats,nowarning)
+%
+if nargin < 7, nowarning = false; end
 
 % Check input, and that values are not completly wrong
 if not( isvector( dmax) & issorted( dmax ) )
@@ -49,7 +52,7 @@ end
 
 % Get data for prescribed dmax
 %
-[dmax0,dNdD0] = snow_psd_field07_core( iwc, t, a, b, lats );
+[dmax0,dNdD0] = snow_psd_field07_core( iwc, t, a, b, lats, nowarning );
 
 % Interpolate to user dmax, using log(dNdD)
 dNdD = exp( interp1( dmax0, log(dNdD0), dmax, 'linear', 'extrap' ) ); 
@@ -58,7 +61,7 @@ return
 
 
 
-function [dmax,dNdD] = snow_psd_field07_core(iwc,t,a,b,lats)
+function [dmax,dNdD] = snow_psd_field07_core(iwc,t,a,b,lats,nowarning)
 
 % Calculate 2nd moment
 my = iwc / a;  % yth moment
@@ -77,7 +80,7 @@ end
 if m2 < 0.0
   error( 'Negative M2' );
 end
-if m2 < 1e-5  |  m2 > 0.1
+if not(nowarning) & ( m2 < 1e-5  |  m2 > 0.1 )
   warning( 'M2 outside of range in original data' );
 end
 
