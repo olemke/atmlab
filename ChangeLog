@@ -1,3 +1,12 @@
+2014-12-12  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-37
+
+        * h2o/parametrisations/ice_psd_Mcfar_97.m: modified so 
+        output not becomes Nan for high and low input values of
+        iwc. 
+ 
+
 2014-12-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-36
