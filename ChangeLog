@@ -1,3 +1,9 @@
+2014-12-16  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-41
+
+        * scattering/backcoef2dBZ.m: added optional inputs.
+ 
 2014-12-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-40
