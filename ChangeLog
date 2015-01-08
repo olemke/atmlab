@@ -1,13 +1,31 @@
+2015-01-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-42
+
+	* An attempt to improve the qpack2 documentation, as well as
+	adding the option to include the complete A matrix in L2. The
+	later on popular demand. Note that L2 does not include any
+	information the order of the elements of x. So use the full A ( as
+	well as (J, S, So ...) with care.
+
+	* retrieval/qpack2/qp2_l2.m: Added some options missing in the
+	header text. Also added the option 'Afull'.
+
+	* documentation/qpack2/qpack2.tex: Some improvements in the
+	documentation of how the fields of L2 are controlled.
+
+	* documentation/qpack2/qpack2.pdf: New version.
+
 2014-12-16  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-41
 
         * scattering/backcoef2dBZ.m: added optional inputs.
- 
+
 2014-12-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-40
-	
+
 	* h2o/parametrisations/snow_psd_field07.m: Added argument to
 	suppress warnings.
 
