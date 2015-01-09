@@ -554,6 +554,39 @@ The covariance matrix of total, observation and smoothing error, respectively.
 Obtained by including the string \rq S\rq, \rq So\rq\ and \rq Ss\rq,
 respectively, in \verb|L2_EXTRA|. 
 
+\newfield
+\verb|jq| and \verb|ji|:\\
+Information describing the different retrieval quantities. The structure
+\verb|jq| is basically matching the user settings. One example:
+\begin{verbatim}
+>> L2(1).jq{1}
+
+ans = 
+
+         maintag: 'Absorption species'
+          subtag: 'O3'
+            mode: 'vmr'
+      analytical: 1
+    perturbation: 0
+           grids: {[48x1 double]}
+\end{verbatim}
+The second structure, \verb|ji|, gives the start and end index in the state
+vector for each retrieval quantity. The data are stored in a manner
+matching the data type used in ARTS for this information, an ArrayOfIndex. 
+For example, if retrieval quantity two holds position 49 in 96 in the state
+vector, we have that
+\begin{verbatim}
+>> L2(1).ji{2}
+
+ans = 
+
+    [49]    [96]
+\end{verbatim}
+These two structures are included automatically when \verb|A|, \verb|S| or any
+data matching the complete state vector is included in the output, and, hence,
+the structures are needed match vector and matrix elements to the different
+retrieval quantities.
+
 
 
 \subsubsection{Background atmospheric state}

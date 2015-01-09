@@ -202,6 +202,12 @@ end
 if any( strcmp( Q.L2_EXTRA, 'Se' ) )
   L2.Se = X.Se;
 end
+if any( strcmp(Q.L2_EXTRA,'J') | strcmp(Q.L2_EXTRA,'Afull') | ...
+        strcmp(Q.L2_EXTRA,'G') | strcmp(Q.L2_EXTRA,'S') | ...
+        strcmp(Q.L2_EXTRA,'Se') | strcmp(Q.L2_EXTRA,'So') )
+  L2.jq = R.jq;  
+  L2.ji = R.ji;  
+end
 
 
 % Start and stop index for each retrieval quantity  

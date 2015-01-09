@@ -1,3 +1,13 @@
+2015-01-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-43
+
+	* retrieval/qpack2/qp2_l2.m: jq and ji are now automatically
+	included if that information is relevant.
+
+	* documentation/qpack2/qpack2.tex:
+	* documentation/qpack2/qpack2.pdf: Description of jq and ji added.
+
 2015-01-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-42
