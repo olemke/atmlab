@@ -1,3 +1,19 @@
+2015-01-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-20
+
+	* Last changes to qpack2 from atmlab 2.3 backported to this version:
+
+	* retrieval/qpack2/qp2_l2.m: Added some options missing in the
+	header text. Also added the option 'Afull'. jq and ji are now
+	automatically included if that information is relevant.
+
+	* documentation/qpack2/qpack2.tex: Some improvements in the
+	documentation of how the fields of L2 are controlled. Description
+	of jq and ji added.
+
+	* documentation/qpack2/qpack2.pdf: New version.
+
 2014-12-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-2-19
@@ -10,7 +26,6 @@
 	* atmlab-2-2-18
 
 	* documentation/ismar/: updated database documentation
-
 
 2014-11-14  Manfred Brath  <manfred.brath@uni-hamburg.de>
 
@@ -27,11 +42,11 @@
 	* documentation/ismar/: added database documentation
 
 2014-11-03  Manfred Brath  <manfred.brath@uni-hamburg.de>
-	
+
 	* atmlab-2-2-15
 
 	* atmlab/atmlab_init.m:	Added ismar path.
-		
+
 	* retrieval/ismar/hamburg/ismar_*.m: bugfixes and performance
 	improvements
 
@@ -39,10 +54,10 @@
 
 	* atmlab-2-2-14
 
-	* retrieval/ismar/hamburg/ismar_*.m: 
+	* retrieval/ismar/hamburg/ismar_*.m:
 
 	First version of ISMAR database generation toolbox.
-	
+
 2014-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-2-13

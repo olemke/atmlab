@@ -15,7 +15,7 @@
 %         'es' : See qinfo(@oem,'es')
 %         'ex' : See qinfo(@oem,'ex')
 %         'yf' : See qinfo(@oem,'yf')
-%          'A' : See qinfo(@oem,'A')
+%      'Afull' : Full averaging kernel matrix.
 %          'G' : See qinfo(@oem,'G')
 %          'J' : See qinfo(@oem,'J')
 %          'S' : See qinfo(@oem,'S')
@@ -25,16 +25,21 @@
 %       'date' : Date of the measurement. Taken from Y. Gives fields 'year', 
 %                'hour', 'day', 'hour', 'min' and 'sec'
 %         'xa' : A priori state for each retrieval quantity.
-%          'y' : Measured spectrum.
+%          'y' : Measured spectrum. Includes also the corresponding frequencies.
+%         'yf' : Fitted spectrum.
 %         'bl' : Baseline fit.
+%      'mresp' : Measurement response.
+%          'A' : Partial averaging kernel matrix.
 %     'tnoise' : Thermal noise magnitude. A scalar. Overall mean of Y.TNOISE.
 %        'ptz' : Includes 'p_grid', 'z_field' and 't_field' from corresponding
 %                fields of Q. For higher atmospheric dimensionalities 
 %                'lat_grid' and 'lon_grid* are also included.
 %
-%    The variables G, J S, So and Ss are stored as complete matrices. The
-%    matrix A, and the vectors e, eo, es, ex and xa (as well as x and mr)
-%    are splitted, and are stored separately for each retrieval quantity.
+%    The variables G, J S, So and Ss are stored as complete matrices. The the
+%    vectors e, eo, es, ex and xa (as well as x and mr) are splitted, and are
+%    stored separately for each retrieval quantity. The full averaging
+%    kernal matrix is obtained by 'Afull', while this matrix splitted in
+%    parts (for each part of x) is obatined by 'A'.
 %
 %    A field speciesX_vmr0 is added automatically when the retrieval unit is
 %    rel or logrel.
@@ -82,7 +87,7 @@ if nargin == 1
     switch Q.L2_EXTRA{i} 
       case {'dx','cost','e','eo','es','ex','yf','A','G','J','S','So','Ss'}
         L2.(Q.L2_EXTRA{i})= true;
-      case 'mresp'
+      case {'mresp','Afull'}
         L2.A = true;
       case {'date','xa','y','bl','tnoise','ptz'}
         %
@@ -179,11 +184,14 @@ end
 
 % Optional matrices
 %
-if any( strcmp( Q.L2_EXTRA, 'G' ) )
-  L2.G = X.G;
-end
 if any( strcmp( Q.L2_EXTRA, 'J' ) )
   L2.J = X.J;
+end
+if any( strcmp( Q.L2_EXTRA, 'Afull' ) )
+  L2.A = X.A;
+end
+if any( strcmp( Q.L2_EXTRA, 'G' ) )
+  L2.G = X.G;
 end
 if any( strcmp( Q.L2_EXTRA, 'S' ) )
   L2.S = X.S;
@@ -193,6 +201,12 @@ if any( strcmp( Q.L2_EXTRA, 'So' ) )
 end
 if any( strcmp( Q.L2_EXTRA, 'Se' ) )
   L2.Se = X.Se;
+end
+if any( strcmp(Q.L2_EXTRA,'J') | strcmp(Q.L2_EXTRA,'Afull') | ...
+        strcmp(Q.L2_EXTRA,'G') | strcmp(Q.L2_EXTRA,'S') | ...
+        strcmp(Q.L2_EXTRA,'Se') | strcmp(Q.L2_EXTRA,'So') )
+  L2.jq = R.jq;  
+  L2.ji = R.ji;  
 end
 
 
