@@ -110,10 +110,9 @@ Xindex(Xindex>length(X))=length(X);
 %% GET COUNTS
 Z = cell(length(Y), length(X));
 counts = zeros (size(Z), 'uint32');
+
 for i = 1:length(in.X)
-    iY = Yindex(i);
-    iX = Xindex(i);
-    counts(iY, iX) = counts(iY, iX) + 1;
+    counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) + 1;
 end
 
 if in.counts
@@ -125,19 +124,21 @@ end
 indata = in.Z;
 
 %% PREALLOCATE DATA
+
+zeroes = zeros ([max(counts(:)), sz(2:end)], class(indata));
 for i = 1:size(counts,1)
     for j = 1:size(counts,2)
-        Z{i, j} = zeros ([counts(i, j), sz(2:end)], class(indata));
+        Z{i, j} = zeroes(1:counts(i,j));
     end
 end
 
 %% LOOP DATA
+
 for i = 1:size(indata,1)
-    iY = Yindex(i);
-    iX = Xindex(i);
-    Z{iY, iX}(counts(iY, iX),:) = indata(i,:);
-    counts(iY, iX) = counts(iY, iX) - 1;
+    Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:) = indata(i,:);
+    counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
 end
+
 end
 %% Subfunctions
 % ||
@@ -145,6 +146,7 @@ end
 
 function [in,lonlat] = check_input(in)
 
+% because we could be gridding non-geographical data
 lonlat = all(isfield(in,{'lat','lon'}));
 if ~isfield(in,'counts') % if you only want the counts
     in.counts = 0;
@@ -189,9 +191,7 @@ else
     ' Y %d, X %d'], size(in.Y,1), size(in.X, 1));
 end
 
-
-
-if lonlat
+if isfield(in,'newX')
     assert(~(any([in.newX(:)>360;in.newX(:)<-180;in.newY(:)>90;in.newY(:)<-90])),...
         errId,'lat/lon values are unphysical')
     
@@ -208,13 +208,16 @@ if lonlat
     if isfield(in,'region')
         warning(errId,'Region specified by newY and newX has presedence over in.region\n')
     end
+    
+    %internally span a region, so that values outside this region can be kicked out
+    % [blcorner,trcorner] (lt1,ln1,lt2,ln2). This should be safe for both
+    % centered and non-centered grids
+    dlt = mean(diff(in.newY))/2;  dln = mean(diff(in.newX))/2;
+    in.region = [min(in.newY)-dlt,min(in.newX)-dln,max(in.newY)+dlt,max(in.newX)+dln];
+else
+    dlt = in.gridsize(1)/2;  dln = in.gridsize(end)/2;
+    in.region = [min(in.Y)-dlt,min(in.X)-dln,max(in.Y)+dlt,max(in.X)+dln];
 end
-
-%internally span a region, so that values outside this region can be kicked out
-% [blcorner,trcorner] (lt1,ln1,lt2,ln2). This should be safe for both
-% centered and non-centered grids
-dlt = mean(diff(in.newY))/2;  dln = mean(diff(in.newX))/2;
-in.region = [min(in.newY)-dlt,min(in.newX)-dln,max(in.newY)+dlt,max(in.newX)+dln];
 
 end
 function in = regionchop(in)

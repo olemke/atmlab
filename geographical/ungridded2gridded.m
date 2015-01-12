@@ -25,23 +25,23 @@ function [data,lat,lon] = ungridded2gridded(in,opt)
 %
 %       grid    cell        containing either
 %                           one (degree) scalar or vector to be applied in both
-%                           directions {[%f]} or {[%f %f]}
+%                           directions {[%f]} or {[%f %f ...]}
 %                                              or
 %                           two (degree) scalars or vectors to be appllied
 %                           to the lat and lon dimensions
-%                             {[latdim],[londim]} = {[%f],[%f]} or {[%f %f],[%f %f]}
+%                             {[latdim],[londim]} = {[%f],[%f]} or {[%f %f ...],[%f %f ...]}
 %
 %                           Default grid is a 1x1 deg
 %
 %       func    {@fhandle/s}    Any function handle for the statistic you want
-%                               to calculate within each grid box. default =
-%                               {@mean,@numel}
+%                               to calculate within each grid box. 
+%                               default = {@mean,@numel}
 %
 %       valid   @fhandle    Throws away all invalid values before apply
 %                           statistics. This function handle 
 %                           toggles what you mean by "valid". To keep all values
-%                           valid = ''; By default only keep positive values
-%                           i.e., valid = @(x)(x(x>=0)). WARNING: but if you input a
+%                           valid = ''; If you only want to keep positive
+%                           values, set valid = @(x)(x(x>=0)). WARNING: but if you input a
 %                           matrix per cell be aware that the above example will
 %                           collapse your data to a vector
 %         
@@ -77,8 +77,12 @@ function [data,lat,lon] = ungridded2gridded(in,opt)
 %                          (if it is a structure)
 %
 %
-% USAGE  e.g., [data,lat,lon] = ungridded2gridded(in,struct('field','something','grid',1,'func',@sum,'valid',@(x)(x(x>0)));
-%              %creates rectangular grid with sum per grid of the values (>0) that were binned into that grid
+% USAGE  e.g., 
+%              Create a rectangular grid with sum per grid of the values (>0) that were
+%              binned into that grid
+%
+%              [data,lat,lon] = ungridded2gridded(in,struct('field','something',...
+%                                       'grid',1,'func',@sum,'valid',@(x)(x(x>0)));
 %
 % $Id$
 % Salomon Eliasson
@@ -96,7 +100,9 @@ default.valid               = '';
 default.noStatistics        = false;
 default.field               = 'data';
 default.replace             = NaN;
-default.dataClass           = 'double';
+opt = optargs_struct(opt,default);
+default.dataClass           = '';%class(in.(opt.field)); This is slow. Leave out if
+%not needed
 opt = optargs_struct(opt,default);
 if ~iscell(opt.func), opt.func={opt.func}; end
 if ~iscell(opt.grid), opt.grid={opt.grid};end
@@ -117,13 +123,13 @@ if length(opt.grid)==1 && isscalar(opt.grid{1})
 elseif length(opt.grid)==1
     in.newlat = opt.grid{1};
     in.newlon = opt.grid{1};
-    logtext(1,'Binning the data to a cutom square grid\n')
+    logtext(1,'Binning the data to a custom square grid\n')
 elseif length(opt.grid)==2 && isscalar(opt.grid{1})
     in.gridsize = [opt.grid{1},opt.grid{2}];
 elseif length(opt.grid)==2
     in.newlat = opt.grid{1};
     in.newlon = opt.grid{2};
-    logtext(1,'Binning the data to a cutom rectangular grid\n')
+    logtext(1,'Binning the data to a custom rectangular grid\n')
 else
     error(errId,'grid is incorrect. See doc %s',mfilename)
 end
@@ -140,9 +146,6 @@ if opt.noStatistics
 end
 data.lat = lat;
 data.lon = lon;
-for F = opt.func
-    logtext(1,'Getting the statistic called "%s" within each gridcell\n',func2str(F{1}))
-end
 
 % --------------------
 % APPLY STATISTICS
@@ -154,10 +157,14 @@ for i = 1: length(flds)
     % check that the cells only contain scalars
     data.fhandle2fieldname{i} = sprintf('%s = %s',flds{i},func2str(opt.func{i}));
     if any(~cellfun(@isscalar,out.(flds{i})(:)))
-        logtext(atmlab('OUT'),'Not doing cell2mat(x) since it only works on scalars. Statistic: "%s" that saved in data.%s will remain a cell\n',data.fhandle2fieldname{i} ,flds{i})
+        logtext(atmlab('OUT'),...
+            ['Not doing cell2mat(x) since it only works on scalars. '...
+            'Statistic: "%s" that saved in data.%s will remain a cell\n'],...
+            data.fhandle2fieldname{i} ,flds{i})
         data.(flds{i}) = out.(flds{i});
         continue
-    end    
+    end  
+    logtext(1,'Doing a cell2mat\n')
     data.(flds{i}) = cell2mat(out.(flds{i}));
 end
 

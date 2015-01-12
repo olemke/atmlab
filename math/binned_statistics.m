@@ -40,18 +40,22 @@ function out = binned_statistics(data_bins, statistics, filter, replace, opt)
 %
 % See also: bin, binning_fast, bin_nd
 %
-% modified by Salomon Eliasson
+% modified by Salomon Eliasson (2014)
 % 2010-07-08 Oliver Lemke
 
 if ~exist('opt', 'var')
     opt = struct();
 end
 
-assert(iscell(statistics),['atmlab:' mfilename ':badInput'],'function handles must be in a cell')
+assert(iscell(statistics),['atmlab:' mfilename ':badInput'],...
+    'function handles must be in a cell')
 if exist('filter','var') && ~isempty(filter)
-    assert( isa( filter, 'function_handle' )||iscell(filter),['atmlab:' mfilename ':BadInput'],'filter must be a function handle or cell thereof')
+    assert( isa( filter, 'function_handle' )||iscell(filter),...
+        ['atmlab:' mfilename ':BadInput'],...
+        'filter must be a function handle or cell thereof')
     if iscell(filter)
         for i = 1:length(filter)
+            logtext(atmlab('OUT'),'Applying filter "%s" to each gridcell\n',func2str(filter{i}))
             data_bins = cellfun(filter{i}, data_bins, 'UniformOutput', false);
         end
     else
@@ -70,7 +74,8 @@ for i = 1:length(statistics)
             ME.rethrow();
         end
     end
-    
+    logtext(atmlab('OUT'),'Getting the statistic called "%s" within each gridcell\n',func2str(statistics{i}))
+
     out.(statname) = cellfun(statistics{i}, data_bins, 'UniformOutput', false);
 
 end
@@ -103,15 +108,16 @@ for i = 1:length(F)
             end
             out.(F{i})(test)=replace(i);
         elseif all(test(:))
-            logtext(atmlab('OUT'),'Data is empty')
+            logtext(atmlab('OUT'),'Data is empty\n')
         end
     end
     
     % -------------------
     % Make sure all the data is the same class
-    if isfield(opt,'dataClass')
-        if any(~cellfun(@(x)(strcmp(class(x),opt.dataClass)),out.(F{i})(:)))
-            out.(F{i}) = cellfun(@(x)(cast(x,opt.dataClass)), out.(F{i}), 'UniformOutput', false);
-        end
+
+    if isfield(opt,'dataClass') && ~isempty(opt.dataClass)
+        logtext(atmlab('OUT'),['Making sure all vectors in cells are the same class '...
+            '(in this case %s)\n'],opt.dataClass)
+        out.(F{i}) = cellfun(@(x)(cast(x,opt.dataClass)), out.(F{i}), 'UniformOutput', false);
     end
 end
