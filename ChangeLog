@@ -1,6 +1,15 @@
 2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-46
+ 
+        * datasets/read_gtopo30: new. reads digital
+        elevation model data files. These files
+        belongs to the atmlab-data svn package. 
+ 
+
+2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-46
 
         * h2o/parametrisations/cloudparticle_mgd.m: new.
         returns concentration of cloud particles following
