@@ -1,3 +1,12 @@
+2015-01-16  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-47
+
+        * datasets/read_gtopo30: modified. modified
+        input and output. Now read gtopo30 data into
+        gformat structure for desired lat/lon limits.
+
+
 2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-46

@@ -1,5 +1,5 @@
 % READ_GTOPO30  reads gtopo30 digital elevation model
-%               data into a matlab structure
+%               data into G-format data
 %
 %
 % GTOPO30 is a digital elevation model for the world, 
@@ -17,72 +17,143 @@
 %
 % FORMAT
 %   
-%         [y] = read_gtopo30(target_lat,target_lon)
+%         [G] = read_gtopo30(lat_limits, lon_limits)
 %
 % OUT    
-%         y.z            elevation [m] 2-D array
-%         y.longitude    longitude grid
-%         y.latitude     latitude grid
-%
+%         G             gtopo30 data on gformat structure
+%                       ( all data at full resolution
+%                         within the desired limits)
 %       
 % IN 
-%        target_lat     latitude  (scalar)
-%        target_lon     longitude (scalar) (-180 to 180)
-%                       the output data structure will 
-%                       contain all data from the 
-%                       corresponding tile
-%                       of the given position   
+%        lat_limits     latitude limits (vector)
+%        lon_limits     longitude limits (vector) (-180 to 180)
+%
 
 % HISTORY: Created by Bengt Rydberg 2015-01-15
 
-function [y]=read_gtopo30(target_lat,target_lon)
+function [G]=read_gtopo30(lat_limits,lon_limits)
 
 strictAssert = atmlab('STRICT_ASSERT');
 
 if strictAssert;
-  rqre_datatype( target_lat, @isscalar );
-  rqre_datatype( target_lon, @isscalar );
-  if target_lon<-180 | target_lon>180;
-    error('target_lon must be inside -180 to 180')
+
+  rqre_datatype( lat_limits, @isvector );
+  rqre_datatype( lon_limits, @isvector );
+  if length(lon_limits)~=2;
+    error('lon_limits must be a vector of length 2')
   end
-  if target_lat<-90 | target_lat>90;
-    error('target_lat must be inside -90 to 90')
+  if length(lat_limits)~=2;
+    error('lat_limits must be a vector of length 2')
   end
+  if any(lon_limits<-180) | any(lon_limits>180);
+    error('lon_limits must be inside -180 to 180')
+  end
+  if any(lat_limits<-90) | any(lat_limits>90);
+    error('lat_limits must be inside -90 to 90')
+  end
+  if lon_limits(1)>lon_limits(2);
+    error('lon_limits(2) must be greater than lon_limits(2)')
+  end
+  if lat_limits(1)>lat_limits(2);
+    error('lat_limits(2) must be greater than lat_limits(2)')
+  end
+
 end
 
 %path to data files
 datadir = fullfile(atmlab('ATMLAB_DATA_PATH'),'dem_data/gtopo30');
 
-%get the correct filename to read
-name = get_gtopo30_filename(target_lat,target_lon);
-name = fullfile(datadir,name);
+%get the correct filenames to read
 
-% read the header file
-[ ULXMAP, ULYMAP, XDIM, YDIM, NROWS, NCOLS ] = ...
+latvec = linspace(lat_limits(1), lat_limits(2), 180);
+lonvec = linspace(lon_limits(1), lon_limits(2), 360);
+names = [];
+k = 1;
+for i = 1:length(latvec)
+  for j = 1:length(lonvec)
+    names{k} = get_gtopo30_filename(latvec(i),lonvec(j));
+    k = k + 1;
+  end
+end
+names = unique(names);
+
+% read the desired files
+
+for i = 1:length(names) 
+  name = fullfile(datadir,names{i});
+  % read the header file
+  [ ULXMAP, ULYMAP, XDIM, YDIM, NROWS, NCOLS ] = ...
          read_gtopo30_hdr(name);
 
-y.latitude = ULYMAP-(1:NROWS)*XDIM;
-y.longitude = ULXMAP+(1:NCOLS)*YDIM;
+  y{i}.latitude = ULYMAP-(1:NROWS)*XDIM;
+  y{i}.longitude = ULXMAP+(1:NCOLS)*YDIM;
 
-% read the data file
+  % read the data file
 
-fid = fopen([name,'.dem'],'rb');
-y.z = fread(fid,[NCOLS NROWS],'int16','b');
-fclose(fid);
-%y.z( find( y.z == -9999 ) ) = nan;
+  fid = fopen([name,'.dem'],'rb');
+  y{i}.z = fread(fid,[NCOLS NROWS],'int16','b');
+  fclose(fid);
+
+end
 
 
-%plot data
+% merge data
+% first create lat/lon grids
+latgrid = [];
+longrid = [];
+for i=1:length(y)
+  latgrid = [latgrid, y{i}.latitude];
+  longrid = [longrid, y{i}.longitude];
+end
+latgrid = sort(unique(latgrid));
+longrid = sort(unique(longrid));
+
+z = zeros(length(latgrid),length(longrid));
+for k = 1:length(y)
+  ind1 = find(y{k}.longitude(1)==longrid);
+  ind2 = find(y{k}.latitude(1)==latgrid);
+  z(ind2-length(y{k}.latitude)+1:ind2, ind1:ind1+length(y{k}.longitude)-1) = flipud(y{k}.z');
+end
+
+%filter the data, only return data within the desired limits
+clear y
+ind1 = find( latgrid >= lat_limits(1) & latgrid<=lat_limits(2) );
+ind2 = find( longrid >= lon_limits(1) & longrid<=lon_limits(2) );
+
+G           = gf_empty(2);
+grid_names  = {'Latitude', 'Longitude'};
+grid_units  = { 'deg', 'deg'};
+grids       = { vec2col(latgrid(ind1)), ...
+                vec2col(longrid(ind2))};
+
+G = gf_set_data(G,z(ind1,ind2),grids,grid_names);
+
+for d = 1:2
+  G = gf_set_grid( G, d, grids{d}, grid_names{d}, grid_units{d} );
+end
+ 
+G.TYPE      = 'surfdata';
+G.NAME      = 'GTOPO30 dem data';
+G.SOURCE    = datadir;
+G.DATA_NAME = 'Surface elevation';
+G.DATA_UNIT = 'm';
+
+
 if 0;
-  pcolor( y.longitude(1:3:end), y.latitude(1:3:end),...
-         y.z(1:3:end,1:3:end)')
+  di=5;
+  pcolor( G.GRID2(1:di:end), G.GRID1(1:di:end), G.DATA(1:di:end,1:di:end))
   shading flat
   colorbar
   load coast
   hold on
+  xlabel('Longitude [deg]')
+  ylabel('Latitude [deg]')
   c1=plot(long,lat,'k');
   set(c1,'linewidth',2)
+  caxis([0 max(G.DATA(:))])
 end
+
+
 
 
 %SUB-FUNCTIONS
