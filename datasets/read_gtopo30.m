@@ -60,6 +60,7 @@ if strictAssert;
 
 end
 
+
 %path to data files
 datadir = fullfile(atmlab('ATMLAB_DATA_PATH'),'dem_data/gtopo30');
 
@@ -108,15 +109,65 @@ end
 latgrid = sort(unique(latgrid));
 longrid = sort(unique(longrid));
 
-z = zeros(length(latgrid),length(longrid));
-for k = 1:length(y)
-  ind1 = find(y{k}.longitude(1)==longrid);
-  ind2 = find(y{k}.latitude(1)==latgrid);
-  z(ind2-length(y{k}.latitude)+1:ind2, ind1:ind1+length(y{k}.longitude)-1) = flipud(y{k}.z');
+
+if max(latgrid)>-60.0125 & min(latgrid)<=-60.0125;
+  % special case: data files above and below
+  % -60 deg S have different sizes 
+  sc = 1;
+  latgrid1 = [];
+  latgrid2 = [];
+  longrid1 = [];
+  longrid2 = [];
+  for i=1:length(y)
+    if any(y{i}.latitude<-60.0125);
+      latgrid1 = [latgrid1, y{i}.latitude];
+      longrid1 = [longrid1, y{i}.longitude];
+    else
+      latgrid2 = [latgrid2, y{i}.latitude];
+      longrid2 = [longrid2, y{i}.longitude];
+    end;
+  end
+  latgrid1 = sort(unique(latgrid1));
+  longrid1 = sort(unique(longrid1));
+  latgrid2 = sort(unique(latgrid2));
+  longrid2 = sort(unique(longrid2));
+  z1 = zeros(length(latgrid1),length(longrid1));
+  z2 = zeros(length(latgrid2),length(longrid2));
+  for k = 1:length(y)
+    if any(y{k}.latitude<-60.0125);
+      ind1 = find(y{k}.longitude(1)==longrid1);
+      ind2 = find(y{k}.latitude(1)==latgrid1);
+      z1(ind2-length(y{k}.latitude)+1:ind2, ind1:ind1+length(y{k}.longitude)-1) = flipud(y{k}.z');
+    else
+      ind1 = find(y{k}.longitude(1)==longrid2);
+      ind2 = find(y{k}.latitude(1)==latgrid2);
+      z2(ind2-length(y{k}.latitude)+1:ind2, ind1:ind1+length(y{k}.longitude)-1) = flipud(y{k}.z');
+    end
+  end
+  lonmin = max(min(longrid1),min(longrid2))-YDIM/2;
+  lonmax = min(max(longrid1),max(longrid2))+YDIM/2;
+
+  ind1   = find(longrid1>=lonmin & longrid1<=lonmax);
+  ind2   = find(longrid2>=lonmin & longrid2<=lonmax);
+
+  longrid = longrid1(ind1);
+  latgrid = sort(union(latgrid1, latgrid2));
+  z       = [z1(:,ind1); z2(:,ind2)];
+
+else
+
+  z = zeros(length(latgrid),length(longrid));
+  for k = 1:length(y)
+    ind1 = find(y{k}.longitude(1)==longrid);
+    ind2 = find(y{k}.latitude(1)==latgrid);
+    z(ind2-length(y{k}.latitude)+1:ind2, ind1:ind1+length(y{k}.longitude)-1) = flipud(y{k}.z');
+  end
+
 end
 
 %filter the data, only return data within the desired limits
 clear y
+
 ind1 = find( latgrid >= lat_limits(1) & latgrid<=lat_limits(2) );
 ind2 = find( longrid >= lon_limits(1) & longrid<=lon_limits(2) );
 

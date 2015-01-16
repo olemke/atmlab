@@ -1,5 +1,14 @@
 2015-01-16  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
+        * atmlab-2-3-48
+
+        * datasets/read_gtopo30: modified. Bugfix.
+        Earlier version produced error in data when
+        input lat_limits crossed -60 deg. 
+
+
+2015-01-16  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
         * atmlab-2-3-47
 
         * datasets/read_gtopo30: modified. modified
