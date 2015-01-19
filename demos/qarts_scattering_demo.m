@@ -142,7 +142,7 @@ Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan )';
 %
 if strcmp( lower(method), 'tr' )
-  Q.IY_MAIN_AGENDA        = { 'iyTransmissionStandard' };
+  Q.IY_MAIN_AGENDA        = { 'Ignore(iy_unit)', 'iyTransmissionStandard' };
   Q.IY_TRANSMITTER_AGENDA = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
                               'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
   Q.IY_UNIT               = '1';

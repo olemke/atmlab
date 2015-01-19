@@ -437,21 +437,17 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
     R.sensor_response = Q.SENSOR_RESPONSE;
   end
   %
-  Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
+  Q.SENSOR_RESPONSE      = fullfile( R.workfolder, 'sensor_response.xml' );
   %
-  Q.SENSOR_RESPONSE     = fullfile( R.workfolder, 'sensor_response.xml' );
-  Q.SENSOR_RESPONSE_F   = fullfile( R.workfolder, 'sensor_response_f.xml' );
-  Q.SENSOR_RESPONSE_ZA  = fullfile( R.workfolder, 'sensor_response_za.xml' );
-  Q.SENSOR_RESPONSE_AA  = fullfile( R.workfolder, 'sensor_response_aa.xml' );
-  Q.SENSOR_RESPONSE_POL = fullfile( R.workfolder, 'sensor_response_pol.xml' );
+  Q.SENSOR_RESPONSE      = fullfile( R.workfolder, 'sensor_response.xml' );
+  Q.SENSOR_RESPONSE_F    = fullfile( R.workfolder, 'sensor_response_f.xml' );
+  Q.SENSOR_RESPONSE_DLOS = fullfile( R.workfolder, 'sensor_response_dlos.xml' );
+  Q.SENSOR_RESPONSE_POL  = fullfile( R.workfolder, 'sensor_response_pol.xml' );
   Q.SENSOR_RESPONSE_F_GRID = ...
                         fullfile( R.workfolder, 'sensor_response_f_grid.xml' );
-  Q.SENSOR_RESPONSE_ZA_GRID = ...
-                       fullfile( R.workfolder, 'sensor_response_za_grid.xml' );
-  Q.SENSOR_RESPONSE_AA_GRID  = ...
-                       fullfile( R.workfolder, 'sensor_response_aa_grid.xml' );
+  Q.SENSOR_RESPONSE_DLOS_GRID = ...
+                      fullfile( R.workfolder, 'sensor_response_dlos_grid.xml' );
   Q.SENSOR_RESPONSE_POL_GRID = ...
                       fullfile( R.workfolder, 'sensor_response_pol_grid.xml' );
-  Q.MBLOCK_ZA_GRID      = fullfile( R.workfolder, 'mblock_za_grid.xml' );
-  Q.MBLOCK_AA_GRID      = fullfile( R.workfolder, 'mblock_aa_grid.xml' );
+  Q.MBLOCK_DLOS_GRID     = fullfile( R.workfolder, 'mblock_dlos_grid.xml' );
 return

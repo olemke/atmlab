@@ -1,4 +1,35 @@
+2015-01-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-50
+
+	* In short, changes to get synced with changes in ARTS. Most
+	changes do not affect the standard usage of qarts/qpack2. With one
+	exception, MBLOCK_ZA_GRID is now called MBLOCK_DLOS_GRID. For
+	standard cases you just need to rename this Q field.
+
+	For further details, see ChabgeLOg of ARTS.
+
+	* demos: General revision of the demo scripts, to adopt to changes.
+
+	* arts/qarts2cfile.m: Adopted to changes below and others recent
+	ARTS changes, such as ScatteringDoit is now called DoitCalc.
+
+	* arts/arts_oem_init.m: Some changes following new Q field names
+	listed below.
+
+	* arts/qarts.m: Changes in defined fields. Renamed ones:
+	ANTENNA_DLOS             -> ANTENNA_DLOS
+	MBLOCK_ZA_GRID           -> MBLOCK_DLOS_GRID
+	SENSORS_RESPONSE_ZA      -> SENSOR_RESPONSE_DLOS
+	SENSORS_RESPONSE_ZA_GRID -> SENSOR_RESPONSE_DLOS_GRID
+
+	Removed:
+	SENSORS_RESPONSE_AA
+	SENSORS_RESPONSE_AA_GRID
+
 2015-01-19  Ole Martin Christensen  <olem@chalmers.se>
+
+        * atmlab-2-3-49
 
 	* retrieval/qpack2/qp2_l2.m: Added the possibility
 	to get ML-parameter ('ga').
@@ -33,14 +64,14 @@
         gformat structure for desired lat/lon limits.
 
 
+>>>>>>> .r9153
 2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-46
- 
+
         * datasets/read_gtopo30: new. reads digital
         elevation model data files. These files
-        belongs to the atmlab-data svn package. 
- 
+        belongs to the atmlab-data svn package.
 
 2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
@@ -48,8 +79,8 @@
 
         * h2o/parametrisations/cloudparticle_mgd.m: new.
         returns concentration of cloud particles following
-        a modified gamma distribution. 
-        
+        a modified gamma distribution.
+
         * h2o/parametrisations/mgd_get_parameters.m: new.
         returns some modified gamma distribution parameters
         given some other.

@@ -151,7 +151,7 @@ Q.SENSOR_DO           = true;
 Q.SENSOR_RESPONSE     = H;
 %
 Q.ANTENNA_DIM         = 1;
-Q.MBLOCK_ZA_GRID      = 0;
+Q.MBLOCK_DLOS_GRID    = 0;
 
 
 
