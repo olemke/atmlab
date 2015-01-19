@@ -9,7 +9,8 @@
 %    Possible choices for L2_EXTRA are:
 %    ----------: These data are transferred from X, the output of *oem*
 %         'dx' : Last value of X.dx. See qinfo(@oem,'dx')
-%       'cost' : Last value of X.cost. See qinfo(@oem,'dx')
+%         'ga' : All values of ML-parameter. See qinfo(@oem,'ga')
+%       'cost' : Last value of X.cost. See qinfo(@oem,'cost')
 %          'e' : See qinfo(@oem,'e')
 %         'eo' : See qinfo(@oem,'eo')
 %         'es' : See qinfo(@oem,'es')
@@ -85,7 +86,7 @@ if nargin == 1
   %
   for i = 1 : length( Q.L2_EXTRA )
     switch Q.L2_EXTRA{i} 
-      case {'dx','cost','e','eo','es','ex','yf','A','G','J','S','So','Ss'}
+      case {'dx','cost','ga','e','eo','es','ex','yf','A','G','J','S','So','Ss'}
         L2.(Q.L2_EXTRA{i})= true;
       case {'mresp','Afull'}
         L2.A = true;
@@ -134,6 +135,9 @@ L2.converged = X.converged;
 if ~O.linear
   if any( strcmp( Q.L2_EXTRA, 'dx' ) )
     L2.dx = X.dx(end);
+  end
+  if any( strcmp( Q.L2_EXTRA, 'ga' ) )
+    L2.ga = X.ga;
   end
 end 
 %

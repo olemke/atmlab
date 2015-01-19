@@ -166,7 +166,7 @@ if strcmp( D.FORMAT, 'param' )
     %
     % Most general option:
     if ~( isfield( D, 'SEPERABLE' )  &  D.SEPERABLE )
-      S = covmat3d_from_cfun( dim, D, G{1:dim} );
+      S = covmat3d_from_cfun_not_seperable( dim, D, G{1:dim} );
       %
     else % Seperable option:
       %

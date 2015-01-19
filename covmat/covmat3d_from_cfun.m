@@ -1,9 +1,17 @@
 % COVMAT3D_FROM_CFUN   Correlation function based covariance matrix for 1D-3D
 %
-%   Converts specification data to a covariance matrix. The covariance is
-%   described by the structure *D*. The function is more general than
-%   *covmat_partstat_corr* (for dimensions <= 3D), but is (much) slower,
-%   particularly for higher data dimensions or long data grids. 
+%   Warning! COVMAT3D_FROM_CFUN does not handle the case where the
+%   correlations in each dimension is not seperable! For this reason this
+%   functions should not be used, and covmat3d_from_cfun_not_seperable
+%   should be used instead.  For seperable cases it is recomended to use 
+%   *covmat_partstat_corr*. For a general function (handeling both
+%   seperable and non-seperable cases) the function covmat3d_from_cfun can
+%   be used.
+%
+%   COVMAT3D_FROM_CFUN converts specification data to a covariance matrix. 
+%   The covariance is described by the structure *D*. The function is more 
+%   general than *covmat_partstat_corr* (for dimensions <= 3D), but is (much) 
+%   slower, particularly for higher data dimensions or long data grids. 
 %
 %   Correlation up to 3 dimensions are handled. The dimensions are here 
 %   denoted as 1, 2 and 3, in order to be general. The physical meaning
@@ -84,6 +92,7 @@
 % OPT   grid2   Retrieval grid in dimension 2. Not needed if *dim* < 2.
 %       grid3   Retrieval grid in dimension 3. Not needed if *dim* < 3.
 
+% 2015-01-15   Warning added. Ole Martin Christensen.
 % 2006-08-21   Created by Patrick Eriksson.
 
 
