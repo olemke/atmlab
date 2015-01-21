@@ -1,3 +1,11 @@
+2015-01-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-51
+
+	* arts/various/arts_map_daa.m: Added local versions of zaaa2cart
+	and cart2zaaa as these functions have been removed from atmlab.
+	Code taken from arts.
+
 2015-01-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-50
@@ -52,8 +60,7 @@
 
         * datasets/read_gtopo30: modified. Bugfix.
         Earlier version produced error in data when
-        input lat_limits crossed -60 deg. 
-
+        input lat_limits crossed -60 deg.
 
 2015-01-16  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
@@ -62,7 +69,6 @@
         * datasets/read_gtopo30: modified. modified
         input and output. Now read gtopo30 data into
         gformat structure for desired lat/lon limits.
-
 
 >>>>>>> .r9153
 2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
