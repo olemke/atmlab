@@ -1,3 +1,13 @@
+2015-01-22  Gerrit Holl  <gerrit.holl@utoronto.ca>:
+
+	* atmlab-2-3-53
+
+	* datasets/HomemadeDataset.m(read_homemade_granule):
+
+	- Bugfix: do not set .epoch to earliest measurement, time axis counts
+	from Unix epoch already so epoch should be 0 instead.  Thanks 
+	圣殷 (Shengyin Li) for leading me to fixing this.
+
 2015-01-22  Gerrit Holl  <gerrit.holl@utoronto.ca>
 
 	* atmlab-2-3-52

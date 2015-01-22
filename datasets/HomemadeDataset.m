@@ -722,7 +722,13 @@ classdef HomemadeDataset < SatDataset
             else
                 date = [str2double(info.year) str2double(info.month) str2double(info.day)];
             end
-            S.epoch = round(date2unixsecs(date(1), date(2), date(3)));
+            % BUGFIX 2015-01-22: I tend to use unixsecs directly as the
+            % time axes.  That means the epoch is 0, not the lowest value!
+            % This will cause serious problems when building collocations
+            % on top of a homemade-dataset.  Thanks to 圣殷 (Shengyin Li)
+            % for leading me identifying this problem.
+            %S.epoch = round(date2unixsecs(date(1), date(2), date(3)));
+            S.epoch = 0;
             
             S.path = file;
             
