@@ -88,7 +88,7 @@ classdef GriddedDataset < SatDataset
                 if any(llat_i==0)
                     logtext(atmlab('ERR'), [...
                          'Warning: found some latitudes so close to the' ...
-                         'south pole that they''re out of range']);
+                         'south pole that they''re out of range\n']);
                     llat_i(llat_i==0) = 1;
                 end
                 mask = true(size(llat_i));

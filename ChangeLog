@@ -1,3 +1,16 @@
+2015-01-22  Gerrit Holl  <gerrit.holl@utoronto.ca>
+
+	* atmlab-2-3-52
+
+	* retrieval/spareice/get_surface_elevation.m: Copied over file from my
+	personal codes that was missing for the correct working of reading
+	SPARE-ICE.
+
+	* atmlab/atmlab_init.m: Finally decided to also add spareice to the
+	path, even though it's not up to atmlab standards.
+
+	* datasets/GriddedDataset.m: Added missing newline in error message.
+
 2015-01-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-51
