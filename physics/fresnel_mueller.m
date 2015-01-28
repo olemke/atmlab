@@ -7,10 +7,10 @@
 %    function for further information.
 %
 %    The structure of the Muller matrix follows the implementation in ARTS
-%    (found in surface.cc). This part os documented in the ARTS theory
+%    (found in surface.cc). This part is documented in the ARTS theory
 %    document. 
 %    
-% FORMAT   M = fresnel(n1,n2,theta1,stokes_dim)
+% FORMAT   M = fresnel_mueller(n1,n2,theta1,stokes_dim)
 %        
 % OUT   M           Mueller matrix.
 %       
