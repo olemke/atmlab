@@ -1,3 +1,10 @@
+2015-01-29  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-55
+
+        * datasets/read_etopo1: added a function
+        that reads etopo1 topography data.
+
 2015-01-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-54
