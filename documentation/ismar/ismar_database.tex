@@ -3,7 +3,7 @@
 \documentclass[english]{scrreprt}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
-\setcounter{secnumdepth}{3}
+\setcounter{secnumdepth}{-2}
 \setcounter{tocdepth}{3}
 \usepackage{textcomp}
 \usepackage{url}
@@ -14,6 +14,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
 %% Because html converters don't know tabularnewline
 \providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter} 
 
 \makeatother
 
@@ -27,13 +32,13 @@
 
 \maketitle
 
-\addsec{Database description}
+\section{Database description}
 
 The database consists of radiative transfer simulations of $1\text{D}$-atmospheric
 profiles made with ARTS 2.2%
 \footnote{ARTS 2.3 is still under strong development with a lot of changes,therefore
 the database will be defined according to ARTS 2.2%
-} . As the database should be the foundation of a retrieval, the database
+}. As the database should be the foundation of a retrieval, the database
 has to be consistent and self-standing, meaning each state of the
 database should be comparable with each other. So, following assumptions
 are made:
@@ -46,12 +51,12 @@ sizes and shapes.
 \end{itemize}
 Therefore, the database has a static part with the grids, instrument
 and scatterer definitions and a variable part with the state variables
-changing for each case. So, the database consists of $6$ grids, $1$
+changing for each case. So, the database consists of $6$ grids, $2$
 instrument description, $5$ descriptions for the scatterers and $13$
 state variables, which all will be described in the folowing parts.
 
 
-\subsection*{Static part}
+\subsection{Static part}
 
 
 \subsubsection*{Grids }
@@ -66,18 +71,17 @@ from $0\text{\textdegree}$ to $180\text{\textdegree}$ in steps of
 $5\text{\textdegree}$ ($37$ steps).
 \item $scattering\_element\_index$, an index that names a specific scattering\_element
 with a number.
-\item $polarization$, a two element grid stating the polarization state.
-The first component is the $I$-component of the Stokes vector and
-the second is the $Q$-component of the Stokes vector. The other two
-elements ($U$, $V$) of the standard Stokes vector can be neglected
-since no Deimos, MARSS or ISMAR channel is using circular polarization.
+\item $polarization$, a four element grid stating the polarization state.
+The first component is the $I$-component, the second is the $Q$-component,
+the second is the $U$-component and the second is the $V$-component
+of the Stokes vector. 
 \end{itemize}
 
 \subsubsection*{Instrument description}
 \begin{itemize}
-\item the channel description $channel\_def\left(channel\_no\right)$, it
-consists of the center frequencies, the offsets of the sidebands and
-the bandwidths, see table \ref{tab:Channel-definition}.
+\item $channel\_def\left(channel\_no\right)$, the channel description,
+it consists of the center frequencies, the offsets of the sidebands
+and the bandwidths, see table \ref{tab:Channel-definition}.
 \begin{table}
 \begin{centering}
 \begin{tabular}{c|r@{\extracolsep{0pt}.}l|r@{\extracolsep{0pt}.}l|r@{\extracolsep{0pt}.}l|c}
@@ -138,6 +142,10 @@ $channel\_no$ & \multicolumn{2}{c|}{quency {[}$\text{GHz}${]}} & \multicolumn{2}
 \protect\caption{\label{tab:Channel-definition}Channel description, taken from: \protect\url{http://www.sat.ltu.se/workshops/ismar/material/20140611_11_rule_ismar_overview.pdf}}
 \end{table}
 
+\item $calibration$, the used calibration, it is a string with either ``PlanckBT''
+or ``RayleighJeansBT'' indicating if the brightness temperature
+is calibrated using the Planck equation or using the Rayleigh-Jeans
+approximation. 
 \end{itemize}
 
 \subsubsection*{Scatterer descriptions}
@@ -174,22 +182,16 @@ the shape.
 \item water vapor as volume mixing ratio $x\left(case\_index,\, pressure\right)$
 \item brightness temperature $\left[\text{K}\right]$:\\
  $t\_b(case\_index,\, pressure,\, channel\_no,\, looking\_direction,\, polarization)$.
-It is calculated by using the Planck equation. The conversion from
-specific intensity to brightness temperature is done seperately for
-each linear polarization and for each simulated frequency before the
-mapping to the channels is done. The mapping is done by taking the
-average brightness temperature of the frequencies belonging to the
-specific channel.
-\item specific intensity $\left[\text{Wm}^{-2}\text{sr}^{-1}\text{Hz}^{-1}\right]$:\\
- $i\_field\_ch(case\_index,\, pressure,\, channel\_no,\, looking\_direction,\, polarization)$,
-it is the $i\_field$ mapped to the channels%
-\footnote{I do not put the $i\_field$ itself inside the database because, everything
-else directly related to radiation inside the database is defined
-according to the channels. If we want to have $i\_field$ defined
-according to a frequency grid, I would suggest that we have an additional
-database with everything directly related to radiation is defined
-according to a specific frequency grid.%
-}.
+It is calculated by using the Planck equation or using the Rayleigh-Jeans
+approximation, which is shown by the variable $calibration$. If the
+Rayleigh-Jeans approximation is used, the conversion from specific
+intensity to brightness temperature will be done seperately for each
+component and for each simulated frequency before the mapping to the
+channels will be done. If planck is used only the $I$ component will
+be converted to brightness temperature. The other components will
+be set to zero, because they are not defined for Planck brightness
+temperature. The mapping is done by taking the average brightness
+temperature of the frequencies belonging to the specific channel.
 \end{itemize}
 \item the surface properties 
 
@@ -204,57 +206,15 @@ defining the surface type of each $case\_index$.
 \, looking\_direction,\, polarization,\, polarization)
 \end{gathered}
 \]
-the two last dimensions are the $2\times2$ reflection matrices for
-a two dimensional stokes vector with the first component being $I$
-and the second component being $Q$.
+the two last dimensions are the $4\times4$ reflection matrices for
+a four dimensional stokes vector with the above mentioned components
 \end{itemize}
 \item the simulated position in space and time 
 
 \begin{itemize}
 \item latittude $\left[\text{\textdegree}\right]$: $lat(case\_index)$ 
 \item longitude $\left[\text{\textdegree}\right]$: $lon(case\_index)$
-\item time $time(case\_index)$
+\item time $time(case\_index)$\end{itemize}
 \end{itemize}
-\end{itemize}
-
-\addchap{Create database}
-
-To create the database, you can use the matlab function ``ismar\_create\_database''
-within ``atmlab/retrieval/ismar/hamburg/''. The database will be
-stored as mat-files. Of course, each single case (preprocessed ARTS-simulation)
-has to be a mat-file. The single preprocessed ARTS-simulations will
-be combined to one database and regridded to common grids of pressure
-coordinates and looking direction. Additionally, $doit\_i\_field1D\_spectrum$
-will be converted to brightness temperature (Planck Tb) and then mapped
-to the ISMAR channels, see also table \ref{tab:Channel-definition}.
-All simulations for the database must consist of the same scattering
-elements. This means all simulations to be put into the database must
-have the same scattering meta data and single scattering data. Each
-ARTS-simulation must consist of the into matlab converted workspace
-variables:
-\begin{itemize}
-\item $atm\_fields\_compact$ 
-\item $cloudbox\_limits$ 
-\item $f\_grid$ 
-\item $doit\_i\_field1D\_spectrum$ 
-\item $part\_species$ 
-\item $pnd\_field$ 
-\item $scat\_data\_per\_part\_species$
-\item $scat\_meta\_array$
-\item $scat\_za\_grid$
-\end{itemize}
-and three additional created variables:
-\begin{itemize}
-\item $lat\_lon\_time$, a vector consisting of the geographical position
-of the simulation (1st component is latitude, 2nd is longitude) and
-the simulated time (third component) in a numeric format 
-\item $surface\_properties$, an array of the two arts workspace variable
-$z\_surface$ and $t\_surface$. 1st component is $z\_surface$ and
-the 2nd is $t\_surface$
-\item $surface\_radiation\_parameter$, which is an empty array if the surface
-is a blackbody, or it is a structure of an gridded\_field6, if the
-reflectivities are given, or it is a structure of a gridded\_field3
-if the complex refraction indices are given. See for additional information
-the ARTS documentation. \end{itemize}
 
 \end{document}
