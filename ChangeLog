@@ -1,3 +1,11 @@
+2015-01-30  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-56
+
+        * datasets/read_etopo1: modified. added
+        extra input/output options and bug-fix.
+         
+
 2015-01-29  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-55

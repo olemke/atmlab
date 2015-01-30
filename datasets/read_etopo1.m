@@ -11,14 +11,14 @@
 % latitude and longitude referenced to World Geodetic System 84 (WGS84).
 % The vertical units represent elevation in meters above mean sea level.
 % 
-% This function is used together with the atmlab function
-% "LAND_SEA_MASK". Ocean data points are masked out with -9999. 
+% This function can used together with the atmlab function
+% "LAND_SEA_MASK". Ocean data points are the masked out with -9999. 
 %
 % The actual data files are found within the atmlab-data svn package.
 %
 % FORMAT
 %
-%         [G] = read_etopo1(lat_limits, lon_limits)
+%         [G] = read_etopo1(lat_limits, lon_limits, sea_flag)
 %
 % OUT
 %         G             etopo1 data on gformat structure
@@ -28,12 +28,21 @@
 % IN
 %        lat_limits     latitude limits (vector)
 %        lon_limits     longitude limits (vector) (-180 to 180)
+%        sea_flag       0 or 1, optional input, if 0 or left out
+%                       the output data includes the the original 
+%                       bathymetry data over oceans.
+%                       If set to 1, ocean data points are set to
+%                       -9999, this option uses the atmlab function
+%                       "LAND_SEA_MASK".
 %
 
 % HISTORY: Created by Bengt Rydberg 2015-01-29
 
-function [G]=read_etopo1(lat_limits,lon_limits)
+function [G]=read_etopo1(lat_limits,lon_limits,sea_flag)
 
+if nargin==2;
+  sea_flag = 0;
+end
 
 strictAssert = atmlab('STRICT_ASSERT');
 
@@ -66,7 +75,6 @@ end
 demfile = fullfile(atmlab('ATMLAB_DATA_PATH'),...
          'dem_data/etopo1/ETOPO1_Ice_g_gmt4.grd');
 
-G          = gf_empty(2);
 
 e_lat = ncread(demfile,'y');
 e_lon = ncread(demfile,'x');
@@ -79,42 +87,54 @@ e_lon = e_lon(j_ind);
 
 start = [j_ind(1) i_ind(1)];
 count = [length(j_ind) length(i_ind)];
-G.DATA = ncread( demfile, 'z', start, count)'; 
 
-[lat,lon,M] = land_sea_mask( '1min' );
-if lon_limits(1)<0;
-  % shift data
-  ind  = find(lon>180);
-  
-  temp = M(:,ind); 
-  M(:, length(ind)+1:end) = M(:, 1:ind(1)-1);
-  M(:, 1:length(ind)) = temp;
-  
-  temp = lon(ind);
-  lon(length(ind)+1:end) = lon(1:ind(1)-1);
-  lon(1:length(ind)) = temp-360;  
-
-end
-
-i_ind  = find( lat >= lat_limits(1) &  lat<= lat_limits(2) );
-j_ind  = find( lon >= lon_limits(1) &  lon<= lon_limits(2) );
-M      = M(i_ind,j_ind); 
-G.DATA = gridinterp( {e_lat,e_lon}, G.DATA, {lat(i_ind),lon(j_ind)} );
-ind    = find(M==255);
-G.DATA(ind) = -9999;
-
-
+G            = gf_empty(2);
+G.DATA       = ncread( demfile, 'z', start, count)'; 
 G.TYPE       = 'surfdata';
 G.NAME       = 'ETOPO1 dem data';
 G.SOURCE     = demfile;
 G.DATA_NAME  = 'Surface elevation';
 G.DATA_UNIT  = 'm';
-G.GRID1      = vec2col(lat(i_ind));
+
+G.GRID1      = vec2col(e_lat);
+G.GRID2      = vec2col(e_lon);
 G.GRID1_NAME = 'Latitude';
 G.GRID1_UNIT = 'deg';
-G.GRID2      = vec2col(lon(j_ind));
 G.GRID2_NAME = 'Longitude';
 G.GRID2_UNIT = 'deg';
+
+
+if sea_flag;
+
+  % mark data points over ocean
+
+  [lat,lon,M] = land_sea_mask( '1min' );
+
+  if lon_limits(1)<0;
+    % shift data
+    ind  = find(lon>=180);
+  
+    temp = M(:,ind); 
+    M(:, length(ind)+1:end) = M(:, 2:ind(1));
+    M(:, 1:length(ind)) = temp;
+  
+    temp = lon(ind);
+    lon(length(ind)+1:end) = lon(2:ind(1));
+    lon(1:length(ind)) = temp-360;  
+
+  end
+
+  i_ind  = find( lat >= lat_limits(1) &  lat<= lat_limits(2) );
+  j_ind  = find( lon >= lon_limits(1) &  lon<= lon_limits(2) );
+  M      = M(i_ind,j_ind); 
+  G.DATA = gridinterp( {e_lat,e_lon}, G.DATA, {lat(i_ind),lon(j_ind)} );
+  ind    = find(M==255);
+  G.DATA(ind) = -9999;
+
+  G.GRID1      = vec2col(lat(i_ind));
+  G.GRID2      = vec2col(lon(j_ind));
+
+end
 
 
 
@@ -127,5 +147,5 @@ if 0;
   c1=plot(long,lat,'k')
   set(c1,'linewidth',2)
   colorbar
-  caxis([-200 max(G.DATA(:))])
+  caxis([-1000 max(G.DATA(:))])
 end
