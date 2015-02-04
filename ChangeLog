@@ -1,3 +1,22 @@
+2015-02-04  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-58
+
+        * gformat/surfdata_empty.m: new function 
+        to handle surface data types, similar to
+        the existing atmdata that handles atmospheric
+        data.
+        
+        * gformat/surfdata_scalar.m: new function  
+        to handle surface data types.
+
+        * gformat/issurfdata.m: new function
+        to handle surface data types.
+
+        * gformat/surfdata_dimadd.m: new function
+        to handle surface data types.
+
+
 2015-02-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-57
