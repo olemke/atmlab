@@ -33,6 +33,7 @@ function L2 = qp2_rel2vmr(L2)
   
 i     = 0;
 ready = false;
+changedone = false; %check if any changes are made
 
 while ~ready
   
@@ -43,7 +44,7 @@ while ~ready
   if ~isfield( L2, nx )
     ready = true;
   
-  else
+  else 
     
     % Define name strings
     % 
@@ -56,8 +57,12 @@ while ~ready
     ns{3} = sprintf( 'species%d_es', i );
     nsx   = sprintf( 'species%d_ex', i );
     
+    if ~isfield( L2, nv ) 
+        
+    else
+    
     rqre_field( L2, nv, 'sub-field vmr0' );
-
+    
     if isfield( L2, nmr )  &  ~isfield( L2, nA )
       error( 'Handling of measurement response requires that A is part of L2' );
     end
@@ -139,6 +144,13 @@ while ~ready
     end  
     
     L2 = rmfield( L2, nv );
+    
+    changedone = true;
+    end
 
   end   % if "species exist"
 end   % while
+
+if ~changedone
+    error('The L2 data is not in relative units, or do not contain the sub-field vmr0')
+end

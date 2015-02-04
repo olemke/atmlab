@@ -1,3 +1,10 @@
+2015-02-04  Ole Martin Christensen  <olem@chalmers.se>
+
+	* arts/qarts.m: changed documentation of ABS.SPECIES.DX
+
+	* retrieval/qpack2/qp2_rel2vmr.m: Can now take 
+	several species (rel and vmr)
+
 2015-02-04  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-58
