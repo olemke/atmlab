@@ -12,7 +12,7 @@
 %       I  Includes same fields as H, where the content of each field
 %          is a description string (used by *qinfo*).
 
-% 2005-01-26   Created by Mattias Ekström.
+% 2005-01-26   Created by Mattias Ekstrï¿½m.
 
 
 function [H,I] = qartsSensor
@@ -24,8 +24,8 @@ I.ANTENNA_DO = [ ...
 'antenna variable of *qartsSensor* is set.'
 ];
 %-----------------------------------------------------------------------------
-H.ANTENNA_LOS = {};
-I.ANTENNA_LOS = [ ...
+H.ANTENNA_DLOS = {};
+I.ANTENNA_DLOS = [ ...
 'As the ARTS WSV with the same name.', ...
 ' If the sensor response does not include an antenna this field can', ...
 ' be left as {}. If set, call of *sensor_responseAntenna* is added.', ...

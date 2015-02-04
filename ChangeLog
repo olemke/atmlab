@@ -1,3 +1,9 @@
+2015-02-04  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-61
+
+	* arts/qartsSensor.m: H.ANTENNA_LOS -> H.ANTENNA_DLOS
+
 2015-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-60
@@ -11,6 +17,8 @@
 	* demos/arts_oem_demo.m: MBLOCK_ZA_GRID was still used.
 
 2015-02-04  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-59
 
 	* arts/qarts.m: changed documentation of ABS.SPECIES.DX
 
