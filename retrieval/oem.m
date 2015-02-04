@@ -736,6 +736,12 @@ end
 
         %- Test for convergence
         if xfound
+          %
+          if ga > 0 % If yes, then SJSJ includes gamma, which we don't 
+                    % want here
+            SJSJ = Sxinv + JtSeinvJ;
+          end   
+          %
           [converged,dx,X] = ...
                           test_convergence( x, xnew, SJSJ, O, xnorm, X, iter );
           nlinprint( O.outfids, iter, ga, cost, cost_x, cost_y, dx );

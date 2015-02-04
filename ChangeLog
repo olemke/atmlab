@@ -1,3 +1,15 @@
+2015-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-60
+
+	* retrieval/oem.m: Removed a small "short-cut". For
+	Marquardt-Levenberg, the convergence criterion a matrix (SJSJ) was
+	influenced by the gamma factor, which is not formally correct. Not
+	actually time consuming to use correct matrix, so now changed.
+	This fixed after input from Ole Martin.
+
+	* demos/arts_oem_demo.m: MBLOCK_ZA_GRID was still used.
+
 2015-02-04  Ole Martin Christensen  <olem@chalmers.se>
 
 	* arts/qarts.m: changed documentation of ABS.SPECIES.DX
