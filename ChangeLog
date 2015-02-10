@@ -1,3 +1,18 @@
+2015-02-09  Gerrit Holl  <gerrit.holl@utoronto.ca>
+
+	* atmlab-2-3-62
+
+	* retrieval/spareice/define_local_datasets.m:
+
+	- Write a more correct granule_duration.  Unlike other
+	HomemadeDatasets, this one is not 86400 seconds but more similar to AMSU.
+
+	* datasets/CollocatedDataset(collocate_and_store_date):
+
+	- Provide a helpful error message if some essential information is
+	missing, such as basedir, subdir, filename.  Should probably do the
+	same for AssociatedDatasets.
+
 2015-02-04  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-3-61

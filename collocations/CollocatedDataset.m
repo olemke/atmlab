@@ -896,7 +896,17 @@ classdef CollocatedDataset < HomemadeDataset
                 error(['atmlab:' mfilename ':invalid'], ...
                     'You set %s %s.overwrite=2.  This is meaningless for core datasets.', class(self), self.name);
             end
-            
+
+            musthave = {'basedir', 'subdir', 'filename'};
+            for i = 1:length(musthave)
+                if isempty(self.(musthave{i}))
+                    error(['atmlab:' mfilename ':missing'], ...
+                        ['You need to set %s %s.%s.  I can collocate all ' ...
+                         'I want but I won''t know where to store anything!'],...
+                         class(self), self.name, musthave{i});
+                end
+            end
+
             additionals = optargs(varargin, {{}});
             self.verify_addis(additionals);
             % get filename
