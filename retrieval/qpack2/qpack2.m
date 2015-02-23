@@ -10,6 +10,10 @@
 %    The data fields of the output structure L2 depends on selected retrieval
 %    quantities and settings in Q. See further *qp2_l2*.
 %
+%    L2.converged is set folowing oem.m. The exception is if there is a
+%    complete crash in the calculations during the inversions, then
+%    L2.converged is set to -99.
+%
 % FORMAT   [L2,X] = qpack2(Q,O,Y)
 %
 % IN    Q        Qarts setting structure. See *qarts*.
@@ -57,8 +61,6 @@ empty_y = checkY( Y );
 %- Loop measurements
 %------------------------------------------------------------------------------
 %
-L2 = [];
-% 
 workfolder = create_tmpfolder;
 cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 %
@@ -88,6 +90,8 @@ for m = 1 : ny
     
   %- Inversion
   else
+
+    errorflag = -99;
     
     %- Init retrieval
     %
@@ -119,23 +123,23 @@ for m = 1 : ny
       [X,R] = oem( O, Qm, R, @arts_oem, Sx, Se, Sxinv, [], xa, Y(m).Y );
     catch
       clear X
-      X.converged = NaN;
+      X.converged = errorflag;
     end
     
     %- Fill return structure
     %
     if l2started
-      if isnan(X.converged)
-        L2(m).converged = NaN;
+      if X.converged == errorflag
+        L2(m).converged = errorflag;
       else
         L2(m) = qp2_l2( Qm, R, xa, O, X, Y, m );
       end
     else
-      % If X.conveged we must wait with initialization
-      if not(isnan(X.converged))
-        L2        = qp2_l2( Qm, R, xa, O, X, Y, m );
+      % If X.converged= we must wait with initialization
+      if X.converged ~= errorflag
+        L2(m) = qp2_l2( Qm, R, xa, O, X, Y, m );
         for i = 1 : m-1
-          L2(i).converged = NaN;
+          L2(i).converged = errorflag;
         end
         l2started = true;
       end
@@ -143,6 +147,12 @@ for m = 1 : ny
   
   end % empty_y
 end % for m
+%
+% Make sure that output arguments are at least are defined.
+% This could happen e.g. if all inversions cause an error
+if not( exist( 'L2', 'var' ) )
+  [L2,X] = deal([]);
+end
 %
 return
 %

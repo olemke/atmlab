@@ -1,5 +1,15 @@
 2015-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-64
+
+	* retrieval/qpack2/qpack2.m (qpack2): Now also the case of no
+	succesful inversion handled. L2 then returned as empty.
+	Changed my mind, and calculation crashes now flagged as -99. NaN
+	should rather indicate that value so far not known, i.e. no
+	inversion even started.
+
+2015-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-63
 
 	* retrieval/qpack2/qpack2.m (qpack2): Call of oem.m now inside
