@@ -64,6 +64,8 @@ cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 %
 ny = length(Y);
 %
+l2started = false;
+%
 for m = 1 : ny
   
   %- Simulate a (noise free) measurement if y is empty
@@ -113,14 +115,30 @@ for m = 1 : ny
 
     %- Perform retrieval
     %
-    [X,R] = oem( O, Qm, R, @arts_oem, Sx, Se, Sxinv, [], xa, Y(m).Y );
+    try
+      [X,R] = oem( O, Qm, R, @arts_oem, Sx, Se, Sxinv, [], xa, Y(m).Y );
+    catch
+      clear X
+      X.converged = NaN;
+    end
     
     %- Fill return structure
     %
-    if m == 1
-      L2    = qp2_l2( Qm, R, xa, O, X, Y, m );
+    if l2started
+      if isnan(X.converged)
+        L2(m).converged = NaN;
+      else
+        L2(m) = qp2_l2( Qm, R, xa, O, X, Y, m );
+      end
     else
-      L2(m) = qp2_l2( Qm, R, xa, O, X, Y, m );
+      % If X.conveged we must wait with initialization
+      if not(isnan(X.converged))
+        L2        = qp2_l2( Qm, R, xa, O, X, Y, m );
+        for i = 1 : m-1
+          L2(i).converged = NaN;
+        end
+        l2started = true;
+      end
     end
   
   end % empty_y
@@ -367,7 +385,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
   if nargout == 2
     
     nnv = size( Y(m).TNOISE, 1 );  % Number of noise values
-    nf  = length( Y(m).F );
+    nf  = length( Y(m).Y );
     
     if do_checks
       rqre_datatype( Y(m).TNOISE, @istensor2, sprintf('Y(%d).TNOISE',m) );

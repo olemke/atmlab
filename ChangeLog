@@ -1,3 +1,23 @@
+2015-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-63
+
+	* retrieval/qpack2/qpack2.m (qpack2): Call of oem.m now inside
+	try-catch, to avoid a complete crash if something goes wrong.
+	L2.converged is set to NaN, and all other fields empty, for cases
+	where an error occur in the oem/arts call.
+
+	* retrieval/oem.m (oem): converged now set to -1 for linear
+	inversions. This to leave NaN free to flag more fundamental problems.
+
+	* handy/pickvalue.m: New function.
+
+	* retrieval/qpack2/qpack2.m (qp2_y2Q): nf now set based on Y.Y, as
+	Y.F not always set.
+
+	* arts/qarts2cfile.m (cfile_Sensor): Changed type for
+	sensor_response_dlos_grid to Matrix.
+
 2015-02-09  Gerrit Holl  <gerrit.holl@utoronto.ca>
 
 	* atmlab-2-3-62

@@ -852,7 +852,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
                Q.SENSOR_RESPONSE_F_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_DLOS_GRID )
-      T = file_or_data( T, 'sensor_response_dlos_grid', 'Vector', ...
+      T = file_or_data( T, 'sensor_response_dlos_grid', 'Matrix', ...
             Q.SENSOR_RESPONSE_DLOS_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
     if qarts_isset( Q.SENSOR_RESPONSE_POL_GRID )

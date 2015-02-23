@@ -23,7 +23,7 @@
 %                  reached. Otherwise 0 for non-linear inversions when the
 %                  maximum number of iterations is reached, or -1 for 
 %                  Marquardt-Levenberg when the maximum value for gamma is
-%                  passed. Set to NaN for linear retrievals.
+%                  passed. Set to -1 also for linear retrievals.
 %      cost      : Total cost, normalised by length of y. A succesful retrieval
 %                  shall then have a cost in the order of 1.
 %      cost_y    : Cost corresponding to the measurement vector.
@@ -435,7 +435,7 @@ end
 
   %- Make sure that X is initialised as a structure
   %
-  X.converged = NaN;   % Expected output for the linear case
+  X.converged = -1;   % Expected output for the linear case
 
   %- xa is used as initial linearisation point
   %
