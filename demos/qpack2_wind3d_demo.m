@@ -2,7 +2,7 @@
 %
 %    This file exemplifies how to set Qpack2 for an instrument scanning in
 %    azimuth (and azimuth angle matters). The example treats a measurement
-%    aimimg at retrieving both horisontal wind components.
+%    aiming at retrieving both horizontal wind components.
 %
 % FORMAT   L2 = qpack2_wind3d_demo
 %        
@@ -109,10 +109,10 @@ errid = ['atmlab:' mfilename];
 arts_xmldata_path = atmlab( 'ARTS_XMLDATA_PATH' );
 arts_includes     = atmlab( 'ARTS_INCLUDES' );
 if isnan( arts_xmldata_path ) 
-  error( errid,'You need to set ARTS_XMLDATA_PATH to run this exmaple.' );
+  error( errid,'You need to set ARTS_XMLDATA_PATH to run this example.' );
 end
 if isnan( arts_includes )
-  error( erird,'You need to ARTS_INCLUDES to run this example.' );
+  error( errid,'You need to ARTS_INCLUDES to run this example.' );
 end                                                      
 %
 fascod = fullfile( arts_xmldata_path, 'planets', 'Earth', 'Fascod' );
@@ -267,7 +267,7 @@ Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
 
 
 
-%- Horsontal wind components vind
+%- Horisontal v-component of wind
 %
 Q.WIND_V_FIELD    = [];      % This is a short-cut for zero wind.
 %

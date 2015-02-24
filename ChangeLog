@@ -1,3 +1,12 @@
+2015-02-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-65
+
+	* files/homedir.m:
+	* files/folder_of_fun.m: Just moved to a more suiting folder.
+
+	* demos/qpack2_wind3d_demo.m: Improved language in comments.
+
 2015-02-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-64
