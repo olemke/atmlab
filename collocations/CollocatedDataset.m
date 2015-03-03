@@ -2042,6 +2042,10 @@ classdef CollocatedDataset < HomemadeDataset
             [~, additionals1, additional_fields1] = self.deal_fields(fields, self.associated);
             info = self.find_info_from_granule(fullpath);
             for i = 1:length(additionals1) % this is where the AssociatedDatasets are
+                
+                % #edit by Salomon
+                if ~isfield(info,'satname'),info.satname='';end
+                % #
                 tmppath = additionals1{i}.find_granule_by_datetime(...
                     [str2double(info.year),str2double(info.month),str2double(info.day)],...
                     info.satname);

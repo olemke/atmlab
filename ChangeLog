@@ -1,3 +1,11 @@
+2015-03-03  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-66
+
+	* datasets/define_datasets.m: Added MODIS collection 6 dataset
+
+	* collocations/CollocatedDataset.m: Added satname = ''; if it is not found in info.
+
 2015-02-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-65

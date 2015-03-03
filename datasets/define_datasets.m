@@ -121,12 +121,14 @@ SatDataset('name', 'mirs', ...
 % collection 5.1
 SatDataset('name', 'modis_aqua_L2', ...
     'reader', @satreaders.modis, ...
-    'granule_duration', 300);
+    'granule_duration', 300,...
+    'satname','aqua');
 
 % collection 6
 SatDataset('name', 'modis_aqua_L2_col6', ...
     'reader', @satreaders.modis, ...
-    'granule_duration', 300);
+    'granule_duration', 300,...
+    'satname','aqua');
 
 SatDataset('name', 'modis_L3'); % no reader defined yet
 
@@ -431,6 +433,11 @@ D.cprCloud.pseudo_fields.Cloud_Types.dependencies   = fieldnames(fields.cpr.Clou
 D.cprCloud.pseudo_fields.Cloud_Types_multiLayer                = fields.cpr.Cloud_Types_multiLayer;
 D.cprCloud.pseudo_fields.Cloud_Types_multiLayer.dependencies   = fieldnames(fields.cpr.Cloud_Types_multiLayer.dependencies_struct)';
 D.cprCloud.reader_processor                         = @cpr_postprocessor;
+
+
+% cloud type dataset from radar and lidar
+% D.cprCloudLidar.members = getfields(fields.cpr,...
+%     {'CloudFraction','CloudPhase','CloudPhaseConfidenceLevel','CloudLayerType','CloudTypeQuality','Cloud_Types_Lidar'});
 
 D.cprCloudLidar.pseudo_fields.Cloud_Types_Lidar                 = fields.cpr.Cloud_Types_Lidar;
 D.cprCloudLidar.pseudo_fields.Cloud_Types_Lidar.dependencies    = fieldnames(fields.cpr.Cloud_Types_Lidar.dependencies_struct)';
