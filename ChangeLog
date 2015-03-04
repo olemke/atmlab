@@ -1,3 +1,15 @@
+2015-03-04  Gerrit Holl  <gerrit.holl@utoronto.ca>:
+
+	* atmlab-2-3-67
+
+	* datasets/HomemadeDataset.m(read_homemade_granule): Revert change
+	made in atmlab-2-3-53, which fixed a problem for collocating SpareICE,
+	but destroyed it for any other HomemadeDataset.
+
+	* retrieval/spareice/NNTrainetProduct.m(read_homemade_granule):
+	Implement aforementioned change in this derived method instead,
+	exactly where it belongs.
+
 2015-03-03  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-66

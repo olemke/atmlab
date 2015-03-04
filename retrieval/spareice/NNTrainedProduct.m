@@ -1547,6 +1547,11 @@ classdef NNTrainedProduct < RetrievalDatabaseProduct
             S.lat = S.LAT;
             S.lon = S.LON;
             S.time = S.TIME;
+            % BUGFIX 2015-03-04: Unlike other HomemadeDatasets, where I
+            % have one file per day and seconds since the start of the
+            % day, here I have one file per orbit and seconds since unix
+            % epoch.  This means epoch should be 0, not start of the day.
+            S.epoch = 0;
             S = rmfield(S, setdiff({'LAT', 'LON', 'TIME'}, fields));
         end
         
