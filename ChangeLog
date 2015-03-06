@@ -1,5 +1,14 @@
 2015-03-06  Gerrit Holl  <gerrit.holl@utoronto.ca>:
 
+	* atmlab-2-3-69
+
+	* datasets/SatDataset.m(level3):
+
+	- Improve processing so it can handle vector-valued data, for example,
+	profiles or multiple channels.
+
+2015-03-06  Gerrit Holl  <gerrit.holl@utoronto.ca>:
+
 	* atmlab-2-3-68
 
 	* collocations/CollocatedDataset.m(collocate_granule):

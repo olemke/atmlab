@@ -1411,6 +1411,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % date2
             % spec
             % fields
+            %   Cell array.  Names of fields to be considered.
             % gridsize
             % (optional) limiters
             %   Cell array.  Each element is either a function handle
@@ -1427,11 +1428,16 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             % - gridmean: 3-D matrix, [nlat nlon nfield]
             %
             % FIXME DOC
+            %
+            % TODO: think of a way to process
+            % multi-dimensional fields, i.e. tb [2457x90x5]
             
             [limiters, data] = optargs(varargin, {{}, struct()});
             %data.gridsize = gridsize;
             allgrans = self.find_granules_for_period(date1, date2, spec);
             allstats = {};
+            lat = -90:gridsize:90;
+            lon = -180:gridsize:180;
             % sort limiters
             if ~iscell(limiters)
                 limiters = {limiters};
@@ -1455,9 +1461,12 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
             i = 0;
             while i < size(allgrans, 1)
                 
+                data = struct();
                 data.lat = zeros(1e6, 1, 'single');
                 data.lon = zeros(1e6, 1, 'single');
-                data.data = zeros(1e6, length(fields), 'single');
+%                data.data = zeros(1e6, ...
+%                    sum(cellfun(@(f)size(grandata.(f), 3), fields)), ...
+%                    'single');
                 
                 N = 1;
                 X = whos('data');
@@ -1467,7 +1476,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                         grandata = self.read_granule(allgrans(i, :), spec, union(fields, also_fields));
                     catch ME
                         switch ME.identifier
-                            case 'atmlab:SatDataset:cannotread'
+                            case {'atmlab:SatDataset:cannotread',
+                                  'atmlab:find_granule_by_datetime'}
                                 logtext(atmlab('ERR'), ...
                                     'Cannot read granule: %s', ...
                                     ME.identifier);
@@ -1476,6 +1486,13 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                                 ME.rethrow();
                         end
                     end
+                    % first time, allocate data.  width depends on fields
+                    if ~isfield(data, 'data')
+                        data.data = zeros(1e6, ...
+                            sum(cellfun(@(f)size(grandata.(f), 3), fields)), ...
+                            'single');
+                    end
+
                     % apply limiters
                     mask = true(size(grandata.lat));
                     for k = 1:length(limit_other)
@@ -1486,7 +1503,20 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     grandata.lon = grandata.lon(mask);
                     for k = 1:length(fields)
                         field = fields{k};
-                        grandata.(field) = grandata.(field)(mask);                    
+                        if ndims(grandata.(field)) <= 2
+                            grandata.(field) = grandata.(field)(mask);                    
+                        else
+                            % process multi-dimensional fields, i.e. tb [2457x90x5]
+                            if ndims(grandata.(field)) > 3
+                                error(['atmlab:' mfilename ':NotImplemented'], ...
+                                    'I cannot handle %d dimensions for %s!', ...
+                                    ndims(grandata.(field)), field);
+                            end
+                            grandata.(field) = arrayfun(@(i)(par(grandata.(field)(:, :, i), ...
+                                mask)), 1:size(grandata.(field), 3), ...
+                                'UniformOutput', false);
+                            grandata.(field) = horzcat(grandata.(field){:});
+                        end
                     end
                         
                     nnew = size(grandata.lat, 1);
@@ -1498,7 +1528,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                         % double allocation
                         data.lat = [data.lat; zeros(size(data.lat, 1), 1, 'single')];
                         data.lon = [data.lon; zeros(size(data.lon, 1), 1, 'single')];
-                        data.data = [data.data; zeros(size(data.data, 1), length(fields), 'single')];
+                        data.data = [data.data; ...
+                            zeros(size(data.data, 1), size(data.data, 2), 'single')];
                     end
                     data.lat(new) = grandata.lat;
                     data.lon(new) = grandata.lon;
@@ -1511,7 +1542,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 end
                 data.lat = data.lat(1:N-1);
                 data.lon = data.lon(1:N-1);
-                data.data = data.data(1:N-1);
+                data.data = data.data(1:N-1, :);
                 
 %                 data.lat = grandata.lat;
 %                 data.lon = grandata.lon;
@@ -1519,8 +1550,8 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
 %                 data.data = horzcat(C{:});
                 logtext(atmlab('OUT'), 'Binning\n');
                 %[binned, lat, lon] = binning_fast(data);
-                indces = bin_nd({data.lat, data.lon}, {-90:gridsize:90, -180:gridsize:180});
-                binned = cellfun(@(ii) data.data(ii), indces, 'UniformOutput', false);
+                indces = bin_nd({data.lat, data.lon}, {lat, lon});
+                binned = cellfun(@(ii) data.data(ii, :), indces, 'UniformOutput', false);
                 stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limit_binnedstats);
                 logtext(atmlab('OUT'), 'Calculating statistics\n');
                 stats.statistic1 = cell2mat(stats.statistic1);
