@@ -606,12 +606,18 @@ classdef CollocatedDataset < HomemadeDataset
                 % limit to one day (if needed)
                 switch oneday
                     case 1
+                        % BUGfix: GH-2015-03-06: This only works if epoch is
+                        % at the start of the date!  Not always the case.
                         % only consider data on the same date as the start for data1
-                        if data1.time(1) < 86400
-                            sameday = data1.time < 86400;
-                        else
-                            sameday = data1.time < 2*86400;
-                        end
+%                        if data1.time(1) < 86400
+%                            sameday = data1.time < 86400;
+%                        else
+%                            sameday = data1.time < 2*86400;
+%                        end
+                        sameday = idivide(uint64(data1.time), ...
+                                          uint64(86400), 'floor') ==  ...
+                                  idivide(uint64(data1.time(1)), ...
+                                          uint64(86400), 'floor');
                         if ~all(sameday)
                             logtext(fid, 'taking only %d/%d that are on the same day\n', ...
                                 sum(sameday), length(data1.time));
@@ -619,12 +625,16 @@ classdef CollocatedDataset < HomemadeDataset
                         iv1 = iv1 & sameday;
                     case 2
                         % only consider data on date after the start date for data1
-                        sameday = data1.time > 86400;
-                        iv1 = iv1 & sameday;
+                        %sameday = data1.time > 86400;
+                        sameday = idivide(uint64(data1.time), ...
+                                          uint64(86400), 'floor') ==  ...
+                                  idivide(uint64(data1.time(1)), ...
+                                          uint64(86400), 'floor')+1;
                         if ~all(sameday)
                             logtext(fid, 'taking from primary only %d/%d that are on the next day\n', ...
                                 sum(sameday), length(data1.time));
                         end
+                        iv1 = iv1 & sameday;
                 end
                 if ~(any(iv1) && any(iv2)) % no overlap
                     logtext(fid, 'upon checking actual data, no actual time overlap, so nothing to collocate\n');

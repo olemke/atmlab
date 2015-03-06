@@ -1,3 +1,14 @@
+2015-03-06  Gerrit Holl  <gerrit.holl@utoronto.ca>:
+
+	* atmlab-2-3-68
+
+	* collocations/CollocatedDataset.m(collocate_granule):
+
+	- Bugfix: this routine was silently assuming that the time axis would
+	always count since the start of the day.  This is true for many
+	SatDatasets but not for many HomemadeDatasets, in particular not for
+	SpareIce.  Now check sameday/nextday in a more rigorous manner.
+
 2015-03-04  Gerrit Holl  <gerrit.holl@utoronto.ca>:
 
 	* atmlab-2-3-67
