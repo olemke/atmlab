@@ -19,7 +19,14 @@ function [head, line] = avhrr_define_gac_l1b
 % See ATMLAB_DATA_PATH/sensors/avhrr/README for how to regenerate this
 % mat-file if necessary
 
-matfile = fullfile(atmlab('ATMLAB_DATA_PATH'), 'sensors', 'avhrr', 'gac_version4.mat');
+basedir = atmlab('ATMLAB_DATA_PATH');
+if ~ischar(basedir) || isempty(basedir)
+    error(['atmlab:' mfilename ':missing'], ...
+        ['AVHRR structure is defined in ATMLAB_DATA_PATH, but this ' ...
+         'is not set.  Please check out atmlab-data and set ' ...
+         'atmlab(''ATMLAB_DATA_PATH'') accordingly.']);
+end
+matfile = fullfile(basedir, 'sensors', 'avhrr', 'gac_version4.mat');
 S = load(matfile);
 
 % add reading information to structure so this need not be done on reading

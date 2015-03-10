@@ -1,3 +1,12 @@
+2015-03-10  Gerrit Holl  <gerrit.holl@utoronto.ca>:
+
+	* atmlab-2-3-70
+
+	* sensors/atovs/avhrr_define_gac_l1b.m:
+
+	- Give a friendly error message when atmlab('ATMLAB_DATA_PATH') is not
+	set.
+
 2015-03-06  Gerrit Holl  <gerrit.holl@utoronto.ca>:
 
 	* atmlab-2-3-69
