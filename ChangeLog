@@ -1,3 +1,17 @@
+2015-03-16  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-71
+
+	* handy/combine_pdfs.m: Fixed a bug on hspace. I have a feeling
+	that there are more bugs will surface when "unusul" requests are
+	made
+
+	* math/binning_fast.m: fixed bug for values that that exactly on the edges
+
+	* files/getfiles_matching_regexp.m: Use amtlabs verbosity instead
+
+	* datasets/define_datasets.m: small edit in units attributes
+
 2015-03-10  Gerrit Holl  <gerrit.holl@utoronto.ca>:
 
 	* atmlab-2-3-70

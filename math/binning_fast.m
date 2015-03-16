@@ -30,8 +30,8 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %
 %
 %                             or
-%                  newY/newlat        [lat vector]      bin into new lat grid
-%                  newX/newlon        [lon vector]      bin into new lon grid
+%                  newY/newlat        [lat vector]      bin into new lat grid using these as centers
+%                  newX/newlon        [lon vector]      bin into new lon grid using these as centers
 %
 %              OPTIONAL
 %                  region        [blcorner,trcorner] (lat1,lon1,lat2,lon2)
@@ -69,12 +69,14 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %         [Z,Y,X] = binning_fast(struct('Z',data,'X',x,'Y',y,'newX',[1:10],'newX',[1:10]))
 %
 % NOTE:
-%       1) Including newlon and newlat causes the function to ignore: in.gridsize
+%       - The output (in input) x-grid and ygrid are grid centers!
+%
+%       - Including newlon and newlat causes the function to ignore: in.gridsize
 %                                                                    in.region
 %                                                                    lonspace
 %
-%       2) A useful function to get statistics (e.g numel, mean, sum, etc) on
-%       the binned data is binned_statistics.
+%       - binned_statistics.m is a useful function to get statistics
+%         (e.g numel, mean, sum, etc) on the binned data is binned_statistics.
 %
 % See also: bin, bin_nd, binned_statistics
 %
@@ -178,30 +180,34 @@ if ~in.counts
     if isequal(numel(in.Z),numel(in.Y),numel(in.X))
         in.Z = in.Z(:); in.Y = in.Y(:); in.X = in.X(:);
     end
-
+    
     assert(isequal(size(in.X,1),size(in.Y,1),size(in.Z,1)),...
-    errId, ['data,Y,X must all have the same first dimension. Found: ' ...
-    'data %d, Y %d, X %d'], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
+        errId, ['data,Y,X must all have the same first dimension. Found: ' ...
+        'data %d, Y %d, X %d'], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
 else
     if isequal(numel(in.Y),numel(in.X))
         in.Y = in.Y(:); in.X = in.X(:);
     end
     assert(isequal(size(in.X,1),size(in.Y,1)),...
-    errId, ['data,Y,X must all have the same first dimension. Found: ' ...
-    ' Y %d, X %d'], size(in.Y,1), size(in.X, 1));
+        errId, ['data,Y,X must all have the same first dimension. Found: ' ...
+        ' Y %d, X %d'], size(in.Y,1), size(in.X, 1));
+end
+
+if lonlat
+    assert(~(any([in.newX(:)>360;in.newX(:)<-180;in.newY(:)>90;in.newY(:)<-90])),...
+        errId,'lat/lon values are unphysical')
+end
+
+% do a general warning
+if ~(max(diff(in.newY))-min(diff(in.newY))<1e-4 && ...
+        max(diff(in.newX))-min(diff(in.newX))<1e-4)
+    warning(['atmlab:' mfilename, ':WonkyNewgrid'],[...
+        'vectors in fields: ''newY'' and ''newX'' are not monotonously spaced. ',...
+        'The output grid will be monotonously spaced, ',...
+        'based on mean(diff(newY)) and  mean(diff(newX))'])
 end
 
 if isfield(in,'newX')
-    assert(~(any([in.newX(:)>360;in.newX(:)<-180;in.newY(:)>90;in.newY(:)<-90])),...
-        errId,'lat/lon values are unphysical')
-    
-    if ~(max(diff(in.newY))-min(diff(in.newY))<1e-4 && ...
-            max(diff(in.newX))-min(diff(in.newX))<1e-4)
-        warning(['atmlab:' mfilename, ':WonkyNewgrid'],[...
-            'vectors in fields: ''newY'' and ''newX'' are not monotonously spaced. ',...
-            'The output grid will be monotonously spaced, ',...
-            'based on mean(diff(newY)) and  mean(diff(newX))'])
-    end
     if isfield(in,'gridsize')
         warning(errId,'fields ''newX'' and ''newY'' cancel ''gridsize''')
     end
@@ -210,23 +216,25 @@ if isfield(in,'newX')
     end
     
     %internally span a region, so that values outside this region can be kicked out
-    % [blcorner,trcorner] (lt1,ln1,lt2,ln2). This should be safe for both
-    % centered and non-centered grids
+    %of [blcorner,trcorner] (lt1,ln1,lt2,ln2). The following assumes that newX and
+    %newY are grid centers!
     dlt = mean(diff(in.newY))/2;  dln = mean(diff(in.newX))/2;
     in.region = [min(in.newY)-dlt,min(in.newX)-dln,max(in.newY)+dlt,max(in.newX)+dln];
+    
 else
     dlt = in.gridsize(1)/2;  dln = in.gridsize(end)/2;
     in.region = [min(in.Y)-dlt,min(in.X)-dln,max(in.Y)+dlt,max(in.X)+dln];
 end
 
 end
+
 function in = regionchop(in)
 % Get rid of all data outside of region
 
-lt1 = in.Y > in.region(1);
-ln1 = in.X > in.region(2);
-lt2 = in.Y < in.region(3);
-ln2 = in.X < in.region(4);
+lt1 = in.Y >= in.region(1);
+ln1 = in.X >= in.region(2);
+lt2 = in.Y <= in.region(3);
+ln2 = in.X <= in.region(4);
 
 index = ln1 & ln2 & lt1 & lt2;
 
@@ -238,6 +246,7 @@ if ~in.counts
 end
 
 end
+
 function [in,Y,X] = outputlatlons(in,lonspace,lonlat)
 %% fix the latlons
 % Sets up lat lon and adjusts in.X to the requested (if requested)

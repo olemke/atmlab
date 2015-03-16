@@ -27,7 +27,7 @@ datadir = [strrep(datadir(1),'~',getenv('HOME')) datadir(2:end)];
 
 % MAKE a list of files using UNIX find (regular files only)
 command = sprintf('find ''%s'' -type f',datadir);
-files = exec_system_cmd(command,atmlab('VERBOSITY'));
+files = exec_system_cmd(command,0);
 
 % use \n for one file per cell element from string output
 files = regexp(files{1},'\n','split');

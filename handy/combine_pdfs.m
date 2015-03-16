@@ -153,7 +153,8 @@ if options.rowsPerPage>4
 end
 
 if all(size(options.hspace) == [1,1])
-    options.hspace= repmat(options.hspace,1,round(length(pdffiles)/options.cols));
+    %options.hspace= repmat(options.hspace,1,round(length(pdffiles)/options.cols));
+    options.hspace= repmat(options.hspace,1,options.rowsPerPage);
 end
 
 % Convert outdir to fullpath
@@ -203,7 +204,7 @@ if (length(options.cols) ~= 1 ... %repeat column count for every row
     
 end
 
-% If cols is only one number, replicate it to match the number files
+% If cols is only one number, replicate it to match the number of rowss
 if (length(options.cols) == 1)
     options.cols = repmat(options.cols, ceil(length(pdffiles)/options.cols), 1);
 end
