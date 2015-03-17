@@ -29,7 +29,7 @@ while x < 0
     b = b+1;
     x = x*10^b;
 end
-prtstr=sprintf('%%g',b);
+prtstr=sprintf('%%g',b); % Don't change this!
 strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
     prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
@@ -45,7 +45,7 @@ n_colored_steps = [BT TT];
 
 N = max(n_colored_steps);
 inc = 255/N; % step gradient
-vect = 255-[1:N]*inc;
+vect = 255-(1:N)*inc;
 
 ctable = zeros(length(tickval)-1,3);
 
@@ -112,10 +112,13 @@ fprintf(fid,'%s\t%3.0f\t%3.0f\t%3.0f\n','N',abs(N));
 
 fclose(fid);
 
+end
 %%%%%%%%%%%%
 % SUBFUNCTIONS
 %   ||||||
 %   vvvvvv
+
+
 
 function [BT,TT,nw] = get_white_boxes(tickval,ref,in)
 %% get_white_boxes
@@ -130,7 +133,7 @@ else
 end
 
 assert(nw<length(tickval)-1,...
-    ['gmtlab:' mfilename ':input'],'number of white boxes (%.0f) exceedes nlevels (%.0f)',...
+    ['gmtlab:' mfilename ':input'],'number of white boxes (%g) exceedes nlevels (%g)',...
     nw,length(tickval)-1)
 
 
@@ -147,7 +150,15 @@ end
 
 % ADJUST nwhite if ref is inbetween contour lines
 if ref < tickval(1) || ref > tickval(end)
-    error(['gmtlab:' mfilename ':badInput'],'Reference value is outside the range of tick values')
+    warning(['gmtlab:' mfilename ':badInput'],'Reference value is outside the range of tick values')
+    
+    if ref < tickval(1)
+        refnew = tickval(1);
+    else
+        refnew = tickval(1);
+    end 
+    logtext(1,'Changed bad reference value ''%d'' to ''%d'' \n',ref,refnew)
+    ref=  refnew;
 end
 
 if ~ismember(ref,tickval) && ~mod(nw,2) 
@@ -163,33 +174,44 @@ end
 whitedomain = (nw + mod(nw,2))/2;   
 
 % BT bottom ticks
-BT = sum(tickval < ref ) -whitedomain;
+BT = sum(tickval <= ref ) -whitedomain;
 % TT top ticks
-TT = sum(tickval > ref ) -whitedomain;
+TT = sum(tickval >= ref ) -whitedomain;
 
-% zero-it if it's less than 0
-BT = BT*(BT>=0);
-TT = TT*(TT>=0);
-
-% if reference is close to an EDGE
-if BT < whitedomain || TT < whitedomain
-    if BT < whitedomain
-        nw = nw - (whitedomain-BT);
-        TT = TT + (whitedomain-BT);
-    end
-    if TT < whitedomain
-        nw = nw - (whitedomain-TT);
-        BT = BT + (whitedomain-TT);
-        
-    end
-
-end
-if TT==0
+if TT < 0
+    % That means that there are less than nw/2 tickvalues higher than the
+    % reference. Therefore, I need to adjust nw
+    nw = nw+TT;
+    TT = 0;
     BT = BT-1;
 end
-if BT==0
+if BT < 0
+    % That means that there are less than nw/2 tickvalues below the
+    % reference. Therefore, I need to adjust nw
+    nw = nw+BT;
+    BT = 0;
     TT = TT-1;
 end
-%special 
+
+% remove white boxes if the total number is wrong
+if (BT+TT+nw - (length(tickval)-1)) > 0
+    dif = BT+TT+nw - (length(tickval)-1);
+    while dif > 0
+        if nw>0&&dif>0; nw=nw-1;dif=dif-1;end
+        if BT>0&&dif>0; BT=BT-1;dif>0;dif=dif-1;end
+        if TT>0&&dif>0; TT=TT-1;dif>0;dif=dif-1;end
+    end
+end
+
+if (BT+TT+nw - (length(tickval)-1)) < 0
+    dif = -1 * (BT+TT+nw - (length(tickval)-1));
+    % just increase white until it's the right number
+    while dif < 0
+        nw=nw+1;
+        dif=dif+1;
+    end
+end
 assert(BT+TT+nw == length(tickval)-1,['gmtlab:' mfilename ':Bug'],...
     'BT+TT+nw ~= length(tickval)-1')
+
+end

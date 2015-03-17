@@ -3,7 +3,8 @@ function filename = gmt_plot(in,field)
 %
 % The function is basically a wrapper that calls gmt shell commands using easy
 % to use matlab arguments. Try test_gmt.m for some examples on how to use the function.
-% Preferably, the data should be CENTERED if the data is gridded (fastest performance).
+% Preferably, the data should be CENTERED if the data is gridded. Plotting
+% gridded data is faster than plotting ungridded data 
 %
 % OUT   filename  The filename of the figure.
 %
@@ -99,6 +100,14 @@ function filename = gmt_plot(in,field)
 %                   ex:     Cell with one or more gmtset commands.
 %                           E.g. in.gmtset={'gmtset D_FORMAT %3.1e','gmtset ...'}
 %                     ------------
+% in.treatAsGridded  in: %f
+%                    ex:  1; This is a patch. It allows you to treat gridded data as ungridded.
+%                         This can be useful if you think the
+%                         internal interpolation for the plot projection is
+%                         causing weird side effects (such as near NaN values) 
+%                    def: 0
+%                     -------------
+%
 % in.header         in:     %s
 %                   ex:     Title of plot
 %                   def     ''
@@ -112,8 +121,7 @@ function filename = gmt_plot(in,field)
 %                   def: 'Helvetica' ('0')
 %                     ------------
 % in.header_fontsize in:    %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Title size
-%                   def:    '36p' (points)
+%                   ex:     Title size%                   def:    '36p' (points)
 %                     ------------
 % in.header_offset  in:     %s or %f (if %f, unit is assumed from in.measure_unit)
 %                   ex:     Moves the title in y-dir on the page
@@ -122,6 +130,10 @@ function filename = gmt_plot(in,field)
 % in.keep_files     in:     %f
 %                   ex:     If you don't want to delete intermediate files
 %                   def:    false
+%                     ------------
+% in.mask           in:     function handle
+%                   ex:     @(x)(x>0); This masks all values less than 0 with NaN
+%                   def:    no mask by default
 %                     ------------
 % in.measure_unit   in:     %s
 %                   ex:     You can explicitly specify the unit used for
@@ -191,7 +203,7 @@ function filename = gmt_plot(in,field)
 %                   def:    Loosely based on the density of the data points
 %                     ------------
 %  resolution       in:     %f [degree]
-%                   ex:     1˚ (== 60minuntes) looks for values withing 1˚
+%                   ex:     1 [deg] (== 60minuntes) looks for values withing 1 [deg]
 %                   def:    Loosely based on the density of the data points, or avialable memory
 %
 %                     ----------------------
@@ -202,7 +214,7 @@ function filename = gmt_plot(in,field)
 %                     ------------
 % in.center         in:     %f
 %                   ex:     Center map at given longitude
-%                   def:    0˚
+%                   def:    0 [deg]
 %                     ------------
 % in.map_width      in:     %s or %f (if %f, unit is assumed from in.measure_unit)
 %                   ex:     Set width of map, e.g., '20c'=20cm
@@ -223,10 +235,11 @@ function filename = gmt_plot(in,field)
 %                   def:    To generate coastlines
 %                     ----------------------
 %
+%
 % in.coast.           | STRUCTURE with one or more of the following fields:
 %
 %  features         in:     %f
-%                   ex:     Don't plot features < in.features [km²]
+%                   ex:     Don't plot features < in.features [km^2]
 %                   def:    determined by lon/lat range
 %                     ------------
 %  resolution       in:     %s
@@ -304,7 +317,7 @@ function filename = gmt_plot(in,field)
 % in.nlevels            in:     %d
 %                       ex:     Refers to the number of contour levels (converted to
 %                           stepsize using datarange)
-%                       def:    20
+%                       def:    best fit for nice tickvalues
 %                     ------------
 % in.force_nlevels      in:     (logical)
 %                       ex:     If set to true, keep nlevels even if it
@@ -577,9 +590,9 @@ function filename = gmt_plot(in,field)
 %                   ex:     Draws a polygon. Use one cell row per polygon:
 %                           {[p1lon1 p1lat1; p1lon2 p1lat2| ...];...}
 %                     ------------
-% in.pspolycolor    ex:     See in.psboxcolor
+% in.pspolycolor    ex:     See in.psbox.boxcolor
 %                     ------------
-% in.pspolythick    ex:     See in.psboxthick
+% in.pspolythick    ex:     See in.psbox.boxthick
 %                     ------------
 %
 %--------------------------------------------------------------------------
@@ -610,13 +623,13 @@ function filename = gmt_plot(in,field)
 %                   ex:     String to appear at lat/lon
 %                   def:    manditory user input
 %
-%  thick            in:     %f
+%  fontsize         in:     %f
 %                   ex:     Text size in points
 %                   def:    20
 %
 %  angle            in:     %f
 %                   ex:     degrees counter-clockwise from horizontal
-%                   def:    0˚
+%                   def:    0 [deg]
 %
 %  fontnum          in:     %f
 %                   ex:     Sets the font type
@@ -668,7 +681,7 @@ atmlab('VERBOSITY',gmtlab('VERBOSITY'));
 cd(out.tmpdir);
 
 if out.gridded
-    out.grdfile = [out.filename '.grd'];
+    out.grdfile = [out.filename '.nc'];
     gmt_nc_save_gridded(out.lon,out.lat,out.(field),out.grdfile);
     logtext(1,'Writing grdfile: %s sucessfull\n',out.grdfile)
 else
@@ -695,7 +708,10 @@ function in = set_GMT_plot(in,field)
 
 
 % Test is GMT is installed and in the path
+
+    %[a,b] = system('which gmt');
 [a,b] = system('which gmtset');
+
 if a == 1
     error(['gmtlab:' mfilename ':shell'],[ [ b '\n\n'],...
         'Either GMT is not installed\n',...
@@ -703,36 +719,39 @@ if a == 1
         'You need to add its installation directory to your PATH\n',...
         'e.g. in Matlab you can add the PATH via \n',...
         'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])'])
+else
+    % This is gmt5
+    %[~,in.gmtVersion] = system('gmt --version');
 end
 
 % SET DEFAULTS
 % general
 default.annot_font_size_primary = '14p';     % size of axis labels (include legend if not set differently by in.legend.font_size)
-default.basemap_axis    = 'nSeW';           % Annotates West and South of the map.
-default.display         = true;             % Display figure to screen
-default.center          = 0;                % The center longitude of the map. The region has to be -180:180 (cyclic)
-default.color_background= '0/0/0';
-default.color_foreground= '255/255/255';
-default.color_nan       = '150/150/150';
-default.header          = '';               % no title by default
-default.header_font     = 'Helvetica';      % one of 35 available fonts
-default.header_fontsize = '36p';
+default.basemap_axis     = 'nSeW';           % Annotates West and South of the map.
+default.display          = true;             % Display figure to screen
+default.center           = 0;                % The center longitude of the map. The region has to be -180:180 (cyclic)
+default.color_background = '0/0/0';
+default.color_foreground = '255/255/255';
+default.color_nan        = '150/150/150';
+default.header           = '';               % no title by default
+default.header_font      = 'Helvetica';      % one of 35 available fonts
+default.header_fontsize  = '36p';
 in = optargs_struct(in,default);
 % how far the title is removed from the top of the map (depends on 'N' or 'n')
-default.header_offset   = [num2str(-0.4+0.6*ismember('N',in.basemap_axis)) 'c'];
-default.keep_files      = false;            % keep intermediate files (debugging)
-default.map_width       = 20;
-default.measure_unit    = 'cm';             % Choose between cm, inch, m, and point.
-default.nlevels         = 20;               % Use 20 color levels by default
-default.force_nlevels   = false;            % do not force, e.g. reduce if uniques are less
-default.nodata          = false;            % true if you only want the map
-default.outdir          = gmtlab('OUTDIR'); % where to put the figure
-default.plotPlacement   = '-Xa5 -Ya5';      % String of global plotPlacements
-default.projection      = 'Q';              % Cylindrical Equidistant Projection.
-default.savelegend      = false;            % make an additional pdf-file only containing the legend
-default.unit            = '';               % unit displayed with legend
-default.xunit           = '';               % xlabel for the legend
-
+default.header_offset    = [num2str(-0.4+0.6*ismember('N',in.basemap_axis)) 'c'];
+default.keep_files       = false;            % keep intermediate files (debugging)
+default.map_width        = 20;
+default.measure_unit     = 'cm';             % Choose between cm, inch, m, and point.
+default.force_nlevels    = false;            % do not force, e.g. reduce if uniques are less
+default.nodata           = false;            % true if you only want the map
+default.outdir           = gmtlab('OUTDIR'); % where to put the figure
+default.plotPlacement    = '-Xa5 -Ya5';      % String of global plotPlacements
+default.projection       = 'Q';              % Cylindrical Equidistant Projection.
+default.savelegend       = false;            % make an additional pdf-file only containing the legend
+default.unit             = '';               % unit displayed with legend
+default.xunit            = '';               % xlabel for the legend
+default.treatAsUngridded = false;            % A patch to easily switch between gridded and ungridded data (mostly for plot testing )
+default.lon360           = false;
 in = optargs_struct(in,default);
 
 in.outdir = sanitise(in.outdir);
@@ -755,6 +774,7 @@ end
 
 if ~isempty(in.header)
     default.filename = ['gmtfile_' in.header '.pdf'];
+    default.filename = strrep(default.filename,'/','-');
 else default.filename = 'default.pdf';
 end
 
@@ -800,9 +820,13 @@ end
 
 if ~ismember(field,fieldnames(in))
     error(['gmtlab:' mfilename ':BadInput'],...
-        'no field by the name of "%s" in struct',field)
+        'no field by the name of "%s" found in input structure',field)
 else
     in.fieldname  = field;
+end
+
+if ~strcmp(field,'mask') && isfield(in,'mask')
+    in.(field)(in.mask(in.(field))) = NaN;
 end
 
 % is the data plotable?
@@ -810,6 +834,10 @@ in = isdata(in,field);
 
 % Check to see if the data is gridded or not
 in = isgridded(in,field);
+
+% special patch if you want to test if you want to switch to treating gridded 
+% data ungridded
+in = treatAsUngridded(in,field);
 
 % Also get rid of NaNs in the geodata (This only applies to ungridded data)
 in = rmNaNsGeo_and_standardize_geodata(in,field);
@@ -825,21 +853,73 @@ if ~in.nodata
     default.datarange     = getdatarange(in,field); %
     if any(isnan(in.(field)(:)))
         default.extra_legend = struct('name','NaN','type','nan'); % include NaNs in the legend
+    else
+        if isfield(in,'extra_legend') && strcmpi(in.extra_legend.name,'NaN') && in.gridded
+            logtext(2,'Asked to make a NaN-legend although none are present in the data\n')
+        end
     end
 end
 in = optargs_struct(in,default);
 in.datarange = double(in.datarange);
 
+
+assert(diff(in.datarange)>0,'atmlab:badInput','min=max in the datarange. Aborting...')
+
 % COLORS & DATA REPRESENTATION
 default.ctable      = 'rainbow';          % color palette
+default.nlevels = get_nlevels(in.datarange);
+in = optargs_struct(in,default);
 [default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
 in = optargs_struct(in,default); clear default
+
 
 % LEGEND
 in = setupLegend(in);
 
 end
 
+function nl = get_nlevels(dr)
+
+if diff(dr) > 1e4
+    %logtext(1,'difference between min and max is more the 1e4. \n')
+    nl = 10;
+    %forget it. too big
+    return
+end
+% find a good number of countour levels
+
+des_nlev = 10; % desired levels
+minlev = 5; % minium levels
+
+rsbl = false;
+for fc = [1,10,100,1000,1000]
+    if abs(dr - floor(dr)) < 1e-6
+        rsbl = true;
+        break
+    end
+end
+
+if ~rsbl
+    f = des_nlev;
+else
+    drdiff = fc * (dr(2)-dr(1));
+    f = drdiff./(1:ceil(sqrt(drdiff))); 
+    f = f(f==fix(f)).' ;
+    f = unique([f;drdiff./f]);
+    f = f/fc;
+end
+
+nl = f(abs(f-des_nlev)==min(abs(f-des_nlev)));
+nl = nl(1);
+if nl < des_nlev
+    nl = dr(2)-dr(1);
+end
+if nl < minlev
+    % recursive until found the acceptable levels
+    dr = dr*2;
+    nl = get_nlevels(dr);
+end
+end
 
 %% SUBFUNCTIONS FOR SETUP
 %      ||||||
@@ -911,16 +991,32 @@ if ~isfield(in,'region')
         
         % check to see if lon-dlon is out side the boundary. If so, fix the
         % region to the edges. Same goes for lat...
-        cond1 = abs(-180-in.lon(1)) <= dn(1);
-        cond2 = 180-in.lon(end) <= dn(end);
+        % If the region passes the dateline it goes back to 0:360 notation
+
+        if in.lon360
+            cond1 = abs(0 - in.lon(1)) <= dn(1);
+            cond2 = 360-in.lon(end) <= dn(end);
+        else
+            cond1 = abs(-180 - in.lon(1)) <= dn(1);
+            cond2 = 180-in.lon(end) <= dn(end);
+        end
         cond3 = abs(-90-in.lat(1)) <= dt(1);
         cond4 = 90-in.lat(end) <= dt(end);
         
         af = annot_format{1};
         if cond1 && cond2 && cond3 && cond4
-            in.region = '-180/180/-90/90';
+            if in.lon360
+                in.region= '0/360/-90/90';
+            else
+                in.region= '-180/180/-90/90';
+            end
+            %in.region = 'g'; % global
         elseif cond1 && cond2
-            fstr = sprintf('-180/180/%s/%s',af,af);
+            if in.lon360
+                fstr = sprintf('0/360/%s/%s',af,af);
+            else
+                fstr = sprintf('-180/180/%s/%s',af,af);
+            end
             in.region = sprintf(fstr,in.lat(1)-dt(1)/2,in.lat(end)+dt(end)/2);
         elseif cond3 && cond4
             fstr = sprintf('%s/%s/-90/90',af,af);
@@ -1013,7 +1109,7 @@ elseif ~isfield(in,'region') && all(isfield(in,{'lat','lon'}))
         min(in.lon(:)),max(in.lon(:)),...
         min(in.lat(:)),max(in.lat(:)));
 else
-    in.region='-180/180/-90/90';
+    in.region='g';
 end
 
 end
@@ -1089,6 +1185,19 @@ end
 
 end
 
+function in = treatAsUngridded(in,field)
+
+if in.treatAsUngridded && in.gridded
+    
+    logtext(1,'Treating the gridded data as ungridded\n')
+    in.lon = repmat(in.lon',length(in.lat),1);
+    in.lat = repmat(in.lat,1,length(in.lon));
+    in.gridded = false;
+    assert(isequal(size(in.lat),size(in.lon),size(in.(field))),'Something went wrong')
+end
+
+end
+
 function in = rmNaNsGeo_and_standardize_geodata(in,field)
 %% rmNaNsGeo
 % Also get rid of NaNs in the geodata
@@ -1097,21 +1206,25 @@ function in = rmNaNsGeo_and_standardize_geodata(in,field)
 errId = ['gmtlab:' mfilename ':badInput']; % common error ID
 
 if ~in.gridded
-
-index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
-if any(~index)
-    logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(~index)/numel(index))
-    in.lat = in.lat(index);
-    in.lon = in.lon(index);
-    in.(field) = in.(field)(index);
-end
-
+    
+    index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
+    if any(~index)
+        logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(~index)/numel(index))
+        assert(sum(index)/numel(index)>0,['atmlab:',mfilename,':badInput'],'No valid lat lons!\n')
+        in.lat = in.lat(index);
+        in.lon = in.lon(index);
+        in.(field) = in.(field)(index);
+    end
+    
 else
     % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
-    [~,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field));
     
+    allow.lon360 = true;
+    [flags,in.lat,in.lon,in.(field)] = standardize_geodata(in.lat,in.lon,in.(field),allow);
+    
+    in.lon360=flags.lon360;
 end
 
 end
@@ -1132,7 +1245,11 @@ end
 if ~isfield(in.legend,'position')
     % ORIENTATION
     
-    x = sscanf(in.region,'%f/%f/%f/%f');
+    if ~strcmp(in.region,'g')
+        x = sscanf(in.region,'%f/%f/%f/%f');
+    else
+        x = [-180, 180, -90, 90];
+    end
     f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
     myHcondition = f < 0.5; tmp = ['v','h']; %vertical,horisontal
 
@@ -1171,8 +1288,12 @@ else
     default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
 end
 default.tick_annotion_format = in.tick_annotation_format;
-default.sidebar     = getsidebar(in); % coloroured triangles using in.datarange
-in.legend           = optargs_struct(in.legend,default);
+if ~isfield(in.legend,'tick_annotations') % incompatible
+    default.tick_spacing = (in.datarange(2)-in.datarange(1))/in.nlevels ...
+        * (floor((in.nlevels-1)/10) + 1);    %10 is the old default number of levels
+end
+default.sidebar      = getsidebar(in); % coloroured triangles using in.datarange
+in.legend            = optargs_struct(in.legend,default);
 
 end
 
@@ -1198,14 +1319,14 @@ if in.gridded
         in.lon = in.lon(cond);
         in.(field) = in.(field)(:,cond);
     end
-    if max(diff(in.lon))>5*min(diff(in.lon)) || ...
-            structfun(@str2double,regexp(in.region,'.+/(?<lnmax>.+)/.+/.+','names')) > 180 % this is a 360 test
+    
+    if in.lon360 && max(diff(in.lon))>5*min(diff(in.lon)) % if the are dicontinuous  
         
         in.lon = in.lon+(in.lon < 0)*360;
         [in.lon,lnindex] = sort(in.lon);
         in.(field) = in.(field)(:,lnindex);
         % if diff equal 0 somewhere then at best the data is repeated e.g.
-        % at 0˚ and 360˚
+        % at 0 and 360 degrees
         if any(diff(in.lon)==0)
             if isequal(in.(field)(:,find(diff(in.lon)==0)),in.(field)(:,find(diff(in.lon)==0)+1)) %#ok<FNDSB>
                 % then remove duplicate line
@@ -1304,6 +1425,11 @@ out = exec_system_cmd(command,gmtlab('verbosity')); % execute all gathered comma
 filename = sprintf('%s/%s.%s',in.outdir,in.filename,in.figuretype);
 
 % If no viewer is defined, check for xpdf, then evince, then okular
+
+if in.display && any(isnan(openwith))
+    logtext(2,'display = 1, yet no view is defined\nE.g. gmtlab(''pdfviewer'',''gnome-open'')\n')
+end
+    
 if in.display && any(isnan(openwith)) && strcmp(in.figuretype,'pdf')
     disp('No pdfviewer defined.')
     disp('Set gmtlab(''PDFVIEWER'',''<e.g. xpdf>'') in your startup file')

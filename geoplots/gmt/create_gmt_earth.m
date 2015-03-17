@@ -15,98 +15,111 @@ in = setup_create_gmt_earth(in);
 
 F = in.filename;
 
+i = 1; %counter
 % Remove earlier .ps and gmt residules
-commands{1} = sprintf('rm -f %s.ps',F);
-%commands{end+1} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
+commands{i} = sprintf('rm -f %s.ps',F); i=i+1;
+%commands{i} = sprintf('rm -f .gmtcommands4 .gmtdefaults');
 
 % Set paper size
-commands{end+1} = 'gmtset PAPER_MEDIA A0+';
+commands{i} = 'gmtset PAPER_MEDIA A0+';  i=i+1;
 
 % Annotations of axis
-commands{end+1} = sprintf('gmtset ANNOT_FONT_SIZE_PRIMARY %s',num2str(in.annot_font_size_primary));
-commands{end+1} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);
-commands{end+1} = sprintf('gmtset HEADER_OFFSET=%s',num2str(in.header_offset));
-commands{end+1} = sprintf('gmtset HEADER_FONT %s',num2str(in.header_font));
-commands{end+1} = sprintf('gmtset HEADER_FONT_SIZE %s',num2str(in.header_fontsize));
-commands{end+1} = sprintf('gmtset MEASURE_UNIT=%s',in.measure_unit);
+commands{i} = sprintf('gmtset ANNOT_FONT_SIZE_PRIMARY %s',num2str(in.annot_font_size_primary));  i=i+1;
+commands{i} = sprintf('gmtset BASEMAP_AXES %s',in.basemap_axis);  i=i+1;
+commands{i} = sprintf('gmtset HEADER_OFFSET=%s',num2str(in.header_offset));  i=i+1;
+commands{i} = sprintf('gmtset HEADER_FONT %s',num2str(in.header_font));  i=i+1;
+commands{i} = sprintf('gmtset HEADER_FONT_SIZE %s',num2str(in.header_fontsize)); i=i+1;
+commands{i} = sprintf('gmtset MEASURE_UNIT=%s',in.measure_unit); i=i+1;
 
 % other gmtset-commands you might have
 if isfield(in,'gmtset')
-    for i = length(in.gmtset)
-        commands{end+1} = in.gmtset{i}; %#ok<*AGROW>
+    for j = length(in.gmtset)
+        commands{i} = in.gmtset{j}; i=i+1;
     end
 end
 
 % PSBASEMAP (open PS-file)
-commands{end+1} = in.plot.basemap;
+commands{i} = in.plot.basemap; i=i+1;
 
 % NEARNEIGHBOR
 if isfield(in,'nearneighbor') && ~isstruct(in.nearneighbor)
-    commands{end+1} = in.nearneighbor;
-    in.grdfile = [in.filename '.grd'];
+    commands{i} = in.nearneighbor; i=i+1;
+    in.grdfile = [in.filename '.nc'];
 elseif ~in.gridded && isfield(in.plot,'grid')
-    in.grdfile = [in.filename '.grd'];
-    commands{end+1} = nearneighbor(in.grdfile,in.plot.grid);
+    in.grdfile = [in.filename '.nc'];
+    commands{i} = nearneighbor(in.grdfile,in.plot.grid); i=i+1;
 end
 
 % IMAGE (plot data)
 if isfield(in,'grdimage')
-    commands{end+1} = in.grdimage;
+    commands{i} = in.grdimage; i=i+1;
 elseif ~in.nodata
-    commands{end+1} = grdimage(F,in);
+    commands{i} = grdimage(F,in); i=i+1;
 end
 
 % LEGEND
 if isfield(in,'psscale')
-    commands{end+1} = in.psscale;
+    commands{i} = in.psscale; i=i+1;
 elseif ~isempty(in.plot.legend)
-    commands{end+1} = psscale(F,in.plot.legend);
+    commands{i} = psscale(F,in.plot.legend); i=i+1;
 end
 if isfield(in,'psscale_extra')
-    commands{end+1} = in.psscale_extra;
+    commands{i} = in.psscale_extra; i=i+1;
 elseif ~isempty(in.plot.extralegend)
-    commands{end+1} = in.plot.extralegend;
+    commands{i} = in.plot.extralegend; i=i+1;
 end
 
 % COASTLINES
 if isfield(in,'pscoast')
-    commands{end+1} = in.pscoast;
+    commands{i} = in.pscoast; i=i+1;
 elseif ~isempty(in.plot.coast)
-    commands{end+1} = pscoast(F,in.plot.coast);
+    commands{i} = pscoast(F,in.plot.coast); i=i+1;
 end
 
 % LOCATION MARKERS
 if isfield(in,'locations')
-    commands = pslocations(F,in,commands);
+    tmp = pslocations(F,in);
+    for j = 1:length(tmp)
+        commands{i} = tmp{j}; i=i+1;
+    end
 end
 
 % CONTOURLINES
 if isfield(in,'grdcontour')
-    commands{end+1} = in.grdcontour;
+    commands{i} = in.grdcontour; i=i+1;
 elseif isfield(in.plot,'grdcontour')
-    for i = 1:length(in.plot.grdcontour) %can have more than 1 set
-        commands{end+1} = grdcontour(F,in.plot.grdcontour(i));
+    for j = 1:length(in.plot.grdcontour) %can have more than 1 set
+        commands{i} = grdcontour(F,in.plot.grdcontour(j)); i=i+1;
     end
 end
 
 % PSBOX & PSPOLY (draw boxes or shapes on map)
 if isfield(in,'psxy')
-    commands{end+1} = in.psxy;
+    commands{i} = in.psxy; i=i+1;
 elseif isfield(in,'psbox') || isfield(in.plot,'psbox')
-    commands = psbox(F,in,commands);
+    tmp = psbox(F,in);
+    for j = 1,length(tmp)
+        commands{i} = tmp{j}; i=i+1;
+    end
 elseif isfield(in.plot,'pspoly')
-    commands = pspoly(F,in,commands);
+    tmp = pspoly(F,in);
+    for j =1:length(tmp)
+        commands{i} = tmp{j}; i=i+1;
+    end
 end
 
 % PSTEXT
 if isfield(in,'pstext') && ~isstruct(in.pstext)
-    commands{end+1} = in.pstext;
+    commands{i} = in.pstext; i=i+1;
 elseif isfield(in.plot,'pstext')
-    commands{end+1} = pstext(F,in.plot.pstext,in.plotPlacement);
+    tmp = pstext(F,in.plot.pstext,in.plotPlacement);
+    for j =1:length(tmp)
+        commands{i} = tmp{j}; i=i+1;
+    end
 end
 
 % CLOSE PS + GRID
-commands{end+1} = in.plot.lastbasemap;
+commands{i} = in.plot.lastbasemap;
 
 %%%%%%%%%%%%%%%%%
 %  SUBFUNCTIONS
@@ -168,7 +181,7 @@ in.plot.lastbasemap = last_psbasemap(in);
 function proj = setup_projection(in)
 %% setup_projection %%
 
-if isempty(in.center) || ~strcmp(in.plot.region(1:9),'-180/180/')
+if isempty(in.center) || ~strcmp(in.plot.region(1),'g') || (length(in.plot.region)>9 && ~strcmp(in.plot.region(1:9),'-180/180/'))
     logtext(1,'Data is not cyclic, choosing in.centre for projection from center longitude...\n')
     x = sscanf(in.plot.region,'%f/%f/%f/%f');
     C = (x(1)+x(2))/2;
@@ -319,7 +332,15 @@ end
 a.plotPlacement = in.plotPlacement;
 
 % Set resolution of coastal features
-rg=sscanf(in.plot.region,'%f/%f/%f/%f');
+if strcmp(in.plot.region,'g')
+    if in.lon360
+        rg = [0 360 -90 90];
+    else
+        rg = [-180 180 -90 90];
+    end
+else
+    rg=sscanf(in.plot.region,'%f/%f/%f/%f');
+end
 ln=rg(2)-rg(1);
 lt=rg(4)-rg(3);
 if ~isfield(in.coast,'features')
@@ -362,11 +383,12 @@ function out = setup_pstext(in)
 assert(all(isfield(in,{'text','lat','lon'})),['gmtlab:' mfilename ':BadInput'],...
     'in.pstext.{text,lat,lon} are the minimum input requirements for in.pstext')
 
-default.thick   = 20;      % text size in points
+default.fontsize= 20;      % text size in points
 default.angle   = 0;       % degrees counter-clockwise from horizontal
 default.fontnum = 1;       % sets the font type
 default.justify = 6;       % sets the alignment
 default.color   = '0/0/0'; % textcolor (black)
+%out = optargs_struct(in,default);
 for i = 1:length(in)
     out(i) = optargs_struct(in(i),default);
 end
@@ -434,26 +456,30 @@ tickval = minn:in.stepsize:maxx;
 function out = setup_psboxpoly(in, field)
 %% ps box
 
-el = size(in.(field),1);
+
+el = length(in.(field));
 if isfield(in,[field 'color'])
     if length(in.([field 'color']))~=el
         error(['atmlab:' mfilename],'Need same number of colors as boxes')
     end
-else in.([field 'color'])(1:l) = {'k'}; %default is black
+else in.([field 'color']) = [0 0 0]; %default is black
 end
+
+colors = cell(length(in.(field)),1);
+for i=1:length(colors)
+    colors{i}=in.([field 'color']){i}.*255; % instead of from 0:1
+end
+out.colors=colors;
 
 if isfield(in,([field 'thick']))
     if length(in.([field 'thick']))~=el
         error(['atmlab:' mfilename],'Need same number of sizes as boxes')
     end
-else out.thick(1:el)={10}; %default size=10
+else in.([field,'thick'])(1:el)={10}; %default size=10
 end
-c = list_colors('colors',in.([field 'color']));
-colors = cell(length(c),1);
-for i=1:length(c)
-    colors{i}=c{i}.*255; % instead of from 0:1
-end
-out.colors=colors;
+
+out.thick = in.([field,'thick']);
+
 out.(field)=in.(field);
 
 function basemap = last_psbasemap(in)
@@ -461,7 +487,17 @@ function basemap = last_psbasemap(in)
 
 % default.ticks = '60g60/30g30' (global)
 % in.plot.region has this format: 'lon1/lon2/lat1/lat2'
-rg=sscanf(in.plot.region,'%f/%f/%f/%f');
+
+if strcmp(in.plot.region,'g')
+    if in.lon360
+        rg = [0 360 -90 90];
+    else
+        rg = [-180 180 -90 90];
+    end
+else
+    rg=sscanf(in.plot.region,'%f/%f/%f/%f');
+end
+
 lon=rg(2)-rg(1);
 lat=rg(4)-rg(3);
 

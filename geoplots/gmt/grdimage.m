@@ -16,9 +16,10 @@ grdimage = 'grdimage';
 %location of file, region and projection
 grdimage = sprintf('%s %s -R -J',grdimage,in.grdfile);
 
-%Use nearestneigbour interpolation, only use the nearest grid point
-%Otherwise the default bicubic interpolation introduces artifacts.
-grdimage = sprintf('%s -S-n/0',grdimage);
+% The default bicubic interpolation introduces artifacts. 
+% Nearneighbor to nearest point causes problems for high density data. 
+
+grdimage = sprintf('%s -S-b/0.5',grdimage);
 
 grdimage = sprintf('%s %s',grdimage,in.plotPlacement);
 

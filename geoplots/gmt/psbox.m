@@ -1,4 +1,4 @@
-function commands = psbox(file,in,commands)
+function box = psbox(file,in)
 % PSBOX Makes boxes in gmtplot
 %
 % IN      file     %s       file to append to
@@ -44,5 +44,4 @@ for i = 1:size(pb,1)
     
     % selects Overlay plot mode and assume more pscode will be appended later
     box = sprintf('%s -K -O >> %s.ps',box,file);
-    commands{end+1} = box;
 end

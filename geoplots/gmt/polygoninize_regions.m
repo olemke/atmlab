@@ -18,7 +18,7 @@ function pspoly = polygoninize_regions(boxes)
 % Created by Salomon Eliasson
 % $Id$
 
-%% Make a grid of logicals
+%% Make a grid of logicals (slightly bigger than the whole world)
 res = .1;
 tmplon = -180-res:res:180+res;
 tmplat = -90-res:res:90+res;
@@ -78,14 +78,14 @@ di=-1;
 j = 1;
 curpoints = [points,false(size(cols))];
 psxy = cell(10,1);
-while 1
+while true
     if isempty(curpoints)
         break
     end
     i = 1;
     psxy{j} = [curpoints(i,2),curpoints(i,1)];
     curpoints(i,5)=true;
-    while  1
+    while true
         di = finddirection(tmpgrid,curpoints,i,di);
         i = nextcoord(di,curpoints,i);
         if curpoints(i,5)

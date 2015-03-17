@@ -77,7 +77,7 @@ B.OPEN_COMMAND      = NaN;
 B.OUTDIR            = atmlab('WORK_AREA');
 B.PDFVIEWER         = NaN;
 B.PSVIEWER          = NaN;
-B.VERBOSITY         = 0;
+B.VERBOSITY         = 1;
 
 function [A,value] = gmt_prstnt_struct( A, def_fun, varargin )
 %% gmt_prstnt_struct

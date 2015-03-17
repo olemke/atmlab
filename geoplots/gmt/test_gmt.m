@@ -104,8 +104,8 @@ for T = sort(in.test)
     switch T
         case 1
             %% TEST: Difference plot, reference=0, nlevels, sidebar
-            test.header        = 'gridded: title² * @~D@~r@+-2@~g@~@+, unit';
-            test.unit         = 'kg/m²';
+            test.header        = 'gridded: title ^2 * @~D@~r@+-2@~g@~@+, unit';
+            test.unit         = 'kg/m@+2s';
             test.basemap_axis = 'neSW';
             test.legend.tick_spacing = 25;
             
@@ -382,8 +382,9 @@ for T = sort(in.test)
             
             % Add some annotations some intervals.
             if ~isfield(in,{'stepsize','nlevels'})
-                % assuming we have 20 levels, test the following
-                tmp = repmat({''},1,20);
+                test.nlevels = 20; %
+
+                tmp = repmat({''},1,test.nlevels);
                 tmp{1} = 'blue'; tmp{6} = 'light blue'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
                 test.legend.tick_annotations = tmp;
             end
@@ -535,16 +536,17 @@ for T = sort(in.test)
             reg = polygoninize_regions(a);
             
             % special for swl
-            swl = {[-180  -60; -180 -45],[-180  -45; -80 -45],[-80  -45; -80 -60],...
-                [-80  -60; -180 -60],[-50  -60; -50 -45],[-50  -45; 60 -45],...
-                [60  -45; 180 -45],[180  -45; 180 -60],[180  -60; 60 -60],[60  -60; -50 -60],...
-                [-180  -60; -180 -45],[-180  -45; -80 -45],[-80  -45; -80 -60],[-80  -60; -180 -60],...
+            swl = {[-180  -60; -180 -45],[-180  -45; -80 -45],...
+                [-80  -45; -80 -60],[-80  -60; -180 -60],[-50  -60; -50 -45],...
+                [-50  -45; 60 -45],[60  -45; 180 -45],[180  -45; 180 -60],...
+                [180  -60; 60 -60],[60  -60; -50 -60],[-180  -60; -180 -45],...
+                [-180  -45; -80 -45],[-80  -45; -80 -60],[-80  -60; -180 -60],...
                 [-50  -60; -50 -45],[-50  -45; 60 -45],[60  -45; 180 -45],...
                 [180  -45; 180 -60],[180  -60; 60 -60],[60  -60; -50 -60]}';
             
             test.pspoly = [reg;swl];
-            swlcols = repmat({'g'},1,length(swl));
-            test.pspolycolor = {'g' 'k' 'r' 'g' 'k' 'r' 'b' 'g' swlcols{:}};
+            swlcols = repmat({[0 1 0]},1,length(swl));
+            test.pspolycolor = {[0 1 0] [0 0 0] [1 0 0] [0 1 0] [0 0 0] [1 0 0] [0 0 1] [0 1 0] swlcols{:}};
             test.nodata=true;
             test.basemap_axis='nWeS';
             in.filename = sprintf('Test%g',T);

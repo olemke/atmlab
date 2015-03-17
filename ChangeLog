@@ -1,5 +1,57 @@
 2015-03-17  Salomon Eliasson  <seliasson@ManUtd>
 
+	* atmlab-2-3-73
+
+	This is probably the final commit for these gmt codes that support
+	GMT4. It is time for me and the gmtlab codes to move on to GMT5
+	which the new linux distributions have installed, and is much
+	nicer anyhow. I don't think many are using these codes so I won't
+	bother to make it backward compatible.
+
+	* geoplots/gmt/makepolar.m: fixed for bug that was rarely triggered
+
+	* geoplots/gmt/grdimage.m: Changed the default gridding
+	algorithm. The previous default bicubic interpolation introduces
+	artifacts in some cases. The Nearneighbor to nearest point also
+	causes problems for high density data.
+
+	* geoplots/gmt/gmtlab.m: Changed the default verbosity
+
+	* geoplots/gmt/gmt_plot.m:
+
+	- Added options "treatAsGridded" and "mask"
+
+	- in.TreatAsGrridded: This is a patch. It allows you to treat gridded data as ungridded.
+	This can be useful if you think the internal interpolation for the
+	plot projection is causing weird side effects (such as near NaN values)
+
+	- in.mask: A mask for the data. e.g. @(x)(x>0); This masks all values less than 0 with NaN
+
+	- the default in.nlevels is now derived based on the data. It used to be hard coded at 20.
+
+	- I put in some more assertions
+
+	* geoplots/gmt/gmt_nc_save_ungridded.m: Now making sure that all the
+	inputs have the right dimensions
+
+	* geoplots/gmt/gmt_inputs.m:
+	- Changed input name 'thick' to 'fontsize'
+	- Changed input type for in.color from '%s' to [%f %f %f]
+
+	* geoplots/gmt/extra_legend.m: Updatated header
+
+	* geoplots/gmt/create_gmt_earth.m: Accept -g for global region
+
+	* geoplots/gmt/test_gmt.m:
+	* geoplots/gmt/pstext.m:
+	* geoplots/gmt/pspoly.m:
+	* geoplots/gmt/pslocations.m:
+	* geoplots/gmt/psbox.m:
+	* geoplots/gmt/polygoninize_regions.m:
+	miniscule changes
+
+2015-03-17  Salomon Eliasson  <seliasson@ManUtd>
+
 	* atmlab-2-3-72
 
 	* geographical/standardize_geodata.m: Made more verbose. Made codeing and header more clear

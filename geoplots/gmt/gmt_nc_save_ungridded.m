@@ -26,7 +26,7 @@ end;
 
 ncid = netcdf.create (strrep(filename,'~',getenv('HOME')), 'NC_CLOBBER');
 
-len = netcdf.defDim (ncid, 'numel', length(data));
+len = netcdf.defDim (ncid, 'numel', length(data(:)));
 
 
 varid1 = netcdf.defVar (ncid, 'x', 'double', len);
@@ -35,9 +35,9 @@ varid3 = netcdf.defVar (ncid, 'z', gmt_get_nctype3(data), len);
 
 netcdf.endDef (ncid);
 
-netcdf.putVar (ncid, varid1, lon);
-netcdf.putVar (ncid, varid2, lat);
-netcdf.putVar (ncid, varid3, data);
+netcdf.putVar (ncid, varid1, lon(:));
+netcdf.putVar (ncid, varid2, lat(:));
+netcdf.putVar (ncid, varid3, data(:));
 
 netcdf.close (ncid);
 

@@ -1,5 +1,5 @@
 function file = extra_legend(in)
-% EXTRA_LEGEND create an extra legend box for the missing values
+% EXTRA_LEGEND create an extra legend box
 %
 % Purpose: To create an extra legend box for the missing values
 %
@@ -11,6 +11,7 @@ function file = extra_legend(in)
 %
 % Created by Salomon Eliasson
 % $Id$
+
 if ~isstruct(in.extra_legend)
     % then you have provided the psscale comamnd directly
     file = '';

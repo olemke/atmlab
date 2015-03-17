@@ -1,4 +1,4 @@
-function commands = pspoly(file,in,commands)
+function commands = pspoly(file,in)
 % PSPOLY Make polygons to plot with GMT
 %
 % IN      file     %s       file to append to
@@ -14,7 +14,8 @@ colors = in.plot.pspoly.colors;
 thick = in.plot.pspoly.thick;
 pp = in.plot.pspoly.pspoly;
 
-for i = 1:size(pp,1)    
+commands = cell(1,length(pp));
+for i = 1:length(pp)    
     %stdin
     %% get full coordinates
     ppcur = pp{i};
@@ -39,5 +40,5 @@ for i = 1:size(pp,1)
     c = colors{i};
     s = thick{i};
     command = sprintf('%s -W%d/%d/%d/%d',command,s,c(1),c(2),c(3));
-    commands{end+1} = sprintf('%s -K -O >> %s.ps',command,file);
+    commands{i} = sprintf('%s -K -O >> %s.ps',command,file);
 end
