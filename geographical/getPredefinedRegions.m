@@ -1,14 +1,16 @@
-function [corners,nregions,regionstrlong] = getPredefinedRegions(regionstr)
+function [corners,extra] = getPredefinedRegions(regionstr)
 % GETPREDEFINEDRREGIONS Returns lat/lon corner values of predefined regions
 %
 % IN:    <none>        If nothing is input the list of currently available 
 %                      regions are shown. Build on this list in
 %                      retrieve_reginfo.m if you want other regions 
-%        regionstr     {'%s'}    Use one or more regions listed in retrieve_reginfo.m
+%        regionstr     {'%s'} Use one or more regions listed in retrieve_reginfo.m
 %
 % OUT: corners = [blcorner,trcorner;blcorner,trcorner]
-%      nregions = number of full regions (not necessarily size(corners,2))
-%      regionstrlong = a string of the longname of the regions.
+%      extra   = structure contianing extra information about the regions 
+%               1) extra.center = center of the region (e.g. for plotting region labels)
+%               2) extra.area   = normalised are of the region [0-1], where 1=global 
+%               3) extra.longname = a string of the longname of the regions.
 %
 % NOTE:
 % - Regions, including all of the AR4 IPCC regions (ch 11), can be chosen
@@ -17,31 +19,29 @@ function [corners,nregions,regionstrlong] = getPredefinedRegions(regionstr)
 %
 % current LIST of regions:
 %    - Make sure to update this list if you add a region to the subfunction!!
-%    Allregions = {'earth','global','total','tropics','boreal_trop','austral_trop',...
-%        'sepdz','seadz','ocean_sub','seapdz_boreal','twp','trop_cont','conv_sa','conv_af',...
+%    Allregions = {'global','total','tropics','boreal_trop','austral_trop',...
+%        'sepdz','seadz','ocean_sub','twp','trop_cont','conv_sa','conv_af',...
 %        'swl','kurosho','gulfstr','nwl','westerlies','swe','aus','polar',...
 %        'waf','eaf','saf','sah','neu','sem','nas','cas','tib','eas','sas',...
 %        'sea','ala','cgi','wna','cna','ena','cam','amz','ssa','nau','sau',...
 %        'car','ind','med','tne','npa','spa','arc','ant'};
 %
-%
 % USAGE      [details,N,regionstrings]  = predefinedRegions   %if you want
 %                                                               the list of
 %                                                               regions
 %
-%            [corners,nregions,regionstrlong] = predefinedRegions(regionstr)
+%            [corners,nregions,longname] = predefinedRegions(regionstr)
 %            % regular use to get corners of a region
 %
 % Created by Salomon Eliasson
 % $Id$
-
+    
 if ~nargin
     corners       = retrieve_reginfo('list');
     fn            = fieldnames(corners);
-    nregions      = length(fn);
-    regionstrlong = cell(1,length(fn)); i =1;
+    longname = cell(1,length(fn)); i =1;
     for F = fn'
-        regionstrlong{i} = corners.(F{1}).longname;
+        longname{i} = corners.(F{1}).extra.longname;
         i = i+1;
     end
     return
@@ -54,45 +54,45 @@ if ~iscell(regionstr)
 end
 
 k=1;
-corners       = zeros(10*length(regionstr),4);
-regionstrlong = cell(1,length(regionstr));
-nregions      = zeros(1,length(regionstr));
+corners       = zeros(100*length(regionstr),4);
 
-b = [];
 for i = 1:length(regionstr) % loop over regionstrings
-    test = regexp(regionstr,'/');
-    if length(test{1})==3
-        x            = sscanf(regionstr{1},'%f/%f/%f/%f');
-        corners(i,1) = x(3); 
-        corners(i,2) = x(1); 
-        corners(i,3) = x(4);
-        corners(i,4) = x(2);
-        regionstrlong{i} = '';
-        nregions(k)      = 1;
-        k = k+1;
-        continue
-    end
-    
-    assert(ismember(regionstr{i},fieldnames(retrieve_reginfo('list'))),...
-    'atmlab:predefinedRegions:notFound','region: %s is not in list',regionstr{i})
 
-    [blcorner,trcorner,regionstrlong{i}]=retrieve_reginfo(regionstr{i});
+    % I don't know what is going on here
+%     test = regexp(regionstr,'/');
+%     if length(test{1})==3
+%         x            = sscanf(regionstr{1},'%f/%f/%f/%f');
+%         corners(i,1) = x(3); 
+%         corners(i,2) = x(1); 
+%         corners(i,3) = x(4);
+%         corners(i,4) = x(2);
+%         longname{i} = '';
+%         k = k+1;
+%         continue
+%     end
+    
+    if ~ismember(regionstr{i},Allregions)
+        disp(Allregions)
+        error('atmlab:predefinedRegions:notFound','region: %s is not in list',regionstr{i})
+
+    end
+    [blcorner,trcorner,extra]=retrieve_reginfo(regionstr{i});
     len = size(blcorner,1);
     
     corners(k:k+len-1,1:2) = blcorner;
     corners(k:k+len-1,3:4) = trcorner;
-    nregions(i) = size(b,1)+size(blcorner,1);b=blcorner; % index of the last box in one region
     k = k+len;
 end
 
 corners = corners(1:k-1,:,:,:);
+end
 
 %%%%%%%%%%%%%%%%%
 % SUBFUNCTIONS
 % ||||||||
 % VVVVVVVV
 
-function [blcorner,trcorner,regionstrlong]=retrieve_reginfo(regionstr)
+function [blcorner,trcorner,extra]=retrieve_reginfo(regionstr)
 %% RETRIEVE_REGINFO returns infor required to work with predefined regions
 %
 % IN: regionstr   %s       Stringname of region. Check list of regions in
@@ -107,123 +107,170 @@ function [blcorner,trcorner,regionstrlong]=retrieve_reginfo(regionstr)
 % Created by Salomon Eliasson
 % $Id$
 
+extra.center =  struct('lat',[],'lon',[]);
+extra.area   = 0;
+k = 1;
+
 assert(nargin==1,'atmlab:retrieve_reginfo:badInput','needs input')
 if strcmp(regionstr,'list')
     % Make sure to update this list if you add a region!!
-    Allregions = {'earth','global','total','tropics','boreal_trop','austral_trop',...
-        'sepdz','seadz','ocean_sub','seadz_boreal','sepdz_boreal','twp','trop_cont','conv_sa','conv_af',...
-        'swl','kurosho','gulfstr','ocean_sub_boreal','nwl','westerlies','swe','aus','polar',...
-        'waf','eaf','saf','sah','neu','sem','nas','cas','tib','eas','sas',...
-        'sea','ala','cgi','wna','cna','ena','cam','amz','ssa','nau','sau',...
-        'car','ind','med','tne','npa','spa','arc','ant'};
+
     for A = Allregions
-        [blcorner,trcorner,regionstrlong]=retrieve_reginfo(A{1});
-        Allreg.(A{1}).shortname = A{1};
-        Allreg.(A{1}).longname  = regionstrlong;
+        [blcorner,trcorner,extra]=retrieve_reginfo(A{1});
+
+        Allreg.(A{1}).extra  = extra;
         Allreg.(A{1}).corners   = [blcorner, trcorner];
     end
-    blcorner=Allreg;trcorner=[];regionstrlong='';
+    
+    % abuse the blcorner and dump everything into it
+    blcorner=Allreg;trcorner=[];
     return
 end
 
 switch lower(regionstr)
-    case {'earth','global'}
-        regionstrlong='earth';
+    case 'global'
+        extra.longname='Global';
+        extra.shortname='global';
         blcorner = [-90,-180]; trcorner = [90,180];
-    case 'total'
-        regionstrlong='total';
-        blcorner = [-60,-180]; trcorner = [60,180];
+        extra.center =  struct('lat',0,'lon',0);
     case 'tropics'
-        regionstrlong='tropics';
-        blcorner = [-30,-180]; trcorner = [30,180];
-    case 'boreal_trop'
-        regionstrlong='Tropical Northern half';
-        blcorner = [0,-180]; trcorner = [30,180];
-    case 'austral_trop'
-        regionstrlong='Tropical Southern half';
-        blcorner = [-30,-180]; trcorner = [0,180];
-    case 'sepdz'
-        regionstrlong ='South East Pacific Dry Zone';
-        blcorner = [-27,-110;-18,-130]; trcorner = [-18,-72;2,-82];
-    case 'seadz'
-        regionstrlong ='South East Atlantic Dry zone';
-        blcorner = [-30,-15;-20,-30]; trcorner = [-5,10;-5,-15];
-    case 'sepdz_boreal'
-        regionstrlong ='South East Pacific boreal Dry zone';
-        blcorner = [-15,-180]; trcorner = [0,-80];
-    case 'seadz_boreal'
-        regionstrlong ='South East Atlantic boreal Dry zone';
-        blcorner = [-23.5,-30]; trcorner = [-5,10];
-    case 'ocean_sub'
-        % this is both seadz and sepdz merged
-        regionstrlong ='Subsidence zones of the South East Pacific and South East Atlantic';
-        [a,b] = retrieve_reginfo('sepdz');
-        [c,d] = retrieve_reginfo('seadz');
+        extra.longname='Tropics';
+        [a,b,x(1)] = retrieve_reginfo('boreal_trop');
+        [c,d,x(2)] = retrieve_reginfo('austral_trop');
         blcorner = cat(1,a,c);
         trcorner = cat(1,b,d);
-    case 'ocean_sub_boreal'
+    case 'boreal_trop'
+        extra.longname='Tropical northern hemisphere';
+        blcorner = [0,-180]; trcorner = [30,180];
+        extra.center =  struct('lat',15,'lon',0);
+    case 'austral_trop'
+        extra.longname='Tropical southern hemisphere';
+        blcorner = [-30,-180]; trcorner = [0,180];
+        extra.center =  struct('lat',-15,'lon',0);
+    case 'sepdz'
+        extra.longname ='South East Pacific Dry Zone';
+        blcorner = [-27,-110;-18,-130]; trcorner = [-18,-72;2,-82];
+        extra.center =  struct('lat',-10,'lon',-100);
+    case 'seadz'
+        extra.longname ='South East Atlantic Dry zone';
+        blcorner = [-30,-15;-20,-30]; trcorner = [-5,10;-5,-15];
+        extra.center = struct('lat',-16,'lon',-10);
+    case 'ocean_sub'
         % this is both seadz and sepdz merged
-        regionstrlong ='Subsidence zones boreal of the South East Pacific and South East Atlantic';
-        [a,b] = retrieve_reginfo('sepdz_boreal');
-        [c,d] = retrieve_reginfo('seadz_boreal');
+        extra.longname ='Subsidence zones of the South East Pacific and South East Atlantic';
+        [a,b,x(1)] = retrieve_reginfo('sepdz');
+        [c,d,x(2)] = retrieve_reginfo('seadz');
+        blcorner = cat(1,a,c);
+        trcorner = cat(1,b,d);
+    case 'sepsc'
+        extra.longname ='South east Pacific stratocumulus zone';
+        blcorner = [];trcorner = [];
+        blcorner(end+1,1:2) = [-7,-100]; trcorner(end+1,1:2) = [-4,-81.5];
+        blcorner(end+1,1:2) = [-8.5,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-80];
+        blcorner(end+1,1:2) = [-10.5,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-79];
+        blcorner(end+1,1:2) = [-12,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-78];
+        blcorner(end+1,1:2) = [-14.5,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-77];
+        blcorner(end+1,1:2) = [-15.5,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-76];
+        blcorner(end+1,1:2) = [-16,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-75];
+        blcorner(end+1,1:2) = [-17,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-74];
+        blcorner(end+1,1:2) = [-17.5,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-73];
+        blcorner(end+1,1:2) = [-18.25,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-72];
+        blcorner(end+1,1:2) = [-23,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-70.5];
+        blcorner(end+1,1:2) = [-27,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-71];
+        blcorner(end+1,1:2) = [-30,-100]; trcorner(end+1,1:2) = [blcorner(end-1,1),-71.5];
+        extra.center =  struct('lat',-20,'lon',-85);
+    case 'seasc'
+        extra.longname ='South east Atlantic stratocumulus zone';
+        blcorner = [];trcorner = [];
+        w=-10;
+        blcorner(end+1,1:2) = [-30,              w]; trcorner(end+1,1:2) = [-29.5,17];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-28.75,16.5];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-28,15.75];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-27,15.25];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-26,15];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-25,14.75];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-22,14.25];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-21,13.5];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-20,13];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-19,12.5];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-18.5,12];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-15,11.5];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-13.5,12.25];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-13,12.5];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-12.5,13];
+        blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-10,13.5];
+
+        extra.center =  struct('lat',-20,'lon',0);
+    
+    case 'sc_regs'
+        % this is both seadz and sepdz merged
+        extra.longname ='Stratocumulus regions';
+        [a,b,x(1)] = retrieve_reginfo('sepsc');
+        [c,d,x(2)] = retrieve_reginfo('seasc');
         blcorner = cat(1,a,c);
         trcorner = cat(1,b,d);
     case 'conv_sa'
-        regionstrlong ='Continental convection area (South America)';
+        extra.longname ='Continental convection area (South America)';
         blcorner = [-14,-71.9;-5,-79;0,-80];
         trcorner = [-5,-50;0,-56;10,-60];
+        extra.center =  struct('lat',-2,'lon',-68);
     case 'conv_af'
-        regionstrlong ='Continental convection area (Africa)';
+        extra.longname ='Continental convection area (Africa)';
         blcorner = [-16,15;-5,11;0,0];
         trcorner = [-5,30;0,33;8,34];
+        extra.center =  struct('lat',0,'lon',20);
     case 'trop_cont'
         % this is conv_af and conv_sa merged
-        regionstrlong ='Tropical Convention Continents';
-        [a,b] = retrieve_reginfo('conv_af');
-        [c,d] = retrieve_reginfo('conv_sa');
+        extra.longname ='Tropical convention over continents';
+        [a,b,x(1)] = retrieve_reginfo('conv_af');
+        [c,d,x(2)] = retrieve_reginfo('conv_sa');
         blcorner = cat(1,a,c);
         trcorner = cat(1,b,d);
     case 'twp'
-        regionstrlong ='Tropical Warm pool';
+        extra.longname ='Tropical Warm Pool';
         blcorner = [-12 80;-8 100;-12 155];
         trcorner = [16 100;14 155;10 175];
+        extra.center =  struct('lat',2,'lon',120);
     case 'swl'
-        regionstrlong ='Southern midlatitude Westerlies';
-        blcorner = [-60,-180;-60,-50];
-        trcorner = [-45,-80;-45,180];
+        extra.longname ='Southern midlatitude Westerlies';
+        blcorner = [-60 -180; -60 -50];
+        trcorner = [-45  -80; -45 180];
+        extra.center =  struct('lat',-52,'lon',{-130,60});
     case 'kurosho'
-        regionstrlong ='The region surrounding the Kurosho Current';
+        extra.longname ='The region surrounding the Kurosho Current';
         % need extra region as passing the dateline causes problems
         blcorner = [33,145;40,160;36,-180;40,-160];
         trcorner = [40,180;50,180;50,-160;55,-135];
+        extra.center =  struct('lat',{38,46},'lon',{165,-160});
     case 'gulfstr'
-        regionstrlong ='The region surrounding the Gulfstream';
+        extra.longname ='The region surrounding the Gulfstream';
         blcorner=[35,-70;45,-55;];
         trcorner=[45,-40;60,-10;];
+        extra.center =  struct('lat',52,'lon',-40);
     case 'nwl'
-        regionstrlong ='Northern midlatitude Westerlies';
-        [a,b] = retrieve_reginfo('gulfstr');
-        [c,d] = retrieve_reginfo('kurosho');
+        extra.longname ='Northern midlatitude Westerlies';
+        [a,b,x(1)] = retrieve_reginfo('gulfstr');
+        [c,d,x(2)] = retrieve_reginfo('kurosho');
         blcorner = cat(1,a,c);
         trcorner = cat(1,b,d);
     case 'westerlies'
         % this is swl and nwl merged
-        regionstrlong ='Northern and Southern hemisphere midlatitude Westerlies';
-        [a,b] = retrieve_reginfo('gulfstr');
-        [c,d] = retrieve_reginfo('kurosho');
-        [e,f] = retrieve_reginfo('swl');
+        extra.longname ='Midlatitude westerlies';
+        [a,b,x(1)] = retrieve_reginfo('gulfstr');
+        [c,d,x(2)] = retrieve_reginfo('kurosho');
+        [e,f,x(3)] = retrieve_reginfo('swl');
         blcorner = cat(1,a,c,e);
         trcorner = cat(1,b,d,f);
     case 'aus'
-        regionstrlong ='Australia';
+        extra.longname ='Australia';
         blcorner = [-45,100]; trcorner = [0,170];
     case 'swe'
-        regionstrlong='Sweden';
+        extra.longname='Sweden';
         blcorner = [54,4];trcorner = [72,32];
     case 'polar'
-        regionstrlong = 'Polar regions';
-        [a,b] = retrieve_reginfo('ant');
-        [c,d] = retrieve_reginfo('arc');
+        extra.longname = 'Polar regions';
+        [a,b,x(1)] = retrieve_reginfo('ant');
+        [c,d,x(2)] = retrieve_reginfo('arc');
         blcorner = cat(1,a,c);
         trcorner = cat(1,b,d);
     otherwise
@@ -237,20 +284,20 @@ switch lower(regionstr)
             
             % Africa
             case 'waf'
-                regionstrlong ='West Africa';
+                extra.longname ='West Africa';
                 blcorner = [-12,-20]; trcorner = [22,18];
             case 'eaf'
-                regionstrlong ='East Africa';
+                extra.longname ='East Africa';
                 blcorner = [-12,22]; trcorner = [18,52];
             case 'saf'
-                regionstrlong ='South Africa';
+                extra.longname ='South Africa';
 %                 disp('WARNING: hard-coded bounding corners dont ')
 %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
 %                 disp('         and have been adjusted to figure 11.26 p923')
 %                 disp('i.e. 35S,10E - 12S,52E has been adjusted to 35S,-10E - 12S,52E')
                 blcorner = [-35,-10]; trcorner = [-12,52];
             case 'sah'
-                regionstrlong ='Sahara';
+                extra.longname ='Sahara';
 %                 disp('WARNING: hard-coded bounding corners dont ')
 %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
 %                 disp('         and have been adjusted to figure 11.26 p923')
@@ -259,37 +306,37 @@ switch lower(regionstr)
                 
                 %Europe
             case 'neu'
-                regionstrlong ='Northern Europe';
+                extra.longname ='Northern Europe';
                 blcorner = [48,-10]; trcorner = [75,40];
             case 'sem'
-                regionstrlong ='Southern Europe and Mediterranean';
+                extra.longname ='Southern Europe and Mediterranean';
                 blcorner = [30,-10]; trcorner = [48,40];
                 
                 %Asia
             case 'nas'
-                regionstrlong ='Nothern Asia';
+                extra.longname ='Nothern Asia';
                 blcorner = [50,40]; trcorner = [70,180];
             case 'cas'
-                regionstrlong ='Central Asia';
+                extra.longname ='Central Asia';
                 blcorner = [30,40]; trcorner = [50,75];
             case 'tib'
-                regionstrlong ='Tibetan Plateau';
+                extra.longname ='Tibetan Plateau';
 %                 disp('WARNING: hard-coded bounding corners dont ')
 %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
 %                 disp('         and have been adjusted to figure 11.26 p923')
 %                 disp('i.e. 30N,50E - 75N,100E has been adjusted to 30N,75E - 50N,100E')
                 blcorner = [30,75]; trcorner = [50,100];
             case 'eas'
-                regionstrlong ='East Asia';
+                extra.longname ='East Asia';
                 blcorner = [20,100]; trcorner = [50,145];
             case 'sas'
-                regionstrlong ='South Asia';
+                extra.longname ='South Asia';
                 %                         disp('         correspond to those on p856 in AR4 IPCC rapport')
                 %                         disp('         and have been adjusted to figure 11.26 p923')
                 %                         disp('i.e. 5N,64E - 50N,100E has been adjusted to 5N,64E - 30N,100E')
                 blcorner = [5,64]; trcorner = [30,100];
             case 'sea'
-                regionstrlong ='South East Asia';
+                extra.longname ='South East Asia';
 %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
 %                 disp('         and have been adjusted to figure 11.26 p923')
 %                 disp('i.e. 11S,95E - 20N,115E has been adjusted to 11S,95E - 20N,')
@@ -297,23 +344,23 @@ switch lower(regionstr)
                 
                 % North America
             case 'ala'
-                regionstrlong ='Alaska';
+                extra.longname ='Alaska';
                 blcorner = [60,-170]; trcorner = [72,-103];
             case 'cgi'
-                regionstrlong ='East Canada, Greenland, Iceland';
+                extra.longname ='East Canada, Greenland, Iceland';
                 blcorner = [50,-103]; trcorner = [85,-10];
             case 'wna'
-                regionstrlong ='Western North America';
+                extra.longname ='Western North America';
 %                 disp('WARNING: hard-coded bounding corners dont ')
 %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
 %                 disp('         and have been adjusted to figure 11.26 p923')
 %                 disp('i.e. 30N,50E - 75N,100E has been adjusted to 30N,130W - 60N,103W')
                 blcorner = [30,-130]; trcorner = [60,-103];
             case 'cna'
-                regionstrlong ='Central North America';
+                extra.longname ='Central North America';
                 blcorner = [30,-103]; trcorner = [50,-85];
             case 'ena'
-                regionstrlong ='Eastern North America';
+                extra.longname ='Eastern North America';
 %                 disp('WARNING: hard-coded bounding corners dont ')
 %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
 %                 disp('         and have been adjusted to figure 11.26 p923')
@@ -321,46 +368,95 @@ switch lower(regionstr)
                 blcorner = [25,-85]; trcorner = [50,-60];
                 % Central and South America
             case 'cam'
-                regionstrlong ='Central America';
+                extra.longname ='Central America';
                 blcorner = [10,-116]; trcorner = [30,-83];
             case 'amz'
-                regionstrlong ='Amazonia';
+                extra.longname ='Amazonia';
                 blcorner = [-20,-82]; trcorner = [12,-34];
             case 'ssa'
-                regionstrlong ='Southern South America';
+                extra.longname ='Southern South America';
                 blcorner = [-56,-76]; trcorner = [-20,-40];
                 
                 %Australia and New Zealand
             case 'nau'
-                regionstrlong ='North Australia';
+                extra.longname ='North Australia';
                 blcorner = [-30,110]; trcorner = [-11,155];
             case 'sau'
-                regionstrlong ='South Australia';
+                extra.longname ='South Australia';
                 blcorner = [-45,110]; trcorner = [-30,155];
                 %Small islands and oceans
             case 'car'
-                regionstrlong ='Caribbean';
+                extra.longname ='Caribbean';
                 blcorner = [10,-85]; trcorner = [25,-60];
             case 'ind'
-                regionstrlong ='Indian Ocean';
+                extra.longname ='Indian Ocean';
                 blcorner = [-35,50]; trcorner = [17.5,100];
             case 'med'
-                regionstrlong ='Mediterranean Basen';
+                extra.longname ='Mediterranean Basen';
                 blcorner = [30,-5]; trcorner = [45,35];
             case 'tne'
-                regionstrlong ='Tropical North East Atlantic';
+                extra.longname ='Tropical North East Atlantic';
                 blcorner = [0,-30]; trcorner = [40,-10];
             case 'npa'
-                regionstrlong ='North Pacific Ocean';
+                extra.longname ='North Pacific Ocean';
                 blcorner = [0,150]; trcorner = [40,360-120];
             case 'spa'
-                regionstrlong ='South Pacific Ocean';
+                extra.longname ='South Pacific Ocean';
                 blcorner = [-55,150]; trcorner = [0,360-80];
             case 'arc'
-                regionstrlong ='Arctic';
-                blcorner = [60,-180]; trcorner = [90,180];
+                extra.longname ='Arctic';
+                blcorner = [70,-180]; trcorner = [90,180];
+                extra.center =  struct('lat',75,'lon',0);
             case 'ant'
-                regionstrlong ='Antarctica';
-                blcorner = [-90,-180]; trcorner = [-60,180];
+                extra.longname ='Antarctica';
+                blcorner = [-90,-180]; trcorner = [-70,180];
+                extra.center =  struct('lat',-75,'lon',0);
         end
+end
+
+if ~exist('x','var')
+    corner = zeros(size(blcorner,1),4);
+    corner(:,1:2) = blcorner;
+    corner(:,3:4) = trcorner;
+    extra.area = find_regionArea(regionstr,corner);
+    extra.shortname = regionstr;
+else
+    % In that case it is an assembled regionstr
+    for i = 1:length(x)
+        L=length(x(i).center);
+        extra.center(k:k+L-1)   = x(i).center;
+        extra.partial_area(i)   = x(i).area;
+        extra.partial_region{i} = x(i).longname;
+        extra.partial_region_short{i} = x(i).shortname;
+        k = k+L;
+    end
+    extra.area = sum([x.area]);
+    extra.shortname=regionstr;
+end
+clear x
+
+end
+function Allregions = Allregions
+
+Allregions = {'global','tropics','boreal_trop','austral_trop',...
+    'sepdz','seadz','ocean_sub','sepsc','seasc','sc_regs','twp','trop_cont','conv_sa','conv_af',...
+    'swl','kurosho','gulfstr','nwl','westerlies','swe','aus','polar',...
+    'waf','eaf','saf','sah','neu','sem','nas','cas','tib','eas','sas',...
+    'sea','ala','cgi','wna','cna','ena','cam','amz','ssa','nau','sau',...
+    'car','ind','med','tne','npa','spa','arc','ant'};
+
+end
+
+function area = find_regionArea(reg,corner)
+
+% USE an high density matrix of latidude weights
+filename = sprintf('~/Dropbox/workSalomon/matlab/SalomonsCodes/data/Predefind_regions_%s',reg);
+if exist(filename,'file')
+else
+lat=-90:.1:90;
+lon=-180:.1:180;
+latweights=repmat(cosd(lat),length(lon),1);
+[regweights] = regionize(latweights,lat,lon,corner);
+area = nansum(regweights(:))/sum(latweights(:));
+end
 end

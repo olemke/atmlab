@@ -1,3 +1,17 @@
+2015-03-17  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-72
+
+	* geographical/standardize_geodata.m: Made more verbose. Made codeing and header more clear
+
+	* geographical/resample_geodata.m: Made a little more verbose
+
+	* geographical/regionize.m: Made function a lot more time efficient
+
+	* geographical/getPredefinedRegions.m: Revamped and added some
+	statistics to the regions. I wonder if anyone other than me is
+	using this function. Maybe remove from atmlab?
+
 2015-03-16  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-71

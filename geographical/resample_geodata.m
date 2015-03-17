@@ -117,6 +117,7 @@ end
 
 %% LOOP over FIELDS to regrid
 for F = field
+    logtext(1,'Processing field: "%s"\n',F{1})
     fsz = size(in.(F{1}));
 
     % COLLAPSE data onto the 3rd dimesion
