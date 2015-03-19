@@ -1,3 +1,12 @@
+2015-03-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-74
+
+	* arts/xml/xmlReadRetrievalQuantity.m: Added reading of subsubtag,
+	as this field has been added on the arts side.
+
+	* arts/xml/xmlWriteRetrievalQuantity.m: Same for writing files.
+
 2015-03-17  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-73

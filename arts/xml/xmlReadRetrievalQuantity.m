@@ -19,9 +19,10 @@
 
 function result = xmlReadRetrievalQuantity(fid, attrlist, itype, ftype, binary, fid2)
 
-  result.maintag          = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.subtag           = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.mode             = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.analytical       = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.perturbation     = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-  result.grids            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.maintag      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.subtag       = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.subsubtag    = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.mode         = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.analytical   = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.perturbation = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+  result.grids        = xmlReadTag(fid, '', itype, ftype, binary, fid2);

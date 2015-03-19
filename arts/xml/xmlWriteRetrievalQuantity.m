@@ -18,6 +18,7 @@ xmlWriteTag (fid, 'RetrievalQuantity', []);
 
 xmlWriteString (fid, fidb, data.maintag, precision);
 xmlWriteString (fid, fidb, data.subtag, precision);
+xmlWriteString (fid, fidb, data.subsubtag, precision);
 xmlWriteString (fid, fidb, data.mode, precision);
 xmlWriteIndex (fid, fidb, data.analytical, precision);
 xmlWriteNumeric (fid, fidb, data.perturbation, precision);
