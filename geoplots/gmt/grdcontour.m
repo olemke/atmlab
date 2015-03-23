@@ -12,7 +12,7 @@ function command = grdcontour(file,in)
 % $Id$
 
 %location of file, region and projection
-grdcontour = sprintf('grdcontour %s -R -J',in.grdfile);
+grdcontour = sprintf('gmt grdcontour %s -R -J',in.grdfile);
 
 grdcontour = sprintf('%s %s',grdcontour,in.plotPlacement);
 
@@ -21,7 +21,7 @@ if isfield(in,'spacing')
 end
 
 if isfield(in,'fontsize')
-    grdcontour = sprintf('%s+s%g',grdcontour,num2str(in.fontsize));
+    grdcontour = sprintf('%s+f%g',grdcontour,num2str(in.fontsize));
 end
 
 if isfield(in,'range')

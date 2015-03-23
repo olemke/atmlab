@@ -1,4 +1,4 @@
-function command = nearneighbor(file,in)
+function command = nearneighbor(in)
 % NEARNEIGHBOR Appends options to GMT nearneighbor
 %
 % PURPOSE: Appends options to a short script and calls the GMT
@@ -11,31 +11,25 @@ function command = nearneighbor(file,in)
 % Created by Salomon Eliasson
 % $Id$
 
-nearneighbor = sprintf('nearneighbor -R');
-
-nearneighbor = sprintf('%s -bic',nearneighbor); %for binary input
+NN = sprintf('gmt nearneighbor -R');
 
 %location of file
-if isfield(in,'ungriddedfile')
-    nearneighbor = sprintf('%s %s',nearneighbor,in.ungriddedfile);
-    nearneighbor = sprintf('%s -G%s',nearneighbor,file);
-else
-    error 'needs in.ungriddedfile '
-end
+NN = sprintf('%s %s',NN,in.ungriddedfile); %stdin
+NN = sprintf('%s -G%s',NN,in.ungriddedfile); % overwrite the file
 
 %increment grid
-if isfield(in,'increment')
-    nearneighbor = sprintf('%s -I%s',nearneighbor,in.increment);
+if isfield(in.nearneighbor,'increment')
+    NN = sprintf('%s -I%s',NN,in.nearneighbor.increment);
 end
 
 %average with adjasent gridpoint GMT default=4
-nearneighbor = sprintf('%s -N1/1',nearneighbor);
+NN = sprintf('%s -N1/1',NN);
 
 %search radius
-if isfield(in,'search')
-    nearneighbor = sprintf('%s -S%s',nearneighbor,in.search);
+if isfield(in.nearneighbor,'search')
+    NN = sprintf('%s -S%s',NN,in.nearneighbor.search);
 else
-    error 'needs in.search'
+    error(['gmtlab:',mfilename,':badInput'], 'needs in.search')
 end
 
-command = sprintf('%s >> %s.ps',nearneighbor,file(1:end-4));
+command = sprintf('%s >> %s.ps',NN,in.filename);

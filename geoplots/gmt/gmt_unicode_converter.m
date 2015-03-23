@@ -4,9 +4,9 @@ function out = gmt_unicode_converter(string)
 % IN   string             Some string to be used in a gmt command call
 % OUT  out                The same string in supported utf 
 %
-% e.g. kg/m²
+% e.g. kg/m??
 %
-% Created by Salomon Eliasson
+% Salomon Eliasson
 % $Id$
 
 out = sprintf('$(echo "%s" |iconv -f utf-8 -t iso-8859-1)',string) ;

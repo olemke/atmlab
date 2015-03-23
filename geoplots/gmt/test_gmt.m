@@ -34,6 +34,10 @@ testDataResolution=1;
 [gridded,ungridded] = test_generate_data_sin_cos(testDataResolution);
 
 [files,info]           = TEST(in,gridded,ungridded);
+if strcmp(files{end}(end-2:end),'.sh')
+    logtext(1,'Debugging!!\n')
+    return
+end
 default.display   = true;
 default.filename  = 'all_tests' ;
 od = isfield(in,'outdir');
@@ -45,7 +49,7 @@ in = optargs_struct(in,default);
 if isequal(in.test,alltests) % if all tests
     default.cols = [3 3 3 2 1 3 1];
 else
-    default.cols = 2;
+    default.cols = min([length(in.test),2]);
 end
 
 in = optargs_struct(in,default);
@@ -58,7 +62,15 @@ end
 warning('off','catstruct:DuplicatesFound') %I'm intentially doing this often
 
 % PUT all figure in one pdf
-files{end+1} = combine_pdfs(files,struct('title','GMT plots: testing its functionality','fontsize','1cm','filename',[in.filename,'.pdf'],'cols',in.cols,'valign','b','outdir',in.outdir,'display',in.display));
+files{end+1} = combine_pdfs(files,...
+    struct('title','GMT plots: testing its functionality',...
+    'fontsize','1cm',...
+    'filename',[in.filename,'.pdf'],...
+    'cols',in.cols,...
+    'valign','b',...
+    'outdir',in.outdir,...
+    'display',in.display,...
+    'pdfcrop',1));
 
 % DISPLAY information about the tests
 disp(' ')
@@ -104,18 +116,19 @@ for T = sort(in.test)
     switch T
         case 1
             %% TEST: Difference plot, reference=0, nlevels, sidebar
-            test.header        = 'gridded: title ^2 * @~D@~r@+-2@~g@~@+, unit';
-            test.unit         = 'kg/m@+2s';
-            test.basemap_axis = 'neSW';
+            test.title        = 'gridded: title ^2 * @~D@~r@+-2@~g@~@+, unit';
+            test.unit         = 'kg/m@+2@+s';
+            test.psbasemap.axes = 'neSW';
             test.legend.tick_spacing = 25;
             
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(gridded,in,test),'data');
+            testThis = catstruct(gridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates that you can include some special',...
-                'characters in in.header and in.unit. This test uses ',...
+                'characters in in.title and in.unit. This test uses ',...
                 'gridded data, where size(data) = [length(lat),length(lon)]',...
-                'Use in.header_offset my shift the title wrt the plot',...
+                'Use in.map_title_offset my shift the title wrt the plot',...
                 'You can also change the size and position of the legend',...
                 '(''x-displacement/y-displacement/height/width''))',...
                 'Here the tick-interval is fixed to every 25th level using in.legend.tick_spacing = 25\n\n'];
@@ -123,18 +136,20 @@ for T = sort(in.test)
         case 2
             
             test.data = gridded.data-200;  % for difference
-                        test.lat = gridded.lat;
+            test.lat = gridded.lat;
             test.lon = gridded.lon;
             test.unit='';
             test.xunit='kg/m@+2';
-            test.ctable = 'mypolar';
-            test.reference = 0;
+            test.ctable.name = 'mypolar';
+            test.ctable.reference = 0;
             test.legend.sidebar = 3; % both above and below
-            test.basemap_axis = 'neSW';
-            test.header = 'Diff plot,ref=0,sidebar=3 (above & below)';
+            test.psbasemap.axes = 'neSW';
+            test.title = 'Diff plot,ref=0,sidebar=3 (above & below)';
             test.legend.tick_spacing = 25;
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(in,test),'data');
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates the mypolar-colortable which is similar to polar.cpt',...
                 'Using in.ctable=''mypolar'' you can define where the reference value',...
@@ -143,51 +158,56 @@ for T = sort(in.test)
                 'axes are labelled. in.sidebar = 3 is tested and means that triangles',...
                 'above and below legend-range are shown to indicate the color of data outside the datarange',...
                 'defined by in.datarange = [min max]. The title offset is set to -0.5 here (moving it down)',...
-                'using in.header_offset = -0.5; See help gmt_plot for more details on these options\n\n'];
+                'using in.map_title_offset = -0.5; See help gmt_plot for more details on these options\n\n'];
             
         case 3
-
+            
             test.data = gridded.data-200;  % for difference
             test.lat = gridded.lat;
             test.lon = gridded.lon;
             test.unit='';
             test.xunit='kg/m@+2';
-            test.ctable = 'mypolar';
-            test.reference = 0;
+            test.ctable.name = 'mypolar';
+            test.ctable.nwhite = 6;
+            test.ctable.reference = 0;
             test.legend.tick_spacing = 25;
             test.legend.sidebar = 2; % above only
-            test.basemap_axis = 'Nesw';
+            test.psbasemap.axes = 'Nesw';
             test.nlevels = 15;
-            test.nwhite = 6;
-            test.header_fontsize = '20p';
-            test.header = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),header';
+
+            test.fontsize_title = '20p';
+            test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),title';
             in.filename = sprintf('Test%g',T);
             
             %this puts standardize_geodata.m to the test
             test.data=test.data'; test.data = test.data(end:-1:1,end:-1:1);
             test.lat = test.lat(end:-1:1);
             test.lon = test.lon(end:-1:1);
-            files{ind} = gmt_plot(catstruct(in,test),'data');
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates that you can change the number of intervals that are',...
                 'colored white around the reference value when using the mypolar-colortable,',...
                 'here in.nwhite = 6. You can also change the number of data intervals ',...
-                '(here in.nlevels = 15), change in.headersize (here in.headersize = 20)',...
+                '(here in.nlevels = 15), change in.fontsize_title (here in.fontsize_title = 20)',...
                 'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)\n\n'];
             
         case 4
             
             %% TEST: title, unit (gridded and ungridded)
-            test.nearneighbor.resolution = 1;
+            test.nearneighbor.resolution = 1; %[deg]
             test.unit            = 'kg/m@+2';
-            test.basemap_axis    = 'nEsW';
-            test.header          = sprintf('Font: ''Courier'': ungridded: %.0f [deg]',test.nearneighbor.resolution);
-            test.header_font     = 'Courier';
-            test.coast.width     = 1;
-            test.coast.color     = '255/255/255';
+            test.psbasemap.axes  = 'nEsW';
+            test.title           = sprintf('Font: ''Courier'': ungridded: %g [deg]',test.nearneighbor.resolution);
+            test.font_title      = 'Courier';
+            test.pscoast.width   = '1p';
+            test.pscoast.color   = '255/255/255';
             test.legend.orientation  = 'h';
             in.filename          = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(ungridded,test,in),'data');
+            
+            testThis = catstruct(ungridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates the same data as Test1a except in an ungridded form.',...
                 'Test 2a is chosen to show that the user can decide how far to look for the next point',...
@@ -201,14 +221,16 @@ for T = sort(in.test)
             %% test 2b
             test.nearneighbor.resolution = 10;
             test.unit            = 'kg/m@+2';
-            test.basemap_axis    = 'nEsW';
-            test.coast.width     = 1;
-            test.coast.color     = '255/255/255';
+            test.psbasemap.axes    = 'nEsW';
+            test.pscoast.width     = '1p';
+            test.pscoast.color     = '255/255/255';
             test.legend.orientation  = 'h';
-            test.header_font   = 8;
-            test.header        = sprintf('Font: 8. ungridded: %.0f [deg]',test.nearneighbor.resolution);
+            test.font_title   = 8;
+            test.title        = sprintf('Font: 8. ungridded: %.0f [deg]',test.nearneighbor.resolution);
             in.filename        = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(ungridded,test,in),'data');
+            
+            testThis = catstruct(ungridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' is chosen to show that the user can decide how far to look for the next point',...
                 'The search radius, where the values within are used to calculate the grid value,',...
@@ -221,15 +243,16 @@ for T = sort(in.test)
             %% test 2c
             test.nearneighbor.resolution = 60;
             test.unit            = 'kg/m@+2';
-            test.coast.width     = 1;
-            test.coast.color     = '255/255/255';
+            test.pscoast.width     = '1p';
+            test.pscoast.color     = '255/255/255';
             test.legend.orientation  = 'h';
-            test.header_font   = 'Times-Roman';
-            test.basemap_axis    = 'neSW';
-            test.header        = sprintf('ungridded: resolution = %g [deg]',test.nearneighbor.resolution);
+            test.font_title   = 'Times-Roman';
+            test.psbasemap.axes    = 'neSW';
+            test.title        = sprintf('ungridded: resolution = %g [deg]',test.nearneighbor.resolution);
             test.legend.orientation  = 'v';
             in.filename        = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(ungridded,test,in),'data');
+            testThis = catstruct(ungridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' is chosen to show that the user can decide how far to look for the next point',...
                 'The search radius, where the values within are used to calculate the grid value,',...
@@ -245,12 +268,14 @@ for T = sort(in.test)
             gridded.data(20:40,20:80) = NaN;
             test.datarange = [160,250];
             test.nlevels        = 18;
-            test.header         = 'upper sidebar, NaN, Hammer projection, center=180';
+            test.title         = 'upper sidebar, NaN, Hammer projection, center=180';
             test.legend.orientation = 'h';
-            test.projection         =  'H';
-            test.center             = 180;      % Center map at given center longitude
+            test.proj.projection         =  'H';
+            test.proj.center             = 180;      % Center map at given center longitude
             in.filename             = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(gridded,test,in),'data');
+            
+            testThis = catstruct(gridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates the Hammer, Robinsson and sinusoidal projections ',...
                 '(using in.projection = ''H''/''R''/''I''), ',...
@@ -270,14 +295,15 @@ for T = sort(in.test)
             test.datarange = [160,250];
             test.nlevels        = 18;
             test.legend.orientation = 'h';
-            test.header               = 'Robinsson projection, center = 0 ';
-            test.projection          = 'N';
-            test.center              = 0;
+            test.title               = 'Robinsson projection, center = 0 ';
+            test.proj.projection          = 'N';
+            test.proj.center              = 0;
             test.legend.tick_spacing = 10;
             test.extra_legend        = struct('name','nan','type','nan');
             in.filename              = sprintf('Test%g',T);
             
-            files{ind} = gmt_plot(catstruct(gridded,test,in),'data');
+            testThis = catstruct(gridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates the Hammer, Robinsson and sinusoidal projections ',...
                 '(using in.projection = ''H''/''R''/''I''), ',...
@@ -301,12 +327,13 @@ for T = sort(in.test)
             test.legend.position        = '12c/0c/20c/2ch';
             test.legend.font_size       = '20p';
             test.legend.tick_spacing    = 15;
-            test.header                 = 'Sinusoidal projection, center = 90';
-            test.projection             = 'I';
-            test.center                 = 90;
+            test.title                 = 'Sinusoidal projection, center = 90';
+            test.proj.projection             = 'I';
+            test.proj.center                 = 90;
             in.filename                 = sprintf('Test%g',T);
             
-            files{ind} = gmt_plot(catstruct(gridded,test,in),'data');
+            testThis = catstruct(gridded,rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates the Hammer, Robinsson and sinusoidal projections ',...
                 '(using in.projection = ''H''/''R''/''I''), ',...
@@ -331,10 +358,10 @@ for T = sort(in.test)
                 end
             end
             
-            test.header = 'contours, HSV colours, horiz. legend';
-            test.projection = 'H';
+            test.title = 'contours, HSV colours, horiz. legend';
+            test.proj.projection = 'H';
             test.nlevels = 10;
-            test.tick_annotation_format = '%g';
+            test.legend.tick_annotation_format = '%g';
             test.legend.orientation = 'h';
             test.contourline.spacing=0.1;
             test.contourline.range=[0 1];
@@ -350,10 +377,12 @@ for T = sort(in.test)
             % TEST pstext aswell
             test.pstext = struct('text',{'Norrland','Australia'},...
                 'lat',{67+51/60,-25},'lon',{20+13/60,130},'angle',{0,-15},...
-                'color','0/255/0');
+                'color','0/255/0','fontsize','10p','justify','C');
             
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot (catstruct(test,in), 'data');
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates contour maps (see contour options in help gmt_plot), ',...
                 'where you can optionally choose to show highs and lows in the of the data.',...
@@ -371,30 +400,34 @@ for T = sort(in.test)
                 gridded.lat>=test.lat(1)&gridded.lat<=test.lat(end),...
                 (gridded.lon+180)>=test.lon(1)&(gridded.lon+180)<=test.lon(end));
             test.filename     = sprintf('Test%g',T);
-            test.header       = 'Region that spans the dateline';
+            test.title       = 'Region that spans the dateline';
             test.legend.xpos= 20.7;
-            files{ind}      = gmt_plot (catstruct(test,in), 'data');
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
+            
             info{ind}       = ['Test:' num2str(T) ' demonstrates data that crosses the dateline, but is not global\n\n'];
             
             
         case 12
-            %% TEST: custom color table, header_size, map_width, grid lines, region
+            %% TEST: custom color table, fontsize_title, map_width, grid lines, region
             
             % Add some annotations some intervals.
             if ~isfield(in,{'stepsize','nlevels'})
                 test.nlevels = 20; %
-
+                
                 tmp = repmat({''},1,test.nlevels);
                 tmp{1} = 'blue'; tmp{6} = 'light blue'; tmp{10} = 'green'; tmp{15} = 'black'; tmp{20} = 'red';
                 test.legend.tick_annotations = tmp;
             end
-            test.header = 'custom legend and sub-region';
-            test.ticks = '30g30/15g15'; % annotations (deg) on major lines (e.g 40 xaxis,20 yaxis)
+            test.title = 'custom legend and sub-region';
+
             % and plot minor lines (e.g 20 xaxis & yaxis)
-            test.head_size = 20;              % (GMT default = 36p)
-            test.map_width = '17i';              % (default is 9 inches)
+            test.fontsize_title = '20p';              % (GMT default = 36p)
+            test.proj.map_width = '17i';              % (default is 9 inches)
             test.region    = '-130/130/-30/30'; % 'lonmin/lonmax/latmin/latmax'
-            test.basemap_axis = 'NeSW';
+            test.psbasemap.axes = 'NeSW';
+            test.psbasemap.ticks = '30g30/15g15'; % annotations (deg) on major lines (e.g 40 xaxis,20 yaxis)
             test.legend.tick_centering = true;
             
             % CUSTOM COLOR TABLE ---
@@ -411,12 +444,14 @@ for T = sort(in.test)
             % ------------------------
             
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(gridded,test,in),'data');
+            
+            testThis = catstruct(gridded, rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates that you can easily make your own custom colortable using in.colorrange.',...
                 'You can also insert your own legend annotations to be used instead of',...
                 'data values using in.legend.tick_annotations. You can also change in.mapwidth,',...
-                'in.headersize, the tick spacing for the axis using in.ticks,',...
+                'in.fontsize_title, the tick spacing for the axis using in.ticks,',...
                 'and in this test its demonstrated how to confine the figure to certain',...
                 'geographical regions using in.region = ''lonmin/lonmax/latmin/latmax''',...
                 'The legend is also automatically made horizontal if the base/height > 3',...
@@ -430,20 +465,23 @@ for T = sort(in.test)
             for i = 1:length(names)
                 test.locations(i).lat = lats(i);
                 test.locations(i).lon = lons(i);
-                test.locations(i).name = names{i};
-                test.locations(i).shape = shape{i};
-                test.locations(i).size = sze{i};
-                test.locations(i).color = color{i};
-                test.locations(i).textsize = textsize(i);
-                test.locations(i).textcolor= textcolor{i};
-                test.locations(i).textalign = textalign{i};
+
+                test.locations(i).symbol = shape{i};
+                test.locations(i).symbolsize = sze{i};
+                test.locations(i).symbolcolor = color{i};
+                test.locations(i).text = names{i};
+                test.locations(i).color = textcolor{i};
+                test.locations(i).fontsize = textsize{i};
+                test.locations(i).justify = textalign{i};
             end
-            test.basemap_axis = 'neSW';
-            test.header = 'SatGroup locations';
+            test.psbasemap.axes = 'neSW';
+            test.title = 'SatGroup locations';
             test.nodata = true;
             test.region = '-20/160/-30/70';
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(test,in));
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test' num2str(T) ' demonstrates that you can plot points and text on a map using',...
                 'in.locations (see help gmt_plot), and demonstrates that there are',...
@@ -457,21 +495,23 @@ for T = sort(in.test)
             for i = 1:length(names)
                 test.locations(i).lat = lats(i);
                 test.locations(i).lon = lons(i);
-                test.locations(i).name = names{i};
-                test.locations(i).shape = shape{i};
-                test.locations(i).size = sze{i};
-                test.locations(i).color = color{i};
-                test.locations(i).textsize = 15;
-                test.locations(i).textcolor= textcolor{i};
-                test.locations(i).textalign = textalign{i};
+                test.locations(i).text = names{i};
+                test.locations(i).symbol = shape{i};
+                test.locations(i).symbolsize = sze{i};
+                test.locations(i).symbolcolor = color{i};
+                test.locations(i).fontsize = '15p';
+                test.locations(i).color= textcolor{i};
+                test.locations(i).justify = textalign{i};
             end
-            test.basemap_axis = 'neSW';
+            test.psbasemap.axes = 'neSW';
             test.nodata = true;
             test.region     = '-10/30/45/70';
-            test.header      = 'SatGroup locations: Europe';
-            test.coast.rivers = 'r';
+            test.title      = 'SatGroup locations: Europe';
             in.filename = sprintf('Test%g',T);
-            files{ind}    = gmt_plot(catstruct(test,in));
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
+            
             info{ind} = ['Test' num2str(T) ' demonstrates that you can plot points and text on a map using',...
                 'in.locations (see help gmt_plot), and demonstrates that there are',...
                 'several map resolutions available.',...
@@ -484,25 +524,26 @@ for T = sort(in.test)
             for i = 1:length(names)
                 test.locations(i).lat = lats(i);
                 test.locations(i).lon = lons(i);
-                test.locations(i).name = names{i};
-                test.locations(i).shape = shape{i};
-                test.locations(i).size = sze{i};
-                test.locations(i).color = color{i};
-                test.locations(i).textsize = 15;
-                test.locations(i).textcolor= textcolor{i};
-                test.locations(i).textalign = textalign{i};
+                test.locations(i).text = names{i};
+                test.locations(i).symbol = shape{i};
+                test.locations(i).symbolsize = sze{i};
+                test.locations(i).symbolcolor = color{i};
+                test.locations(i).fontsize = '15p';
+                test.locations(i).color= textcolor{i};
+                test.locations(i).justify = textalign{i};
             end
-            test.basemap_axis = 'neSW';
+            test.psbasemap.axes = 'neSW';
             test.nodata = true;
             
             
             % TEST: smallregion
-            test.header = 'SatGroup locations: Kiruna';
+            test.title = 'SatGroup locations: Kiruna';
             test.region = '16/22/66.2/70';
-            test.coast.rivers = 'a';
+            test.pscoast.rivers = 'a';
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(test,in));
             
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test' num2str(T) ' demonstrates that you can plot points and text on a map using',...
                 'in.locations (see help gmt_plot), and demonstrates that there are',...
@@ -512,45 +553,14 @@ for T = sort(in.test)
         case 16
             %% TEST: pspolygon
             
-            % REGIONS FROM eliasson11:assessing_acp
-            a = [-12    80    16   100;...
-                -8   100    14   155;...
-                -12   155    10   175;...
-                35   -70    45   -40;...
-                45   -55    60   -10;...
-                33   145    40   180;...
-                40   160    50   180;...
-                36  -180    50  -160;...
-                40  -160    55  -135;...
-                -27  -110   -18   -72;...
-                -18  -130     2   -82;...
-                -30   -15    -5    10;...
-                -20   -30    -5   -15;...
-                -16    15    -5    30;...
-                -5    11     0    33;...
-                0     0     8    34;...
-                -14   -72    -5   -50;...
-                -5   -79     0   -56;...
-                0   -80    10   -60];
-            
-            reg = polygoninize_regions(a);
-            
-            % special for swl
-            swl = {[-180  -60; -180 -45],[-180  -45; -80 -45],...
-                [-80  -45; -80 -60],[-80  -60; -180 -60],[-50  -60; -50 -45],...
-                [-50  -45; 60 -45],[60  -45; 180 -45],[180  -45; 180 -60],...
-                [180  -60; 60 -60],[60  -60; -50 -60],[-180  -60; -180 -45],...
-                [-180  -45; -80 -45],[-80  -45; -80 -60],[-80  -60; -180 -60],...
-                [-50  -60; -50 -45],[-50  -45; 60 -45],[60  -45; 180 -45],...
-                [180  -45; 180 -60],[180  -60; 60 -60],[60  -60; -50 -60]}';
-            
-            test.pspoly = [reg;swl];
-            swlcols = repmat({[0 1 0]},1,length(swl));
-            test.pspolycolor = {[0 1 0] [0 0 0] [1 0 0] [0 1 0] [0 0 0] [1 0 0] [0 0 1] [0 1 0] swlcols{:}};
+            % Taken from 
+            test = regionSetUp_for_GMT;
             test.nodata=true;
-            test.basemap_axis='nWeS';
+            test.psbasemap.axes='nWeS';
             in.filename = sprintf('Test%g',T);
-            files{ind} = gmt_plot(catstruct(test,in));
+            
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
             
             info{ind} = ['Test:' num2str(T) ' demonstrates that you can draw polygons on a map, using in.pspoly.',...
                 'E.g. useful if you want to draw regions of interest on a map\n\n'];
@@ -578,8 +588,154 @@ lons     = [20.216 153 9.2 8 77 10.22 4.77 13.77 7.85 78.48];
 textcolor= repmat({'black'},1,length(names)); textcolor{1} = 'red';
 color    = repmat({'green'},1,length(names)); color{3} = 'yellow';
 textalign= {'LM','RB','LM','LB','CB','LT','RM','LM','RM','RM'};
-textsize = [15,15,7,7,15,7,7,7,7,7];
+textsize = {'15p','15p','7p','7p','15p','7p','7p','7p','7p','7p'};
 shape    = repmat({'c'},1,length(names));shape{3} = 'd';
-sze      = repmat({.08},1,length(names)); sze{3} = .1;
+sze      = repmat({'.08p'},1,length(names)); sze{3} = '.1p';
+
+end
+
+function [gridded,ungridded] = test_generate_data_sin_cos(sz)
+%% test_generate_data_sin_cos
+
+if ~exist('sz','var')
+    sz = 1;
+end
+
+gridded.lat    = -90+sz/2:sz:90-sz/2;
+gridded.lon    = -180+sz/2:sz:180-sz/2;
+gridded.data   = zeros(length(gridded.lat),length(gridded.lon));
+ungridded.data = zeros(length(gridded.lat)*length(gridded.lon),1);
+ungridded.lon  = zeros(size(ungridded.data));
+ungridded.lat  = zeros(size(ungridded.data));
+
+ln = length(gridded.lon);
+lt = length(gridded.lat);
+for j=0:lt-1
+    for i=0:ln-1
+        gridded.data(j+1,i+1)=sin(((i+lt)/ln)*pi+pi/2)* cos((j/lt)*pi+pi/2)*100+160;
+    end
+end
+
+if nargout==2
+    ungridded.data = gridded.data;
+    ungridded.lat = repmat(gridded.lat',1,length(gridded.lon));
+    ungridded.lon = repmat(gridded.lon,length(gridded.lat),1);
+end
+
+end
+
+function [gmtinput,options] = regionSetUp_for_GMT(options)
+%% regionSetUp_for_GMT
+%
+% Makes the structure to be passed to GMT to plot the regions with or without
+% data overlay
+%
+% INPUT
+%      options (structure)
+%           regionstr = {'reg1','reg2',etc}        ; mandatory
+%           color     = a 3xlength(regionstr) array; opt
+%           fontsize  = 10p (size of region labels) ; opt
+%           thick     = a 1xlength(regionstr) array; opt 
+%
+% USAGE: region = regionSetUp_for_GMT(struct('regionstr',{{'trop_cont'}}));
+%
+% NOTE: If you only want to plot the regions with no data overlay, include
+%       in.nodata= true.
+%       e.g.
+%       file = gmt_plot(catstruct(regionSetUp_for_GMT(struct('regionstr',{{'trop_cont','twp'}})),struct('nodata',true)))
+% $Id$
+
+if ~nargin, options = struct; end
+
+% REGIONS FROM eliasson11:assessing_acp
+default.regionstr   = {'westerlies','twp','trop_cont','sc_regs','polar'};
+options             = optargs_struct(options,default);
+default.color       = list_colors('Ncolors',length(options.regionstr));
+default.fontsize    = '10p';
+options             = optargs_struct(options,default);
+default.thick       = repmat({'2p'},1,length(options.regionstr)); % this is textsize
+options             = optargs_struct(options,default);
+clear default
+
+% I need these to be strings
+col = cell(1,length(options.color));
+for i = 1:length(options.color)
+    col{i} = sprintf('%g/%g/%g',255*options.color{i});
+end
+options.color = col; clear col
+
+lat=[];lon=[];text=[];textcolor=[];i=1;
+for r = 1:length(options.regionstr)
+    R = options.regionstr{r};
+    tmp = [];
+    switch R
+            
+        case {'westerlies','swl','ant','arc','polar'}
+            tmp = [tmp;veryAnnoyingSideeffect(R)];
+            [~,extra] = getPredefinedRegions(R);
+        otherwise
+            [regin,extra] = getPredefinedRegions(R);
+            tmp = [tmp;polygoninize_regions(regin)];
+    end
+    
+    lat = [lat,{extra.center.lat}];
+    lon = [lon,{extra.center.lon}];
+    
+    
+    for k = 1:length(tmp)
+        gmtinput.pspoly.coord{i} = tmp{k};
+        gmtinput.pspoly.color{i} = options.color{r};
+        gmtinput.pspoly.thick{i} = options.thick{r};
+        
+        i = i+1;
+    end
+    text = [text,repmat({R},1,length(extra.center))];
+    textcolor = [textcolor,repmat(options.color(r),1,length(extra.center))];
+    clear extra
+end
+
+gmtinput.pstext= struct('text',text,'lat',lat,'lon',lon,...
+    'fontsize',options.fontsize,'color',textcolor);
+
+assert( (length(gmtinput.pspoly.color)==1 || length(gmtinput.pspoly.color)==length(gmtinput.pspoly.coord)),...
+    'There are %d destinct reigions and I need as many colors. recieved %d',...
+    length(gmtinput.pspoly.coord),length(gmtinput.pspoly.color))
+
+end
+
+function reg = veryAnnoyingSideeffect(R)
+
+% all high latitude regions that go from -180 to 180
+reg = {};
+switch R
+    
+    case 'westerlies'
+        tmp = getPredefinedRegions('nwl');
+        reg = [polygoninize_regions(tmp);veryAnnoyingSideeffect('swl')'];
+    case 'swl'
+        reg{end+1}= [-180  -60; -180 -45];reg{end+1}= [-180  -45; -80 -45];
+        reg{end+1}= [-80  -45; -80 -60];reg{end+1}= [-80  -60; -180 -60];
+        
+        % splitting it up into 2 horisontal legs
+        reg{end+1}= [-50  -60; -50 -45];reg{end+1}= [-50  -45; 60 -45];
+        reg{end+1}= [60  -45; 180 -45];reg{end+1}= [180  -45; 180 -60];
+        
+        reg{end+1}= [180  -60; 60 -60];reg{end+1}= [60  -60; -50 -60];
+    
+    case 'ant'
+        reg{end+1}= [-180  -90; -180 -70];reg{end+1}= [-180  -70; 0 -70];
+        reg{end+1}= [0  -70; 180 -70];reg{end+1}= [180  -70; 180 -90];
+        reg{end+1}= [180  -90; 0 -90];reg{end+1}= [0 -90; -180,-90]; 
+        
+    case 'arc'
+        reg{end+1}= [-180  90; -180 70];reg{end+1}= [-180  70; 0 70];
+        reg{end+1}= [0  70; 180 70];reg{end+1}= [180  70; 180 90];
+        reg{end+1}= [180  90; 0 90];reg{end+1}= [0 90; -180,90]; 
+        
+    case 'polar'
+        reg = [veryAnnoyingSideeffect('ant')';veryAnnoyingSideeffect('arc')'];
+    otherwise
+        disp('Nothing coded for this')
+end
 
 end

@@ -1,3 +1,33 @@
+2015-03-17  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-75
+
+	* geoplots/gmt*:
+	- Substantial commit where the GMT wrapper is now
+	adapted to GMT5. I.e. if anyone is using GMT4 (which they
+	shouldn't) than the codes are broken after this commit
+	- Fixed several strange coding practices in my codes and made much more
+	self-consistent and consistent with the GMT codes.
+
+	* geoplots/gmt/append_tickannotations.m
+	* geoplots/gmt/create_gmt_earth.m
+	* geoplots/gmt/extra_legend.m
+	* geoplots/gmt/gmt_inputs.m
+	* geoplots/gmt/gmt_plot.m
+	* geoplots/gmt/gmt_unicode_converter.m
+	* geoplots/gmt/grdcontour.m
+	* geoplots/gmt/grdimage.m
+	* geoplots/gmt/makecpt.m
+	* geoplots/gmt/makepolar.m
+	* geoplots/gmt/nearneighbor.m
+	* geoplots/gmt/psbox.m
+	* geoplots/gmt/pscoast.m
+	* geoplots/gmt/pslocations.m
+	* geoplots/gmt/pspoly.m
+	* geoplots/gmt/psscale.m
+	* geoplots/gmt/pstext.m
+	* geoplots/gmt/test_gmt.m
+
 2015-03-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-74

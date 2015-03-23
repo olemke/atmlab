@@ -34,9 +34,9 @@ strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
     prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
 % REFERENCE
-if ~isfield(in,'reference')
+if ~isfield(in.ctable,'reference')
     ref = (max(tickval)+min(tickval))/2;
-else ref = in.reference;
+else ref = in.ctable.reference;
 end
 
 [BT,TT,nw] = get_white_boxes(tickval,ref,in);
@@ -124,11 +124,11 @@ function [BT,TT,nw] = get_white_boxes(tickval,ref,in)
 %% get_white_boxes
 
 % WHITEBOXES
-if ~isfield(in,'nwhite')
+if ~isfield(in.ctable,'nwhite')
     nw = ceil((length(tickval)-1)/10);
     input = false;
 else
-    nw = in.nwhite;
+    nw = in.ctable.nwhite;
     input=true;
 end
 
@@ -144,7 +144,7 @@ if ismember(ref,tickval) && mod(nw,2)
     if input
         warning(['gmtlab:' mfilename ':badInput'],...
             '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is exactly on a contour level,',...
-            'i.e in.nwhite must be an even number. Increasing ',in.nwhite,nw);
+            'i.e in.ctable.nwhite must be an even number. Increasing ',in.ctable.nwhite,nw);
     end
 end
 
@@ -167,7 +167,7 @@ if ~ismember(ref,tickval) && ~mod(nw,2)
     if input
         warning(['gmtlab:' mfilename ':badInput'],...
             '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is inbetween contour levels,',...
-            'i.e in.nwhite must be an odd number. Decreasing ',in.nwhite,nw);
+            'i.e in.ctable.nwhite must be an odd number. Decreasing ',in.ctable.nwhite,nw);
     end
 end
 

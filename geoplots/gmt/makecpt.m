@@ -10,7 +10,7 @@ function file = makecpt(in)
 % Created by Salomon Eliasson
 % $Id$
 
-mkcpt = sprintf('makecpt -C%s',in.ctable);
+mkcpt = sprintf('gmt makecpt -C%s',in.ctable.name);
 
 if isfield(in,'tickval')
     mkcpt = sprintf('%s -Ttickvalues.txt',mkcpt);

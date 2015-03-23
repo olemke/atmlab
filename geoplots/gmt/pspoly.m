@@ -1,7 +1,7 @@
-function commands = pspoly(file,in)
+function commands = pspoly(in)
 % PSPOLY Make polygons to plot with GMT
 %
-% IN      file     %s       file to append to
+% IN
 %         in       struct   options here (see help gmt_plot)
 %         command  cell     cell of string commands for systemcall
 %
@@ -10,18 +10,19 @@ function commands = pspoly(file,in)
 % Created by Oliver Lemke
 % $Id$
 
-colors = in.plot.pspoly.colors;
-thick = in.plot.pspoly.thick;
-pp = in.plot.pspoly.pspoly;
+colors = in.pspoly.color;
+thick = in.pspoly.thick;
+pp = in.pspoly.coord;
 
 commands = cell(1,length(pp));
+
 for i = 1:length(pp)    
     %stdin
     %% get full coordinates
     ppcur = pp{i};
     a=cell(size(ppcur,1)+1,1);
     for j = 1:size(ppcur,1)
-        a{j}=sprintf('%d %d',ppcur(j,1), ppcur(j,2));
+        a{j}=sprintf('%g %g',ppcur(j,1), ppcur(j,2));
     end
     a{size(ppcur,1)+1}=a{1};
     
@@ -31,14 +32,19 @@ for i = 1:length(pp)
     end
     stdin = [stdin,a{size(ppcur,1)+1},' D'];
     
-    command = sprintf('echo -e "%s" |',stdin);
-    command = sprintf('%s psxy -R -J -A',command);
-    command = sprintf('%s %s',command,in.plotPlacement);
+    txtfile = ['psxy' num2str(i)];
+    fid=fopen(txtfile,'w');
+    cleanup = onCleanup(@() fclose(fid));
+    fprintf(fid,stdin);
     
-    % color and size of box
+    if strcmp(in.proj.projection, 'Q')
+        straight = '-A';
+    else
+        straight = '';
+    end
+    % -A draw straight lines. Otherwise they are great archs
     
-    c = colors{i};
-    s = thick{i};
-    command = sprintf('%s -W%d/%d/%d/%d',command,s,c(1),c(2),c(3));
-    commands{i} = sprintf('%s -K -O >> %s.ps',command,file);
+    commands{i} = sprintf('gmt psxy %s -R -J %s -W%s,%s -K -O %s >> %s.ps',...
+        txtfile,straight,num2str(thick{i}),colors{i},in.plotPlacement,in.filename);
+
 end

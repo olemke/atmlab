@@ -1,10 +1,12 @@
 function filename = gmt_plot(in,field)
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
-% The function is basically a wrapper that calls gmt shell commands using easy
-% to use matlab arguments. Try test_gmt.m for some examples on how to use the function.
+% The function is basically a wrapper that calls GMT shell commands using easy
+% to use matlab arguments.
+% Try <a href="matlab:help test_gmt">test_gmt</a> for some examples on how to use the function.
 % Preferably, the data should be CENTERED if the data is gridded. Plotting
-% gridded data is faster than plotting ungridded data 
+% gridded data is faster than plotting ungridded data. This GMT wrapper supports
+% GMT 5.
 %
 % OUT   filename  The filename of the figure.
 %
@@ -28,10 +30,10 @@ function filename = gmt_plot(in,field)
 % The easiest thing to do is to define a viewer in your startup file.
 %
 % Add something like the following to your startup file')
-% gmtlab( 'OUTDIR', '/name/a/favorite' ) %% The default directory to put plots
+% gmtlab( 'OUTDIR', '/name/a/favorite/directory' ) %% The default directory to put plots
 % gmtlab( 'PSVIEWER','gv');             %% set viewer for .ps files
 % gmtlab( 'PDFVIEWER','xpdf -z width'); %% set viewer for .pdf files
-% gmtlab( 'OPEN_COMMAND','gnome-open'); %% set a general open command
+% --> gmtlab( 'OPEN_COMMAND','gnome-open'); %% set a general open command <-- This one is enough
 % gmtlab( 'VERBOSITY',1); %% This outputs stdout on the screen.
 %
 % Structure contents:
@@ -46,17 +48,17 @@ function filename = gmt_plot(in,field)
 % (lat,lon.data) must be the same.
 % i.e isequal(size(in.lat),size(in.lon),size(in.data))
 %
-% If your data is gridded the data MUST have the dimensions:
-% [length(in.lat),length(in.lon)] == size(in.(field));
-%  << transpose: in.(field) = in.(field)'; if this is not the case >>
 %
 % NOTE: 1) If your data is UNGRIDDED I recommend setting
 %          in.nearneighbor.resolution = Deg (something suitable).
 %       2) gmt_plot automatically detects if the data is gridded or not
 %
 %
-% HOW TO READ VARIABLE DESCRIPTION OF OPTIONAL VARIABLES:
-% KEY:  in.variable   in: = expect input type, ex: = Explanation/Example, de: = Default value/behavior
+% HOW TO READ THIS HELP
+% in.variable   in = expect input type
+%               ex = Explanation/Example
+%               de = Default value/behavior
+%
 % NOTE: If "def" is missing for a variable it means the variable is not used by default
 %
 %                  types: %s=character or string
@@ -64,278 +66,217 @@ function filename = gmt_plot(in,field)
 %                         {}=cell
 %--------------------------------------------------------------------------
 %
-% GENERAL:
+% OPTIONS
 %
-% in.annot_font_size_primary
-%                   in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     The size of the font, e.g., '2c'=2cm for e.g., the axis.
-%                           Setting this will also change the size of the
-%                           fonts of the annotations for the legend. If you
-%                           want a different size for the legend
-%                           annotations, set in.legend.font_size.
-%                   def:    '14p'
-% in.basemap_axis   in:     %s
-%                   ex:     'WSne', annotates West and South of the map,
-%                           but not North or East
-%                   def:    'WSne'
-%                   ------------
-% in.display        in:     %f
-%                   ex:     If false, file created but not displayed
-%                   def:    true
-%                   ------------
-% in.filename       in:     %s
-%                   ex:     'yourfilename', or 'yourfilename.jpg'
-%                   def:    Generated from title. The filetype is determined by the file
+% in.cptfile           in:     %s
+%                      ex:     Path to a colortable (*.cpt)
+%                     ------------
+% in.ctable           See below how to set the color table (default=rainbow)
+%                     ------------
+% in.color_background  in:  %s
+%                      ex:  Set the background color (values less than range)
+%                      def: '0/0/0' ('black')
+%                     ------------
+% in.color_foreground  in:  %s
+%                      ex:  Set the foreground color (values greater than range)
+%                      def: '255/255/255' ('white')
+%                     ------------
+% in.color_nan         in:     %s
+%                      ex:     Set the color of NaNs
+%                      def:    '125/125/125' ('grey')
+%                     ------------
+% in.colorrange       See below how to make your own colortables
+%                     ------------
+% in.contourline      See below how to draw contour lines on the map
+%                     ------------
+% in.datarange         in:     [%f, %f]
+%                      ex:     Min and max range of data values to display
+%                     ------------
+% in.display           in:     %f
+%                      ex:     If false, file created but not displayed
+%                      def:    true
+%                     ------------
+% in.filename          in:     %s
+%                      ex:     'yourfilename', or 'yourfilename.jpg'
+%                      def:    Generated from title. The filetype is determined by the file
 %                           ending given by your filename, e.g., any of bla.{pdf,jpg,eps,tif,png,ps}
 %                     ------------
-% in.figuretype     in:     %s
-%                   ex:     'eps','pdf','BMP','jpg','PNG','PPM' (not recommended), or 'tif'.
+% in.figuretype        in:     %s
+%                      ex:     'eps','pdf','BMP','jpg','PNG','PPM' (not recommended), or 'tif'.
 %                           If the figure type is included in the filename,
 %                           e.g., file.png, or file.jpg, then that file type is
 %                           used, however defining in.figuretype will
 %                           override this.
-%                   def:    'pdf'
+%                      def:    'pdf'
 %                     ------------
-% in.gmtset         in:     {%s,%s,...}
-%                   ex:     Cell with one or more gmtset commands.
-%                           E.g. in.gmtset={'gmtset D_FORMAT %3.1e','gmtset ...'}
+% in.fontsize_annot_primary
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     The size of the font, e.g., '2c'=2cm for e.g., the axis.
+%                              Setting this will also change the size of the
+%                              fonts of the annotations for the legend. If you
+%                              want a different size for the legend
+%                              annotations, set in.legend.font_size.
+%                      def:    '14p'
 %                     ------------
-% in.treatAsGridded  in: %f
-%                    ex:  1; This is a patch. It allows you to treat gridded data as ungridded.
-%                         This can be useful if you think the
-%                         internal interpolation for the plot projection is
-%                         causing weird side effects (such as near NaN values) 
-%                    def: 0
+% in.font_annot_primary
+%                      in: %s or %f
+%                      ex: There are 35 fonts to choose from. Either provide a
+%                          number 0-34 or a string (case sensitive) of the
+%                          font to use. E.g., 'Helvetica' (0), 'Times-Roman' (4),
+%                          'Courier' (8), etc. See "gmtdefault" man page for the
+%                          whole list. You can even setup other fonts
+%                          (see also <a href="http://gmt.soest.hawaii.edu/doc/5.1.1/GMT_Docs.html">GMT Docs</a>                      def: 'Helvetica' ('0')
 %                     -------------
-%
-% in.header         in:     %s
-%                   ex:     Title of plot
-%                   def     ''
+% in.fontsize_annot_secondary
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     The size of the font, e.g., '2c'=2cm for e.g., the axis.
+%                              Setting this will also change the size of the
+%                              fonts of the annotations for the legend. If you
+%                              want a different size for the legend
+%                              annotations, set in.legend.font_size.
+%                      def:    '14p'
 %                     ------------
-% in.header_font    in: %s or %f
-%                   ex: There are 35 fonts to choose from. Either provide a
-%                       number 1-35 or a string (case sensitive) of the
-%                       font to use. E.g., 'Helvetica' (0), 'Times-Roman' (4),
-%                       'Courier' (8), etc. See "gmtdefault" man page for the
-%                       whole list
-%                   def: 'Helvetica' ('0')
+% in.font_annot_secondary
+%                      in: %s or %f
+%                      ex: There are 35 fonts to choose from. Either provide a
+%                          number 0-34 or a string (case sensitive) of the
+%                          font to use. E.g., 'Helvetica' (0), 'Times-Roman' (4),
+%                          'Courier' (8), etc.
+%                      def: 'Helvetica' ('0')
+%                     -------------
+% in.font_title        in: %s or %f
+%                      ex: There are 35 fonts to choose from. Either provide a
+%                          number 1-35 or a string (case sensitive) of the
+%                          font to use. E.g., 'Helvetica' (0), 'Times-Roman' (4),
+%                          'Courier' (8), etc. See "gmtdefault" man page for the
+%                          whole list
+%                      def: 'Helvetica' ('0')
+%                     --------------
+% in.fontsize_title    in:    %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Title size%                   def:    '36p' (points)
+%                     --------------
+% in.gmtset            in:     {%s,%s,...}
+%                      ex:     Cell with one or more gmtset commands.
+%                              E.g. in.gmtset={'gmt set FORMAT_FLOAT_OUT %3.1e','gmt set ...'}
 %                     ------------
-% in.header_fontsize in:    %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Title size%                   def:    '36p' (points)
+% in.grdimage          in:     %s
+%                      ex:     'gmt grdimage OPT > filename.ps', explicitly sets
+%                              the grdimage GMT command directly.
 %                     ------------
-% in.header_offset  in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Moves the title in y-dir on the page
-%                   def:    '0.5c' (cm)
+% in.keep_files        in:     %f
+%                      ex:     If you don't want to delete intermediate files
+%                      def:    false
 %                     ------------
-% in.keep_files     in:     %f
-%                   ex:     If you don't want to delete intermediate files
-%                   def:    false
+% in.map_title_offset
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Moves the title in y-dir on the page
+%                      def:    '0.5c' (cm)
 %                     ------------
-% in.mask           in:     function handle
-%                   ex:     @(x)(x>0); This masks all values less than 0 with NaN
-%                   def:    no mask by default
+% in.makecpt           in:     %s
+%                      ex:     'gmt makecpt OPT > filename.ps', explicitly sets the
+%                              makecpt GMT command directly.
 %                     ------------
-% in.measure_unit   in:     %s
-%                   ex:     You can explicitly specify the unit used for
-%                       distances and lengths by appending c (cm), i (inch), m
-%                       (meter), or p (points). When no unit is indicated the
-%                       value will be assumed to be in the unit set by
-%                       MEASURE_UNIT. The default unit to use for all commands
-%                       if none is given.
-%                   def:    'c'
+% in.makeScriptAndStop
+%                      in:  %f
+%                      ex:  For the developer and those who want the shell script
+%                           generated by this program
+%                      def: false
+%                     -------------
+% in.mask              in:     function handle
+%                      ex:     @(x)(x>0); This masks all values less than 0 with NaN
+%                      def:    no mask by default
 %                     ------------
-% in.nodata         in:     %f
-%                   ex:     If you only want a map (compatible with all options)
-%                   def:    false
+% in.nearneighbor:    See below on nearneigbour
 %                     ------------
-% in.outdir         in:     %s
-%                   ex:     'name/a/directory'
-%                   def:    gmtlab('OUTDIR')  ('.' if not set)
-%                       ------------
-% in.plotPlacement  in:     %s
-%                   ex:     String of global plotPlacements (see "man grdimage" for info)
-%                   def:    '-Ya5 -Xa5'
-%                       ------------
-% in.ticks          in:     %s
-%                   ex:     '60g30/30g15'. The first value for both axis
-%                           denotes the tick interval to annotate, the second
-%                           value is the interval to draw the gridlines. xaxis and
-%                           yaxis are separated by '/'. i.e (x-axis: 'annot'g'grid'/ y-axis: 'annot'g'grid')
-%                           Note: To remove gridlines set the second value to 0.
-%                   def:    Determined by input lat/lon range.
+% in.nlevels           in:     %d
+%                      ex:     Refers to the number of contour levels (converted to
+%                            stepsize using datarange)
+%                      def:    best fit for nice tickvalues
 %                     ------------
-% in.unit           in:     %s
-%                   ex:     String displayed on the y-axis of a legend
-%                   def:    ''
+% in.force_nlevels     in:     (logical)
+%                      ex:     If set to true, keep nlevels even if it
+%                              exceeds  the number of unique values.  If
+%                              set to false, nlevels is reduced to the
+%                              number of unique values if it exceeds it.
+%                      def:    false
 %                     ------------
-% in.xunit          in:     %s
-%                   ex:     String displayed on the x-axis of a legend
-%                   def:    ''
+% in.nodata            in:     %f
+%                      ex:     If you only want a map (compatible with all options)
+%                      def:    false
 %                     ------------
-%
-% NOTE:               For special characters in the string refer to the
-%                     section on character escape sequences (4.16 in GMT
-%                     cookbook v4.5.7).
-%                     e.g. for unit (or title) \Delta r^{-2} should be
-%                     written '@~D@~r@+-2' (see GMT_manpages under plotting
-%                     text (p207 GMT 5.0)
-%
-%--------------------------------------------------------------------------
-%
-% PROJECTION, GRID, COASTLINES:
-%
-% in.region         in:     %s
-%                   ex:     '-180/180/-90/90'=global range, defined from
-%                           sprintf('%f/%f/%f/%f',lon1,lon2,lat1,lat2)
-%                   def:    determined by input lat/lon range
+% in.outdir            in:     %s
+%                      ex:     'name/a/directory'
+%                      def:    gmtlab('OUTDIR')  ('.' if not set)
 %                     ------------
-% in.nearneighbor   in:     %s
-%                   ex:     'nearneighbor OPT > filename.ps', explicitly sets
-%                           the nearneighbor GMT command directly. If
-%                           in.nearneighbor is a structure, it'll use the
-%                           structure arguments to generate the command.
-%                     ----------------------
-%
-% in.nearneighbor.    | STRUCTURE with one or more of the following fields:
-%
-%  search           in:     %s
-%                   ex:     '30m' Search for data within 30 [arcmin]
-%                   def:    Loosely based on the density of the data points
+% in.plotPlacement     in:     %s
+%                      ex:     String of global plotPlacements (see "man grdimage" for info)
+%                      def:    '-Ya5 -Xa5'
 %                     ------------
-%  resolution       in:     %f [degree]
-%                   ex:     1 [deg] (== 60minuntes) looks for values withing 1 [deg]
-%                   def:    Loosely based on the density of the data points, or avialable memory
-%
-%                     ----------------------
-%
-% in.projection     in:     %s
-%                   ex:     See available projections in GMT manual.
-%                   def:    'Q' (cylindric equidistant)
+% in.proj             See below on map projections/size
 %                     ------------
-% in.center         in:     %f
-%                   ex:     Center map at given longitude
-%                   def:    0 [deg]
+% in.proj_length_unit
+%                      in:     %s
+%                      ex:     You can explicitly specify the unit used for
+%                              distances and lengths by appending c (cm), i (inch), m
+%                              (meter), or p (points). When no unit is indicated the
+%                              value will be assumed to be in the unit set by
+%                              proj_length_unit. The default unit to use for all commands
+%                              if none is given.
+%                      def:    'c'
 %                     ------------
-% in.map_width      in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Set width of map, e.g., '20c'=20cm
-%                   def:    20 (cm)
+% in.psbasemap        See below on psbasemap
 %                     ------------
-% in.proj           in:     %s
-%                   ex:     Describes the projection, center, and map_width
-%                   def:    'Q0/20' (see above)
+% in.pscoast          See below on pscoast
 %                     ------------
-% in.pscoast        in:     %s
-%                   ex:     'pscoast OPT > filename.ps', explicitly sets the
-%                           pscoast GMT command.
-%                     ----------------------
-% in.coast          in:     %f
-%                   ex:     If you don't want coastlines, set to false. If
-%                           in.coast is a structure, it'll use the structure
-%                           arguments to generate the pscoast command.
-%                   def:    To generate coastlines
-%                     ----------------------
-%
-%
-% in.coast.           | STRUCTURE with one or more of the following fields:
-%
-%  features         in:     %f
-%                   ex:     Don't plot features < in.features [km^2]
-%                   def:    determined by lon/lat range
+% in.pspoly           See below on pspoly how to draw shapes
 %                     ------------
-%  resolution       in:     %s
-%                   ex:     (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude
-%                   def:    determined by lon/lat range
+% in.pstext           See below on pstext write on the map
 %                     ------------
-%  rivers           in:     %s
-%                   ex:     Display rivers. pscoast -Ioption (1-10, a,r,i,c)
-%                   def:    '1' (=major rivers)
+% in.region            in:     %s
+%                      ex:     '-180/180/-90/90'=global range, defined from
+%                              sprintf('%f/%f/%f/%f',lon1,lon2,lat1,lat2)
+%                      def:    determined by input lat/lon range
 %                     ------------
-%  width            in:     %f [points]
-%                   ex:     Width of coastlines
-%                   def:    .3
-%                     ----------------------
-%  color            in:     %s
-%                   ex:     Color of coast and rivers in rgb e.g. '255/255/255'
-%                           gives white coastlines
-%                   def:    COLOR_BACKGROUND
-%                     ----------------------
-%
-% (for grid, see in.ticks)
-%
-%--------------------------------------------------------------------------
-%
-% COLORS & DATA REPRESENTATION:
-%
-% in.datarange      in:     [%f, %f]
-%                   ex:     Min and max range of data values to display
-%                     ------------
-% in.grdimage       in:     %s
-%                   ex:     'grdimage OPT > filename.ps', explicitly sets
-%                           the grdimage GMT command directly.
-%                     ------------
-% in.makecpt        in:     %s
-%                   ex:     'makecpt OPT > filename.ps', explicitly sets the
-%                           makecpt GMT command directly.
-%                     ------------
-% in.cptfile        in:     %s
-%                   ex:     Path to any .cpt file generated previously
-%                     ------------
-% in.ctable         in:     %s
-%                   ex:     See GMT color palettes
-%                   def:    'rainbow'
-%
-%                     NOTE: 'mypolar' is a nice colortable for difference
-%                     plots, and there are two additional optional
-%                     arguments for this color table:
-%                                   ------------
-%                     in.reference:  in:    %d
-%                                    ex:    Where to center the white color
-%                                    def:   mean(data(:))
-%
-%                           Note:    Recommend set in.reference = 0 for
-%                                    difference plots, but any reference
-%                                    will work.
-%                                   ------------
-%
-%                     in.nwhite:     in:    %d
-%                                    ex:    The number of white contours around
-%                                           a reference value
-%                                    def:   determined by number of levels
-%
-% in.color_background   in:  %s
-%                       ex:  Set the background color (values less than range)
-%                       def: '0/0/0' ('black')
-%                     ------------
-% in.color_foreground   in:  %s
-%                       ex:  Set the foreground color (values greater than range)
-%                       def: '255/255/255' ('white')
-%                     ------------
-% in.color_nan          in:     %s
-%                       ex:     Set the color of NaNs
-%                       def:    '125/125/125' ('grey')
-%                     ------------
-% in.nlevels            in:     %d
-%                       ex:     Refers to the number of contour levels (converted to
-%                           stepsize using datarange)
-%                       def:    best fit for nice tickvalues
-%                     ------------
-% in.force_nlevels      in:     (logical)
-%                       ex:     If set to true, keep nlevels even if it
-%                               exceeds  the number of unique values.  If
-%                               set to false, nlevels is reduced to the
-%                               number of unique values if it exceeds it.
-%                       def:    false
-%                      ------------
-% in.stepsize           in:     %f
-%                       ex:     The stepsize between data values. This overrides
-%                               nlevels (-T/min/max/stepsize in makecpt)
-%                       def:    determined by nlevels
+% in.stepsize          in:     %f
+%                      ex:     The stepsize between data values. This overrides
+%                              nlevels (-T/min/max/stepsize in makecpt)
+%                      def:    determined by nlevels
 %                     ------------
 %
-% in.tickval            in:     %f
-%                       ex:     Vector of values to be used for ticks and data interval
-%                       def:    Determined by datarange and stepsize
+% in.tickval           in:     %f
+%                      ex:     Vector of values to be used for ticks and data interval
+%                      def:    Determined by datarange and stepsize
 %                     ------------
+% in.title             in:     %s
+%                      ex:     Title of plot
+%                      def     ''
+%                     ------------
+% in.treatAsGridded    in: %f
+%                      ex:  1; This is a patch. It allows you to treat gridded data as ungridded.
+%                           This can be useful if you think the
+%                           internal interpolation for the plot projection is
+%                           causing weird side effects (such as near NaN values)
+%                      def: 0
+%                     ------------
+% in.unit              in:     %s
+%                      ex:     String displayed on the y-axis of a legend
+%                      def:    ''
+%                     ------------
+% in.xunit             in:     %s
+%                      ex:     String displayed on the x-axis of a legend
+%                      def:    ''
+%                     ------------
+%
+% NOTE:             For SPECIAL CHARACTERS in a string (such as title) refer to the
+%                   GMT cookbook  (<a href="http://gmt.soest.hawaii.edu/doc/5.1.0/index.html#the-cookbook">GMT Cookbook</a>)
+%
+% ======================
+%  Structure options
+% ======================
+%
+%---------------------------
+%
+% COLORRANGE
 %
 % NOTE: For your own CUSTOM COLORTABLE use in.colorrange.colors
 % (see below). Assign a color to a relative value, e.g between 0-1, where
@@ -349,141 +290,280 @@ function filename = gmt_plot(in,field)
 %                     ----------------------
 % in.colorrange.      | STRUCTURE with one or more of the following fields:
 %
-%  colors           in:     {{%d,%s},{%d,%s},etc.} %d is the data value, %s is the color
-%                   ex:     {20,'255/0/0'} (red in RGB)
+%  colors              in:     {{%d,%s},{%d,%s},etc.} %d is the data value, %s is the color
+%                      ex:     {20,'255/0/0'} (red in RGB)
 %                     ------------
-%  color_model      in:     %s
-%                   ex:     'RGB', 'HSV'
-%                   def:    'RGB'
-%                     ----------------------
+%  color_model         in:     %s
+%                      ex:     'RGB', 'HSV'
+%                      def:    'RGB'
+%                     ------------
 %
 %------------------------------------------------------------------------------------
+%
+% COLOR TABLE
+%
+% ---- string --------
+% in.ctable            in:     %s
+%                      ex:     See GMT color palettes
+%                      def:    'rainbow'
+%
+%                      NOTE: 'mypolar' is a nice colortable for difference
+%                      plots, and there are two additional optional
+%                      arguments for this color table:
+% ----- struct ---------
+%
+% in.ctable
+%                     ------------
+%       name           in:    %s
+%                      ex:    'rainbow' | 'mypolar' | etc
+%                     ------------
+%       nwhite:        in:    %d
+%                      ex:    The number of white contours around
+%                             a reference value
+%                      def:   determined by number of levels
+%                     ------------
+%       reference:     in:    %d
+%                      ex:    Where to center the white color
+%                      def:   mean(data(:))
+%                     ------------
+%
+%                      Note:    Recommend set in.reference = 0 for
+%                               difference plots, but any reference
+%                               will work.
+%
+%
+% ----------------------------------------------------------------------------
+%
 % LEGENDS:
 %
 % in.extra_legend     structure containing:
-%       name        in:     %s
-%                   ex:     An associated string name. E.g., 'NaN','masked', etc...
-%                   def:    mandatory
+%       name           in:     %s
+%                      ex:     An associated string name. E.g., 'NaN','masked', etc...
+%                      def:    mandatory
 %                     ------------
-%       type        in:     %s
-%                   ex:     'bg','fg', or 'nan', means use the color for the background,
-%                            foreground, or nan, given in in.color_background, in.color_foreground,
-%                            in.color_nan. So far these are the only 3 options.
-%                   def:    mandatory
+%       type           in:     %s
+%                      ex:     'bg','fg', or 'nan', means use the color for the background,
+%                              foreground, or nan, given in in.color_background, in.color_foreground,
+%                              in.color_nan. So far these are the only 3 options.
+%                      def:    mandatory
 %                     ------------
-%       position    in:     %s
-%                   ex:     '9.7i/2.3i/0.8c/0.8c' ('x-displacement/y-displacement/height/width') (i = inch , c = cm)
-%                           Append 'h' for horisontal legend.
-%                   def:    Placement otherwise determined by the placement of the main legend
+%       position       in:     %s
+%                      ex:     '9.7i/2.3i/0.8c/0.8c'
+%                              ('x-displacement/y-displacement/height/width') (i = inch , c = cm)
+%                              Append 'h' for horisontal legend.
+%                      def:    Placement otherwise determined by the placement of the main legend
 %                     ------------
-%      fontsize     in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     '10c'
-%                     ----------------------
-% in.pscale         in:     %s
-%                   ex:     'psscale OPT > filename.ps', explicitly sets the
-%                            psscale GMT command for the legend directly.
+%      fontsize        in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     '10c'
 %                     ------------
-% in.pscale_extra   in:     %s
-%                   ex:     'psscale OPT > filename.ps', explicitly sets the
+% in.pscale            in:     %s
+%                      ex:     'gmt psscale OPT > filename.ps', explicitly sets the
+%                              psscale GMT command for the legend directly.
+%                     ------------
+% in.pscale_extra      in:     %s
+%                      ex:     'gmt psscale OPT > filename.ps', explicitly sets the
 %                           psscale GMT command for the extra legend directly.
 %                     ------------
-% in.savelegend     in:     %f
-%                   ex:     Controls separate PDF for the legend.  If value
-%                           is 0, only 1 file will be generated containing
-%                           map+legend.  If value is 1, one file will be
-%                           generated for map+legend and one file for
-%                           legend only.  If value is 2, one file will be
-%                           generated containing ONLY the map, and one
-%                           containing ONLY the legend.  The legend will be
-%                           stored in [in.filename '_legend.' extension] in
-%                           the output directory.
-%                   def:    false
+% in.savelegend        in:     %f
+%                      ex:     Controls separate PDF for the legend.  If value
+%                              is 0, only 1 file will be generated containing
+%                              map+legend.  If value is 1, one file will be
+%                              generated for map+legend and one file for
+%                              legend only.  If value is 2, one file will be
+%                              generated containing ONLY the map, and one
+%                              containing ONLY the legend.  The legend will be
+%                              stored in [in.filename '_legend.' extension] in
+%                              the output directory.
+%                      def:    false
 %                     ------------
-% in.legend         in:     %f
-%                   ex:     Set to false if you don't want a legend. if in.legend
-%                           is a structure, it's equivalent to in.legend = true
-%                   def:    true
-%                     ----------------------
+% in.legend            in:     %f
+%                      ex:     Set to false if you don't want a legend. if in.legend
+%                              is a structure, it's equivalent to in.legend = true
+%                      def:    true
+%                     ------------
 %
 % in.legend.          | STRUCTURE with one or more of the following fields:
 %
 %  font_size
-%                   in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Size of annotations in legend, e.g., '1c'=1cm
-%                   def:    '14p'
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Size of annotations in legend, e.g., '1c'=1cm
+%                      def:    '14p'
 %                     ------------
-%  box_spacing      in:     %f
-%                   ex:     Space between legend boxes
-%                   def:    0 (side by side)
+%  box_spacing         in:     %f
+%                      ex:     Space between legend boxes
+%                      def:    0 (side by side)
 %                     ------------
-%  position         in:     %s
-%                   ex:     '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
-%                           ('x-displacement/y-displacement/height/width'). Append 'h'
-%                           for horisontal legend.
-%                   def:    Determined by map dimensions
+%  position            in:     %s
+%                      ex:     '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
+%                              ('x-displacement/y-displacement/height/width'). Append 'h'
+%                              for horisontal legend.
+%                      def:    Determined by map dimensions
 %                     ------------
-%  equalboxwidth    in:     %f
-%                   ex:     If the legend color boxes have to be the same size, 1
-%                   def:    false (-L option)
+%  equalboxwidth       in:     %f
+%                      ex:     If the legend color boxes have to be the same size, 1
+%                      def:    false (-L option)
 %                     ------------
-%  length           in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Toggle the length of the legend bar (e.g., '3.9i'=3.9 inch). Use negative value to reverse the
-%                           legend. See also width,xpos,ypos,orientation for legend
-%                   def:    '3.9i'
+%  length              in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Toggle the length of the legend bar (e.g., '3.9i'=3.9 inch).
+%                              Use negative value to reverse the legend.
+%                              See also width,xpos,ypos,orientation for legend
+%                      def:    '3.9i'
 %                     ------------
-%  orientation      in:     %s
-%                   ex:     If you want a horizontal/vertical legend input 'h'/'v'.
-%                   def:    Determined by map dimensions
+%  locations          See below how to plot locations on the map
 %                     ------------
-%  shift_tick_annotations
-%                   in:     %s
-%                   ex:     Move tick annotations to the right by x units, e.g. '.5i' (.5 inches)
+%  orientation         in:     %s
+%                      ex:     If you want a horizontal/vertical legend input 'h'/'v'.
+%                      def:    Determined by map dimensions
 %                     ------------
-%  sidebar          in:     %f
-%                   ex:     Input scalar 0, 1, 2, or 3. Indicates none,
-%                           below range only, above range, or both
-%                   def:    Determined from data
+%  map_annot_offset_primary
+%                      in:     %s
+%                      ex:     Move tick annotations to the right by x units, e.g. '.5i' (.5 inches)
+%                     ------------
+%  sidebar             in:     %f
+%                      ex:     Input scalar 0, 1, 2, or 3. Indicates none,
+%                              below range only, above range, or both
+%                      def:    Determined from data
 %                     ------------
 %  tick_annotations
-%                   in:     {%s,%s,...}
-%                   ex:     {'','','middle','',''}. Number of annotations must be = nlevels, and all
-%                           cell elements must be strings (or empty strings)
+%                      in:     {%s,%s,...}
+%                      ex:     {'','','middle','',''}. Number of annotations must be = nlevels, and all
+%                              cell elements must be strings (or empty strings)
 %                     ------------
 %  tick_annotation_format
-%                   in:     %s
-%                   ex:     '%3.1e'
+%                      in:     %s
+%                      ex:     '%3.1e'
 %                     ------------
-%  tick_centering   in:     %f
-%                   ex:     Have tick annotation at the center of the boxes
-%                   def:    false (edges)
+%  tick_centering      in:     %f
+%                      ex:     Have tick annotation at the center of the boxes
+%                      def:    false (edges)
 %                     ------------
-%  tick_length      in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     The length of the ticks, e.g., '.5c'=.5cm
+%  map_tick_length_primary
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     The length of the ticks, e.g., '.5c'=.5cm
 %                     ------------
-%  tick_spacing     in:     %f
-%                   ex:     If you want to manually decide how the ticks in the
-%                           legend should be spread. x=> every xth data value,
-%                           1=>same number of ticks as datarange
-%                   def:    One tick per data level
+%  map_tick_length_secondary
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     The length of the ticks, e.g., '.5c'=.5cm
+%                     ------------
+%  tick_spacing        in:     %f
+%                      ex:     If you want to manually decide how the ticks in the
+%                             legend should be spread. x=> every xth data value,
+%                             1=>same number of ticks as datarange
+%                      def:    One tick per data level
 %
 %                   NOTE: This option is desirable if you have many
 %                           data levels.
 %                     ------------
-%  width            in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Toggle the width of the legend bar. See also length,xpos,ypos, orientation for legend
-%                   def:    '.2i'
+%  width               in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Toggle the width of the legend bar.
+%                              See also length,xpos,ypos, orientation for legend
+%                      def:    '.2i'
 %                     ------------
-%  xpos             in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Toggle the x-position of the center of the
+%  xpos                in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Toggle the x-position of the center of the
 %                           legend bar. See also length,width,ypos, orientation for legend
-%                   def:    '9.8i' for verticle
+%                      def:    '9.8i' for verticle
 %                     ------------
-%  ypos             in:     %s or %f (if %f, unit is assumed from in.measure_unit)
-%                   ex:     Toggle the y-position of the center of the legend bar.
-%                           See also length,width,xpos, orientation for legend
-%                   def:    '2.3i' for verticle
+%  ypos                in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Toggle the y-position of the center of the legend bar.
+%                              See also length,width,xpos, orientation for legend
+%                      def:    '2.3i' for vertical
 %------------------------------------------------------------------------------------
-% PLOT LOCATION MARKERS:
+%
+% NEARNEIGHBOR
+%
+% i) A string to be used for the system call to invoke nearneighbor
+% or
+% ii) A structure with one or more of the following fields:
+%
+% in.nearneighbor.    |
+%
+%  search              in:     %s
+%                      ex:     '30m' Search for data within 30 [arcmin]
+%                      def:    Loosely based on the density of the data points
+%                     ------------
+%  resolution          in:     %f [degree]
+%                      ex:     1 [deg] (== 60minuntes) looks for values withing 1 [deg]
+%                      def:    Loosely based on the density of the data points, or avialable memory
+% ------------------------------------------------------------------------
+%
+% PROJECTION
+%
+% in.proj           struct
+%         projection   in:     %s
+%                      ex:     See available projections in GMT manual.
+%                      def:    'Q' (cylindric equidistant)
+%                     ------------
+%         center       in:     %f
+%                      ex:     Center map at given longitude
+%                      def:    0 [deg]
+%                     ------------
+%         map_width    in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     Set width of map, e.g., '20c'=20cm
+%                      def:    20 (cm)
+%
+% or the string:
+%
+% in.proj              in:     %s
+%                      ex:     'projection/center/mapwidth'
+%                      def:    'Q0/20' (see above)
+%-----------------------------------------------------------------
+% PSBASEMAP
+%
+% in.psbasemap
+%
+%     axes             in:     %s
+%                      ex:     'WSne', annotates West and South of the map,
+%                              but not North or East
+%                      def:    'WSne'
+%                     ------------
+%     ticks            in:     %s
+%                      ex:     '60g30/30g15'. The first value for both axis
+%                              denotes the tick interval to annotate, the second
+%                              value is the interval to draw the gridlines. xaxis and
+%                              yaxis are separated by '/'. i.e (x-axis:
+%                              'annot'g'grid'/ y-axis: 'annot'g'grid')
+%                              Note: To remove gridlines set the second value to 0.
+%                      def:    Determined by input lat/lon range.
+%--------------------------------------------------------------------------
+% PSCOAST
+%
+% --string ------
+% in.pscoast           in:     %s (STRING COMMAND)
+%                      ex:     'pscoast OPT > filename.ps', explicitly sets the
+%                           pscoast GMT command.
+% --logical -----
+% in.pscoast           in:     %f (LOGICAL TURN OFF)
+%                      ex:     If you don't want coastlines, set to false. If
+%                              in.coast is a structure, it'll use the structure
+%                              arguments to generate the pscoast command.
+%                      def:    To generate coastlines
+% --structure ---
+%
+% in.pscoast           | STRUCTURE with one or more of the following fields:
+%
+%  color               in:     %s
+%                      ex:     Color of coast and rivers in rgb e.g. '255/255/255'
+%                              gives white coastlines
+%                      def:    COLOR_BACKGROUND
+%                     ------------
+%  features            in:     %f
+%                      ex:     Don't plot features < in.features [km^2]
+%                      def:    determined by lon/lat range
+%                     ------------
+%  resolution          in:     %s
+%                      ex:     (f)ull, (h)igh, (i)ntermediate, (l)ow, and (c)rude
+%                      def:    determined by lon/lat range
+%                     ------------
+%  rivers              in:     %s
+%                      ex:     Display rivers. pscoast -Ioption (1-10, a,r,i,c)
+%                      def:    '1' (=major rivers)
+%                     ------------
+%  width               in:     %s
+%                      ex:     Width of coastlines
+%                      def:    '.3p'
+% ----------------------------------------------------------------
+% LOCATION MARKERS:
 %
 %  for multiple locations define all fields according to :
 %  in.locations(1).name = 'x',
@@ -493,113 +573,76 @@ function filename = gmt_plot(in,field)
 %
 % in.locations.       | Structure with one or more of the following fields:
 %
-%  lat              in:     %f
-%                   ex:     Latitude of marker
-%                   def:    mandatory user input
+%  lat                 in:     %f
+%                      ex:     Latitude of marker
+%                      def:    mandatory user input
 %                     ------------
-%  lon              in:     %f
-%                   ex:     Longitude of marker
-%                   def:    manditory user input
+%  lon                 in:     %f
+%                      ex:     Longitude of marker
+%                      def:    manditory user input
 %                     ------------
-%  name             in:     %s
-%                   ex:     Name of marker
+%  symbol              in:     %s
+%                      ex:     Shape of marker. '' if you don't want one
+%                      def:    'c' c=filled circle
 %                     ------------
-%  shape            in:     %s
-%                   ex:     Shape of marker
-%                   def:    'c' c=filled circle
+%  symbolsize          in:     %s
+%                      ex:     Size of shape.
+%                      def:    '5p'
 %                     ------------
-%  size             in:     %f
-%                   ex:     Size of shape.
-%                   def:    .08
+%  symbolcolor         in:     %s
+%                      ex:     color of the symbol.
+%                      def:    '0/0/0'
 %                     ------------
-%  color            in:     %s
-%                   ex:     Color of marker
-%                   def:    'white'
-%                     ------------
-%  textsize         in:     %f
-%                   ex:     Size of name
-%                   def:    15
-%                     ------------
-%  textcolor        in:     %s
-%                   ex:     Color of name
-%                   def:    in.location.color
-%                     ------------
-%  textalign        in:     %s
-%                   ex:     Two letters for the position of marker relative
-%                           to the text. 1st letter for horizontal
-%                           position: L, C, R. 2nd letter for vertical
-%                           position: T, M, B
-%                   def:    'LT'
+%  symbolfill          in:     %s
+%                      ex:     Color of marker
+%                      def:    'white' (or '255/255/255')
+%
+% see pstext for the text arguments (text,fontsize,angle,font,justify,color) 
+% for in.locations.(textarg)
+%
 %--------------------------------------------------------------------------
 %
-% PLOT CONTOURS:
-%
-% in.grdcontour     in:     %s
-%                   ex:     'grdcontour OPT > filename.ps', explicitly sets
-%                           the grdcontour GMT command directly.
-%                     ------------
+% CONTOURS:
 %
 % in.contourline.     | Structure with one or more of the following fields:
 %
-% spacing           in:     %f
-%                   ex:     Data interval between contours
+% spacing              in:     %f
+%                      ex:     Data interval between contours
 %                     ------------
-% range             in:     [%f %f]
-%                   def:    in.datarange
+% range                in:     [%f %f]
+%                      def:    in.datarange
 %                     ------------
-% linethick         in:     %f
+% linethick            in:     %f
 %                     ------------
-% more              in:     %s
-%                   ex:     Additional commands for GMT's grdcontour.
-%                           E.g. '-T1c/0.001c:LH'
-%                     ----------------------
+% more                 in:     %s
+%                      ex:     Additional commands for GMT's grdcontour.
+%                              E.g. '-T1c/0.001c:LH'
 %
 % If several contour plots should overlap define all fields according to:
 %  in.grdcontour(1).spacing = x,
 %  in.grdcontour(2).spacing = y, etc...
 %--------------------------------------------------------------------------
 %
-% DRAW SHAPES ON MAP:
-% in.psbox = [%f %f %f %f]
-% in.psbox.           | Structure with one or more of the following fields:
+% PSPOLY: DRAWING LINES and SHAPES ON MAP
 %
-%                     ----------------------
-%  box              in:     [%f %f %f %f]
-%                   ex:     E.g. for box regions: [lon11 lat11 lon12 lat12;lon21 lat21 lon22 lat22]=
-%                           [Bottom left corner1, Top right corner1;
-%                           Bottom left corner2, Top right corner2]|
+% in.pspoly.coord
+%                      in:     {[%f %f;%f %f;...] [%f %f;...]}
+%                      ex:     Draws a polygon based on coordinates.
+%                              Use one cell row per polygon region:
+%                              {[lon1 lat1; lon2 lat2; ...];...}
 %                     ------------
-%  boxes            in:     [%f %f ...]
-%                   ex:     The index of the last row of the regions. e.g 3 7, if
-%                           you have 2 regions defined by 3 resp 4 boxes. This is
-%                           useful for defining psboxcolor. Each index is defines
-%                           the last corner of a region, where a region is
-%                           essentially made up of many smaller boxes regions.
+% in.pspoly.color      in:     contains strings: {'%f/%f/%f',...}
+%                      ex:     RGB color or every region
+%                      def:    {'0/0/0'} for every region (values range from 0 to 255)
 %                     ------------
-% boxcolor          in:     {[%f %f %f]}
-%                   ex:     RGB color or every region
-%                   def:    {[0 0 0]} for every region
-%                     ------------
-% boxthick          in:     {%f}
-%                   ex:     Thickness of lines
-%                   def:    20 for every region boundary
-%                     ------------
-%
-% in.pspoly (%double)
-%                   in:     {[%f %f;%f %f;...] [%f %f;...]}
-%                   ex:     Draws a polygon. Use one cell row per polygon:
-%                           {[p1lon1 p1lat1; p1lon2 p1lat2| ...];...}
-%                     ------------
-% in.pspolycolor    ex:     See in.psbox.boxcolor
-%                     ------------
-% in.pspolythick    ex:     See in.psbox.boxthick
-%                     ------------
-%
+% in.pspoly.thick      in:     {%s,...}
+%                      ex:     Thickness of lines
+%                      def:    10p for every region boundary
 %--------------------------------------------------------------------------
-% DRAW TEXT ON A MAP
+% PSTEXT: Write text on a map
 %
-% in.pstext         in:     %s
-%                   ex:     'pstext OPT > filename.ps', explicitly sets
+% in.pstext            in:     %s
+%                      ex:     'pstext OPT > filename.ps', explicitly sets
 %                           the pstext GMT command directly. If in.pstext is a
 %                           structure, it'll use the structure arguments to
 %                           generate the command.
@@ -611,38 +654,40 @@ function filename = gmt_plot(in,field)
 %  in.pstext(1).text = 'example',
 %  in.pstext(2).text = 'example2', etc...
 %
-%  lat              in:     %f
-%                   ex:     Centre word at this latitude
-%                   def:    manditory user input
+%  lat                 in:     %f
+%                      ex:     Centre word at this latitude
+%                      def:    manditory user input
+%                     ------------
+%  lon                 in:     %f
+%                      ex:     Centre word at this longitude
+%                      def:    manditory user input
+%                     ------------
+%  text                in:     %s
+%                      ex:     String to appear at lat/lon
+%                      def:    manditory user input
+%                     ------------
+%  fontsize            in:     %s
+%                      ex:     Text size in points
+%                      def:    10p
+%                     ------------
+%  angle               in:     %f
+%                      ex:     degrees counter-clockwise from horizontal
+%                      def:    0 [deg]
+%                     ------------
+%  font                in:     %s or %f
+%                      ex:     Sets the font type
+%                      def:    1
+%                     ------------
+%  justify             in:     %f
+%                      ex:     Sets the alignment
+%                      def:    6
+%                     ------------
+%  color               in:     %s
+%                      ex:     RGB text color
+%                      def:    '0/0/0'
 %
-%  lon              in:     %f
-%                   ex:     Centre word at this longitude
-%                   def:    manditory user input
-%
-%  text             in:     %s
-%                   ex:     String to appear at lat/lon
-%                   def:    manditory user input
-%
-%  fontsize         in:     %f
-%                   ex:     Text size in points
-%                   def:    20
-%
-%  angle            in:     %f
-%                   ex:     degrees counter-clockwise from horizontal
-%                   def:    0 [deg]
-%
-%  fontnum          in:     %f
-%                   ex:     Sets the font type
-%                   def:    1
-%
-%  justify          in:     %f
-%                   ex:     Sets the alignment
-%                   def:    6
-%
-%  color            in:     %s
-%                   ex:     RGB text color
-%                   def:    '0/0/0'
 %--------------------------------------------------------------------------
+%
 %
 % QUICK TEST
 %
@@ -651,19 +696,32 @@ function filename = gmt_plot(in,field)
 % in.data = rand(length(in.lat),length(in.lon))
 % file = gmt_plot(in);
 %
+% ACKNOWLEDGEMENTS
 %
-% Created by Salomon Eliasson (s.eliasson@ltu.se) and Oliver Lemke
+% Copyright ?1991?2014 by P. Wessel, W. H. F. Smith, R. Scharroo, J. Luis and F. Wobbe
+%
+% The Generic Mapping Tools (GMT) is free software; you can redistribute it
+% and/or modify it under the terms of the GNU Lesser General Public License as
+% published by the Free Software Foundation.
+%
+% See also: <a href="http://gmt.soest.hawaii.edu/doc/5.1.1/GMT_Docs.html">GMT Docs</a>
+%
+% Created by Salomon Eliasson and Oliver Lemke
 % $Id$
+
 
 if ~exist('field','var') && isfield(in,'data')
     field = 'data';
+elseif in.nodata
+    field = '';
 end
 
 assert(logical(exist('field','var')) || (isfield(in,'nodata')&&in.nodata) ,...
     ['atmlab:' mfilename ':badInput'],...
     'I need a "field".\nIf you want to plot the map with no data, input in.nodata=true')
 
-check_input(in)
+
+check_input(in,field)
 
 if isfield(in,'nodata')&&in.nodata
     out = set_GMT_plot(in);
@@ -709,8 +767,7 @@ function in = set_GMT_plot(in,field)
 
 % Test is GMT is installed and in the path
 
-    %[a,b] = system('which gmt');
-[a,b] = system('which gmtset');
+[a,b] = system('which gmt');
 
 if a == 1
     error(['gmtlab:' mfilename ':shell'],[ [ b '\n\n'],...
@@ -720,39 +777,49 @@ if a == 1
         'e.g. in Matlab you can add the PATH via \n',...
         'setenv(''PATH'',[getenv(''PATH'') '':<GMTINSTALLDIR>/bin''])'])
 else
-    % This is gmt5
-    %[~,in.gmtVersion] = system('gmt --version');
+    %This is gmt5
+    [~,in.gmtVersion] = system('gmt --version');
+    in.gmtVersion = strtrim(in.gmtVersion);
 end
+logtext(1,'Using is GMT version %s\n',in.gmtVersion)
 
 % SET DEFAULTS
 % general
-default.annot_font_size_primary = '14p';     % size of axis labels (include legend if not set differently by in.legend.font_size)
-default.basemap_axis     = 'nSeW';           % Annotates West and South of the map.
+default.fontsize_annot_primary = '14p';     % size of axis labels (including legend if not set differently by in.legend.font_size)
+default.font_annot_primary = 'Helvetica';     % font of axis labels (including legend if not set differently by in.legend.font)
+default.fontsize_annot_secondary = '10p';
+default.font_annot_secondary = 'Helvetica';
+default.psbasemap.axes   = 'nSeW';           % Annotates West and South of the map.
 default.display          = true;             % Display figure to screen
-default.center           = 0;                % The center longitude of the map. The region has to be -180:180 (cyclic)
 default.color_background = '0/0/0';
 default.color_foreground = '255/255/255';
 default.color_nan        = '150/150/150';
-default.header           = '';               % no title by default
-default.header_font      = 'Helvetica';      % one of 35 available fonts
-default.header_fontsize  = '36p';
+default.title           = '';               % no title by default
+default.font_title      = 'Helvetica';      % one of 35 available fonts
+default.fontsize_title  = '36p';
 in = optargs_struct(in,default);
+clear default
+
 % how far the title is removed from the top of the map (depends on 'N' or 'n')
-default.header_offset    = [num2str(-0.4+0.6*ismember('N',in.basemap_axis)) 'c'];
+default.map_title_offset    = [num2str(-0.4+0.6*ismember('N',in.psbasemap.axes)) 'c'];
 default.keep_files       = false;            % keep intermediate files (debugging)
-default.map_width        = 20;
-default.measure_unit     = 'cm';             % Choose between cm, inch, m, and point.
+default.proj.center      = 0;                % The center longitude of the map. The region has to be -180:180 (cyclic)
+default.proj.projection  = 'Q';              % Cylindrical Equidistant Projection.
+default.proj.map_width   = 20;
+default.proj_length_unit     = 'cm';             % Choose between cm, inch, m, and point.
 default.force_nlevels    = false;            % do not force, e.g. reduce if uniques are less
 default.nodata           = false;            % true if you only want the map
 default.outdir           = gmtlab('OUTDIR'); % where to put the figure
 default.plotPlacement    = '-Xa5 -Ya5';      % String of global plotPlacements
-default.projection       = 'Q';              % Cylindrical Equidistant Projection.
 default.savelegend       = false;            % make an additional pdf-file only containing the legend
 default.unit             = '';               % unit displayed with legend
 default.xunit            = '';               % xlabel for the legend
 default.treatAsUngridded = false;            % A patch to easily switch between gridded and ungridded data (mostly for plot testing )
 default.lon360           = false;
+default.makeScriptAndStop = false;           % For the developer and those who want the shell script generated by this program
 in = optargs_struct(in,default);
+
+clear default
 
 in.outdir = sanitise(in.outdir);
 
@@ -766,19 +833,14 @@ if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
         'Either %s doesn''t exist, or atmlab does not have write access to %s',in.outdir,in.outdir)
 end
 
-% backward compatibility
-if isfield(in,'header_size')
-    warning('atmlab:temporary','in.header_size has been renamed to in.header_fontsize. in.header_size will be removed in future releases')
-    in.header_fontsize = in.header_size; in=rmfield(in,'header_size');
-end
-
-if ~isempty(in.header)
-    default.filename = ['gmtfile_' in.header '.pdf'];
+if ~isempty(in.title)
+    default.filename = ['gmtfile_' in.title '.pdf'];
     default.filename = strrep(default.filename,'/','-');
 else default.filename = 'default.pdf';
 end
 
 in = optargs_struct(in,default);
+clear default
 
 % find default figuretype
 b = regexp(in.filename,'\.');
@@ -798,19 +860,11 @@ else
 end
 
 in = optargs_struct(in,default);
+clear default
 
 in.filename = sanitise(in.filename);
-in.header = regexprep(in.header,'([()])','\\$1');
-in.header = regexprep(in.header,':',' ');
-
-%coast
-if ~isfield(in,'coast') || isstruct(in.coast) || in.coast
-    if ~isfield(in,'coast'), in.coast=struct([]);end
-    default.rivers      = '1';  % '1' displays major rivers only. 'a' displays all.
-    default.width       = .3;   % width of the coast
-    
-    in.coast            = optargs_struct(in.coast,default); clear default
-end
+in.title = regexprep(in.title,'([()])','\\$1');
+in.title = regexprep(in.title,':',' ');
 
 if in.nodata
     % If I only want an empty map, get the essentials and leave here.
@@ -835,7 +889,7 @@ in = isdata(in,field);
 % Check to see if the data is gridded or not
 in = isgridded(in,field);
 
-% special patch if you want to test if you want to switch to treating gridded 
+% special patch if you want to test if you want to switch to treating gridded
 % data ungridded
 in = treatAsUngridded(in,field);
 
@@ -847,6 +901,8 @@ in = assign_region(in,field);
 
 in = specialregion(in,field); %in case the region covers the dateline and is not continuous
 
+% get default ticks for map borders
+in = getDefaultTicks(in);
 
 % DATARANGE
 if ~in.nodata
@@ -859,7 +915,9 @@ if ~in.nodata
         end
     end
 end
+
 in = optargs_struct(in,default);
+clear default
 in.datarange = double(in.datarange);
 
 
@@ -869,9 +927,10 @@ assert(diff(in.datarange)>0,'atmlab:badInput','min=max in the datarange. Abortin
 default.ctable      = 'rainbow';          % color palette
 default.nlevels = get_nlevels(in.datarange);
 in = optargs_struct(in,default);
+clear default
 [default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
-in = optargs_struct(in,default); clear default
-
+in = optargs_struct(in,default);
+clear default
 
 % LEGEND
 in = setupLegend(in);
@@ -903,7 +962,7 @@ if ~rsbl
     f = des_nlev;
 else
     drdiff = fc * (dr(2)-dr(1));
-    f = drdiff./(1:ceil(sqrt(drdiff))); 
+    f = drdiff./(1:ceil(sqrt(drdiff)));
     f = f(f==fix(f)).' ;
     f = unique([f;drdiff./f]);
     f = f/fc;
@@ -925,7 +984,7 @@ end
 %      ||||||
 %      VVVVVV
 
-function check_input(in)
+function check_input(in,field)
 %% CheckInput
 % Checks the input type of all options. If the field is in the list of
 % available options, it will be tested against a anomynous function (e.g.
@@ -968,7 +1027,13 @@ for F = Fields
                 end
             end
         end
+    else
+        if ~any(strcmp(F{1},{field,'lat','lon'}))
+            warning(errID,['field: "%s" will not be used as it '...
+                'is not data or in the list of options'],F{1})
+        end
     end
+    
 end
 
 end
@@ -992,7 +1057,7 @@ if ~isfield(in,'region')
         % check to see if lon-dlon is out side the boundary. If so, fix the
         % region to the edges. Same goes for lat...
         % If the region passes the dateline it goes back to 0:360 notation
-
+        
         if in.lon360
             cond1 = abs(0 - in.lon(1)) <= dn(1);
             cond2 = 360-in.lon(end) <= dn(end);
@@ -1010,7 +1075,6 @@ if ~isfield(in,'region')
             else
                 in.region= '-180/180/-90/90';
             end
-            %in.region = 'g'; % global
         elseif cond1 && cond2
             if in.lon360
                 fstr = sprintf('0/360/%s/%s',af,af);
@@ -1034,22 +1098,24 @@ if ~isfield(in,'region')
     end
 else
     in.userDefinedRegion = true;
-    % remove frivolous data for memory and speed performance in that case
-    x = sscanf(in.region,'%f/%f/%f/%f');
-    lt = in.lat >= x(3) & in.lat <=x(4); %logical vector
-    ln = in.lon >= x(1) & in.lon <=x(2); %logical vector
-    if in.gridded
-        in.(field) = in.(field)(lt,ln);
-        in.lat = in.lat(lt);
-        in.lon = in.lon(ln);
-    else
-        in.(field) = in.(field)(lt&ln);
-        in.lat = in.lat(lt&ln);
-        in.lon = in.lon(lt&ln);
-    end
-    assert(~isempty(in.lat) && ~isempty(in.lon),...
-        errId,'lat or lon are empty')
 end
+
+% remove frivolous data for memory and speed performance in that case
+x = sscanf(in.region,'%f/%f/%f/%f');
+lt = in.lat >= x(3) & in.lat <=x(4); %logical vector
+ln = in.lon >= x(1) & in.lon <=x(2); %logical vector
+if in.gridded
+    in.(field) = in.(field)(lt,ln);
+    in.lat = in.lat(lt);
+    in.lon = in.lon(ln);
+else
+    in.(field) = in.(field)(lt&ln);
+    in.lat = in.lat(lt&ln);
+    in.lon = in.lon(lt&ln);
+end
+assert(~isempty(in.lat) && ~isempty(in.lon),...
+    errId,'lat or lon are empty')
+
 
 end
 
@@ -1103,15 +1169,66 @@ in.sidebar = false;
 in.legend  = false;
 in.gridded = false;
 in.nlevels = 1;
+
+% a stab at the region before something more elaborate is done
+in = preGetRegion(in);
+
+% get default ticks for map borders
+in = getDefaultTicks(in);
+
+end
+
+function in = preGetRegion(in)
+
 if isfield(in,'region')
+    % do nothing
 elseif ~isfield(in,'region') && all(isfield(in,{'lat','lon'}))
     in.region = sprintf('%g/%g/%g/%g/%g',...
         min(in.lon(:)),max(in.lon(:)),...
         min(in.lat(:)),max(in.lat(:)));
 else
-    in.region='g';
+    in.region='-180/180/-90/90';
+end
 end
 
+function in = getDefaultTicks(in)
+%% getDefaultTicks
+%
+% Set the ticks around the borders of the map
+%
+%
+% requires in.region and in.psbasemap
+
+% 'g'  seems to not work so well
+% if strcmp(in.region,'g')
+%     if in.lon360
+%         rg = [0 360 -90 90];
+%     else
+%         rg = [-180 180 -90 90];
+%     end
+% else
+rg=sscanf(in.region,'%f/%f/%f/%f');
+%end
+
+ln=rg(2)-rg(1);
+lt=rg(4)-rg(3);
+
+% for nice step lengths
+
+% lons
+as   = [240 180 120 90 60 30 15];
+step = [60 40 30 20 15 10 5];
+a = step(~(as>ln));
+if isempty(a), a = ln/6; end
+
+%lats
+bs   = [120 90 60 40 30 20 15];
+step = [60 30 30 20 10 5 2.5];
+b = step(~(bs>lt));
+if isempty(b), b = lt/14; end
+
+default.ticks = sprintf('%gg%g/%gg%g',a(1),b(1),a(1)/2,b(1)/2);
+in.psbasemap = optargs_struct(in.psbasemap,default);
 end
 
 function in = isdata(in,field)
@@ -1245,27 +1362,20 @@ end
 if ~isfield(in.legend,'position')
     % ORIENTATION
     
-    if ~strcmp(in.region,'g')
-        x = sscanf(in.region,'%f/%f/%f/%f');
-    else
-        x = [-180, 180, -90, 90];
-    end
+    x = sscanf(in.region,'%f/%f/%f/%f');
     f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
-    myHcondition = f < 0.5; tmp = ['v','h']; %vertical,horisontal
-
-    if in.savelegend
-        default.orientation = 'h'; % because usually you want this.
-    else
-        default.orientation = tmp(myHcondition+1);
-    end
+    myHcondition = f < 0.5; tmp = {'v','h'}; %vertical,horisontal
+    default.orientation = tmp{myHcondition+1};
     defThick=.2; %thickness of legend bar
     
     % I use map_width to find the defaults.
-    [mw,mwu] = separate_integer_and_unit(in.map_width);
+    [mw,mwu] = separate_integer_and_unit(in.proj.map_width);
     in.legend           = optargs_struct(in.legend,default); %need orientation now
+    clear default
+    
     switch in.legend.orientation
         case 'v'
-            vec = [10.11+(.5*defThick+0.44*ismember('E',in.basemap_axis)) ... % could use annot_font_size_primary for better precision
+            vec = [10.11+(.5*defThick+0.44*ismember('E',in.psbasemap.axes)) ... % could use fontsize_annot_primary for better precision
                 2.44*f ...
                 5.22*f ...
                 defThick]/10;
@@ -1273,7 +1383,7 @@ if ~isfield(in.legend,'position')
         case 'h'
             
             vec = [5 ...
-                -0.1-(0.5*defThick+0.4*ismember('S',in.basemap_axis))...
+                -0.1-(0.5*defThick+0.4*ismember('S',in.psbasemap.axes))...
                 10.55 ...
                 defThick]/10;
             
@@ -1320,7 +1430,7 @@ if in.gridded
         in.(field) = in.(field)(:,cond);
     end
     
-    if in.lon360 && max(diff(in.lon))>5*min(diff(in.lon)) % if the are dicontinuous  
+    if in.lon360 && max(diff(in.lon))>5*min(diff(in.lon)) % if the are dicontinuous
         
         in.lon = in.lon+(in.lon < 0)*360;
         [in.lon,lnindex] = sort(in.lon);
@@ -1383,8 +1493,25 @@ switch lower(in.figuretype)
         error(['gmtlab:' mfilename ':FigureType'],...
             '%s: not supported',in.figuretype)
 end
-command{end+1} = sprintf('ps2raster %s.ps -A -P %s',in.filename,T);
+command{end+1} = sprintf('gmt ps2raster %s.ps -A -P %s',in.filename,T);
+
+% Assemble open command
+openwith = gmtlab('OPEN_COMMAND');
+
+if in.makeScriptAndStop
+    filename = makeScriptAndStop(command);
+    logtext(1,'Stopped\n')
+    return
+end
+
+% move the plot
 command{end+1} = sprintf('mv %s.%s %s',in.filename,in.figuretype,in.outdir);
+
+% display it
+if in.display && ~any(isnan(openwith))
+    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',...
+        openwith,in.outdir,in.filename,in.figuretype);
+end
 
 if in.savelegend
     % MAKE a separate file for the legend
@@ -1405,47 +1532,31 @@ if in.savelegend
     command{end+1} = sprintf('mv %s.%s %s',in.filename_legend,in.figuretype,in.outdir);
 end
 
-% Assemble open command
-openwith = NaN;
-if strcmp(in.figuretype,'pdf')
-    openwith = gmtlab('PDFVIEWER');
-elseif strcmp(in.figuretype,'eps')
-    openwith = gmtlab('PSVIEWER');
-end
-if isnan(openwith)
-    openwith = gmtlab('OPEN_COMMAND');
-end
-if in.display && ~any(isnan(openwith))
-    command{end+1} = sprintf('%s %s/%s.%s >/dev/null &',...
-        openwith,in.outdir,in.filename,in.figuretype);
-end
-
 out = exec_system_cmd(command,gmtlab('verbosity')); % execute all gathered commands
 
 filename = sprintf('%s/%s.%s',in.outdir,in.filename,in.figuretype);
 
+% TRY and open the file even without user input
 % If no viewer is defined, check for xpdf, then evince, then okular
-
 if in.display && any(isnan(openwith))
     logtext(2,'display = 1, yet no view is defined\nE.g. gmtlab(''pdfviewer'',''gnome-open'')\n')
-end
     
-if in.display && any(isnan(openwith)) && strcmp(in.figuretype,'pdf')
-    disp('No pdfviewer defined.')
-    disp('Set gmtlab(''PDFVIEWER'',''<e.g. xpdf>'') in your startup file')
-    if ~system('which xpdf')
-        openwith = 'xpdf';
-    elseif ~system('which evince')
-        openwith = 'evince'; % for gnome users
-    elseif ~system('which okular')
-        openwith  = 'okular'; % for kde users
-    end
-    if ~any(isnan(openwith))
-        logtext(1,'Opening file with %s for now\n',openwith)
-        system(sprintf('%s %s &',openwith,filename));
+    if strcmp(in.figuretype,'pdf')
+        disp('No pdfviewer defined.')
+        disp('Set gmtlab(''PDFVIEWER'',''<e.g. xpdf>'') in your startup file')
+        if ~system('which xpdf')
+            openwith = 'xpdf';
+        elseif ~system('which evince')
+            openwith = 'evince'; % for gnome users
+        elseif ~system('which okular')
+            openwith  = 'okular'; % for kde users
+        end
+        if ~any(isnan(openwith))
+            logtext(1,'Opening file with %s for now\n',openwith)
+            system(sprintf('%s %s &',openwith,filename));
+        end
     end
 end
-
 hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
 logtext(atmlab('OUT'), 'GMT plot stored at:  %s\n',filename)
@@ -1461,10 +1572,6 @@ file = [basename '_legend'];
 
 %make sure it's not here
 exec_system_cmd(sprintf('rm -f %s.ps',file),gmtlab('verbosity'));
-
-% Make the page large enough to fit most legends
-cmd = {'gmtset PAPER_MEDIA a0'};
-command = [cmd, command{1}];
 
 %Remove trailing .ps entry
 crop=regexp(command,'>>');
@@ -1537,4 +1644,33 @@ else
     atmlab('VERBOSITY',V);
 end
 
+end
+
+function filename = makeScriptAndStop(command)
+%% Make a script for debugging
+
+logtext(1,'Making directory to put scripts and plot data into\n')
+folder = sprintf('%s/gmt_test_%s',gmtlab('OUTDIR'),datestr(now,'yyyymmdd_HHMMSS'));
+exec_system_cmd(sprintf('mkdir %s',folder));
+
+exec_system_cmd(sprintf('rsync -avP %s/* %s/.',pwd,folder));
+
+curdir=pwd;
+cd(folder)
+
+logtext(1,'Making file: %s/script.sh\n',folder)
+fid = fopen('script.sh','w');
+fprintf(fid,'#!/bin/bash\n');
+fprintf(fid,'\n\n\n');
+fprintf(fid,'cd %s\n\n',folder);
+for C = command
+    fprintf(fid,'%s\n',C{1});
+end
+
+exec_system_cmd(sprintf('chmod +x %s/script.sh',folder));
+filename = fullfile(folder,'script.sh');
+
+a = exec_system_cmd(sprintf('du -h %s',gmtlab('OUTDIR')));
+logtext(2,'\nDon''t forget to clean up\n%swhen you are done!\n',a{1})
+cd(curdir)
 end

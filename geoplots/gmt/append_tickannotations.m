@@ -15,11 +15,10 @@ function file = append_tickannotations(file,annotations)
 
 % READ OLD FILE
 fid = fopen(file);
-out={};
-while 1
+out=cell(1,length(annotations));
+for i = 1:length(annotations)
     s=fgetl(fid);
-    if (s == -1) break; end
-    out{end+1}=s;
+    out{i}=s;
 end
 fclose(fid);
 

@@ -13,7 +13,7 @@ function file = extra_legend(in)
 % $Id$
 
 if ~isstruct(in.extra_legend)
-    % then you have provided the psscale comamnd directly
+    % then you have provided the psscale command directly
     file = '';
     return
 end

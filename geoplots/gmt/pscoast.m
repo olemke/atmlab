@@ -1,9 +1,9 @@
-function command = pscoast(file,in)
+function command = pscoast(in)
 % PSCOAST appends options to GMT pscoast
 %
 % PURPOSE:  Appends options to a short script and calls the GMT
 % 
-% IN    file      %s              .ps-file created/appened to by command
+% IN
 %       in        struct          options here (see help gmt_plot)
 %
 % OUT   command   %s              string command to be used in system call
@@ -11,36 +11,30 @@ function command = pscoast(file,in)
 % Created by Salomon Eliasson
 % $Id$
 
-pscoast = sprintf('pscoast -R -J');
+pscoast = sprintf('gmt pscoast -R -J %s',in.plotPlacement);
 
-pscoast = sprintf('%s %s',pscoast,in.plotPlacement);
+C=in.pscoast;
+
+default.features   = 1000;  % nothing smaller than 1000km^2
+default.resolution = 'l'; % low
+default.rivers     = 'r'; % All major rivers
+default.width      = '0.3p';
+default.color      = in.color_background;
+
+C = optargs_struct(C,default);
+% set the minimal area of features to plot
+
+%Draw shorelines. Append attributes [Defaults: width = 1, color = black, texture = solid].
+pscoast = sprintf('%s -W%s,%s',pscoast,C.width,C.color);
+
+pscoast = sprintf('%s -A%g',pscoast,C.features);
+pscoast = sprintf('%s -D%s',pscoast,C.resolution);
+for i = 1:length(C.rivers)
+    % thickness is left empty ('before ',')
+    pscoast = sprintf('%s -I%s/,%s',pscoast,num2str(C.rivers(i)),C.color);
+end
 
 % selects Overlay plot mode and assuming more pscode will be appended
 pscoast = sprintf('%s -O -K',pscoast);
 
-% set the minimal area of features to plot
-if isfield(in,'features')
-    pscoast = sprintf('%s -A%g',pscoast,in.features);
-end
-
-if isfield(in,'resolution')
-    pscoast = sprintf('%s -D%s',pscoast,in.resolution);
-end
-
-if isfield(in,'rivers')
-    pscoast = sprintf('%s -I%s',pscoast,in.rivers);
-    if isfield(in,'color') % for rivers
-        pscoast = sprintf('%s/%s',pscoast,in.color);
-    end
-end
-
-%Draw coastlines. Append attributes [Defaults: width = 1, color = black, texture = solid].
-if isfield(in,'width')
-    pscoast = sprintf('%s -W%gp',pscoast,in.width);
-else pscoast = sprintf('%s -W',pscoast);
-end
-if isfield(in,'color') %for coast
-    pscoast = sprintf('%s/%s',pscoast,in.color);
-end
-
-command = sprintf('%s >> %s.ps',pscoast,file);
+command = sprintf('%s >> %s.ps',pscoast,in.filename);

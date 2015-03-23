@@ -1,9 +1,9 @@
-function command = psscale(file,in)
+function command = psscale(in)
 % PSSCALE Appends options to GMT psscale
 %
 % PURPOSE: Appends options to a short script and calls the GMT
 %
-% IN    file      %s              .ps-file created/appened to by command
+% IN
 %       in        struct          options here (see help gmt_plot)
 %
 % OUT   command   %s              string command to be used in system call
@@ -11,42 +11,46 @@ function command = psscale(file,in)
 % Created by Salomon Eliasson
 % $Id$
 
-assert(isfield(in,'cptfile'),['gmtlab:' mfilename ':badInput'],'needs in.cptfile')
+L = in.legend;
+assert(isfield(L,'cptfile'),['gmtlab:' mfilename ':badInput'],'needs in.cptfile')
 
-psscale = sprintf('psscale');
-if isfield(in,'position')
-    psscale = sprintf('%s -D%s',psscale,in.position);
+psscale = 'gmt psscale';
+if isfield(L,'position')
+    psscale = sprintf('%s -D%s',psscale,L.position);
 else
     psscale = sprintf('%s -D%s/%s/%s/%s%s',...
-        psscale,num2str(in.xpos),num2str(in.ypos),num2str(in.length),num2str(in.width),...
-        in.orientation);
+        psscale,num2str(L.xpos),num2str(L.ypos),num2str(L.length),num2str(L.width),...
+        L.orientation);
     
     %may only append 'h'
-    if strcmp(in.orientation,'v'), psscale = psscale(1:end-1); end 
+    if strcmp(L.orientation,'v'), psscale = psscale(1:end-1); end 
 end
 
-if ( isfield(in,'tick_annotations') && ~isempty(in.tick_annotations) ) || ...
-        ( isfield(in,'equalboxwidth') && in.equalboxwidth ) || ...
-        any(isfield(in,{'box_spacing','tick_centering'}))
+if ( isfield(L,'tick_annotations') && ~isempty(L.tick_annotations) ) || ...
+        ( isfield(L,'equalboxwidth') && L.equalboxwidth ) || ...
+        any(isfield(L,{'box_spacing','tick_centering'}))
     
     psscale = sprintf('%s -L',psscale);
     
-    if isfield(in,'box_spacing')
+    if isfield(L,'box_spacing')
         % tickspacing (annotation every xth contour), unit (dispay with legend)
-        psscale = sprintf('%s%g',psscale,in.box_spacing);
+        psscale = sprintf('%s%g',psscale,L.box_spacing);
     end
-    if isfield(in,'tick_centering')
+    if isfield(L,'tick_centering')
         psscale = sprintf('%si',psscale);
     end
+noB = true;    
+else
+    noB = false;
 end
 
-psscale = sprintf('%s %s',psscale,in.plotPlacement);
+psscale = sprintf('%s %s',psscale,L.plotPlacement);
 
 % selects Overlay plot mode and assume more pscode will be appended later
 psscale = sprintf('%s -O -K',psscale);
 
-if in.sidebar %i.e the triangles bellow the min and above the max values
-    switch in.sidebar
+if L.sidebar %i.e the triangles bellow the min and above the max values
+    switch L.sidebar
         case 1
             str = '-Eb';
         case 2
@@ -60,27 +64,40 @@ if in.sidebar %i.e the triangles bellow the min and above the max values
     psscale = sprintf('%s %s',psscale,str);
 end
 
-if isfield(in,'tick_spacing')
-    psscale = sprintf('%s -B%g:"%s":/:"%s":',psscale,in.tick_spacing,in.xunit,in.unit);
-else
-    psscale = sprintf('%s -B:"%s":/:"%s":',psscale,in.xunit,in.unit);
+
+if isfield(L,'tick_spacing')
+    psscale = sprintf('%s -B%g:"%s":/:"%s":',psscale,L.tick_spacing,L.xunit,L.unit);
+elseif ~noB && ~(strcmp(L.xunit(1:9),'$(echo ""') && strcmp(L.unit(1:9),'$(echo ""'))
+    % meaning that xunit and unit should not be empty. Also the -L option does
+    % not work with the -B option
+    psscale = sprintf('%s -B:"%s":/:"%s":',psscale,L.xunit,L.unit);
+elseif noB && (~isempty(L.xunit) || ~isempty(L.unit))
+    warning(['gmtlab:' mfilename,':incompatable'],...
+        ['-L option (annotations etc) cannot be used '...
+        'with the -B option (unit and xunit)\nChoosing to ignore the -B option'...
+        'Thereby in.unit and in.xunit will not be displayed in the legend'])
 end
 
-psscale = sprintf('%s -C%s',psscale,in.cptfile);
+psscale = sprintf('%s -C%s',psscale,L.cptfile);
 
-if isfield(in,'shift_tick_annotations')
-    psscale = sprintf('%s --ANNOT_OFFSET_PRIMARY=%s',psscale,in.shift_tick_annotations);
+if isfield(L,'map_annot_offset_primary')
+    psscale = sprintf('%s --MAP_ANNOT_OFFSET_PRIMARY=%s',psscale,L.map_annot_offset_primary);
 end
 
-if isfield(in,'font_size')
-    psscale = sprintf('%s --ANNOT_FONT_SIZE_PRIMARY=%s',psscale,num2str(in.font_size));
+if isfield(L,'font_size')
+    psscale = sprintf('%s --FONT_ANNOT_PRIMARY=%s',psscale,num2str(L.font_size));
 end
 
-if isfield(in,'tick_length')
-    psscale = sprintf('%s --TICK_LENGTH %s',psscale,num2str(in.tick_length));
-end
-if isfield(in,'tick_annotation_format')
-    psscale = sprintf('%s --D_FORMAT=%s',psscale,in.tick_annotation_format);
+if isfield(L,'map_tick_length_primary')
+    psscale = sprintf('%s --MAP_TICK_LENGTH_PRIMARY=%s',psscale,num2str(L.map_tick_length_primary));
 end
 
-command = sprintf('%s >> %s.ps',psscale,file);
+if isfield(L,'map_tick_length_secondary')
+    psscale = sprintf('%s --MAP_TICK_LENGTH_SECONDARY=%s',psscale,num2str(L.map_tick_length_secondary));
+end
+
+if isfield(L,'tick_annotation_format')
+    psscale = sprintf('%s --FORMAT_FLOAT_OUT=%s',psscale,L.tick_annotation_format);
+end
+
+command = sprintf('%s >> %s.ps',psscale,in.filename);
