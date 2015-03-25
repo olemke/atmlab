@@ -11,7 +11,7 @@ function [outdata,outlat,outlon,weights] = regionize(data,lat,lon,corner,opt)
 %     opt.trim     = true or false
 %                    (1=trim data and lat lons outside the region (default), 0=don't)
 %     opt.maskwith = NaN % what to mask the data with
-%     opt.includeEdges = 0,1,2 depending on if you don't want (0), do want (1)
+%     opt.includeEdges = 0,1,2 depending on if you don't want (0)=default, do want (1)
 %                        to include the regionbounds in the output data. Or (2)
 %                        if you want a weight between 0-1 to be given for the
 %                        grid boxes where the region boundary cuts through
@@ -67,12 +67,19 @@ if opt.isgridded
     %
     % Trim the data before hand to quicken up the code
     
-    % This is not the best way to quicken the code. Quicker to loop over
-    % rectangular regions instead. Polar region is a good example
-    
     % save these originals
     if ~opt.trim
-        origdata = nan(size(outdata(:,:,:)));
+        if isnan(opt.maskwith)
+            origdata = nan(size(outdata(:,:,:)));
+        elseif isinf(opt.maskwith)
+            origdata = nan(size(outdata(:,:,:)));
+        elseif islogical(opt.maskwith)&&opt.maskwith
+            origdata = true(size(outdata(:,:,:)));
+        elseif islogical(opt.maskwith)&&~opt.maskwith
+            origdata = false(size(outdata(:,:,:)));
+        else
+            origdata = opt.maskwith*ones(size(outdata(:,:,:)),class(outdata));
+        end
         origlat  = outlat;
         origlon  = outlon;
     end

@@ -26,7 +26,7 @@ function [info, files] = test_gmt(in)
 if ~exist('in','var'); in=struct([]); end
 
 % SET some defaults
-alltests = 1:16;
+alltests = 1:17;
 default.test      = alltests; % which tests to do (default=all)
 
 in = optargs_struct(in,default);
@@ -47,7 +47,7 @@ in = optargs_struct(in,default);
 % for the final pdfs
 
 if isequal(in.test,alltests) % if all tests
-    default.cols = [3 3 3 2 1 3 1];
+    default.cols = [3 3 3 2 1 3 2];
 else
     default.cols = min([length(in.test),2]);
 end
@@ -121,7 +121,7 @@ for T = sort(in.test)
             test.psbasemap.axes = 'neSW';
             test.legend.tick_spacing = 25;
             
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             testThis = catstruct(gridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
             
@@ -146,7 +146,7 @@ for T = sort(in.test)
             test.psbasemap.axes = 'neSW';
             test.title = 'Diff plot,ref=0,sidebar=3 (above & below)';
             test.legend.tick_spacing = 25;
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -177,7 +177,7 @@ for T = sort(in.test)
 
             test.fontsize_title = '20p';
             test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),title';
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             %this puts standardize_geodata.m to the test
             test.data=test.data'; test.data = test.data(end:-1:1,end:-1:1);
@@ -204,7 +204,7 @@ for T = sort(in.test)
             test.pscoast.width   = '1p';
             test.pscoast.color   = '255/255/255';
             test.legend.orientation  = 'h';
-            in.filename          = sprintf('Test%g',T);
+            test.filename          = sprintf('Test%g',T);
             
             testThis = catstruct(ungridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -227,7 +227,7 @@ for T = sort(in.test)
             test.legend.orientation  = 'h';
             test.font_title   = 8;
             test.title        = sprintf('Font: 8. ungridded: %.0f [deg]',test.nearneighbor.resolution);
-            in.filename        = sprintf('Test%g',T);
+            test.filename        = sprintf('Test%g',T);
             
             testThis = catstruct(ungridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -250,7 +250,7 @@ for T = sort(in.test)
             test.psbasemap.axes    = 'neSW';
             test.title        = sprintf('ungridded: resolution = %g [deg]',test.nearneighbor.resolution);
             test.legend.orientation  = 'v';
-            in.filename        = sprintf('Test%g',T);
+            test.filename        = sprintf('Test%g',T);
             testThis = catstruct(ungridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
             
@@ -272,7 +272,7 @@ for T = sort(in.test)
             test.legend.orientation = 'h';
             test.proj.projection         =  'H';
             test.proj.center             = 180;      % Center map at given center longitude
-            in.filename             = sprintf('Test%g',T);
+            test.filename             = sprintf('Test%g',T);
             
             testThis = catstruct(gridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -300,7 +300,7 @@ for T = sort(in.test)
             test.proj.center              = 0;
             test.legend.tick_spacing = 10;
             test.extra_legend        = struct('name','nan','type','nan');
-            in.filename              = sprintf('Test%g',T);
+            test.filename              = sprintf('Test%g',T);
             
             testThis = catstruct(gridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -320,17 +320,17 @@ for T = sort(in.test)
         case 9
             
             gridded.data(20:40,20:80) = NaN;
-            test.nlevels        = 18;
-            test.legend.orientation = 'h';
-            test.datarange          = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
-            test.extra_legend           = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize','25p');
-            test.legend.position        = '12c/0c/20c/2ch';
-            test.legend.font_size       = '20p';
-            test.legend.tick_spacing    = 15;
-            test.title                 = 'Sinusoidal projection, center = 90';
-            test.proj.projection             = 'I';
-            test.proj.center                 = 90;
-            in.filename                 = sprintf('Test%g',T);
+            test.nlevels              = 18;
+            test.legend.orientation   = 'h';
+            test.datarange            = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
+            test.extra_legend         = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize','25p');
+            test.legend.position      = '12c/0c/20c/2ch';
+            test.legend.font_size     = '20p';
+            test.legend.tick_spacing  = 15;
+            test.title                = 'Sinusoidal projection, center = 90';
+            test.proj.projection      = 'I';
+            test.proj.center          = 90;
+            test.filename               = sprintf('Test%g',T);
             
             testThis = catstruct(gridded,rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -379,7 +379,7 @@ for T = sort(in.test)
                 'lat',{67+51/60,-25},'lon',{20+13/60,130},'angle',{0,-15},...
                 'color','0/255/0','fontsize','10p','justify','C');
             
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -443,7 +443,7 @@ for T = sort(in.test)
             % makes a colortable that goes from blue to white to green to black to red in RGB format.
             % ------------------------
             
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(gridded, rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -478,7 +478,7 @@ for T = sort(in.test)
             test.title = 'SatGroup locations';
             test.nodata = true;
             test.region = '-20/160/-30/70';
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -507,7 +507,7 @@ for T = sort(in.test)
             test.nodata = true;
             test.region     = '-10/30/45/70';
             test.title      = 'SatGroup locations: Europe';
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -540,7 +540,7 @@ for T = sort(in.test)
             test.title = 'SatGroup locations: Kiruna';
             test.region = '16/22/66.2/70';
             test.pscoast.rivers = 'a';
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -552,12 +552,11 @@ for T = sort(in.test)
             
         case 16
             %% TEST: pspolygon
-            
-            % Taken from 
+
             test = regionSetUp_for_GMT;
             test.nodata=true;
             test.psbasemap.axes='nWeS';
-            in.filename = sprintf('Test%g',T);
+            test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);
@@ -565,6 +564,26 @@ for T = sort(in.test)
             info{ind} = ['Test:' num2str(T) ' demonstrates that you can draw polygons on a map, using in.pspoly.',...
                 'E.g. useful if you want to draw regions of interest on a map\n\n'];
             
+        case 17
+            [~,extra] = getPredefinedRegions({'westerlies','twp','trop_cont','sc_regs','polar'});
+
+            test.lat = extra{1}.mask.lat;
+            test.lon = extra{1}.mask.lon;
+            test.data = false(length(test.lon),length(test.lat));
+            for i = 1:length(extra)
+                test.data = test.data | extra{i}.mask.mask;
+            end
+
+            test.psbasemap.axes='nWeS';
+            test.filename = sprintf('Test%g',T);
+            test.legend.tick_centering = true;
+            test.legend.box_spacing = 1;
+            test.legend.tick_annotations = {'not region','region'};
+
+            testThis = catstruct(rmfield(in,'test'),test);
+            files{ind} = gmt_plot(testThis);
+            
+            info{ind} = ['Test:', num2str(T) ' demonstrates a fancy pscale, which can come in handy'];
         otherwise
             error(['atmlab:' mfilename],'Test %g has no entry',T)
     end
@@ -678,8 +697,8 @@ for r = 1:length(options.regionstr)
             tmp = [tmp;polygoninize_regions(regin)];
     end
     
-    lat = [lat,{extra.center.lat}];
-    lon = [lon,{extra.center.lon}];
+    lat = [lat,{extra{1}.center.lat}];
+    lon = [lon,{extra{1}.center.lon}];
     
     
     for k = 1:length(tmp)
@@ -689,8 +708,8 @@ for r = 1:length(options.regionstr)
         
         i = i+1;
     end
-    text = [text,repmat({R},1,length(extra.center))];
-    textcolor = [textcolor,repmat(options.color(r),1,length(extra.center))];
+    text = [text,repmat({R},1,length(extra{1}.center))];
+    textcolor = [textcolor,repmat(options.color(r),1,length(extra{1}.center))];
     clear extra
 end
 

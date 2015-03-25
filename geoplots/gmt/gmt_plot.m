@@ -200,6 +200,8 @@ function filename = gmt_plot(in,field)
 %                              number of unique values if it exceeds it.
 %                      def:    false
 %                     ------------
+%  locations          See below how to plot locations on the map
+%                     ------------
 % in.nodata            in:     %f
 %                      ex:     If you only want a map (compatible with all options)
 %                      def:    false
@@ -389,9 +391,11 @@ function filename = gmt_plot(in,field)
 %                      ex:     Size of annotations in legend, e.g., '1c'=1cm
 %                      def:    '14p'
 %                     ------------
-%  box_spacing         in:     %f
-%                      ex:     Space between legend boxes
+%  box_spacing         in:     %f. It has to be a number, and it seems to be in inches
+%                      ex:     Space between legend boxes. 
 %                      def:    0 (side by side)
+%                      NOTE:   If you set a non-zero number you'll also get rid of
+%                              the color gradient, i.e. each box will have it's own color
 %                     ------------
 %  position            in:     %s
 %                      ex:     '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
@@ -408,8 +412,6 @@ function filename = gmt_plot(in,field)
 %                              Use negative value to reverse the legend.
 %                              See also width,xpos,ypos,orientation for legend
 %                      def:    '3.9i'
-%                     ------------
-%  locations          See below how to plot locations on the map
 %                     ------------
 %  orientation         in:     %s
 %                      ex:     If you want a horizontal/vertical legend input 'h'/'v'.
@@ -712,7 +714,7 @@ function filename = gmt_plot(in,field)
 
 if ~exist('field','var') && isfield(in,'data')
     field = 'data';
-elseif in.nodata
+elseif isfield(in,'nodata') && in.nodata
     field = '';
 end
 
@@ -806,7 +808,7 @@ default.keep_files       = false;            % keep intermediate files (debuggin
 default.proj.center      = 0;                % The center longitude of the map. The region has to be -180:180 (cyclic)
 default.proj.projection  = 'Q';              % Cylindrical Equidistant Projection.
 default.proj.map_width   = 20;
-default.proj_length_unit     = 'cm';             % Choose between cm, inch, m, and point.
+default.proj_length_unit = 'cm';             % Choose between cm, inch, m, and point.
 default.force_nlevels    = false;            % do not force, e.g. reduce if uniques are less
 default.nodata           = false;            % true if you only want the map
 default.outdir           = gmtlab('OUTDIR'); % where to put the figure
@@ -925,10 +927,10 @@ assert(diff(in.datarange)>0,'atmlab:badInput','min=max in the datarange. Abortin
 
 % COLORS & DATA REPRESENTATION
 default.ctable      = 'rainbow';          % color palette
-default.nlevels = get_nlevels(in.datarange);
+default.nlevels = get_nlevels(in);
 in = optargs_struct(in,default);
 clear default
-[default.stepsize,default.tick_annotation_format]    = getstepsize(in,field);    % color level datastep interval
+[default.stepsize,default.tick_annotation_format]    = getstepsize(in);    % color level datastep interval
 in = optargs_struct(in,default);
 clear default
 
@@ -937,7 +939,23 @@ in = setupLegend(in);
 
 end
 
-function nl = get_nlevels(dr)
+function nl = get_nlevels(in)
+
+des_nlev = 10; % desired levels
+minlev = 5; % minium levels
+
+dr = in.datarange;
+
+% Find out if there are less unique values than the desired number of layers
+uq = unique(in.(in.fieldname)(...
+    in.(in.fieldname)>=dr(1) & ...
+    in.(in.fieldname)<=dr(2) ...
+    ) );
+
+if uq<=des_nlev
+    nl = length(uq);
+    return
+end
 
 if diff(dr) > 1e4
     %logtext(1,'difference between min and max is more the 1e4. \n')
@@ -947,8 +965,7 @@ if diff(dr) > 1e4
 end
 % find a good number of countour levels
 
-des_nlev = 10; % desired levels
-minlev = 5; % minium levels
+
 
 rsbl = false;
 for fc = [1,10,100,1000,1000]
@@ -976,7 +993,7 @@ end
 if nl < minlev
     % recursive until found the acceptable levels
     dr = dr*2;
-    nl = get_nlevels(dr);
+    nl = get_nlevels(in);
 end
 end
 
@@ -1134,21 +1151,13 @@ datarange = [10^(round(x)-1) * round(d(1) * (1/10^(round(x)-1))),...
 
 end
 
-function [stepsize,annot_format] = getstepsize(in,field)
+function [stepsize,annot_format] = getstepsize(in)
 %% getstepsize
 
 if in.nodata
     stepsize = 0;
     annot_format='';
     return
-end
-
-% default number of levels
-if length(unique(in.(field)))<in.nlevels && ~in.force_nlevels
-    logtext(atmlab('OUT'),'unique values < %d\n',in.nlevels)
-    in.nlevels = length(unique(in.(field)));
-    logtext(atmlab('OUT'),'setting in.nlevels =  length(unique(in.(field)) (%d)\n',...
-        length(unique(in.(field))))
 end
 
 if isfield(in,'stepsize')

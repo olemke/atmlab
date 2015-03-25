@@ -1,21 +1,21 @@
 function [corners,extra] = getPredefinedRegions(regionstr)
 % GETPREDEFINEDRREGIONS Returns lat/lon corner values of predefined regions
 %
-% IN:    <none>        If nothing is input the list of currently available 
+% IN:    <none>        If nothing is input the list of currently available
 %                      regions are shown. Build on this list in
-%                      retrieve_reginfo.m if you want other regions 
+%                      retrieve_reginfo.m if you want other regions
 %        regionstr     {'%s'} Use one or more regions listed in retrieve_reginfo.m
 %
 % OUT: corners = [blcorner,trcorner;blcorner,trcorner]
-%      extra   = structure contianing extra information about the regions 
+%      extra   = structure contianing extra information about the regions
 %               1) extra.center = center of the region (e.g. for plotting region labels)
-%               2) extra.area   = normalised are of the region [0-1], where 1=global 
+%               2) extra.area   = normalised are of the region [0-1], where 1=global
 %               3) extra.longname = a string of the longname of the regions.
 %
 % NOTE:
 % - Regions, including all of the AR4 IPCC regions (ch 11), can be chosen
 %   from the set of regions (see list below). The code defining the regions
-%   is in the subfunction (retrieve_reginfo) to this function. 
+%   is in the subfunction (retrieve_reginfo) to this function.
 %
 % current LIST of regions:
 %    - Make sure to update this list if you add a region to the subfunction!!
@@ -35,7 +35,7 @@ function [corners,extra] = getPredefinedRegions(regionstr)
 %
 % Created by Salomon Eliasson
 % $Id$
-    
+
 if ~nargin
     corners       = retrieve_reginfo('list');
     fn            = fieldnames(corners);
@@ -57,26 +57,13 @@ k=1;
 corners       = zeros(100*length(regionstr),4);
 
 for i = 1:length(regionstr) % loop over regionstrings
-
-    % I don't know what is going on here
-%     test = regexp(regionstr,'/');
-%     if length(test{1})==3
-%         x            = sscanf(regionstr{1},'%f/%f/%f/%f');
-%         corners(i,1) = x(3); 
-%         corners(i,2) = x(1); 
-%         corners(i,3) = x(4);
-%         corners(i,4) = x(2);
-%         longname{i} = '';
-%         k = k+1;
-%         continue
-%     end
     
     if ~ismember(regionstr{i},Allregions)
         disp(Allregions)
         error('atmlab:predefinedRegions:notFound','region: %s is not in list',regionstr{i})
-
+        
     end
-    [blcorner,trcorner,extra]=retrieve_reginfo(regionstr{i});
+    [blcorner,trcorner,extra{i}]=retrieve_reginfo(regionstr{i});
     len = size(blcorner,1);
     
     corners(k:k+len-1,1:2) = blcorner;
@@ -114,10 +101,10 @@ k = 1;
 assert(nargin==1,'atmlab:retrieve_reginfo:badInput','needs input')
 if strcmp(regionstr,'list')
     % Make sure to update this list if you add a region!!
-
+    
     for A = Allregions
         [blcorner,trcorner,extra]=retrieve_reginfo(A{1});
-
+        
         Allreg.(A{1}).extra  = extra;
         Allreg.(A{1}).corners   = [blcorner, trcorner];
     end
@@ -199,9 +186,9 @@ switch lower(regionstr)
         blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-13,12.5];
         blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-12.5,13];
         blcorner(end+1,1:2) = [trcorner(end,1),  w]; trcorner(end+1,1:2) = [-10,13.5];
-
+        
         extra.center =  struct('lat',-20,'lon',0);
-    
+        
     case 'sc_regs'
         % this is both seadz and sepdz merged
         extra.longname ='Stratocumulus regions';
@@ -291,17 +278,17 @@ switch lower(regionstr)
                 blcorner = [-12,22]; trcorner = [18,52];
             case 'saf'
                 extra.longname ='South Africa';
-%                 disp('WARNING: hard-coded bounding corners dont ')
-%                 disp('         correspond to those on p856 in AR4 IPCC rapport')
-%                 disp('         and have been adjusted to figure 11.26 p923')
-%                 disp('i.e. 35S,10E - 12S,52E has been adjusted to 35S,-10E - 12S,52E')
+                %                 disp('WARNING: hard-coded bounding corners dont ')
+                %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
+                %                 disp('         and have been adjusted to figure 11.26 p923')
+                %                 disp('i.e. 35S,10E - 12S,52E has been adjusted to 35S,-10E - 12S,52E')
                 blcorner = [-35,-10]; trcorner = [-12,52];
             case 'sah'
                 extra.longname ='Sahara';
-%                 disp('WARNING: hard-coded bounding corners dont ')
-%                 disp('         correspond to those on p856 in AR4 IPCC rapport')
-%                 disp('         and have been adjusted to figure 11.26 p923')
-%                 disp('i.e. 18N,20E - 30N,65E has been adjusted to 18N,20W - 30N,65E')
+                %                 disp('WARNING: hard-coded bounding corners dont ')
+                %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
+                %                 disp('         and have been adjusted to figure 11.26 p923')
+                %                 disp('i.e. 18N,20E - 30N,65E has been adjusted to 18N,20W - 30N,65E')
                 blcorner = [18,-20]; trcorner = [30,65];
                 
                 %Europe
@@ -321,10 +308,10 @@ switch lower(regionstr)
                 blcorner = [30,40]; trcorner = [50,75];
             case 'tib'
                 extra.longname ='Tibetan Plateau';
-%                 disp('WARNING: hard-coded bounding corners dont ')
-%                 disp('         correspond to those on p856 in AR4 IPCC rapport')
-%                 disp('         and have been adjusted to figure 11.26 p923')
-%                 disp('i.e. 30N,50E - 75N,100E has been adjusted to 30N,75E - 50N,100E')
+                %                 disp('WARNING: hard-coded bounding corners dont ')
+                %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
+                %                 disp('         and have been adjusted to figure 11.26 p923')
+                %                 disp('i.e. 30N,50E - 75N,100E has been adjusted to 30N,75E - 50N,100E')
                 blcorner = [30,75]; trcorner = [50,100];
             case 'eas'
                 extra.longname ='East Asia';
@@ -337,9 +324,9 @@ switch lower(regionstr)
                 blcorner = [5,64]; trcorner = [30,100];
             case 'sea'
                 extra.longname ='South East Asia';
-%                 disp('         correspond to those on p856 in AR4 IPCC rapport')
-%                 disp('         and have been adjusted to figure 11.26 p923')
-%                 disp('i.e. 11S,95E - 20N,115E has been adjusted to 11S,95E - 20N,')
+                %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
+                %                 disp('         and have been adjusted to figure 11.26 p923')
+                %                 disp('i.e. 11S,95E - 20N,115E has been adjusted to 11S,95E - 20N,')
                 blcorner = [-11,95]; trcorner = [20,155];
                 
                 % North America
@@ -351,20 +338,20 @@ switch lower(regionstr)
                 blcorner = [50,-103]; trcorner = [85,-10];
             case 'wna'
                 extra.longname ='Western North America';
-%                 disp('WARNING: hard-coded bounding corners dont ')
-%                 disp('         correspond to those on p856 in AR4 IPCC rapport')
-%                 disp('         and have been adjusted to figure 11.26 p923')
-%                 disp('i.e. 30N,50E - 75N,100E has been adjusted to 30N,130W - 60N,103W')
+                %                 disp('WARNING: hard-coded bounding corners dont ')
+                %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
+                %                 disp('         and have been adjusted to figure 11.26 p923')
+                %                 disp('i.e. 30N,50E - 75N,100E has been adjusted to 30N,130W - 60N,103W')
                 blcorner = [30,-130]; trcorner = [60,-103];
             case 'cna'
                 extra.longname ='Central North America';
                 blcorner = [30,-103]; trcorner = [50,-85];
             case 'ena'
                 extra.longname ='Eastern North America';
-%                 disp('WARNING: hard-coded bounding corners dont ')
-%                 disp('         correspond to those on p856 in AR4 IPCC rapport')
-%                 disp('         and have been adjusted to figure 11.26 p923')
-%                 disp('i.e. 25N,85W - 50N,50W has been adjusted to 25N,85W - 50N,60W')
+                %                 disp('WARNING: hard-coded bounding corners dont ')
+                %                 disp('         correspond to those on p856 in AR4 IPCC rapport')
+                %                 disp('         and have been adjusted to figure 11.26 p923')
+                %                 disp('i.e. 25N,85W - 50N,50W has been adjusted to 25N,85W - 50N,60W')
                 blcorner = [25,-85]; trcorner = [50,-60];
                 % Central and South America
             case 'cam'
@@ -418,11 +405,20 @@ if ~exist('x','var')
     corner = zeros(size(blcorner,1),4);
     corner(:,1:2) = blcorner;
     corner(:,3:4) = trcorner;
-    extra.area = find_regionArea(regionstr,corner);
+    % get the area and mask
+    [extra.area,extra.mask] = find_regionArea(corner);
     extra.shortname = regionstr;
 else
     % In that case it is an assembled regionstr
+
+    extra.shortname=regionstr;
+    extra.area = sum([x.area]);
+    extra.mask.lat = x(1).mask.lat;
+    extra.mask.lon = x(1).mask.lon;
+    extra.mask.mask = false(length(extra.mask.lon),length(extra.mask.lat));
     for i = 1:length(x)
+        extra.mask.mask = extra.mask.mask | x(i).mask.mask;
+        
         L=length(x(i).center);
         extra.center(k:k+L-1)   = x(i).center;
         extra.partial_area(i)   = x(i).area;
@@ -430,8 +426,6 @@ else
         extra.partial_region_short{i} = x(i).shortname;
         k = k+L;
     end
-    extra.area = sum([x.area]);
-    extra.shortname=regionstr;
 end
 clear x
 
@@ -447,16 +441,28 @@ Allregions = {'global','tropics','boreal_trop','austral_trop',...
 
 end
 
-function area = find_regionArea(reg,corner)
+function [area,mask] = find_regionArea(corner)
 
-% USE an high density matrix of latidude weights
-filename = sprintf('~/Dropbox/workSalomon/matlab/SalomonsCodes/data/Predefind_regions_%s',reg);
-if exist(filename,'file')
-else
-lat=-90:.1:90;
-lon=-180:.1:180;
+% Find the area of the region in relation to the Earth. Also, provide a region
+% mask easy to apply to data in order to single out a region
+%
+%
+
+step = .1; %deg
+lat =-90+step:step:90-step;
+lon =-180+step:step:180-step;
+mask = true(length(lon),length(lat));
+
+mask = regionize(mask,lat,lon,corner,struct('maskwith',false,'trim',0));
+
 latweights=repmat(cosd(lat),length(lon),1);
-[regweights] = regionize(latweights,lat,lon,corner);
+regweights = latweights(mask);
 area = nansum(regweights(:))/sum(latweights(:));
-end
+
+tmp = mask;
+clear mask
+mask.lat = lat;
+mask.lon = lon;
+mask.mask = tmp;
+
 end

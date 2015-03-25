@@ -314,6 +314,10 @@ if isfield(in,'tickval')
 end
 
 % generate cpt files
+%
+% Using makecpt it is not possible to append tick_annotations here. This has to
+% be done at a later step on an existing cpt-file
+%
 switch in.ctable.name
     case 'mypolar'
         if ~isfield(in,'tickval')
@@ -326,8 +330,6 @@ switch in.ctable.name
         if isfield(in.colorrange,'colors')
             cpt_from_colorrange(in.colorrange);
             in.cptfile = makecpt(in);
-        elseif isfield(in.colorrange,'discrete_colors')
-            in.cptfile = cpt_discrete_colors(in);
         end
         
     otherwise
@@ -368,13 +370,7 @@ a = in.legend;
 % structure where they really belong
 F = {'xunit','unit','cptfile','plotPlacement'};
 for f = F(ismember(F,fieldnames(in)))
-    %     switch f{1}
-    %         case {'unit','xunit'}
-    %             a.(f{1}) = gmt_unicode_converter(in.(f{1}));
-    %         otherwise
-    %             a.(f{1}) = in.(f{1});
-    %     end
-    
+
     a.(f{1}) = in.(f{1});
 end
 
@@ -410,6 +406,8 @@ if isfield(in,'extra_legend') && isstruct(in.extra_legend)
 end
 
 if isfield(in.legend,'tick_annotations')
+    assert(in.nlevels == length(in.legend.tick_annotations),...
+    ['gmtlab:' mfilename ':input'],'Number of annotations must match number of ticks')
     append_tickannotations(in.cptfile,in.legend.tick_annotations);
 end
 if ~exist('b','var'), b = struct([]);end

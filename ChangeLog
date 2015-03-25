@@ -1,4 +1,23 @@
-2015-03-17  Salomon Eliasson  <seliasson@ManUtd>
+2015-03-25  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-76
+
+	* geoplots/gmt/test_gmt.m: Fixed som bugs and added a test
+
+	* geoplots/gmt/makepolar.m: Corrected an error message
+
+	* geoplots/gmt/gmt_plot.m: Fixed a bug in deciding the number of
+	levels. Clarified some help on legends
+
+	* geoplots/gmt/create_gmt_earth.m: Added a comment
+
+	* geoplots/gmt/append_tickannotations.m: Fixed a bug
+
+	* geographical/regionize.m: Fixed bug that was changing the datatype of the output data
+
+	* geographical/getPredefinedRegions.m: Now also making a logical mask for each region
+
+2015-03-23  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-75
 

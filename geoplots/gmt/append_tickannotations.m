@@ -15,16 +15,15 @@ function file = append_tickannotations(file,annotations)
 
 % READ OLD FILE
 fid = fopen(file);
-out=cell(1,length(annotations));
-for i = 1:length(annotations)
+s = 0; i =1;
+out = cell(1,10);
+while s ~= -1
     s=fgetl(fid);
     out{i}=s;
+    i = i+1;
 end
 fclose(fid);
-
-% CHECK INPUT
-assert(sum(~cellfun('isempty', regexp(out,'^[-+]?[0-9]*\.?[0-9]+'))) == length(annotations),...
-    ['gmtlab:' mfilename ':input'],'Number of annotations must match number of ticks')
+out = out(1:i-2);
 
 fid = fopen(file,'w'); x = 1;
 for i = 1:length(out)

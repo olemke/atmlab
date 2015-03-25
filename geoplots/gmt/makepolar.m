@@ -29,7 +29,7 @@ while x < 0
     b = b+1;
     x = x*10^b;
 end
-prtstr=sprintf('%%g',b); % Don't change this!
+prtstr=sprintf('%%g',b); %#ok<CTPCT> % Don't change this!
 strtot = strcat(prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\t',...
     prtstr,'\t','%3.0f','\t','%3.0f','\t','%3.0f','\n');
 
@@ -133,7 +133,7 @@ else
 end
 
 assert(nw<length(tickval)-1,...
-    ['gmtlab:' mfilename ':input'],'number of white boxes (%g) exceedes nlevels (%g)',...
+    ['gmtlab:' mfilename ':input'],'number of white boxes (%g) exceedes nlevels (%g) -1',...
     nw,length(tickval)-1)
 
 
