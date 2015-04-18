@@ -103,6 +103,11 @@ if nargin == 1
     %
     S = { 'Generl', 'SensorSave', 'CloseF' };
    
+  case 'iy'
+    %
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'JacobiSave', ...
+          'CldBox', 'SctMth', 'RteExe', 'CloseF' };
+
   case 'y_init'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'SensorSave', ...
@@ -778,10 +783,11 @@ function T = cfile_RteExe( Q, partname, workfolder )
   end
   %
   T{end+1} = add_savefile( 'y',       workfolder );
-%  T{end+1} = add_savefile( 'y_f',     workfolder );
-%  T{end+1} = add_savefile( 'y_pol',   workfolder );
-%  T{end+1} = add_savefile( 'y_pos',   workfolder );
-%  T{end+1} = add_savefile( 'y_los',   workfolder );
+  T{end+1} = add_savefile( 'y_f',     workfolder );
+  T{end+1} = add_savefile( 'y_pol',   workfolder );
+  T{end+1} = add_savefile( 'y_pos',   workfolder );
+  T{end+1} = add_savefile( 'y_los',   workfolder );
+  T{end+1} = add_savefile( 'y_geo',   workfolder );
   T{end+1} = add_savefile( 'y_aux',   workfolder );
   %
   if qarts_isset( Q.J_DO ) 
@@ -1614,11 +1620,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     %
     T = add_agenda( T, 'doit_mono_agenda', { ...
            'DoitScatteringDataPrepare', ...
-           sprintf( 'doit_i_fieldSetClearsky(all_frequencies=%d)', ...
-                                               Q.CLOUDBOX.METHOD_PRMTRS.ALL_F ); 
-           'doit_i_fieldIterate',...
-           'DoitCloudboxFieldPut' } ...
-    );
+           'doit_i_field_monoIterate' } );
     %
     T = add_agenda( T, 'pha_mat_spt_agenda', { ...
         'pha_mat_sptFromDataDOITOpt' } );
@@ -1645,13 +1647,13 @@ function T = cfile_SctMth( Q, partname, workfolder )
          sprintf( 'doit_conv_flagAbsBT(epsilon=[%s])', ...
          vector2commalist(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON(1:Q.STOKES_DIM))) ...
         } );
-    T = add_agenda( T, 'iy_cloudbox_agenda', { 'Ignore(rtp_pos)', ...
-                       'Ignore(rtp_los)', 'iyInterpCloudboxField' } );
-
+    T = add_agenda( T, 'iy_cloudbox_agenda', { 'iyInterpCloudboxField' } );
+    %
     if ~strcmp( partname, 'SctMthBatch' )
-      T{end+1} = 'sensor_checkedCalc';
       T{end+1} = 'DoitInit';
       T{end+1} = 'DoitGetIncoming';
+      T{end+1} = sprintf( 'doit_i_fieldSetClearsky(all_frequencies=%d)', ...
+                                               Q.CLOUDBOX.METHOD_PRMTRS.ALL_F ); 
       T{end+1} = 'DoitCalc';
     end
     

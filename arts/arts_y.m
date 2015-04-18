@@ -6,7 +6,7 @@
 %    active selection through J_DO. Otherwise NaN is returned.
 %    variables.
 %
-% FORMAT   [y,y_aux,J,jq,ji] = arts_y( Q [, workfolder] )
+% FORMAT   [y,y_aux,J,jq,ji,y_geo,y_f,y_pol,y_pos,y_los] = arts_y( Q [, workfolder] )
 %        
 % OUT   y            Spectrum vector.
 %       y_aux        Auxilary data (see *y_aux*).
@@ -14,6 +14,11 @@
 %       jq           Jacobian quantities. NaN returned if Q.J not defined.
 %       ji           Jacobian indices. NaN returned if Q.J not defined.
 %                    Indices are 1-based (that is, ARTS indices + 1);
+%       y_geo        As the WSV with the same name.
+%       y_f          As the WSV with the same name.
+%       y_pol        As the WSV with the same name.
+%       y_pos        As the WSV with the same name.
+%       y_los        As the WSV with the same name.
 % IN    Q            Qarts structure.
 % OPT   workfolder   If not defined or empty, a temporary folder is created.
 %                    Otherwise this is interpreted as the path to a folder 
@@ -24,7 +29,7 @@
 
 % 2004-09-17   Created by Patrick Eriksson.
 
-function [y,y_aux,J,jq,ji] = arts_y( Q, workfolder )
+function [y,y_aux,J,jq,ji,y_geo,y_f,y_pol,y_pos,y_los] = arts_y( Q, workfolder )
 %
 if nargin < 2, workfolder = []; end
 %
@@ -64,15 +69,13 @@ arts( cfile );
 
 
 %- Load data
-
-  
+% 
 y = xmlLoad( fullfile( workfolder, 'y.xml' ) );
-
-
+%
 if nargout >= 2
   y_aux = xmlLoad( fullfile( workfolder, 'y_aux.xml' ) );
 end
-
+%
 if nargout >= 3  & qarts_isset( Q.J_DO ) &  Q.J_DO
   %
   J = xmlLoad( fullfile( workfolder, 'jacobian.xml' ) );
@@ -87,6 +90,24 @@ if nargout >= 3  & qarts_isset( Q.J_DO ) &  Q.J_DO
     end
   end
 end
+%
+if nargout >= 6
+  y_geo = xmlLoad( fullfile( workfolder, 'y_geo.xml' ) );
 
+  if nargout >= 7
+    y_f = xmlLoad( fullfile( workfolder, 'y_f.xml' ) );
+  
+    if nargout >= 8
+      y_pol = xmlLoad( fullfile( workfolder, 'y_pol.xml' ) );
+      
+      if nargout >= 9
+        y_pos = xmlLoad( fullfile( workfolder, 'y_pos.xml' ) );
 
-
+        if nargout >= 10
+          y_los = xmlLoad( fullfile( workfolder, 'y_los.xml' ) );
+        
+        end
+      end
+    end
+  end
+end

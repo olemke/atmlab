@@ -227,7 +227,7 @@ elseif strcmp( lower(method), 'doit' )
                                                            'doit_za_grid.xml');
   C.METHOD_PRMTRS.EPSILON         = [ 0.1 0.01 0.01 0.01 ];
   C.METHOD_PRMTRS.SCAT_ZA_INTERP  = 'polynomial';
-  C.METHOD_PRMTRS.ALL_F           = false;
+  C.METHOD_PRMTRS.ALL_F           = true;
   %
   C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
                                                            'abs_vecAddPart' };

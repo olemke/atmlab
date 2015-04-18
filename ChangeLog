@@ -1,3 +1,18 @@
+2015-04-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-76
+
+	* Qarts updated to changes in ARTS around DOIT.
+
+	* arts/qarts2cfile.m: Several changes in DOIT part.
+
+	* demos/qarts_scattering_demo.m (qarts_scattering_demo):
+	C.METHOD_PRMTRS.ALL_F  changed to true, could not false to work.
+	Jana emailed about it.
+
+	* tests/make_check_qarts.m (make_check_qarts): Updated target for
+	DOIT test.
+
 2015-03-25  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-76

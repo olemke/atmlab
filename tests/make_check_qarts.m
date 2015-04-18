@@ -113,14 +113,14 @@ end
 
 %= Qarts with DOIT
 %
-y0 = [ 152.78 -0.21 ];
+y0 = [ 153.30 -0.21 ];
 dy = 1e-2;
 %
 try
   [Q,f,ztan,y_c,y] = qarts_scattering_demo( [], 'doit' );
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_scatting_demo* ===\n\n');
+  fprintf('\n=== Error while running *qarts_scattering_demo* ===\n\n');
   rethrow(lasterror);
 end
 %

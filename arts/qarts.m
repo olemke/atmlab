@@ -654,6 +654,16 @@ I.REFR_INDEX_AIR_AGENDA = [ ...
 'As the arts WSV with the same name. WSMs are listed as an array of strings.'
 ];
 %-----------------------------------------------------------------------------
+Q.RTE_LOS = {};
+I.RTE_LOS = [ ...
+'As the arts WSV with the same name.'
+];
+%-----------------------------------------------------------------------------
+Q.RTE_POS = {};
+I.RTE_POS = [ ...
+'As the arts WSV with the same name.'
+];
+%-----------------------------------------------------------------------------
 Q.SENSOR_DO = {};
 I.SENSOR_DO = [ ...
 'Boolean to include sensor characteristics. Otherwise monochromatic pencil ',...
