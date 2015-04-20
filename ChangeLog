@@ -1,3 +1,19 @@
+2015-04-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-77
+
+	* Added functionality to easier make use of iyCalc. Ise arts_iy
+	for this. And a small revision of arts_y.m.
+
+	* arts/arts_iy.m: New function.
+
+	* demos/qarts_iy_demo.m: New demo script.
+
+	* arts/arts_y.m (arts_y): Added y_geo, y_f, y_pol, y_pos and y_los
+	as output arguments.
+
+	* arts/qarts.m (qarts): Added RTE_POS, RTE_POS2 and RTS_LOS.
+
 2015-04-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-76

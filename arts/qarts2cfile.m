@@ -105,8 +105,8 @@ if nargin == 1
    
   case 'iy'
     %
-    S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'JacobiSave', ...
-          'CldBox', 'SctMth', 'RteExe', 'CloseF' };
+    S = { 'Generl', 'AtmSrf', 'Absrpt', 'PbcSet', ...
+          'CldBox', 'SctMth', 'PbcExe', 'CloseF' };
 
   case 'y_init'
     %
@@ -192,6 +192,14 @@ for ip = 1 : length(parts)
     %
     T = cfile_RteExe( Q, parts{ip}, workfolder );
 
+   case 'PbcSet'
+    %
+    T = cfile_PbcSet( Q, parts{ip}, workfolder );
+   
+   case 'PbcExe'
+    %
+    T = cfile_PbcExe( Q, parts{ip}, workfolder );
+    
    case 'BatchC'
     %
     T = cfile_BatchC( Q, parts{ip}, workfolder );
@@ -796,6 +804,122 @@ function T = cfile_RteExe( Q, partname, workfolder )
       T{end+1} = add_savefile( 'jacobian', workfolder );
     end
   end
+return
+
+
+
+%------------------------------------------------------------------------------
+% Sub-function handling:
+%
+%    blackbody_radiation_agenda
+%    surface_rtprop_agenda
+%    iy_surface_agenda
+%    iy_space_agenda
+%    iy_transmitter_agenda
+%    ppath_lmax
+%    ppath_lraytrace
+%    ppath_step_agenda
+%    refr_index_air__agenda
+%    rte_agenda
+%    rte_pos
+%    rte_pos2
+%    rte_los
+%
+function T = cfile_PbcSet( Q, partname, workfolder )
+  %                                                                         %&%
+  if ~strcmp( partname, 'PbcSet' )                                          %&%
+    error( 'Only recognised choices is ''PbcSet''.' );                      %&%
+  end                                                                       %&%
+  %
+  T = {};
+  %
+  if qarts_isset( Q.BLACKBODY_RADIATION_AGENDA )
+    T = add_agenda( T, 'blackbody_radiation_agenda', ...
+                                                Q.BLACKBODY_RADIATION_AGENDA );
+  end    
+  if qarts_isset( Q.SURFACE_RTPROP_AGENDA )
+    T = add_agenda( T, 'surface_rtprop_agenda', Q.SURFACE_RTPROP_AGENDA );
+  end
+  if qarts_isset( Q.IY_SURFACE_AGENDA )
+    T = add_agenda( T, 'iy_surface_agenda', Q.IY_SURFACE_AGENDA );
+  end
+  if qarts_isset( Q.IY_SPACE_AGENDA )
+    T = add_agenda( T, 'iy_space_agenda', Q.IY_SPACE_AGENDA );
+  end
+  if qarts_isset( Q.IY_TRANSMITTER_AGENDA )
+    T = add_agenda( T, 'iy_transmitter_agenda', Q.IY_TRANSMITTER_AGENDA );
+  end
+  if qarts_isset( Q.PPATH_LMAX )
+    rqre_datatype( Q.PPATH_LMAX, @istensor0, 'Q.PPATH_LMAX' );              %&%
+    T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
+  end  
+  if qarts_isset( Q.PPATH_LRAYTRACE )
+    rqre_datatype( Q.PPATH_LRAYTRACE, @istensor0, 'Q.PPATH_LRAYTRACE' );    %&%
+    T{end+1} = sprintf( 'NumericSet( ppath_lraytrace, %.2e )', ...
+                                                       Q.PPATH_LRAYTRACE );
+  end  
+  if qarts_isset( Q.PPATH_AGENDA )
+    T = add_agenda( T, 'ppath_agenda', Q.PPATH_AGENDA );
+  end
+  if qarts_isset( Q.PPATH_STEP_AGENDA )
+    T = add_agenda( T, 'ppath_step_agenda', Q.PPATH_STEP_AGENDA );
+  end
+  if qarts_isset( Q.REFR_INDEX_AIR_AGENDA )
+    T = add_agenda( T, 'refr_index_air_agenda', Q.REFR_INDEX_AIR_AGENDA );
+  end
+  if qarts_isset( Q.RTE_POS )
+    T = file_or_data( T, 'rte_pos', 'Vector', Q.RTE_POS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.RTE_POS2 )
+    T = file_or_data( T, 'rte_pos2', 'Vector', Q.RTE_POS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.RTE_LOS )
+    T = file_or_data( T, 'rte_los', 'Vector', Q.RTE_LOS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.IY_MAIN_AGENDA )
+    T = add_agenda( T, 'iy_main_agenda', Q.IY_MAIN_AGENDA );
+  end
+  if qarts_isset( Q.IY_SUB_AGENDA )
+    T = add_agenda( T, 'iy_sub_agenda', Q.IY_SUB_AGENDA );
+  end
+  if qarts_isset( Q.IY_AUX_VARS )
+    T = file_or_data( T, 'iy_aux_vars', 'ArrayOfString', Q.IY_AUX_VARS,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
+  if qarts_isset( Q.IY_UNIT )
+    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );                       %&%
+    T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
+  end
+  %
+return
+
+
+
+% Sub-function handling:
+%
+%    iy
+%    iy_aux
+%    ppath
+%
+function T = cfile_PbcExe( Q, partname, workfolder )
+  %                                                                         %&%
+  if ~strcmp( partname, 'PbcExe' )                                          %&%
+    error( 'Only recognised choice is ''PbcExe''.' );                       %&%
+  end                                                                       %&%
+  %
+  T = add_rtecalcstart( Q );
+  T{end+1} = 'jacobianOff';
+  %
+  if qarts_isset( Q.YCALC_WSMS )
+    T = add_wsms( T, 'YCALC_WSMS', Q.YCALC_WSMS, Q );
+  end
+  %
+  T{end+1} = add_savefile( 'iy',       workfolder );
+  T{end+1} = add_savefile( 'iy_aux',   workfolder );
+  T{end+1} = add_savefile( 'ppath',    workfolder );
 return
 
 

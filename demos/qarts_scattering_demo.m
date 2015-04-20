@@ -131,7 +131,7 @@ Q                     = qarts_abstable( Q );
 
 %= Set RTE variables
 %
-Q.YCALC_WSMS          = { 'sensor_checkedCalc','yCalc' };
+Q.YCALC_WSMS          = { 'yCalc' };
 %
 Q.PPATH_LMAX          = 5e3/max([1,6*iwcfac]);
 Q.PPATH_LRAYTRACE     = Q.PPATH_LMAX;

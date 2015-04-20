@@ -41,7 +41,7 @@ end
 
 %- Default output
 %
-[y_aux,J,jq,ji] = deal( NaN );
+[J,jq,ji] = deal( NaN );
 
 
 %- Create workfolder?
