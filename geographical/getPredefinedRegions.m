@@ -96,6 +96,7 @@ function [blcorner,trcorner,extra]=retrieve_reginfo(regionstr)
 
 extra.center =  struct('lat',[],'lon',[]);
 extra.area   = 0;
+extra.riktigArea   = 0;
 k = 1;
 
 assert(nargin==1,'atmlab:retrieve_reginfo:badInput','needs input')
@@ -405,13 +406,15 @@ if ~exist('x','var')
     corner = zeros(size(blcorner,1),4);
     corner(:,1:2) = blcorner;
     corner(:,3:4) = trcorner;
+    
     % get the area and mask
-    [extra.area,extra.mask] = find_regionArea(corner);
+    [extra.riktigArea,extra.area,extra.mask] = find_regionArea(corner,regionstr);
     extra.shortname = regionstr;
 else
     % In that case it is an assembled regionstr
-
+    
     extra.shortname=regionstr;
+    extra.riktigArea = sum([x.riktigArea]);
     extra.area = sum([x.area]);
     extra.mask.lat = x(1).mask.lat;
     extra.mask.lon = x(1).mask.lon;
@@ -421,6 +424,7 @@ else
         
         L=length(x(i).center);
         extra.center(k:k+L-1)   = x(i).center;
+        extra.partial_riktigArea(i)   = x(i).riktigArea;
         extra.partial_area(i)   = x(i).area;
         extra.partial_region{i} = x(i).longname;
         extra.partial_region_short{i} = x(i).shortname;
@@ -441,24 +445,36 @@ Allregions = {'global','tropics','boreal_trop','austral_trop',...
 
 end
 
-function [area,mask] = find_regionArea(corner)
+function [latWeightedArea,area,mask] = find_regionArea(corner,regstr)
 
 % Find the area of the region in relation to the Earth. Also, provide a region
 % mask easy to apply to data in order to single out a region
 %
-%
+% latWeightedArea  = is the actual fractional area of the region
+% area = is the area of the region if the world is flat (i.e., not taking
+% latitudes into account)
 
 step = .1; %deg
 lat =-90+step:step:90-step;
 lon =-180+step:step:180-step;
 mask = true(length(lon),length(lat));
 
+if strcmp(regstr,'global')
+    clear mask
+    mask.lat=lat;
+    mask.lon=lon;
+    mask.data=true(length(lon),length(lat));
+    latWeightedArea=1;
+    area=1;
+    return
+end
+
 mask = regionize(mask,lat,lon,corner,struct('maskwith',false,'trim',0));
 
 latweights=repmat(cosd(lat),length(lon),1);
 regweights = latweights(mask);
-area = nansum(regweights(:))/sum(latweights(:));
-
+latWeightedArea = nansum(regweights(:))/sum(latweights(:));
+area = sum(mask(:))/sum(~mask(:));
 tmp = mask;
 clear mask
 mask.lat = lat;

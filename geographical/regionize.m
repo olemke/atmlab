@@ -230,9 +230,15 @@ end
 assert(isequal(a(1:2),[length(lat),length(lon)]) || isequal(a(1:2),[length(lon),length(lat)]),...
     errID,'Incorrect size dimensions of lat, lon, data')
 
-
+options.dimorder    = 'latlon';
+options.lat_descend = false;
+options.lon_descend = false;
+options.lon360      = false; % because regions are often described in -180:180
 % make sure conventions are followed
-[flags,outlat,outlon,outdata] = standardize_geodata(lat(:),lon(:),data);
+[flags,tmp] = standardize_geodata(struct('lat',lat(:),'lon',lon(:),'data',data),options);
+outlat = tmp.lat;
+outlon = tmp.lon;
+outdata = tmp.data;
 
 function [logical_field,periphery] = get_logicalfield(in,corner,dlt,dln,opt)
 %% get_logicalfield
@@ -353,7 +359,7 @@ if flags.lon360
     data    = data(:,lnindex,:);
     if w; weights = weights(:,lnindex);end
 end
-%
+
 if flags.lon_descend
     [lon,lnindex]  = sort(lon,'descend');
     data = data(:,lnindex,:);
@@ -368,7 +374,7 @@ if flags.lat_descend
 end
 
 % If orig data was data(lon,lat,...), Permute BACK
-if flags.permute
+if strcmp(flags.dimorder,'lonlat')
     data = permute(data,[2,1,3]);
     if w; weights = permute(weights,[2,1]); end
 end

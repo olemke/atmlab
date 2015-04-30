@@ -1,3 +1,49 @@
+2015-04-30  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-78
+
+	* geographical/getPredefinedRegions.m: Small edit
+
+	* geographical/standardize_geodata.m:
+
+	- Made way more flexible. Before the output data was organised
+	according to certain rules. Now that is only the default and the
+	user can pass the data through and decide how the data should be
+	formatted.
+
+	1) You can decide if you want the data ordered as (lat,lon,....) or (lon,lat,....)
+	2) have ascending or descending latitudes or not
+	3) whether to have the data in the longitude regime 0:360 or -180:180
+
+	* geographical/regionize.m:
+	* geographical/resample_geodata.m:
+	* geographical/geo_single_localtime.m:
+
+	- Adapted to new standardize_geodata
+
+	* geoplots/gmt/create_gmt_earth.m:
+
+	- Fixed serious bug if data was not global and in.center was
+	defined not near the center of the longitude range.
+
+	- Fixed other smaller bugs
+
+	* geoplots/gmt/gmt_inputs.m: Added option in.nearneighbor.memGb
+	which allows you to set/limit the amount of RAM used to generate
+	the plot. only relevant for very large data amounts
+
+	* geoplots/gmt/gmt_plot.m: Fixed bug in picking the best default
+	number of levels and bug in defining regions
+
+	* geoplots/gmt/grdimage.m: Fixed bug in -n option
+
+	* geoplots/gmt/test_gmt.m: Small updates
+
+	* handy/combine_pdfs.m: Fixed numerous bugs and made more stable
+
+	* handy/list_colors.m: Added way more colors derived from a list
+	of colors on some webpage
+
 2015-04-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-77

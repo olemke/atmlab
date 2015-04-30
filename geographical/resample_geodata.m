@@ -83,7 +83,11 @@ sz                                  = check_input(in,field,newgrid,errID);
 [newlat,newlon]                     = assemble_newgrid(in.lat,in.lon,newgrid,errID);
 
 % STANDARDIZE "new grid" internally
-[rg_flags,newlat,newlon]            = standardize_geodata(newlat,newlon);
+gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false);
+[rg_flags,tmp]            = standardize_geodata(struct('lat',newlat,'lon',newlon),gridoptions);
+newlat=tmp.lat;
+newlon=tmp.lon;
+clear tmp
 
 % LEAVE function if nothing needs to be done
 if isequal(in.lat(:),newlat(:)) && isequal(in.lon(:),newlon(:))
@@ -124,12 +128,16 @@ for F = field
     data = in.(F{1})(:,:,:);
     
     % STANDARDIZE "input" data internally
-    [flags,lat,lon,data]  = standardize_geodata(in.lat,in.lon,data);
-
+    gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false,'dimorder','latlon');
+    [flags,tmp]  = standardize_geodata(struct('lat',in.lat,'lon',in.lon,'data',data),gridoptions);
+    lat  = tmp.lat;
+    lon  = tmp.lon;
+    data = tmp.data;
+    clear tmp
+    
     % CHECK for every field
     assert(isequal(fsz(1:2),sz(1:2)),...
         errID,'All input fields for processing don''t have matching lat lon dims')
-   
     
     % USE appropriate METHOD
     switch out.method
@@ -164,7 +172,7 @@ for F = field
         [~,lnindex] = sort(newlon+(newlon<0)*360);
         data = data(:,lnindex,:);
     end
-    if flags.permute
+    if strcmp(flags.dimorder,'lonlat')
         data = permute(data,[2,1,3]);
     end
 

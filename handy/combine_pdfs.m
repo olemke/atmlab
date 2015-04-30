@@ -57,10 +57,9 @@ function outfile = combine_pdfs(pdffiles, options)
 %            def: 1
 %       options.hspace
 %            in:   %f
-%            ex:   space between columns in cm 
+%            ex:   space between columns in cm
 %            def:  1
-%            note: Provide vector, where length(opt.hspace)==length(n_pdfs/opt.cols [rows]))
-%                  if you want different spaces for different rows)
+%            note: Providing a vector mean that you want different hspace between plot for each row
 %       options.rightPadding
 %            in:  %f
 %            ex:  padding to the right of a row in cm. Note: Needs one value per row.
@@ -104,7 +103,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %
 %            in:  %d
 %            ex:  Number of rows per page. option.rowsPerPage can also be a vector
-%                 containing the number of rows that on page each each should have
+%                 containing the number of rows on each page.
 %                In that case, the sum of this vector must match the total
 %                number of rows (=n files / sum(in.cols)).
 %            def: all the rows on one page
@@ -119,7 +118,7 @@ if ~nargin, error(['atmlab:' mfilename],'Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
-default.cols        = 2;
+default.cols        = min(length(pdffiles),2);
 default.vspace      = 1;
 default.hspace      = 1;
 default.valign      = 'm';
@@ -137,39 +136,14 @@ default.pdfcrop    = false;
 default.pdfviewer  = '';
 options = optargs_struct(options, default);
 
-% Default is one page for all the plots
-if length(options.cols)>1
-    default.rowsPerPage = length(options.cols);
-else default.rowsPerPage = floor(length(pdffiles)/options.cols);
-end
-
-options = optargs_struct(options, default);
-
-if options.rowsPerPage>4
-    warning(['atmlab:',mfilename,':badInput'],...
-        ['There will be more than 4 rows of plots on this page. '...
-        'If the page is too long latex will crash. Consider limiting '...
-        'the number of rows per page using options.rowPerPage = [%d, %d, etc]'])
-end
-
-if all(size(options.hspace) == [1,1])
-    %options.hspace= repmat(options.hspace,1,round(length(pdffiles)/options.cols));
-    options.hspace= repmat(options.hspace,1,options.rowsPerPage);
-end
+%%
+% Path
 
 % Convert outdir to fullpath
 options.outdir = path_replace_tilde(options.outdir);
 if (isempty(options.outdir) || options.outdir(1) ~= filesep())
     options.outdir = fullfile(pwd(), options.outdir);
 end
-
-% Sanity checks
-assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
-    'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
-assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
-    '%s does not exist', options.outdir);
-
-
 % If we got a regexp, use ls to get the file list
 if ischar(pdffiles)
     direct = fileparts(pdffiles);
@@ -188,46 +162,53 @@ pdffiles = pdffiles(~cellfun('isempty',pdffiles));
 pdffiles = path_replace_tilde(pdffiles);
 assert(~isempty(pdffiles), 'atmlab:combine_pdfs', 'List of input pdf files is empty');
 
-% Check the number of columns verses the number of plots
-if (length(options.cols) ~= 1 ... %repeat column count for every row
-        && sum(options.cols) ~= length(pdffiles))
-    if length(pdffiles) > sum(options.cols)
-        error (['atmlab:' mfilename]', ...
-            'Number of plots (%d) doesn''t match sum of columns (%d)', ...
-            length(pdffiles), sum(options.cols));
-        pdffiles = pdffiles(1:sum(options.cols));
-    else
-        error (['atmlab:' mfilename]', ...
-            'Number of plots (%d) doesn''t match sum of columns (%d).', ...
-            length(pdffiles), sum(options.cols));
-    end
-    
+%%
+% Columns and rows
+
+% First check if a vector of columns is given but it doesn't match the number of pdffiles
+assert(sum(options.cols)<=length(pdffiles),...
+    ['atmlab:',mfilename,':badInput'],'number of columns is more than the number of files')
+
+
+% columns
+options.cols = make_fit(options.cols,pdffiles);
+
+% rows
+rows = length(options.cols);
+default.rowsPerPage = rows; % Default is one page for all the plots
+options = optargs_struct(options, default); clear default;
+options.rowsPerPage = make_fit(options.rowsPerPage,options.cols);
+if options.rowsPerPage>4
+    warning(['atmlab:',mfilename,':badInput'],...
+        ['There will be more than 4 rows of plots on this page. '...
+        'If the page is too long latex will crash. Consider limiting '...
+        'the number of rows per page using options.rowsPerPage. e.g. options.rowsPerPage = [3, 2, etc]'])
+end
+% Pages
+options.pages = length(options.rowsPerPage);
+
+if size(options.hspace) == [1,1]
+    options.hspace = repmat(options.hspace,1,sum(options.rowsPerPage));
 end
 
-% If cols is only one number, replicate it to match the number of rowss
-if (length(options.cols) == 1)
-    options.cols = repmat(options.cols, ceil(length(pdffiles)/options.cols), 1);
-end
-
-if length(options.rowsPerPage)==1
-    len=options.rowsPerPage;
-    options.rowsPerPage = repmat(options.rowsPerPage,1,floor(length(options.cols)/len));
-    clear len
-end
-
-if options.pdfcrop && length(options.rowsPerPage)<sum(options.cols)
+if options.pdfcrop && options.pages>1
     warning(['atmlab:',mfilename,':badInput'],...
         ['Cannot use pdfcrop if the output pdf has more than 1 page. '...
         'Setting psdcrop to false\n'])
     options.pdfcrop=false;
 end
 
+%% Assertions
+% Sanity checks
+assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
+    'atmlab:combine_pdfs', 'Vertical alignment must be either ''m'' or ''b''');
+assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
+    '%s does not exist', options.outdir);
+
 %% Setup is complete, let's get cracking
 layout = create_layout_from_pdffiles(pdffiles, options);
 
-create_pdf_from_layout_with_latex(layout, options);
-
-outfile = fullfile(options.outdir, options.filename);
+outfile = create_pdf_from_layout_with_latex(layout, options);
 
 %% Display output
 % This only works for the following pre-programmed options
@@ -276,7 +257,7 @@ for i = 1:length(pdffiles)
     end
     
     if options.samesize, width=max([psize.width]); else width=psize(i).width; end
-        
+    
     layout.plotsbyrow{row}(col) = struct('height', psize(i).height*sc, ...
         'width', width*sc, ...
         'file', pdffiles{i});
@@ -290,7 +271,13 @@ for i = 1:length(pdffiles)
             + options.hspace(row)*(length(R{:})-1) ...
             + options.secret_latex_spacing_tweak*length(R{:});
         layout.rowheight(row) = max([R{:}.height]);
+        
+        %if options.rowsPerPage(1)>row
         row = row + 1;
+        %else
+        % leave, or the above will be overwritten with page 2's statisics
+        %return
+        %end
         
     end
     
@@ -308,7 +295,7 @@ tmpfolder = create_tmpfolder();
 % evidence behind.
 c = onCleanup(@() delete_tmpfolder(tmpfolder));
 
-%% Assemble our pretty tex file
+%% Assemble the laTeX file
 file = fullfile(tmpfolder, 'out.tex');
 fid = fopen(file,'w');
 Cob = onCleanup(@(x) fclose(fid));
@@ -326,18 +313,15 @@ else
 end
 
 % find a good height
-k = 1;height=zeros(1,length(options.rowsPerPage));
-for i = 1:length(options.rowsPerPage)
-   
+k = 1;height=zeros(1,options.pages);
+for i = 1:options.pages
+    
     height(i) = sum(layout.rowheight(k:k+options.rowsPerPage(i)-1)) ...
-       + 2*margin + 2*fz ...
-       + options.vspace*options.rowsPerPage(i);
-   
-   k = k+options.rowsPerPage(i);
-   
-   if k>=length(options.cols)
-       break
-   end
+        + 2*margin + 2*fz ...
+        + options.vspace*options.rowsPerPage(i);
+    
+    k = k+options.rowsPerPage(i);
+
 end
 height = max(height);
 
@@ -392,11 +376,11 @@ for R = layout.plotsbyrow
         fprintf(fid, '\\vspace{%gcm}\\\\\n\n', options.vspace);
     end
     
-    if page > length(options.rowsPerPage)
+    if page > options.pages
         break
     end
     
-    % page break? allways putting a pagebreak at the end 
+    % page break? allways putting a pagebreak at the end
     if row == options.rowsPerPage(page)
         fprintf(fid,'\\newpage\n');
         page = page+1;
@@ -415,7 +399,10 @@ exec_system_cmd(sprintf('cd %s && pdflatex -interaction nonstopmode out.tex', ..
     atmlab('VERBOSITY'));
 
 file = fullfile(options.outdir, options.filename);
-exec_system_cmd(sprintf('cd %s && mv -f out.pdf ''%s''', ...
+% allow spaces
+file = strrep(file,' ','\ ');
+
+exec_system_cmd(sprintf('cd %s && mv -f out.pdf %s', ...
     tmpfolder, file), ...
     atmlab('VERBOSITY'));
 
@@ -425,6 +412,39 @@ if options.pdfcrop
         error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
     end
     exec_system_cmd(sprintf('mv %s-crop.pdf %s',file(1:end-4),file),atmlab('VERBOSITY'));
+end
+
+end
+
+function var = make_fit(var,ref)
+%
+% This is something I do in exactly the same way twice
+
+% Make cols into a vector if it isn't
+if isscalar(var)
+    sclr = var;
+    tmp = zeros(1,length(ref));
+    ind=1;
+    i = length(ref);
+    while i > 0
+        if (i-sclr) >= 0
+            tmp(ind) = sclr;
+            i = i-sclr;
+            ind = ind+1;
+        elseif (i-sclr)==0
+            tmp(ind) = sclr;
+            var = tmp(1:ind);
+            return
+        else
+            tmp(ind) = mod(i,sclr);
+            i = i-mod(i,sclr);
+        end
+        if i==length(ref)
+            % nothing was done. E.g for rows if all the pdffiles fit on one page
+            return
+        end
+    end
+    var = tmp(1:ind-1);
 end
 
 end

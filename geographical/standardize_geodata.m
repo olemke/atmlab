@@ -1,49 +1,49 @@
-function [flags,lat,lon,data] = standardize_geodata(lat,lon,data,allow)
-% STANDARDIZE_GEODATA sort and rearrange lat,lon, data to common format
+function [flags,out] = standardize_geodata(in,options)
+%% STANDARDIZE_GEODATA sort and rearrange lat,lon, data to a format of your liking.
 %
 %                  For gridded data.
 %
-%  PURPOSE  Makes sure lat lons are ascending, lons are in -180:180 regime,
-%           and makes sure that data has the dimensions data(lat,lon)
+%  PURPOSE  Make sure the lat lon [data] are sorted in a way of your choosing
+%           The default ordering is
+%                1) ascending latitudes ands longitudes
+%                2) dims of data are lat, lon, ...
+%                3) longitudes should be between -180:180
+%                4) no dublicate longitudes (e.g. 0 and 360 should not coexist)
 %
-%  IN       lat      vector
-%           lon      vector
-%  OPT      data     matrix      dims = (lat,lon,...) or (lon,lat,...)
-%           allow  structure
+%  IN       in.lat      vector
+%           in.lon      vector
+%  OPT      in.data     matrix      dims = (lat,lon,...) or (lon,lat,...)
+%           options  structure
 %                       some options including what you want to do to
 %                       homogenise, basically what features you want to allow.
 %                       These are the defaults:
 %
-%                    default.permute = true; % Order the data as (lat,lon,....); or else do nothing
+%                    default.dimorder = 'latlon'; % Order the data as (lat,lon,....); or else do nothing
 %                    default.lon_descend = false; % allow descending order of longitudes
 %                    default.lat_descend = false; % allow descending order of latitudes
 %                    default.lon360 = false; % allow longitudes go from 0:360 (as opposed to -180:180) globally
 %                    default.dublicate = false % allow duplicate values (repeat longitudes e.g. at -180 and 180)
 %
 %  OUT
-%           flags     struct     A structure of flags to indicate which
-%                                issue the function addressed.
-%           lat       vector     Ascending lats
-%           lons      vector     Ascending lons and 0:360 -> -180:180
-%           data      matrix     data(lat,lon,....) and rearranged to new
-%                                lat/lons
+%           flags     struct     A structure of flags to indicate how your data is arranged
+%           out       struct     Equivalent to 'in', but with the data order as
+%                                requested
 %
 % NOTE: 1) If lat and lon are the same length the first dimesion of data is
 %       assumed to correspond to lat.
-%       2) If data is a region that has lons in the 0:360 regime AND wraps
-%       over 360, this will cause an error. e.g. [350 360 10 20]
 %
-% USAGE:    [flags,lat,lon,data] = standardize_geodata(lat,lon,data)
-%           or
-%           [flags,lat,lon] = standardize_geodata(lat,lon)
+% USAGE:    [flags,lat,lon,data] = standardize_geodata(in,[options])
 %
 % created by Salomon Eliasson
-% $Id: homogenize_datalatlon.m 7163 2011-09-21 19:42:48Z seliasson $
-
+% $Id$
 
 % -------    CHECK for errors
-errID = ['gmtlab:' mfilename ':badInput'];
-dexist = exist('data','var');
+errID = ['atmlab:' mfilename ':badInput'];
+dexist = isfield(in,'data');
+
+lat = in.lat;
+lon = in.lon;
+if dexist, data = in.data; end
 
 assert(isvector(lat) && isvector(lon),errID,'lat and lons must be vectors')
 
@@ -56,49 +56,67 @@ assert(all(lon(2:end)<lon(1:end-1)) || all(lon(2:end)>lon(1:end-1)),...
 assert(all(lat(2:end)<lat(1:end-1)) || all(lat(2:end)>lat(1:end-1)),...
     errID,'Latitudes must be ordered ascending or descending');
 
+% --------  Check the state of the input data
 if dexist
-    sz = size(data);
     
-    assert(isequal(prod(sz(1:2)),numel(lat)*numel(lon)),...
-        errID,'data does not appear to be gridded according to (lon,lat,...) or (lat,lon,...)')
-end
-
-if ~exist('allow','var'); allow = struct(); end
-default.permute     = true; % Order the data as (lat,lon,....); or else do nothing
-default.lon_descend = false; % allow descending order of longitudes
-default.lat_descend = false; % allow descending order of latitudes
-default.lon360      = false; % allow longitudes go from 0:360 (as opposed to -180:180) globally
-default.dublicate   = false; % allow duplicate values (repeat longitudes e.g. at -180 and 180)
-
-allow = optargs_struct(allow,default);
-
-% --------  SET FLAGS
-if dexist
+    sz = size(data);
     %undesired dimensions
-    flags.permute = (length(lon)==sz(1) && length(lat)==sz(2)) && ...
-        length(lat) ~= length(lon);
+    if (length(lon)==sz(2) && length(lat)==sz(1)) && ...
+            length(lat) ~= length(lon)
+        
+        flags.dimorder = 'latlon';
+        
+    elseif (length(lon)==sz(1) && length(lat)==sz(2)) && ...
+            length(lat) ~= length(lon)
+        
+        flags.dimorder = 'lonlat';
+        
+    elseif length(lat) ~= length(lon)
+        
+        flags.dimorder = 'undetermined';
+    else
+        error(errID,'data does not appear to be gridded according to (lon,lat,...) or (lat,lon,...)')
+    end
+    
 end
 
-%undesired lon orientation
 flags.lon_descend = all(lon(2:end)<lon(1:end-1));
 
-%undesired latorientation
 flags.lat_descend = all(lat(2:end)<lat(1:end-1));
 
 flags.lon360 = any(lon > 180);
 
 flags.duplicate = flags.lon360 & all(ismember(lon,[0,360]));
 
-% --------  HOMOGENIZE the input
+% SET the defaults
+if ~exist('options','var'); options = struct(); end
 
-% PERMUTE data so that dimensions are data(lat,lon)
+% default should be to do nothing
 if dexist
-    if flags.permute && allow.permute
+    default.dimorder    = flags.dimorder; % Order the data as (lat,lon,....); or else do nothing
+end
+default.lon_descend = flags.lon_descend; % allow descending order of longitudes
+default.lat_descend = flags.lat_descend; % allow descending order of latitudes
+default.lon360      = flags.lon360; % allow longitudes go from 0:360 (as opposed to -180:180) globally
+default.dublicate   = flags.duplicate; % allow duplicate values (repeat longitudes e.g. at -180 and 180)
+
+options = optargs_struct(options,default);
+
+% --------  Do the work
+
+% PERMUTE data so that dimensions are data(lat,lon) or data(lon,lat)
+if dexist
+    if (strcmp(options.dimorder,'latlon') && strcmp(flags.dimorder,'lonlat')) ||...
+            (strcmp(options.dimorder,'lonlat') && strcmp(flags.dimorder,'latlon'))
+        
         x = 1:ndims(data);
         x(1)=2;x(2)=1;
         data = permute(data,x);
-    elseif flags.permute
-        logtext(1,'data is ordered (lon,lat,...)\n')
+        flags.out.dimorder = options.dimorder;
+        
+        logtext(1,'Swapped the 1st and 2nd dimensions\n')
+    else
+        flags.out.dimorder = flags.dimorder;
     end
 end
 
@@ -106,35 +124,66 @@ end
 % on 3rd dimesion. A reshape at the end of this function will unflatten the
 % data again later
 
-% make LONS ASCENDING
-if flags.lon_descend && ~allow.lon_descend
+% LONS ascending or descending
+if (flags.lon_descend && ~options.lon_descend) || ...
+        (~flags.lon_descend && options.lon_descend)
+    
     lon = lon(end:-1:1);
+    
     if dexist
-        data = data(:,end:-1:1,:);
+        if strcmp(flags.dimorder,'latlon')
+            data = data(:,end:-1:1,:);
+        else
+            data = data(end:-1:1,:,:);
+        end
     end
-elseif flags.lon_descend
-    logtext(1,'Longitudes are descending\n')
+    flags.out.lon_descend = options.lon_descend;
+    logtext(1,'Changed the order of longitudes\n')
+else
+    flags.out.lon_descend = flags.lon_descend;
 end
 
-% make LATS ASCEND
-if flags.lat_descend && ~allow.lat_descend
+% LATS ascending or descending
+if (flags.lat_descend && ~options.lat_descend) || ...
+        (~flags.lat_descend && options.lat_descend)
+    
     lat = lat(end:-1:1);
+    
     if dexist
-        data = data(end:-1:1,:,:);
+        if strcmp(flags.out.dimorder,'latlon')
+            data = data(end:-1:1,:,:);
+        else
+            data = data(:,end:-1:1,:);
+        end
     end
-elseif flags.lat_descend
-    logtext(1,'Latitudes are descending\n')
+    flags.out.lat_descend = options.lat_descend;
+    logtext(1,'Changed the order of latitudes\n')
+else
+    flags.out.lat_descend = flags.lat_descend;
 end
 
-% make sure LONGITUDES ARE IN -180:180 REGIME
-if flags.lon360 && ~allow.lon360
-    lon = lon-(lon > 180)*360;
-    [lon,lnindex] = sort(lon);
-    if dexist
-        data = data(:,lnindex,:);
+% LONGITUDES -180:180 or 0:360 regime
+if (flags.lon360 && ~options.lon360) || ...
+        (~flags.lon360 && options.lon360)
+    
+    if flags.lon360 && ~options.lon360
+        lon = lon-(lon > 180)*360;
+    elseif ~flags.lon360 && options.lon360
+        lon = lon+(lon<0)*360;
     end
-elseif flags.lon360
-    logtext(1,'Longitudes are in the 0:360- regime\n')
+    [lon,lnindex] = sort(lon);
+    
+    if dexist
+        if strcmp(flags.out.dimorder,'latlon')
+            data = data(:,lnindex,:);
+        else
+            data = data(lnindex,:,:);
+        end
+    end
+    flags.out.lon360 = options.lon360;
+    logtext(1,'Changed the longitude regime\n')
+else
+    flags.out.lon360 = flags.lon360;
 end
 
 
@@ -149,25 +198,39 @@ end
 % contain both 0 and 360 (duplicate), but don't contain the longitude: 180,
 % the lon vector and data matrix will be shortened.
 
-if flags.duplicate && ~allow.duplicate
-    [sv,index] = unique(lon);
+if flags.duplicate && ~options.duplicate
+    [~,index] = unique(lon);
     lon = lon(index);
     if dexist
-        data = data(:,index,:);
+        if strcmp(flags.out.dimorder,'latlon')
+            data = data(:,index,:);
+        else
+            data = data(index,:,:);
+        end
     end
     if lon(end)==180
         lon = [-180 lon];
         if dexist
-            data = [data(:,end,:) data];
+            if strcmp(flags.out.dimorder,'latlon')
+                data = [data(:,end,:) data];
+            else
+                data = [data(end,:,:) data];
+            end
         end
     else
         warning(sprintf('atmlab:%s:ChangedDataDimensions',mfilename),...
             'Duplicate lons removed changing the size of the lon vector (and data)')
     end
-elseif flags.duplicate
-    logtext(1,'There are duplicate longitudes in the data\n')
+    flags.out.duplicate = options.duplicate;
+    logtext(1,'checked for duplicate data and removed if so\n')
+else
+    flags.out.duplicate = flags.duplicate;
 end
 
 if dexist
     data = reshape(data,[size(data,1),size(data,2),sz(3:end)]);
 end
+
+out.lat = lat;
+out.lon = lon;
+if dexist, out.data = data; end

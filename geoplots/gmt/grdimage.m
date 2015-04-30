@@ -18,8 +18,10 @@ grdimage = sprintf('%s %s -R -J',grdimage,in.grdfile);
 
 % The default bicubic interpolation introduces artifacts. 
 % Nearneighbor to nearest point causes problems for high density data. 
-% This is the default anyway
-%grdimage = sprintf('%s -nb+t0.5',grdimage);
+
+% The following is supposed to be the default, but some projections fail in
+% certain circumstances if the following is omitted
+grdimage = sprintf('%s -nb+t0.5',grdimage);
 
 grdimage = sprintf('%s %s',grdimage,in.plotPlacement);
 

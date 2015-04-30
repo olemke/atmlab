@@ -49,13 +49,18 @@ assert(ismember(method,{'nearest','linear','cubic','spline'}),...
 ['atmlab:' mfilename ':badInput'],'method: "%s" not valid',method)
 
 % INTERNALLY make lons -180:180 and adjust data accordingly
-[flags,lat,lon,data] = standardize_geodata(lat,lon,data); %#ok<ASGLU>
+sortoptions = struct('dimorder','latlon');
+[flags,tmp] = standardize_geodata(struct('lat',lat,'lon',lon,'data',data),sortoptions); %#ok<ASGLU>
+
+lat=tmp.lat;
+lon=tmp.lon;
+data=tmp.data;
 
 % Get the SIZE of the original data
 sz = size(data);
 
 % PERMUTE so that the data(time,lon,lat...). % data(lat,lon,...) is ensured
-% via the standardize function
+% via the dimorder input to standardize function
 data = permute(data,[N,2,1,3:N-1]);
 
 % COLLAPSE it to data(time,lon,lat*etc)
@@ -85,49 +90,7 @@ for i = 1:size(data,2) % longitude in the first dimension
     out(i,:) = interp1(utcvec, D, utc0(i), method); %[lon,lat*etc]
 end
 
-% ----------------------------
-%  REARRANGE to original format
-
-% if the orig lons are in the 0:360 regime. Put them BACK
-if flags.lon360
-    if flags.duplicate
-        % remove -180 to avoid duplication
-        lon = lon(2:end);
-        out = out(2:end,:);
-    end
-    lon = lon +(lon < 0)*360;
-    [lon,indexlon] = sort(lon); %#ok<ASGLU>
-    out = out(indexlon,:);
-    if flags.duplicate
-        % reintroduce duplicates at 0 and 360
-        out = [out; out(1,:)];
-    end
-end
-
-% if the lons were DESCENDING
-if flags.lon_descend
-    out = out(end:-1:1,:);
-end
 
 % RECONSTRUCT collapsed dimensions [lon,lat,...]
 data = reshape(out,[size(out,1),sz([1,3:N-1])]);
 
-% If the orig lats are DESCENDING. Put them BACK
-if flags.lat_descend
-    % permute to put lat in first position in order to callapse
-    data = permute(data,[2,1,3:N-1]); %[lat,lon,....]
-    
-    % locally flatten and reshape
-    sz = size(data); 
-    out = data(:,:);  %[lat,lon*etc]
-    % adjust the lats
-    out = out(end:-1:1,:);
-    data = reshape(out,sz);  %[lat,lon,....]
-    
-    if flags.permute
-        data = permute(data,[2,1,3:N-1]); % [lon,lat,...]
-    end
-elseif ~flags.permute
-    % If orig data was data(lon,lat,...), leave the data as is
-    data = permute(data,[2,1,3:N-1]);
-end 

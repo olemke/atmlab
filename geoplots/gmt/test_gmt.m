@@ -173,10 +173,9 @@ for T = sort(in.test)
             test.legend.tick_spacing = 25;
             test.legend.sidebar = 2; % above only
             test.psbasemap.axes = 'Nesw';
-            test.nlevels = 15;
 
             test.fontsize_title = '20p';
-            test.title = 'Diff plot,nlevels=15,nwhite=6,sidebar=2 (above only),title';
+            test.title = 'Diff plot,nwhite=6,sidebar=2 (above only),title';
             test.filename = sprintf('Test%g',T);
             
             %this puts standardize_geodata.m to the test
@@ -190,7 +189,7 @@ for T = sort(in.test)
             info{ind} = ['Test:' num2str(T) ' demonstrates that you can change the number of intervals that are',...
                 'colored white around the reference value when using the mypolar-colortable,',...
                 'here in.nwhite = 6. You can also change the number of data intervals ',...
-                '(here in.nlevels = 15), change in.fontsize_title (here in.fontsize_title = 20)',...
+                ', change in.fontsize_title (here in.fontsize_title = 20)',...
                 'or decide to only have the sidebar for values above the datarange (here in.sidebar=2)\n\n'];
             
         case 4
@@ -267,7 +266,6 @@ for T = sort(in.test)
             
             gridded.data(20:40,20:80) = NaN;
             test.datarange = [160,250];
-            test.nlevels        = 18;
             test.title         = 'upper sidebar, NaN, Hammer projection, center=180';
             test.legend.orientation = 'h';
             test.proj.projection         =  'H';
@@ -320,7 +318,6 @@ for T = sort(in.test)
         case 9
             
             gridded.data(20:40,20:80) = NaN;
-            test.nlevels              = 18;
             test.legend.orientation   = 'h';
             test.datarange            = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
             test.extra_legend         = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize','25p');
@@ -360,7 +357,6 @@ for T = sort(in.test)
             
             test.title = 'contours, HSV colours, horiz. legend';
             test.proj.projection = 'H';
-            test.nlevels = 10;
             test.legend.tick_annotation_format = '%g';
             test.legend.orientation = 'h';
             test.contourline.spacing=0.1;
@@ -372,8 +368,7 @@ for T = sort(in.test)
             test.color_foreground = '255/255/0';
             test.colorrange.colors = {{0,'0/1/1'},{1,'60/1/1'}};
             test.colorrange.color_model = 'HSV';
-            test.nlevels = 5;
-            
+                        
             % TEST pstext aswell
             test.pstext = struct('text',{'Norrland','Australia'},...
                 'lat',{67+51/60,-25},'lon',{20+13/60,130},'angle',{0,-15},...
@@ -401,7 +396,7 @@ for T = sort(in.test)
                 (gridded.lon+180)>=test.lon(1)&(gridded.lon+180)<=test.lon(end));
             test.filename     = sprintf('Test%g',T);
             test.title       = 'Region that spans the dateline';
-            test.legend.xpos= 20.7;
+%            test.legend.xpos= 20.7;
             
             testThis = catstruct(rmfield(in,'test'),test);
             files{ind} = gmt_plot(testThis);

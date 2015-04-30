@@ -18,8 +18,12 @@ i = 1; %counter
 % If this directory isn't new (which it should be), you should remove the
 % residuals using 'rm gmt.* ps2raster* Test1.ps *~ *.pdf'
 
+commands{i} = sprintf('rm -f gmt.* %s.{ps,pdf}',in.filename);i=i+1;
+
+
 % debug
 commands{i} = sprintf('gmt set GMT_COMPATIBILITY=4');i=i+1;
+
 
 commands{i} = 'gmt set PS_MEDIA A0';  i=i+1;
 commands{i} = sprintf('gmt set FONT_ANNOT_PRIMARY %s,%s',num2str(in.fontsize_annot_primary),num2str(in.font_annot_primary));i=i+1;
@@ -65,7 +69,7 @@ elseif isstruct(in.legend)
 end
 if isfield(in,'psscale_extra')
     commands{i} = in.psscale_extra; i=i+1;
-elseif ~in.nodata && ~isempty(in.extra_legend)
+elseif ~in.nodata && (isfield(in,'extra_legend') && ~isempty(in.extra_legend))
     commands{i} = in.extra_legend; i=i+1;
 end
 
@@ -177,7 +181,6 @@ end
 
 % Close file with this
 in.psbasemap.str{2} = setupbasemap(in,1);
-%in.plot.lastbasemap = last_psbasemap(in);
 
 end
 
@@ -185,10 +188,18 @@ function proj = setup_projection(in)
 %% setup_projection %%
 
 P = in.proj;
-if isempty(P.center) ||...
-        ~strcmp(in.region(1),'g') ||...
-        (length(in.region)>9 && ~strcmp(in.region(1:9),'-180/180/'))
-    x = sscanf(in.region,'%f/%f/%f/%f');
+
+x = sscanf(in.region,'%f/%f/%f/%f');
+
+allLongs = (x(1)==-180&&x(2)==180) || (x(1)==0&&x(2)==360); 
+if  ~isfield(P,'center') || ~allLongs % if not global
+
+    if ~allLongs && isfield(P,'center')
+        logtext(2,'There are strange artifacts if the data doesn''t cover all longitudes and P.center is not close to the middle (like now).\n')
+        logtext(2,'Resetting to P.center to the center of the longitude range. P.center = %g.\n',(x(1)+x(2))/2)
+        logtext(2,'If you desparately need the map centered somewhere else try in.makeScriptAndStop=true, tweak the -Q entry in psbasemap in the generated script manually, and run the script on the command line\n')
+    end
+        
     P.center = (x(1)+x(2))/2;
 end
 
@@ -248,19 +259,26 @@ oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );
 % some reasonable maximum default
 % apparently it costs 1200bytes per point
 
-memGB = .1;
-maxpoints = memGB*1024^3  / 1200;
+% hard code some sort of maxium
+
+if ~isfield(in,'nearneighbor')
+    in.nearneighbor = struct();
+end
+
+default.memGB = .1;
+in.nearneighbor = optargs_struct(default,in.nearneighbor);
+maxpoints = in.nearneighbor.memGB*1024^3  / 1200;
 maxres = oneDegRegion/maxpoints;
 
 % -----------------------------------------------------
 % Resolution inferred by data, or by user defined
-if isfield(in,'nearneighbor') &&...
-        isfield(in.nearneighbor,'resolution')
+if isfield(in.nearneighbor,'resolution')
     %user
     res = in.nearneighbor.resolution;
 else
-    %data
-    res = max([ abs(median(diff(in.lat)));abs(median(diff(in.lon)))]) ;
+    % the data could be randomly sampled and then this is useless, and maxres is
+    % chosen
+    res = max([ abs(median(diff(sort(in.lat))));abs(median(diff(sort(in.lon))))]) ;
 end
 
 % check if res is acceptable
