@@ -1,3 +1,17 @@
+2015-05-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-79
+
+	* arts/qarts2cfile.m (cfile_Jacobi): The unit 'logrel' is now mapped
+	to 'rel' when calling arts. This as logrel now is removed from
+	arts. In arts logrel and rel were identical options.
+
+	* arts/arts_version.m: Just editing of header text.
+
+	* atmlab/atmlab_version.m (atmlab_version): Removed 'This is' from
+	screen output version. The two possible failures were treated in
+	different ways. Now both result in an error.
+
 2015-04-30  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-78

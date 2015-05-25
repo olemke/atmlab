@@ -1,4 +1,6 @@
-% ATMLAB_VERSION   Atmlab version number. 
+% ATMLAB_VERSION   Extracts Atmlab version information. 
+%
+%    The version is reported as a short string.
 %
 %    Version number taken from the ChangeLog file.
 %
@@ -31,8 +33,7 @@ changelog = fullfile( toppath, 'ChangeLog' );
 fid = fopen( changelog, 'r' );
 
 if fid < 0
-  s = 'atmlab-?.? (could not locate ChangeLog file)';
-  return
+  error( 'Could not locate Atmlab''s ChangeLog file)' );
 end
 
 s = '';
@@ -55,7 +56,7 @@ s(ind(2:end)) = '.';
 
 if nargout==0
   
-  fprintf('This is %s\n',s);
+  fprintf('%s\n',s);
   clear s
 
 elseif nargout == 1

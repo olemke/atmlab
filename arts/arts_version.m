@@ -1,12 +1,12 @@
-% ARTS_VERSION   Reports the version of arts
+% ARTS_VERSION   Extracts ARTS version information
 %
 %    The version is reported as a short string. Complete information can be
 %    printed on the screen.
 %
 % FORMAT   s = arts_version( long_on_screen )
 %        
-% OUT   s              A string describing the arts version, e.g. 'arts-2.1.3'
-% OPT   long_on_screen Flag to print detailed information.
+% OUT   s                A string describing the arts version, e.g. 'arts-2.1.3'
+% OPT   long_on_screen   Flag to print detailed information.
 
 % 2012-10-22   Created by Patrick Eriksson.
 
