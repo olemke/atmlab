@@ -9,6 +9,9 @@
 %    It seems to be no standard value for this factor
 %    for Radar equivalent reflectivity products.   
 %
+%    Note also that *b* equals 4pi*Z(Omega=180), following the standard
+%    practice in the radar community.
+%
 % FORMAT  Ze = backcoef2dBZ(lambda,b [,t0,Kwater2])
 %
 % OUT     Ze         10*log10 of radar equivalent reflectivity 

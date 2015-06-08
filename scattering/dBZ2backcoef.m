@@ -3,6 +3,9 @@
 %    Converts equivalent radar reflectivity to backscattering coefficient.
 %    The "inverse" of backcoef2dBZ.
 %
+%    Note that *b* equals 4pi*Z(Omega=180), following the standard
+%    practice in the radar community.
+%
 % FORMAT  b = dBZ2backcoef( lambda, Ze )
 %
 % OUT     b          backscattering coefficient [1/m]

@@ -1,3 +1,13 @@
+2015-06-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-80
+
+	* scattering/backcoef2dBZ.m:
+	* scattering/dBZ2backcoef.m:
+	* scattering/mie_back.m: Added comments in header that the
+	backscattering coefficient of concern equals 4pi*Z(Omega=180).
+	This to avoid any confusion about this for the future.
+
 2015-05-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-79

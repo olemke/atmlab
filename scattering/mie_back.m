@@ -4,8 +4,9 @@
 %   combination of refractive index and wavelength, but a multiple of
 %   particle sizes are allowed.
 %
-%   Returns Mie-backscattering cross-sections to be used
-%   for e.g. a monostatic radar.
+%   Returns Mie-backscattering cross-sections to be used for e.g. a monostatic
+%   radar. Note that *y* equals 4pi*Z(Omega=180), following the standard
+%   practice in the radar community.
 %
 % FORMAT  y = mie_back(m,lambda,r)
 %
