@@ -1,3 +1,14 @@
+2015-06-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-81
+
+	* retrieval/qpack2/qpack2.m: If any error in oem, this error is
+	now displayed. Note that if all inversions fail, then L2 comes out
+	as empty.
+
+	The creation of Se failed for cases with appended spectra, such as
+	in qpack2_wind_demo. How long has this been broken?
+
 2015-06-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-80

@@ -121,9 +121,10 @@ for m = 1 : ny
     %
     try
       [X,R] = oem( O, Qm, R, @arts_oem, Sx, Se, Sxinv, [], xa, Y(m).Y );
-    catch
+    catch ME
       clear X
       X.converged = errorflag;
+      rethrow(ME);
     end
     
     %- Fill return structure
@@ -284,14 +285,14 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
     rqre_datatype( Y(m).ZA, @istensor1, sprintf('Y(%d).ZA',m) );
     if length(Y(m).ZA) ~= length(Y(m).Z_PLATFORM)
       error( errid, ...
-             'Y(%d).ZA and Y(%d).Z_PLATFORM must have the same length', m, m );
+            'Y(%d).ZA and Y(%d).Z_PLATFORM must have the same length.', m, m );
     end
     rqre_datatype( Y(m).F, @istensor1, sprintf('Y(%d).F',m) ); 
     if Q.ATMOSPHERE_DIM == 3
       rqre_datatype( Y(m).AA, @istensor1, sprintf('Y(%d).AA',m) );
       if length(Y(m).ZA) ~= length(Y(m).AA) 
         error( errid, ...
-                     'Y(%d).AA and Y(%d).ZA must have the same length', m, m );
+                    'Y(%d).AA and Y(%d).ZA must have the same length.', m, m );
       end 
     end
   end
@@ -394,8 +395,8 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
   %
   if nargout == 2
     
-    nnv = size( Y(m).TNOISE, 1 );  % Number of noise values
-    nf  = length( Y(m).Y );
+    nnv = size( Y(m).TNOISE, 1 );
+    nf  = length( Y(m).F );
     
     if do_checks
       rqre_datatype( Y(m).TNOISE, @istensor2, sprintf('Y(%d).TNOISE',m) );
@@ -408,7 +409,7 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
          'Column size of Y(%d).TNOISE must match length of Y(%d).ZA.', m, m );
       end
     end
-    
+
     [i,j,s] = find( Q.TNOISE_C );
     ni      = length( i );
     [i2,j2,s2] = deal( zeros( ni*nza, 1 ) );
