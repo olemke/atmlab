@@ -1,3 +1,20 @@
+2015-06-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-82
+
+	* h2o/parametrisations/rain_psd_mp48.m: Interface to ARTS' WSM
+	dNdD_MP98. Interface should be OK, but results are unrealistic.
+	Jana contacted about a possible typo in the arts code.
+
+	* h2o/parametrisations/mgd_get_lambda.m:
+	* h2o/parametrisations/mgd_moment.m:
+	* h2o/parametrisations/mgd_psd.m: Start on making a set of
+	functions for operations on modified gamma distributions.
+
+	* handy/scalars_vectors2same_size.m: New function. Cryptic name,
+	but did not find anything better. The function is useful for
+	parsing input arguments, see e.g. mgd_momoment.
+
 2015-06-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-81
