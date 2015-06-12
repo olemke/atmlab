@@ -37,7 +37,7 @@ for i = 1 : npsd
     error( '(mu+1)/ga must be > 0.' );
   end
   
-  p    = mu(i) + k(i) + 1;
-  m(i) = n0(i) * gamma( p / ga(i) ) / ( ga(i) * la(i)^p );
-  
+  % Eq 17 in PH11
+  p    = ( mu(i) + k(i) + 1 ) / ga(i);
+  m(i) = n0(i) * gamma( p ) / ( ga(i) * la(i)^p );  
 end

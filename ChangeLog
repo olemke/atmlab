@@ -1,3 +1,35 @@
+2015-06-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-83
+
+	* h2o/parametrisations/mgd_de2dg.m:
+	* h2o/parametrisations/mgd_dg2de.m: New.
+
+	* h2o/parametrisations/particle_dg2de.m:
+	* h2o/parametrisations/particle_de2dg.m: New names of functions
+	listed below. Replaced dmax with dg in function names, to be
+	consistent with Petty&Huang 2011.
+
+	* h2o/parametrisations/particle_dmax2de.m:
+	* h2o/parametrisations/particle_de2dmax.m: Renamed, see just above.
+
+	* h2o/parametrisations/mgd_get_*.m: Ice is now default for
+	density, to be consistent with the particle_dx2dy functions.
+
+	* h2o/parametrisations/mgd_get_n0.m: New.
+
+	* h2o/parametrisations/mgd_get_parameters.m: Replaced by function
+	below.
+
+	* h2o/parametrisations/mgd_get_n0_lambda.m: New. Replacing the
+	function above.
+
+	* h2o/parametrisations/mgd_get_lambda.m: Changed to return PSD for
+	d_g, to return PSD for d_e. Input a and b then replaced by rho.
+
+	* h2o/parametrisations/mgd_moment.m: There was a mistake in the
+	core calculation.
+
 2015-06-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-82
