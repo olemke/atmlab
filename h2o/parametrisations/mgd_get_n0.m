@@ -10,7 +10,7 @@
 %  All input arguments can be scalars or tensor1 (as in e.g. *mgd_moment*).
 %  That is, a number of *la* can be determined in one function call.
 %
-% FORMAT  la = mgd_get_n0(q,ntot,mu,gamma[,rho])
+% FORMAT  n0 = mgd_get_n0(w,mu,la,ga[,rho])
 %
 % OUT   n0   See *mgd_psd*.
 % IN    w    Particle mass concentration.

@@ -11,7 +11,7 @@
 %  All input arguments can be scalars or tensor1 (as in e.g. *mgd_moment*).
 %  That is, a number of *la* can be determined in one function call.
 %
-% FORMAT  [n0,la] = mgd_get_n0_lambda(q,ntot,mu,gamma[,rho])
+% FORMAT  [n0,la] = mgd_get_n0_lambda(q,ntot,mu,ga[,rho])
 %
 % OUT   n0   See *mgd_psd*.
 %       la   See *mgd_psd*.

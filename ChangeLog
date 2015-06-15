@@ -1,3 +1,11 @@
+2015-06-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-84
+
+	* h2o/parametrisations/mgd_get_lambda.m:
+	* h2o/parametrisations/mgd_get_n0_lambda.m:
+	* h2o/parametrisations/mgd_get_n0.m: Corrected format string in header.
+
 2015-06-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-83
