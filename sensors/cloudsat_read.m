@@ -3,7 +3,7 @@
 %    The function reads data from single files. The data are provided as a
 %    single structure having field names taken from the HDF data. For
 %    example, 
-%       P=cloudsat_read(filename,{'Latitude','Longitude','Sigma_Zero'})
+%       P=cloudsat_read(filename,{'Latitude','Longitude','Sigma-Zero'})
 %    gives
 %       P =
 %            Latitude: [37081x1 double]
@@ -20,7 +20,11 @@
 %
 %    Data are scaled to consider scaling factors and "non-standard"
 %    units. The data are returned using the following units:
-%      g, m, dB and deg
+%      kg, m, dB and deg
+%
+%    Note that no conversion from log is made (as log is part of the field
+%    names), but an unit conversion could still be applied. For example,
+%    log10(1/L) is converted to log10(1/m3).
 %
 %    The data are returned as double precision variables, sorted in such
 %    way that each row corresponds to a position. For example, the cloud 
@@ -52,9 +56,6 @@
 %        fieldnames = cloudsat_read(filename,[],'lat',[-30 30],'lon',[0 180]);
 %   Longitude limits can be left out. Default for longitude limits is 
 %   [-180 180]. 
-%
-%    The function is based on CPR_L1B_rdr2 (unknown author). Send bug
-%    reports, suggestions or improvements to patrick.eriksson@chalmers.se
 %
 % FORMAT   P = cloudsat_read(filename[,fieldlist,choice1,c1arg,choice2,c2arg])
 %        
@@ -142,15 +143,15 @@ allfields = { fileinfo.Swath.GeolocationFields.Name, ...
 if isempty( fieldlist )  |  strcmp( choice1, 'fields' )
 
   if strcmp( choice1, 'fields' )
-    P = rename_fields( allfields, 1 );
+    P = allfields;
     return
   end
 
   hdfnames  = allfields;
-  fieldlist = rename_fields( hdfnames, 1 );
+  fieldlist = allfields;
 
 else
-  hdfnames = rename_fields( fieldlist );
+  hdfnames = fieldlist;
 end
 
 
@@ -262,6 +263,11 @@ P = [];
 %
 try
     P = read_cloudsat_hdf(fileinfo.Filename,fieldlist);
+
+    % Reset fieldlist as some fields can be slightly renamed ('-' replaced
+    % by '_')
+    fieldlist = vec2row( fieldnames( P ) );
+
     for F = fieldlist
         % convention to make everything double
         if ~ischar(P.(F{1}))
@@ -293,18 +299,18 @@ for it=1:length(fieldlist)
   ifactor = strmatch([hdfnames{it} '.factor'],attributes);
   ioffset = strmatch([hdfnames{it} '.offset'],attributes);
   iunit   = strmatch([hdfnames{it} '.units'],attributes);
-  if ~isempty(iunit)
-    unit=fileinfo.Swath.Attributes(iunit).Value;
-    unit=unitconv(unit,hdfnames{it});
-  else
-    unit=1;
-  end
 
   if ~isempty(ifactor) & ~isempty(ioffset) 
      factor = double(fileinfo.Swath.Attributes(ifactor).Value(1));
      offset = double(fileinfo.Swath.Attributes(ioffset).Value(1));
-     P.(fieldlist{it}) = (P.(fieldlist{it})/factor - offset)*unit;
+     P.(fieldlist{it}) = P.(fieldlist{it}) / factor - offset;     
   end
+  
+  if ~isempty(iunit)
+    unit              = fileinfo.Swath.Attributes(iunit).Value;
+    P.(fieldlist{it}) = unitconv( P.(fieldlist{it}), unit, hdfnames{it} );
+  end
+  
 end
 
   
@@ -315,90 +321,41 @@ return
 
 %--- Sub functions ---------------------------------------------------------
 
-%--- Conversion of field names
-%
-% Renaming information stored in internal variable *table*. Default is
-% conversion from matlab to HDF names.
-%
-% OUT   names       Renamed field names
-% IN    names       Original field names
-%       backwards   Set to true for conversion to matlab names. Default
-%                   is false.
-%  
-function names = rename_fields( names, backwards )
-
-  if nargin < 2, backwards = 0; end  
-
-  %- Renaming table
-  %
-  % HDF name in column 1, matlab name in column 2
-  %
-  table{1} = { 'Sigma-Zero', 'Sigma_Zero' };
-  
-  if backwards
-    iout = 2;
-    iin  = 1;
-  else
-    iout = 1;
-    iin  = 2;
-  end
-
-  for it = 1 : length(table)
-    ind = find( strcmp( names, table{it}{iin} ) );
-    if ~isempty( ind )
-      names{ind} = table{it}{iout};
-    end
-  end
-
-return
-
-
 %--- Unit conversion 
 %
 % Conversion information stored in internal variable *table*. 
 %  
-function u=unitconv(unit,field)
+function x = unitconv(x,unit,field)
 
 % Make sure that *unit* is a row vector (can be column for old HDF versions)
 %
 unit = vec2row( unit );
   
 if strcmp(unit,['mg m^{-3}']) |  strcmp(unit,['mg/m^3'])
-   u=1e-3;
+   x = x * 1e-6;
 elseif strcmp(unit,['um'])
-   u=1e-6;
-elseif strcmp(unit,['degrees'])
-   u=1;
-elseif strcmp(unit,['m'])  |  strcmp(unit,['/m'])
-   u=1;
-elseif strcmp(unit,['meters'])
-   u=1;
-elseif strcmp(unit,['dBZe'])  |  strcmp(unit,['dbz'])  |  strcmp(unit,['dBZ'])
-   u=1;
+   x = x * 1e-6;
 elseif strcmp(unit,['dB*100'])
-   u=1e-2;
+   x = x * 1e-2;
 elseif strcmp(unit,['km'])
-   u=1e3;
+   x = x * 1e3;
 elseif strcmp(unit,['1/km'])  |  strcmp(unit,['/km'])
-   u=1e-3;
-elseif strcmp(unit,['seconds'])
-   u=1;
-elseif strcmp(unit,['--'])  |  strcmp(unit,['none'])  |  strcmp(unit,['None'])
-   u=1;
-elseif strcmp(unit,['%'])
-   u=1;
-elseif strcmp(unit,['g m^{-2}'])  |  strcmp(unit,['g/m^2'])
-   u=1;
-elseif strcmp(unit,['K'])
-   u=1;
+   x = x * 1e-3;
 elseif strcmp(unit,['L^{-1}'])
-   u=1e3;
-elseif strcmp(unit,['cm^{-3}'])
-   u=1e6;
-elseif strcmp(unit,['Pa'])
-   u=1;
-elseif strcmp(unit,['kg/kg']) |  strcmp(unit,['kg kg**-1']) 
-   u=1;
+   x = x * 1e3;
+elseif strcmp(unit,['log(L^{-1})'])
+   x = x + 3;
+elseif strcmp(unit,['degrees'])  | strcmp(unit,['m'])       | ...
+       strcmp(unit,['/m'])       | strcmp(unit,['meters'])  | ...
+       strcmp(unit,['dBZe'])     | strcmp(unit,['dbz'])     | ...  
+       strcmp(unit,['dBZ'])      | strcmp(unit,['seconds']) | ...  
+       strcmp(unit,['--'])       | strcmp(unit,['none'])    | ...  
+       strcmp(unit,['None'])     | strcmp(unit,['%'])       | ...  
+       strcmp(unit,['g m^{-2}']) | strcmp(unit,['g/m^2'])   | ...  
+       strcmp(unit,['K'])        | strcmp(unit,['cm^{-3}']) | ...  
+       strcmp(unit,['Pa'])       | strcmp(unit,['kg/kg'])   | ...    
+       strcmp(unit,['kg kg**-1']) 
+  % Nothing to do
 else 
    u=1;
    warning( 'cloudsat_read:unknownUnit', ...

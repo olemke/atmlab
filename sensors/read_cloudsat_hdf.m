@@ -36,12 +36,15 @@ function [d, attr] = read_cloudsat_hdf(hdfFile, sdsName)
 %      etc. The 2nd output variable contains the attributes of all the fields 
 %      in sdsName
 %
+%      Further, some of the hdf data have name including '-'. Matlab does not
+%      allow '-' in field names and the fields are renamed, using '_'. Most
+%      notable case is probably 'Sigma-Zero', that is returned as 'Sigma_Zero'.
 %
 % Created by Salomon Eliasson based on read_clavrx_hdf by 
 % Aleksandar Jelenak <Aleksandar.Jelenak@noaa.gov>
-%
-% LAST MODIFICATION: "$Id$"
 
+  
+  
 % Error checking.
 narginchk(2, 2);
 nargoutchk(1, 2);
@@ -114,22 +117,26 @@ for i = 1:length(sdsName)
     % Look for the SDS var using user-supplied name.
     assert(ismember(sdsName{i}, allfields),...
         [errId ':MissingFromFile'],'variable %s is missing in %s',sdsName{i}, hdfFile)
+
+    % Matlab field names can not contain '-', while some CloudSat data has
+    % this char in names. We use instead '_' in Matlab field names:
+    fname = strrep( sdsName{i}, '-', '_' );
     
     % READ the data.
-    d.(sdsName{i}) = hdfread(hdfFile,sdsName{i});
+    d.(fname) = hdfread(hdfFile,sdsName{i});
     
     % hdfread outputs the data in a 1x1 cell. We don't need that
-    if iscell(d.(sdsName{i})) && length(iscell(d.(sdsName{i})))==1
-        d.(sdsName{i}) = d.(sdsName{i}){1};
+    if iscell(d.(fname)) && length(iscell(d.(fname)))==1
+        d.(fname) = d.(fname){1};
     end
     
     % make sure strings are always rowvectors
-    if ischar(d.(sdsName{i}))
-        d.(sdsName{i}) = d.(sdsName{i})(:)';
+    if ischar(d.(fname))
+        d.(fname) = d.(fname)(:)';
     end
         
     % Return SDS attributes if the user has supplied a second output variable.
     if nargout == 2
-        attr.(sdsName{i}) = Attributes{ismember(allfields,sdsName{i})};
+        attr.(fname) = Attributes{ismember(allfields,sdsName{i})};
     end
 end
