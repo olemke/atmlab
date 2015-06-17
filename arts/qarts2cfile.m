@@ -631,6 +631,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       end
       %
+      T{end+1} = 'FlagOn( nlte_checked )';    % This really safe?
       T{end+1} = 'abs_lookupCalc'; 
       if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
         T = add_agenda( T, 'propmat_clearsky_agenda', ...
@@ -638,6 +639,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       else      
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
             'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+            'Ignore(rtp_temperature_nlte)', ...
             'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       end 
       %
@@ -654,6 +656,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       else      
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
                 'Ignore(rtp_mag)', 'Ignore(rtp_los)',...
+                'Ignore(rtp_temperature_nlte)', ...
                 'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       end
       %
@@ -662,6 +665,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     end
     
     T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
+    T{end+1} = 'FlagOn( nlte_checked )';    % This really safe?
     
   end %  qarts_isset( Q.ABSORPTION )
 

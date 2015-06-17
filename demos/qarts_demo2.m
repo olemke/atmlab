@@ -94,9 +94,11 @@ Q.ABS_SPECIES(5).ATMDATA = gf_set( atmdata_empty(0), 0.781, [] );
 %= Temperature and geoemtrical altitudes are taken from CIRA86
 %
 Q.T.ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
-         'climatology', 'cira86', 'cira86.t.xml' ), 'Temperature', 't_field' );
+                       'planets', 'Earth', 'CIRA86', 'climatology', ... 
+                           'cira86.t.xml' ), 'Temperature', 't_field' );
 Q.Z.ATMDATA              = gf_artsxml( fullfile( arts_xmldata_path, ...
-           'climatology', 'cira86', 'cira86.z.xml' ), 'Altitudes', 'z_field' );
+                       'planets', 'Earth', 'CIRA86', 'climatology', ... 
+                             'cira86.z.xml' ), 'Altitudes', 'z_field' );
 
 
 %= Set-up atmosphere and surface
