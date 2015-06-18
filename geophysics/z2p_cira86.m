@@ -30,27 +30,26 @@
 function [p,t,Gc86z,Gc86t]=z2p_cira86(z,lat,doy,Gc86z,Gc86t)
 
 if atmlab('STRICT_ASSERT')
-    rqre_datatype( z, @istensor1 );                                    %&%
-    rqre_datatype( lat, @istensor1 );                                  %&%
-    rqre_datatype( doy, @istensor1 );                                  %&%
+    rqre_datatype( z, @istensor1 );
+    rqre_datatype( lat, @istensor1 );
+    rqre_datatype( doy, @istensor1 );
     
     errid = ['atmlab:' mfilename ':badInput'];
     
-    
-    if any(doy)>367 || any(doy<1)                                      %&%
-        error(errid,'doy range is [1,367]')              %&%
-    end                                                                %&%
-    if any(lat)>90 || any(lat<-90)                                     %&%
-        error(errid,'latitude range is -90 to 90')      %&%
-    end                                                                %&%
+    if any(doy)>367 || any(doy<1)
+        error(errid,'doy range is [1,367]')
+    end                                 
+    if any(lat)>90 || any(lat<-90)
+        error(errid,'latitude range is -90 to 90')
+    end 
 end
 
 % Create a a mjd matching the given doy (ie. the inverse of mjd2doy)
 mjd = date2mjd( 2000, 1, 1, 0, 0, 0 ) + doy - 1;
 
 if (nargin < 4 || isempty(Gc86z))
-    cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', ...
-        'cira86', 'cira86.z.xml' );
+    cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
+            'Earth', 'CIRA86', 'climatology', 'cira86.z.xml' );
     Gc86z = gf_artsxml( cira86, 'CIRA86', 'z_field' );
 end
 G    = atmdata_regrid( Gc86z, { Gc86z.GRID1, lat, 0, mjd } );
@@ -60,8 +59,8 @@ logp = log( G.GRID1 );
 
 if nargout > 1
     if (nargin < 5 || isempty(Gc86t))
-        cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', ...
-            'cira86', 'cira86.t.xml' );
+        cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
+            'Earth', 'CIRA86', 'climatology', 'cira86.t.xml' );
         Gc86t = gf_artsxml( cira86, 'CIRA86', 't_field' );
     end
     G = atmdata_regrid( Gc86t, { Gc86t.GRID1, lat, 0, mjd } );

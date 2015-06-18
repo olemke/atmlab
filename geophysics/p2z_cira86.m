@@ -17,23 +17,26 @@
 % 2007-11-01   Created by Bengt Rydberg
 
 function [z,t]=p2z_cira86(p,lat,doy)
-                                                                   %&%
-rqre_datatype( p, @istensor1 );                                    %&%
-rqre_datatype( lat, @istensor1 );                                  %&%
-rqre_datatype( doy, @istensor1 );                                  %&%
-if any(doy)>367 | any(doy<1)                                       %&%
-  error('doy range is [1,367]')                                    %&%
-end                                                                %&%
-if any(lat)>90 | any(lat<-90)                                      %&%
-   error('latitude range is -90 to 90')                            %&%
-end                                                                %&%
+                          
+if atmlab('STRICT_ASSERT')
+  rqre_datatype( p, @istensor1 );         
+  rqre_datatype( lat, @istensor1 );       
+  rqre_datatype( doy, @istensor1 );       
+  if any(doy)>367 | any(doy<1)            
+    error('doy range is [1,367]')         
+  end                                     
+  if any(lat)>90 | any(lat<-90)           
+     error('latitude range is -90 to 90') 
+  end                                     
+end
+
 
 % Create a a mjd matching the given doy (ie. the inverse of mjd2doy)
 mjd = date2mjd( 2000, 1, 1, 0, 0, 0 ) + doy - 1;
 
 
-cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
-                                                               'cira86.z.xml' );
+cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
+            'Earth', 'CIRA86', 'climatology', 'cira86.z.xml' );
 
 G = gf_artsxml( cira86, 'CIRA86', 'z_field' );
 
@@ -46,8 +49,8 @@ else
 end
 
 if nargout > 1
-  cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'climatology', 'cira86', ...
-                                                               'cira86.t.xml' );
+  cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
+            'Earth', 'CIRA86', 'climatology', 'cira86.t.xml' );
   G = gf_artsxml( cira86, 'CIRA86', 't_field' );
 
   G = atmdata_regrid( G, { p, lat, 0, mjd } );

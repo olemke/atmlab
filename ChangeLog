@@ -1,3 +1,13 @@
+2015-06-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-87
+
+	* geophysics/p2z_cira86.m (p2z_cira86): Now using STRICT_ASSERT.
+	Path inside arts-xml-data updated.
+
+	* geophysics/z2p_cira86.m (z2p_cira86): Path inside arts-xml-data
+	updated.
+
 2015-06-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-86
