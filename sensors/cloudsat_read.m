@@ -275,10 +275,10 @@ try
         end
         % convention to make all vectors column vectors
         if isvector(P.(F{1}))
-            P.(F{1}) = P.(F{1})(:);
+            P.(F{1}) = vec2col( P.(F{1}) );
         end
         % apply conditions
-        if ~isempty(iout) && ( isvector(P.(F{1})) || ismatrix(P.(F{1})) )
+        if ~isempty(iout) &&  size(P.(F{1}),1) > 1
             P.(F{1}) = P.(F{1})(iout,:);
         end
     end

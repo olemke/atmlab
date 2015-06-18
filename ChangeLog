@@ -1,5 +1,11 @@
 2015-06-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-88
+
+	* sensors/cloudsat_read.m: Setting limits in lat and lon was broken.
+
+2015-06-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-87
 
 	* geophysics/p2z_cira86.m (p2z_cira86): Now using STRICT_ASSERT.
