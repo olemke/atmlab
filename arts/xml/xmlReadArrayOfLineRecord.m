@@ -17,7 +17,7 @@
 
 function result = xmlReadArrayOfLineRecord(fid,attrlist,itype,ftype,binary,fid2)
 
-ne = str2num (xmlGetAttrValue (attrlist, 'nelem'));
+ne = str2double (xmlGetAttrValue (attrlist, 'nelem'));
 
 %=== Some old setting varaibles
 %

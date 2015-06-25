@@ -17,13 +17,13 @@
 
 function result = xmlReadTensor7(fid, attrlist, itype, ftype, binary, fid2)
 
-nl = str2num (xmlGetAttrValue (attrlist, 'nlibraries'));
-nv = str2num (xmlGetAttrValue (attrlist, 'nvitrines'));
-ns = str2num (xmlGetAttrValue (attrlist, 'nshelves'));
-nb = str2num (xmlGetAttrValue (attrlist, 'nbooks'));
-np = str2num (xmlGetAttrValue (attrlist, 'npages'));
-nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
-nc = str2num (xmlGetAttrValue (attrlist, 'ncols'));
+nl = str2double (xmlGetAttrValue (attrlist, 'nlibraries'));
+nv = str2double (xmlGetAttrValue (attrlist, 'nvitrines'));
+ns = str2double (xmlGetAttrValue (attrlist, 'nshelves'));
+nb = str2double (xmlGetAttrValue (attrlist, 'nbooks'));
+np = str2double (xmlGetAttrValue (attrlist, 'npages'));
+nr = str2double (xmlGetAttrValue (attrlist, 'nrows'));
+nc = str2double (xmlGetAttrValue (attrlist, 'ncols'));
 nelem =  nl * nv * ns * nb * np * nr * nc;
 
 if ~binary

@@ -17,10 +17,10 @@
 
 function result = xmlReadTensor4(fid, attrlist, itype, ftype, binary, fid2)
 
-nb = str2num (xmlGetAttrValue (attrlist, 'nbooks'));
-np = str2num (xmlGetAttrValue (attrlist, 'npages'));
-nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
-nc = str2num (xmlGetAttrValue (attrlist, 'ncols'));
+nb = str2double (xmlGetAttrValue (attrlist, 'nbooks'));
+np = str2double (xmlGetAttrValue (attrlist, 'npages'));
+nr = str2double (xmlGetAttrValue (attrlist, 'nrows'));
+nc = str2double (xmlGetAttrValue (attrlist, 'ncols'));
 nelem =  nb * np * nr * nc;
 
 if ~binary

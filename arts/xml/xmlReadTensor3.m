@@ -17,9 +17,9 @@
 
 function result = xmlReadTensor3(fid, attrlist, itype, ftype, binary, fid2)
 
-np = str2num (xmlGetAttrValue (attrlist, 'npages'));
-nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
-nc = str2num (xmlGetAttrValue (attrlist, 'ncols'));
+np = str2double (xmlGetAttrValue (attrlist, 'npages'));
+nr = str2double (xmlGetAttrValue (attrlist, 'nrows'));
+nc = str2double (xmlGetAttrValue (attrlist, 'ncols'));
 nelem =  np * nr * nc;
 
 if ~binary

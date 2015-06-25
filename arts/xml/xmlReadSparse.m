@@ -17,8 +17,8 @@
 
 function result = xmlReadSparse(fid, attrlist, itype, ftype, binary, fid2)
 
-nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
-nc = str2num (xmlGetAttrValue (attrlist, 'ncols'));
+nr = str2double (xmlGetAttrValue (attrlist, 'nrows'));
+nc = str2double (xmlGetAttrValue (attrlist, 'ncols'));
 
 i = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 j = xmlReadTag(fid, '', itype, ftype, binary, fid2);

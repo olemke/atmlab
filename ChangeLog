@@ -1,3 +1,20 @@
+2015-06-25  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-89
+
+	* arts/xml/xmlReadSpeciesAuxData.m, arts/xml/xmlWriteSpeciesAuxData.m:
+
+	Added reading/writing support for SpeciesAuxData.
+
+	* arts/xml/xmlReadArrayOfLineRecord.m, arts/xml/xmlReadIndexVector.m,
+	arts/xml/xmlReadMatrix.m, arts/xml/xmlReadSingleScatteringData.m,
+	arts/xml/xmlReadSparse.m, arts/xml/xmlReadTensor3.m,
+	arts/xml/xmlReadTensor4.m, arts/xml/xmlReadTensor5.m,
+	arts/xml/xmlReadTensor6.m, arts/xml/xmlReadTensor7.m,
+	arts/xml/xmlReadVector.m:
+
+	Use str2double instead of str2num.
+
 2015-06-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-88

@@ -23,7 +23,7 @@ vstr = xmlGetAttrValue (attrlist, 'version');
 if isempty(vstr)
     version = 1;
 else
-    version = str2num(vstr);
+    version = str2double(vstr);
 end
 result.ptype            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
 if (version == 1)

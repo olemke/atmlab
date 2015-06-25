@@ -17,7 +17,7 @@
 
 function result = xmlReadIndexVector(fid, attrlist, itype, ftype, binary, fid2)
 
-nr = str2num (xmlGetAttrValue (attrlist, 'nelem'));
+nr = str2double (xmlGetAttrValue (attrlist, 'nelem'));
 
 if ~binary
   result = fscanf (fid, '%d', nr);

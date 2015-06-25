@@ -17,8 +17,8 @@
 
 function result = xmlReadMatrix(fid, attrlist, itype, ftype, binary, fid2)
 
-nr = str2num (xmlGetAttrValue (attrlist, 'nrows'));
-nc = str2num (xmlGetAttrValue (attrlist, 'ncols'));
+nr = str2double (xmlGetAttrValue (attrlist, 'nrows'));
+nc = str2double (xmlGetAttrValue (attrlist, 'ncols'));
 nelem = nr * nc;
 
 if ~binary
