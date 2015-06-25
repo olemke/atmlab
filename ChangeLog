@@ -1,3 +1,9 @@
+2015-06-25  Richard Larsson  <ric.larsson@gmail.com>
+
+	* atmlab-2-3-90
+	
+	* arts/xml/xmlWriteSpeciesAuxData.m:  Added partition type tags.
+
 2015-06-25  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-89
