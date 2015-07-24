@@ -1,3 +1,12 @@
+2015-07-24  Richard Larsson  <ric.larsson@gmail.com>
+
+	* atmlab-2-3-91
+	
+	* arts/qarts2cfile.m:  Temporary fix.  nlteOff now runs and 
+	the generic input bad_partition_functions_ok=1 is forced.
+	If these should be choices, I have no idea where qpack sets those choises,
+	so I cannot add the code.
+
 2015-06-25  Richard Larsson  <ric.larsson@gmail.com>
 
 	* atmlab-2-3-90

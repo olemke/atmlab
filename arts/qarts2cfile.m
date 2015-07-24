@@ -432,9 +432,9 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   end
   %
   if qarts_isset(Q.VMR_NEGATIVE_OK) & Q.VMR_NEGATIVE_OK 
-    T{end+1} = 'atmfields_checkedCalc(negative_vmr_ok=1)';
+    T{end+1} = 'atmfields_checkedCalc(negative_vmr_ok=1,bad_partition_functions_ok=1)';
   else
-    T{end+1} = 'atmfields_checkedCalc';
+    T{end+1} = 'atmfields_checkedCalc(bad_partition_functions_ok=1)';
   end
   T{end+1} = 'atmgeom_checkedCalc';
   %
@@ -631,7 +631,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       end
       %
-      T{end+1} = 'FlagOn( nlte_checked )';    % This really safe?
+      T{end+1} = 'nlteOff';    % This really safe?
       T{end+1} = 'abs_lookupCalc'; 
       if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
         T = add_agenda( T, 'propmat_clearsky_agenda', ...
@@ -665,7 +665,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     end
     
     T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
-    T{end+1} = 'FlagOn( nlte_checked )';    % This really safe?
+    T{end+1} = 'nlteOff';    % This really safe?
     
   end %  qarts_isset( Q.ABSORPTION )
 
