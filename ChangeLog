@@ -1,3 +1,11 @@
+2015-08-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-92
+
+	* physics/hz2invcm.m:
+	* physics/invcm2hz.m: Two new functions for conversion between Hz
+	and cm-1.
+
 2015-07-24  Richard Larsson  <ric.larsson@gmail.com>
 
 	* atmlab-2-3-91
