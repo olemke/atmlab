@@ -13,7 +13,7 @@
 %        
 % OUT   S      The covariance matrix
 % IN    xp     The data abscissa.
-%       Std    Standard deviations. Given as a two vector matrix. First column
+%       Std    Standard deviations. Given as a two column matrix. First column
 %              holds position in same unit as *xp*. The second column is the 
 %              standard deviation at the postions of the first column. These
 %              values are then interpolated to *xp*, extrapolating end
@@ -30,7 +30,7 @@
 %              Must be given for all *cfun* beside 'drc'. Extrapolation as
 %              for *Std*. Scalar input is allowed.
 %       cco    Correlation cut-off. All values below this limit are set to 0.
-%       mapfun Mapping function from grid unit to unit for corrleation
+%       mapfun Mapping function from grid unit to unit for correlation
 %              lengths. For example, if correlation lengths are given in
 %              pressure decades, while the basic coordinate is Pa, this is
 %              *mapfun* handled by setting *mapfun* to @log10. 

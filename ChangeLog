@@ -1,3 +1,32 @@
+2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-94
+
+	* Did last commit from a sub-folder and then missed some
+	new/changed files.
+
+2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-93
+
+	* A restart of the ARTS scene generator. This work has up to now
+	been done outside Atmlab, largely by Bengt.
+
+	* arts/scenegen/modify/asg_hydrostat.m:
+	* arts/scenegen/regrid/surfrtdata_empty.m:
+	* arts/scenegen/regrid/asg_regrid.m:
+	* arts/scenegen/export/asg2q.m:
+	* gformat/atmdata_rndmz_by_covar.m:
+	* gformat/atmdata_dimadd.m: Added.
+
+	* atmlab/atmlab_init.m: Added ARTS scenegen folders to search
+	path.
+
+	* arts/scenegen_old: Old version movewd here, for reference. Not
+	active/working.
+
+	* covmat/covmat1d_from_cfun.m: Fixed typos in header text.
+
 2015-08-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-92

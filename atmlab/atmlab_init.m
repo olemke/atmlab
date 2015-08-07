@@ -67,8 +67,10 @@ addpath( fullfile( toppath, 'covmat' ) );
 addpath( fullfile( toppath, 'collocations' ) ); 
 addpath( fullfile( toppath, 'atmlab' ) ); 
 addpath( fullfile( toppath, 'arts', 'netcdf' ) ); 
-%addpath( fullfile( toppath, 'arts', 'scenegen', 'amsu' ) ); 
-%addpath( fullfile( toppath, 'arts', 'scenegen' ) ); 
+addpath( fullfile( toppath, 'arts', 'scenegen', 'regrid' ) ); 
+addpath( fullfile( toppath, 'arts', 'scenegen', 'modify' ) ); 
+addpath( fullfile( toppath, 'arts', 'scenegen', 'import' ) ); 
+addpath( fullfile( toppath, 'arts', 'scenegen', 'export' ) ); 
 addpath( fullfile( toppath, 'arts', 'xml' ) ); 
 addpath( fullfile( toppath, 'arts_usage' ) ); 
 addpath( fullfile( toppath, 'arts' ) ); 
@@ -90,6 +92,7 @@ end
 if atmlab('LEGACY_MODE')
     addpath( fullfile( toppath, 'deprecated' ) ); 
 end
+
 
 %=== Define some aliases
 %
