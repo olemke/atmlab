@@ -1,5 +1,12 @@
 2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-96
+
+	* sensors/read_ismar_l1b.m: New. Despite the name, also MARSS is
+	handled.
+
+2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-95
 
 	* site-specific/chalmers-gem/ecmwf2atmdata.m:
@@ -705,7 +712,6 @@
         input and output. Now read gtopo30 data into
         gformat structure for desired lat/lon limits.
 
->>>>>>> .r9153
 2015-01-15  Bengt Rydberg  <bengt.rydberg@molflow.com>
 
         * atmlab-2-3-46
