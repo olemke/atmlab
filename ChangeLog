@@ -1,5 +1,13 @@
 2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-95
+
+	* site-specific/chalmers-gem/ecmwf2atmdata.m:
+	* site-specific/chalmers-gem/ecmwf2surfdata.m:
+	* site-specific/chalmers-gem/find_ecmwf_files: Added.
+
+2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-94
 
 	* Did last commit from a sub-folder and then missed some
