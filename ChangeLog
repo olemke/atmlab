@@ -1,5 +1,11 @@
 2015-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-98
+
+	* sensors/ismar_los.m: Added thius function made by Bengt.
+
+2015-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-97
 
 	* math/vec2cell.m: New.
