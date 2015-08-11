@@ -4,7 +4,7 @@
 %   returned as modified julain date (MJD).
 %   
 %   Example result:
-%     >> I=read_ismar('marss_20150308_b891_firstlook.nc')
+%     >> I=read_ismar_l1b('marss_20150308_b891_firstlook.nc')
 %     I = 
 %
 %                            mjd: [102240x1 double]
@@ -25,7 +25,7 @@
 % OUT   I      Structure with L1b data.
 % IN    file   Name of file to read.
 
-% 2015-08-07  Mainly written byu Bent Rydberg. Polished and added to Atmlab
+% 2015-08-07  Mainly written by Bengt Rydberg. Polished and added to Atmlab
 % by Patrick.
 
 function I = read_ismar_l1b(file)
@@ -45,7 +45,6 @@ minute   = str2num( timeref.minute );
 second   = str2num( timeref.second );
 mjd0     = date2mjd( year, month, day, hour, minute, second );
 I.mjd    = mjd0 + time/(60*60*24);
-I.mjd    = time;
 
 
 % read remaining variables

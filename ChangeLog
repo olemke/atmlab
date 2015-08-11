@@ -1,3 +1,11 @@
+2015-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-97
+
+	* math/vec2cell.m: New.
+
+	* sensors/read_ismar_l1b.m: MJD was totally wrong. Fixed typos in header.
+
 2015-08-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-96
