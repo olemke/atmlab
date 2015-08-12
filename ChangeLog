@@ -1,5 +1,15 @@
 2015-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-100
+
+	* sensors/ismar_los.m: Small extension of header. And now also
+	handles MARSS. That is, both "ISMAR functions" cover also MARSS.
+
+	* sensors/read_ismar_l1b.m (read_ismar_l1b): Fixed some spelling
+	mistakes in header and comemnts.
+
+2015-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-99
 
 	* files/whichfiles.m: Added reference to whichfolders in header text.

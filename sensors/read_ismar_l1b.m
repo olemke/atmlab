@@ -1,7 +1,7 @@
 % READ_ISMAR_L1B   Reading of ISMAR and MARSS L1B data  
 %
 %   All variables are extracted. Date and time data are combined and
-%   returned as modified julain date (MJD).
+%   returned as modified Julian date (MJD).
 %   
 %   Example result:
 %     >> I=read_ismar_l1b('marss_20150308_b891_firstlook.nc')
@@ -26,7 +26,7 @@
 % IN    file   Name of file to read.
 
 % 2015-08-07  Mainly written by Bengt Rydberg. Polished and added to Atmlab
-% by Patrick.
+%             by Patrick.
 
 function I = read_ismar_l1b(file)
 
@@ -75,7 +75,7 @@ I.platform_orientation   = double( I.platform_orientation );
 I.sensor_view_angle      = ncread( file, 'sensor_view_angle', [1], [Inf] );
 I.sensor_view_angle      = double( I.sensor_view_angle );
 
-% POlarisation not present in oldest files
+% Polarisation not present in oldest files
 try
   I.detected_polarisation  = ncread( file, 'detected_polarisation', ...
                                    [1 1], [Inf Inf] );

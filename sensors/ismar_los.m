@@ -8,23 +8,41 @@
 % actual scan angle.
 %
 % These angles can be used to fill sensor_los when doing 
-% 3D calculations and using the met-mm system.
+% 3D calculations and using the met-mm system, e.g.:
 %
-% FORMAT   [za,aa] = ismar_los(I,ind)
+%   sensor_los = [za,aa];
 %
-% OUT   za    Zenith angles
-%       aa    Azimuth angles
-% IN    I     Structure with ISMAR measurement data
-%       ind   Index of data to be used
+% FORMAT   [za,aa] = ismar_los(I,ind,[instrument])
+%
+% OUT   za           Zenith angles
+%       aa           Azimuth angles
+% IN    I            Structure with ISMAR measurement data
+%       ind          Index of data to be used
+% OPT   instrument   Name of instrument, 'ISMAR' or 'MARSS'. 
+%                    Default is 'ISMAR*.
 
 % 2015-08-10  Created by Bengt Rydberg
 
-function [za,aa] = ismar_los(I,ind)
-  
+function [za,aa] = ismar_los(I,ind,instrument)
+%
+if nargin < 3
+  instrument = 'ismar';
+end
+
+% Mounting pitch angle
+switch upper(instrument)
+ case 'MARSS'
+  pitch0 = 3;   
+ case 'ISMAR'
+  pitch0 = -3;
+ otherwise
+  error( 'Not recognised choice for *instrument*.' );
+end
+
 
 yaw   = I.platform_orientation( ind );
-pitch = I.platform_pitch_angle( ind ) - 3;  % take into account of a 3 degree 
-roll  = I.platform_roll_angle( ind );       % mounting angle of the sensor
+pitch = I.platform_pitch_angle( ind ) + pitch0;
+roll  = I.platform_roll_angle( ind );       
 
 
 
