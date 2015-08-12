@@ -1,8 +1,16 @@
+2015-08-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-99
+
+	* files/whichfiles.m: Added reference to whichfolders in header text.
+
+	* files/whichfolders.m: New.
+
 2015-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-98
 
-	* sensors/ismar_los.m: Added thius function made by Bengt.
+	* sensors/ismar_los.m: Added this function made by Bengt.
 
 2015-08-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 

@@ -5,6 +5,8 @@
 %
 %    Folders are ignored. This means that '*' will not include . and ..
 %
+%    See also *whichfiles*.
+%
 % FORMAT   filenames = whichfiles( [ rgexp, folder ] )
 %        
 % OUT   filenames   Cell array of strings with names of files. Complete path
