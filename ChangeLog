@@ -1,5 +1,14 @@
 2015-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-102
+
+	* demos/asg_*_demo.m: Removed all old ASG demos as they have not
+	been working for a long time, and instead
+
+	* demos/asg_clearsky_demo.m: added this new demo file.
+
+2015-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-101
 
 	* arts/qarts2cfile.m (cfile_CldBox): Adopted to recent changes in
