@@ -1621,7 +1621,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
                                                           'same length.' ); %&%
     end                                                                     %&%
     %
-    T{end+1}  = 'ParticleTypeInit';
+    T{end+1}  = 'ScatSpeciesInit';
     do_pfCALC = false;
     %
     for i = 1 : length(Q.CLOUDBOX.PND_FIELD)
@@ -1644,9 +1644,9 @@ function T = cfile_CldBox( Q, partname, workfolder )
         do_pfCALC = true;
       end
       %
-      T{end+1} = 'ParticleTypeAdd(';
-      T{end+1} = sprintf('   filename_scat_data="%s",',sfile );
-      T{end+1} = sprintf('   filename_pnd_field="%s")',pfile );
+      T{end+1} = 'ScatElementsPndAndScatAdd(';
+      T{end+1} = sprintf('   scat_data_files=["%s"],',sfile );
+      T{end+1} = sprintf('   pnd_field_files=["%s"])',pfile );
     end
     %
     if do_pfCALC 
