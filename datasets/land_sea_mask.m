@@ -19,12 +19,17 @@
 % For implementation notes (how to add masks etc.), see
 % atmlab-data/land_water_mask/README
 %
-% FORMAT   [lat,lon,M] = land_sea_mask(gridsize)
+% FORMAT   [lat,lon,M] = land_sea_mask(gridsize[,lat_limits, lon_limits])
 %
 % IN
 %
 %   gridsize    string      size of the grid (The available grids are '1min','5min','60min','1deg')
 %        
+% OPT  These optional arguments can only be used when a gridsize is given:
+%        lat_limits     latitude limits (vector of length 2, -90 to 90)
+%        lon_limits     longitude limits (vector of length 2, -180 to 360,
+%                       but max seperated with 360 deg)
+
 % OUT   lat   Latitude grid for M.
 %       lon   Longitude grid for M.
 %       M     Mask matrix, with nonzero (may be 1) for land and 0 for sea.
@@ -52,19 +57,55 @@ function varargout = land_sea_mask(varargin)
 
 switch nargin
     case 0
-        [varargout{1:3}] = land_sea_mask_old;
+        [lat,lon,M] = land_sea_mask_old;
     otherwise
         gridsize = varargin{1};
         if strcmp(gridsize, '?')
             S = dir(fullfile(atmlab('ATMLAB_DATA_PATH'), 'land_water_mask'));
             [~, ~, ~, ~, tokenStr]= regexp({S.name}, 'land_water_mask_(.*)\.png');
             varargout{1} = cellfun(@(v) v{1}, tokenStr(~cellfun(@isempty, tokenStr)));
+            return  % !!!!!
         else
-            [varargout{1:3}] = land_sea_mask_new(varargin{:});
+            [lat,lon,M] = land_sea_mask_new(varargin{1});
         end
 end
 
+
+
+% Cropping in lat and lon
+if nargin > 1
+  %
+  lat_limits = varargin{2};
+  lon_limits = varargin{3};
+  %
+  if atmlab('STRICT_ASSERT')
+    chk_lat_limits( lat_limits );
+    chk_lon_limits( lon_limits );
+  end
+  %
+  % Find index of data to keep
+  ilat = find( lat >= lat_limits(1)  &  lat <= lat_limits(2) ); 
+  [lon,ilon] = adjust_to_lonlimits( lon, lon_limits );
+  ilon = find( ilon );
+  % Crop
+  lat = lat( ilat );
+  lon = lon( ilon );
+  M   = M(ilat,ilon);
+  % Sorting in lon needed?
+  if ~issorted( lon )
+    [lon,ilon] = sort( lon );
+    M = M(:,ilon);
+  end
+
+  % Copy to output args 
+  [varargout{1:3}] = deal( lat, lon, M );
+  
 end 
+
+end
+
+
+
 function [lat, lon, M] = land_sea_mask_new(gridsize)
 
 atmlab('require', {'ATMLAB_DATA_PATH'});

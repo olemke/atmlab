@@ -92,9 +92,9 @@ i_o2             = length( G );
 
 
 
-% N2, set to fixed value  (0.718)
+% N2, set to fixed value  (0.781)
 %
-G{end+1}         = atmdata_scalar(0.718);
+G{end+1}         = atmdata_scalar(0.781);
 G{end}.NAME      = 'N2';
 G{end}.DATA_NAME = 'Volume mixing ratio';
 G{end}.DATA_UNIT = '-';

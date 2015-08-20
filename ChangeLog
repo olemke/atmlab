@@ -1,3 +1,24 @@
+2015-08-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-103
+
+	* datasets/land_sea_mask.m: Moved to new folder. Now allows lat
+	and lon cropping (but cropping applied first after reading).
+
+	* datasets/read_gtopo30.m:
+	* sensors/cloudsat_read.m: Making use of new function below, and
+	now allows lon limits following [0,360].
+
+	* geographical/adjust_to_lonlimits.m: New.
+
+	* geographical/chk_lat_limits.m:
+	* geographical/chk_lon_limits.m: New. function pair.
+
+	* geographical/shift_longitudes.m: Improved spelling in header text.
+
+	* demos/asg_clearsky_demo.m (asg_clearsky_demo): Correction for
+	N2. Was set to 0718, now 0.781.
+
 2015-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-102

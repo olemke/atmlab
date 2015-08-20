@@ -55,7 +55,8 @@
 %   To read "tropical" data for the eastern hemisphere:
 %        fieldnames = cloudsat_read(filename,[],'lat',[-30 30],'lon',[0 180]);
 %   Longitude limits can be left out. Default for longitude limits is 
-%   [-180 180]. 
+%   [-180 180]. The longitude limits must be inside [-180,360], but not
+%   seperated with more than 360 deg.
 %
 % FORMAT   P = cloudsat_read(filename[,fieldlist,choice1,c1arg,choice2,c2arg])
 %        
@@ -206,13 +207,17 @@ if ~isempty( choice1 )
     %- latitude
     if strcmp( choice1, 'lat' )  |  strcmp( choice2, 'lat' )
       if strcmp( choice1, 'lat' )
-        if ~( isnumeric(c1arg) & isvector(c1arg) & length(c1arg)==2 )
-          error( '*c1arg* must for ''lat'' option be a vector of length 2.' );
+        try
+          chk_lat_limits( c1arg )
+        catch
+          error( '*c1arg* must for ''lat'' option be a vector passing *chk_lat_limits*.' );
         end
         latlims = c1arg;
       else  
-        if ~( isnumeric(c2arg) & isvector(c2arg) & length(c2arg)==2 )
-          error( '*c2arg* must for ''lat'' option be a vector of length 2.' );
+        try
+          chk_lat_limits( c2arg )
+        catch
+          error( '*c2arg* must for ''lat'' option be a vector passing *chk_lat_limits*.' );
         end
         latlims = c2arg;
       end
@@ -223,13 +228,17 @@ if ~isempty( choice1 )
     %- longitude
     if strcmp( choice1, 'lon' )  |  strcmp( choice2, 'lon' )
       if strcmp( choice1, 'lon' )
-        if ~( isnumeric(c1arg) & isvector(c1arg) & length(c1arg)==2 )
-          error( '*c1arg* must for ''lon'' option be a vector of length 2.' );
+        try
+          chk_lon_limits( c1arg )
+        catch
+          error( '*c1arg* must for ''lon'' option be a vector passing *chk_lon_limits*.' );
         end
         lonlims = c1arg;
       else  
-        if ~( isnumeric(c2arg) & isvector(c2arg) & length(c2arg)==2 )
-          error( '*c2arg* must for ''lon'' option be a vector of length 2.' );
+        try
+          chk_lon_limits( c2arg )
+        catch
+          error( '*c2arg* must for ''lon'' option be a vector passing *chk_lon_limits*.' );
         end
         lonlims = c2arg;
       end
@@ -237,9 +246,11 @@ if ~isempty( choice1 )
       lonlims = [-180 180 ];
     end   
 
-    iout = inleg & ...
-        P.Latitude  >= latlims(1) & P.Latitude  <= latlims(2) & ...
-        P.Longitude >= lonlims(1) & P.Longitude <= lonlims(2);
+    % Adjust longitudes according to lonlims and find hits
+    [P.Longitude,ilon] = adjust_to_lonlimits( P.Longitude, lonlims );
+    
+    % Find data matching criteria
+    iout = inleg & P.Latitude >= latlims(1) & P.Latitude <= latlims(2) & ilon;
     
     if isempty(iout)
       P = 'No data matching reading restrictions.';

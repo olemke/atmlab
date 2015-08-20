@@ -1,7 +1,6 @@
 % READ_GTOPO30  reads gtopo30 digital elevation model
 %               data into G-format data
 %
-%
 % GTOPO30 is a digital elevation model for the world, 
 % developed by USGS. It has a 30-arc second resolution 
 % (approximately 1 km), and is split into 33 tiles 
@@ -23,43 +22,42 @@
 %         G             gtopo30 data on gformat structure
 %                       ( all data at full resolution
 %                         within the desired limits)
-%       
 % IN 
-%        lat_limits     latitude limits (vector)
-%        lon_limits     longitude limits (vector) (-180 to 180)
+%        lat_limits     latitude limits (vector of length 2, -90 to 90)
+%        lon_limits     longitude limits (vector of length 2, -180 to 360,
+%                       but max seperated with 360 deg)
 %
 
 % HISTORY: Created by Bengt Rydberg 2015-01-15
 
 function [G]=read_gtopo30(lat_limits,lon_limits)
 
-strictAssert = atmlab('STRICT_ASSERT');
-
-if strictAssert;
-
-  rqre_datatype( lat_limits, @isvector );
-  rqre_datatype( lon_limits, @isvector );
-  if length(lon_limits)~=2;
-    error('lon_limits must be a vector of length 2')
-  end
-  if length(lat_limits)~=2;
-    error('lat_limits must be a vector of length 2')
-  end
-  if any(lon_limits<-180) | any(lon_limits>180);
-    error('lon_limits must be inside -180 to 180')
-  end
-  if any(lat_limits<-90) | any(lat_limits>90);
-    error('lat_limits must be inside -90 to 90')
-  end
-  if lon_limits(1)>lon_limits(2);
-    error('lon_limits(2) must be greater than lon_limits(2)')
-  end
-  if lat_limits(1)>lat_limits(2);
-    error('lat_limits(2) must be greater than lat_limits(2)')
-  end
-
+if atmlab('STRICT_ASSERT')
+  chk_lat_limits( lat_limits );
+  chk_lon_limits( lon_limits );
 end
 
+
+% 2015-08-20, PE
+%
+% Introduced this wrapper part to allow lon_limits outside [-180,180]  
+ 
+if lon_limits(2) <= 180
+  G = read_gtopo30_core( lat_limits, lon_limits );
+elseif lon_limits(1) >= 180
+  G = read_gtopo30_core( lat_limits, lon_limits-360 );
+  G.GRID2 = G.GRID2 + 360;
+else
+  % Passing +-180, here we read in two parts and merge
+  G  = read_gtopo30_core( lat_limits, [lon_limits(1) 180] );
+  G2 = read_gtopo30_core( lat_limits, [-180 lon_limits(2)-360] );
+  G.GRID2 = [ G.GRID2; G2.GRID2+360 ];
+  G.DATA  = [ G.DATA, G2.DATA ];
+end
+  
+  
+function G = read_gtopo30_core(lat_limits,lon_limits)
+ 
 
 %path to data files
 datadir = fullfile(atmlab('ATMLAB_DATA_PATH'),'dem_data/gtopo30');
