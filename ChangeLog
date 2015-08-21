@@ -1,5 +1,14 @@
 2015-08-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-105
+
+	* datasets/land_sea_mask.m: lon grid ended up having two 0 when
+	shifting to [-180,180].
+
+	* geographical/adjust_to_lonlimits.m: Corrected header.
+
+2015-08-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-104
 
 	* datasets/land_sea_mask.m: Mistake in my last commit. Output

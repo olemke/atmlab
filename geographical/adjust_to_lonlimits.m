@@ -35,7 +35,7 @@ elseif lon_limits(1) < 0
   lons = shift_longitudes( lons0, -180, 180 );
 % [0,360]
 else
-  lons = shift_longitudes( lons0, -0, 360 );
+  lons = shift_longitudes( lons0, 0, 360 );
 end
 
 %- Find hits

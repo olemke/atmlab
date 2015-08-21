@@ -85,7 +85,13 @@ if nargin > 1
   %
   % Find index of data to keep
   ilat = find( lat >= lat_limits(1)  &  lat <= lat_limits(2) ); 
-  [lon,ilon] = adjust_to_lonlimits( lon, lon_limits );
+  % Both 0 and 360 are mapped to 0, if adjusting to [-180,180]. The data at
+  % 360 is only needed if lon_limit(2) == 360.
+  if lon_limits(2) == 360
+    [lon,ilon] = adjust_to_lonlimits( lon, lon_limits );
+  else
+    [lon,ilon] = adjust_to_lonlimits( lon(1:end-1), lon_limits );
+  end
   ilon = find( ilon );
   % Crop
   lat = lat( ilat );
