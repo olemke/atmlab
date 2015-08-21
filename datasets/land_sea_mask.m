@@ -97,11 +97,12 @@ if nargin > 1
     M = M(:,ilon);
   end
 
-  % Copy to output args 
-  [varargout{1:3}] = deal( lat, lon, M );
-  
 end 
 
+
+% Copy to output args 
+[varargout{1:3}] = deal( lat, lon, M );
+  
 end
 
 
