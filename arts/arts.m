@@ -1,7 +1,7 @@
 % ARTS   Call ARTS 
 %
-%    Calls ARTS where path to executable and verbosity are taken from personal
-%    settings. That is, the settings ARTS_PATH and 
+%    Calls ARTS where path to executable and verbosity are taken from 
+%    personal settings. That is, the settings ARTS_PATH and 
 %    FMODEL_VERBOSITY are used (see futher*atmlab*).
 %
 %    Note that Matlab allows a call as
@@ -11,7 +11,7 @@
 %    all inside a string, as:
 %       arts '-w all';
 %
-% FORMAT   [status,result] = arts( cfile [,errortol,noecho] )
+% FORMAT   [status,result] = arts( cfile [,errortol] )
 %        
 % OUT   status     Status returned by ARTS. Is 0 if all OK.
 %       result     String containing messages to standard output.
@@ -19,51 +19,52 @@
 %                  '-h'.
 % OPT   errortol   Flag to tolerate error. If set to 0, an ARTS error gives
 %                  rise also to a Matlab error. Default is 0.
-%       noecho     Flag to suppress screen output. Default is false.
 
 % 2004-09-07   Created by Patrick Eriksson.
 
 function [status,result] = arts(cfile,varargin)
 %
-[errortol,noecho] = optargs( varargin, { 0, false } );
+[errortol] = optargs( varargin, { false } );
                                                                 
+if atmlab('STRICT_ASSERT')
+  %
+  atmlab( 'require', {'ARTS_PATH','FMODEL_VERBOSITY'} ); 
+  %
+  exec   = atmlab( 'ARTS_PATH' );
+  rlevel = atmlab( 'FMODEL_VERBOSITY' );
+  %                                                         
+  if isempty( exec )                                       
+    error('Path to ARTS executable must be a string.');    
+  end
+else
+  exec   = atmlab( 'ARTS_PATH' );
+  rlevel = atmlab( 'FMODEL_VERBOSITY' );
+end
 
-atmlab( 'require', {'ARTS_PATH','FMODEL_VERBOSITY'} );           %&%
 
-exec   = atmlab( 'ARTS_PATH' );
-rlevel = atmlab( 'FMODEL_VERBOSITY' );
-                                                                 %&%
-if isempty( exec )                                               %&%
-  error('Path to ARTS executable must be a string.');            %&%
-end                                                              %&%
-if isempty( rlevel )                                             %&%
-  rlevel = 0;                                                    %&%
-end                                                              %&%
+if isempty( rlevel )                                     
+  rlevel = 0;                                            
+end                                                      
+
 
 outdir = fileparts( cfile );
 
-if noecho
-  if isempty( outdir )
-    [status,result] = system( ...
+
+if isempty( outdir )
+  [status,result] = system( ...
                        sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
-  else
-    [status,result] = system( ...
-         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
-  end  
 else
-  if isempty( outdir )
-    [status,result] = system( ...
-                       sprintf('%s -r%d0 %s', exec, rlevel, cfile ), '-echo' );
-  else
-    [status,result] = system( ...
-         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ), '-echo' );
-  end
+  [status,result] = system( ...
+         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+end
+
+
+if ~isempty( result )
+  disp( result )
 end
 
 
 if status  &  ~errortol
-  %disp( result )
-  fprintf('\n');
   error('An error occured while executing ARTS. See above.')
 end
 

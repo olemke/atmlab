@@ -1,3 +1,18 @@
+2015-08-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-106
+
+	* arts/arts.m: Revised how this function handles screen output and
+	error messages, after wasting time due to missing error
+	information in a case reported by Fran in Bern. Seems that -echo
+	flag is not working on all systems (an obselete flag?), and
+	removed this flag. Also removed the noecho input argument, as
+	the verbosity now is supposed to controlled by FMODEL_VERBOSITY.
+	Adopted the code following these changes.
+
+	Tell me if you get unexpected behaviour on your system, now after
+	this change.
+
 2015-08-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-105
