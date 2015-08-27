@@ -90,6 +90,33 @@ for i = 1 : nq
     else                                                                    %&%
       error( 'Unknown wind subtag.' );                                      %&%
     end
+
+   case 'Magnetic field'   %---------------------------------------------------
+    %
+    if strcmp( R.jq{i}.subtag, 'u' )             
+      rqre_field( Q.MAG_U, 'SX', 'Q.MAG_U' );                               %&%
+      rqre_datatype( Q.MAG_U.SX, @istensor2, 'Q.MAG_U.SX' );                %&%
+      if any( size(Q.MAG_U.SX) ~= length(ind) )                             %&%
+        error( sprintf('Wrong size of Q.MAG_U.SX.') );                      %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.MAG_U.SX;
+    elseif strcmp( R.jq{i}.subtag, 'v' )             
+      rqre_field( Q.MAG_V, 'SX', 'Q.MAG_V' );                               %&%
+      rqre_datatype( Q.MAG_V.SX, @istensor2, 'Q.MAG_V.SX' );                %&%
+      if any( size(Q.MAG_V.SX) ~= length(ind) )                             %&%
+        error( sprintf('Wrong size of Q.MAG_V.SX.') );                      %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.MAG_V.SX;
+    elseif strcmp( R.jq{i}.subtag, 'w' ) 
+      rqre_field( Q.MAG_W, 'SX', 'Q.MAG_W' );                               %&%
+      rqre_datatype( Q.MAG_W.SX, @istensor2, 'Q.MAG_W.SX' );                %&%
+      if any( size(Q.MAG_W.SX) ~= length(ind) )                             %&%
+        error( sprintf('Wrong size of Q.MAG_W.SX.') );                      %&%
+      end                                                                   %&%
+      Sx(ind,ind) = Q.MAG_W.SX;
+    else                                                                    %&%
+      error( 'Unknown magnetic field subtag.' );                            %&%
+    end
     
    case 'Sensor pointing'   %--------------------------------------------------
     %

@@ -24,7 +24,7 @@
 % OUT   atmfield    Obtained data field.
 % IN    Q           Qarts setting structure.
 %       vstring     The variable for which ATMDATA shall be interpolated.
-%                   Case of strong is ignored. Examples: 't', 'T', 'z', 
+%                   Case of string is ignored. Examples on strings: 't', 'T', 
 %                   'wind_u' and 'WIND_w'.
 % OPT   mjd         Date as MJD. A scalar.
 %       ltime       Local (solar) time, in hours. A scalar.

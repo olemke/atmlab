@@ -98,6 +98,22 @@ for i = 1 : nq
     end
     %
     clear X
+
+   case 'Magnetic field'   %--------------------------------------------------
+    %
+    X = x2field( Q.ATMOSPHERE_DIM, R.jq{i}.grids, x(ind) );
+    X = arts_regrid( Q.ATMOSPHERE_DIM, R.jq{i}.grids, X, Q );
+    if strcmp( R.jq{i}.subtag, 'u' )
+      xmlStore( fullfile(R.workfolder,'mag_u_field.xml'), X, 'Tensor3' );
+    elseif strcmp( R.jq{i}.subtag, 'v' )
+      xmlStore( fullfile(R.workfolder,'mag_v_field.xml'), X, 'Tensor3' );
+    elseif strcmp( R.jq{i}.subtag, 'w' )
+      xmlStore( fullfile(R.workfolder,'mag_w_field.xml'), X, 'Tensor3' );
+    else
+      assert( false );
+    end
+    %
+    clear X
     
    case 'Sensor pointing'   %-------------------------------------------------
     %

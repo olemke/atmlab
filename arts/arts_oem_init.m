@@ -112,7 +112,7 @@ if atmlab( 'STRICT_ASSERT' )
     end 
   end  
 
-  % vind fields
+  % wind fields
   if isfield( Q, 'WIND_U.RETRIEVE' ) & Q.WIND_U.RETRIEVE & ...
                                               ~qarts_isset( Q.WIND_U_FIELD )
     error( 'If wind u-component is retrieved, WIND_U_FIELD must be set.' );
@@ -124,6 +124,20 @@ if atmlab( 'STRICT_ASSERT' )
   if isfield( Q, 'WIND_W.RETRIEVE' ) & Q.WIND_W.RETRIEVE & ...
                                               ~qarts_isset( Q.WIND_W_FIELD )
     error( 'If wind w-component is retrieved, WIND_W_FIELD must be set.' );
+  end  
+
+  % Magnetic field
+  if isfield( Q, 'MAG_U.RETRIEVE' ) & Q.MAG_U.RETRIEVE & ...
+                                              ~qarts_isset( Q.MAG_U_FIELD )
+    error( 'If mag u-component is retrieved, MAG_U_FIELD must be set.' );
+  end  
+  if isfield( Q, 'MAG_V.RETRIEVE' ) & Q.MAG_V.RETRIEVE & ...
+                                              ~qarts_isset( Q.MAG_V_FIELD )
+    error( 'If mag v-component is retrieved, MAG_V_FIELD must be set.' );
+  end  
+  if isfield( Q, 'MAG_W.RETRIEVE' ) & Q.MAG_W.RETRIEVE & ...
+                                              ~qarts_isset( Q.MAG_W_FIELD )
+    error( 'If mag w-component is retrieved, MAG_W_FIELD must be set.' );
   end  
   
   % Sensor stuff
@@ -158,7 +172,8 @@ R            = [];
 R.i_rel      = [];
 R.workfolder = workfolder;
 %
-[Q,R,t_field,z_field,vmr_field,wind_u,wind_v,wind_w] = init_local( Q, R );
+[Q,R,t_field,z_field,vmr_field,wind_u,wind_v,wind_w,mag_u,mag_v,mag_w] = ...
+                                                         init_local( Q, R );
 
 
 
@@ -259,6 +274,33 @@ for i = 1 : nq
     else
       error( 'Unknown wind subtag.' );
     end
+
+  case 'Magnetic field'   %-------------------------------------------------------------
+    %
+    if strcmp( R.jq{i}.subtag, 'u' )
+      Q = force_file_local( Q, 'MAG_U_FIELD', 'Tensor3', R );
+      if isempty( mag_u )
+        mag_u = zeros( size( t_field ) );
+      end
+      xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, mag_u, ...
+                                                             R.jq{i}.grids ) );
+    elseif strcmp( R.jq{i}.subtag, 'v' )
+      Q = force_file_local( Q, 'MAG_V_FIELD', 'Tensor3', R );
+      if isempty( mag_v )
+        mag_v = zeros( size( t_field ) );
+      end
+      xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, mag_v, ...
+                                                             R.jq{i}.grids ) );
+    elseif strcmp( R.jq{i}.subtag, 'w' )
+      Q = force_file_local( Q, 'MAG_W_FIELD', 'Tensor3', R );
+      if isempty( mag_w )
+        mag_w = zeros( size( t_field ) );
+      end
+      xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, mag_w, ...
+                                                             R.jq{i}.grids ) );
+    else
+      error( 'Unknown magnetic field subtag.' );
+    end
     
    %---------------------------------------------------------------------------
    case { 'Frequency', 'Sensor pointing', 'Polynomial baseline fit', ...
@@ -328,7 +370,7 @@ return
 
 
 
-function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
+function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v,wind_w,mag_u,mag_v,mag_w] = ...
                                                              init_local( Q, R )
 
   %- Copy some data to R
@@ -389,6 +431,22 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v, wind_w] = ...
     wind_w = qarts_get( Q.WIND_W_FIELD );
   else
     wind_w = NaN;
+  end
+  % Magnetic field
+  if qarts_isset( Q.MAG_U_FIELD )
+    mag_u = qarts_get( Q.MAG_U_FIELD );
+  else
+    mag_u = NaN;
+  end
+  if qarts_isset( Q.MAG_V_FIELD )
+    mag_v = qarts_get( Q.MAG_V_FIELD );
+  else
+    mag_v = NaN;
+  end
+  if qarts_isset( Q.MAG_W_FIELD )
+    mag_w = qarts_get( Q.MAG_W_FIELD );
+  else
+    mag_w = NaN;
   end
   
   %- Absorption

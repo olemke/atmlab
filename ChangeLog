@@ -1,3 +1,15 @@
+2015-08-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-107
+
+	* retrieval/qpack2/qp2_l2.m:
+	* arts/qarts_atm_field.m:
+	* arts/arts_sx.m:
+	* arts/arts_x2QR.m:
+	* arts/arts_oem_init.m:
+	* arts/qarts.m: Preperations for allowing retrieval of magnetic
+	field components.
+
 2015-08-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-106

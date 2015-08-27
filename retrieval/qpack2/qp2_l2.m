@@ -307,6 +307,42 @@ for q = 1 : length(R.jq)
     else                                                                    %&%
       error( 'Unknown wind subtag.' );                                      %&%
     end
+
+  elseif strcmp( R.jq{q}.maintag, 'Magnetic field' )
+    %--------------------------------------------------------------------------
+    if strcmp( R.jq{q}.subtag, 'u' )
+      rqre_field( Q.MAG_U, 'L2', 'Q.MAG_U' );                               %&%
+      out = qarts_get( Q.MAG_U.L2 );
+      rqre_datatype( out, @isboolean, 'Q.MAG_U.L2' );                       %&%
+      %
+      if out
+        s        = 'mag_u';
+        atmfield = true;
+        Astruct  = Q.MAG_U;
+      end
+    elseif strcmp( R.jq{q}.subtag, 'v' )
+      rqre_field( Q.MAG_V, 'L2', 'Q.MAG_V' );                               %&%
+      out = qarts_get( Q.MAG_V.L2 );
+      rqre_datatype( out, @isboolean, 'Q.MAG_V.L2' );                       %&%
+      %
+      if out
+        s        = 'mag_v';
+        atmfield = true;
+        Astruct  = Q.MAG_V;
+      end
+    elseif strcmp( R.jq{q}.subtag, 'w' )
+      rqre_field( Q.MAG_W, 'L2', 'Q.MAG_W' );                               %&%
+      out = qarts_get( Q.MAG_W.L2 );
+      rqre_datatype( out, @isboolean, 'Q.MAG_W.L2' );                       %&%
+      %
+      if out
+        s        = 'mag_w';
+        atmfield = true;
+        Astruct  = Q.MAG_W;
+      end
+    else                                                                    %&%
+      error( 'Unknown magnetic field subtag.' );                            %&%
+    end
     
   elseif strcmp( R.jq{q}.maintag, 'Sensor pointing' )
     %--------------------------------------------------------------------------
