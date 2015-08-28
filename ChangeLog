@@ -1,3 +1,16 @@
+2015-08-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-108
+
+	* arts/arts.m: Yet an attempt to improve this function, as the
+	last change did not solve the problem for everybody. Seems to be a
+	problem with older matlab versions. Using a hint from Oliver, the
+	call is now redirected through bash. Works for for me, but as last
+	time:
+
+	Tell me if you get unexpected behaviour on your system, now after
+	this change.
+
 2015-08-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-107

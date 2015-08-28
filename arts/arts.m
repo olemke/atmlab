@@ -50,12 +50,21 @@ end
 outdir = fileparts( cfile );
 
 
+% The call involving bash introduced 2015-08-28. Pattern suggested by 
+% Oliver L. THis after problems with an old matlab version. The speculation
+% is that the old version does not catch stderr, and result could end up
+% empty. The bash solution should hopefully fix this!?
+
 if isempty( outdir )
-  [status,result] = system( ...
-                       sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+  [status,result] = system( sprintf( ...
+                               'bash -c "%s -r%d0 %s" 2>&1', exec, rlevel, cfile ) );
+  %[status,result] = system( ...
+  %                     sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
 else
-  [status,result] = system( ...
-         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+  [status,result] = system( sprintf( ...
+                 'bash -c "%s -r%d0 -o %s %s" 2>&1', exec, rlevel, outdir, cfile ) );
+%  [status,result] = system( ...
+%         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
 end
 
 
