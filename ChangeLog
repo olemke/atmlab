@@ -1,3 +1,20 @@
+2015-08-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-109
+
+	* arts/arts_oem_init.m:
+	* arts/arts_oem:
+	* arts/qarts2cfile.m: Further work on mag field retrieval. 
+
+	* arts/arts_oem_init.m:
+	* arts/qarts.m: Added the option MINMAX to wind components.
+
+	* demos/data/HITRAN2012_o2line_118GHz.par: New name of this file.
+
+	* demos/qarts_zeeman_demo.m: Updated paths to CIRA86 files, and
+	had to change namw on file holding HITRAN data. Started to add
+	test of mag field retrieval.
+
 2015-08-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-108

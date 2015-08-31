@@ -257,6 +257,10 @@ for i = 1 : nq
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_u, ...
                                                              R.jq{i}.grids ) );
+      if isfield( Q.WIND_U, 'MINMAX' )  & ~isempty(Q.WIND_U.MINMAX)
+        R.minmax(ind,1:length(Q.WIND_U.MINMAX)) = ...
+                                     repmat( Q.WIND_U.MINMAX', length(ind), 1 );
+      end 
     elseif strcmp( R.jq{i}.subtag, 'v' )
       Q = force_file_local( Q, 'WIND_V_FIELD', 'Tensor3', R );
       if isempty( wind_v )
@@ -264,6 +268,10 @@ for i = 1 : nq
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_v, ...
                                                              R.jq{i}.grids ) );
+      if isfield( Q.WIND_V, 'MINMAX' )  & ~isempty(Q.WIND_V.MINMAX)
+        R.minmax(ind,1:length(Q.WIND_V.MINMAX)) = ...
+                                     repmat( Q.WIND_V.MINMAX', length(ind), 1 );
+      end 
     elseif strcmp( R.jq{i}.subtag, 'w' )
       Q = force_file_local( Q, 'WIND_W_FIELD', 'Tensor3', R );
       if isempty( wind_w )
@@ -271,6 +279,10 @@ for i = 1 : nq
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, wind_w, ...
                                                              R.jq{i}.grids ) );
+      if isfield( Q.WIND_W, 'MINMAX' )  & ~isempty(Q.WIND_W.MINMAX)
+        R.minmax(ind,1:length(Q.WIND_W.MINMAX)) = ...
+                                     repmat( Q.WIND_W.MINMAX', length(ind), 1 );
+      end 
     else
       error( 'Unknown wind subtag.' );
     end
@@ -284,6 +296,10 @@ for i = 1 : nq
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, mag_u, ...
                                                              R.jq{i}.grids ) );
+      if isfield( Q.MAG_U, 'MINMAX' )  & ~isempty(Q.MAG_U.MINMAX)
+        R.minmax(ind,1:length(Q.MAG_U.MINMAX)) = ...
+                                     repmat( Q.MAG_U.MINMAX', length(ind), 1 );
+      end 
     elseif strcmp( R.jq{i}.subtag, 'v' )
       Q = force_file_local( Q, 'MAG_V_FIELD', 'Tensor3', R );
       if isempty( mag_v )
@@ -291,6 +307,10 @@ for i = 1 : nq
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, mag_v, ...
                                                              R.jq{i}.grids ) );
+      if isfield( Q.MAG_V, 'MINMAX' )  & ~isempty(Q.MAG_V.MINMAX)
+        R.minmax(ind,1:length(Q.MAG_V.MINMAX)) = ...
+                                     repmat( Q.MAG_V.MINMAX', length(ind), 1 );
+      end 
     elseif strcmp( R.jq{i}.subtag, 'w' )
       Q = force_file_local( Q, 'MAG_W_FIELD', 'Tensor3', R );
       if isempty( mag_w )
@@ -298,6 +318,10 @@ for i = 1 : nq
       end
       xa(ind) = mat2col( arts_regrid( Q.ATMOSPHERE_DIM, Q, mag_w, ...
                                                              R.jq{i}.grids ) );
+      if isfield( Q.MAG_W, 'MINMAX' )  & ~isempty(Q.MAG_W.MINMAX)
+        R.minmax(ind,1:length(Q.MAG_W.MINMAX)) = ...
+                                     repmat( Q.MAG_W.MINMAX', length(ind), 1 );
+      end 
     else
       error( 'Unknown magnetic field subtag.' );
     end

@@ -1443,6 +1443,114 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} = sprintf( '  %s,%s,%s,"w")', name1, name2, name3 );
     end  
   end  
+
+  %- Magnetic field, U
+  %                                                                         %&%
+  if qarts_isset( Q.MAG_U )
+    if ~isfield( Q.MAG_U, 'RETRIEVE' )                                      %&%
+       error( 'When Q.MAG_U exists, the field RETRIEVE must be set.' );     %&%
+    end                                                                     %&%
+    rqre_datatype( Q.MAG_U.RETRIEVE, @isboolean, 'Q.MAG_U.RETRIEVE' );      %&%
+    if Q.MAG_U.RETRIEVE                                                    
+      %                                                                     %&%
+      if ~isfield( Q.MAG_U, {'GRIDS'} )                                     %&%
+        error( ...                                                          %&%
+          'With Q.MAG_U.RETRIEVED true the field ''GRIDS'' must exist.' );  %&%
+      end                                                                   %&%
+      rqre_datatype( Q.MAG_U.GRIDS, @iscell, 'Q.MAG_U.GRIDS' );             %&%
+      if length(Q.MAG_U.GRIDS) ~= 3                                         %&%
+        error( 'Q.MAG_U.GRIDS has not length 3.' );                         %&%
+      end                                                                   %&%
+      %
+      name1    = 'mag_u_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T        = file_or_data( T, name1, 'Vector', Q.MAG_U.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'mag_u_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T        = file_or_data( T, name2, 'Vector', Q.MAG_U.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'mag_u_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T        = file_or_data( T, name3, 'Vector', Q.MAG_U.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      T{end+1} ='jacobianAddMagField(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,"u")', name1, name2, name3 );
+    end  
+  end  
+
+  %- Magnetic field, V
+  %                                                                         %&%
+  if qarts_isset( Q.MAG_V )
+    if ~isfield( Q.MAG_V, 'RETRIEVE' )                                      %&%
+       error( 'When Q.MAG_V exists, the field RETRIEVE must be set.' );     %&%
+    end                                                                     %&%
+    rqre_datatype( Q.MAG_V.RETRIEVE, @isboolean, 'Q.MAG_V.RETRIEVE' );      %&%
+    if Q.MAG_V.RETRIEVE                                                    
+      %                                                                     %&%
+      if ~isfield( Q.MAG_V, {'GRIDS'} )                                     %&%
+        error( ...                                                          %&%
+          'With Q.MAG_V.RETRIEVED true the field ''GRIDS'' must exist.' );  %&%
+      end                                                                   %&%
+      rqre_datatype( Q.MAG_V.GRIDS, @iscell, 'Q.MAG_V.GRIDS' );             %&%
+      if length(Q.MAG_V.GRIDS) ~= 3                                         %&%
+        error( 'Q.MAG_V.GRIDS has not length 3.' );                         %&%
+      end                                                                   %&%
+      %
+      name1    = 'mag_v_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T        = file_or_data( T, name1, 'Vector', Q.MAG_V.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'mag_v_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T        = file_or_data( T, name2, 'Vector', Q.MAG_V.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'mag_v_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T        = file_or_data( T, name3, 'Vector', Q.MAG_V.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      T{end+1} ='jacobianAddMagField(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,"v")', name1, name2, name3 );
+    end  
+  end  
+  
+  %- Magnetic field, W
+  %                                                                         %&%
+  if qarts_isset( Q.MAG_W )
+    if ~isfield( Q.MAG_W, 'RETRIEVE' )                                      %&%
+       error( 'When Q.MAG_W exists, the field RETRIEVE must be set.' );     %&%
+    end                                                                     %&%
+    rqre_datatype( Q.MAG_W.RETRIEVE, @isboolean, 'Q.MAG_W.RETRIEVE' );      %&%
+    if Q.MAG_W.RETRIEVE                                                    
+      %                                                                     %&%
+      if ~isfield( Q.MAG_W, {'GRIDS'} )                                     %&%
+        error( ...                                                          %&%
+          'With Q.MAG_W.RETRIEVED true the field ''GRIDS'' must exist.' );  %&%
+      end                                                                   %&%
+      rqre_datatype( Q.MAG_W.GRIDS, @iscell, 'Q.MAG_W.GRIDS' );             %&%
+      if length(Q.MAG_W.GRIDS) ~= 3                                         %&%
+        error( 'Q.MAG_W.GRIDS has not length 3.' );                         %&%
+      end                                                                   %&%
+      %
+      name1    = 'mag_w_jac_p_grid';
+      T{end+1} = create_var( name1, 'Vector' );
+      T        = file_or_data( T, name1, 'Vector', Q.MAG_W.GRIDS{1}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name1 );
+      name2    = 'mag_w_jac_lat_grid';
+      T{end+1} = create_var( name2, 'Vector' );
+      T        = file_or_data( T, name2, 'Vector', Q.MAG_W.GRIDS{2}, ...
+                                workfolder, Q.INPUT_FILE_FORMAT, name2 );
+      name3    = 'mag_w_jac_lon_grid';
+      T{end+1} = create_var( name3, 'Vector' );
+      T        = file_or_data( T, name3, 'Vector', Q.MAG_W.GRIDS{3},...
+                                    workfolder, Q.INPUT_FILE_FORMAT, name3 );
+      T{end+1} ='jacobianAddMagField(jacobian_quantities,jacobian_agenda,';
+      T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
+      T{end+1} = sprintf( '  %s,%s,%s,"w")', name1, name2, name3 );
+    end  
+  end  
   
   %- Frequency
   %

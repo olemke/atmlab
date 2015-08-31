@@ -24,7 +24,6 @@ function [R,y,J] = arts_oem( Q, R, x, iter )
 
 
 %--- Map x to variables ----------------------------------------------
-
 if iter > 1
   [Q,R] = arts_x2QR( Q, R, x );
 end
