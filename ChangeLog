@@ -3,7 +3,7 @@
 	* atmlab-2-3-110
 
 	* demos/qarts_zeeman_demo.m: Extended, to also cover demo of mag
-	field retrieval.
+	field retrieval. This seems now to work!
 
 	* arts/arts_oem_init.m (force_file_local): This sub-function now
 	considers Q.INPUT_FILE_FORMAT, to avoid inconsistency to the
