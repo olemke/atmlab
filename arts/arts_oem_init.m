@@ -377,7 +377,7 @@ return
 function Q = force_file_local( Q, fieldname, datatype, R )
   if ~ischar( getfield( Q, fieldname ) )
     filename = fullfile( R.workfolder, [lower(fieldname),'.xml'] );
-    xmlStore( filename, Q.(fieldname), datatype );
+    xmlStore( filename, Q.(fieldname), datatype, Q.INPUT_FILE_FORMAT );
     Q.(fieldname) = filename;
   end
 return

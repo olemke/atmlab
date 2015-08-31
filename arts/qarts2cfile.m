@@ -1082,7 +1082,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
            'sensor_responseFillFgrid(polyorder=%d,nfill=%d)', v(1), v(2) );
        
       case 'rotation'
-        U = file_or_data( U, 'stokes_rotation', 'Matrix', ...
+        U = file_or_data( U, 'stokes_rotation', 'Vector', ...
                       H.STOKES_ROTATION, workfolder, Q.INPUT_FILE_FORMAT );
         U{end+1} = 'sensor_responseStokesRotation';
        

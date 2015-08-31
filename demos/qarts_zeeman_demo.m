@@ -167,7 +167,7 @@ Q.SENSOR_DO            = true;
 Q.SENSOR_RESPONSE      = H;
 
   
-
+  
 %= Calculate spectrum
 %
 y0 = arts_y( Q );
@@ -198,9 +198,9 @@ Q.MAG_W.ATMDATA        = gf_artsxml( fullfile( magdatafolder, ...
                                 'IGRF11_2010_200km-5deg-5deg.B_w.xml.gz' ),...
                                      'Magnetic w-component', 'mag_field' ); 
 % Qpack2 makes this automatically:
-Q.MAG_U_FIELD          = 1e-6*qarts_atm_field( Q, 'mag_u', mjd );
-Q.MAG_V_FIELD          = 1e-6*qarts_atm_field( Q, 'mag_v', mjd );
-Q.MAG_W_FIELD          = 1e-6*qarts_atm_field( Q, 'mag_w', mjd );
+Q.MAG_U_FIELD          = qarts_atm_field( Q, 'mag_u', mjd );
+Q.MAG_V_FIELD          = qarts_atm_field( Q, 'mag_v', mjd );
+Q.MAG_W_FIELD          = qarts_atm_field( Q, 'mag_w', mjd );
 %
 y = arts_y( Q );
   
@@ -208,20 +208,20 @@ y = arts_y( Q );
 %= Plot
 %
 if ~nargout
+  figure(1)
   plot( Q.F_GRID/1e9, y0, Q.F_GRID/1e9, y );
   xlabel( 'Frequency [GHz]' )
   ylabel( 'Brightness temperature [K]' )
   legend( 'I without Zeeman', 'I with Zeeman' )
 end
 
-return
+
 
 %
 %
 %  Test of retrieval. 
 %
 %
-
   
 %
 % Activate retrieval of all three magnetic field components
@@ -229,7 +229,7 @@ return
 Q.MAG_U.RETRIEVE = true;   
 Q.MAG_U.L2       = true;
 Q.MAG_U.GRIDS    = { Q.P_GRID(1:2:end), mean(Q.LAT_GRID), mean(Q.LON_GRID) };
-Q.MAG_U.SX       = covmat1d_from_cfun( Q.MAG_U(1).GRIDS{1}, 20e-6, ...
+Q.MAG_U.SX       = covmat1d_from_cfun( Q.MAG_U(1).GRIDS{1}, 10e-6, ...
                                                     'lin', 1, 0.00, @log10 );
 %
 Q.MAG_V.RETRIEVE = Q.MAG_U.RETRIEVE; 
@@ -300,18 +300,32 @@ Y.TNOISE = 0.5;
 
 % Make new simulation with mag field components constant
 %
+% We must clear ATMDATA, otherwise qpack will overwrite the mag fields we
+% set below
+%
+Q.MAG_U = rmfield( Q.MAG_U, 'ATMDATA' );
+Q.MAG_V = rmfield( Q.MAG_V, 'ATMDATA' );
+Q.MAG_W = rmfield( Q.MAG_W, 'ATMDATA' );
+%
 Q.MAG_U_FIELD(:) = mean( Q.MAG_U_FIELD(:) );
 Q.MAG_V_FIELD(:) = mean( Q.MAG_V_FIELD(:) );
 Q.MAG_W_FIELD(:) = mean( Q.MAG_W_FIELD(:) );
-%
-%Q.ABS_SPECIES(1).TAG{1}  = 'O2';
-%Q.PROPMAT_CLEARSKY_AGENDA = { 'propmat_clearsky_agenda__OnTheFly' };
 %
 Y.Y = [];
 %
 Y = qpack2( Q, oem, Y );            % Dummy oem structure OK here 
 
 
+
+% Change mag fields, to get a deviating a priori state
+%
+du = -2e-6;
+dv =  5e-6;
+dw = -1e-6;
+%
+Q.MAG_U_FIELD = Q.MAG_U_FIELD + du;
+Q.MAG_V_FIELD = Q.MAG_V_FIELD + dv;
+Q.MAG_W_FIELD = Q.MAG_W_FIELD + dw;
 
 
 %- OEM variables
@@ -332,8 +346,24 @@ end
 Q.TNOISE_C = speye( length(Q.F_GRID) );
 
 
-
 %- Make inversion
 %
 L2 = qpack2( Q, O, Y );
+
+
+
+%= Plot
+%
+if ~nargout
+  figure(2)
+  z = p2z_simple( L2.mag_u_p );
+  plot( 1e6*(L2.mag_u_xa-du), z/1e3, 'b', 1e6*L2.mag_u_x, z/1e3, 'b--', ...
+        1e6*(L2.mag_v_xa-dv), z/1e3, 'r', 1e6*L2.mag_v_x, z/1e3, 'r--', ...
+        1e6*(L2.mag_w_xa-dw), z/1e3, 'k', 1e6*L2.mag_w_x, z/1e3, 'k--' );
+  ylabel( 'Approx. altitude [km]' );
+  xlabel( 'Magnetic field component [muT]' );
+  legend( 'u, true', 'u, retrieved', 'v, true', 'v, retrieved', ...
+          'w, true', 'w, retrieved', 'Location', 'South' );
+end
+
 
