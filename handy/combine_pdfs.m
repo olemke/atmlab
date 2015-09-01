@@ -85,7 +85,7 @@ function outfile = combine_pdfs(pdffiles, options)
 %            in:  %f
 %            ex:  tries to open pdf file with 'gnome-open' or 'kde-open'
 %                 if you are on a linux and 'open' if called from Mac
-%            def: false
+%            def: true
 %       options.pdfviewer
 %            in:  %s
 %            ex:  Your pdf-viewing program of choice
@@ -130,7 +130,7 @@ end
 default.samesize   = false;
 default.outdir     = gmtlab('outdir');
 default.secret_latex_spacing_tweak = 0.5;
-default.display    = false;
+default.display    = true;
 default.title      = '';
 default.pdfcrop    = false;
 default.pdfviewer  = '';
@@ -187,7 +187,7 @@ end
 % Pages
 options.pages = length(options.rowsPerPage);
 
-if size(options.hspace) == [1,1]
+if isscalar(options.hspace)
     options.hspace = repmat(options.hspace,1,sum(options.rowsPerPage));
 end
 
@@ -236,7 +236,11 @@ function layout = create_layout_from_pdffiles(pdffiles, options)
 % regexp that gives us width and height from pdfinfo output
 regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 
-col = 1; row = 1;filenum=1;
+
+% -------
+% get the height and width information from each pdffile
+%
+psize(length(pdffiles)) = struct('width','','height','');
 for i = 1:length(pdffiles)
     info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 1);
     
@@ -246,41 +250,54 @@ for i = 1:length(pdffiles)
         'uniformoutput', 0);
 end
 
+col = 1;
+row = 1;
+filenum=1;
 for i = 1:length(pdffiles)
-    % --------------
-    % Apply scaling
-    % --------------
+
+    % apply scale to with if given 
     if isfield(options,'scale') && ~isempty(options.scale(options.scale(:,1)==filenum,2))
         sc = options.scale(options.scale(:,1)==filenum,2);
-    else
-        sc = 1;
+    else sc = 1;
     end
     
-    if options.samesize, width=max([psize.width]); else width=psize(i).width; end
+    % get the width from psize or get the maximum width from psize and apply to
+    % all 
+    if options.samesize
+        width=max([psize.width]);
+    else width=psize(i).width;
+    end
     
-    layout.plotsbyrow{row}(col) = struct('height', psize(i).height*sc, ...
-        'width', width*sc, ...
+    % On this row and this column element, set the height and width associated
+    % with the file at hand
+    layout.plotsbyrow{row}(col) = struct('width', width*sc, ...
+        'height', psize(i).height*sc, ...
         'file', pdffiles{i});
-    
+
+    % now go to the next column
     col = col + 1;
-    if (col > options.cols(row) ...
-            || length([layout.plotsbyrow{:}]) == length(pdffiles))
-        col = 1;
+    
+    % but if the next column is on the NEXT row (or the last file is processed), find the row dimensions
+    if col > options.cols(row)
         R = layout.plotsbyrow(row);
+        
+        % width
         layout.rowwidth(row) = sum([R{:}.width]) ...
             + options.hspace(row)*(length(R{:})-1) ...
             + options.secret_latex_spacing_tweak*length(R{:});
+        
+        % height
         layout.rowheight(row) = max([R{:}.height]);
+        % -------
         
-        %if options.rowsPerPage(1)>row
+        % reset columns and increment the row number
+        col = 1;
         row = row + 1;
-        %else
-        % leave, or the above will be overwritten with page 2's statisics
-        %return
-        %end
-        
     end
-    
+ 
+    if filenum == length(pdffiles)
+        return
+    end        
     filenum = filenum+1;
 end
 
@@ -407,44 +424,53 @@ exec_system_cmd(sprintf('cd %s && mv -f out.pdf %s', ...
     atmlab('VERBOSITY'));
 
 if options.pdfcrop
+    f_ind = strfind(file,'.pdf');
+    if ~isempty(f_ind)
+        file = file(1:f_ind-1);
+    end
     [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),atmlab('VERBOSITY'));
     if logical(test)
         error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
     end
-    exec_system_cmd(sprintf('mv %s-crop.pdf %s',file(1:end-4),file),atmlab('VERBOSITY'));
+    exec_system_cmd(sprintf('mv %s-crop.pdf %s.pdf',file,file),atmlab('VERBOSITY'));
 end
 
 end
 
 function var = make_fit(var,ref)
 %
-% This is something I do in exactly the same way twice
+% This is something I do in exactly the same way for several different variables
 
-% Make cols into a vector if it isn't
+% Make scalar entry into a vector if it isn't already
 if isscalar(var)
-    sclr = var;
+    inscalar = var;
     tmp = zeros(1,length(ref));
-    ind=1;
-    i = length(ref);
-    while i > 0
-        if (i-sclr) >= 0
-            tmp(ind) = sclr;
-            i = i-sclr;
-            ind = ind+1;
-        elseif (i-sclr)==0
-            tmp(ind) = sclr;
-            var = tmp(1:ind);
+    i=1;
+    
+    remaining = length(ref); 
+    while remaining > 0
+        if (remaining-inscalar) >= 0
+            % there are more files remaining than the scalar input
+            tmp(i) = inscalar;
+            remaining = remaining-inscalar;
+            i = i+1;
+        elseif (remaining-inscalar)==0
+            % an exact fit
+            tmp(i) = inscalar;
+            var = tmp(1:i);
             return
         else
-            tmp(ind) = mod(i,sclr);
-            i = i-mod(i,sclr);
+            % There are less files remaining than the scalar input
+            tmp(i) = mod(remaining,inscalar);
+            remaining = remaining-mod(remaining,inscalar);
+            i = i+1;
         end
-        if i==length(ref)
+        if remaining==length(ref)
             % nothing was done. E.g for rows if all the pdffiles fit on one page
             return
         end
     end
-    var = tmp(1:ind-1);
+    var = tmp(1:i-1);
 end
 
 end

@@ -13,7 +13,7 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %               MANDITORY:
 %                   Z/data         [data matrix]     of any class. size(data,1)
 %                                                  must be the same length
-%                                                  as lat lon, but data may
+%                                                  as X Y, but data may
 %                                                  have 2 dimensions or more, e.g.
 %                                                  lvls, seasons, etc.
 %

@@ -183,7 +183,7 @@ function filename = gmt_plot(in,field)
 %                      def: false
 %                     -------------
 % in.mask              in:     function handle
-%                      ex:     @(x)(x>0); This masks all values less than 0 with NaN
+%                      ex:     @(x)(x<0); This masks all values less 0 with NaN
 %                      def:    no mask by default
 %                     ------------
 % in.nearneighbor:    See below on nearneigbour
@@ -1031,7 +1031,7 @@ assert(isstruct(in),errID,'"in" must be a structure')
 [GSE,GSSE] = gmt_inputs;
 
 Fields = fieldnames(in)';
-
+fieldsNotToRead = cell(100,1); ii = 1;
 for F = Fields
     % See if the in.(field) is a listed option
     test = GSE(ismember(GSE(:,2),F{1}),:);
@@ -1063,12 +1063,13 @@ for F = Fields
         end
     else
         if ~any(strcmp(F{1},{field,'lat','lon'}))
-            warning(errID,['field: "%s" will not be used as it '...
-                'is not data or in the list of options'],F{1})
+            fieldsNotToRead{ii} = F{1}; ii= ii+1;
         end
     end
-    
 end
+
+fprintf(1,'Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
+fprintf(1,' will not be used as they are not "data" or in the list of options\n');
 
 end
 
