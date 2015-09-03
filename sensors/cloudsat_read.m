@@ -341,9 +341,11 @@ function x = unitconv(x,unit,field)
 % Make sure that *unit* is a row vector (can be column for old HDF versions)
 %
 unit = vec2row( unit );
-  
+
 if strcmp(unit,['mg m^{-3}']) |  strcmp(unit,['mg/m^3'])
    x = x * 1e-6;
+elseif strcmp(unit,['g m^{-2}']) |  strcmp(unit,['g/m^2'])
+   x = x * 1e-3;
 elseif strcmp(unit,['um'])
    x = x * 1e-6;
 elseif strcmp(unit,['dB*100'])

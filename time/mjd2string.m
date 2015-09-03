@@ -23,7 +23,7 @@ rqre_datatype( onlyday, @isboolean );               %&%
 
 
 if ~onlyday
-  s = sprintf( '%04d-%02d-%02d %02d:%02d:%02d', year,month,day,h,m,s );
+  s = sprintf( '%04d-%02d-%02d %02d:%02d:%06.3f', year,month,day,h,m,s );
 else
   s = sprintf( '%04d-%02d-%02d', year,month,day );
 end

@@ -1,3 +1,14 @@
+2015-09-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-112
+
+	* sensors/cloudsat_read.m (unitconv): Column values (such as IWP)
+	were not scaled to SI units.
+
+	* time/mjd2string.m (mjd2string): Changed how seconds are written.
+	Old pattern resulted in floating point output. Now fixed point,
+	including digits dowm to ms.
+
 2015-09-01  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-111
