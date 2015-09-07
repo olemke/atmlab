@@ -391,7 +391,7 @@ else
     DATA = zeros([length(newlat),length(newlon),size(data,3)],class(data));
 end
 
-fprintf('Using interpolation method: %s\n',in.method)
+logtext(1,'Using interpolation method: %s\n',in.method)
 for i = 1:size(data,3)
     DATA(:,:,i) = interp2(X,Y,data(:,:,i),XI,YI,in.method);
 end
@@ -448,7 +448,7 @@ if ~islogical(in.data)
 else data = false([length(lat),length(lon),size(in.data,3)]);
 end
 
-polyWeightSum = @(d,w,i)(nansum(d(i).*w(i))./nansum(w(i)));
+polyWeightSum = @(d,w,i)(nansum(single(d(i)).*w(i))./nansum(w(i)));
 
 % DETERMINE new grid BOUNDARIES from grid spacing
 gn = mean(diff(lon)); gt = mean(diff(lat));

@@ -86,7 +86,9 @@ flags.lat_descend = all(lat(2:end)<lat(1:end-1));
 
 flags.lon360 = any(lon > 180);
 
-flags.duplicate = flags.lon360 & all(ismember(lon,[0,360]));
+flags.duplicate = (length(unique(lon)) ~= length(lon)) | ...
+    (any(lon==-180) & any(lon ==180)) | ...
+    (any(lon==0) & any(lon ==360));
 
 % SET the defaults
 if ~exist('options','var'); options = struct(); end
@@ -98,7 +100,7 @@ end
 default.lon_descend = flags.lon_descend; % allow descending order of longitudes
 default.lat_descend = flags.lat_descend; % allow descending order of latitudes
 default.lon360      = flags.lon360; % allow longitudes go from 0:360 (as opposed to -180:180) globally
-default.dublicate   = flags.duplicate; % allow duplicate values (repeat longitudes e.g. at -180 and 180)
+default.duplicate   = flags.duplicate; % allow duplicate values (repeat longitudes e.g. at -180 and 180)
 
 options = optargs_struct(options,default);
 
@@ -201,6 +203,8 @@ end
 if flags.duplicate && ~options.duplicate
     [~,index] = unique(lon);
     lon = lon(index);
+    sz1 = size(lon,1)==length(lon);
+    
     if dexist
         if strcmp(flags.out.dimorder,'latlon')
             data = data(:,index,:);
@@ -209,12 +213,25 @@ if flags.duplicate && ~options.duplicate
         end
     end
     if lon(end)==180
-        lon = [-180 lon];
-        if dexist
-            if strcmp(flags.out.dimorder,'latlon')
-                data = [data(:,end,:) data];
-            else
-                data = [data(end,:,:) data];
+        
+        if sz1
+            lon = [-180; lon];
+            if dexist
+                if strcmp(flags.out.dimorder,'latlon')
+                    data = [data(:,end,:); data];
+                else
+                    data = [data(end,:,:); data];
+                end
+            end
+        else
+            
+            lon = [-180 lon];
+            if dexist
+                if strcmp(flags.out.dimorder,'latlon')
+                    data = [data(:,end,:) data];
+                else
+                    data = [data(end,:,:) data];
+                end
             end
         end
     else

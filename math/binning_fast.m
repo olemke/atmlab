@@ -2,7 +2,7 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %% BINNING_FAST bins ungridded data onto a grid
 %
 % Purpose:
-% Bins ungridded data to a cell grid using d = in.gridsize. Each bin will contain a
+% Bins UNGRIDDED DATA to a cell grid using d = in.gridsize. Each bin will contain a
 % vector of values for that bin.
 %
 % The structure elements lon,lat,data (or X,Y,Z) must be the same size, and the function

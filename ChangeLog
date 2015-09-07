@@ -1,5 +1,15 @@
 2015-09-07  Salomon Eliasson  <seliasson@ManUtd>
 
+	* atmlab-2-3-113
+
+	* geographical/standardize_geodata.m: Fixed bug when dealing with duplicate data
+
+	* geographical/resample_geodata.m: Fixed so that it can also handle uint8 data
+
+	* math/binning_fast.m: Made something clearer in header
+
+2015-09-07  Salomon Eliasson  <seliasson@ManUtd>
+
 	* atmlab-2-3-112
 
 	* geoplots/gmt/gmt_plot.m: Fixed bug determining map width if in.proj is a string
