@@ -1,3 +1,11 @@
+2015-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-114
+
+	* documentation/qpack2/qpack2.tex (subsubsection{Qpack2
+	specifics}): Added comment making clear that HSE has higfhest
+	priority when setting z_field.
+
 2015-09-07  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-113

@@ -331,7 +331,9 @@ fields in special way:
 \item In the case of \verb|Z_FIELD| there is another option, this field can be
   set by applying hydrostatic equilibrium, then activated by setting
   \verb|Q.HSE.ON| to true. The reference point for hydrostatic equilibrium is
-  specified by \verb|Y.HSE_P| and \verb|Y.HSE_Z| (Sec.~\ref{sec:Y}). 
+  specified by \verb|Y.HSE_P| and \verb|Y.HSE_Z| (Sec.~\ref{sec:Y}). If 
+  \verb|Q.HSE.ON| is true, the derived \verb|Z_FIELD| has highest priority, and
+  any settings in the \verb|Z_FIELD| and \verb|Z.ATMDATA| have no effect.
 \item \verb|Q.HSE_P| is set to \verb|Y.HSE_P|. Other fields of \verb|Q.HSE|
   must be set by the user, thus including an active choice for \verb|Q.HSE.ON|.
 \item \verb|Q.ABSORPTION| must be set. The option 'CalcTable' is not allowed
