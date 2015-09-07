@@ -433,6 +433,7 @@ if options.pdfcrop
         error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
     end
     exec_system_cmd(sprintf('mv %s-crop.pdf %s.pdf',file,file),atmlab('VERBOSITY'));
+    file = [file,'.pdf'];
 end
 
 end

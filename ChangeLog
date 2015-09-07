@@ -1,3 +1,13 @@
+2015-09-07  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-112
+
+	* geoplots/gmt/gmt_plot.m: Fixed bug determining map width if in.proj is a string
+
+	* handy/combine_pdfs.m: fixed bug in output filename if using pdfcrop
+
+	* geographical/resample_geodata.m: Fixed bug determining which resampling method to use
+
 2015-09-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-112

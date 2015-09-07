@@ -77,14 +77,14 @@ if ~iscell(field), field={field}; end
 out = in;
 
 % CHECK input
-sz                                  = check_input(in,field,newgrid,errID);
+sz                = check_input(in,field,newgrid,errID);
 
 % ASSEMBLE_newgrid
-[newlat,newlon]                     = assemble_newgrid(in.lat,in.lon,newgrid,errID);
+[newlat,newlon]   = assemble_newgrid(in.lat,in.lon,newgrid,errID);
 
 % STANDARDIZE "new grid" internally
 gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false);
-[rg_flags,tmp]            = standardize_geodata(struct('lat',newlat,'lon',newlon),gridoptions);
+[rg_flags,tmp]    = standardize_geodata(struct('lat',newlat,'lon',newlon),gridoptions);
 newlat=tmp.lat;
 newlon=tmp.lon;
 clear tmp
@@ -97,7 +97,7 @@ if isequal(in.lat(:),newlat(:)) && isequal(in.lon(:),newlon(:))
 end
 
 % CHECK WHICH test
-out.method                          = which_test(in.lat,in.lon,newlat,newlon);
+out.method        = which_test(in.lat,in.lon,newlat,newlon);
 
 % PRINT to screen what is about to happen
 if strcmp(out.method,'shift grid')
@@ -129,7 +129,7 @@ for F = field
     
     % STANDARDIZE "input" data internally
     gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false,'dimorder','latlon');
-    [flags,tmp]  = standardize_geodata(struct('lat',in.lat,'lon',in.lon,'data',data),gridoptions);
+    [flags,tmp]   = standardize_geodata(struct('lat',in.lat,'lon',in.lon,'data',data),gridoptions);
     lat  = tmp.lat;
     lon  = tmp.lon;
     data = tmp.data;
@@ -299,10 +299,10 @@ function method = which_test(LAT,LON,newlat,newlon)
 eps = 1e-5; %this corresponds to 1 meter at the equator
 
 % diff averages
-dnlt = mean(diff(newlat));
-dnln = mean(diff(newlon));
-dlt  = mean(diff(LAT));
-dln  = mean(diff(LON));
+dnlt = mean(abs(diff(newlat)));
+dnln = mean(abs(diff(newlon)));
+dlt  = mean(abs(diff(LAT)));
+dln  = mean(abs(diff(LON)));
 
 % temporay vectors
 nltb   = newlat - dnlt/2;

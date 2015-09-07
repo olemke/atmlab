@@ -1435,7 +1435,13 @@ if ~isfield(in.legend,'position')
     defThick=.2; %thickness of legend bar
     
     % I use map_width to find the defaults.
-    [mw,mwu] = separate_integer_and_unit(in.proj.map_width);
+    if ischar(in.proj)
+        x = regexp(in.proj,'.*/(?<map_width>.+)','names');
+        mwstr = x.map_width;
+    else
+        mwstr = in.proj.map_width;
+    end
+    [mw,mwu] = separate_integer_and_unit(mwstr);
     in.legend           = optargs_struct(in.legend,default); %need orientation now
     clear default
     
