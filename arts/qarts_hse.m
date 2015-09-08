@@ -73,7 +73,7 @@ rqre_gridmatch( T, 2, lat_grid );                                           %&%
 rqre_gridmatch( VMR, 2, p_grid );                                           %&%
 rqre_gridmatch( VMR, 3, lat_grid );                                         %&%
 
-keyboard
+
 Z = zeros( size( T ) );
 %
 for ilon = 1 : size( T, 3 )
