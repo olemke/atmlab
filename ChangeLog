@@ -1,3 +1,10 @@
+2015-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-116
+
+	* h2o/parametrisations/ice_psd_mh97.m: Before error if t>273.15.
+	Now t up to 280K allowed, by adjusting the t down to 273.15.
+
 2015-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-115

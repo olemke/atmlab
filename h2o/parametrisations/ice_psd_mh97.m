@@ -19,6 +19,14 @@ function n = ice_psd_mh97(dme_grid,iwc,t,varargin)
 %
 [noisy] = optargs( varargin, { false } );
 
+% ARTS version requires t < 273.15. We add some margin
+%
+if t > 280
+  error( 'Temperatures above 280 K are not allowed.' );
+elseif t > 273.15
+  t = 273.15;
+end
+
 
 % Create workfolder
 %
