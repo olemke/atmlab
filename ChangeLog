@@ -1,5 +1,16 @@
 2015-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-117
+
+	* h2o/parametrisations/ice_psd_Mcfar_97.m: Check added in last
+	commit, now placed in this version of MH97, where it should have
+	been!
+
+	* h2o/parametrisations/ice_psd_mh97.m: Removed check on
+	temperature is this is now done in ARTS, and this MH97 calls ARTS!
+
+2015-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-116
 
 	* h2o/parametrisations/ice_psd_mh97.m: Before error if t>273.15.

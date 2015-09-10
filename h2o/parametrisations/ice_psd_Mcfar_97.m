@@ -20,7 +20,8 @@
 %
 % OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
-% IN       T     Temperature [Kelvin]
+% IN       T     Temperature [Kelvin]. T above 280 K not allowed.
+%                Temperatures above 273.15 K are mapped to 273.15 K.
 %          IWC   Ice water content [kg/m^3]
 %          D     the size vector of the ice particles,
 %                (the mass equivalent sphere diameter [m]),
@@ -33,6 +34,14 @@
 
 function [y]=ice_psd_Mcfar_97(T,IWC,D,mode);
 
+% ARTS version requires t < 273.15. We add some margin
+%
+if T > 280
+  error( 'Temperatures above 280 K are not allowed.' );
+elseif T > 273.15
+  T = 273.15;
+end
+  
 
 T   = T-273.15;
 IWC = IWC*1e3; % change unit to g/m^3 
