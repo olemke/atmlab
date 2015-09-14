@@ -84,9 +84,9 @@ if opt.isgridded
         origlon  = outlon;
     end
     
-    % chop away what we don't need to look through
-    indexlat = outlat>= min(corner(:,1)) & outlat<max(corner(:,3));
-    indexlon = outlon>= min(corner(:,2)) & outlon<max(corner(:,4));
+    % chop away what we don't need to look through. Include the edges
+    indexlat = outlat>= min(corner(:,1)) & outlat<=max(corner(:,3));
+    indexlon = outlon>= min(corner(:,2)) & outlon<=max(corner(:,4));
     outlat   = outlat(indexlat);
     outlon   = outlon(indexlon);
     z.data   = outdata(indexlat,indexlon,:);  %collapse to 3Doutdata;

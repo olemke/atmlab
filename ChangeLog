@@ -1,20 +1,17 @@
-2015-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
-
-	* atmlab-2-3-117
-
-	* h2o/parametrisations/ice_psd_Mcfar_97.m: Check added in last
-	commit, now placed in this version of MH97, where it should have
-	been!
-
-	* h2o/parametrisations/ice_psd_mh97.m: Removed check on
-	temperature is this is now done in ARTS, and this MH97 calls ARTS!
-
-2015-09-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+2015-09-14  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-116
 
-	* h2o/parametrisations/ice_psd_mh97.m: Before error if t>273.15.
-	Now t up to 280K allowed, by adjusting the t down to 273.15.
+	* geographical/regionize.m: Now Including upper edge in the region to extract.
+
+	* geographical/resample_geodata.m: Commented out assertion that I
+	don't think I need (that the lat and lon are equally spaced).
+
+	* geoplots/gmt/gmt_plot.m:
+	- Use PDFVIEWER first and foremost if it is provided
+	- Fixed bug when making separate file for legend (psscale)
+
+	* handy/combine_pdfs.m: fixed little bug when displaying the final pdf
 
 2015-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 

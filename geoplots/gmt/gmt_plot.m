@@ -1568,7 +1568,11 @@ end
 command{end+1} = sprintf('gmt ps2raster %s.ps -A -P %s',in.filename,T);
 
 % Assemble open command
-openwith = gmtlab('OPEN_COMMAND');
+if isnan(gmtlab('PDFVIEWER'))
+    openwith = gmtlab('OPEN_COMMAND');
+else
+    openwith = gmtlab('PDFVIEWER');
+end
 
 if in.makeScriptAndStop
     filename = makeScriptAndStop(command);
@@ -1611,7 +1615,7 @@ filename = sprintf('%s/%s.%s',in.outdir,in.filename,in.figuretype);
 % TRY and open the file even without user input
 % If no viewer is defined, check for xpdf, then evince, then okular
 if in.display && any(isnan(openwith))
-    logtext(2,'display = 1, yet no view is defined\nE.g. gmtlab(''pdfviewer'',''gnome-open'')\n')
+    logtext(2,'display = 1, yet no viewer is defined\nE.g. gmtlab(''pdfviewer'',''gnome-open'')\n')
     
     if strcmp(in.figuretype,'pdf')
         disp('No pdfviewer defined.')
@@ -1649,9 +1653,11 @@ exec_system_cmd(sprintf('rm -f %s.ps',file),gmtlab('verbosity'));
 crop=regexp(command,'>>');
 
 % Additional adjustments
-for i = 2:length(command)
+for i = 1:length(command)
+%for i = 2:length(command)
     command{i} = sprintf('%s -P >> %s.ps', command{i}(1:crop{i}-1), file );
-    if i == 2
+    %if i == 2
+    if i == 1
         command{i} = regexprep(command{i},'-O','');
     end
     if i == length(command)
@@ -1660,7 +1666,7 @@ for i = 2:length(command)
 end
 
 % This forces it to be a pdf
-command{end+1} = sprintf('ps2raster %s.ps -A -P -Tf',file);
+command{end+1} = sprintf('gmt ps2raster %s.ps -A -P -Tf',file);
 exec_system_cmd(command,gmtlab('verbosity'));
 
 end

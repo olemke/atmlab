@@ -225,7 +225,7 @@ if options.display && isempty(options.pdfviewer)
         end
     end
 elseif options.display
-    exec_system_cmd(sprintf('%s %s',options.pdfviewer,outfile));
+    exec_system_cmd(sprintf('%s %s >/dev/null &',options.pdfviewer,outfile));
 end
 
 end
