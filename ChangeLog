@@ -1,3 +1,10 @@
+2015-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-117
+
+	* covmat/covmat1d_markov.m: Call of covmat1d_from_cfun was
+	completly wrong and caused an error.
+
 2015-09-14  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-116

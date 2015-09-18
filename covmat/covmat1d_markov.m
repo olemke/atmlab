@@ -43,6 +43,6 @@ w   = [ repmat(c1,1,n-1) c2 repmat(c2*(1+alpha^2),1,n-2) c2 repmat(c1,1,n-1) ];
 %
 Sinv = sparse( row, col, w, n, n );
 
+S = covmat1d_from_cfun( [0:dz:dz*(n-1)]', sigma, 'exp', lc, cco );
 
-S = covmat1d_from_cfun( 0:dz:dz*(n-1)*dz, sigma, 'exp', lc, cco );
 
