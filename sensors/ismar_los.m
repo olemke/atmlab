@@ -19,7 +19,7 @@
 % IN    I            Structure with ISMAR measurement data
 %       ind          Index of data to be used
 % OPT   instrument   Name of instrument, 'ISMAR' or 'MARSS'. 
-%                    Default is 'ISMAR*.
+%                    Default is 'ISMAR'.
 
 % 2015-08-10  Created by Bengt Rydberg
 
@@ -40,8 +40,8 @@ switch upper(instrument)
 end
 
 
-yaw   = I.platform_orientation( ind );
-pitch = I.platform_pitch_angle( ind ) + pitch0;
+yaw   = I.platform_orientatio( ind );
+pitch = I.platform_pitch_angl( ind ) + pitch0;
 roll  = I.platform_roll_angle( ind );       
 
 
