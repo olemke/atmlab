@@ -1,3 +1,9 @@
+2015-09-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-118
+
+	* sensors/ismar_los.m: Fixed typo in header text.
+
 2015-09-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-117
