@@ -1,3 +1,9 @@
+2015-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-119
+
+	* arts/qarts2cfile.m (cfile_Jacobi): Removed mapping of rel to logrel
+
 2015-09-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-118

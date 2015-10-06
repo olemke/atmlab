@@ -1282,7 +1282,6 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         end
         %
         unit = Q.ABS_SPECIES(i).UNIT;
-        if strcmp(unit,'logrel'), unit = 'rel'; end
         %
         T{end+1} ='jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,';
         T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
