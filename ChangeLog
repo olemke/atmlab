@@ -1,3 +1,12 @@
+2015-10-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-120
+
+	* arts/qarts2cfile.m (cfile_CldBox): Cloudbox limits were written
+	to the cfile as %.3f. This is not sufficient precision when going
+	down to m scales. The limits are now written as %.9e to allow
+	simulations on more small scales.
+
 2015-10-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-119

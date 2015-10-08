@@ -1705,7 +1705,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
     T{1}     = 'cloudboxSetManuallyAltitude(';
     T{end+1} = '   cloudbox_on,cloudbox_limits,atmosphere_dim,z_field,';
     T{end+1} = sprintf( ...
-            '   lat_grid,lon_grid,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f', limits );
+            '   lat_grid,lon_grid,%.9e,%.9e,%.9e,%.9e,%.9e,%.9e', limits );
     T{end+1} = ')';
   end
 
