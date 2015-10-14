@@ -68,6 +68,14 @@ function filename = gmt_plot(in,field)
 %
 % OPTIONS
 %
+%                     ------------
+% in.add_offset        in:     %f
+%                      ex:     The offset you want to automatically apply to the
+%                              provided data. This is often provided 
+%                              by convention in the attributes of a variable
+%                              (from netcdf). See also scale_factor and
+%                              fill_value
+%                     ------------
 % in.cptfile           in:     %s
 %                      ex:     Path to a colortable (*.cpt)
 %                     ------------
@@ -100,6 +108,12 @@ function filename = gmt_plot(in,field)
 %                      ex:     'yourfilename', or 'yourfilename.jpg'
 %                      def:    Generated from title. The filetype is determined by the file
 %                           ending given by your filename, e.g., any of bla.{pdf,jpg,eps,tif,png,ps}
+%                     ------------
+% in.fill_value        in:     %f
+%                      ex:     The fill value to NaN-out. This is often provided
+%                              by convention in the attributes of a variable
+%                              (from netcdf). See also scale_factor and
+%                              add_offset
 %                     ------------
 % in.figuretype        in:     %s
 %                      ex:     'eps','pdf','BMP','jpg','PNG','PPM' (not recommended), or 'tif'.
@@ -241,6 +255,13 @@ function filename = gmt_plot(in,field)
 %                      ex:     '-180/180/-90/90'=global range, defined from
 %                              sprintf('%f/%f/%f/%f',lon1,lon2,lat1,lat2)
 %                      def:    determined by input lat/lon range
+%                     ------------
+% in.scale_factor      in:     %f
+%                      ex:     The scale factor you want to automatically apply to the
+%                              provided data. This is often provided 
+%                              by convention in the attributes of a variable
+%                              (from netcdf). See also add_offset and
+%                              fill_value
 %                     ------------
 % in.stepsize          in:     %f
 %                      ex:     The stepsize between data values. This overrides
@@ -797,42 +818,56 @@ logtext(1,'Using GMT version %s\n',in.gmtVersion)
 
 % SET DEFAULTS
 % general
-default.fontsize_annot_primary = '14p';     % size of axis labels (including legend if not set differently by in.legend.font_size)
-default.font_annot_primary = 'Helvetica';     % font of axis labels (including legend if not set differently by in.legend.font)
+default.add_offset               = [];
+default.color_background         = '0/0/0';
+default.color_foreground         = '255/255/255';
+default.color_nan                = '150/150/150';
+default.display                  = true;
+default.fill_value               = [];
+default.font_title               = 'Helvetica';
+default.font_annot_primary       = 'Helvetica';
+default.fontsize_annot_primary   = '14p';
+default.font_annot_secondary     = 'Helvetica';
 default.fontsize_annot_secondary = '10p';
-default.font_annot_secondary = 'Helvetica';
-default.psbasemap.axes   = 'nSeW';           % Annotates West and South of the map.
-default.display          = true;             % Display figure to screen
-default.color_background = '0/0/0';
-default.color_foreground = '255/255/255';
-default.color_nan        = '150/150/150';
-default.title           = '';               % no title by default
-default.font_title      = 'Helvetica';      % one of 35 available fonts
-default.fontsize_title  = '36p';
+default.fontsize_title           = '36p';
+default.psbasemap.axes           = 'nSeW';
+default.scale_factor             = [];     
+default.title                    = '';
+
 in = optargs_struct(in,default);
 clear default
+
+default.keep_files               = false;
 
 % how far the title is removed from the top of the map (depends on 'N' or 'n')
-default.map_title_offset    = [num2str(-0.4+0.6*ismember('N',in.psbasemap.axes)) 'c'];
-default.keep_files       = false;            % keep intermediate files (debugging)
+default.map_title_offset         = [num2str(-0.4+0.6*ismember('N',in.psbasemap.axes)) 'c'];
 
-% Best to let the middle of the data define the center of the projection as default
-%default.proj.center      = 0;                % The center longitude of the map. The region has to be -180:180 (cyclic)
-default.proj.projection  = 'Q';              % Cylindrical Equidistant Projection.
-default.proj.map_width   = 20;
-default.proj_length_unit = 'cm';             % Choose between cm, inch, m, and point.
-default.force_nlevels    = false;            % do not force, e.g. reduce if uniques are less
-default.nodata           = false;            % true if you only want the map
-default.outdir           = gmtlab('OUTDIR'); % where to put the figure
-default.plotPlacement    = '-Xa5 -Ya5';      % String of global plotPlacements
-default.savelegend       = false;            % make an additional pdf-file only containing the legend
-default.unit             = '';               % unit displayed with legend
-default.xunit            = '';               % xlabel for the legend
-default.treatAsUngridded = false;            % A patch to easily switch between gridded and ungridded data (mostly for plot testing )
-default.makeScriptAndStop = false;           % For the developer and those who want the shell script generated by this program
+
+default.force_nlevels            = false;
+default.makeScriptAndStop        = false;
+default.nodata                   = false;
+default.outdir                   = gmtlab('OUTDIR');
+default.plotPlacement            = '-Xa5 -Ya5';
+default.proj.projection          = 'Q';
+default.proj.map_width           = 20;
+default.proj_length_unit         = 'cm';
+default.savelegend               = false;
+default.treatAsUngridded         = false;
+default.unit                     = '';
+default.xunit                    = '';
+
 in = optargs_struct(in,default);
 
 clear default
+
+if ~isempty(in.fill_value)
+    in.(field) = double(in.(field));
+    in.(field)(in.(field) == in.fill_value) = NaN;
+end
+
+if ~isempty(in.scale_factor)
+    in.(field) = double(in.(field)).*in.scale_factor + in.add_offset;
+end
 
 in.outdir = sanitise(in.outdir);
 
@@ -1042,7 +1077,7 @@ for F = Fields
         strfun = func2str(fun);
         
         assert(fun(in.(test{2})),errID,...
-            'Input type is incorrect. in.%s should pass test: %s',test{2},strfun);
+            'Input type is incorrect. in.%s should pass the test: %s',test{2},strfun);
         
         % If in.(field) is itself a structure, do it again (more or less)
         if isstruct(in.(test{2})) && ismember(test{2},fieldnames(GSSE))

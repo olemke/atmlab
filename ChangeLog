@@ -1,3 +1,16 @@
+2015-10-14  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-121
+
+	* handy/combine_pdfs.m: options.pages wasn't implemented properly
+
+	* geoplots/gmt/gmt_plot.m: Added add_offset, fill_value, and
+	scale_factor for if you want to scale and add an offset inside
+	gmt_plot. This is nice if browsing through data variables straight
+	from a netcdf file
+
+	* geoplots/gmt/gmt_inputs.m: Added some more variables to check
+
 2015-10-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-120
@@ -28,7 +41,7 @@
 
 2015-09-14  Salomon Eliasson  <seliasson@ManUtd>
 
-	* atmlab-2-3-116
+	* handy/combine_pdfs.m: fixed little bug when displaying the final pdf
 
 	* geographical/regionize.m: Now Including upper edge in the region to extract.
 

@@ -36,56 +36,32 @@ function outfile = combine_pdfs(pdffiles, options)
 %                 containing the number of columns that should be on each each row.
 %                 In that case, the sum of this vector must match the number of pdf files.
 %            def: 2
-%       options.filename
-%            in:  %s
-%            ex:  name of output file
-%            def: 'out.pdf'
-%       options.outdir
-%            in:  %s
-%            ex:  directory for output
-%            def: gmtlab('outdir')
-%       options.samesize
-%            in:   %f
-%            ex:   Whether or not to force the figures to have the same size on the page
-%            def:  false
-%            note: This can be useful to make sure your plots are nicely aligned
-%                  on the page,s especially if you have plots that are nearly the
-%                  same size
-%       options.vspace
-%            in:  %f
-%            ex:  space between rows in cm
-%            def: 1
-%       options.hspace
-%            in:   %f
-%            ex:   space between columns in cm
-%            def:  1
-%            note: Providing a vector mean that you want different hspace between plot for each row
-%       options.rightPadding
-%            in:  %f
-%            ex:  padding to the right of a row in cm. Note: Needs one value per row.
-%                 e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
-%            def: 1
-%       options.valign
-%            in:  %s
-%            ex:  vertical alignment. 'm' = middle, 'b' = bottom, 't'=top
-%            def: 'm'
-%       options.scale
-%            in:  [%d,%d; etc]
-%            ex:  scale individual figures. [filenumber,scale]
-%            def: 1
-%       options.title
-%            in:  %s
-%            ex:  title to be displayed above the combined pdfs
-%            def: <none>
-%       options.fontsize
-%            in:  %s
-%            ex:  E.g., '4cm' or '40pt'
-%            def: 1/22 * rowwidth (but only relevent if title is given)
 %       options.display
 %            in:  %f
 %            ex:  tries to open pdf file with 'gnome-open' or 'kde-open'
 %                 if you are on a linux and 'open' if called from Mac
 %            def: true
+%       options.filename
+%            in:  %s
+%            ex:  name of output file
+%            def: 'out.pdf'
+%       options.fontsize
+%            in:  %s
+%            ex:  E.g., '4cm' or '40pt'
+%            def: 1/22 * rowwidth (but only relevent if title is given)
+%       options.hspace
+%            in:   %f
+%            ex:   space between columns in cm
+%            def:  1
+%            note: Providing a vector mean that you want different hspace between plot for each row
+%       options.outdir
+%            in:  %s
+%            ex:  directory for output
+%            def: gmtlab('outdir')
+%       options.pages
+%            in:  %f
+%            ex:  number of pages
+%            def: 1
 %       options.pdfviewer
 %            in:  %s
 %            ex:  Your pdf-viewing program of choice
@@ -97,6 +73,11 @@ function outfile = combine_pdfs(pdffiles, options)
 %            ex:  Do a pdfcrop when finished putting everything together
 %            def: false
 %
+%       options.rightPadding
+%            in:  %f
+%            ex:  padding to the right of a row in cm. Note: Needs one value per row.
+%                 e.g., for 4 rows something like options.rightPadding=[1.7,1.7,0,0]
+%            def: 1
 %       options.rowsPerPage
 %            This is good if you have many plots that are not suitable for just
 %            one page
@@ -107,6 +88,37 @@ function outfile = combine_pdfs(pdffiles, options)
 %                In that case, the sum of this vector must match the total
 %                number of rows (=n files / sum(in.cols)).
 %            def: all the rows on one page
+%       options.samesize
+%            in:   %f
+%            ex:   Whether or not to force the figures to have the same size on the page
+%            def:  false
+%            note: This can be useful to make sure your plots are nicely aligned
+%                  on the page,s especially if you have plots that are nearly the
+%                  same size
+%       options.scale
+%            in:  [%d,%d; etc]
+%            ex:  scale individual figures. [filenumber,scale]
+%            def: 1
+%       options.title
+%            in:  %s
+%            ex:  title to be displayed above the combined pdfs
+%            def: <none>
+%       options.valign
+%            in:  %s
+%            ex:  vertical alignment. 'm' = middle, 'b' = bottom, 't'=top
+%            def: 'm'
+%       options.vspace
+%            in:  %f
+%            ex:  space between rows in cm
+%            def: 1
+
+
+
+
+
+
+
+
 % OUT:      outfile = The fullpath to the created pdf-file
 %
 % NOTE: The files are appended left to right and from top to bottom.
@@ -119,21 +131,22 @@ if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
 default.cols        = min(length(pdffiles),2);
-default.vspace      = 1;
-default.hspace      = 1;
-default.valign      = 'm';
+default.display    = true;
 if isfield(options,'title') && ~isempty(options.title)
     default.filename = [sanitise(options.title),'.pdf'];
 else
     default.filename = 'out.pdf';
 end
-default.samesize   = false;
+default.hspace      = 1;
 default.outdir     = gmtlab('outdir');
-default.secret_latex_spacing_tweak = 0.5;
-default.display    = true;
-default.title      = '';
+default.pages      = 1;
 default.pdfcrop    = false;
 default.pdfviewer  = '';
+default.samesize   = false;
+default.secret_latex_spacing_tweak = 0.5;
+default.title      = '';
+default.valign      = 'm';
+default.vspace      = 1;
 options = optargs_struct(options, default);
 
 %%
@@ -174,8 +187,18 @@ assert(sum(options.cols)<=length(pdffiles),...
 options.cols = make_fit(options.cols,pdffiles);
 
 % rows
-rows = length(options.cols);
-default.rowsPerPage = rows; % Default is one page for all the plots
+
+
+rows = length(options.cols)/options.pages;
+
+if isfield(options,'pages')
+    if isfield(options,'rowsPerPage')
+        warning(['atmlab:',mfilename,':badInput'],'options.pages forces the number of rows')
+    end
+    options.rowsPerPage = rows;
+else
+    default.rowsPerPage = rows; % Default is one page for all the plots
+end
 options = optargs_struct(options, default); clear default;
 options.rowsPerPage = make_fit(options.rowsPerPage,options.cols);
 if options.rowsPerPage>4
