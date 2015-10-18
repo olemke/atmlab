@@ -1,3 +1,9 @@
+2015-10-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-122
+
+	* sensors/ismar_los.m (ismar_los): Some typo fixes.
+
 2015-10-14  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-121

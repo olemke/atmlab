@@ -40,8 +40,8 @@ switch upper(instrument)
 end
 
 
-yaw   = I.platform_orientatio( ind );
-pitch = I.platform_pitch_angl( ind ) + pitch0;
+yaw   = I.platform_orientation( ind );
+pitch = I.platform_pitch_angle( ind ) + pitch0;
 roll  = I.platform_roll_angle( ind );       
 
 
@@ -74,7 +74,7 @@ for i = 1 : n
   % calculate zenith angle
   za(i) = acosd( r1'*[0 0 1]'  );
   
-  % caclulate the azimuth angle
+  % calculate the azimuth angle
   [dum,dum,aa(i)] = cart2geocentric( r1(1), r1(2), r1(3) );
 
 end
