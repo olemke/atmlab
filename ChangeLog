@@ -1,5 +1,13 @@
 2015-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-125
+
+	* sensors/ismar_los.m: Changed order between pitch and roll (when
+	calculating r1) as that gives a perfect match with angles found in
+	L1b data. 
+
+2015-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-124
 
 	* sensors/ismar_los.m: Modified. There were several problems in

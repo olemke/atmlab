@@ -5,8 +5,7 @@
 %
 % The default is to calculate the angles for each view. The obtained zenith
 % angles should then match the L1b field sensor_view_angle (besides
-% difference in reference direction). For COSMICS flight B893, the mismatch
-% between *za* and sensor_view_angles of MARSS was found to be below 1 deg.
+% difference in reference direction).
 %
 % By setting *do_met_mm* to true, the returned za and aa values are instead
 % the values expected by the MetMM system.
@@ -28,7 +27,8 @@
 %                    MetMM system. Default is false.
 
 % 2015-08-10  Created by Bengt Rydberg
-% 2015-10-19  Extended to cover non MetMM case
+% 2015-10-19  PE, some definition issues sorted out, and extended to cover 
+%             non MetMM case
 
 function [za,aa] = ismar_los(I,ind,varargin)
 %
@@ -87,7 +87,8 @@ for i = 1 : n
         0  cosd(roll(i))  -sind(roll(i)); ...
         0  sind(roll(i))   cosd(roll(i)) ]; 
 
-  [r1] = Y*P*R*vnom';
+  %r1 = Y*P*R*vnom';   % This is the correct order according to we page above.
+  r1 = Y*R*P*vnom';   % This gives perfect match with L1b data
 
   % calculate zenith angle
   za(i) = acosd( r1'*[0 0 1]'  );
