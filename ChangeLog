@@ -1,3 +1,16 @@
+2015-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-123
+
+	* Started a small series of functions, deriving variables from
+	ARTS single scattering data.
+
+	* scattering/assp2backcoef.m: New.
+
+	* scattering/assp2g.m: New, replaces function below.
+
+	* scattering/asymmetry_parameter.m: Replaced by function above.
+
 2015-10-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-122
