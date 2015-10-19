@@ -1,5 +1,17 @@
 2015-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-124
+
+	* sensors/ismar_los.m: Modified. There were several problems in
+	the function. Changes made but some parts require verification
+	from Stuart, how some angles are defined.
+
+	However, note that for usage with MetMM, you now need to set an
+	additional variable, a flag to trigger these calculations. Using
+	sensor_pol is now the default case.
+
+2015-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-123
 
 	* Started a small series of functions, deriving variables from
