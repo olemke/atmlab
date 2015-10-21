@@ -1,3 +1,12 @@
+2015-10-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-126
+
+	* sensors/read_ismar_l1b.m: Added reading of azimuth angle. So far
+	just found in a test file. Will be part of revised L1b data?
+
+	* sensors/ismar_los.m: Corrected/updated some comments.
+
 2015-10-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-125

@@ -75,13 +75,22 @@ I.platform_orientation   = double( I.platform_orientation );
 I.sensor_view_angle      = ncread( file, 'sensor_view_angle', [1], [Inf] );
 I.sensor_view_angle      = double( I.sensor_view_angle );
 
+% Azimuth angle not present in oldest files
+try
+  I.sensor_azimuth_angle = ncread( file, 'sensor_azimuth_angle', ...
+                                   [1], [Inf] );
+  I.sensor_azimuth_angle = double( I.sensor_azimuth_angle );
+catch
+  I.sensor_azimuth_angle = NaN;
+end
+
 % Polarisation not present in oldest files
 try
-  I.detected_polarisation  = ncread( file, 'detected_polarisation', ...
+  I.detected_polarisation = ncread( file, 'detected_polarisation', ...
                                    [1 1], [Inf Inf] );
-  I.detected_polarisation  = double( I.detected_polarisation );
+  I.detected_polarisation = double( I.detected_polarisation );
 catch
-  I.detected_polarisation  = NaN;
+  I.detected_polarisation = NaN;
 end
 
 I.brightness_temperature = ncread( file, 'brightness_temperature', ...

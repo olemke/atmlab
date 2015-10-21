@@ -72,11 +72,12 @@ for i = 1 : n
     else
       [x,y,z,dx,dy,dz]=geocentricposlos2cart( 1, 0, 0, 360-za_famm, 180 );      
     end
-    % Differences in corrdinate system makes that x and z are swapped
+    % Differences in corrdinate systems make that x and z are swapped
     vnom = [ dz, 0 , dx ];
   end
 
-  % yaw/pitch/roll rotations are taken from http://planning.cs.uiuc.edu/node102.html:
+  % yaw/pitch/roll rotations are taken from 
+  % http://planning.cs.uiuc.edu/node102.html:
   Y = [ cosd(yaw(i))  -sind(yaw(i))  0; ...
         sind(yaw(i))   cosd(yaw(i))  0; ...
            0              0          1 ];
@@ -87,8 +88,8 @@ for i = 1 : n
         0  cosd(roll(i))  -sind(roll(i)); ...
         0  sind(roll(i))   cosd(roll(i)) ]; 
 
-  %r1 = Y*P*R*vnom';   % This is the correct order according to we page above.
-  r1 = Y*R*P*vnom';   % This gives perfect match with L1b data
+  r1 = Y*P*R*vnom';   % This is the correct order according to web page above.
+  %r1 = Y*R*P*vnom';   % This gives perfect match with L1b data. Or gave?
 
   % calculate zenith angle
   za(i) = acosd( r1'*[0 0 1]'  );
