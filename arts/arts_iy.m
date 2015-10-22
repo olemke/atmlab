@@ -19,12 +19,16 @@
 %                    will be left in the folder. The files are not read if
 %                    corresponding output argument is not considered.
 %                    Default is [].
+%        full_ppath  Extract full ppath structures. Default is to use the
+%                    *ppathWriteXMLPartial* WSM.
 
 % 2015-04-19   Created by Patrick Eriksson.
 
-function [iy,iy_aux,ppath] = arts_iy( Q, workfolder )
+function [iy,iy_aux,ppath] = arts_iy( Q, workfolder, full_ppath )
 %
-if nargin < 2, workfolder = []; end
+if nargin < 2, workfolder = [];    end
+if nargin < 3, full_ppath = false; end
+
 %
 if atmlab( 'STRICT_ASSERT' )
   rqre_datatype( Q, @isstruct );
@@ -40,11 +44,28 @@ if isempty( workfolder )
 end
 
 
-%- Run ARTS
+%- Create cfile
 %
 parts = qarts2cfile( 'iy' );    
 S     = qarts2cfile( Q, parts, workfolder );
 cfile = fullfile( workfolder, 'cfile.arts' );
+
+
+% Shall saving of ppath be added?
+if nargout >= 3
+  filename = fullfile( workfolder, 'ppath.xml' );
+  if full_ppath
+    s = sprintf('WriteXML(output_file_format,ppath,"%s")', filename );    
+  else
+    s = sprintf('ppathWriteXMLPartial(output_file_format,ppath,"%s")', ...
+                     filename );
+  end
+  S{end+1} = S{end};
+  S{end-1} = s;
+end
+
+%- Run ARTS
+%
 strs2file( cfile, S );
 arts( cfile );
 

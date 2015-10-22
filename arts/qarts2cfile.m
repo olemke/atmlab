@@ -906,7 +906,6 @@ return
 %
 %    iy
 %    iy_aux
-%    ppath
 %
 function T = cfile_PbcExe( Q, partname, workfolder )
   %                                                                         %&%
@@ -923,7 +922,7 @@ function T = cfile_PbcExe( Q, partname, workfolder )
   %
   T{end+1} = add_savefile( 'iy',       workfolder );
   T{end+1} = add_savefile( 'iy_aux',   workfolder );
-  T{end+1} = add_savefile( 'ppath',    workfolder );
+  %T{end+1} = add_savefile( 'ppath',    workfolder );
 return
 
 
