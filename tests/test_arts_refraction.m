@@ -26,7 +26,7 @@ Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 %
 Q.PPATH_AGENDA          = { 'ppath_agenda__FollowSensorLosPath'   };
 Q.PPATH_STEP_AGENDA     = { 'ppath_step_agenda__RefractedPath'    };
-Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__GasThayer'    };
+Q.REFR_INDEX_AIR_AGENDA = { 'refr_index_air_agenda__GasMicrowavesEarth' };
 %
 Q.F_GRID                = 100e9;
 Q.CLOUDBOX_DO           = false;

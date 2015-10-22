@@ -710,6 +710,11 @@ I.SENSOR_LOS = [ ...
 'As the arts WSV with the same name.'
 ];
 %-----------------------------------------------------------------------------
+Q.SENSOR_POL = {};
+I.SENSOR_POL = [ ...
+'As the arts WSV with the same name.'
+];
+%-----------------------------------------------------------------------------
 Q.SENSOR_POS = {};
 I.SENSOR_POS = [ ...
 'As the arts WSV with the same name.'

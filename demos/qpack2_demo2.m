@@ -176,8 +176,8 @@ H.BACKEND_CHANNEL_RESPONSE{1} = B;
 clear B
 %
 % We assume a H polarisation response. A number coding is applied, see:
-% arts -d sensor_pol 
-H.SENSOR_POL          = { 6 };
+% arts -d instrument_pol 
+H.INSTRUMENT_POL      = { 6 };
 %
 Q.SENSOR_DO           = true;
 Q.SENSOR_RESPONSE     = H;

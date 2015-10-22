@@ -76,7 +76,7 @@ Q.IY_MAIN_AGENDA             = { 'iy_main_agenda__Emission'            };
 %  
 if do_refr
   Q.PPATH_STEP_AGENDA        = { 'ppath_step_agenda__RefractedPath'    };
-  Q.REFR_INDEX_AIR_AGENDA    = { 'refr_index_air_agenda__GasThayer'    };
+  Q.REFR_INDEX_AIR_AGENDA    = { 'refr_index_air_agenda__GasMicrowavesEarth' };
 else
   Q.PPATH_STEP_AGENDA        = { 'ppath_step_agenda__GeometricPath'    };
 end

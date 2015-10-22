@@ -1,5 +1,29 @@
 2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-131
+
+	* Some changes to catch up with changes in ARTS.
+
+	* arts_usage/arts_radioocc_1D_slta.m:
+	* arts_usage/arts_radioocc_1D.m: Changed to new agenda name,
+	refr_index_airMicrowavesEarth.
+
+	* demos/qarts_ppath_demo.m:
+	* tests/test_arts_refraction.m:
+	* demos/qarts_scattering_demo.m: Changed to use new name agenda
+	template, refr_index_air_agenda__GasMicrowavesEarth.
+
+	* demos/qpack2_demo2.m: SENSOR_POL changed to INSTRUMENT_POL.
+
+	* arts/qarts2cfile.m (cfile_Sensor): Adopted to the two changes
+	below.
+
+	* arts/qarts.m (qarts): Added SENSOR_POL.
+
+	* arts/qartsSensor.m: Renamed old sensor_pol to instrument_pol.
+
+2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-130
 
 	* Found out that 80% of the time for some calculations were spent

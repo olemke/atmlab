@@ -745,6 +745,10 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T = file_or_data( T, 'sensor_los', 'Matrix', Q.SENSOR_LOS,...
                                           workfolder, Q.INPUT_FILE_FORMAT );
   end
+  if qarts_isset( Q.SENSOR_POL )
+    T = file_or_data( T, 'sensor_pol', 'Matrix', Q.SENSOR_POL,...
+                                          workfolder, Q.INPUT_FILE_FORMAT );
+  end
   if qarts_isset( Q.SENSOR_TIME )
     T = file_or_data( T, 'sensor_time', 'Vector', Q.SENSOR_TIME,...
                                           workfolder, Q.INPUT_FILE_FORMAT );
@@ -1009,7 +1013,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
     if qarts_isset( H.STOKES_ROTATION )
       parts{end+1} = 'rotation';
     end
-    if qarts_isset( H.SENSOR_POL )
+    if qarts_isset( H.INSTRUMENT_POL )
       parts{end+1} = 'polarisation';
     end
     if qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO
@@ -1086,8 +1090,8 @@ function T = cfile_Sensor( Q, partname, workfolder )
         U{end+1} = 'sensor_responseStokesRotation';
        
        case 'polarisation'
-        U = file_or_data( U, 'sensor_pol', 'ArrayOfIndex', ...
-                           H.SENSOR_POL, workfolder, Q.INPUT_FILE_FORMAT );
+        U = file_or_data( U, 'instrument_pol', 'ArrayOfIndex', ...
+                           H.INSTRUMENT_POL, workfolder, Q.INPUT_FILE_FORMAT );
         U{end+1} = 'sensor_responsePolarisation';
        
       case 'antenna'
