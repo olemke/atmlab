@@ -1,3 +1,11 @@
+2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-127
+
+	* sensors/ismar_los.m: Changed treatment of pitch0. Some cleaning
+	of code. Stuart and I now get consistent results (angle
+	differences below 1e-5 deg)!
+
 2015-10-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-126

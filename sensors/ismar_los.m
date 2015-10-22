@@ -1,11 +1,11 @@
-% ISMAR_LOS   Calculates zenith and azimuth angles mased on "ISMAR data"
+% ISMAR_LOS   Calculates zenith and azimuth angles based on "ISMAR data"
 %
 % Calculates ARTS zenith and azimuth angles corresponding to ISMAR or MARSS
 % L1B data.
 %
 % The default is to calculate the angles for each view. The obtained zenith
-% angles should then match the L1b field sensor_view_angle (besides
-% difference in reference direction).
+% angles should then match the L1b fields sensor_view_angle (besides difference
+% in reference direction) and sensor_azimuth_angle .
 %
 % By setting *do_met_mm* to true, the returned za and aa values are instead
 % the values expected by the MetMM system.
@@ -27,8 +27,8 @@
 %                    MetMM system. Default is false.
 
 % 2015-08-10  Created by Bengt Rydberg
-% 2015-10-19  PE, some definition issues sorted out, and extended to cover 
-%             non MetMM case
+% 2015-10-22  PE, some definition issues sorted out, and extended to cover 
+%             non MetMM case. Stuart and we now get consistent results!
 
 function [za,aa] = ismar_los(I,ind,varargin)
 %
@@ -46,12 +46,10 @@ switch upper(instrument)
 end
 
 
+% Extract 
 yaw   = I.platform_orientation( ind );
-pitch = I.platform_pitch_angle( ind ) + pitch0;
+pitch = I.platform_pitch_angle( ind );
 roll  = I.platform_roll_angle( ind );       
-
-n       = length(yaw);
-[za,aa] = deal( zeros( n, 1 ) );
 
 
 % Pitch and roll are reversed in the expressions used below
@@ -60,21 +58,30 @@ pitch = -pitch;
 roll  = -roll;
 
 
+% Loop measurements and calculate
+n       = length(yaw);
+[za,aa] = deal( zeros( n, 1 ) );
+%
 for i = 1 : n
   
-  % Create a vector for nominal direction
+  % Zenith angle of nominal direction
   if do_metmm
-    vnom = [0 0 -1];
+    za_famm = 180 - pitch0;
   else
-    za_famm = I.angle(ind(i));
-    if za_famm <= 180
-      [x,y,z,dx,dy,dz]=geocentricposlos2cart( 1, 0, 0, za_famm, 0 );
-    else
-      [x,y,z,dx,dy,dz]=geocentricposlos2cart( 1, 0, 0, 360-za_famm, 180 );      
-    end
-    % Differences in corrdinate systems make that x and z are swapped
-    vnom = [ dz, 0 , dx ];
+    za_famm = I.angle(ind(i)) - pitch0;
   end
+  
+  % Create a vector for nominal direction
+  % (when subtracting pitch0 we can end up slightly below 0)
+  if za_famm < 0
+    [x,y,z,dx,dy,dz]=geocentricposlos2cart( 1, 0, 0, -za_famm, 180 );
+  elseif za_famm <= 180
+    [x,y,z,dx,dy,dz]=geocentricposlos2cart( 1, 0, 0, za_famm, 0 );
+  else
+    [x,y,z,dx,dy,dz]=geocentricposlos2cart( 1, 0, 0, 360-za_famm, 180 );      
+  end
+  % Differences in corrdinate systems make that x and z are swapped
+  vnom = [ dz, 0 , dx ];
 
   % yaw/pitch/roll rotations are taken from 
   % http://planning.cs.uiuc.edu/node102.html:
@@ -89,7 +96,6 @@ for i = 1 : n
         0  sind(roll(i))   cosd(roll(i)) ]; 
 
   r1 = Y*P*R*vnom';   % This is the correct order according to web page above.
-  %r1 = Y*R*P*vnom';   % This gives perfect match with L1b data. Or gave?
 
   % calculate zenith angle
   za(i) = acosd( r1'*[0 0 1]'  );
@@ -99,6 +105,7 @@ for i = 1 : n
     [dum,dum,aa(i)] = cart2geocentric( r1(1), r1(2), r1(3) );
   end
 end
+
 
 % For MetMM, the reference direction is always taken as the anti-flight direction!
 if do_metmm
