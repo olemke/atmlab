@@ -1,5 +1,13 @@
 2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-129
+
+	* geodetic/line_point_shortest_dist.m: New.
+
+	* ChangeLog: Corrected spelling mistakes in last ChangeLog message!
+
+2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-128
 
 	* Following change in ARTS, removed Thayer as standard for
@@ -7,9 +15,9 @@
 	old Thayer function, set k2 and k3 to 64.8e-8 and 3.776e-3,
 	respectively.
 
-	* forwardmodel/n_air_mwawes_earth.m: New, based on fucntion below.
+	* forwardmodel/n_air_mwawes_earth.m: New, based on function below.
 
-	* forwardmodel/n_air_thayer.m: Removed/replacved with function
+	* forwardmodel/n_air_thayer.m: Removed/replaced with function
 	above.
 
 2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
