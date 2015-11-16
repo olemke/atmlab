@@ -1,3 +1,8 @@
+2015-11-16  Ole Martin Christensen  <olem@chalmers.se>
+
+	* covmat/covmat3d_from_cfun.m: corrected a bug in the z
+	direction for gaussian non-separable matrix.
+
 2015-10-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-131

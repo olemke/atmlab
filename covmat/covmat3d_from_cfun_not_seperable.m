@@ -404,7 +404,7 @@ function C = make_cmatrix_2d( x, y, clx, cly, cfunx, cfuny )
             y_cl = 0;
         end
         
-        c = exp(-sqrt((x_cl)^4 + (y_cl)^4));
+        c = exp(-((x_cl)^2 + (y_cl)^2));
         C(row,col) = c; 
         C(col,row) = c;
       end
@@ -524,12 +524,12 @@ function C = make_cmatrix_3d( x, y, z, clx, cly, clz, cfunx, cfuny, cfunz )
         if isnan(y_cl) %To take into acount drc in one dimension
             y_cl = 0;
         end
-        z_cl = dz./colymean; %y normalized with correlation length
+        z_cl = dz./colzmean; %y normalized with correlation length
         if isnan(z_cl) %To take into acount drc in one dimension
             z_cl = 0;
         end
         
-        c = exp(-sqrt((x_cl)^4 + (y_cl)^4 + (z_cl)^4));
+        c = exp(-((x_cl)^2 + (y_cl)^2 + (z_cl)^2));
         C(row,col) = c; 
         C(col,row) = c;
       end
