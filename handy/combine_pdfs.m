@@ -188,8 +188,12 @@ options.cols = make_fit(options.cols,pdffiles);
 
 % rows
 
+if options.pages > length(options.cols)
+    warning(['atmlab:',mfilename,':badInput'],'options.pages forced to %i (= length(options.cols) )',length(options.cols))
+    options.pages = length(options.cols);
+end
 
-rows = length(options.cols)/options.pages;
+rows = ceil(length(options.cols)/options.pages);
 
 if isfield(options,'pages')
     if isfield(options,'rowsPerPage')

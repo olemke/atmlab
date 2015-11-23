@@ -184,7 +184,7 @@ function filename = gmt_plot(in,field)
 % in.map_title_offset
 %                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
 %                      ex:     Moves the title in y-dir on the page
-%                      def:    '0.5c' (cm)
+%                      def:    '0c' (cm)
 %                     ------------
 % in.makecpt           in:     %s
 %                      ex:     'gmt makecpt OPT > filename.ps', explicitly sets the

@@ -1,4 +1,12 @@
+2015-11-23  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-133
+
+	* handy/combine_pdfs.m: Fixed bug if the asked for number of pages is too high
+
 2015-11-16  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-132
 
 	* covmat/covmat3d_from_cfun.m: corrected a bug in the z
 	direction for gaussian non-separable matrix.
