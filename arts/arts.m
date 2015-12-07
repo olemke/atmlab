@@ -68,7 +68,7 @@ else
 end
 
 
-if ~isempty( result )
+if ~isempty( result )  &  nargout < 2
   disp( result )
 end
 

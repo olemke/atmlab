@@ -12,7 +12,7 @@
 
 function s = arts_version( long_on_screen )
 
-[notok,s] = arts( '-v', [], true );
+[notok,s] = arts( '-v', true );
 
 if nargin & long_on_screen
   disp(s)

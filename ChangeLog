@@ -1,3 +1,12 @@
+2015-12-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-134
+
+	* arts/arts_version.m: Adopted call of arts.m.
+
+	* arts/arts.m: Don't display text messages on screen if result is
+	output argument.
+
 2015-11-23  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-133
