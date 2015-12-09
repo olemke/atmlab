@@ -23,9 +23,7 @@ end
 
 D = datasets;
 
-%base_dir = '/scratch/uni/u237/';
-fprintf('Temporarily changed base_dir for debugging!!\n')
-base_dir = '/Users/seliasson/sshfs/hamburg/';
+base_dir = '/scratch/uni/u237/';
 data_base_dir = [base_dir 'data/'];
 userdata_base_dir = [base_dir 'user_data/'];
 
