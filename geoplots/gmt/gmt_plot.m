@@ -818,7 +818,7 @@ logtext(1,'Using GMT version %s\n',in.gmtVersion)
 
 % SET DEFAULTS
 % general
-default.add_offset               = [];
+default.add_offset               = 0;
 default.color_background         = '0/0/0';
 default.color_foreground         = '255/255/255';
 default.color_nan                = '150/150/150';
@@ -831,7 +831,7 @@ default.font_annot_secondary     = 'Helvetica';
 default.fontsize_annot_secondary = '10p';
 default.fontsize_title           = '36p';
 default.psbasemap.axes           = 'nSeW';
-default.scale_factor             = [];     
+default.scale_factor             = 1;     
 default.title                    = '';
 
 in = optargs_struct(in,default);

@@ -1552,7 +1552,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 %[binned, lat, lon] = binning_fast(data);
                 indces = bin_nd({data.lat, data.lon}, {lat, lon});
                 binned = cellfun(@(ii) data.data(ii, :), indces, 'UniformOutput', false);
-                stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limit_binnedstats);
+                stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))}, limit_binnedstats,0,struct('dataClass',class(binned{1,1})));
                 logtext(atmlab('OUT'), 'Calculating statistics\n');
                 stats.statistic1 = cell2mat(stats.statistic1);
                 % cell2mat on multi-dim will flatten 2nd dimension,

@@ -1,3 +1,22 @@
+2015-12-09  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-135
+
+	* datasets/SatDataset.m:
+
+	-Added some extra arguments to binned_statistics call in
+	level3. There was a rare case that caused cell2mat to crash.
+	Sometimes 'limitbinnedstats' emptied cells instead of [0x1]. I now
+	added the 'replace' and 'dataClass' arguments to avoid this
+	happening again.
+
+	* geographical/standardize_geodata.m: fixed lying header
+
+	* geoplots/gmt/gmt_plot.m:
+	- default add_offset and scale_factor is now 0 and 1 respectively
+
+	* math/binned_statistics.m: cosmetics
+
 2015-12-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-134

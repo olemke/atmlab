@@ -97,8 +97,7 @@ for i = 1:length(F)
         if any(test(:)) && ~all(test(:))
             % find a cell that is not empty and check if the class matches the
             % class of the replace value
-            x = cellfun(@isempty,data_bins);
-            x = data_bins(~x);
+            x = data_bins(~cellfun(@isempty,data_bins));
             if ~strcmp(class(replace{i}),class(x{1})) && ~isfield(opt,'dataClass')
                 warning(['atmlab:' mfilename ':dataClass'],...
                     ['replace  value/s is not the same class as data_bins\n'...
@@ -117,7 +116,7 @@ for i = 1:length(F)
 
     if isfield(opt,'dataClass') && ~isempty(opt.dataClass)
         logtext(atmlab('OUT'),['Making sure all vectors in cells are the same class '...
-            '(in this case %s)\n'],opt.dataClass)
+            '(in this case "%"s)\n'],opt.dataClass)
         out.(F{i}) = cellfun(@(x)(cast(x,opt.dataClass)), out.(F{i}), 'UniformOutput', false);
     end
 end

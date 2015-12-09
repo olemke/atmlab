@@ -32,7 +32,7 @@ function [flags,out] = standardize_geodata(in,options)
 % NOTE: 1) If lat and lon are the same length the first dimesion of data is
 %       assumed to correspond to lat.
 %
-% USAGE:    [flags,lat,lon,data] = standardize_geodata(in,[options])
+% USAGE:    [flags,out] = standardize_geodata(in,[options])
 %
 % created by Salomon Eliasson
 % $Id$
