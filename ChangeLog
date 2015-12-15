@@ -1,3 +1,17 @@
+2015-12-15  Manfred Brath  <manfred.brath@uni-hamburg.de>
+
+    * atmlab-2-3-137
+
+	* documentation/ismar/: added database documentation
+	
+	* retrieval/ismar/hamburg/{calculate_HMP.m, calculate_IWV.m}: 
+	added functions to calculate integrated water vapor and 
+	hydrometeor paths from database
+	
+	* retrieval/ismar/hamburg/ismar_import_zipped_arts_simulation.m:
+	added a function to convert the output of an arts-simulation for
+	the database into a mat-file
+	
 2015-12-09  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-136
