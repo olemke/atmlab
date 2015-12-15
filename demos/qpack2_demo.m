@@ -133,7 +133,6 @@ Q.CLOUDBOX_DO         = false;
 %
 Q.PPATH_AGENDA               = { 'ppath_agenda__FollowSensorLosPath'   };
 Q.PPATH_STEP_AGENDA          = { 'ppath_step_agenda__GeometricPath'    };
-Q.BLACKBODY_RADIATION_AGENDA = { 'blackbody_radiation_agenda__Planck'  };
 Q.IY_SPACE_AGENDA            = { 'iy_space_agenda__CosmicBackground'   };
 Q.IY_SURFACE_AGENDA          = { 'iy_surface_agenda__UseSurfaceRtprop' };
 Q.IY_MAIN_AGENDA             = { 'iy_main_agenda__Emission'            };

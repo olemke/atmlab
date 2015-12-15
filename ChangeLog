@@ -1,3 +1,23 @@
+2015-12-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-138
+
+	* demos/qpack2_wind3d_demo.m:
+	* demos/qpack2_t_demo.m:
+	* demos/qpack2_demo2.m:
+	* demos/qpack2_demo.m:
+	* demos/qarts_zeeman_demo.m:
+	* demos/qarts_scattering_demo.m:
+	* demos/qarts_iy_demo.m:
+	* demos/qarts_demo2.m:
+	* demos/qarts_demo.m:
+	* demos/qarts_backend_demo.m:
+	* demos/asg_clearsky_demo.m:
+	* demos/arts_oem_demo.m: Removed defintion of BLACKBODY_RADIATION_AGENDA.
+
+	* arts/qarts2cfile.m:
+	* arts/qarts.m: Removed BLACKBODY_RADIATION_AGENDA.
+
 2015-12-15  Manfred Brath  <manfred.brath@uni-hamburg.de>
 
     * atmlab-2-3-137

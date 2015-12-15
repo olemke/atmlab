@@ -680,7 +680,6 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
-%    blackbody_radiation_agenda
 %    surface_rtprop_agenda
 %    iy_surface_agenda
 %    iy_space_agenda
@@ -703,10 +702,6 @@ function T = cfile_RteSet( Q, partname, workfolder )
   %
   T = {};
   %
-  if qarts_isset( Q.BLACKBODY_RADIATION_AGENDA )
-    T = add_agenda( T, 'blackbody_radiation_agenda', ...
-                                                Q.BLACKBODY_RADIATION_AGENDA );
-  end    
   if qarts_isset( Q.SURFACE_RTPROP_AGENDA )
     T = add_agenda( T, 'surface_rtprop_agenda', Q.SURFACE_RTPROP_AGENDA );
   end
@@ -819,7 +814,6 @@ return
 %------------------------------------------------------------------------------
 % Sub-function handling:
 %
-%    blackbody_radiation_agenda
 %    surface_rtprop_agenda
 %    iy_surface_agenda
 %    iy_space_agenda
@@ -841,10 +835,6 @@ function T = cfile_PbcSet( Q, partname, workfolder )
   %
   T = {};
   %
-  if qarts_isset( Q.BLACKBODY_RADIATION_AGENDA )
-    T = add_agenda( T, 'blackbody_radiation_agenda', ...
-                                                Q.BLACKBODY_RADIATION_AGENDA );
-  end    
   if qarts_isset( Q.SURFACE_RTPROP_AGENDA )
     T = add_agenda( T, 'surface_rtprop_agenda', Q.SURFACE_RTPROP_AGENDA );
   end
