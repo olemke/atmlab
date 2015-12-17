@@ -1,3 +1,18 @@
+2015-12-15  Manfred Brath  <manfred.brath@uni-hamburg.de>
+
+    * atmlab-2-3-141
+	
+	* retrieval/ismar/hamburg/{calculate_hmp.m, calculate_iwv.m}: 
+	renamed the function names and reformatted the function headers
+	
+	* retrieval/ismar/hamburg/ismar_import_zipped_arts_simulation.m:
+	reformatted the function headers
+	
+	* retrieval/ismar/hamburg/load_database_wfilter.m:
+	added a function to load chunks of an ISMAR database and to join the chunks.
+	Additionally there is also the possibility to filter data, so that only the 
+	data which passes the filter are joined.
+
 2015-12-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-140
@@ -32,6 +47,21 @@
 
 	* arts/qarts2cfile.m:
 	* arts/qarts.m: Removed BLACKBODY_RADIATION_AGENDA.
+
+2015-12-15  Manfred Brath  <manfred.brath@uni-hamburg.de>
+
+    * atmlab-2-3-138
+	
+	* retrieval/ismar/hamburg/{calculate_hmp.m, calculate_iwv.m}: 
+	renamed the function names and reformatted the function headers
+	
+	* retrieval/ismar/hamburg/ismar_import_zipped_arts_simulation.m:
+	reformatted the function headers
+	
+	* retrieval/ismar/hamburg/load_database_wfilter.m:
+	added a function to load chunks of an ISMAR database and to join the chunks.
+	Additionally there is also the possibility to filter data, so that only the 
+	data which passes the filter are joined.
 
 2015-12-15  Manfred Brath  <manfred.brath@uni-hamburg.de>
 

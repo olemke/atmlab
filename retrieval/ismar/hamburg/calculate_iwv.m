@@ -1,22 +1,9 @@
+% calculate_HMP     A function to calculate the integrated water vapor(IWV)
+%                   within a database for the ISMAR retrieval.
 %
-% results=calculate_IWV(data,upper_limit,lower_limit)
-%
-% function to calculate integrated water vapor (IWV) within the database
-%
-% input:
-%   data,        database as struct with fieldnames according to the ISMAR
-%                database documentation.
-%   upper_limit, upper limit of integration
-%   lower_limit, lower limit of integration
-%
-% output:
-%   results,     a struct consisting of the fields:
-%                   "IWV" - integrated water vapor
-%                   "altitude" - altitude if cummulative path is selected,
-%                                otherwise NaN
-%                   "pressure" - pressure if cummulative path is selected,
-%                                otherwise NaN
-%
+%   The function will calculate the IWV of the hydrometeors
+%   within a ISMAR retrievaldatabase. This is done using a mid point
+%   integration.
 %
 %   If upper_limit is positive infinity and lower_limit is empty then the 
 %   IWV is calculated by integrating over the complete column.
@@ -42,9 +29,27 @@
 %   IWV is calculated by integrating from the TOA to the
 %   lower_limit
 %
-%   Manfred Brath, Hamburg, 14/12/2015
+% FORMAT    results=calculate_iwv(data,upper_limit,lower_limit)
+%
+% OUT   results,     a struct consisting of the fields:
+%                    "IWV" - integrated water vapor
+%                    "altitude" - altitude if cummulative path is selected,
+%                                 otherwise NaN
+%                    "pressure" - pressure if cummulative path is selected,
+%                                 otherwise NaN
+%
+%
+% IN    data,        database as struct with fieldnames according to the ISMAR
+%                    database documentation.
+%       upper_limit, upper limit of integration
+%       lower_limit, lower limit of integration
+%
+%
 
-function results=calculate_IWV(data,upper_limit,lower_limit)
+%   2015-12-14  Manfred Brath
+%   2015-12-17  Manfred Brath
+
+function results=calculate_iwv(data,upper_limit,lower_limit)
 
 
 

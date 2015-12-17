@@ -1,9 +1,10 @@
-function ismar_import_zipped_arts_simulation(directory,basename,outputdir,tempfolder,index)
-% ismar_import_zipped_arts_simulation(directory,basename,outputdir,tempfolder,index)
+% ismar_import_zipped_arts_simulation
 %
 % Function for importing the different arts-xml-output of a single
-% simulation into matlab and combine them to one mat-file. The mandatory
-% output of a arts-simulation for the ISMAR retrieval consist of a xml-file 
+% simulation, which are archived as one zip-file into matlab and combine 
+% them to one mat-file. The mandatory
+% output of a arts-simulation for the ISMAR retrieval consist of a zip-archive
+% containing a xml-file 
 %   for each of the following arts workspace variables:
 %   
 %   - doit_i_field
@@ -33,28 +34,32 @@ function ismar_import_zipped_arts_simulation(directory,basename,outputdir,tempfo
 % If the additional quantities are not given, then they will saved as empty
 % arrays. 
 %
-%--------------------------------------------------------------------------
-%Input:
-%   - directory, the location of the zip_archives of the ARTS-simulations as 
-%                   a string
-%   - basename, the first part of the name of the xml-file till the variable 
-%                   name
-%   - outputdir, the location where the mat files should be saved.
-%
-%   - tempfolder, location where to save temporary files
-%
-%   - index, a vector with the indices of the different simulations. index
-%                   can be excluded, if all simulations with the samebase
-%                   should be imported.
-%
 %  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   WORKS ONLY WITH ARTS 2.3!!!!!!!   
 %
 %  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   02/12/2015, Manfred Brath
+% FORMAT    ismar_import_zipped_arts_simulation(directory,basename,outputdir,tempfolder,index)
+%
+% OUT   there is no output!
+%
+% IN    directory, the location of the zip_archives of the ARTS-simulations as 
+%                   a string
+%       basename, the first part of the name of the xml-file till the variable 
+%                   name
+%       outputdir, the location where the mat files should be saved.
+%
+%       tempfolder, location where to save temporary files
+%
+%       index, a vector with the indices of the different simulations. index
+%                   can be excluded, if all simulations with the samebase
+%                   should be imported.   
 
+%   2015-12-02  Manfred Brath
+%   2015-12-17  Manfred Brath
+
+function ismar_import_zipped_arts_simulation(directory,basename,outputdir,tempfolder,index)
 
 %% main variable identifier (strings)
 

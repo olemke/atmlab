@@ -1,28 +1,9 @@
+% calculate_HMP     A function to calculate hydrometeorpaths within the 
+%                   database for the ISMAR retrieval.
 %
-% results=calculate_HMP(data,HMPtypes,upper_limit,lower_limit)
-%
-% function to calculate paths of the hydrometeor within the database
-%
-% input:
-%   data,        database as struct with fieldnames according to the ISMAR
-%                database documentation.
-%   HMPtypes,    a cell-array with the hydrometeors for which the paths
-%                should be calculated. If set empty, then all hydrometeor
-%                paths are calculated.
-%   upper_limit, upper limit of integration
-%   lower_limit, lower limit of integration
-%
-% output:
-%   results,     a struct consisting of the fields
-%                   "HMP" - hydrometeor path(s)
-%                   "altitude" - altitude if cummulative path is selected,
-%                                otherwise NaN
-%                   "pressure" - pressure if cummulative path is selected,
-%                                otherwise NaN
-%                   "HMPtypes" - a cell array with the name of the
-%                                hydrometors
-%
-%
+%   The function will calculate the hydrometeor paths of the hydrometeors
+%   within a ISMAR retrievaldatabase. This is done using a mid point
+%   integration.
 %
 %   If upper_limit is positive infinity and lower_limit is empty then the 
 %   hydrometeor path is calculated by integrating over the complete column.
@@ -47,11 +28,32 @@
 %   If upper_limit is empty and lower_limit is positive then the 
 %   hydrometeor path is calculated by integrating from the TOA to the
 %   lower_limit
+% 
+% FORMAT    results=calculate_iwv(data,HMPtypes,upper_limit,lower_limit)
 %
-%   Manfred Brath, Hamburg, 14/12/2015
+% OUT   results,     a struct consisting of the fields
+%                    "HMP" - hydrometeor path(s)
+%                    "altitude" - altitude if cummulative path is selected,
+%                                 otherwise NaN
+%                    "pressure" - pressure if cummulative path is selected,
+%                                 otherwise NaN
+%                    "HMPtypes" - a cell array with the name of the
+%                                 hydrometors
+%
+% IN    data,        database as struct with fieldnames according to the ISMAR
+%                    database documentation.
+%       HMPtypes,    a cell-array with the hydrometeors for which the paths
+%                    should be calculated. If set empty, then all hydrometeor
+%                    paths are calculated.
+%       upper_limit, upper limit of integration
+%       lower_limit, lower limit of integration
+%
+
+%   2015-12-14  Manfred Brath
+%   2015-12-17  Manfred Brath
 
 
-function results=calculate_HMP(data,HMPtypes,upper_limit,lower_limit)
+function results=calculate_hmp(data,HMPtypes,upper_limit,lower_limit)
 
 if nargin<4
     lower_limit=[];
