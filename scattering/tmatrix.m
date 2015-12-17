@@ -49,7 +49,7 @@
 %       cri_source   Source to complex refractive index. A string. Default
 %                    is to use the default string in arts.
 %       ndgs         Number of division points in computing integrals over
-%                    the particle surface. Only used fvor random orientation.
+%                    the particle surface. Only used for random orientation.
 
 % 2014-09-27   Created by Patrick Eriksson.
 

@@ -1,5 +1,11 @@
 2015-12-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-140
+
+	* scattering/tmatrix.m: Fixed a spelling mistake in header.
+
+2015-12-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-139
 
 	* scattering/tmatrix.m (tmatrix): Added ngds as optional input.
