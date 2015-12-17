@@ -1,3 +1,12 @@
+2015-12-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-139
+
+	* scattering/tmatrix.m (tmatrix): Added ngds as optional input.
+	Selected 5 as default value, which differs from the (present )
+	default is arts that is 2. A higher value should be hood for
+	accuracy, and clearly help to handle high axial ratios.
+
 2015-12-15  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-138

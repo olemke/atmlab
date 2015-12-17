@@ -37,7 +37,7 @@
 %       shape        Particle shape. 
 %       ptype        Particle type. 
 %       diameter     Particle diameter.
-%       aspect_ratio  Particle aspect ratio.
+%       aspect_ratio Particle aspect ratio.
 % OPT   d_is_max     Default is that *diameter* is equivalent volume diameter
 %                    (Dveq). Set this flag to true if *diameter* is instead
 %                    the maximum dimension (Dmax).
@@ -48,14 +48,16 @@
 %       mass         Particle mass. Only used to set meta data. Default is NaN.
 %       cri_source   Source to complex refractive index. A string. Default
 %                    is to use the default string in arts.
+%       ndgs         Number of division points in computing integrals over
+%                    the particle surface. Only used fvor random orientation.
 
 % 2014-09-27   Created by Patrick Eriksson.
 
 function [S,M,dveq] = tmatrix(workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
                               shape,ptype,diameter,aspect_ratio,varargin)
 %
-[d_is_max,outfile,precision,mass,cri_source] = ...
-                          optargs( varargin, { false, [], 0.001, NaN, [] } );
+[d_is_max,outfile,precision,mass,cri_source,ndgs] = ...
+                          optargs( varargin, { false, [], 0.001, NaN, [], 5 } );
   
   
 %- Basic checks of input
@@ -145,6 +147,7 @@ end
 if ~isempty(cri_source)
   S{end+1} = sprintf('  cri_source   = "%s",', cri_source );
 end
+S{end+1} = sprintf('  ndgs         = %d,', ndgs );
 S{end+1} = sprintf('  precision    = %.6e', precision );
 S{end+1} = ')';
 if isempty(outfile)
