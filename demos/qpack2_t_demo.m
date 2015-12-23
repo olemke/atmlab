@@ -144,7 +144,7 @@ B.data                = [1 1];
 H.BACKEND_CHANNEL_RESPONSE{1} = B;
 clear B
 %
-H.SENSOR_POL          = { 6 };
+H.INSTRUMENT_POL      = { 6 };
 %
 Q.SENSOR_DO           = true;
 Q.SENSOR_RESPONSE     = H;

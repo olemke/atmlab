@@ -340,6 +340,8 @@ fields in special way:
   (as it is difficult to ensure generation of good absorption tables in a
   general manner). You must either use 'OnTheFly' or create an absorption table
   as a pre-calculation (the 'LoadTable' option).
+\item \verb|Q.SENSOR_POS| and \verb|Q.SENSOR_LOS| are set based on data in the
+  \verb|Y| structure. User specified data in these fields have no impact.
 \item \verb|Q.TNOISE_C| must be set.
 \item The a priori knowledge covariance matrix (Sx) is created by
   \verb|arts_sx| and the \verb|SX| sub-fields of the retrieval quantities must
@@ -797,15 +799,17 @@ possible to handle measurements consisting of multiple spectra.
 %
 If the sensor characteristics are common for all spectra involved (not
 including thermal noise) it is relatively straightforward to apply Qpack. For
-example, the same sensor is moved vertically, or rotated to measure at
+example, a sensor that is moved vertically, or rotated to measure at
 different zenith angles, can be treated. Requirements and considerations to
 handle such multiple-spectra measurements include:
 \begin{itemize}
 \item The fields \verb|Y.Z_PLATFORM| and \verb|Y.ZA| shall give the altitude
   and zenith angle of each spectrum, and are accordingly (column) vectors
   instead of scalar values for single-spectra cases. 
-\item \verb|Y.LATITUDE| and \verb|Y.LONGITUDE| are kept as scalar values, the
-  same geographical position is assumed for all spectra.
+\item If \verb|Y.LAT_PLATFORM| is used, this must be a vector of same length as
+  \verb|Y.ZA|. Note that \verb|Y.LATITUDE|, as well as \verb|Y.LONGITUDE|, is
+  always scalar values, and can not be used to descibe a horizontally moving
+  sensor.
 \item \verb|Y.T_NOISE| must be extended where each column describes the noise
   of the corresponding spectrum. Hence, the noise level can vary between the
   spectra.
@@ -832,6 +836,7 @@ considerations are then:
   directions. Using the \verb|ATMDATA| feature with an input 1D atmosphere
   handles this automatically.
 \item The field \verb|Y.AA| shall be set, and match \verb|Y.ZA| in length.
+\item If \verb|Y.LON_PLATFORM| is used, this vector must match \verb|Y.ZA| in length.
 \item Latitude and longitude retrieval grids, such in
   \verb|Q.ABS_SPECIES.GRIDS|, must be specified, but must have length one. Any
   value should work. One example:

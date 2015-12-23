@@ -14,7 +14,7 @@
 %        
 % OUT   g
 % IN    f0        Line centre.
-%       fwhm      FWHM for Doppler broadening (pr correspondingly)
+%       fwhm      FWHM for Doppler broadening (or correspondingly)
 %       df1       Starting point for grid, in distance from f0. E.g. -500e6
 %                 for a grid starting 0.5 GHz below f0.
 %       df2       End point for grid, in distance from f0. E.g. 500e6

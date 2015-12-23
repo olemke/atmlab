@@ -1,16 +1,38 @@
+2015-12-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-142
+
+	* This commit should allow that Qpack2 can also be applied on 2D
+	and 3D limb sounding. In any case, the latitude and longitude of
+	the observation platform can now be specified.
+
+	* demos/qpack2_t_demo.m: Changed old SENSOR_POL to new name of
+	INSTRUMEMNT_POL.
+
+	* retrieval/qpack2/qpack2.m (qp2_y2Q): Implemented handling of
+	LAT_PLATFORM and LON_PLATFORM. Corrected check of size(Y.TNOISE).
+
+	* documentation/qpack2/qpack2.tex: Updates with respect to changes
+	below. And also added one point os SENSOR_POS/LOS.
+
+	* retrieval/qpack2/qp2_y.m: Added LAT_PLATFORM and LON_PLATFORM,
+	and expended somewhat description of LATITUDE and LONGITUDE.
+
+	* gridcreation/grid_for_1line.m: Fixed typo in header.
+
 2015-12-15  Manfred Brath  <manfred.brath@uni-hamburg.de>
 
-    * atmlab-2-3-141
-	
-	* retrieval/ismar/hamburg/{calculate_hmp.m, calculate_iwv.m}: 
+	* atmlab-2-3-141
+
+	* retrieval/ismar/hamburg/{calculate_hmp.m, calculate_iwv.m}:
 	renamed the function names and reformatted the function headers
-	
+
 	* retrieval/ismar/hamburg/ismar_import_zipped_arts_simulation.m:
 	reformatted the function headers
-	
+
 	* retrieval/ismar/hamburg/load_database_wfilter.m:
 	added a function to load chunks of an ISMAR database and to join the chunks.
-	Additionally there is also the possibility to filter data, so that only the 
+	Additionally there is also the possibility to filter data, so that only the
 	data which passes the filter are joined.
 
 2015-12-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>

@@ -2,7 +2,7 @@
 %
 %    Read qpack2.pdf for an introduction to Qpack2 and user instructions.
 %
-%    The main task to make OEM type inversions. The measurement data in *Y* are
+%    The function performs OEM type inversions. The measurement data in *Y* are
 %    inverted by combining the function oem.m and Qarts (interface to arts-2).
 %    Forward model and retrieval variables are packed into the Qarts structure
 %    Q. OEM specific parameters are found in O.
@@ -295,6 +295,20 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
                     'Y(%d).AA and Y(%d).ZA must have the same length.', m, m );
       end 
     end
+    if Q.ATMOSPHERE_DIM > 1
+      if qarts_isset( Y.LAT_PLATFORM )  &  ...
+                                  length(Y(m).ZA) ~=  length(Y(m).LAT_PLATFORM)
+        error( ...
+           'Y(%d).LAT_PLATFORM and Y(%d).ZA must have the same length.', m, m );
+      end
+      if Q.ATMOSPHERE_DIM == 3
+        if qarts_isset( Y.LON_PLATFORM )  &  ...
+                                  length(Y(m).ZA) ~=  length(Y(m).LON_PLATFORM)
+          error( ...
+          'Y(%d).LON_PLATFORM* and Y(%d).ZA must have the same length.', m, m );
+        end
+      end
+    end
   end
 
   %- Map ATMDATA (if set) to VMR_FIELD, Z_FIELD and T_FIELD, and apply HSE
@@ -376,14 +390,26 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
     Q.SENSOR_POS  = Y(m).Z_PLATFORM;
     Q.SENSOR_LOS  = Y(m).ZA;
   elseif Q.ATMOSPHERE_DIM == 2
-    Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, repmat( [Y(m).LATITUDE], nza, 1 ) ];
+    if qarts_isset( Y.LAT_PLATFORM )   
+      Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, vec2col(Y(m).LAT_PLATFORM) ];
+    else
+      Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, repmat( Y(m).LATITUDE, nza, 1 ) ];
+    end
     Q.SENSOR_LOS  = [ Y(m).ZA ];
   elseif Q.ATMOSPHERE_DIM == 3
-    Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, ...
-                      repmat( [Y(m).LATITUDE,Y(m).LONGITUDE], nza, 1 ) ];
+    if qarts_isset( Y.LAT_PLATFORM )   
+      lat = vec2col( Y(m).LAT_PLATFORM );
+    else
+      lat = repmat( Y(m).LATITUDE, nza, 1 );
+    end
+    if qarts_isset( Y.LON_PLATFORM )   
+      lon = vec2col( Y(m).LON_PLATFORM );
+    else
+      lon = repmat( Y(m).LONGITUDE, nza, 1 );
+    end
+    Q.SENSOR_POS  = [ Y(m).Z_PLATFORM, lat, lon ];
     Q.SENSOR_LOS  = [ Y(m).ZA, Y(m).AA ];
   end
-
 
   %- Set a dummy sensor_time, if not already defined
   %
@@ -396,13 +422,13 @@ function  [Q,Se] = qp2_y2Q( Q, Y, m )
   if nargout == 2
     
     nnv = size( Y(m).TNOISE, 1 );
-    nf  = length( Y(m).F );
+    nf  = length( qarts_get( Q.SENSOR_RESPONSE.F_BACKEND ) );
     
     if do_checks
       rqre_datatype( Y(m).TNOISE, @istensor2, sprintf('Y(%d).TNOISE',m) );
       if nnv ~= 1  &&  nnv ~= nf
-        error( errid, ...
-         'Row size of Y(%d).TNOISE must be 1 or equal to length of Y.F.', m );
+        error( errid, [ 'Row size of Y(%d).TNOISE must be 1 or equal to ',...
+                        'length of Q.SENSOR_RESPONSE.F_BACKEND.' ], m );
       end
       if size( Y(m).TNOISE, 2 ) ~= nza
         error( errid, ...
