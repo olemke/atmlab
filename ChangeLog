@@ -1,3 +1,27 @@
+2016-01-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-143
+
+	* You could need to update your functions if you use covariance
+	matrices of 2D or 3D type.
+
+	* retrieval/qpack2/qp2_l2.m (qp2_l2): The variable siz was not set
+	correctly for 2D and 3D atmospheric variables.
+
+	* covmat/covmat3d.m: D.SEPERABLE renamed to D.SEPARABLE, to use
+	correct spelling. Header text expanded, including parts from
+	removed covmat3d_from_cfun.
+
+	* covmat/covmat_partstat_corr.m:
+	* covmat/covmat3d_from_cfun_not_seperable.m: Expanded header
+	somewhat, with a recommendation to primarily use the covmat3d
+	interface function.
+
+	* covmat/covmat3d_from_cfun.m: Removed this function. It did
+	nothing not treated by *covmat_partstat_corr*, but slower,
+
+	* arts/qarts.m: Just a typo fix.
+
 2015-12-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-142

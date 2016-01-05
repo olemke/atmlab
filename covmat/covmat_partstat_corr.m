@@ -18,6 +18,8 @@
 %    for x=[x1,x2,...xn]', and C2 the same thing for y, etc. The correlation
 %    along dimensions 1 depends thus only on x, no dependency on y, z ...
 %
+%    The simplest way to use this function is likely by *covmat3d*.
+%
 % FORMAT   S = covmat_partstat_corr( si, C1 [, C2, C3 ...] )
 %        
 % OUT   S    Covariance matrix.

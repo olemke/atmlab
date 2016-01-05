@@ -1,11 +1,15 @@
 % COVMAT3D_FROM_CFUN_not_seperable   Correlation function based covariance
 % matrix for 1D-3D for nonseperable dimensions.
 %
+%   The recommended way to use this function is by *covmat3d* (with D.SEPERABLE
+%   set to false). The function *covmat3d* performs more detailed input checks,
+%   and also selects more rapid options when possible.
 %
-%   Converts specification data to a covariance matrix for nonseparable dimensions. 
-%   The covariance is described by the structure *D*. The function is more general than
-%   *covmat_partstat_corr* (for dimensions <= 3D), but is (much) slower,
-%   particularly for higher data dimensions or long data grids. 
+%   This functon converts specification data to a covariance matrix for
+%   nonseparable dimensions. The covariance is described by the structure *D*.
+%   The function is more general than *covmat_partstat_corr* (for dimensions <=
+%   3D), but is (much) slower, particularly for higher data dimensions or long
+%   data grids.
 %
 %   Correlation up to 3 dimensions are handled. The dimensions are here 
 %   denoted as 1, 2 and 3, in order to be general. The physical meaning
