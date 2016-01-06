@@ -1,3 +1,33 @@
+2016-01-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-144
+
+	* If you have been using oem.m directly, note that O.sxnorm is
+	removed. Nothing to change if you are a Qpack user.
+
+	* demos/qpack2_demo2.m: Added demonstration of how to set SXINV.
+	Used H2O for this.
+
+	* retrieval/qpack2/qpack2.m: Adopted regarding removal of
+	O.sxnorm. And now sets Sxinv (by arts_sx, before this calculation
+	was done in oem).
+
+	* arts/arts_sx.m: Can now also return Sxinv. As this function can
+	invert sub-matrices to create the full Sxinv, using this option is
+	more efficient than inverting the complete Sx. Makes use of SXINV,
+	when set.
+
+	* arts/qarts.m: Introduced the optional sub-field SXINV, for all
+	retrieval quantities.
+
+	* retrieval/oem.m (oem): Now follows STRICT_ASSERT.
+
+	"sxnorm" is now not optional. It is always applied. I made this
+	change as I realised that it is easy to apply the normalisation on
+	Sxinv as well. That is, Sxinv can be pre-calculated even with
+	sxnorm. Then changed as using sxnorm is the safest option, and to
+	make the list of inputs and the code somewhat less complicated.
+
 2016-01-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-143

@@ -6,16 +6,17 @@
 %    inside each retrieval quantity. The result will be a (sparse) matrix with
 %    non-zero elements in blocks around the diagonal.
 %
-% FORMAT   Sx = arts_sx( Q, R )
+% FORMAT   [Sx,Sxinv] = arts_sx( Q, R )
 %        
-% OUT   Sx   Covariance matrix (sparse).
-% IN    Q     Qarts structure. See *qarts*.
-%       R     Retrieval data structure. See *arts_oem*.
+% OUT   Sx      Covariance matrix (sparse).
+%       Sxinv   Inverse of Sx
+% IN    Q       Qarts structure. See *qarts*.
+%       R       Retrieval data structure. See *arts_oem*.
 
 % 2006-09-07   Created by Patrick Eriksson.
 
 
-function Sx = arts_sx( Q, R )
+function [Sx,Sxinv] = arts_sx( Q, R )
 
 
 
@@ -30,6 +31,13 @@ Sx = sparse( nx, nx );
 %
 i_asj = find( [ Q.ABS_SPECIES.RETRIEVE ] );
 
+%- Sxinv
+if nargout > 1
+  do_sxinv = true;
+  Sxinv    = sparse( nx, nx );
+else
+  do_sxinv = false;
+end
 
 
 %--- Loop retrieval quantities and fill xa and R fields -----------------------
@@ -53,7 +61,19 @@ for i = 1 : nq
     end                                                                     %&%
     %
     Sx(ind,ind) = Q.ABS_SPECIES(ig).SX;
-   
+    %
+    % Here we need to catch that SXINV can be empty. This happens if SXINV
+    % is set for one species, but not others.
+    if do_sxinv
+      if isfield( Q.ABS_SPECIES(ig), 'SXINV' )  &  ...
+            ~isempty(Q.ABS_SPECIES(ig).SXINV)
+        Sxinv(ind,ind) = Q.ABS_SPECIES(ig).SXINV;
+      else
+        Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+      end
+    end
+
+    
    case 'Atmospheric temperatures'   %-----------------------------------------
     %
     rqre_field( Q.T, 'SX', 'Q.T' );                                         %&%
@@ -63,7 +83,16 @@ for i = 1 : nq
     end                                                                     %&%
     %
     Sx(ind,ind) = Q.T.SX;
+    %
+    if do_sxinv
+      if isfield( Q.T, 'SXINV' )
+        Sxinv(ind,ind) = Q.T.SXINV;
+      else
+        Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+      end
+    end
 
+    
    case 'Wind'   %-------------------------------------------------------------
     %
     if strcmp( R.jq{i}.subtag, 'u' )             
@@ -73,6 +102,15 @@ for i = 1 : nq
         error( sprintf('Wrong size of Q.WIND_U.SX.') );                     %&%
       end                                                                   %&%
       Sx(ind,ind) = Q.WIND_U.SX;
+      %
+      if do_sxinv
+        if isfield( Q.WIND_U, 'SXINV' )
+          Sxinv(ind,ind) = Q.WIND_U.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     elseif strcmp( R.jq{i}.subtag, 'v' )             
       rqre_field( Q.WIND_V, 'SX', 'Q.WIND_V' );                             %&%
       rqre_datatype( Q.WIND_V.SX, @istensor2, 'Q.WIND_V.SX' );              %&%
@@ -80,6 +118,15 @@ for i = 1 : nq
         error( sprintf('Wrong size of Q.WIND_V.SX.') );                     %&%
       end                                                                   %&%
       Sx(ind,ind) = Q.WIND_V.SX;
+      %
+      if do_sxinv
+        if isfield( Q.WIND_V, 'SXINV' )
+          Sxinv(ind,ind) = Q.WIND_V.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     elseif strcmp( R.jq{i}.subtag, 'w' ) 
       rqre_field( Q.WIND_W, 'SX', 'Q.WIND_W' );                             %&%
       rqre_datatype( Q.WIND_W.SX, @istensor2, 'Q.WIND_W.SX' );              %&%
@@ -87,10 +134,20 @@ for i = 1 : nq
         error( sprintf('Wrong size of Q.WIND_W.SX.') );                     %&%
       end                                                                   %&%
       Sx(ind,ind) = Q.WIND_W.SX;
+      %
+      if do_sxinv
+        if isfield( Q.WIND_W, 'SXINV' )
+          Sxinv(ind,ind) = Q.WIND_W.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     else                                                                    %&%
       error( 'Unknown wind subtag.' );                                      %&%
     end
 
+    
    case 'Magnetic field'   %---------------------------------------------------
     %
     if strcmp( R.jq{i}.subtag, 'u' )             
@@ -100,6 +157,15 @@ for i = 1 : nq
         error( sprintf('Wrong size of Q.MAG_U.SX.') );                      %&%
       end                                                                   %&%
       Sx(ind,ind) = Q.MAG_U.SX;
+      %
+      if do_sxinv
+        if isfield( Q.MAG_U, 'SXINV' )
+          Sxinv(ind,ind) = Q.MAG_U.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     elseif strcmp( R.jq{i}.subtag, 'v' )             
       rqre_field( Q.MAG_V, 'SX', 'Q.MAG_V' );                               %&%
       rqre_datatype( Q.MAG_V.SX, @istensor2, 'Q.MAG_V.SX' );                %&%
@@ -107,6 +173,15 @@ for i = 1 : nq
         error( sprintf('Wrong size of Q.MAG_V.SX.') );                      %&%
       end                                                                   %&%
       Sx(ind,ind) = Q.MAG_V.SX;
+      %
+      if do_sxinv
+        if isfield( Q.MAG_V, 'SXINV' )
+          Sxinv(ind,ind) = Q.MAG_V.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     elseif strcmp( R.jq{i}.subtag, 'w' ) 
       rqre_field( Q.MAG_W, 'SX', 'Q.MAG_W' );                               %&%
       rqre_datatype( Q.MAG_W.SX, @istensor2, 'Q.MAG_W.SX' );                %&%
@@ -114,9 +189,19 @@ for i = 1 : nq
         error( sprintf('Wrong size of Q.MAG_W.SX.') );                      %&%
       end                                                                   %&%
       Sx(ind,ind) = Q.MAG_W.SX;
+      %
+      if do_sxinv
+        if isfield( Q.MAG_W, 'SXINV' )
+          Sxinv(ind,ind) = Q.MAG_W.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     else                                                                    %&%
       error( 'Unknown magnetic field subtag.' );                            %&%
     end
+
     
    case 'Sensor pointing'   %--------------------------------------------------
     %
@@ -130,7 +215,16 @@ for i = 1 : nq
     end                                                                     %&%
     %
     Sx(ind,ind) = Q.POINTING.SX;
-   
+    %
+    if do_sxinv
+      if isfield( Q.POINTING, 'SXINV' )
+        Sxinv(ind,ind) = Q.POINTING.SXINV;
+      else
+        Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+      end
+    end
+
+    
    case 'Frequency'   %--------------------------------------------------------
     %
     if strcmp( R.jq{i}.subtag, 'Shift' )
@@ -141,6 +235,14 @@ for i = 1 : nq
       end                                                                   %&%
       Sx(ind,ind) = Q.FSHIFTFIT.SX;
       %
+      if do_sxinv
+        if isfield( Q.FSHIFTFIT, 'SXINV' )
+          Sxinv(ind,ind) = Q.FSHIFTFIT.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     elseif strcmp( R.jq{i}.subtag, 'Stretch' )
       rqre_field( Q.FSTRETCHFIT, 'SX', 'Q.FSTRETCHFIT' );                   %&%
       rqre_datatype( Q.FSTRETCHFIT.SX, @istensor2, 'Q.FSTRETCHFIT.SX' );    %&%
@@ -149,9 +251,18 @@ for i = 1 : nq
       end                                                                   %&%
       Sx(ind,ind) = Q.FSTRETCHFIT.SX;
       %
+      if do_sxinv
+        if isfield( Q.FSTRETCHFIT, 'SXINV' )
+          Sxinv(ind,ind) = Q.FSTRETCHFIT.SXINV;
+        else
+          Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+        end
+      end
+      %
     else                                                                    %&%
       error( 'Unknown frequency subtag' );                                  %&%
     end
+
     
    case 'Polynomial baseline fit'   %------------------------------------------
     %
@@ -165,7 +276,17 @@ for i = 1 : nq
     end                                                                     %&%
     %
     Sx(ind,ind) = Q.POLYFIT.(sxname);
- 
+    %
+    if do_sxinv
+      sxname = sprintf( 'SXINV%d', c );
+      if isfield( Q.POLYFIT, sxname )
+        Sxinv(ind,ind) = Q.POLYFIT.(sxname);
+      else
+        Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+      end
+    end
+
+    
    case 'Sinusoidal baseline fit'   %------------------------------------------
     %
     c      = sscanf( R.jq{i}.subtag(end+[-1:0]), '%d' ) + 1;
@@ -179,8 +300,23 @@ for i = 1 : nq
     %
     Sx(ind(1:2:end),ind(1:2:end)) = Q.SINEFIT.(sxname);
     Sx(ind(2:2:end),ind(2:2:end)) = Q.SINEFIT.(sxname);
-   
+    %
+    if do_sxinv
+      sxname = sprintf( 'SXINV%d', c );
+      if isfield( Q.SINEFIT, sxname )
+        Sxinv(ind(1:2:end),ind(1:2:end)) = Q.SINEFIT.(sxname);
+        Sxinv(ind(2:2:end),ind(2:2:end)) = Q.SINEFIT.(sxname);
+      else
+        Sxinv(ind,ind) = Sx(ind,ind) \ speye(length(ind));
+      end
+    end
+
+    
   otherwise   %----------------------------------------------------------------
     error( sprintf('Unknown retrieval quantity (%s).',R.jq{i}.maintag) ); 
   end
+
 end
+
+
+

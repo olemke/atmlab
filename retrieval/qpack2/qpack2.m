@@ -105,16 +105,8 @@ for m = 1 : ny
     %- Sx
     if m == 1
       %
-      Sx = arts_sx( Qm, R );
+      [Sx,Sxinv] = arts_sx( Qm, R );
       %
-      si = sqrt( diag( Sx ) );
-      if max(si) / min(si) <= 1e3
-        Sxinv    = Sx \ speye(size(Sx));
-        O.sxnorm = 0;
-      else
-        Sxinv    = [];
-        O.sxnorm = 1;
-      end
     end
 
     %- Perform retrieval
