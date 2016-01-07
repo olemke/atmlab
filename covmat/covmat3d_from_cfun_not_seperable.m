@@ -452,11 +452,11 @@ function C = make_cmatrix_3d( x, y, z, clx, cly, clz, cfunx, cfuny, cfunz )
       for col=(row+1):n
         colxmean = (clx(row)+clx(col))/2; %mean correlation length
         colymean = (cly(row)+cly(col))/2; %mean correlation length
-        colzmean = (cly(row)+cly(col))/2; %mean correlation length
+        colzmean = (clz(row)+clz(col))/2; %mean correlation length
 
         dx = x(row)-x(col); %distance
         dy = y(row)-y(col); %distance
-        dz = y(row)-y(col); %distance
+        dz = z(row)-z(col); %distance
 
         x_cl = dx./colxmean; %x normalized with correlation length
         if isnan(x_cl) %To take into acount drc in one dimension
@@ -484,11 +484,11 @@ function C = make_cmatrix_3d( x, y, z, clx, cly, clz, cfunx, cfuny, cfunz )
       for col=(row+1):n
         colxmean = (clx(row)+clx(col))/2; %mean correlation length
         colymean = (cly(row)+cly(col))/2; %mean correlation length
-        colzmean = (cly(row)+cly(col))/2; %mean correlation length
+        colzmean = (clz(row)+clz(col))/2; %mean correlation length
 
         dx = x(row)-x(col); %distance
         dy = y(row)-y(col); %distance
-        dz = y(row)-y(col); %distance
+        dz = z(row)-z(col); %distance
 
         x_cl = dx./colxmean; %x normalized with correlation length
         if isnan(x_cl) %To take into acount drc in one dimension

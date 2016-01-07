@@ -1,3 +1,8 @@
+2016-01-07  Ole Martin Christensen  <olem@chalmers.se>
+
+	* covmat/covmat3d_from_cfun_not_seperable.m: Fixed bug in 3D
+	function for linear and exponential correlation.
+
 2016-01-06  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-144
