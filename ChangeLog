@@ -1,4 +1,15 @@
+2016-01-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-146
+
+	* ChangeLog: Added version number to last commit.
+
+	* covmat/covmat3d.m: Corrected "small example" in header. I had
+	missed to remove some old stuff.
+
 2016-01-07  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-145
 
 	* covmat/covmat3d_from_cfun_not_seperable.m: Fixed bug in 3D
 	function for linear and exponential correlation.

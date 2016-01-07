@@ -77,7 +77,8 @@
 %      CL3_GRID3  
 %
 %      A simple example:
-%         D.FORMAT    = 'param'; 
+%         D.SEPARABLE = 0;
+%         D.SI        = 1; 
 %         D.CCO       = 0.01; 
 %         D.CFUN1     = 'exp';
 %         D.CL1       = 0.2;
