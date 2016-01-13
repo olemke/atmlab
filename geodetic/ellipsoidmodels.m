@@ -42,6 +42,9 @@ switch lower(model)
  
  case 'sphericalmars'
   ellipsoid = [ 3389.5e3 0 ]';
+  
+ case 'ellipsoidmars'
+  ellipsoid = [ 3396.19e3 0.1083 ]';
 
  case 'sphericaljupiter'
   ellipsoid = [ 69911e3 0 ]';

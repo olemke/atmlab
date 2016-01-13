@@ -1,3 +1,11 @@
+2016-01-07  Richard Larsson  <ric.larsson@gmail.com>
+
+	* atmlab-2-3-147
+	
+	* arts/arts.m: Sets atmlab('ARTS_XMLDATA_PATH') as default
+	datapath input if available as part of the system call that 
+	runs arts.
+	
 2016-01-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-146

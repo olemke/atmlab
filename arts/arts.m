@@ -46,6 +46,11 @@ if isempty( rlevel )
   rlevel = 0;                                            
 end                                                      
 
+if ~isnan(atmlab('ARTS_XMLDATA_PATH'))
+  arts_datapath=true;
+else
+  arts_datapath=false;
+end
 
 outdir = fileparts( cfile );
 
@@ -55,16 +60,30 @@ outdir = fileparts( cfile );
 % is that the old version does not catch stderr, and result could end up
 % empty. The bash solution should hopefully fix this!?
 
-if isempty( outdir )
-  [status,result] = system( sprintf( ...
-                               'bash -c "%s -r%d0 %s" 2>&1', exec, rlevel, cfile ) );
-  %[status,result] = system( ...
-  %                     sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+if arts_datapath
+  if isempty( outdir )
+    [status,result] = system( sprintf( ...
+				'bash -c "%s -r%d0 -D %s %s" 2>&1', exec, rlevel, atmlab('ARTS_XMLDATA_PATH'), cfile ) );
+    %[status,result] = system( ...
+    %                     sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+  else
+    [status,result] = system( sprintf( ...
+		  'bash -c "%s -r%d0 -o %s -D %s %s" 2>&1', exec, rlevel, outdir, atmlab('ARTS_XMLDATA_PATH'), cfile ) );
+  %  [status,result] = system( ...
+  %         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+  end
 else
-  [status,result] = system( sprintf( ...
-                 'bash -c "%s -r%d0 -o %s %s" 2>&1', exec, rlevel, outdir, cfile ) );
-%  [status,result] = system( ...
-%         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+  if isempty( outdir )
+    [status,result] = system( sprintf( ...
+				'bash -c "%s -r%d0 %s" 2>&1', exec, rlevel, cfile ) );
+    %[status,result] = system( ...
+    %                     sprintf('%s -r%d0 %s', exec, rlevel, cfile ) );
+  else
+    [status,result] = system( sprintf( ...
+		  'bash -c "%s -r%d0 -o %s %s" 2>&1', exec, rlevel, outdir, cfile ) );
+  %  [status,result] = system( ...
+  %         sprintf('%s -r%d0 -o %s %s', exec, rlevel, outdir, cfile ) );
+  end
 end
 
 
