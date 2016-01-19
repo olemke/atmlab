@@ -1,7 +1,17 @@
+2016-01-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-148
+
+	* demos/arts_oem_demo.m:
+	* retrieval/qpack2/qpack2.m: Adopted call of arts_oem_init.
+
+	* arts/arts_oem_init.m: Structure O was in/out, but neither used
+	or modified by the function and now removed as argument.
+
 2016-01-07  Richard Larsson  <ric.larsson@gmail.com>
 
 	* atmlab-2-3-147
-	
+
 	* arts/arts.m: Sets atmlab('ARTS_XMLDATA_PATH') as default
 	datapath input if available as part of the system call that 
 	runs arts.

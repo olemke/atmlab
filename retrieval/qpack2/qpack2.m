@@ -99,8 +99,8 @@ for m = 1 : ny
       O.msg = sprintf( 'Inversion case %d (of %d)', m, ny );
     end
     %
-    [Qm,Se]     = qp2_y2Q( Q, Y, m );
-    [Qm,O,R,xa] = arts_oem_init( Qm, O, workfolder );
+    [Qm,Se]   = qp2_y2Q( Q, Y, m );
+    [Qm,R,xa] = arts_oem_init( Qm, workfolder );
     
     %- Sx
     if m == 1

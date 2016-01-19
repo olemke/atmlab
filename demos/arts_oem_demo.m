@@ -183,7 +183,7 @@ Q                          = qarts_abstable( Q );
 workfolder = create_tmpfolder;
 cu = onCleanup( @()delete_tmpfolder( workfolder ) );
 %  
-[Qoem,O,R,xa] = arts_oem_init( Q, O, workfolder );
+[Qoem,R,xa] = arts_oem_init( Q, workfolder );
 %
 Sx = arts_sx( Q, R );
 

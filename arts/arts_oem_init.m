@@ -11,7 +11,7 @@
 %
 %    The standard sequence of function calls is:
 %
-%       [Qoem,O,R,xa] = arts_oem_init( Q, O, workfolder );
+%       [Qoem,R,xa] = arts_oem_init( Q, workfolder );
 %       Sx            = arts_sx( Qoem, R );
 %       Se            = covmat ...
 %       X             = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
@@ -47,19 +47,17 @@
 %       vmr_field0      : A priori vmr field
 %       sensor_response : A copy of Q.SENSOR_RESPONSE 
 %
-% FORMAT   [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
+% FORMAT   [Q,R,xa] = arts_oem_init(Q,workfolder)
 %        
 % Out   Q            Modified Q structure
-%       O            Modified O structure
 %       R            Structure with retrieval variables. See *arts_oem*.
 %       xa           A priori state vector
-% In    O            OEM settings.
-%       Q            Qarts settings.
+% In    Q            Qarts settings.
 %       workfolder   Use this as "workfolder".
 
 % 2010-01-11   Created by Patrick Eriksson.
 
-function [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
+function [Q,R,xa] = arts_oem_init(Q,workfolder)
 
 
 %-----------------------------------------------------------------------------
@@ -68,9 +66,8 @@ function [Q,O,R,xa] = arts_oem_init(Q,O,workfolder)
 if atmlab( 'STRICT_ASSERT' )
 
   % Input
-  rqre_nargin( 3, nargin );
+  rqre_nargin( 2, nargin );
   rqre_datatype( Q, @isstruct ); 
-  rqre_datatype( O, @isstruct ); 
   rqre_datatype( workfolder, @ischar ); 
 
   % These checks are of course not complete. They focus on demands of
