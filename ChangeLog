@@ -1,3 +1,13 @@
+2016-01-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-149
+
+	* math/interpp.m: Added an assert to check consistent size of
+	input. This after by accident finding out that there seems to be
+	some loophole in the size checking inside interp1.
+
+	* retrieval/oem.m: Fixed a spelling error.
+
 2016-01-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-148

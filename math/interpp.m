@@ -27,5 +27,7 @@ function X = interpp(pp,Xp,p)
 pp	= vec2col(pp);
 np	= length(pp);
 
+assert( size(Xp,1) == np );
+
 X	= interp1([1e3;log(pp);-1e3],[Xp(1,:);Xp;Xp(np,:)],log(p));
 
