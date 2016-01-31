@@ -1,3 +1,13 @@
+2016-01-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-150
+
+	* demos/qpack2_demo2.m (q_demo): Added comemnt around usage of
+	covmat1d_markov.
+
+	* covmat/covmat1d_markov.m: Non-constant sigma now handled.
+	Sinv calculated just if it is requested.
+
 2016-01-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-149

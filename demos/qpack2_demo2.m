@@ -247,7 +247,8 @@ Q.ABS_SPECIES(2).GRIDS    = { Q.P_GRID(1:21), [], [] };
 Q.ABS_SPECIES(2).ATMDATA  = gf_artsxml( fullfile( fascod, ...
     'midlatitude-winter', 'midlatitude-winter.H2O.xml' ), 'H2O', 'vmr_field' );
 Q.ABS_SPECIES(2).UNIT     = 'rel';
-% Here we demonstrate also how SXINV can be set
+% Here we demonstrate also how SXINV can be set.
+% Note that *covmat1d_markov* requires an equidistant grid.
 [Q.ABS_SPECIES(2).SX,Q.ABS_SPECIES(2).SXINV] = ...
     covmat1d_markov( length(Q.ABS_SPECIES(2).GRIDS{1}), 0.5, ...
                      diff(p2z_simple(Q.ABS_SPECIES(2).GRIDS{1}(1:2))), 8e3 );
