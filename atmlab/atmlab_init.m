@@ -38,6 +38,7 @@ addpath( fullfile( toppath, 'sensors' ) );
 addpath( fullfile( toppath, 'scattering' ) ); 
 addpath( fullfile( toppath, 'retrieval','qpack2' ) ); 
 addpath( fullfile( toppath, 'retrieval','spareice' ) ); 
+addpath( fullfile( toppath, 'retrieval','ismar', 'general' ) ); 
 addpath( fullfile( toppath, 'retrieval' ) ); 
 addpath( fullfile( toppath, 'randomize','iaaft' ) ); 
 addpath( fullfile( toppath, 'randomize' ) ); 

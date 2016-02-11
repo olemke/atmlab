@@ -1,3 +1,15 @@
+2016-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-151
+
+	* atmlab/atmlab_init.m: Path to retrieval/ismar/general now added.
+
+	* retrieval/ismar/general/calculate_hmp.m:
+	* retrieval/ismar/general/calculate_iwv.m: Moved to another folder.
+
+	* sensors/cloudsat_read.m (unitconv): Added conversion for log(mm)
+	and W.
+
 2016-01-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-150
