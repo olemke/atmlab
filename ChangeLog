@@ -1,3 +1,11 @@
+2016-02-16  Manfred Brath  <manfred.brath@uni-hamburg.de>
+
+	* atmlab-2-3-152
+
+	* retrieval/ismar/general/calculate_iwv.m: There was an error, if the
+	pressure vector was a column vector instead of a row vector. Now, it works
+	for row and column vectors.
+
 2016-02-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-151

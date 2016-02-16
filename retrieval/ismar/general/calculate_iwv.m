@@ -48,6 +48,7 @@
 
 %   2015-12-14  Manfred Brath
 %   2015-12-17  Manfred Brath
+%   2016-02-16  MAnfred Brath
 
 function results=calculate_iwv(data,upper_limit,lower_limit)
 
@@ -62,12 +63,17 @@ if nargin<3
     lower_limit=[];
 end
 
-% calculate water vapor density
 
+%gas constant of water vapor
 R_h2o=constants('GAS_CONST_WATER_VAPOR');
-p=data.pressure;
+
+%the colon and the transpose are there to be sure that p is a row vector
+p=data.pressure(:)';
+
+%temperature
 T=data.temperature;
 
+% calculate water vapor density
 WV=data.water_vapor./T.*repmat(p,size(data.water_vapor,1),1)/R_h2o;
 
 % calculate the hydrometor paths etc. for the different possible altitudes 
