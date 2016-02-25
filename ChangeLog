@@ -1,3 +1,15 @@
+2016-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-153
+
+	* site-specific/chalmers-gem/erainterim2surfdata.m:
+	* site-specific/chalmers-gem/erainterim2atmdata.m: Draft
+	functions to read ERA-Interim netcdf files.
+
+	* math/gaussfilter.m: New.
+
+	* math/boxcarfilter.m: Slightly extended header text.
+
 2016-02-16  Manfred Brath  <manfred.brath@uni-hamburg.de>
 
 	* atmlab-2-3-152

@@ -8,8 +8,9 @@
 %    min( diff( x ) ).
 %
 %    The filter is throughout applied symmetrically. Parts of the filter
-%    extending outside the complete data range, r into data gaps, 
-%    are neglected.
+%    extending outside the complete data range are neglected. The response is
+%    normalised for each point and if y equals one everywhere, also yf will be
+%    one everywhere.
 %
 % FORMAT   yf = boxcarfilter(x,y,xw)
 %        
