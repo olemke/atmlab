@@ -1,5 +1,14 @@
 2016-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-154
+
+	* h2o/parametrisations/eps_ice_matzler06.m: Changed max
+	temperature to 280K, following the Liebe93 function. It is good to
+	have some margin to O C when setting up scattering data. Values
+	obtained at 280 K look OK.
+
+2016-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-153
 
 	* site-specific/chalmers-gem/erainterim2surfdata.m:

@@ -9,7 +9,7 @@
 %        
 % OUT   z   Complex relative permittivity
 % IN    f   Frequency [Hz]. 0.01-3000 GHz.
-%       TK  Temperature [K]. 20-273.15 K.
+%       TK  Temperature [K]. 20-280 K.
 
 % 2006-03-07   Function provided by C. Matzler (some adaptions by PE).
 
@@ -20,8 +20,8 @@ function z = eps_ice_matzler06(f,TK)
     if f<0.01  |  f>3000
       error('Valid range for frequency is 0.01-3000 GHz'); 
     end
-    if TK<20  |  TK>273.15
-      error('Valid range for temperature is 20-273.15 K'); 
+    if TK<20  |  TK>280
+      error('Valid range for temperature is 20-280 K'); 
     end
 	
 	B1 = 0.0207;
