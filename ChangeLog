@@ -1,3 +1,16 @@
+2016-03-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-155
+
+	* geophysics/p2z_cira86.m: Now an error if selecting too low pressure.
+
+	* geophysics/z2p_cira86.m: Added comment in header above upper limit.
+
+	* geophysics/z2p_simple.m (z2p_simple):
+	* geophysics/p2z_simple.m (p2z_simple): Introduced an upper limit
+	at 0.01Pa/120km as this conversion is not even approximate in the
+	thermosphere.
+
 2016-02-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-154

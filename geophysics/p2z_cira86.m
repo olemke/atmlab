@@ -16,7 +16,7 @@
 
 % 2007-11-01   Created by Bengt Rydberg
 
-function [z,t]=p2z_cira86(p,lat,doy)
+function [z,t] = p2z_cira86(p,lat,doy)
                           
 if atmlab('STRICT_ASSERT')
   rqre_datatype( p, @istensor1 );         
@@ -39,6 +39,11 @@ cira86 = fullfile( atmlab('ARTS_XMLDATA_PATH'), 'planets', ...
             'Earth', 'CIRA86', 'climatology', 'cira86.z.xml' );
 
 G = gf_artsxml( cira86, 'CIRA86', 'z_field' );
+
+if any( p < G.GRID1(end) )
+  error( ['One or several input pressures are above the upper limit of CIRA86 ' ...
+          '(that is %.3f Pa)'], G.GRID1(end) );
+end
 
 G = atmdata_regrid( G, { p, lat, 0, mjd } );
 

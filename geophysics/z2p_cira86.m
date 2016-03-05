@@ -4,6 +4,9 @@
 %    climataology. Linear interpolation between log(pressure),
 %    latitude, and day of year is performed.
 %
+%    NaN is obtained if selecting altitudes going above the coverage of
+%    CIRA86 (about 110 km).
+%
 %    The function optionally returns the gridded fields for cira 86z and t.
 %    This is useful if you need to call Z2P_CIRA86 very often.
 %    Store Gc86z and G86t on the first call, then pass them in with every
@@ -52,6 +55,7 @@ if (nargin < 4 || isempty(Gc86z))
             'Earth', 'CIRA86', 'climatology', 'cira86.z.xml' );
     Gc86z = gf_artsxml( cira86, 'CIRA86', 'z_field' );
 end
+
 G    = atmdata_regrid( Gc86z, { Gc86z.GRID1, lat, 0, mjd } );
 Z    = G.DATA;
 p    = zeros( length(z), size(Z,2), size(Z,4) );
