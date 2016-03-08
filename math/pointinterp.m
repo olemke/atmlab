@@ -31,26 +31,31 @@
 function B = pointinterp(agrids,A,pos,varargin)
 %
 [iopt,extrap] = optargs( varargin, { 'linear', false } );
-                                                                          %&%
-%- Check input                                                            %&%
-%                                                                         %&%
-rqre_nargin( 3, nargin )                                                  %&%
-rqre_datatype( agrids, @iscell );                                         %&%
-rqre_datatype( A, @isnumeric );                                           %&%
-rqre_datatype( pos, @istensor2 );                                         %&%
+
+
 indim  = length(agrids);
 outdim = size(pos,2);
-if dimens(A) > length(agrids)                                             %&%
-  error( 'Dimensionality of A is higher than number of given grids.' );   %&%
-end                                                                       %&%
-if outdim < indim                                                         %&%
-  error('There can not be fewer columns in *pos* than grids in *agrids*.');%&%
-end                                                                       %&%
-for d = 1 : indim                                                         %&%
-  rqre_datatype( agrids{d}, @istensor1, 'Grids in *agrids*' );            %&%
-  rqre_gridmatch( A, d, agrids{d} );                                      %&%
-end                                                                       %&%
-rqre_datatype( extrap, @isboolean );                                      %&%
+
+strict_assert = atmlab('STRICT_ASSERT');
+
+if strict_assert
+  rqre_nargin( 3, nargin );
+  rqre_datatype( agrids, @iscell );
+  rqre_datatype( A, @isnumeric );  
+  rqre_datatype( pos, @istensor2 );
+  if dimens(A) > length(agrids)                                          
+    error( 'Dimensionality of A is higher than number of given grids.' );
+  end
+  if outdim < indim
+    error('There can not be fewer columns in *pos* than grids in *agrids*.');
+  end
+  for d = 1 : indim
+    rqre_datatype( agrids{d}, @istensor1, 'Grids in *agrids*' );
+    rqre_gridmatch( A, d, agrids{d} );
+  end
+  rqre_datatype( extrap, @isboolean );   
+end
+
 
 
 %- Check a or determine a's effective dimensions
@@ -59,15 +64,17 @@ if extrap    % Ignore singleton dimensions
   dims = find( size( A ) > 1 );
   A    = getdims( A, dims );
 else
-  if outdim ~= indim                                                      %&%
-    error( ['With *extrap* false, the number of columns in *pos* ',...    %&%
-                'and the number of grids in *agrids* must be equal.'] );  %&%
-  end                                                                     %&%
-  asize = size( A );                                                      %&%
-  if length(asize) < outdim  ||  any( asize(1:outdim)==1 )                %&%
-    error( ['With *extrap* false there can not be any singleton ',...     %&%
-                                              'dimmensions in *A*.'] );   %&%
-  end                                                                     %&%
+  if strict_assert  
+    if outdim ~= indim                                                      
+      error( ['With *extrap* false, the number of columns in *pos* ',...    
+                  'and the number of grids in *agrids* must be equal.'] );  
+    end                                                                     
+    asize = size( A );                                                      
+    if length(asize) < outdim  ||  any( asize(1:outdim)==1 )                
+      error( ['With *extrap* false there can not be any singleton ',...     
+                                                'dimmensions in *A*.'] );   
+    end
+  end
   dims = 1:outdim;
 end
 
@@ -152,8 +159,8 @@ elseif dim == 5
   B = interpn( agrids{dims(1)}, agrids{dims(2)}, agrids{dims(3)}, ...
                agrids{dims(4)}, agrids{dims(5)}, A, xi, yi, zi, ui, vi, iopt ); 
 
-else                                                             %&%
-  error( 'Interpolation above 5D is not handled.' );             %&%
+else
+  error( 'Interpolation above 5D is not handled.' ); 
 end
 
 return

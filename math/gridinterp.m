@@ -39,7 +39,6 @@
 % OPT   iopt       Interpolation option. See *interpn*. Default is 'linear'.
 %       extrap     Special treatment of extrapolation. See above.
 %                  Default is false.
-%
 
 % 2006-08-22   Created by Patrick Eriksson.
 
@@ -48,29 +47,31 @@ function B = gridinterp(agrids,A,newgrids,varargin)
 %
 [iopt,extrap] = optargs( varargin, { 'linear', false } );
 errid= ['atmlab', mfilename, 'badInput'];
+
+% Note that the code is repeated below, but without checks
+
 if atmlab('STRICT_ASSERT')
-    %&%
-    %&%
-    %- Check input                                                            %&%
-    %                                                                         %&%
-    rqre_nargin( 3, nargin )                                                  %&%
-    rqre_datatype( agrids, @iscell );                                         %&%
-    rqre_datatype( A, @isnumeric );                                           %&%
-    rqre_datatype( newgrids, @iscell );                                       %&%
+
+    %- Check input
+    %
+    rqre_nargin( 3, nargin );
+    rqre_datatype( agrids, @iscell );
+    rqre_datatype( A, @isnumeric );  
+    rqre_datatype( newgrids, @iscell );
     indim  = length(agrids);
     outdim = length(newgrids);
-    if dimens(A) > length(agrids)                                             %&%
-        error(errid, 'Dimensionality of A is higher than number of given grids.' );   %&%
-    end                                                                       %&%
-    if outdim < indim                                                         %&%
-        error(errid,'There can not be fewer grids in *newgrids* than in *agrids*.');  %&%
-    end                                                                       %&%
-    for d = 1 : indim                                                         %&%
-        rqre_datatype( agrids{d}, @istensor1, 'Grids in *agrids*' );            %&%
-        rqre_gridmatch( A, d, agrids{d}, true );                                %&%
-        rqre_datatype( newgrids{d}, @istensor1, 'Grids in *newgrids*' );        %&%
-    end                                                                       %&%
-    rqre_datatype( extrap, @isboolean );                                      %&%
+    if dimens(A) > length(agrids) 
+        error(errid, 'Dimensionality of A is higher than number of given grids.' );
+    end
+    if outdim < indim 
+        error(errid,'There can not be fewer grids in *newgrids* than in *agrids*.');
+    end
+    for d = 1 : indim
+        rqre_datatype( agrids{d}, @istensor1, 'Grids in *agrids*' );
+        rqre_gridmatch( A, d, agrids{d}, true );
+        rqre_datatype( newgrids{d}, @istensor1, 'Grids in *newgrids*' );
+    end
+    rqre_datatype( extrap, @isboolean );
     
     
     %- Check a or determine a's effective dimensions
@@ -80,15 +81,15 @@ if atmlab('STRICT_ASSERT')
         A    = getdims( A, dims );
     else
         
-        if outdim ~= indim                                                      %&%
-            error( errid, ['With *extrap* false, the number of grids in *newgrids* ',... %&%
-                'and *agrids* must be the same.'] );  %&%
-        end                                                                     %&%
-        asize = size( A );                                                      %&%
-        if length(asize) < outdim  ||  any( asize(1:outdim)==1 )                %&%
-            error( errid,['With *extrap* false there can not be any singleton ',...     %&%
+        if outdim ~= indim 
+            error( errid, ['With *extrap* false, the number of grids in *newgrids* ',...
+                'and *agrids* must be the same.'] );
+        end                                                                     
+        asize = size( A );  
+        if length(asize) < outdim  ||  any( asize(1:outdim)==1 )
+            error( errid,['With *extrap* false there can not be any singleton ',...
                 'dimmensions in *A*.'] );   %&%
-        end                                                                     %&%
+        end 
         dims = 1:outdim;
     end
     
@@ -105,10 +106,10 @@ if atmlab('STRICT_ASSERT')
         else
             xi = newgrids{dims(1)};
         end
-        %                                                                     %&%
-        if isempty(xi)                                                        %&%
-            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');%&%
-        end                                                                   %&%
+        %             
+        if isempty(xi)
+            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
+        end 
         %
         B = interp1( agrids{dims(1)}, A, xi, iopt );
         
@@ -121,10 +122,10 @@ if atmlab('STRICT_ASSERT')
             xi = newgrids{dims(1)};
             yi = newgrids{dims(2)};
         end
-        %                                                                     %&%
-        if isempty(xi)||isempty(yi)                                            %&%
-            error( errid,'Empty grid found in *newgrid* for non-singleton dimension.');%&%
-        end                                                                   %&%
+        %                           
+        if isempty(xi)||isempty(yi) 
+            error( errid,'Empty grid found in *newgrid* for non-singleton dimension.');
+        end                         
         %
         [xi,yi] = ndgrid( xi, yi );
         %
@@ -141,10 +142,10 @@ if atmlab('STRICT_ASSERT')
             yi = newgrids{dims(2)};
             zi = newgrids{dims(3)};
         end
-        %                                                                     %&%
-        if isempty(xi)||isempty(yi)||isempty(zi)                                %&%
-            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');%&%
-        end                                                                   %&%
+        %                                       
+        if isempty(xi)||isempty(yi)||isempty(zi)
+            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
+        end                                     
         %
         [xi,yi,zi] = ndgrid( xi, yi, zi );
         %
@@ -164,10 +165,10 @@ if atmlab('STRICT_ASSERT')
             zi = newgrids{dims(3)};
             ui = newgrids{dims(4)};
         end
-        %                                                                     %&%
-        if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)                    %&%
-            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');%&%
-        end                                                                   %&%
+        %                                                                     
+        if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)                 
+            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
+        end
         %
         [xi,yi,zi,ui] = ndgrid( xi, yi, zi, ui );
         %
@@ -189,18 +190,11 @@ if atmlab('STRICT_ASSERT')
             ui = newgrids{dims(4)};
             vi = newgrids{dims(5)};
         end
-        %                                                                     %&%
-        if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)||isempty(vi)        %&%
-            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');%&%
-        end                                                                   %&%
-        %
-        [xi,yi,zi,ui,vi] = ndgrid( xi, yi, zi, ui, vi );
-        %
-        B = interpn( agrids{dims(1)}, agrids{dims(2)}, agrids{dims(3)}, ...
-            agrids{dims(4)}, agrids{dims(5)}, A, xi, yi, zi, ui, vi, iopt );
-        
-    else                                                             %&%
-        error( errid,'Interpolation above 5D is not handled.' );             %&%
+        %  
+        if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)||isempty(vi)
+            error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
+        end
+        error( errid,'Interpolation above 5D is not handled.' );             
     end
     
     
