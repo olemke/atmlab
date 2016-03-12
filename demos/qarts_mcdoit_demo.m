@@ -185,7 +185,6 @@ C.LIMITS = [ -1e3 zcloud+2e3 ];
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
 T_grid = [200 235 270];  
-T_grid = [250];  
 
 
 % Create scattering properties for a simple cloud assumption
