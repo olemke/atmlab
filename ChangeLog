@@ -1,3 +1,14 @@
+2016-03-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* demos/qarts_mcdoit_demo.m: IY_MAIN_AGENDA updated for mc part.
+	Added horisontally aligned option when setting scat data.
+
+	* arts/qarts2cfile.m (cfile_SctMth): Adopted to renaming of
+	DoitAngularGridsSet.
+
+	* demos/qarts_scattering_demo.m: IY_MAIN_AGENDA updated for mc and
+	tr options.
+
 2016-03-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-156

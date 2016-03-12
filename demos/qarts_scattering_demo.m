@@ -141,7 +141,7 @@ Q.SENSOR_POS          = repmat( sensor_pos, length(ztan), 1 );
 Q.SENSOR_LOS          = geomztan2za( Q.REFELLIPSOID(1), zplat, ztan )';
 %
 if strcmp( lower(method), 'tr' )
-  Q.IY_MAIN_AGENDA        = { 'Ignore(iy_unit)', 'iyTransmissionStandard' };
+  Q.IY_MAIN_AGENDA        = { 'iy_main_agenda__Transmission' };
   Q.IY_TRANSMITTER_AGENDA = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
                               'MatrixUnitIntensity(iy,stokes_dim,f_grid)' };
   Q.IY_UNIT               = '1';
@@ -169,7 +169,7 @@ C.LIMITS = [ 6e3 16e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
-T_grid = [200 270];   % MC does not accept a single temperature!
+T_grid = [200 270]; 
 
 
 % Create scattering properties for a simple cloud assumption
@@ -204,8 +204,7 @@ C.PND_FIELD{1} = box_pnd_mono_size_1d( alt, imc, r );
 if strcmp( lower(method), 'mc' )
   %
   C.METHOD                        = 'MC';
-  Q.IY_MAIN_AGENDA                = { 'Ignore( rte_pos2 )', 'iyMC', ...
-                                      'Touch(ppath)' };
+  Q.IY_MAIN_AGENDA                = { 'iy_main_agenda__ScattMC' };
   Q.IY_AUX_VARS                   = { 'Error (uncorrelated)' };
   %
   C.METHOD_PRMTRS.STD_ERR         = m_arg;

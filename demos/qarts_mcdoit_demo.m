@@ -24,7 +24,7 @@
 %       ym           MC result
 %       ymerror      Error estimate for *ym*
 % OPT   CMdu         User DOIT settings for C.METHOD_PRMTRS. To see defaults
-%                    look into the function, the defaulrs are set a few
+%                    look into the function, the defaults are set a few
 %                    lines this text. CMd is the variable to check out.
 %       CMdm         As above but refers to MC.
 %       iwp          IWP. Default is 0.5 kg/m2
@@ -93,10 +93,8 @@ Q.WSMS_AT_START{1} = 'Copy(iy_main_agenda,iy_main_agenda__Emission)';
 Q.WSMS_AT_START{2} = 'Copy(ppath_agenda,ppath_agenda__FollowSensorLosPath)';
 Q.WSMS_AT_START{3} = ...
                     'Copy(ppath_step_agenda,ppath_step_agenda__GeometricPath)';
-Q.WSMS_AT_START{4} = ...
-         'Copy(blackbody_radiation_agenda,blackbody_radiation_agenda__Planck)';
-Q.WSMS_AT_START{5} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
-Q.WSMS_AT_START{6} = ...
+Q.WSMS_AT_START{4} = 'Copy(iy_space_agenda,iy_space_agenda__CosmicBackground)';
+Q.WSMS_AT_START{5} = ...
                  'Copy(iy_surface_agenda,iy_surface_agenda__UseSurfaceRtprop)';
 
 
@@ -186,7 +184,8 @@ C.LIMITS = [ -1e3 zcloud+2e3 ];
 
 % Temperature for scattering data (if only one is given, no
 % temperature interpolation is performed in ARTS calculation.
-T_grid = [200 235 270];   % MC does not accept a single temperature!
+T_grid = [200 235 270];  
+T_grid = [250];  
 
 
 % Create scattering properties for a simple cloud assumption
@@ -208,13 +207,19 @@ r = dpart/2;
 % Calculate scattering data using Mie or T-matrix.
 % Note that for Tmatrix option data are kept as a file, and are not imported
 % into Matlab.
-if 1
+if 0
   C.SCAT_DATA{1} = mie_arts_scat_data( fgrid, T_grid, rfr_index, theta, r );
 elseif 0
   N = complex_refr_indexFromFunc( fgrid, T_grid', @eps_ice_matzler06, @sqrt );
   C.SCAT_DATA{1} = tmatrix( workfolder, fgrid, T_grid', theta', [], N, ...
                             'spheroidal', 'macroscopically_isotropic', ...
                             2*r, 1.0001, false, ...
+                            fullfile(workfolder,'scat_data') );
+elseif 1
+  N = complex_refr_indexFromFunc( fgrid, T_grid', @eps_ice_matzler06, @sqrt );
+  C.SCAT_DATA{1} = tmatrix( workfolder, fgrid, T_grid', theta', [0:10:180]', N, ...
+                            'spheroidal', 'horizontally_aligned', ...
+                            2*r, 1.6, false, ...
                             fullfile(workfolder,'scat_data') );
 else
   if exist( 'hongdata_read' ) ~= 2
@@ -306,8 +311,7 @@ C.METHOD                        = 'MC';
 C.METHOD_PRMTRS                 = CMm;
 %
 Q.CLOUDBOX                      = C;
-Q.IY_MAIN_AGENDA                = { 'Ignore( rte_pos2 )', 'iyMC', ...
-                                    'Touch(ppath)' };
+Q.IY_MAIN_AGENDA                = { 'iy_main_agenda__ScattMC' };
 Q.IY_AUX_VARS                   = { 'Error (uncorrelated)' };
 Q.IY_UNIT                       = 'RJBT';
 Q.WSMS_BEFORE_RTE               = {};
