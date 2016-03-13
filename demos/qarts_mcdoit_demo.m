@@ -206,7 +206,7 @@ r = dpart/2;
 % Calculate scattering data using Mie or T-matrix.
 % Note that for Tmatrix option data are kept as a file, and are not imported
 % into Matlab.
-if 0
+if 1
   C.SCAT_DATA{1} = mie_arts_scat_data( fgrid, T_grid, rfr_index, theta, r );
 elseif 0
   N = complex_refr_indexFromFunc( fgrid, T_grid', @eps_ice_matzler06, @sqrt );
@@ -214,7 +214,7 @@ elseif 0
                             'spheroidal', 'macroscopically_isotropic', ...
                             2*r, 1.0001, false, ...
                             fullfile(workfolder,'scat_data') );
-elseif 1
+elseif 0
   N = complex_refr_indexFromFunc( fgrid, T_grid', @eps_ice_matzler06, @sqrt );
   C.SCAT_DATA{1} = tmatrix( workfolder, fgrid, T_grid', theta', [0:10:180]', N, ...
                             'spheroidal', 'horizontally_aligned', ...
@@ -260,8 +260,8 @@ C.METHOD                        = 'DOIT';
 C.METHOD_PRMTRS                 = CMd;
 
 % Need a trick here for setting RJ
-Q.IY_UNIT                       = '1';
-Q.WSMS_BEFORE_RTE{1}            = 'StringSet(iy_unit,"RJBT")';  
+%Q.IY_UNIT                       = 'RJBT';
+%Q.WSMS_BEFORE_RTE{1}            = 'StringSet(iy_unit,"RJBT")';  
 
 C.OPT_PROP_PART_AGENDA = { 'ext_matInit', 'abs_vecInit', 'ext_matAddPart', ...
                                                          'abs_vecAddPart' };

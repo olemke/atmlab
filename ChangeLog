@@ -1,4 +1,13 @@
+2016-03-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-158
+
+	* demos/qarts_mcdoit_demo.m: And changed back to use Mie for
+	setting scattering properties.
+
 2016-03-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-157
 
 	* demos/qarts_mcdoit_demo.m: IY_MAIN_AGENDA updated for mc part.
 	Added horisontally aligned option when setting scat data.
