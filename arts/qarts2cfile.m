@@ -1280,7 +1280,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
         T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
         T{end+1} = sprintf( '  %s,', arts_tgs_cnvrt(Q.ABS_SPECIES(i).TAG) );
-        T{end+1} = sprintf( '  "%s","%s",%.9g)', method,unit,dx);
+        T{end+1} = sprintf( '  "%s","%s",1,%.9g)', method,unit,dx);
       end
     end % for
   end % if

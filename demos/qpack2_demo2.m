@@ -239,7 +239,7 @@ Q.ABS_SPECIES(1).MINMAX  = 1e-6;
   
 %- Water 
 %
-Q.ABS_SPECIES(2).TAG      = { 'H2O-PWR98' };
+Q.ABS_SPECIES(2).TAG      = { 'H2O-PWR98', 'H2O' };
 Q.ABS_SPECIES(2).RETRIEVE = true;
 Q.ABS_SPECIES(2).L2       = false;
 % Note that grid below is the first part of Q.P_GRID
