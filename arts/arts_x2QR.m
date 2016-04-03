@@ -120,8 +120,13 @@ for i = 1 : nq
     assert( strcmp( R.jq{i}.subtag, 'Zenith angle off-set' ) );
     %
     sensor_los      = R.los;
-    sensor_los(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
-                                                    R.jq{i}.grids{1} )* x(ind); 
+    // Handle "jitter" separately
+    if R.jq{i}.grids{1}(1) == -1
+      sensor_los(:,1) = R.los(:,1) + x(ind);
+    else
+      sensor_los(:,1) = R.los(:,1) + arts_polybasis_func( Q.SENSOR_TIME, ...
+                                                    R.jq{i}.grids{1} )* x(ind); ...
+    end
     xmlStore( fullfile(R.workfolder,'sensor_los.xml'), sensor_los, 'Matrix' );
    
    case 'Frequency'   %-------------------------------------------------------

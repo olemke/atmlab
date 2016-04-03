@@ -1,3 +1,9 @@
+2016-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-161
+
+	* arts/arts_x2QR.m (arts_x2QR): Pointing jitter case was not handled.
+
 2016-03-31  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-3-160
