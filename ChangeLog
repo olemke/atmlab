@@ -1,3 +1,9 @@
+2016-04-04  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-162
+
+	* arts/arts_x2QR.m: Fix typo in comment, replaced // with %.
+
 2016-04-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-161

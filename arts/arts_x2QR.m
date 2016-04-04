@@ -120,7 +120,7 @@ for i = 1 : nq
     assert( strcmp( R.jq{i}.subtag, 'Zenith angle off-set' ) );
     %
     sensor_los      = R.los;
-    // Handle "jitter" separately
+    % Handle "jitter" separately
     if R.jq{i}.grids{1}(1) == -1
       sensor_los(:,1) = R.los(:,1) + x(ind);
     else
