@@ -27,7 +27,7 @@ far as possible.
 The changes done for each SVN commit shall be explained satisfactorily
 in ChangeLog. 
 
-Please join the atmlab-dev mailing list at
-https://www.sat.ltu.se/mailman/listinfo/atmlab-dev
+Please join the atmlab_dev mailing list at
+https://mailman.rrz.uni-hamburg.de/mailman/listinfo/atmlab_dev.mi
 
 Patrick Eriksson, 2002-12-09   <patrick.eriksson@chalmers.se>

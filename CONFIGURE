@@ -69,9 +69,10 @@ configuration exists yet, some subsystems (such as datasets) will only work
 after you have defined the location of datasets in the way that is done in
 site-specific/kiruna/datasets_init.m.
 
-It is recommended to join the atmlab-dev mailing list. See
-https://www.sat.ltu.se/mailman/listinfo/atmlab-dev for instructions. In case
-of questions, write to atmlab-dev@www.sat.ltu.se.
+It is recommended to join the atmlab_dev mailing list. See
+https://mailman.rrz.uni-hamburg.de/mailman/listinfo/atmlab_dev.mi for
+instructions. In case of questions, write to
+atmlab_dev.mi@lists.uni-hamburg.de
 
 Good luck!
 
