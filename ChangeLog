@@ -1,3 +1,11 @@
+2016-05-12  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-164
+
+	* arts/xml/xmlReadArrayOfLineRecord.m:
+
+	Fix problem with non-Unix line-endings. Bug reported by Jonas Hagen.
+
 2016-04-05  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-163

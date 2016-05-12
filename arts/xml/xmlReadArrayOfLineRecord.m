@@ -198,7 +198,7 @@ function S = next_line( fid )
   end
 
   %= Read next line
-  sin = fgets( fid );
+  sin = strtrim( fgets( fid ));
 
   %= Return if empty line
   if length(sin) < 2
