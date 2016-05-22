@@ -1,3 +1,8 @@
+2016-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* scattering/particles2ab.m: New function. It derives a and b of
+	mass = a * dmax^b.
+
 2016-05-12  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-164
