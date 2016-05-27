@@ -129,7 +129,7 @@ function filename = gmt_plot(in,field)
 %                              Setting this will also change the size of the
 %                              fonts of the annotations for the legend. If you
 %                              want a different size for the legend
-%                              annotations, set in.legend.font_size.
+%                              annotations, set in.legend.fontsize.
 %                      def:    '14p'
 %                     ------------
 % in.font_annot_primary
@@ -147,7 +147,7 @@ function filename = gmt_plot(in,field)
 %                              Setting this will also change the size of the
 %                              fonts of the annotations for the legend. If you
 %                              want a different size for the legend
-%                              annotations, set in.legend.font_size.
+%                              annotations, set in.legend.fontsize.
 %                      def:    '14p'
 %                     ------------
 % in.font_annot_secondary
@@ -167,7 +167,12 @@ function filename = gmt_plot(in,field)
 %                      def: 'Helvetica' ('0')
 %                     --------------
 % in.fontsize_title    in:    %s or %f (if %f, unit is assumed from in.proj_length_unit)
-%                      ex:     Title size%                   def:    '36p' (points)
+%                      ex:     Title size
+%                      def:    '36p' (points)
+%                     --------------
+% in.func              in:     function handle
+%                      ex:     Apply this function to the data field. e.g. @(x)(nanmean(x(:,:,:,2),3))
+%                      def:    none
 %                     --------------
 % in.gmtset            in:     {%s,%s,...}
 %                      ex:     Cell with one or more gmtset commands.
@@ -178,7 +183,9 @@ function filename = gmt_plot(in,field)
 %                              the grdimage GMT command directly.
 %                     ------------
 % in.keep_files        in:     %f
-%                      ex:     If you don't want to delete intermediate files
+%                      ex:     If you don't want to delete intermediate files.
+%                              If you are really after the shell script that make
+%                              the plot see in.makeScriptAndStop 
 %                      def:    false
 %                     ------------
 % in.map_title_offset
@@ -373,14 +380,10 @@ function filename = gmt_plot(in,field)
 %                              in.color_nan. So far these are the only 3 options.
 %                      def:    mandatory
 %                     ------------
-%       position       in:     %s
-%                      ex:     '9.7i/2.3i/0.8c/0.8c'
-%                              ('x-displacement/y-displacement/height/width') (i = inch , c = cm)
-%                              Append 'h' for horisontal legend.
-%                      def:    Placement otherwise determined by the placement of the main legend
-%                     ------------
 %      fontsize        in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
 %                      ex:     '10c'
+%                     ------------
+%      see in.legend of more options
 %                     ------------
 % in.pscale            in:     %s
 %                      ex:     'gmt psscale OPT > filename.ps', explicitly sets the
@@ -410,7 +413,7 @@ function filename = gmt_plot(in,field)
 %
 % in.legend.          | STRUCTURE with one or more of the following fields:
 %
-%  font_size
+%  fontsize
 %                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
 %                      ex:     Size of annotations in legend, e.g., '1c'=1cm
 %                      def:    '14p'
@@ -421,15 +424,20 @@ function filename = gmt_plot(in,field)
 %                      NOTE:   If you set a non-zero number you'll also get rid of
 %                              the color gradient, i.e. each box will have it's own color
 %                     ------------
-%  position            in:     %s
-%                      ex:     '9.7i/2.3i/10c/0.8c' (i = inch , c = cm)
-%                              ('x-displacement/y-displacement/height/width'). Append 'h'
-%                              for horisontal legend.
-%                      def:    Determined by map dimensions
-%                     ------------
 %  equalboxwidth       in:     %f
 %                      ex:     If the legend color boxes have to be the same size, 1
 %                      def:    false (-L option)
+%                     ------------
+%  extra_legend        in:     %s
+%                      ex:     more instrucrtions to psscale. e.g. '-Li'
+%                      def:    none
+%                     ------------
+%  justify             in:     %s
+%                      ex:     sets the alignment. The alignment refers to the part of the legend 
+%                              that will be mapped onto the (x,y) point. Choose a 2 character 
+%                              combination of L, C, R (for left, center, or right) and 
+%                              T, M, B for top, middle, or bottom. e.g., BL for lower left.
+%                      def:    'BR'
 %                     ------------
 %  length              in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
 %                      ex:     Toggle the length of the legend bar (e.g., '3.9i'=3.9 inch).
@@ -437,13 +445,25 @@ function filename = gmt_plot(in,field)
 %                              See also width,xpos,ypos,orientation for legend
 %                      def:    '3.9i'
 %                     ------------
-%  orientation         in:     %s
-%                      ex:     If you want a horizontal/vertical legend input 'h'/'v'.
-%                      def:    Determined by map dimensions
+%  lineThick           in:     %f
+%                      ex:     Thickness of the boxline surrounding legend
+%                      def:    0.2
 %                     ------------
 %  map_annot_offset_primary
 %                      in:     %s
 %                      ex:     Move tick annotations to the right by x units, e.g. '.5i' (.5 inches)
+%                     ------------
+%  map_tick_length_primary
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     The length of the ticks, e.g., '.5c'=.5cm
+%                     ------------
+%  map_tick_length_secondary
+%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
+%                      ex:     The length of the ticks, e.g., '.5c'=.5cm
+%                     ------------
+%  orientation         in:     %s
+%                      ex:     If you want a horizontal/vertical legend input 'h'/'v'.
+%                      def:    Determined by map dimensions
 %                     ------------
 %  sidebar             in:     %f
 %                      ex:     Input scalar 0, 1, 2, or 3. Indicates none,
@@ -463,14 +483,6 @@ function filename = gmt_plot(in,field)
 %                      ex:     Have tick annotation at the center of the boxes
 %                      def:    false (edges)
 %                     ------------
-%  map_tick_length_primary
-%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
-%                      ex:     The length of the ticks, e.g., '.5c'=.5cm
-%                     ------------
-%  map_tick_length_secondary
-%                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
-%                      ex:     The length of the ticks, e.g., '.5c'=.5cm
-%                     ------------
 %  tick_spacing        in:     %f
 %                      ex:     If you want to manually decide how the ticks in the
 %                             legend should be spread. x=> every xth data value,
@@ -480,20 +492,20 @@ function filename = gmt_plot(in,field)
 %                   NOTE: This option is desirable if you have many
 %                           data levels.
 %                     ------------
+%  xoffset             in:     %s
+%                      ex:     offset the color scale by dx away from the refpoint
+%                              point in the direction implied by justify
+%                      def:    '-1c'
+%                     ------------
+%  yoffset             in:     %s
+%                      ex:     offset the color scale by dy away from the refpoint
+%                              point in the direction implied by justify
+%                      def:    '-1c'
+%                     ------------
 %  width               in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
 %                      ex:     Toggle the width of the legend bar.
 %                              See also length,xpos,ypos, orientation for legend
 %                      def:    '.2i'
-%                     ------------
-%  xpos                in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
-%                      ex:     Toggle the x-position of the center of the
-%                           legend bar. See also length,width,ypos, orientation for legend
-%                      def:    '9.8i' for verticle
-%                     ------------
-%  ypos                in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
-%                      ex:     Toggle the y-position of the center of the legend bar.
-%                              See also length,width,xpos, orientation for legend
-%                      def:    '2.3i' for vertical
 %------------------------------------------------------------------------------------
 %
 % NEARNEIGHBOR
@@ -860,15 +872,6 @@ in = optargs_struct(in,default);
 
 clear default
 
-if ~isempty(in.fill_value)
-    in.(field) = double(in.(field));
-    in.(field)(in.(field) == in.fill_value) = NaN;
-end
-
-if ~isempty(in.scale_factor)
-    in.(field) = double(in.(field)).*in.scale_factor + in.add_offset;
-end
-
 in.outdir = sanitise(in.outdir);
 
 if strcmp(in.outdir(1),'~')
@@ -931,6 +934,22 @@ if ~strcmp(field,'mask') && isfield(in,'mask')
     in.(field)(in.mask(in.(field))) = NaN;
 end
 
+% apply a function to the data first
+if ~strcmp(field,'func') && isfield(in,'func')
+    logtext(1,'Applying "%s" to the datafield "%s"\n',func2str(in.func),field)
+    in.(field) = in.func(in.(field));
+end
+
+% use fillvalue, add_offset, and scale_factor
+if ~isempty(in.fill_value)
+    in.(field) = double(in.(field));
+    in.(field)(in.(field) == in.fill_value) = NaN;
+end
+
+if ~isempty(in.scale_factor)
+    in.(field) = double(in.(field)).*in.scale_factor + in.add_offset;
+end
+
 % is the data plotable?
 in = isdata(in,field);
 
@@ -961,6 +980,7 @@ if ~in.nodata
         if isfield(in,'extra_legend') && strcmpi(in.extra_legend.name,'NaN') && in.gridded
             logtext(2,'Asked to make a NaN-legend although none are present in the data\n')
         end
+        default.extra_legend = false;
     end
 end
 
@@ -984,6 +1004,11 @@ clear default
 
 % LEGEND
 in = setupLegend(in);
+
+% extra LEGEND
+if isstruct(in.extra_legend)
+    in = setupXtraLegend(in);
+end
 
 end
 
@@ -1068,8 +1093,15 @@ assert(isstruct(in),errID,'"in" must be a structure')
 Fields = fieldnames(in)';
 fieldsNotToRead = cell(100,1); ii = 1;
 for F = Fields
+    
+    f = F{1};
+    if strcmp(f,field)
+        logtext(2,['in.%s is ordinarily a gmt option, but "field"=%s ',...
+            'has precedence and thus in.%s will be treated as data\n'],f,f,f)
+        continue
+    end
     % See if the in.(field) is a listed option
-    test = GSE(ismember(GSE(:,2),F{1}),:);
+    test = GSE(ismember(GSE(:,2),f),:);
     
     if ~isempty(test)
         % corresponding test function
@@ -1083,7 +1115,8 @@ for F = Fields
         if isstruct(in.(test{2})) && ismember(test{2},fieldnames(GSSE))
             Fields2 = fieldnames(in.(test{2}))';
             for F2 = Fields2
-                test2 = GSSE.(test{2})(ismember(GSSE.(test{2})(:,2),F2{1}),:);
+                f2 = F2{1};
+                test2 = GSSE.(test{2})(ismember(GSSE.(test{2})(:,2),f2),:);
                 if ~isempty(test2)
                     fun = test2{1};
                     strfun = char(fun);
@@ -1092,19 +1125,19 @@ for F = Fields
                         test{2},test2{2},strfun);
                 else
                     warning(errID,'in.%s.%s is not a valid field in in.%s ',...
-                        test{2},F2{1},test{2})
+                        test{2},f2,test{2})
                 end
             end
         end
     else
-        if ~any(strcmp(F{1},{field,'lat','lon'}))
-            fieldsNotToRead{ii} = F{1}; ii= ii+1;
+        if ~any(strcmp(f,{field,'lat','lon'}))
+            fieldsNotToRead{ii} = f; ii= ii+1;
         end
     end
 end
 
-fprintf(1,'Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
-fprintf(1,' will not be used as they are not "data" or in the list of options\n');
+logtext(atmlab('VERBOSITY'),'Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
+logtext(atmlab('VERBOSITY'),'Will not be used as they are not "data" or in the list of options\n');
 
 end
 
@@ -1447,6 +1480,38 @@ end
 
 end
 
+function in = setupXtraLegend(in)
+
+default.width     = in.legend.width;
+in.extra_legend   = optargs_struct(in.extra_legend,default); clear default
+default.length    = in.extra_legend.width;
+default.lineThick = in.legend.lineThick;
+default.justify   = 'RB';
+default.fontsize  = in.fontsize_annot_primary;
+default.unit      = false;
+
+[lw,lwu] = separate_integer_and_unit(in.legend.width);
+if strcmp(in.legend.orientation,'h')
+    switch in.proj.projection
+        case {'H','I'} % hammer,sinusoidal
+            projOff = 5;
+        case 'N' % robinsson
+            projOff = 2.5;
+        otherwise
+            projOff = 1;
+    end
+    default.xoffset = sprintf('-%.2f%s',projOff*lw*2,lwu);
+    default.yoffset = '0';
+    
+elseif strcmp(in.legend.orientation,'v')
+    default.xoffset = '0';
+    default.yoffset = sprintf('-%.2f%s',lw*2,lwu);
+end
+in.extra_legend   = optargs_struct(in.extra_legend,default);
+
+in.extra_legend.extra_instructions = '-Li'; % no ticks, square   
+end
+
 function in = setupLegend(in)
 % SETUP LEGEND
 
@@ -1456,54 +1521,50 @@ if isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend)
     return
 end
 if ~isfield(in,'legend') || ~isstruct(in.legend)
-    in.legend=struct([]);
+    in.legend=struct();
 end
 
 % apply defaults to legend
-if ~isfield(in.legend,'position')
-    % ORIENTATION
+
+% ORIENTATION
+x = sscanf(in.region,'%f/%f/%f/%f');
+f = ( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
+myHcondition = f <= 0.25; tmp = {'v','h'}; %vertical,horisontal
+default.orientation = tmp{myHcondition+1};
+
     
-    x = sscanf(in.region,'%f/%f/%f/%f');
-    f = 2*( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
-    myHcondition = f < 0.5; tmp = {'v','h'}; %vertical,horisontal
-    default.orientation = tmp{myHcondition+1};
-    defThick=.2; %thickness of legend bar
-    
-    % I use map_width to find the defaults.
-    if ischar(in.proj)
-        x = regexp(in.proj,'.*/(?<map_width>.+)','names');
-        mwstr = x.map_width;
-    else
-        mwstr = in.proj.map_width;
-    end
-    [mw,mwu] = separate_integer_and_unit(mwstr);
-    in.legend           = optargs_struct(in.legend,default); %need orientation now
-    clear default
-    
-    switch in.legend.orientation
-        case 'v'
-            vec = [10.11+(.5*defThick+0.44*ismember('E',in.psbasemap.axes)) ... % could use fontsize_annot_primary for better precision
-                2.44*f ...
-                5.22*f ...
-                defThick]/10;
-            
-        case 'h'
-            
-            vec = [5 ...
-                -0.1-(0.5*defThick+0.4*ismember('S',in.psbasemap.axes))...
-                10.55 ...
-                defThick]/10;
-            
-        otherwise
-            error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)
-    end
-    default.xpos   = sprintf('%.2f%s',vec(1)*mw,mwu);
-    default.ypos   = sprintf('%.2f%s',vec(2)*mw,mwu);
-    default.length = sprintf('%.2f%s',vec(3)*mw,mwu);
-    default.width  = sprintf('%.2f%s',vec(4)*mw,mwu);
+% I use map_width to find the defaults.
+if ischar(in.proj)
+    x = regexp(in.proj,'.*/(?<map_width>.+)','names');
+    mwstr = x.map_width;
 else
-    default = regexp(in.legend.position,'(?<xpos>.+)/(?<ypos>.+)/(?<length>.+)/(?<width>.+)(?<orientation>\w{1})','names');
+    mwstr = in.proj.map_width;
 end
+[mw,mwu] = separate_integer_and_unit(mwstr);
+
+default.lineThick =.2; %thickness of legend bar
+
+in.legend         = optargs_struct(in.legend,default); %need orientation now
+default.width     = sprintf('%.2f%s',in.legend.lineThick*mw/5,mwu);
+in.legend         = optargs_struct(in.legend,default); %need orientation now
+lw = separate_integer_and_unit(in.legend.width);
+switch in.legend.orientation
+    case 'v'
+        default.justify = 'CR'; %center right
+        default.length  = sprintf('%.2f%s',f*mw,mwu);
+        default.xoffset = sprintf('-%.2f%s',lw*2,mwu);
+        default.yoffset = '0';
+        
+    case 'h'
+        default.justify = 'BC'; % bottom centre
+        default.length  = sprintf('%.2f%s',mw,mwu);
+        default.xoffset = '0';
+        default.yoffset = sprintf('-%.2f%s',lw*2,mwu);
+        
+    otherwise
+        error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)
+end
+
 default.tick_annotion_format = in.tick_annotation_format;
 if ~isfield(in.legend,'tick_annotations') % incompatible
     default.tick_spacing = (in.datarange(2)-in.datarange(1))/in.nlevels ...
@@ -1600,7 +1661,7 @@ switch lower(in.figuretype)
         error(['gmtlab:' mfilename ':FigureType'],...
             '%s: not supported',in.figuretype)
 end
-command{end+1} = sprintf('gmt ps2raster %s.ps -A -P %s',in.filename,T);
+command{end+1} = sprintf('gmt psconvert %s.ps -A -P %s',in.filename,T);
 
 % Assemble open command
 if isnan(gmtlab('PDFVIEWER'))
@@ -1701,7 +1762,7 @@ for i = 1:length(command)
 end
 
 % This forces it to be a pdf
-command{end+1} = sprintf('gmt ps2raster %s.ps -A -P -Tf',file);
+command{end+1} = sprintf('gmt psconvert %s.ps -A -P -Tf',file);
 exec_system_cmd(command,gmtlab('verbosity'));
 
 end

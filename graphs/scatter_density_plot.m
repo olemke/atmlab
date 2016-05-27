@@ -9,7 +9,11 @@ function [h_ax, h_cb] = scatter_density_plot(x, y, varargin)
 %
 % Adding labels, titles, axes-properties etc. is not done in this function,
 % but should be done by the user manually, or by passing the 'axprops'
-% option. See below for an example.
+% option. See below for an example. 
+%
+% NOTE: If you provide a 'trans' argument you must also provide the opposite transformation! 
+%       E.g. If you provide opt.transx = @(x)log10(x), provide the opposite,
+%       opt.invtrans = @(x)10.^(x)
 %
 % IN
 %
@@ -136,6 +140,8 @@ pcolor(opts.invtransx(paddedx), opts.invtransy(paddedy), paddedN);
 %pcolor(opts.invtransx(xbins), opts.invtransy(ybins), N);
 
 set(gca(), opts.axprops);
+
+% Remove the grid (but this can be misleading)
 shading('flat');
 
 % use a custom colour-table, most notably with white as the base colour
@@ -144,7 +150,6 @@ set(gcf(), 'colormap', largecolour);
 
 %% plot medians
 
-%plot_quantiles();
 hold('on');
 if ~isempty(opts.medprops)
     plot_medians(x, y, paddedx, paddedy, opts);

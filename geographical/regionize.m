@@ -141,10 +141,11 @@ if opt.isgridded
     tmp(:,~logical_field&~periphery) = opt.maskwith;
     if ~(isnan(opt.maskwith) && any(strcmp(class(tmp),{'double','single'}))) && ...
             ~isequal(opt.maskwith,cast(opt.maskwith,class(tmp)))
-        warning('atmlab:behaviour',['Data class doesn''t match class of opt.maskwith. ',...
-            'instead of masking with %d, masking with %d'],...
-            opt.maskwith,cast(opt.maskwith,class(tmp)))
-    
+        if atmlab('VERBOSITY')
+            warning('atmlab:behaviour',['Data class doesn''t match class of opt.maskwith. ',...
+                'instead of masking with %d, masking with %d'],...
+                opt.maskwith,cast(opt.maskwith,class(tmp)))
+        end
         tmp(:,~logical_field&~periphery) = cast(opt.maskwith,class(tmp));
     else
         tmp(:,~logical_field&~periphery) = opt.maskwith;
@@ -214,6 +215,9 @@ errID = 'atmlab:reginize:badInput';
 
 a = size(data);
 
+assert(isequal(a(1:2),[length(lat),length(lon)]) || isequal(a(1:2),[length(lon),length(lat)]),...
+    errID,'Incorrect size dimensions of lat, lon, data')
+
 opt.isgridded = isequal(a(1:2),[length(lat),length(lon)]) | isequal(a(1:2),[length(lon),length(lat)]);
 opt.maskonlyUngridded = isempty(data) & isequal(size(lat),size(lon));
 
@@ -225,10 +229,6 @@ if ~opt.isgridded || opt.maskonlyUngridded
     flags = [];
     return
 end
-
-
-assert(isequal(a(1:2),[length(lat),length(lon)]) || isequal(a(1:2),[length(lon),length(lat)]),...
-    errID,'Incorrect size dimensions of lat, lon, data')
 
 options.dimorder    = 'latlon';
 options.lat_descend = false;

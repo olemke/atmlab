@@ -1,4 +1,4 @@
-function command = psscale(in)
+function command = psscale(L,filename)
 % PSSCALE Appends options to GMT psscale
 %
 % PURPOSE: Appends options to a short script and calls the GMT
@@ -11,20 +11,9 @@ function command = psscale(in)
 % Created by Salomon Eliasson
 % $Id$
 
-L = in.legend;
 assert(isfield(L,'cptfile'),['gmtlab:' mfilename ':badInput'],'needs in.cptfile')
 
-psscale = 'gmt psscale';
-if isfield(L,'position')
-    psscale = sprintf('%s -D%s',psscale,L.position);
-else
-    psscale = sprintf('%s -D%s/%s/%s/%s%s',...
-        psscale,num2str(L.xpos),num2str(L.ypos),num2str(L.length),num2str(L.width),...
-        L.orientation);
-    
-    %may only append 'h'
-    if strcmp(L.orientation,'v'), psscale = psscale(1:end-1); end 
-end
+psscale = 'gmt psscale -R -J -X -Y';
 
 if ( isfield(L,'tick_annotations') && ~isempty(L.tick_annotations) ) || ...
         ( isfield(L,'equalboxwidth') && L.equalboxwidth ) || ...
@@ -39,53 +28,74 @@ if ( isfield(L,'tick_annotations') && ~isempty(L.tick_annotations) ) || ...
     if isfield(L,'tick_centering')
         psscale = sprintf('%si',psscale);
     end
-noB = true;    
+    noB = true;
 else
     noB = false;
 end
 
-psscale = sprintf('%s %s',psscale,L.plotPlacement);
-
-% selects Overlay plot mode and assume more pscode will be appended later
-psscale = sprintf('%s -O -K',psscale);
-
-if L.sidebar %i.e the triangles bellow the min and above the max values
-    switch L.sidebar
-        case 1
-            str = '-Eb';
-        case 2
-            str = '-Ef';
-        case 3
-            str = '-E';
-        otherwise
-            error(['gmtlab:' mfilename ':input'],...
-                'error in determining sidebar')
+if ~islogical(L.unit)
+    if isfield(L,'tick_spacing')
+        psscale = sprintf('%s -B%g:"%s":/:"%s":',psscale,L.tick_spacing,L.xunit,L.unit);
+    elseif ~noB && ~(strcmp(L.xunit(1:9),'$(echo ""') && strcmp(L.unit(1:9),'$(echo ""'))
+        % meaning that xunit and unit should not be empty. Also the -L option does
+        % not work with the -B option
+        psscale = sprintf('%s -B:"%s":/:"%s":',psscale,L.xunit,L.unit);
+    elseif noB && (~isempty(L.xunit) || ~isempty(L.unit))
+        warning(['gmtlab:' mfilename,':incompatable'],...
+            ['-L option (annotations etc) cannot be used '...
+            'with the -B option (unit and xunit)\nChoosing to ignore the -B option'...
+            'Thereby in.unit and in.xunit will not be displayed in the legend'])
     end
-    psscale = sprintf('%s %s',psscale,str);
 end
 
+psscale = sprintf('%s -Dj%s',psscale,L.justify);
 
-if isfield(L,'tick_spacing')
-    psscale = sprintf('%s -B%g:"%s":/:"%s":',psscale,L.tick_spacing,L.xunit,L.unit);
-elseif ~noB && ~(strcmp(L.xunit(1:9),'$(echo ""') && strcmp(L.unit(1:9),'$(echo ""'))
-    % meaning that xunit and unit should not be empty. Also the -L option does
-    % not work with the -B option
-    psscale = sprintf('%s -B:"%s":/:"%s":',psscale,L.xunit,L.unit);
-elseif noB && (~isempty(L.xunit) || ~isempty(L.unit))
-    warning(['gmtlab:' mfilename,':incompatable'],...
-        ['-L option (annotations etc) cannot be used '...
-        'with the -B option (unit and xunit)\nChoosing to ignore the -B option'...
-        'Thereby in.unit and in.xunit will not be displayed in the legend'])
+psscale = sprintf('%s+w%s/%s',psscale,num2str(L.length),num2str(L.width));
+
+if isfield(L,'xoffset')
+    psscale = sprintf('%s+o%s',psscale,L.xoffset);
+end
+
+if isfield(L,'yoffset')
+    psscale = sprintf('%s/%s',psscale,L.yoffset);
+end
+
+if isfield(L,'orientation') && strcmp(L.orientation,'h'),
+    psscale = sprintf('%s+h',psscale);
+end
+
+if isfield(L,'sidebar')
+    if L.sidebar %i.e the triangles bellow the min and above the max values
+        switch L.sidebar
+            case 1
+                str = '+eb';
+            case 2
+                str = '+ef';
+            case 3
+                str = '+e';
+            otherwise
+                error(['gmtlab:' mfilename ':input'],...
+                    'error in determining sidebar')
+        end
+        psscale = sprintf('%s%s',psscale,str);
+    end
+end
+
+if isfield(L,'extra_instructions')
+    psscale = sprintf('%s %s',psscale,L.extra_instructions);
 end
 
 psscale = sprintf('%s -C%s',psscale,L.cptfile);
+
+% selects Overlay plot mode and assume more pscode will be appended later
+psscale = sprintf('%s -O -K',psscale);
 
 if isfield(L,'map_annot_offset_primary')
     psscale = sprintf('%s --MAP_ANNOT_OFFSET_PRIMARY=%s',psscale,L.map_annot_offset_primary);
 end
 
-if isfield(L,'font_size')
-    psscale = sprintf('%s --FONT_ANNOT_PRIMARY=%s',psscale,num2str(L.font_size));
+if isfield(L,'fontsize')
+    psscale = sprintf('%s --FONT_ANNOT_PRIMARY=%s',psscale,num2str(L.fontsize));
 end
 
 if isfield(L,'map_tick_length_primary')
@@ -100,4 +110,4 @@ if isfield(L,'tick_annotation_format')
     psscale = sprintf('%s --FORMAT_FLOAT_OUT=%s',psscale,L.tick_annotation_format);
 end
 
-command = sprintf('%s >> %s.ps',psscale,in.filename);
+command = sprintf('%s >> %s.ps',psscale,filename);

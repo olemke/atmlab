@@ -37,6 +37,13 @@ function [vc,hex] = list_colors(varargin)
 % $Id$
 % 18/11,2009 Salomon Eliasson
 
+assert(ischar(varargin{1}),'First argument must be either "Ncolors" or "Colors"')
+assert((strcmpi(varargin{1},'Ncolors')&isscalar(varargin{2})) |...
+    (strcmpi(varargin{1},'Colors')&iscell(varargin{2})),...
+    ['If "Ncolors" provide a scalar second argument. '...
+    'If "Colors" provide a cell as the second argument'])
+
+
 assert(nargin>0,['Salomons:' mfilename ':badInput'],'Input error')
 colors={'k','g','r','b','c','m','y','gr','p','o','caucasian 1','pi'};
 

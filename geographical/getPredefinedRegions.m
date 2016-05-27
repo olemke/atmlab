@@ -44,6 +44,7 @@ if ~nargin
         longname{i} = corners.(F{1}).extra.longname;
         i = i+1;
     end
+    extra = struct();
     return
 end
 assert(iscell(regionstr)||ischar(regionstr),...
@@ -209,7 +210,7 @@ switch lower(regionstr)
         extra.center =  struct('lat',0,'lon',20);
     case 'trop_cont'
         % this is conv_af and conv_sa merged
-        extra.longname ='Tropical convention over continents';
+        extra.longname ='Tropical convection over continents';
         [a,b,x(1)] = retrieve_reginfo('conv_af');
         [c,d,x(2)] = retrieve_reginfo('conv_sa');
         blcorner = cat(1,a,c);

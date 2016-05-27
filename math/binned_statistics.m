@@ -84,7 +84,7 @@ F = fieldnames(out)';
 for i = 1:length(F)
     
     % ---------------
-    % assign relace values to empty cells
+    % assign replace values to empty cells
     if exist('replace','var')
         
         if ~iscell(replace), replace={replace};end
@@ -92,7 +92,7 @@ for i = 1:length(F)
         
         
         % putting back [] if the input was empty to begin with would be desirable, since e.g. nansum([])=0,
-        %
+        % unless replace is equal to 0
         test =  cellfun('isempty',data_bins) | cellfun('isempty',out.(F{i}));
         if any(test(:)) && ~all(test(:))
             % find a cell that is not empty and check if the class matches the
@@ -116,7 +116,7 @@ for i = 1:length(F)
 
     if isfield(opt,'dataClass') && ~isempty(opt.dataClass)
         logtext(atmlab('OUT'),['Making sure all vectors in cells are the same class '...
-            '(in this case "%"s)\n'],opt.dataClass)
+            '(in this case "%s")\n'],opt.dataClass)
         out.(F{i}) = cellfun(@(x)(cast(x,opt.dataClass)), out.(F{i}), 'UniformOutput', false);
     end
 end

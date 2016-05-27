@@ -11,7 +11,7 @@ function command = pscoast(in)
 % Created by Salomon Eliasson
 % $Id$
 
-pscoast = sprintf('gmt pscoast -R -J %s',in.plotPlacement);
+pscoast = 'gmt pscoast -R -J -X -Y';
 
 C=in.pscoast;
 

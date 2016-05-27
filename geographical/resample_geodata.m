@@ -80,13 +80,13 @@ out = in;
 sz                = check_input(in,field,newgrid,errID);
 
 % ASSEMBLE_newgrid
-[newlat,newlon]   = assemble_newgrid(in.lat,in.lon,newgrid,errID);
+[newlon,newlat]   = assemble_newgrid(in.lon,in.lat,newgrid,errID);
 
 % STANDARDIZE "new grid" internally
 gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false);
-[rg_flags,tmp]    = standardize_geodata(struct('lat',newlat,'lon',newlon),gridoptions);
-newlat=tmp.lat;
+[rg_flags,tmp]    = standardize_geodata(struct('lon',newlon,'lat',newlat),gridoptions);
 newlon=tmp.lon;
+newlat=tmp.lat;
 clear tmp
 
 % LEAVE function if nothing needs to be done
@@ -238,7 +238,7 @@ else
 end
 
 
-function [newlat,newlon] = assemble_newgrid(LAT,LON,newgrid,errID)
+function [newlon,newlat] = assemble_newgrid(LON,LAT,newgrid,errID)
 %% ASSEMBLE_newgrid
 % in:    LAT             orig latvector
 %        LON             orig lonvector
@@ -249,8 +249,8 @@ function [newlat,newlon] = assemble_newgrid(LAT,LON,newgrid,errID)
 
 if iscell(newgrid)
     % E.g. for mapping one dataset to anothers lat/lons
-    newlat = newgrid{1};
-    newlon = newgrid{2};
+    newlon = newgrid{1};
+    newlat = newgrid{2};
     assert(max(diff(newlat))-min(diff(newlat))<0.1&&max(diff(newlon))-min(diff(newlon))<0.1,...
         errID,'The input newgrid must be equidegree (constant spacing)')
     

@@ -4,11 +4,7 @@ function [flags,out] = standardize_geodata(in,options)
 %                  For gridded data.
 %
 %  PURPOSE  Make sure the lat lon [data] are sorted in a way of your choosing
-%           The default ordering is
-%                1) ascending latitudes ands longitudes
-%                2) dims of data are lat, lon, ...
-%                3) longitudes should be between -180:180
-%                4) no dublicate longitudes (e.g. 0 and 360 should not coexist)
+%
 %
 %  IN       in.lat      vector
 %           in.lon      vector
@@ -18,11 +14,11 @@ function [flags,out] = standardize_geodata(in,options)
 %                       homogenise, basically what features you want to allow.
 %                       These are the defaults:
 %
-%                    default.dimorder = 'latlon'; % Order the data as (lat,lon,....); or else do nothing
-%                    default.lon_descend = false; % allow descending order of longitudes
-%                    default.lat_descend = false; % allow descending order of latitudes
-%                    default.lon360 = false; % allow longitudes go from 0:360 (as opposed to -180:180) globally
-%                    default.dublicate = false % allow duplicate values (repeat longitudes e.g. at -180 and 180)
+%                    default.dimorder    = 'lonlat'; % Order the data as (lon,lat,....);
+%                    default.lon_descend = true; % order the longitudes in descending order
+%                    default.lat_descend = true; % order the latitudes in descending order
+%                    default.lon360      = true; % fit longitudes (and data if given) to 0:360 regime
+%                    default.dublicate = true % allow duplicate values (repeat longitudes e.g. at -180 and 180)
 %
 %  OUT
 %           flags     struct     A structure of flags to indicate how your data is arranged

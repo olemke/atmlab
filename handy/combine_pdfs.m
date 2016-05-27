@@ -111,14 +111,6 @@ function outfile = combine_pdfs(pdffiles, options)
 %            in:  %f
 %            ex:  space between rows in cm
 %            def: 1
-
-
-
-
-
-
-
-
 % OUT:      outfile = The fullpath to the created pdf-file
 %
 % NOTE: The files are appended left to right and from top to bottom.
@@ -196,7 +188,7 @@ end
 rows = ceil(length(options.cols)/options.pages);
 
 if isfield(options,'pages')
-    if isfield(options,'rowsPerPage')
+    if atmlab('VERBOSITY') && isfield(options,'rowsPerPage')
         warning(['atmlab:',mfilename,':badInput'],'options.pages forces the number of rows')
     end
     options.rowsPerPage = rows;
@@ -269,7 +261,7 @@ regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 %
 psize(length(pdffiles)) = struct('width','','height','');
 for i = 1:length(pdffiles)
-    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 1);
+    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 0);
     
     % pdfinfo uses BigPoints as a unit. Converting to cm.
     psize(i) =  structfun(@(x) str2double(x)/72*2.54, ...
@@ -400,7 +392,8 @@ for R = layout.plotsbyrow
     for P = R{:}
         fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, P.width);
         tmpplotname=sprintf('plot%d.pdf', filenum);
-        mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
+        %mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
+        mvplotcmd{filenum}=sprintf('cp %s %s/%s', P.file, tmpfolder, tmpplotname); %#ok
         if isfield(options,'scale') && ~isempty(options.scale(options.scale(:,1)==filenum,2))
             strscale = num2str(options.scale(options.scale(:,1)==filenum,2));
         else

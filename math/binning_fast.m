@@ -1,4 +1,4 @@
-function [Z,Y,X] = binning_fast(in,lonspace)
+function [Z,Y,X] = binning_fast(in)
 %% BINNING_FAST bins ungridded data onto a grid
 %
 % Purpose:
@@ -11,11 +11,11 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 % IN
 %   in       struct containing:
 %               MANDITORY:
-%                   Z/data         [data matrix]     of any class. size(data,1)
-%                                                  must be the same length
-%                                                  as X Y, but data may
-%                                                  have 2 dimensions or more, e.g.
-%                                                  lvls, seasons, etc.
+%                   Z/data         [data matrix]   of any class. data must
+%                   have the same geograhical dimensions as X and Y (same 1st
+%                   dimension if x, y are vextors, or same first 2 dimension if
+%                   X,Y are two dimensionl., but may have more dimensions e.g.
+%                   lvls, seasons, etc. Currently works up to 3 extra dimensions
 %
 %                   X/lon          [lon matrix]      of any class
 %                   Y/lat          [lat matrix]      of any class
@@ -38,26 +38,26 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %
 %
 %
-%          If region is given, the function will only bin the data within the
-%          given region. Particularily useful if you have high resolution data
-%          in a region. The default grid domain is assumed to be global
-%          otherwise.
+%                        If region is given, the function will only bin the data within the
+%                        given region. Particularily useful if you have high resolution data
+%                        in a region. The default grid domain is assumed to be global
+%                        otherwise.
 %
-%  lonspace    %f     Optional for lat/lon data to indicate the desired longitude format
+%                 lonspace    %f     Optional for lat/lon data to indicate the desired longitude format
 %                     lonspace = 360 for lon=0:360,
 %                     lonspace = 180 for lon=-180:180
 %                     lonspace = 0 do nothing (default)
 %
-%           If lonspace is not given, the function automatically picks a format
-%           depending on if there are any longitude values larger than 180
-%           (lon>180). This may be important if your input data does not cover both
-%           hemispheres.
+%                        If lonspace is not given, the function automatically picks a format
+%                        depending on if there are any longitude values larger than 180
+%                        (lon>180). This may be important if your input data does not cover both
+%                        hemispheres.
 %
-%  counts   %f (e.g. true=1)
-%           Optional logical for if you only want the number of counts per bin, e.g. to see how
-%           often a certain combination of X-Y happens (numel per box).
+%                 counts   %f (e.g. true=1)
+%                        Optional logical for if you only want the number of counts per bin, e.g. to see how
+%                        often a certain combination of X-Y happens (numel per box).
 %
-% Out:
+% OUT:
 %                   1) Z  ( cell (size(Y,X)) or counts) %data
 %                   2) Y  ( vector )          %lat
 %                   3) X  ( vector )          %lon
@@ -73,7 +73,7 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 %
 %       - Including newlon and newlat causes the function to ignore: in.gridsize
 %                                                                    in.region
-%                                                                    lonspace
+%                                                                    in.lonspace
 %
 %       - binned_statistics.m is a useful function to get statistics
 %         (e.g numel, mean, sum, etc) on the binned data is binned_statistics.
@@ -83,34 +83,34 @@ function [Z,Y,X] = binning_fast(in,lonspace)
 % Created by Oliver Lemke and Salomon Eliasson
 % $Id$
 
-[in,lonlat] = check_input(in);
+default.lonspace = 0; % this is only of intrest if you have an in.gridsize
+in = optargs_struct(in,default);
 
-if nargin==1, lonspace=0;end
-[in,Y,X] = outputlatlons(in,lonspace,lonlat);
+in = check_input(in);
 
-if ~in.counts
-    % data might be 2D or more e.g. levels,etc
-    sz = size(in.Z);
-    in.Z = in.Z(:,:); %collapse data
-end
+in = outputlatlons(in);
 
 in = regionchop(in);
 
 % setup new GRIDSIZE
-d(1) = mean(diff(Y));
-d(2) = mean(diff(X));
+d(1) = mean(diff(in.newY));
+d(2) = mean(diff(in.newX));
 
 %% assign index value
-Yindex = floor( (in.Y - (min(Y)-d(1)/2)) /d(1) ) + 1;
-Xindex = floor( (in.X - (min(X)-d(2)/2)) /d(2) ) + 1;
+% This assumes a completely regular grid
+Yindex = floor( (in.Y - (min(in.newY)-d(1)/2)) /d(1) ) + 1;
+Xindex = floor( (in.X - (min(in.newX)-d(2)/2)) /d(2) ) + 1;
 
-% make sure Xindex and Yindex don't exceed maximum
-Yindex(Yindex>length(Y))=length(Y);
-Xindex(Xindex>length(X))=length(X);
-
+% For slightly irregular grids
+% make sure Xindex and Yindex don't exceed maximum or minimum. I.e., putting
+% values outside the edges into the edge boxes
+Yindex(Yindex>length(in.newY))=length(in.newY);
+Xindex(Xindex>length(in.newX))=length(in.newX);
+Yindex(Yindex==0)=1;
+Xindex(Xindex==0)=1;
 
 %% GET COUNTS
-Z = cell(length(Y), length(X));
+Z = cell(length(in.newY), length(in.newX));
 counts = zeros (size(Z), 'uint32');
 
 for i = 1:length(in.X)
@@ -127,34 +127,90 @@ indata = in.Z;
 
 %% PREALLOCATE DATA
 
-zeroes = zeros ([max(counts(:)), sz(2:end)], class(indata));
-for i = 1:size(counts,1)
-    for j = 1:size(counts,2)
-        Z{i, j} = zeroes(1:counts(i,j));
+zeroes = zeros ([max(counts(:)), in.size(2:end)], class(indata));
+if isvector(in.Z) % no extra dimensions
+    for i = 1:size(counts,1)
+        for j = 1:size(counts,2)
+            Z{i, j} = zeroes(1:counts(i,j));
+        end
+    end
+elseif ismatrix(in.Z) % one extra dimension
+    for i = 1:size(counts,1)
+        for j = 1:size(counts,2)
+            Z{i, j} = zeroes(1:counts(i,j),:);
+        end
+    end
+elseif length(in.size)==3 % two extra dimensions
+    for i = 1:size(counts,1)
+        for j = 1:size(counts,2)
+            Z{i, j} = zeroes(1:counts(i,j),:,:);
+        end
+    end
+elseif length(in.size)==4 % three extra dimensions
+    for i = 1:size(counts,1)
+        for j = 1:size(counts,2)
+            Z{i, j} = zeroes(1:counts(i,j),:,:,:);
+        end
     end
 end
 
 %% LOOP DATA
-
-for i = 1:size(indata,1)
-    Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:) = indata(i,:);
-    counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
+if isvector(in.Z) % no extra dimensions
+    for i = 1:size(indata,1)
+        Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i))) = indata(i);
+        counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
+    end
+elseif ismatrix(in.Z) % one extra dimension
+    for i = 1:size(indata,1)
+        Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:) = indata(i,:);
+        counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
+    end
+elseif length(in.size)==3 % two extra dimensions
+    for i = 1:size(indata,1)
+        Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:,:) = indata(i,:,:);
+        counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
+    end
+elseif length(in.size)==4 % three extra dimensions
+    for i = 1:size(indata,1)
+        Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:,:,:) = indata(i,:,:,:);
+        counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
+    end
 end
-
+   
+X = in.newX;
+Y = in.newY;
 end
 %% Subfunctions
 % ||
 % VV
 
-function [in,lonlat] = check_input(in)
+function in = check_input(in)
 
-% because we could be gridding non-geographical data
-lonlat = all(isfield(in,{'lat','lon'}));
-if ~isfield(in,'counts') % if you only want the counts
+errId = ['atmlab:' mfilename ':badInput'];
+
+%% because we could be gridding non-geographical data
+in.lonlat = all(isfield(in,{'lat','lon'}));
+
+%% did you pass a grid?
+if any(isfield(in,{'newlon','newlat','newX','newY'}))
+    in.gridprovided = true;
+    if in.lonspace ~= 0
+        logtext(1,'lonspace makes no sense if you pass a grid to map to. Ignoring lonspace...\n')
+        in.lonspace = 0;
+    end
+    if isfield(in,'region')
+        logtext(1,'region makes no sense if you pass a grid to map to. Ignoring region...\n')
+        in = rmfeild(in,'region');
+    end
+end
+
+%% you want to do more than just count the number hits in a grid
+if ~isfield(in,'counts') 
     in.counts = 0;
 end
 
-if lonlat
+%% If your data is geographical
+if in.lonlat
     in.X = in.lon;
     in.Y = in.lat;
     in = rmfield(in,{'lon','lat'});
@@ -162,20 +218,25 @@ if lonlat
         in.Z = in.data;
         in = rmfield(in,'data');
     end
-    if isfield(in,'newlon')
+    if isfield(in,'newlon') % grid provided is geographical
         in.newX = in.newlon;
         in.newY = in.newlat;
         in = rmfield(in,{'newlon','newlat'});
+
+        assert(~(any([in.newX(:)>360;in.newX(:)<-180;in.newY(:)>90;in.newY(:)<-90])),...
+            errId,'lat/lon values are unphysical')
     end
 end
 
-errId = ['atmlab:' mfilename ':badInput'];
+%% If fields are missing
+
 assert(all(isfield(in,{'Y','X','Z'})) || all(isfield(in,{'Y','X','counts'})),...
     errId,'''lat'',''lon'',''data'' (or ''X'',''Y'',''Z'') are required input fields')
 
 assert(isfield(in,'gridsize') || all(isfield(in,{'newX','newY'})),...
     errId,'Either field ''gridsize'' or fields ''newY/newlat'' and ''newX/newlon'' are required' )
 
+%% Dimension checks
 if ~in.counts
     if isequal(numel(in.Z),numel(in.Y),numel(in.X))
         in.Z = in.Z(:); in.Y = in.Y(:); in.X = in.X(:);
@@ -193,37 +254,88 @@ else
         ' Y %d, X %d'], size(in.Y,1), size(in.X, 1));
 end
 
-if lonlat
-    assert(~(any([in.newX(:)>360;in.newX(:)<-180;in.newY(:)>90;in.newY(:)<-90])),...
-        errId,'lat/lon values are unphysical')
-end
+assert(ndims(in.Z)<=4,errId,...
+    [mfilename,' currently only supports 3 extra dimensions'])
 
-% do a general warning
-if ~(max(diff(in.newY))-min(diff(in.newY))<1e-4 && ...
-        max(diff(in.newX))-min(diff(in.newX))<1e-4)
-    warning(['atmlab:' mfilename, ':WonkyNewgrid'],[...
-        'vectors in fields: ''newY'' and ''newX'' are not monotonously spaced. ',...
-        'The output grid will be monotonously spaced, ',...
-        'based on mean(diff(newY)) and  mean(diff(newX))'])
-end
+%% Some general warnings
+if in.gridprovided
+    if ~(max(diff(in.newY))-min(diff(in.newY))<1e-2 && ...
+            max(diff(in.newX))-min(diff(in.newX))<1e-2)
+        warning(['atmlab:' mfilename, ':WonkyNewgrid'],[...
+            'vectors in fields: ''newY'' and ''newX'' are not monotonously spaced. ',...
+            'The output grid will be monotonously spaced, ',...
+            'based on mean(diff(newY)) and  mean(diff(newX))'])
+    end
 
-if isfield(in,'newX')
     if isfield(in,'gridsize')
         warning(errId,'fields ''newX'' and ''newY'' cancel ''gridsize''')
     end
-    if isfield(in,'region')
-        warning(errId,'Region specified by newY and newX has presedence over in.region\n')
+
+    %%%%%
+    % Need to confirm the grid with this function
+    [in.flags,tmp] = standardize_geodata(struct('lon',in.newX,'lat',in.newY),...
+        struct('lon_descend',false,'lat_descend',false));
+    in.newX = tmp.lon;
+    in.newY = tmp.lat;
+end
+
+end
+
+function in = outputlatlons(in)
+%% fix the latlons
+% Sets up lat lon and adjusts in.X to the requested (if requested)
+% longitude regime (0:360 or -180:180)
+%
+errId = ['atmlab:' mfilename ':badInput'];
+
+if in.lonlat % it is a geographical grid
+    
+    % the grid might be in 0:360 deg space and the data in -180:180; Match the
+    % data to the new grid
+    if any(in.newX>180), in.lonspace = 360; end
+    
+    if in.lonspace==360
+        testless = in.X<0;   %logical for any lons < 0
+        in.X(testless) = in.X(testless)+360;
+        in.f360=true;
+    elseif in.lonspace==180
+        testmore = in.X>180; %logical for any lons > 180
+        in.X(testmore) = in.X(testmore)-360;
+        in.f360=false;
+    elseif in.lonspace==0
+        testmore = in.X>180; %logical for any lons > 180
+        in.f360 = any(testmore);
+    else
+        error(errId,...
+            'in.lonspace must be 180, 360 , or 0 (default (do nothing))')
     end
     
-    %internally span a region, so that values outside this region can be kicked out
-    %of [blcorner,trcorner] (lt1,ln1,lt2,ln2). The following assumes that newX and
-    %newY are grid centers!
-    dlt = mean(diff(in.newY))/2;  dln = mean(diff(in.newX))/2;
-    in.region = [min(in.newY)-dlt,min(in.newX)-dln,max(in.newY)+dlt,max(in.newX)+dln];
-    
+    if in.f360 && ~isfield(in,'region')
+        in.region = [-90 0 90 360];
+    elseif ~in.f360 && ~isfield(in,'region')
+        in.region = [-90 -180 90 180];
+    end
 else
-    dlt = in.gridsize(1)/2;  dln = in.gridsize(end)/2;
-    in.region = [min(in.Y)-dlt,min(in.X)-dln,max(in.Y)+dlt,max(in.X)+dln];
+    % If it is not geographical
+    if in.gridprovided
+        dy  = mean(diff(in.newY)); dx = mean(diff(in.newX));
+        dlt = dy/2;  dln = dx/2;
+        in.region = [min(in.newY)-dlt,min(in.newX)-dln,max(in.newY)+dlt,max(in.newX)+dln];
+    else
+        dlt = in.gridsize(1)/2;  dln = in.gridsize(end)/2;
+        in.region = [min(in.Y)-dlt,min(in.X)-dln,max(in.Y)+dlt,max(in.X)+dln];
+    end
+end
+
+if ~any(isfield(in,{'newX','newY'}))
+    d = in.gridsize;
+    assert(numel(d)<=2,errId,'''gridsize'' should contain 1 or 2 values')
+    
+    if isscalar(d), d = [d,d]; end
+    assert(isnumeric(in.region),errId,'in.region must be a numeric vector of coordinates')
+    
+    in.newY = in.region(1)+0.5*d(1):d(1):in.region(3)-0.5*d(1);
+    in.newX = in.region(2)+0.5*d(2):d(2):in.region(4)-0.5*d(2);
 end
 
 end
@@ -238,62 +350,22 @@ ln2 = in.X <= in.region(4);
 
 index = ln1 & ln2 & lt1 & lt2;
 
+
 in.Y = in.Y(index);
 in.X = in.X(index);
 
 if ~in.counts
-    in.Z = in.Z(index,:);
-end
-
-end
-
-function [in,Y,X] = outputlatlons(in,lonspace,lonlat)
-%% fix the latlons
-% Sets up lat lon and adjusts in.X to the requested (if requested)
-% longitude regime (0:360 or -180:180)
-%
-errId = ['atmlab:' mfilename ':badInput'];
-
-if lonlat
-    testmore = in.X>180; %logical for any lons > 180
-    testless = in.X<0; %logical for any lons < 0
+    % I need to collapse the data in all cases
+    in.size = size(in.Z);
     
-    if lonspace==360
-        in.X(testless) = in.X(testless)+360;
-        in.f360=true;
-    elseif lonspace==180
-        in.X(testmore) = in.X(testmore)-360;
-        in.f360=false;
-    elseif lonspace==0
-        in.f360 = any(testmore(:));
-    else
-        error(errId,...
-            'lonspace must be 180, 360 or 0 (default (do nothing))')
-    end
-    
-    if in.f360 && ~isfield(in,'region')
-        in.region = [-90 0 90 360];
-    elseif ~in.f360 && ~isfield(in,'region')
-        in.region = [-90 -180 90 180];
+    if ~all(index)
+        in.Z = in.Z(index,:);
+        if ~isequal(size(in.Z),in.size)
+            % there where more than 2 dimensions in the orginal data
+            in.Z = reshape(in.Z,in.size);
+        end
     end
 end
 
-if any(isfield(in,{'newX','newX'}))
-    Y = in.newY;
-    X = in.newX;
-    if lonspace~=0
-        warning(errId,'fields ''newY'' and ''newX'' make lonspace irrelevant')
-    end
-    return
 end
 
-d = in.gridsize;
-assert(numel(d)<=2,errId,'''gridsize'' should contain 1 or 2 values')
-
-if isscalar(d), d = [d,d]; end
-assert(isnumeric(in.region),errId,'in.region must be a numeric vector of coordinates')
-
-Y = in.region(1)+0.5*d(1):d(1):in.region(3)-0.5*d(1);
-X = in.region(2)+0.5*d(2):d(2):in.region(4)-0.5*d(2);
-
-end

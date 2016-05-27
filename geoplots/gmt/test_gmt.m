@@ -1,4 +1,4 @@
-function [info, files] = test_gmt(in)
+function [files,info] = test_gmt(in)
 % TEST_GMT To test various aspecs of gmt_plot
 %
 % PURPOSE: To test various aspecs of gmt_plot. Especially before commiting
@@ -11,7 +11,7 @@ function [info, files] = test_gmt(in)
 %      test and the addional options added by the user (which have precedence).
 %      -----------
 %      in.test: If you only want to run a subset of tests, e.g. in.test =
-%      [1,3,4] runs tests 1,3,4. The default behaviour is to run all tests ([1:7])
+%      [1,3,4] runs tests 1,3,4. The default behaviour is to run all tests ([1:17])
 %
 %      -----------
 %
@@ -322,7 +322,7 @@ for T = sort(in.test)
             test.datarange            = [160,250];% displayed value range. Sidebar triangles shown for data outside range.
             test.extra_legend         = struct('name','nan','type','nan','position','0i/0i/2c/2ch','fontsize','25p');
             test.legend.position      = '12c/0c/20c/2ch';
-            test.legend.font_size     = '20p';
+            test.legend.fontsize     = '20p';
             test.legend.tick_spacing  = 15;
             test.title                = 'Sinusoidal projection, center = 90';
             test.proj.projection      = 'I';

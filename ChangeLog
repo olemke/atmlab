@@ -1,3 +1,51 @@
+2016-05-27  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-166
+
+	* graphs/scatter_density_plot.m: Added some more explanations in the header
+
+	* datasets/SatDataset.m: Made changes to level3, to handle
+	variables with more dimensions than lon lat
+
+	* math/binning_fast.m: Fixed errors that surfaced when I tried to
+	bin multi-dimensional data
+
+	* handy/combine_pdfs.m:
+
+	- Removed '' from sprintf('cp ''%s'' ''%s/%s''', P.file,
+	tmpfolder, tmpplotname), since it wasn't executing in bash. This
+	fixed a failure to execute although I don't know why it was
+	suddenly failing.
+
+	- made verbosity toggleable
+
+	* geographical/standardize_geodata.m: stopped the lies coming from
+	the header
+
+	* handy/sanitise.m: Changed atmlab('ERR') to atmlab('OUT'). I hope
+	no one cares
+
+	* geoplots/gmt/test_gmt.m:
+	* geoplots/gmt/psscale.m:
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/gmt_inputs.m (:):
+
+	- Made some changes to the legend options, especially removing
+	depricated options and using the new flashy approaches mean to be
+	used in GMT5
+
+	* geoplots/gmt/create_gmt_earth.m: Fixed crash if one doesn't want
+	a legend, but does want and extra_legend (such as because of NaNs)
+
+	* geographical/resample_geodata.m:
+	* math/binned_statistics.m:
+	* geographical/getPredefinedRegions.m:
+	insignificant
+
+	* handy/list_colors.m:  Added some assertions
+
+	* geographical/regionize.m: fixed assertion
+
 2016-05-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-165

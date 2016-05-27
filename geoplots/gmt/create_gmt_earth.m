@@ -65,11 +65,11 @@ end
 if isfield(in,'psscale')
     commands{i} = in.psscale; i=i+1;
 elseif isstruct(in.legend)
-    commands{i} = psscale(in); i=i+1;
+    commands{i} = psscale(in.legend,in.filename); i=i+1;
 end
 if isfield(in,'psscale_extra')
     commands{i} = in.psscale_extra; i=i+1;
-elseif ~in.nodata && (isfield(in,'extra_legend') && ~isempty(in.extra_legend))
+elseif ~in.nodata && (isfield(in,'extra_legend') && ischar(in.extra_legend))
     commands{i} = in.extra_legend; i=i+1;
 end
 
@@ -176,7 +176,17 @@ end
 
 % LEGEND/S
 if isstruct(in.legend) && ~in.nodata
-    [in.legend,in.extra_legend] = mklegend(in);
+    [in.legend,extra_legend] = mklegend(in);
+    if ~islogical(in.extra_legend)
+        in.extra_legend = extra_legend;
+    end
+end
+
+
+if ~isstruct(in.legend) && ...
+        (isfield(in,'extra_legend') && isstruct(in.extra_legend)) && ...
+        ~in.nodata
+    [~,in.extra_legend] = mklegend(in);
 end
 
 % Close file with this
@@ -211,9 +221,15 @@ function basemap = setupbasemap(in,last)
 %% setupbasemap
 
 basemap = 'gmt psbasemap';
-basemap = sprintf('%s -R%s',basemap,in.region);
-basemap = sprintf('%s -J%s',basemap,in.proj.str);
-basemap = sprintf('%s %s',basemap,in.plotPlacement);
+%redirect '>' overwrites and existing file, '>>' appends to one
+if ~last
+    basemap = sprintf('%s -R%s',basemap,in.region);
+    basemap = sprintf('%s -J%s',basemap,in.proj.str);
+    basemap = sprintf('%s %s',basemap,in.plotPlacement);
+else
+    basemap = sprintf('%s -R -J -X -Y',basemap);
+end
+
 basemap = sprintf('%s -B%s',basemap,in.psbasemap.ticks);
 if ~isempty(in.title)
     %basemap = sprintf('%s:."%s":',basemap,gmt_unicode_converter(in.title));
@@ -224,8 +240,6 @@ end
 basemap = sprintf('%s -P',basemap);
 
 % Allow more plot code to be appended after
-
-%redirect '>' overwrites and existing file, '>>' appends to one
 if ~last
     basemap = sprintf('%s -K > %s.ps',basemap,in.filename);
 else
@@ -362,7 +376,7 @@ switch in.ctable.name
 end
 
 % extra legend box for missing values
-if isfield(in,'extra_legend')
+if isfield(in,'extra_legend') && isstruct(in.extra_legend)
     in.extra_legend.cptfile = extra_legend(in);
 end
 
@@ -384,50 +398,28 @@ function [a,b] = mklegend(in)
 %% mklegend
 
 a = in.legend;
-% get what is in the in-structure, i.e one level up from in.legend
-% structure where they really belong
-F = {'xunit','unit','cptfile','plotPlacement'};
-for f = F(ismember(F,fieldnames(in)))
 
-    a.(f{1}) = in.(f{1});
-end
-
-% Also needed
-if isfield(in,'extra_legend') && isstruct(in.extra_legend)
-    if ~isfield(in.extra_legend,'position')
-        [w,wu]=separate_integer_and_unit(in.legend.width); %thickness of legend bar
-        [x,xu]=separate_integer_and_unit(in.legend.xpos);
-        [y,yu]=separate_integer_and_unit(in.legend.ypos);
-        [l,~]=separate_integer_and_unit(in.legend.length);
-        if ~isequal(wu,xu,yu)
-            warning(['atmlab:' mfilename],...
-                'miss-matching units will cause strange default placements of extra_legend');
-        end
-        if strcmp(in.legend.orientation,'v')
-            vec = [x, y-0.5*l-2*w, w, w];
-            lsize = sprintf('%g%s/%g%s/%g%s/%g%s',...
-                vec(1),xu,vec(2),wu,vec(3),wu,vec(3),wu);
-        elseif strcmp(in.legend.orientation,'h')
-            vec = [x+0.5*l+2*w, y, w, w];
-            lsize = sprintf('%g%s/%g%s/%g%s/%g%s',...
-                vec(1),wu,vec(2),yu,vec(3),wu,vec(3),wu);
-        end
-    else
-        lsize = in.extra_legend.position;
+if isstruct(a)
+    
+    % get what is in the in-structure, i.e one level up from in.legend
+    % structure where they really belong
+    F = {'xunit','unit','cptfile','plotPlacement'};
+    for f = F(ismember(F,fieldnames(in)))
+        
+        a.(f{1}) = in.(f{1});
     end
-    if isfield(in.extra_legend,'fontsize')
-        fz = in.extra_legend.fontsize;
-    else fz = in.fontsize_annot_primary;
-    end
-    b = sprintf('gmt psscale -D%s -Xa5 -Ya5 -Li -O -K -C%s --FONT_ANNOT_PRIMARY=%s >> %s.ps',...
-        lsize,in.extra_legend.cptfile,fz,in.filename);
 end
-
 if isfield(in.legend,'tick_annotations')
     assert(in.nlevels == length(in.legend.tick_annotations),...
     ['gmtlab:' mfilename ':input'],'Number of annotations must match number of ticks')
     append_tickannotations(in.cptfile,in.legend.tick_annotations);
 end
+
+% Also needed
+if isfield(in,'extra_legend') && isstruct(in.extra_legend)
+    b = psscale(in.extra_legend,in.filename);
+end
+
 if ~exist('b','var'), b = struct([]);end
 if ~exist('a','var'), a = struct([]);end
 
