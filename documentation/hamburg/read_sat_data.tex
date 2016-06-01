@@ -1,0 +1,128 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\rmdefault}
+\usepackage[T1]{fontenc}
+\usepackage{courier}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{listings}
+\lstset{language=Matlab,basicstyle={\ttfamily}}
+
+
+%\usepackage{geometry}
+%\geometry{
+% a4paper,
+% total={170mm,257mm},
+% left=20mm,
+% top=20mm,
+% }
+
+\title{How to read satellite data with Atmlab?}
+\author{Oleksandr Bobryshev}
+\date{1 June 2016}
+
+\begin{document}
+
+\maketitle
+
+Atmlab is a collection of Matlab functions that can be useful when dealing with the tasks of remote sensing and meteorology in general.
+There is a set of functions that can look for the data for the specific interval of time or specific data and read the data into Matlab from whatever format the data is stored.
+\\
+\\
+\begin{large}\textbf{How to set the reading routine from the scratch? }
+\end{large}
+\\
+\\
+First we need to do preliminary preparation
+\begin{enumerate}
+  \item	Download Atmlab from here:
+
+\begin{lstlisting}
+http://radiativetransfer.org/tools/
+\end{lstlisting}
+
+  \item	Add following lines to the startup.m file of MATLAB
+\begin{lstlisting}
+run( 'ATMLAB/atmlab/atmlab_init' );
+atmlab( 'SITE', 'hamburg' );
+\end{lstlisting}
+\end{enumerate}
+
+\noindent{Now we need to prepare the MATLAB for working with data}
+
+\begin{enumerate}[resume]
+  \item	In MATLAB execute
+\begin{lstlisting}
+Datasets_config; 
+D = datasets;
+\end{lstlisting}
+\end{enumerate}
+
+
+Steps 4-5 are presenting the way to read AMSU-A data. To work with the other data just replace the names ``amsua'' $($step 4$)$ and ``poes\_radiometer'' $($step 5$)$ to the name of your sensor $($see list below or documentation of the functions$)$.
+
+
+\newpage\begin{enumerate}[resume]
+\item Next step is to find the locations of the files that you want to read
+
+\begin{lstlisting}
+[m, paths] = D.amsua.find_granules_for_period (
+[2012 1 1], [2012 1 2], 'noaa18' );
+\end{lstlisting}
+Example output:\\
+m\hspace{1cm}16x6 \hspace{1cm}768\hspace{0.2cm} double\\          
+paths\hspace{0.4cm}1x16\hspace{1cm}5216\hspace{0.2cm}cell\\\\
+m = \\
+\hspace{0.4cm}2011\hspace{0.6cm}12\hspace{0.6cm}31\hspace{0.6cm}22\hspace{0.6cm}37\hspace{0.6cm}-1
+\begin{lstlisting}
+paths{1} =
+`/scratch/uni/u237/data/amsu/noaa18_amsua_2011/12/31/
+253092573.NSS.AMAX.NN.D11365.S2237.E2359.B3408282.GC.gz`
+\end{lstlisting}
+
+\item Now we have paths to the files we can actually read the information from the file
+\end{enumerate}
+\begin{lstlisting}
+C = satreaders.poes_radiometer( paths{1} );
+\end{lstlisting}
+Example output:\\
+C = \\
+\hspace{0.5cm}lon:\hspace{0.2cm} [614x30 double]\\
+\hspace{0.5cm}lat:\hspace{0.25cm} [614x30 double]\\
+\hspace{0.5cm}tb:\hspace{0.35cm} [614x30x15 double]\\
+\\\\
+List of data with which we can work:
+\begin{itemize}
+\itemsep0em
+\item AMSU-A, 
+\item AMSUB, 
+\item AVHRR,
+\item ATMS, 
+\item CALYPSO, 
+\item CLOUD\_CCI, 
+\item CPR, 
+\item DARDAR, 
+\item HIRS, 
+\item GRAS, 
+\item GRUAN, 
+\item ISCCP, 
+\item MHS, 
+\item MIRS, 
+\item MODIS, 
+\item MSPPS, 
+\item PATMOSX, 
+\item SAPHIR, 
+\item SSMT2
+\end{itemize}
+
+If your data is not here, don’t be upset. It is fairly easy to create a reading routine for reading the data you need for your work.
+The main files are located here:
+\begin{lstlisting}
+ATMLAB/datasets
+ATMLAB/site-specific
+\end{lstlisting}
+
+
+
+\end{document}

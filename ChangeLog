@@ -1,3 +1,11 @@
+2016-06-01  Alex Bobryshev <oleksandr.bobryshev@uni-hamburg.de>
+
+        * atmlab-2-3-167
+
+        * documentation/hamburg/read_sat_data.tex: Added a 
+        "coocking recipe" like documentation on how to read satellite data
+        using atmlab.
+
 2016-05-27  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-166
