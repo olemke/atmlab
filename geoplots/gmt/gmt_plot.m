@@ -799,7 +799,7 @@ commands = create_gmt_earth(out);
 
 % finalize
 
-filename=sort_figures(out,commands);
+filename=setup_figure(out,commands);
 
 end
 %%%%%%%%%%%%%%%%%%%%
@@ -1637,7 +1637,7 @@ end
 % Other subfunctions
 %
 
-function filename = sort_figures(in,command)
+function filename = setup_figure(in,command)
 %% SORT FIGURES
 
 

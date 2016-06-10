@@ -1,3 +1,14 @@
+2016-06-10  Salomon Eliasson  <seliasson@ManUtd>
+
+        * atmlab-2-3-168
+
+	* geoplots/gmt/test_gmt.m: Now checks if pdfinfo exists. if not,
+	don't use combine_pdfs, but rather display each map separately
+
+	* handy/combine_pdfs.m: fixed typo
+
+	* geoplots/gmt/gmt_plot.m: changed name of a subfunction function
+
 2016-06-01  Alex Bobryshev <oleksandr.bobryshev@uni-hamburg.de>
 
         * atmlab-2-3-167

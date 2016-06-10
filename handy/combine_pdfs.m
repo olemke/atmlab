@@ -213,7 +213,7 @@ end
 if options.pdfcrop && options.pages>1
     warning(['atmlab:',mfilename,':badInput'],...
         ['Cannot use pdfcrop if the output pdf has more than 1 page. '...
-        'Setting psdcrop to false\n'])
+        'Setting pdfcrop to false\n'])
     options.pdfcrop=false;
 end
 
