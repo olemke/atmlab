@@ -1,3 +1,14 @@
+2016-06-28  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-169
+
+	* geoplots/gmt/test_gmt.m: improved one of the tests.
+
+	* geoplots/gmt/gmt_plot.m: Implemented a more clever automatic
+	placement of the legends and map_title_offset
+
+	* geographical/resample_geodata.m: edited header to reflect reality
+
 2016-06-10  Salomon Eliasson  <seliasson@ManUtd>
 
         * atmlab-2-3-168

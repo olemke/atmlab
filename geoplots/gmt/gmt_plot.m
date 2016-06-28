@@ -369,6 +369,12 @@ function filename = gmt_plot(in,field)
 %
 % LEGENDS:
 %
+% in.extra_legend      in:     %f
+%                      ex:     Set to false if you don't want an extra_legend. 
+%                              if in.extra_legend is a structure, it's equivalent
+%                              to in.extra_legend = true
+%                      def:    true
+%                     ------------
 % in.extra_legend     structure containing:
 %       name           in:     %s
 %                      ex:     An associated string name. E.g., 'NaN','masked', etc...
@@ -852,15 +858,16 @@ clear default
 default.keep_files               = false;
 
 % how far the title is removed from the top of the map (depends on 'N' or 'n')
-default.map_title_offset         = [num2str(-0.4+0.6*ismember('N',in.psbasemap.axes)) 'c'];
-
-
+[fl,u2] = separate_integer_and_unit(in.fontsize_annot_primary);
+default.map_title_offset         = sprintf('%.0f%s',0.1*fl + ... %half width of annotation
+                                           ismember('N',in.psbasemap.axes)*fl,u2); 
+                                       
 default.force_nlevels            = false;
 default.makeScriptAndStop        = false;
 default.nodata                   = false;
 default.outdir                   = gmtlab('OUTDIR');
 default.plotPlacement            = '-Xa5 -Ya5';
-default.proj.projection          = 'Q';
+default.proj.projection          = 'N';
 default.proj.map_width           = 20;
 default.proj_length_unit         = 'cm';
 default.savelegend               = false;
@@ -977,7 +984,10 @@ if ~in.nodata
     if any(isnan(in.(field)(:)))
         default.extra_legend = struct('name','NaN','type','nan'); % include NaNs in the legend
     else
-        if isfield(in,'extra_legend') && strcmpi(in.extra_legend.name,'NaN') && in.gridded
+        if isfield(in,'extra_legend') && ...
+                isstruct(in.extra_legend) && ...
+                strcmpi(in.extra_legend.name,'NaN') && ...
+                in.gridded
             logtext(2,'Asked to make a NaN-legend although none are present in the data\n')
         end
         default.extra_legend = false;
@@ -1136,8 +1146,8 @@ for F = Fields
     end
 end
 
-logtext(atmlab('VERBOSITY'),'Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
-logtext(atmlab('VERBOSITY'),'Will not be used as they are not "data" or in the list of options\n');
+fprintf('Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
+fprintf('Will not be used as they are not "data" or in the list of options\n');
 
 end
 
@@ -1497,6 +1507,8 @@ if strcmp(in.legend.orientation,'h')
             projOff = 5;
         case 'N' % robinsson
             projOff = 2.5;
+        case 'R' %winkel-trippel
+            projOff = 2;
         otherwise
             projOff = 1;
     end
@@ -1540,27 +1552,35 @@ if ischar(in.proj)
 else
     mwstr = in.proj.map_width;
 end
-[mw,mwu] = separate_integer_and_unit(mwstr);
+[mw,u] = separate_integer_and_unit(mwstr);
 
 default.lineThick =.2; %thickness of legend bar
 
 in.legend         = optargs_struct(in.legend,default); %need orientation now
-default.width     = sprintf('%.2f%s',in.legend.lineThick*mw/5,mwu);
+[fl,u2] = separate_integer_and_unit(in.fontsize_annot_primary);
+default.width     = sprintf('%.2f%s',2*fl,u2);
+
 in.legend         = optargs_struct(in.legend,default); %need orientation now
-lw = separate_integer_and_unit(in.legend.width);
+
 switch in.legend.orientation
     case 'v'
         default.justify = 'CR'; %center right
-        default.length  = sprintf('%.2f%s',f*mw,mwu);
-        default.xoffset = sprintf('-%.2f%s',lw*2,mwu);
+        default.length  = sprintf('%.2f%s',f*mw,u);
+        if ismember('E',in.psbasemap.axes)
+            default.xoffset = sprintf('-%.2f%s',4*fl,u2);
+        elseif ismember('e',in.psbasemap.axes)
+            default.xoffset = sprintf('-%.2f%s',3*fl,u2);
+        end
         default.yoffset = '0';
-        
     case 'h'
         default.justify = 'BC'; % bottom centre
-        default.length  = sprintf('%.2f%s',mw,mwu);
+        default.length  = sprintf('%.2f%s',mw,u);
         default.xoffset = '0';
-        default.yoffset = sprintf('-%.2f%s',lw*2,mwu);
-        
+        if ismember('S',in.psbasemap.axes)
+            default.yoffset = sprintf('-%.2f%s',4*fl,u2);
+        elseif ismember('s',in.psbasemap.axes)
+            default.yoffset = sprintf('-%.2f%s',3*fl,u2);
+        end
     otherwise
         error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)
 end

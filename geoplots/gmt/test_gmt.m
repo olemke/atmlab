@@ -573,7 +573,9 @@ for T = sort(in.test)
 
             test = regionSetUp_for_GMT;
             test.nodata=true;
-            test.psbasemap.axes='nWeS';
+            test.psbasemap.axes='nwes';
+            test.proj.projection = 'Q';
+            
             test.filename = sprintf('Test%g',T);
             
             testThis = catstruct(rmfield(in,'test'),test);

@@ -17,12 +17,12 @@ function out = resample_geodata(in,field,newgrid)
 %
 %   field       %s          {'field1',etc}; The field/s  you want to regrid
 %
-%   newgrid     %f, or [%f %f], {[newlat],[newlon]} (e.g. newlat = -90:5:90)
+%   newgrid     %f, or [%f %f], {[newlon],[newlat]} (e.g. newlat = -90:5:90)
 %
 %              a) Either make a sqaure grid using a scalar %f. e.g 1deg ->
 %                 2deg (Assumes centered data!)
 %
-%              b) or a 2 element vector [%f %f] means [latstep, lonstep]
+%              b) or a 2 element vector [%f %f] means [lonstep, latstep]
 %                 e.g. 1*1 -> 1.25*2.75 (Assumes centered data!)
 %
 %              c) or {[newlat],[newlon]} if you want to match to a predefined
