@@ -3,7 +3,9 @@ function [flags,out] = standardize_geodata(in,options)
 %
 %                  For gridded data.
 %
-%  PURPOSE  Make sure the lat lon [data] are sorted in a way of your choosing
+%  PURPOSE  Make sure the lat lon [data] are sorted in a way of your choosing.
+%  the default behaviour is to do nothing, but just report how the data is
+%  arrange. If you want to change the arrangement, includen your choice in 'opt'
 %
 %
 %  IN       in.lat      vector

@@ -1,3 +1,13 @@
+2016-07-14  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-171
+
+	* geoplots/gmt/gmt_plot.m: if in.datarange is a scalar, the value
+	represents the minimum plot value and in that case the maximum is
+	taken from the 95th-percentile.
+
+	* geographical/standardize_geodata.m: updated header
+
 2016-07-14  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-170

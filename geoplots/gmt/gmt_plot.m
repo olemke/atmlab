@@ -98,7 +98,9 @@ function filename = gmt_plot(in,field)
 % in.contourline      See below how to draw contour lines on the map
 %                     ------------
 % in.datarange         in:     [%f, %f]
-%                      ex:     Min and max range of data values to display
+%                      ex:     Min and max range of data values to display. If
+%                              you only provide a scalar, it is treated as the minimum
+%                              value in the range
 %                     ------------
 % in.display           in:     %f
 %                      ex:     If false, file created but not displayed
@@ -998,6 +1000,8 @@ in = optargs_struct(in,default);
 clear default
 in.datarange = double(in.datarange);
 
+% if you have only given the min value
+if isscalar(in.datarange), tmp=getdatarange(in,field);in.datarange(2) = tmp(2);end
 
 assert(diff(in.datarange)>0,'atmlab:badInput','min=max in the datarange. Aborting...')
 
