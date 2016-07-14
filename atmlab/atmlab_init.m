@@ -52,6 +52,7 @@ addpath( fullfile( toppath, 'h2o', 'thermodynamics' ) );
 addpath( fullfile( toppath, 'gridcreation', 'uniformsphere' ) ); 
 addpath( fullfile( toppath, 'gridcreation', 'annealing' ) ); 
 addpath( fullfile( toppath, 'gridcreation' ) ); 
+addpath( fullfile( toppath, 'graphs', 'cmaps' ) );
 addpath( fullfile( toppath, 'graphs' ) );
 addpath( fullfile( toppath, 'gformat' ) );
 addpath( fullfile( toppath, 'geoplots', 'gmt') );

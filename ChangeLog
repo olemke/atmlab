@@ -1,3 +1,15 @@
+2016-07-14  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-170
+
+	* graphs/cmaps/typhon_cmaps.m:
+
+	Function to read colormaps defined in typhon.
+
+	* graphs/cmaps/*.txt: Colormap data files.
+
+	Colormaps are defined in seperate txt files.
+
 2016-06-28  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-169
