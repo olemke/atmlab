@@ -6,18 +6,23 @@
 % Input x can be a vector, matrix, or higher order tensor, the
 % output is always a scalar
 %
-% FORMAT y = rms(x)
+% FORMAT y = rms(x, dim)
 %
 % OUT    y	RMS value
 % IN     x      Input vector or matrix
+%        dim    Optional argument to compute RMS along one dimension
 %
 % 2008-09-02 Created by Stefan Buehler
- 
-function y = rms(x)
+% 2016-07-21 Added dim argument, Oliver Lemke
 
-xs = x(:) .* x(:);
+function y = rms(x, dim)
 
-s  = sum(xs) / length(x(:));
+if nargin == 1
+    xs = x(:) .* x(:);
 
-y  = sqrt(s);
+    s  = sum(xs) / length(x(:));
 
+    y  = sqrt(s);
+else
+    y = sqrt(mean(x .* conj(x), dim));
+end

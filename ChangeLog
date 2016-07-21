@@ -1,3 +1,11 @@
+2016-07-21  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-172
+
+	* math/rms.m:
+
+	Add optional dim argument to calculate RMS only along one dimension.
+
 2016-07-14  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-171
