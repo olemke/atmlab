@@ -4,7 +4,9 @@
 % the number of elements, and takes the root.
 %
 % Input x can be a vector, matrix, or higher order tensor, the
-% output is always a scalar
+% output is a scalar if the optional dim argument is not provided.
+%
+% If dim is given, the RMS is only calculated along that dimension.
 %
 % FORMAT y = rms(x, dim)
 %

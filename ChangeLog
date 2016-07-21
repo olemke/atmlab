@@ -1,5 +1,11 @@
 2016-07-21  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-3-173
+
+	* math/rms.m: Adapt docs.
+
+2016-07-21  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-3-172
 
 	* math/rms.m:
