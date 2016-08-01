@@ -1488,12 +1488,15 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     end
                     % first time, allocate data.  width depends on fields
                     
-                    found = false; nonGeoDim = 1;
-                    while ~found
-                        if numel(data.lat)==size(data.lat,nonGeoDim), found = true; end
-                    end
-                    nonGeoDim = nonGeoDim + 1;
+%                    found = false; nonGeoDim = 1;
+                    nonGeoDim = find(size(grandata.lat)>1,1, 'last') + 1;
+%                    while ~found
+%                        if numel(data.lat)==size(data.lat,nonGeoDim), found = true; end
+%                        nonGeoDim = nonGeoDim + 1;
+%                    end
 
+                    % for all fields, sum first dimension AFTER lat/lon
+                    % dimensions
                     if ~isfield(data, 'data')
                         data.data = zeros(1e6, ...
                             sum(cellfun(@(f)size(grandata.(f), nonGeoDim), fields)), ...
@@ -1510,23 +1513,28 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                     grandata.lon = grandata.lon(mask);
                     for k = 1:length(fields)
                         field = fields{k};
-                        if ndims(grandata.(field)) <= nonGeoDim-1
-                            grandata.(field) = grandata.(field)(mask);                    
+%                        if ndims(grandata.(field)) <= nonGeoDim-1
+                        if numel(grandata.(field)) == numel(mask)
+                            grandata.(field) = grandata.(field)(mask);
                         else
                             % process multi-dimensional fields, i.e. tb [2457x90x5]
-                            if ndims(grandata.(field)) > nonGeoDim
-                                error(['atmlab:' mfilename ':NotImplemented'], ...
-                                    'I cannot handle %d dimensions for %s!', ...
-                                    ndims(grandata.(field)), field);
-                            end
-                            if nonGeoDim == 3
+%                            if ndims(grandata.(field)) > nonGeoDim
+%                                error(['atmlab:' mfilename ':NotImplemented'], ...
+%                                    'I cannot handle %d dimensions for %s!', ...
+%                                    ndims(grandata.(field)), field);
+%                            end
+                            if ndims(grandata.(field)) == 3
                                 grandata.(field) = arrayfun(@(i)(par(grandata.(field)(:, :, i), ...
-                                    mask)), 1:size(grandata.(field), nonGeoDim), ...
+                                    mask)), 1:size(grandata.(field), 3), ...
                                     'UniformOutput', false);
-                            elseif nonGeoDim == 2
-                                grandata.(field) = arrayfun(@(i)(par(grandata.(field)(:, i), ...
-                                    mask)), 1:size(grandata.(field), nonGeoDim), ...
-                                    'UniformOutput', false);
+%                            elseif nonGeoDim == 2
+%                                grandata.(field) = arrayfun(@(i)(par(grandata.(field)(:, i), ...
+%                                    mask)), 1:size(grandata.(field), nonGeoDim), ...
+%                                    'UniformOutput', false);
+                            else
+                                error(['atmlab:' mfilename ':NotImplemented'], ...
+                                    'Sorry, can''t handle %d dimensions for %s!', ...
+                                    ndims(grandata.(field)), field);
                             end
                             grandata.(field) = horzcat(grandata.(field){:});
                         end
@@ -1571,7 +1579,7 @@ classdef SatDataset < handle % subclass from handle to pass-by-reference
                 % like the cells containing diffent dimensions
                 stats = binned_statistics(binned, {@(x)(size(x,1)), @(x)(sum(x,1))},...
                     limit_binnedstats,...
-                    {0,zeros(1,size(data.data,nonGeoDim))},... %replace
+                    {0,zeros(1,size(data.data,2))},... %replace
                     struct('dataClass',class(binned{1,1})));
                 logtext(atmlab('OUT'), 'Calculating statistics\n');
                 stats.statistic1 = cell2mat(stats.statistic1);

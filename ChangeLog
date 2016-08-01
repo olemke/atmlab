@@ -1,3 +1,13 @@
+2016-08-01  Gerrit Holl  <g.holl@reading.ac.uk>
+
+	* atmlab-2-3-174
+
+	* datasets/SatDataset.m(level3):
+
+	- Make this work with filters for multidimensional data such as BTs.
+	  I don't have time for thorough testing right now, this might break
+	  stuff.  Please scream at me if it does.
+
 2016-07-21  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-173
