@@ -365,6 +365,14 @@ function filename = gmt_plot(in,field)
 %                      Note:    Recommend set in.reference = 0 for
 %                               difference plots, but any reference
 %                               will work.
+%                     ------------
+%       reverse        in:    %f
+%                      ex:    Reverse the colortable.
+%
+%                      Note: Currently working with all built-in colortables
+%                            as well as the typhon colortables. 'mypolar' is
+%                            not affected.
+%                     ------------
 %
 %
 % ----------------------------------------------------------------------------

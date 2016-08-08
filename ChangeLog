@@ -1,5 +1,17 @@
 2016-08-08  Lukas Kluft  <lukas.kluft@gmail.com>
 
+	* atmlab-2-3-176
+
+	* geoplots/gmt/gmt_plot.m:
+
+	Updated documentation about reversing color palettes.
+
+	* geoplots/gmt/makecpt.m:
+
+	Added option to reverse the sense of color progression.
+
+2016-08-08  Lukas Kluft  <lukas.kluft@gmail.com>
+
 	* atmlab-2-3-175
 
 	* atmlab/atmlab_init.m:
