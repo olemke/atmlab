@@ -55,6 +55,7 @@ addpath( fullfile( toppath, 'gridcreation' ) );
 addpath( fullfile( toppath, 'graphs', 'cmaps' ) );
 addpath( fullfile( toppath, 'graphs' ) );
 addpath( fullfile( toppath, 'gformat' ) );
+addpath( fullfile( toppath, 'geoplots', 'gmt', 'cptfiles') );
 addpath( fullfile( toppath, 'geoplots', 'gmt') );
 addpath( fullfile( toppath, 'geoplots' ) );
 addpath( fullfile( toppath, 'geophysics' ) );

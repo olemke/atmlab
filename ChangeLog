@@ -1,3 +1,19 @@
+2016-08-08  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-175
+
+	* atmlab/atmlab_init.m:
+
+	Added geopltos/gmt/cptfiles to atmlab path.
+
+	* geoplots/gmt/cptfiles/typhon_ctables.m:
+
+	Function to return paths to color palette files.
+
+	* geoplots/gmt/cptfiles/*.cpt: Color palette data files.
+
+	Color palettes are defined in seperate cpt files.
+
 2016-08-01  Gerrit Holl  <g.holl@reading.ac.uk>
 
 	* atmlab-2-3-174
