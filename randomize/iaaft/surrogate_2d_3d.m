@@ -36,7 +36,7 @@
 % Suite 330, Boston, MA  02111-1307, USA.
 
 % Load data.
-%[fourier_coeff_2d, sorted_values_prof, x, y, template, mean_pdf_profile, no_values_x, no_values_y] = load_2d_data_vertical(1);
+[fourier_coeff_2d, sorted_values_prof, x, y, template, mean_pdf_profile, no_values_x, no_values_y] = load_2d_data_vertical(1);
 
 % Enlarge the vector with the sorted values to the number of points of
 % the 3D field.
@@ -67,5 +67,5 @@ template  = remove_average_profile(template, -mean_pdf_profile);    % Add the me
 surrogate = remove_average_profile(surrogate, -mean_pdf_profile);   % Add the mean profile to the surrogate
 
 % plot results
-%plot_2d_surrogate(x, y, template,  'template')
-%plot_3d_surrogate(x, x, y, surrogate, 'surrogate')
+plot_2d_surrogate(x, y, template,  'template')
+plot_3d_surrogate(x, x, y, surrogate, 'surrogate')

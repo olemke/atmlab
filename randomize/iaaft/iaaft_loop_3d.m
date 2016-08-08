@@ -35,8 +35,8 @@ surrogate=reshape(surrogate,no_values_y,no_values_x,no_values_z);
 
 % Main intative loop
 counter = 0;
-at=tic;
-while ( (error_amplitude > errorThresshold | error_spec > errorThresshold) & (toc(at) < timeThresshold) & (speed > speedThresshold) ) %0.0001 300
+tic;
+while ( (error_amplitude > errorThresshold | error_spec > errorThresshold) & (toc < timeThresshold) & (speed > speedThresshold) ) %0.0001 300
     % addapt the power spectrum
     old_surrogate = surrogate;    
     x=ifftn(double(surrogate));
@@ -59,11 +59,11 @@ while ( (error_amplitude > errorThresshold | error_spec > errorThresshold) & (to
     error_amplitude = difference/standard_deviation;
     counter = counter + 1;
 
-    TotalError = error_spec + error_amplitude;
+    TotalError = error_spec + error_amplitude
     speed = (oldTotalError - TotalError) / TotalError;
     oldTotalError = TotalError;
 end
 
-error_spec;
-error_amplitude;
+error_spec
+error_amplitude
 surrogate = real(surrogate);

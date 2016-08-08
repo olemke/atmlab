@@ -41,26 +41,13 @@ standard_deviation=std(sorted_values);
 
 % The method starts with a randomized uncorrelated time series y with the pdf of
 % sorted_values
-
-if 0
-   load 2dtest.mat 
-   x1=setdiff(1:no_values_y^2,xi); 
-   x0=find(sorted_values<=0.2147-1e-3);
-   [dummy,index]=sort(rand(size(x0)));
-   surrogate(xi)=0.2147;
-   surrogate(x1(index)) = sorted_values(x0);
-end
-
-if 1
-   [dummy,index]=sort(rand(size(sorted_values)));
-   surrogate(index) = sorted_values;
-end
-
+[dummy,index]=sort(rand(size(sorted_values)));
+surrogate(index) = sorted_values;
 surrogate=reshape(surrogate,no_values_y,no_values_x);
-
+% imagesc(surrogate)
+% colorbar
 
 % Main intative loop
-
 tic;
 while ( (error_amplitude > errorThresshold | error_spec > errorThresshold) & (toc < timeThresshold) & (speed > speedThresshold) ) %0.0001 300
     % addapt the power spectrum
@@ -71,35 +58,24 @@ while ( (error_amplitude > errorThresshold | error_spec > errorThresshold) & (to
     surrogate = fft2(x);
     difference=mean(mean(abs(real(surrogate)-old_surrogate)));
     error_spec = difference/standard_deviation
+    
+%    imagesc(real(surrogate))
+%    colorbar
+    
     % addept the amplitude distribution
     old_surrogate = real(surrogate);
     surrogate=reshape(surrogate,1,no_values_y*no_values_x);
-    
-    if 1 
-       [dummy,index]=sort(real(surrogate));
-       surrogate(index)=sorted_values;
-    end     
-
-    if 0
-       [dummy,index]=sort(real(surrogate(x1)));
-       surrogate(x1(index))=sorted_values(x0);
-       surrogate(xi)=0.2147;
-    end
-
+    [dummy,index]=sort(real(surrogate));
+    surrogate(index)=sorted_values;
     surrogate=reshape(surrogate,no_values_y,no_values_x);
-    
     difference=mean(mean(abs(real(surrogate)-old_surrogate)));
     error_amplitude = difference/standard_deviation
     
-
+%   imagesc(real(surrogate)) 
+%   colorbar
     totalError = error_spec + error_amplitude
     speed = (oldTotalError - totalError) / totalError;
     oldTotalError = totalError;
 end
 
 surrogate = real(surrogate);
-figure  
-imagesc(real(surrogate)) 
-
-%keyboard
-

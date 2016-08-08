@@ -1,3 +1,11 @@
+2016-08-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-177
+
+	* randomize/iaaft/: Re-downloaded all data and files of IAAFT, to
+	make sure that we have the latest version. Just a few m-files seem
+	to have been changed.
+
 2016-08-08  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-176

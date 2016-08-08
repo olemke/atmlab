@@ -3,22 +3,14 @@ function [fourier_coeff_2d, sorted_values_prof, x, y, template, mean_pdf_profile
 % Load a 2D field.
 switch number
     case 1
-        %load data_altocumulus.mat
-        %template = double(dbz);
-        load('/home/bengt/CIWSIR/Dataset_gen/CloudSAT_data/test_2d23d.mat')
-	template=IWC;
-        %keyboard
-        %template=template(8:end,61:100);       
-        %imagesc(template)
-        %size(template)
-         
-
+        load data_altocumulus.mat
+        template = double(dbz);
         % This radar measurement of an Altocumulus field is mirrored to get
         % a field without jumps at the edges. The field was reduced in size
         % four times without averaging, do not use this field for scientif
         % purposes.
-        %template = [template  flipdim(template,2)];  
-        %template = flipdim(template, 1);
+        template = [template  flipdim(template,2)];  
+        template = flipdim(template, 1);
         
     otherwise
         % A cloud field retrieved with Optimal Estimation by Ulrich

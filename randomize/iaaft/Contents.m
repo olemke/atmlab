@@ -1,7 +1,9 @@
-%This directory or contains programs to make surrogate cloud fields 
-%using the Iterative Amplitude Adapted Fourier Transform (IAAFT) method 
-%or the Stochastic Iterative Amplitude Adapted Fourier Transform (SIAAFT) 
-%method.
+% This directory or contains programs to make surrogate cloud fields 
+% using the Iterative Amplitude Adapted Fourier Transform (IAAFT) method 
+% or the Stochastic Iterative Amplitude Adapted Fourier Transform (SIAAFT) 
+% method.
+%
+% All files and data re-downloaded Aug 8, 2016 (PE).
 %
 % This Matlab version was written by Victor Venema,
 % Victor.Venema@uni-bonn.de, http:\\www.meteo.uni-bonn.de\victor, or

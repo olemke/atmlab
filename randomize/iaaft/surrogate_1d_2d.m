@@ -34,17 +34,7 @@
 % or write to the Free Software Foundation, Inc., 59 Temple Place - 
 % Suite 330, Boston, MA  02111-1307, USA.
 
-function [surrogate]=surrogate_1d_2d(x,y)  
-%[fourier_coeff, sorted_values, x, template, meanValue, no_values] = load_1d_data(1);
-
-
-%load('/home/bengt/CIWSIR/Dataset_gen/CloudSAT_data/cloud_eof.mat')
-template=y;
-no_values = length(y);
-meanValue = mean(y);
-sorted_values = sort(y - meanValue);
-fourier_coeff = abs(ifft(y - meanValue))';
-%plot(x,y)
+[fourier_coeff, sorted_values, x, template, meanValue, no_values] = load_1d_data(1);
 
 % Enlarge the vector with the sorted values to the number of points of
 % the 2D field.
@@ -72,7 +62,5 @@ coeff_2d = sqrt(coeff_2d);
 surrogate = surrogate + meanValue;
 
 % Plot results
-if 0
 plot_1d_surrogate(x, template,  'template')
 plot_2d_surrogate(x, x, surrogate, 'surrogate')
-end
