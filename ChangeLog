@@ -1,3 +1,15 @@
+2016-08-09  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-178
+
+	* geoplots/gmt/gmt_inputs.m: Added in.ctable.reverse.
+
+	Included test for input field in.ctable.reverse.
+
+	* geoplots/gmt/gmt_plot.m:
+
+	Fixed type and documentation of in.ctable.reverse.
+
 2016-08-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-177
