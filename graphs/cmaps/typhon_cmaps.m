@@ -23,10 +23,11 @@
 %                   temperature
 %                   velocity
 %                   vorticity
+% OPT   N       Number of color levels.
 
 % 2016-07-14   Lukas Kluft: Created.
 
-function cmap = typhon_cmaps(name)
+function cmap = typhon_cmaps(name, N)
     % If the colormap name ends with '_r' revert the colormap.
     revert = any(regexp(name,'_r$'));
 
@@ -46,4 +47,7 @@ function cmap = typhon_cmaps(name)
     if revert
         cmap = flipud(cmap);
     end
+
+    if nargin > 1
+        cmap = cmap(ceil(linspace(1, length(cmap), N)), :);
 end

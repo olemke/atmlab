@@ -1,3 +1,10 @@
+2016-08-12  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* graphs/cmaps/typhon_cmaps.m: Added support for discrete colormaps.
+
+	It is now possible to pass the optional argument N to specify an amount of
+	discrete color levels.
+
 2016-08-09  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-178
