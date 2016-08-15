@@ -1,3 +1,10 @@
+2016-08-15 Bengt Rydberg <bengt.rydberg@molflow.com>
+       
+        * atmlab-2-3-179
+
+        * site-specific/chalmers-gem/find_ecmwf_files.m: added option
+        for finding available ERAInterim files on chalmers-gem filesystem 
+
 2016-08-12  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* graphs/cmaps/typhon_cmaps.m: Added support for discrete colormaps.
