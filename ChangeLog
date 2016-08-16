@@ -1,9 +1,16 @@
+2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+        * atmlab-2-3-180
+
+	* site-specific/chalmers-gem/erainterim2atmdata.m: Can now read
+	and merge multiple files, but option noty yet tested.
+
 2016-08-15 Bengt Rydberg <bengt.rydberg@molflow.com>
-       
+
         * atmlab-2-3-179
 
         * site-specific/chalmers-gem/find_ecmwf_files.m: added option
-        for finding available ERAInterim files on chalmers-gem filesystem 
+        for finding available ERAInterim files on chalmers-gem filesystem.
 
 2016-08-12  Lukas Kluft  <lukas.kluft@gmail.com>
 

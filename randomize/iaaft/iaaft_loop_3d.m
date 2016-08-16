@@ -59,11 +59,11 @@ while ( (error_amplitude > errorThresshold | error_spec > errorThresshold) & (to
     error_amplitude = difference/standard_deviation;
     counter = counter + 1;
 
-    TotalError = error_spec + error_amplitude
+    TotalError = error_spec + error_amplitude;
     speed = (oldTotalError - TotalError) / TotalError;
     oldTotalError = TotalError;
 end
 
-error_spec
-error_amplitude
+%error_spec
+%error_amplitude
 surrogate = real(surrogate);
