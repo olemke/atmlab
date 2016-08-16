@@ -56,7 +56,7 @@ function [G] = erainterim2atmdata(infile,parameter,lat_limits,lon_limits,mjd_lim
 %--------------------------------------------------------------------------------
 % Special solution for reading/merging of multiple files
 %
-if iscellstr(infiles)
+if iscellstr(infile)
   %
   if length(infile) == 1
     G = erainterim2atmdata( infile{1}, parameter, lat_limits, lon_limits, ...

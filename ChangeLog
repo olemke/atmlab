@@ -1,5 +1,12 @@
 2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+        * atmlab-2-3-182
+
+	* site-specific/chalmers-gem/erainterim2atmdata.m: There was a
+	typo in new code.
+
+2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
         * atmlab-2-3-181
 
 	* Missed comments for last commit:
