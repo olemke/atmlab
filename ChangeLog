@@ -1,5 +1,14 @@
 2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+        * atmlab-2-3-181
+
+	* Missed comments for last commit:
+
+	* randomize/iaaft/surrogate_2d_3d.m:
+	* randomize/iaaft/iaaft_loop_3d.m: Some unnecessary lines commnted out.
+
+2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
         * atmlab-2-3-180
 
 	* site-specific/chalmers-gem/erainterim2atmdata.m: Can now read
