@@ -1,9 +1,14 @@
 % ERAINTERIM2SURFDATA    Loads ERA-Interim data into surfdata structure
 %
+%   The function can read and merge multiple files. This option requires
+%   that all latitude and longitude grids are equal. No advanced
+%   checking is made, so use the option carefully.
+%
 % FORMAT   G = erainterim2surfdata( infile, parameter, lat_limits, lon_limits, mjd_limits )
 % 
 % OUT      G          atmdata structure  
-% IN       infile     Name of the file to read
+% IN       infile     Name of the file(s) to read. For single file reading
+%                     this can be string. Otherwise an array of strings.
 %          parameter  parameter to read in, options are
 %                     'surface pressure', 'sea surface temperature',
 %                     'skin temperature', '2 m temperature', 
@@ -28,6 +33,56 @@
 % 2015-08-20  Adopted to handle lon_limits following [-180,180]
 
 function [G] = erainterim2surfdata(infile,parameter,lat_limits,lon_limits,mjd_limits)
+
+
+%--------------------------------------------------------------------------------
+% Special solution for reading/merging of multiple files
+
+if iscellstr(infile)
+  %
+  if length(infile) == 1
+    G = erainterim2surfdata( infile{1}, parameter, lat_limits, lon_limits, ...
+                            mjd_limits);
+    return;  
+  end
+  %
+  for i = 1 : length(infile)
+    H{i} = erainterim2surfdata( infile{i}, parameter, lat_limits, lon_limits, ...
+                               mjd_limits);
+    mjd1(i) = H{i}.GRID3(1); 
+    nmjd(i) = length( H{i}.GRID3 ); 
+    %
+    if i == 1
+      s0 = size( H{i}.DATA );
+    else
+      s  = size( H{i}.DATA );      
+      if any( s ~= s0 )
+        error( ['Number of pressures, latitudes or longitudes differs between ' ...
+                'files.' ] );
+      end
+    end
+  end
+  %
+  G = H{1};
+  G.DATA  = zeros( [ s0(1:2) sum(nmjd) ] );
+  G.GRID3 = zeros( sum(nmjd), 1 );
+  %
+  [~,o] = sort( mjd1 );
+  n = 0;
+  %
+  for i = 1 : length(infile)
+    j   = o(i);
+    ind = n+1 : n+nmjd(j);
+    n   = n+nmjd(j);
+    %
+    G.DATA(:,:,ind) = H{j}.DATA;
+    G.GRID3(ind)    = H{j}.GRID3; 
+  end
+  %
+  return  
+end
+%--------------------------------------------------------------------------------
+
 
 if atmlab('STRICT_ASSERT')
   %Check input paramters

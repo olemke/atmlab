@@ -55,7 +55,7 @@ function [G] = erainterim2atmdata(infile,parameter,lat_limits,lon_limits,mjd_lim
 
 %--------------------------------------------------------------------------------
 % Special solution for reading/merging of multiple files
-%
+
 if iscellstr(infile)
   %
   if length(infile) == 1
@@ -85,7 +85,7 @@ if iscellstr(infile)
   G.DATA  = zeros( [ s0(1:3) sum(nmjd) ] );
   G.GRID4 = zeros( sum(nmjd), 1 );
   %
-  o = sort( mjd1 );
+  [~,o] = sort( mjd1 );
   n = 0;
   %
   for i = 1 : length(infile)
@@ -140,7 +140,7 @@ if atmlab('STRICT_ASSERT')
 end
 
 
-% Check if lon_limits are inside [0,360] and cropping can be dione already
+% Check if lon_limits are inside [0,360] and cropping can be done already
 % in reading
 if lon_limits(1) < 0
   do_loncrop  = true;

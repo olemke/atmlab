@@ -1,5 +1,15 @@
 2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+        * atmlab-2-3-183
+
+	* site-specific/chalmers-gem/erainterim2surfdata.m: Now handling
+	multiple files as the atmdata version.
+
+	* site-specific/chalmers-gem/erainterim2atmdata.m: A small fix.
+	Now really tested.
+
+2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
         * atmlab-2-3-182
 
 	* site-specific/chalmers-gem/erainterim2atmdata.m: There was a
