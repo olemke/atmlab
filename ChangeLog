@@ -1,3 +1,15 @@
+2016-08-17  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-184
+
+	* geoplots/gmt/cptfiles/difference.cpt, graphs/cmaps/difference.txt:
+
+	Added a variant of a blue-to-red colormap.
+
+	* geoplots/gmt/cptfiles/typhon_ctables.m, graphs/cmaps/typhon_cmaps.m:
+
+	Updated new colormap in documentation.
+
 2016-08-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
         * atmlab-2-3-183

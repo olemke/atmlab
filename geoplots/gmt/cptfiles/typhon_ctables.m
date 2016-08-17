@@ -20,6 +20,7 @@
 % IN    name       Colormap name.
 %                  Valid names are:
 %                      density
+%                      difference
 %                      phase
 %                      speed
 %                      temperature
