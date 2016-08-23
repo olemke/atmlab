@@ -1,3 +1,11 @@
+2016-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-185
+
+	* site-specific/chalmers-gem/erainterim2atmdata.m:
+	* site-specific/chalmers-gem/erainterim2surfdata.m: Added asserts
+	to make sure that input longitudes cover 0 to 360.
+
 2016-08-17  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-184
