@@ -9,11 +9,20 @@
 
 function hname = hostname
 
+persistent hp;
 
-[st,hname] = system( 'hostname' );
+if isempty(hp)
 
-%- Remove any newline character
-%
-if hname(end) == sprintf('\n')
-  hname = hname(1:end-1);
+  [st,hname] = system( 'hostname' );
+
+  %- Remove any newline character
+  %
+  if hname(end) == sprintf('\n')
+    hname = hname(1:end-1);
+  end
+  
+  hp = hname;
+
+else
+  hname = hp;
 end

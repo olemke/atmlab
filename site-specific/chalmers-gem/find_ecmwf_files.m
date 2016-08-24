@@ -31,7 +31,7 @@ if nargin<3
   ecmwfdir='/odin/external/ecmwfNCD';
 elseif strcmp(source,'era');
   if strcmp( hostname, 'virga' )  |  strcmp( whoami, 'patrick2' )
-    ecmwfdir='/home/patrick/Extdata/ERA-Interim/';
+    ecmwfdir='~/Extdata/ERA-Interim/';
   else
     ecmwfdir='/misc/pearl/extdata/ERA-Interim/';
   end

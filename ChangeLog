@@ -1,5 +1,21 @@
 2016-08-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-188
+
+	* files/tmpdir.m: An alernative to tempdir. This new function
+	makes use of environemnt variable TMPDIR.
+
+	* files/homedir.m:
+	* handy/whoami.m:
+	* handy/hostname.m: Now using internal persitstent variable,
+	follwoing matlab's tempname function. This to avoid repeated
+	system calls.
+
+	* site-specific/chalmers-gem/find_ecmwf_files.m: Now using ~ in
+	local path.
+
+2016-08-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-187
 
 	* site-specific/chalmers-gem/find_ecmwf_files.m: For ERA, local

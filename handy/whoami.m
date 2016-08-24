@@ -10,25 +10,36 @@
 function user = whoami
 
 
-[s,user] = system( 'whoami' );
+persistent up;
 
-if s
-  error( 'System call to establish user name failed.' );
-end
+if isempty(up)
 
 
-%= Remove domain name that can be included on Windows machines
-%
-if ispc
-  i = find( user == '\' )
-  if ~isempty(i)
-    user = user((i+1):end);
+  [s,user] = system( 'whoami' );
+
+  if s
+    error( 'System call to establish user name failed.' );
   end
-end
 
 
-%- Remove any newline character
-%
-if user(end) == sprintf('\n')
-  user = user(1:end-1);
+  %= Remove domain name that can be included on Windows machines
+  %
+  if ispc
+    i = find( user == '\' )
+    if ~isempty(i)
+      user = user((i+1):end);
+    end
+  end
+
+
+  %- Remove any newline character
+  %
+  if user(end) == sprintf('\n')
+    user = user(1:end-1);
+  end
+
+  up = user;
+  
+else
+  user = up;
 end

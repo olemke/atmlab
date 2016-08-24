@@ -9,9 +9,18 @@
 
 function d = homedir
 
+persistent dp;
 
-d = getenv('HOME');
+if isempty(dp)
 
-if isempty(d)
-  error('atmlab:homedir', 'No home-directory defined');
+  d = getenv('HOME');
+
+  if isempty(d)
+    error('atmlab:homedir', 'No home-directory defined');
+  end
+
+  dp = d;
+  
+else
+  d = dp;
 end
