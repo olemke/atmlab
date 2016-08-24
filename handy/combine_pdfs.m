@@ -111,12 +111,20 @@ function outfile = combine_pdfs(pdffiles, options)
 %            in:  %f
 %            ex:  space between rows in cm
 %            def: 1
+%       options.outputformat
+%            in: %s
+%            ex: 'dvi' or 'pdf'. 'dvi is useful if you plots are in eps and 
+%                you are having problems with transparency
+%            def: 'pdf
+%             
+%          
 % OUT:      outfile = The fullpath to the created pdf-file
 %
 % NOTE: The files are appended left to right and from top to bottom.
 
 
 % 2013-04-10 Oliver Lemke and Salomon Eliasson.
+% $Id$
 
 if ~nargin, error(['atmlab:' mfilename],'Needs input. See help.'); end
 if nargin == 1, options = struct; end
@@ -125,9 +133,9 @@ if nargin == 1, options = struct; end
 default.cols        = min(length(pdffiles),2);
 default.display    = true;
 if isfield(options,'title') && ~isempty(options.title)
-    default.filename = [sanitise(options.title),'.pdf'];
+    default.filename = sanitise(options.title);
 else
-    default.filename = 'out.pdf';
+    default.filename = 'out';
 end
 default.hspace      = 1;
 default.outdir     = gmtlab('outdir');
@@ -139,6 +147,8 @@ default.secret_latex_spacing_tweak = 0.5;
 default.title      = '';
 default.valign      = 'm';
 default.vspace      = 1;
+default.outputformat='pdf';
+
 options = optargs_struct(options, default);
 
 %%
@@ -255,14 +265,29 @@ function layout = create_layout_from_pdffiles(pdffiles, options)
 % regexp that gives us width and height from pdfinfo output
 regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 
-
 % -------
 % get the height and width information from each pdffile
 %
 psize(length(pdffiles)) = struct('width','','height','');
 for i = 1:length(pdffiles)
-    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 0);
     
+    if strcmp(pdffiles{i}(end-3:end),'.eps')
+        % make a tempory file and then delete it (if you want to ultimately
+        % create a .dvi), otherwise we need epstopdf since pdflatex cannot
+        % handle .eps (internally uses epstopdf anyhow)
+        exec_system_cmd(sprintf('cp ''%s'' epstmp.eps', pdffiles{i}), 0);
+        exec_system_cmd('epstopdf epstmp.eps',0);
+        info  = exec_system_cmd('pdfinfo epstmp.pdf', 0);
+        if strcmp(options.outputformat,'pdf')
+            tmpfile = sprintf('%s.pdf',pdffiles{i}(1:end-4));
+            exec_system_cmd(sprintf('cp epstmp.pdf %s.pdf',tmpfile));
+            pdffiles{i} = tmpfile;
+        else
+            exec_system_cmd('rm epstmp.{eps,pdf}', 0);
+        end
+    else
+        info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 0);
+    end
     % pdfinfo uses BigPoints as a unit. Converting to cm.
     psize(i) =  structfun(@(x) str2double(x)/72*2.54, ...
         regexp(info{1},regx, 'names'), ...
@@ -391,7 +416,7 @@ for R = layout.plotsbyrow
     col=1;
     for P = R{:}
         fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, P.width);
-        tmpplotname=sprintf('plot%d.pdf', filenum);
+        tmpplotname=sprintf('plot%d.%s',filenum,P.file(end-2:end));
         %mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
         mvplotcmd{filenum}=sprintf('cp %s %s/%s', P.file, tmpfolder, tmpplotname); %#ok
         if isfield(options,'scale') && ~isempty(options.scale(options.scale(:,1)==filenum,2))
@@ -430,30 +455,37 @@ fprintf(fid,'\n');
 fprintf(fid,'\\end{document}\n');
 
 %% Hand the TeX file over to pdflatex
+if strcmp(options.outputformat,'dvi')
+    compiler = 'latex';
+else
+    compiler = 'pdflatex';
+end
 exec_system_cmd(mvplotcmd, atmlab('VERBOSITY'));
-exec_system_cmd(sprintf('cd %s && pdflatex -interaction nonstopmode out.tex', ...
-    tmpfolder), ...
+exec_system_cmd(sprintf('cd %s && %s -interaction nonstopmode out.tex', ...
+    tmpfolder,compiler), ...
     atmlab('VERBOSITY'));
 
 file = fullfile(options.outdir, options.filename);
 % allow spaces
 file = strrep(file,' ','\ ');
 
-exec_system_cmd(sprintf('cd %s && mv -f out.pdf %s', ...
-    tmpfolder, file), ...
+exec_system_cmd(sprintf('cd %s && mv -f out.%s %s', ...
+    tmpfolder, options.outputformat,file), ...
     atmlab('VERBOSITY'));
 
-if options.pdfcrop
-    f_ind = strfind(file,'.pdf');
-    if ~isempty(f_ind)
-        file = file(1:f_ind-1);
+if strcmp(options.outputformat,'pdf')
+    if options.pdfcrop
+        f_ind = strfind(file,'.pdf');
+        if ~isempty(f_ind)
+            file = file(1:f_ind-1);
+        end
+        [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),atmlab('VERBOSITY'));
+        if logical(test)
+            error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
+        end
+        exec_system_cmd(sprintf('mv %s-crop.pdf %s.pdf',file,file),atmlab('VERBOSITY'));
+        file = [file,'.pdf'];
     end
-    [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),atmlab('VERBOSITY'));
-    if logical(test)
-        error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
-    end
-    exec_system_cmd(sprintf('mv %s-crop.pdf %s.pdf',file,file),atmlab('VERBOSITY'));
-    file = [file,'.pdf'];
 end
 
 end
