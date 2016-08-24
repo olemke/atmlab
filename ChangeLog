@@ -1,3 +1,11 @@
+2016-08-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-187
+
+	* site-specific/chalmers-gem/find_ecmwf_files.m: For ERA, local
+	files are assumed if the hostname is virga (my laptop). This to
+	allow running tests "off-line". Also added same "fix" for runs at C3SE.
+
 2016-08-24  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-186
