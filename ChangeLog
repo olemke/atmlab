@@ -1,3 +1,10 @@
+2016-08-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-189
+
+	* math/nearestinvec.m: Extended the function to also handle
+	non-scalar zi.
+
 2016-08-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-188
