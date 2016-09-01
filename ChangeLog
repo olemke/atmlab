@@ -1,5 +1,39 @@
 2016-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-191
+
+	* time/yearnum.m (yearnum):
+	* time/weekofyear.m (weekofyear):
+	* time/monthofyear.m (monthofyear):
+	* time/mjd2date.m (mjd2date):
+	* time/mjd2jd.m (mjd2jd):
+	* time/jdate2jd.m (jdate2jd):
+	* time/jd2mjd.m (jd2mjd):
+	* time/jd2jdate.m (jd2jdate):
+	* time/jd2date.m (jd2date):
+	* time/istime.m (istime):
+	* time/isleapyear.m (isleapyear):
+	* time/isjdate.m (isjdate):
+	* time/isdate.m (isdate):
+	* time/hms2days.m (hms2days):
+	* time/easterday.m (easterday):
+	* time/daysinmonth.m (daysinmonth):
+	* time/days2hms.m (days2hms):
+	* time/dayofyear.m (dayofyear):
+	* time/date2jd.m (date2jd):
+	* time/dayofmonth.m (dayofmonth):
+	* time/date2unixsecs.m (date2unixsecs): In all these functions,
+	commented out check of nargin of type: error(nargchk(0, 6,
+	nargsin));
+	This as usage of nargchk now gives:
+	Warning: NARGCHK will be removed in a future release. Use
+	NARGINCHK or NARGOUTCHK instead.
+
+	And I just don't have the energy to properly change all those
+	input checks.
+
+2016-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-190
 
 	* handy/hostname.m: Flag -s is now used when calling the system
