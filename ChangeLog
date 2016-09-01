@@ -1,3 +1,13 @@
+2016-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-190
+
+	* handy/hostname.m: Flag -s is now used when calling the system
+	hostname function. This to make sure that the short version is
+	obtained, and not the fully qualified domain name. This was my
+	intention when making the function. So far only tested on Ubuntu
+	14 and 16. Tell me if the flag causes problems on other systems.
+
 2016-08-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-189

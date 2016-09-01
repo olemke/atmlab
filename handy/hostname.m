@@ -13,7 +13,7 @@ persistent hp;
 
 if isempty(hp)
 
-  [st,hname] = system( 'hostname' );
+  [st,hname] = system( 'hostname -s' );
 
   %- Remove any newline character
   %
