@@ -1,3 +1,9 @@
+2016-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-192
+
+	* handy/gong.m: Produces a gong-type sound.
+
 2016-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-191
