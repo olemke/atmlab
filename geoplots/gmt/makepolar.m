@@ -78,29 +78,19 @@ for ii = 1:length(tickval)-1
         tickval(ii+1),ctable(ii,1),ctable(ii,2),ctable(ii,3));
 end
 
-% Set Background and forground colors base on the last color minus 2 times
+% Set Background and forground colors base on the last color minus 3 times
 % the gradient of color change used in ctable
-if isfield(in,'color_background')
+if isfield(in,'forcedColorBack')
     BG = sscanf(in.color_background,'%f/%f/%f');
 else
-    tmp = ctable(1,1);
-    if (tmp-2*inc)>0
-        BG = [tmp-2*inc tmp-2*inc 255];
-    else
-        BG = [tmp tmp 255-2*inc];
-    end
+    BG = max([ctable(1,:)-3*inc;0,0,0],[],1);
 end
-if isfield(in,'color_foreground')
+if isfield(in,'forcedColorFore')
     FG = sscanf(in.color_foreground,'%f/%f/%f');
 else
-    tmp = ctable(end,end);
-    if (tmp-2*inc)>0
-        FG = [255 tmp-2*inc tmp-2*inc];
-    else
-        FG = [255-2*inc tmp tmp];
-    end
+    FG = max([ctable(end,:)-3*inc;0,0,0],[],1);
 end
-if isfield(in,'color_nan')
+if isfield(in,'forcedColorNaN')
     N = sscanf(in.color_nan,'%f/%f/%f');
 else
     N = [128 128 128]; %Grey

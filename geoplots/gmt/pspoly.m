@@ -37,7 +37,7 @@ for i = 1:length(pp)
     cleanup = onCleanup(@() fclose(fid));
     fprintf(fid,stdin);
     
-    if strcmp(in.proj.projection, 'Q')
+    if strcmp(in.proj(1), 'Q')
         straight = '-A';
     else
         straight = '';

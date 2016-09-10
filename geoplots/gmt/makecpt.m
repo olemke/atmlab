@@ -23,7 +23,7 @@ else
     mkcpt = sprintf(fstr,mi,mx,step);
 end
 
-if isstruct(in.ctable) & isfield(in.ctable,'reverse') & in.ctable.reverse == 1
+if isstruct(in.ctable) && isfield(in.ctable,'reverse') && in.ctable.reverse == 1
     mkcpt = sprintf('%s -I',mkcpt);
 end
 

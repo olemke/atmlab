@@ -129,13 +129,6 @@ end
 function in = setup_create_gmt_earth(in)
 %% setup_create_gmt_earth %%
 
-% PROJECTION
-if isstruct(in.proj)
-    in.proj.str = setup_projection(in);
-else
-    in.proj.str = in.proj;
-end
-
 in.psbasemap.str{1} = setupbasemap(in,0);
 
 % GRIDDING
@@ -194,29 +187,6 @@ in.psbasemap.str{2} = setupbasemap(in,1);
 
 end
 
-function proj = setup_projection(in)
-%% setup_projection %%
-
-P = in.proj;
-
-x = sscanf(in.region,'%f/%f/%f/%f');
-
-allLongs = (x(1)==-180&&x(2)==180) || (x(1)==0&&x(2)==360); 
-if  ~isfield(P,'center') || ~allLongs % if not global
-
-    if ~allLongs && isfield(P,'center')
-        logtext(2,'There are strange artifacts if the data doesn''t cover all longitudes and P.center is not close to the middle (like now).\n')
-        logtext(2,'Resetting to P.center to the center of the longitude range. P.center = %g.\n',(x(1)+x(2))/2)
-        logtext(2,'If you desparately need the map centered somewhere else try in.makeScriptAndStop=true, tweak the -Q entry in psbasemap in the generated script manually, and run the script on the command line\n')
-    end
-        
-    P.center = (x(1)+x(2))/2;
-end
-
-proj = sprintf('%s%g/%s',P.projection,P.center,num2str(P.map_width));
-
-end
-
 function basemap = setupbasemap(in,last)
 %% setupbasemap
 
@@ -224,7 +194,7 @@ basemap = 'gmt psbasemap';
 %redirect '>' overwrites and existing file, '>>' appends to one
 if ~last
     basemap = sprintf('%s -R%s',basemap,in.region);
-    basemap = sprintf('%s -J%s',basemap,in.proj.str);
+    basemap = sprintf('%s -J%s',basemap,in.proj);
     basemap = sprintf('%s %s',basemap,in.plotPlacement);
 else
     basemap = sprintf('%s -R -J -X -Y',basemap);
@@ -403,7 +373,7 @@ if isstruct(a)
     
     % get what is in the in-structure, i.e one level up from in.legend
     % structure where they really belong
-    F = {'xunit','unit','cptfile','plotPlacement'};
+    F = {'cptfile','plotPlacement'};
     for f = F(ismember(F,fieldnames(in)))
         
         a.(f{1}) = in.(f{1});

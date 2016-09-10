@@ -1,3 +1,18 @@
+2016-09-10  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-193
+
+	* geoplots/gmt/pspoly.m: small adaptation
+
+	* geoplots/gmt/makepolar.m: Fixed buggy handling of background and foreground colours
+
+	* geoplots/gmt/makecpt.m: changed & to && in conditional
+
+	* geoplots/gmt/gmt_plot.m: making a pdf with just the legend
+	didn't work anymore, but now it does. I needed to handle projection slightly  differently
+
+	* geoplots/gmt/create_gmt_earth.m: moved setup_projection to gmt_plot
+
 2016-09-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-192

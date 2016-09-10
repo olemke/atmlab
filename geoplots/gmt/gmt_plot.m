@@ -843,6 +843,11 @@ else
     in.gmtVersion = strtrim(in.gmtVersion);
 end
 logtext(1,'Using GMT version %s\n',in.gmtVersion)
+clear tmp
+
+if isfield(in,'color_background');in.forcedColorsBack=true;end
+if isfield(in,'color_foreground');in.forcedColorsFore=true;end
+if isfield(in,'color_nan')       ;in.forcedColorsNan=true ;end
 
 % SET DEFAULTS
 % general
@@ -879,6 +884,7 @@ default.outdir                   = gmtlab('OUTDIR');
 default.plotPlacement            = '-Xa5 -Ya5';
 default.proj.projection          = 'N';
 default.proj.map_width           = 20;
+default.proj.center              = 0;
 default.proj_length_unit         = 'cm';
 default.savelegend               = false;
 default.treatAsUngridded         = false;
@@ -937,6 +943,9 @@ in.title = regexprep(in.title,':',' ');
 if in.nodata
     % If I only want an empty map, get the essentials and leave here.
     in = nodata(in);
+    if ~ischar(in.proj)
+        in = setup_projection(in);
+    end
     return
 end
 
@@ -1032,6 +1041,10 @@ if isstruct(in.extra_legend)
     in = setupXtraLegend(in);
 end
 
+if ~ischar(in.proj)
+    in = setup_projection(in);
+end
+
 end
 
 function nl = get_nlevels(in)
@@ -1117,7 +1130,7 @@ fieldsNotToRead = cell(100,1); ii = 1;
 for F = Fields
     
     f = F{1};
-    if strcmp(f,field)
+    if strcmp(f,field) && ismember(field,GSE(:,2))
         logtext(2,['in.%s is ordinarily a gmt option, but "field"=%s ',...
             'has precedence and thus in.%s will be treated as data\n'],f,f,f)
         continue
@@ -1337,6 +1350,29 @@ elseif ~isfield(in,'region') && all(isfield(in,{'lat','lon'}))
 else
     in.region='-180/180/-90/90';
 end
+end
+
+function in = setup_projection(in)
+%% setup_projection %%
+
+P = in.proj;
+
+x = sscanf(in.region,'%f/%f/%f/%f');
+
+allLongs = (x(1)==-180&&x(2)==180) || (x(1)==0&&x(2)==360); 
+if  ~isfield(P,'center') || ~allLongs % if not global
+
+    if ~allLongs && isfield(P,'center')
+        logtext(2,'There are strange artifacts if the data doesn''t cover all longitudes and P.center is not close to the middle (like now).\n')
+        logtext(2,'Resetting to P.center to the center of the longitude range. P.center = %g.\n',(x(1)+x(2))/2)
+        logtext(2,'If you desparately need the map centered somewhere else try in.makeScriptAndStop=true, tweak the -Q entry in psbasemap in the generated script manually, and run the script on the command line\n')
+    end
+        
+    P.center = (x(1)+x(2))/2;
+end
+
+in.proj = sprintf('%s%g/%s',P.projection,P.center,num2str(P.map_width));
+
 end
 
 function in = getDefaultTicks(in)
@@ -1605,6 +1641,11 @@ end
 default.sidebar      = getsidebar(in); % coloroured triangles using in.datarange
 in.legend            = optargs_struct(in.legend,default);
 
+
+% add unit and xunit
+in.legend.unit = in.unit;
+in.legend.xunit = in.xunit;
+
 end
 
 function sidebar = getsidebar(in)
@@ -1719,6 +1760,7 @@ end
 
 if in.savelegend
     % MAKE a separate file for the legend
+    
     findPsScale = ~cellfun('isempty',regexp(command,'psscale'));
     if ~any(findPsScale)
         v = atmlab('VERBOSITY');
@@ -1726,10 +1768,15 @@ if in.savelegend
         logtext(atmlab('ERR'),'psscale, which is used to make the legend was never called. Maybe legend=0 or there was no input data?\n')
         atmlab('VERBOSITY',v);
         filename = '';
-        
         return
     end
-    in.filename_legend = makelegendpdf(in.filename, command(findPsScale));
+    
+    % make the history and config files
+    for i = 1:find(~cellfun('isempty',regexp(command,'psbasemap'))==1, 1 )
+        exec_system_cmd(command{i});
+    end
+    
+    in.filename_legend = makelegendpdf(in,command(findPsScale));
     if in.savelegend==2 % store legend ONLY in external file
         command = command(~findPsScale);
     end
@@ -1764,18 +1811,17 @@ end
 hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
 logtext(atmlab('OUT'), 'GMT plot stored at:  %s\n',filename)
-
+if in.savelegend
+    logtext(atmlab('OUT'), 'GMT plot legend stored at:  %s.pdf\n',in.filename_legend)
+end
 end
 
-function file = makelegendpdf(basename, command)
+function file = makelegendpdf(in, command)
 %% Make a separate pdf for the legend
 % Only allowed to have 1 or 2 psscale commands in the commad list. the first one
 % is the regular legend. The second is for the nan legend (if it exists)
 
-file = [basename '_legend'];
-
-%make sure it's not here
-exec_system_cmd(sprintf('rm -f %s.ps',file),gmtlab('verbosity'));
+file = [in.filename,'_legend'];
 
 %Remove trailing .ps entry
 crop=regexp(command,'>>');
@@ -1784,7 +1830,7 @@ crop=regexp(command,'>>');
 for i = 1:length(command)
 %for i = 2:length(command)
     command{i} = sprintf('%s -P >> %s.ps', command{i}(1:crop{i}-1), file );
-    %if i == 2
+
     if i == 1
         command{i} = regexprep(command{i},'-O','');
     end
