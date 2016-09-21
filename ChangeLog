@@ -1,3 +1,13 @@
+2016-09-20  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-194
+	
+	* geophysics/pt2z.m: First estimate ignores altitude restrictions of 
+	p2z_simple
+	
+	* math/gridinterp.m: A for loop was wrongly concatinated when running 
+	with atmlab(STRICT_ASSERT) == 0. Fixed.
+	
 2016-09-10  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-193

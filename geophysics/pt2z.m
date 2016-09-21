@@ -65,7 +65,7 @@ end
 
 %= Make rough estimate of *z*
 %
-z = p2z_simple( p );
+z = p2z_simple( p,0 );
 z = shift2refpoint( p, z, p0, z0 );
 
 

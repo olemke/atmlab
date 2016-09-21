@@ -51,19 +51,19 @@ errid= ['atmlab', mfilename, 'badInput'];
 % Note that the code is repeated below, but without checks
 
 if atmlab('STRICT_ASSERT')
-
+    
     %- Check input
     %
     rqre_nargin( 3, nargin );
     rqre_datatype( agrids, @iscell );
-    rqre_datatype( A, @isnumeric );  
+    rqre_datatype( A, @isnumeric );
     rqre_datatype( newgrids, @iscell );
     indim  = length(agrids);
     outdim = length(newgrids);
-    if dimens(A) > length(agrids) 
+    if dimens(A) > length(agrids)
         error(errid, 'Dimensionality of A is higher than number of given grids.' );
     end
-    if outdim < indim 
+    if outdim < indim
         error(errid,'There can not be fewer grids in *newgrids* than in *agrids*.');
     end
     for d = 1 : indim
@@ -81,15 +81,15 @@ if atmlab('STRICT_ASSERT')
         A    = getdims( A, dims );
     else
         
-        if outdim ~= indim 
+        if outdim ~= indim
             error( errid, ['With *extrap* false, the number of grids in *newgrids* ',...
                 'and *agrids* must be the same.'] );
-        end                                                                     
-        asize = size( A );  
+        end
+        asize = size( A );
         if length(asize) < outdim  ||  any( asize(1:outdim)==1 )
             error( errid,['With *extrap* false there can not be any singleton ',...
                 'dimmensions in *A*.'] );   %&%
-        end 
+        end
         dims = 1:outdim;
     end
     
@@ -106,10 +106,10 @@ if atmlab('STRICT_ASSERT')
         else
             xi = newgrids{dims(1)};
         end
-        %             
+        %
         if isempty(xi)
             error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
-        end 
+        end
         %
         B = interp1( agrids{dims(1)}, A, xi, iopt );
         
@@ -122,10 +122,10 @@ if atmlab('STRICT_ASSERT')
             xi = newgrids{dims(1)};
             yi = newgrids{dims(2)};
         end
-        %                           
-        if isempty(xi)||isempty(yi) 
+        %
+        if isempty(xi)||isempty(yi)
             error( errid,'Empty grid found in *newgrid* for non-singleton dimension.');
-        end                         
+        end
         %
         [xi,yi] = ndgrid( xi, yi );
         %
@@ -142,10 +142,10 @@ if atmlab('STRICT_ASSERT')
             yi = newgrids{dims(2)};
             zi = newgrids{dims(3)};
         end
-        %                                       
+        %
         if isempty(xi)||isempty(yi)||isempty(zi)
             error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
-        end                                     
+        end
         %
         [xi,yi,zi] = ndgrid( xi, yi, zi );
         %
@@ -165,8 +165,8 @@ if atmlab('STRICT_ASSERT')
             zi = newgrids{dims(3)};
             ui = newgrids{dims(4)};
         end
-        %                                                                     
-        if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)                 
+        %
+        if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)
             error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
         end
         %
@@ -190,11 +190,11 @@ if atmlab('STRICT_ASSERT')
             ui = newgrids{dims(4)};
             vi = newgrids{dims(5)};
         end
-        %  
+        %
         if isempty(xi)||isempty(yi)||isempty(zi)||isempty(ui)||isempty(vi)
             error(errid,'Empty grid found in *newgrid* for non-singleton dimension.');
         end
-        error( errid,'Interpolation above 5D is not handled.' );             
+        error( errid,'Interpolation above 5D is not handled.' );
     end
     
     
@@ -222,7 +222,7 @@ if atmlab('STRICT_ASSERT')
         end
     end
 else
-
+    
     % ------------
     % The else contains the same as in the if environment except but without
     % assertions.
@@ -308,34 +308,34 @@ else
         [xi,yi,zi,ui,vi] = ndgrid( xi, yi, zi, ui, vi );
         B = interpn( agrids{dims(1)}, agrids{dims(2)}, agrids{dims(3)}, ...
             agrids{dims(4)}, agrids{dims(5)}, A, xi, yi, zi, ui, vi, iopt );
-        
-        %- Post-processing for *extrap*
-        %
-        if extrap  &&  dim < outdim
-            % Make extrapolation for A's singleton dimensions
-            map = ones( 1, max([2 outdim]) ); % Repmat demands at least two values
-            lg  = ones( 1, max([2 outdim]) );
-            for d = 1 : outdim
-                lg(d) = max([ 1 length( newgrids{d} ) ] );  % The 1 to handle empty grids
-                if ~any( dims == d )  &&  lg(d) > 1          % for singleton dimensions
-                    map(d) = length( newgrids{d} );
-                end
-            end
-            if any( map > 1 )
-                B = repmat( B, map );
-            end
-            
-            % Full dimension is not obtained above for some cases of singleton
-            % dimensions. Fixed by a reshape
-            bsize = size(B);
-            if length(bsize) < length(lg)  ||  any( bsize ~= lg )
-                B = reshape( B, lg );
+    end
+    
+    %- Post-processing for *extrap*
+    %
+    if extrap  &&  dim < outdim
+        % Make extrapolation for A's singleton dimensions
+        map = ones( 1, max([2 outdim]) ); % Repmat demands at least two values
+        lg  = ones( 1, max([2 outdim]) );
+        for d = 1 : outdim
+            lg(d) = max([ 1 length( newgrids{d} ) ] );  % The 1 to handle empty grids
+            if ~any( dims == d )  &&  lg(d) > 1          % for singleton dimensions
+                map(d) = length( newgrids{d} );
             end
         end
+        if any( map > 1 )
+            B = repmat( B, map );
+        end
         
+        % Full dimension is not obtained above for some cases of singleton
+        % dimensions. Fixed by a reshape
+        bsize = size(B);
+        if length(bsize) < length(lg)  ||  any( bsize ~= lg )
+            B = reshape( B, lg );
+        end
     end
     
 end
+    
 
 
 %---
