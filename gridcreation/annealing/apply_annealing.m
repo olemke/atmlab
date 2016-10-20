@@ -1,4 +1,4 @@
-function result=apply_annealing(filename_H,filename_y_mono,nlos,Cloop,C)
+function result=apply_annealing(filename_H,filename_y_mono,nlos,Cloop,Cann)
 % APPLY_ANNEALING control the simulated annealing for an individual channel
 %
 % apply_annealing reads the required input from xml files (ARTS
@@ -9,7 +9,7 @@ function result=apply_annealing(filename_H,filename_y_mono,nlos,Cloop,C)
 %
 % FORMAT
 %
-%   Result=apply_annealing(filename_H,filename_y_mono,nlos,Cloop,C)
+%   Result=apply_annealing(filename_H,filename_y_mono,nlos,Cloop,Cann)
 %
 % IN
 %        filename_H:      File containing the H matrix (ARTS-xml)

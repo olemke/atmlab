@@ -1,3 +1,9 @@
+2016-10-20  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
+
+	* atmlab-2-3-196
+
+	* gridcreation/annealing/apply_annealing.m: fixed function argument. 
+
 2016-10-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-195
