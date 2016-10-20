@@ -18,7 +18,7 @@
 %
 % FORMAT   [S,M,dveq] = tmatrix(workfolder,f_grid,t_grid,za_grid,aa_grid,N, ...
 %                               shape,ptype,diameter,aspect_ratio
-%                               [,d_is_max,precision,mass,cri_source] )
+%                               [,d_is_max,outfile,precision,mass,cri_source,ndgs] )
 %        
 % OUT   S            ARTS single scattering data, either as imported data or
 %                    set to a path (then equal to *outfile*).
@@ -50,6 +50,7 @@
 %                    is to use the default string in arts.
 %       ndgs         Number of division points in computing integrals over
 %                    the particle surface. Only used for random orientation.
+%                    Default is 5.
 
 % 2014-09-27   Created by Patrick Eriksson.
 

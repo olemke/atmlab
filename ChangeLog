@@ -1,3 +1,9 @@
+2016-10-20  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-195
+
+	* scattering/tmatrix.m: Corrections of header text.
+
 2016-09-20  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-3-194

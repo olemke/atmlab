@@ -161,7 +161,9 @@ arts_abstable( Q, workfolder );
 Q.IY_UNIT             = 'RJBT';
 Q.YCALC_WSMS          = { 'yCalc' };
 %
-Q.PPATH_LMAX          = 2e3/max([1,iwp/0.5]);
+%Q.PPATH_LMAX          = 2e3/max([1,iwp/0.5]);
+Q.PPATH_LMAX          = 2e3;
+%Q.PPATH_LMAX          = 50;
 %
 Q.SENSOR_POS          = 830e3;
 Q.SENSOR_LOS          = 135;
@@ -277,6 +279,7 @@ Q.CLOUDBOX    = C;
 %= DOIT
 %
 yd = arts_y( Q, workfolder );
+disp( 'DOIT ready' )
 %
 if nargout < 3, return, end
   
