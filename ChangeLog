@@ -1,5 +1,14 @@
 2016-10-20  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
 
+	* atmlab-2-3-197
+
+	* gridcreation/annealing/loop_anneal.m: verbose level for gridcreation/annealing/find_best_freq_set_anneal.m
+	has been always set to 1 in case the control structure was given, no matter which or if any verbose 
+	level was defined beforehand. 
+	Removed this, so verbose levels can be passed to  find_best_freq_set_anneal.m via loop_anneal.  
+ 
+2016-10-20  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
+
 	* atmlab-2-3-196
 
 	* gridcreation/annealing/apply_annealing.m: fixed function argument. 
