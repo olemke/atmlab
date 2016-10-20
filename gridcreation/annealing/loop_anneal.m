@@ -27,16 +27,6 @@
 function R = loop_anneal(H, y_mono, n_start, n_incr, acc, C)
 
 
-% Check input
-if nargin == 6
-  % Control parameter C is provided! If C is not provided,
-  % find_best_freq_set_anneal will use default values
-  %
-  % Set values
-  % Set verbosity of find_best_freq_set_anneal to 0:
-  C.verb = 1;
-end
-
 disp('****************************************')
 disp(sprintf('Starting with n = %d.', n_start))
 
