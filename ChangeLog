@@ -1,3 +1,11 @@
+2016-11-01  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-198
+
+	* sensors/atovs/avhrr_gac_read.m:
+
+	Fix indexing errors when channel 3a is present.
+
 2016-10-20  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
 
 	* atmlab-2-3-197
