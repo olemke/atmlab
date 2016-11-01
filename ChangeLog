@@ -1,3 +1,15 @@
+2016-11-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-2-24
+
+	* Introduced two bug fixes from v2.3.
+
+	* covmat/covmat1d_markov.m: Call of covmat1d_from_cfun was
+	completly wrong and caused an error.
+
+	* retrieval/qpack2/qp2_l2.m (qp2_l2): The variable siz was not set
+	correctly for 2D and 3D atmospheric variables.
+
 2016-05-12  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-2-23

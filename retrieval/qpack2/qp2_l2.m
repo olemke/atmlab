@@ -371,7 +371,7 @@ for q = 1 : length(R.jq)
         %
         if Q.ATMOSPHERE_DIM >= 2
           L2.([s,'_lat']) = Astruct.GRIDS{2};
-          siz(2)          = length( Astruct.GRIDS{2} );
+          siz             = [length(Astruct.GRIDS{1}),length(Astruct.GRIDS{2})];
           %
           if Q.ATMOSPHERE_DIM == 3
             L2.([s,'_lon']) = Astruct.GRIDS{3};
