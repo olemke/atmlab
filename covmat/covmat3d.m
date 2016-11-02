@@ -255,24 +255,17 @@ else    % 2D and 3D
     if isscalar( D.SI )     % Standard devaition
       si = D.SI;
     else
-      x = repmat( vec2col(grid1), length(grid2), 1 );          
-      y = repmat( vec2row(grid2), length(grid1), 1 );
-      y = y(:);
       if dim == 2
-        si = interpd( [x,y], D.SI, D.SI_GRID1, D.SI_GRID2, 'linear' );
+        si = gridinterp( {grid1,grid2}, D.SI, {D.SI_GRID1, D.SI_GRID2}, 'linear' );
       else
         if dim == 3
-          x = repmat( x, length(grid3), 1 );
-          y = repmat( y, length(grid3), 1 );
-          z = repmat( vec2row(grid3), length(grid1)*length(grid2), 1 );
-          z = z(:);
-          si = interpd( [x,y,z], D.SI, D.SI_GRID1, D.SI_GRID2, ...
-                                                D.SI_GRID3, 'linear' );
+          si = gridinterp( {grid1,grid2,grid3}, D.SI, {D.SI_GRID1, D.SI_GRID2, ...
+                                                D.SI_GRID3}, 'linear' );
         end
       end
     end
     %
-    S = covmat_partstat_corr( si, C{1:dim} );
+    S = covmat_partstat_corr( si(:), C{1:dim} );
   end
 end
   

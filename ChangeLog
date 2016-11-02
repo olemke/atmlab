@@ -1,3 +1,9 @@
+2016-11-02  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-199
+
+	* covmat/covmat3d.m: The function used the outdated function interpd, it is now rewritten to use gridinterp instead. 
+
 2016-11-01  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-198
