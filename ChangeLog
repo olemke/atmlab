@@ -1,3 +1,9 @@
+2016-11-09  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* graphs/cmaps/qualitative1.txt:
+
+	Adjusted yellow to the one used in qualitaive2.
+
 2016-11-07  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* graphs/cmaps/qualitative2.txt: Exchanged the very bright yellow.
