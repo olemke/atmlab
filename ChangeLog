@@ -1,5 +1,9 @@
 2016-11-14  Lukas Kluft  <lukas.kluft@gmail.com>
 
+	* math/allclose.m: Fixed handling of multi-dimensional arrays.
+
+2016-11-14  Lukas Kluft  <lukas.kluft@gmail.com>
+
 	* math/allclose.m, math/isclose.m:
 
 	Element-wise comparison of two arrays.

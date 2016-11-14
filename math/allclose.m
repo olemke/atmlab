@@ -27,6 +27,6 @@ if nargin < 3
     rtol=1e-05;
 end
 
-bool = all(isclose(a, b, rtol, atol) == 1);
+bool = all(flat(isclose(a, b, rtol, atol)) == 1);
 
 end
