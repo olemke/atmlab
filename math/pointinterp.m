@@ -1,4 +1,4 @@
-% INTERPD  Point interpolation of 1D-5D data
+% POINTINTERP  Point interpolation of 1D-5D data
 %
 %    Atmlabs function for interpolation of data to a set of points. This is
 %    basically an interface to to the standard interp1 and interpn functions.

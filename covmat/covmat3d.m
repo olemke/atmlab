@@ -16,7 +16,7 @@
 % 
 %       [(x1,y1,z1) (x2,y1,z2) ...(xn,y1,z1) (x1,y2,z) ... (x1,y1,z2) ...]'
 %
-%   Default is to calculate the covariance matrix as
+%   Default (i.e seperable = true) is to calculate the covariance matrix as
 %      S(i,j) = si(i)*si(j)*c1(i,j)*c2(i,j)*c3(i,j),
 %   where si(i) is the standard deviation at point i, c1(i,j) is the 
 %   dim1-correlation between point i and j, etc. That is, the correlation 
@@ -44,6 +44,8 @@
 %
 %   Recognised fields of D are:
 %   ---
+%      SEPARABLE  Flag to set whether the correlations in the different
+%                 dimensions are seperable or not. Default is true.
 %      SI         A priori standard deviation. Dimensionality must match *dim*.
 %                 Dimension order (dim1,dim2,dim3). 
 %      SI_GRID1   Grid of SI in dimension 1. 
@@ -256,11 +258,11 @@ else    % 2D and 3D
       si = D.SI;
     else
       if dim == 2
-        si = gridinterp( {grid1,grid2}, D.SI, {D.SI_GRID1, D.SI_GRID2}, 'linear' );
+        si = gridinterp( {D.SI_GRID1, D.SI_GRID2}, D.SI, {grid1,grid2}, 'linear' );
       else
         if dim == 3
-          si = gridinterp( {grid1,grid2,grid3}, D.SI, {D.SI_GRID1, D.SI_GRID2, ...
-                                                D.SI_GRID3}, 'linear' );
+          si = gridinterp( {D.SI_GRID1, D.SI_GRID2, ...
+                                                D.SI_GRID3}, D.SI, {grid1,grid2,grid3}, 'linear' );
         end
       end
     end

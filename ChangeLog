@@ -1,3 +1,14 @@
+2016-11-15  Ole Martin Christensen  <olem@chalmers.se>
+
+	* atmlab-2-3-201
+
+	* covmat/covmat3d.m: Bug in usage of gridinterp.m fixed.
+
+	* covmat/covmat3d_from_cfun_not_seperable.m: Used
+	depricated function interpd. Changed to pointinterp.
+
+	* math/pointinterp: Corrected typo in header. 
+	
 2016-11-14  Alex Bobryshev  <oleksandr.bobryshev@uni-hamburg.de>
 
 	* atmlab-2-3-200

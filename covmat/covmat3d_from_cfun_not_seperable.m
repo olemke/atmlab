@@ -5,7 +5,7 @@
 %   set to false). The function *covmat3d* performs more detailed input checks,
 %   and also selects more rapid options when possible.
 %
-%   This functon converts specification data to a covariance matrix for
+%   This function converts specification data to a covariance matrix for
 %   nonseparable dimensions. The covariance is described by the structure *D*.
 %   The function is more general than *covmat_partstat_corr* (for dimensions <=
 %   3D), but is (much) slower, particularly for higher data dimensions or long
@@ -168,12 +168,12 @@ else
     clx = repmat( D.CL1, n, 1 );
   else
     if dim == 1
-      clx = interpd( x, D.CL1, D.CL1_GRID1, 'linear' );
+      clx = pointinterp( {D.CL1_GRID1}, D.CL1, x, 'linear' );
     elseif dim == 2
-      clx = interpd( [x,y], D.CL1, D.CL1_GRID1, D.CL1_GRID2, 'linear' );
+      clx = pointinterp( {D.CL1_GRID1, D.CL1_GRID2}, D.CL1, [x,y], 'linear' );
     else
-      clx = interpd( [x,y,z], D.CL1, D.CL1_GRID1, D.CL1_GRID2, D.CL1_GRID3,...
-                                                                  'linear' );
+      clx = pointinterp( {D.CL1_GRID1, D.CL1_GRID2, D.CL1, D.CL1_GRID3},...
+                                                        [x,y,z], 'linear' );
     end
     if any( isnan(clx) )
       error( ['NaN obtained for dim1 correlation length. ',...
@@ -191,9 +191,9 @@ if dim >= 2
       cly = repmat( D.CL2, n, 1 );
     else
       if dim == 2
-        cly = interpd( [x,y], D.CL2, D.CL2_GRID1, D.CL2_GRID2, 'linear' );
+        cly = pointinterp( D.CL2, D.CL2_GRID1, D.CL2_GRID2, 'linear' );
       else
-        cly = interpd( [x,y,z], D.CL2, D.CL2_GRID1, D.CL2_GRID2, ...
+        cly = pointinterp( [x,y,z], D.CL2, D.CL2_GRID1, D.CL2_GRID2, ...
                                                      D.CL2_GRID3, 'linear' );
       end
       if any( isnan(cly) )
@@ -212,8 +212,8 @@ if dim == 3
     if isscalar( D.CL3 )
       clz = repmat( D.CL3, n, 1 );
     else
-      clz = interpd( [x,y,z], D.CL3, D.CL3_GRID1, D.CL3_GRID2, ...
-                                                     D.CL3_GRID3, 'linear' );
+      clz = pointinterp( {D.CL3_GRID1, D.CL3_GRID2, D.CL3_GRID3}, D.CL3, ...
+          [x,y,z], 'linear' );
     end
     if any( isnan(clz) )
       error( ['NaN obtained for dim3 correlation length. ',...
@@ -249,12 +249,14 @@ if isscalar( D.SI )
   si = repmat( D.SI, n, 1 );
 else
   if dim == 1
-    si = interpd( x, D.SI, D.SI_GRID1, 'linear' );
-  elseif dim == 2
-    si = interpd( [x,y], D.SI, D.SI_GRID1, D.SI_GRID2, 'linear' );
+    si = pointinterp( {D.SI_GRID1}, D.SI, x, 'linear' );
+  elseif dim == 2  
+    for i = 1:100
+        si = pointinterp( {D.SI_GRID1, D.SI_GRID2}, D.SI, [x,y], 'linear' );
+    end
   else
-    si = interpd( [x,y,z], D.SI, D.SI_GRID1, D.SI_GRID2, D.SI_GRID3, ...
-                                                                  'linear' );
+    si = pointinterp(  {D.SI_GRID1, D.SI_GRID2, D.SI_GRID3}, D.SI, ...
+                                                         [x,y,z], 'linear' );
   end
 end
 %
