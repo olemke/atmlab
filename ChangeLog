@@ -1,3 +1,10 @@
+2016-11-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-202
+
+	* site-specific/chalmers-gem/OdinSmr/WebApi/: Started on this
+	function set.
+
 2016-11-15  Ole Martin Christensen  <olem@chalmers.se>
 
 	* atmlab-2-3-201
@@ -7,14 +14,14 @@
 	* covmat/covmat3d_from_cfun_not_seperable.m: Used
 	depricated function interpd. Changed to pointinterp.
 
-	* math/pointinterp: Corrected typo in header. 
-	
+	* math/pointinterp: Corrected typo in header.
+
 2016-11-14  Alex Bobryshev  <oleksandr.bobryshev@uni-hamburg.de>
 
 	* atmlab-2-3-200
 
 	* datasets/+satreaders/saphirl2b.m
-	  datasets/+satreaders/atms.m: 
+	  datasets/+satreaders/atms.m:
 	  satreaders for the collocation toolkit. Work same as other
 	  satreaders.
 	 
