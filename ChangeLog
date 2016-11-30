@@ -1,3 +1,13 @@
+2016-11-30  Jana Mendrok  <jana.mendrok@chalmers.se>
+
+	* atmlab-2-3-203
+
+	* h2o/parametrisations/n_ice_ray72.m:
+	Implementation of Ray, 1972 model for ice refractive index (this is
+	largely outdated, but still some people dare to use it. needed here for
+	being able to quantify differences to newer models).
+	So far, untested.
+
 2016-11-29  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-202
@@ -1403,7 +1413,7 @@
 
 2015-06-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-        * atmlab-2-3-81
+	* atmlab-2-3-81
 
 	* retrieval/qpack2/qpack2.m: If any error in oem, this error is
 	now displayed. Note that if all inversions fail, then L2 comes out
@@ -1414,7 +1424,7 @@
 
 2015-06-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-        * atmlab-2-3-80
+	* atmlab-2-3-80
 
 	* scattering/backcoef2dBZ.m:
 	* scattering/dBZ2backcoef.m:
@@ -2573,7 +2583,7 @@
 	  the  small bug call hdf5info was inverted as some other calls need 
 	  it but inreoduced another call to enable the reading of nionzipped 
 	  files which need the call.
-          info=h5info(filename);
+	info=h5info(filename);
 
 2014-07-14  Jana Mendrok  <jana.mendrok@ltu.se>
 
