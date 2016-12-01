@@ -1,3 +1,10 @@
+2016-12-01  Jana Mendrok  <jana.mendrok@chalmers.se>
+
+	* atmlab-2-3-204
+
+	* h2o/parametrisations/n_ice_ray72.m:
+	Tested and modified accordingly.
+
 2016-11-30  Jana Mendrok  <jana.mendrok@chalmers.se>
 
 	* atmlab-2-3-203
