@@ -1,3 +1,12 @@
+2016-12-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-205
+
+	* site-specific/chalmers-gem/erainterim2surfdata.m:
+	* site-specific/chalmers-gem/erainterim2atmdata.m: Assert for lon
+	grid assumed a global coverage. Now changed to just check that
+	first lon >= 0.
+
 2016-12-01  Jana Mendrok  <jana.mendrok@chalmers.se>
 
 	* atmlab-2-3-204

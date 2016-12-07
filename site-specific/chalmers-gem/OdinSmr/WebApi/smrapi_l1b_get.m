@@ -6,17 +6,17 @@
 %       e         Error message. Returned as [] if all OK.
 %  IN   API       Structure wioth basic API settings.
 %       freqmode  Frequency mode.
+%       backend   String with name of backend.
 %       scanid    Scan ID number.
 
 % 2016-11-29   Patrick Eriksson
 
 
-function [SMR,e] = smrapi_l1b_get(API,freqmode,scanid)
+function [SMR,e] = smrapi_l1b_get(API,freqmode,backend,scanid)
 
-error('Not yet working')
 
-url = sprintf( 'http://%s/rest_api/%s/scan/AC2/%d/%d', ...
-               API.webapi_url, API.l1_version, freqmode, scanid );
+url = sprintf( 'http://%s/rest_api/%s/scan/%s/%d/%d', ...
+               API.webapi_url, API.l1_version, backend, freqmode, scanid );
 
 SMR.API      = API;
 

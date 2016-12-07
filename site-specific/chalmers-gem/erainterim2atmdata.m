@@ -157,8 +157,8 @@ lat = ncread(infile, '/latitude');
 lon = ncread(infile, '/longitude');
 lat = double(lat);
 lon = double(lon);
-assert(lon(1)==0);
-assert(lon(end)>358);
+assert(lon(1)>=0);
+
 
 %time: hours since 1900-01-01
 time  = ncread(infile, '/time');
