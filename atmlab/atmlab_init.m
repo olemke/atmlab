@@ -44,6 +44,7 @@ addpath( fullfile( toppath, 'randomize','iaaft' ) );
 addpath( fullfile( toppath, 'randomize' ) ); 
 addpath( fullfile( toppath, 'physics' ) );
 addpath( fullfile( toppath, 'lineshape', 'faddeeva' ) ); 
+addpath( fullfile( toppath, 'lineshape' ) ); 
 addpath( fullfile( toppath, 'mie' ) ); 
 addpath( fullfile( toppath, 'math' ) ); 
 addpath( fullfile( toppath, 'handy' ) ); 

@@ -1,3 +1,12 @@
+2016-12-08  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab/atmlab_init.m: Added lineshape to atmlab path.
+
+	* lineshape/linewidth.m:
+
+	Function to calculate linewidth from frequency grid and absorption
+	cross-sections.
+
 2016-12-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-205
