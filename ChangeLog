@@ -1,5 +1,9 @@
 2016-12-08  Lukas Kluft  <lukas.kluft@gmail.com>
 
+	* lineshape/linewidth.m: Fixed documentation.
+
+2016-12-08  Lukas Kluft  <lukas.kluft@gmail.com>
+
 	* atmlab/atmlab_init.m: Added lineshape to atmlab path.
 
 	* lineshape/linewidth.m:

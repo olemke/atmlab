@@ -3,8 +3,7 @@
 % FORMAT   lw = linewidth(f, a)
 %
 % OUT   lw         Linewidth.
-% IN    name       Colormap name.
-%       f          Frequency grid.
+% IN    f          Frequency grid.
 %       a          Absortion cross-sections.
 
 % 2016-12-08   Lukas Kluft: Created.
