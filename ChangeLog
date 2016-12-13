@@ -1,8 +1,20 @@
+2016-12-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-208
+
+	* site-specific/chalmers-gem/OdinSmr: Removed sub-folder WebApi,
+	and placed functions in this folder. Some new and renamed
+	functions.
+
 2016-12-08  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-207
 
 	* lineshape/linewidth.m: Fixed documentation.
 
 2016-12-08  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-206
 
 	* atmlab/atmlab_init.m: Added lineshape to atmlab path.
 

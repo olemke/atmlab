@@ -1,6 +1,6 @@
 % SMRAPI_BASIC_SETIINGS
 %
-%   The API structure holds settings associated with the SMR WebApi that
+%   The API structure holds settings associated with the SMR WebApi, that
 %   normally should be static for one session. The fields are
 %     webapi_url : The address to the WebApi server.
 %        timeout : Timout value for calls of the WebApi [s].

@@ -1,10 +1,13 @@
 % SMRAPI_L2_GET    Reads L2 data for specified scan.
 %
+%   Use this function of the data extraction starts with L2. Otherwise try
+%   to use *smrapi_append*.
+%
 % FORMAT   [SMR,e] = smrapi_l2_get(API,freqmode,scanid)
 %
 % OUT   SMR       Data structure, will contain fields API, L2, L2i etc.
 %       e         Error message. Returned as [] if all OK.
-%  IN   API       Structure wioth basic API settings.
+%  IN   API       Structure with basic API settings.
 %       freqmode  Frequency mode.
 %       scanid    Scan ID number.
 
