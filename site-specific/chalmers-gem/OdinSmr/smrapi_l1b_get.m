@@ -2,6 +2,8 @@
 %
 %   Use this function of the data extraction starts with L1b. Otherwise try
 %   to use *smrapi_append*.
+%  
+%   Multiple scan ids are handled.
 %
 % FORMAT   [SMR,e] = smrapi_l1b_get(API,freqmode,scanid)
 %
@@ -9,7 +11,7 @@
 %       e         Error message. Returned as [] if all OK.
 %  IN   API       Structure with basic API settings.
 %       freqmode  Frequency mode.
-%       scanid    Scan ID number.
+%       scanid    One or several scan ID numbers.
 
 % 2016-11-29   Patrick Eriksson
 
@@ -32,12 +34,14 @@ switch freqmode
     error( 'Don''t know backend for this freqmode (%d).', freqmode );
 end
 
-    
-url = sprintf( 'http://%s/rest_api/%s/scan/%s/%d/%d', ...
-               API.webapi_url, API.l1_version, backend, freqmode, scanid );
 
-SMR.API      = API;
+for i = 1 : length(scanid)
+  urls{i} = sprintf( 'http://%s/rest_api/%s/scan/%s/%d/%d', API.webapi_url, ...
+                     API.l1_version, backend, freqmode, scanid(i) );
+end
 
-[SMR,e]      = smrapi_append( SMR, url, 'L1b' );
+
+[SMR,e] = smrapi_call( API, urls, 'L1b' );
+
 
 

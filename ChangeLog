@@ -1,5 +1,16 @@
 2016-12-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-209
+
+	* site-specific/chalmers-gem/OdinSmr: Changes in all basically
+	existing functions. Now handling multiple scanids etc. More robust
+	against failures in reading. 
+
+	* site-specific/chalmers-gem/OdinSmr/smr_get_subfield.m:
+	* site-specific/chalmers-gem/OdinSmr/smrapi_log_find_dates.m: New functions.
+
+2016-12-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-208
 
 	* site-specific/chalmers-gem/OdinSmr: Removed sub-folder WebApi,

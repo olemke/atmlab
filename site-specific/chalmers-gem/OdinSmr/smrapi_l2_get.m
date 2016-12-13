@@ -3,13 +3,15 @@
 %   Use this function of the data extraction starts with L2. Otherwise try
 %   to use *smrapi_append*.
 %
+%   Multiple scan ids are handled.
+%
 % FORMAT   [SMR,e] = smrapi_l2_get(API,freqmode,scanid)
 %
 % OUT   SMR       Data structure, will contain fields API, L2, L2i etc.
 %       e         Error message. Returned as [] if all OK.
 %  IN   API       Structure with basic API settings.
 %       freqmode  Frequency mode.
-%       scanid    Scan ID number.
+%       scanid    One or several scan ID numbers.
 
 % 2016-11-29   Patrick Eriksson
 
@@ -17,9 +19,11 @@
 function [SMR,e] = smrapi_l2_get(API,freqmode,scanid)
 
 
-url = sprintf( 'http://%s/rest_api/%s/level2/%s/%d/%d', ...
-               API.webapi_url, API.l2_version, API.l2_project, freqmode, scanid );
+for i = 1 : length(scanid)
+  urls{i} = sprintf( 'http://%s/rest_api/%s/level2/%s/%d/%d', API.webapi_url, ...
+                     API.l2_version, API.l2_project, freqmode, scanid(i) );
+end
 
-SMR.API = API;
 
-[SMR,e] = smrapi_append( SMR, url );
+[SMR,e] = smrapi_call( API, urls );
+
