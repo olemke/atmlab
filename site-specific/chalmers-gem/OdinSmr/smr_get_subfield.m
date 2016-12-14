@@ -22,6 +22,9 @@
 function D = smr_get_subfield( SMR, datapos )
 
 
+D = [];  % If SMR happens to be empty
+
+
 % Matlab can always not handle SMR.(datapos) as datapos can contain several
 % levels and we need to go down one level at the time
 %
