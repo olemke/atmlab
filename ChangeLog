@@ -1,3 +1,12 @@
+2016-12-16  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-211
+
+	* lineshape/linewidth.m: Use linear interpoliation.
+
+	The usage of linear interpolation leads to a significant performance
+	improvement when searching the zero crossings with ``fnzeros`.
+
 2016-12-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-210

@@ -9,6 +9,6 @@
 % 2016-12-08   Lukas Kluft: Created.
 
 function lw = linewidth(f, a)
-    tmp = fnzeros(spline(f, a - max(a) / 2));
+    tmp = fnzeros(interp1(f, a - max(a) / 2, 'linear', 'pp'));
     lw = diff(tmp(1, :));
 end
