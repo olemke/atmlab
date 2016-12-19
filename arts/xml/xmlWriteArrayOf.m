@@ -16,6 +16,11 @@
 
 function xmlWriteArrayOf(fid, fidb, data, type, precision, attrlist)
 
+if exist(['xmlWriteArrayOf' type], 'file') == 2
+    feval (['xmlWriteArrayOf' type], fid, fidb, data, precision);
+    return
+end
+
 nrows = size (data, 1);
 ncols = size (data, 2);
 

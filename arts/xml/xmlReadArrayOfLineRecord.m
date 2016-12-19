@@ -17,19 +17,7 @@
 
 function result = xmlReadArrayOfLineRecord(fid,attrlist,itype,ftype,binary,fid2)
 
-ne = str2double (xmlGetAttrValue (attrlist, 'nelem'));
-
-%=== Some old setting varaibles
-%
-flims  = [0 Inf];
-sorted = 0;
-ilim   = 0;
-
-
-%=== Present version number
-%
-vers = 3;
-
+nelem = str2double (xmlGetAttrValue (attrlist, 'nelem'));
 
 %=== Check that this is a ARTSCAT file and the version number is correct
 %
@@ -37,149 +25,22 @@ s = xmlGetAttrValue (attrlist, 'version');
 
 %
 if ~strncmp( s, 'ARTSCAT-', 8 )
-  error('An ARTS line file must start with "ARTSCAT-"');
+    error('An ARTS line file must start with "ARTSCAT-"');
 end
 %
-stest = sprintf('ARTSCAT-%d', vers );
+vers = s(9:end);
 %
-if ~strncmp( s, stest, length(stest) )
-  serr = sprintf('The line file has not the correct version number\n');
-  serr = sprintf('%s(it should be %d)',serr,vers);
-  error( serr );
+if vers == '3'
+    result = read_artscat3(fid, nelem);
+elseif vers == '5'
+    result = read_artscat5(fid, nelem);
+else
+    error( 'atmlab:xmlLoad:xmlReadArrayOfLineRecord', ...
+        'The line file has not the correct version number\n (it should be 3 or 5)');
 end
 
-
-
-%=== Read lines 
-%
-S = next_line( fid );
-while isempty(S) & ~feof(fid)
-  S = next_line( fid );
-end
-
-n     = 0;
-%
-result     = [];
-%
-while ~isempty(S)
-
-  f = sscanf( S{2}, '%f' );
-
-  if sorted  &  f >= flims(2)
-    break
-  end
-  
-  i0 = sscanf( S{4}, '%f' );
-  
-  if f >= flims(1)  &  f <= flims(2)  &  i0 >= ilim
-    %
-    n = n + 1;
-    %
-    for i = 1:length(S)
-  
-      switch i
-  
-       case 1
-         result{n}.name = S{i};
-        
-       case 2
-         result{n}.f = f;
-     
-       case 3
-         result{n}.psf = sscanf( S{i}, '%f' );
-     
-       case 4
-         result{n}.i0 = i0;
-     
-       case 5
-         result{n}.t_i0 = sscanf( S{i}, '%f' );
-     
-       case 6
-         result{n}.elow = sscanf( S{i}, '%f' );
-     
-       case 7
-         result{n}.agam = sscanf( S{i}, '%f' );
-     
-       case 8
-         result{n}.sgam = sscanf( S{i}, '%f' );
-     
-       case 9
-         result{n}.nair = sscanf( S{i}, '%f' );
-     
-       case 10
-         result{n}.nself = sscanf( S{i}, '%f' );
-     
-       case 11
-         result{n}.t_gam = sscanf( S{i}, '%f' );
-     
-       case 12
-         result{n}.n_aux = sscanf( S{i}, '%f' );
-         n_aux      = result{n}.n_aux;
-         %
-         % Aux variables are handled below otherwise
-     
-       case 13 + n_aux
-         result{n}.df = sscanf( S{i}, '%f' );
-     
-       case 14 + n_aux
-         result{n}.di0 = sscanf( S{i}, '%f' );
-     
-       case 15 + n_aux
-         result{n}.dagam = sscanf( S{i}, '%f' );
-     
-       case 16 + n_aux
-         result{n}.dsgam = sscanf( S{i}, '%f' );
-     
-       case 17 + n_aux
-         result{n}.dnair = sscanf( S{i}, '%f' );
-     
-       case 18 + n_aux
-         result{n}.dnself = sscanf( S{i}, '%f' );
-     
-       case 19 + n_aux
-         result{n}.dpsf = sscanf( S{i}, '%f' );
-     
-       case 20 + n_aux
-         result{n}.qcode = sscanf( S{i}, '%s' );
-     
-       case 21 + n_aux
-         result{n}.qlower = sscanf( S{i}, '%s' );
-     
-       case 22 + n_aux
-         result{n}.qlower = sscanf( S{i}, '%s' );
-     
-       case 23 + n_aux
-         result{n}.if = sscanf( S{i}, '%s' );
-     
-       case 24 + n_aux
-         result{n}.ii0 = sscanf( S{i}, '%s' );
-     
-       case 25 + n_aux
-         result{n}.ilw = sscanf( S{i}, '%s' );
-     
-       case 26 + n_aux
-         result{n}.ipsf = sscanf( S{i}, '%s' );
-     
-       case 27 + n_aux
-         result{n}.iaux = sscanf( S{i}, '%s' );
-      
-       otherwise
-         %
-         if i <= 12+n_aux
-           eval(['result{i}.aux',int2str(i-11)]) = sscanf( S{i}, '%f' );
-         else
-           error(sprintf('To many fields found for line %d.',n));
-         end
-      end
-    end 
-  end
-  %
-  S = next_line( fid );
-  %
-end
-
-if n ~= ne
-  error('Number of lines in catalogue (%d) doesnt match nelem attribute (%d)', n, ne);
+if length(result) ~= nelem
+    error('Number of lines in catalogue (%d) doesnt match nelem attribute (%d)', length(result), nelem);
 end
 
 return
@@ -188,96 +49,182 @@ return
 
 %------------------------------------------------------------------------------
 
-function S = next_line( fid )
+function lines = read_artscat3(fid, nelem)
 
-  S = [];
+%=== Read lines
+%
 
-  %= Just return if EOF
-  if feof(fid)
-    return
-  end
+S = {};
+while numel(S) < 2 && ~feof(fid)
+    S = strsplit( strtrim( fgets( fid )), ' ' );
+end
 
-  %= Read next line
-  sin = strtrim( fgets( fid ));
+n = 0;
 
-  %= Return if empty line
-  if length(sin) < 2
-    return
-  end
+% Preallocate line record structure array
+result(1:nelem) = struct(...
+    'version', 3, ...
+    'name', '', ...
+    'f', '', ...
+    'psf', '', ...
+    'i0', '', ...
+    't_i0', '', ...
+    'elow', '', ...
+    'agam', '', ...
+    'sgam', '', ...
+    'nair', '', ...
+    'nself', '', ...
+    't_gam', '', ...
+    'n_aux', '', ...
+    'df', '', ...
+    'di0', '', ...
+    'dagam', '', ...
+    'dsgam', '', ...
+    'dnair', '', ...
+    'dnself', '', ...
+    'dpsf', '', ...
+    'qcode', '', ...
+    'qupper', '', ...
+    'qlower', '', ...
+    'if', '', ...
+    'ii0', '', ...
+    'ilw', '', ...
+    'ipsf', '', ...
+    'iaux', '' ...
+    );
 
-  %= Read until next line that starts with @ and replace line feeds 
-  %= with a blank
-  %
-  if sin(1) ~= '@'
-    serr = sprintf('Could not read linefile at:\n%s',sin);
-    error( serr );
-  end
-  % 
-  s = [ sin( 3 : (length(sin)-1) ), ' ' ];
-  %
-  c1 = fscanf(fid,'%c',1);
-  %
-  while ~isempty(c1) & c1~='@'
-    %
-    fseek(fid,-1,'cof');   
-    %
-    sin = fgets( fid );
-    s   = [ s, sin( 1 : (length(sin)-1) ), ' ' ];
-    %
-    c1 = fscanf(fid,'%c',1);
-  end
-
-  %= Back one step in the file
-  fseek(fid,-1,'cof');   
-
-  %= Field index 
-  i = 0;
-
-  while 1
-
-    i = i + 1;
-
-    %= Text field inside " "
-    %
-    if s(1) == '"'
-      %
-      iprims = find( s == '"' );
-      %
-      if length(iprims) < 2
-        error('Unmatched " found.');
-      end
-      %
-      S{i} = s(2:(iprims(2)-1));
-      %
-      l = iprims(2);
-
-    %= Closing tag reached
-    %
-    elseif s(1) == '<' & s(2) == '/'
-      return
-    %= Other field
-    %
-    else
-
-      %= Find field seperations
-      iblank = find( s == ' ' );
-
-      %= Pick out text until first blank
-      l    = iblank(1) - 1;    
-      S{i} = s(1:l);
-
+while numel(S) > 1
+    
+    n = n + 1;
+    
+    result(n).name = S{2};
+    result(n).f = sscanf( S{3}, '%f' );
+    result(n).psf = sscanf( S{4}, '%f' );
+    result(n).i0 = sscanf( S{5}, '%f' );
+    result(n).t_i0 = sscanf( S{6}, '%f' );
+    result(n).elow = sscanf( S{7}, '%f' );
+    result(n).agam = sscanf( S{8}, '%f' );
+    result(n).sgam = sscanf( S{9}, '%f' );
+    result(n).nair = sscanf( S{10}, '%f' );
+    result(n).nself = sscanf( S{11}, '%f' );
+    result(n).t_gam = sscanf( S{12}, '%f' );
+    result(n).n_aux = sscanf( S{13}, '%f' );
+    n_aux      = result(n).n_aux;
+    
+    % Aux variables are handled below otherwise
+    for i = 14:13+n_aux
+        result(n).(sprintf('aux%d', i-13)) = sscanf( S{i}, '%f' );
     end
-
-    %= Remove used text
-    s = s( (l+1):length(s) );
-
-    %= Remove blanks at the start of s (if no-blanks, we are ready)
-    ichars = find( s ~= ' ' );
-    if isempty( ichars )
-      return;
+    
+    result(n).df = sscanf( S{14+n_aux}, '%f' );
+    result(n).di0 = sscanf( S{15+n_aux}, '%f' );
+    result(n).dagam = sscanf( S{16+n_aux}, '%f' );
+    result(n).dsgam = sscanf( S{17+n_aux}, '%f' );
+    result(n).dnair = sscanf( S{18+n_aux}, '%f' );
+    result(n).dnself = sscanf( S{19+n_aux}, '%f' );
+    result(n).dpsf = sscanf( S{20+n_aux}, '%f' );
+    if numel(S) > 20+n_aux
+        result(n).qcode = sscanf( S{21+n_aux}, '%s' );
+    elseif numel(S) > 21+n_aux
+        result(n).qupper = sscanf( S{22+n_aux}, '%s' );
+    elseif numel(S) > 22+n_aux
+        result(n).qlower = sscanf( S{23+n_aux}, '%s' );
+    elseif numel(S) > 23+n_aux
+        result(n).if = sscanf( S{24+n_aux}, '%s' );
+    elseif numel(S) > 24+n_aux
+        result(n).ii0 = sscanf( S{25+n_aux}, '%s' );
+    elseif numel(S) > 25+n_aux
+        result(n).ilw = sscanf( S{26+n_aux}, '%s' );
+    elseif numel(S) > 26+n_aux
+        result(n).ipsf = sscanf( S{27+n_aux}, '%s' );
+    elseif numel(S) > 27+n_aux
+        result(n).iaux = sscanf( S{28+n_aux}, '%s' );
     end
-    s = s( ichars(1):length(s) );
- 
-  end
+    
+    S = textscan( strtrim( fgets( fid )), '%s', 'delimiter', ' ' );
+    S = S{1};
+end
+
+lines = result;
 return
 
+function lines = read_artscat5(fid, nelem)
+
+%=== Read lines
+%
+S = '';
+while numel(S) < 2 && ~feof(fid)
+    S = fgetl( fid );
+end
+
+% Preallocate line record structure array
+result(1:nelem) = struct(...,
+    'version', 5, ...
+    'name', '', ...
+    'f', '', ...
+    'i0', '', ...
+    't_i0', '', ...
+    'elow', '', ...
+    'a', '', ...
+    'gupper', '', ...
+    'glower', '', ...
+    'PB_type', '', ...
+    'PB_values', '', ...
+    'LM_type', '', ...
+    'LM_values', '', ...
+    'QN', '', ...
+    'PF_type', '', ...
+    'PF_values', '' ...
+    );
+
+known_tags = {'PB ', 'LM ', 'PF ', 'QN '};
+for n = 1:nelem
+    [tokens, pos] = textscan(S, '@ %s %f %f %f %f %f %f %f');
+    result(n).name = tokens{1}{1};
+    result(n).f = tokens{2};
+    result(n).i0 = tokens{3};
+    result(n).t_i0 = tokens{4};
+    result(n).elow = tokens{5};
+    result(n).a = tokens{6};
+    result(n).gupper = tokens{7};
+    result(n).glower = tokens{8};
+    S_tags = S(pos+1:end);
+    values = textscan(S_tags, '%s', 'delimiter', known_tags);
+    values = values{1}';
+    tag_pos = 1;
+    for t = 2:length(values)
+        tag = S_tags(tag_pos:tag_pos+2);
+        current_values = values{t};
+        if strcmp(tag, 'PB ')
+            type_length = 1;
+            while current_values(type_length) ~= ' ' && type_length < length(current_values)
+                type_length = type_length + 1;
+            end
+            result(n).PB_type = sscanf(current_values(1:type_length), '%s');
+            result(n).PB_values = sscanf(current_values(type_length+1:end), '%f');
+        elseif strcmp(tag, 'LM ')
+            result(n).LM_type = sscanf(current_values(1:3), '%s');
+            result(n).LM_values = sscanf(current_values(4:end), '%f');
+        elseif strcmp(tag, 'PF ')
+            result(n).PF_type = sscanf(current_values(1:3), '%s');
+            % Ignore first number, it is just the number of elements
+            pf_values = sscanf(current_values(4:end), '%f');
+            result(n).PF_values = pf_values(2:end);
+        elseif strcmp(tag, 'QN ')
+            result(n).QN = current_values;
+        else
+            error('atmlab:xmlLoad:xmlReadArrayOfLineRecord', ...
+                'Unknown catalog tag: %s', tag);
+        end
+        tag_pos = tag_pos + 3 + length(values{t});
+    end
+    S = fgetl( fid );
+end
+
+if ~strcmp(strtrim(S), '</ArrayOfLineRecord>')
+    error('atmlab:xmlLoad:xmlReadArrayOfLineRecord', ...
+        'Unexpected end of catalog. Expected </ArrayOfLineRecord> tag, got\n%s', S);
+end
+
+lines = result;
+return

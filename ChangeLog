@@ -1,3 +1,30 @@
+2016-12-19  Oliver Lemke  <olemke@core-dump.info>
+
+	* atmlab-2-3-212
+
+	NOTE: ArrayOfLineRecords are now returned as struct arrays,
+	not cell arrays anymore. This means you have to index them
+	with () instead of {}.
+
+	* arts/xml/xmlWriteArrayOf.m:
+
+	Give explicit implementations of array reading routines precedence
+	over the generic implementation. Creates the possibility of overwriting
+	the default array reading routine with a specialized one. Necessary for
+	writing ArrayOfLineRecord.
+
+	* arts/xml/xmlReadArrayOfLineRecord.m:
+
+	Add support for reading ARTSCAT-5.
+
+	Optimized reading speed of ARTSCAT-3 by factor 2 by preallocating the
+	struct array and getting rid of the (slow) custom parsing function.
+	Instead textscan is used to split the line into tokens.
+
+	* arts/xml/xmlWriteArrayOfLineRecord.m:
+
+	New writing routine for ARTSCAT-5.
+
 2016-12-16  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-211
