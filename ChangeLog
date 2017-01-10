@@ -1,3 +1,12 @@
+2017-01-10  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-213
+
+	* arts/xml/xmlStore.m, arts/xml/xmlStoreWithComment.m:
+
+	Improved documentation. Explicitly mention that the full ARTS data type has
+	to be passed.
+
 2016-12-19  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-212
