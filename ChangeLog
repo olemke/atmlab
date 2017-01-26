@@ -1,4 +1,13 @@
+2017-01-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-215
+
+	* files/file2strs.m: Now not returns S=[] for empty files, instead
+	of resulting in an error.
+
 2017-01-17  Maryam Jamali  <maryam.jamali@ltu.se>
+
+	* atmlab-2-3-214
 
 	* atmlab/h2o/parametrisations/snow_psd_kneifel11. Added.
 

@@ -28,6 +28,7 @@ fid = fileopen( filename, 'r' );
 
 %= Loop and read one line at the time (not storing newlines)
 %
+S = [];
 j = 0;
 %
 while 1	
