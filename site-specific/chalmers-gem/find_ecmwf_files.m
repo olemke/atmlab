@@ -30,8 +30,8 @@ ecmwf = true;
 if nargin<3
   ecmwfdir='/odin/external/ecmwfNCD';
 elseif strcmp(source,'era');
-  if strcmp( hostname, 'virga' )  |  strcmp( whoami, 'patrick2' )
-    ecmwfdir='~/Extdata/ERA-Interim/';
+  if strcmp( whoami, 'patrick' )
+    ecmwfdir='~/Dendrite/AtmData/EraInterim';
   else
     ecmwfdir='/misc/pearl/extdata/ERA-Interim/';
   end

@@ -183,17 +183,26 @@ if length(varargin) == 2
     %
     addsite;
 
-   case {'ATMLAB_DATA_PATH', 'ARTS_XMLDATA_PATH', 'ARTS_INCLUDES', 'ATMLAB_PATH'}
-     if ~exist(varargin{2}, 'dir')
+    case {'ATMLAB_DATA_PATH', 'ARTS_XMLDATA_PATH', 'ARTS_INCLUDES', ...
+          'ATMLAB_PATH'}
+      %
+      if ~exist(varargin{2}, 'dir')
         warning('atmlab:dirnotfound', ['Warning: ' varargin{1} ' set to ' ...
             varargin{2} ' which is not found or not a directory']);
-     end
+      end
 
-   case {'ARTS_PATH', 'PYTHON'}
-     if ~exist(varargin{2}, 'file')
+    case {'ARTS_PATH', 'PYTHON'}
+      %
+      ind = strfind( varargin{2}, '-' );
+      if isempty(ind)
+        name = varargin{2};
+      else
+        name = varargin{2}(1:ind(1)-1);
+      end
+      if ~exist(deblank(name), 'file')
         warning('atmlab:filenotfound', ['Warning: ' varargin{1} ' set to ' ...
             varargin{2} ' which is not found']);
-     end
+      end
     
   end
 end
