@@ -129,9 +129,9 @@ if atmlab('STRICT_ASSERT')
 end
 
 
-% Check if lon_limits are inside [0,360] and cropping can be dione already
+% Check if lon_limits are inside [0,359] and cropping can be done already
 % in reading
-if lon_limits(1) < 0
+if lon_limits(1) < 0  |  lon_limits(2) > 359
   do_loncrop  = true;
   lon_limits0 = lon_limits;
   lon_limits  = [0 360];   % To read all lon
@@ -271,8 +271,14 @@ G.SOURCE     = infile;
 
 % crop in lon remaining?
 if do_loncrop
-  [lon,i]     = adjust_to_lonlimits( G.GRID2, lon_limits0 );
+  % We add 0 as 360 to really cover all longotudes
+  lon_tmp           = [ G.GRID2; 360 ];
+  data              = zeros( size(G.DATA,1), size(G.DATA,2)+1, size(G.DATA,3) );
+  data(:,1:end-1,:) = G.DATA;
+  data(:,end,:)     = G.DATA(:,end,:);
+  %  
+  [lon,i]     = adjust_to_lonlimits( lon_tmp, lon_limits0 );
   i           = find(i);
   [G.GRID2,j] = sort( lon(i) );
-  G.DATA      = G.DATA(:,i(j),:);
+  G.DATA      = data(:,i(j),:);
 end

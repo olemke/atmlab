@@ -1,12 +1,22 @@
+2017-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-216
+
+	* site-specific/chalmers-gem/erainterim2surfdata.m:
+	* site-specific/chalmers-gem/erainterim2atmdata.m: There was a gap
+	in the data coverage just below lon 360. Data for lon=0 not copied
+	to really cover [0,360]. Probably still potential problems for
+	close to -180.
+
 2017-01-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-216
 
 	* site-specific/chalmers-gem/find_ecmwf_files.m: Path to ERA now
-	set to dendrite for user patrick. 
+	set to dendrite for user patrick.
 
 	* atmlab/atmlab.m: Added some code allowing to set ARTS_PATH
-	including flags, and not get a warning. E.g.: arts -n1 
+	including flags, and not get a warning. E.g.: arts -n1
 	The code assumes that the ctual file path does not contain -.
 	Works for me! A problem for someone?
 

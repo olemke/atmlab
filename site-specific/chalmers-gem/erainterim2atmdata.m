@@ -327,6 +327,13 @@ G.SOURCE     = infile;
 
 % crop in lon remaining?
 if do_loncrop
+  % We add 0 as 360 to really cover all longotudes
+  lon_tmp           = [ G.GRID2; 360 ];
+  data              = zeros( size(G.DATA,1), size(G.DATA,2), ...
+                             size(G.DATA,3)+1, size(G.DATA,4) );
+  data(:,:,1:end-1,:) = G.DATA;
+  data(:,:,end,:)     = G.DATA(:,:,end,:);
+  %  
   [lon,i]     = adjust_to_lonlimits( G.GRID3, lon_limits0 );
   i           = find(i);
   [G.GRID3,j] = sort( lon(i) );
