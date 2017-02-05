@@ -279,6 +279,6 @@ if do_loncrop
   %  
   [lon,i]     = adjust_to_lonlimits( lon_tmp, lon_limits0 );
   i           = find(i);
-  [G.GRID2,j] = sort( lon(i) );
+  [G.GRID2,j] = unique( lon(i) );
   G.DATA      = data(:,i(j),:);
 end

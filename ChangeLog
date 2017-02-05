@@ -1,3 +1,12 @@
+2017-02-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-217
+
+	* site-specific/chalmers-gem/erainterim2surfdata.m:
+	* site-specific/chalmers-gem/erainterim2atmdata.m: Replaced sort
+	with unique in last change. This to fix that 0 could appear twice
+	in final grid.
+
 2017-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-216
