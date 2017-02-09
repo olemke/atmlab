@@ -63,6 +63,10 @@ if exist('filter','var') && ~isempty(filter)
     end
 end
 
+stmp = cellfun(@(x)(sprintf('"%s",',func2str(x))),statistics,'UniformOutput',0);
+tmp = [tmp{:}];
+logtext(atmlab('OUT'),'Getting the statistic/s called %s within each gridcell\n',tmp(1:end-1))
+
 for i = 1:length(statistics)
     try
         A.(func2str(statistics{i}))=0; %#ok<STRNU> % it like a "isvalidfieldname" test
@@ -74,7 +78,6 @@ for i = 1:length(statistics)
             ME.rethrow();
         end
     end
-    logtext(atmlab('OUT'),'Getting the statistic called "%s" within each gridcell\n',func2str(statistics{i}))
 
     out.(statname) = cellfun(statistics{i}, data_bins, 'UniformOutput', false);
 
@@ -115,8 +118,6 @@ for i = 1:length(F)
     % Make sure all the data is the same class
 
     if isfield(opt,'dataClass') && ~isempty(opt.dataClass)
-        logtext(atmlab('OUT'),['Making sure all vectors in cells are the same class '...
-            '(in this case "%s")\n'],opt.dataClass)
         out.(F{i}) = cellfun(@(x)(cast(x,opt.dataClass)), out.(F{i}), 'UniformOutput', false);
     end
 end

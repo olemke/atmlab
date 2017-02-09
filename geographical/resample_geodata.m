@@ -55,7 +55,7 @@ function out = resample_geodata(in,field,newgrid)
 % USAGE:         out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},3);
 %         e.g.   out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},[3,5]);
 %                out = resample_geodata(in,{'CC','HCC','MCC','LCC','P','T','Q'},...
-%                        {[ newlats ],[ newlons ]} );
+%                        {[ newlons ],[ newlats ]} );
 %
 %                1st example: Someone wants to resample 7 data fields
 %                in one go to a 3x3 deg grid (the common lat lons are in the structure)

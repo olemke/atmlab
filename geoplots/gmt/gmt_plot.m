@@ -118,7 +118,7 @@ function filename = gmt_plot(in,field)
 %                              add_offset
 %                     ------------
 % in.figuretype        in:     %s
-%                      ex:     'eps','pdf','BMP','jpg','PNG','PPM' (not recommended), or 'tif'.
+%                      ex:     'eps','pdf','BMP','jpg','png','PPM' (not recommended), or 'tif'.
 %                           If the figure type is included in the filename,
 %                           e.g., file.png, or file.jpg, then that file type is
 %                           used, however defining in.figuretype will
@@ -865,7 +865,7 @@ default.fontsize_annot_secondary = '10p';
 default.fontsize_title           = '36p';
 default.psbasemap.axes           = 'nSeW';
 default.scale_factor             = 1;     
-default.title                    = '';
+default.title                    = field;
 
 in = optargs_struct(in,default);
 clear default
@@ -892,7 +892,7 @@ default.unit                     = '';
 default.xunit                    = '';
 
 in = optargs_struct(in,default);
-
+in = orderfields(in);
 clear default
 
 in.outdir = sanitise(in.outdir);
@@ -908,19 +908,20 @@ if system(sprintf('test -d %s -a -w %s',in.outdir,in.outdir))
 end
 
 if ~isempty(in.title)
-    default.filename = ['gmtfile_' in.title '.pdf'];
+    default.filename = ['gmtfile_' in.title];
     default.filename = strrep(default.filename,'/','-');
-else default.filename = 'default.pdf';
+else default.filename = 'default';
 end
 
 in = optargs_struct(in,default);
+in = orderfields(in);
 clear default
 
 % find default figuretype
 b = regexp(in.filename,'\.');
 if ~isempty(b)
     ft = in.filename(b(end)+1:end);
-    if ismember(lower(ft),lower({'eps','pdf','BMP','JPEG','jpg','PNG','PPM','tif'}))
+    if ismember(lower(ft),lower({'eps','pdf','BMP','JPEG','jpg','png','PPM','tif'}))
         default.figuretype = ft;
     else
         logtext(atmlab('OUT'),'figuretype: %s is not an available type. Will produce .pdf\n',ft);
@@ -934,6 +935,7 @@ else
 end
 
 in = optargs_struct(in,default);
+in = orderfields(in);
 clear default
 
 in.filename = sanitise(in.filename);
@@ -1014,8 +1016,12 @@ if ~in.nodata
 end
 
 in = optargs_struct(in,default);
+in = orderfields(in);
+
 clear default
 in.datarange = double(in.datarange);
+assert(length(unique(in.(field)((in.(field))>=in.datarange(1)&in.(field)<=in.datarange(2))))>2,...
+    'It appears all all data is outside the range of in.datarange')
 
 % if you have only given the min value
 if isscalar(in.datarange), tmp=getdatarange(in,field);in.datarange(2) = tmp(2);end
@@ -1045,6 +1051,7 @@ if ~ischar(in.proj)
     in = setup_projection(in);
 end
 
+in = orderfields(in);
 end
 
 function nl = get_nlevels(in)
@@ -1292,6 +1299,10 @@ function datarange = getdatarange(in,field)
 %% getdatarange
 
 tmp = in.(field)(:);
+
+%sneakily remove the outliers from contention  
+tmp = unique(in.(field)(:));tmp=tmp(2:end);
+
 d = double([min(tmp(~isinf(tmp))) max(tmp(~isinf(tmp)))]);
 
 % Do some tricks to get the most useful datarange. (rounded, but preserve precision)
@@ -1714,8 +1725,8 @@ function filename = setup_figure(in,command)
 %% SORT FIGURES
 
 
-%'eps','pdf','BMP','jpg','PNG','PPM','TIFF', ot 'tif'
-switch lower(in.figuretype)
+%'eps','pdf','BMP','jpg','png','PPM','TIFF', ot 'tif'
+switch in.figuretype
     case 'pdf'
         T = '-Tf';
     case 'bmp'
@@ -1737,10 +1748,14 @@ end
 command{end+1} = sprintf('gmt psconvert %s.ps -A -P %s',in.filename,T);
 
 % Assemble open command
-if isnan(gmtlab('PDFVIEWER'))
-    openwith = gmtlab('OPEN_COMMAND');
+if strcmp(in.figuretype,'pdf')
+    if isnan(gmtlab('PDFVIEWER'))
+        openwith = gmtlab('OPEN_COMMAND');
+    else
+        openwith = gmtlab('PDFVIEWER');
+    end
 else
-    openwith = gmtlab('PDFVIEWER');
+    openwith = gmtlab('OPEN_COMMAND');
 end
 
 if in.makeScriptAndStop

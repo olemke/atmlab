@@ -14,13 +14,12 @@ function [flags,out] = standardize_geodata(in,options)
 %           options  structure
 %                       some options including what you want to do to
 %                       homogenise, basically what features you want to allow.
-%                       These are the defaults:
 %
-%                    default.dimorder    = 'lonlat'; % Order the data as (lon,lat,....);
-%                    default.lon_descend = true; % order the longitudes in descending order
-%                    default.lat_descend = true; % order the latitudes in descending order
-%                    default.lon360      = true; % fit longitudes (and data if given) to 0:360 regime
-%                    default.dublicate = true % allow duplicate values (repeat longitudes e.g. at -180 and 180)
+%                    dimorder    = 'lonlat'; % Order the data as (lon,lat,....);
+%                    lon_descend = true; % order the longitudes in descending order
+%                    lat_descend = true; % order the latitudes in descending order
+%                    lon360      = true; % fit longitudes (and data if given) to 0:360 regime
+%                    dublicate = true % allow duplicate values (repeat longitudes e.g. at -180 and 180)
 %
 %  OUT
 %           flags     struct     A structure of flags to indicate how your data is arranged
@@ -72,8 +71,10 @@ if dexist
     elseif length(lat) ~= length(lon)
         
         flags.dimorder = 'undetermined';
-    else
-        error(errID,'data does not appear to be gridded according to (lon,lat,...) or (lat,lon,...)')
+    elseif sz(1)==sz(2)
+        
+        fprintf('cannot determine dim order, Assumin dim order is lonlat')
+        flags.dimorder = 'lonlat';
     end
     
 end

@@ -1,4 +1,4 @@
-function dates = daterange(date1, date2)
+function dates = daterange(date1, date2, resolution)
 
 % daterange Returns a matrix of valid dates within the daterange
 %
@@ -8,8 +8,13 @@ function dates = daterange(date1, date2)
 %
 % IN
 %
-%   date1   array   Starting date
-%   date2   array   Ending date
+%   date1      array    Starting date
+%   date2      array    Ending date
+% 
+% OPT
+%
+%   resolution scalar  output: 2 = [y1 m1;y2 m2;] (monthly),
+%                      3 = [y1 m1 d1;y2 m2 d2; ...]  (daily) etc.
 %
 % OUT
 %
@@ -30,8 +35,11 @@ errId = ['atmlab' mfilename ':badInput'];
 assert(length(date1)==length(date2),errId,...
     'length(date1)~=length(date2)')
 
-dl = length(date1);
-
+if exist('resolution','var')
+    dl = resolution;
+else
+    dl = length(date1);
+end
 if dl ==2
     date1(3) = 1;
     date2(3) = 1;

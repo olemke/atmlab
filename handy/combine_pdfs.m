@@ -1,6 +1,6 @@
 function outfile = combine_pdfs(pdffiles, options)
-% COMBINE_PDFS Combine several PDF files on one page
-%
+% COMBINE_PDFS Combine several PDF (or eps) files on one page
+% 
 % USAGE: outfile = combine_pdfs(pdffiles, options)
 %
 % E.g. file = combine_pdfs(files,struct('cols',[2 2 2 2 1],...))
@@ -120,7 +120,9 @@ function outfile = combine_pdfs(pdffiles, options)
 %          
 % OUT:      outfile = The fullpath to the created pdf-file
 %
-% NOTE: The files are appended left to right and from top to bottom.
+% NOTE: The files are appended left to right and from top to bottom. This
+% function does not handle bitmaps like png since it relys on pdfinfo to
+% retrieve the size of the figures
 
 
 % 2013-04-10 Oliver Lemke and Salomon Eliasson.
@@ -236,6 +238,11 @@ assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
 
 %% Setup is complete, let's get cracking
 layout = create_layout_from_pdffiles(pdffiles, options);
+if isempty(layout)
+    outfile='';
+    logtext(1,'File not created\n')
+    return
+end 
 
 outfile = create_pdf_from_layout_with_latex(layout, options);
 
@@ -270,8 +277,12 @@ regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 %
 psize(length(pdffiles)) = struct('width','','height','');
 for i = 1:length(pdffiles)
-    
-    if strcmp(pdffiles{i}(end-3:end),'.eps')
+    if strcmpi(pdffiles{i}(end-3:end),{'.png'})
+        logtext(1,'Cannot handle .png. Quitting...\n')
+        layout='';
+        return
+    end 
+    if strcmpi(pdffiles{i}(end-3:end),{'.eps'})
         % make a tempory file and then delete it (if you want to ultimately
         % create a .dvi), otherwise we need epstopdf since pdflatex cannot
         % handle .eps (internally uses epstopdf anyhow)

@@ -244,7 +244,7 @@ if ~in.counts
     
     assert(isequal(size(in.X,1),size(in.Y,1),size(in.Z,1)),...
         errId, ['data,Y,X must all have the same first dimension. Found: ' ...
-        'data %d, Y %d, X %d'], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
+        'data %d, Y %d, X %d. It seems your data is not "ungridded" '], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
 else
     if isequal(numel(in.Y),numel(in.X))
         in.Y = in.Y(:); in.X = in.X(:);

@@ -1,6 +1,27 @@
+2017-02-09  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-219
+
+	* geographical/resample_geodata.m:
+	* geographical/standardize_geodata.m:
+	* math/binning_fast.m:
+	- Improved documentation
+	- Added additional error message
+
+	* geoplots/gmt/gmt_plot.m: Added some little tweaks for more desirable default behaviour
+
+	* handy/combine_pdfs.m: expanded to also include EPS files. It
+	does not handle bitmaps such as PNG, since I rely on pdfinfo to find the size of the plot
+
+	* math/binned_statistics.m: made a runtime message less repetitive
+
+	* time/daterange.m: added optional argument to set the temporal
+	resolution of the output regardless of how precise the provided
+	date. E.g., [y1 m1;y2 m2]=daterange([y1 m1 d1],[y2 m2 d2],2)
+
 2017-02-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-2-3-217
+	* atmlab-2-3-218
 
 	* site-specific/chalmers-gem/erainterim2surfdata.m:
 	* site-specific/chalmers-gem/erainterim2atmdata.m: Replaced sort
@@ -9,7 +30,7 @@
 
 2017-01-30  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-2-3-216
+	* atmlab-2-3-217
 
 	* site-specific/chalmers-gem/erainterim2surfdata.m:
 	* site-specific/chalmers-gem/erainterim2atmdata.m: There was a gap
