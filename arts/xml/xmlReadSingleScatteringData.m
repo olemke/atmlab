@@ -21,21 +21,21 @@ function result = xmlReadSingleScatteringData(fid, attrlist, itype, ftype, binar
 
 vstr = xmlGetAttrValue (attrlist, 'version');
 if isempty(vstr)
-    version = 1;
+    result.version = 1;
 else
-    version = str2double(vstr);
+    result.version = str2double(vstr);
 end
 result.ptype            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
-if (version == 1)
-    result.ptype = arts_ptype2string(result.ptype);
+if (result.version == 1)
+    result.version = 2;
+    result.ptype = arts_ptype2string(result.ptype, result.version);
 end
 
-valid_particle_types = { 'general', 'macroscopically_isotropic', ...
-                         'horizontally_aligned' };
-if ~any( ismember( valid_particle_types, result.ptype ) )
-  error('atmlab:xmlWriteScatteringMetaData:IllegalParticleType', ...
-        ['Illegal particle_type ' data.particle_type '\n' ...
-         'Valid types are: ' sprintf('%s ', valid_particle_types{:})])
+if ~arts_check_ptype(result.ptype, result.version)
+    error('atmlab:xmlWriteScatteringMetaData:IllegalParticleType', ...
+        ['Illegal particle_type ' result.ptype '\n' ...
+        'Valid types for version 3: general, totally_random, azimuthally_random\n' ...
+        'Valid types for version 2: general, macroscopically_isotropic, horizontally_aligned'])
 end
 
 result.description      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
