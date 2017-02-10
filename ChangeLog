@@ -1,8 +1,17 @@
 2017-02-10  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-3-221
+
+	* arts/xml/xmlReadSingleScatteringData.m:
+
+	Convert version 2 data to version 3 on reading if possible (azimuthally
+	random data is kept at version 2).
+
+2017-02-10  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-3-220
 
-	* arts/xml/xmlReadSingleScatteringData.m,
+	* arts/xml/xmlReadSingleScatteringData.m:
 
 	Add support for new SSD version 3. The version number is now stored as
 	a field in the SSD structure.

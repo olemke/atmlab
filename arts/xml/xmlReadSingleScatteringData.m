@@ -25,7 +25,10 @@ if isempty(vstr)
 else
     result.version = str2double(vstr);
 end
+
 result.ptype            = xmlReadTag(fid, '', itype, ftype, binary, fid2);
+
+% Version 1 can be directly converted into version 2
 if (result.version == 1)
     result.version = 2;
     result.ptype = arts_ptype2string(result.ptype, result.version);
@@ -36,6 +39,12 @@ if ~arts_check_ptype(result.ptype, result.version)
         ['Illegal particle_type ' result.ptype '\n' ...
         'Valid types for version 3: general, totally_random, azimuthally_random\n' ...
         'Valid types for version 2: general, macroscopically_isotropic, horizontally_aligned'])
+end
+
+% Non-azimuthally random data can be converted directly to version 3
+if result.version == 2 && ~strcmp(result.ptype, 'horizontally_aligned')
+    result.version = 3;
+    result.ptype = arts_update_ptype(result.ptype);
 end
 
 result.description      = xmlReadTag(fid, '', itype, ftype, binary, fid2);
