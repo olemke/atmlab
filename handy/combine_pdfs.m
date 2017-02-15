@@ -132,13 +132,8 @@ if ~nargin, error(['atmlab:' mfilename],'Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
-default.cols        = min(length(pdffiles),2);
+default.cols        = min([length(pdffiles),2]);
 default.display    = true;
-if isfield(options,'title') && ~isempty(options.title)
-    default.filename = sanitise(options.title);
-else
-    default.filename = 'out';
-end
 default.hspace      = 1;
 default.outdir     = gmtlab('outdir');
 default.pages      = 1;
@@ -153,6 +148,13 @@ default.outputformat='pdf';
 
 options = optargs_struct(options, default);
 
+if ~isempty(options.title)
+    default.filename = sprintf('%s.%s',sanitise(options.title),options.outputformat);
+else
+    default.filename = sprintf('out.%s',options.outputformat);
+end
+
+options = optargs_struct(options, default);
 %%
 % Path
 

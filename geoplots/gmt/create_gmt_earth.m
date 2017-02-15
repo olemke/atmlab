@@ -324,7 +324,8 @@ switch in.ctable.name
     case 'mypolar'
         if ~isfield(in,'tickval')
             tickval = ownctable(in);
-        else tickval = in.tickval;
+        else
+            tickval = in.tickval;
         end
         in.cptfile = makepolar(tickval,in);
     case 'colorrange'

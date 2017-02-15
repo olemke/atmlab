@@ -63,7 +63,7 @@ if exist('filter','var') && ~isempty(filter)
     end
 end
 
-stmp = cellfun(@(x)(sprintf('"%s",',func2str(x))),statistics,'UniformOutput',0);
+tmp = cellfun(@(x)(sprintf('"%s",',func2str(x))),statistics,'UniformOutput',0);
 tmp = [tmp{:}];
 logtext(atmlab('OUT'),'Getting the statistic/s called %s within each gridcell\n',tmp(1:end-1))
 

@@ -1,3 +1,14 @@
+2017-02-15  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-222
+
+	* handy/combine_pdfs.m: Using title for the filename is title is given and filename is not
+	* handy/catstruct.m:
+	* geoplots/gmt/create_gmt_earth.m:
+	dealt with mlint messages
+
+	* math/binned_statistics.m: removed error that snuck into  the last commit
+
 2017-02-10  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-3-221
