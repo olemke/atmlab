@@ -1,3 +1,25 @@
+2017-02-20  Mareike Burba  <mareikeburba@uni-hamburg.de>
+
+	* atmlab-2-3-223
+
+	* gridcreation/annealing/loop_anneal.m : replaces loop_anneal and
+	apply_annealing. The reshaping in apply_annealing is moved here. The
+	dimensions of the data are checked anyways. Furthermore, I added a new
+	input parameter: bf_below. That stands for "brute force below" the given
+	number of frequencies per channel. At the moment, it only works for
+	bf_below <=2, so for one frequency per channel. But for more options
+	could be added new functions. bf_below=1 means that no brute force
+	approach will be used.
+
+	* gridcreation/annealing/test_freq_set_gasteiger.m: added. Is the same
+	as test_freq_set, but using a error measure like Gasteiger et al. 2014.
+	
+	* find_best_freq_set_anneal_rowWise.m : added functionality to use
+	the Gasteiger error measure if C.use_gasteiger is set to true.
+	C.use_gasteiger is false by default. If gasteiger is on, it is checked
+	if the temperature T is greater than the smallest floating point number
+	in Matlab. Otherwise the algorithm is stuck.
+
 2017-02-15  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-222
