@@ -1,3 +1,21 @@
+2017-02-20  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
+
+	* atmlab-2-3-224
+
+	* physics/NedT2NedR.m: function that converts noise equivalent 
+	temperature to noise equivalent radiances, input are NedT, 
+	reference temperature and a wavenumber.  
+ 
+	* physics/i2planckTb.m: a bit more fancy to handle dimensions 
+	mismatch between frequency and irradiance input. A single frequency 
+	is accepted for an irradiance vector. It can also deal with 
+	frequencies and irradiances when one of them needs to be transposed. 
+
+	* h2o/thermodynamics/vmr2dewpoint.m: get dew point from volume mixing 
+	ratio and pressure
+
+	* physics/planck_wlength.m: typo fix in documentation. 
+
 2017-02-20  Mareike Burba  <mareikeburba@uni-hamburg.de>
 
 	* atmlab-2-3-223

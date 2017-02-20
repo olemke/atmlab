@@ -1,4 +1,4 @@
-% PLANCK_WLENGTH  Planck function, as a function if wavelength
+% PLANCK_WLENGTH  Planck function, as a function of wavelength
 %
 % Calculates the Planck function (blackbody radiation) for given wavelength 
 % and temperature.
