@@ -24,9 +24,9 @@ function g = assp2g(S)
 if length(S) > 1
   error( 'Only single element *S* is handled (i.e. length(S) must be 1).' );
 end
-if ~strcmp( S.ptype, 'macroscopically_isotropic' )
+if ~strcmp( S.ptype, 'totally_random' )
   %
-  error( 'So far just complete random orientation is handled.' );
+  error( 'So far just totally random orientation is handled.' );
 end
 if S.za_grid(1) ~= 0
   error( 'First value of S.za_grid must be 0.' );

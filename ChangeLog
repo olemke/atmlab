@@ -1,11 +1,23 @@
+2017-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-225
+
+	* scattering/mie_arts_scat_data.m: Updated. Now returning data of
+	version 3.
+
+	* tests/make_check_qarts.m:
+	* scattering/assp2backcoef.m:
+	* scattering/assp2g.m: macroscopically_isotropic /
+	horizontally_aligned replaced with totally_random / azimuthally_random.
+
 2017-02-20  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
 
 	* atmlab-2-3-224
 
-	* physics/NedT2NedR.m: function that converts noise equivalent 
-	temperature to noise equivalent radiances, input are NedT, 
-	reference temperature and a wavenumber.  
- 
+	* physics/NedT2NedR.m: function that converts noise equivalent
+	temperature to noise equivalent radiances, input are NedT,
+	reference temperature and a wavenumber.
+
 	* physics/i2planckTb.m: a bit more fancy to handle dimensions 
 	mismatch between frequency and irradiance input. A single frequency 
 	is accepted for an irradiance vector. It can also deal with 

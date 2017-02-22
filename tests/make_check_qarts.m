@@ -190,10 +190,10 @@ try
   N       = complex_refr_indexFromFunc( f_grid, t_grid, ...
                                         @eps_water_liebe93, @sqrt);  
   D = tmatrix( [], f_grid, t_grid, za_grid, aa_grid, N, ...
-               'spheroidal', {'horizontally_aligned'}, 150e-6, [1.001;2] );
+               'spheroidal', {'azimuthally_random'}, 150e-6, [1.001;2] );
 catch 
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qpack2_demo2* ===\n\n');
+  fprintf('\n=== Error while running *tmatrix* ===\n\n');
   rethrow(lasterror);
 end
 %
