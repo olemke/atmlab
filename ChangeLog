@@ -1,3 +1,15 @@
+2017-03-01  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
+
+	* atmlab-2-3-226
+
+	* gridcreation/annealing/find_best_freq_set_anneal_rowWise.m: update documentation
+
+	* gridcreation/annealing/loop_anneal.m: fix bug with function naming
+
+	* gridcreation/annealing/test_freq_set_gasteiger.m: update documentation
+
+	* physics/i2planckTb.m: update documentation
+
 2017-02-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-225

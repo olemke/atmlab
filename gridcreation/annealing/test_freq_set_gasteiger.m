@@ -17,13 +17,14 @@
 %     use_rel_error Flag: If true then use relative error instead
 %                   of absolute error.
 
+% 2017-02-20 Modified version of test_freq_set by Mareike Burba, in order 
+% 			 to define the error as in Gasteiger 2014. 
+
 function e = test_freq_set_gasteiger(s, y_ref, H, y_mono, H_ref, use_rel_error)
 
 % Number of channels:
 x = size(H);
 nchannels = x(1);
-
-%keyboard
 
 H_red = H(:,s);
 

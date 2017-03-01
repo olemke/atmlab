@@ -61,6 +61,8 @@
 %     C        An optional structure with control parameters. 
 
 % 2008-09-25 Created by Stefan Buehler. 
+% 2017-02-20 Modified by Mareike Burba. Added use_gasteiger flag and 
+%            the error calculation used by Gasteiger 2014
 
 function [sb, Wb, eb, h] = find_best_freq_set_anneal_rowWise(H, y_mono, n, C)
 

@@ -14,7 +14,7 @@
 % 2002-12-12   Created by Claudia Emde.
 % 2017-01-05   Added feature to deal with reshape of singular dim f
 %              Get not annoyed all the time because f is transposed
-%              compared to i
+%              compared to i. By Mareike Burba
 
 
 function tb = i2planckTb(i,f)

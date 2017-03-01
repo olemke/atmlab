@@ -11,7 +11,7 @@
 % with one frequency more, and so on until the desired accuracy is
 % reached.
 %
-% FORMAT R = loop_anneal_new(H, y_mono_array, n_start, n_incr, acc, C, bf_below)
+% FORMAT R = loop_anneal(H, y_mono_array, n_start, n_incr, acc, C, bf_below)
 %
 % OUT R       An array of structures. Each structure has elements sb, Wb,
 %             eb, h, which correspond to the output arguments of
@@ -32,8 +32,16 @@
 %             possible values: 1, 2
 
 % 2008-09-25 Created by Stefan Buehler. 
+% 2017-02-20 Modified by Mareike Burba. Added bf_below functionality, 
+%            and moved the reshaping of y_mono_array from apply_annealing
+%            to this function such that apply_annealing is not needed any more. 
+%            Commented are some lines which hardcode a limit of 10 frequencies
+%            to be selected per channel, this was helpful to apply the simulated
+%            annealing to IASI. 
+%            However one may think about another way to avoid that the algorithm
+%            tries more and more frequencies and the error is not decreasing. 
 
-function R = loop_anneal_new(H, y_mono_array, n_start, n_incr, acc, C, bf_below)
+function R = loop_anneal(H, y_mono_array, n_start, n_incr, acc, C, bf_below)
 
 
 % Check input 
