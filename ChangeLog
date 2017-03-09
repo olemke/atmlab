@@ -1,3 +1,9 @@
+2017-03-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-227
+
+	* scattering/particles2ab.m: Correction of format in header.
+
 2017-03-01  Mareike Burba  <mareikeburba@studium.uni-hamburg.de>
 
 	* atmlab-2-3-226

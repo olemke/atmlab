@@ -5,7 +5,7 @@
 %
 %   The function performs a fit to derive a and b for a set of particles.
 %
-% FORMAT   [a,b] = scatmeta2ab(dmax,mass,varargin)
+% FORMAT   [a,b] = particles2ab(dmax,mass[,dmax_limit])
 %
 % OUT   a           Derived a coefficient.
 %       b           Derived b coefficient.
