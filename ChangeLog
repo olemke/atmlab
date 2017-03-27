@@ -1,3 +1,10 @@
+2017-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-228
+
+	* sensors/read_ismar_l1b.m: Updated to latest format. Older
+	formats no longer supported.
+
 2017-03-09  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-227

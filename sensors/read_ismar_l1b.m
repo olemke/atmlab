@@ -4,21 +4,28 @@
 %   returned as modified Julian date (MJD).
 %   
 %   Example result:
-%     >> I=read_ismar_l1b('marss_20150308_b891_firstlook.nc')
+%     >> I=read_ismar_l1b('metoffice-ismar_faam_20150305_r014_b889.nc')
 %     I = 
+%                                      mjd: [11935x1 double]
+%                                  channel: [21x7 char]
+%                                    angle: [11935x1 double]
+%                                 altitude: [11935x1 double]
+%                                 latitude: [11935x1 double]
+%                                longitude: [11935x1 double]
+%                     platform_pitch_angle: [11935x1 double]
+%                      platform_roll_angle: [11935x1 double]
+%                     platform_orientation: [11935x1 double]
+%                        sensor_view_angle: [11935x1 double]
+%                     sensor_azimuth_angle: [11935x1 double]
+%                    detected_polarisation: [21x11935 double]
+%                   brightness_temperature: [21x11935 double]
+%      brightness_temperature_random_error: [21x11935 double]
+%    brightness_temperature_positive_error: [21x11935 double]
+%    brightness_temperature_negative_error: [21x11935 double]
+%         calibration_interpolation_factor: [21x11935 double]
 %
-%                            mjd: [102240x1 double]
-%                        channel: [5x9 char]
-%                          angle: [102240x1 double]
-%                       altitude: [102240x1 double]
-%                       latitude: [102240x1 double]
-%                      longitude: [102240x1 double]
-%           platform_pitch_angle: [102240x1 double]
-%            platform_roll_angle: [102240x1 double]
-%           platform_orientation: [102240x1 double]
-%              sensor_view_angle: [102240x1 double]
-%          detected_polarisation: [5x102240 double]
-%         brightness_temperature: [5x102240 double]
+%  Note that the field brightness_temperature_random_error is not at hand
+%  for MARSS.
 %
 % FORMAT   I = read_ismar_l1b(file)
 %
@@ -45,6 +52,7 @@ minute   = str2num( timeref.minute );
 second   = str2num( timeref.second );
 mjd0     = date2mjd( year, month, day, hour, minute, second );
 I.mjd    = mjd0 + time/(60*60*24);
+
 
 
 % read remaining variables
@@ -75,25 +83,35 @@ I.platform_orientation   = double( I.platform_orientation );
 I.sensor_view_angle      = ncread( file, 'sensor_view_angle', [1], [Inf] );
 I.sensor_view_angle      = double( I.sensor_view_angle );
 
-% Azimuth angle not present in oldest files
-try
-  I.sensor_azimuth_angle = ncread( file, 'sensor_azimuth_angle', ...
-                                   [1], [Inf] );
-  I.sensor_azimuth_angle = double( I.sensor_azimuth_angle );
-catch
-  I.sensor_azimuth_angle = NaN;
-end
+I.sensor_azimuth_angle   = ncread( file, 'sensor_azimuth_angle', [1], [Inf] );
+I.sensor_azimuth_angle   = double( I.sensor_azimuth_angle );
 
-% Polarisation not present in oldest files
-try
-  I.detected_polarisation = ncread( file, 'detected_polarisation', ...
-                                   [1 1], [Inf Inf] );
-  I.detected_polarisation = double( I.detected_polarisation );
-catch
-  I.detected_polarisation = NaN;
-end
+I.detected_polarisation  = ncread( file, 'detected_polarisation', [1 1], [Inf Inf] );
+I.detected_polarisation  = double( I.detected_polarisation );
 
 I.brightness_temperature = ncread( file, 'brightness_temperature', ...
                                    [1 1], [Inf Inf] );
 I.brightness_temperature = double( I.brightness_temperature );
+
+try
+  I.brightness_temperature_random_error = ...
+      ncread( file, 'brightness_temperature_random_error', [1 1], [Inf Inf] );
+  I.brightness_temperature_random_error = ...
+      double( I.brightness_temperature_random_error );
+end
+
+I.brightness_temperature_positive_error = ...
+    ncread( file, 'brightness_temperature_positive_error', [1 1], [Inf Inf] );
+I.brightness_temperature_positive_error = ...
+    double( I.brightness_temperature_positive_error );
+
+I.brightness_temperature_negative_error = ...
+    ncread( file, 'brightness_temperature_negative_error', [1 1], [Inf Inf] );
+I.brightness_temperature_negative_error = ...
+    double( I.brightness_temperature_negative_error );
+
+I.calibration_interpolation_factor = ...
+    ncread( file, 'calibration_interpolation_factor', [1 1], [Inf Inf] );
+I.calibration_interpolation_factor = ...
+    double( I.calibration_interpolation_factor );
 
