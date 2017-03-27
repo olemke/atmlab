@@ -142,7 +142,10 @@ for i = 1 : ny
   w = exp( -0.5*chi2( repmat(Y(:,i),1,nb)-Yb, Se ) );
 
   if M.norm_w 
-    w = w /  exp(-m*(1-2/9/m)^3/2);
+    % This version uses mean of chi2 as normalisation
+    w = w /  exp(-m/2);
+    % This version uses median of chi2 as normalisation
+    %w = w /  exp(-m*(1-2/9/m)^3/2);
   end
   
   ind_hit = find( w >= M.w_limit );    

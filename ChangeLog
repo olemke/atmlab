@@ -1,5 +1,14 @@
 2017-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-229
+
+	* retrieval/mci.m: The normalisation of weights was not done
+	exactly as said in header. Instead of using mean of chi2, I once
+	tested to use the median instead and seems that I manged to commit
+	this. Now changed back. Should not have made a big impact.
+
+2017-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-228
 
 	* sensors/read_ismar_l1b.m: Updated to latest format. Older
