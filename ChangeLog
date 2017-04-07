@@ -1,3 +1,13 @@
+2017-04-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-230
+
+	* h2o/parametrisations/mgd_get_lambda2.m:
+	* h2o/parametrisations/mgd_get_n02.m: New functions.
+
+	* h2o/parametrisations/mgd_get_n0.m:
+	* h2o/parametrisations/mgd_get_lambda.m: Header text modified.
+
 2017-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-229

@@ -3,9 +3,10 @@
 %  See *mgd_psd* for a defintion of MGD. This function handles the case when n0
 %  is unknown, while the mass concentration and other MGD variables are known.
 %
-%  The PSD with respect to equivalent spherical diameter, de, is returned. If
-%  this is liquid- or solid-equivalent de depends on the selection of *rho*.
-%  See PH11 [Petty and Huang, JAS, 2011] for further details.
+%  This version assumes that the size grid is de (see function
+%  *particle_de2dg*). Particle mass is calculated as rho*pi*de^3/6.
+%
+%  If your size grid is dg, use *mgd_get_n02*
 %
 %  All input arguments can be scalars or tensor1 (as in e.g. *mgd_moment*).
 %  That is, a number of *la* can be determined in one function call.
@@ -34,7 +35,7 @@ npsd = length(w);
 n0   = zeros( npsd, 1 );
 
 for i = 1 : npsd
-  % Eq 31 in PH11
+  % Eq 37 in PH11
   a0    = rho(i) * pi / 6;
   p     = ( mu(i) + 4 ) / ga(i);
   n0(i) = ( w(i) * ga(i) * la(i)^p ) / ( a0 * gamma( p ) );
