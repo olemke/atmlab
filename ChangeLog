@@ -1,3 +1,32 @@
+2017-05-31  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-231
+
+	* math/binning_fast.m: Fixed bug: Now making sure the output grid
+	X-Y coordinates are ordered as they were inputted
+
+	* files/loadvar.m: Can now ask to retrieve more than one variable at a time.
+
+	* files/loadncvar.m: Also handle if the field 'attributes' or
+	'global_attributes' is passed to function
+
+	* geoplots/gmt/makepolar.m: fixed bug where white region was not
+	centered around the reference. Fixed nonsensical programming from
+	an earlier me.
+
+	* geoplots/gmt/gmt_plot.m: Added assertion. updated default plot
+	title. Tweaked automatically finding the datarange
+
+	* geoplots/gmt/gmt_inputs.m: don't allow psbasemap to be a
+	string. it has to be a structure
+
+	* geographical/standardize_geodata.m: made possible to silence
+	output from this function
+
+	* math/isodd.m:
+	* math/iseven.m:
+	changed "|" to "||" to silence mlint
+
 2017-04-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-230

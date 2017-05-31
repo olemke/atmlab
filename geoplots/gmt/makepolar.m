@@ -2,10 +2,10 @@ function filecpt = makepolar(tickval,in)
 % MAKEPOLAR create a .cpt-file based on the 'polar' but with extra options
 %
 % PURPOSE: To create a .cpt file based on the 'polar'
-%           colourtable that garantees white color around a reference value 
+%           colourtable that garantees white color around a reference value
 %           (e.g. in.reference = 0)
 %
-%         
+%
 % IN      tickval     [%f,%f,etc]        The data contour values
 %         in          struct             options here (see help gmt_plot)
 %
@@ -16,12 +16,12 @@ function filecpt = makepolar(tickval,in)
 %             the color depending on the number of contours, where the
 %             reference is relative to max/min data and the number of boxes
 %             that should be white. Gradient is from blue to white to red,
-%             and the grandient is equal on both sides of the reference. 
+%             and the grandient is equal on both sides of the reference.
 %
 % Created by Salomon Eliasson
 % $Id$
 
-% string format to file 
+% string format to file
 diff = tickval(2)-tickval(1);
 b=~isequal(floor(diff),diff);
 x=diff;
@@ -49,19 +49,16 @@ vect = 255-(1:N)*inc;
 
 ctable = zeros(length(tickval)-1,3);
 
-
-% BLUE 
+% BLUE
 tmp = abs([vect(BT:-1:1);vect(BT:-1:1);repmat(255,1,BT)])';
-len = size(tmp,1);
-ctable(1:len,:) = tmp;
+ctable(1:BT,:) = tmp;
 
 % WHITE
-ctable(len+1:len+nw,:) = repmat([255,255,255],nw,1);
-len = len+nw;
+ctable(BT+1:BT+nw,:) = repmat([255,255,255],nw,1);
 
 % RED
 tmp = abs([repmat(255,1,TT);vect(TT:-1:1);vect(TT:-1:1)])';
-ctable(len+1:end,:) = tmp(end:-1:1,:);
+ctable(BT+nw+1:end,:) = tmp(end:-1:1,:);
 
 
 %% Make a cptfile out of it
@@ -83,12 +80,12 @@ end
 if isfield(in,'forcedColorBack')
     BG = sscanf(in.color_background,'%f/%f/%f');
 else
-    BG = max([ctable(1,:)-3*inc;0,0,0],[],1);
+    BG = max([ctable(1,:)-[5,5,3]*inc;0,0,0],[],1);
 end
 if isfield(in,'forcedColorFore')
     FG = sscanf(in.color_foreground,'%f/%f/%f');
 else
-    FG = max([ctable(end,:)-3*inc;0,0,0],[],1);
+    FG = max([ctable(end,:)-[3,5,5]*inc;0,0,0],[],1);
 end
 if isfield(in,'forcedColorNaN')
     N = sscanf(in.color_nan,'%f/%f/%f');
@@ -113,95 +110,46 @@ end
 function [BT,TT,nw] = get_white_boxes(tickval,ref,in)
 %% get_white_boxes
 
-% WHITEBOXES
 if ~isfield(in.ctable,'nwhite')
-    nw = ceil((length(tickval)-1)/10);
-    input = false;
-else
-    nw = in.ctable.nwhite;
-    input=true;
+    in.ctable.nwhite=ceil(in.nlevels/10);
 end
 
-assert(nw<length(tickval)-1,...
-    ['gmtlab:' mfilename ':input'],'number of white boxes (%g) exceedes nlevels (%g) -1',...
-    nw,length(tickval)-1)
+centers = tickval(2:end)-(tickval(2:end)-tickval(1:end-1))/2;
 
-
-% ADJUST nwhite if ref is on a contour line
-if ismember(ref,tickval) && mod(nw,2) 
-    % if ref is on one of the edges and nwhite is odd, increase nwhite by 1
-    nw = nw+1;
-    if input
-        warning(['gmtlab:' mfilename ':badInput'],...
-            '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is exactly on a contour level,',...
-            'i.e in.ctable.nwhite must be an even number. Increasing ',in.ctable.nwhite,nw);
-    end
-end
-
-% ADJUST nwhite if ref is inbetween contour lines
-if ref < tickval(1) || ref > tickval(end)
-    warning(['gmtlab:' mfilename ':badInput'],'Reference value is outside the range of tick values')
+for i = 1:length(tickval)-1
+    % I want to find inbetween where the reference is
     
-    if ref < tickval(1)
-        refnew = tickval(1);
-    else
-        refnew = tickval(1);
-    end 
-    logtext(1,'Changed bad reference value ''%d'' to ''%d'' \n',ref,refnew)
-    ref=  refnew;
+    if centers(i)<ref, below=i;end
+    if centers(i)>ref, above=i;break;end
 end
 
-if ~ismember(ref,tickval) && ~mod(nw,2) 
-    % if ref is in between the edges and nwhite is even, decrease by 1
-    nw = nw-1;
-    if input
-        warning(['gmtlab:' mfilename ':badInput'],...
-            '%s %s nwhite = %.0f to nwhite = %.0f','Reference value is inbetween contour levels,',...
-            'i.e in.ctable.nwhite must be an odd number. Decreasing ',in.ctable.nwhite,nw);
+
+if (in.ctable.nwhite>0) && exist('above','var')
+    
+    windex=below:above;
+    while length(windex)<in.ctable.nwhite
+        if (windex(1)-1)<1 || (windex(end)+1)==in.nlevels
+            break
+        end
+        windex = [windex(1)-1,windex,windex(end)+1]; %#ok<AGROW>
     end
-end
-
-whitedomain = (nw + mod(nw,2))/2;   
-
-% BT bottom ticks
-BT = sum(tickval <= ref ) -whitedomain;
-% TT top ticks
-TT = sum(tickval >= ref ) -whitedomain;
-
-if TT < 0
-    % That means that there are less than nw/2 tickvalues higher than the
-    % reference. Therefore, I need to adjust nw
-    nw = nw+TT;
-    TT = 0;
-    BT = BT-1;
-end
-if BT < 0
-    % That means that there are less than nw/2 tickvalues below the
-    % reference. Therefore, I need to adjust nw
-    nw = nw+BT;
-    BT = 0;
-    TT = TT-1;
-end
-
-% remove white boxes if the total number is wrong
-if (BT+TT+nw - (length(tickval)-1)) > 0
-    dif = BT+TT+nw - (length(tickval)-1);
-    while dif > 0
-        if nw>0&&dif>0; nw=nw-1;dif=dif-1;end
-        if BT>0&&dif>0; BT=BT-1;dif>0;dif=dif-1;end
-        if TT>0&&dif>0; TT=TT-1;dif>0;dif=dif-1;end
+    nw = length(windex);
+    
+    if nw ~= in.ctable.nwhite
+        logtext(1,['Changed number of white boxes from %i to %i ',...
+            'to match the tick better together with reference = %f\n'],in.ctable.nwhite,nw,ref);
     end
+    
+    %if sum(nearref)>nw; nw=nw+1; end
+    
+    % BT bottom ticks
+    BT = length(1:windex(1)-1);
+    % TT top ticks
+    TT = length(windex(end)+1:length(centers));
+else
+    BT = sum(centers<ref);
+    TT = sum(centers>ref);
+    nw = 0;
 end
-
-if (BT+TT+nw - (length(tickval)-1)) < 0
-    dif = -1 * (BT+TT+nw - (length(tickval)-1));
-    % just increase white until it's the right number
-    while dif < 0
-        nw=nw+1;
-        dif=dif+1;
-    end
-end
-assert(BT+TT+nw == length(tickval)-1,['gmtlab:' mfilename ':Bug'],...
-    'BT+TT+nw ~= length(tickval)-1')
 
 end

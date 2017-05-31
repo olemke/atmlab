@@ -177,8 +177,23 @@ elseif length(in.size)==4 % three extra dimensions
     end
 end
    
-X = in.newX;
-Y = in.newY;
+
+if ( ~(in.flags.lon_descend==in.flags.out.lon_descend) || ...
+        ~(in.flags.lat_descend==in.flags.out.lat_descend) || ...
+        ~(in.flags.lon360==in.flags.out.lon360))
+
+    % change back the order of the X, Y if I have changed them
+
+    [~,tmp] = standardize_geodata(struct('lon',in.newX,'lat',in.newY,'data',{Z}),...
+        catstruct(in.flags,struct('silent',1)));
+    X = tmp.lon;
+    Y = tmp.lat;
+    Z = tmp.data;
+else
+    X = in.newX;
+    Y = in.newY;
+end
+
 end
 %% Subfunctions
 % ||
@@ -272,9 +287,10 @@ if in.gridprovided
     end
 
     %%%%%
-    % Need to confirm the grid with this function
+    % Need to confirm the requested grid with this function
+
     [in.flags,tmp] = standardize_geodata(struct('lon',in.newX,'lat',in.newY),...
-        struct('lon_descend',false,'lat_descend',false));
+        struct('lon_descend',false,'lat_descend',false,'silent', true));
     in.newX = tmp.lon;
     in.newY = tmp.lat;
 end

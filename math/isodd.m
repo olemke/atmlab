@@ -18,7 +18,7 @@ function bool = isodd(n)
 
 bool = false;
 
-if isempty(n) | ~isnumeric(n), return, end
+if isempty(n) || ~isnumeric(n), return, end
 
 if any( rem(n(:),2) == 0 ), return, end
 

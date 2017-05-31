@@ -18,7 +18,7 @@ function bool = iseven(n)
 
 bool = false;
 
-if isempty(n) | ~isnumeric(n), return, end
+if isempty(n) || ~isnumeric(n), return, end
 
 if any( rem(n(:),2) == 1 ), return, end
 

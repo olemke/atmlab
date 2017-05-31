@@ -771,7 +771,14 @@ function filename = gmt_plot(in,field)
 % Created by Salomon Eliasson and Oliver Lemke
 % $Id$
 
-
+if nargin==2
+    assert(ischar(field),['atmlab:' mfilename ':badInput'],...
+        ['The second argument to this function is supposed ',...
+        'to be the string name of data variable you wish to plot\n',...
+        '(otherwise it is assumed that a field called ''data'' exists, ',...
+        'and this is the field it will try to plot)'])
+end
+    
 if ~exist('field','var') && isfield(in,'data')
     field = 'data';
 elseif isfield(in,'nodata') && in.nodata
@@ -865,7 +872,11 @@ default.fontsize_annot_secondary = '10p';
 default.fontsize_title           = '36p';
 default.psbasemap.axes           = 'nSeW';
 default.scale_factor             = 1;     
-default.title                    = field;
+if exist('field','var')
+    default.title                = field;
+else
+    default.title                = 'noField';
+end
 
 in = optargs_struct(in,default);
 clear default
@@ -1020,8 +1031,8 @@ in = orderfields(in);
 
 clear default
 in.datarange = double(in.datarange);
-assert(length(unique(in.(field)((in.(field))>=in.datarange(1)&in.(field)<=in.datarange(2))))>2,...
-    'It appears all all data is outside the range of in.datarange')
+%assert(length(unique(in.(field)((in.(field))>=in.datarange(1)&in.(field)<=in.datarange(2))))>2,...
+%    'It appears all data is outside the range of in.datarange, or you only have 2 valid values')
 
 % if you have only given the min value
 if isscalar(in.datarange), tmp=getdatarange(in,field);in.datarange(2) = tmp(2);end
@@ -1298,10 +1309,10 @@ end
 function datarange = getdatarange(in,field)
 %% getdatarange
 
-tmp = in.(field)(:);
+tmp = in.(field)(~isnan(in.(field)));
 
 %sneakily remove the outliers from contention  
-tmp = unique(in.(field)(:));tmp=tmp(2:end);
+tmp = unique(tmp);tmp=tmp(min([length(tmp)-1,2]):end);
 
 d = double([min(tmp(~isinf(tmp))) max(tmp(~isinf(tmp)))]);
 

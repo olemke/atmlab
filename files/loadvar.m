@@ -12,28 +12,33 @@
 %       varname    Name of variable.
 
 % 2008-10-27   Created by Patrick Eriksson.
-
+% 2017-05-31   Modified by Salomon Eliasson
 
 function x = loadvar( filename, varname )
 
-try
-    X = load( filename, varname );
-catch ME
-    switch ME.identifier
-        case 'MATLAB:load:numColumnsNotSame'
-            % Matlab tried to load as ASCII and failed.
-            % Try to load as binary MAT-file instead.
-            X = load(filename, varname, '-mat');
-        otherwise
-            ME.rethrow();
+if ~iscell(varname), varname={varname}; end
+    
+for V = varname(:)'
+    v = V{1};
+    try
+        X = load( filename, v );
+    catch ME
+        switch ME.identifier
+            case 'MATLAB:load:numColumnsNotSame'
+                % Matlab tried to load as ASCII and failed.
+                % Try to load as binary MAT-file instead.
+                X = load(filename, v, '-mat');
+            otherwise
+                ME.rethrow();
+        end
     end
-end
-
-if ~isfield( X, varname )
-    error( ['atmlab:' mfilename ':variableNotFound'],...
-        lastwarn);
-else
-    x = X.(varname);
+    
+    if ~isfield( X, v )
+        error( ['atmlab:' mfilename ':variableNotFound'],...
+            lastwarn);
+    else
+        x.(v) = X.(v);
+    end
 end
 
 end

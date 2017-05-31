@@ -19,7 +19,8 @@ function [flags,out] = standardize_geodata(in,options)
 %                    lon_descend = true; % order the longitudes in descending order
 %                    lat_descend = true; % order the latitudes in descending order
 %                    lon360      = true; % fit longitudes (and data if given) to 0:360 regime
-%                    dublicate = true % allow duplicate values (repeat longitudes e.g. at -180 and 180)
+%                    dublicate   = true % allow duplicate values (repeat longitudes e.g. at -180 and 180)
+%                    silent      = false; % don't be quiet about it
 %
 %  OUT
 %           flags     struct     A structure of flags to indicate how your data is arranged
@@ -100,10 +101,11 @@ default.lon_descend = flags.lon_descend; % allow descending order of longitudes
 default.lat_descend = flags.lat_descend; % allow descending order of latitudes
 default.lon360      = flags.lon360; % allow longitudes go from 0:360 (as opposed to -180:180) globally
 default.duplicate   = flags.duplicate; % allow duplicate values (repeat longitudes e.g. at -180 and 180)
-
+default.silent      = false;
 options = optargs_struct(options,default);
 
 % --------  Do the work
+s=~options.silent;
 
 % PERMUTE data so that dimensions are data(lat,lon) or data(lon,lat)
 if dexist
@@ -115,7 +117,7 @@ if dexist
         data = permute(data,x);
         flags.out.dimorder = options.dimorder;
         
-        logtext(1,'Swapped the 1st and 2nd dimensions\n')
+        if s,logtext(1,'Swapped the 1st and 2nd dimensions\n');end
     else
         flags.out.dimorder = flags.dimorder;
     end
@@ -139,7 +141,7 @@ if (flags.lon_descend && ~options.lon_descend) || ...
         end
     end
     flags.out.lon_descend = options.lon_descend;
-    logtext(1,'Changed the order of longitudes\n')
+    if s, logtext(1,'Changed the order of longitudes\n'); end
 else
     flags.out.lon_descend = flags.lon_descend;
 end
@@ -158,7 +160,7 @@ if (flags.lat_descend && ~options.lat_descend) || ...
         end
     end
     flags.out.lat_descend = options.lat_descend;
-    logtext(1,'Changed the order of latitudes\n')
+    if s, logtext(1,'Changed the order of latitudes\n'); end
 else
     flags.out.lat_descend = flags.lat_descend;
 end
@@ -182,7 +184,7 @@ if (flags.lon360 && ~options.lon360) || ...
         end
     end
     flags.out.lon360 = options.lon360;
-    logtext(1,'Changed the longitude regime\n')
+    if s, logtext(1,'Changed the longitude regime\n'); end
 else
     flags.out.lon360 = flags.lon360;
 end
@@ -238,7 +240,7 @@ if flags.duplicate && ~options.duplicate
             'Duplicate lons removed changing the size of the lon vector (and data)')
     end
     flags.out.duplicate = options.duplicate;
-    logtext(1,'checked for duplicate data and removed if so\n')
+    if s, logtext(1,'checked for duplicate data and removed if so\n'); end
 else
     flags.out.duplicate = flags.duplicate;
 end

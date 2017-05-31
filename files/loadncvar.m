@@ -26,7 +26,8 @@
 % 2012-01-30   Modified by Gerrit Holl.
 % 2012-02-23   Modified by Gerrit Holl.
 % 2013-02-13   Modified by Salomon Eliasson.
-
+% 2017-05-31   Modified by Salomon Eliasson.
+       
 function [ret, glattr, attr] = loadncvar( filename, varname )
 
 errId = ['atmlab:' mfilename];
@@ -63,6 +64,17 @@ elseif iscell(varname)
         ret = struct();
     end
     for v = varname(:).'
+        
+        if strcmp(v{1},'attributes')
+           ret.(v{1})=loadncattr(ncid,varname(~ismember(varname,...
+               {'attributes','global_attributes'})));
+            continue
+        end
+        if strcmp(v{1},'global_attributes')
+            ret.(v{1})=loadncglobalattr(ncid);
+            continue
+        end
+        
         try
             varid = netcdf.inqVarID (ncid, v{1});
         catch ME
