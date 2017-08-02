@@ -32,5 +32,12 @@ function z = eps_ice_matzler06(f,TK)
 	beta = betam + deltabeta;
 	theta = 300./TK - 1;
 	alfa = (0.00504 + 0.0062*theta).*exp(-22.1*theta);
-	z = 3.1884 + 9.1e-4*(TK-273);
+	
+    % PE, 2017-08-02:
+    % Real part is not allowed to go below 3.10, to partly consider this
+    % comment from the book chapter: At T < 240 K the temperature
+    % sensitivity decreases, and a constant value of 3.10 is found at T <
+    % 100 K.
+    z = max( 3.10, 3.1884 + 9.1e-4*(TK-273) );
+    
 	z = z + i*(alfa./f + beta.*f);

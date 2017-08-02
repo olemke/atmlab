@@ -1,3 +1,13 @@
+2017-08-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-232
+
+	* h2o/parametrisations/eps_ice_matzler06.m: Real part is now not
+	allowed to go below 3.10, as in the book chapter it is said:
+	At T < 240 K the temperature sensitivity decreases, and a constant
+	value of 3.10 is found at T < 100 K.
+	This was pointed out by Eugene Clothiaux.
+
 2017-05-31  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-231
