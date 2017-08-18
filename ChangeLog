@@ -1,3 +1,10 @@
+2017-08-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-233
+
+	* site-specific/chalmers-gem/OdinSmr: All functions removed. Will
+	restart this function set from scratch.
+
 2017-08-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-232
