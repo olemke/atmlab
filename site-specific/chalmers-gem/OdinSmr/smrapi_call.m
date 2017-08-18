@@ -1,0 +1,34 @@
+% SMRAPI_CALL    Calls API with prepared URL
+%
+%   The function is general, it requires a valid URL string as input.
+%
+%   If failure, an error is issued or NaN is returned depending on value of
+%   API. robust.
+%   
+% FORMAT   D = smrapi_call( API, url )
+%
+% OUT   D     Obtained data.
+%  IN   API   Structure with basic API settings.
+%       url   URL to use.
+
+% 2017-08-18   Patrick Eriksson
+
+
+function D = smrapi_call( API, url )
+  
+try
+    
+  w = webread( url, weboptions('ContentType','json','Timeout', API.timeout) );
+  
+catch ME
+  
+  if API.robust
+    D = NaN;
+  else
+    error( ME.message );
+  end
+  return    
+end
+
+
+D = w.Data;
