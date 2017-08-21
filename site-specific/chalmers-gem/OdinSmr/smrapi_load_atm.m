@@ -41,17 +41,17 @@ if ~ischar( dataname )
 end
     
     
-if strcmp( API.l1_version, 'v5' )
+if strcmp( API.version, 'v5' )
   %
   for i = 1 : length(SMR)
     if strcmp( dataname, 'PTZ' )  |  strcmp( dataname, 'ptz' )
       url = sprintf( 'http://%s/rest_api/%s/level1/%d/%d/ptz/', ...
-                     API.webapi_url, API.l1_version, SMR(i).FreqMode, ...
+                     API.url, API.version, SMR(i).FreqMode, ...
                      SMR(i).ScanID );
       datanae = 'PTZ';
     else
       url = sprintf( 'http://%s/rest_api/%s/level1/%d/%d/apriori/%s', ...
-                     API.webapi_url, API.l1_version, SMR(i).FreqMode, ...
+                     API.url, API.version, SMR(i).FreqMode, ...
                      SMR(i).ScanID, dataname );
     end
   end
@@ -60,5 +60,5 @@ if strcmp( API.l1_version, 'v5' )
   SMR(i).ATM.(dataname) = D;
   
 else
-  error( 'L1 version %s is not supported.', API.l1_version );
+  error( 'API version %s is not supported.', API.version );
 end

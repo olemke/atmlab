@@ -16,17 +16,18 @@
 
 % 2017-08-18  Patrick Eriksson
 
-function SMR = smrapi_find_l2_period(API,SMR,freqmode,start_time,end_time,varargin)
+function SMR = smrapi_find_l2_period(API,SMR,project,freqmode,start_time,end_time,...
+                                     varargin)
 %
 [limit,offset] = optargs( varargin, { Inf, NaN } );
 
 %http://odin.rss.chalmers.se/rest_api/v5/level2/development/meso_vds4/13/ ...
 %    scans/?start_time=2012-02-29&end_time=2012-03-01&limit=100
 
-if strcmp( API.l1_version, 'v5' )
+if strcmp( API.version, 'v5' )
   %
   url = sprintf( 'http://%s/rest_api/%s/level2/development/%s/%d/scans', ...
-                 API.webapi_url, API.l1_version, API.l2_project, freqmode );
+                 API.url, API.version, project, freqmode );
   url = sprintf( '%s/?start_time=%s&end_time=%s', ...
                  url, smrapi_time(start_time), smrapi_time(end_time) );
  
@@ -41,18 +42,19 @@ if strcmp( API.l1_version, 'v5' )
   
   if  isstruct(L2urls)
     for i = 1 : length(L2urls)
-      SMR(end+1).FreqMode = freqmode;
-      SMR(end).ScanID     = L2urls(i).ScanID;
-      L2                  = smrapi_call( API, L2urls(i).URLS.URL_level2 );
-      SMR(end).L2         = L2.L2;
-      SMR(end).L2c        = L2.L2c;
-      SMR(end).L2i        = L2.L2i;
+      SMR(end+1).L2Project = project;
+      SMR(end).FreqMode    = freqmode;
+      SMR(end).ScanID      = L2urls(i).ScanID;
+      L2                   = smrapi_call( API, L2urls(i).URLS.URL_level2 );
+      SMR(end).L2          = L2.L2;
+      SMR(end).L2c         = L2.L2c;
+      SMR(end).L2i         = L2.L2i;
     end
   end
     
     
 else
-  error( 'L1 version %s is not supported.', API.l1_version );
+  error( 'API version %s is not supported.', API.version );
 end
 
 

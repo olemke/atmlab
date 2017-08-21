@@ -22,10 +22,10 @@ function SMR = smrapi_find_log_period(API,SMR,freqmode,start_time,end_time,varar
 [species] = optargs( varargin, { [] } );
 
 
-if strcmp( API.l1_version, 'v5' )
+if strcmp( API.version, 'v5' )
   %
   url = sprintf( 'http://%s/rest_api/%s/level1/%d/scans/?start_time=%s&end_time=%s', ...
-                 API.webapi_url, API.l1_version, freqmode, ...
+                 API.url, API.version, freqmode, ...
                  smrapi_time(start_time), smrapi_time(end_time) );
   
   if ~isempty( species )
@@ -52,7 +52,7 @@ if strcmp( API.l1_version, 'v5' )
     
     
 else
-  error( 'L1 version %s is not supported.', API.l1_version );
+  error( 'API version %s is not supported.', API.version );
 end
 
 

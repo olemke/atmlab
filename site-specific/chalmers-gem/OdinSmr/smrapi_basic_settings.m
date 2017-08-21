@@ -2,13 +2,12 @@
 %
 %   The API structure holds settings associated with the SMR WebApi, that
 %   normally should be static for one session. The fields are
-%     webapi_url : The address to the WebApi server.
+%            url : The address to the WebApi server.
+%        version : The API version.
 %        timeout : Timout value for calls of the WebApi [s].
 %         robust : False means to issue an error if api call fails. 
-%                  If set to true, data are instead set to NaN.
-%     l1_version : The string used to identify the L1 version.
-%     l2_version : The string used to identify the L2 version.
-%     l2_project : The string used to identify the L2 project.
+%                  If set to true, data are instead set to NaN (and no error
+%                  is issued).
 %   
 % FORMAT   API = smrapi_basic_settings
 %
@@ -20,14 +19,13 @@
 function API = smrapi_basic_settings
 
 
-API.webapi_url  = 'malachite.rss.chalmers.se';
+API.url     = 'malachite.rss.chalmers.se';
 
-API.timeout     = 120;
+API.version = 'v5';
 
-API.robust      = false;
+API.timeout = 120;
 
-API.l1_version  = 'v5';
+API.robust  = false;
 
-API.l2_version  = 'v5';
-API.l2_project  = '';   % Should be set to name of standard inversions
+
 

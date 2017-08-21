@@ -21,16 +21,16 @@ if ~isfield(SMR,'ScanID') | ~isfield(SMR,'FreqMode')
 end
 
 
-if strcmp( API.l1_version, 'v5' )
+if strcmp( API.version, 'v5' )
   %
   for i = 1 : length(SMR)  
     url = sprintf( 'http://%s/rest_api/%s/level1/%d/%d/Log/', ...
-                   API.webapi_url, API.l1_version, SMR(i).FreqMode, SMR(i).ScanID );
+                   API.url, API.version, SMR(i).FreqMode, SMR(i).ScanID );
   
     SMR(i).LOG = smrapi_call( API, url );
   end
     
     
 else
-  error( 'L1 version %s is not supported.', API.l1_version );
+  error( 'API version %s is not supported.', API.version );
 end
