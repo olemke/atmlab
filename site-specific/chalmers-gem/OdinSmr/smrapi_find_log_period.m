@@ -1,6 +1,6 @@
 % SMRAPI_FIND_LOG_PERIOD   Find LOG data for a time period
 %
-%    See *smrapi_time* for valid formats for *start_time* and *end_time*.
+%    See *apihelp_time* for valid formats for *start_time* and *end_time*.
 %
 %    Valid formats for *species* is string and cellstring, e.g. 'O3* and
 %    {'O3','ClO'}. Set species = 'all';, to include all species defined.
@@ -26,7 +26,7 @@ if strcmp( API.version, 'v5' )
   %
   url = sprintf( 'http://%s/rest_api/%s/level1/%d/scans/?start_time=%s&end_time=%s', ...
                  API.url, API.version, freqmode, ...
-                 smrapi_time(start_time), smrapi_time(end_time) );
+                 apihelp_time(start_time), apihelp_time(end_time) );
   
   if ~isempty( species )
     if ischar( species )

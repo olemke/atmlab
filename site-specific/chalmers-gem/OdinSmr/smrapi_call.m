@@ -16,19 +16,24 @@
 
 function D = smrapi_call( API, url )
   
-try
-    
-  w = webread( url, weboptions('ContentType','json','Timeout', API.timeout) );
-  
-catch ME
-  
-  if API.robust
-    D = NaN;
-  else
-    error( ME.message );
+for i = 1 : API.retries
+
+  try
+    w = webread( url, weboptions('ContentType','json','Timeout',API.timeout) );
+  catch ME
+    w = NaN;
   end
-  return    
+
+  if isstruct(w)  
+    D = w.Data;  
+    return
+  end
+  
 end
 
 
-D = w.Data;
+if API.robust
+  D = NaN;
+else
+  error( ME.message );
+end

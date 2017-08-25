@@ -1,6 +1,6 @@
 % SMRAPI_FIND_L2_PERIOD   Find L2 data for a time period
 %
-%    See *smrapi_time* for valid formats for *start_time* and *end_time*.
+%    See *apihelp_time* for valid formats for *start_time* and *end_time*.
 %
 % FORMAT  SMR = smrapi_find_l2_period(API,SMR,freqmode,start_time,end_time
 %                                     [,limit,offset])
@@ -21,15 +21,13 @@ function SMR = smrapi_find_l2_period(API,SMR,project,freqmode,start_time,end_tim
 %
 [limit,offset] = optargs( varargin, { Inf, NaN } );
 
-%http://odin.rss.chalmers.se/rest_api/v5/level2/development/meso_vds4/13/ ...
-%    scans/?start_time=2012-02-29&end_time=2012-03-01&limit=100
 
 if strcmp( API.version, 'v5' )
   %
   url = sprintf( 'http://%s/rest_api/%s/level2/development/%s/%d/scans', ...
                  API.url, API.version, project, freqmode );
   url = sprintf( '%s/?start_time=%s&end_time=%s', ...
-                 url, smrapi_time(start_time), smrapi_time(end_time) );
+                 url, apihelp_time(start_time), apihelp_time(end_time) );
  
   if ~isinf( limit )
     url = sprintf( '%s/&limit=%d', url, limit );

@@ -1,4 +1,4 @@
-% SMRAPI_TIME   Handling of time formats
+% APIHELP_TIME   Handling of time formats
 %
 %    The function converts different input formats, to the format expected
 %    by the WebApi. 
@@ -7,7 +7,7 @@
 %
 %    Exampel on valid UTC strings are '2010-10-01' and '2015-01-04T11:12:13Z'
 %
-% FORMAT  timestr = smrapi_time( inputtime )
+% FORMAT  timestr = apihelp_time( inputtime )
 %
 % OUT   timestr    A string.
 %  IN   inputtime  A valid time, see above. A scalar.
@@ -15,7 +15,7 @@
 % 2017-08-18  Patrick Eriksson
 
 
-function timestr = smrapi_time( inputtime )
+function timestr = apihelp_time( inputtime )
 
 
 if ischar( inputtime )

@@ -1,3 +1,13 @@
+2017-08-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-237
+
+	* site-specific/chalmers-gem/OdinSmr: There now load functions
+	also for L2, L2I and L2C.
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_call.m: Now considers
+	API.retries.
+
 2017-08-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-236

@@ -19,11 +19,13 @@
 function API = smrapi_basic_settings
 
 
-API.url     = 'malachite.rss.chalmers.se';
+API.url     = 'odin.rss.chalmers.se';
 
 API.version = 'v5';
 
 API.timeout = 120;
+
+API.retries = 2;
 
 API.robust  = false;
 
