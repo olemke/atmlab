@@ -1,4 +1,4 @@
-function filename = gmt_plot(in,field)
+function [filename,out] = gmt_plot(in,field)
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
 % The function is basically a wrapper that calls GMT shell commands using easy
@@ -1013,7 +1013,7 @@ in = getDefaultTicks(in);
 % DATARANGE
 if ~in.nodata
     default.datarange     = getdatarange(in,field); %
-    if any(isnan(in.(field)(:)))
+    if any(isnan(in.(field)(:))) && isfield(in,'legend')&&isstruct(in.legend)
         default.extra_legend = struct('name','NaN','type','nan'); % include NaNs in the legend
     else
         if isfield(in,'extra_legend') && ...
@@ -1051,12 +1051,19 @@ in = optargs_struct(in,default);
 clear default
 
 % LEGEND
-in = setupLegend(in);
 
-% extra LEGEND
-if isstruct(in.extra_legend)
-    in = setupXtraLegend(in);
+if ~ (isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend))
+    % If in.legend = false, do nothing
+    
+    
+    in = setupLegend(in);
+    
+    % extra LEGEND
+    if isstruct(in.extra_legend)
+        in = setupXtraLegend(in);
+    end
 end
+
 
 if ~ischar(in.proj)
     in = setup_projection(in);
@@ -1582,12 +1589,12 @@ if strcmp(in.legend.orientation,'h')
         otherwise
             projOff = 1;
     end
-    default.xoffset = sprintf('-%.2f%s',projOff*lw*2,lwu);
+    default.xoffset = sprintf('%.2f%s',projOff*lw*2,lwu);
     default.yoffset = '0';
     
 elseif strcmp(in.legend.orientation,'v')
     default.xoffset = '0';
-    default.yoffset = sprintf('-%.2f%s',lw*2,lwu);
+    default.yoffset = sprintf('%.2f%s',lw*2,lwu);
 end
 in.extra_legend   = optargs_struct(in.extra_legend,default);
 
@@ -1598,10 +1605,7 @@ function in = setupLegend(in)
 % SETUP LEGEND
 
 errId = ['gmtlab:' mfilename ':badInput']; % common error ID
-if isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend)
-    % If in.legend = false, do nothing
-    return
-end
+
 if ~isfield(in,'legend') || ~isstruct(in.legend)
     in.legend=struct();
 end
@@ -1634,12 +1638,12 @@ in.legend         = optargs_struct(in.legend,default); %need orientation now
 
 switch in.legend.orientation
     case 'v'
-        default.justify = 'CR'; %center right
+        default.justify = 'MR'; %middle right
         default.length  = sprintf('%.2f%s',f*mw,u);
         if ismember('E',in.psbasemap.axes)
-            default.xoffset = sprintf('-%.2f%s',4*fl,u2);
+            default.xoffset = sprintf('%.2f%s',2*fl,u2);
         elseif ismember('e',in.psbasemap.axes)
-            default.xoffset = sprintf('-%.2f%s',3*fl,u2);
+            default.xoffset = sprintf('%.2f%s',0.5*fl,u2);
         end
         default.yoffset = '0';
     case 'h'
@@ -1647,9 +1651,9 @@ switch in.legend.orientation
         default.length  = sprintf('%.2f%s',mw,u);
         default.xoffset = '0';
         if ismember('S',in.psbasemap.axes)
-            default.yoffset = sprintf('-%.2f%s',4*fl,u2);
+            default.yoffset = sprintf('%.2f%s',2*fl,u2);
         elseif ismember('s',in.psbasemap.axes)
-            default.yoffset = sprintf('-%.2f%s',3*fl,u2);
+            default.yoffset = sprintf('%.2f%s',0.5*fl,u2);
         end
     otherwise
         error(errId,'orientation should be "v" or "h", not "%s"',in.legend.orientation)

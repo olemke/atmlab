@@ -373,6 +373,10 @@ LAT=in.lat(:)';
 dn = mean(diff(LON));
 dt = mean(diff(LAT));
 
+% make sure they have the same data class
+newlon=cast(newlon,class(in.lon));
+newlat=cast(newlat,class(in.lat));
+
 while LON(1)>=newlon(1)
     LON = [LON(1)-dn,LON,LON(end)+dn];
     data = [data(:,end,:),data,data(:,1,:)];

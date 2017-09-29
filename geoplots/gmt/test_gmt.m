@@ -40,6 +40,7 @@ if strcmp(files{end}(end-2:end),'.sh')
 end
 default.display   = true;
 default.filename  = 'all_tests' ;
+default.pdfcrop   = true;
 od = isfield(in,'outdir');
 default.outdir    = gmtlab('OUTDIR');
 in = optargs_struct(in,default);
@@ -74,7 +75,7 @@ if in.display
             'valign','b',...
             'outdir',in.outdir,...
             'display',in.display,...
-            'pdfcrop',1));
+            'pdfcrop',in.pdfcrop));
         
     else
         logtext(1,'Display all PDFs separately since pdfinfo is missing, and hence combine_pdfs wont work.');
@@ -162,7 +163,7 @@ for T = sort(in.test)
             test.lat = gridded.lat;
             test.lon = gridded.lon;
             test.unit='';
-            test.xunit='kg/m@+2';
+            test.xunit='kg/m@+2@+';
             test.ctable.name = 'mypolar';
             test.ctable.reference = 0;
             test.legend.sidebar = 3; % both above and below
@@ -189,7 +190,7 @@ for T = sort(in.test)
             test.lat = gridded.lat;
             test.lon = gridded.lon;
             test.unit='';
-            test.xunit='kg/m@+2';
+            test.xunit='kg/m@+2@+';
             test.ctable.name = 'mypolar';
             test.ctable.nwhite = 6;
             test.ctable.reference = 0;
@@ -219,7 +220,7 @@ for T = sort(in.test)
             
             %% TEST: title, unit (gridded and ungridded)
             test.nearneighbor.resolution = 1; %[deg]
-            test.unit            = 'kg/m@+2';
+            test.unit            = 'kg/m@+2@+';
             test.psbasemap.axes  = 'nEsW';
             test.title           = sprintf('Font: ''Courier'': ungridded: %g [deg]',test.nearneighbor.resolution);
             test.font_title      = 'Courier';
@@ -242,7 +243,7 @@ for T = sort(in.test)
         case 5
             %% test 2b
             test.nearneighbor.resolution = 10;
-            test.unit            = 'kg/m@+2';
+            test.unit            = 'kg/m@+2@+';
             test.psbasemap.axes    = 'nEsW';
             test.pscoast.width     = '1p';
             test.pscoast.color     = '255/255/255';
@@ -264,7 +265,7 @@ for T = sort(in.test)
         case 6
             %% test 2c
             test.nearneighbor.resolution = 60;
-            test.unit            = 'kg/m@+2';
+            test.unit            = 'kg/m@+2@+';
             test.pscoast.width     = '1p';
             test.pscoast.color     = '255/255/255';
             test.legend.orientation  = 'h';

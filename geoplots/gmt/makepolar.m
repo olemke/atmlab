@@ -116,6 +116,7 @@ end
 
 centers = tickval(2:end)-(tickval(2:end)-tickval(1:end-1))/2;
 
+below=1;
 for i = 1:length(tickval)-1
     % I want to find inbetween where the reference is
     

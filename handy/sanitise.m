@@ -7,7 +7,7 @@ function new = sanitise(old, varargin)
 % user, pass your string through this function first. It will sanitise the
 % input, replacing any undesired characters.
 %
-% Dangerous characters are: :=, ()*/<>!?%;
+% Dangerous characters are: :=, ()*<>!?%;
 %
 % IN
 %

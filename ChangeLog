@@ -1,3 +1,30 @@
+2017-09-29  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-238
+
+	* handy/combine_pdfs.m:
+
+	- Made in.cols more flexible, and now a more robust handling of
+	pages,rows, cols etc.
+	- added --ini to pdfcrop since it has
+	stopped working for me on several systems.
+
+	* geoplots/gmt/test_gmt.m: Added pdfcrop as an option
+
+	* geoplots/gmt/psscale.m: changed -Dj to -DJ since it was causing
+	a weird bug that put the legend annotations on the wrong side
+
+	* geoplots/gmt/makepolar.m: Fixed small bug
+
+	* geoplots/gmt/gmt_plot.m: Fixed some bugs in making the legend in
+	certain cases
+
+	* geoplots/gmt/create_gmt_earth.m: commented out GMT_COMPATIBILITY=4
+
+	* geographical/resample_geodata.m:
+	* handy/sanitise.m:
+	small edit
+
 2017-08-25  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-237

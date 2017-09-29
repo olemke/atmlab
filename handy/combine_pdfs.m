@@ -33,7 +33,12 @@ function outfile = combine_pdfs(pdffiles, options)
 %       options.cols
 %            in:  %d
 %            ex:  Number of columns per row. option.cols can also be a vector
-%                 containing the number of columns that should be on each each row.
+%                 containing the number of columns that should be on each
+%                 each row. If the number of columns is less than the
+%                 number of pdf files, the values of the number of columns
+%                 per row is reused. e.g, 6 files, and options.cols=[1,2],
+%                 make a file with the following number of columns per
+%                 rows: 1,2,2,1
 %                 In that case, the sum of this vector must match the number of pdf files.
 %            def: 2
 %       options.display
@@ -136,7 +141,6 @@ default.cols        = min([length(pdffiles),2]);
 default.display    = true;
 default.hspace      = 1;
 default.outdir     = gmtlab('outdir');
-default.pages      = 1;
 default.pdfcrop    = false;
 default.pdfviewer  = '';
 default.samesize   = false;
@@ -146,6 +150,10 @@ default.valign      = 'm';
 default.vspace      = 1;
 default.outputformat='pdf';
 
+options = optargs_struct(options, default);
+if ~isfield(options,'rowsPerPage')
+    default.pages      = 1;    
+end
 options = optargs_struct(options, default);
 
 if ~isempty(options.title)
@@ -193,23 +201,32 @@ assert(sum(options.cols)<=length(pdffiles),...
 options.cols = make_fit(options.cols,pdffiles);
 
 % rows
-
-if options.pages > length(options.cols)
-    warning(['atmlab:',mfilename,':badInput'],'options.pages forced to %i (= length(options.cols) )',length(options.cols))
-    options.pages = length(options.cols);
-end
-
-rows = ceil(length(options.cols)/options.pages);
-
-if isfield(options,'pages')
-    if atmlab('VERBOSITY') && isfield(options,'rowsPerPage')
-        warning(['atmlab:',mfilename,':badInput'],'options.pages forces the number of rows')
+if ~isfield(options,'rowsPerPage')
+    if options.pages > length(options.cols)
+        warning(['atmlab:',mfilename,':badInput'],'options.pages forced to %i (= length(options.cols) )',length(options.cols))
+        options.pages = length(options.cols);
     end
-    options.rowsPerPage = rows;
+    
+    rows = ceil(length(options.cols)/options.pages);
+    
+    if isfield(options,'pages')
+        if atmlab('VERBOSITY') && isfield(options,'rowsPerPage')
+            warning(['atmlab:',mfilename,':badInput'],'options.pages forces the number of rows')
+        end
+        options.rowsPerPage = rows;
+    else
+        default.rowsPerPage = rows; % Default is one page for all the plots
+    end
+    options = optargs_struct(options, default); clear default;
 else
-    default.rowsPerPage = rows; % Default is one page for all the plots
+    if isscalar(options.rowsPerPage)
+        options.pages = ceil(length(options.cols)/options.rowsPerPage);
+    else
+        % assuming the user provides rowsperpage
+        options.pages = length(options.rowsPerPage);
+    end
 end
-options = optargs_struct(options, default); clear default;
+
 options.rowsPerPage = make_fit(options.rowsPerPage,options.cols);
 if options.rowsPerPage>4
     warning(['atmlab:',mfilename,':badInput'],...
@@ -322,7 +339,8 @@ for i = 1:length(pdffiles)
     % all 
     if options.samesize
         width=max([psize.width]);
-    else width=psize(i).width;
+    else
+        width=psize(i).width;
     end
     
     % On this row and this column element, set the height and width associated
@@ -335,6 +353,7 @@ for i = 1:length(pdffiles)
     col = col + 1;
     
     % but if the next column is on the NEXT row (or the last file is processed), find the row dimensions
+    
     if col > options.cols(row)
         R = layout.plotsbyrow(row);
         
@@ -492,7 +511,7 @@ if strcmp(options.outputformat,'pdf')
         if ~isempty(f_ind)
             file = file(1:f_ind-1);
         end
-        [message,test]=exec_system_cmd(sprintf('pdfcrop %s',file),atmlab('VERBOSITY'));
+        [message,test]=exec_system_cmd(sprintf('pdfcrop --ini %s',file),atmlab('VERBOSITY'));
         if logical(test)
             error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
         end
@@ -537,6 +556,15 @@ if isscalar(var)
         end
     end
     var = tmp(1:i-1);
+elseif sum(var)<length(ref)
+    tmp=var;
+    while (sum(tmp)+var(end))<length(ref)
+        tmp(end+1)=var(end);
+    end
+    if sum(tmp)<length(ref)
+        tmp(end+1)=length(ref)-sum(tmp);
+    end
+    var=tmp;
 end
 
 end

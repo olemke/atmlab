@@ -48,7 +48,7 @@ if ~islogical(L.unit)
     end
 end
 
-psscale = sprintf('%s -Dj%s',psscale,L.justify);
+psscale = sprintf('%s -DJ%s',psscale,L.justify);
 
 psscale = sprintf('%s+w%s/%s',psscale,num2str(L.length),num2str(L.width));
 
@@ -60,7 +60,7 @@ if isfield(L,'yoffset')
     psscale = sprintf('%s/%s',psscale,L.yoffset);
 end
 
-if isfield(L,'orientation') && strcmp(L.orientation,'h'),
+if isfield(L,'orientation') && strcmp(L.orientation,'h')
     psscale = sprintf('%s+h',psscale);
 end
 
