@@ -2,12 +2,13 @@
 %
 %    See *apihelp_time* for valid formats for *start_time* and *end_time*.
 %
-% FORMAT  SMR = smrapi_find_l2_period(API,SMR,freqmode,start_time,end_time
+% FORMAT  SMR = smrapi_find_l2_period(API,SMR,project,freqmode,start_time,end_time
 %                                     [,limit,offset])
 %
 % OUT   SMR        Extended SMR structure, loaded data are appended.
 %  IN   API        Structure with basic API settings.
 %       SMR        Original SMR structure.
+%       project    Name of L2 project.
 %       freqmode   Frequency mode number.
 %       start_time Return data after this time (inclusive). 
 %       end_time   Return data before this time (exclusive). 

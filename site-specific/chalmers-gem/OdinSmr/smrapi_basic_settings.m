@@ -8,6 +8,7 @@
 %         robust : False means to issue an error if api call fails. 
 %                  If set to true, data are instead set to NaN (and no error
 %                  is issued).
+%        retries : Number of API calls to do, if robust.
 %   
 % FORMAT   API = smrapi_basic_settings
 %

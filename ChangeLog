@@ -1,3 +1,13 @@
+2017-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-239
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_find_l2_period.m:
+	Argument *project* was missing in header info.
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_basic_settings.m:
+	Added description of field retries.
+
 2017-09-29  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-238
