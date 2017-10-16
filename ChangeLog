@@ -1,5 +1,11 @@
 2017-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-240
+
+	* forwardmodel/fm_o3_111ghz.m: Extended.
+
+2017-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
 	* atmlab-2-3-239
 
 	* site-specific/chalmers-gem/OdinSmr/smrapi_find_l2_period.m:
