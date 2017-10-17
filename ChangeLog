@@ -1,3 +1,9 @@
+2017-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-241
+
+	* site-specific/chalmers-gem/OdinSmr/smrl2_frequency.m: Corrected header.
+
 2017-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-240

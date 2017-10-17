@@ -2,7 +2,7 @@
 %
 %   The function returns absolute frequencies for the selected set of spectra.
 %
-% FORMAT   [F,i0] = smrl2_frequency( L1B, L2I [, itan] )
+% FORMAT   [F,ich1,itan1] = smrl2_frequency( L1B, L2I [, itan] )
 %
 % OUT  F       Frequencies, one column per spectrum.
 %      ich1    Index in L1B of channels present in L2I.
