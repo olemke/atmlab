@@ -53,9 +53,18 @@ function [Z,Y,X] = binning_fast(in)
 %                        (lon>180). This may be important if your input data does not cover both
 %                        hemispheres.
 %
-%                 counts   %f (e.g. true=1)
-%                        Optional logical for if you only want the number of counts per bin, e.g. to see how
-%                        often a certain combination of X-Y happens (numel per box).
+%                 countsOnly %f (e.g. true=1), Optional logical for if you only want the number of counts per bin, e.g. to see how
+%                        often a certain combination of X-Y happens (numel
+%                        per box). 
+%
+%
+%                 counts_matrix ... or counts can be a matrix of counts from a
+%                       previous run. If you are only this can save up to
+%                       20% computational time if you are calling this
+%                       function many times based on the same lat/lon.
+%
+%
+%                        
 %
 % OUT:
 %                   1) Z  ( cell (size(Y,X)) or counts) %data
@@ -111,16 +120,23 @@ Xindex(Xindex==0)=1;
 
 %% GET COUNTS
 Z = cell(length(in.newY), length(in.newX));
-counts = zeros (size(Z), 'uint32');
 
-for i = 1:length(in.X)
-    counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) + 1;
-end
-
-if in.counts
-    % If you only want the counts you can leave now
-    Z = counts;
-    return
+if ~isfield(in,'counts_matrix')
+    
+    counts = zeros (size(Z), 'uint32');
+    
+    for i = 1:length(in.X)
+        counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) + 1;
+    end
+    
+    
+    if in.countsOnly
+        % If you only want the counts you can leave now
+        Z = counts;
+        return
+    end
+else
+    counts=in.counts_matrix;
 end
 
 indata = in.Z;
@@ -177,10 +193,9 @@ elseif length(in.size)==4 % three extra dimensions
     end
 end
    
-
-if ( ~(in.flags.lon_descend==in.flags.out.lon_descend) || ...
+if ( in.gridprovided && (~(in.flags.lon_descend==in.flags.out.lon_descend) || ...
         ~(in.flags.lat_descend==in.flags.out.lat_descend) || ...
-        ~(in.flags.lon360==in.flags.out.lon360))
+        ~(in.flags.lon360==in.flags.out.lon360)))
 
     % change back the order of the X, Y if I have changed them
 
@@ -217,11 +232,13 @@ if any(isfield(in,{'newlon','newlat','newX','newY'}))
         logtext(1,'region makes no sense if you pass a grid to map to. Ignoring region...\n')
         in = rmfeild(in,'region');
     end
+else
+    in.gridprovided=false;
 end
 
 %% you want to do more than just count the number hits in a grid
-if ~isfield(in,'counts') 
-    in.counts = 0;
+if ~isfield(in,'countsOnly') 
+    in.countsOnly = false;
 end
 
 %% If your data is geographical
@@ -229,7 +246,7 @@ if in.lonlat
     in.X = in.lon;
     in.Y = in.lat;
     in = rmfield(in,{'lon','lat'});
-    if ~in.counts
+    if ~in.countsOnly
         in.Z = in.data;
         in = rmfield(in,'data');
     end
@@ -245,14 +262,14 @@ end
 
 %% If fields are missing
 
-assert(all(isfield(in,{'Y','X','Z'})) || all(isfield(in,{'Y','X','counts'})),...
+assert(all(isfield(in,{'Y','X','Z'})) || all(isfield(in,{'Y','X','countsOnly'})),...
     errId,'''lat'',''lon'',''data'' (or ''X'',''Y'',''Z'') are required input fields')
 
 assert(isfield(in,'gridsize') || all(isfield(in,{'newX','newY'})),...
     errId,'Either field ''gridsize'' or fields ''newY/newlat'' and ''newX/newlon'' are required' )
 
 %% Dimension checks
-if ~in.counts
+if ~in.countsOnly
     if isequal(numel(in.Z),numel(in.Y),numel(in.X))
         in.Z = in.Z(:); in.Y = in.Y(:); in.X = in.X(:);
     end
@@ -260,6 +277,9 @@ if ~in.counts
     assert(isequal(size(in.X,1),size(in.Y,1),size(in.Z,1)),...
         errId, ['data,Y,X must all have the same first dimension. Found: ' ...
         'data %d, Y %d, X %d. It seems your data is not "ungridded" '], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
+
+    assert(ndims(in.Z)<=4,errId,...
+        [mfilename,' currently only supports 3 extra dimensions'])
 else
     if isequal(numel(in.Y),numel(in.X))
         in.Y = in.Y(:); in.X = in.X(:);
@@ -269,8 +289,7 @@ else
         ' Y %d, X %d'], size(in.Y,1), size(in.X, 1));
 end
 
-assert(ndims(in.Z)<=4,errId,...
-    [mfilename,' currently only supports 3 extra dimensions'])
+
 
 %% Some general warnings
 if in.gridprovided
@@ -304,8 +323,29 @@ function in = outputlatlons(in)
 %
 errId = ['atmlab:' mfilename ':badInput'];
 
+
+
 if in.lonlat % it is a geographical grid
-    
+
+    if ~any(isfield(in,{'newX','newY'}))
+        d = in.gridsize;
+        assert(numel(d)<=2,errId,'''gridsize'' should contain 1 or 2 values')
+        
+        if isscalar(d), d = [d,d]; end
+        
+        if ~isfield(in,'region')
+            % assume global
+            if min(in.X)<0
+                in.region=[-90,-180,90,180];
+            else
+                in.region=[-90,0,90,360];
+            end
+        end
+        
+        in.newY = in.region(1)+0.5*d(1):d(1):in.region(3)-0.5*d(1);
+        in.newX = in.region(2)+0.5*d(2):d(2):in.region(4)-0.5*d(2);
+    end
+
     % the grid might be in 0:360 deg space and the data in -180:180; Match the
     % data to the new grid
     if any(in.newX>180), in.lonspace = 360; end
@@ -343,17 +383,6 @@ else
     end
 end
 
-if ~any(isfield(in,{'newX','newY'}))
-    d = in.gridsize;
-    assert(numel(d)<=2,errId,'''gridsize'' should contain 1 or 2 values')
-    
-    if isscalar(d), d = [d,d]; end
-    assert(isnumeric(in.region),errId,'in.region must be a numeric vector of coordinates')
-    
-    in.newY = in.region(1)+0.5*d(1):d(1):in.region(3)-0.5*d(1);
-    in.newX = in.region(2)+0.5*d(2):d(2):in.region(4)-0.5*d(2);
-end
-
 end
 
 function in = regionchop(in)
@@ -370,15 +399,17 @@ index = ln1 & ln2 & lt1 & lt2;
 in.Y = in.Y(index);
 in.X = in.X(index);
 
-if ~in.counts
+if ~in.countsOnly
     % I need to collapse the data in all cases
     in.size = size(in.Z);
     
     if ~all(index)
         in.Z = in.Z(index,:);
-        if ~isequal(size(in.Z),in.size)
-            % there where more than 2 dimensions in the orginal data
-            in.Z = reshape(in.Z,in.size);
+        if length(in.size)>2
+            if ~isequal(size(in.Z),in.size)
+                % there where more than 2 dimensions in the orginal data
+                in.Z = reshape(in.Z,in.size(2:end));
+            end
         end
     end
 end

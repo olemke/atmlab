@@ -1,3 +1,9 @@
+2017-10-26  Salomon Eliasson  <seliasson@ManUtd>
+
+	* atmlab-2-3-241
+
+	* math/binning_fast.m: made it faster to just get the counts.
+
 2017-10-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-241
