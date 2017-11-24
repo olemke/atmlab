@@ -1,4 +1,4 @@
-function out = resample_geodata(in,field,newgrid)
+function [out,weights] = resample_geodata(in,field,newgrid,weights)
 % RESAMPLE_GEODATA regrid the data to a new gridsize or fitting to new lat lons
 %
 % PURPOSE:  To resample GRIDDED data according a given gridsize or lat/lon
@@ -70,7 +70,7 @@ function out = resample_geodata(in,field,newgrid)
 % $Id: regrid_dataset.m 6417 2011-04-21 06:44:37Z seliasson $
 
 errID = ['atmlab:' mfilename ':badInput'];
-assert(nargin==3,errID,'Incorrect number of input arguments')
+assert(nargin>2,errID,'Incorrect number of input arguments')
 if ~iscell(field), field={field}; end
 
 % rename the structure so nothing is lost after this function
@@ -83,7 +83,7 @@ sz                = check_input(in,field,newgrid,errID);
 [newlon,newlat]   = assemble_newgrid(in.lon,in.lat,newgrid,errID);
 
 % STANDARDIZE "new grid" internally
-gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false);
+gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false,'silent',true);
 [rg_flags,tmp]    = standardize_geodata(struct('lon',newlon,'lat',newlat),gridoptions);
 newlon=tmp.lon;
 newlat=tmp.lat;
@@ -119,7 +119,15 @@ elseif strcmp(out.method,'interpolate')
     end
 end
 
+if strcmp(out.method,'coarse grid with area weighting') && ...
+    (~exist('weights','var') || isempty(weights))
+    % do this only once. This saves time if there are more than one field
+    [~,tmp]   = standardize_geodata(struct('lat',in.lat,'lon',in.lon),gridoptions);
+    logtext(1,'getting weights\n')
+    weights = get_weights_for_coarser_grid_withAreaweighting(struct('lat',tmp.lat,'lon',tmp.lon),newlat,newlon);
+end
 %% LOOP over FIELDS to regrid
+
 for F = field
     logtext(1,'Processing field: "%s"\n',F{1})
     fsz = size(in.(F{1}));
@@ -128,7 +136,7 @@ for F = field
     data = in.(F{1})(:,:,:);
     
     % STANDARDIZE "input" data internally
-    gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false,'dimorder','latlon');
+    gridoptions=struct('lat_descend',false,'lon_descend',false,'lon360',false,'dimorder','latlon','silent',true);
     [flags,tmp]   = standardize_geodata(struct('lat',in.lat,'lon',in.lon,'data',data),gridoptions);
     lat  = tmp.lat;
     lon  = tmp.lon;
@@ -149,7 +157,8 @@ for F = field
             data = coarser_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
         case 'coarse grid with area weighting'
             % successfully tested for 4D data and lon=0:360, lat = end:-1:1
-            data = coarser_grid_withAreaweighting(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+            data = coarser_grid_withAreaweighting2(struct('lat',lat,'lon',lon,'data',data),weights,newlat,newlon);
+            %data = coarser_grid_withAreaweighting(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
         case 'shift grid'
             % successfully: regular, 4D, 
             data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data,'method',intm),newlat,newlon);
@@ -422,7 +431,7 @@ if any(isnan(tmpdata(:))), warning(['atmlab:' mfilename ':calculation'],...
         'There are NaNs in the data, and these may lead to biases on the coarser grid'); end
 tmpdata = binned_statistics(tmpdata,{@nanmean});
 
-if ndims(in.data)==2
+if ismatrix(in.data)
     data = cell2mat(tmpdata.mean);
 elseif ndims(in.data)==3
     % make into MATRIX(lat,lat,...)
@@ -433,6 +442,39 @@ elseif ndims(in.data)==3
         for j = 1:length(lon)
             data(i,j,:) = tmpdata.mean{i,j};
         end
+    end
+end
+
+function weights = get_weights_for_coarser_grid_withAreaweighting(in,newlat,newlon)
+
+% DETERMINE new grid BOUNDARIES from grid spacing
+gn = mean(diff(newlon));    gt = mean(diff(newlat));
+dn = mean(diff(in.lon)); dt = mean(diff(in.lat));
+if isnan(gt), gt = (in.lat(end)-in.lat(1) + dt);end %incase there's only one latitude
+if isnan(gn), gn = (in.lon(end)-in.lon(1) + dn);end %incase there's only one longitude
+
+lattop = newlat+gt/2+dt;
+latbot = newlat-gt/2;
+lontop = newlon+gn/2+dn;
+lonbot = newlon-gn/2;
+
+weights = cell(length(newlat),length(newlon));
+
+%LOOP over larger grid
+for ii = 1:length(newlat)
+    for jj=1:length(newlon)
+        
+        % GET lats lons in or tangent to grid(i,j)
+        ilon = in.lon >= lonbot(jj) & in.lon < lontop(jj);
+        ilat = in.lat >= latbot(ii) & in.lat < lattop(ii);
+        
+        % find WEIGHTS
+        % A = [x,y,width,height] x,y = bottom corner
+        A = [lonbot(jj),latbot(ii),gn,gt];
+        [x,y] = meshgrid(in.lon(ilon)-dn/2,in.lat(ilat)-dt/2);
+        B = [ x(:), y(:), repmat(dn,length(y(:)),1), repmat(dt,length(x(:)),1)];
+        weights{ii,jj} = rectint(A,B);
+
     end
 end
 
@@ -488,6 +530,55 @@ for ii = 1:length(lat)
         
         for kk = 1:size(d,1)
             data(ii,jj,kk)    = polyWeightSum(d(kk,:),weights,~isnan(d(kk,:)));
+        end
+    end
+end
+
+function data = coarser_grid_withAreaweighting2(in,weights,lat,lon)
+%% COARSER_GRID make a coarse grid from a finer grid
+% method: Uses area weighting for grids that don't fit nicely into each
+% other and assumes local plane assumption, which is good as long as the
+% grids are not too large (see help resample_data).
+% NOTE: Biases may be introduced because I am using nanmean. The solution
+%       is to also output the number of values used in the averaging for
+%       each grid (not doing that right now. Add feature if needed)
+
+
+% preallocate
+if ~islogical(in.data)
+    data = zeros([length(lat),length(lon),size(in.data,3)],class(in.data));
+else data = false([length(lat),length(lon),size(in.data,3)]);
+end
+
+polyWeightSum = @(d,w,i)(nansum(single(d(i)).*w(i))./nansum(w(i)));
+
+% DETERMINE new grid BOUNDARIES from grid spacing
+gn = mean(diff(lon)); gt = mean(diff(lat));
+dn = mean(diff(in.lon)); dt = mean(diff(in.lat));
+if isnan(gt), gt = (in.lat(end)-in.lat(1) + dt);end %incase there's only one latitude
+if isnan(gn), gn = (in.lon(end)-in.lon(1) + dn);end %incase there's only one longitude
+
+lattop = lat+gt/2+dt;
+latbot = lat-gt/2;
+lontop = lon+gn/2+dn;
+lonbot = lon-gn/2;
+
+%LOOP over larger grid
+for ii = 1:length(lat)
+    for jj=1:length(lon)
+        
+        % GET lats lons in or tangent to grid(i,j)
+        ilon = in.lon >= lonbot(jj) & in.lon < lontop(jj);
+        ilat = in.lat >= latbot(ii) & in.lat < lattop(ii);
+
+        % get data SUBSET
+        d = in.data(ilat,ilon,:);
+        
+        % COLLAPSE data on the lat/lon dimensions to match output from rectint
+        d = permute(d,[3,1,2]);
+        
+        for kk = 1:size(d,1)
+            data(ii,jj,kk)    = polyWeightSum(d(kk,:),weights{ii,jj},~isnan(d(kk,:)));
         end
     end
 end

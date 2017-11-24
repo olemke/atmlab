@@ -1810,7 +1810,7 @@ if in.savelegend
     if in.savelegend==2 % store legend ONLY in external file
         command = command(~findPsScale);
     end
-    command{end+1} = sprintf('mv %s.%s %s',in.filename_legend,in.figuretype,in.outdir);
+    command{end+1} = sprintf('mv -v %s.%s %s',in.filename_legend,in.figuretype,in.outdir);
 end
 
 out = exec_system_cmd(command,gmtlab('verbosity')); % execute all gathered commands
