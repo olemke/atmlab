@@ -45,9 +45,10 @@ if strcmp( API.version, 'v5' )
       SMR(end).FreqMode    = freqmode;
       SMR(end).ScanID      = L2urls(i).ScanID;
       L2                   = smrapi_call( API, L2urls(i).URLS.URL_level2 );
-      SMR(end).L2          = L2.L2;
-      SMR(end).L2c         = L2.L2c;
-      SMR(end).L2i         = L2.L2i;
+      SMR(end).L2          = L2.L2.Data;
+      SMR(end).L2C         = L2.L2c.Data;
+      SMR(end).L2I         = L2.L2i.Data;
+      SMR(end).L2A         = L2.L2anc.Data;
     end
   end
     

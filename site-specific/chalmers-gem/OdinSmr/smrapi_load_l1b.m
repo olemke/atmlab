@@ -2,7 +2,7 @@
 %
 %   The input SMR must contain fields ScanID and FreqMode.
 %
-%   Data obtained from API are returned as SMR.L1b.
+%   Data obtained from API are returned as SMR.L1B.
 %
 % FORMAT   SMR = smrapi_load_l1b( API, SMR )
 %
@@ -27,7 +27,7 @@ if strcmp( API.version, 'v5' )
     url = sprintf( 'http://%s/rest_api/%s/level1/%d/%d/L1b/', ...
                    API.url, API.version, SMR(i).FreqMode, SMR(i).ScanID );
   
-    SMR(i).L1b = smrapi_call( API, url );
+    SMR(i).L1B = smrapi_call( API, url );
   end
     
     

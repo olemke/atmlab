@@ -1,10 +1,23 @@
+2018-02-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-243
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_load_l1b.m: Renamed
+	SMR.L1b to SMR.L1B.
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_find_l2_period.m: The
+	Data level is now removed, ie the actual data are at SMR.L2 and
+	not SMR.L2.Data. L2i and L2c renamed to L2I and L2C. Now also L2a
+	attached to SMR.
+
 2017-11-24  Salomon Eliasson  <seliasson@ManUtd>
 
 	* atmlab-2-3-242
 
 	* geoplots/gmt/gmt_plot.m: cosmetics
 
-	* geographical/resample_geodata.m: Made much faster for regridding to similar sized grids
+	* geographical/resample_geodata.m: Made much faster for regridding
+	to similar sized grids
 
 2017-10-26  Salomon Eliasson  <seliasson@ManUtd>
 
