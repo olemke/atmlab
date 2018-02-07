@@ -892,6 +892,8 @@ function T = cfile_PbcSet( Q, partname, workfolder )
     T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
   end
   %
+  T{end+1} = 'jacobianOff';
+  %
 return
 
 
@@ -908,7 +910,6 @@ function T = cfile_PbcExe( Q, partname, workfolder )
   end                                                                       %&%
   %
   T = add_rtecalcstart( Q );
-  T{end+1} = 'jacobianOff';
   %
   if qarts_isset( Q.YCALC_WSMS )
     T = add_wsms( T, 'YCALC_WSMS', Q.YCALC_WSMS, Q );

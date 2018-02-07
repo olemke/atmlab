@@ -1,3 +1,14 @@
+2018-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-243
+
+	* First a warning. Qpack is not up to date with ARTS, and don't
+	expect everything to work. Change below fixes at least basic
+	pencil beam calculations
+
+	* arts/qarts2cfile.m: A small change to allow pencil beam
+	calculations togetehr with newest ARTS.
+
 2018-02-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-243
@@ -14,7 +25,7 @@
 
 	* atmlab-2-3-242
 
-	* geoplots/gmt/gmt_plot.m: cosmetics
+	* geoplots/gmt/gm.t_plot.m: cosmetics
 
 	* geographical/resample_geodata.m: Made much faster for regridding
 	to similar sized grids
