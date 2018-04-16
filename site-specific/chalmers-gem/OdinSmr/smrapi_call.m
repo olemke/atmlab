@@ -17,7 +17,6 @@
 function D = smrapi_call( API, url )
   
 for i = 1 : API.retries
-
   try
     w = webread( url, weboptions('ContentType','json','Timeout',API.timeout) );
   catch ME
@@ -35,5 +34,11 @@ end
 if API.robust
   D = NaN;
 else
-  error( ME.message );
+  if isnan(w)
+    error( ME.message );
+  elseif isempty(w)
+    error( 'webread gave an empty result.' );
+  else
+    error( 'Something went wrong when calling webread.' );
+  end
 end

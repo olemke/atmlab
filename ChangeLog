@@ -1,6 +1,13 @@
+2018-04-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-245
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_call.m: A bit improved
+	handling of errors.
+
 2018-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-2-3-243
+	* atmlab-2-3-244
 
 	* First a warning. Qpack is not up to date with ARTS, and don't
 	expect everything to work. Change below fixes at least basic
