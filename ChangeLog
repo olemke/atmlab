@@ -1,3 +1,13 @@
+2018-04-23  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-246
+
+	* graphs/cmaps/cubehelix.txt, graphs/cmaps/typhon_cmaps.m:
+
+	Add the default "cubehelix" colormap:
+
+	https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/
+
 2018-04-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-245

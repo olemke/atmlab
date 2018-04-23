@@ -14,6 +14,7 @@
 % OUT   cmap    Colormap.
 % IN    name    Colormap name.
 %               Valid names are:
+%                   cubehelix
 %                   density
 %                   difference
 %                   phase
