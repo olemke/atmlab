@@ -1,3 +1,24 @@
+2018-04-24  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
+
+	* atmlab-2-3-247
+
+	* handy/combine_pdfs.m:
+	- now allways adding the suffix pdf to the ourput file incase there is none is given
+	- fixed bug in filename passed to pdf-crop
+	- Now handles png,tiff,eps, and jpg files and made sure the
+	temporary files are all made in a temp directory that is later removed
+
+	* handy/png2pdf.m: Added
+
+	* geoplots/gmt/makepolar.m: fixed bug in the number of which boxes
+	if reference is right on the maximum value
+
+	* geographical/resample_geodata.m:
+	* geoplots/gmt/gmt_plot.m:
+	* geoplots/gmt/pscoast.m:
+	* geoplots/gmt/create_gmt_earth.m:
+	small edits
+
 2018-04-23  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-246

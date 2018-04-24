@@ -1,4 +1,4 @@
-function [filename,out] = gmt_plot(in,field)
+function [filename,out,commands] = gmt_plot(in,field)
 % GMT_PLOT plotting interface for GMT (Generic Mapping Tools)
 %
 % The function is basically a wrapper that calls GMT shell commands using easy
@@ -793,7 +793,8 @@ check_input(in,field)
 
 if isfield(in,'nodata')&&in.nodata
     out = set_GMT_plot(in);
-else out = set_GMT_plot(in,field);
+else
+    out = set_GMT_plot(in,field);
 end
 
 % make TEMPDIR and set atmlab('VERBOSITY') to gmtlab('VERBOSITY')
@@ -894,7 +895,7 @@ default.nodata                   = false;
 default.outdir                   = gmtlab('OUTDIR');
 default.plotPlacement            = '-Xa5 -Ya5';
 default.proj.projection          = 'N';
-default.proj.map_width           = 20;
+default.proj.map_width           = '20c';
 default.proj.center              = 0;
 default.proj_length_unit         = 'cm';
 default.savelegend               = false;
@@ -921,7 +922,8 @@ end
 if ~isempty(in.title)
     default.filename = ['gmtfile_' in.title];
     default.filename = strrep(default.filename,'/','-');
-else default.filename = 'default';
+else
+    default.filename = 'default';
 end
 
 in = optargs_struct(in,default);
@@ -1056,7 +1058,7 @@ if ~ (isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend))
     % If in.legend = false, do nothing
     
     
-    in = setupLegend(in);
+    in.legend = setupLegend(in);
     
     % extra LEGEND
     if isstruct(in.extra_legend)
@@ -1196,8 +1198,10 @@ for F = Fields
     end
 end
 
-fprintf('Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
-fprintf('Will not be used as they are not "data" or in the list of options\n');
+if ~isempty(fieldsNotToRead)
+    fprintf('Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
+    fprintf('Will not be used as they are not "data" or in the list of options\n');
+end
 
 end
 
@@ -1589,8 +1593,8 @@ if strcmp(in.legend.orientation,'h')
         otherwise
             projOff = 1;
     end
-    default.xoffset = sprintf('%.2f%s',projOff*lw*2,lwu);
-    default.yoffset = '0';
+    default.xoffset = sprintf('%.2f%s',2*lw+projOff*lw*2,lwu);
+    default.yoffset = '0.2c'; % not a general solution
     
 elseif strcmp(in.legend.orientation,'v')
     default.xoffset = '0';
@@ -1601,7 +1605,7 @@ in.extra_legend   = optargs_struct(in.extra_legend,default);
 in.extra_legend.extra_instructions = '-Li'; % no ticks, square   
 end
 
-function in = setupLegend(in)
+function legend = setupLegend(in)
 % SETUP LEGEND
 
 errId = ['gmtlab:' mfilename ':badInput']; % common error ID
@@ -1630,13 +1634,21 @@ end
 
 default.lineThick =.2; %thickness of legend bar
 
-in.legend         = optargs_struct(in.legend,default); %need orientation now
+legend  = optargs_struct(in.legend,default); %need orientation now
 [fl,u2] = separate_integer_and_unit(in.fontsize_annot_primary);
+
+if strcmp(u2,'p') && strcmp(u,'c')
+    % convert to c
+    fl=fl*0.035;
+    u2='c';
+end
+
+% thickness of the legend
 default.width     = sprintf('%.2f%s',2*fl,u2);
 
-in.legend         = optargs_struct(in.legend,default); %need orientation now
+legend         = optargs_struct(legend,default); %need orientation now
 
-switch in.legend.orientation
+switch legend.orientation
     case 'v'
         default.justify = 'MR'; %middle right
         default.length  = sprintf('%.2f%s',f*mw,u);
@@ -1660,23 +1672,23 @@ switch in.legend.orientation
 end
 
 default.tick_annotion_format = in.tick_annotation_format;
-if ~isfield(in.legend,'tick_annotations') % incompatible
+if ~isfield(legend,'tick_annotations') % incompatible
     default.tick_spacing = (in.datarange(2)-in.datarange(1))/in.nlevels ...
         * (floor((in.nlevels-1)/10) + 1);    %10 is the old default number of levels
 end
-default.sidebar      = getsidebar(in); % coloroured triangles using in.datarange
-in.legend            = optargs_struct(in.legend,default);
+default.sidebar   = getsidebar(in); % coloroured triangles using in.datarange
+legend            = optargs_struct(legend,default);
 
 
 % add unit and xunit
-in.legend.unit = in.unit;
-in.legend.xunit = in.xunit;
+legend.unit = in.unit;
+legend.xunit = in.xunit;
 
 end
 
 function sidebar = getsidebar(in)
 %% color level datastep interval
-% sidebar can have the values 0,1,2,3 (none, bellow only, above only, both).
+% sidebar can have the values 0,1,2,3 (none, below only, above only, both).
 
 sidebar =  ( min(in.(in.fieldname)(:))<in.datarange(1) ) + ...
     2* ( max(in.(in.fieldname)(:))>in.datarange(2) );
@@ -1697,7 +1709,7 @@ if in.gridded
         in.(field) = in.(field)(:,cond);
     end
     
-    if in.lon360 && max(diff(in.lon))>5*min(diff(in.lon)) % if the are dicontinuous
+    if in.lon360 && max(diff(in.lon))>5*min(diff(in.lon)) % if the are discontinuous
         
         in.lon = in.lon+(in.lon < 0)*360;
         [in.lon,lnindex] = sort(in.lon);

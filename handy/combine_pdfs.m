@@ -1,7 +1,7 @@
-function outfile = combine_pdfs(pdffiles, options)
+function outfile = combine_pdfs(inputfiles, options)
 % COMBINE_PDFS Combine several PDF (or eps) files on one page
 % 
-% USAGE: outfile = combine_pdfs(pdffiles, options)
+% USAGE: outfile = combine_pdfs(inputfiles, options)
 %
 % E.g. file = combine_pdfs(files,struct('cols',[2 2 2 2 1],...))
 %
@@ -11,12 +11,12 @@ function outfile = combine_pdfs(pdffiles, options)
 %
 % EXTERNAL DEPENDENCIES: pdfinfo, pdflatex.
 %
-% IN:   pdffiles            cell: Each element contains the path to a
+% IN:   inputfiles            cell: Each element contains the path to a
 %                                 file.
 %                           OR
 %                           string: 'dir(<string>)' will get a list of files,
 %                                   globbing is allowed:
-%                             e.g pdffiles = figs/*{CAlow,CAmiddle,CAhigh}*
+%                             e.g inputfiles = figs/*{CAlow,CAmiddle,CAhigh}*
 %
 %
 % OPT
@@ -137,18 +137,18 @@ if ~nargin, error(['atmlab:' mfilename],'Needs input. See help.'); end
 if nargin == 1, options = struct; end
 
 %% Set defaults and use them if not specified by user
-default.cols        = min([length(pdffiles),2]);
-default.display    = true;
-default.hspace      = 1;
-default.outdir     = gmtlab('outdir');
-default.pdfcrop    = false;
-default.pdfviewer  = '';
-default.samesize   = false;
+default.cols              = min([length(inputfiles),2]);
+default.display           = true;
+default.hspace            = 1;
+default.outdir            = gmtlab('outdir');
+default.outputformat      = 'pdf';
+default.pdfcrop           = true;
+default.pdfviewer         = '';
+default.samesize          = false;
 default.secret_latex_spacing_tweak = 0.5;
-default.title      = '';
-default.valign      = 'm';
-default.vspace      = 1;
-default.outputformat='pdf';
+default.title             = '';
+default.valign            = 'm';
+default.vspace            = 1;
 
 options = optargs_struct(options, default);
 if ~isfield(options,'rowsPerPage')
@@ -163,6 +163,12 @@ else
 end
 
 options = optargs_struct(options, default);
+
+if ~(any(strcmp(options.filename(end-3:end),{'.dvi','.pdf'})))
+    % I guess I forgot the suffix
+    options.filename = [options.filename,'.pdf'];
+end
+
 %%
 % Path
 
@@ -172,33 +178,33 @@ if (isempty(options.outdir) || options.outdir(1) ~= filesep())
     options.outdir = fullfile(pwd(), options.outdir);
 end
 % If we got a regexp, use ls to get the file list
-if ischar(pdffiles)
-    direct = fileparts(pdffiles);
-    files = dir(pdffiles);
+if ischar(inputfiles)
+    direct = fileparts(inputfiles);
+    files = dir(inputfiles);
     tmp = cell(1,length(files));
     for i = 1:length(files)
         tmp{i} = [direct,'/',files(i).name];
         
     end
-    pdffiles = tmp;
+    inputfiles = tmp;
 end
 
 % Make sure filenames are in a row vector and non-empty
-pdffiles = pdffiles(:)';
-pdffiles = pdffiles(~cellfun('isempty',pdffiles));
-pdffiles = path_replace_tilde(pdffiles);
-assert(~isempty(pdffiles), 'atmlab:combine_pdfs', 'List of input pdf files is empty');
+inputfiles = inputfiles(:)';
+inputfiles = inputfiles(~cellfun('isempty',inputfiles));
+inputfiles = path_replace_tilde(inputfiles);
+assert(~isempty(inputfiles), 'atmlab:combine_pdfs', 'List of input pdf files is empty');
 
 %%
 % Columns and rows
 
-% First check if a vector of columns is given but it doesn't match the number of pdffiles
-assert(sum(options.cols)<=length(pdffiles),...
+% First check if a vector of columns is given but it doesn't match the number of inputfiles
+assert(sum(options.cols)<=length(inputfiles),...
     ['atmlab:',mfilename,':badInput'],'number of columns is more than the number of files')
 
 
 % columns
-options.cols = make_fit(options.cols,pdffiles);
+options.cols = make_fit(options.cols,inputfiles);
 
 % rows
 if ~isfield(options,'rowsPerPage')
@@ -255,8 +261,16 @@ assert(length(options.valign) == 1 && any('mbt' == options.valign), ...
 assert(isdir(options.outdir), 'atmlab:combine_pdfs', ...
     '%s does not exist', options.outdir);
 
+
 %% Setup is complete, let's get cracking
-layout = create_layout_from_pdffiles(pdffiles, options);
+options.tmpfolder = create_tmpfolder();
+
+%% Hook up a cleanup callback.
+% In case we screw up the LaTeX run, we don't want to leave any
+% evidence behind.
+c = onCleanup(@() delete_tmpfolder(options.tmpfolder));
+
+layout = create_layout_from_inputfiles(inputfiles, options);
 if isempty(layout)
     outfile='';
     logtext(1,'File not created\n')
@@ -285,8 +299,7 @@ end
 
 end
 
-
-function layout = create_layout_from_pdffiles(pdffiles, options)
+function layout = create_layout_from_inputfiles(inputfiles, options)
 
 % regexp that gives us width and height from pdfinfo output
 regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
@@ -294,30 +307,34 @@ regx = 'Page size: +(?<width>\d.+).x.(?<height>\d.+) pts';
 % -------
 % get the height and width information from each pdffile
 %
-psize(length(pdffiles)) = struct('width','','height','');
-for i = 1:length(pdffiles)
-    if strcmpi(pdffiles{i}(end-3:end),{'.png'})
-        logtext(1,'Cannot handle .png. Quitting...\n')
-        layout='';
-        return
-    end 
-    if strcmpi(pdffiles{i}(end-3:end),{'.eps'})
-        % make a tempory file and then delete it (if you want to ultimately
-        % create a .dvi), otherwise we need epstopdf since pdflatex cannot
-        % handle .eps (internally uses epstopdf anyhow)
-        exec_system_cmd(sprintf('cp ''%s'' epstmp.eps', pdffiles{i}), 0);
-        exec_system_cmd('epstopdf epstmp.eps',0);
-        info  = exec_system_cmd('pdfinfo epstmp.pdf', 0);
-        if strcmp(options.outputformat,'pdf')
-            tmpfile = sprintf('%s.pdf',pdffiles{i}(1:end-4));
-            exec_system_cmd(sprintf('cp epstmp.pdf %s.pdf',tmpfile));
-            pdffiles{i} = tmpfile;
-        else
-            exec_system_cmd('rm epstmp.{eps,pdf}', 0);
-        end
-    else
-        info  = exec_system_cmd(sprintf('pdfinfo ''%s''', pdffiles{i}), 0);
+psize(length(inputfiles)) = struct('width','','height','');
+for i = 1:length(inputfiles)
+    [~,file,ft]=fileparts(inputfiles{i});
+    switch ft
+        
+        case '.png'
+            % In that case, sneakily convert png to pdf
+            inputfiles{i} = png2pdf(inputfiles{i},struct('outdir',options.tmpfolder));
+        case '.eps'
+            % make a tempory file and then delete it (if you want to ultimately
+            % create a .dvi), otherwise we need epstopdf since pdflatex cannot
+            % handle .eps (internally uses epstopdf anyhow)
+            epsfile=sprintf('%s/epstmp',options.tmpfolder);
+            exec_system_cmd(sprintf('cp ''%s'' %s.eps',inputfiles{i},epsfile), 0);
+            exec_system_cmd(sprintf('epstopdf %s.eps',epsfile),0);
+            %info  = exec_system_cmd(sprintf('pdfinfo %s.pdf',epsfile), 0);
+            tmpfile = sprintf('%s/dummy_%s_%i.pdf',options.tmpfolder,date,i);
+            exec_system_cmd(sprintf('cp %s.pdf %s',epsfile,tmpfile));
+            inputfiles{i} = tmpfile;
+        case '.pdf'
+        case {'.tiff','.tif','.jpg','.jpeg'}
+            % to a conversion 
+            exec_system_cmd(sprintf('convert %s %s/%s.png',inputfiles{i},options.tmpfolder,file));
+            inputfiles{i} = png2pdf(sprintf('%s/%s.png',options.tmpfolder,file),struct('outdir',options.tmpfolder));
+        otherwise
+            error(['atmlab:',mfilename,':invalid'],'I can''t yet handle filetype: %s',ft)
     end
+    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', inputfiles{i}), 0);
     % pdfinfo uses BigPoints as a unit. Converting to cm.
     psize(i) =  structfun(@(x) str2double(x)/72*2.54, ...
         regexp(info{1},regx, 'names'), ...
@@ -327,12 +344,13 @@ end
 col = 1;
 row = 1;
 filenum=1;
-for i = 1:length(pdffiles)
+for i = 1:length(inputfiles)
 
     % apply scale to with if given 
     if isfield(options,'scale') && ~isempty(options.scale(options.scale(:,1)==filenum,2))
         sc = options.scale(options.scale(:,1)==filenum,2);
-    else sc = 1;
+    else
+        sc = 1;
     end
     
     % get the width from psize or get the maximum width from psize and apply to
@@ -347,7 +365,7 @@ for i = 1:length(pdffiles)
     % with the file at hand
     layout.plotsbyrow{row}(col) = struct('width', width*sc, ...
         'height', psize(i).height*sc, ...
-        'file', pdffiles{i});
+        'file', inputfiles{i});
 
     % now go to the next column
     col = col + 1;
@@ -371,7 +389,7 @@ for i = 1:length(pdffiles)
         row = row + 1;
     end
  
-    if filenum == length(pdffiles)
+    if filenum == length(inputfiles)
         return
     end        
     filenum = filenum+1;
@@ -381,15 +399,8 @@ end
 
 function file = create_pdf_from_layout_with_latex(layout, options)
 
-tmpfolder = create_tmpfolder();
-
-%% Hook up a cleanup callback.
-% In case we screw up the LaTeX run, we don't want to leave any
-% evidence behind.
-c = onCleanup(@() delete_tmpfolder(tmpfolder));
-
 %% Assemble the laTeX file
-file = fullfile(tmpfolder, 'out.tex');
+file = fullfile(options.tmpfolder, 'out.tex');
 fid = fopen(file,'w');
 Cob = onCleanup(@(x) fclose(fid));
 
@@ -449,8 +460,8 @@ for R = layout.plotsbyrow
     for P = R{:}
         fprintf(fid,'\\begin{minipage}[%s]{%gcm}\n', options.valign, P.width);
         tmpplotname=sprintf('plot%d.%s',filenum,P.file(end-2:end));
-        %mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, tmpfolder, tmpplotname); %#ok
-        mvplotcmd{filenum}=sprintf('cp %s %s/%s', P.file, tmpfolder, tmpplotname); %#ok
+        %mvplotcmd{filenum}=sprintf('cp ''%s'' ''%s/%s''', P.file, options.tmpfolder, tmpplotname); %#ok
+        mvplotcmd{filenum}=sprintf('cp %s %s/%s', P.file, options.tmpfolder, tmpplotname); %#ok
         if isfield(options,'scale') && ~isempty(options.scale(options.scale(:,1)==filenum,2))
             strscale = num2str(options.scale(options.scale(:,1)==filenum,2));
         else
@@ -474,7 +485,7 @@ for R = layout.plotsbyrow
         break
     end
     
-    % page break? allways putting a pagebreak at the end
+    % page break? always putting a pagebreak at the end
     if row == options.rowsPerPage(page)
         fprintf(fid,'\\newpage\n');
         page = page+1;
@@ -494,15 +505,15 @@ else
 end
 exec_system_cmd(mvplotcmd, atmlab('VERBOSITY'));
 exec_system_cmd(sprintf('cd %s && %s -interaction nonstopmode out.tex', ...
-    tmpfolder,compiler), ...
+    options.tmpfolder,compiler), ...
     atmlab('VERBOSITY'));
 
 file = fullfile(options.outdir, options.filename);
 % allow spaces
 file = strrep(file,' ','\ ');
 
-exec_system_cmd(sprintf('cd %s && mv -f out.%s %s', ...
-    tmpfolder, options.outputformat,file), ...
+exec_system_cmd(sprintf('cd %s && cp -f -v out.%s %s', ...
+    options.tmpfolder, options.outputformat,file), ...
     atmlab('VERBOSITY'));
 
 if strcmp(options.outputformat,'pdf')
@@ -511,7 +522,7 @@ if strcmp(options.outputformat,'pdf')
         if ~isempty(f_ind)
             file = file(1:f_ind-1);
         end
-        [message,test]=exec_system_cmd(sprintf('pdfcrop --ini %s',file),atmlab('VERBOSITY'));
+        [message,test]=exec_system_cmd(sprintf('pdfcrop --ini %s.pdf',file),atmlab('VERBOSITY'));
         if logical(test)
             error(['atmlab' mfilename],'There was a problem with pdfcrop: %s',message{1})
         end
@@ -551,7 +562,7 @@ if isscalar(var)
             i = i+1;
         end
         if remaining==length(ref)
-            % nothing was done. E.g for rows if all the pdffiles fit on one page
+            % nothing was done. E.g for rows if all the inputfiles fit on one page
             return
         end
     end

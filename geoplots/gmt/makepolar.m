@@ -77,15 +77,19 @@ end
 
 % Set Background and forground colors base on the last color minus 3 times
 % the gradient of color change used in ctable
+
+% set a scaleactor that also cares about the number of layers you have
+sf = in.nlevels/20;
+
 if isfield(in,'forcedColorBack')
     BG = sscanf(in.color_background,'%f/%f/%f');
 else
-    BG = max([ctable(1,:)-[5,5,3]*inc;0,0,0],[],1);
+    BG = max([ctable(1,:)-[5,5,3]*inc*sf;0,0,0],[],1);
 end
 if isfield(in,'forcedColorFore')
     FG = sscanf(in.color_foreground,'%f/%f/%f');
 else
-    FG = max([ctable(end,:)-[3,5,5]*inc;0,0,0],[],1);
+    FG = max([ctable(end,:)-[3,5,5]*inc*sf;0,0,0],[],1);
 end
 if isfield(in,'forcedColorNaN')
     N = sscanf(in.color_nan,'%f/%f/%f');
@@ -147,10 +151,14 @@ if (in.ctable.nwhite>0) && exist('above','var')
     BT = length(1:windex(1)-1);
     % TT top ticks
     TT = length(windex(end)+1:length(centers));
+elseif in.ctable.nwhite>0
+    nw = in.ctable.nwhite;
+    BT = sum(centers<ref)-nw;
+    TT = 0;
 else
+    nw = 0;
     BT = sum(centers<ref);
     TT = sum(centers>ref);
-    nw = 0;
 end
 
 end

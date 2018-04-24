@@ -157,8 +157,7 @@ for F = field
             data = coarser_grid(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
         case 'coarse grid with area weighting'
             % successfully tested for 4D data and lon=0:360, lat = end:-1:1
-            data = coarser_grid_withAreaweighting2(struct('lat',lat,'lon',lon,'data',data),weights,newlat,newlon);
-            %data = coarser_grid_withAreaweighting(struct('lat',lat,'lon',lon,'data',data),newlat,newlon);
+            data = coarser_grid_withAreaweighting(struct('lat',lat,'lon',lon,'data',data),weights,newlat,newlon);
         case 'shift grid'
             % successfully: regular, 4D, 
             data = interpolate_grid(struct('lat',lat,'lon',lon,'data',data,'method',intm),newlat,newlon);
@@ -225,8 +224,8 @@ assert(~isequal([size(in.(field{1}),1),size(in.(field{1}),2)],size(in.lat),size(
     errID,'function only works on regular grids, i.e. data(lat,lon,...) or data(lon,lat,...)')
 % assert(max(diff(in.lat))-min(diff(in.lat))<0.1&&max(diff(in.lon))-min(diff(in.lon))<0.1,...
 %     errID,'The input data must be equidegree (constant spacing)')
-assert( (isequal(in.lat,sort(in.lat)) || isequal(in.lat,sort(in.lat,'descend')) ) && ...
-    (isequal(in.lon,sort(in.lon)) || isequal(in.lon,sort(in.lon,'descend')) ),...
+assert( ( isequal(in.lat,sort(in.lat)) || isequal(in.lat,sort(in.lat,'descend')) ) && ... % lats
+    ( isequal(in.lon,sort(in.lon)) || isequal(in.lon,sort(in.lon,'descend')) ),...        % lons
     errID,'both lat & lon must be ascending or descending')
 sz = size(in.(field{1}));
 assert(isequal([length(in.lat),length(in.lon)],[sz(1),sz(2)]) || ...
@@ -387,7 +386,7 @@ newlon=cast(newlon,class(in.lon));
 newlat=cast(newlat,class(in.lat));
 
 while LON(1)>=newlon(1)
-    LON = [LON(1)-dn,LON,LON(end)+dn];
+    LON = [LON(1)-dn,LON,LON(end)+dn]; %#ok<*AGROW>
     data = [data(:,end,:),data,data(:,1,:)];
 end
 while LAT(1)>=newlat(1)
@@ -478,7 +477,7 @@ for ii = 1:length(newlat)
     end
 end
 
-function data = coarser_grid_withAreaweighting(in,lat,lon)
+function data = coarser_grid_withAreaweighting(in,weights,lat,lon)
 %% COARSER_GRID make a coarse grid from a finer grid
 % method: Uses area weighting for grids that don't fit nicely into each
 % other and assumes local plane assumption, which is good as long as the
@@ -491,63 +490,8 @@ function data = coarser_grid_withAreaweighting(in,lat,lon)
 % preallocate
 if ~islogical(in.data)
     data = zeros([length(lat),length(lon),size(in.data,3)],class(in.data));
-else data = false([length(lat),length(lon),size(in.data,3)]);
-end
-
-polyWeightSum = @(d,w,i)(nansum(single(d(i)).*w(i))./nansum(w(i)));
-
-% DETERMINE new grid BOUNDARIES from grid spacing
-gn = mean(diff(lon)); gt = mean(diff(lat));
-dn = mean(diff(in.lon)); dt = mean(diff(in.lat));
-if isnan(gt), gt = (in.lat(end)-in.lat(1) + dt);end %incase there's only one latitude
-if isnan(gn), gn = (in.lon(end)-in.lon(1) + dn);end %incase there's only one longitude
-
-lattop = lat+gt/2+dt;
-latbot = lat-gt/2;
-lontop = lon+gn/2+dn;
-lonbot = lon-gn/2;
-
-%LOOP over larger grid
-for ii = 1:length(lat)
-    for jj=1:length(lon)
-        
-        % GET lats lons in or tangent to grid(i,j)
-        ilon = in.lon >= lonbot(jj) & in.lon < lontop(jj);
-        ilat = in.lat >= latbot(ii) & in.lat < lattop(ii);
-        
-        % find WEIGHTS
-        % A = [x,y,width,height] x,y = bottom corner
-        A = [lonbot(jj),latbot(ii),gn,gt];
-        [x,y] = meshgrid(in.lon(ilon)-dn/2,in.lat(ilat)-dt/2);
-        B = [ x(:), y(:), repmat(dn,length(y(:)),1), repmat(dt,length(x(:)),1)];
-        weights = rectint(A,B);
-
-        % get data SUBSET
-        d = in.data(ilat,ilon,:);
-        
-        % COLLAPSE data on the lat/lon dimensions to match output from rectint
-        d = permute(d,[3,1,2]);
-        
-        for kk = 1:size(d,1)
-            data(ii,jj,kk)    = polyWeightSum(d(kk,:),weights,~isnan(d(kk,:)));
-        end
-    end
-end
-
-function data = coarser_grid_withAreaweighting2(in,weights,lat,lon)
-%% COARSER_GRID make a coarse grid from a finer grid
-% method: Uses area weighting for grids that don't fit nicely into each
-% other and assumes local plane assumption, which is good as long as the
-% grids are not too large (see help resample_data).
-% NOTE: Biases may be introduced because I am using nanmean. The solution
-%       is to also output the number of values used in the averaging for
-%       each grid (not doing that right now. Add feature if needed)
-
-
-% preallocate
-if ~islogical(in.data)
-    data = zeros([length(lat),length(lon),size(in.data,3)],class(in.data));
-else data = false([length(lat),length(lon),size(in.data,3)]);
+else
+    data = false([length(lat),length(lon),size(in.data,3)]);
 end
 
 polyWeightSum = @(d,w,i)(nansum(single(d(i)).*w(i))./nansum(w(i)));
@@ -583,14 +527,15 @@ for ii = 1:length(lat)
     end
 end
 
-function data = fine_and_coarse(in,newlat,newlon,method)
-
-data = interpolate_grid(in,newlat,newlon);
-warning('atmlab:resample_geodata:incomplete',...
-    ['Using interpolation (interp2) for grids that are finer in one dimension '...
-    'and coarser in the other. This is NO GOOD for the dimension that is coarser, '...
-    'because of linear interpolation.'])
-return
+% function data = fine_and_coarse(in,newlat,newlon,method)
+% 
+% data = interpolate_grid(in,newlat,newlon);
+% warning('atmlab:resample_geodata:incomplete',...
+%     ['Using interpolation (interp2) for grids that are finer in one dimension '...
+%     'and coarser in the other. This is NO GOOD for the dimension that is coarser, '...
+%     'because of linear interpolation.'])
+% 
+% return
 
 % Code to fix this problem incomplete below:
 

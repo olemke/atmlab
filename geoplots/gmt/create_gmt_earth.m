@@ -22,7 +22,7 @@ commands{i} = sprintf('rm -f gmt.* %s.{ps,pdf}',in.filename);i=i+1;
 
 
 % debug
-commands{i} = sprintf('gmt set GMT_COMPATIBILITY=4');i=i+1;
+%commands{i} = sprintf('gmt set GMT_COMPATIBILITY=4');i=i+1;
 
 
 commands{i} = 'gmt set PS_MEDIA A0';  i=i+1;
