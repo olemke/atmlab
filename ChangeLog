@@ -1,3 +1,10 @@
+2018-05-17  Bengt Rydberg  <bengt.rydberg@molflow.com>
+
+        * atmlab-2-3-250
+
+        * sensors/read_mhs_data: added function that reads metop /
+        microwave humidity sounder (MHS) level1b data files
+
 2018-05-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-249
