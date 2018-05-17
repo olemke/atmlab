@@ -37,8 +37,10 @@ if atmlab('STRICT_ASSERT')
   rqre_datatype( iopt, @ischar );
 end
 
-agrids = cell(length(G));
+
 for i = 1 : length( G )
+  %
+  agrids = [];
   %
   for d = 1  : G(i).DIM
       gname        = sprintf('GRID%d',d);

@@ -42,7 +42,7 @@ b = false;
 
 if ~isstruct(G) ||  ~isfield(G,'DIM'), return, end
 
-Gt = atmdata_empty( max( G(:).DIM ) );
+Gt = atmdata_empty( max( [G(:).DIM] ) );
 
 if ~all( isfield( G, fieldnames(Gt) ) ), return, end
 

@@ -1,9 +1,20 @@
+2018-05-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-249
+
+	* gformat/gf_regrid.m (gf_regrid): agrids was initialised wrongly.
+	Now simple set to be empty for each i.
+
+	* gformat/isatmdata.m (isatmdata):
+	* gformat/isgformat.m (isgformat): Creation of Gt failed in newer
+	matlab versions. Fixed by adding [] to get [G(:).DIM].
+
 2018-04-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-248
 
 	* demos/simple_mw_sims.m: New. Can be used as it is. But also
-	demonstrates how to simply make forward model simulations. 
+	demonstrates how to simply make forward model simulations.
 
 2018-04-24  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
 
