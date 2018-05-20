@@ -146,7 +146,7 @@ elseif isequal( lower(parameter), 'u10' )
 elseif isequal( lower(parameter), 'v10' )
   data      = ncread( infile, '/v10', start, count );
   unit      = ncreadatt( infile, '/v10', 'units' );
-  data_name = 'u10';
+  data_name = 'v10';
 
 end
 
