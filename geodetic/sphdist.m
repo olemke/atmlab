@@ -11,7 +11,7 @@
 % OUT   d      Distance, either in degress or m.
 % IN    lat1   Latitude of position 1.
 %       lon1   Longitude of position 1.
-% IN    lat2   Latitude of position 2.
+%       lat2   Latitude of position 2.
 %       lon2   Longitude of position 2.
 % OPT   r      The radius (common for both points).
 

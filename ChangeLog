@@ -1,3 +1,11 @@
+2018-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-253
+
+	* geodetic/destination_bearing.m: New. 
+
+	* geodetic/sphdist.m: Small fix in header.
+
 2018-05-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-252
