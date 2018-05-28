@@ -6,7 +6,7 @@
 % IN       infile     Name of the file to read. 
 %          parameter  parameter to read in, options are:
 %                     'Temperature', 'Geopotential', 'Altitude', 'H2O', 'O3',
-%                     'IWC', 'LWC'
+%                     'Cloud cover', 'LWC', 'RWC', 'IWC', 'SWC'
 %          lat_limits latitude limits filter (vector of length 2, values in [-90,90]) 
 %          lon_limits longitude limits filter (vector of length 2, both
 %                     +-180 and 0-360 can be used) 
@@ -38,9 +38,13 @@ if atmlab('STRICT_ASSERT')
        isequal(lower(parameter), 'altitude') | ...
        isequal(lower(parameter), 'h2o') | ...
        isequal(lower(parameter), 'o3') | ...
+       isequal(lower(parameter), 'cloud cover') | ...
        isequal(lower(parameter), 'lwc') | ...
-       isequal(lower(parameter), 'iwc') )
-    error('Valid parameter options are: Temperature , H2O, O3, IWC, LWC, Geopotental, or Altitude.')
+       isequal(lower(parameter), 'rwc') | ...
+       isequal(lower(parameter), 'iwc') | ...
+       isequal(lower(parameter), 'swc') )
+    error( ['Valid parameter options are: Temperature, Geopotental, Altitude, ' ...
+            'H2O, O3, Cloud cover, LWC, RWC, IWC and SWC'] );
   end
 
   chk_lat_limits( lat_limits );
@@ -171,6 +175,45 @@ elseif isequal( lower(parameter), 'o3' )
     error( 'Unknow unit for %s.', parameter );
   end
 
+elseif isequal( lower(parameter), 'cloud cover')
+  data      = ncread(infile, '/cc', start, count);
+  unit      = ncreadatt(infile, '/cc', 'units');
+  data_name = 'Cloud cover';
+  if strncmp(unit,'(0 - 1)',length(unit))
+  else
+    error( 'Unknow unit for %s.', parameter );
+  end
+  
+elseif isequal( lower(parameter), 'lwc')
+  data      = ncread(infile, '/clwc', start, count);
+  temp      = ncread(infile, '/t', start, count);
+  unit      = ncreadatt(infile, '/clwc', 'units');
+  data_name = 'Liquid water content';
+  if strncmp(unit,'kg kg**-1',length(unit))
+    datai = zeros(size(data));
+    for i = 1:size(data,3)
+      datai(:,:,i,:) = mixr2massconc( data(:,:,i,:), P(i), temp(:,:,i,:) );
+    end
+    unit = 'kg/m^3';
+  else
+    error( 'Unknow unit for %s.', parameter );
+  end
+
+elseif isequal( lower(parameter), 'rwc')
+  data      = ncread(infile, '/crwc', start, count);
+  temp      = ncread(infile, '/t', start, count);
+  unit      = ncreadatt(infile, '/crwc', 'units');
+  data_name = 'Rain water content';
+  if strncmp(unit,'kg kg**-1',length(unit))
+    datai = zeros(size(data));
+    for i = 1:size(data,3)
+      datai(:,:,i,:) = mixr2massconc( data(:,:,i,:), P(i), temp(:,:,i,:) );
+    end
+    unit = 'kg/m^3';
+  else
+    error( 'Unknow unit for %s.', parameter );
+  end
+  
 elseif isequal( lower(parameter), 'iwc' )
   data      = ncread( infile, '/ciwc', start, count );
   temp      = ncread( infile, '/t', start, count );
@@ -184,18 +227,19 @@ elseif isequal( lower(parameter), 'iwc' )
     end
     unit = 'kg/m^3';
   else
-    error( 'Unknow unit for IWC.' );
+    error( 'Unknow unit for %s.', parameter );
   end
 
-elseif isequal( lower(parameter), 'lwc')
-  data      = ncread(infile, '/clwc', start, count);
-  temp      = ncread(infile, '/t', start, count);
-  unit      = ncreadatt(infile, '/clwc', 'units');
-  data_name = 'Liquid water content';
-  if strncmp(unit,'kg kg**-1',length(unit))
+elseif isequal( lower(parameter), 'swc' )
+  data      = ncread( infile, '/cswc', start, count );
+  temp      = ncread( infile, '/t', start, count );
+  unit      = ncreadatt( infile, '/cswc', 'units' );
+  data_name = 'Snow water content';
+  if strcmp( unit, 'kg kg**-1' )
     datai = zeros(size(data));
     for i = 1:size(data,3)
-      datai(:,:,i,:) = mixr2massconc( data(:,:,i,:), P(i), temp(:,:,i,:) );
+      datai(:,:,i,:) = mixr2massconc( ...
+          data(:,:,i,:), P(i), temp(:,:,i,:));
     end
     unit = 'kg/m^3';
   else

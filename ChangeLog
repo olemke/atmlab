@@ -1,8 +1,15 @@
+2018-05-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-254
+
+	* site-specific/chalmers-gem/era5_pressure_read.m: Added handling
+	of cloud cover, RWC, and SWC.
+
 2018-05-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-253
 
-	* geodetic/destination_bearing.m: New. 
+	* geodetic/destination_bearing.m: New.
 
 	* geodetic/sphdist.m: Small fix in header.
 
