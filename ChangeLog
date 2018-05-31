@@ -1,3 +1,10 @@
+2018-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-255
+
+	* site-specific/chalmers-gem/era5_surface_read.m: More variables
+	now handled.
+
 2018-05-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-254

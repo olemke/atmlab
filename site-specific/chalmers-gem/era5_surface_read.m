@@ -33,20 +33,17 @@ if atmlab('STRICT_ASSERT')
   if ~ischar(parameter)
     error( 'Input argument *parameter* must be a string.' )
   end 
+
+  choices = { 'Surface pressure', '2 metre temperature', ...
+              'Sea surface temperature', 'Skin temperature', ...
+              'Sea-ice cover', 'Ice temperature 1', 'U10', 'V10' };
   
-  if ~ ( isequal(lower(parameter), 'surface pressure') | ...
-         isequal(lower(parameter), 'sea surface temperature') | ...
-         isequal(lower(parameter), 'skin temperature') | ...
-         isequal(lower(parameter), '2 m temperature') | ...
-         isequal(lower(parameter), 'u10') | ...
-         isequal(lower(parameter), 'v10') | ...
-         isequal(lower(parameter), 'lwp') | ...
-         isequal(lower(parameter), 'iwp') | ...
-         isequal(lower(parameter), 'lcc') | ...
-         isequal(lower(parameter), 'mcc') | ...
-         isequal(lower(parameter), 'hcc')  )       
-    error([ 'Valid parameter options are: Surface pressure, sea surface ' ...
-            'temperature, skin temperature, and 2 m temperature, u10 and v10' ])
+  if ~any( strcmp( lower(parameter), lower(choices) ) )
+    fprintf( 'Valid options for *parameter* are:\n' );
+    for i = 1 : length(choices)
+      fprintf( '  ''%s''\n', choices{i} );
+    end
+    error( 'Your chice of *parameter* (''%s'') is not recognised.', parameter )
   end
 
   chk_lat_limits( lat_limits );
@@ -123,6 +120,11 @@ if isequal( lower(parameter), 'surface pressure' )
   unit      = ncreadatt( infile, '/sp', 'units' );
   data_name = 'Surface pressure';
 
+elseif isequal( lower(parameter), '2 metre temperature' )
+  data      = ncread( infile, '/t2m', start, count );
+  unit      = ncreadatt( infile, '/t2m', 'units' );
+  data_name = '2 metre temperature';
+
 elseif isequal( lower(parameter), 'sea surface temperature' )
   data      = ncread( infile, '/sst', start, count );
   unit      = ncreadatt( infile, '/sst', 'units' );
@@ -133,21 +135,28 @@ elseif isequal( lower(parameter), 'skin temperature' )
   unit      = ncreadatt( infile, '/skt', 'units' );
   data_name = 'Skin temperature';
 
-elseif isequal( lower(parameter), '2 m temperature' )
-  data      = ncread( infile, '/t2m', start, count );
-  unit      = ncreadatt( infile, '/t2m', 'units' );
-  data_name = '2 m temperature';
+elseif isequal( lower(parameter), 'sea-ice cover' )
+  data      = ncread( infile, '/ci', start, count );
+  unit      = ncreadatt( infile, '/ci', 'units' );
+  data_name = 'Sea-ice cover';
+
+elseif isequal( lower(parameter), 'ice temperature 1' )
+  data      = ncread( infile, '/istl1', start, count );
+  unit      = ncreadatt( infile, '/istl1', 'units' );
+  data_name = 'Ice temperature layer 1';
 
 elseif isequal( lower(parameter), 'u10' )
   data      = ncread( infile, '/u10', start, count );
   unit      = ncreadatt( infile, '/u10', 'units' );
-  data_name = 'u10';
+  data_name = '10 metre U wind component';
 
 elseif isequal( lower(parameter), 'v10' )
   data      = ncread( infile, '/v10', start, count );
   unit      = ncreadatt( infile, '/v10', 'units' );
-  data_name = 'v10';
+  data_name = '10 metre V wind component';
 
+else
+  assert( 0 );
 end
 
 
