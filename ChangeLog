@@ -1,8 +1,15 @@
+2018-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-257
+
+	* geographical/set_lon_limits.m (set_lon_limits): Added output
+	arguments lonlow and lonhigh.
+
 2018-06-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-256
 
-	* geographical/set_lon_limits.m: New. 
+	* geographical/set_lon_limits.m: New.
 
 2018-05-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 

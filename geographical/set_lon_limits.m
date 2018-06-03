@@ -15,16 +15,22 @@
 %    [-180,180]. lons=[-1 1] will here also give lon_limits=[-1 1], but e.g.
 %    lons=[-179 179] gives lon_limits=[179 181].
 %
+%    The second and third output argument are set to -180/0 or 180/360,
+%    respectively, dependent on what longitude range that has been selected.
+%    These arguments can be used as input to *shift_longitudes*.
+%
 % FORMAT   lon_limits = shift_longitudes( lons [,prefer0to360] )
 %        
 % OUT   lon_limits   Found longitude limits
+%       lonlow       Matches the OPT of *shift_longitudes* with the same name.
+%       lonhigh      Matches the OPT of *shift_longitudes* with the same name.
 % IN    lons         Longitude points
 % OPT   prefer0to360 See above. Default is true.
 
 % 2018-06-01   Created by Patrick Eriksson.
 
 
-function lon_limits = set_lon_limits(lons,varargin)
+function [lon_limits,lonlow,lonhigh] = set_lon_limits(lons,varargin)
 %
 [prefer0to360] = optargs( varargin, { true } );
 
@@ -34,23 +40,28 @@ lon_limits1 = [ min(lon_try) max(lon_try) ];
 lon_try     = shift_longitudes( lon_try, -180, 180 );
 lon_limits2 = [ min(lon_try) max(lon_try) ];
 
-if diff(lon_limits1) < diff(lon_limits2)
+if diff(lon_limits1) <= diff(lon_limits2)
   lon_limits = lon_limits1;
+  [lonlow,lonhigh] = deal( 0, 360 );
 else  
   lon_limits = lon_limits2;
+  [lonlow,lonhigh] = deal( -180, 180 );
 end    
 
 if diff(lon_limits) > 180 
   if prefer0to360
-    lon_limits = [ 0 360 ];
+    [lonlow,lonhigh] = deal( 0, 360 );
   else
-    lon_limits = [ -180 180 ];
+    [lonlow,lonhigh] = deal( -180, 180 );
   end
+  lon_limits = [ lonlow lonhigh ];
 else
   if prefer0to360  &  lon_limits(2) <= 0
     lon_limits = lon_limits + 360;
+    [lonlow,lonhigh] = deal( 0, 360 );
   elseif ~prefer0to360  &  lon_limits(1) > 180
     lon_limits = lon_limits - 360;    
+    [lonlow,lonhigh] = deal( -180, 180 );
   end
 
 end
