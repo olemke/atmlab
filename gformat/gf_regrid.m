@@ -40,7 +40,7 @@ end
 
 for i = 1 : length( G )
   %
-  agrids = [];
+  agrids = {};
   %
   for d = 1  : G(i).DIM
       gname        = sprintf('GRID%d',d);

@@ -100,14 +100,14 @@ Q.ABS_LINESHAPE_FACTOR  = 'VVH';
 
 %= Set RTE variables (refraction is here neglected)
 %
-Q.IY_MAIN_AGENDA        = { 'iyEmissionStandard' };
+Q.IY_MAIN_AGENDA        = { 'ppathCalc', 'iyEmissionStandard' };
 Q.IY_SPACE_AGENDA       = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
                             'MatrixCBR(iy,stokes_dim,f_grid)' };
 Q.SURFACE_RTPROP_AGENDA = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
                            ['InterpAtmFieldToPosition(out=surface_skin_t,', ...
                                                          'field=t_field)'], ...
                             'surfaceBlackbody' };
-Q.IY_SURFACE_AGENDA     = { 'iySurfaceRtpropAgenda' };
+Q.IY_SURFACE_AGENDA     = { 'SurfaceDummy', 'iySurfaceRtpropAgenda' };
 Q.IY_AUX_VARS           = [];
 %
 Q.YCALC_WSMS            = { 'yCalc' };

@@ -1,3 +1,22 @@
+2018-06-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-258
+
+	* Some work to update qarts to changes done in ARTS. Not fully completed.
+
+	* arts/qarts2cfile.m (cfile_Absrpt): Updated setting of
+	propmat_clearsky_agenda.
+
+	* demos/qarts_demo.m (qarts_demo): Updated some settings.
+
+	* gformat/gf_regrid.m (gf_regrid): Init of grids changed from []
+	to {}.
+
+	* arts/arts_ji.m: New function.
+
+	* arts/arts_oem_init.m (init_local):
+	* arts/arts_y.m (arts_y): Now etting ji by calling arts_ji.
+
 2018-06-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-257

@@ -82,12 +82,7 @@ if nargout >= 3  & qarts_isset( Q.J_DO ) &  Q.J_DO
   %
   if nargout >= 4
     jq = xmlLoad( fullfile( workfolder, 'jacobian_quantities.xml' ) );
-    ji = xmlLoad( fullfile( workfolder, 'jacobian_indices.xml' ) );
-    for i = 1 : length(ji)
-      for j = 1 : length(ji{i})
-        ji{i}{j} = ji{i}{j} + 1;
-      end
-    end
+    ji = arts_ji( R.jq );
   end
 end
 %

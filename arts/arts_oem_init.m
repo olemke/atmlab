@@ -492,17 +492,12 @@ function [Q,R,t_field,z_field,vmr_field,wind_u,wind_v,wind_w,mag_u,mag_v,mag_w] 
   %- Jacobian
   %
   R.jq = xmlLoad( fullfile( R.workfolder, 'jacobian_quantities.xml' ) );
-  R.ji = xmlLoad( fullfile( R.workfolder, 'jacobian_indices.xml' ) );
   % 
   if length( R.jq ) == 0
     error( 'No retrieval quantities defined!?' );
   end
   %
-  for i = 1 : length(R.ji)           % Fix different indexing
-    for j = 1 : length(R.ji{i})
-      R.ji{i}{j} = R.ji{i}{j} + 1;
-    end
-  end
+  R.ji = arts_ji( R.jq );
 
   %- Sensor
   %

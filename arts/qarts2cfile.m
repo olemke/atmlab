@@ -638,8 +638,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                                 Q.PROPMAT_CLEARSKY_AGENDA );
       else      
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-            'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-            'Ignore(rtp_temperature_nlte)', ...
+            'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_nlte)', ...
             'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       end 
       %
@@ -655,8 +654,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                                 Q.PROPMAT_CLEARSKY_AGENDA );
       else      
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-                'Ignore(rtp_mag)', 'Ignore(rtp_los)',...
-                'Ignore(rtp_temperature_nlte)', ...
+                'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_nlte)', ...
                 'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
       end
       %
@@ -1635,7 +1633,6 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   %
   if strcmp( partname, 'JacobiSave' )
     T{end+1} = add_savefile( 'jacobian_quantities', workfolder );
-    T{end+1} = add_savefile( 'jacobian_indices', workfolder );
   end
 return
 
