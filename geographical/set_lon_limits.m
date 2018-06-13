@@ -19,26 +19,27 @@
 %    respectively, dependent on what longitude range that has been selected.
 %    These arguments can be used as input to *shift_longitudes*.
 %
-% FORMAT   lon_limits = shift_longitudes( lons [,prefer0to360] )
+% FORMAT   [lon_limits,lonlow,lonhigh] = set_lon_limits( lons [,prefer0to360,margin] )
 %        
 % OUT   lon_limits   Found longitude limits
 %       lonlow       Matches the OPT of *shift_longitudes* with the same name.
 %       lonhigh      Matches the OPT of *shift_longitudes* with the same name.
 % IN    lons         Longitude points
 % OPT   prefer0to360 See above. Default is true.
+%       margin       Add extra margin, in each end. Default is 0.
 
 % 2018-06-01   Created by Patrick Eriksson.
 
 
 function [lon_limits,lonlow,lonhigh] = set_lon_limits(lons,varargin)
 %
-[prefer0to360] = optargs( varargin, { true } );
+[prefer0to360,margin] = optargs( varargin, { true, 0 } );
 
 lon_try     = shift_longitudes( lons(:), 0, 360 );
-lon_limits1 = [ min(lon_try) max(lon_try) ];
+lon_limits1 = [ min(lon_try)-margin max(lon_try)+margin ];
 
 lon_try     = shift_longitudes( lon_try, -180, 180 );
-lon_limits2 = [ min(lon_try) max(lon_try) ];
+lon_limits2 = [ min(lon_try)-margin max(lon_try)+margin ];
 
 if diff(lon_limits1) <= diff(lon_limits2)
   lon_limits = lon_limits1;

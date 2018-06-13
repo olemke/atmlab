@@ -1,3 +1,10 @@
+2018-06-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-259
+
+	* geographical/set_lon_limits.m: Fixed error in header. And added
+	margin as optional argument.
+
 2018-06-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-258
