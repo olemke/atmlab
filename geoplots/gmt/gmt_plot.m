@@ -850,7 +850,7 @@ else
     [~,in.gmtVersion] = system('gmt --version');
     in.gmtVersion = strtrim(in.gmtVersion);
 end
-logtext(1,'Using GMT version %s\n',in.gmtVersion)
+%logtext(1,'Using GMT version %s\n',in.gmtVersion)
 clear tmp
 
 if isfield(in,'color_background');in.forcedColorsBack=true;end
@@ -1199,7 +1199,7 @@ for F = Fields
 end
 
 if ~isempty(fieldsNotToRead)
-    fprintf('Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
+    logtext(1,'Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
     fprintf('Will not be used as they are not "data" or in the list of options\n');
 end
 
@@ -1908,11 +1908,11 @@ associated_w_errors  = command(eindex);
 
 % display GMT calls containing warning
 if ~isempty(Warnings)
-    V = atmlab('VERBOSITY'); atmlab('VERBOSITY',1);
+    %V = atmlab('VERBOSITY'); atmlab('VERBOSITY',1);
     logtext(atmlab('OUT'),'GMT completed with the following warning messages:\n')
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_warning,Warnings,'UniformOutput',0);
     logtext(atmlab('OUT'),'%s\n',[tmp{:}])
-    atmlab('VERBOSITY',V);
+    %atmlab('VERBOSITY',V);
 end
 
 % error on GMT errors

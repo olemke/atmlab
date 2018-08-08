@@ -71,11 +71,11 @@ for i=1:length(strcolors)                                                       
         vc{i}=strcolors{i};
     elseif ischar(strcolors{i})
         switch lower(strcolors{i})
-
-
-                % from http://www.tayloredmktg.com/rgb/
-                %
-                % white pastels
+            
+            
+            % from http://www.tayloredmktg.com/rgb/
+            
+            %% white pastels
             case 'snow', vc{i}=[255,250,250]; hex{i} = 'fffafa';
             case 'snow 2', vc{i}=[238,233,233]; hex{i} = 'eee9e9';
             case 'snow 3', vc{i}=[205,201,201]; hex{i} = 'cdc9c9';
@@ -126,11 +126,9 @@ for i=1:length(strcolors)                                                       
             case 'lavender blush', vc{i}=[255,240,245]; hex{i} = 'fff0f5';
             case 'misty rose', vc{i}=[255,228,225]; hex{i} = 'ffe4e1';
             case {'w','white'}, vc{i}=[255,255,255]; hex{i} = 'ffffff';
-
                 
-                %%%%%%%%%%%%%%
-                % 'grays
                 
+            %% grays
             case {'k','black'}, vc{i}=[0,0,0]; hex{i} = '000000';
             case 'dark slate gray', vc{i}=[49,79,79]; hex{i} = '2f4f4f';
             case 'dim gray', vc{i}=[105,105,105]; hex{i} = '696969';
@@ -139,9 +137,7 @@ for i=1:length(strcolors)                                                       
             case {'gr','gray','grey'}, vc{i}=[190,190,190]; hex{i} = 'bebebe';
             case 'light gray', vc{i}=[211,211,211]; hex{i} = 'd3d3d3';
                 
-                %%%%%%%%%%
-                % blues
-                
+            %% blues
             case 'midnight blue', vc{i}=[25,25,112]; hex{i} = '191970';
             case 'navy', vc{i}=[0,0,128]; hex{i} = '000080';
             case 'cornflower blue', vc{i}=[100,149,237]; hex{i} = '6495ed';
@@ -168,8 +164,7 @@ for i=1:length(strcolors)                                                       
             case 'light cyan', vc{i}=[224,255,255]; hex{i} = 'e0ffff';
             case 'cadet blue', vc{i}=[95,158,160]; hex{i} = '5f9ea0';
                 
-                %%%%%%%%
-                % greens
+            %% greens
             case {'g','green'}, vc{i}=[0 255 0];hex{i}='00ff00';
             case 'medium aquamarine', vc{i}=[102,205,170]; hex{i} = '66cdaa';
             case 'aquamarine', vc{i}=[127,255,212]; hex{i} = '7fffd4';
@@ -192,10 +187,7 @@ for i=1:length(strcolors)                                                       
             case 'dark khaki', vc{i}=[189,183,107]; hex{i} = 'bdb76b';
             case 'khaki', vc{i}=[240,230,140]; hex{i} = 'f0e68c';
                 
-                %%%%%%%%%%%
-                % yellow
-                
-                
+            %% yellow
             case 'pale goldenrod', vc{i}=[238,232,170]; hex{i} = 'eee8aa';
             case 'light goldenrod yellow', vc{i}=[250,250,210]; hex{i} = 'fafad2';
             case 'light yellow', vc{i}=[255,255,224]; hex{i} = 'ffffe0';
@@ -205,9 +197,7 @@ for i=1:length(strcolors)                                                       
             case 'goldenrod', vc{i}=[218,165,32]; hex{i} = 'daa520';
             case 'dark goldenrod', vc{i}=[184,134,11]; hex{i} = 'b8860b';
                 
-                %%%%%%%%%%%%
-                % browns
-                
+            %% browns
             case 'rosy brown', vc{i}=[188,143,143]; hex{i} = 'bc8f8f';
             case 'indian red', vc{i}=[205,92,92]; hex{i} = 'cd5c5c';
             case 'saddle brown', vc{i}=[139,69,19]; hex{i} = '8b4513';
@@ -222,10 +212,7 @@ for i=1:length(strcolors)                                                       
             case 'firebrick', vc{i}=[178,34,34]; hex{i} = 'b22222';
             case 'brown', vc{i}=[165,42,42]; hex{i} = 'a52a2a';
                 
-                %%%%%%%%%%%
-                % oranges
-                
-                
+            %% oranges
             case 'dark salmon', vc{i}=[233,150,122]; hex{i} = 'e9967a';
             case 'salmon', vc{i}=[250,128,114]; hex{i} = 'fa8072';
             case 'light salmon', vc{i}=[255,160,122]; hex{i} = 'ffa07a';
@@ -237,10 +224,7 @@ for i=1:length(strcolors)                                                       
             case 'orange red', vc{i}=[255,69,0]; hex{i} = 'ff4500';
             case {'red','r'}, vc{i}=[255,0,0]; hex{i} = 'ff0000';
                 
-                %%%%%%%%%%%%%%%%%%
-                % pinks/violets
-                
-  
+            %% pinks/violets
             case 'caucasian 1',vc{i}=[255,224,189]; hex{i}='ffe0bd';
             case 'caucasian 2',vc{i}=[255,205,148]; hex{i}='ffcd95';
             case 'caucasian 3',vc{i}=[234,192,134]; hex{i}='eac086';

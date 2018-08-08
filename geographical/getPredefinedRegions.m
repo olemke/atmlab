@@ -117,6 +117,16 @@ if strcmp(regionstr,'list')
 end
 
 switch lower(regionstr)
+    case 'cloud_cci_paper_atlantic'
+        extra.longname='Atlantic';
+        extra.shortname='Atlantic';
+        blcorner = [48,-25]; trcorner = [53,-15];
+        extra.center =  struct('lat',0,'lon',0);
+    case 'cloud_cci_paper_nw_europe'
+        extra.longname='North-West Europe';
+        extra.shortname='North-West Europe';
+        blcorner = [48,5]; trcorner = [53,15];
+        extra.center =  struct('lat',0,'lon',0);
     case 'global'
         extra.longname='Global';
         extra.shortname='global';
@@ -210,7 +220,7 @@ switch lower(regionstr)
         extra.center =  struct('lat',0,'lon',20);
     case 'trop_cont'
         % this is conv_af and conv_sa merged
-        extra.longname ='Tropical convection over continents';
+        extra.longname ='Tropical continents';
         [a,b,x(1)] = retrieve_reginfo('conv_af');
         [c,d,x(2)] = retrieve_reginfo('conv_sa');
         blcorner = cat(1,a,c);
@@ -437,7 +447,7 @@ clear x
 end
 function Allregions = Allregions
 
-Allregions = {'global','tropics','boreal_trop','austral_trop',...
+Allregions = {'cloud_cci_paper_atlantic','cloud_cci_paper_nw_europe','global','tropics','boreal_trop','austral_trop',...
     'sepdz','seadz','ocean_sub','sepsc','seasc','sc_regs','twp','trop_cont','conv_sa','conv_af',...
     'swl','kurosho','gulfstr','nwl','westerlies','swe','aus','polar',...
     'waf','eaf','saf','sah','neu','sem','nas','cas','tib','eas','sas',...

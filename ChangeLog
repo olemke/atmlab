@@ -1,3 +1,15 @@
+2018-08-08  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
+
+	* atmlab-2-3-260
+
+	* handy/combine_pdfs.m: Added some more capabilities. Can now combine more file types
+
+	* handy/list_colors.m:
+	* geographical/getPredefinedRegions.m:
+	* geographical/standardize_geodata.m:
+	* geoplots/gmt/gmt_plot.m:
+	small uninteresting changes
+
 2018-06-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-259

@@ -160,7 +160,7 @@ if (flags.lat_descend && ~options.lat_descend) || ...
         end
     end
     flags.out.lat_descend = options.lat_descend;
-    if s, logtext(1,'Changed the order of latitudes\n'); end
+    if s, logtext(atmlab('OUT'),'Changed the order of latitudes\n'); end
 else
     flags.out.lat_descend = flags.lat_descend;
 end

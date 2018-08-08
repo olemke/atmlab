@@ -164,7 +164,7 @@ end
 
 options = optargs_struct(options, default);
 
-if ~(any(strcmp(options.filename(end-3:end),{'.dvi','.pdf'})))
+if length(options.filename)< 4 || ~(any(strcmp(options.filename(end-3:end),{'.dvi','.pdf'})))
     % I guess I forgot the suffix
     options.filename = [options.filename,'.pdf'];
 end
@@ -283,18 +283,18 @@ outfile = create_pdf_from_layout_with_latex(layout, options);
 % This only works for the following pre-programmed options
 if options.display && isempty(options.pdfviewer)
     if ismac
-        exec_system_cmd(sprintf('open %s',outfile));
+        exec_system_cmd(sprintf('open %s',outfile),atmlab('VERBOSITY'));
     elseif isunix
         [~,b1]=system('which gnome-open');
         [~,b2]=system('which kde-open');
         if ~isempty(b1)
-            exec_system_cmd(sprintf('gnome-open %s &',outfile));
+            exec_system_cmd(sprintf('gnome-open %s &',outfile),atmlab('VERBOSITY'));
         elseif ~isempty(b2)
-            exec_system_cmd(sprintf('kde-open %s &',outfile));
+            exec_system_cmd(sprintf('kde-open %s &',outfile),atmlab('VERBOSITY'));
         end
     end
 elseif options.display
-    exec_system_cmd(sprintf('%s %s >/dev/null &',options.pdfviewer,outfile));
+    exec_system_cmd(sprintf('%s %s >/dev/null &',options.pdfviewer,outfile),atmlab('VERBOSITY'));
 end
 
 end
@@ -320,21 +320,21 @@ for i = 1:length(inputfiles)
             % create a .dvi), otherwise we need epstopdf since pdflatex cannot
             % handle .eps (internally uses epstopdf anyhow)
             epsfile=sprintf('%s/epstmp',options.tmpfolder);
-            exec_system_cmd(sprintf('cp ''%s'' %s.eps',inputfiles{i},epsfile), 0);
-            exec_system_cmd(sprintf('epstopdf %s.eps',epsfile),0);
+            exec_system_cmd(sprintf('cp ''%s'' %s.eps',inputfiles{i},epsfile),atmlab('VERBOSITY'));
+            exec_system_cmd(sprintf('epstopdf %s.eps',epsfile),atmlab('VERBOSITY'));
             %info  = exec_system_cmd(sprintf('pdfinfo %s.pdf',epsfile), 0);
             tmpfile = sprintf('%s/dummy_%s_%i.pdf',options.tmpfolder,date,i);
-            exec_system_cmd(sprintf('cp %s.pdf %s',epsfile,tmpfile));
+            exec_system_cmd(sprintf('cp %s.pdf %s',epsfile,tmpfile),atmlab('VERBOSITY'));
             inputfiles{i} = tmpfile;
         case '.pdf'
         case {'.tiff','.tif','.jpg','.jpeg'}
             % to a conversion 
-            exec_system_cmd(sprintf('convert %s %s/%s.png',inputfiles{i},options.tmpfolder,file));
+            exec_system_cmd(sprintf('convert %s %s/%s.png',inputfiles{i},options.tmpfolder,file),atmlab('VERBOSITY'));
             inputfiles{i} = png2pdf(sprintf('%s/%s.png',options.tmpfolder,file),struct('outdir',options.tmpfolder));
         otherwise
             error(['atmlab:',mfilename,':invalid'],'I can''t yet handle filetype: %s',ft)
     end
-    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', inputfiles{i}), 0);
+    info  = exec_system_cmd(sprintf('pdfinfo ''%s''', inputfiles{i}),atmlab('VERBOSITY'));
     % pdfinfo uses BigPoints as a unit. Converting to cm.
     psize(i) =  structfun(@(x) str2double(x)/72*2.54, ...
         regexp(info{1},regx, 'names'), ...
