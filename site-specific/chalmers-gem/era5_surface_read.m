@@ -36,7 +36,8 @@ if atmlab('STRICT_ASSERT')
 
   choices = { 'Surface pressure', '2 metre temperature', ...
               'Sea surface temperature', 'Skin temperature', ...
-              'Sea-ice cover', 'Ice temperature 1', 'U10', 'V10' };
+              'Sea-ice cover', 'Ice temperature 1', 'Snow depth', ...
+              'U10', 'V10' };
   
   if ~any( strcmp( lower(parameter), lower(choices) ) )
     fprintf( 'Valid options for *parameter* are:\n' );
@@ -144,6 +145,11 @@ elseif isequal( lower(parameter), 'ice temperature 1' )
   data      = ncread( infile, '/istl1', start, count );
   unit      = ncreadatt( infile, '/istl1', 'units' );
   data_name = 'Ice temperature layer 1';
+
+elseif isequal( lower(parameter), 'snow depth' )
+  data      = ncread( infile, '/sd', start, count );
+  unit      = ncreadatt( infile, '/sd', 'units' );
+  data_name = 'Snow depth';
 
 elseif isequal( lower(parameter), 'u10' )
   data      = ncread( infile, '/u10', start, count );
