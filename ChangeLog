@@ -1,5 +1,7 @@
 2018-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
+	* atmlab-2-3-261
+
 	* site-specific/chalmers-gem/era5_surface_read.m: Added handling
 	of snow depth.
 
