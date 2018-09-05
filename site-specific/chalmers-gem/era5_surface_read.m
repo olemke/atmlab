@@ -37,7 +37,9 @@ if atmlab('STRICT_ASSERT')
   choices = { 'Surface pressure', '2 metre temperature', ...
               'Sea surface temperature', 'Skin temperature', ...
               'Sea-ice cover', 'Ice temperature 1', 'Snow depth', ...
-              'U10', 'V10' };
+              'U10', 'V10', ...
+              'Large scale rain rate', 'Large scale snow rate', ...
+              'Convective rain rate', 'Convective snow rate' };
   
   if ~any( strcmp( lower(parameter), lower(choices) ) )
     fprintf( 'Valid options for *parameter* are:\n' );
@@ -161,6 +163,26 @@ elseif isequal( lower(parameter), 'v10' )
   unit      = ncreadatt( infile, '/v10', 'units' );
   data_name = '10 metre V wind component';
 
+elseif isequal( lower(parameter), 'large scale rain rate' )
+  data      = ncread( infile, '/lsrr', start, count );
+  unit      = ncreadatt( infile, '/lsrr', 'units' );
+  data_name = 'Large scale rain rate';
+
+elseif isequal( lower(parameter), 'large scale snow rate' )
+  data      = ncread( infile, '/lssfr', start, count );
+  unit      = ncreadatt( infile, '/lssfr', 'units' );
+  data_name = 'Large scale snow rate';
+  
+elseif isequal( lower(parameter), 'convective rain rate' )
+  data      = ncread( infile, '/crr', start, count );
+  unit      = ncreadatt( infile, '/crr', 'units' );
+  data_name = 'Convective rain rate';
+
+elseif isequal( lower(parameter), 'convective snow rate' )
+  data      = ncread( infile, '/csfr', start, count );
+  unit      = ncreadatt( infile, '/csfr', 'units' );
+  data_name = 'Convective snow rate';
+  
 else
   assert( 0 );
 end

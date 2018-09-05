@@ -1,9 +1,9 @@
-2018-08-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+2018-09-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-261
 
 	* site-specific/chalmers-gem/era5_surface_read.m: Added handling
-	of snow depth.
+	of some surface rain and snow fluxes.
 
 2018-08-08  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
 
