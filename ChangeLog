@@ -1,3 +1,12 @@
+2018-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-262
+
+	* physics/airdensity.m: Header was not fully correct.
+
+	* geophysics/mixr2massconc.m (mixr2massconc): Constant Re was set
+	but not used.
+
 2018-09-05  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-261

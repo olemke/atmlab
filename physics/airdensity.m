@@ -1,5 +1,5 @@
 %=============================================================
-% vmr = mixr2vmr(mixr,molm)
+% rho = airdensity(p,t)
 %
 % Calculates air density by trivial application of the
 % ideal gas law 
@@ -7,7 +7,7 @@
 % Input:    p      atmospheric pressure [Pa]
 %           t      absolute temperature [K]
 %
-% Output:   rho    air density  [Kg/m3]
+% Output:   rho    air density  [kg/m3]
 %
 % Carlos Jimenez 2014-02-12
 %=============================================================
