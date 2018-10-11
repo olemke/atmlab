@@ -1,3 +1,10 @@
+2018-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-263
+
+	* geographical/adjust_to_lonlimits.m:
+	* geographical/set_lon_limits.m: Changes of header text.
+
 2018-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-262

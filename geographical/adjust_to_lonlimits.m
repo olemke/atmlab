@@ -1,9 +1,10 @@
-% ADJUST_TO_LONLIMITS   Determines if [-180,180] or [0,360] used for lons
+% ADJUST_TO_LONLIMITS   Adjust longitudes before comparing to limits
 %
 %   Determines which longitude system is used, based, on values in
-%   *lon_limits*. That is, if longitudes are expected to be inside
-%   [-180,180] or [0,360]. Output *lon* are the input *lon0* adjusted to
-%   found range.  For example:
+%   *lon_limits*. That is, if longitudes are defined over range
+%   [-180,180] or [0,360]. 
+%
+%   Output *lons* are the input *lons0* adjusted to found range.  For example:
 %     >> [lon,i] = adjust_to_lonlimits([-33 -4  55],[0,350])   
 %   gives
 %     lon = [ 327 -4 55 ]  and  i = [ 1 0 1 ] 

@@ -7,8 +7,8 @@
 %    If the data points span more than 180 degrees, a 360 degree range is
 %    always returned.
 %
-%    The output *lon_limits* ae inside the range [-180,360]. If
-%    *prefer0to360* is set to true, the limits are kept inside [0,369] when
+%    The output *lon_limits* are inside the range [-180,360]. If
+%    *prefer0to360* is set to true, the limits are kept inside [0,360] when
 %    possible. But note that e.g. lons=[-1 1] will give lon_limits=[-1 1].
 %
 %    With *prefer0to360* set to false, the target range is instead
