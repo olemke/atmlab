@@ -6,7 +6,7 @@
 %    If the optional argument *r* is given, the distance in m is returned.
 %    Otherwise the angular distance in degrees is returned.
 %
-% FORMAT   d = sphdist2(lat1,lon1,lat2,lon2[,r])
+% FORMAT   d = sphdist(lat1,lon1,lat2,lon2[,r])
 %        
 % OUT   d      Distance, either in degress or m.
 % IN    lat1   Latitude of position 1.

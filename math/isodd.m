@@ -6,7 +6,7 @@
 %    test. Here also double numbers are accapted, as long as they are
 %    odd integers.
 %
-% FORMAT   bool = iseven(n)
+% FORMAT   bool = isodd(n)
 %        
 % OUT   bool   true if odd integer, else false.
 % IN    n      A variable of any valid numeric data type.
@@ -20,6 +20,7 @@ bool = false;
 
 if isempty(n) || ~isnumeric(n), return, end
 
-if any( rem(n(:),2) == 0 ), return, end
+if all( abs(rem(n(:),2)) == 1 )
+  bool = true;
+end
 
-bool = true;

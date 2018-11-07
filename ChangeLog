@@ -1,3 +1,13 @@
+2018-11-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-264
+
+	* geodetic/ellipsoidradii2.m:
+	* geodetic/ellipsoidradii.m: Corrected header text.
+
+	* math/isodd.m (isodd):
+	* math/iseven.m (iseven): Non-integer values were not handled correctly.
+
 2018-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-263

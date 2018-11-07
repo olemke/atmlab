@@ -20,6 +20,6 @@ bool = false;
 
 if isempty(n) || ~isnumeric(n), return, end
 
-if any( rem(n(:),2) == 1 ), return, end
-
-bool = true;
+if any( abs(rem(n(:),2)) == 0 )
+  bool = true;
+end

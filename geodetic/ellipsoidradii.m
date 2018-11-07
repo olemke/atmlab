@@ -5,7 +5,7 @@
 %
 %    To obtain the radii for geoDETIC latitude, use *ellipsoidradii2*.
 %
-% FORMAT   r = ellipsoidradii( ellipsoid, lat_gd )
+% FORMAT   r = ellipsoidradii( ellipsoid, lat )
 %    
 % OUT   r          Radii. See above.
 % IN    ellipsoid  Model ellipsoid as returned by *ellipsoidmodels*.

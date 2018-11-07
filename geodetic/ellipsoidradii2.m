@@ -1,4 +1,4 @@
-% ELLIPSOIDRADII   Different geodetic radii of a reference ellipsoid
+% ELLIPSOIDRADII2   Geodetic radii of a reference ellipsoid
 %
 %    The calculation expressions are taken from radiigeo.pdf, found in the
 %    same folder as this function.
@@ -6,7 +6,7 @@
 %    Please note that geoDETIC latitudes are used. Use *ellipsoidradii* for
 %    geocentric latitudes.
 %
-% FORMAT   r = ellipsoidradii( ellipsoid, lat_gd )
+% FORMAT   r = ellipsoidradii2( ellipsoid, lat_gd )
 %    
 % OUT   r          Radii. See above.
 % IN    ellipsoid  Model ellipsoid as returned by *ellipsoidmodels*.
