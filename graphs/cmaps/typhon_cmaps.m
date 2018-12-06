@@ -17,12 +17,15 @@
 %                   cubehelix
 %                   density
 %                   difference
+%                   material
+%                   max_planck
 %                   phase
 %                   qualitative1
 %                   qualitative2
 %                   seismic
 %                   speed
 %                   temperature
+%                   uhh
 %                   velocity
 %                   vorticity
 % OPT   N       Number of color levels.

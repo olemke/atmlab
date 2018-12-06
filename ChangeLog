@@ -1,3 +1,12 @@
+2018-12-06  Lukas Kluft  <lukas.kluft@gmail.com>
+
+	* atmlab-2-3-265
+
+	* graphs/cmaps/typhon_cmaps.m, graphs/cmaps/material.txt,
+	  graphs/cmaps/max_planck.txt, graphs/cmaps/uhh.txt:
+
+	Add qualitative colormaps "material", "max_planck" and "uhh".
+
 2018-11-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-264
