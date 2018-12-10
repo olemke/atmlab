@@ -1,3 +1,10 @@
+2018-12-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-266
+
+	* site-specific/chalmers-gem/OdinSmr/smrapi_load_l1b.m: Added
+	optional argument for triggering "debug".
+
 2018-12-06  Lukas Kluft  <lukas.kluft@gmail.com>
 
 	* atmlab-2-3-265
