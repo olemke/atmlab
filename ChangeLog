@@ -1,3 +1,10 @@
+2018-12-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-267
+
+	* forwardmodel/diff_za_aa.m: New functions.
+	* forwardmodel/add_za_aa.m:
+
 2018-12-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-266
