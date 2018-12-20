@@ -18,14 +18,6 @@ function R= rotationmat3D(r,Axis)
 %
 %Bileschi 2009
 
-if nargin == 1
-   if(length(rotX) == 3)
-      rotY = rotX(2);
-      rotZ = rotZ(3);
-      rotX = rotX(1);
-   end
-end
-
 % useful intermediates
 L = norm(Axis);
 if (L < eps)
@@ -51,5 +43,5 @@ R(2,1) = u*v*(1-c) + w*s;
 R(2,2) = v2 + (u2+w2)*c;
 R(2,3) = v*w*(1-c) - u*s;
 R(3,1) = u*w*(1-c) - v*s;
-R(3,2) = v*w*(1-c)+u*s;
+R(3,2) = v*w*(1-c) + u*s;
 R(3,3) = w2 + (u2+v2)*c;

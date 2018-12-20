@@ -1,4 +1,4 @@
-% DIFF_ZA_AA   Takes thne difference of zenith and azimuth angles
+% DIFF_ZA_AA   Takes the difference of zenith and azimuth angles
 %
 %   Takes the difference between a set of angles (za,aa) and a reference
 %   direction (za0,aa0). That is, this function is the "inverse" of
@@ -42,13 +42,16 @@ aa = aa(:)';
 
 % Find vector around which rotation shall be performed to maintain aa
 %  
-vrot = cross( [0 0 1], [x;y;z] );
+% The vector is given by vrot = cross( [0 0 1], [x;y;z] );
+% but it turns out that the result of this operation is just:
+%
+vrot = [-y,x,0];
 
 % Unit vectors towards (za,aa)
 %
 [x,y,z] = zaaa2cart( za, aa );
 
-% Apply rotation from (za,aa) to (90,aa)
+% Apply rotation from (za,aa) towards (90,aa0)
 %
 u = rotationmat3D( -(za0-90)*pi/180, vrot ) * [x;y;z];
 

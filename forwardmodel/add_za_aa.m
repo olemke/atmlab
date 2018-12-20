@@ -36,7 +36,10 @@ daa = daa(:)';
   
 % Find vector around which rotation shall be performed to maintain aa
 %  
-vrot = cross( [0 0 1], [x;y;z] );
+% The vector is given by vrot = cross( [0 0 1], [x;y;z] );
+% but it turns out that the result of this operation is just:
+%
+vrot = [-y,x,0];
 
 % Unit vectors towards (dza,daa) around (90,aa0)
 %

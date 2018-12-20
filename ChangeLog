@@ -1,3 +1,14 @@
+2018-12-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-268
+
+	* forwardmodel/add_za_aa.m:
+	* forwardmodel/diff_za_aa.m: vrot now set directly, faster than
+	older calculation by cross.
+
+	* math/rotationmat3D.m (rotationmat3D): Removed some strange code
+	for nargin == 1.
+
 2018-12-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-267
