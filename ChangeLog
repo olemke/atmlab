@@ -1,3 +1,34 @@
+2019-01-23  Imke Hans  <imke.hans@uni-hamburg.de>
+
+	* atmlab-2-3-269
+
+	* datasets/+satreaders/poes_radiometer_FCDR.m,
+	datasets/+satreaders/poes_radiometer_level1b.m,
+	datasets/+satreaders/ssmt2_ngdc_ncreader,
+	datasets/+satreaders/ssmt2_ngdc_ncreader.m,
+	datasets/datasets_config.m,
+	datasets/define_datasets.m:
+	
+	Added functions to organise the reading from FCDR and level1b data
+	for MW radiometers. 
+	Added reader for SSMT2-NGDC-data.
+	Modified config+define code to allow for usage of the new readers.
+	
+	
+	* sensors/read_AMSUB_allvar.m, sensors/read_AMSUB_header.m,
+	sensors/read_AMSUB_record.m, sensors/read_FIDUCEO_MW_FCDR.m,
+	sensors/read_MHS_allvar.m, sensors/read_MHS_header.m,
+	sensors/read_MHS_record.m, sensors/read_MW_level1b.m,
+	sensors/read_SSMT2_allvar.m, sensors/ssmt2_read.m:
+	
+	Added readers for level1b data (all variables) and FCDR data for MW
+	humidity sounders.
+	
+	* site-specific/hamburg/datasets_init.m:
+	
+	Modified: added paths and regualr expressions for FCDR data stored on
+	thunder.
+
 2018-12-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-268

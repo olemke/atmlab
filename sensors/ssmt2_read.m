@@ -129,7 +129,7 @@ end
 
 S.nscan   = fread (fid, 1, 'uint16');
 S.ngap    = fread (fid, 1, 'uint16');
-S.precal  = fread (fid, 108, 'uint8');
+S.precal  = fread (fid, 54, 'uint16'); %was 108 and uint8
 
 S.apc  = reshape (fread (fid, NPOS*NCHAN, 'uint16') / 100, NCHAN, NPOS)';
 
@@ -182,7 +182,9 @@ while (~feof (fid) && recn < S.nscan)
     end
     rec.count = timecount (2:NCHAN+1, :);
     
-    rec.rawcal = fread (fid, 172, 'uint8');
+    rec.rawcal = fread (fid, 86, 'uint16'); %was 172 and uint8
+
+
     
     rec.slope  = fread (fid, NCHAN, 'int16')' / 10000;
     %FIXME OLE: The offset factor was changed at some point

@@ -76,6 +76,11 @@ if atmlab('LEGACY_MODE')
     A.amsub_regexp = nan;
     A.amsub_filename = nan;
     
+    A.amsub_FCDR_basedir = nan;
+    A.amsub_FCDR_subdir = nan;
+    A.amsub_FCDR_regexp = nan;
+    A.amsub_FCDR_filename = nan;
+    
     A.avhrr_basedir = nan;
     A.avhrr_subdir = nan;
     A.avhrr_regexp = nan;
@@ -133,6 +138,11 @@ if atmlab('LEGACY_MODE')
     A.mhs_subdir = nan;
     A.mhs_regexp = nan;
     A.mhs_filename = nan;
+    
+    A.mhs_FCDR_basedir = nan;
+    A.mhs_FCDR_subdir = nan;
+    A.mhs_FCDR_regexp = nan;
+    A.mhs_FCDR_filename = nan;
     
     
     % old

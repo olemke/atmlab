@@ -84,9 +84,13 @@ D.amsua.basedir = [data_base_dir 'amsu'];
 D.amsua.subdir = '$SAT_amsua_$YEAR4/$MONTH/$DAY';
 D.amsua.re = poes_re;
 
-D.amsub.basedir = [data_base_dir 'amsu'];
+D.amsub.basedir = [data_base_dir 'amsub'];
 D.amsub.subdir = '$SAT_amsub_$YEAR4/$MONTH/$DAY';
 D.amsub.re = poes_re;
+
+D.amsub_FCDR.basedir = ['/scratch/uni/u237/data/fiduceo-fcdr/easy/v4_1fv2_0_1']; 
+D.amsub_FCDR.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
+D.amsub_FCDR.re = '(?<satname>[a-z0-9]{6})/(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/FIDUCEO_FCDR_L1C_MHS_(?<satname>[A-Z0-9]{6})_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})|_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\d{6}_\d{14}_EASY_v4.1_fv2.0.1';
 
 D.cloud_cci.basedir = [data_base_dir 'cloud_cci/ESACCI-L2_CLOUD-CLD_PRODUCTS-AVHRRGAC'];
 D.cloud_cci.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
@@ -112,6 +116,10 @@ D.mirs.re = '\.D(?<year02>\d{2})(?<doy>\d{3})\.S(?<hour>\d{2})(?<minute>\d{2})\.
 D.mhs.basedir = [data_base_dir 'mhs'];
 D.mhs.subdir = '$SAT_mhs_$YEAR4/$MONTH/$DAY';
 D.mhs.re = poes_re;
+
+D.mhs_FCDR.basedir = ['/scratch/uni/u237/data/fiduceo-fcdr/easy/v4_1fv2_0_1']; 
+D.mhs_FCDR.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
+D.mhs_FCDR.re = '(?<satname>[a-z0-9]{6})/(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/FIDUCEO_FCDR_L1C_MHS_(?<satname>[A-Z0-9]{6})_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})|_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\d{6}_\d{14}_EASY_v4.1_fv2.0.1'; 
 
 % collection 5
 D.modis_aqua_L2.basedir = [data_base_dir 'modis/51/MYD06_L2'];
@@ -151,6 +159,24 @@ D.ssmt2.basedir = [data_base_dir 'ssmt_ngdc'];
 D.ssmt2.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
 D.ssmt2.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
 D.ssmt2.re = '(?<satname>F[0-9]{2})(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})\.T2\.gz';
+
+D.ssmt2_ngdc.basedir = [data_base_dir 'ssmt/ssmt2_ngdc_nc'];
+D.ssmt2_ngdc.subdir = '$SAT/$YEAR4';
+%D.ssmt2_ngdc.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
+D.ssmt2_ngdc.re = '(?<satname>F[0-9]{2})(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})\.nc';
+
+
+D.ssmt2_noaaclass.basedir = [data_base_dir 'ssmt'];
+D.ssmt2_noaaclass.subdir = '$SAT_ssmt2_$YEAR4/$MONTH/$DAY';
+%D.ssmt2_noaaclass.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
+D.ssmt2_noaaclass.re = '(?<satname>f[0-9]{2})_(?<type>[a-z0-9]+)_(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/[A-Z0-9.]+\.S[A-Z0-9.]+\.S.[A-Z0-9.]+\.S(?<hour>\d{2})(?<minute>\d{2})|\.S(?<hour>\d{2})(?<minute>\d{2})';
+
+
+D.ssmt2_FCDR.basedir = ['/scratch/uni/u237/data/fiduceo-fcdr/easy/v4_1fv2_0_1'];
+D.ssmt2_FCDR.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
+%D.ssmt2_FCDR.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
+D.ssmt2_FCDR.re = '(?<satname>[a-z0-9]{3})/(?<year>\d{4})/(?<month>\d{2})/(?<day>\d{2})/FIDUCEO_FCDR_L1C_SSMT2_(?<satname>[A-Z0-9]{3})_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})|_(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\d{6}_\d{14}_EASY';
+
 
 D.CFSR.basedir = [userdata_base_dir 'gholl/reanalysis_per_day'];
 D.CFSR.subdir = '$YEAR4/$MONTH/$DAY';
