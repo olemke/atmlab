@@ -1,3 +1,10 @@
+2019-02-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-270
+
+	* retrieval/oem.m (oem): Added check that O.linear is true is
+	characterisation shall be done.
+
 2019-01-23  Imke Hans  <imke.hans@uni-hamburg.de>
 
 	* atmlab-2-3-269

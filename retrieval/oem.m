@@ -363,7 +363,10 @@ end
       end                                                                     
     end                                                                       
                                                                               
-    if nargin < 10                                                            
+    if nargin < 10
+      if ~O.linear                                                               
+        error('O.linear must be true for characterisation.');                 
+      end                                                                     
       if O.cost                                                               
         error('O.cost is not handled for characterisation.');                 
       end                                                                     
