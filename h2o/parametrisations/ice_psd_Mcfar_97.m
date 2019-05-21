@@ -16,7 +16,7 @@
 %     and implications for radiative transfer: results from CEPEX",
 %     J. Atmos. Sci., 54, 2187-2200, 1997
 %
-% FORMAT   [y] = ice_psd_Mcfar_97(T,IWC,D,mode)     
+% FORMAT   [y] = ice_psd_Mcfar_97(T,IWC,D[,mode,t_min_psd,t_max_psd])     
 %
 % OUT      y is a vector with the particle size distribution [#/m^3/m]
 %
@@ -26,22 +26,31 @@
 %          D     the size vector of the ice particles,
 %                (the mass equivalent sphere diameter [m]),
 %                where the concentration will be calculated  
-%          mode  1=both small and large mode
+% OPT      mode  1=both small and large mode (default)
 %                2=only small mode
 %                3=only large mode
-%
+%     t_min_psd  Low temperature limit to use as paramtrization temperature.
+%                Default is 180
+%     t_max_psd  High temperature limit to use as paramtrization temperature.
+%                Default is 273.15
+
 % History: 2004-07-19  Created by Bengt Rydberg
 
-function [y]=ice_psd_Mcfar_97(T,IWC,D,mode);
+function [y]=ice_psd_Mcfar_97(T,IWC,D,varargin);
+%
+[mode,t_min_psd,t_max_psd] = optargs( varargin, { 1, 180, 273.15 } )
 
-% ARTS version requires t < 273.15. We add some margin
+
+% Temperature
 %
 if T > 280
   error( 'Temperatures above 280 K are not allowed.' );
-elseif T > 273.15
-  T = 273.15;
+elseif T > t_max_psd
+  T = t_max_psd;
+elseif T < t_min_psd
+  T = t_min_psd;
 end
-  
+
 
 T   = T-273.15;
 IWC = IWC*1e3; % change unit to g/m^3 
