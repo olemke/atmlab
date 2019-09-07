@@ -434,10 +434,19 @@ Y(2) = Y(1);
 Y(2).LONGITUDE = pi;
 Y(2).ZA        = 45;
 
+% Add frequency error to measurement 2
+%
+df = 100e3;
+Y(2).F         = Y(2).F + df;
+
 
 % Calculate simulated spectra
 %
 Y = qpack2( Q, oem, Y );            % Dummy oem structure OK here 
+
+% Move back to expected frequencies in Y(2)
+%
+Y(2).F = Y(2).F - df;
 
 % Add thermal noise
 %
