@@ -168,6 +168,12 @@ elseif length(in.size)==4 % three extra dimensions
             Z{i, j} = zeroes(1:counts(i,j),:,:,:);
         end
     end
+elseif length(in.size)==5 % three extra dimensions
+    for i = 1:size(counts,1)
+        for j = 1:size(counts,2)
+            Z{i, j} = zeroes(1:counts(i,j),:,:,:,:);
+        end
+    end
 end
 
 %% LOOP DATA
@@ -189,6 +195,11 @@ elseif length(in.size)==3 % two extra dimensions
 elseif length(in.size)==4 % three extra dimensions
     for i = 1:size(indata,1)
         Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:,:,:) = indata(i,:,:,:);
+        counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
+    end
+elseif length(in.size)==5 % three extra dimensions
+    for i = 1:size(indata,1)
+        Z{Yindex(i), Xindex(i)}(counts(Yindex(i), Xindex(i)),:,:,:,:) = indata(i,:,:,:,:);
         counts(Yindex(i), Xindex(i)) = counts(Yindex(i), Xindex(i)) - 1;
     end
 end
@@ -278,7 +289,7 @@ if ~in.countsOnly
         errId, ['data,Y,X must all have the same first dimension. Found: ' ...
         'data %d, Y %d, X %d. It seems your data is not "ungridded" '], size(in.Z, 1), size(in.Y, 1), size(in.X, 1));
 
-    assert(ndims(in.Z)<=4,errId,...
+    assert(ndims(in.Z)<=5,errId,...
         [mfilename,' currently only supports 3 extra dimensions'])
 else
     if isequal(numel(in.Y),numel(in.X))
@@ -325,7 +336,7 @@ errId = ['atmlab:' mfilename ':badInput'];
 
 
 
-if in.lonlat % it is a geographical grid
+if in.lonlat || isfield(in,'lonspace') % it is a geographical grid
 
     if ~any(isfield(in,{'newX','newY'}))
         d = in.gridsize;

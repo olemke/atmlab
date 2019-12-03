@@ -1,3 +1,9 @@
+2019-12-03  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
+
+	* atmlab-2-3-273
+
+	* math/binning_fast: small bugfix
+
 2019-09-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-272
