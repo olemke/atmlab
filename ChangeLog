@@ -1,3 +1,10 @@
+2020-01-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-274
+
+	* arts/wsv2group.m:
+	* arts/xml/xmlStoreAuto.m: New functions.
+
 2019-12-03  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
 
 	* atmlab-2-3-273
