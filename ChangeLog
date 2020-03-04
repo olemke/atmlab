@@ -1,3 +1,9 @@
+2020-03-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-275
+
+	* scattering/pnd2bulk.m (pnd2bulk): New function.
+
 2020-01-23  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-274
