@@ -16,6 +16,7 @@
 
 % 2014-02-10   Maryam Jamali 
 % 2015-10-19   Restructured, Patrick Eriksson
+% 2020-03-13   Fixed problem that occurs if S.za_grid is not a column.
 
 function g = assp2g(S)
   
@@ -37,26 +38,27 @@ end
   
 
 g = zeros( length(S.f_grid), length(S.T_grid) );
-
+za_grid = vec2col(S.za_grid);
 % ARTS uses pure phase matrix values, and not a normalised phase function,
 % and we need to include a normalisation 
 
-azi_w = abs( sind(S.za_grid) );   % Azimuthal weighting
-cterm = cosd(S.za_grid);          % Avoid recalculate cos term
+azi_w = abs( sind(za_grid) );   % Azimuthal weighting
+cterm = cosd(za_grid);          % Avoid recalculate cos term
 
 for j = 1 : length(S.f_grid) 
   for k = 1 : length(S.T_grid)  
       
     p    = squeeze( S.pha_mat_data(j,k,:,1,1,1,1) );
-    
+    p = vec2col(p);
+
     % All pi factors disappear as they are part of both integrals
     %
-    normfac = trapz( S.za_grid, p.*azi_w );
+    normfac = trapz( za_grid, p.*azi_w );
     %
     if normfac == 0  % If zero, this means that p==0 and should indicate very
       g(j,k) = 0;    % small particles that have g=0.
     else
-      g(j,k) = trapz( S.za_grid, cterm.*p.*azi_w ) / normfac;
+      g(j,k) = trapz( za_grid, cterm.*p.*azi_w ) / normfac;
     end
   end
 end

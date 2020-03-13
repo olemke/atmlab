@@ -1,3 +1,9 @@
+2020-03-13  Robin Ekelund  <robin.ekelund@chalmers.se>
+
+	* atmlab-2-3-276
+
+	* scattering/assp2g.m: Fixed problem that occurs if S.za_grid is not a column
+
 2020-03-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-276
