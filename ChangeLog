@@ -1,3 +1,15 @@
+2020-03-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-276
+
+	* handy/vif.m: Added this function Richie Cotton (taken from
+	Matlab's file central). It is a "vector if" function, that also
+	almost works as a ternary conditional operator.
+
+	* scattering/pnd2bulk.m: Did silently assume that cloudbox covers
+	complete atmosphere. Now cloudbox limits must be given and smaller
+	cloudboxes are handled. 
+
 2020-03-04  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-275
