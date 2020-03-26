@@ -1,3 +1,31 @@
+2020-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-278
+
+	* Updates to make qarts to work with present arts version
+	(2.3.1279). Not sure if all is fixed, but demos seem to run at least.
+
+	* Removed some less important demos, as well as the two
+	related to scattering. The later as qarts should not be considered
+	to support scattering calculations (but still possible if using a
+	lot of tricks).
+
+	* arts/qarts2cfile.m: Changes related to abs_lines and jacobianAdd.
+
+	* arts/qarts.m: Updated and removed some obselete text for Jacobians.
+
+	* demos/qarts_mcdoit_demo.m:
+	* demos/qarts_scattering_demo.m:
+	* demos/qarts_ppath_demo.m:
+	* demos/qarts_zeeman_demo.m: Removed. 
+
+	* demos/qarts_demo2.m:
+	* demos/qarts_demo.m:
+	* demos/qpack2_demo.m:
+	* demos/qpack2_demo2.m:
+	* demos/qarts_iy_demo.m: 
+	* demos/qpack2_wind3d_demo.m: Small update fixes.
+
 2020-03-13  Robin Ekelund  <robin.ekelund@chalmers.se>
 
 	* atmlab-2-3-277

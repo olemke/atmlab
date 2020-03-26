@@ -68,9 +68,9 @@ Q.ABS_SPECIES(3).TAG{1} = 'N2-SelfContStandardType';
 Q.ABS_SPECIES(4).TAG{1} = 'O2-PWR98';
 %
 Q.ABSORPTION            = 'OnTheFly';  % A simple, but slow, option!
-Q.ABS_LINES_FORMAT      = 'Arts';
+Q.ABS_LINES_FORMAT      = 'ARTSCAT';
 Q.ABS_LINES           = fullfile( atmlab_example_data, 'o3line111ghz' );
-Q.ABS_LINESHAPE         = 'Voigt_Kuntz6';
+Q.ABS_LINESHAPE         = 'VP';
 Q.ABS_LINESHAPE_CUTOFF  = -1;
 Q.ABS_LINESHAPE_FACTOR  = 'VVH';
 
@@ -135,7 +135,7 @@ Q.RTE_LOS             = 70;
 
 %- Calculate
 %
-Q.IY_AUX_VARS = { 'Transmission', 'Absorption, species 0' };
+Q.IY_AUX_VARS = { 'Optical depth' };
 %
 [iy,iy_aux,ppath] = arts_iy( Q );
 
@@ -154,15 +154,8 @@ if nargout == 0
   figure(2)
   plot( f/1e9, iy_aux{1}(:,1,1,end) )
   xlabel( 'Frequency [GHz]' );
-  ylabel( 'Total atmospheric transmission [-]' );
-  title( 'Corresponding transmission' );
-  
-  figure(3)
-  [u,v] = min( ( abs( f - 110.836e9 ) ) );
-  plot( squeeze( iy_aux{2}(v,1,1,:) ), ppath.pos(:,1)/1e3 )
-  xlabel( 'Absorption [1/m]' );
-  ylabel( 'Altitude [km]' );
-  title( 'Ozone absorption at 110.836 GHz' );
+  ylabel( 'OPtical depth [-]' );
+  title( 'Corresponding optical depths' );
   
   figure(4)
   plot( ppath.pos(:,1)/1e3, ppath.los )

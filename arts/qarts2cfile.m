@@ -509,25 +509,6 @@ function T = cfile_Absrpt( Q, partname, workfolder )
     %
     if strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION, 'CalcTable')
       %
-      nset = qarts_isset( Q.ABS_LINESHAPE )  +  ...
-             qarts_isset( Q.ABS_LINESHAPE_FACTOR ) + ...
-             qarts_isset( Q.ABS_LINESHAPE_CUTOFF );
-      %
-      if nset  
-        if nset < 3
-          error( ['Q.ABS_LINESHAPE, Q.ABS_LINESHAPE_FACTOR, and ', ...
-         'Q.ABS_LINESHAPE_CUTOFF must all be left empty ({}), or all be set.']);
-        end
-        %                                                                   %&%
-        rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' );       %&%
-        rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, ...                 %&%
-                                                'Q.ABS_LINESHAPE_FACTOR' ); %&%
-        rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, ...              %&%
-                                                'Q.ABS_LINESHAPE_CUTOFF' ); %&%
-        T{end+1} = sprintf('abs_lineshapeDefine(abs_lineshape,"%s","%s",%e)',...
-             Q.ABS_LINESHAPE, Q.ABS_LINESHAPE_FACTOR, Q.ABS_LINESHAPE_CUTOFF );
-      end
-      %
       if qarts_isset( Q.ABS_LINES_FORMAT )
         %                                                                   %&%
         rqre_datatype( Q.ABS_LINES_FORMAT, @ischar, 'Q.ABS_LINES_FORMAT' ); %&%
@@ -561,10 +542,29 @@ function T = cfile_Absrpt( Q, partname, workfolder )
           else
             f1 = 0;                      f2 = 1e99;
           end
-          T{end+1} = sprintf( ...
-                          'abs_linesReadFrom%s(abs_lines,"%s",%.3e,%.3e)', ...
-                                       Q.ABS_LINES_FORMAT, filename, f1, f2 );
+          T{end+1} = sprintf( 'Read%s(abs_lines,"%s",%.3e,%.3e,"","")', ...
+                                     upper(Q.ABS_LINES_FORMAT), filename, f1, f2 );
+          %
+          if qarts_isset( Q.ABS_LINESHAPE )
+              rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' );       %&%
+              T{end+1} = sprintf( 'abs_linesSetLineShapeType(abs_lines,"%s")', ...
+                                  Q.ABS_LINESHAPE );
+          end   
+          %
+          if qarts_isset( Q.ABS_LINESHAPE_FACTOR )
+              rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, 'Q.ABS_LINESHAPE_FACTOR' ); %&%
+              T{end+1} = sprintf( 'abs_linesSetNormalization(abs_lines,"%s")', ...
+                                  Q.ABS_LINESHAPE_FACTOR );
+          end
+          %
+          if qarts_isset( Q.ABS_LINESHAPE_CUTOFF )
+              rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, 'Q.ABS_LINESHAPE_CUTOFF' ); %&%
+              T{end+1} = sprintf( 'abs_linesSetCutoff(abs_lines,"ByLine",%e)', ...
+                                  Q.ABS_LINESHAPE_CUTOFF );
+          end
+          %
           T{end+1} = 'abs_lines_per_speciesCreateFromLines';
+          %
         end
       end
       %
@@ -587,6 +587,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
 
     if strcmp( Q.ABSORPTION, 'OnTheFly' )
       %
+      T{end+1} = 'lbl_checkedCalc';
+      %
       if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
         T = add_agenda( T, 'propmat_clearsky_agenda', ...
                                                 Q.PROPMAT_CLEARSKY_AGENDA );
@@ -597,6 +599,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       end
       %
     elseif strcmp( Q.ABSORPTION, 'CalcTable' )
+      %
+      T{end+1} = 'lbl_checkedCalc';
       %
       if qarts_isset( Q.ABS_P )
         T = file_or_data( T, 'abs_p', 'Vector', Q.ABS_P, ...
@@ -1256,30 +1260,13 @@ function T = cfile_Jacobi( Q, partname, workfolder )
         T{end+1} = create_var( name3, 'Vector' );
         T = file_or_data( T, name3, 'Vector', Q.ABS_SPECIES(i).GRIDS{3},...
                                   workfolder, Q.INPUT_FILE_FORMAT, name3 );
-        method = 'analytical'; dx = 0;
-        if (isfield( Q.ABS_SPECIES(i), 'METHOD' ) & ...                     %&%
-           ~isempty( Q.ABS_SPECIES(i).METHOD )) & ...                    %&%
-           (~isfield( Q.ABS_SPECIES(i), 'DX' ) | isempty( Q.ABS_SPECIES(i).DX )) %&%
-                                                                            %&%
-           error( ['Q.ABS_SPECIES(%d).METHOD is set to pertubation, but '... %&%
-               'Q.ABS_SPECIES(%d).DX is not specified'], i ,i );            %&%
-
-            
-        end
-        if isfield( Q.ABS_SPECIES(i), 'METHOD' ) & ...
-           ~isempty( Q.ABS_SPECIES(i).METHOD ) & ...
-           isfield( Q.ABS_SPECIES(i), 'DX' ) & ~isempty( Q.ABS_SPECIES(i).DX ), 
-                method = Q.ABS_SPECIES(i).METHOD;
-                dx = Q.ABS_SPECIES(i).DX;
-        end
-        %
         unit = Q.ABS_SPECIES(i).UNIT;
         %
         T{end+1} ='jacobianAddAbsSpecies(jacobian_quantities,jacobian_agenda,';
         T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
         T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
         T{end+1} = sprintf( '  %s,', arts_tgs_cnvrt(Q.ABS_SPECIES(i).TAG) );
-        T{end+1} = sprintf( '  "%s","%s",1,%.9g)', method,unit,dx);
+        T{end+1} = sprintf( '  "%s")', unit);
       end
     end % for
   end % if
@@ -1314,16 +1301,12 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} = create_var( name3, 'Vector' );
       T        = file_or_data( T, name3, 'Vector', Q.T.GRIDS{3},...
                                     workfolder, Q.INPUT_FILE_FORMAT, name3 );
-      hse = 'on'; method = 'analytical'; dt = 1;
+      hse = 'on'; 
       if isfield( Q.T, 'HSE' ) & qarts_isset( Q.T.HSE ), hse = Q.T.HSE; end
-      if isfield( Q.T, 'METHOD' ) & qarts_isset( Q.T.METHOD ), 
-        method = Q.T.METHOD; 
-      end
-      if isfield( Q.T, 'DT' ) & qarts_isset( Q.T.DT ), dt = Q.T.DT; end      
       T{end+1} ='jacobianAddTemperature(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
-      T{end+1} = sprintf( '  "%s","%s",%.3f)', hse, method, dt );
+      T{end+1} = sprintf( '  "%s")', hse );
     end  
   end
 

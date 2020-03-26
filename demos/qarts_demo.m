@@ -91,9 +91,9 @@ Q.ABS_SPECIES(4).TAG{2} = 'H2O-PWR98';
 Q.ABS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
 %
 Q.ABSORPTION            = 'OnTheFly';  % A simple, but slow, option!
-Q.ABS_LINES_FORMAT      = 'Arts';
+Q.ABS_LINES_FORMAT      = 'ARTSCAT';
 Q.ABS_LINES             = fullfile( atmlab_example_data , 'lines501.4' );
-Q.ABS_LINESHAPE         = 'Voigt_Kuntz6';
+Q.ABS_LINESHAPE         = 'VP';
 Q.ABS_LINESHAPE_CUTOFF  = -1;
 Q.ABS_LINESHAPE_FACTOR  = 'VVH';
 

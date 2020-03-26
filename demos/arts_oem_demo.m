@@ -164,7 +164,7 @@ Q.ABS_SPECIES(2).SX       = covmat1d_from_cfun( Q.ABS_SPECIES(2).GRIDS{1}, ...
 %- Set-up/create absorption look-up table
 %----------------------------------------------------------------------------
 
-Q.ABS_LINES_FORMAT         = 'Arts';
+Q.ABS_LINES_FORMAT         = 'ARTSCAT';
 Q.ABS_LINES                = fullfile( atmlab_example_data , 'o3line111ghz' );
 Q.ABS_NLS                  = [];
 %

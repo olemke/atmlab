@@ -157,7 +157,7 @@ Q.PPATH_LMAX          = 250;
 %- Absorption
 %
 Q.ABS_LINES           = fullfile( atmlab_example_data, 'o3line111ghz' );
-Q.ABS_LINES_FORMAT    = 'Arts';
+Q.ABS_LINES_FORMAT    = 'ARTSCAT';
 %
 Q.ABSORPTION          = 'OnTheFly';
 Q.ABS_NLS             = [];
