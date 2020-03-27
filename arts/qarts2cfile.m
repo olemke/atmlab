@@ -517,55 +517,71 @@ function T = cfile_Absrpt( Q, partname, workfolder )
           T{end+1} = 'abs_lines_per_speciesSetEmpty';
         else
           %
-          rqre_datatype( Q.ABS_LINES, {@ischar,@isstruct,@isempty}, ...     %&%
+          rqre_datatype( Q.ABS_LINES, {@ischar,@isstruct}, ...             %&%
                                                            'Q.ABS_LINES' ); %&%
           %
-          if strcmp(upper(Q.ABS_LINES_FORMAT),'ARTS') & ~ischar(Q.ABS_LINES)
+          if strcmp(upper(Q.ABS_LINES_FORMAT),'XML')
             filename = fullfile( workfolder, 'abs_lines.xml' );
-            T = file_or_data( T, 'abs_lines', 'ArrayOfLineRecord', ...
+            T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
                             Q.ABS_LINES, workfolder, Q.INPUT_FILE_FORMAT );
           else
             if ~ischar( Q.ABS_LINES )                                       %&%
               error( ...                                                    %&%
-               'Q.ABS_LINES must be a filename for formats beside Arts.' ); %&%
+               'Q.ABS_LINES must be a filename for formats beside XML.' );  %&%
             end                                                             %&%
             filename = Q.ABS_LINES;
-          end
-          %
-          if qarts_isset( Q.ABS_LINES_FLIMS )
-            if ~( isnumeric( Q.ABS_LINES_FLIMS )  &  ...                    %&%
-                  length( Q.ABS_LINES_FLIMS ) == 2 )                        %&%
-              error( ...                                                    %&%
+            %
+            if qarts_isset( Q.ABS_LINES_FLIMS )
+              if ~( isnumeric( Q.ABS_LINES_FLIMS )  &  ...                  %&%
+                    length( Q.ABS_LINES_FLIMS ) == 2 )                      %&%
+                error( ...                                                  %&%
                  'If set, Q.ABS_LINES_FLIMS must be a vector of length 2' );%&%
-            end                                                             %&%
-            f1 = Q.ABS_LINES_FLIMS(1);   f2 = Q.ABS_LINES_FLIMS(2);
-          else
-            f1 = 0;                      f2 = 1e99;
-          end
-          T{end+1} = sprintf( 'Read%s(abs_lines,"%s",%.3e,%.3e,"","")', ...
-                                     upper(Q.ABS_LINES_FORMAT), filename, f1, f2 );
-          %
-          if qarts_isset( Q.ABS_LINESHAPE )
-              rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' );       %&%
+              end                                                           %&%
+              f1 = Q.ABS_LINES_FLIMS(1);   
+              f2 = Q.ABS_LINES_FLIMS(2);
+            else
+                f1 = 0;                      
+                f2 = 1e99;
+            end   
+            T{end+1} = sprintf( 'Read%s(abs_lines,"%s",%.3e,%.3e,"","")', ...
+                                upper(Q.ABS_LINES_FORMAT), filename, f1, f2 );
+            %
+            if qarts_isset( Q.ABS_LINESHAPE )
+              rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' ); %&%
               T{end+1} = sprintf( 'abs_linesSetLineShapeType(abs_lines,"%s")', ...
-                                  Q.ABS_LINESHAPE );
-          end   
-          %
-          if qarts_isset( Q.ABS_LINESHAPE_FACTOR )
-              rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, 'Q.ABS_LINESHAPE_FACTOR' ); %&%
+                                 Q.ABS_LINESHAPE );
+            end   
+            %
+            if qarts_isset( Q.ABS_LINESHAPE_FACTOR )
+              rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, ...           %&%
+                             'Q.ABS_LINESHAPE_FACTOR' ); ...                %&%
               T{end+1} = sprintf( 'abs_linesSetNormalization(abs_lines,"%s")', ...
                                   Q.ABS_LINESHAPE_FACTOR );
-          end
-          %
-          if qarts_isset( Q.ABS_LINESHAPE_CUTOFF )
-              rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, 'Q.ABS_LINESHAPE_CUTOFF' ); %&%
-              T{end+1} = sprintf( 'abs_linesSetCutoff(abs_lines,"ByLine",%e)', ...
-                                  Q.ABS_LINESHAPE_CUTOFF );
+            end
+            %
+            if qarts_isset( Q.ABS_LINESHAPE_CUTOFF )
+              rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, ...        %&%
+                             'Q.ABS_LINESHAPE_CUTOFF' );                    %&%
+              if Q.ABS_LINESHAPE_CUTOFF < 0
+                T{end+1} = sprintf( 'abs_linesSetCutoff(abs_lines,"None",-1)' );
+              else
+                T{end+1} = sprintf( 'abs_linesSetCutoff(abs_lines,"ByLine",%e)', ...
+                                    Q.ABS_LINESHAPE_CUTOFF );
+              end
+            end
+            %
+            if qarts_isset( Q.ABS_LINESHAPE_MIRRORING )
+              rqre_datatype( Q.ABS_LINESHAPE_MIRRORING, @ischar, ...          %&%
+                             'Q.ABS_LINESHAPE_MIRRORING' ); ...               %&%
+              T{end+1} = sprintf( 'abs_linesSetMirroring(abs_lines,"%s")', ...
+                                  Q.ABS_LINESHAPE_MIRRORING );
+            end
+            %
           end
           %
           T{end+1} = 'abs_lines_per_speciesCreateFromLines';
           %
-        end
+        end  % not NONE
       end
       %
       T = add_includes( T, 'Q.ABS_MODELS', Q.ABS_MODELS );

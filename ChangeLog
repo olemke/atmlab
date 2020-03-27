@@ -1,3 +1,14 @@
+2020-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-279
+
+	* arts/qarts2cfile.m:
+	Negative Q.ABS_LINESHAPE_CUTOFF now gives no cutoff again.
+	Now also new abs_line system supported.
+	Q.ABS_LINESHAPE_MIRRORING now handled
+
+	* arts/qarts.m: Updated following changes above.
+
 2020-03-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-278
