@@ -517,13 +517,21 @@ function T = cfile_Absrpt( Q, partname, workfolder )
           T{end+1} = 'abs_lines_per_speciesSetEmpty';
         else
           %
-          rqre_datatype( Q.ABS_LINES, {@ischar,@isstruct}, ...             %&%
-                                                           'Q.ABS_LINES' ); %&%
-          %
           if strcmp(upper(Q.ABS_LINES_FORMAT),'XML')
-            filename = fullfile( workfolder, 'abs_lines.xml' );
-            T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
-                            Q.ABS_LINES, workfolder, Q.INPUT_FILE_FORMAT );
+            rqre_datatype( Q.ABS_LINES, {@ischar,@iscellstr}, 'Q.ABS_LINES' ); %&%
+            if ischar( Q.ABS_LINES )
+              T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
+                                Q.ABS_LINES, workfolder, Q.INPUT_FILE_FORMAT );
+            else
+              T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
+                                Q.ABS_LINES{1}, workfolder, Q.INPUT_FILE_FORMAT );
+              T{end+1} = 'ArrayOfAbsorptionLinesCreate( appending_lines )';
+              for i = 2 : length(Q.ABS_LINES)
+                T = file_or_data( T, 'appending_lines', 'ArrayOfAbsorptionLines', ...
+                                  Q.ABS_LINES{i}, workfolder, Q.INPUT_FILE_FORMAT );
+                T{end+1} = 'abs_linesAppendWithLines(abs_lines,appending_lines,0)';
+              end
+            end
           else
             if ~ischar( Q.ABS_LINES )                                       %&%
               error( ...                                                    %&%
