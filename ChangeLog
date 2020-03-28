@@ -1,3 +1,10 @@
+2020-03-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-280
+
+	* geographical/set_lon_limits.m: Limits could end up above 360 due
+	to how margin was added. 
+
 2020-03-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-279

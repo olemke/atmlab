@@ -35,11 +35,11 @@ function [lon_limits,lonlow,lonhigh] = set_lon_limits(lons,varargin)
 %
 [prefer0to360,margin] = optargs( varargin, { true, 0 } );
 
-lon_try     = shift_longitudes( lons(:), 0, 360 );
-lon_limits1 = [ min(lon_try)-margin max(lon_try)+margin ];
+lon_try = shift_longitudes( mat2col([lons(:) lons(:)-margin lons(:)+margin]), 0, 360 );
+lon_limits1 = [ min(lon_try) max(lon_try) ];
 
-lon_try     = shift_longitudes( lon_try, -180, 180 );
-lon_limits2 = [ min(lon_try)-margin max(lon_try)+margin ];
+lon_try = shift_longitudes( mat2col([lons(:) lons(:)-margin lons(:)+margin]), -180, 180 );
+lon_limits2 = [ min(lon_try) max(lon_try) ];
 
 if diff(lon_limits1) <= diff(lon_limits2)
   lon_limits = lon_limits1;
