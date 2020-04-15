@@ -71,7 +71,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                     ------------
 % in.add_offset        in:     %f
 %                      ex:     The offset you want to automatically apply to the
-%                              provided data. This is often provided 
+%                              provided data. This is often provided
 %                              by convention in the attributes of a variable
 %                              (from netcdf). See also scale_factor and
 %                              fill_value
@@ -141,7 +141,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                          font to use. E.g., 'Helvetica' (0), 'Times-Roman' (4),
 %                          'Courier' (8), etc. See "gmtdefault" man page for the
 %                          whole list. You can even setup other fonts
-%                          (see also <a href="http://gmt.soest.hawaii.edu/doc/5.1.1/GMT_Docs.html">GMT Docs</a>                      def: 'Helvetica' ('0')
+%                          (see also <a href="http://gmt.soest.hawaii.edu/doc/5.1.1/GMT_Docs.html">GMT fonts</a>
 %                     -------------
 % in.fontsize_annot_secondary
 %                      in:     %s or %f (if %f, unit is assumed from in.proj_length_unit)
@@ -187,7 +187,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 % in.keep_files        in:     %f
 %                      ex:     If you don't want to delete intermediate files.
 %                              If you are really after the shell script that make
-%                              the plot see in.makeScriptAndStop 
+%                              the plot see in.makeScriptAndStop
 %                      def:    false
 %                     ------------
 % in.map_title_offset
@@ -267,7 +267,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                     ------------
 % in.scale_factor      in:     %f
 %                      ex:     The scale factor you want to automatically apply to the
-%                              provided data. This is often provided 
+%                              provided data. This is often provided
 %                              by convention in the attributes of a variable
 %                              (from netcdf). See also add_offset and
 %                              fill_value
@@ -380,7 +380,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 % LEGENDS:
 %
 % in.extra_legend      in:     %f
-%                      ex:     Set to false if you don't want an extra_legend. 
+%                      ex:     Set to false if you don't want an extra_legend.
 %                              if in.extra_legend is a structure, it's equivalent
 %                              to in.extra_legend = true
 %                      def:    true
@@ -435,10 +435,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                      def:    '14p'
 %                     ------------
 %  box_spacing         in:     %f. It has to be a number, and it seems to be in inches
-%                      ex:     Space between legend boxes.
-%                      def:    0 (side by side)
-%                      NOTE:   If you set a non-zero number you'll also get rid of
-%                              the color gradient, i.e. each box will have it's own color
+%                      ex:     0
 %                     ------------
 %  equalboxwidth       in:     %f
 %                      ex:     If the legend color boxes have to be the same size, 1
@@ -449,9 +446,9 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                      def:    none
 %                     ------------
 %  justify             in:     %s
-%                      ex:     sets the alignment. The alignment refers to the part of the legend 
-%                              that will be mapped onto the (x,y) point. Choose a 2 character 
-%                              combination of L, C, R (for left, center, or right) and 
+%                      ex:     sets the alignment. The alignment refers to the part of the legend
+%                              that will be mapped onto the (x,y) point. Choose a 2 character
+%                              combination of L, C, R (for left, center, or right) and
 %                              T, M, B for top, middle, or bottom. e.g., BL for lower left.
 %                      def:    'BR'
 %                     ------------
@@ -537,7 +534,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                      def:    Loosely based on the density of the data points
 %                     ------------
 %  resolution          in:     %f [degree]
-%                      ex:     1 [deg] (== 60minuntes) looks for values withing 1 [deg]
+%                      ex:     1 [deg] (== 60minutes) looks for values withing 1 [deg]
 %                      def:    Loosely based on the density of the data points, or avialable memory
 %
 %
@@ -546,7 +543,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                              the map. This could be useful of you have high
 %                              density and the default of 100Mib is not enough
 %                              to represent the data in the resolution you want
-%                      def:    0.1
+%                      def:    2
 % ------------------------------------------------------------------------
 %
 % PROJECTION
@@ -628,8 +625,8 @@ function [filename,out,commands] = gmt_plot(in,field)
 % LOCATION MARKERS:
 %
 %  for multiple locations define all fields according to :
-%  in.locations(1).name = 'x',
-%  in.locations(2).name = 'y', etc...
+%  in.locations(1).text = 'x',
+%  in.locations(2).text = 'y', etc...
 %
 %                     ----------------------
 %
@@ -645,7 +642,8 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                     ------------
 %  symbol              in:     %s
 %                      ex:     Shape of marker. '' if you don't want one
-%                      def:    'c' c=filled circle
+%                      def:    'c' c=filled circle.
+%                      more shapes: -,+,a,b,c,d,e,g,h,i,j,n, etc (see psxy -S<opt>)
 %                     ------------
 %  symbolsize          in:     %s
 %                      ex:     Size of shape.
@@ -659,7 +657,7 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                      ex:     Color of marker
 %                      def:    'white' (or '255/255/255')
 %
-% see pstext for the text arguments (text,fontsize,angle,font,justify,color)
+% see pstext for the text arguments (text,fontsize,angle,font,justify,color,outline)
 % for in.locations.(textarg)
 %
 %--------------------------------------------------------------------------
@@ -668,17 +666,26 @@ function [filename,out,commands] = gmt_plot(in,field)
 %
 % in.contourline.     | Structure with one or more of the following fields:
 %
-% spacing              in:     %f
-%                      ex:     Data interval between contours
+% color                in:     string, or {string, string, ...} matching
+%                              the number of levels
 %                     ------------
-% range                in:     [%f %f]
-%                      def:    in.datarange
+% fontsize             in:     %f [p]
+%                     ------------
+% levels               in:     [%f %f ...]
 %                     ------------
 % linethick            in:     %f
 %                     ------------
 % more                 in:     %s
 %                      ex:     Additional commands for GMT's grdcontour.
 %                              E.g. '-T1c/0.001c:LH'
+%                     ------------
+% spacing              in:     %f
+%                      ex:     Data interval between contours. Only
+%                              relevant if you have not provided 'levels;
+%                     ------------
+% range                in:     [%f %f]
+%                      def:    in.datarange. Only
+%                              relevant if you have not provided 'levels;
 %
 % If several contour plots should overlap define all fields according to:
 %  in.grdcontour(1).spacing = x,
@@ -716,6 +723,27 @@ function [filename,out,commands] = gmt_plot(in,field)
 %  in.pstext(1).text = 'example',
 %  in.pstext(2).text = 'example2', etc...
 %
+%  angle               in:     %f
+%                      ex:     degrees counter-clockwise from horizontal
+%                      def:    0 [deg]
+%                     ------------
+%  color               in:     %s
+%                      ex:     RGB text color
+%                      def:    '0/0/0'
+%                     ------------
+%  fontsize            in:     %s
+%                      ex:     Text size in points
+%                      def:    10p
+%                     ------------
+%  font                in:     %s or %f
+%                      ex:     Sets the font type
+%                      def:    1
+%                     ------------
+%  justify             in:     %f
+%                      ex:     The alignment refers to the part of the text
+%                              string that will be mapped onto the (x,y) point.
+%                      def:    'CM'
+%                     ------------
 %  lat                 in:     %f
 %                      ex:     Centre word at this latitude
 %                      def:    manditory user input
@@ -724,29 +752,15 @@ function [filename,out,commands] = gmt_plot(in,field)
 %                      ex:     Centre word at this longitude
 %                      def:    manditory user input
 %                     ------------
+%  outline             in:     %s
+%                      ex:     '-S0.5p,0/0/0'. This gives a medium thick
+%                      black line around your text. The string follows
+%                      exactly the GMT pen definitions: <a href="https://www-k12.atmos.washington.edu/~ovens/gmt/doc/html/GMT_Docs/node49.html">GMT pen attributes</a>
+%                      ----------
 %  text                in:     %s
 %                      ex:     String to appear at lat/lon
 %                      def:    manditory user input
 %                     ------------
-%  fontsize            in:     %s
-%                      ex:     Text size in points
-%                      def:    10p
-%                     ------------
-%  angle               in:     %f
-%                      ex:     degrees counter-clockwise from horizontal
-%                      def:    0 [deg]
-%                     ------------
-%  font                in:     %s or %f
-%                      ex:     Sets the font type
-%                      def:    1
-%                     ------------
-%  justify             in:     %f
-%                      ex:     Sets the alignment
-%                      def:    6
-%                     ------------
-%  color               in:     %s
-%                      ex:     RGB text color
-%                      def:    '0/0/0'
 %
 %--------------------------------------------------------------------------
 %
@@ -778,7 +792,7 @@ if nargin==2
         '(otherwise it is assumed that a field called ''data'' exists, ',...
         'and this is the field it will try to plot)'])
 end
-    
+
 if ~exist('field','var') && isfield(in,'data')
     field = 'data';
 elseif isfield(in,'nodata') && in.nodata
@@ -810,7 +824,7 @@ cd(out.tmpdir);
 if out.gridded
     out.grdfile = [out.filename '.nc'];
     gmt_nc_save_gridded(out.lon,out.lat,out.(field),out.grdfile);
-    logtext(1,'Writing grdfile: %s sucessfull\n',out.grdfile)
+    logtext(atmlab('VERBOSITY'),'Writing grdfile: %s sucessfull\n',out.grdfile)
 else
     if ~out.nodata
         out.ungriddedfile = [out.filename '.nc'];
@@ -850,7 +864,7 @@ else
     [~,in.gmtVersion] = system('gmt --version');
     in.gmtVersion = strtrim(in.gmtVersion);
 end
-%logtext(1,'Using GMT version %s\n',in.gmtVersion)
+%logtext(atmlab('VERBOSITY'),'Using GMT version %s\n',in.gmtVersion)
 clear tmp
 
 if isfield(in,'color_background');in.forcedColorsBack=true;end
@@ -872,7 +886,7 @@ default.font_annot_secondary     = 'Helvetica';
 default.fontsize_annot_secondary = '10p';
 default.fontsize_title           = '36p';
 default.psbasemap.axes           = 'nSeW';
-default.scale_factor             = 1;     
+default.scale_factor             = 1;
 if exist('field','var')
     default.title                = field;
 else
@@ -887,8 +901,8 @@ default.keep_files               = false;
 % how far the title is removed from the top of the map (depends on 'N' or 'n')
 [fl,u2] = separate_integer_and_unit(in.fontsize_annot_primary);
 default.map_title_offset         = sprintf('%.0f%s',0.1*fl + ... %half width of annotation
-                                           ismember('N',in.psbasemap.axes)*fl,u2); 
-                                       
+    ismember('N',in.psbasemap.axes)*fl,u2);
+
 default.force_nlevels            = false;
 default.makeScriptAndStop        = false;
 default.nodata                   = false;
@@ -898,7 +912,7 @@ default.proj.projection          = 'N';
 default.proj.map_width           = '20c';
 default.proj.center              = 0;
 default.proj_length_unit         = 'cm';
-default.savelegend               = false;
+default.savelegend               = 0;
 default.treatAsUngridded         = false;
 default.unit                     = '';
 default.xunit                    = '';
@@ -937,7 +951,7 @@ if ~isempty(b)
     if ismember(lower(ft),lower({'eps','pdf','BMP','JPEG','jpg','png','PPM','tif'}))
         default.figuretype = ft;
     else
-        logtext(atmlab('OUT'),'figuretype: %s is not an available type. Will produce .pdf\n',ft);
+        logtext(atmlab('VERBOSITY'),'figuretype: %s is not an available type. Will produce .pdf\n',ft);
         default.figuretype = 'pdf';
     end
     if ~isfield(in,'figuretype')
@@ -977,7 +991,7 @@ end
 
 % apply a function to the data first
 if ~strcmp(field,'func') && isfield(in,'func')
-    logtext(1,'Applying "%s" to the datafield "%s"\n',func2str(in.func),field)
+    logtext(atmlab('VERBOSITY'),'Applying "%s" to the datafield "%s"\n',func2str(in.func),field)
     in.(field) = in.func(in.(field));
 end
 
@@ -1022,7 +1036,7 @@ if ~in.nodata
                 isstruct(in.extra_legend) && ...
                 strcmpi(in.extra_legend.name,'NaN') && ...
                 in.gridded
-            logtext(2,'Asked to make a NaN-legend although none are present in the data\n')
+            logtext(atmlab('ERR'),'Asked to make a NaN-legend although none are present in the data\n')
         end
         default.extra_legend = false;
     end
@@ -1056,8 +1070,7 @@ clear default
 
 if ~ (isfield(in,'legend') && (~isstruct(in.legend) && ~in.legend))
     % If in.legend = false, do nothing
-    
-    
+        
     in.legend = setupLegend(in);
     
     % extra LEGEND
@@ -1158,7 +1171,7 @@ for F = Fields
     
     f = F{1};
     if strcmp(f,field) && ismember(field,GSE(:,2))
-        logtext(2,['in.%s is ordinarily a gmt option, but "field"=%s ',...
+        logtext(atmlab('ERR'),['in.%s is ordinarily a gmt option, but "field"=%s ',...
             'has precedence and thus in.%s will be treated as data\n'],f,f,f)
         continue
     end
@@ -1182,9 +1195,16 @@ for F = Fields
                 if ~isempty(test2)
                     fun = test2{1};
                     strfun = char(fun);
-                    assert(fun(in.(test{2})(1).(test2{2})),errID,...
-                        'Input type is incorrect. in.%s.%s should pass the test: @%s',...
-                        test{2},test2{2},strfun);
+                    if ~fun(in.(test{2})(1).(test2{2}))
+                        logtext(atmlab('ERR'),'Input type is incorrect. in.%s.%s should pass the test: @%s\n\n',...
+                            test{2},test2{2},strfun)
+                        
+                        logtext(atmlab('ERR'),'in.%s.%s = ',test{2},test2{2})
+                        disp(in.(test{2})(1).(test2{2}))
+                        error(errID,...
+                            'Input type is incorrect. in.%s.%s should pass the test: @%s',...
+                            test{2},test2{2},strfun);
+                    end
                 else
                     warning(errID,'in.%s.%s is not a valid field in in.%s ',...
                         test{2},f2,test{2})
@@ -1198,9 +1218,10 @@ for F = Fields
     end
 end
 
-if ~isempty(fieldsNotToRead)
-    logtext(1,'Warning: Fields: ');fprintf(1,'"%s",',fieldsNotToRead{1:ii-1});
-    fprintf('Will not be used as they are not "data" or in the list of options\n');
+if ~all(cellfun(@isempty,fieldsNotToRead))
+    logtext(atmlab('ERR'),...
+        'Warning: Fields: "%s",Will not be used as they are not "data" or in the list of options\n',...
+        fieldsNotToRead{1:ii-1});
 end
 
 end
@@ -1320,10 +1341,20 @@ end
 function datarange = getdatarange(in,field)
 %% getdatarange
 
-tmp = in.(field)(~isnan(in.(field)));
+tmpdata = in.(field)(~isnan(in.(field)));
 
-%sneakily remove the outliers from contention  
-tmp = unique(tmp);tmp=tmp(min([length(tmp)-1,2]):end);
+tmp = unique(tmpdata);
+
+if isfield(in,'nlevels')
+    lim=in.nlevels;
+else
+    lim=10;
+end
+
+if length(tmp)>=lim
+    %sneakily remove the outliers from contention
+    tmp=tmp(min([length(tmp)-1,2]):end);
+end
 
 d = double([min(tmp(~isinf(tmp))) max(tmp(~isinf(tmp)))]);
 
@@ -1392,15 +1423,15 @@ P = in.proj;
 
 x = sscanf(in.region,'%f/%f/%f/%f');
 
-allLongs = (x(1)==-180&&x(2)==180) || (x(1)==0&&x(2)==360); 
+allLongs = abs((abs(x(1))+abs(x(2)) ) - 360) <1; % allow within one degree
 if  ~isfield(P,'center') || ~allLongs % if not global
-
+    
     if ~allLongs && isfield(P,'center')
-        logtext(2,'There are strange artifacts if the data doesn''t cover all longitudes and P.center is not close to the middle (like now).\n')
-        logtext(2,'Resetting to P.center to the center of the longitude range. P.center = %g.\n',(x(1)+x(2))/2)
-        logtext(2,'If you desparately need the map centered somewhere else try in.makeScriptAndStop=true, tweak the -Q entry in psbasemap in the generated script manually, and run the script on the command line\n')
+        logtext(atmlab('ERR'),'There are strange artifacts if the data doesn''t cover all longitudes and P.center is not close to the middle (like now).\n')
+        logtext(atmlab('ERR'),'Resetting to P.center to the center of the longitude range. P.center = %g.\n',(x(1)+x(2))/2)
+        logtext(atmlab('ERR'),'If you desparately need the map centered somewhere else try in.makeScriptAndStop=true, tweak the -Q entry in psbasemap in the generated script manually, and run the script on the command line\n')
     end
-        
+    
     P.center = (x(1)+x(2))/2;
 end
 
@@ -1470,14 +1501,14 @@ if ~isfield(in,'lat')
     assert(any(isfield(in,l)),Id,'No latitudes present')
     in.lat = in.(l{isfield(in,l)});
 elseif any(isfield(in,{'Latitude','latitude'}))
-    disp('Several latitude vectors present. Using in.lat')
+    logtext(atmlab('ERR'),'Several latitude vectors present. Using in.lat')
 end
 if ~isfield(in,'lon')
     l = {'Longitude','longitude','long'};
     assert(any(isfield(in,l)),Id,'No longitudes present')
     in.lon = in.(l{isfield(in,l)});
 elseif any(isfield(in,{'Longitude','longitude','long'}))
-    disp('Several longitude vectors present. Using in.lon')
+    logtext(atmlab('ERR'),'Several longitude vectors present. Using in.lon')
 end
 
 end
@@ -1523,7 +1554,7 @@ function in = treatAsUngridded(in,field)
 
 if in.treatAsUngridded && in.gridded
     
-    logtext(1,'Treating the gridded data as ungridded\n')
+    logtext(atmlab('VERBOSITY'),'Treating the gridded data as ungridded\n')
     in.lon = repmat(in.lon',length(in.lat),1);
     in.lat = repmat(in.lat,1,length(in.lon));
     in.gridded = false;
@@ -1543,7 +1574,7 @@ if ~in.gridded
     
     index = in.lat >= -90 & in.lat <= 90 & in.lon >= -180 & in.lon <= 360;
     if any(~index)
-        logtext(1,'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(~index)/numel(index))
+        logtext(atmlab('VERBOSITY'),'Data with dodgy geodata will be ignored (%.2f%%)\n',100*sum(~index)/numel(index))
         assert(sum(index)/numel(index)>0,['atmlab:',mfilename,':badInput'],'No valid lat lons!\n')
         in.lat = in.lat(index);
         in.lon = in.lon(index);
@@ -1552,21 +1583,41 @@ if ~in.gridded
     in.lon360 = ~(min(in.lon(:))<0 || ~max(in.lon(:))>180);
 else
     % make sure that the lons,lats and data are ordered in ascending and data(lat,lon)
+    
+    %if in.lon360 && max(diff(in.lon))>5*min(diff(in.lon)) % if the are discontinuous
     assert(length(in.lat)*length(in.lon)==numel(in.(field)),...
         errId,'numel(data) must length(lat)*length(lon)')
     
-    dataOptions.lon360 = true;
+    % standardize
     dataOptions.dimorder='latlon';
     dataOptions.lat_descend=false;
     dataOptions.lon_descend=false;
     dataOptions.duplicate=false;
-    [flags,tmp] = standardize_geodata(...
-        struct('lat',in.lat,'lon',in.lon,'data',in.(field)),dataOptions);
+    [~,tmp] = standardize_geodata(struct('lat',in.lat,'lon',in.lon,'data',in.(field)),dataOptions);
     in.lat=tmp.lat;
     in.lon=tmp.lon;
     in.(field)=tmp.data;
     clear tmp
-    in.lon360=flags.out.lon360;
+            
+    % shift to 360 degrees if possible
+    if ~isfield(in.proj,'center')
+        dataOptions.lon360 = true;
+        [~,tmp] = standardize_geodata(...
+            struct('lat',in.lat,'lon',in.lon,'data',in.(field)),dataOptions);
+        
+        if max(diff(tmp.lon))>5*min(diff(tmp.lon))
+            logtext(1,'Did not convert to 0:360 grid')
+            in.lon360=false;
+        else
+            in.lat=tmp.lat;
+            in.lon=tmp.lon;
+            in.(field)=tmp.data;
+            clear tmp
+            in.lon360=true;
+        end
+    else
+        in.lon360=false;
+    end
 end
 
 end
@@ -1583,7 +1634,12 @@ default.unit      = false;
 
 [lw,lwu] = separate_integer_and_unit(in.legend.width);
 if strcmp(in.legend.orientation,'h')
-    switch in.proj.projection
+    if isstruct(in.proj)
+        p=in.proj.projection;
+    else
+        p=in.proj(1);
+    end
+    switch p
         case {'H','I'} % hammer,sinusoidal
             projOff = 5;
         case 'N' % robinsson
@@ -1593,7 +1649,7 @@ if strcmp(in.legend.orientation,'h')
         otherwise
             projOff = 1;
     end
-    default.xoffset = sprintf('%.2f%s',2*lw+projOff*lw*2,lwu);
+    default.xoffset = sprintf('%.2f%s',2*lw*(1+projOff),lwu);
     default.yoffset = '0.2c'; % not a general solution
     
 elseif strcmp(in.legend.orientation,'v')
@@ -1602,7 +1658,7 @@ elseif strcmp(in.legend.orientation,'v')
 end
 in.extra_legend   = optargs_struct(in.extra_legend,default);
 
-in.extra_legend.extra_instructions = '-Li'; % no ticks, square   
+in.extra_legend.extra_instructions = '-Li'; % no ticks, square
 end
 
 function legend = setupLegend(in)
@@ -1614,15 +1670,32 @@ if ~isfield(in,'legend') || ~isstruct(in.legend)
     in.legend=struct();
 end
 
+default.lineThick =.2; %thickness of legend bar
+
 % apply defaults to legend
 
-% ORIENTATION
-x = sscanf(in.region,'%f/%f/%f/%f');
-f = ( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
-myHcondition = f <= 0.25; tmp = {'v','h'}; %vertical,horisontal
-default.orientation = tmp{myHcondition+1};
+%% ORIENTATION
+%  This only applies to rectangular grids
 
-    
+if isstruct(in.proj)
+    p=in.proj.projection(1);
+else
+    p=in.proj(1);
+end
+
+switch p
+    case {'S','s'}
+        default.orientation='v';
+        f=1;
+    otherwise
+        x = sscanf(in.region,'%f/%f/%f/%f');
+        f = ( x(4)-x(3))/ ( x(2)-x(1) ); %something between 0->1 equivalent to 180/360->120/360 lats/lons
+        myHcondition = f <= 0.25; tmp = {'v','h'}; %vertical,horisontal
+        default.orientation = tmp{myHcondition+1};
+end
+
+legend  = optargs_struct(in.legend,default); %need orientation now
+
 % I use map_width to find the defaults.
 if ischar(in.proj)
     x = regexp(in.proj,'.*/(?<map_width>.+)','names');
@@ -1631,12 +1704,7 @@ else
     mwstr = in.proj.map_width;
 end
 [mw,u] = separate_integer_and_unit(mwstr);
-
-default.lineThick =.2; %thickness of legend bar
-
-legend  = optargs_struct(in.legend,default); %need orientation now
 [fl,u2] = separate_integer_and_unit(in.fontsize_annot_primary);
-
 if strcmp(u2,'p') && strcmp(u,'c')
     % convert to c
     fl=fl*0.035;
@@ -1653,9 +1721,9 @@ switch legend.orientation
         default.justify = 'MR'; %middle right
         default.length  = sprintf('%.2f%s',f*mw,u);
         if ismember('E',in.psbasemap.axes)
-            default.xoffset = sprintf('%.2f%s',2*fl,u2);
+            default.xoffset = sprintf('%.2f%s',2.5*fl,u2);
         elseif ismember('e',in.psbasemap.axes)
-            default.xoffset = sprintf('%.2f%s',0.5*fl,u2);
+            default.xoffset = sprintf('%.2f%s',0.7*fl,u2);
         end
         default.yoffset = '0';
     case 'h'
@@ -1683,6 +1751,19 @@ legend            = optargs_struct(legend,default);
 % add unit and xunit
 legend.unit = in.unit;
 legend.xunit = in.xunit;
+
+% make the legend special if there are only two to 4 unique values
+lim=2;
+if length(unique(in.(in.fieldname)))<=lim+1
+    if ~isfield(in.legend,'box_spacing'); legend.box_spacing = 1;end
+    if ~isfield(in.legend,'tick_centering'); legend.tick_centering = true;end
+    if ~isfield(in.legend,'tick_annotations')
+        v=unique(in.(in.fieldname));
+        for i=1:length(v)
+            legend.tick_annotations{i} = num2str(v(i));
+        end
+    end
+end
 
 end
 
@@ -1737,7 +1818,7 @@ if in.gridded
         'The longitudes are not continuous. FIXME: put workaround in place')
     
     if length(in.lat) == size(in.(field),1)+1 || length(in.lon) == size(in.(field),2)+1
-        logtext(1,'Data does not appear to be centered. Internally ')
+        logtext(atmlab('ERR'),'Data does not appear to be centered. Internally ')
         in = centerGeoData(in,field);
     end
 end
@@ -1772,10 +1853,13 @@ switch in.figuretype
         error(['gmtlab:' mfilename ':FigureType'],...
             '%s: not supported',in.figuretype)
 end
+
 command{end+1} = sprintf('gmt psconvert %s.ps -A -P %s',in.filename,T);
 
-% Assemble open command
+% get rid of whitespace
 if strcmp(in.figuretype,'pdf')
+    command{end+1} = sprintf('pdfcrop %s.pdf',in.filename);
+    command{end+1} = sprintf('mv %s-crop.pdf %s.pdf',in.filename,in.filename);
     if isnan(gmtlab('PDFVIEWER'))
         openwith = gmtlab('OPEN_COMMAND');
     else
@@ -1787,7 +1871,7 @@ end
 
 if in.makeScriptAndStop
     filename = makeScriptAndStop(command);
-    logtext(1,'Stopped\n')
+    logtext(atmlab('ERR'),'Stopped\n')
     return
 end
 
@@ -1818,7 +1902,7 @@ if in.savelegend
         exec_system_cmd(command{i});
     end
     
-    in.filename_legend = makelegendpdf(in,command(findPsScale));
+    in.filename_legend = makelegend(in,command(findPsScale));
     if in.savelegend==2 % store legend ONLY in external file
         command = command(~findPsScale);
     end
@@ -1832,11 +1916,11 @@ filename = sprintf('%s/%s.%s',in.outdir,in.filename,in.figuretype);
 % TRY and open the file even without user input
 % If no viewer is defined, check for xpdf, then evince, then okular
 if in.display && any(isnan(openwith))
-    logtext(2,'display = 1, yet no viewer is defined\nE.g. gmtlab(''pdfviewer'',''gnome-open'')\n')
+    logtext(atmlab('ERR'),'display = 1, yet no viewer is defined\nE.g. gmtlab(''pdfviewer'',''gnome-open'')\n')
     
     if strcmp(in.figuretype,'pdf')
-        disp('No pdfviewer defined.')
-        disp('Set gmtlab(''PDFVIEWER'',''<e.g. xpdf>'') in your startup file')
+        logtext(atmlab('VERBOSITY'),'No pdfviewer defined.\n')
+        logtext(atmlab('VERBOSITY'),'Set gmtlab(''PDFVIEWER'',''<e.g. xpdf>'') in your startup file\n')
         if ~system('which xpdf')
             openwith = 'xpdf';
         elseif ~system('which evince')
@@ -1845,21 +1929,21 @@ if in.display && any(isnan(openwith))
             openwith  = 'okular'; % for kde users
         end
         if ~any(isnan(openwith))
-            logtext(1,'Opening file with %s for now\n',openwith)
+            logtext(atmlab('VERBOSITY'),'Opening file with %s for now\n',openwith)
             system(sprintf('%s %s &',openwith,filename));
         end
     end
 end
 hunt_down_errors(command,out) % look for system call errors in the gmt calls
 
-logtext(atmlab('OUT'), 'GMT plot stored at:  %s\n',filename)
+logtext(atmlab('VERBOSITY'), 'GMT plot stored at:  %s\n',filename)
 if in.savelegend
-    logtext(atmlab('OUT'), 'GMT plot legend stored at:  %s.pdf\n',in.filename_legend)
+    logtext(atmlab('VERBOSITY'), 'GMT plot legend stored at:  %s.%s\n',in.filename_legend,in.figuretype)
 end
 end
 
-function file = makelegendpdf(in, command)
-%% Make a separate pdf for the legend
+function file = makelegend(in, command)
+%% Make a separate file for the legend
 % Only allowed to have 1 or 2 psscale commands in the commad list. the first one
 % is the regular legend. The second is for the nan legend (if it exists)
 
@@ -1870,9 +1954,9 @@ crop=regexp(command,'>>');
 
 % Additional adjustments
 for i = 1:length(command)
-%for i = 2:length(command)
+    %for i = 2:length(command)
     command{i} = sprintf('%s -P >> %s.ps', command{i}(1:crop{i}-1), file );
-
+    
     if i == 1
         command{i} = regexprep(command{i},'-O','');
     end
@@ -1881,8 +1965,27 @@ for i = 1:length(command)
     end
 end
 
-% This forces it to be a pdf
-command{end+1} = sprintf('gmt psconvert %s.ps -A -P -Tf',file);
+switch in.figuretype
+    case 'pdf'
+        T = '-Tf';
+    case 'bmp'
+        T = '-Tb -Qg -Qt';
+    case 'eps'
+        T = '-Te';
+    case 'jpg'
+        T = '-Tj -Qg -Qt';
+    case 'png'
+        T = '-Tg -Qg -Qt'; %-Q is for no antialiaing 'g'raphics and 't'ext
+    case 'tif'
+        T = '-Tt -Qg -Qt';
+    case 'ppm' % is not recommended
+        T = '-Tm -Qg -Qt';
+    otherwise
+        error(['gmtlab:' mfilename ':FigureType'],...
+            '%s: not supported',in.figuretype)
+end
+
+command{end+1} = sprintf('gmt psconvert %s.ps -A -P %s',file,T);
 exec_system_cmd(command,gmtlab('verbosity'));
 
 end
@@ -1909,9 +2012,9 @@ associated_w_errors  = command(eindex);
 % display GMT calls containing warning
 if ~isempty(Warnings)
     %V = atmlab('VERBOSITY'); atmlab('VERBOSITY',1);
-    logtext(atmlab('OUT'),'GMT completed with the following warning messages:\n')
+    logtext(atmlab('VERBOSITY'),'GMT completed with the following warning messages:\n')
     tmp = cellfun(@(x,y)(sprintf('%s\n%s\n',x,y(1:end-1))),associated_w_warning,Warnings,'UniformOutput',0);
-    logtext(atmlab('OUT'),'%s\n',[tmp{:}])
+    logtext(atmlab('VERBOSITY'),'%s\n',[tmp{:}])
     %atmlab('VERBOSITY',V);
 end
 
@@ -1928,13 +2031,13 @@ function gmtcleanup(tmpdir,curdir,keepfiles,V)
 %% cleanUp
 
 if keepfiles
-    logtext(1,'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
-    logtext(2,'Remember to delete the directory when you are done\n')
+    logtext(atmlab('VERBOSITY'),'in.keep_files = true;\nTemporary files are stored at %s.\n',pwd)
+    logtext(atmlab('ERR'),'Remember to delete the directory when you are done\n')
 else
     % cd back to the original directory
     cd(curdir);
     rmdir(tmpdir,'s')
-    logtext(1,'%s is now removed\n',tmpdir)
+    logtext(atmlab('VERBOSITY'),'%s is now removed\n',tmpdir)
     atmlab('VERBOSITY',V);
 end
 
@@ -1943,7 +2046,7 @@ end
 function filename = makeScriptAndStop(command)
 %% Make a script for debugging
 
-logtext(1,'Making directory to put scripts and plot data into\n')
+logtext(atmlab('VERBOSITY'),'Making directory to put scripts and plot data into\n')
 folder = sprintf('%s/gmt_test_%s',gmtlab('OUTDIR'),datestr(now,'yyyymmdd_HHMMSS'));
 exec_system_cmd(sprintf('mkdir %s',folder));
 
@@ -1952,7 +2055,7 @@ exec_system_cmd(sprintf('rsync -avP %s/* %s/.',pwd,folder));
 curdir=pwd;
 cd(folder)
 
-logtext(1,'Making file: %s/script.sh\n',folder)
+logtext(atmlab('VERBOSITY'),'Making file: %s/script.sh\n',folder)
 fid = fopen('script.sh','w');
 fprintf(fid,'#!/bin/bash\n');
 fprintf(fid,'\n\n\n');
@@ -1965,6 +2068,6 @@ exec_system_cmd(sprintf('chmod +x %s/script.sh',folder));
 filename = fullfile(folder,'script.sh');
 
 a = exec_system_cmd(sprintf('du -h %s',gmtlab('OUTDIR')));
-logtext(2,'\nDon''t forget to clean up\n%swhen you are done!\n',a{1})
+logtext(atmlab('ERR'),'\nDon''t forget to clean up\n%swhen you are done!\n',a{1})
 cd(curdir)
 end

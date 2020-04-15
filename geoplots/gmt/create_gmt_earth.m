@@ -35,6 +35,12 @@ commands{i} = sprintf('gmt set PROJ_LENGTH_UNIT=%s',in.proj_length_unit); i=i+1;
 commands{i} = sprintf('gmt set COLOR_FOREGROUND=%s',in.color_foreground);i=i+1;
 commands{i} = sprintf('gmt set COLOR_BACKGROUND=%s',in.color_background);i=i+1;
 
+% coastlines
+if ~isempty(getenv('DIR_GSHHG'))
+    commands{i} = sprintf('gmt set DIR_GSHHG=%s',getenv('DIR_GSHHG'));i=i+1;
+end
+
+
 % other gmtset-commands you might have
 if isfield(in,'gmtset')
     for j = length(in.gmtset)
@@ -88,8 +94,8 @@ if isfield(in,'locations')
 end
 
 % CONTOURLINES
-if isfield(in,'contourlines')
-    commands{i} = in.contourlines.str; i=i+1;
+if isfield(in,'contourline')
+    commands{i} = in.contourline.str; i=i+1;
 end
 
 % PSBOX & PSPOLY (draw boxes or shapes on map)
@@ -164,7 +170,7 @@ end
 
 % CONTOUR LINES
 if isfield(in,'contourline')
-    in.grdcontour = mkgrdcontour(in);
+    in.contourline.str = grdcontour(in.filename,in);
 end
 
 % LEGEND/S
@@ -239,7 +245,7 @@ oneDegRegion = ( x(2)-x(1) )*( x(4)-x(3) );
 % ---------------------
 % Maximum resolution
 
-% memGB = freeRAM()/1024; % How much RAM is available? TO LARGE
+% memGB = freeRAM()/1024; % How much RAM is available? TOO LARGE
 % some reasonable maximum default
 % apparently it costs 1200bytes per point
 
@@ -249,8 +255,8 @@ if ~isfield(in,'nearneighbor')
     in.nearneighbor = struct();
 end
 
-default.memGB = .1;
-in.nearneighbor = optargs_struct(default,in.nearneighbor);
+default.memGB = 2;
+in.nearneighbor = optargs_struct(in.nearneighbor,default);
 maxpoints = in.nearneighbor.memGB*1024^3  / 1200;
 maxres = oneDegRegion/maxpoints;
 
@@ -260,9 +266,9 @@ if isfield(in.nearneighbor,'resolution')
     %user
     res = in.nearneighbor.resolution;
 else
-    % the data could be randomly sampled and then this is useless, and maxres is
-    % chosen
-    res = max([ abs(median(diff(sort(in.lat))));abs(median(diff(sort(in.lon))))]) ;
+    res = max([ abs(max(diff(sort(in.lat))));abs(max(diff(sort(in.lon))))]);
+    % this is too much. multiply it
+    res=res*3;
 end
 
 % check if res is acceptable
@@ -308,9 +314,9 @@ if isfield(in,'tickval')
     % make temporary tickval file
     fid=fopen('tickvalues.txt','w');
     if isfield(in,'tick_annotation_format')
-        fprintf(fid,in.tick_annotation_format,in.tickval);
+        fprintf(fid,sprintf('%s ',in.tick_annotation_format),in.tickval);
     else
-        fprintf(fid,sprintf('%s\n',getAnnotFormat(in.tickval)),in.tickval);
+        fprintf(fid,sprintf('%s ',getAnnotFormat(in.tickval)),in.tickval);
     end
     fclose(fid);
 end
@@ -349,18 +355,6 @@ end
 % extra legend box for missing values
 if isfield(in,'extra_legend') && isstruct(in.extra_legend)
     in.extra_legend.cptfile = extra_legend(in);
-end
-
-end
-
-function a = mkgrdcontour(in)
-%% mkgrdcontour
-
-default.cptfile     = in.cptfile;
-default.grdfile     = in.grdfile;
-for i = 1:length(in.contourline)
-    a(i) = catstruct(default,in.contourline(i)); %#ok<*AGROW>
-    a(i).plotPlacement = in.plotPlacement;
 end
 
 end
@@ -466,16 +460,17 @@ default.features = (dist1+dist2)/const; %km^2
 
 % resolution
 
-if default.features < 50; 
+if default.features < 50 
     default.resolution = 'h'; % high
     default.rivers = 'a';
-elseif default.features < 150;
+elseif default.features < 150
     default.resolution = 'i'; % intermediate
     default.rivers = 0:1;
-elseif default.features < 500;
+elseif default.features < 500
     default.resolution = 'l'; % low
     default.rivers = 0;
-else default.resolution = 'c'; %crude
+else
+    default.resolution = 'c'; %crude
     default.rivers = 0;
 end
 default.color = in.color_background;

@@ -1,3 +1,15 @@
+2020-04-15  Salomon Eliasson  <sm_salel@bi1.nsc.liu.se>
+
+	* atmlab-2-3-282
+
+	* files/loadncfile.m: Don't fail if there is problem with global
+	attributes, just output the message asbout it
+
+	* geoplots/gmt/gmt_plot.m: numerous small edits and improvements
+	to default behaviour
+
+	* geoplots/gmt/create_gmt_earth.m: Small edits
+
 2020-03-28  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-281

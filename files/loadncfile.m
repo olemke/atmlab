@@ -25,22 +25,31 @@ if strcmp(filename(end-2:end),'.gz')
 	filename = uncompress(filename,tmpdir);
     if isempty(filename), error(errId,'Uncompressing failed'); end
 end
-  
+
+% small hack 
+if ~any(ismember(filename(end-4:end),'.'))
+    % assuming it is a .nc file
+    filename=[filename,'.nc'];
+end
+
 ncid = netcdf.open (filename, 'NOWRITE');
 
 cleanupObject = onCleanup(@() netcdf.close (ncid));
 
-ret.global_attributes =  loadncglobalattr( ncid );
-
+try
+    ret.global_attributes =  loadncglobalattr( ncid );
+catch ME
+    disp(ME)
+end
 [~,nvars] = netcdf.inq(ncid);
 
 for i = 0:nvars-1
    [varname, ~, ~, natts] = netcdf.inqVar (ncid, i);
-   svarname = genvarname(varname);
+   svarname = matlab.lang.makeValidName(varname);
    ret.(svarname) = nc_read_varid(ncid,i);
    for j = 0:natts-1
        attname = netcdf.inqAttName (ncid, i, j);
-       ret.attributes.(svarname).(genvarname(attname)) = ...
+       ret.attributes.(svarname).(matlab.lang.makeValidName(attname)) = ...
            netcdf.getAtt (ncid, i, attname);
    end 
 end
@@ -62,15 +71,15 @@ function grp = read_group(~, gid)
 
 varids = netcdf.inqVarIDs(gid);
 chgrpids = netcdf.inqGrps(gid);
-grpname = genvarname(netcdf.inqGrpName(gid));
+grpname = matlab.lang.makeValidName(netcdf.inqGrpName(gid));
 grp.(grpname)=struct();
 for i = varids
     [varname, ~, ~, natts] = netcdf.inqVar (gid, i);
-    svarname = genvarname(varname);
+    svarname = matlab.lang.makeValidName(varname);
     grp.(grpname).(svarname) = netcdf.getVar (gid, i);
     for j = 0:natts-1
         attname = netcdf.inqAttName (gid, i, j);
-        grp.(grpname).attributes.(svarname).(genvarname(attname)) = ...
+        grp.(grpname).attributes.(svarname).(matlab.lang.makeValidName(attname)) = ...
             netcdf.getAtt (gid, i, attname);
     end
 end
