@@ -15,21 +15,23 @@
 
 function group = wsv2group(wsv)
 
-[s,r] = arts( ['-d ',wsv] );
-
-if s
-  g = NaN;
-else
-   
-  i = strfind( r, 'Group = ' );
-  
-  if isempty(i)
-    error( 'Did not manage to locate group information' ); 
-  end
-
-  r = r(i+8:end);
-
-  rb = find( double(r) == 10 );
-
-  group = deblank( r(1:rb(1)) );
+try 
+  [s,r] = arts( ['-d ',wsv] );
+catch
+  error( sprintf('*%s* seems not to be a standard ARTS WSV.', wsv) );    
 end
+
+
+i = strfind( r, 'Group' );
+  
+if isempty(i)
+  error( 'Did not manage to locate group information in ARTS output!' ); 
+end
+
+r = r( i+5 : end );   % Cuts just after Group
+i = strfind( r, '=' );
+r = r( i+1 : end );   % Cuts just after first =
+
+rb = find( double(r) == 10 );  % Finds linefeeds
+
+group = strtrim( r(1:rb(1)-1) );
