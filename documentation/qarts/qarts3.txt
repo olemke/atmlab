@@ -1,29 +1,40 @@
 =========================== Qarts3 ===========================
 
-This is a stub to a (possible) future qarts3 user guide. The ambition so far is
-to document some basic features of qarts3. Anyhow, qarts3 is mainly documented
-through the qinfo system, as described below, and by providing a number of
-"demos" found in the atmlab/demo folder.
+This is a short Qarts3 user guide. The ambition is only to document the basic
+features of Qarts3.
 
-Qarts3 is primarily an interface to the ARTS forward model allowing to set-up
-arts calculations and exucute those calculations without leaving matlab. All
-settings to control the arts run go into a structure denoted as Q. Most fields
-of Q match directly an ARTS workspace variable (WSV) or agenda, beside that
-qarts fields are all written using uppercase letters. For example, Q.F_GRID
-matches the ARTS WSV f_grid. The qarts system contains a number of functions to
-help you setting the fields of Q. Remaining functions in qarts allow you to run
-arts in different ways. 
+The basic idea behind Qarts3 is to define a run of ARTS by a structure Q. With
+a Q structure properly set, the ARTS run is done as
 
-Not all fields of Q are used directly in an arts run. The Q structure is
-designed to also hold information needed to perform an inversion of OEM type.
-OEM retrievals are most simply performed by using the qpack3 system.
-Qpack3 is described seperately.
+>> U = qarts_run( Q );
 
+The oUtput of ARTS is returned in the structure U. The function *qarts_run* has
+some optional arguments that can be used of a more experienced user. Do
+
+>> help qarts3_run
+
+for details.
+
+The trick is of course to define Q properly. In Qarts3 the Q-structure does not
+have a fixed set of fields, in contrast to the earlier version of Qarts.
+However, Q is not allowed to contain any unrecognised field. The set of allowed
+field names are the ones definied in *qarts3*, fields matching pre-defined or
+user defined ARTS workspace variables. The remaining part of the user guide
+describes the fields and their options.
+
+
+The mandatory fields of Q are best included in this way:
+
+>> Q = qarts3
+
+Most fields are set to {}, which in Qarts3 means undefined (in contrast to []
+which means an empty vector, matrix or tensor). Some fields are given useful
+default values. 
 
 To list all fields of Q, type:
 >> qarts3
 
-That is, to initialise a Q structure you do:
+As mentioned, to initialise a Q structure you do:
 >> Q = qarts3;
 
 To get a short description of all fields:
@@ -31,50 +42,52 @@ To get a short description of all fields:
 
 To get the description of a particular field, add the field name as second
 input argument, e.g.:
->> qinfo( @qarts3, 'F_GRID' )
+>> qinfo( @qarts3, 'J_DO' )
 
 The symbol * is recognised as a wildcard in the field argument, e.g.:
 >> qinfo( @qarts3, 'SENSOR*' )
 
-
-A few Q fields are structures with a number of fields, such as
-Q.SENSOR_RESPONSE. These structures can be initialised by special functions
-(e.g. qartsSensor). These sub-structures are documented as the main Q, i.e.
-using qinfo. For example: >> qinfo( @qartsSensor )
-
-The options to set the Q fields vary between the fields. More basic variables
-must be assigned a value inside matlab, e.g.:
->> Q.STOKES_DIM  = 2;
->> Q.CLOUDBOX_DO = true;
-
-You can of course make of some function to set such (all other fields), e.g.:
->> Q.STOKES_DIM = max( 1, 4*any(pnd_field>0) );
+The built-in documentation specifies what options that are at hand for these
+fields. Regarding formats, the same rule as the ones described below for
+workspace variables apply.
 
 
-For vectors and more complex variables, you have several options. As above,
-eg.:
->> Q.Z_SURFACE = 100*rand(25,25);
+You can add a field to Q for every pre-defined workspace variable (WSV). These
+fields shall be named exactly as the ARTS WSV, e.g. Q.f_grid. This means that
+the name of these fields shall have lowercase letters, while all other field
+names shall be uppercase.
 
-Or by giving the name of a file holding relevant data, e.g.:
->> Q.Z_SURFACE = '/home/myname/dataexamples/z_surface.xml';
+WSVs, except agendas, can be defined in three different ways.
 
-You can also define control file text, that in the ARTS language should work as
-an include file. That is, a set of workspace method calls, embraced of 'Arts2{'
-and '}'. The text is given as an array of strings. One common application of
-this option: 
->> Q.Z_SURFACE = { 'Arts2{', ...
+1. As a value inside Matlab (matching the ARTS group of the WSV). Some
+examples (note that vectors should columns):
+
+>> Q.f_grid = [ 110e9 190e9 ]';
+>> Q.f_grid = linspace( 200e9, 300e9, 101 )';
+>> Q.f_grid = some_other_existing_column_vector;
+
+2. Or by giving the name of a xml-file holding relevant data, e.g.:
+
+>> Q.z_surface = '/home/myname/dataexamples/z_surface.xml';
+
+3. As a string array matching an ARTS include file. That is, a set of workspace
+method calls, embraced of 'Arts2{' and '}'. For example:
+
+>> Q.z_surface = { 'Arts2{', ...
                    'Extract( z_surface, z_field, 0 )' , ...
                    '}' };
 
 There exists a small help function that avoids specifying the start and end
 string:
->> Q.Z_SURFACE = text2cfile( 'Extract( z_surface, z_field, 0 )' );
+
+>> Q.z_surface = text2cfile( 'Extract( z_surface, z_field, 0 )' );
 
 
 For agenda variables, the only option is to give an array of strings. The
 content of the strings are inserted in the control file created without any
 formatting. You should not include the AgendaSet part. An example:
->> Q.IY_SPACE_AGENDA = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
+
+>> Q.iy_space_agenda = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
                          'MatrixCBR(iy,stokes_dim,f_grid)' };
 
 Please, note that for agendas there should be no 'Arts2{'.
@@ -82,19 +95,40 @@ Please, note that for agendas there should be no 'Arts2{'.
 The pre-defined agenda templates can be used by just giving the name of the
 template to copy, on the condition that the name of the template includes '__'.
 For example:
->> Q.PPATH_AGENDA = { 'ppath_agenda__FollowSensorLosPath' };
+
+>> Q.ppath_agenda = { 'ppath_agenda__FollowSensorLosPath' };
+
 
 In all cases where ARTS control file pieces are accepted, a simple if-else
-feature can be used. The keywords are <IF>, <ELSE> and <END>. The else part is
-not mandatory. Nested if-s are not allowed. The argument to if can only be
-fields of Q that are booleans, such as Q.CLOUDBOX_DO. Two exemples on how this
-works (main difference is that Arts2 must be included for the WSV)::
+feature can be used. The keywords are <IF>, <ELSE> and <END> (that must be at
+the start of the string). The else part is not mandatory. Nested if-s are not
+allowed. The argument to if can only be fields of Q that are booleans, such as
+Q.CLOUDBOX_DO. Two exemples on how this works (main difference is that Arts2
+must be included for the WSV)::
 
-Q.IY_MAIN_AGENDA = { '<IF> CLOUDBOX_DO', 'iyHybrid', ...
+Q.iy_main_agenda = { '<IF> CLOUDBOX_DO', 'iyHybrid', ...
                      '<ELSE>', 'iyEmissionStandard', '<END>' };
 
-Q.F_GRID = { 'Arts2{', '<IF> CLOUDBOX_DO', 'ReadXML(f_grid,"f1.xml")', ...
+Q.f_grid = { 'Arts2{', '<IF> CLOUDBOX_DO', 'ReadXML(f_grid,"f1.xml")', ...
                        '<ELSE>', 'ReadXML(f_grid,"f2.xml")', '<END>', '}' };
 
-For further information on the general usage and examples on making using how
-the qarts3 functions, see the demonstration scripts in folder demos/.
+
+The output of a run is flagged by the keyword <OUTPUT> (must start the string),
+followed by the name of the WSV, following this pattern:
+
+Q.WSMS_AT_END = { '<OUTPUT> y' };
+
+All variables marked in this way will be included in the output of
+*qarts3_run*. If a WSV is flagged as output seveveral times, *qarts3_run* will
+return the value matching the last file saving.
+
+
+You can also introduce non-standard ARTS WSVs, following this pattern:
+
+>> Q.F_GRID2_Vector_WSV = Q.f_grid + 1e6;
+
+That is, the field names starts by the name of the variable to introduce, in
+uppercase letters. This is followed by the group of the variable. And last add
+_WSV to flag that this is a new WSV. Qarts3 will automatically create the
+variable in ARTS. Please note that the ARTS WSV will be named in lowercase, i.e.
+f_grid2 in the example above.

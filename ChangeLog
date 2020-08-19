@@ -1,6 +1,13 @@
+2020-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-284
+
+	* The core functionality of qarts3 now in place, but many Q fields
+	are lacking support.
+
 2020-08-18  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
-	* atmlab-2-3-282
+	* atmlab-2-3-283
 
 	* Some work and testing, as a small start towards qarts3 and qpack3.
 

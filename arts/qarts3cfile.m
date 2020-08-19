@@ -1,49 +1,140 @@
-% Include files
-% WSMS_AT_START
-% WSVs
-% Z, T, ABS_SPECIES, WIND_U/V/W, MAG_U/V/W
-% WSMS_AT_HALFWAY
-% SENSOR
-% WSMS_ACTION
-% WSMS_AT_END
+% QARTS3CFILE  Builds a control file for ARTS
+%
+%    The function converts the settings and defintions in Q to control file
+%    text. For a default call of the method, the settings in Q are included
+%    in the following order:
+%       Include files
+%       WSMS_AT_START
+%       ATMOSPHERE_DIM, 
+%       Workspace variables (WSVs)
+%       Atmospheric fields: Z, T, ABS_SPECIES, WIND_U/V/W, MAG_U/V/W
+%       WSMS_AT_HALFWAY
+%       SENSOR
+%       Retrieval (Jacobian + OEM)
+%       SCATTERING
+%       WSMS_AT_END
+%
+%    The experienced user can change the order by defining *parts*. See the
+%    code below for the modules that are at hand ('Start', 'End' etc). 
+%
+%    The predefined full calculations are: 
+%       'All': A full run.
+%
+% FORMAT S = qarts3cfile( Q, wfolder[, parts, check_fields] )
+%
+% OUT   S            String cell array that can be passed to *strs2file*.
+% IN    Q            Qarts3 structure
+%       wfolder      Folder where calculations will be performed. Typically a
+%                    temporary folder.
+% OPT   parts        Control file parts to include. Default is 'All'.
+%       check_fields Flag to control if all fields are recognised. Default is
+%                    true.
 
-function S = qarts3cfile( Q, parts, wfolder )
+% 2020-08-19   Patrick Eriksson
 
-%- Run and append cfile parts
+function S = qarts3cfile( Q, wfolder, parts, check_fields )
+%
+if nargin < 3 | isempty(parts)
+  parts = 'All';
+end
+if nargin < 4
+  check_fields = true;
+end
+    
+    
+%- Expand *parts*?
+%
+if ischar( parts )
+  switch parts
+    case 'All'
+      %
+      parts = { 'Start', 'WSVs', 'AtmFields', 'Halfway', 'Sensor', ...
+              'Retrieval', 'Scattering', 'End' };
+    otherwise
+      error( sprintf( 'Unknown option for string *parts* (%s).', parts ) );
+  end 
+end    
+
+
+%- Expand Q to have fields for usage checking
+%
+fnames = fieldnames( Q );
+%
+for i = 1 : length(fnames)
+  Q.(sprintf('USED_%s',fnames{i})) = false;
+end
+    
+
+%- Loop parts and append cfile pieces
 %
 S    = {};
 %
 for ip = 1 : length(parts)
 
   switch parts{ip}
+    case 'Start'
+      %
+      [T,Q] = do_start( Q, wfolder );
 
-   case 'All'
-    %
-    T = qarts3cfile( Q, ...
-                     { 'Start', 'WSVs', 'End' }, ... 
-                     wfolder );
+    case 'WSVs'
+      %
+      [T,Q] = do_WSVs( Q, wfolder );
+
+    case 'AtmFields'
+      %
+      [T,Q] = do_atmfields( Q, wfolder );
+
+    case 'Halfway'
+      %
+      [T,Q] = do_halfway( Q, wfolder );
+
+    case 'Sensor'
+      %
+      [T,Q] = do_sensor( Q, wfolder );
+
+    case 'Scattering'
+      %
+      [T,Q] = do_scattering( Q, wfolder );
+
+    case 'Retrieval'
+      %
+      [T,Q] = do_retrieval( Q, wfolder );
     
-  case 'Start'
-    %
-    T = do_Start( Q, wfolder );
+    case 'End'
+      %
+      [T,Q] = do_end( Q, wfolder );
 
-   case 'WSVs'
-    %
-    T = do_WSVs( Q, wfolder );
-
-   case 'End'
-    %
-    T = do_End( Q, wfolder );
-
-   otherwise
-    error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
+    otherwise
+      error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
   end
 
   if ~isempty(T)
-   S = { S{:} T{:} };
+    S = { S{:} T{:} };
   end
 
 end
+
+
+%- Check if all fields have been used
+%
+if check_fields
+  fnames = fieldnames( Q );
+  first  = true;
+  %
+  for i = 1 : length(fnames)
+    if strncmp( fnames{i}, 'USED_', 5 ) & ~Q.(fnames{i})
+      if first
+        fprintf( 'The Q provided includes these non-recognised fields:\n' );
+        first = false;
+      end
+      fprintf( '  %s\n', fnames{i}(6:end) );
+    end
+  end
+  if ~first
+    error( 'Q must only contain fields that are recognised and used!' );
+  end
+end
+
 
 return
 
@@ -58,8 +149,9 @@ return
 %    Start lines
 %    Inlcude files
 %    WSMS_AT_START
+%    ATMOSPHERE_DIM
 %
-function T = do_Start( Q, wfolder )
+function [T,Q] = do_start( Q, wfolder )
   %
   T{1} = [ '# Control file created by Atmlab function *qarts3cfile*' ];
   T{2} = 'Arts2{';
@@ -67,9 +159,31 @@ function T = do_Start( Q, wfolder )
   T = add_includes( T, 'Q.INCLUDES', Q.INCLUDES );
   %
   if qarts_isset( Q.WSMS_AT_START )
-    T = add_wsms( T, ' WSMS_AT_START', Q.WSMS_AT_START, Q, false );
+    T = add_wsms( T, ' WSMS_AT_START', Q.WSMS_AT_START, Q, false, wfolder );
   end
+  %
+  if qarts_isset( Q.ATMOSPHERE_DIM )
+    T{end+1} = sprintf( '  AtmosphereSet%dD', Q.ATMOSPHERE_DIM );
+  end 
+  Q = ftick( Q, { 'INCLUDES', 'WSMS_AT_START', 'ATMOSPHERE_DIM' } );
 return
+
+
+
+%------------------------------------------------------------------------------
+% Adds (in given order):
+%    WSMS_AT_halfway
+%
+function [T,Q] = do_halfway( Q, wfolder )
+  %
+  T = [];
+  %
+  if qarts_isset( Q.WSMS_AT_HALFWAY )
+    T = add_wsms( T, ' WSMS_AT_HALFWAY', Q.WSMS_AT_HALFWAY, Q, false, wfolder );
+  end
+  Q = ftick( Q, { 'WSMS_AT_HALFWAY' } );
+return
+
 
 
 %------------------------------------------------------------------------------
@@ -77,26 +191,29 @@ return
 %    WSMS_AT_END
 %    Closing of cfile
 %
-function T = do_End( Q, wfolder )
+function [T,Q] = do_end( Q, wfolder )
   %
   T = [];
   %
   if qarts_isset( Q.WSMS_AT_END )
-    T = add_wsms( T, ' WSMS_AT_END', Q.WSMS_AT_END, Q, false );
+    T = add_wsms( T, ' WSMS_AT_END', Q.WSMS_AT_END, Q, false, wfolder );
   end
   %
   T{end+1} = '}';
+  Q = ftick( Q, { 'WSMS_AT_END' } );
 return
+
 
 
 %------------------------------------------------------------------------------
 % Adds (in given order):
 %    All WSVs
 %
-function T = do_WSVs( Q, wfolder )
+function [T,Q] = do_WSVs( Q, wfolder )
   %
   T = [];
   format = Q.INPUT_FILE_FORMAT;
+  Q = ftick( Q, { 'INPUT_FILE_FORMAT' } );
   %
   fnames = fieldnames( Q );
   %
@@ -105,24 +222,95 @@ function T = do_WSVs( Q, wfolder )
     if fname(1) >= 'a' & fname(1) <= 'z'
       group = wsv2group( fname ); 
       if strcmp( group, 'Agenda' )
-        T = add_agenda( T, fname, Q.(fname), Q );
+        T = add_agenda( T, fname, Q.(fname), Q, wfolder );
       else
         T = file_or_data( T, fname, group, Q.(fname), Q, wfolder, format ); 
       end
-    elseif length(fname) > 4 & strcmp( fname(end+[-3:0]), '_WSV' )
+      Q = ftick( Q, { fname } );
+    elseif length(fname) > 4 & strcmp( fname(end+[-3:0]), '_WSV' ) & ...
+                              ~strcmp( fname(1:5), 'USED_' )
       ius = strfind( fname, '_' );
       if length(ius) < 2
         error(sprintf('*%s* is not a valid definition of a non-std WSV.',fname));
       end
       group = fname( ius(end-1)+1 : ius(end)-1 );
-      wsv = fname( 1 : ius(end-1)-1 );
+      wsv = lower( fname( 1 : ius(end-1)-1 ) );
       T{end+1} = sprintf( '  %sCreate(%s)', group, wsv );
       if strcmp( group, 'Agenda' )
-        T = add_agenda( T, wsv, Q.(fname), Q );
+        T = add_agenda( T, wsv, Q.(fname), Q, wfolder );
       else
         T = file_or_data( T, wsv, group, Q.(fname), Q, wfolder, format ); 
       end
+      Q = ftick( Q, { fname } );
     end
+  end
+return
+
+
+
+%------------------------------------------------------------------------------
+% Adds (in given order):
+%
+function [T,Q] = do_atmfields( Q, wfolder )
+  %
+  T = [];
+  %
+return
+
+
+
+%------------------------------------------------------------------------------
+% Adds (in given order):
+%
+function [T,Q] = do_sensor( Q, wfolder )
+  %
+  Q = ftick( Q, { 'SENSOR_DO' } );
+  T = [];
+  %
+  if ~qarts_isset( Q.SENSOR_DO )
+    T = {};
+  elseif ~Q.SENSOR_DO
+    T{1} = '  sensorOff';
+  else
+    error( 'Sensor not yet handled' );
+  end
+return
+
+
+
+%------------------------------------------------------------------------------
+% Adds (in given order):
+%
+function [T,Q] = do_scattering( Q, wfolder )
+  %
+  Q = ftick( Q, { 'SCATTERING_DO' } );
+  T = [];
+  %
+  if ~qarts_isset( Q.SCATTERING_DO )
+    T = {};
+  elseif ~Q.SCATTERING_DO
+    T{1} = '  cloudboxOff';
+  else
+    error( 'Scattering not yet handled' );
+  end
+return
+
+
+
+%------------------------------------------------------------------------------
+% Adds (in given order):
+%
+function [T,Q] = do_retrieval( Q, wfolder )
+  %
+  Q = ftick( Q, { 'J_DO' } );
+  T = [];
+  %
+  if ~qarts_isset( Q.J_DO )
+    T = {};
+  elseif ~Q.J_DO
+    T{1} = '  jacobianOff';
+  else
+    error( 'Scattering not yet handled' );
   end
 return
 
@@ -157,13 +345,13 @@ return
 
 
 
-function T = file_or_data(T,artsvar,datatype,qvalue,Q,workfolder,dformat,...
+function T = file_or_data(T,artsvar,datatype,qvalue,Q,wfolder,dformat,...
                                                                   nonDefFileId)
   % Check if string array with cfile code to include. If yes, fill T and return.
   if iscellstr(qvalue)  &  length(qvalue) > 1  &  ...
      strcmp( qvalue{1}, 'Arts2{' )  &  strcmp( qvalue{end}, '}' )
 
-     T = add_wsms( T, artsvar, {qvalue{2:end-1}}, Q, false );
+     T = add_wsms( T, artsvar, {qvalue{2:end-1}}, Q, false, wfolder );
     return  % --->
   end
 
@@ -213,9 +401,9 @@ function T = file_or_data(T,artsvar,datatype,qvalue,Q,workfolder,dformat,...
     T{end+1} = add_readfile( artsvar, qvalue );
   else
     if nargin > 7
-      filename = fullfile( workfolder, [nonDefFileId,'.xml'] );
+      filename = fullfile( wfolder, [nonDefFileId,'.xml'] );
     else
-      filename = fullfile( workfolder, [artsvar,'.xml'] );
+      filename = fullfile( wfolder, [artsvar,'.xml'] );
     end
     xmlStore( filename, qvalue, datatype, dformat );
     T{end+1} = add_readfile( artsvar, filename );
@@ -240,14 +428,14 @@ return
 
 
 
-function s = add_savefile( artsvar, workfolder )
-  filename = fullfile( workfolder, [ artsvar, '.xml' ] );
-  s = sprintf('  WriteXML(output_file_format,%s,"%s")', artsvar, filename );
+function s = add_savefile( artsvar, wfolder )
+  filename = fullfile( wfolder, [ artsvar, '.xml' ] );
+  s = sprintf('WriteXML(output_file_format,%s,"%s")', artsvar, filename );
 return
 
 
 
-function T = add_wsms( T, field, strarray, Q, add_indent )
+function T = add_wsms( T, field, strarray, Q, add_indent, wfolder )
   if ~iscellstr( strarray )
     error( sprintf( ...
            'The field %s must be specified as cell array of strings.', ...
@@ -257,6 +445,8 @@ function T = add_wsms( T, field, strarray, Q, add_indent )
   insert = true;
   for j = 1 : length(strarray)
     thisline = strarray{j};
+    skipline = false;
+    % Check keywords
     if length(thisline) > 0  &  thisline(1) == '<'
       if strncmp( thisline, '<IF>', 4 )
         if length(thisline) < 5
@@ -274,33 +464,39 @@ function T = add_wsms( T, field, strarray, Q, add_indent )
           insert = false;
         end
         inif = true;
+        skipline = true;
       elseif strncmp( thisline, '<ELSE>', 6 )
-        if length( deblank( thisline ) ) ~= 6
+        if ~inif | length( deblank( thisline ) ) ~= 6
           error( 'Incorrect line including <ELSE> found in %s.', field );
         end
         insert = ~insert;
+        skipline = true;
       elseif strncmp( thisline, '<END>', 5 )
-        if length( deblank( thisline ) ) ~= 5
+        if ~inif | length( deblank( thisline ) ) ~= 5
           error( 'Incorrect line including <END> found in %s.', field );
         end
         inif   = false;
         insert = true;
+        skipline = true;
+      elseif strncmp( thisline, '<OUTPUT>', 8 )
+        artsvar = strtrim( thisline(9:end) );
+        thisline = add_savefile( artsvar, wfolder );
       else
+        error( 'Could not decode this line: %s', thisline );
       end
-    else
-      if insert
-        if add_indent
-          T{end+1} = sprintf( '    %s', strarray{j} );
-        else
-          T{end+1} = sprintf( '  %s', strarray{j} );
-        end
+    end % Keyword part
+    if insert & ~skipline
+      if add_indent
+        T{end+1} = sprintf( '    %s', thisline );
+      else
+        T{end+1} = sprintf( '  %s', thisline );
       end
     end
   end
 return
 
 
-function T = add_agenda( T, agenda, strarray, Q )
+function T = add_agenda( T, agenda, strarray, Q, wfolder )
   if ~iscellstr( strarray )
     error( sprintf( ...
           'The agenda %s must be specified as cell array of strings.', ...
@@ -310,7 +506,14 @@ function T = add_agenda( T, agenda, strarray, Q )
     T{end+1} = sprintf( '  Copy(%s,%s)', agenda, strarray{1} );
   else
     T{end+1} = sprintf( '  AgendaSet(%s){', agenda );
-    T = add_wsms( T, agenda, strarray, Q, true );
+    T = add_wsms( T, agenda, strarray, Q, true, wfolder );
     T{end+1} = '  }';
+  end
+return
+
+
+function Q = ftick( Q, fields )
+  for i = 1 : length(fields)
+    Q.(sprintf('USED_%s',fields{i})) = true;
   end
 return
