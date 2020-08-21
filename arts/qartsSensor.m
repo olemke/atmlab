@@ -1,7 +1,6 @@
 % QARTSSENSOR   Defines setting fields for ARTS sensor response calculations
 %
-%    The function provides default values for all recognised fields and a 
-%    description of each field. 
+%    The function provides a description of each field.
 %
 %    This function is organised in such way that *qcheck* and *qinfo*
 %    can be used.
@@ -12,7 +11,7 @@
 %       I  Includes same fields as H, where the content of each field
 %          is a description string (used by *qinfo*).
 
-% 2005-01-26   Created by Mattias Ekstr�m.
+% 2005-01-26   Created by Mattias Ekström.
 
 
 function [H,I] = qartsSensor

@@ -5,7 +5,7 @@
 %    that the output can be combined with other control file pieces
 %    by combining their string arrays. The final control file is
 %    created by *strs2file*.
-%    
+%
 %    The control file structure is determined by putting different 'parts'
 %    together, following the format: parts = {'Generl','AtmSrfSave'}
 %
@@ -16,8 +16,8 @@
 %       CldBox / CldBoxSave
 %       SctMth / SctMthSave / SctMthBatch
 %       RteSet
-%       Sensor / SensorSave 
-%       Jacobi 
+%       Sensor / SensorSave
+%       Jacobi
 %       RteExe
 %       BatchC
 %
@@ -26,16 +26,16 @@
 %    are added automaticlly to the control file, everything else must be
 %    specified by the qarts fields or be handled by include control files.
 %
-%    For fields that can be given both as a Matlab variable or name of a 
+%    For fields that can be given both as a Matlab variable or name of a
 %    file, a file is generated automatically if the input a variable.
 %    Output is stored in files placed in *workfolder*, with names identical
 %    the WSV name and extension '.xml' (e.g. y.xml).
 %
-%    The parts to combine for some different tasks can be obtained by 
-%    this function, using the second format version below. In this case, 
+%    The parts to combine for some different tasks can be obtained by
+%    this function, using the second format version below. In this case,
 %    there shall only be one input argument, and it shall be a plain string.
 %    Defined options, of general interest, for *runtype* are:
-%      'GetAtmSrf'  : To obtain variables defining the atmosphere and the 
+%      'GetAtmSrf'  : To obtain variables defining the atmosphere and the
 %                     surface.
 %      'GetAbsTable': To obtain an absorption table.
 %      'GetSensor'  : To obtain a sensor response matrix.
@@ -64,30 +64,38 @@
 % IN    runtype   String describing type of calculation to perform.
 %                 See further above.
 
-% 2007-08-21   Large revision of function structure and code. PE 
-% 
+% 2007-08-21   Large revision of function structure and code. PE
+%
 % 2004-09-08   Created by Patrick Eriksson (PE).
 
 
 function S = qarts2cfile( Q, parts, workfolder )
-                                                                            %&%
-                                                                            %&%
-%- Check input                                                              %&%
-%                                                                           %&%
-if ~( nargin == 1  |  nargin == 3 )                                         %&%
-  error( 'The function takes 1 or 3 input arguments.' );                    %&%
-end                                                                         %&%
+
+
+%- Check input
+%
+if ~( nargin == 1  |  nargin == 3 )
+  error( 'The function takes 1 or 3 input arguments.' );
+end
+
+
+%- Check that a reasoanble ARTS version is used
+%
+if ~strncmp( arts_version, 'arts-2.3.12', 11 )
+  error( ['A relative late ARTS v2.3 should be used (at least not below ' ...
+          '2.3.1200). Your version is %s.'], arts_version );
+end
 
 
 
 %--- Version returning cfile parts --------------------------------------------
 %
 if nargin == 1
-                                                                            %&%
-                                                                            %&%
-  if ~ischar( Q )                                                           %&%
-    error( 'If number of arguments is 1, this argument must be a string' ); %&%
-  end                                                                       %&%
+
+
+  if ~ischar( Q )
+    error( 'If number of arguments is 1, this argument must be a string' );
+  end
 
   switch Q
 
@@ -102,7 +110,7 @@ if nargin == 1
   case 'GetSensor'
     %
     S = { 'Generl', 'SensorSave', 'CloseF' };
-   
+
   case 'iy'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'PbcSet', ...
@@ -112,12 +120,12 @@ if nargin == 1
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'SensorSave', ...
           'JacobiSave', 'CloseF' };
-    
+
   case 'y_after_init'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
           'CldBox', 'SctMth', 'RteExe', 'CloseF' };
-   
+
   case 'y'
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'JacobiSave', ...
@@ -127,9 +135,9 @@ if nargin == 1
     %
     S = { 'Generl', 'AtmSrf', 'Absrpt', 'RteSet', 'Sensor', 'Jacobi', ...
           'CldBox', 'SctMthBatch', 'BatchC', 'CloseF' };
-                                                                            %&%
-  otherwise                                                                 %&%
-    error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );        %&%
+
+  otherwise
+    error( sprintf( 'Unknown cfile type (%s) was requested.', Q ) );
   end
 
   return    % --->
@@ -151,7 +159,7 @@ for ip = 1 : length(parts)
   T = [];
 
   switch parts{ip}(1:6)
-    
+
    case 'Generl'
     %
     T = cfile_Generl( Q, parts{ip}, workfolder );
@@ -159,35 +167,35 @@ for ip = 1 : length(parts)
    case 'CloseF'
     %
     T = cfile_CloseF( Q, parts{ip}, workfolder );
-    
+
    case 'AtmSrf'
     %
     T = cfile_AtmSrf( Q, parts{ip}, workfolder );
-   
+
    case 'Absrpt'
     %
     T = cfile_Absrpt( Q, parts{ip}, workfolder );
-   
+
    case 'RteSet'
     %
     T = cfile_RteSet( Q, parts{ip}, workfolder );
-   
+
    case 'Sensor'
     %
     T = cfile_Sensor( Q, parts{ip}, workfolder );
-    
+
    case 'Jacobi'
     %
     T = cfile_Jacobi( Q, parts{ip}, workfolder );
-   
+
    case 'CldBox'
     %
     T = cfile_CldBox( Q, parts{ip}, workfolder );
-   
+
    case 'SctMth'
     %
     T = cfile_SctMth( Q, parts{ip}, workfolder );
-   
+
    case 'RteExe'
     %
     T = cfile_RteExe( Q, parts{ip}, workfolder );
@@ -195,19 +203,19 @@ for ip = 1 : length(parts)
    case 'PbcSet'
     %
     T = cfile_PbcSet( Q, parts{ip}, workfolder );
-   
+
    case 'PbcExe'
     %
     T = cfile_PbcExe( Q, parts{ip}, workfolder );
-    
+
    case 'BatchC'
     %
     T = cfile_BatchC( Q, parts{ip}, workfolder );
-    
+
    otherwise
     error( sprintf( 'Unknown cfile part (%s) was requested.', parts{ip} ) );
   end
-  
+
   if ~isempty(T)
    S = { S{:} T{:} };
   end
@@ -231,14 +239,14 @@ return
 %    Start of cfile
 %    output_file_format
 %    stokes_dim
-%    f_grid  
+%    f_grid
 %    abs_species
 %
 function T = cfile_Generl( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~( strcmp( partname, 'Generl' )  |  strcmp( partname, 'GenerlSave' ) ) %&%
-    error( 'Only recognised choices are ''Generl'' and ''GenerlSave''.' );  %&%
-  end                                                                       %&%
+  %
+  if ~( strcmp( partname, 'Generl' )  |  strcmp( partname, 'GenerlSave' ) )
+    error( 'Only recognised choices are ''Generl'' and ''GenerlSave''.' );
+  end
   %
   T{1} = [ '# Control file created by Atmlab function *qarts2cfile*' ];
   T{2} = 'Arts2{';
@@ -250,40 +258,40 @@ function T = cfile_Generl( Q, partname, workfolder )
   end
   %
   if qarts_isset( Q.OUTPUT_FILE_FORMAT )
-    rqre_datatype( Q.OUTPUT_FILE_FORMAT, @ischar, 'Q.OUTPUT_FILE_FORMAT' ); %&%
-    if ~any( strcmp( lower(Q.OUTPUT_FILE_FORMAT), {'binary','ascii'} ) )    %&%
-      error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );     %&%
-    end                                                                     %&%
+    rqre_datatype( Q.OUTPUT_FILE_FORMAT, @ischar, 'Q.OUTPUT_FILE_FORMAT' );
+    if ~any( strcmp( lower(Q.OUTPUT_FILE_FORMAT), {'binary','ascii'} ) )
+      error( 'Q.OUTPUT_FILE_FORMAT must be ''binary'' or ''ascii''.' );
+    end
     T{end+1} = sprintf( 'output_file_formatSet%s%s', ...
       upper(Q.OUTPUT_FILE_FORMAT(1)), lower(Q.OUTPUT_FILE_FORMAT(2:end)) );
   end
   %
-  rqre_datatype( Q.INPUT_FILE_FORMAT, @ischar, 'Q.INPUT_FILE_FORMAT' );     %&%
-  if ~any( strcmp( lower(Q.INPUT_FILE_FORMAT), {'binary','double'} ) )      %&%
-    error( 'Q.INPUT_FILE_FORMAT must be ''binary'' or ''double''.' );       %&%
-  end                                                                       %&%
+  rqre_datatype( Q.INPUT_FILE_FORMAT, @ischar, 'Q.INPUT_FILE_FORMAT' );
+  if ~any( strcmp( lower(Q.INPUT_FILE_FORMAT), {'binary','double'} ) )
+    error( 'Q.INPUT_FILE_FORMAT must be ''binary'' or ''double''.' );
+  end
   %
   if qarts_isset( Q.STOKES_DIM )
-    rqre_alltypes( Q.STOKES_DIM, {@istensor0,@iswhole}, 'Q.STOKES_DIM' );   %&%
-    rqre_in_range( Q.STOKES_DIM, 1, 4, 'Q.STOKES_DIM' );                    %&%
+    rqre_alltypes( Q.STOKES_DIM, {@istensor0,@iswhole}, 'Q.STOKES_DIM' );
+    rqre_in_range( Q.STOKES_DIM, 1, 4, 'Q.STOKES_DIM' );
     T{end+1} = sprintf( 'IndexSet(stokes_dim,%d)', Q.STOKES_DIM );
   end
-  %  
+  %
   if qarts_isset( Q.F_GRID )
     T = file_or_data( T, 'f_grid', 'Vector', Q.F_GRID, workfolder, ...
                                                      Q.INPUT_FILE_FORMAT );
   end
   %
   if qarts_isset( Q.ATMOSPHERE_DIM )
-    rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...             %&%
-                                                      'Q.ATMOSPHERE_DIM' ); %&%
-    rqre_in_range( Q.ATMOSPHERE_DIM, 1, 3, 'Q.ATMOSPHERE_DIM' );            %&%
+    rqre_alltypes( Q.ATMOSPHERE_DIM, {@istensor0,@iswhole}, ...
+                                                      'Q.ATMOSPHERE_DIM' );
+    rqre_in_range( Q.ATMOSPHERE_DIM, 1, 3, 'Q.ATMOSPHERE_DIM' );
     T{end+1} = sprintf( 'AtmosphereSet%dD', Q.ATMOSPHERE_DIM );
   end
   %
   if qarts_isset( Q.ABS_SPECIES )
-    rqre_datatype( Q.ABS_SPECIES, @isstruct, 'Q.ABS_SPECIES' );             %&%
-    rqre_field( Q.ABS_SPECIES, 'TAG', 'Q.ABS_SPECIES' );                    %&%
+    rqre_datatype( Q.ABS_SPECIES, @isstruct, 'Q.ABS_SPECIES' );
+    rqre_field( Q.ABS_SPECIES, 'TAG', 'Q.ABS_SPECIES' );
     T{end+1} = sprintf( 'abs_speciesSet(species=[%s])', ...
                                            arts_tgs_cnvrt(Q.ABS_SPECIES) );
   end
@@ -293,7 +301,7 @@ function T = cfile_Generl( Q, partname, workfolder )
     T{end+1} = add_savefile( 'stokes_dim', workfolder );
     T{end+1} = add_savefile( 'f_grid', workfolder );
     T{end+1} = add_savefile( 'abs_species', workfolder );
-  end  
+  end
 return
 
 
@@ -332,10 +340,10 @@ return
 %    winds
 %
 function T = cfile_AtmSrf( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~( strcmp( partname, 'AtmSrf' )  |  strcmp( partname, 'AtmSrfSave' ) ) %&%
-    error( 'Only recognised choices are ''AtmSrf'' and ''AtmSrfSave''.' );  %&%
-  end                                                                       %&%
+  %
+  if ~( strcmp( partname, 'AtmSrf' )  |  strcmp( partname, 'AtmSrfSave' ) )
+    error( 'Only recognised choices are ''AtmSrf'' and ''AtmSrfSave''.' );
+  end
   %
   T = [];
   %
@@ -348,30 +356,30 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                                      Q.INPUT_FILE_FORMAT );
   end
   %
-  if qarts_isset( Q.LAT_GRID ) 
+  if qarts_isset( Q.LAT_GRID )
     T = file_or_data( T, 'lat_grid', 'Vector', Q.LAT_GRID, workfolder, ...
                                                          Q.INPUT_FILE_FORMAT );
   end
-  if qarts_isset( Q.LON_GRID ) 
+  if qarts_isset( Q.LON_GRID )
     T = file_or_data( T, 'lon_grid', 'Vector', Q.LON_GRID, workfolder, ...
                                                          Q.INPUT_FILE_FORMAT );
   end
   %
-  if qarts_isset( Q.LAT_TRUE ) 
+  if qarts_isset( Q.LAT_TRUE )
     T = file_or_data( T, 'lat_true', 'Vector', Q.LAT_TRUE, workfolder, ...
                                                          Q.INPUT_FILE_FORMAT );
   end
-  if qarts_isset( Q.LON_TRUE ) 
+  if qarts_isset( Q.LON_TRUE )
     T = file_or_data( T, 'lon_true', 'Vector', Q.LON_TRUE, workfolder, ...
                                                          Q.INPUT_FILE_FORMAT );
   end
   %
   if qarts_isset( Q.RAW_ATMOSPHERE )
-    rqre_datatype( Q.RAW_ATMOSPHERE, @ischar, 'Q.RAW_ATMOSPHERE' );         %&%
-    if qarts_isset( Q.RAW_ATM_EXPAND_1D )                                   %&%
-      rqre_datatype( Q.RAW_ATM_EXPAND_1D, @isboolean, ...                   %&%
-                                                   'Q.RAW_ATM_EXPAND_1D' ); %&%
-    end                                                                     %&%
+    rqre_datatype( Q.RAW_ATMOSPHERE, @ischar, 'Q.RAW_ATMOSPHERE' );
+    if qarts_isset( Q.RAW_ATM_EXPAND_1D )
+      rqre_datatype( Q.RAW_ATM_EXPAND_1D, @isboolean, ...
+                                                   'Q.RAW_ATM_EXPAND_1D' );
+    end
     T{end+1} = sprintf( 'AtmRawRead(basename="%s")', Q.RAW_ATMOSPHERE );
     if qarts_isset( Q.RAW_ATM_EXPAND_1D ) & Q.RAW_ATM_EXPAND_1D
       wsm = 'AtmFieldsCalcExpand1D';
@@ -384,11 +392,11 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   if qarts_isset( Q.T_FIELD )
     T = file_or_data( T, 't_field', 'Tensor3', Q.T_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
-  end      
+  end
   if qarts_isset( Q.VMR_FIELD )
     T = file_or_data( T, 'vmr_field', 'Tensor4', Q.VMR_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
-  end      
+  end
   if qarts_isset( Q.Z_FIELD )
     T = file_or_data( T, 'z_field', 'Tensor3', Q.Z_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
@@ -397,11 +405,11 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   if qarts_isset( Q.WIND_U_FIELD )
     T = file_or_data( T, 'wind_u_field', 'Tensor3', Q.WIND_U_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
-  end      
+  end
   if qarts_isset( Q.WIND_V_FIELD )
     T = file_or_data( T, 'wind_v_field', 'Tensor3', Q.WIND_V_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
-  end      
+  end
   if qarts_isset( Q.WIND_W_FIELD )
     T = file_or_data( T, 'wind_w_field', 'Tensor3', Q.WIND_W_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
@@ -410,18 +418,18 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   if qarts_isset( Q.MAG_U_FIELD )
     T = file_or_data( T, 'mag_u_field', 'Tensor3', Q.MAG_U_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
-  end      
+  end
   if qarts_isset( Q.MAG_V_FIELD )
     T = file_or_data( T, 'mag_v_field', 'Tensor3', Q.MAG_V_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
-  end      
+  end
   if qarts_isset( Q.MAG_W_FIELD )
     T = file_or_data( T, 'mag_w_field', 'Tensor3', Q.MAG_W_FIELD, ...
                                              workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
   if qarts_isset(Q.REFELLIPSOID)
-    rqre_datatype( Q.REFELLIPSOID, {@istensor1}, 'Q.REFELLIPSOID' );        %&%
+    rqre_datatype( Q.REFELLIPSOID, {@istensor1}, 'Q.REFELLIPSOID' );
     T = file_or_data( T, 'refellipsoid', 'Vector', Q.REFELLIPSOID, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
@@ -431,7 +439,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
   end
   %
-  if qarts_isset(Q.VMR_NEGATIVE_OK) & Q.VMR_NEGATIVE_OK 
+  if qarts_isset(Q.VMR_NEGATIVE_OK) & Q.VMR_NEGATIVE_OK
     T{end+1} = 'atmfields_checkedCalc(negative_vmr_ok=1,bad_partition_functions_ok=1)';
   else
     T{end+1} = 'atmfields_checkedCalc(bad_partition_functions_ok=1)';
@@ -439,25 +447,25 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
   T{end+1} = 'atmgeom_checkedCalc';
   %
   if qarts_isset( Q.HSE )
-    if ~isfield( Q.HSE, 'ON' ) & ~isbool( Q.HSE.ON )                        %&%
-      error( ...                                                            %&%
-      'When Q.HSE is present, HSE.ON must be a present and be a boolean.'); %&%
-    end                                                                     %&%
+    if ~isfield( Q.HSE, 'ON' ) & ~isbool( Q.HSE.ON )
+      error( ...
+      'When Q.HSE is present, HSE.ON must be a present and be a boolean.');
+    end
     if Q.HSE.ON
-      if ~isfield( Q.HSE, {'P','ACCURACY'} )                                %&%
-        error( 'With Q.HSE.ON true the fields P and ACCURACY must exist' ); %&%
-      end                                                                   %&%
-      rqre_datatype( Q.HSE.P, @istensor0, 'Q.HSE.P' );                      %&%
-      rqre_datatype( Q.HSE.ACCURACY, @istensor0, 'Q.HSE.ACCURACY' );        %&%
-      T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );      
+      if ~isfield( Q.HSE, {'P','ACCURACY'} )
+        error( 'With Q.HSE.ON true the fields P and ACCURACY must exist' );
+      end
+      rqre_datatype( Q.HSE.P, @istensor0, 'Q.HSE.P' );
+      rqre_datatype( Q.HSE.ACCURACY, @istensor0, 'Q.HSE.ACCURACY' );
+      T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );
       T{end+1} = sprintf( 'NumericSet(z_hse_accuracy,%.3f)', Q.HSE.ACCURACY );
       T{end+1} = 'z_fieldFromHSE';
     else
       % To allow dummy values for t retrievals without HSE
-      if isfield( Q.HSE, 'P' ) 
-        T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );      
+      if isfield( Q.HSE, 'P' )
+        T{end+1} = sprintf( 'NumericSet(p_hse,%.3f)', Q.HSE.P );
       end
-      if isfield( Q.HSE, 'ACCURACY' ) 
+      if isfield( Q.HSE, 'ACCURACY' )
         T{end+1} = sprintf( 'NumericSet(z_hse_accuracy,%.3f)', Q.HSE.ACCURACY );
       end
     end
@@ -474,7 +482,7 @@ function T = cfile_AtmSrf( Q, partname, workfolder )
     T{end+1} = add_savefile( 'refellipsoid', workfolder );
     T{end+1} = add_savefile( 'z_surface', workfolder );
   end
-  
+
 return
 
 
@@ -492,33 +500,33 @@ function T = cfile_Absrpt( Q, partname, workfolder )
   abstable = false;
   %
   T = {};
-  %                                                                         %&%
-  if ~( strcmp( partname, 'Absrpt' )  |  strcmp( partname, 'AbsrptSave' ) ) %&%
-    error( 'Only recognised choices are ''Absrpt'' and ''AbsrptSave''.' );  %&%
-  end                                                                       %&%
+  %
+  if ~( strcmp( partname, 'Absrpt' )  |  strcmp( partname, 'AbsrptSave' ) )
+    error( 'Only recognised choices are ''Absrpt'' and ''AbsrptSave''.' );
+  end
   %
   if qarts_isset( Q.ABSORPTION )
-    rqre_datatype( Q.ABSORPTION, @ischar, 'Q.ABSORPTION' );                 %&%
-    %                                                                       %&%
-    if ~( strcmp(Q.ABSORPTION,'OnTheFly') | ...                             %&%
-          strcmp(Q.ABSORPTION,'LoadTable') | ...                            %&%
-          strcmp(Q.ABSORPTION,'CalcTable') )                                %&%
-      error( ['Only recognised choices for *ABSORPTION* are ',...           %&%
-                       '''OnTheFly'', ''LoadTable'' and ''CalcTable''.'] ); %&%
-    end                                                                     %&%
+    rqre_datatype( Q.ABSORPTION, @ischar, 'Q.ABSORPTION' );
+    %
+    if ~( strcmp(Q.ABSORPTION,'OnTheFly') | ...
+          strcmp(Q.ABSORPTION,'LoadTable') | ...
+          strcmp(Q.ABSORPTION,'CalcTable') )
+      error( ['Only recognised choices for *ABSORPTION* are ',...
+                       '''OnTheFly'', ''LoadTable'' and ''CalcTable''.'] );
+    end
     %
     if strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION, 'CalcTable')
       %
       if qarts_isset( Q.ABS_LINES_FORMAT )
-        %                                                                   %&%
-        rqre_datatype( Q.ABS_LINES_FORMAT, @ischar, 'Q.ABS_LINES_FORMAT' ); %&%
+        %
+        rqre_datatype( Q.ABS_LINES_FORMAT, @ischar, 'Q.ABS_LINES_FORMAT' );
         %
         if strcmp( upper(Q.ABS_LINES_FORMAT), 'NONE' )
           T{end+1} = 'abs_lines_per_speciesSetEmpty';
         else
           %
           if strcmp(upper(Q.ABS_LINES_FORMAT),'XML')
-            rqre_datatype( Q.ABS_LINES, {@ischar,@iscellstr}, 'Q.ABS_LINES' ); %&%
+            rqre_datatype( Q.ABS_LINES, {@ischar,@iscellstr}, 'Q.ABS_LINES' );
             if ischar( Q.ABS_LINES )
               T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
                                 Q.ABS_LINES, workfolder, Q.INPUT_FILE_FORMAT );
@@ -533,43 +541,43 @@ function T = cfile_Absrpt( Q, partname, workfolder )
               end
             end
           else
-            if ~ischar( Q.ABS_LINES )                                       %&%
-              error( ...                                                    %&%
-               'Q.ABS_LINES must be a filename for formats beside XML.' );  %&%
-            end                                                             %&%
+            if ~ischar( Q.ABS_LINES )
+              error( ...
+               'Q.ABS_LINES must be a filename for formats beside XML.' );
+            end
             filename = Q.ABS_LINES;
             %
             if qarts_isset( Q.ABS_LINES_FLIMS )
-              if ~( isnumeric( Q.ABS_LINES_FLIMS )  &  ...                  %&%
-                    length( Q.ABS_LINES_FLIMS ) == 2 )                      %&%
-                error( ...                                                  %&%
-                 'If set, Q.ABS_LINES_FLIMS must be a vector of length 2' );%&%
-              end                                                           %&%
-              f1 = Q.ABS_LINES_FLIMS(1);   
+              if ~( isnumeric( Q.ABS_LINES_FLIMS )  &  ...
+                    length( Q.ABS_LINES_FLIMS ) == 2 )
+                error( ...
+                 'If set, Q.ABS_LINES_FLIMS must be a vector of length 2' );
+              end
+              f1 = Q.ABS_LINES_FLIMS(1);
               f2 = Q.ABS_LINES_FLIMS(2);
             else
-                f1 = 0;                      
+                f1 = 0;
                 f2 = 1e99;
-            end   
+            end
             T{end+1} = sprintf( 'Read%s(abs_lines,"%s",%.3e,%.3e,"","")', ...
                                 upper(Q.ABS_LINES_FORMAT), filename, f1, f2 );
             %
             if qarts_isset( Q.ABS_LINESHAPE )
-              rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' ); %&%
+              rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' );
               T{end+1} = sprintf( 'abs_linesSetLineShapeType(abs_lines,"%s")', ...
                                  Q.ABS_LINESHAPE );
-            end   
+            end
             %
             if qarts_isset( Q.ABS_LINESHAPE_FACTOR )
-              rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, ...           %&%
-                             'Q.ABS_LINESHAPE_FACTOR' ); ...                %&%
+              rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, ...
+                             'Q.ABS_LINESHAPE_FACTOR' ); ...
               T{end+1} = sprintf( 'abs_linesSetNormalization(abs_lines,"%s")', ...
                                   Q.ABS_LINESHAPE_FACTOR );
             end
             %
             if qarts_isset( Q.ABS_LINESHAPE_CUTOFF )
-              rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, ...        %&%
-                             'Q.ABS_LINESHAPE_CUTOFF' );                    %&%
+              rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, ...
+                             'Q.ABS_LINESHAPE_CUTOFF' );
               if Q.ABS_LINESHAPE_CUTOFF < 0
                 T{end+1} = sprintf( 'abs_linesSetCutoff(abs_lines,"None",-1)' );
               else
@@ -579,8 +587,8 @@ function T = cfile_Absrpt( Q, partname, workfolder )
             end
             %
             if qarts_isset( Q.ABS_LINESHAPE_MIRRORING )
-              rqre_datatype( Q.ABS_LINESHAPE_MIRRORING, @ischar, ...          %&%
-                             'Q.ABS_LINESHAPE_MIRRORING' ); ...               %&%
+              rqre_datatype( Q.ABS_LINESHAPE_MIRRORING, @ischar, ...
+                             'Q.ABS_LINESHAPE_MIRRORING' ); ...
               T{end+1} = sprintf( 'abs_linesSetMirroring(abs_lines,"%s")', ...
                                   Q.ABS_LINESHAPE_MIRRORING );
             end
@@ -598,10 +606,10 @@ function T = cfile_Absrpt( Q, partname, workfolder )
         T = add_wsms( T, 'ABS_WSMS', Q.ABS_WSMS, Q );
       end
     end
-        
+
     if qarts_isset( Q.ABS_XSEC_AGENDA )
       T = add_agenda( T, 'abs_xsec_agenda', Q.ABS_XSEC_AGENDA );
-    else      
+    else
       T = add_agenda( T, 'abs_xsec_agenda', { ...
                          'abs_xsec_per_speciesInit', ...
                          'abs_xsec_per_speciesAddLines', ...
@@ -616,7 +624,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
         T = add_agenda( T, 'propmat_clearsky_agenda', ...
                                                 Q.PROPMAT_CLEARSKY_AGENDA );
-      else      
+      else
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
                   'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
                   'propmat_clearskyInit', 'propmat_clearskyAddOnTheFly' } );
@@ -643,7 +651,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                          workfolder, Q.INPUT_FILE_FORMAT );
       end
       if qarts_isset( Q.ABS_NLS )
-        rqre_datatype( Q.ABS_NLS, {@isempty,@iscellstr}, 'Q.ABS_NLS' );     %&%
+        rqre_datatype( Q.ABS_NLS, {@isempty,@iscellstr}, 'Q.ABS_NLS' );
         if isempty( Q.ABS_NLS )
           T{end+1} = 'abs_speciesSet(abs_species=abs_nls,species=[])';
         else
@@ -652,7 +660,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
                                                    arts_tgs_cnvrt(Q.ABS_NLS) );
         end
         % As abs_species changed, this must be repeated:
-        T{end+1} = 'abs_xsec_agenda_checkedCalc'; 
+        T{end+1} = 'abs_xsec_agenda_checkedCalc';
       end
       if qarts_isset( Q.ABS_NLS_PERT )
         T = file_or_data( T, 'abs_nls_pert', 'Vector', Q.ABS_NLS_PERT, ...
@@ -660,18 +668,18 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       end
       %
       T{end+1} = 'nlteOff';    % This really safe?
-      T{end+1} = 'abs_lookupCalc'; 
+      T{end+1} = 'abs_lookupCalc';
       if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
         T = add_agenda( T, 'propmat_clearsky_agenda', ...
                                                 Q.PROPMAT_CLEARSKY_AGENDA );
-      else      
+      else
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
             'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_nlte)', ...
             'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
-      end 
+      end
       %
       abstable = true;
-      %   
+      %
     elseif strcmp( Q.ABSORPTION, 'LoadTable' )
       %
       T = file_or_data( T, 'abs_lookup', 'GasAbsLookup', Q.ABS_LOOKUP, ...
@@ -680,7 +688,7 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       if qarts_isset( Q.PROPMAT_CLEARSKY_AGENDA )
         T = add_agenda( T, 'propmat_clearsky_agenda', ...
                                                 Q.PROPMAT_CLEARSKY_AGENDA );
-      else      
+      else
         T = add_agenda( T, 'propmat_clearsky_agenda', { ...
                 'Ignore(rtp_mag)', 'Ignore(rtp_los)', 'Ignore(rtp_nlte)', ...
                 'propmat_clearskyInit', 'propmat_clearskyAddFromLookup' } );
@@ -689,13 +697,13 @@ function T = cfile_Absrpt( Q, partname, workfolder )
       abstable = true;
       %
     end
-    
+
     T{end+1} = 'propmat_clearsky_agenda_checkedCalc';
     T{end+1} = 'nlteOff';    % This really safe?
-    
+
   end %  qarts_isset( Q.ABSORPTION )
 
-  
+
   if abstable  &  strcmp( partname, 'AbsrptSave' )
     T{end+1} = add_savefile( 'abs_lookup', workfolder );
   end
@@ -721,10 +729,10 @@ return
 %    transmitter_pos
 %
 function T = cfile_RteSet( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~strcmp( partname, 'RteSet' )                                          %&%
-    error( 'Only recognised choices is ''RteSet''.' );                      %&%
-  end                                                                       %&%
+  %
+  if ~strcmp( partname, 'RteSet' )
+    error( 'Only recognised choices is ''RteSet''.' );
+  end
   %
   T = {};
   %
@@ -741,14 +749,14 @@ function T = cfile_RteSet( Q, partname, workfolder )
     T = add_agenda( T, 'iy_transmitter_agenda', Q.IY_TRANSMITTER_AGENDA );
   end
   if qarts_isset( Q.PPATH_LMAX )
-    rqre_datatype( Q.PPATH_LMAX, @istensor0, 'Q.PPATH_LMAX' );              %&%
+    rqre_datatype( Q.PPATH_LMAX, @istensor0, 'Q.PPATH_LMAX' );
     T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
-  end  
+  end
   if qarts_isset( Q.PPATH_LRAYTRACE )
-    rqre_datatype( Q.PPATH_LRAYTRACE, @istensor0, 'Q.PPATH_LRAYTRACE' );    %&%
+    rqre_datatype( Q.PPATH_LRAYTRACE, @istensor0, 'Q.PPATH_LRAYTRACE' );
     T{end+1} = sprintf( 'NumericSet( ppath_lraytrace, %.2e )', ...
                                                        Q.PPATH_LRAYTRACE );
-  end  
+  end
   if qarts_isset( Q.PPATH_AGENDA )
     T = add_agenda( T, 'ppath_agenda', Q.PPATH_AGENDA );
   end
@@ -789,7 +797,7 @@ function T = cfile_RteSet( Q, partname, workfolder )
                                           workfolder, Q.INPUT_FILE_FORMAT );
   end
   if qarts_isset( Q.IY_UNIT )
-    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );                       %&%
+    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );
     T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
   end
   %
@@ -806,13 +814,13 @@ return
 %    jacobian
 %
 function T = cfile_RteExe( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~strcmp( partname, 'RteExe' )                                          %&%
-    error( 'Only recognised choice is ''RteExe''.' );                       %&%
-  end                                                                       %&%
+  %
+  if ~strcmp( partname, 'RteExe' )
+    error( 'Only recognised choice is ''RteExe''.' );
+  end
   %
   T = add_rtecalcstart( Q );
-  %       
+  %
   T{end+1} = 'sensor_checkedCalc';
   %
   if qarts_isset( Q.YCALC_WSMS )
@@ -827,8 +835,8 @@ function T = cfile_RteExe( Q, partname, workfolder )
   T{end+1} = add_savefile( 'y_geo',   workfolder );
   T{end+1} = add_savefile( 'y_aux',   workfolder );
   %
-  if qarts_isset( Q.J_DO ) 
-    rqre_datatype( Q.J_DO, @isboolean, 'Q.J_DO' );                          %&%
+  if qarts_isset( Q.J_DO )
+    rqre_datatype( Q.J_DO, @isboolean, 'Q.J_DO' );
     if Q.J_DO
       T{end+1} = add_savefile( 'jacobian', workfolder );
     end
@@ -854,10 +862,10 @@ return
 %    rte_los
 %
 function T = cfile_PbcSet( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~strcmp( partname, 'PbcSet' )                                          %&%
-    error( 'Only recognised choices is ''PbcSet''.' );                      %&%
-  end                                                                       %&%
+  %
+  if ~strcmp( partname, 'PbcSet' )
+    error( 'Only recognised choices is ''PbcSet''.' );
+  end
   %
   T = {};
   %
@@ -874,14 +882,14 @@ function T = cfile_PbcSet( Q, partname, workfolder )
     T = add_agenda( T, 'iy_transmitter_agenda', Q.IY_TRANSMITTER_AGENDA );
   end
   if qarts_isset( Q.PPATH_LMAX )
-    rqre_datatype( Q.PPATH_LMAX, @istensor0, 'Q.PPATH_LMAX' );              %&%
+    rqre_datatype( Q.PPATH_LMAX, @istensor0, 'Q.PPATH_LMAX' );
     T{end+1} = sprintf( 'NumericSet( ppath_lmax, %.2e )', Q.PPATH_LMAX );
-  end  
+  end
   if qarts_isset( Q.PPATH_LRAYTRACE )
-    rqre_datatype( Q.PPATH_LRAYTRACE, @istensor0, 'Q.PPATH_LRAYTRACE' );    %&%
+    rqre_datatype( Q.PPATH_LRAYTRACE, @istensor0, 'Q.PPATH_LRAYTRACE' );
     T{end+1} = sprintf( 'NumericSet( ppath_lraytrace, %.2e )', ...
                                                        Q.PPATH_LRAYTRACE );
-  end  
+  end
   if qarts_isset( Q.PPATH_AGENDA )
     T = add_agenda( T, 'ppath_agenda', Q.PPATH_AGENDA );
   end
@@ -914,7 +922,7 @@ function T = cfile_PbcSet( Q, partname, workfolder )
                                           workfolder, Q.INPUT_FILE_FORMAT );
   end
   if qarts_isset( Q.IY_UNIT )
-    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );                       %&%
+    rqre_datatype( Q.IY_UNIT, @ischar, 'Q.IY_UNIT' );
     T{end+1} = sprintf( 'StringSet(iy_unit,"%s")', Q.IY_UNIT );
   end
   %
@@ -930,10 +938,10 @@ return
 %    iy_aux
 %
 function T = cfile_PbcExe( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~strcmp( partname, 'PbcExe' )                                          %&%
-    error( 'Only recognised choice is ''PbcExe''.' );                       %&%
-  end                                                                       %&%
+  %
+  if ~strcmp( partname, 'PbcExe' )
+    error( 'Only recognised choice is ''PbcExe''.' );
+  end
   %
   T = add_rtecalcstart( Q );
   %
@@ -953,10 +961,10 @@ return
 %    sensor variables
 %
 function T = cfile_Sensor( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~( strcmp( partname, 'Sensor' )  |  strcmp( partname, 'SensorSave' ) ) %&%
-    error( 'Only recognised choices are ''Sensor'' and ''SensorSave''.' );  %&%
-  end                                                                       %&%
+  %
+  if ~( strcmp( partname, 'Sensor' )  |  strcmp( partname, 'SensorSave' ) )
+    error( 'Only recognised choices are ''Sensor'' and ''SensorSave''.' );
+  end
 
   do_parts = false;
 
@@ -964,15 +972,15 @@ function T = cfile_Sensor( Q, partname, workfolder )
     T = {};
     return                           % Return
   end
-    
-  rqre_datatype( Q.SENSOR_DO, @isboolean, 'Q.SENSOR_DO' );                  %&%
+
+  rqre_datatype( Q.SENSOR_DO, @isboolean, 'Q.SENSOR_DO' );
   if ~Q.SENSOR_DO
     T{1} = 'sensorOff';
     return                           % Return
   end
-    
-  rqre_datatype( Q.SENSOR_RESPONSE, ...                                     %&%
-           {@ischar,@issparse,@iscellstr,@isstruct}, 'Q.SENSOR_RESPONSE' ); %&%
+
+  rqre_datatype( Q.SENSOR_RESPONSE, ...
+           {@ischar,@issparse,@iscellstr,@isstruct}, 'Q.SENSOR_RESPONSE' );
 
   do_parts = 0;
   %
@@ -1013,13 +1021,13 @@ function T = cfile_Sensor( Q, partname, workfolder )
       T = file_or_data( T, 'sensor_response_pol_grid', 'ArrayOfIndex', ...
              Q.SENSOR_RESPONSE_POL_GRID, workfolder, Q.INPUT_FILE_FORMAT );
     end
-  elseif iscellstr( Q.SENSOR_RESPONSE ) 
+  elseif iscellstr( Q.SENSOR_RESPONSE )
     T = Q.SENSOR_RESPONSE;
   end
 
   %- Structure version:
   %
-  if do_parts  
+  if do_parts
     %
     H = Q.SENSOR_RESPONSE;
     %
@@ -1039,10 +1047,10 @@ function T = cfile_Sensor( Q, partname, workfolder )
     if qarts_isset( H.FILL_FGRID )
       parts{end+1} = 'fill_fgrid';
     end
-    if qarts_isset( H.MIXER_DO ) & H.MIXER_DO 
+    if qarts_isset( H.MIXER_DO ) & H.MIXER_DO
       parts{end+1} = 'mixer';
     end
-    if qarts_isset( H.IF2RF ) & H.IF2RF 
+    if qarts_isset( H.IF2RF ) & H.IF2RF
       parts{end+1} = 'if2rf';
     end
     if qarts_isset( H.BACKEND_DO ) & H.BACKEND_DO
@@ -1052,7 +1060,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
       parts{end+1} = 'beamswitch';
     end
     % If multiple LO are given exchange 'mixer' for 'multimixer' and 'remove
-    % 'backend' 
+    % 'backend'
     if( any(strcmp( 'mixer', parts ))   &  ...
         any(strcmp( 'backend', parts )) &  length(H.LO) > 1 )
       %
@@ -1061,7 +1069,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
       parts     = parts{ find( ~strcmp('backend',parts) ) };
     end
     parts{end+1} = 'close';
-        
+
     % Start writing to output structure
     T = {};
 
@@ -1076,41 +1084,41 @@ function T = cfile_Sensor( Q, partname, workfolder )
         if qarts_isset( H.ANTENNA_DO )  &  ~H.ANTENNA_DO
           U{end+1} = 'AntennaOff';
         end
-        if qarts_isset( Q.ANTENNA_DIM ) 
-          rqre_alltypes( Q.ANTENNA_DIM, {@istensor0,@iswhole}, ...          %&%
-                                                          'Q.STOKES_DIM' ); %&%
-          rqre_in_range( Q.ANTENNA_DIM, 1, 2, 'Q.ANTENNA_DIM' );            %&%
+        if qarts_isset( Q.ANTENNA_DIM )
+          rqre_alltypes( Q.ANTENNA_DIM, {@istensor0,@iswhole}, ...
+                                                          'Q.STOKES_DIM' );
+          rqre_in_range( Q.ANTENNA_DIM, 1, 2, 'Q.ANTENNA_DIM' );
           U{end+1} = sprintf( 'IndexSet(antenna_dim,%d)', Q.ANTENNA_DIM );
         end
-        if qarts_isset( Q.MBLOCK_DLOS_GRID ) 
+        if qarts_isset( Q.MBLOCK_DLOS_GRID )
           U = file_or_data( U, 'mblock_dlos_grid', 'Matrix', ...
                      Q.MBLOCK_DLOS_GRID, workfolder, Q.INPUT_FILE_FORMAT );
-        end        
+        end
         if qarts_isset( H.SENSOR_NORM )
-          rqre_datatype( H.SENSOR_NORM, @isboolean, ...                     %&%
-                                         'Q.SENSOR_RESPONSE.SENSOR_NORM' ); %&%
+          rqre_datatype( H.SENSOR_NORM, @isboolean, ...
+                                         'Q.SENSOR_RESPONSE.SENSOR_NORM' );
           U{end+1} = sprintf( 'IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
         end
         U{end+1} = 'sensor_responseInit';
-        
+
       case 'fill_fgrid'
         v = qarts_get( H.FILL_FGRID );
-        if ~( isnumeric(v) & isvector(v) & length(v) == 2 )                 %&%
-          error( 'The sensor *FILL_FGRID* must be a vector of length 2.' ); %&%
-        end                                                                 %&%
+        if ~( isnumeric(v) & isvector(v) & length(v) == 2 )
+          error( 'The sensor *FILL_FGRID* must be a vector of length 2.' );
+        end
         U{end+1} = sprintf( ...
            'sensor_responseFillFgrid(polyorder=%d,nfill=%d)', v(1), v(2) );
-       
+
       case 'rotation'
         U = file_or_data( U, 'stokes_rotation', 'Vector', ...
                       H.STOKES_ROTATION, workfolder, Q.INPUT_FILE_FORMAT );
         U{end+1} = 'sensor_responseStokesRotation';
-       
+
        case 'polarisation'
         U = file_or_data( U, 'instrument_pol', 'ArrayOfIndex', ...
                            H.INSTRUMENT_POL, workfolder, Q.INPUT_FILE_FORMAT );
         U{end+1} = 'sensor_responsePolarisation';
-       
+
       case 'antenna'
         if qarts_isset( H.ANTENNA_DLOS )
           U = file_or_data( U, 'antenna_dlos', 'Matrix', ...
@@ -1121,17 +1129,17 @@ function T = cfile_Sensor( Q, partname, workfolder )
                      H.ANTENNA_RESPONSE, workfolder, Q.INPUT_FILE_FORMAT );
         end
         U{end+1} = 'sensor_responseAntenna';
-        
+
       case 'mixer'
-        if qarts_isset( H.LO ) 
+        if qarts_isset( H.LO )
           U = file_or_data( U, 'lo', 'Numeric', H.LO, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
         end
-        if qarts_isset( H.SIDEBAND_RESPONSE )           
+        if qarts_isset( H.SIDEBAND_RESPONSE )
           U = file_or_data( U, 'sideband_response', 'GriddedField1', ...
                     H.SIDEBAND_RESPONSE, workfolder, Q.INPUT_FILE_FORMAT );
         end
-        if qarts_isset( H.SIDEBAND_MODE )           
+        if qarts_isset( H.SIDEBAND_MODE )
           U = file_or_data( U, 'sideband_mode', 'String', ...
                         H.SIDEBAND_MODE, workfolder, Q.INPUT_FILE_FORMAT );
         end
@@ -1139,12 +1147,12 @@ function T = cfile_Sensor( Q, partname, workfolder )
 
       case 'if2rf'
         U{end+1} = 'sensor_responseIF2RF';
-        
+
       case 'backend'
-        if qarts_isset( H.F_BACKEND ) 
+        if qarts_isset( H.F_BACKEND )
           U = file_or_data( U, 'f_backend', 'Vector', H.F_BACKEND, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
-        end        
+        end
         if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
           U = file_or_data( U, 'backend_channel_response', ...
             'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ...
@@ -1154,45 +1162,45 @@ function T = cfile_Sensor( Q, partname, workfolder )
           U{end+1} = 'sensor_responseBackend';
         else
           df = qarts_get( H.F_SWITCHING );
-          if ~( isnumeric(df) & isvector(df) & length(df)==2 )              %&%
-          error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );%&%
-          end                                                               %&%
+          if ~( isnumeric(df) & isvector(df) & length(df)==2 )
+          error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );
+          end
           U{end+1} = 'sensor_responseBackendFrequencySwitching(';
           U{end+1} = sprintf( '   df1=%.6e, df2=%.6e)', df(1), df(2) );
         end
-        
+
        case 'multimixer'
         if qarts_isset( H.F_SWITCHING )
           error( 'The sensor *F_SWITCHING* option can not be used together ',...
                                                          'with multiple LO.' );
         end
-        if qarts_isset( H.LO ) 
+        if qarts_isset( H.LO )
           U = file_or_data( U, 'lo_multi', 'Vector', H.LO, workfolder, ...
                                                      Q.INPUT_FILE_FORMAT );
         end
-        if qarts_isset( H.SIDEBAND_RESPONSE )           
+        if qarts_isset( H.SIDEBAND_RESPONSE )
           U = file_or_data( U, 'sideband_response_multi', ...
                      'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
-        end   
-        if qarts_isset( H.SIDEBAND_MODE )           
+        end
+        if qarts_isset( H.SIDEBAND_MODE )
           U = file_or_data( U, 'sideband_mode_multi', 'ArrayOfString', ...
                             H.SIDEBAND_MODE, workfolder, Q.INPUT_FILE_FORMAT );
-        end   
-        if qarts_isset( H.F_BACKEND ) 
+        end
+        if qarts_isset( H.F_BACKEND )
           U = file_or_data( U, 'f_backend_multi', 'ArrayOfVector', ...
                             H.F_BACKEND, workfolder, Q.INPUT_FILE_FORMAT );
-        end        
+        end
         if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
           U = file_or_data( U, 'backend_channel_response_multi', ....
-                 'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ... 
+                 'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ...
                                          workfolder, Q.INPUT_FILE_FORMAT );
         end
         U{end+1} = 'sensor_responseMultiMixerBackend';
-        
+
       case 'beamswitch'
         U{1} = 'sensor_responseBeamSwitching';
-        
+
       case 'close'
         U{1} = '# End of sensor part';
 
@@ -1203,7 +1211,7 @@ function T = cfile_Sensor( Q, partname, workfolder )
       T = { T{:} U{:} };
     end
   end
-  
+
   %- Saving
   %
   if strcmp( partname, 'SensorSave' )
@@ -1234,7 +1242,7 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   end
 
   do_parts = false;
-  
+
   if ~qarts_isset( Q.J_DO )
      T={};
      return
@@ -1247,30 +1255,30 @@ function T = cfile_Jacobi( Q, partname, workfolder )
   T{1} = 'jacobianInit';
 
   %- Gas species
-  %                                                                         %&%
-  rqre_field( Q.ABS_SPECIES, 'RETRIEVE', 'Q.ABS_SPECIES' );                 %&%
   %
-  if any( [ Q.ABS_SPECIES.RETRIEVE ] == true )      
-    %                                                                       %&%
-    if ~isfield( Q.ABS_SPECIES, {'UNIT','GRIDS'} )                          %&%
-      error( ['With Q.ABS_SPECIES.RETRIEVED true the fields ', ...          %&%
-              '''UNIT'' and ''GRIDS'' must exist.'] );                      %&%
-    end                                                                     %&%
+  rqre_field( Q.ABS_SPECIES, 'RETRIEVE', 'Q.ABS_SPECIES' );
+  %
+  if any( [ Q.ABS_SPECIES.RETRIEVE ] == true )
+    %
+    if ~isfield( Q.ABS_SPECIES, {'UNIT','GRIDS'} )
+      error( ['With Q.ABS_SPECIES.RETRIEVED true the fields ', ...
+              '''UNIT'' and ''GRIDS'' must exist.'] );
+    end
     %
     for i = 1 : length(Q.ABS_SPECIES)
       %
-      rqre_datatype( Q.ABS_SPECIES(i).RETRIEVE, @isboolean, ...             %&%
-                                 sprintf('Q.ABS_SPECIES(%d).RETRIEVE',i) ); %&%
+      rqre_datatype( Q.ABS_SPECIES(i).RETRIEVE, @isboolean, ...
+                                 sprintf('Q.ABS_SPECIES(%d).RETRIEVE',i) );
       %
       if Q.ABS_SPECIES(i).RETRIEVE
         %
-        rqre_datatype( Q.ABS_SPECIES(i).UNIT, @ischar, ...                  %&%
-                                     sprintf('Q.ABS_SPECIES(%d).UNIT',i) ); %&%
-        rqre_datatype( Q.ABS_SPECIES(i).GRIDS, @iscell, ...                 %&%
-                                    sprintf('Q.ABS_SPECIES(%d).GRIDS',i) ); %&%
-        if length(Q.ABS_SPECIES(i).GRIDS) ~= 3                              %&%
-              error( 'Q.ABS_SPECIES(%d).GRIDS has not length 3.', i );      %&%
-        end                                                                 %&%
+        rqre_datatype( Q.ABS_SPECIES(i).UNIT, @ischar, ...
+                                     sprintf('Q.ABS_SPECIES(%d).UNIT',i) );
+        rqre_datatype( Q.ABS_SPECIES(i).GRIDS, @iscell, ...
+                                    sprintf('Q.ABS_SPECIES(%d).GRIDS',i) );
+        if length(Q.ABS_SPECIES(i).GRIDS) ~= 3
+              error( 'Q.ABS_SPECIES(%d).GRIDS has not length 3.', i );
+        end
         %
         name1    = sprintf( 'gas%d_jac_p_grid', i );
         T{end+1} = create_var( name1, 'Vector' );
@@ -1295,23 +1303,23 @@ function T = cfile_Jacobi( Q, partname, workfolder )
     end % for
   end % if
 
-  
+
   %- Atmospheric temperatures
-  %                                                                         %&%
+  %
   if qarts_isset( Q.T )
-    if ~isfield( Q.T, 'RETRIEVE' )                                          %&%
-       error( 'When Q.T exists, the field RETRIEVE must be set.' );         %&%
-    end                                                                     %&%
-    rqre_datatype( Q.T.RETRIEVE, @isboolean, 'Q.T.RETRIEVE' );              %&%
+    if ~isfield( Q.T, 'RETRIEVE' )
+       error( 'When Q.T exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.T.RETRIEVE, @isboolean, 'Q.T.RETRIEVE' );
     if Q.T.RETRIEVE
-      %                                                                     %&%
-      if ~isfield( Q.T, {'GRIDS'} )                                         %&%
-        error( 'With Q.T.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
-      end                                                                   %&%
-      rqre_datatype( Q.T.GRIDS, @iscell, 'Q.T.GRIDS' );                     %&%
-      if length(Q.T.GRIDS) ~= 3                                             %&%
-        error( 'Q.T.GRIDS has not length 3.' );                             %&%
-      end                                                                   %&%
+      %
+      if ~isfield( Q.T, {'GRIDS'} )
+        error( 'With Q.T.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.T.GRIDS, @iscell, 'Q.T.GRIDS' );
+      if length(Q.T.GRIDS) ~= 3
+        error( 'Q.T.GRIDS has not length 3.' );
+      end
       %
       name1    = 'temperature_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1325,32 +1333,32 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} = create_var( name3, 'Vector' );
       T        = file_or_data( T, name3, 'Vector', Q.T.GRIDS{3},...
                                     workfolder, Q.INPUT_FILE_FORMAT, name3 );
-      hse = 'on'; 
+      hse = 'on';
       if isfield( Q.T, 'HSE' ) & qarts_isset( Q.T.HSE ), hse = Q.T.HSE; end
       T{end+1} ='jacobianAddTemperature(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,', name1, name2, name3 );
       T{end+1} = sprintf( '  "%s")', hse );
-    end  
+    end
   end
 
   %- Wind, U
-  %                                                                         %&%
+  %
   if qarts_isset( Q.WIND_U )
-    if ~isfield( Q.WIND_U, 'RETRIEVE' )                                     %&%
-       error( 'When Q.WIND_U exists, the field RETRIEVE must be set.' );    %&%
-    end                                                                     %&%
-    rqre_datatype( Q.WIND_U.RETRIEVE, @isboolean, 'Q.WIND_U.RETRIEVE' );    %&%
-    if Q.WIND_U.RETRIEVE                                                    
-      %                                                                     %&%
-      if ~isfield( Q.WIND_U, {'GRIDS'} )                                    %&%
-        error( ...                                                          %&%
-          'With Q.WIND_U.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
-      end                                                                   %&%
-      rqre_datatype( Q.WIND_U.GRIDS, @iscell, 'Q.WIND_U.GRIDS' );           %&%
-      if length(Q.WIND_U.GRIDS) ~= 3                                        %&%
-        error( 'Q.WIND_U.GRIDS has not length 3.' );                        %&%
-      end                                                                   %&%
+    if ~isfield( Q.WIND_U, 'RETRIEVE' )
+       error( 'When Q.WIND_U exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.WIND_U.RETRIEVE, @isboolean, 'Q.WIND_U.RETRIEVE' );
+    if Q.WIND_U.RETRIEVE
+      %
+      if ~isfield( Q.WIND_U, {'GRIDS'} )
+        error( ...
+          'With Q.WIND_U.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.WIND_U.GRIDS, @iscell, 'Q.WIND_U.GRIDS' );
+      if length(Q.WIND_U.GRIDS) ~= 3
+        error( 'Q.WIND_U.GRIDS has not length 3.' );
+      end
       %
       name1    = 'wind_u_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1367,26 +1375,26 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} ='jacobianAddWind(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,"u")', name1, name2, name3 );
-    end  
-  end  
+    end
+  end
 
   %- Wind, V
-  %                                                                         %&%
+  %
   if qarts_isset( Q.WIND_V )
-    if ~isfield( Q.WIND_V, 'RETRIEVE' )                                     %&%
-       error( 'When Q.WIND_V exists, the field RETRIEVE must be set.' );    %&%
-    end                                                                     %&%
-    rqre_datatype( Q.WIND_V.RETRIEVE, @isboolean, 'Q.WIND_V.RETRIEVE' );    %&%
-    if Q.WIND_V.RETRIEVE                                                    
-      %                                                                     %&%
-      if ~isfield( Q.WIND_V, {'GRIDS'} )                                    %&%
-        error( ...                                                          %&%
-          'With Q.WIND_V.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
-      end                                                                   %&%
-      rqre_datatype( Q.WIND_V.GRIDS, @iscell, 'Q.WIND_V.GRIDS' );           %&%
-      if length(Q.WIND_V.GRIDS) ~= 3                                        %&%
-        error( 'Q.WIND_V.GRIDS has not length 3.' );                        %&%
-      end                                                                   %&%
+    if ~isfield( Q.WIND_V, 'RETRIEVE' )
+       error( 'When Q.WIND_V exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.WIND_V.RETRIEVE, @isboolean, 'Q.WIND_V.RETRIEVE' );
+    if Q.WIND_V.RETRIEVE
+      %
+      if ~isfield( Q.WIND_V, {'GRIDS'} )
+        error( ...
+          'With Q.WIND_V.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.WIND_V.GRIDS, @iscell, 'Q.WIND_V.GRIDS' );
+      if length(Q.WIND_V.GRIDS) ~= 3
+        error( 'Q.WIND_V.GRIDS has not length 3.' );
+      end
       %
       name1    = 'wind_v_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1403,26 +1411,26 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} ='jacobianAddWind(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,"v")', name1, name2, name3 );
-    end  
-  end  
-  
+    end
+  end
+
   %- Wind, W
-  %                                                                         %&%
+  %
   if qarts_isset( Q.WIND_W )
-    if ~isfield( Q.WIND_W, 'RETRIEVE' )                                     %&%
-       error( 'When Q.WIND_W exists, the field RETRIEVE must be set.' );    %&%
-    end                                                                     %&%
-    rqre_datatype( Q.WIND_W.RETRIEVE, @isboolean, 'Q.WIND_W.RETRIEVE' );    %&%
-    if Q.WIND_W.RETRIEVE                                                    
-      %                                                                     %&%
-      if ~isfield( Q.WIND_W, {'GRIDS'} )                                    %&%
-        error( ...                                                          %&%
-          'With Q.WIND_W.RETRIEVED true the field ''GRIDS'' must exist.' ); %&%
-      end                                                                   %&%
-      rqre_datatype( Q.WIND_W.GRIDS, @iscell, 'Q.WIND_W.GRIDS' );           %&%
-      if length(Q.WIND_W.GRIDS) ~= 3                                        %&%
-        error( 'Q.WIND_W.GRIDS has not length 3.' );                        %&%
-      end                                                                   %&%
+    if ~isfield( Q.WIND_W, 'RETRIEVE' )
+       error( 'When Q.WIND_W exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.WIND_W.RETRIEVE, @isboolean, 'Q.WIND_W.RETRIEVE' );
+    if Q.WIND_W.RETRIEVE
+      %
+      if ~isfield( Q.WIND_W, {'GRIDS'} )
+        error( ...
+          'With Q.WIND_W.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.WIND_W.GRIDS, @iscell, 'Q.WIND_W.GRIDS' );
+      if length(Q.WIND_W.GRIDS) ~= 3
+        error( 'Q.WIND_W.GRIDS has not length 3.' );
+      end
       %
       name1    = 'wind_w_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1439,26 +1447,26 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} ='jacobianAddWind(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,"w")', name1, name2, name3 );
-    end  
-  end  
+    end
+  end
 
   %- Magnetic field, U
-  %                                                                         %&%
+  %
   if qarts_isset( Q.MAG_U )
-    if ~isfield( Q.MAG_U, 'RETRIEVE' )                                      %&%
-       error( 'When Q.MAG_U exists, the field RETRIEVE must be set.' );     %&%
-    end                                                                     %&%
-    rqre_datatype( Q.MAG_U.RETRIEVE, @isboolean, 'Q.MAG_U.RETRIEVE' );      %&%
-    if Q.MAG_U.RETRIEVE                                                    
-      %                                                                     %&%
-      if ~isfield( Q.MAG_U, {'GRIDS'} )                                     %&%
-        error( ...                                                          %&%
-          'With Q.MAG_U.RETRIEVED true the field ''GRIDS'' must exist.' );  %&%
-      end                                                                   %&%
-      rqre_datatype( Q.MAG_U.GRIDS, @iscell, 'Q.MAG_U.GRIDS' );             %&%
-      if length(Q.MAG_U.GRIDS) ~= 3                                         %&%
-        error( 'Q.MAG_U.GRIDS has not length 3.' );                         %&%
-      end                                                                   %&%
+    if ~isfield( Q.MAG_U, 'RETRIEVE' )
+       error( 'When Q.MAG_U exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.MAG_U.RETRIEVE, @isboolean, 'Q.MAG_U.RETRIEVE' );
+    if Q.MAG_U.RETRIEVE
+      %
+      if ~isfield( Q.MAG_U, {'GRIDS'} )
+        error( ...
+          'With Q.MAG_U.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.MAG_U.GRIDS, @iscell, 'Q.MAG_U.GRIDS' );
+      if length(Q.MAG_U.GRIDS) ~= 3
+        error( 'Q.MAG_U.GRIDS has not length 3.' );
+      end
       %
       name1    = 'mag_u_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1475,26 +1483,26 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} ='jacobianAddMagField(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,"u")', name1, name2, name3 );
-    end  
-  end  
+    end
+  end
 
   %- Magnetic field, V
-  %                                                                         %&%
+  %
   if qarts_isset( Q.MAG_V )
-    if ~isfield( Q.MAG_V, 'RETRIEVE' )                                      %&%
-       error( 'When Q.MAG_V exists, the field RETRIEVE must be set.' );     %&%
-    end                                                                     %&%
-    rqre_datatype( Q.MAG_V.RETRIEVE, @isboolean, 'Q.MAG_V.RETRIEVE' );      %&%
-    if Q.MAG_V.RETRIEVE                                                    
-      %                                                                     %&%
-      if ~isfield( Q.MAG_V, {'GRIDS'} )                                     %&%
-        error( ...                                                          %&%
-          'With Q.MAG_V.RETRIEVED true the field ''GRIDS'' must exist.' );  %&%
-      end                                                                   %&%
-      rqre_datatype( Q.MAG_V.GRIDS, @iscell, 'Q.MAG_V.GRIDS' );             %&%
-      if length(Q.MAG_V.GRIDS) ~= 3                                         %&%
-        error( 'Q.MAG_V.GRIDS has not length 3.' );                         %&%
-      end                                                                   %&%
+    if ~isfield( Q.MAG_V, 'RETRIEVE' )
+       error( 'When Q.MAG_V exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.MAG_V.RETRIEVE, @isboolean, 'Q.MAG_V.RETRIEVE' );
+    if Q.MAG_V.RETRIEVE
+      %
+      if ~isfield( Q.MAG_V, {'GRIDS'} )
+        error( ...
+          'With Q.MAG_V.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.MAG_V.GRIDS, @iscell, 'Q.MAG_V.GRIDS' );
+      if length(Q.MAG_V.GRIDS) ~= 3
+        error( 'Q.MAG_V.GRIDS has not length 3.' );
+      end
       %
       name1    = 'mag_v_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1511,26 +1519,26 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} ='jacobianAddMagField(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,"v")', name1, name2, name3 );
-    end  
-  end  
-  
+    end
+  end
+
   %- Magnetic field, W
-  %                                                                         %&%
+  %
   if qarts_isset( Q.MAG_W )
-    if ~isfield( Q.MAG_W, 'RETRIEVE' )                                      %&%
-       error( 'When Q.MAG_W exists, the field RETRIEVE must be set.' );     %&%
-    end                                                                     %&%
-    rqre_datatype( Q.MAG_W.RETRIEVE, @isboolean, 'Q.MAG_W.RETRIEVE' );      %&%
-    if Q.MAG_W.RETRIEVE                                                    
-      %                                                                     %&%
-      if ~isfield( Q.MAG_W, {'GRIDS'} )                                     %&%
-        error( ...                                                          %&%
-          'With Q.MAG_W.RETRIEVED true the field ''GRIDS'' must exist.' );  %&%
-      end                                                                   %&%
-      rqre_datatype( Q.MAG_W.GRIDS, @iscell, 'Q.MAG_W.GRIDS' );             %&%
-      if length(Q.MAG_W.GRIDS) ~= 3                                         %&%
-        error( 'Q.MAG_W.GRIDS has not length 3.' );                         %&%
-      end                                                                   %&%
+    if ~isfield( Q.MAG_W, 'RETRIEVE' )
+       error( 'When Q.MAG_W exists, the field RETRIEVE must be set.' );
+    end
+    rqre_datatype( Q.MAG_W.RETRIEVE, @isboolean, 'Q.MAG_W.RETRIEVE' );
+    if Q.MAG_W.RETRIEVE
+      %
+      if ~isfield( Q.MAG_W, {'GRIDS'} )
+        error( ...
+          'With Q.MAG_W.RETRIEVED true the field ''GRIDS'' must exist.' );
+      end
+      rqre_datatype( Q.MAG_W.GRIDS, @iscell, 'Q.MAG_W.GRIDS' );
+      if length(Q.MAG_W.GRIDS) ~= 3
+        error( 'Q.MAG_W.GRIDS has not length 3.' );
+      end
       %
       name1    = 'mag_w_jac_p_grid';
       T{end+1} = create_var( name1, 'Vector' );
@@ -1547,49 +1555,49 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} ='jacobianAddMagField(jacobian_quantities,jacobian_agenda,';
       T{end+1} = '   atmosphere_dim,p_grid,lat_grid,lon_grid,';
       T{end+1} = sprintf( '  %s,%s,%s,"w")', name1, name2, name3 );
-    end  
-  end  
-  
+    end
+  end
+
   %- Frequency
   %
-  if qarts_isset(Q.FSHIFTFIT) 
-    rqre_datatype( Q.FSHIFTFIT, @isstruct, 'Q.FSHIFTFIT' );                 %&%
-    rqre_field( Q.FSHIFTFIT, 'RETRIEVE', 'Q.FSHIFTFIT' );                   %&%
-    rqre_datatype( Q.FSHIFTFIT.RETRIEVE, @isboolean, ...                    %&%
-                                                 'Q.FSHIFTFIT.RETRIEVAL' ); %&%
+  if qarts_isset(Q.FSHIFTFIT)
+    rqre_datatype( Q.FSHIFTFIT, @isstruct, 'Q.FSHIFTFIT' );
+    rqre_field( Q.FSHIFTFIT, 'RETRIEVE', 'Q.FSHIFTFIT' );
+    rqre_datatype( Q.FSHIFTFIT.RETRIEVE, @isboolean, ...
+                                                 'Q.FSHIFTFIT.RETRIEVAL' );
     if Q.FSHIFTFIT.RETRIEVE
-      rqre_field( Q.FSHIFTFIT, 'DF', 'Q.FSHIFTFIT' );                       %&%
-      rqre_datatype( Q.FSHIFTFIT.DF, @istensor0, 'Q.FSHIFTFIT.DF' );        %&%
+      rqre_field( Q.FSHIFTFIT, 'DF', 'Q.FSHIFTFIT' );
+      rqre_datatype( Q.FSHIFTFIT.DF, @istensor0, 'Q.FSHIFTFIT.DF' );
       T{end+1} = sprintf('jacobianAddFreqShift(df=%.6e)', Q.FSHIFTFIT.DF );
     end
   end
-  if qarts_isset(Q.FSTRETCHFIT) 
-    rqre_datatype( Q.FSTRETCHFIT, @isstruct, 'Q.FSTRETCHFIT' );             %&%
-    rqre_field( Q.FSTRETCHFIT, 'RETRIEVE', 'Q.FSTRETCHFIT' );               %&%
-    rqre_datatype( Q.FSTRETCHFIT.RETRIEVE, @isboolean, ...                  %&%
-                                               'Q.FSTRETCHFIT.RETRIEVAL' ); %&%
+  if qarts_isset(Q.FSTRETCHFIT)
+    rqre_datatype( Q.FSTRETCHFIT, @isstruct, 'Q.FSTRETCHFIT' );
+    rqre_field( Q.FSTRETCHFIT, 'RETRIEVE', 'Q.FSTRETCHFIT' );
+    rqre_datatype( Q.FSTRETCHFIT.RETRIEVE, @isboolean, ...
+                                               'Q.FSTRETCHFIT.RETRIEVAL' );
     if Q.FSTRETCHFIT.RETRIEVE
-      rqre_field( Q.FSTRETCHFIT, 'DF', 'Q.FSTRETCHFIT' );                   %&%
-      rqre_datatype( Q.FSTRETCHFIT.DF, @istensor0, 'Q.FSTRETCHFIT.DF' );    %&%
+      rqre_field( Q.FSTRETCHFIT, 'DF', 'Q.FSTRETCHFIT' );
+      rqre_datatype( Q.FSTRETCHFIT.DF, @istensor0, 'Q.FSTRETCHFIT.DF' );
       T{end+1} = sprintf('jacobianAddFreqStretch(df=%.6e)', Q.FSTRETCHFIT.DF );
     end
   end
 
   %- Pointing
   %
-  if qarts_isset(Q.POINTING) 
-    rqre_datatype( Q.POINTING, @isstruct, 'Q.POINTING' );                   %&%
-    rqre_field( Q.POINTING, 'RETRIEVE', 'Q.POINTING' );                     %&%
-    rqre_datatype( Q.POINTING.RETRIEVE, @isboolean, ...                     %&%
-                                                  'Q.POINTING.RETRIEVAL' ); %&%
+  if qarts_isset(Q.POINTING)
+    rqre_datatype( Q.POINTING, @isstruct, 'Q.POINTING' );
+    rqre_field( Q.POINTING, 'RETRIEVE', 'Q.POINTING' );
+    rqre_datatype( Q.POINTING.RETRIEVE, @isboolean, ...
+                                                  'Q.POINTING.RETRIEVAL' );
     if Q.POINTING.RETRIEVE
-      rqre_field( Q.POINTING, 'DZA', 'Q.POINTING' );                        %&%
-      rqre_datatype( Q.POINTING.DZA, @istensor0, 'Q.POINTING.DZA' );        %&%
-      rqre_field( Q.POINTING, 'POLY_ORDER', 'Q.POINTING' );                 %&%
-      rqre_alltypes( Q.POINTING.POLY_ORDER, {@istensor0,@iswhole}, ...      %&%
-                                                 'Q.POINTING.POLY_ORDER' ); %&%
-      rqre_field( Q.POINTING, 'CALCMODE', 'Q.POINTING' );                   %&%
-      rqre_datatype( Q.POINTING.CALCMODE, @ischar, Q.POINTING.CALCMODE' );  %&%
+      rqre_field( Q.POINTING, 'DZA', 'Q.POINTING' );
+      rqre_datatype( Q.POINTING.DZA, @istensor0, 'Q.POINTING.DZA' );
+      rqre_field( Q.POINTING, 'POLY_ORDER', 'Q.POINTING' );
+      rqre_alltypes( Q.POINTING.POLY_ORDER, {@istensor0,@iswhole}, ...
+                                                 'Q.POINTING.POLY_ORDER' );
+      rqre_field( Q.POINTING, 'CALCMODE', 'Q.POINTING' );
+      rqre_datatype( Q.POINTING.CALCMODE, @ischar, Q.POINTING.CALCMODE' );
       T{end+1} = 'jacobianAddPointingZa(jacobian_quantities, jacobian_agenda,';
       T{end+1} =  '   sensor_pos, sensor_time,';
       T{end+1} = sprintf( '   %d,"%s",%d)', Q.POINTING.POLY_ORDER, ...
@@ -1599,29 +1607,29 @@ function T = cfile_Jacobi( Q, partname, workfolder )
 
   %- Polyfit
   %
-  if qarts_isset(Q.POLYFIT) 
-    rqre_datatype( Q.POLYFIT, @isstruct, 'Q.POLYFIT' );                     %&%
-    rqre_field( Q.POLYFIT, 'RETRIEVE', 'Q.POLYFIT' );                       %&%
-    rqre_datatype( Q.POLYFIT.RETRIEVE, @isboolean, 'Q.POLYFIT.RETRIEVAL' ); %&%
+  if qarts_isset(Q.POLYFIT)
+    rqre_datatype( Q.POLYFIT, @isstruct, 'Q.POLYFIT' );
+    rqre_field( Q.POLYFIT, 'RETRIEVE', 'Q.POLYFIT' );
+    rqre_datatype( Q.POLYFIT.RETRIEVE, @isboolean, 'Q.POLYFIT.RETRIEVAL' );
     if Q.POLYFIT.RETRIEVE
-      rqre_field( Q.POLYFIT, 'ORDER', 'Q.POLYFIT' );                        %&%
-      rqre_alltypes( Q.POLYFIT.ORDER, {@istensor0,@iswhole}, ...            %&%
-                                                       'Q.POLYFIT.ORDER' ); %&%
+      rqre_field( Q.POLYFIT, 'ORDER', 'Q.POLYFIT' );
+      rqre_alltypes( Q.POLYFIT.ORDER, {@istensor0,@iswhole}, ...
+                                                       'Q.POLYFIT.ORDER' );
       T{end+1} = 'jacobianAddPolyfit(jacobian_quantities, jacobian_agenda,';
       T{end+1} =  '   sensor_response_pol_grid,sensor_response_dlos_grid,';
       T{end+1} = sprintf( '   sensor_pos,%d)', Q.POLYFIT.ORDER );
     end
   end
-  
+
   %- Sinefit
   %
-  if qarts_isset(Q.SINEFIT) 
-    rqre_datatype( Q.SINEFIT, @isstruct, 'Q.SINEFIT' );                     %&%
-    rqre_field( Q.SINEFIT, 'RETRIEVE', 'Q.SINEFIT' );                       %&%
-    rqre_datatype( Q.SINEFIT.RETRIEVE, @isboolean, 'Q.SINEFIT.RETRIEVAL' ); %&%
+  if qarts_isset(Q.SINEFIT)
+    rqre_datatype( Q.SINEFIT, @isstruct, 'Q.SINEFIT' );
+    rqre_field( Q.SINEFIT, 'RETRIEVE', 'Q.SINEFIT' );
+    rqre_datatype( Q.SINEFIT.RETRIEVE, @isboolean, 'Q.SINEFIT.RETRIEVAL' );
     if Q.SINEFIT.RETRIEVE
-      rqre_field( Q.SINEFIT, 'PERIODS', 'Q.SINEFIT' );                      %&%
-      rqre_datatype( Q.SINEFIT.PERIODS, @istensor1, 'Q.SINEFIT.PERIODS' );  %&%
+      rqre_field( Q.SINEFIT, 'PERIODS', 'Q.SINEFIT' );
+      rqre_datatype( Q.SINEFIT.PERIODS, @istensor1, 'Q.SINEFIT.PERIODS' );
       T{end+1} = 'jacobianAddSinefit(jacobian_quantities, jacobian_agenda,';
       T{end+1} =  '   sensor_response_pol_grid,sensor_response_dlos_grid,';
       s = sprintf( '   sensor_pos,[%f', Q.SINEFIT.PERIODS(1) );
@@ -1632,11 +1640,11 @@ function T = cfile_Jacobi( Q, partname, workfolder )
       T{end+1} = s;
     end
   end
-  
-  T{end+1} = 'jacobianClose';    
 
-  
-  %- Saving 
+  T{end+1} = 'jacobianClose';
+
+
+  %- Saving
   %
   if strcmp( partname, 'JacobiSave' )
     T{end+1} = add_savefile( 'jacobian_quantities', workfolder );
@@ -1656,43 +1664,43 @@ return
 %    opt_prop_gas_agenda
 %
 function T = cfile_CldBox( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~( strcmp( partname, 'CldBox' )  |  strcmp( partname, 'CldBoxSave' ) ) %&%
-    error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );  %&%
-  end                                                                       %&%
+  %
+  if ~( strcmp( partname, 'CldBox' )  |  strcmp( partname, 'CldBoxSave' ) )
+    error( 'Only recognised choices are ''CldBox'' and ''CldBoxSave''.' );
+  end
 
   if ~qarts_isset(Q.CLOUDBOX_DO)
      T={};
      return
   end
 
-  rqre_datatype( Q.CLOUDBOX_DO, @isboolean, 'Q.CLOUDBOX_DO' );              %&%
-  
+  rqre_datatype( Q.CLOUDBOX_DO, @isboolean, 'Q.CLOUDBOX_DO' );
+
   if ~Q.CLOUDBOX_DO
     T{1}     = 'cloudboxOff';
     T{end+1} = 'cloudbox_checkedCalc';
     return
   end
-  
-  if ~isstruct( Q.CLOUDBOX )                                                %&%
-    error( 'Q.CLOUDBOX must be a structure if Q.CLOUD_BOX=1.' );            %&%
-  end                                                                       %&%
+
+  if ~isstruct( Q.CLOUDBOX )
+    error( 'Q.CLOUDBOX must be a structure if Q.CLOUD_BOX=1.' );
+  end
 
   %= Check that all fields are present
   %
   qcheck( @qartsCloudbox, Q.CLOUDBOX );
 
-  rqre_datatype( Q.CLOUDBOX.METHOD, @ischar, 'Q.CLOUDBOX.METHOD' );         %&%
-  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC','FOS','NONE'} ) ) %&%
-    error( ...                                                              %&% 
-       'Q.CLOUDBOX.METHOD must be ''DOIT'', ''MC'', ''FOS'' or ''none''.' ) %&%
-  end                                                                       %&%
+  rqre_datatype( Q.CLOUDBOX.METHOD, @ischar, 'Q.CLOUDBOX.METHOD' );
+  if ~any( strcmp( upper(Q.CLOUDBOX.METHOD), {'DOIT','MC','FOS','NONE'} ) )
+    error( ...
+       'Q.CLOUDBOX.METHOD must be ''DOIT'', ''MC'', ''FOS'' or ''none''.' )
+  end
 
   %= Cloudbox
   %
   if qarts_isset (Q.CLOUDBOX.LIMITS)
-    rqre_alltypes( Q.CLOUDBOX.LIMITS, {@isnumeric,@isvector}, ...           %&%
-                                                    'Q.CLOUDBOX.LIMITS' );  %&%
+    rqre_alltypes( Q.CLOUDBOX.LIMITS, {@isnumeric,@isvector}, ...
+                                                    'Q.CLOUDBOX.LIMITS' );
     nlims = length(Q.CLOUDBOX.LIMITS);
     if  nlims < 6
       limits          = zeros(1,6);
@@ -1711,20 +1719,20 @@ function T = cfile_CldBox( Q, partname, workfolder )
     T = file_or_data( T, 'particle_masses', 'Matrix', ...
                  Q.CLOUDBOX.PARTICLE_MASSES, workfolder, Q.INPUT_FILE_FORMAT );
   end
-  
+
   %= Particle field and single scattering data
   %
   nset = qarts_isset(Q.CLOUDBOX.PND_FIELD) + qarts_isset(Q.CLOUDBOX.SCAT_DATA);
-  %                                                                         %&%
-  if nset == 1                                                              %&%
-    error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must both ',...   %&%
-                                    'be set, or both be undefined ({}).' ); %&%
-  end                                                                       %&%
-  if nset                                                                   
-    if length(Q.CLOUDBOX.PND_FIELD) ~= length(Q.CLOUDBOX.SCAT_DATA)         %&%
-      error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must have ',... %&%
-                                                          'same length.' ); %&%
-    end                                                                     %&%
+  %
+  if nset == 1
+    error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must both ',...
+                                    'be set, or both be undefined ({}).' );
+  end
+  if nset
+    if length(Q.CLOUDBOX.PND_FIELD) ~= length(Q.CLOUDBOX.SCAT_DATA)
+      error( 'Q.CLOUDBOX.PND_FIELD and Q.CLOUDBOX.SCAT_DATA must have ',...
+                                                          'same length.' );
+    end
     %
     T{end+1}  = 'ScatSpeciesInit';
     do_pfCALC = false;
@@ -1740,7 +1748,7 @@ function T = cfile_CldBox( Q, partname, workfolder )
       if isstr( Q.CLOUDBOX.PND_FIELD{i} )
         pfile = Q.CLOUDBOX.PND_FIELD{i};
       else
-        pfile = fullfile( workfolder, sprintf( 'pnd_field_raw_%d.xml', i ) ); 
+        pfile = fullfile( workfolder, sprintf( 'pnd_field_raw_%d.xml', i ) );
         xmlStore( pfile, Q.CLOUDBOX.PND_FIELD{i}, 'GriddedField3', ...
                                                        Q.INPUT_FILE_FORMAT );
       end
@@ -1754,14 +1762,14 @@ function T = cfile_CldBox( Q, partname, workfolder )
       T{end+1} = sprintf('   pnd_field_files=["%s"])',pfile );
     end
     %
-    if do_pfCALC 
+    if do_pfCALC
       T{end+1} = 'pnd_fieldCalcFrompnd_field_raw';
     end
   end
   %
   T{end+1} = 'cloudbox_checkedCalc';
 
-  %= Agendas for scattering properties 
+  %= Agendas for scattering properties
   %
   if qarts_isset(Q.CLOUDBOX.OPT_PROP_PART_AGENDA)
     T = add_agenda( T, 'opt_prop_part_agenda', Q.CLOUDBOX.OPT_PROP_PART_AGENDA);
@@ -1788,64 +1796,64 @@ return
 %    variables for the different scattering methods
 %
 function T = cfile_SctMth( Q, partname, workfolder )
-  %                                                                         %&%
-  if ~( strcmp( partname, 'SctMth' )  |  ...                                %&%
-        strcmp( partname, 'SctMthSave' )  |  ...                            %&%
-        strcmp( partname, 'SctMthBatch' ) )                                 %&%
-    error( ['Only recognised choices are ''SctMth'', ''SctMthSave'' ',...   %&%
-            'and ''SctMthBatch''.'] );                                      %&%
-  end                                                                       %&%
+  %
+  if ~( strcmp( partname, 'SctMth' )  |  ...
+        strcmp( partname, 'SctMthSave' )  |  ...
+        strcmp( partname, 'SctMthBatch' ) )
+    error( ['Only recognised choices are ''SctMth'', ''SctMthSave'' ',...
+            'and ''SctMthBatch''.'] );
+  end
 
   if ~qarts_isset(Q.CLOUDBOX_DO)
      T={};
      return                           % Return
   else
-    rqre_datatype( Q.CLOUDBOX_DO, @isboolean, 'Q.CLOUDBOX_DO' );            %&%
+    rqre_datatype( Q.CLOUDBOX_DO, @isboolean, 'Q.CLOUDBOX_DO' );
     if ~Q.CLOUDBOX_DO
       T={};
       return                           % Return
-    end    
+    end
   end
-  
-  % It is assumed that cfile_CldBox has been called and checks of Q.CLOUDBOX 
+
+  % It is assumed that cfile_CldBox has been called and checks of Q.CLOUDBOX
   % have been performed
 
   %= DOIT / MC
   %
   if strcmp( upper(Q.CLOUDBOX.METHOD), 'DOIT' )
     %
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, {'N_ZA_GRID','N_AA_GRID',...      %&%
-          'ZA_GRID_OPT_FILE', 'SCAT_ZA_INTERP', 'EPSILON', 'ALL_F' }, ...   %&%
-                              'Q.CLOUDBOX.METHOD_PRMTRS when using DOIT' ); %&%
-    rqre_alltypes( Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID, ...                  %&%
-             {@istensor0,@iswhole}, 'Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID' ); %&%
-    rqre_alltypes( Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID, ...                  %&%
-             {@istensor0,@iswhole}, 'Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, @ischar, ...    %&%
-                               'Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP' ); %&%
-    if ~any( strcmp( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, ...           %&%
-                                               {'linear','polynomial'} ) )  %&%
-      error( ['Unknown interpolation method. ',...                          %&%
-              'Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP can be ',...         %&%
-              '''linear'' or ''polynomial''.'] );                           %&%
-    end                                                                     %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, ...           %&%
-       {@ischar,@istensor0}, 'Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.ALL_F, @isboolean, ...          %&%
-                                        'Q.CLOUDBOX.METHOD_PRMTRS.ALL_F' ); %&%
-    
+    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, {'N_ZA_GRID','N_AA_GRID',...
+          'ZA_GRID_OPT_FILE', 'SCAT_ZA_INTERP', 'EPSILON', 'ALL_F' }, ...
+                              'Q.CLOUDBOX.METHOD_PRMTRS when using DOIT' );
+    rqre_alltypes( Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID, ...
+             {@istensor0,@iswhole}, 'Q.CLOUDBOX.METHOD_PRMTRS.N_ZA_GRID' );
+    rqre_alltypes( Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID, ...
+             {@istensor0,@iswhole}, 'Q.CLOUDBOX.METHOD_PRMTRS.N_AA_GRID' );
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, @ischar, ...
+                               'Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP' );
+    if ~any( strcmp( Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP, ...
+                                               {'linear','polynomial'} ) )
+      error( ['Unknown interpolation method. ',...
+              'Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP can be ',...
+              '''linear'' or ''polynomial''.'] );
+    end
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, ...
+       {@ischar,@istensor0}, 'Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE' );
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.ALL_F, @isboolean, ...
+                                        'Q.CLOUDBOX.METHOD_PRMTRS.ALL_F' );
+
     if isempty( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )  |  ...
        ( ischar( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE ) & ...
        strcmp( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, '""' ) )
       optfile = '';
-    elseif isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )      
-      optfile = fullfile( workfolder, 'scat_za_grid.xml' ); 
+    elseif isnumeric( Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE )
+      optfile = fullfile( workfolder, 'scat_za_grid.xml' );
       xmlStore( filename, Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE, ...
                                            'Vector', Q.INPUT_FILE_FORMAT );
-    else     
+    else
       optfile = Q.CLOUDBOX.METHOD_PRMTRS.ZA_GRID_OPT_FILE;
     end
-    
+
     T{1}     = sprintf( ...
                     'doit_za_interpSet(doit_za_interp,atmosphere_dim,"%s")', ...
                                       Q.CLOUDBOX.METHOD_PRMTRS.SCAT_ZA_INTERP );
@@ -1861,7 +1869,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
     %
     T = add_agenda( T, 'pha_mat_spt_agenda', { ...
         'pha_mat_sptFromDataDOITOpt' } );
-    
+
     if isempty( optfile )
       T = add_agenda( T, 'doit_scat_field_agenda', ...
                                              { 'doit_scat_fieldCalc' } );
@@ -1879,7 +1887,7 @@ function T = cfile_SctMth( Q, partname, workfolder )
       T = add_agenda( T, 'doit_rte_agenda', { sprintf( ...
                             'doit_i_fieldUpdateSeq%dD', Q.ATMOSPHERE_DIM ) } );
     end
-    
+
     T = add_agenda( T, 'doit_conv_test_agenda', { ...
          sprintf( 'doit_conv_flagAbsBT(epsilon=[%s])', ...
          vector2commalist(Q.CLOUDBOX.METHOD_PRMTRS.EPSILON(1:Q.STOKES_DIM))) ...
@@ -1890,10 +1898,10 @@ function T = cfile_SctMth( Q, partname, workfolder )
       T{end+1} = 'DoitInit';
       T{end+1} = 'DoitGetIncoming';
       T{end+1} = sprintf( 'doit_i_fieldSetClearsky(all_frequencies=%d)', ...
-                                               Q.CLOUDBOX.METHOD_PRMTRS.ALL_F ); 
+                                               Q.CLOUDBOX.METHOD_PRMTRS.ALL_F );
       T{end+1} = 'DoitCalc';
     end
-    
+
   elseif strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
     %
     T = {};
@@ -1907,8 +1915,8 @@ function T = cfile_SctMth( Q, partname, workfolder )
     T = add_agenda( {}, 'iy_cloudbox_agenda', { 'Ignore(rtp_pos)', ...
                         'Ignore(rtp_los)', 'Ignore(f_grid)', 'Touch(iy)' } );
     %
-  else                                                                      %&%
-    error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );                       %&%
+  else
+    error( 'Unknown choice for Q.CLOUDBOX.METHOD.' );
   end
 
 return
@@ -1923,7 +1931,7 @@ return
 function T = cfile_BatchC( Q, partname, workfolder )
 
   error(' Batch part of *qarts2cfile* not updated.' );
-  
+
   %- Some checks of data
   %
   if ~isstruct( Q.BATCH )
@@ -1947,14 +1955,14 @@ function T = cfile_BatchC( Q, partname, workfolder )
   n_int = zeros(5,1);   % Same for index variables
   %
   for i = 1 : length( Q.BATCH.DATA )
-    
+
     rqre_field( Q.BATCH.DATA(i), 'TYPE', 0 );
     rqre_char( sprintf('Q.BATCH{%d}.TYPE',i), Q.BATCH.DATA(i).TYPE );
     rqre_field( Q.BATCH.DATA(i), 'WSV', 0 );
     rqre_char( sprintf('Q.BATCH{%d}.WSV',i), Q.BATCH.DATA(i).WSV );
     rqre_field( Q.BATCH.DATA(i), 'X', 0 );
-  
-    %if size(Q.BATCH.DATA(i).X,1) < Q.BATCH.N 
+
+    %if size(Q.BATCH.DATA(i).X,1) < Q.BATCH.N
     %  error( sprintf( ...
     %         'Q.BATCH.DATA{%d}.X contains fewer cases than Q.BATCH.N', i ) );
     %end
@@ -1965,18 +1973,18 @@ function T = cfile_BatchC( Q, partname, workfolder )
     %
     if strcmp(datatype,'num')
       n_num(dim) = n_num(dim) + 1;
-      vn         = n_num(dim);      % "variable number" 
+      vn         = n_num(dim);      % "variable number"
     elseif strcmp(datatype,'int')
       n_int(dim) = n_int(dim) + 1;
-      vn         = n_int(dim);      % "variable number" 
+      vn         = n_int(dim);      % "variable number"
     else
       vn         = 1;               % Assume only one variable of other types
     end
-    
+
     mainname  = Q.BATCH.DATA(i).WSV;
     batchtype = arts_datatypes( dim+1, datatype );
     batchname = sprintf( '%s_%d', lower(batchtype), vn );
-    
+
     T = file_or_data( T, batchname, batchtype, Q.BATCH.DATA(i).X, ...
          workfolder, Q.INPUT_FILE_FORMAT, sprintf('%s_batch.xml',mainname) );
     A{end+1} = sprintf( '%sExtractFrom%s(%s,%s,ybatch_index)', ...
@@ -1990,14 +1998,14 @@ function T = cfile_BatchC( Q, partname, workfolder )
   A   = { A{:} Q.BATCH.WSM{:} Arc{:} };
   %
   T = add_agenda( T, 'ybatch_calc_agenda', A );
-  
+
   %- Make actual calculations
   %
   T{end+1} = sprintf( 'IndexSet(ybatch_n){%d}', Q.BATCH.N );
   T{end+1} = 'ybatchCalc';
   %
   T{end+1} = add_savefile( 'ybatch', workfolder );
-  
+
 return
 
 
@@ -2025,49 +2033,49 @@ function T = file_or_data(T,artsvar,datatype,qvalue,workfolder,dformat,...
     end
     return  % --->
   end
-  
-  if strcmp( datatype, 'Index' )                                           %&%
-    rqre_datatype( qvalue, {@ischar,@iswhole}, ...                         %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'Numeric' )                                     %&%
-    rqre_datatype( qvalue, {@ischar,@istensor0}, ...                       %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'Vector' )                                      %&%
-    rqre_datatype( qvalue, {@ischar,@istensor1}, ...                       %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'Matrix' )                                      %&%
-    rqre_datatype( qvalue, {@ischar,@istensor2}, ...                       %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'Tensor3' )                                     %&%
-    rqre_datatype( qvalue, {@ischar,@istensor3}, ...                       %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'Tensor4' )                                     %&%
-    rqre_datatype( qvalue, {@ischar,@istensor4}, ...                       %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'Sparse' )                                      %&%
-    rqre_datatype( qvalue, {@ischar,@issparse}, ...                        %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'String' )                                      %&%
-    rqre_datatype( qvalue, {@ischar,@isempty}, ...                         %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  elseif strcmp( datatype, 'ArrayOfString' )                               %&%
-    rqre_datatype( qvalue, {@ischar,@isempty,@iscellstr,}, ...             %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  % A generic check for remaining array types                              %&%
-  elseif strncmp( datatype, 'ArrayOf', 7 )                                 %&%
-    rqre_datatype( qvalue, {@ischar,@isempty,@iscell}, ...                 %&%
-                                    sprintf('The input for %s',artsvar) ); %&%
-  end                                                                      %&%
-  
+
+  if strcmp( datatype, 'Index' )
+    rqre_datatype( qvalue, {@ischar,@iswhole}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'Numeric' )
+    rqre_datatype( qvalue, {@ischar,@istensor0}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'Vector' )
+    rqre_datatype( qvalue, {@ischar,@istensor1}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'Matrix' )
+    rqre_datatype( qvalue, {@ischar,@istensor2}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'Tensor3' )
+    rqre_datatype( qvalue, {@ischar,@istensor3}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'Tensor4' )
+    rqre_datatype( qvalue, {@ischar,@istensor4}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'Sparse' )
+    rqre_datatype( qvalue, {@ischar,@issparse}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'String' )
+    rqre_datatype( qvalue, {@ischar,@isempty}, ...
+                                    sprintf('The input for %s',artsvar) );
+  elseif strcmp( datatype, 'ArrayOfString' )
+    rqre_datatype( qvalue, {@ischar,@isempty,@iscellstr,}, ...
+                                    sprintf('The input for %s',artsvar) );
+  % A generic check for remaining array types
+  elseif strncmp( datatype, 'ArrayOf', 7 )
+    rqre_datatype( qvalue, {@ischar,@isempty,@iscell}, ...
+                                    sprintf('The input for %s',artsvar) );
+  end
+
   % Determine if input data are a file
   isfile = ischar( qvalue );
   if strcmp( datatype, 'String' )       % Special handling of String vars.
-    [p,n,ext] = fileparts( qvalue );  
+    [p,n,ext] = fileparts( qvalue );
     if ~strcmp( ext, {'xml','nc'} )
       isfile = false;
     end
   end
-  
+
   if isfile
     T{end+1} = add_readfile( artsvar, qvalue );
   else
@@ -2087,9 +2095,9 @@ function s = add_readfile( artsvar, filename )
    case '.xml'
      s = sprintf('ReadXML(%s,"%s")', artsvar, filename );
    case '.nc'
-     s = sprintf('ReadNetCDF(%s,"%s")', artsvar, filename );     
+     s = sprintf('ReadNetCDF(%s,"%s")', artsvar, filename );
    otherwise
-    error( sprintf( ... 
+    error( sprintf( ...
     'Unknown file extension (%s), Allowed options are ''xml'' and ''nc''', ...
         ext ) );
   end
@@ -2103,13 +2111,13 @@ return
 
 
 function T = add_agenda( T, agenda, strarray )
-  if ~iscellstr( strarray )                                                %&%
-    error( sprintf( ...                                                    %&%
-          'The agenda %s must be specified as cell array of strings.', ... %&%
-                                                        upper(agenda) ) ); %&%
-  end                                                                      %&%
+  if ~iscellstr( strarray )
+    error( sprintf( ...
+          'The agenda %s must be specified as cell array of strings.', ...
+                                                        upper(agenda) ) );
+  end
   if length(strarray) == 1  &  ~isempty(strfind( strarray{1}, [agenda,'__'] ) )
-    T{end+1} = sprintf( 'Copy(%s,%s)', agenda, strarray{1} );  
+    T{end+1} = sprintf( 'Copy(%s,%s)', agenda, strarray{1} );
   else
     T{end+1} = sprintf( 'AgendaSet(%s){', agenda );
     for j = 1 : length(strarray)
@@ -2121,16 +2129,16 @@ return
 
 
 function T = add_wsms( T, field, strarray, Q )
-  if ~iscellstr( strarray )                                                %&%
-    error( sprintf( ...                                                    %&%
-           'The field %s must be specified as cell array of strings.', ... %&%
-                                                                field ) ); %&%
-  end                                                                      %&%
+  if ~iscellstr( strarray )
+    error( sprintf( ...
+           'The field %s must be specified as cell array of strings.', ...
+                                                                field ) );
+  end
   inif   = false;
   insert = true;
   for j = 1 : length(strarray)
     thisline = strarray{j};
-    if length(thisline) > 0  &  thisline(1) == '<' 
+    if length(thisline) > 0  &  thisline(1) == '<'
       if strncmp( thisline, '<IF>', 4 )
         if length(thisline) < 5
           error( 'Empty <IF> found in %s.', field );
@@ -2144,7 +2152,7 @@ function T = add_wsms( T, field, strarray, Q )
         if Q.(qfield)
           insert = true;
         else
-          insert = false;        
+          insert = false;
         end
         inif = true;
       elseif strncmp( thisline, '<ELSE>', 6 )
@@ -2160,7 +2168,7 @@ function T = add_wsms( T, field, strarray, Q )
         insert = true;
       else
       end
-    else    
+    else
       if insert
         T{end+1} = sprintf( '%s', strarray{j} );
       end
@@ -2172,19 +2180,19 @@ return
 function T = add_includes( T, name, field )
   %
   if qarts_isset( field )
-    if ~iscellstr( field )                                                 %&%
-      error( sprintf('%s must be given as a cell array of strings.',...    %&%
-                                                                  name) ); %&%
-    end                                                                    %&%
+    if ~iscellstr( field )
+      error( sprintf('%s must be given as a cell array of strings.',...
+                                                                  name) );
+    end
     %
     arts_includes = atmlab( 'ARTS_INCLUDES' );
     %
     for i = 1 : length( field )
       if strfind( field{i}, 'ARTS_INCLUDES' )
-        if isnan( arts_includes )                                          %&%
-          error( ...                                                       %&%
-           'Atmlab setting ARTS_INCLUDES is requested, but is not set.' ); %&%
-        end                                                                %&%
+        if isnan( arts_includes )
+          error( ...
+           'Atmlab setting ARTS_INCLUDES is requested, but is not set.' );
+        end
         s = strrep( field{i}, 'ARTS_INCLUDES', arts_includes );
       else
         s = field{i};
@@ -2200,33 +2208,33 @@ function T = add_rtecalcstart( Q )
   T = {};
 
   %----------
-  %- MC 
+  %- MC
   %----------
   if qarts_isset( Q.CLOUDBOX_DO )  &  Q.CLOUDBOX_DO  &  ...
                                         strcmp( upper(Q.CLOUDBOX.METHOD), 'MC' )
-    %                                                                       %&%
-    % Some checks of Q.CLOUDBOX performed already in cfile_CldBox           %&%
-    %                                                                       %&%
-    if ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR' )  |  ...              %&%
-       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME' )  |  ...             %&%
-       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER' )  |  ...             %&%
-       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MIN_ITER' )                     %&%
-      error( ['With Q.CLOUDBOX_DO=1 and MC method selected, ',...           %&%
-           'CLOUDBOX.METHOD_PRMTRS must contain the fields: STD_ERR, ',...  %&%
-              'MAX_TIME, MAX_ITER and MIN_ITER'] )                          %&%
-    end                                                                     %&%
-    %                                                                       %&%
-    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, {'STD_ERR','MAX_TIME',...         %&%
-                                       'MAX_ITER', 'MIN_ITER' }, ...        %&%
-                                'Q.CLOUDBOX.METHOD_PRMTRS when using MC' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR, @istensor0, ...        %&%
-                                      'Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME, @istensor0, ...       %&%
-                                     'Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, @istensor0, ...       %&%
-                                     'Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER' ); %&%
-    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER, @istensor0, ...       %&%
-                                     'Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER' ); %&%
+    %
+    % Some checks of Q.CLOUDBOX performed already in cfile_CldBox
+    %
+    if ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'STD_ERR' )  |  ...
+       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_TIME' )  |  ...
+       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MAX_ITER' )  |  ...
+       ~isfield( Q.CLOUDBOX.METHOD_PRMTRS, 'MIN_ITER' )
+      error( ['With Q.CLOUDBOX_DO=1 and MC method selected, ',...
+           'CLOUDBOX.METHOD_PRMTRS must contain the fields: STD_ERR, ',...
+              'MAX_TIME, MAX_ITER and MIN_ITER'] )
+    end
+    %
+    rqre_field( Q.CLOUDBOX.METHOD_PRMTRS, {'STD_ERR','MAX_TIME',...
+                                       'MAX_ITER', 'MIN_ITER' }, ...
+                                'Q.CLOUDBOX.METHOD_PRMTRS when using MC' );
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR, @istensor0, ...
+                                      'Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR' );
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME, @istensor0, ...
+                                     'Q.CLOUDBOX.METHOD_PRMTRS.MAX_TIME' );
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER, @istensor0, ...
+                                     'Q.CLOUDBOX.METHOD_PRMTRS.MAX_ITER' );
+    rqre_datatype( Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER, @istensor0, ...
+                                     'Q.CLOUDBOX.METHOD_PRMTRS.MIN_ITER' );
     %
     T{end+1} = sprintf( 'NumericSet(mc_std_err,%.3e)', ...
                                        Q.CLOUDBOX.METHOD_PRMTRS.STD_ERR );
@@ -2241,5 +2249,5 @@ function T = add_rtecalcstart( Q )
   if qarts_isset( Q.WSMS_BEFORE_RTE )
     T = add_wsms( T, 'WSMS_BEFORE_RTE', Q.WSMS_BEFORE_RTE );
   end
-return  
+return
 %------------------------------------------------------------------------------

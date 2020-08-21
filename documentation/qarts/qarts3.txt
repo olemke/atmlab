@@ -18,9 +18,8 @@ for details.
 The trick is of course to define Q properly. In Qarts3 the Q-structure does not
 have a fixed set of fields, in contrast to the earlier version of Qarts.
 However, Q is not allowed to contain any unrecognised field. The set of allowed
-field names are the ones definied in *qarts3*, fields matching pre-defined or
-user defined ARTS workspace variables. The remaining part of the user guide
-describes the fields and their options.
+field names are the ones defined in *qarts3*, fields matching pre-defined or
+user defined ARTS workspace variables. 
 
 
 The mandatory fields of Q are best included in this way:
@@ -30,6 +29,20 @@ The mandatory fields of Q are best included in this way:
 Most fields are set to {}, which in Qarts3 means undefined (in contrast to []
 which means an empty vector, matrix or tensor). Some fields are given useful
 default values. 
+
+
+The fields defined in *qarts3* represent mainly higher level help features, to
+help you top set a group of variables, such as defining the sensor by Q.SENSOR.
+Note that these fields can contain sub-fields that match workspace variables,
+sp be aware of possible conflicts if you have defined these variables in other
+ways as well.
+
+As an example the distinction between Q.atmosphere_dim and Q.ATMOSPHERE_DIM can
+be used. The fist field just sets the atmosphere_dim workspace variable, while
+the later triggers a call of AtmosphereSet1D, AtmosphereSet2D or
+AtmosphereSet3D which also sets some other variables to suitable default
+values.
+
 
 To list all fields of Q, type:
 >> qarts3
@@ -52,10 +65,10 @@ fields. Regarding formats, the same rule as the ones described below for
 workspace variables apply.
 
 
-You can add a field to Q for every pre-defined workspace variable (WSV). These
-fields shall be named exactly as the ARTS WSV, e.g. Q.f_grid. This means that
-the name of these fields shall have lowercase letters, while all other field
-names shall be uppercase.
+Except the fields defined in *qarts3*, you can add a field to Q for every
+pre-defined workspace variable (WSV). These fields shall be named exactly as
+the ARTS WSV, e.g. Q.f_grid. This means that the name of these fields shall
+have lowercase letters, while all other field names shall be uppercase.
 
 WSVs, except agendas, can be defined in three different ways.
 
@@ -103,7 +116,7 @@ In all cases where ARTS control file pieces are accepted, a simple if-else
 feature can be used. The keywords are <IF>, <ELSE> and <END> (that must be at
 the start of the string). The else part is not mandatory. Nested if-s are not
 allowed. The argument to if can only be fields of Q that are booleans, such as
-Q.CLOUDBOX_DO. Two exemples on how this works (main difference is that Arts2
+Q.CLOUDBOX_DO. Two examples on how this works (main difference is that Arts2
 must be included for the WSV)::
 
 Q.iy_main_agenda = { '<IF> CLOUDBOX_DO', 'iyHybrid', ...
@@ -119,7 +132,7 @@ followed by the name of the WSV, following this pattern:
 Q.WSMS_AT_END = { '<OUTPUT> y' };
 
 All variables marked in this way will be included in the output of
-*qarts3_run*. If a WSV is flagged as output seveveral times, *qarts3_run* will
+*qarts3_run*. If a WSV is flagged as output several times, *qarts3_run* will
 return the value matching the last file saving.
 
 

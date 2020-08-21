@@ -224,7 +224,11 @@ y = 1.1 * y + si*randn(size(Se,1),1);
 
 %- Perform retrieval
 %
+try
 X = oem( O, Qoem, R, @arts_oem, Sx, Se, [], [], xa, y );
+catch
+    keyboard
+    end
 %
 clear Qoem 
 

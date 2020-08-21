@@ -157,7 +157,7 @@ if nargout == 0
   ylabel( 'OPtical depth [-]' );
   title( 'Corresponding optical depths' );
   
-  figure(4)
+  figure(3)
   plot( ppath.pos(:,1)/1e3, ppath.los )
   xlabel( 'Altitude [km]' );
   ylabel( 'Zenith angle [deg]' );

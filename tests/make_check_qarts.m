@@ -34,26 +34,6 @@ end
 disp( 'Done: qarts_abstable_demo')
 
 
-
-%= qarts_ppath_demo
-%
-try
-  ppath = qarts_ppath_demo(600e3,113);
-catch
-  reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_ppath_demo* ===\n\n');
-  rethrow(lasterror);
-end
-%
-if abs( ppath.np ~= 120 )
-  reset_verbosity( va, vf );
-  error('Unexpected result from *qarts_ppath_demo*');
-else
-  disp( 'Done: qarts_ppath_demo')
-end
-
-
-
 %= qarts_demo 1 and 2
 %
 y0 = [ 4.115 27.94 ];
@@ -110,26 +90,16 @@ else
 end
 
 
-
-%= Qarts with DOIT
-%
-y0 = [ 153.30 -0.21 ];
-dy = 1e-2;
+%= qarts_iy_demo
 %
 try
-  [Q,f,ztan,y_c,y] = qarts_scattering_demo( [], 'doit' );
+  iy = qarts_iy_demo;
 catch
   reset_verbosity( va, vf );
-  fprintf('\n=== Error while running *qarts_scattering_demo* ===\n\n');
+  fprintf('\n=== Error while running *qarts_iy_demo* ===\n\n');
   rethrow(lasterror);
 end
-%
-if any( abs( y(end+[-1:0])' - y0 ) > dy )
-  reset_verbosity( va, vf );
-  error('Unexpected result from *qarts_scattering_demo* with DOIT.');
-else
-  disp( 'Done: qpack_scattering_demo with DOIT')
-end
+disp( 'Done: qarts_iy_demo')
 
 
 %= OEM
@@ -186,11 +156,11 @@ try
   f_grid  = [ 100e9; 200e9 ];
   t_grid  = [ 275 : 25 : 350 ]';
   za_grid = [ 0 : 20 : 180 ]';
-  aa_grid = [ 0 : 60 : 360 ]';
+  aa_grid = [ 0 : 60 : 180 ]';
   N       = complex_refr_indexFromFunc( f_grid, t_grid, ...
                                         @eps_water_liebe93, @sqrt);  
   D = tmatrix( [], f_grid, t_grid, za_grid, aa_grid, N, ...
-               'spheroidal', {'azimuthally_random'}, 150e-6, [1.001;2] );
+               'spheroidal', 'azimuthally_random', 150e-6, 2 );
 catch 
   reset_verbosity( va, vf );
   fprintf('\n=== Error while running *tmatrix* ===\n\n');

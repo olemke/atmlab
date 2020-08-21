@@ -1,3 +1,15 @@
+2020-08-21  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-285
+
+	* Smaller updates of Qarts some Qarts demos and further work on
+	Qarts3. Some first demos in place.
+
+	* tests/make_check_qarts.m: Updated.
+
+	* arts/qarts.m: OUTPUT_FILE_FORMAT now given a default value:
+	'binary'.
+
 2020-08-19  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-284
