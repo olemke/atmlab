@@ -81,8 +81,6 @@ Q.ABS_LINESHAPE_FACTOR  = 'VVH';
 
 %= Define atmosphere and surface
 %
-Q.atmosphere_dim        = 1;
-%
 Q.p_grid                = z2p_simple( [0:500:45e3 46e3:1e3:95e3]' );
 %
 arts_xmldata_path       = atmlab( 'ARTS_XMLDATA_PATH' );

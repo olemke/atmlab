@@ -13,7 +13,7 @@
 %                             Z, T, WIND_U/V/W, MAG_U/V/W
 %       Surface Q-fields: Z_SURFACE
 %       HSE
-%       ABSORPTION
+%       ABSORPTION and ABS_LINE*
 %       WSMS_AT_HALFWAY
 %       SENSOR
 %       Retrieval (Jacobian + OEM)
@@ -274,7 +274,9 @@ return
 
 %------------------------------------------------------------------------------
 % Adds (in given order):
+%    ABS_SPECIES->abs_species
 %    RAW_ATMOSPHERE
+%    Z_SURFACE
 %    HSE
 %
 function [T,Q] = do_atmsurffields( Q, wfolder )
@@ -301,7 +303,7 @@ function [T,Q] = do_atmsurffields( Q, wfolder )
                       Q.INPUT_FILE_FORMAT );
   end
   %
-  if Q.HSE.ON
+  if qarts_isset( Q.HSE ) & Q.HSE.ON
     T{end+1} = sprintf( '  NumericSet(p_hse,%.3f)', Q.HSE.P );
     T{end+1} = sprintf( '  NumericSet(z_hse_accuracy,%.3f)', Q.HSE.ACCURACY );
     if qarts_isset( Q.CHECKS_DO ) & Q.CHECKS_DO
@@ -474,7 +476,9 @@ function [T,Q] = do_absorption( Q, wfolder )
     end
   end %  qarts_isset( Q.ABSORPTION )
   %
-  Q = ftick( Q, { 'ABSORPTION' } );
+  Q = ftick( Q, { 'ABSORPTION', 'ABS_LINES', 'ABS_LINES_FLIMS', 'ABS_LINES_FORMAT',...
+                  'ABS_LINESHAPE', 'ABS_LINESHAPE_CUTOFF', 'ABS_LINESHAPE_FACTOR',...
+                  'ABS_LINESHAPE_MIRRORING'} );
   %
 return
 
