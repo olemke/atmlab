@@ -1128,7 +1128,13 @@ function T = cfile_Sensor( Q, partname, workfolder )
           U = file_or_data( U, 'antenna_response', 'GriddedField4',...
                      H.ANTENNA_RESPONSE, workfolder, Q.INPUT_FILE_FORMAT );
         end
-        U{end+1} = 'sensor_responseAntenna';
+        if qarts_isset( H.ANTENNA_OPTION2D )
+          U{end+1} = sprintf( 'sensor_responseAntenna(option_2d="%s")', ...
+                              H.ANTENNA_OPTION2D );
+        else    
+          U{end+1} = 'sensor_responseAntenna';
+        end
+        
 
       case 'mixer'
         if qarts_isset( H.LO )

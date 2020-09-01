@@ -1,3 +1,13 @@
+2020-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-287
+
+	* arts/qarts3cfile.m:
+	* arts/qarts2cfile.m: Added handling of ANTENNA_OPTION2D.
+
+	* arts/qartsSensor.m: Introduced ANTENNA_OPTION2D, an option to
+	appear in ARTS.
+
 2020-08-31  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-286
