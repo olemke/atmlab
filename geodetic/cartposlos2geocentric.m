@@ -4,7 +4,7 @@
 %   (dx,dy,dz). The corresponding quantities in polar coordinates are
 %   (r,lat,lon) and (za,aa), respectively.
 %
-%   See *Contents* for defintion of coordinate systems.
+%   See *geocentricposlos2cart* for defintion of coordinate systems.
 %
 %   If the optional arguments are given, it is ensured that latitude and
 %   longitude are kept constant for zenith or nadir cases, and the longitude

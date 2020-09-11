@@ -1,21 +1,20 @@
 % GEOCENTRICPOSLOS2CART converts from spherical POS/LOS to cartesian coordinates
 %
 % See Contents for a defintion of the geocentric coordinate system. 
-% The local LOS angles are defined following the EAST-NORTH-UP system:
+% The local LOS angles are defined as in ARTS:
 %         za    aa
 %         90    0   points towards north
 %         90    90  points towards east
-%         0     aa  points up
+%         0     aa  points up (with respect to (0,0,0))
 % 
-% FORMAT  [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,az) 
+% FORMAT  [x,y,z,dx,dy,dz] = geocentricposlos2cart(r,lat,lon,za,az) 
 %
 % OUT     x    Coordinate in x dimension
 %         y    Coordinate in y dimension
 %         z    Coordinate in z dimension
 %         dx   LOS component in x dimension
 %         dy   LOS component in y dimension
-%         dz   LOS 
-%
+%         dz   LOS component in z dimension
 % IN      r    Radius 
 %         lat  Latitude
 %         lon  Longitude
@@ -23,6 +22,8 @@
 %         aa   azimuth angle
 
 % History: created by Bengt Rydberg 2011-10-31
+
+
 function [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,aa)
 
 if any( r == 0 )

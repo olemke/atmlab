@@ -58,20 +58,3 @@ u = rotationmat3D( (za0-90)*pi/180, vrot ) * [x;y;z];
 za = reshape( za, si );
 aa = reshape( aa, si );
 
-return
-
-
-function [x,y,z] = zaaa2cart(za,aa)
-  z = cosd( za );
-  x = sind( za );
-  y = sind( aa ) .* x;
-  x = cosd( aa ) .* x;
-return
-
-
-function [za,aa] = cart2zaaa(x,y,z)
-%  r = sqrt( x*x + y*y + z*z );
-%  za = acosd( z ./ r );
-  za = acosd( z );  
-  aa = atan2d( y, x );
-return

@@ -13,6 +13,8 @@
 %      za     Other zenith angle(s). Can be a vector or matrix.
 %      aa     Other azimuth angle(s). Can be a vector or matrix.
 
+% 2018-12-17 Patrick Eriksson
+
 
 function [dza,daa] = diff_za_aa( za0, aa0, za, aa )
 
@@ -69,20 +71,3 @@ daa = aa - aa0;
 dza = reshape( dza, si );
 daa = reshape( daa, si );
 
-return
-
-
-function [x,y,z] = zaaa2cart(za,aa)
-  z = cosd( za );
-  x = sind( za );
-  y = sind( aa ) .* x;
-  x = cosd( aa ) .* x;
-return
-
-
-function [za,aa] = cart2zaaa(x,y,z)
-%  r = sqrt( x*x + y*y + z*z );
-%  za = acosd( z ./ r );
-  za = acosd( z );  
-  aa = atan2d( y, x );
-return

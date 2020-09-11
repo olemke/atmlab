@@ -27,10 +27,10 @@ end
 
 a      = ellipsoid(1);
 e2     = ellipsoid(2) ^ 2;
-sinphi = sind( lat );
-cosphi = cosd( lat );
-N      = a ./ sqrt(1 - e2 * sinphi.^2);
-x      = (N + h) .* cosphi .* cosd(lon);
-y      = (N + h) .* cosphi .* sind(lon);
-z      = (N*(1 - e2) + h) .* sinphi;
+sinlat = sind( lat );
+coslat = cosd( lat );
+N      = a ./ sqrt(1 - e2 * sinlat.^2);
+x      = (N + h) .* coslat .* cosd(lon);
+y      = (N + h) .* coslat .* sind(lon);
+z      = (N*(1 - e2) + h) .* sinlat;
 

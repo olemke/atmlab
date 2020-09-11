@@ -1,3 +1,13 @@
+2020-09-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-288
+
+	* geodetic/: POlishing of documentation.
+
+	* geodetic/zaaa2enu.m: New
+
+	* geodetic/geodeticposlos2cart.m: New
+
 2020-09-01  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-287
