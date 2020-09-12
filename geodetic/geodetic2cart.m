@@ -10,7 +10,6 @@
 % OUT    x    Coordinate in x dimension
 %        y    Coordinate in y dimension
 %        z    Coordinate in z dimension
-%
 % IN     h         Geodetic height (height above the reference ellipsoid)
 %        lat       Geodetic latitude
 %        lon       Geodetic longitude

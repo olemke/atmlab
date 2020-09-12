@@ -16,7 +16,7 @@
 % IN      za   zenith angle
 %         aa   azimuth angle
 
-% 2020-09-11, Patrick Eriksson
+% 2020-09-11   Patrick Eriksson
 
 function [dx,dy,dz] = zaaa2enu(za,aa)
 

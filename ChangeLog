@@ -1,8 +1,20 @@
+2020-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-289
+
+	* geodetic: Smaller fixes in documentation in several functions.
+
+	* geodetic/cartposlos2geodetic.m: New.
+
+	* geodetic/enu2zaaa.m: New.
+
+	* geodetic/geodeticposlos2cart.m: Finished documentation.
+
 2020-09-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-288
 
-	* geodetic/: POlishing of documentation.
+	* geodetic/: Polishing of documentation.
 
 	* geodetic/zaaa2enu.m: New
 

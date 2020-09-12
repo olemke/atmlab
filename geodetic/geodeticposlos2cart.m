@@ -1,13 +1,14 @@
-% GEOCENTRICPOSLOS2CART converts from spherical POS/LOS to cartesian coordinates
+% GEODETICPOSLOS2CART converts from geodetic POS/LOS to cartesian coordinates
 %
-% See Contents for a defintion of the geocentric coordinate system. 
+% See Contents for a defintion of the cartesian ECEF coordinate system. 
 % The local LOS angles are defined as in ARTS:
 %         za    aa
 %         90    0   points towards north
 %         90    90  points towards east
 %         0     aa  points up
+% Here up means local zenith, i.e. the reference ellipsoid normal.
 % 
-% FORMAT  [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,az) 
+% FORMAT  [x,y,z,dx,dy,dz] = geodeticposlos2cart(h,lat,lon,za,aa[,ellipsoid])
 %
 % OUT     x    Coordinate in x dimension
 %         y    Coordinate in y dimension
@@ -15,11 +16,13 @@
 %         dx   LOS component in x dimension
 %         dy   LOS component in y dimension
 %         dz   LOS component in z dimension
-% IN      r    Radius 
+% IN      h    Altitude
 %         lat  Latitude
 %         lon  Longitude
 %         za   zenith angle
 %         aa   azimuth angle
+% OPT     ellipsoid a vector with the form [semimajor axis; eccentricity]
+%                  specifying the ellipsoid. Default is WGS84.
 
 % 2020-09-11, Patrick Eriksson
 
@@ -66,12 +69,11 @@ else
   sinlon = sind(lon);
 
   [de,dn,du] = zaaa2enu( za, aa );  
-  
-  a  = coslat .* du - sinlat .* dn;
 
-  dx = -sinlon.*de + coslon.*a ;
-  dy = coslon.*de + sinlon.*a;
-  dz = coslat.*dn + sinlat.*du;
+  % See https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#From_ECEF_to_ENU
+  dx = -sinlon.*de - sinlat.*coslon.*dn + coslat.*coslon.*du;  
+  dy =  coslon.*de - sinlat.*sinlon.*dn + coslat.*sinlon.*du;  
+  dz =               coslat.*        dn + sinlat.*        du;  
   
 end
 

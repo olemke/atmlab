@@ -7,14 +7,13 @@
 % OUT     x    Coordinate in x dimension
 %         y    Coordinate in y dimension
 %         z    Coordinate in z dimension
-%
 % IN      r    Radius 
 %         lat  Latitude
 %         lon  Longitude
 
 % History: created by Bengt Rydberg 2011-10-31
 
-function [x,y,z]=geocentric2cart(r,lat,lon)
+function [x,y,z] = geocentric2cart(r,lat,lon)
 
 if any( r == 0 )
   error( 'This set of functions are not handling the case of r = 0.' );  

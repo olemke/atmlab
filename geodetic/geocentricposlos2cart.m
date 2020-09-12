@@ -6,6 +6,7 @@
 %         90    0   points towards north
 %         90    90  points towards east
 %         0     aa  points up (with respect to (0,0,0))
+% Here up is defined w.r.t. coordinate system centre
 % 
 % FORMAT  [x,y,z,dx,dy,dz] = geocentricposlos2cart(r,lat,lon,za,az) 
 %
@@ -24,7 +25,7 @@
 % History: created by Bengt Rydberg 2011-10-31
 
 
-function [x,y,z,dx,dy,dz]=geocentricposlos2cart(r,lat,lon,za,aa)
+function [x,y,z,dx,dy,dz] = geocentricposlos2cart(r,lat,lon,za,aa)
 
 if any( r == 0 )
   error( 'This function is not handling the case of r = 0.' );  
