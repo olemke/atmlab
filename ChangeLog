@@ -1,3 +1,18 @@
+2020-09-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-290
+
+	* geodetic: Fixes of several headers and some eefficiency improvements.
+
+	* arts/qarts3.m: Default for Q.CHECKS_DO is now false. This to
+	allow that default Q creates an empty cfile.
+
+	* geodetic/zenith2cart.m: New.
+
+	* geodetic/cartposlos2geocentric.m: Calculation of aa not
+	vectorised, but up to 3D data are now handled. Beofe just vector
+	input was OK.
+
 2020-09-12  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-289

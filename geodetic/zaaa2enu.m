@@ -8,20 +8,20 @@
 %         90    90  points towards east
 %         0     aa  points up 
 %
-% FORMAT   [dx,dy,dz] = zaaa2enu(za,aa)
+% FORMAT   [de,dn,du] = zaaa2enu(za,aa)
 %
-% OUT     dx   LOS component in x dimension
-%         dy   LOS component in y dimension
-%         dz   LOS component in z dimension
+% OUT     de   LOS component in e dimension
+%         dn   LOS component in n dimension
+%         du   LOS component in u dimension
 % IN      za   zenith angle
 %         aa   azimuth angle
 
 % 2020-09-11   Patrick Eriksson
 
-function [dx,dy,dz] = zaaa2enu(za,aa)
+function [de,dn,du] = zaaa2enu(za,aa)
 
 st = sind( za );
 
-dx = st .* sind(aa);
-dy = st .* cosd(aa);
-dz = cosd( za );
+de = st .* sind(aa);
+dn = st .* cosd(aa);
+du = cosd( za );

@@ -29,7 +29,7 @@
 
 function [h,lat,lon,za,aa] = cartposlos2geodetic(x,y,z,dx,dy,dz,ellipsoid)
 
-if nargin<6
+if nargin<7
   %WGS84 reference ellipsoid
   ellipsoid = ellipsoidmodels( 'WGS84' );
 end 

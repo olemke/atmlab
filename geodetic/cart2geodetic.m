@@ -31,14 +31,15 @@ rad2deg = constants( 'RAD2DEG' );
 lon=atan2(y,x)*rad2deg;
 
 % Latitude
-B0=atan2(z,sqrt(x.^2+y.^2));
-B=ones(size(B0));
-e2=ellipsoid(2)^2;
+sq = sqrt(x.^2+y.^2);
+B0 = atan2(z,sq);
+B  = B0 - 1;
+e2 = ellipsoid(2)^2;
 while(any(abs(B-B0)>1e-10))
     N=ellipsoid(1)./sqrt(1-e2*sin(B0).^2);
-    h=sqrt(x.^2+y.^2)./cos(B0)-N;
+    h=sq./cos(B0)-N;
     B=B0;
-    B0=atan((z./sqrt(x.^2+y.^2)).*(1-e2*N./(N+h)).^(-1));
+    B0=atan((z./sq) .* 1./(1-e2*N./(N+h)));
 end
 lat=B*rad2deg;
 

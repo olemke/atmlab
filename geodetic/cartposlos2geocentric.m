@@ -67,62 +67,64 @@ aa = zeros(size(za));
 
 % FIXME: surely at least some (if not all) cases here can be vectorised
 
-for i = 1 : length(za)
+for i = 1 : size(za,1)
+for j = 1 : size(za,2)
+for k = 1 : size(za,3)
 
   % Fixes for za with optional input
   if nargin > 6
-    if za0(i) < 1e-6  ||  za0(i) > 180-1e-6    % Nadir or zenith
-      za(i) = za0(i);
-    elseif isnan(za(i))
-      za(i) = 90;
-    elseif dr(i) < 0              % Expression above gives only za < 90
-      za(i) = 180 - za(i);
+    if za0(i,j,k) < 1e-6  ||  za0(i,j,k) > 180-1e-6    % Nadir or zenith
+      za(i,j,k) = za0(i,j,k);
+    elseif isnan(za(i,j,k))
+      za(i,j,k) = 90;
+    elseif dr(i,j,k) < 0              % Expression above gives only za < 90
+      za(i,j,k) = 180 - za(i,j,k);
     end
   end
 
   % Azimuth angle:
     
   % Take original value if N-S
-  if nargin > 6  &&  ( abs(aa0(i)) < 1e-6  ||  abs(aa0(i)-180) < 1e-6 )
+  if nargin > 6  &&  ( abs(aa0(i,j,k)) < 1e-6  ||  abs(aa0(i,j,k)-180) < 1e-6 )
     % Check that not lon changed with 180 deg
-    if lon(i) == lon0(i)
-      aa(i) = aa0(i);
+    if lon(i,j,k) == lon0(i,j,k)
+      aa(i,j,k) = aa0(i,j,k);
     else
-      if abs(aa0(i)) < 1e-6
-        aa(i) = 180;
+      if abs(aa0(i,j,k)) < 1e-6
+        aa(i,j,k) = 180;
       else
-        aa(i) = 0;
+        aa(i,j,k) = 0;
       end
     end
   
   % Set to zero for nadir and zenith
-  elseif za(i) < 1e-6  ||  za(i) > 180-1e-6 
-    aa(i) = 0;
+  elseif za(i,j,k) < 1e-6  ||  za(i,j,k) > 180-1e-6 
+    aa(i,j,k) = 0;
     
   
   % For lat = +- 90 the azimuth angle gives the longitude along which 
   % the LOS goes
-  elseif abs( lat(i) ) > 90-1e-8 
-    aa(i) = rad2deg * atan2( dy(i), dx(i) );
+  elseif abs( lat(i,j,k) ) > 90-1e-8 
+    aa(i,j,k) = rad2deg * atan2( dy(i,j,k), dx(i,j,k) );
 
   %General case
   else
     %
-    dlat  = -sinlat(i)*coslon(i)/r(i)*dx(i) + coslat(i)/r(i)*dz(i) - ...
-             sinlat(i)*sinlon(i)/r(i)*dy(i);
-    dlon  = -sinlon(i)/coslat(i)/r(i)*dx(i) + coslon(i)/coslat(i)/r(i)*dy(i);
-    aa(i) = rad2deg * acos( r(i) * dlat / sin( deg2rad * za(i) ) );
+    dlat  = -sinlat(i,j,k)*coslon(i,j,k)/r(i,j,k)*dx(i,j,k) + coslat(i,j,k)/r(i,j,k)*dz(i,j,k) - ...
+             sinlat(i,j,k)*sinlon(i,j,k)/r(i,j,k)*dy(i,j,k);
+    dlon  = -sinlon(i,j,k)/coslat(i,j,k)/r(i,j,k)*dx(i,j,k) + coslon(i,j,k)/coslat(i,j,k)/r(i,j,k)*dy(i,j,k);
+    aa(i,j,k) = rad2deg * acos( r(i,j,k) * dlat / sin( deg2rad * za(i,j,k) ) );
     %
-    if isnan( aa(i) ) ||  ~isreal( aa(i) )
+    if isnan( aa(i,j,k) ) ||  ~isreal( aa(i,j,k) )
       if dlat >= 0
-        aa(i) = 0;
+        aa(i,j,k) = 0;
       else
-        aa(i) = 180;
+        aa(i,j,k) = 180;
       end
     elseif dlon < 0
-      aa(i) = -aa(i);
+      aa(i,j,k) = -aa(i,j,k);
     end
   end
 end
-
+end
 end

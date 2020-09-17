@@ -24,7 +24,7 @@
 % IN      x      Coordinate in x dimension
 %         y      Coordinate in y dimension
 %         z      Coordinate in z dimension
-%         lat0   Original latitude
+% OPT     lat0   Original latitude
 %         lon0   Original longitude
 %         za0    Orignal zenith angle
 %         aa0    Orignal azimuth angle

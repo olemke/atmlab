@@ -31,5 +31,5 @@ coslat = cosd( lat );
 N      = a ./ sqrt(1 - e2 * sinlat.^2);
 x      = (N + h) .* coslat .* cosd(lon);
 y      = (N + h) .* coslat .* sind(lon);
-z      = (N*(1 - e2) + h) .* sinlat;
+z      = (N.*(1 - e2) + h) .* sinlat;
 
