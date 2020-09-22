@@ -1,3 +1,9 @@
+2020-09-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-291
+
+	* scattering/molecular_scatcoef.m: New, not totally finished.
+
 2020-09-17  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-290
