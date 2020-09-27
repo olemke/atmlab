@@ -9,7 +9,7 @@
 %    
 % OUT   r          Radii. See above.
 % IN    ellipsoid  Model ellipsoid as returned by *ellipsoidmodels*.
-%       lat_gd     Geocentric latitudes.
+%       lat        Geocentric latitudes.
 
 % 2012-02-06   Created by Patrick Eriksson.
 

@@ -1,3 +1,11 @@
+2020-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-292
+
+	* geodetic/ellipsoid_intersection.m: New.
+
+	* geodetic/ellipsoidradii.m: Fixed typo in header.
+
 2020-09-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-291
