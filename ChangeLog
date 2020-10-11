@@ -1,3 +1,11 @@
+2020-10-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-3-293
+
+	* forwardmodel/add_za_aa.m:
+	* forwardmodel/diff_za_aa.m: Were not updated to use zaaa2enu,
+	instead zaaa2cart.
+
 2020-09-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-3-292

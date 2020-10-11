@@ -32,7 +32,7 @@ daa = daa(:)';
 
 % Unit vector towards aa0 at za=90
 %
-[x,y,z] = zaaa2cart( 90, aa0 );
+[x,y,z] = zaaa2enu( 90, aa0 );
   
 % Find vector around which rotation shall be performed to maintain aa
 %  
@@ -43,7 +43,7 @@ vrot = [-y,x,0];
 
 % Unit vectors towards (dza,daa) around (90,aa0)
 %
-[x,y,z] = zaaa2cart( 90+dza, aa0 + daa );
+[x,y,z] = zaaa2enu( 90+dza, aa0 + daa );
 
 % Apply rotation
 %
@@ -51,7 +51,7 @@ u = rotationmat3D( (za0-90)*pi/180, vrot ) * [x;y;z];
 
 % Calculate za and aa for rotated u
 %
-[za,aa] = cart2zaaa( u(1,:), u(2,:), u(3,:) );
+[za,aa] = enu2zaaa( u(1,:), u(2,:), u(3,:) );
 
 % Reshape to original size
 %
