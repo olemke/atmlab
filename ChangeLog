@@ -1,5 +1,13 @@
 2020-10-14  Oliver Lemke  <olemke@core-dump.info>
 
+	* atmlab-2-5-0
+
+	* Post-release version bump
+
+	* CHANGES-2.4: Renamed to CHANGES-2.5 and pruned
+
+2020-10-14  Oliver Lemke  <olemke@core-dump.info>
+
 	* atmlab-2-4-0
 
 	* 2.4.0 Release
