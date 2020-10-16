@@ -49,14 +49,6 @@ if nargin < 4
 end
 
 
-%- Check that a reasoanble ARTS version is used
-%
-if ~strncmp( arts_version, 'arts-2.3.12', 11 )
-  error( ['A relative late ARTS v2.3 should be used (at least not below ' ...
-          '2.3.1200). Your version is %s.'], arts_version );
-end
-
-
 %- Expand *parts*?
 %
 if ischar( parts )
