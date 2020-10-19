@@ -1,3 +1,9 @@
+2020-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-4-1
+
+	* arts/qarts3cfile.m: Removed demand on ARTS version.
+
 2020-10-14  Oliver Lemke  <olemke@core-dump.info>
 
 	* atmlab-2-4-0
