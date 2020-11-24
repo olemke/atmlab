@@ -81,9 +81,9 @@ end
 
 %- Check that a reasoanble ARTS version is used
 %
-if ~strncmp( arts_version, 'arts-2.3.12', 11 )
-  error( ['A relative late ARTS v2.3 should be used (at least not below ' ...
-          '2.3.1200). Your version is %s.'], arts_version );
+if ~strncmp( arts_version, 'arts-2.4', 8 )
+  error( ['For atmlab-2.4 you must use a ARTS v2.4 version. ' ...
+          'Your version is %s.'], arts_version );
 end
 
 
@@ -96,7 +96,7 @@ if nargin == 1
   if ~ischar( Q )
     error( 'If number of arguments is 1, this argument must be a string' );
   end
-
+  
   switch Q
 
   case 'GetAtmSrf'

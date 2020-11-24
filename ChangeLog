@@ -1,3 +1,10 @@
+2020-11-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-4-2
+
+	* arts/qarts2cfile.m: Check of ARTS version was wrong. It is now
+	demended to have a ARTS 2.4 version.
+
 2020-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-4-1
