@@ -1,3 +1,11 @@
+2020-12-02  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-2
+
+	* geophysics/pt2z.m (pt2z): Now using pos2g, instead of local version
+
+	* geophysics/pos2g.m: Switched to return apparent gravity.
+
 2020-10-16  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-1

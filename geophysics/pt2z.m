@@ -72,7 +72,7 @@ z = shift2refpoint( p, z, p0, z0 );
 %= Set Earth radius and g at z=0
 %
 re = ellipsoidradii( ellipsoid, lat );
-g0 = lat2g0( lat );
+g0 = pos2g( lat, 0 );
 
 
 %= Gas constant and molecular weight of dry air and water vapour 
@@ -139,14 +139,3 @@ function g = z2g(r_geoid,g0,z)
   g = g0 * (r_geoid./(r_geoid+z)).^2;
   %
 return
-
-% Expression below taken from Wikipedia page "Gravity of Earth", that is stated
-% to be: International Gravity Formula 1967, the 1967 Geodetic Reference System
-% Formula, Helmert's equation or Clairault's formula.
-function g0 = lat2g0(lat)
-  %
-  x  = abs( lat );
-  g0 = 9.780327 * ( 1 + 5.3024e-3*sind(x).^2 + 5.8e-6*sind(2*x).^2 );
-  %
-return
-

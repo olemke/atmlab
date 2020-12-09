@@ -53,7 +53,7 @@
 %      i_lines   Inlude lines with these indexes, a vector of integers (see
 %                table in code). Default is to include all. Some selections
 %                are hard-coded and selected by giving a string:
-%                'Upto340'; Sets *i_lines* to indexes that gives marginal 
+%                'UpTo340'; Sets *i_lines* to indexes that gives marginal 
 %                deviation below 340 GHz, compared to using all MPM lines.
 
 % 2019-12-27 Patrick Eriksson
