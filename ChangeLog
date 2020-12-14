@@ -1,3 +1,11 @@
+2020-12-14  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-4-3
+
+	* gformat/gf_load.m: loadvar was used but that function has been
+	changed and does not work here. Changed to use load directly.
+	Should fix problem reported by Witali Krochin.
+
 2020-11-24  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-4-2
