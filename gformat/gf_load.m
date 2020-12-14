@@ -9,9 +9,7 @@
 
 function G = gf_load( file )
   
-
-G = loadvar( file, 'G' );
-
+load( file, 'G' );
 
 if atmlab('STRICT_ASSERT') & ~isgformat( G )
   error( 'The file does not contain gformat data.' );
