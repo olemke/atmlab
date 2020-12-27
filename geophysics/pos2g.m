@@ -39,4 +39,4 @@ g = 9.780327 * ( 1 + 0.0053024*sin(lat).^2 - 0.0000058*sin(2*lat).^2) - ...
 % A first course in Atmospheric Thermodynamics by G. Petty (page 89)
 % As well as https://glossary.ametsoc.org/wiki/Apparent_gravity
 %
-g = g - ((7.29e-5)^2*6378e3)*cos(lat).^2
+g = g - ((7.29e-5)^2*6378e3)*cos(lat).^2;
