@@ -1,3 +1,9 @@
+2021-01-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-5
+
+	* math/gaussfilter.m: Improvement of header test.
+
 2020-12-27  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-4

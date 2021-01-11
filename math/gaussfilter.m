@@ -13,7 +13,7 @@
 % OUT   yf   Filtered data.
 % IN    x    Data abscissa.
 %       y    Data values. Must be given as a column vector or a matrix.
-%       xw   Width (total) of the filter. 
+%       xw   Full width at half max (FWHM) of the filter. 
 
 % 2006-04-05   Created by Patrick Eriksson.
 
