@@ -51,17 +51,18 @@ end
 ready = 0;
 count = 100;
 %
-username = getenv('USER');
-if (~isempty(username)), username = [username '-']; end
-tmpfolderparts = regexp(tempname(workarea), ...
+while count && ~ready
+    
+  username = getenv('USER');
+  if (~isempty(username)), username = [username '-']; end
+  tmpfolderparts = regexp(tempname(workarea), ...
     ['(?<dirname>.*' filesep ')(?<basename>[^' filesep ']*)$'], ...
     'names');
-tmpfolder = [tmpfolderparts.dirname 'atmlab-' username tmpfolderparts.basename];
+  tmpfolder = [tmpfolderparts.dirname 'atmlab-' username tmpfolderparts.basename];
 
-% Has happened that whitespace has entered, at least from username
-tmpfolder = tmpfolder( ~isspace(tmpfolder) );
+  % Has happened that whitespace has entered, at least from username
+  tmpfolder = tmpfolder( ~isspace(tmpfolder) );
 
-while count && ~ready
   if ~exist( tmpfolder, 'dir' )
     [a,b] = mkdir(tmpfolder);      %#ok<ASGLU>
     if isempty(b)           % Check again if folder exist, for extra safety

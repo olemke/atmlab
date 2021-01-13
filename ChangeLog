@@ -1,3 +1,10 @@
+2021-01-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-6
+
+	* files/create_tmpfolder.m: TRied to make the process safer. The
+	while loop now generates a new name at each try.
+
 2021-01-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-5
