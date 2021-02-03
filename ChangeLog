@@ -1,3 +1,11 @@
+2021-02-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-7
+
+	* h2o/parametrisations: New functions dardar_airfrac.m,
+	dardar_psd.m, eps_water_ell07.m, liq_psd_abel12.m and
+	liq_psd_wang16.m.
+
 2021-01-13  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-6
