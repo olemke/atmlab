@@ -1,6 +1,6 @@
 % QARTS3_IY_DEMO   Doing an iyCalc calculation with Qarts3
 %
-%    A simple demonstration of how to use Qarts3 for peforming a
+%    A simple demonstration of how to use Qarts3 for performing a
 %    monochromatic pencil beam calculations using ARTS' iyCalc method, and
 %    how to use iy_aux and ppath also outputted by iyCalc.
 %
@@ -45,8 +45,9 @@ Q.INCLUDES            = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
                           fullfile( 'ARTS_INCLUDES', 'planet_earth.arts' ) };
 Q.ATMOSPHERE_DIM      = 1;
 Q.stokes_dim          = 1;
-Q.J_DO                = false;
-Q.SCATTERING_DO       = false;
+Q.J                   = [];
+Q.PARTICLES           = [];
+Q.CHECKS_DO           = 1;
 
 
 %= Define agendas
@@ -56,27 +57,28 @@ Q.SCATTERING_DO       = false;
 % This works only if the pre-defined agenda is names following the pattern:
 %   name_of_agenda__(Something)
 %
-Q.ppath_agenda               = { 'ppath_agenda__FollowSensorLosPath'   };
-Q.ppath_step_agenda          = { 'ppath_step_agenda__GeometricPath'    };
-Q.iy_space_agenda            = { 'iy_space_agenda__CosmicBackground'   };
-Q.iy_surface_agenda          = { 'iy_surface_agenda__UseSurfaceRtprop' };
-Q.iy_main_agenda             = { 'iy_main_agenda__Emission'            };
+Q.abs_xsec_agenda         = { 'abs_xsec_agenda__noCIA'              };
+Q.propmat_clearsky_agenda = { 'propmat_clearsky_agenda__OnTheFly' };
+Q.ppath_agenda            = { 'ppath_agenda__FollowSensorLosPath'   };
+Q.ppath_step_agenda       = { 'ppath_step_agenda__GeometricPath'    };
+Q.iy_space_agenda         = { 'iy_space_agenda__CosmicBackground'   };
+Q.iy_surface_agenda       = { 'iy_surface_agenda__UseSurfaceRtprop' };
+Q.iy_main_agenda          = { 'iy_main_agenda__Emission'            };
 
 
 %= Absorption
 %
-Q.ABS_SPECIES(1).TAG{1} = 'O3';
-Q.ABS_SPECIES(2).TAG{1} = 'H2O-PWR98';
-Q.ABS_SPECIES(3).TAG{1} = 'N2-SelfContStandardType';
-Q.ABS_SPECIES(4).TAG{1} = 'O2-PWR98';
+Q.GAS_SPECIES(1).TAG{1} = 'O3';
+Q.GAS_SPECIES(2).TAG{1} = 'H2O-PWR98';
+Q.GAS_SPECIES(3).TAG{1} = 'N2-SelfContStandardType';
+Q.GAS_SPECIES(4).TAG{1} = 'O2-PWR98';
 %
-Q.ABSORPTION            = 'OnTheFly';  % A simple, but slow, option!
-Q.ABS_LINES_FORMAT      = 'ARTSCAT';
-Q.ABS_LINES           = fullfile( atmlab_example_data, 'o3line111ghz' );
-Q.ABS_LINESHAPE         = 'VP';
-Q.ABS_LINESHAPE_CUTOFF  = -1;
-Q.ABS_LINESHAPE_FACTOR  = 'VVH';
-
+Q.ABSORPTION{end+1} = sprintf( 'ReadARTSCAT(%s="%s",%s="%s",%s="%s")', ...
+                               'filename', ...
+                               fullfile( atmlab_example_data , 'o3line111ghz' ), ...
+                               'normalization_option', 'VVH', ...
+                               'lineshapetype_option', 'VP' );
+Q.ABSORPTION{end+1} = 'abs_lines_per_speciesCreateFromLines';
 
 
 %= Define atmosphere and surface

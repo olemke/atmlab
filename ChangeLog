@@ -1,3 +1,11 @@
+2021-02-07  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-8
+
+	* Qarts3: Made qarts3 even slimmer. More stuff has now be set as
+	direct ARTS method calls. See the two demo scripts for some
+	examples. In any case, qarts3 is still work in progress.
+
 2021-02-03  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-7

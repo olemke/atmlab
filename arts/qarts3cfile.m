@@ -5,19 +5,17 @@
 %    in the following order:
 %       Include files
 %       WSMS_AT_START
-%       ATMOSPHERE_DIM,
+%       ATMOSPHERE_DIM
 %       Workspace variables (WSVs)
-%       Atmospheric Q-fields: ABS_SPECIES->abs_species,
-%                             RAW_ATMOSPHERE,
-%                             ABS_SPECIES->vmr_field,
-%                             Z, T, WIND_U/V/W, MAG_U/V/W
-%       Surface Q-fields: Z_SURFACE
+%       GAS_SPECIES
+%       RAW_ATMOSPHERE,
+%       Z_SURFACE
 %       HSE
-%       ABSORPTION and ABS_LINE*
+%       ABSORPTION
 %       WSMS_AT_HALFWAY
+%       PARTICLES
 %       SENSOR
-%       Retrieval (Jacobian + OEM)
-%       SCATTERING
+%       J
 %       CHECKS_DO
 %       WSMS_AT_END
 %
@@ -266,7 +264,7 @@ return
 
 %------------------------------------------------------------------------------
 % Adds (in given order):
-%    ABS_SPECIES->abs_species
+%    GAS_SPECIES
 %    RAW_ATMOSPHERE
 %    Z_SURFACE
 %    HSE
@@ -275,9 +273,12 @@ function [T,Q] = do_atmsurffields( Q, wfolder )
   %
   T = [];
   %
-  if qarts_isset( Q.ABS_SPECIES )
-    T{end+1} = sprintf( '  abs_speciesSet(species=[%s])', ...
-                                           arts_tgs_cnvrt(Q.ABS_SPECIES) );
+  %
+  if qarts_isset( Q.GAS_SPECIES )
+    rqre_datatype( Q.GAS_SPECIES, @isstruct, 'Q.GAS_SPECIES' );
+    rqre_field( Q.GAS_SPECIES, 'TAG', 'Q.GAS_SPECIES' );
+    T{end+1} = sprintf( 'abs_speciesSet(species=[%s])', ...
+                                           arts_tgs_cnvrt(Q.GAS_SPECIES) );
   end
   %
   if qarts_isset( Q.RAW_ATMOSPHERE )
@@ -312,7 +313,7 @@ function [T,Q] = do_atmsurffields( Q, wfolder )
     end
   end
   %
-  Q = ftick( Q, { 'ABS_SPECIES', 'RAW_ATMOSPHERE', 'RAW_ATM_EXPAND_1D' } );
+  Q = ftick( Q, { 'GAS_SPECIES', 'RAW_ATMOSPHERE', 'RAW_ATM_EXPAND_1D' } );
   Q = ftick( Q, { 'Z_SURFACE', 'HSE' } );
 return
 
@@ -325,377 +326,54 @@ return
 function [T,Q] = do_absorption( Q, wfolder )
   %
   T = [];
+  if qarts_isset( Q.ABSORPTION ) & ~isempty(Q.ABSORPTION)
+    T = add_wsms( T, 'ABSORPTION', Q.ABSORPTION, Q, false, wfolder );
+  end %  
   %
-  if qarts_isset( Q.ABSORPTION )
-    rqre_datatype( Q.ABSORPTION, @ischar, 'Q.ABSORPTION' );
-    %
-    if ~( strcmp(Q.ABSORPTION,'OnTheFly') | ...
-          strcmp(Q.ABSORPTION,'LoadTable') | ...
-          strcmp(Q.ABSORPTION,'CalcTable') )
-      error( ['Only recognised choices for *ABSORPTION* are ',...
-                       '''OnTheFly'', ''LoadTable'' and ''CalcTable''.'] );
-    end
-    %
-    if strcmp(Q.ABSORPTION,'OnTheFly') | strcmp(Q.ABSORPTION, 'CalcTable')
-      %
-      if qarts_isset( Q.ABS_LINES_FORMAT )
-        %
-        rqre_datatype( Q.ABS_LINES_FORMAT, @ischar, 'Q.ABS_LINES_FORMAT' );
-        %
-        if strcmp( upper(Q.ABS_LINES_FORMAT), 'NONE' )
-          T{end+1} = '  abs_lines_per_speciesSetEmpty';
-        else
-          %
-          if strcmp(upper(Q.ABS_LINES_FORMAT),'XML')
-            rqre_datatype( Q.ABS_LINES, {@ischar,@iscellstr}, 'Q.ABS_LINES' );
-            if ischar( Q.ABS_LINES )
-              T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
-                                Q.ABS_LINES, wfolder, Q.INPUT_FILE_FORMAT );
-            else
-              T = file_or_data( T, 'abs_lines', 'ArrayOfAbsorptionLines', ...
-                                Q.ABS_LINES{1}, wfolder, Q.INPUT_FILE_FORMAT );
-              T{end+1} = '  ArrayOfAbsorptionLinesCreate( appending_lines )';
-              for i = 2 : length(Q.ABS_LINES)
-                T = file_or_data( T, 'appending_lines', 'ArrayOfAbsorptionLines', ...
-                                  Q.ABS_LINES{i}, wfolder, Q.INPUT_FILE_FORMAT );
-                T{end+1} = '  abs_linesAppendWithLines(abs_lines,appending_lines,0)';
-              end
-            end
-          else
-            if ~ischar( Q.ABS_LINES )
-              error( ...
-               'Q.ABS_LINES must be a filename for formats beside XML.' );
-            end
-            filename = Q.ABS_LINES;
-            %
-            if qarts_isset( Q.ABS_LINES_FLIMS )
-              if ~( isnumeric( Q.ABS_LINES_FLIMS )  &  ...
-                    length( Q.ABS_LINES_FLIMS ) == 2 )
-                error( ...
-                 'If set, Q.ABS_LINES_FLIMS must be a vector of length 2' );
-              end
-              f1 = Q.ABS_LINES_FLIMS(1);
-              f2 = Q.ABS_LINES_FLIMS(2);
-            else
-                f1 = 0;
-                f2 = 1e99;
-            end
-            T{end+1} = sprintf( '  Read%s(abs_lines,"%s",%.3e,%.3e,"","")', ...
-                                upper(Q.ABS_LINES_FORMAT), filename, f1, f2 );
-            %
-            if qarts_isset( Q.ABS_LINESHAPE )
-              rqre_datatype( Q.ABS_LINESHAPE, @ischar, 'Q.ABS_LINESHAPE' );
-              T{end+1} = sprintf( '  abs_linesSetLineShapeType(abs_lines,"%s")', ...
-                                 Q.ABS_LINESHAPE );
-            end
-            %
-            if qarts_isset( Q.ABS_LINESHAPE_FACTOR )
-              rqre_datatype( Q.ABS_LINESHAPE_FACTOR, @ischar, ...
-                             'Q.ABS_LINESHAPE_FACTOR' ); ...
-              T{end+1} = sprintf( '  abs_linesSetNormalization(abs_lines,"%s")', ...
-                                  Q.ABS_LINESHAPE_FACTOR );
-            end
-            %
-            if qarts_isset( Q.ABS_LINESHAPE_CUTOFF )
-              rqre_datatype( Q.ABS_LINESHAPE_CUTOFF, @istensor0, ...
-                             'Q.ABS_LINESHAPE_CUTOFF' );
-              if Q.ABS_LINESHAPE_CUTOFF < 0
-                T{end+1} = sprintf( '  abs_linesSetCutoff(abs_lines,"None",-1)' );
-              else
-                T{end+1} = sprintf( '  abs_linesSetCutoff(abs_lines,"ByLine",%e)', ...
-                                    Q.ABS_LINESHAPE_CUTOFF );
-              end
-            end
-            %
-            if qarts_isset( Q.ABS_LINESHAPE_MIRRORING )
-              rqre_datatype( Q.ABS_LINESHAPE_MIRRORING, @ischar, ...
-                             'Q.ABS_LINESHAPE_MIRRORING' ); ...
-              T{end+1} = sprintf( '  abs_linesSetMirroring(abs_lines,"%s")', ...
-                                  Q.ABS_LINESHAPE_MIRRORING );
-            end
-            %
-          end
-          %
-          T{end+1} = '  abs_lines_per_speciesCreateFromLines';
-          %
-        end  % not NONE
-      end
-    end
-
-    if ~isfield( Q, 'abs_xsec_agenda' )
-      T = add_agenda( T, 'abs_xsec_agenda', { ...
-                         'abs_xsec_per_speciesInit', ...
-                         'abs_xsec_per_speciesAddLines', ...
-                         'abs_xsec_per_speciesAddConts' }, ...
-                      Q, wfolder );
-    end
-
-    if strcmp( Q.ABSORPTION, 'OnTheFly' )
-      %
-      if ~isfield( Q, 'propmat_clearsky_agenda' )
-        T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-                           'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-                           'propmat_clearskyInit', 'propmat_clearskyAddOnTheFly' }, ...
-                        Q, wfolder );                            
-      end
-      %
-    elseif strcmp( Q.ABSORPTION, 'CalcTable' )
-      %
-      T{end+1} = '  abs_lookupCalc';
-      if ~isfield( Q, 'propmat_clearsky_agenda' )
-        T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-                           'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-                           'Ignore(rtp_nlte)', 'propmat_clearskyInit', ...
-                           'propmat_clearskyAddFromLookup' }, ...
-                        Q, wfolder );                            
-      end
-      %
-      abstable = true;
-      %
-    elseif strcmp( Q.ABSORPTION, 'LoadTable' )
-      %
-      T{end+1} = '  abs_lookupAdapt';
-      if ~isfield( Q, 'propmat_clearsky_agenda' )
-        T = add_agenda( T, 'propmat_clearsky_agenda', { ...
-                           'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
-                           'Ignore(rtp_nlte)', 'propmat_clearskyInit', ...
-                           'propmat_clearskyAddFromLookup' }, ...
-        Q, wfolder );                            
-      end
-      %
-      abstable = true;
-      %
-    end
-  end %  qarts_isset( Q.ABSORPTION )
-  %
-  Q = ftick( Q, { 'ABSORPTION', 'ABS_LINES', 'ABS_LINES_FLIMS', 'ABS_LINES_FORMAT',...
-                  'ABS_LINESHAPE', 'ABS_LINESHAPE_CUTOFF', 'ABS_LINESHAPE_FACTOR',...
-                  'ABS_LINESHAPE_MIRRORING'} );
+  Q = ftick( Q, { 'ABSORPTION' } );
   %
 return
 
 
 %------------------------------------------------------------------------------
 % Adds (in given order):
-%     SENSOR
 %     J
-%     SCATTERRING
+%     PARTICLES
+%     SENSOR
 %
 function [T,Q] = do_modules( Q, wfolder )
   %
-  T = {};
+  T = [];
+  %--- Jacobian
+  if qarts_isset( Q.J )
+    if isempty( Q.J )
+      T{end+1} = '  jacobianOff';
+    else
+      T = add_wsms( T, 'J', Q.J, Q, false, wfolder );
+    end
+  end
+  
+  %--- Particles
+  if qarts_isset( Q.PARTICLES )
+    if isempty( Q.PARTICLES )
+      T{end+1} = '  cloudboxOff';
+    else
+      T = add_wsms( T, 'PARTICLES', Q.PARTICLES, Q, false, wfolder );
+    end
+  end
   
   %--- Sensor
-  if qarts_isset( Q.SENSOR_DO )
-    if ~Q.SENSOR_DO
+  if qarts_isset( Q.SENSOR )
+    if isempty( Q.SENSOR )
       T{end+1} = '  sensorOff';
       T{end+1} = '  AntennaOff';
       T{end+1} = '  FlagOn(sensor_checked)';    
     else
-      % Cfile text 
-      if iscellstr( Q.SENSOR )
-        T = add_wsms( T, 'SENSOR', Q.SENSOR, Q, false, wfolder );
-      % Defined as structure
-      else
-        H = Q.SENSOR;
-        qcheck( @qartsSensor, H );
-        % Find out sensor structure
-        parts{1} = 'init';
-        if qarts_isset( H.STOKES_ROTATION )
-          parts{end+1} = 'rotation';
-        end
-        if qarts_isset( H.INSTRUMENT_POL )
-          parts{end+1} = 'polarisation';
-        end
-        if qarts_isset( H.ANTENNA_DO ) & H.ANTENNA_DO
-          parts{end+1} = 'antenna';
-        end
-        if qarts_isset( H.FILL_FGRID )
-          parts{end+1} = 'fill_fgrid';
-        end
-        if qarts_isset( H.MIXER_DO ) & H.MIXER_DO
-          parts{end+1} = 'mixer';
-        end
-        if qarts_isset( H.IF2RF ) & H.IF2RF
-          parts{end+1} = 'if2rf';
-        end
-        if qarts_isset( H.BACKEND_DO ) & H.BACKEND_DO
-          parts{end+1} = 'backend';
-        end
-        if qarts_isset( H.BEAM_SWITCHING )  &  H.BEAM_SWITCHING
-          parts{end+1} = 'beamswitch';
-        end
-        % If multiple LO are given exchange 'mixer' for 'multimixer' and 'remove
-        % 'backend'
-        if( any(strcmp( 'mixer', parts ))   &  ...
-            any(strcmp( 'backend', parts )) &  length(H.LO) > 1 )
-          %
-          ir        = find( strcmp('mixer',parts) );
-          parts{ir} = 'multimixer';
-          parts     = parts{ find( ~strcmp('backend',parts) ) };
-        end
-        parts{end+1} = 'close';
-
-        for it = 1 : length(parts)
-          %
-          U = {};
-
-          switch parts{it}
-
-          case 'init'
-            U{1} = ['  # Start of sensor part:'];
-            if qarts_isset( H.ANTENNA_DO )  &  ~H.ANTENNA_DO
-              U{end+1} = '  AntennaOff';
-            end
-            if qarts_isset( H.SENSOR_NORM )
-              rqre_datatype( H.SENSOR_NORM, @isboolean, ...
-                                             'Q.SENSOR.SENSOR_NORM' );
-              U{end+1} = sprintf( '  IndexSet(sensor_norm,%d)', H.SENSOR_NORM );
-            end
-            U{end+1} = '  sensor_responseInit';
-
-          case 'fill_fgrid'
-            v = qarts_get( H.FILL_FGRID );
-            if ~( isnumeric(v) & isvector(v) & length(v) == 2 )
-              error( 'The sensor *FILL_FGRID* must be a vector of length 2.' );
-            end
-            U{end+1} = sprintf( ...
-               '  sensor_responseFillFgrid(polyorder=%d,nfill=%d)', v(1), v(2) );
-
-          case 'rotation'
-            U = file_or_data( U, 'stokes_rotation', 'Vector', ...
-                          H.STOKES_ROTATION, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            U{end+1} = '  sensor_responseStokesRotation';
-
-           case 'polarisation'
-            U = file_or_data( U, 'instrument_pol', 'ArrayOfIndex', ...
-                               H.INSTRUMENT_POL, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            U{end+1} = '  sensor_responsePolarisation';
-
-          case 'antenna'
-            if qarts_isset( H.ANTENNA_DLOS )
-              U = file_or_data( U, 'antenna_dlos', 'Matrix', ...
-                             H.ANTENNA_DLOS, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.ANTENNA_RESPONSE )
-              U = file_or_data( U, 'antenna_response', 'GriddedField4',...
-                         H.ANTENNA_RESPONSE, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.ANTENNA_OPTION2D )
-              U{end+1} = sprintf( '  sensor_responseAntenna(option_2d="%s")', ...
-                                  H.ANTENNA_OPTION2D );
-            else
-              U{end+1} = '  sensor_responseAntenna';
-            end
-
-          case 'mixer'
-            if qarts_isset( H.LO )
-              U = file_or_data( U, 'lo', 'Numeric', H.LO, ...
-                                             Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.SIDEBAND_RESPONSE )
-              U = file_or_data( U, 'sideband_response', 'GriddedField1', ...
-                        H.SIDEBAND_RESPONSE, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.SIDEBAND_MODE )
-              U = file_or_data( U, 'sideband_mode', 'String', ...
-                            H.SIDEBAND_MODE, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            U{end+1} = '  sensor_responseMixer';
-
-          case 'if2rf'
-            U{end+1} = '  sensor_responseIF2RF';
-
-          case 'backend'
-            if qarts_isset( H.F_BACKEND )
-              U = file_or_data( U, 'f_backend', 'Vector', H.F_BACKEND, ...
-                                             Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
-              U = file_or_data( U, 'backend_channel_response', ...
-                'ArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ...
-                                             Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if ~qarts_isset( H.F_SWITCHING )
-              U{end+1} = '  sensor_responseBackend';
-            else
-              df = qarts_get( H.F_SWITCHING );
-              if ~( isnumeric(df) & isvector(df) & length(df)==2 )
-              error( 'The sensor *F_SWITCHING* must be a vector of length 2.' );
-              end
-              U{end+1} = '  sensor_responseBackendFrequencySwitching(';
-              U{end+1} = sprintf( '   df1=%.6e, df2=%.6e)', df(1), df(2) );
-            end
-
-           case 'multimixer'
-            if qarts_isset( H.F_SWITCHING )
-              error( 'The sensor *F_SWITCHING* option can not be used together ',...
-                                                             'with multiple LO.' );
-            end
-            if qarts_isset( H.LO )
-              U = file_or_data( U, 'lo_multi', 'Vector', H.LO, Q, wfolder, ...
-                                                         Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.SIDEBAND_RESPONSE )
-              U = file_or_data( U, 'sideband_response_multi', ...
-                         'ArrayOfGriddedField1', H.SIDEBAND_RESPONSE, ...
-                                             Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.SIDEBAND_MODE )
-              U = file_or_data( U, 'sideband_mode_multi', 'ArrayOfString', ...
-                                H.SIDEBAND_MODE, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.F_BACKEND )
-              U = file_or_data( U, 'f_backend_multi', 'ArrayOfVector', ...
-                                H.F_BACKEND, Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            if qarts_isset( H.BACKEND_CHANNEL_RESPONSE )
-              U = file_or_data( U, 'backend_channel_response_multi', ....
-                     'ArrayOfArrayOfGriddedField1', H.BACKEND_CHANNEL_RESPONSE, ...
-                                             Q, wfolder, Q.INPUT_FILE_FORMAT );
-            end
-            U{end+1} = '  sensor_responseMultiMixerBackend';
-
-          case 'beamswitch'
-            U{1} = '  sensor_responseBeamSwitching';
-
-          case 'close'
-            U{1} = '  sensor_checkedCalc';
-            U{2} = '  # End of sensor part';
-
-          otherwise
-            error(sprintf('Unknown action (%s) was requested.',parts{it}));
-          end
-          %
-          T = { T{:} U{:} };
-          %
-        end %for parts
-      end %
+      T = add_wsms( T, 'SENSOR', Q.SENSOR, Q, false, wfolder );
     end
   end
-  Q = ftick( Q, { 'SENSOR_DO', 'SENSOR' } );
-
   
-  %--- Jacobian and OEM
-  if qarts_isset( Q.J_DO )
-    if ~Q.J_DO
-      T{end+1} = '  jacobianOff';
-    else
-      error( 'Retrievals not yet handled' );
-    end
-  end
-  Q = ftick( Q, { 'J_DO' } );
-
-  
-  %--- Scattering
-  if qarts_isset( Q.SCATTERING_DO )
-    if ~Q.SCATTERING_DO
-      T{end+1} = '  cloudboxOff';
-    else
-      error( 'Scattering not yet handled' );
-    end
-  end
-  Q = ftick( Q, { 'SCATTERING_DO' } );
+  Q = ftick( Q, { 'PARTICLES', 'SENSOR', 'J' } );
 return
 
 

@@ -34,13 +34,14 @@ Q.INCLUDES              = { fullfile( 'ARTS_INCLUDES', 'general.arts' ), ...
 
 %= De-activate parts not used
 %
-Q.SCATTERING_DO         = false;
-Q.J_DO                  = false;
+Q.PARTICLES             = [];
+Q.J                     = [];
   
 
 %= Some basic settings
 %
 Q.output_file_format    = 'ascii';
+Q.CHECKS_DO             = 1;
 
 
 %= Define atmosphere and surface
@@ -83,22 +84,28 @@ Q.lon_true              = -30;
 
 %= Absorption species
 %
-Q.ABS_SPECIES(1).TAG{1} = 'ClO';
-Q.ABS_SPECIES(2).TAG    = { 'O3' };   % Note the different way to set TAG!
-Q.ABS_SPECIES(3).TAG{1} = 'N2O';
-Q.ABS_SPECIES(4).TAG{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
-Q.ABS_SPECIES(4).TAG{2} = 'H2O-PWR98';
-Q.ABS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
+Q.GAS_SPECIES(1).TAG{1} = 'ClO';
+Q.GAS_SPECIES(2).TAG    = { 'O3' };   % Note the different way to set TAG!
+Q.GAS_SPECIES(3).TAG{1} = 'N2O';
+Q.GAS_SPECIES(4).TAG{1} = 'H2O-*-490e9-510e9';   % Some local lines not in PWR98
+Q.GAS_SPECIES(4).TAG{2} = 'H2O-PWR98';
+Q.GAS_SPECIES(5).TAG{1} = 'N2-SelfContStandardType';
 
 
 %= Calculation of absorption
 %
-Q.ABSORPTION            = 'OnTheFly';  % A simple, but slow, option!
-Q.ABS_LINES_FORMAT      = 'ARTSCAT';
-Q.ABS_LINES             = fullfile( atmlab_example_data , 'lines501.4' );
-Q.ABS_LINESHAPE         = 'VP';
-Q.ABS_LINESHAPE_CUTOFF  = -1;
-Q.ABS_LINESHAPE_FACTOR  = 'VVH';
+Q.abs_xsec_agenda        = { 'abs_xsec_per_speciesInit', ...
+                             'abs_xsec_per_speciesAddLines', ...
+                             'abs_xsec_per_speciesAddConts' };
+Q.propmat_clearsky_agenda = { 'Ignore(rtp_mag)', 'Ignore(rtp_los)', ...
+                              'propmat_clearskyInit', ...
+                              'propmat_clearskyAddOnTheFly' };
+Q.ABSORPTION{end+1} = sprintf( 'ReadARTSCAT(%s="%s",%s="%s",%s="%s")', ...
+                               'filename', ...
+                               fullfile( atmlab_example_data , 'lines501.4' ), ...
+                               'normalization_option', 'VVH', ...
+                               'lineshapetype_option', 'VP' );
+Q.ABSORPTION{end+1} = 'abs_lines_per_speciesCreateFromLines';
 
 
 %= Set RTE variables (refraction is here neglected)
@@ -135,19 +142,17 @@ Q.f_grid                = linspace( 501.18e9, 501.58e9, 201 )';
 % antenna pattern.
 %
 if 0
-  Q.SENSOR_DO           = false;
-else    
-  Q.SENSOR_DO           = true;
+  Q.SENSOR              = [];
+else 
+  Q.sensor_norm         = 1;
   Q.antenna_dim         = 1;
+  Q.antenna_dlos         = 0;  
   Q.mblock_dlos_grid    = [-0.04:0.02:0.04]';
+  Q.antenna_response    = fullfile( atmlab_example_data, 'antenna.xml' );
   %
-  H                     = qartsSensor;
-  H.SENSOR_NORM         = true;
-  H.ANTENNA_DO          = true;
-  H.ANTENNA_DLOS        = 0;
-  H.ANTENNA_RESPONSE    = fullfile( atmlab_example_data, 'antenna.xml' );
-  %
-  Q.SENSOR              = H;
+  Q.SENSOR{end+1}       = 'sensor_responseInit';
+  Q.SENSOR{end+1}       = 'sensor_responseAntenna';
+  Q.SENSOR{end+1}       = 'sensor_checkedCalc';
 end
 
 

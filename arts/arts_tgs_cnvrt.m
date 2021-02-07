@@ -10,10 +10,10 @@
 %    
 %    The function handles also definition of multiple species. The data must
 %    then be packed into the field 'TAG' of a structure array:  
-%       a.TAG{1} = 'ClO';
-%       a.TAG{1} = 'O3';
-%       a,TAG{1} = 'H2O';
-%       a.TAG{2} = 'H2O-MPM89';
+%       a(1).TAG{1} = 'ClO';
+%       a(2).TAG{1} = 'O3';
+%       a(3).TAG{1} = 'H2O';
+%       a(3).TAG{2} = 'H2O-MPM89';
 %    which results in the string
 %       '"ClO","O3","H2O,H2O-MPM89"'
 %

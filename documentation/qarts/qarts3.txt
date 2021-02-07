@@ -8,7 +8,7 @@ a Q structure properly set, the ARTS run is done as
 
 >> U = qarts_run( Q );
 
-The oUtput of ARTS is returned in the structure U. The function *qarts_run* has
+The output of ARTS is returned in the structure U. The function *qarts_run* has
 some optional arguments that can be used of a more experienced user. Do
 
 >> help qarts3_run
@@ -32,14 +32,12 @@ default values.
 
 
 The fields defined in *qarts3* represent mainly higher level help features, to
-help you top set a group of variables, such as defining the sensor by Q.SENSOR.
-Note that these fields can contain sub-fields that match workspace variables,
-sp be aware of possible conflicts if you have defined these variables in other
-ways as well.
+help you to set a group of variables. Note that these fields can cause
+conflicts if you have defined these variables in other ways as well.
 
-As an example the distinction between Q.atmosphere_dim and Q.ATMOSPHERE_DIM can
-be used. The fist field just sets the atmosphere_dim workspace variable, while
-the later triggers a call of AtmosphereSet1D, AtmosphereSet2D or
+As an example, the distinction between Q.atmosphere_dim and Q.ATMOSPHERE_DIM
+can be used. The first field just sets the atmosphere_dim workspace variable,
+while the later triggers a call of AtmosphereSet1D, AtmosphereSet2D or
 AtmosphereSet3D which also sets some other variables to suitable default
 values.
 
