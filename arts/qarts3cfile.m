@@ -13,9 +13,9 @@
 %       HSE
 %       ABSORPTION
 %       WSMS_AT_HALFWAY
-%       PARTICLES
 %       SENSOR
 %       J
+%       PARTICLES
 %       CHECKS_DO
 %       WSMS_AT_END
 %
@@ -277,7 +277,7 @@ function [T,Q] = do_atmsurffields( Q, wfolder )
   if qarts_isset( Q.GAS_SPECIES )
     rqre_datatype( Q.GAS_SPECIES, @isstruct, 'Q.GAS_SPECIES' );
     rqre_field( Q.GAS_SPECIES, 'TAG', 'Q.GAS_SPECIES' );
-    T{end+1} = sprintf( 'abs_speciesSet(species=[%s])', ...
+    T{end+1} = sprintf( '  abs_speciesSet(species=[%s])', ...
                                            arts_tgs_cnvrt(Q.GAS_SPECIES) );
   end
   %
@@ -337,13 +337,25 @@ return
 
 %------------------------------------------------------------------------------
 % Adds (in given order):
+%     SENSOR
 %     J
 %     PARTICLES
-%     SENSOR
 %
 function [T,Q] = do_modules( Q, wfolder )
   %
   T = [];
+  
+  %--- Sensor
+  if qarts_isset( Q.SENSOR )
+    if isempty( Q.SENSOR )
+      T{end+1} = '  sensorOff';
+      T{end+1} = '  AntennaOff';
+      T{end+1} = '  FlagOn(sensor_checked)';    
+    else
+      T = add_wsms( T, 'SENSOR', Q.SENSOR, Q, false, wfolder );
+    end
+  end
+
   %--- Jacobian
   if qarts_isset( Q.J )
     if isempty( Q.J )
@@ -359,17 +371,6 @@ function [T,Q] = do_modules( Q, wfolder )
       T{end+1} = '  cloudboxOff';
     else
       T = add_wsms( T, 'PARTICLES', Q.PARTICLES, Q, false, wfolder );
-    end
-  end
-  
-  %--- Sensor
-  if qarts_isset( Q.SENSOR )
-    if isempty( Q.SENSOR )
-      T{end+1} = '  sensorOff';
-      T{end+1} = '  AntennaOff';
-      T{end+1} = '  FlagOn(sensor_checked)';    
-    else
-      T = add_wsms( T, 'SENSOR', Q.SENSOR, Q, false, wfolder );
     end
   end
   
