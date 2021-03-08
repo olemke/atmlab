@@ -1,8 +1,16 @@
+2021-03-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-11
+
+	* site-specific/onsala/oi22_invert.m: Put plotting in sub-functions.
+
 2021-02-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-10
 
-	* onsala new site-specific folder.
+	* site-specific/onsala: new site-specific folder. Contains code
+	for inverting the 22 GHz ground-based observations at Onsala Space
+	Observatory.
 
 2021-02-10  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 

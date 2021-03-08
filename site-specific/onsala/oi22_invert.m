@@ -28,18 +28,16 @@ itest          = [1:R.phase1_ntest size(O.tb,1)+[-R.phase1_ntest+1:0]];
 Qy             = Q;
 Qy.J           = [];
 Qy.WSMS_AT_END = { 'yCalc', '<OUTPUT> y' };
-iter           = 1;
+iter           = 0;
 %
 while R.phase1_do
-  U   = qarts3_run( Qy, P.workfolder );
-  dtb = mean( U.y(itest) - O.tb(itest,io) );
+  iter = iter + 1;
+  U    = qarts3_run( Qy, P.workfolder );
+  dtb  = mean( U.y(itest) - O.tb(itest,io) );
+  %
   if R.show_plots
-    figure(1)
-    plot( O.freq/1e9, O.tb(:,io), O.freq/1e9, U.y );
-    title( sprintf('Case %d: phase 1, iteration %d', io, iter ) );
-    xlabel( 'Frequency [GHz]' ), ylabel( 'Tb [K]' ), 
-    drawnow
-  end  
+    do_fig1( O, U, io, iter ); 
+  end
   %
   if abs(dtb) < R.phase1_dtb
     R.phase1_do = false;
@@ -48,7 +46,6 @@ while R.phase1_do
     Qy.vmr_field(3,:) = Qy.vmr_field(3,:) .* ( 1 + fac * ...
       ( 1 - linear_transition( R.phase1_bp1, R.phase1_bp2, Q.z_field ) ) )';    
   end
-  iter = iter + 1;
 end
 %
 Q.vmr_field = Qy.vmr_field;
@@ -60,7 +57,6 @@ clear Qy
 Q = set_q_local( Q, P, R, A, O, io );
 
 
-
 %-------------------------------------------------------------------------
 %- Phase 2: Run OEM with Guass-Newton
 %-------------------------------------------------------------------------
@@ -68,27 +64,8 @@ Q = set_q_local( Q, P, R, A, O, io );
 U = qarts3_run( Q, P.workfolder );
 %
 if R.show_plots
-  %
-  l  = length( R.h2o.grid );
-  z  = interpp( A.p, A.z, R.h2o.grid );
-  p0 = interpp( A.p, A.h2o, R.h2o.grid );
-  p1 = interpp( A.p, Q.vmr_field(3,:)', R.h2o.grid );
-  p2 = U.x(1:l) .* p1;
-  %
-  figure(2)
-  subplot(2,1,1)
-  plot( 1e6*p0, z/1e3, '--', 1e6*p2, z/1e3, '-' );
-  axis([0 11 20 90]);
-  title( sprintf('Case %d: phase 2, convergence %d', io, U.oem_diagnostics(1) ) );
-  xlabel( 'H2O VMR [ppm]' ), ylabel( 'Altitude [km]' );
-  %
-  subplot(2,1,2)
-  semilogx( p0, z/1e3, '--', p1, z/1e3, '-.' , p2, z/1e3, '-' );
-  axis([1e-4 0.03 0 9]);
-  xlabel( 'H2O VMR [-]' ), ylabel( 'Altitude [km]' );
-  legend( 'ERA5+Fascod', 'Phase 1', 'Phase 2', 'Location', 'North' );
-  drawnow
-end  
+  do_fig2( A, Q, R, U, io );
+end
 
 
 %-------------------------------------------------------------------------
@@ -101,27 +78,14 @@ if R.phase3_do & U.oem_diagnostics(1)
   U                        = qarts3_run( Q, P.workfolder );
   %
   if R.show_plots
-    %
-    p3 = U.x(1:l) .* p1;
-    %
-    figure(3)
-    subplot(2,1,1)
-    plot( 1e6*p0, z/1e3, '--', 1e6*p3, z/1e3, '-' );
-    axis([0 11 20 90]);
-    title( sprintf('Case %d: phase 2, convergence %d', io, U.oem_diagnostics(1) ) );
-    xlabel( 'H2O VMR [ppm]' ), ylabel( 'Altitude [km]' );
-    %
-    subplot(2,1,2)
-    semilogx( p0, z/1e3, '--', p2, z/1e3, '-.' , p3, z/1e3, '-' );
-    axis([1e-4 0.03 0 9]);
-    xlabel( 'H2O VMR [-]' ), ylabel( 'Altitude [km]' );
-    legend( 'ERA5+Fascod', 'Phase 2', 'Phase 3', 'Location', 'SouthWest' );
-    drawnow
+    do_fig3( A, Q, R, U, io );
   end  
 end
 
 
 %- Fill L2
+%
+l                  = length( R.h2o.grid );
 %
 L2.convergence     = U.oem_diagnostics(1);
 L2.cost            = U.oem_diagnostics(3);
@@ -151,24 +115,14 @@ end
 %- Plot residual?
 %
 if R.show_plots
-  figure(4)
-  plot( O.freq/1e9, L2.yfitted-O.tb(:,io) )
-  hold on
-  plot( O.freq/1e9, L2.baseline, 'LineWidth', 2 )
-  hold off
-  xlabel( 'Frequency [GHz]' );
-  ylabel( 'Tb [K]' );
-  legend( 'Residual', 'Baseline' );
+  do_fig4( L2, O, io );
 end
 
 return
 
 
-
-
-
 %--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
+%--- Sub-functions
 %--------------------------------------------------------------------------
 
 function Q = set_q_local(Q,P,R,A,O,io);
@@ -270,4 +224,73 @@ Q.WSMS_AT_END{end+1}     = '<OUTPUT> retrieval_eo';
 Q.WSMS_AT_END{end+1}     = '<OUTPUT> retrieval_ss';
 Q.WSMS_AT_END{end+1}     = '<OUTPUT> avk';
 
+return
+
+
+
+function do_fig1( O, U, io, iter )
+  figure(1)
+  plot( O.freq/1e9, O.tb(:,io), O.freq/1e9, U.y );
+  title( sprintf('Case %d: phase 1, iteration %d', io, iter ) );
+  xlabel( 'Frequency [GHz]' ), ylabel( 'Tb [K]' ), 
+  drawnow
+return
+
+
+function do_fig2( A, Q, R, U, io )
+  l  = length( R.h2o.grid );
+  z  = interpp( A.p, A.z, R.h2o.grid );
+  p0 = interpp( A.p, A.h2o, R.h2o.grid );
+  p1 = interpp( A.p, Q.vmr_field(3,:)', R.h2o.grid );
+  p2 = U.x(1:l) .* p1;
+  %
+  figure(2)
+  subplot(2,1,1)
+  plot( 1e6*p0, z/1e3, '--', 1e6*p2, z/1e3, '-' );
+  axis([0 11 20 90]);
+  title( sprintf('Case %d: phase 2, convergence %d', io, U.oem_diagnostics(1) ) );
+  xlabel( 'H2O VMR [ppm]' ), ylabel( 'Altitude [km]' );
+  %
+  subplot(2,1,2)
+  semilogx( p0, z/1e3, '--', p1, z/1e3, '-.' , p2, z/1e3, '-' );
+  axis([1e-4 0.03 0 9]);
+  xlabel( 'H2O VMR [-]' ), ylabel( 'Altitude [km]' );
+  legend( 'ERA5+Fascod', 'Phase 1', 'Phase 2', 'Location', 'North' );
+  drawnow
+return
+
+
+function do_fig3( A, Q, R, U, io )
+  l  = length( R.h2o.grid );
+  z  = interpp( A.p, A.z, R.h2o.grid );
+  p0 = interpp( A.p, A.h2o, R.h2o.grid );
+  p1 = interpp( A.p, Q.vmr_field(3,:)', R.h2o.grid );
+  p2 = U.x(1:l) .* p1;
+  p3 = U.x(1:l) .* p1;
+  %
+  figure(3)
+  subplot(2,1,1)
+  plot( 1e6*p0, z/1e3, '--', 1e6*p3, z/1e3, '-' );
+  axis([0 11 20 90]);
+  title( sprintf('Case %d: phase 2, convergence %d', io, U.oem_diagnostics(1) ) );
+  xlabel( 'H2O VMR [ppm]' ), ylabel( 'Altitude [km]' );
+  %
+  subplot(2,1,2)
+  semilogx( p0, z/1e3, '--', p2, z/1e3, '-.' , p3, z/1e3, '-' );
+  axis([1e-4 0.03 0 9]);
+  xlabel( 'H2O VMR [-]' ), ylabel( 'Altitude [km]' );
+  legend( 'ERA5+Fascod', 'Phase 2', 'Phase 3', 'Location', 'SouthWest' );
+  drawnow
+return
+
+
+function do_fig4( L2, O, io )
+  figure(4)
+  plot( O.freq/1e9, L2.yfitted-O.tb(:,io) )
+  hold on
+  plot( O.freq/1e9, L2.baseline, 'LineWidth', 2 )
+  hold off
+  xlabel( 'Frequency [GHz]' );
+  ylabel( 'Tb [K]' );
+  legend( 'Residual', 'Baseline' );
 return
