@@ -23,6 +23,8 @@ Q    = q_demo;           % Local file, found below
 %
 Y = y_demo( Q );  
 
+size(Y)
+return
 
 %- OEM variables
 %

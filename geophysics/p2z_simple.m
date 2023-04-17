@@ -11,6 +11,7 @@
 %        
 % OUT   z   Altitudes [m]
 % IN    p   Pressure [Pa]
+% OPT   checkalt    Variable to ovveride altitude check
 
 % 2005-05-11   Created by Patrick Eriksson.
 
@@ -21,8 +22,8 @@ if nargin < 2
 end
 
 if checkalt
-    if any( p < 0.01 )
-        error( 'Pressures below 0.01 Pa are not accepted.' );
+    if any( p < 0.003 )
+        error( 'Pressures below 0.003 Pa (120 km) are not accepted.' );
     end
 end
 

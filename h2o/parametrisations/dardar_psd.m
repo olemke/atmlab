@@ -8,14 +8,15 @@
 % include de=0, this OK but requires a sorted de (i.e. de(1)=0). The zero
 % size is than replaced with 0.1*de(2) and a hopefully useful psd is obtained.
 %
-% FORMAT [psd,N0star,dm] = dardar_psd(de,rho,iwc,paramater_value,paramater_name[,version])
+% FORMAT [psd,N0star,dm] = dardar_psd(de,rho,iwc,paramater_value,paramater_name
+%                            [,version,alpha,beta])
 %
 % OUT    psd              particle size distribution vector
 %        N0star           Input or derived value for this parameter.
 %        dm               Input or derived value for this parameter.
 % IN     de               Particle size grid [m].
 %        rho              Density of medium [Kg/m3]
-%        iwc              Oce water content
+%        iwc              Ice water content
 %        parameter_value  Options are the value of N0star, Dm (mean size by mass)
 %                         or temperature.
 %                         N0star and Dm are psd parameter as defined in Delanoe.
@@ -33,16 +34,21 @@
 %                             'v2': Set to values applied in DARDAR V2.1,
 %                                   according to Cazenave et al, AMT, 2019
 %                                   (Fig 2). This is the default option.
-%                             'vX': Set to values applied in DARDAR V2,
+%                             'v3': Set to values applied in DARDAR V3,
 %                                   according to Cazenave et al, AMT, 2019.
 %                                   These values are also found as "All" in
-%                                   Table 4 of D14. 
+%                                   Table 4 of D14. This is the default option.
+%                           'user': User defined values. In this case alpha and
+%                                   beta must be given as arguments.
+%        alpha            Value of alpha. Only used with version='user'
+%        beta             Value of beta. Only used with version='user'
 
 % History: created by Bengt Rydberg, modified 2017-02-10
 
-function [psd,N0star,dm] = dardar_psd(de,rho,iwc,parameter_value,parameter_name,version)
+function [psd,N0star,dm] = ...
+  dardar_psd(de,rho,iwc,parameter_value,parameter_name,version,alpha,beta)
 %
-if nargin < 6 | isempty(version), version = 'v2'; end
+if nargin < 6 | isempty(version), version = 'v3'; end
 
 % The function has been tested to give agreement with Fig 2 in Cazenave et al,
 % AMT, 2019. This for N0star and Dm options.
@@ -73,27 +79,29 @@ psd = zeros(length(N0star), length(de));
 % dardar-psd parameters for n(De)
 switch lower(version)
   case 'd14'
-    alfa = -0.237;
+    alpha = -0.237;
     beta = 1.839;
   case 'v2'
-    alfa = -2;
+    alpha = -2;
     beta = 4;
-  case 'vx'
-    alfa = -0.262;
+  case 'v3'
+    alpha = -0.262;
     beta = 1.754;
+  case 'user'
+    %
   otherwise
-    error( 'Allowed options for *version* are: ''d14'', ''v2'' and ''vX''.' );
+    error( 'Allowed options for *version* are: ''d14'', ''v2'', ''v3'' and ''user''.' );
 end
 
 
 for i = 1:length(iwc)
   X = de / dm(i);
   f0 = beta * gamma(4) / 4^4;
-  g4 = gamma((alfa + 4)/beta);
-  g5 = gamma((alfa + 5)/beta);
-  f1 = g5^(4 + alfa) / g4^(5 + alfa);
+  g4 = gamma((alpha + 4)/beta);
+  g5 = gamma((alpha + 5)/beta);
+  f1 = g5^(4 + alpha) / g4^(5 + alpha);
   f2 = g5 / g4;
-  n_norm = f0 * f1 * X.^alfa .* exp( -(X * f2).^beta );
+  n_norm = f0 * f1 * X.^alpha .* exp( -(X * f2).^beta );
   psd(i, :) = N0star(i) * n_norm;
 end
 ind = find(isnan(psd));

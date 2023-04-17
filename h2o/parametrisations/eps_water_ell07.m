@@ -12,7 +12,7 @@
 %  OUT   z   Complex relative permittivity (dielectric constant)
 %
 %  IN    f   Frequency [Hz]. 0 - 25 THz.
-%        T   Temperature [K]. 273.15 - 373.15 K.
+%        T   Temperature [K]. 233 - 373.15 K.
 %
 
 % Created by Bengt Rydberg 2017-01-02
@@ -22,8 +22,8 @@ function e = eps_water_ell07(f_grid, t)
 if min(f_grid) < 0 | max(f_grid) > 25e12
   error('Valid range for frequency is 0 - 25 THz');
 end
-if min(t) < 273.15  |  max(t) > 373.15
-  error('Valid range for temperature is 273.15 - 373.15K');
+if min(t) < 225  |  max(t) > 373.15
+  error('Valid range for temperature is 225 - 373.15K');
 end
 
 

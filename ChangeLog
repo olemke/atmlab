@@ -1,3 +1,18 @@
+2023-04-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-12
+
+	* raytrace: Started this set of simple ray tracing functions.
+
+2021-06-22  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* geophysics/p2z_simple.m: Set pressure limit to be more
+	consistent with the altitude limit in z2p_simple. Also fixed
+	missing do of opt argument.
+
+	* arts/qarts3cfile.m: atmfields_checkedCalc now called with
+	bad_partition_functions_ok=1.
+
 2021-03-08  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-11

@@ -1,0 +1,17 @@
+The fields of S:
+---
+r_planet : The radius of the (spherical) planet
+n_funct  : Function handle to refractive index function
+n_params : Parameters to refractive index function
+l_step   : Ray tracing step length
+
+
+The fields of P:
+---
+alpha  : Angle in cylindrical coordinate system
+length : The length from transmitter along the path 
+n      : Refractive index
+r      : Radius in cylindrical coordinate system
+theta  : Local zenith angle of propagation
+x      : x of Cartesian coordinate system (transmitter at x=0)
+y      : y of Cartesian coordinate system
