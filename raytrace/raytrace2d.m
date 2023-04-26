@@ -35,13 +35,14 @@ i = 1;
 f = 180 * S.l_step / pi;
 %
 while P(i).length < l_stop
-    % Make sure to not more below ground
+    % Make sure to not move below ground
     l_step   = S.l_step;
     surf_hit = false;
     if P(i).theta > 90
         k        = S.r_planet / sind(P(i).theta);
         l2ground = k * sind(P(i).theta + asind(P(i).r/k) - 180);
-        if l2ground <= S.l_step
+        % l2ground gets imaginary if no intersection with ground!
+        if isreal(l2ground) && l2ground <= S.l_step
             l_step   = l2ground;
             surf_hit = true;
         end
