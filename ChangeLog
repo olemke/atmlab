@@ -1,3 +1,10 @@
+2023-04-26  Patrick Eriksson  <patrick.eriksson@chalmers.se>
+
+	* atmlab-2-5-13
+
+	* raytrace/raytrace2d.m: Changing algorithm, to also handle
+	trapping layers. Work in progress.
+
 2023-04-11  Patrick Eriksson  <patrick.eriksson@chalmers.se>
 
 	* atmlab-2-5-12
